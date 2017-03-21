@@ -1,0 +1,75 @@
+<!--
+App global configuration
+-->
+<link rel="import" href="../../bower_components/etools-dexiejs/etools-dexiejs.html">
+<link rel="import" href="../../scripts/lodash/lodash.html">
+
+<script>
+    'use strict';
+
+    /* exported etoolsAjaxDefaultDexieDbPrefix */
+    var etoolsAjaxDefaultDexieDbPrefix = 'frontendTemplate';
+
+    var etoolsAppConfig = {
+      // dexie js
+      appDexieDb: new Dexie('etoolsApp'),
+
+      // app endpoints
+      endpoints: {
+        userInfo: {
+          url: '/users/api/profile/',
+          exp: 30 * 60 * 1000, // 30min
+          cachingKey: 'userData'
+        },
+        countries: {
+          url: '../../data/countries.json',
+          exp: 6 * 60 * 60 * 1000, // 6h
+          cachingKey: 'countries'
+        },
+        testTemplateEndpointUse: {
+          template: '/api/country/<%=id%>',
+          exp: 30 * 60 * 1000, // 30min
+          cachingKey: 'countries'
+        }
+      },
+
+      globals: {
+        // globals
+        baseSite: window.location.origin,
+        basePath: (window.location.port === '8080') ? '/' : '/partners/',
+
+        getEndpoint: function(endpointName, data) {
+          var endpoint = etoolsAppConfig.endpoints[endpointName];
+          if (endpoint && endpoint.hasOwnProperty('template') && endpoint.template !== '') {
+            endpoint.url = this.baseSite + _.template(endpoint.template)(data);
+          }
+          return endpoint;
+        },
+
+        getAllPermissions: function() {
+          return etoolsAppConfig.permissions;
+        }
+      },
+
+      // permissions
+      permissions: {
+        superPermissions: ['loggedInDefault', 'userInfoMenu',
+                           'interventionsMenu', 'statsMenu'], //for testing
+        partnerOnlyPermissions: ['interventionsMenu'],
+        defaultPermissions: ['loggedInDefault','userInfoMenu'],
+        partnerPermissions: ['interventionsMenu'],
+        managementPermissions: ['statsMenu']
+      },
+
+    };
+
+    /**
+     * for db versioning check
+     * https://github.com/dfahlander/Dexie.js/wiki/Design#database-versioning
+     */
+    etoolsAppConfig.appDexieDb.version(1).stores({
+      collectionsList: '&name,expire',
+      countries: 'id, name'
+    });
+
+</script>

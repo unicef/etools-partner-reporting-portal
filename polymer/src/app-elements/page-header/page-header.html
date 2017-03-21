@@ -1,0 +1,77 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout.html">
+
+<link rel="import" href="../../../bower_components/etools-page-refresh/etools-page-refresh.html">
+
+<link rel="import" href="../countries-dropdown/countries-dropdown.html">
+
+<link rel="import" href="../../../styles/shared-styles.html">
+
+<dom-module id="page-header">
+
+  <template>
+    <style include="shared-styles">
+      div[main-title] {
+        position: relative;
+        bottom: 1px;
+        margin-left: 24px;
+        text-transform: capitalize;
+      }
+
+      div[main-title],
+      etools-page-refresh {
+        color: var(--light-primary-text-color);
+      }
+
+      #menuButton {
+        display: block;
+      }
+
+      .right-side {
+        @apply(--layout-horizontal);
+        @apply(--layout-center);
+      }
+
+      etools-page-refresh {
+        margin-left: 25px;
+      }
+
+      @media (min-width: 850px) {
+        #menuButton {
+          display: none;
+        }
+        div[main-title] {
+          margin-left: 32px;
+        }
+      }
+    </style>
+    <app-toolbar>
+      <paper-icon-button id="menuButton" class="light" icon="menu" on-tap="openDrawer"></paper-icon-button>
+      <div main-title>{{title}}</div>
+      <div class="right-side">
+        <countries-dropdown id="countries" countries="[[countries]]"></countries-dropdown>
+        <etools-page-refresh></etools-page-refresh>
+      </div>
+    </app-toolbar>
+  </template>
+
+  <script>
+    (function() {
+      Polymer({
+        is: 'page-header',
+
+        properties: {
+          title: String
+        },
+
+        openDrawer: function() {
+          this.fire('drawer');
+        }
+
+      });
+    })();
+  </script>
+
+</dom-module>

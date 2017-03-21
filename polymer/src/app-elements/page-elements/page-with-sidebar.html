@@ -1,0 +1,38 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../../bower_components/etools-content-panel/etools-content-panel.html">
+
+<dom-module id="page-with-sidebar">
+  <template>
+    <style include="page-layout-styles">
+      :host {
+        @apply(--layout-horizontal);
+        width: 100%;
+      }
+    </style>
+
+    <div id="pageContent">
+      <etools-content-panel title="Some data">
+        <p>Tab 1 page data section...</p>
+      </etools-content-panel>
+    </div>
+
+    <div id="sidebar">
+      <etools-content-panel title="Some sidebar content">
+        <p>Synced from VISION</p>
+      </etools-content-panel>
+    </div>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'page-with-sidebar'
+      });
+
+    })();
+  </script>
+</dom-module>

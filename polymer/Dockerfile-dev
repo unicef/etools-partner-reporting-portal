@@ -1,0 +1,14 @@
+FROM mhart/alpine-node:7
+
+RUN apk update
+RUN apk add git
+
+RUN npm install -g polymer-cli
+
+RUN mkdir /code/
+
+VOLUME ".:/code"
+
+WORKDIR /code
+
+CMD ["polymer", "serve"]

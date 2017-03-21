@@ -1,0 +1,119 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../../bower_components/iron-collapse/iron-collapse.html">
+<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
+
+<dom-module id="side-bar-item">
+
+  <template>
+
+    <style>
+
+      :host {
+        display: block;
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      :host([hidden]) {
+        display: none;
+      }
+
+      iron-collapse {
+        display: none;
+      }
+
+      :host([nested-nav]) iron-collapse {
+        display: block;
+      }
+
+      #main {
+        @apply(--layout-horizontal);
+        @apply(--layout-center);
+
+        position: relative;
+        height: 48px;
+        cursor: pointer;
+        text-decoration: none;
+        text-transform: capitalize;
+      }
+
+      #name {
+        margin-left: 16px;
+        color: var(--dark-primary-text-color);
+      }
+
+      iron-icon {
+        margin: 0 16px;
+        color: var(--dark-icon-color);
+      }
+
+      :host(.iron-selected) #main {
+        background-color: #e8e8e8;
+      }
+
+      :host(.iron-selected:not([nested-nav])) #main > * {
+        color: var(--primary-background-color);
+      }
+
+      #main:active {
+        background-color: var(--dark-hover-color);
+      }
+
+      :host(.iron-selected) #main:active {
+        background-color: var(--dark-divider-color);
+      }
+
+      .content-wrapper {
+        padding-top: 8px;
+        padding-bottom: 24px;
+        font-weight: 400;
+        text-transform: capitalize;
+        color: var(--dark-secondary-text-color);
+      }
+
+      .content-wrapper ::content a {
+        display: block;
+        white-space: nowrap;
+        padding: 8px 24px 8px 72px;
+      }
+
+    </style>
+
+    <a id="main" href="{{href}}" on-tap="_handleMainTap">
+      <iron-icon icon="{{icon}}"></iron-icon>
+      <div id="name">{{name}}</div>
+    </a>
+
+    <iron-collapse id="collapse" opened="{{opened}}">
+      <div class="content-wrapper">
+        <content></content>
+      </div>
+    </iron-collapse>
+
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'side-bar-item',
+
+      _handleMainTap: function() {
+        if (this.hasAttribute('nested-nav')) {
+          this.toggleDrawer();
+        }
+        this.fire('selected');
+      },
+
+      toggleDrawer: function() {
+        if (this.hasAttribute('nested-nav')) {
+          this.opened = this.opened ? false : true;
+        }
+      },
+
+    });
+
+  </script>
+
+</dom-module>

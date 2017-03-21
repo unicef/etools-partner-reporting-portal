@@ -1,0 +1,42 @@
+{
+  "name": "polymer-starter-kit-custom-build",
+  "version": "0.0.0",
+  "description": "A starting point for Polymer 1.0 custom build apps",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:PolymerElements/generator-polymer-init-custom-build"
+  },
+  "license": "http://polymer.github.io/LICENSE.txt",
+  "bugs": {
+    "url": "https://github.com/PolymerElements/generator-polymer-init-custom-build/issues"
+  },
+  "engines": {
+    "node": ">=4.0"
+  },
+  "private": true,
+  "devDependencies": {
+    "css-slam": "^1.1.0",
+    "del": "^2.2.1",
+    "gulp": "gulpjs/gulp#4.0",
+    "gulp-csslint": "^1.0.0",
+    "gulp-html-extract": "^0.2.0",
+    "gulp-htmlhint": "^0.3.1",
+    "gulp-htmlmin": "^2.0.0",
+    "gulp-if": "^2.0.1",
+    "gulp-imagemin": "^3.0.1",
+    "gulp-jscs": "^4.0.0",
+    "gulp-jscs-stylish": "^1.4.0",
+    "gulp-jshint": "^2.0.1",
+    "gulp-uglify": "^2.0.0",
+    "gulp-useref": "^3.1.2",
+    "gulp-util": "^3.0.7",
+    "htmlhint-stylish": "^1.0.3",
+    "jshint": "^2.9.3",
+    "jshint-stylish": "^2.2.1",
+    "lazypipe": "^1.0.1",
+    "merge-stream": "^1.0.0",
+    "plylog": "^0.4.0",
+    "polymer-build": "^0.4.0",
+    "yargs": "^5.0.0"
+  }
+}

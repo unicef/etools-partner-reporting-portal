@@ -1,0 +1,182 @@
+[
+ {
+   "id": 1,
+   "name": "Global",
+   "imgClass": ""
+ },
+ {
+   "id": 2,
+   "name": "UAT",
+   "imgClass": ""
+ },
+ {
+   "id": 3,
+   "name": "China",
+   "imgClass": "flag-icon flag-icon-cn"
+ },
+ {
+   "id": 4,
+   "name": "South Sudan",
+   "imgClass": "flag-icon flag-icon-ss"
+ },
+ {
+   "id": 5,
+   "name": "Kenya",
+   "imgClass": "flag-icon flag-icon-ke"
+ },
+ {
+   "id": 6,
+   "name": "Nepal",
+   "imgClass": "flag-icon flag-icon-np"
+ },
+ {
+   "id": 7,
+   "name": "Sierra Leone",
+   "imgClass": "flag-icon flag-icon-sl"
+ },
+ {
+   "id": 8,
+   "name": "Myanmar",
+   "imgClass": "flag-icon flag-icon-mm"
+ },
+ {
+   "id": 9,
+   "name": "Lebanon",
+   "imgClass": "flag-icon flag-icon-lb"
+ },
+ {
+   "id": 10,
+   "name": "Syria Cross Border",
+   "imgClass": "flag-icon flag-icon-sy"
+ },
+ {
+   "id": 11,
+   "name": "Syria",
+   "imgClass": "flag-icon flag-icon-sy"
+ },
+ {
+   "id": 12,
+   "name": "Sudan",
+   "imgClass": "flag-icon flag-icon-sd"
+ },
+ {
+   "id": 13,
+   "name": "Iraq",
+   "imgClass": "flag-icon flag-icon-iq"
+ },
+ {
+   "id": 14,
+   "name": "Menaro",
+   "imgClass": ""
+ },
+ {
+   "id": 15,
+   "name": "Turkey",
+   "imgClass": "flag-icon flag-icon-tr"
+ },
+ {
+   "id": 16,
+   "name": "FRG",
+   "imgClass": ""
+ },
+ {
+   "id": 18,
+   "name": "Jordan",
+   "imgClass": "flag-icon flag-icon-jo"
+ },
+ {
+   "id": 19,
+   "name": "Geneva PFP",
+   "imgClass": ""
+ },
+ {
+   "id": 20,
+   "name": "Philippines",
+   "imgClass": "flag-icon flag-icon-ph"
+ },
+ {
+   "id": 21,
+   "name": "Palestine",
+   "imgClass": "flag-icon flag-icon-ps"
+ },
+ {
+   "id": 22,
+   "name": "Yemen",
+   "imgClass": "flag-icon flag-icon-ye"
+ },
+ {
+   "id": 23,
+   "name": "Nigeria",
+   "imgClass": "flag-icon flag-icon-ne"
+ },
+ {
+   "id": 24,
+   "name": "Afghanistan",
+   "imgClass": "flag-icon flag-icon-af"
+ },
+ {
+   "id": 25,
+   "name": "Pakistan",
+   "imgClass": "flag-icon flag-icon-pk"
+ },
+ {
+   "id": 26,
+   "name": "Cambodia",
+   "imgClass": "flag-icon flag-icon-kh"
+ },
+ {
+   "id": 27,
+   "name": "Indonesia",
+   "imgClass": "flag-icon flag-icon-id"
+ },
+ {
+   "id": 28,
+   "name": "DRC",
+   "imgClass": ""
+ },
+ {
+   "id": 29,
+   "name": "Kazakhstan",
+   "imgClass": "flag-icon flag-icon-kz"
+ },
+ {
+   "id": 30,
+   "name": "Somalia",
+   "imgClass": "flag-icon flag-icon-so"
+ },
+ {
+   "id": 31,
+   "name": "South Africa",
+   "imgClass": "flag-icon flag-icon-za"
+ },
+ {
+   "id": 32,
+   "name": "Rwanda",
+   "imgClass": "flag-icon flag-icon-rw"
+ },
+ {
+   "id": 34,
+   "name": "ESARO",
+   "imgClass": ""
+ },
+ {
+   "id": 35,
+   "name": "Ethiopia",
+   "imgClass": "flag-icon flag-icon-et"
+ },
+ {
+   "id": 36,
+   "name": "ROSA",
+   "imgClass": ""
+ },
+ {
+   "id": 37,
+   "name": "Liberia",
+   "imgClass": "flag-icon flag-icon-lr"
+ },
+ {
+   "id": 38,
+   "name": "WCARO",
+   "imgClass": ""
+ }
+]

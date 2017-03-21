@@ -1,0 +1,8 @@
+node_modules/
+build/
+bower_components/
+dist/
+.tmp
+.idea
+*.sublime-project
+*.sublime-workspace
