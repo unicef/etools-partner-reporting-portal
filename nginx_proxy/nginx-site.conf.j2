@@ -1,0 +1,26 @@
+upstream django_api {
+  server http://django_api:8000;
+}
+
+server {
+    listen      80;
+
+    location /api/ {
+      include /etc/nginx/conf.d/uwsgi_params;
+      uwsgi_pass django_api;
+    }
+
+    location /sockjs-node/ {
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "upgrade";
+      proxy_http_version 1.1;
+      proxy_pass http://polymer_app:8000/sockjs-node/;
+    }
+
+    location / {
+      proxy_set_header Host $host:$server_port;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_pass http://polymer_app:8000/;
+    }
+}
