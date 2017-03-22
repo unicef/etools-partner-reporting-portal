@@ -16,8 +16,8 @@ var templatePath = '';
 
 // Configure the main eTools project paths
 function config() {
-  global.config.build.rootDirectory = path.join('../EquiTrack/assets/frontend/', global.config.appName);
-  global.config.build.templateDirectory = path.join('../EquiTrack/templates/frontend/', global.config.appName);
+  global.config.build.rootDirectory = path.join('./dist/assets/frontend/', global.config.appName);
+  global.config.build.templateDirectory = path.join('./dist/templates/frontend/', global.config.appName);
   global.config.build.bundledDirectory = '.';
   indexPath = path.join(global.config.build.rootDirectory, 'index.html');
   bowerPath = path.join(global.config.build.rootDirectory, 'bower.json');

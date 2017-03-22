@@ -1,6 +1,0 @@
-# Pro-tip: Try not to put anything here. There should be no dependency in
-#	production that isn't in development.
--r base.txt
-
-raven==5.27.1
-newrelic==2.24.0.21
