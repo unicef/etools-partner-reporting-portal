@@ -26,7 +26,7 @@ echo "*** CREATING DATABASE ***"
 "${psql[@]}" <<- 'EOSQL'
     DROP ROLE IF EXISTS etools_prp_user;
     CREATE ROLE etools_prp_user WITH superuser login;
-    CREATE DATABASE IF NOT EXISTS etools_prp;
+    CREATE DATABASE etools_prp;
     GRANT ALL PRIVILEGES ON DATABASE etools_prp TO etools_prp_user;
 EOSQL
 
@@ -37,3 +37,5 @@ EOSQL
 # bzcat $DB_DUMP_LOCATION | nice pg_restore --verbose  -U etools_prp_user -F t -d etools_prp
 
 echo "*** DATABASE CREATED! ***"
+
+done

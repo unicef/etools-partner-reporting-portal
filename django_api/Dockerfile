@@ -1,10 +1,10 @@
 FROM python:2.7
 
 ARG env
-ENV ENV ${env:-prod}
+ENV ENV ${env:-dev}
 
 ARG requirement_file
-ENV REQUIREMENT_FILE ${requirement_file:-prod.txt}
+ENV REQUIREMENT_FILE ${requirement_file:-dev.txt}
 
 # Install dependencies
 RUN apt-get update
@@ -53,7 +53,7 @@ ENV CPLUS_INCLUDE_PATH /usr/include/gdal
 ENV C_INCLUDE_PATH /usr/include/gdal
 
 ADD ./requirements/* /tmp/
-ADD ./django_api /code/
+ADD . /code/
 VOLUME /code
 
 ENV WAITFORIT_VERSION="v1.4.0"
@@ -73,5 +73,6 @@ RUN chmod -R a+rw /data
 ENV PYTHONUNBUFFERED 1
 WORKDIR /code/
 
-ENV DJANGO_SETTINGS_MODULE settings.production
 RUN python manage.py collectstatic --noinput
+
+EXPOSE 8000

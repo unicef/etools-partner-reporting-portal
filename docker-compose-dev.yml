@@ -6,7 +6,7 @@ services:
       context: ./nginx_proxy
       dockerfile: ./Dockerfile
     ports:
-      - "8000:80"
+      - "8080:80"
     depends_on:
       - django_api
       - polymer
@@ -16,11 +16,11 @@ services:
       - django_api/.env
     build:
       context: ./django_api
-      dockerfile: ./Dockerfile-dev
+      dockerfile: ./Dockerfile
       args:
         ENV: dev
         REQUIREMENT_FILE: dev.txt
-    command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 && python /code/manage.py migrate && uwsgi --ini /code/uwsgi.ini"
+    command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 && python /code/manage.py migrate && python /code/manage.py runserver 0.0.0.0:8000"
     depends_on:
       - db
 
@@ -34,5 +34,5 @@ services:
   polymer:
     build:
       context: ./polymer
-      dockerfile: ./Dockerfile-dev
+      dockerfile: ./Dockerfile
     command: ash -c "polymer serve -H 0.0.0.0"
