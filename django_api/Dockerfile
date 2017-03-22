@@ -56,10 +56,6 @@ ADD ./requirements/* /tmp/
 ADD . /code/
 VOLUME /code
 
-ENV WAITFORIT_VERSION="v1.4.0"
-RUN curl -o /code/waitforit -sSL https://github.com/maxcnunes/waitforit/releases/download/$WAITFORIT_VERSION/waitforit-linux_amd64 && \
-    chmod +x /code/waitforit
-
 # Install PyPi dependencies
 WORKDIR /tmp
 RUN pip install -r $REQUIREMENT_FILE
@@ -73,6 +69,7 @@ RUN chmod -R a+rw /data
 ENV PYTHONUNBUFFERED 1
 WORKDIR /code/
 
-RUN python manage.py collectstatic --noinput
+COPY waitforit /usr/local/bin/waitforit
+RUN chmod +x /usr/local/bin/waitforit
 
 EXPOSE 8000
