@@ -1,4 +1,4 @@
-FROM python:2.7.11-wheezy
+FROM python:2.7
 
 ARG env
 ENV ENV ${env:-prod}
@@ -42,7 +42,6 @@ RUN apt-get install -y --no-install-recommends \
 
 # Install Python tools
 RUN pip install --upgrade \
-    setuptools \
     virtualenv \
     virtualenvwrapper \
     fabric \
@@ -53,12 +52,13 @@ RUN pip install --upgrade \
 ENV CPLUS_INCLUDE_PATH /usr/include/gdal
 ENV C_INCLUDE_PATH /usr/include/gdal
 
-ENV WAITFORIT_VERSION="v1.3.1"
-RUN curl -o /usr/local/bin/waitforit -sSL https://github.com/maxcnunes/waitforit/releases/download/$WAITFORIT_VERSION/waitforit-linux_amd64 && \
-    chmod +x /usr/local/bin/waitforit
-
 ADD ./requirements/* /tmp/
-ADD . /code/
+ADD ./django_api /code/
+VOLUME /code
+
+ENV WAITFORIT_VERSION="v1.4.0"
+RUN curl -o /code/waitforit -sSL https://github.com/maxcnunes/waitforit/releases/download/$WAITFORIT_VERSION/waitforit-linux_amd64 && \
+    chmod +x /code/waitforit
 
 # Install PyPi dependencies
 WORKDIR /tmp

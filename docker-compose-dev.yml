@@ -3,7 +3,7 @@ version: '2.1'
 services:
   proxy:
     build:
-      context: ./nginx-proxy
+      context: ./nginx_proxy
       dockerfile: ./Dockerfile
     ports:
       - "8000:80"
@@ -20,7 +20,7 @@ services:
       args:
         ENV: dev
         REQUIREMENT_FILE: dev.txt
-    command: bash -c "/code/wait-for-it.sh db:5432 && python /code/manage${BACKEND_DEBUG}.py runserver 0.0.0.0:8000"
+    command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 && python /code/django_api/manage.py migrate && uwsgi --ini /code/django_api/uwsgi.ini"
     depends_on:
       - db
 
@@ -35,4 +35,4 @@ services:
     build:
       context: ./polymer
       dockerfile: ./Dockerfile-dev
-    command: [polymer, serve, -H, 0.0.0.0]
+    command: ash -c "polymer serve -H 0.0.0.0"

@@ -394,7 +394,7 @@ CACHES = {
 
 # WSGI CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#wsgi-application
-WSGI_APPLICATION = "wsgi.application'
+WSGI_APPLICATION = "wsgi.application"
 # END WSGI CONFIGURATION
 
 LOGGING = {
