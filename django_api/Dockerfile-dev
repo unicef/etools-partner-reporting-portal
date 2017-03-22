@@ -1,10 +1,10 @@
 FROM python:2.7.11-wheezy
 
 ARG env
-ENV ENV ${env:-prod}
+ENV ENV ${env:-dev}
 
 ARG requirement_file
-ENV REQUIREMENT_FILE ${requirement_file:-prod.txt}
+ENV REQUIREMENT_FILE ${requirement_file:-dev.txt}
 
 # Install dependencies
 RUN apt-get update
@@ -73,5 +73,4 @@ RUN chmod -R a+rw /data
 ENV PYTHONUNBUFFERED 1
 WORKDIR /code/
 
-ENV DJANGO_SETTINGS_MODULE settings.production
-RUN python manage.py collectstatic --noinput
+ENV DJANGO_SETTINGS_MODULE settings.local

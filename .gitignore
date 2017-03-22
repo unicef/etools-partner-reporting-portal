@@ -1,16 +1,5 @@
-.idea
-
 *.DS_Store
 *~
 
+# Docker environment file
 .env
-
-*.pyc
-pip-log.txt
-uploads/
-staticserve/
-django_api/django_api/settings/local.py
-django_api/django_api/settings/local.py.backup
-
-dump-*.sql
-*.sqlite3
