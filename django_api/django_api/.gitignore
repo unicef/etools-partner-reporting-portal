@@ -1,0 +1,69 @@
+# Python bytecode:
+*.py[co]
+
+# Packaging files:
+*.egg*
+
+# Editor temp files:
+*.swp
+*~
+
+# Sphinx docs:
+build
+
+# SQLite3 database files:
+*.db
+*.sql
+
+# Logs:
+*.log
+
+# PyCharm IDE files:
+*idea*
+*.sublime-project
+*.sublime-workspace
+
+# static & media folders:
+static/*
+
+# Dump files:
+*.dump
+dump.rdb
+
+# Archive files:
+*.tar
+*.gz
+
+# Key files:
+*.key
+*.crt
+
+# Robot crawlers:
+robots/*.png
+robots/log.html
+robots/output.xml
+robots/report.html
+
+# Coverage outputs:
+htmlcov
+.coverage
+
+# Windows specific files:
+*.bak
+*.dat
+*.dir
+
+_builds
+_projects
+_steps
+
+celerybeat-schedule
+
+*.cpg
+*.dbf
+*.shp
+*.shx
+
+packer_cache
+*.iso
+*.box
