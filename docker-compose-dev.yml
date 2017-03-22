@@ -1,0 +1,38 @@
+version: '2.1'
+
+services:
+  proxy:
+    build:
+      context: ./nginx-proxy
+      dockerfile: ./Dockerfile
+    ports:
+      - "8000:80"
+    depends_on:
+      - django_api
+      - polymer
+
+  django_api:
+    env_file:
+      - django_api/.env
+    build:
+      context: ./django_api
+      dockerfile: ./Dockerfile-dev
+      args:
+        ENV: dev
+        REQUIREMENT_FILE: dev.txt
+    command: bash -c "/code/wait-for-it.sh db:5432 && python /code/manage${BACKEND_DEBUG}.py runserver 0.0.0.0:8000"
+    depends_on:
+      - db
+
+  db:
+    build:
+      context: ./db
+      dockerfile: ./Dockerfile
+#    volumes:
+#      - './postgres_data:/var/lib/postgresql/data'
+
+  polymer:
+    build:
+      context: ./polymer
+      dockerfile: ./Dockerfile-dev
+    command: [polymer, serve, -H, 0.0.0.0]
