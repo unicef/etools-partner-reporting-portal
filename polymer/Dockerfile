@@ -5,10 +5,10 @@ RUN apk add git
 
 RUN npm install -g bower polymer-cli gulp-cli
 
-WORKDIR /tmp
-
 ADD bower.json /tmp/
 ADD package.json /tmp/
+
+WORKDIR /tmp
 
 RUN npm install
 RUN bower --allow-root install
