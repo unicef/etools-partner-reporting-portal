@@ -15,6 +15,7 @@ RUN bower --allow-root install
 
 RUN mkdir /code/
 ADD . /code/
+VOLUME /code
 WORKDIR /code
 
 RUN cp -a /tmp/node_modules /code/node_modules
