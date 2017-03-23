@@ -21,7 +21,7 @@
     "gulp-csslint": "^1.0.0",
     "gulp-html-extract": "^0.2.0",
     "gulp-htmlhint": "^0.3.1",
-    "gulp-htmlmin": "^2.0.0",
+    "gulp-htmlmin": "^3.0.0",
     "gulp-if": "^2.0.1",
     "gulp-imagemin": "^3.0.1",
     "gulp-jscs": "^4.0.0",
@@ -35,8 +35,11 @@
     "jshint-stylish": "^2.2.1",
     "lazypipe": "^1.0.1",
     "merge-stream": "^1.0.0",
-    "plylog": "^0.4.0",
-    "polymer-build": "^0.4.0",
-    "yargs": "^5.0.0"
+    "plylog": "^0.5.0",
+    "polymer-build": "^0.9.1",
+    "yargs": "^7.0.2"
+  },
+  "dependencies": {
+    "vinyl-fs": "^2.4.4"
   }
 }
