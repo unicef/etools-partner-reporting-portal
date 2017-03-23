@@ -26,8 +26,9 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 INSTALLED_APPS += [
     'debug_toolbar',
+    'django_extensions',
 ]
 
-MIDDLEWARE_CLASSES += [
+MIDDLEWARE_CLASSES = [
     'debug_toolbar.middleware.DebugToolbarMiddleware',
-]
+] + MIDDLEWARE_CLASSES
