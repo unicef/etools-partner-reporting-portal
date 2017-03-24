@@ -20,6 +20,8 @@ for DB in template_postgis "$POSTGRES_DB"; do
 		CREATE EXTENSION IF NOT EXISTS postgis_tiger_geocoder;
 EOSQL
 
+done
+
 echo "*** CREATING DATABASE ***"
 
 # create default database
@@ -37,5 +39,3 @@ EOSQL
 # bzcat $DB_DUMP_LOCATION | nice pg_restore --verbose  -U etools_prp_user -F t -d etools_prp
 
 echo "*** DATABASE CREATED! ***"
-
-done
