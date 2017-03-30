@@ -11,7 +11,13 @@ from reporting.models import Project
 
 # Create your models here.
 class Activity(models.Model):
-    name = models.CharField(max_length=255)
+    title = models.CharField(max_length=255)
+    standard = models.CharField(max_length=255)
+    status = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    tags = models.CharField(max_length=255)
+
     location = models.ForeignKey(Location, null=True, related_name="activities")
     cluster = models.ForeignKey(Cluster, null=True, related_name="activities")
     cluster_objective = models.ForeignKey(ClusterObjective, null=True, related_name="activities")
