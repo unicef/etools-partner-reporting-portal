@@ -8,6 +8,7 @@ from core.models import Partner
 
 class User(AbstractUser):
     partner = models.ForeignKey(Partner, related_name="users")
+    organization = models.CharField(max_length=255)
 
     def __str__(self):
         return "{} - User".format(self.get_fullname())
