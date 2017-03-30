@@ -10,5 +10,5 @@ from reporting.models import Indicator
 # Create your models here.
 class IndicatorReport(models.Model):
     name = models.CharField(max_length=255)
-    indicator = models.ForeignKey(Indicator, null=True, related_name="indicator_reports")
-    location = models.ForeignKey(Location, null=True, related_name="indicator_reports")
+    indicator = models.ForeignKey(Indicator, related_name="indicator_reports")
+    location = models.ForeignKey(Location, related_name="indicator_reports")

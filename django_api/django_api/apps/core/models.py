@@ -14,12 +14,12 @@ class Intervention(models.Model):
 class Country(models.Model):
     name = models.CharField(max_length=255)
     intervention = models.ForeignKey(
-        Intervention, null=True, related_name="countries")
+        Intervention, related_name="countries")
 
 
 class Partner(models.Model):
     name = models.CharField(max_length=255)
-    cluster = models.ForeignKey(Cluster, null=True, related_name="partners")
+    cluster = models.ForeignKey(Cluster, related_name="partners")
 
 
 class Location(models.Model):

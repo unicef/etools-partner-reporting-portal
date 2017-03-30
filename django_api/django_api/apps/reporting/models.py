@@ -12,13 +12,13 @@ from cluster.models import Cluster, ClusterObjective
 # Create your models here.
 class Project(models.Model):
     name = models.CharField(max_length=255)
-    cluster = models.ForeignKey(Cluster, null=True, related_name="projects")
+    cluster = models.ForeignKey(Cluster, related_name="projects")
     partner = models.ForeignKey(Partner, null=True, related_name="projects")
 
 
 class IndicatorBlueprint(models.Model):
     name = models.CharField(max_length=255)
-    activity = models.ForeignKey(Activity, null=True, related_name="indicator_blueprints")
+    activity = models.ForeignKey(Activity, related_name="indicator_blueprints")
 
 
 class Indicator(models.Model):

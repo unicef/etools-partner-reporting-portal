@@ -7,7 +7,7 @@ from core.models import Partner
 
 
 class User(AbstractUser):
-    partner = models.ForeignKey(Partner, null=True, related_name="users")
+    partner = models.ForeignKey(Partner, related_name="users")
 
     def __str__(self):
         return "{} - User".format(self.get_fullname())
