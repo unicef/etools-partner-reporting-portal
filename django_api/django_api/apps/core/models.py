@@ -20,3 +20,7 @@ class Country(models.Model):
 class Partner(models.Model):
     name = models.CharField(max_length=255)
     cluster = models.ForeignKey(Cluster, null=True, related_name="partners")
+
+
+class Location(models.Model):
+    name = models.CharField(max_length=255)
