@@ -8,18 +8,18 @@ RUN npm install -g bower polymer-cli gulp-cli
 ADD bower.json /tmp/
 ADD package.json /tmp/
 
+ADD . /code/
+
 WORKDIR /tmp
 
 RUN npm install
 RUN bower --allow-root install
 
-RUN mkdir /code/
-ADD . /code/
-VOLUME /code
-WORKDIR /code
-
 RUN cp -a /tmp/node_modules /code/node_modules
 RUN cp -a /tmp/bower_components /code/bower_components
+
+WORKDIR /code
+VOLUME /code
 
 EXPOSE 8080
 CMD ["gulp", "node", "express.js"]

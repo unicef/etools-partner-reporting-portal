@@ -37,6 +37,8 @@ services:
     build:
       context: ./polymer
       dockerfile: ./Dockerfile
-    command: ash -c "polymer serve -H 0.0.0.0"
     volumes:
-      - './polymer:/code/'
+        - ./polymer/:/code
+        - /code/node_modules
+        - /code/bower_components
+    command: ash -c "npm run dev"
