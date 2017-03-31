@@ -13,6 +13,9 @@
   "engines": {
     "node": ">=4.0"
   },
+  "scripts": {
+    "dev": "lite-server"
+  },
   "private": true,
   "devDependencies": {
     "css-slam": "^1.1.0",
@@ -37,6 +40,7 @@
     "merge-stream": "^1.0.0",
     "plylog": "^0.4.0",
     "polymer-build": "^0.4.0",
-    "yargs": "^5.0.0"
+    "yargs": "^5.0.0",
+    "lite-server": "^2.3.0"
   }
 }

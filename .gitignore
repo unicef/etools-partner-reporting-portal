@@ -6,3 +6,6 @@
 
 # PyCharm
 .idea/
+
+# Python compiled
+*.pyc
