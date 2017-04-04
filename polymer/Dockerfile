@@ -15,8 +15,8 @@ WORKDIR /tmp
 RUN npm install
 RUN bower --allow-root install
 
-RUN cp -a /tmp/node_modules /code/node_modules
-RUN cp -a /tmp/bower_components /code/bower_components
+RUN cp -a /tmp/node_modules/ /code/
+RUN cp -a /tmp/bower_components/ /code/
 
 WORKDIR /code
 VOLUME /code
