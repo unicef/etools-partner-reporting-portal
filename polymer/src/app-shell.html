@@ -30,6 +30,12 @@
       app-toolbar {
         background: var(--theme-primary-color);
       }
+
+      .mode {
+        font-size: 16px;
+        text-transform: uppercase;
+        color: var(--theme-primary-text-color-light);
+      }
     </style>
 
     <app-location route="{{route}}"></app-location>
@@ -44,7 +50,11 @@
       <app-drawer>
         <app-header>
           <app-toolbar>
-
+            <div class="mode">
+              Cluster
+              <br>
+              Reporting
+            </div>
           </app-toolbar>
         </app-header>
 
