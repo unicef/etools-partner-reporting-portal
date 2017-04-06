@@ -3,6 +3,8 @@
 <link rel="import" href="../../bower_components/app-layout/app-header-layout/app-header-layout.html">
 <link rel="import" href="../../bower_components/app-layout/app-toolbar/app-toolbar.html">
 
+<link rel="import" href="etools-logo.html">
+
 <dom-module id="page-header">
   <template>
     <style>
@@ -13,18 +15,12 @@
       app-header {
         background: var(--theme-page-header-background-color);
       }
-
-      #etools-logo {
-        width: 120px;
-      }
     </style>
 
     <app-header-layout>
       <app-header>
         <app-toolbar>
-          <content>
-            <img id="etools-logo" src="../../images/etools_logo.svg" alt="etools logo">
-          </content>
+          <etools-logo size="120px" text-color="#fff"></etools-logo>
         </app-toolbar>
       </app-header>
     </app-header-layout>
