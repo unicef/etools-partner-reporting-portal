@@ -1,0 +1,28 @@
+<script src="../../bower_components/redux/index.js"></script>
+
+<script>
+  (function () {
+    App.Reducers = App.Reducers || {};
+
+    App.Reducers.Auth = Redux.combineReducers({
+      token: tokenReducer,
+    });
+
+    function tokenReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = null;
+      }
+
+      switch (action.type) {
+        case 'SET_TOKEN':
+          return action.token;
+
+        case 'RESET_TOKEN':
+          return null;
+
+        default:
+          return state;
+      }
+    }
+  }());
+</script>

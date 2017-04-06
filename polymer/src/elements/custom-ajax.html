@@ -1,0 +1,100 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../redux-store.html">
+
+<dom-module id="test-ajax">
+  <template>
+    <iron-ajax
+        id="ajax"
+        bubbles
+
+        auto$="[[auto]]"
+
+        method="[[method]]"
+        content-type="[[contentType]]"
+        url="[[url]]"
+        body="[[body]]"
+        params="[[params]]"
+        headers="[[customHeaders]]"
+        timeout="[[timeout]]"
+        handle-as="[[handleAs]]"
+        json-prefix="[[jsonPrefix]]"
+        sync="[[sync]]"
+        withCredentials="[[withCredentials]]"
+
+        loading="{{loading}}"
+        active-requests="{{activeRequests}}"
+        debounce-duration="{{debounceDuration}}"
+        last-error="{{lastError}}"
+        last-request="{{lastRequest}}"
+        last-response="{{lastResponse}}">
+    </iron-ajax>
+  </template>
+
+  <script>
+    (function () {
+      Polymer({
+        is: 'test-ajax',
+
+        behaviors: [
+          App.Behaviors.ReduxBehavior,
+          App.Behaviors.Utils,
+        ],
+
+        properties: {
+          token: {
+            type: String,
+            statePath: 'auth.token',
+          },
+
+          headers: {
+            type: Object,
+            value: {},
+          },
+
+          loading: {
+            type: Boolean,
+            notify: true,
+          },
+
+          customHeaders: {
+            type: Object,
+            computed: '_computeHeaders(headers, token)',
+          },
+        },
+
+        _computeHeaders: function (headers, token) {
+          return this._extend({}, {
+            Authorization: 'Bearer ' + token,
+          }, headers);
+        },
+
+        listeners: {
+          'ajax.response': '_handleResponse',
+          'ajax.request': '_handleRequest',
+          'ajax.error': '_handleError',
+        },
+
+        _handleResponse: function () {
+          this.fire.apply(this, ['response'].concat(arguments));
+        },
+
+        _handleRequest: function () {
+          this.fire.apply(this, ['request'].concat(arguments));
+        },
+
+        _handleError: function () {
+          this.fire.apply(this, ['error'].concat(arguments));
+        },
+
+        generateRequest: function () {
+          return this.$.ajax.generateRequest.apply(this.$.ajax, arguments);
+        },
+
+        toRequestOptions: function () {
+          return this.$.ajax.toRequestOptions.apply(this.$.ajax, arguments);
+        },
+      });
+    }());
+  </script>
+</dom-module>
