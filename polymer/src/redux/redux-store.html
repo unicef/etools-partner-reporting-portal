@@ -1,13 +1,14 @@
-<link rel="import" href="../bower_components/polymer-redux/polymer-redux.html">
+<link rel="import" href="../../bower_components/polymer-redux/polymer-redux.html">
+
+<link rel="import" href="redux.html">
 <link rel="import" href="reducers/auth.html">
 
-<script src="../bower_components/redux/index.js"></script>
-<script src="../bower_components/redux-thunk/index.js"></script>
+<script src="../../bower_components/redux-thunk/index.js"></script>
 
 <script>
   (function () {
     var rootReducer = Redux.combineReducers({
-      auth: App.reducers.auth,
+      auth: App.Reducers.Auth,
     });
 
     var store = Redux.createStore(

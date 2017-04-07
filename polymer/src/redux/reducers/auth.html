@@ -1,7 +1,10 @@
-<script src="../../bower_components/redux/index.js"></script>
+<link rel="import" href="../redux.html">
+<link rel="import" href="../../constants.html">
 
 <script>
   (function () {
+    'use strict';
+
     App.Reducers = App.Reducers || {};
 
     App.Reducers.Auth = Redux.combineReducers({
@@ -14,10 +17,10 @@
       }
 
       switch (action.type) {
-        case 'SET_TOKEN':
+        case App.Constants.SET_TOKEN:
           return action.token;
 
-        case 'RESET_TOKEN':
+        case App.Constants.RESET_TOKEN:
           return null;
 
         default:

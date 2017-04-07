@@ -1,8 +1,9 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
-<link rel="import" href="../redux-store.html">
+<link rel="import" href="../redux/redux-store.html">
+<link rel="import" href="../utils.html">
 
-<dom-module id="test-ajax">
+<dom-module id="etools-prp-ajax">
   <template>
     <iron-ajax
         id="ajax"
@@ -34,11 +35,11 @@
   <script>
     (function () {
       Polymer({
-        is: 'test-ajax',
+        is: 'etools-prp-ajax',
 
         behaviors: [
           App.Behaviors.ReduxBehavior,
-          App.Behaviors.Utils,
+          App.Behaviors.UtilsBehavior,
         ],
 
         properties: {
