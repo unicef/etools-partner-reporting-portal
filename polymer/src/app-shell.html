@@ -1,46 +1,21 @@
-<!--
-@license
-Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
--->
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/app-route/app-location.html">
 <link rel="import" href="../bower_components/app-route/app-route.html">
 <link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
 <link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
-<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
-<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
-<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
-<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
-<link rel="import" href="../bower_components/paper-material/paper-material.html">
-<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
-<link rel="import" href="../bower_components/iron-collapse/iron-collapse.html">
-<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="../bower_components/iron-icons/social-icons.html">
 
-<link rel="import" href="app-config/etools-app-config.html">
-<link rel="import" href="app-elements/user-data/user-data.html">
-<link rel="import" href="app-elements/side-bar-item/side-bar-item.html">
+<link rel="import" href="styles/app-theme.html">
 
-<link rel="import" href="app-elements/countries-dropdown/countries-dropdown.html">
-<link rel="import" href="app-elements/countries-data/countries-data.html">
+<link rel="import" href="utils.html">
+<link rel="import" href="errors.html">
 
-<link rel="import" href="../styles/shared-styles.html">
-<link rel="import" href="../styles/page-layout-styles.html">
-<link rel="import" href="../styles/app-theme.html">
+<link rel="import" href="elements/page-nav.html">
+<link rel="import" href="elements/page-header.html">
 
 <dom-module id="app-shell">
-
   <template>
-
-    <style include="shared-styles">
-
+    <style>
       :host {
         display: block;
       }
@@ -48,68 +23,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       app-drawer {
         --app-drawer-width: 220px;
         --app-drawer-content-container: {
-            background-color: var(--light-theme-content-color);
-        };
+          box-shadow: 1px 0 2px 1px rgba(0, 0, 0, .1);
+        }
       }
 
-      .side-nav-wrapper {
-        @apply(--layout-vertical);
-
-        height: 100%;
-        overflow-y: var(--side-bar-scrolling);
-        overflow-x: hidden;
-        border-right: 1px solid var(--dark-divider-color);
+      app-toolbar {
+        background: var(--theme-primary-color);
       }
 
-      .side-nav-wrapper .header {
-        min-height: 60px;
-        border-bottom: 1px solid var(--dark-divider-color);
+      .mode {
+        font-size: 16px;
+        text-transform: uppercase;
+        color: var(--theme-primary-text-color-light);
+        cursor: default;
+        user-select: none;
       }
-
-      #etools-logo {
-        height: 50%;
-        width: 60%;
-      }
-
-      #unicef-logo {
-        height: 100%;
-        width: 60%;
-      }
-
-      #app-select {
-        margin-left: auto;
-        width: 47px;
-        height: 47px;
-      }
-
-      .side-nav-wrapper .nav-menu {
-        padding: 8px 0;
-      }
-
-      .side-nav-wrapper .divider {
-        margin: 8px 0;
-        border-bottom: 1px solid var(--dark-divider-color);
-      }
-
-      .side-nav-wrapper .footer {
-        @apply(--layout-horizontal);
-        @apply(--layout-center-center);
-
-        margin-top: auto;
-        min-height: 26px;
-        padding: 16px 16px;
-        border-top: 1px solid var(--dark-divider-color);
-      }
-
-      #countries {
-        position: fixed;
-        top: 9px;
-        right: 20px;
-      }
-
     </style>
-
-    <user-data permissions="{{permissions}}"></user-data>
 
     <app-location route="{{route}}"></app-location>
 
@@ -119,150 +48,126 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         data="{{routeData}}"
         tail="{{subroute}}"></app-route>
 
-    <app-drawer-layout id="layout" responsive-width="850px" narrow="{{narrow}}" fullbleed>
-
-      <!-- Drawer content -->
-      <app-drawer id="drawer" transition-duration="350">
-
-        <div class="side-nav-wrapper">
-
-          <app-toolbar class="header">
-            <img id="etools-logo" src="../images/etools_logo.svg" alt="etools logo">
-            <paper-icon-button id="app-select" on-tap="openAppMenu" class="dark" icon="apps"></paper-icon-button>
+    <app-drawer-layout persistent responsive-width="0px">
+      <app-drawer>
+        <app-header>
+          <app-toolbar>
+            <div class="mode">
+              Cluster
+              <br>
+              Reporting
+            </div>
           </app-toolbar>
+        </app-header>
 
-          <div class="nav-menu">
-            <iron-selector selected="[[page]]" attr-for-selected="name" selectable="side-bar-item" role="navigation">
-
-              <side-bar-item name="section1" icon="description" href="/section1/tab1"></side-bar-item>
-              <side-bar-item name="section2" icon="book" href="/section2"></side-bar-item>
-              <side-bar-item name="section3" icon="build" href="/section3"></side-bar-item>
-              <div class="divider"></div>
-
-              <!-- Permissions example: only display settings if the user has permission -->
-              <side-bar-item hidden$="{{!permissions.userInfoMenu}}" name="settings" icon="settings" href="/settings"></side-bar-item>
-
-              <side-bar-item name="user support" icon="help" href="/support"></side-bar-item>
-              <side-bar-item name="discussions" icon="question-answer" href="/discussion"></side-bar-item>
-              <side-bar-item name="information" icon="info" href="/information"></side-bar-item>
-
-            </iron-selector>
-          </div>
-
-          <div class="footer">
-            <img id="unicef-logo" src="../images/UNICEF_logo.png" alt="UNICEF logo">
-          </div>
-
-        </div>
-
+        <page-nav
+            id="nav"
+            selected="{{page}}"
+            role="navigation">
+        </page-nav>
       </app-drawer>
 
-      <!-- Main content -->
+      <page-header></page-header>
 
       <iron-pages id="pages"
                   selected="[[page]]"
                   attr-for-selected="name"
-                  fallback-selection="not-found"
                   role="main">
-        <page-section1 name="section1" route="{{subroute}}"></page-section1>
-        <page-section2 name="section2" route="{{subroute}}"></page-section2>
-        <page-section3 name="section3" route="{{subroute}}"></page-section3>
-        <page-not-found name="not-found"></page-not-found>
+        <template is="dom-if" if="[[_equals(page, 'dashboard')]]" restamp="true">
+          <page-dashboard
+              name="dashboard"
+              route="{{subroute}}">
+          </page-dashboard>
+        </template>
+
+        <template is="dom-if" if="[[_equals(page, 'interventions')]]" restamp="true">
+          <page-interventions
+              name="interventions"
+              route="{{subroute}}">
+          </page-interventions>
+        </template>
+
+        <template is="dom-if" if="[[_equals(page, 'activity-reports')]]" restamp="true">
+          <page-activity-reports
+              name="activity-reports"
+              route="{{subroute}}">
+          </page-activity-reports>
+        </template>
+
+        <template is="dom-if" if="[[_equals(page, 'project-reports')]]" restamp="true">
+          <page-project-reports
+              name="project-reports"
+              route="{{subroute}}">
+          </page-project-reports>
+        </template>
+
+        <template is="dom-if" if="[[_equals(page, 'cluster-objective-reports')]]" restamp="true">
+          <page-cluster-objective-reports
+              name="cluster-objective-reports"
+              route="{{subroute}}">
+          </page-cluster-objective-reports>
+        </template>
+
+        <template is="dom-if" if="[[_equals(page, 'analysis')]]" restamp="true">
+          <page-analysis
+              name="analysis"
+              route="{{subroute}}">
+          </page-analysis>
+        </template>
+
+        <template is="dom-if" if="[[_equals(page, 'not-found')]]" restamp="true">
+          <page-not-found
+              name="not-found">
+          </page-not-found>
+        </template>
       </iron-pages>
-
     </app-drawer-layout>
-
   </template>
 
   <script>
-
     Polymer({
-
       is: 'app-shell',
 
-      properties: {
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.ErrorHandlerBehavior,
+      ],
 
+      properties: {
         page: {
           type: String,
-          reflectToAttribute: true,
-          observer: '_pageChanged'
+          value: 'dashboard',
+          observer: '_pageChanged',
         },
-
-        narrow: {
-          type: Boolean,
-          reflectToAttribute: true
-        },
-
-        _toast: {
-          type: Object,
-          value: null
-        },
-
-        _toastQueue: {
-          type: Array,
-          value: function() { return []; }
-        },
-
       },
 
       observers: [
-        '_routePageChanged(routeData.page)'
+        '_routePageChanged(routeData.page)',
       ],
 
-      listeners: {
-        'toast': 'queueToast',
-        'drawer': 'toggleDrawer',
-        '404': '_pageNotFound',
+      attached: function () {
+        this.listen(window, 'error', '_handleError');
       },
 
-      attached: function() {
-        if (this.route.path === '/') {
-          this.set('route.path', '/section1/tab1');
-        }
-      },
-
-      toggleDrawer: function() {
-        this.$.drawer.toggle();
-      },
-
-      queueToast: function(e, detail) {
-        if (!this._toast) {
-          this._toast = document.createElement('paper-toast');
-          this.listen(this._toast, 'iron-overlay-closed', 'dequeueToast');
-          Polymer.dom(this.$.layout).appendChild(this._toast);
-          Polymer.dom.flush();
-        }
-        if (!this._toastQueue.length) {
-          this.push('_toastQueue', detail);
-          this._toast.show(detail);
+      _routePageChanged: function (page) {
+        if (!page) {
+          this.$.nav.fire('reset');
+          this.set('route.path', 'dashboard');
         } else {
-          this.push('_toastQueue', detail);
+          this.page = page;
         }
       },
 
-      dequeueToast: function() {
-        this.shift('_toastQueue');
-        if (this._toastQueue.length) {
-          this._toast.show(this._toastQueue[0]);
-        }
-      },
-
-      _routePageChanged: function(page) {
-        this.page = page || 'section1';
-      },
-
-      _pageChanged: function(page) {
+      _pageChanged: function (page) {
         var resolvedPageUrl = this.resolveUrl('pages/page-' + page + '.html');
-        this.importHref(resolvedPageUrl, null, this._pageNotFound, true);
+
+        this.importHref(resolvedPageUrl, null, this._notFound, true);
       },
 
-      _pageNotFound: function() {
+      _notFound: function () {
+        this.$.nav.fire('reset');
         this.page = 'not-found';
-        this.fire('toast', {text: 'Oops you hit a 404!'});
-      }
-
+      },
     });
-
   </script>
-
 </dom-module>

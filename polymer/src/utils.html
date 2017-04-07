@@ -1,0 +1,50 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Behaviors = App.Behaviors || {};
+
+    App.Behaviors.UtilsBehavior = {
+      _equals: function (a, b) {
+        return a === b;
+      },
+
+      _extend: (function () {
+        return typeof Object.assign === 'function' ?
+            Object.assign.bind(Object) :
+            function (target) {
+              var nextSource, nextKey, index, to;
+
+              if (target == null) {
+                throw new TypeError('Cannot convert undefined or null to object');
+              }
+
+              to = Object(target)
+
+              for (index = 1; index < arguments.length; index++) {
+                nextSource = arguments[index];
+
+                if (nextSource != null) {
+                  for (nextKey in nextSource) {
+                    if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+                      to[nextKey] = nextSource[nextKey];
+                    }
+                  }
+                }
+              }
+            };
+      }()),
+
+      _forEach: function (selector, fn) {
+        [].forEach.call(
+          Polymer.dom(this.root).querySelectorAll(selector),
+          fn,
+          this
+        );
+      },
+    };
+
+  }());
+</script>
