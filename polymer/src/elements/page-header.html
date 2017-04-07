@@ -1,0 +1,34 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../../bower_components/app-layout/app-toolbar/app-toolbar.html">
+
+<link rel="import" href="etools-logo.html">
+
+<dom-module id="page-header">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      app-header {
+        background: var(--theme-page-header-background-color);
+      }
+    </style>
+
+    <app-header-layout>
+      <app-header>
+        <app-toolbar>
+          <etools-logo size="120px" text-color="#fff"></etools-logo>
+        </app-toolbar>
+      </app-header>
+    </app-header-layout>
+  </template>
+
+  <script>
+    Polymer({
+      id: 'page-header',
+    });
+  </script>
+</dom-module>

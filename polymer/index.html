@@ -14,8 +14,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
 
-    <title>eTools</title>
-    <meta name="description" content="Partnership Management Portal">
+    <title>etools-partner-reporting-portal</title>
+    <meta name="description" content="">
 
     <link rel="icon" href="/images/favicon.ico">
 
@@ -27,12 +27,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <!-- Add to homescreen for Chrome on Android. Fallback for manifest.json -->
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="eTools - Partnership Management">
+    <meta name="application-name" content="">
 
     <!-- Add to homescreen for Safari on iOS -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="eTools - Partnership Management">
+    <meta name="apple-mobile-web-app-title" content="">
 
     <!-- Homescreen icons -->
     <link rel="apple-touch-icon" href="/images/manifest/icon-48x48.png">
@@ -52,6 +52,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         dom: 'shadow',
         lazyRegister: true
       };
+
+      window.App = {};
 
       // Load webcomponentsjs polyfill if browser does not support native Web Components
       (function() {
@@ -97,13 +99,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <style>
       body {
         margin: 0;
-        font-family: 'Roboto', 'Noto', sans-serif;
-        font-size: 14px;
-        font-weight: 400;
-        line-height: 1.5;
-        min-height: 100vh;
-        background-color: #FAFAFA;
-        color: rgba(0, 0, 0, 0.87);
+        font: 14px/1.5 Roboto, Noto, sans-serif;
+        color: #212121;
+        background-color: #f3f3f3;
       }
     </style>
   </head>

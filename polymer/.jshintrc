@@ -16,10 +16,6 @@
   "laxbreak": true,
   "globals": {
     "Polymer": true,
-    "_": true,
-    "Dexie": true,
-    "etoolsAppConfig": true,
-    "etoolsAjaxDefaultDexieDbPrefix": true,
-    "DynamicCustomStyleBehavior": true
+    "App": true
   }
 }
