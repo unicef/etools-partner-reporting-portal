@@ -33,7 +33,7 @@
           // Use saved token, if present
           var savedToken = this.$.storage.value;
 
-          if (savedToken) {
+          if (savedToken && !this.token) {
             this.dispatch(App.Actions.setToken(savedToken));
           }
         },
