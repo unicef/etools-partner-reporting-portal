@@ -19,7 +19,8 @@
     "paper-item": "PolymerElements/paper-item#^1.2.1",
     "polymer-redux": "^0.4.2",
     "redux": "https://npmcdn.com/redux/dist/redux.min.js",
-    "redux-thunk": "https://npmcdn.com/redux-thunk/dist/redux-thunk.min.js"
+    "redux-thunk": "https://npmcdn.com/redux-thunk/dist/redux-thunk.min.js",
+    "iron-localstorage": "PolymerElements/iron-localstorage#^1.0.6"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0"
