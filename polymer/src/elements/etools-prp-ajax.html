@@ -76,7 +76,13 @@
           'ajax.error': '_handleError',
         },
 
-        _handleResponse: function () {
+        _handleResponse: function (e, request) {
+          var token = request.xhr.getResponseHeader('token');
+
+          if (token) {
+            this.dispatch(App.Actions.setToken(token));
+          }
+
           this.fire.apply(this, ['response'].concat(arguments));
         },
 
@@ -85,6 +91,12 @@
         },
 
         _handleError: function () {
+          var status = this.lastError.status;
+
+          if (status === 401) {
+            this.dispatch(App.Actions.resetToken());
+          }
+
           this.fire.apply(this, ['error'].concat(arguments));
         },
 

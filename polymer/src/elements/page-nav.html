@@ -84,13 +84,13 @@
         key-event-target="null">
 
       <paper-item name="dashboard">
-        <a href="/dashboard">
+        <a href="/app/dashboard">
           <span>Dashboard</span>
         </a>
       </paper-item>
 
       <paper-item name="interventions">
-        <a href="/interventions">
+        <a href="/app/interventions">
           <span>Interventions</span>
         </a>
       </paper-item>
@@ -98,7 +98,7 @@
       <paper-submenu>
         <paper-item
             class="menu-trigger">
-          <a href="/activity-reports">
+          <a href="/app/activity-reports">
             <span>Reporting</span>
           </a>
         </paper-item>
@@ -110,19 +110,19 @@
             selectable="paper-item"
             key-event-target="null">
           <paper-item name="activity-reports">
-            <a href="/activity-reports">
+            <a href="/app/activity-reports">
               <span>Activity reports</span>
             </a>
           </paper-item>
 
           <paper-item name="project-reports">
-            <a href="/project-reports">
+            <a href="/app/project-reports">
               <span>Project reports</span>
             </a>
           </paper-item>
 
           <paper-item name="cluster-objective-reports">
-            <a href="/cluster-objective-reports">
+            <a href="/app/cluster-objective-reports">
               <span>Cluster objective reports</span>
             </a>
           </paper-item>
@@ -130,7 +130,7 @@
       </paper-submenu>
 
       <paper-item name="analysis">
-        <a href="/analysis">
+        <a href="/app/analysis">
           <span>Analysis</span>
         </a>
       </paper-item>
@@ -144,13 +144,6 @@
       behaviors: [
         App.Behaviors.UtilsBehavior,
       ],
-
-      properties: {
-        selected: {
-          type: String,
-          notify: true,
-        },
-      },
 
       listeners: {
         reset: '_reset',
@@ -178,10 +171,12 @@
         });
 
         // Expand submenus on first load
-        this._forEach('paper-submenu', function (submenu) {
-          if (Polymer.dom(submenu).querySelector('[name="' + self.selected + '"]')) {
-            submenu.open();
-          }
+        this.async(function () {
+          self._forEach('paper-submenu', function (submenu) {
+            if (Polymer.dom(submenu).querySelector('[name="' + self.selected + '"]')) {
+              submenu.open();
+            }
+          });
         });
       },
     });
