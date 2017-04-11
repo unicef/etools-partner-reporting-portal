@@ -3,7 +3,6 @@
 <link rel="import" href="../bower_components/app-route/app-route.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 
-<link rel="import" href="styles/app-theme.html">
 <link rel="import" href="elements/etools-prp-auth.html">
 
 <link rel="import" href="utils.html">
@@ -14,6 +13,11 @@
     <style>
       :host {
         display: block;
+        height: 100%;
+      }
+
+      iron-pages {
+        height: 100%;
       }
     </style>
 
@@ -77,7 +81,7 @@
 
       _routePageChanged: function (page) {
         if (!page) {
-          this.set('route.path', 'app');
+          this.set('route.path', '/app');
         } else {
           this.page = page;
         }

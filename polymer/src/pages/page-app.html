@@ -57,7 +57,6 @@
         </app-header>
 
         <page-nav
-            id="nav"
             selected="{{page}}"
             role="navigation">
         </page-nav>
@@ -142,8 +141,7 @@
 
       _routePageChanged: function (page) {
         if (!page) {
-          this.$.nav.fire('reset');
-          this.set('route.path', 'dashboard');
+          this.set('route.path', '/dashboard');
         } else {
           this.page = page;
         }
@@ -156,7 +154,6 @@
       },
 
       _notFound: function () {
-        this.$.nav.fire('reset');
         this.page = 'not-found';
       },
     });

@@ -94,16 +94,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
     </script>
 
+    <link rel="import" href="/bower_components/polymer/polymer.html">
+    <link rel="import" href="/src/styles/app-theme.html">
+    <link rel="import" href="/src/styles/global-styles.html">
     <link rel="import" href="/src/app-shell.html">
 
-    <style>
-      body {
-        margin: 0;
-        font: 14px/1.5 Roboto, Noto, sans-serif;
-        color: #212121;
-        background-color: #f3f3f3;
-      }
-    </style>
+    <style is="custom-style" include="app-theme global-styles"></style>
   </head>
   <body unresolved>
     <app-shell></app-shell>

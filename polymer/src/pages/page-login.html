@@ -1,19 +1,84 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/iron-media-query/iron-media-query.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+
+<link rel="import" href="../elements/etools-logo.html">
+<link rel="import" href="../responsive.html">
+<link rel="import" href="../settings.html">
 
 <dom-module id="page-login">
   <template>
     <style>
       :host {
         display: block;
+        height: 100%;
+
+        --login-container-inner-layout: {}
+      }
+
+      @media (min-width: 600px) {
+        :host {
+          --login-container-inner-layout: {
+            @apply(--layout-vertical);
+            @apply(--layout-center-justified);
+          };
+        }
+      }
+
+      .login-container {
+        @apply(--layout-horizontal);
+        @apply(--layout-center-justified);
+
+        box-sizing: border-box;
+        min-height: 100%;
+        padding: 1em;
+        background: var(--theme-primary-color);
+      }
+
+      .login-container-inner {
+        @apply(--login-container-inner-layout);
+      }
+
+      paper-card {
+        width: 290px;
+      }
+
+      @media (min-width: 600px) {
+        paper-card {
+          width: 480px;
+        }
+      }
+
+      .logo-container {
+        padding: 2em 0;
+        text-align: center;
       }
     </style>
 
-    <h1>Login</h1>
+    <iron-media-query
+        query="[[desktopLayoutQuery]]"
+        query-matches="{{isDesktop}}">
+    </iron-media-query>
+
+    <div class="login-container">
+      <div class="login-container-inner">
+        <paper-card>
+          <div class="logo-container">
+            <etools-logo size="180px" text-color="#233944"></etools-logo>
+          </div>
+        </paper-card>
+      </div>
+    </div>
   </template>
 
   <script>
     Polymer({
       is: 'page-login',
+
+      behaviors: [
+        App.Behaviors.ResponsiveBehavior,
+      ],
     });
   </script>
 </dom-module>

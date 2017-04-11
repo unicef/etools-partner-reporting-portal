@@ -11,12 +11,18 @@
 
     <h1>Page not found</h1>
 
-    <a href="[[backlinkUrl]]">Head back home</a>
+    <a on-tap="_refresh" href="#">Head back home</a>
   </template>
 
   <script>
     Polymer({
       is: 'page-not-found',
+
+      _refresh: function (e) {
+        e.preventDefault();
+
+        window.location.href = '/';
+      },
     });
   </script>
 </dom-module>
