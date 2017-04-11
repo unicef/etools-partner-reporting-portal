@@ -27,6 +27,11 @@
             type: String,
             statePath: 'auth.token',
           },
+          authenticated: {
+            type: Boolean,
+            notify: true,
+            computed: '_computeAuthenticated(token)',
+          },
         },
 
         attached: function () {
@@ -36,6 +41,10 @@
           if (savedToken && !this.token) {
             this.dispatch(App.Actions.setToken(savedToken));
           }
+        },
+
+        _computeAuthenticated: function (token) {
+          return !!token;
         },
       });
     }());
