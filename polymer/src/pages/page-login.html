@@ -2,6 +2,8 @@
 <link rel="import" href="../../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../../bower_components/iron-media-query/iron-media-query.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
 
 <link rel="import" href="../elements/etools-logo.html">
 <link rel="import" href="../responsive.html">
@@ -15,6 +17,12 @@
         height: 100%;
 
         --login-container-inner-layout: {}
+
+        --paper-button: {
+          width: 220px;
+          padding: 1em;
+          background: #fff;
+        };
       }
 
       @media (min-width: 600px) {
@@ -33,7 +41,7 @@
         box-sizing: border-box;
         min-height: 100%;
         padding: 1em;
-        background: var(--theme-primary-color);
+        background: linear-gradient(#72c300, #009a54);
       }
 
       .login-container-inner {
@@ -50,9 +58,50 @@
         }
       }
 
-      .logo-container {
+      .header {
         padding: 2em 0;
         text-align: center;
+      }
+
+      .header h1 {
+        @apply(--paper-font-subhead);
+
+        margin: 0;
+      }
+
+      .login-buttons {
+        padding: 3em 1em;
+        background: var(--theme-primary-color);
+      }
+
+      .login-buttons-label {
+        @apply(--paper-font-headline);
+
+        margin: 0 0 .75em;
+        color: var(--theme-primary-text-color-light);
+        text-align: center;
+      }
+
+      .login-buttons ul {
+        @apply(--layout-vertical);
+
+        padding: 0;
+        margin: 0;
+        list-style: none;
+      }
+
+      .login-buttons li {
+        @apply(--layout-horizontal);
+        @apply(--layout-center-justified);
+      }
+
+      .login-buttons li:not(:last-child) {
+        margin-bottom: 1em;
+      }
+
+      .login-buttons a {
+        text-decoration: none;
+        color: inherit;
       }
     </style>
 
@@ -64,8 +113,37 @@
     <div class="login-container">
       <div class="login-container-inner">
         <paper-card>
-          <div class="logo-container">
-            <etools-logo size="180px" text-color="#233944"></etools-logo>
+          <div class="header">
+            <etools-logo size="[[logoSize]]" text-color="#233944"></etools-logo>
+
+            <h1>Partner Reporting Portal</h1>
+          </div>
+          <div class="login-buttons">
+            <p class="login-buttons-label">Sign in with</p>
+
+            <ul>
+              <li>
+                <a href="/todo">
+                  <paper-button raised>
+                    <img src="../../images/google.png" alt="Google" height="20">
+                  </paper-button>
+                </a>
+              </li>
+              <li>
+                <a href="/todo">
+                  <paper-button raised>
+                    <img src="../../images/unicef.png" alt="Unicef" height="20">
+                  </paper-button>
+                </a>
+              </li>
+              <li>
+                <a href="/todo">
+                  <paper-button raised>
+                    <img src="../../images/humanitarianid.png" alt="Humanitarian ID" height="20">
+                  </paper-button>
+                </a>
+              </li>
+            </ul>
           </div>
         </paper-card>
       </div>
@@ -79,6 +157,17 @@
       behaviors: [
         App.Behaviors.ResponsiveBehavior,
       ],
+
+      properties: {
+        logoSize: {
+          type: Number,
+          computed: '_computeLogoSize(isDesktop)',
+        },
+      },
+
+      _computeLogoSize: function (isDesktop) {
+        return isDesktop ? 180 : 120;
+      },
     });
   </script>
 </dom-module>

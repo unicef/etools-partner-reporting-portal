@@ -22,7 +22,8 @@
     "iron-media-query": "PolymerElements/iron-media-query#^1.0.8",
     "polymer-redux": "^0.4.2",
     "redux": "https://npmcdn.com/redux/dist/redux.min.js",
-    "redux-thunk": "https://npmcdn.com/redux-thunk/dist/redux-thunk.min.js"
+    "redux-thunk": "https://npmcdn.com/redux-thunk/dist/redux-thunk.min.js",
+    "paper-button": "PolymerElements/paper-button#^1.0.14"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0"

@@ -21,7 +21,7 @@
       }
     </style>
 
-    <etools-prp-auth></etools-prp-auth>
+    <etools-prp-auth authenticated="{{authenticated}}"></etools-prp-auth>
 
     <app-location route="{{route}}"></app-location>
 
@@ -69,6 +69,15 @@
           type: String,
           observer: '_pageChanged',
         },
+
+        authenticated: {
+          type: Boolean,
+        },
+
+        redirectPath: {
+          type: String,
+          computed: '_computeRedirectPath(authenticated)',
+        },
       },
 
       observers: [
@@ -81,7 +90,7 @@
 
       _routePageChanged: function (page) {
         if (!page) {
-          this.set('route.path', '/app');
+          this.set('route.path', this.redirectPath);
         } else {
           this.page = page;
         }
@@ -95,6 +104,10 @@
 
       _notFound: function () {
         this.page = 'not-found';
+      },
+
+      _computeRedirectPath: function (authenticated) {
+        return authenticated ? '/app' : '/login';
       },
     });
   </script>

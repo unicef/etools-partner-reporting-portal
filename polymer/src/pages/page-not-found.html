@@ -1,4 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
 
 <dom-module id="page-not-found">
   <template>
@@ -6,21 +8,31 @@
       :host {
         display: block;
         padding: 25px;
+
+        --paper-button: {
+          background-color: #fff;
+        };
+      }
+
+      h1 {
+        @apply(--paper-font-display1);
       }
     </style>
 
     <h1>Page not found</h1>
 
-    <a on-tap="_refresh" href="#">Head back home</a>
+    <paper-button id="return" on-tap="_return" raised>Head back home</paper-button>
   </template>
 
   <script>
     Polymer({
       is: 'page-not-found',
 
-      _refresh: function (e) {
-        e.preventDefault();
+      listeners: {
+        'return.tap': '_return',
+      },
 
+      _return: function () {
         window.location.href = '/';
       },
     });
