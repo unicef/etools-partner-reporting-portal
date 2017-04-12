@@ -2,6 +2,8 @@
   "entrypoint": "index.html",
   "shell": "src/app-shell.html",
   "fragments": [
+    "src/pages/page-login.html",
+    "src/pages/page-app.html",
     "src/pages/page-dashboard.html",
     "src/pages/page-interventions.html",
     "src/pages/page-activity-reports.html",
@@ -13,7 +15,8 @@
   "sourceGlobs": [
    "src/**/*",
    "images/**/*",
-   "bower.json"
+   "bower.json",
+   "manifest.json"
   ],
   "includeDependencies": [
     "bower_components/webcomponentsjs/webcomponents-lite.min.js"
