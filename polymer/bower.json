@@ -20,6 +20,7 @@
     "paper-card": "PolymerElements/paper-card#^1.1.4",
     "iron-localstorage": "PolymerElements/iron-localstorage#^1.0.6",
     "iron-media-query": "PolymerElements/iron-media-query#^1.0.8",
+    "promise-polyfill": "polymerlabs/promise-polyfill#^1.0.0",
     "polymer-redux": "^0.4.2",
     "redux": "https://npmcdn.com/redux/dist/redux.min.js",
     "redux-thunk": "https://npmcdn.com/redux-thunk/dist/redux-thunk.min.js",

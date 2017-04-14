@@ -1,5 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/promise-polyfill/promise-polyfill-lite.html">
+
 <link rel="import" href="../redux/redux-store.html">
 <link rel="import" href="../utils.html">
 
@@ -100,12 +102,35 @@
           this.fire.apply(this, ['error'].concat(arguments));
         },
 
+        _buildResponse: function (req) {
+          return {
+            status: req.status,
+            data: req.parseResponse(),
+            xhr: req.xhr,
+          };
+        },
+
         generateRequest: function () {
           return this.$.ajax.generateRequest.apply(this.$.ajax, arguments);
         },
 
         toRequestOptions: function () {
           return this.$.ajax.toRequestOptions.apply(this.$.ajax, arguments);
+        },
+
+        thunk: function () {
+          return (function () {
+            var req = this.generateRequest();
+            var self = this;
+
+            return req.completes
+                .then(function () {
+                  return self._buildResponse(req);
+                })
+                .catch(function () {
+                  return Promise.reject(self._buildResponse(req));
+                });
+          }.bind(this));
         },
       });
     }());

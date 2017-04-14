@@ -15,6 +15,7 @@
   "newcap": false,
   "laxbreak": true,
   "globals": {
+    "Promise": true,
     "App": true,
     "Polymer": true,
     "Redux": true,
