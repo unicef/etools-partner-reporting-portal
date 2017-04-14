@@ -85,7 +85,7 @@
       ],
 
       attached: function () {
-        this.listen(window, 'error', '_handleError');
+        this.listen(this.root, 'error', '_handleError');
       },
 
       _routePageChanged: function (page) {
