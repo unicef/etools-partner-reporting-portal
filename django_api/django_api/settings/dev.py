@@ -19,15 +19,16 @@ STATIC_ROOT = '%s/staticserve' % DATA_VOLUME
 # domains/hosts etc.
 DOMAIN_NAME = '127.0.0.1:8000'
 WWW_ROOT = 'http://%s/' % DOMAIN_NAME
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "django_api"]
 
 # other
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 INSTALLED_APPS += [
     'debug_toolbar',
+    'django_extensions',
 ]
 
-MIDDLEWARE_CLASSES += [
+MIDDLEWARE_CLASSES = [
     'debug_toolbar.middleware.DebugToolbarMiddleware',
-]
+] + MIDDLEWARE_CLASSES

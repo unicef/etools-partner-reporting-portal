@@ -1,5 +1,5 @@
 # Django packages
-Django==1.9.10
+Django==1.10.6
 
 # Other Python packages
-psycopg2==2.6.2
+psycopg2==2.7.1
