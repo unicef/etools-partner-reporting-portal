@@ -1,0 +1,31 @@
+<link rel="import" href="../redux.html">
+<link rel="import" href="../../constants.html">
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Reducers = App.Reducers || {};
+
+    App.Reducers.Auth = Redux.combineReducers({
+      token: tokenReducer,
+    });
+
+    function tokenReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = '';
+      }
+
+      switch (action.type) {
+        case App.Constants.SET_TOKEN:
+          return action.token;
+
+        case App.Constants.RESET_TOKEN:
+          return '';
+
+        default:
+          return state;
+      }
+    }
+  }());
+</script>

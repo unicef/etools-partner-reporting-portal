@@ -1,0 +1,36 @@
+<link rel="import" href="../constants.html">
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Actions = {
+      setToken: function (token) {
+        return {
+          type: App.Constants.SET_TOKEN,
+          token: token,
+        };
+      },
+
+      resetToken: function () {
+        return {
+          type: App.Constants.RESET_TOKEN,
+        };
+      },
+
+      userLogin: function () {
+        return {
+          type: App.Constants.USER_LOGIN,
+        };
+      },
+
+      userLogout: function () {
+        return function (dispatch) {
+          // TODO: Reset store
+
+          dispatch(App.Actions.resetToken());
+        };
+      },
+    };
+  }());
+</script>

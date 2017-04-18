@@ -1,0 +1,138 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/promise-polyfill/promise-polyfill-lite.html">
+
+<link rel="import" href="../redux/redux-store.html">
+<link rel="import" href="../utils.html">
+
+<dom-module id="etools-prp-ajax">
+  <template>
+    <iron-ajax
+        id="ajax"
+        bubbles
+
+        auto$="[[auto]]"
+
+        method="[[method]]"
+        content-type="[[contentType]]"
+        url="[[url]]"
+        body="[[body]]"
+        params="[[params]]"
+        headers="[[customHeaders]]"
+        timeout="[[timeout]]"
+        handle-as="[[handleAs]]"
+        json-prefix="[[jsonPrefix]]"
+        sync="[[sync]]"
+        withCredentials="[[withCredentials]]"
+
+        loading="{{loading}}"
+        active-requests="{{activeRequests}}"
+        debounce-duration="{{debounceDuration}}"
+        last-error="{{lastError}}"
+        last-request="{{lastRequest}}"
+        last-response="{{lastResponse}}">
+    </iron-ajax>
+  </template>
+
+  <script>
+    (function () {
+      Polymer({
+        is: 'etools-prp-ajax',
+
+        behaviors: [
+          App.Behaviors.ReduxBehavior,
+          App.Behaviors.UtilsBehavior,
+        ],
+
+        properties: {
+          token: {
+            type: String,
+            statePath: 'auth.token',
+          },
+
+          headers: {
+            type: Object,
+            value: {},
+          },
+
+          loading: {
+            type: Boolean,
+            notify: true,
+          },
+
+          customHeaders: {
+            type: Object,
+            computed: '_computeHeaders(headers, token)',
+          },
+        },
+
+        _computeHeaders: function (headers, token) {
+          return this._extend({}, {
+            Authorization: 'Bearer ' + token,
+          }, headers);
+        },
+
+        listeners: {
+          'ajax.response': '_handleResponse',
+          'ajax.request': '_handleRequest',
+          'ajax.error': '_handleError',
+        },
+
+        _handleResponse: function (e, request) {
+          var token = request.xhr.getResponseHeader('token');
+
+          if (token) {
+            this.dispatch(App.Actions.setToken(token));
+          }
+
+          this.fire.apply(this, ['response'].concat(arguments));
+        },
+
+        _handleRequest: function () {
+          this.fire.apply(this, ['request'].concat(arguments));
+        },
+
+        _handleError: function () {
+          var status = this.lastError.status;
+
+          if (status === 401) {
+            this.dispatch(App.Actions.resetToken());
+          }
+
+          this.fire.apply(this, ['error'].concat(arguments));
+        },
+
+        _buildResponse: function (req) {
+          return {
+            status: req.status,
+            data: req.parseResponse(),
+            xhr: req.xhr,
+          };
+        },
+
+        generateRequest: function () {
+          return this.$.ajax.generateRequest.apply(this.$.ajax, arguments);
+        },
+
+        toRequestOptions: function () {
+          return this.$.ajax.toRequestOptions.apply(this.$.ajax, arguments);
+        },
+
+        thunk: function () {
+          return (function () {
+            var req = this.generateRequest();
+            var self = this;
+
+            return req.completes
+                .then(function () {
+                  return self._buildResponse(req);
+                })
+                .catch(function () {
+                  return Promise.reject(self._buildResponse(req));
+                });
+          }.bind(this));
+        },
+      });
+    }());
+  </script>
+</dom-module>

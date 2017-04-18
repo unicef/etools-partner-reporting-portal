@@ -1,67 +1,40 @@
-<!--
-@license
-Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
--->
-
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-
-<link rel="import" href="../../styles/shared-styles.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
 
 <dom-module id="page-not-found">
-
   <template>
-
-    <style include="shared-styles">
-
+    <style>
       :host {
         display: block;
+        padding: 25px;
+
+        --paper-button: {
+          background-color: #fff;
+        };
       }
 
-      a {
-        color: var(--accent-color);
+      h1 {
+        @apply(--paper-font-display1);
       }
-
     </style>
 
+    <h1>Page not found</h1>
 
-    <app-header-layout>
-
-      <app-header fixed shadow>
-
-        <app-toolbar>
-          <paper-icon-button class="light" icon="menu" on-tap="openDrawer"></paper-icon-button>
-          <div main-title>404</div>
-        </app-toolbar>
-
-      </app-header>
-
-      <div id="pageContent">
-        <paper-material elevation="1">
-          <a href="/section1/tab1">Head back home.</a>
-        </paper-material>
-      </div>
-
-    </app-header-layout>
-
+    <paper-button id="return" on-tap="_return" raised>Head back home</paper-button>
   </template>
 
   <script>
-
     Polymer({
-
       is: 'page-not-found',
 
-      openDrawer: function() {
-        this.fire('drawer');
+      listeners: {
+        'return.tap': '_return',
       },
 
+      _return: function () {
+        window.location.href = '/';
+      },
     });
-
   </script>
-
 </dom-module>

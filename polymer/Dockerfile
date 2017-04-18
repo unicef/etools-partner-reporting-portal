@@ -1,4 +1,4 @@
-FROM mhart/alpine-node:7.7.4
+FROM mhart/alpine-node:7.8.0
 
 RUN apk update
 RUN apk add git
