@@ -1,6 +1,7 @@
 {
   "preset": "google",
   "disallowSpacesInAnonymousFunctionExpression": null,
+  "disallowSpacesInFunctionExpression": null,
   "disallowTrailingWhitespace": null,
   "maximumLineLength": 100,
   "validateIndentation": null,

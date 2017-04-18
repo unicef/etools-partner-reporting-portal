@@ -22,6 +22,7 @@ var htmlLintOptions = {
   'title-require': false,
   'attr-value-double-quotes': true,
   'attr-no-duplication': true,
+  'attr-lowercase': false,
   'id-unique': true
 };
 
