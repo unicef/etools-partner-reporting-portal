@@ -20,3 +20,4 @@ class Partner(models.Model):
 
 class Location(models.Model):
     name = models.CharField(max_length=255)
+    reportable = models.ForeignKey('reporting.Reportable', related_name="locations")

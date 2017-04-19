@@ -40,7 +40,7 @@ class IndicatorBlueprint(models.Model):
     activity = models.ForeignKey('activity.Activity', related_name="indicator_blueprints")
 
 
-class Indicator(models.Model):
+class Reportable(models.Model):
     title = models.CharField(max_length=255)
     baseline = models.FloatField()
     target = models.FloatField()
@@ -57,7 +57,7 @@ class IndicatorDisaggregation(models.Model):
     name = models.CharField(max_length=255)
     range = FloatRangeField()
 
-    indicator = models.ForeignKey(Indicator, related_name="indicator_disaggregations")
+    indicator = models.ForeignKey(Reportable, related_name="indicator_disaggregations")
 
 
 class IndicatorDataSpecification(models.Model):
@@ -66,4 +66,4 @@ class IndicatorDataSpecification(models.Model):
     frequency = models.IntegerField()
     unit = models.CharField(max_length=255)
 
-    indicator = models.ForeignKey(Indicator, related_name="indicator_data_specifications")
+    indicator = models.ForeignKey(Reportable, related_name="indicator_data_specifications")
