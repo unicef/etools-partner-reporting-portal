@@ -38,7 +38,7 @@ class Output(models.Model):
 
 class IndicatorBlueprint(models.Model):
     name = models.CharField(max_length=255)
-    activity = models.ForeignKey('activity.Activity', related_name="indicator_blueprints")
+    cluster_activity = models.ForeignKey('cluster.ClusterActivity', related_name="indicator_blueprints")
 
 
 class Reportable(models.Model):
@@ -52,9 +52,9 @@ class Reportable(models.Model):
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
 
-    project = models.ForeignKey(Project, null=True, related_name="indicators")
-    blueprint = models.ForeignKey(IndicatorBlueprint, null=True, related_name="indicators")
-    objective = models.ForeignKey('cluster.ClusterObjective', null=True, related_name="indicators")
+    project = models.ForeignKey(Project, null=True, related_name="reportables")
+    blueprint = models.ForeignKey(IndicatorBlueprint, null=True, related_name="reportables")
+    objective = models.ForeignKey('cluster.ClusterObjective', null=True, related_name="reportables")
 
 
 class IndicatorDisaggregation(models.Model):

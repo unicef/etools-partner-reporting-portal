@@ -12,3 +12,10 @@ class Cluster(models.Model):
 class ClusterObjective(models.Model):
     name = models.CharField(max_length=255)
     cluster = models.ForeignKey(Cluster, related_name="cluster_objectives")
+
+
+class ClusterActivity(models.Model):
+    name = models.CharField(max_length=255)
+    cluster = models.ForeignKey(Cluster, related_name="cluster_activities", null=True)
+    cluster_objective = models.ForeignKey(ClusterObjective, related_name="cluster_activities", null=True)
+    project = models.ForeignKey('reporting.Project', related_name="cluster_activities")

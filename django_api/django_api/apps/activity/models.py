@@ -23,3 +23,4 @@ class PartnerActivity(models.Model):
     activity = models.ForeignKey(Activity, related_name="partner_activites")
     project = models.ForeignKey('reporting.Project', null=True, related_name="partner_activities")
     partner = models.ForeignKey('core.Partner', related_name="partner_activities")
+    cluster_activity = models.ForeignKey('cluster.ClusterActivity', related_name="partner_activities")
