@@ -71,3 +71,19 @@ class IndicatorDataSpecification(models.Model):
     unit = models.CharField(max_length=255)
 
     indicator = models.ForeignKey(Reportable, related_name="indicator_data_specifications")
+
+
+class ProgrammeDocument(models.Model):
+    name = models.CharField(max_length=255)
+
+
+class CountryProgrammeOutput(models.Model):
+    name = models.CharField(max_length=255)
+
+    programme_document = models.ForeignKey(ProgrammeDocument, related_name="cp_outputs")
+
+
+class LowerLevelOutput(models.Model):
+    name = models.CharField(max_length=255)
+
+    indicator = models.ForeignKey(CountryProgrammeOutput, related_name="ll_outputs")
