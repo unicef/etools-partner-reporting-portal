@@ -12,13 +12,13 @@
     "src/pages/page-analysis.html",
     "src/pages/page-not-found.html"
   ],
-  "sourceGlobs": [
+  "sources": [
    "src/**/*",
    "images/**/*",
    "bower.json",
    "manifest.json"
   ],
-  "includeDependencies": [
+  "extraDependencies": [
     "bower_components/webcomponentsjs/webcomponents-lite.min.js"
   ]
 }
