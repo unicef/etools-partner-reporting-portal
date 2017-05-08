@@ -36,6 +36,7 @@
     "htmlhint-stylish": "^1.0.3",
     "jshint": "^2.9.3",
     "jshint-stylish": "^2.2.1",
+    "lite-server": "^2.3.0",
     "lazypipe": "^1.0.1",
     "merge-stream": "^1.0.0",
     "plylog": "^0.4.0",
