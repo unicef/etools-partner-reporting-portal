@@ -1,3 +1,6 @@
+<link rel="import" href="redux/actions.html">
+<link rel="import" href="redux/store.html">
+
 <script>
   (function () {
     'use strict';
@@ -18,9 +21,10 @@
 
           switch (xhr.status) {
             case 401:
-              this.async(function () {
-                self.set('route.path', '/login');
-              });
+              App.Store.dispatch(App.Actions.userLogout())
+                  .then(function () {
+                    self.set('route.path', '/login');
+                  });
               break;
 
             default:

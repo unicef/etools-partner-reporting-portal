@@ -46,7 +46,7 @@
 
     <app-drawer-layout persistent responsive-width="0px">
       <app-drawer>
-        <app-header>
+        <app-header fixed>
           <app-toolbar>
             <div class="mode">
               Cluster
@@ -148,7 +148,7 @@
       },
 
       _pageChanged: function (page) {
-        var resolvedPageUrl = this.resolveUrl('page-' + page + '.html');
+        var resolvedPageUrl = this.resolveUrl('app/page-' + page + '.html');
 
         this.importHref(resolvedPageUrl, null, this._notFound, true);
       },

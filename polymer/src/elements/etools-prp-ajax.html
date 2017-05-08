@@ -2,7 +2,7 @@
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../../bower_components/promise-polyfill/promise-polyfill-lite.html">
 
-<link rel="import" href="../redux/redux-store.html">
+<link rel="import" href="../redux/store.html">
 <link rel="import" href="../utils.html">
 
 <dom-module id="etools-prp-ajax">
@@ -63,6 +63,22 @@
           customHeaders: {
             type: Object,
             computed: '_computeHeaders(headers, token)',
+          },
+
+          lastRequest: {
+            notify: true,
+          },
+
+          lastResponse: {
+            notify: true,
+          },
+
+          lastError: {
+            notify: true,
+          },
+
+          activeRequests: {
+            notify: true,
           },
         },
 
