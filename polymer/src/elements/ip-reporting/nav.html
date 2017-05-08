@@ -1,0 +1,57 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../../bower_components/paper-item/paper-item.html">
+
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/page-nav.html">
+
+<link rel="import" href="../../styles/page-nav.html">
+
+<dom-module id="ip-reporting-nav">
+  <template>
+    <style include="page-nav-styles"></style>
+
+    <paper-menu
+        id="menu"
+        selected="{{selected}}"
+        attr-for-selected="name"
+        selectable="paper-item"
+        key-event-target="null">
+
+      <paper-item name="dashboard">
+        <a href="/app/ip-reporting/dashboard">
+          <span>Dashboard</span>
+        </a>
+      </paper-item>
+
+      <paper-item name="overview">
+        <a href="/app/ip-reporting/overview">
+          <span>Overview</span>
+        </a>
+      </paper-item>
+
+      <paper-item name="pd-reports">
+        <a href="/app/ip-reporting/pd-reports">
+          <span>PD Reports</span>
+        </a>
+      </paper-item>
+
+      <paper-item name="indicators">
+        <a href="/app/ip-reporting/indicators">
+          <span>Indicators</span>
+        </a>
+      </paper-item>
+    </paper-menu>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'ip-reporting-nav',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.PageNavBehavior,
+      ],
+    });
+  </script>
+</dom-module>
