@@ -12,7 +12,6 @@ class User(AbstractUser):
         return "{} - User".format(self.get_fullname())
 
 
-# Create your models here.
 class UserProfile(models.Model):
     user = models.OneToOneField(User, related_name="profile")
 

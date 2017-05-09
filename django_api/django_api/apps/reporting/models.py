@@ -5,7 +5,7 @@ from django.contrib.postgres.fields import FloatRangeField, JSONField
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 
-# Create your models here.
+
 class Project(models.Model):
     title = models.CharField(max_length=255)
     code = models.CharField(max_length=255)
@@ -96,9 +96,6 @@ class Reportable(models.Model):
     project = models.ForeignKey(Project, null=True, related_name="reportables")
     blueprint = models.ForeignKey(IndicatorBlueprint, null=True, related_name="reportables")
     objective = models.ForeignKey('cluster.ClusterObjective', null=True, related_name="reportables")
-
-    class Meta:
-        unique_together = (("blueprint", "content_object"),)
 
 
 class IndicatorDisaggregation(models.Model):
