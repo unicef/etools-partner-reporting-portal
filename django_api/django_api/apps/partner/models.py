@@ -81,7 +81,7 @@ class Partner(TimeStampedModel):
         blank=True,
         null=True
     )
-    country = models.CharField(
+    country_code = models.CharField(
         max_length=2,
         choices=COUNTRIES_ALPHA2_CODE,
         blank=True,
@@ -127,26 +127,26 @@ class Partner(TimeStampedModel):
     cluster = models.ManyToManyField('cluster.Cluster', related_name="partners")
 
     class Meta:
-        ordering = ['name']
-        unique_together = ('name', 'vendor_number')
+        ordering = ['title']
+        unique_together = ('title', 'vendor_number')
 
     def __unicode__(self):
-        return self.name
+        return self.title
 
     @property
     def country(self):
-        return COUNTRIES_ALPHA2_CODE_DICT[self.country]
+        return COUNTRIES_ALPHA2_CODE_DICT[self.country_code]
 
     @property
     def address(self):
-        return ", ".join(self.street_address, self.city, self.postal_code, self.get_country())
+        return ", ".join(self.street_address, self.city, self.postal_code, self.country)
 
 
 class PartnerProject(TimeStampedModel):
     title = models.CharField(max_length=255)
     start_date = models.DateField()
     end_date = models.DateField()
-    status = models.CharField()
+    status = models.CharField(max_length=100)
     budget = models.FloatField()
 
     cluster = models.ManyToManyField('cluster.Cluster', related_name="partner_projects")

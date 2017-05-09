@@ -7,7 +7,7 @@ from model_utils.models import TimeStampedModel
 
 class Cluster(TimeStampedModel):
     title = models.CharField(max_length=255)
-    country = models.ForeignKey('core.Country', related_name="clusters")
+    intervention = models.ForeignKey('core.Intervention', related_name="clusters")
     user = models.ForeignKey('account.User', related_name="clusters")
 
 
