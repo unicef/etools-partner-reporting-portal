@@ -16,7 +16,7 @@
       Redux.applyMiddleware(ReduxThunk.default)
     );
 
-    window.__SUPER_SECRET_STORE__ = store; // FIXME
+    App.Store = App.Store || store;
 
     App.Behaviors = App.Behaviors || {};
 
