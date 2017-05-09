@@ -5,8 +5,8 @@
 
 <link rel="import" href="styles/app-theme.html">
 <link rel="import" href="elements/etools-prp-auth.html">
-<link rel="import" href="utils.html">
-<link rel="import" href="errors.html">
+<link rel="import" href="behaviors/utils.html">
+<link rel="import" href="behaviors/errors.html">
 
 <dom-module id="app-shell">
   <template>
@@ -47,10 +47,7 @@
       </template>
 
        <template is="dom-if" if="[[_equals(page, 'not-found')]]" restamp="true">
-          <page-not-found
-              name="not-found"
-              backlink-url="/">
-          </page-not-found>
+          <page-not-found name="not-found"></page-not-found>
         </template>
     </iron-pages>
   </template>
@@ -97,7 +94,7 @@
       },
 
       _pageChanged: function (page) {
-        var resolvedPageUrl = this.resolveUrl('pages/page-' + page + '.html');
+        var resolvedPageUrl = this.resolveUrl('pages/' + page + '.html');
 
         this.importHref(resolvedPageUrl, null, this._notFound, true);
       },

@@ -1,0 +1,140 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../../../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../../../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../../../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../../../bower_components/iron-pages/iron-pages.html">-->
+
+<link rel="import" href="../../behaviors/utils.html">
+
+<link rel="import" href="../../elements/ip-reporting/nav.html">
+<link rel="import" href="../../elements/page-header.html">
+
+<dom-module id="page-ip-reporting">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      app-drawer {
+        --app-drawer-width: 220px;
+        --app-drawer-content-container: {
+          box-shadow: 1px 0 2px 1px rgba(0, 0, 0, .1);
+        }
+      }
+
+      app-toolbar {
+        background: var(--theme-primary-color);
+      }
+
+      .mode {
+        font-size: 16px;
+        text-transform: uppercase;
+        color: var(--theme-primary-text-color-light);
+        cursor: default;
+        user-select: none;
+      }
+    </style>
+
+    <app-route
+        route="{{route}}"
+        pattern="/:page"
+        data="{{routeData}}"
+        tail="{{subroute}}">
+    </app-route>
+
+    <app-drawer-layout persistent responsive-width="0px">
+      <app-drawer>
+        <app-header fixed>
+          <app-toolbar>
+            <div class="mode">
+              IP
+              <br>
+              Reporting
+            </div>
+          </app-toolbar>
+        </app-header>
+
+        <ip-reporting-nav
+            selected="{{page}}"
+            role="navigation">
+        </ip-reporting-nav>
+      </app-drawer>
+
+      <page-header></page-header>
+
+      <iron-pages
+          selected="[[page]]"
+          attr-for-selected="name">
+        <template is="dom-if" if="[[_equals(page, 'dashboard')]]" restamp="true">
+          <page-ip-reporting-dashboard
+              name="dashboard"
+              route="{{subroute}}">
+          </page-ip-reporting-dashboard>
+        </template>
+
+        <template is="dom-if" if="[[_equals(page, 'overview')]]" restamp="true">
+          <page-ip-reporting-overview
+              name="overview"
+              route="{{subroute}}">
+          </page-ip-reporting-overview>
+        </template>
+
+        <template is="dom-if" if="[[_equals(page, 'pd-reports')]]" restamp="true">
+          <page-ip-reporting-pd-reports
+              name="pd-reports"
+              route="{{subroute}}">
+          </page-ip-reporting-pd-reports>
+        </template>
+
+        <template is="dom-if" if="[[_equals(page, 'indicators')]]" restamp="true">
+          <page-ip-reporting-indicators
+              name="indicators"
+              route="{{subroute}}">
+          </page-ip-reporting-indicators>
+        </template>
+      </iron-pages>
+    </app-drawer-layout>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'page-ip-reporting',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+      ],
+
+      properties: {
+        page: {
+          type: String,
+          observer: '_pageChanged',
+        },
+      },
+
+      observers: [
+        '_routePageChanged(routeData.page)',
+      ],
+
+      _routePageChanged: function (page) {
+        if (!page) {
+          this.set('route.path', '/dashboard');
+        } else {
+          this.page = page;
+        }
+      },
+
+      _pageChanged: function (page) {
+        var resolvedPageUrl = this.resolveUrl('ip-reporting/' + page + '.html');
+
+        this.importHref(resolvedPageUrl, null, this._notFound, true);
+      },
+
+      _notFound: function () {
+        window.location.href = '/';
+      },
+    });
+  </script>
+</dom-module>
