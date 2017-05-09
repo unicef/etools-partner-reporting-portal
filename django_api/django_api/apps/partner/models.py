@@ -144,14 +144,13 @@ class Partner(TimeStampedModel):
 
 class PartnerProject(TimeStampedModel):
     title = models.CharField(max_length=255)
-    code = models.CharField(max_length=255)
-    in_ops = models.BooleanField(default=False)
-    geograph = models.CharField(max_length=255)
-    time_period = models.DateTimeField(auto_now=True)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    status = models.CharField()
     budget = models.FloatField()
-    status = models.CharField(max_length=255)
 
-    cluster = models.ForeignKey('cluster.Cluster', related_name="partner_projects")
+    cluster = models.ManyToManyField('cluster.Cluster', related_name="partner_projects")
+    location = models.ManyToManyField('core.Location', related_name="partner_projects")
     partner = models.ForeignKey(Partner, null=True, related_name="partner_projects")
 
 

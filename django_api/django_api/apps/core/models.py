@@ -29,6 +29,12 @@ class Intervention(TimeStampedModel):
         unique=True,
     )
     title = models.CharField(max_length=255)
+    country_code = models.CharField(
+        max_length=2,
+        choices=COUNTRIES_ALPHA2_CODE,
+        null=True,
+        blank=True
+    )
     status = models.CharField(
         max_length=3,
         blank=True,
@@ -59,59 +65,13 @@ class Intervention(TimeStampedModel):
     def __unicode__(self):
         return self.number
 
-
-class Country(TimeStampedModel):
-    title = models.CharField(max_length=255)
-    intervention = models.ForeignKey(
-        Intervention, related_name="countries")
-    code = models.CharField(
-        max_length=2,
-        choices=COUNTRIES_ALPHA2_CODE,
-        null=True,
-        blank=True
-    )
-
-    business_area_code = models.CharField(
-        max_length=10,
-        null=True,
-        blank=True
-    )
-    latitude = models.DecimalField(
-        null=True, blank=True,
-        max_digits=8,
-        decimal_places=5,
-        validators=[MinValueValidator(Decimal(-90)), MaxValueValidator(Decimal(90))]
-    )
-    longitude = models.DecimalField(
-        null=True, blank=True,
-        max_digits=8,
-        decimal_places=5,
-        validators=[MinValueValidator(Decimal(-180)), MaxValueValidator(Decimal(180))]
-    )
-    initial_zoom = models.IntegerField(default=8)
-
-    # hmm, I gues we don't need this at all (vision sync stuff)
-    vision_sync_enabled = models.BooleanField(default=True)
-    vision_last_synced = models.DateTimeField(null=True, blank=True)
-
-    local_currency_code = models.CharField(max_length=5, default=None, null=True)
-    local_currency_title = models.CharField(max_length=128, default=None, null=True)
-
-    threshold_tre_usd = models.DecimalField(max_digits=20, decimal_places=4, default=None, null=True)
-    threshold_tae_usd = models.DecimalField(max_digits=20, decimal_places=4, default=None, null=True)
-
-    def __unicode__(self):
-        if self.code:
-            return "%s (%s)" % (self.title, self.code)
-        return self.title
-
     @property
     def country_name(self):
-        return COUNTRIES_ALPHA2_CODE_DICT[self.code]
+        return COUNTRIES_ALPHA2_CODE_DICT[self.country_code]
 
     @property
     def country_code(self):
-        return self.code.lower()
+        return self.country_code.lower()
 
 
 class Location(TimeStampedModel):

@@ -18,4 +18,4 @@ class ClusterObjective(TimeStampedModel):
 
 class ClusterActivity(TimeStampedModel):
     title = models.CharField(max_length=255)
-    cluster_objective = models.ForeignKey(ClusterObjective, related_name="cluster_activities", null=True)
+    cluster_objective = models.ForeignKey(ClusterObjective, related_name="cluster_activities")
