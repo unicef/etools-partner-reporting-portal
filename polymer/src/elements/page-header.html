@@ -10,6 +10,8 @@
     <style>
       :host {
         display: block;
+        position: relative;
+        z-index: 1;
       }
 
       app-header {
@@ -18,7 +20,7 @@
     </style>
 
     <app-header-layout>
-      <app-header>
+      <app-header fixed>
         <app-toolbar>
           <etools-logo size="120" text-color="#fff"></etools-logo>
         </app-toolbar>

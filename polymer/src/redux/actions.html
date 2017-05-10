@@ -1,4 +1,5 @@
 <link rel="import" href="../constants.html">
+<link rel="import" href="../../bower_components/promise-polyfill/promise-polyfill-lite.html">
 
 <script>
   (function () {
@@ -26,9 +27,21 @@
 
       userLogout: function () {
         return function (dispatch) {
-          // TODO: Reset store
+          /**
+           * TODO:
+           * - reset store
+           * - return logout api call
+           */
 
           dispatch(App.Actions.resetToken());
+
+          return Promise.resolve(); // FIXME
+        };
+      },
+
+      reset: function () {
+        return {
+          type: App.Constants.RESET,
         };
       },
     };

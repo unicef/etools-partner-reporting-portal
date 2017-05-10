@@ -2,15 +2,15 @@
   "entrypoint": "index.html",
   "shell": "src/app-shell.html",
   "fragments": [
-    "src/pages/page-login.html",
-    "src/pages/page-app.html",
-    "src/pages/page-dashboard.html",
-    "src/pages/page-interventions.html",
-    "src/pages/page-activity-reports.html",
-    "src/pages/page-project-reports.html",
-    "src/pages/page-cluster-objective-reports.html",
-    "src/pages/page-analysis.html",
-    "src/pages/page-not-found.html"
+    "src/pages/login.html",
+    "src/pages/app.html",
+    "src/pages/not-found.html",
+    "src/pages/app/ip-reporting.html",
+    "src/pages/app/ip-reporting/dashboard.html",
+    "src/pages/app/ip-reporting/overview.html",
+    "src/pages/app/ip-reporting/pd-reports.html",
+    "src/pages/app/ip-reporting/indicators.html",
+    "src/pages/app/cluster-reporting.html"
   ],
   "sourceGlobs": [
    "src/**/*",

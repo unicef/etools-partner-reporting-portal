@@ -1,0 +1,79 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+
+<link rel="import" href=" ../behaviors/utils.html">
+
+<dom-module id="page-app">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <app-route
+        route="{{route}}"
+        pattern="/:app"
+        data="{{routeData}}"
+        tail="{{subroute}}">
+    </app-route>
+
+    <iron-pages
+        selected="[[page]]"
+        attr-for-selected="name">
+      <template is="dom-if" if="[[_equals(page, 'ip-reporting')]]" restamp="true">
+        <page-ip-reporting
+            name="ip-reporting"
+            route="{{subroute}}">
+        </page-ip-reporting>
+      </template>
+
+      <template is="dom-if" if="[[_equals(page, 'cluster-reporting')]]" restamp="true">
+        <page-cluster-reporting
+            name="cluster-reporting"
+            route="{{subroute}}">
+        </page-cluster-reporting>
+      </template>
+    </iron-pages>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'page-app',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+      ],
+
+      properties: {
+        page: {
+          type: String,
+          observer: '_pageChanged',
+        },
+      },
+
+      observers: [
+        '_routeAppChanged(routeData.app)',
+      ],
+
+      _routeAppChanged: function (app) {
+        if (!app) {
+          this.set('route.path', 'ip-reporting'); // FIXME: correct default?
+        } else {
+          this.page = app;
+        }
+      },
+
+      _pageChanged: function (page) {
+        var resolvedPageUrl = this.resolveUrl('app/' + page + '.html');
+
+        this.importHref(resolvedPageUrl, null, this._notFound, true);
+      },
+
+      _notFound: function () {
+        window.location.href = '/';
+      },
+    });
+  </script>
+</dom-module>
