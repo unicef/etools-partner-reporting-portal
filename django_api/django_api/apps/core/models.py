@@ -18,6 +18,11 @@ from .countries import COUNTRIES_ALPHA2_CODE_DICT, COUNTRIES_ALPHA2_CODE
 
 class Intervention(models.Model):
 
+    INTERVENTION_STATUS_HELP_TEXT = """
+        Draft = In discussion with partner, Active = Currently ongoing,
+        Implemented = completed, Terminated = cancelled or not approved
+    """
+
     document_type = models.CharField(
         choices=INTERVENTION_TYPES,
         max_length=255,
@@ -38,10 +43,7 @@ class Intervention(models.Model):
         blank=True,
         choices=INTERVENTION_STATUS,
         default=INTERVENTION_STATUS.draft,
-        help_text='Draft = In discussion with partner, '
-                  'Active = Currently ongoing, '
-                  'Implemented = completed, '
-                  'Terminated = cancelled or not approved'
+        help_text=INTERVENTION_STATUS_HELP_TEXT
     )
     start = models.DateField(
         null=True,
