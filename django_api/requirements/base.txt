@@ -3,3 +3,5 @@ Django==1.10.6
 
 # Other Python packages
 psycopg2==2.7.1
+django-model-utils==2.6.1  # latest 3.0.0 but need to check changes
+django-mptt==0.8.6

@@ -148,3 +148,6 @@ USE_TZ = True
 
 STATIC_URL = '/api/static/'
 # FORCE_SCRIPT_NAME = '/api/'
+
+# Authentication settings
+AUTH_USER_MODEL = 'account.User'
