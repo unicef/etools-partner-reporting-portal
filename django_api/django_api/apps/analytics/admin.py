@@ -1,3 +1,9 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import (
+    IndicatorReport,
+    ProgressReport,
+)
+
+admin.site.register(IndicatorReport)
+admin.site.register(ProgressReport)

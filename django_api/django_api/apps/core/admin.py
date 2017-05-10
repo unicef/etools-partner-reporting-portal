@@ -1,3 +1,13 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import (
+    Intervention,
+    Country,
+    Partner,
+    Location,
+)
+
+admin.site.register(Intervention)
+admin.site.register(Country)
+admin.site.register(Partner)
+admin.site.register(Location)
