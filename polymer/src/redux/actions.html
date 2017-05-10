@@ -39,6 +39,20 @@
         };
       },
 
+      setCountry: function (newCountry) {
+        return {
+          type: App.Constants.SET_COUNTRY,
+          country: newCountry,
+        };
+      },
+
+      setCountries: function (countries) {
+        return {
+          type: App.Constants.SET_COUNTRIES,
+          countries: countries,
+        };
+      },
+
       reset: function () {
         return {
           type: App.Constants.RESET,

@@ -1,0 +1,123 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+
+<link rel="import" href="../styles/country-flags.html">
+
+<dom-module id="country-dropdown">
+  <template>
+    <style include="country-flag-styles">
+      :host {
+        display: block;
+        cursor: pointer;
+      }
+
+      paper-dropdown-menu {
+        width: 160px;
+
+        --paper-input-container-underline: {
+          display: none;
+        };
+
+        --paper-input-container-underline-focus: {
+          display: none;
+        };
+
+        --paper-input-container-underline-disabled: {
+          display: none;
+        };
+
+        --paper-input-container-input: {
+          color: var(--theme-primary-text-color-medium);
+        };
+
+        --paper-dropdown-menu-icon: {
+          color: var(--theme-primary-text-color-medium);
+        };
+
+        --paper-input-container-label: {
+          top: 4px;
+          color: var(--theme-primary-text-color-medium);
+        };
+
+        --paper-input-container-input: {
+          margin-bottom: 2px;
+          color: var(--theme-primary-text-color-medium);
+        }
+      }
+
+      paper-item {
+        font-size: 15px;
+        white-space: nowrap;
+        cursor: pointer;
+      }
+
+      iron-icon {
+        bottom: 2px;
+        min-width: 24px;
+        min-height: 20px;
+        margin-right: 8px;
+      }
+
+      paper-item iron-icon {
+        margin-right: 16px;
+      }
+    </style>
+
+    <paper-dropdown-menu label="[[country.name]]" noink no-label-float>
+      <paper-listbox class="dropdown-content" on-iron-select="_countrySelected">
+        <template id="repeat" is="dom-repeat" items="[[data]]">
+          <paper-item>
+            <iron-icon class$="[[_computeClass(item)]]" item-icon></iron-icon>
+            [[item.name]]
+          </paper-item>
+        </template>
+      </paper-listbox>
+    </paper-dropdown-menu>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'country-dropdown',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        country: {
+          type: Object,
+          computed: '_computeCountry(data, current)',
+        },
+        current: {
+          type: String,
+        },
+        data: {
+          type: Array,
+        },
+      },
+
+      _countrySelected: function(e) {
+        const newCode = this.$.repeat.itemForElement(e.detail.item).code;
+
+        // TODO: read from props (etools-prp-countries reads it from the store)
+
+        // TODO hard-redirect to /app/[new_country_code]/[current_app] upon selection
+        // (store current_app in localStorage maybe?)
+
+        console.log('selected:', newCode);
+      },
+
+      _computeClass: function (country) {
+        return 'flag-icon flag-icon-' + country.code;
+      },
+
+      _computeCountry: function (data, code) {
+        return data.filter(function (country) {
+          return country.code === code;
+        })[0];
+      },
+    });
+  </script>
+</dom-module>
