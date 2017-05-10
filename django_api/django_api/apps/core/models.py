@@ -114,10 +114,12 @@ class Country(models.Model):
             return "%s (%s)" % (self.name, self.country_short_code)
         return self.name
 
-    def get_country_name(self):
+    @property
+    def country_name(self):
         return COUNTRIES_ALPHA2_CODE_DICT[self.code]
 
-    def get_country_code(self):
+    @property
+    def country_code(self):
         return self.code.lower()
 
 
