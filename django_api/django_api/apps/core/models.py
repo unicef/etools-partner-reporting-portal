@@ -100,6 +100,8 @@ class Country(models.Model):
         validators=[MinValueValidator(Decimal(-180)), MaxValueValidator(Decimal(180))]
     )
     initial_zoom = models.IntegerField(default=8)
+
+    # hmm, I gues we don't need this at all (vision sync stuff)
     vision_sync_enabled = models.BooleanField(default=True)
     vision_last_synced = models.DateTimeField(null=True, blank=True)
 
@@ -110,8 +112,8 @@ class Country(models.Model):
     threshold_tae_usd = models.DecimalField(max_digits=20, decimal_places=4, default=None, null=True)
 
     def __unicode__(self):
-        if self.country_short_code:
-            return "%s (%s)" % (self.name, self.country_short_code)
+        if self.code:
+            return "%s (%s)" % (self.name, self.code)
         return self.name
 
     @property
