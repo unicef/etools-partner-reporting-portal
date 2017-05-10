@@ -5,6 +5,8 @@ from django.contrib.postgres.fields import FloatRangeField, JSONField
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 
+from mptt.models import TreeForeignKey
+
 
 class Project(models.Model):
     title = models.CharField(max_length=255)
@@ -96,6 +98,8 @@ class Reportable(models.Model):
     project = models.ForeignKey(Project, null=True, related_name="reportables")
     blueprint = models.ForeignKey(IndicatorBlueprint, null=True, related_name="reportables")
     objective = models.ForeignKey('cluster.ClusterObjective', null=True, related_name="reportables")
+
+    parent_indicator = TreeForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
 
 
 class IndicatorDisaggregation(models.Model):
