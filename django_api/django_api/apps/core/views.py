@@ -1,4 +1,4 @@
-from rest_framework.generics import RetrieveAPIView, ListAPIView, RetrieveUpdateAPIView
+from rest_framework.generics import RetrieveAPIView, ListAPIView
 
 from .models import Country, Partner
 from .serializer import SimpleCountrySerializer, PartnerDetailsSerializer
