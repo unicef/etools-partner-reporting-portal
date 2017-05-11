@@ -5,14 +5,10 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
 from model_utils.models import TimeStampedModel
-from mptt.models import TreeForeignKey
 
 from .common import (
-    PARTNER_TYPE,
-    SHARED_PARTNER_TYPE,
     INTERVENTION_TYPES,
     INTERVENTION_STATUS,
-    CSO_TYPES,
 )
 from .countries import COUNTRIES_ALPHA2_CODE_DICT, COUNTRIES_ALPHA2_CODE
 
@@ -120,7 +116,7 @@ class Country(TimeStampedModel):
 
 class Location(TimeStampedModel):
     title = models.CharField(max_length=255)
-    reportable = models.ForeignKey('reporting.Reportable', related_name="locations")
+    reportable = models.ForeignKey('indicator.Reportable', related_name="locations")
 
     latitude = models.DecimalField(
         null=True,
@@ -138,7 +134,7 @@ class Location(TimeStampedModel):
     )
     p_code = models.CharField(max_length=32, blank=True, null=True)
 
-    parent = TreeForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
+    parent = models.ForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
     # uncomment when dj will be >= 1.11
     # geom = models.MultiPolygonField(null=True, blank=True)
     # point = models.PointField(null=True, blank=True)

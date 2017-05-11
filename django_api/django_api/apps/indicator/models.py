@@ -67,7 +67,7 @@ class Reportable(TimeStampedModel):
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
 
-    project = models.ForeignKey(Project, null=True, related_name="reportables")
+    project = models.ForeignKey('partner.PartnerProject', null=True, related_name="reportables")
     blueprint = models.ForeignKey(IndicatorBlueprint, null=True, related_name="reportables")
     objective = models.ForeignKey('cluster.ClusterObjective', null=True, related_name="reportables")
 
