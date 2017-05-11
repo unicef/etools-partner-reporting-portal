@@ -3,5 +3,5 @@ from __future__ import unicode_literals
 from django.apps import AppConfig
 
 
-class ReportingConfig(AppConfig):
-    name = 'reporting'
+class UnicefConfig(AppConfig):
+    name = 'unicef'

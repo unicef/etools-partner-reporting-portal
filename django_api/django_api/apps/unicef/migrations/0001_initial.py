@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Cluster',
+            name='CountryProgrammeOutput',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, editable=False, verbose_name='created')),
@@ -29,7 +29,20 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='ClusterActivity',
+            name='LowerLevelOutput',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, editable=False, verbose_name='created')),
+                ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, editable=False, verbose_name='modified')),
+                ('title', models.CharField(max_length=255)),
+                ('indicator', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='ll_outputs', to='unicef.CountryProgrammeOutput')),
+            ],
+            options={
+                'abstract': False,
+            },
+        ),
+        migrations.CreateModel(
+            name='ProgrammeDocument',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, editable=False, verbose_name='created')),
@@ -41,21 +54,23 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='ClusterObjective',
+            name='ProgressReport',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, editable=False, verbose_name='created')),
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, editable=False, verbose_name='modified')),
-                ('title', models.CharField(max_length=255)),
-                ('cluster', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='cluster_objectives', to='cluster.Cluster')),
+                ('partner_contribution_to_date', models.CharField(max_length=256)),
+                ('funds_received_to_date', models.CharField(max_length=256)),
+                ('challenges_in_the_reporting_period', models.CharField(max_length=256)),
+                ('proposed_way_forward', models.CharField(max_length=256)),
             ],
             options={
                 'abstract': False,
             },
         ),
         migrations.AddField(
-            model_name='clusteractivity',
-            name='cluster_objective',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='cluster_activities', to='cluster.ClusterObjective'),
+            model_name='countryprogrammeoutput',
+            name='programme_document',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='cp_outputs', to='unicef.ProgrammeDocument'),
         ),
     ]
