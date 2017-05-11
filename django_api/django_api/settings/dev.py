@@ -5,7 +5,6 @@ from .base import *
 # dev overrides
 DATA_VOLUME = '/data'
 DEBUG = True
-TEMPLATE_DEBUG = DEBUG
 IS_DEV = True
 
 UPLOADS_DIR_NAME = 'uploads'

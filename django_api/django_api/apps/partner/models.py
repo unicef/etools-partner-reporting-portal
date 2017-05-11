@@ -139,7 +139,7 @@ class Partner(TimeStampedModel):
 
     @property
     def address(self):
-        return ", ".join(self.street_address, self.city, self.postal_code, self.country)
+        return ", ".join([self.street_address, self.city, self.postal_code, self.country])
 
 
 class PartnerProject(TimeStampedModel):
