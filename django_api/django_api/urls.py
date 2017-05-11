@@ -22,7 +22,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 urlpatterns = [
     url(r'^api/admin/', admin.site.urls),
-    url(r'^api/core/', include('partner.urls')),
+    url(r'^api/partner/', include('partner.urls')),
 ]
 
 if settings.DEBUG:
