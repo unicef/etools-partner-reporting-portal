@@ -246,10 +246,12 @@ class Partner(models.Model):
     def __unicode__(self):
         return self.name
 
-    def get_country(self):
+    @property
+    def country_name(self):
         return COUNTRIES_ALPHA2_CODE_DICT[self.country]
 
-    def get_address(self):
+    @property
+    def address(self):
         return ", ".join(self.street_address, self.city, self.postal_code, self.get_country())
 
 
