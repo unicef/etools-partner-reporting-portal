@@ -2,7 +2,7 @@
 <link rel="import" href="../../bower_components/app-route/app-route.html">
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
 
-<link rel="import" href="../elements/etools-prp-countries">
+<link rel="import" href="../elements/etools-prp-countries.html">
 <link rel="import" href="../behaviors/utils.html">
 <link rel="import" href="../redux/actions.html">
 <link rel="import" href="../redux/store.html">
@@ -16,13 +16,13 @@
     </style>
 
     <etools-prp-countries
-        all="{{countries}}"
-        current="{{country}}">
+        id="countries"
+        all="{{countries}}">
     </etools-prp-countries>
 
     <app-route
         route="{{route}}"
-        pattern="/:country/:app"
+        pattern="/:country_code/:app"
         data="{{routeData}}"
         tail="{{subroute}}">
     </app-route>
@@ -63,40 +63,69 @@
       },
 
       observers: [
-        '_routeCountryChanged(routeData.country)',
+        '_routeCountryChanged(routeData.country_code)',
         '_routeAppChanged(routeData.app)',
       ],
 
-      _routeCountryChanged: function (country) {
-        var self = this;
+      _redirectToCountry: function (country) {
+        var code = country.code;
 
-        if (!country) {
-          this.dispatch(App.Actions.reset()); // Switch country = wipe all the data
+        this.set('route.path', '/' + code + '/');
+        this.set('routeData.country_code', code);
+      },
 
-          setTimeout(function () {
-            // Simulate network request
-            var defaultCountry = 'cc';
+      _redirectToApp: function (app) {
+        this.set('route.path', '/' + this.routeData.country_code + '/' + app);
+      },
 
-            self.dispatch(App.Actions.setCountry(defaultCountry));
+      _handleCountriesAsync: function (e, change) {
+        var country;
 
-            self.set('route.path', '/' + defaultCountry + '/');
-            self.set('routeData.country', defaultCountry);
-          }, 1000);
+        try {
+          if (change.value.length) {
+            this.unlisten(this.$.countries, 'all-changed', '_handleCountriesAsync');
+
+            country = change.value[0];
+
+            this._redirectToCountry(country);
+          }
+        } catch (err) {}
+      },
+
+      _routeCountryChanged: function (country_code) {
+        var country;
+
+        if (!country_code) {
+          this.dispatch(App.Actions.reset()); // Switch country === wipe all the data
+
+          if (this.countries.length) {
+
+            // Default to first
+            country = this.countries[0];
+
+            this._redirectToCountry(country);
+          } else {
+            // Wait until countries are available, then pick one & redirect
+            this.listen(this.$.countries, 'all-changed', '_handleCountriesAsync');
+          }
         } else {
-          self.dispatch(App.Actions.setCountry(country));
+          this.dispatch(App.Actions.setCountry(country_code));
         }
       },
 
       _routeAppChanged: function (app) {
         var defaultApp = 'ip-reporting'; // FIXME: correct default?
 
-        if (!this.routeData.country) {
+        if (!this.routeData.country_code) {
           return;
         }
 
         if (!app) {
-          this.set('route.path', '/' + this.routeData.country + '/' + defaultApp);
+          this._redirectToApp(defaultApp);
         } else {
+          this.dispatch(App.Actions.setApp(app));
+
+          // Render
           this.page = app;
         }
       },
@@ -112,30 +141,31 @@
       },
 
       attached: function () {
-
-        // FIXME (temporary only):
-        this.dispatch(App.Actions.setCountries([
-          {
-            id: 1,
-            name: 'China',
-            code: 'cn',
-          },
-          {
-            id: 2,
-            name: 'South Sudan',
-            code: 'ss',
-          },
-          {
-            id: 3,
-            name: 'Nepal',
-            code: 'np',
-          },
-          {
-            id: 4,
-            name: 'Sierra Leone',
-            code: 'sl',
-          },
-        ]));
+        // FIXME (temporary only; fetch countries from the API):
+        setTimeout(function () {
+          this.dispatch(App.Actions.setCountries([
+            {
+              id: 1,
+              name: 'China',
+              code: 'cn',
+            },
+            {
+              id: 2,
+              name: 'South Sudan',
+              code: 'ss',
+            },
+            {
+              id: 3,
+              name: 'Nepal',
+              code: 'np',
+            },
+            {
+              id: 4,
+              name: 'Sierra Leone',
+              code: 'sl',
+            },
+          ]));
+        }.bind(this), 500 /* simulate network latency */);
       },
     });
   </script>

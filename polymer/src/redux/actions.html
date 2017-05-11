@@ -53,6 +53,13 @@
         };
       },
 
+      setApp: function (app) {
+        return {
+          type: App.Constants.SET_APP,
+          app: app,
+        };
+      },
+
       reset: function () {
         return {
           type: App.Constants.RESET,

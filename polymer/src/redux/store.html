@@ -3,6 +3,7 @@
 <link rel="import" href="redux.html">
 <link rel="import" href="reducers/auth.html">
 <link rel="import" href="reducers/countries.html">
+<link rel="import" href="reducers/app.html">
 
 <script src="../../bower_components/redux-thunk/index.js"></script>
 
@@ -11,6 +12,7 @@
     var rootReducer = Redux.combineReducers({
       auth: App.Reducers.Auth,
       countries: App.Reducers.Countries,
+      app: App.Reducers.App,
     });
 
     var store = Redux.createStore(
