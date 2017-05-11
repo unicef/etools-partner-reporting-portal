@@ -8,7 +8,11 @@
 
 ## Development
 If You want enter inside backend, You should run command:
-    1. display all containers and read "CONTAINER ID" for your backend:
-        $ docker ps
-    2. enter inside backend (with TTY communications)
-        $ docker exec -t -i "CONTAINER ID" bash
+   1. display all containers and read "CONTAINER ID" for your backend:
+   ```
+   $ docker ps
+   ```
+   2. enter inside backend (with TTY communications)
+   ```
+   $ docker exec -t -i "CONTAINER ID" bash
+   ```

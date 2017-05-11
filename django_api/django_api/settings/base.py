@@ -56,12 +56,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'rest_framework',
+
     'account',
-    'activity',
-    'analytics',
     'cluster',
     'core',
-    'reporting',
+    'indicator',
+    'partner',
+    'unicef',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -148,3 +150,6 @@ USE_TZ = True
 
 STATIC_URL = '/api/static/'
 # FORCE_SCRIPT_NAME = '/api/'
+
+# Authentication settings
+AUTH_USER_MODEL = 'account.User'
