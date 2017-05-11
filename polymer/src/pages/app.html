@@ -3,9 +3,11 @@
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
 
 <link rel="import" href="../elements/etools-prp-countries.html">
+<link rel="import" href="../elements/etools-prp-ajax.html">
 <link rel="import" href="../behaviors/utils.html">
 <link rel="import" href="../redux/actions.html">
 <link rel="import" href="../redux/store.html">
+<link rel="import" href="../endpoints.html">
 
 <dom-module id="page-app">
   <template>
@@ -19,6 +21,11 @@
         id="countries"
         all="{{countries}}">
     </etools-prp-countries>
+
+    <etools-prp-ajax
+        id="interventions"
+        url="[[interventionsUrl]]">
+    </etools-prp-ajax>
 
     <app-route
         route="{{route}}"
@@ -60,6 +67,11 @@
           type: String,
           observer: '_pageChanged',
         },
+
+        interventionsUrl: {
+          type: String,
+          value: App.Endpoints.interventions(),
+        }
       },
 
       observers: [
@@ -140,32 +152,22 @@
         window.location.href = '/not-found';
       },
 
+      _handleInterventions: function (res) {
+        var countries = (res.data || [])
+            .map(function (intervention) {
+              return {
+                id: intervention.id,
+                code: intervention.country_code,
+                name: intervention.country_name,
+              };
+            });
+
+        this.dispatch(App.Actions.setCountries(countries));
+      },
+
       attached: function () {
-        // FIXME (temporary only; fetch countries from the API):
-        this.async(function () {
-          this.dispatch(App.Actions.setCountries([
-            {
-              id: 1,
-              name: 'China',
-              code: 'cn',
-            },
-            {
-              id: 2,
-              name: 'South Sudan',
-              code: 'ss',
-            },
-            {
-              id: 3,
-              name: 'Nepal',
-              code: 'np',
-            },
-            {
-              id: 4,
-              name: 'Sierra Leone',
-              code: 'sl',
-            },
-          ]));
-        }, 500); // Simulate network latency
+        this.$.interventions.thunk()()
+            .then(this._handleInterventions.bind(this));
       },
     });
   </script>
