@@ -2,10 +2,10 @@
   (function () {
     'use strict';
 
-    const BASE_URL = '/api';
+    var BASE_URL = '/api';
 
     App.Endpoints = {
-      _buildUrl(tail) {
+      _buildUrl: function (tail) {
         return BASE_URL + tail;
       },
 

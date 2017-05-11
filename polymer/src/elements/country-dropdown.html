@@ -110,7 +110,7 @@
       },
 
       _countrySelected: function(e) {
-        const newCode = this.$.repeat.itemForElement(e.detail.item).code;
+        var newCode = this.$.repeat.itemForElement(e.detail.item).code;
 
         if (newCode === this.current) {
           return;
