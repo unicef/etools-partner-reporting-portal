@@ -69,7 +69,10 @@
     </style>
 
     <paper-dropdown-menu label="[[country.name]]" noink no-label-float>
-      <paper-listbox class="dropdown-content" on-iron-select="_countrySelected">
+      <paper-listbox
+          class="dropdown-content"
+          on-iron-select="_countrySelected"
+          selected="[[selected]]">
         <template id="repeat" is="dom-repeat" items="[[data]]">
           <paper-item>
             <iron-icon class$="[[_computeClass(item)]]" item-icon></iron-icon>
@@ -93,6 +96,12 @@
         country: {
           type: Object,
           computed: '_computeCountry(data, current)',
+        },
+
+        selected: {
+          type: Number,
+          value: 0,
+          computed: '_computeSelected(data, country)',
         },
 
         current: String,
@@ -120,6 +129,10 @@
         return data.filter(function (country) {
           return country.code === code;
         })[0];
+      },
+
+      _computeSelected: function (data, country) {
+        return data.indexOf(country);
       },
     });
   </script>
