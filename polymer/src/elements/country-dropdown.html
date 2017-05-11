@@ -94,16 +94,18 @@
           type: Object,
           computed: '_computeCountry(data, current)',
         },
-        current: {
-          type: String,
-        },
-        data: {
-          type: Array,
-        },
+
+        current: String,
+
+        data: Array,
       },
 
       _countrySelected: function(e) {
         const newCode = this.$.repeat.itemForElement(e.detail.item).code;
+
+        if (newCode === this.current) {
+          return;
+        }
 
         this.dispatch(App.Actions.setCountry(newCode));
 
