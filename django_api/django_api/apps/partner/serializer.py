@@ -12,5 +12,5 @@ class PartnerDetailsSerializer(serializers.ModelSerializer):
         model = Partner
         fields = ('id', 'title', 'short_title', 'alternate_title', 'vendor_number', 'partner_type', 'partner_type_long',
                   'shared_partner_long', 'shared_partner', 'last_assessment_date', 'core_values_assessment_date',
-                  'address', 'street_address', 'city', 'postal_code', 'country', 'country_code_lower', 'email',
+                  'address', 'street_address', 'city', 'postal_code', 'country', 'country_code', 'email',
                   'phone_number')

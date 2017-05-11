@@ -1,10 +1,10 @@
 from django.conf.urls import url
 
 from .views import (
-    SimpleCountryAPIView,
+    SimpleInterventionAPIView,
 )
 
 
 urlpatterns = [
-    url(r'^simple-country/$', SimpleCountryAPIView.as_view(), name="simple-country"),
+    url(r'^simple-intervention/$', SimpleInterventionAPIView.as_view(), name="simple-intervention"),
 ]
