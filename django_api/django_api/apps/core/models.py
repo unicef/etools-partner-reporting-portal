@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
+from model_utils.models import TimeStampedModel
 from mptt.models import TreeForeignKey
 
 from .common import (
@@ -16,13 +17,7 @@ from .common import (
 from .countries import COUNTRIES_ALPHA2_CODE_DICT, COUNTRIES_ALPHA2_CODE
 
 
-class Intervention(models.Model):
-
-    INTERVENTION_STATUS_HELP_TEXT = """
-        Draft = In discussion with partner, Active = Currently ongoing,
-        Implemented = completed, Terminated = cancelled or not approved
-    """
-
+class Intervention(TimeStampedModel):
     document_type = models.CharField(
         choices=INTERVENTION_TYPES,
         max_length=255,
@@ -43,7 +38,10 @@ class Intervention(models.Model):
         blank=True,
         choices=INTERVENTION_STATUS,
         default=INTERVENTION_STATUS.draft,
-        help_text=INTERVENTION_STATUS_HELP_TEXT
+        help_text="""
+            Draft = In discussion with partner, Active = Currently ongoing,
+            Implemented = completed, Terminated = cancelled or not approved
+        """
     )
     start = models.DateField(
         null=True,
@@ -54,11 +52,6 @@ class Intervention(models.Model):
         null=True,
         blank=True,
         help_text='The date the Intervention will end'
-    )
-    submission_date = models.DateField(
-        null=True,
-        blank=True,
-        help_text='The date the partner submitted complete PD/SSFA documents to Unicef',
     )
 
     signed_by_unicef_date = models.DateField(null=True, blank=True)
@@ -71,8 +64,8 @@ class Intervention(models.Model):
         return self.number
 
 
-class Country(models.Model):
-    name = models.CharField(max_length=255)
+class Country(TimeStampedModel):
+    title = models.CharField(max_length=255)
     intervention = models.ForeignKey(
         Intervention, related_name="countries")
     code = models.CharField(
@@ -106,15 +99,15 @@ class Country(models.Model):
     vision_last_synced = models.DateTimeField(null=True, blank=True)
 
     local_currency_code = models.CharField(max_length=5, default=None, null=True)
-    local_currency_name = models.CharField(max_length=128, default=None, null=True)
+    local_currency_title = models.CharField(max_length=128, default=None, null=True)
 
     threshold_tre_usd = models.DecimalField(max_digits=20, decimal_places=4, default=None, null=True)
     threshold_tae_usd = models.DecimalField(max_digits=20, decimal_places=4, default=None, null=True)
 
     def __unicode__(self):
         if self.code:
-            return "%s (%s)" % (self.name, self.code)
-        return self.name
+            return "%s (%s)" % (self.title, self.code)
+        return self.title
 
     @property
     def country_name(self):
@@ -125,136 +118,8 @@ class Country(models.Model):
         return self.code.lower()
 
 
-class Partner(models.Model):
-
-    name = models.CharField(
-        max_length=255,
-        verbose_name='Full Name',
-        help_text='Please make sure this matches the name you enter in VISION'
-    )
-    short_name = models.CharField(
-        max_length=50,
-        blank=True
-    )
-    alternate_name = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True
-    )
-    partner_type = models.CharField(
-        max_length=3,
-        choices=PARTNER_TYPE,
-        default=PARTNER_TYPE.government,
-    )
-    shared_partner = models.CharField(
-        help_text='Partner shared with UNDP or UNFPA?',
-        choices=SHARED_PARTNER_TYPE,
-        default=SHARED_PARTNER_TYPE.no,
-        max_length=3
-    )
-    cso_type = models.CharField(
-        max_length=3,
-        choices=CSO_TYPES,
-        verbose_name='CSO Type',
-        blank=True,
-        null=True
-    )
-    email = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True
-    )
-    phone_number = models.CharField(
-        max_length=32,
-        blank=True,
-        null=True
-    )
-    last_assessment_date = models.DateField(
-        blank=True,
-        null=True
-    )
-    core_values_assessment_date = models.DateField(
-        blank=True,
-        null=True,
-        verbose_name=u'Date positively assessed against core values'
-    )
-
-    street_address = models.CharField(
-        max_length=512,
-        blank=True,
-        null=True
-    )
-    city = models.CharField(
-        max_length=32,
-        blank=True,
-        null=True
-    )
-    postal_code = models.CharField(
-        max_length=32,
-        blank=True,
-        null=True
-    )
-    country = models.CharField(
-        max_length=2,
-        choices=COUNTRIES_ALPHA2_CODE,
-        blank=True,
-        null=True
-    )
-
-    total_ct_cp = models.DecimalField(
-        decimal_places=2,
-        max_digits=12,
-        blank=True,
-        null=True,
-        help_text='Total Cash Transferred for Country Programme'
-    )
-    total_ct_cy = models.DecimalField(
-        decimal_places=2,
-        max_digits=12,
-        blank=True,
-        null=True,
-        help_text='Total Cash Transferred per Current Year'
-    )
-
-    vendor_number = models.CharField(
-        blank=True,
-        null=True,
-        unique=True,
-        max_length=30
-    )
-    alternate_id = models.IntegerField(
-        blank=True,
-        null=True
-    )
-    alternate_name = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True
-    )
-    rating = models.CharField(
-        max_length=50,
-        null=True,
-        verbose_name='Risk Rating'
-    )
-
-    cluster = models.ForeignKey('cluster.Cluster', related_name="partners")
-
-    class Meta:
-        ordering = ['name']
-        unique_together = ('name', 'vendor_number')
-
-    def __unicode__(self):
-        return self.name
-
-    def get_country(self):
-        return COUNTRIES_ALPHA2_CODE_DICT[self.country]
-
-    def get_address(self):
-        return ", ".join(self.street_address, self.city, self.postal_code, self.get_country())
-
-
-class Location(models.Model):
-    name = models.CharField(max_length=255)
+class Location(TimeStampedModel):
+    title = models.CharField(max_length=255)
     reportable = models.ForeignKey('reporting.Reportable', related_name="locations")
 
     latitude = models.DecimalField(
@@ -279,13 +144,13 @@ class Location(models.Model):
     # point = models.PointField(null=True, blank=True)
 
     class Meta:
-        unique_together = ('name', 'p_code')
-        ordering = ['name']
+        unique_together = ('title', 'p_code')
+        ordering = ['title']
 
     def __unicode__(self):
         if self.p_code:
-            return "%s {PCode: %s}" % (self.name, self.p_code)
-        return self.name
+            return "%s {PCode: %s}" % (self.title, self.p_code)
+        return self.title
 
     @property
     def geo_point(self):
