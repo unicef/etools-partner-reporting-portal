@@ -1,13 +1,13 @@
 from rest_framework import serializers
 
-from .models import Country, Partner
+from .models import Partner
 
 
-class SimpleCountrySerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Country
-        fields = ('id', 'name', 'country_name', 'country_code', 'business_area_code')
+# class SimpleCountrySerializer(serializers.ModelSerializer):
+#
+#     class Meta:
+#         model = Country
+#         fields = ('id', 'name', 'country_name', 'country_code', 'business_area_code')
 
 
 class PartnerDetailsSerializer(serializers.ModelSerializer):

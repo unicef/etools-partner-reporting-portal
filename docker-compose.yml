@@ -2,6 +2,7 @@ version: '2.1'
 
 services:
   proxy:
+    image: unicef/etools-prp-nginx-proxy
     build:
       context: ./nginx_proxy
       dockerfile: ./Dockerfile
@@ -12,6 +13,7 @@ services:
       - polymer
 
   django_api:
+    image: unicef/etools-prp-django-api
     env_file:
       - django_api/.env
     build:
@@ -27,6 +29,7 @@ services:
       - db
 
   db:
+    image: unicef/etools-prp-db
     build:
       context: ./db
       dockerfile: ./Dockerfile
@@ -34,6 +37,7 @@ services:
 #      - './postgres_data:/var/lib/postgresql/data'
 
   polymer:
+    image: unicef/etools-prp-polymer
     build:
       context: ./polymer
       dockerfile: ./Dockerfile

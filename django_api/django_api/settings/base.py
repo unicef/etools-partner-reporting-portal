@@ -58,11 +58,11 @@ INSTALLED_APPS = [
     'rest_framework',
 
     'account',
-    'activity',
-    'analytics',
     'cluster',
     'core',
-    'reporting',
+    'indicator',
+    'partner',
+    'unicef',
 ]
 
 MIDDLEWARE_CLASSES = [

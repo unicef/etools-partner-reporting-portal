@@ -1,9 +1,11 @@
 from django.contrib import admin
 
 from .models import (
-    Activity,
+    Partner,
+    PartnerProject,
     PartnerActivity,
 )
 
-admin.site.register(Activity)
+admin.site.register(Partner)
+admin.site.register(PartnerProject)
 admin.site.register(PartnerActivity)
