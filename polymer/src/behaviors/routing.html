@@ -33,7 +33,7 @@
        * expression within the template.
        */
       buildUrl: function (baseUrl, tail) {
-        if (tail[0] !== '/') {
+        if (tail.length && tail[0] !== '/') {
           tail = '/' + tail;
         }
 

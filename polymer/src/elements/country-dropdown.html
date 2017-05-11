@@ -4,6 +4,9 @@
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 
 <link rel="import" href="../styles/country-flags.html">
+<link rel="import" href="../redux/store.html">
+<link rel="import" href="../redux/actions.html">
+<link rel="import" href="../behaviors/routing.html">
 
 <dom-module id="country-dropdown">
   <template>
@@ -83,6 +86,7 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.RoutingBehavior,
       ],
 
       properties: {
@@ -101,12 +105,9 @@
       _countrySelected: function(e) {
         const newCode = this.$.repeat.itemForElement(e.detail.item).code;
 
-        // TODO: read from props (etools-prp-countries reads it from the store)
+        this.dispatch(App.Actions.setCountry(newCode));
 
-        // TODO hard-redirect to /app/[new_country_code]/[current_app] upon selection
-        // (store current_app in localStorage maybe?)
-
-        console.log('selected:', newCode);
+        window.location.href = this.buildUrl(this._baseUrl, '/');
       },
 
       _computeClass: function (country) {
