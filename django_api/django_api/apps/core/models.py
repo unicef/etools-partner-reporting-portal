@@ -70,12 +70,15 @@ class Intervention(TimeStampedModel):
         return COUNTRIES_ALPHA2_CODE_DICT[self.country_code]
 
     @property
-    def country_code(self):
+    def country_code_lower(self):
+        """
+        Frontend need to get lower case country code
+        """
         return self.country_code.lower()
 
     @property
     def address(self):
-        return ", ".join(self.street_address, self.city, self.postal_code, self.get_country())
+        return ", ".join(self.street_address, self.city, self.postal_code, self.country_name)
 
 
 class Location(models.Model):

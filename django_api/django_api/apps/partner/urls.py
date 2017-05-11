@@ -7,6 +7,5 @@ from .views import (
 
 
 urlpatterns = [
-#    url(r'^simple-country/$', SimpleCountryAPIView.as_view(), name="simple-country"),
     url(r'^partner-details/(?P<pk>\d+)/$', PartnerDetailsAPIView.as_view(), name="partner-details"),
 ]

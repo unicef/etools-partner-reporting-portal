@@ -3,13 +3,6 @@ from rest_framework import serializers
 from .models import Partner
 
 
-# class SimpleCountrySerializer(serializers.ModelSerializer):
-#
-#     class Meta:
-#         model = Country
-#         fields = ('id', 'name', 'country_name', 'country_code', 'business_area_code')
-
-
 class PartnerDetailsSerializer(serializers.ModelSerializer):
 
     partner_type_long = serializers.CharField(source='get_partner_type_display')
@@ -19,5 +12,5 @@ class PartnerDetailsSerializer(serializers.ModelSerializer):
         model = Partner
         fields = ('id', 'title', 'short_title', 'alternate_title', 'vendor_number', 'partner_type', 'partner_type_long',
                   'shared_partner_long', 'shared_partner', 'last_assessment_date', 'core_values_assessment_date',
-                  'address', 'street_address', 'city', 'postal_code', 'country', 'country_code', 'email',
+                  'address', 'street_address', 'city', 'postal_code', 'country', 'country_code_lower', 'email',
                   'phone_number')
