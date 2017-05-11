@@ -142,7 +142,7 @@
 
       attached: function () {
         // FIXME (temporary only; fetch countries from the API):
-        setTimeout(function () {
+        this.async(function () {
           this.dispatch(App.Actions.setCountries([
             {
               id: 1,
@@ -165,7 +165,7 @@
               code: 'sl',
             },
           ]));
-        }.bind(this), 500 /* simulate network latency */);
+        }, 500); // Simulate network latency
       },
     });
   </script>
