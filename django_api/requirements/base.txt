@@ -8,3 +8,8 @@ djangorestframework==3.6.2
 psycopg2==2.7.1
 django-model-utils==2.6.1  # latest 3.0.0 but need to check changes
 django-mptt==0.8.6
+
+# Testing
+astroid==1.5.2
+isort==4.2.5
+pylint==1.7.1
