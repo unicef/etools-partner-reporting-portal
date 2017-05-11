@@ -70,11 +70,11 @@ class Intervention(TimeStampedModel):
         return COUNTRIES_ALPHA2_CODE_DICT[self.country_code]
 
     @property
-    def country_code(self):
-        return self.country_code.lower()
+    def address(self):
+        return ", ".join(self.street_address, self.city, self.postal_code, self.country_name)
 
 
-class Location(TimeStampedModel):
+class Location(models.Model):
     title = models.CharField(max_length=255)
     reportable = models.ForeignKey('indicator.Reportable', related_name="locations")
 
