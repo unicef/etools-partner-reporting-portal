@@ -14,7 +14,7 @@
     "node": ">=4.0"
   },
   "scripts": {
-    "dev": "lite-server"
+    "dev": "./node_modules/lite-server/bin/lite-server"
   },
   "private": true,
   "devDependencies": {

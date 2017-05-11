@@ -1,3 +1,11 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import (
+    Cluster,
+    ClusterObjective,
+    ClusterActivity,
+)
+
+admin.site.register(Cluster)
+admin.site.register(ClusterObjective)
+admin.site.register(ClusterActivity)
