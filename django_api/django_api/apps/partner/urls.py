@@ -7,5 +7,5 @@ from .views import (
 
 
 urlpatterns = [
-    url(r'^partner-details/(?P<pk>\d+)/$', PartnerDetailsAPIView.as_view(), name="partner-details"),
+    url(r'^partner-details/$', PartnerDetailsAPIView.as_view(), name="partner-details"),
 ]
