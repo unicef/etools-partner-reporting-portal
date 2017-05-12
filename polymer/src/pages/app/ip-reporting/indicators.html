@@ -1,17 +1,18 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/paper-material/paper-material.html">
+
+<link rel="import" href="../../../elements/ip-reporting/list-view-indicators.html">
+
+<link rel="import" href="../../../styles/page-headers.html">
 
 <dom-module id="page-ip-reporting-indicators">
   <template>
-    <style>
-      :host {
-        display: block;
-        padding: 25px;
-      }
-    </style>
-
-    <div>Indicators</div>
+    <paper-material class="subheader" elevation="0">
+      <style include="page-headers"></style>
+      <h2>Indicators</h2>
+    </paper-material>
+    <list-view-indicators />
   </template>
-
   <script>
     Polymer({
       is: 'page-ip-reporting-indicators',

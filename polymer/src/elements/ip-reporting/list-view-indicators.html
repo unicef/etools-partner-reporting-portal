@@ -1,0 +1,76 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../../../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../../../bower_components/etools-data-table/etools-data-table.html">
+
+
+<link rel="import" href="../../styles/page-headers.html">
+
+<dom-module id="list-view-indicators">
+  <template>
+    <style include='page-headers'>
+      :host {
+        display: block;
+        padding: 25px;
+      }
+    </style>
+    <indicator-list-data id="indicators" />
+      <h3>List of Indicators</h3>
+      <etools-data-table-header
+        id="listHeader"
+        label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
+        <etools-data-table-column class="col-2" field="number" sortable>
+          PD/SSFA ToR ref.#
+        </etools-data-table-column>
+        <etools-data-table-column class="col-4" field="indicator"  sortable>
+          Indicator
+        </etools-data-table-column>
+        <etools-data-table-column class="flex-c" field="progress" sortable>
+          Current progress
+        </etools-data-table-column>
+      </etools-data-table-header>
+
+      <template id="rows" is="dom-repeat" items="[[governments]]" as="entry">
+        <etools-data-table-row details-opened="[[detailsOpened]]">
+          <div slot="row-data">
+            <span class="col-data">
+              [[entry.code]]
+              2016/000-0
+            </span>
+            <span class="col-data">
+              [[[entry.title]]
+              Lorem ipsum dolor sit amet, etiam mattis, quisque dapibus proin et. Etiam arcu est mollis amet nulla, id ut morbi.
+            </span>
+            <span class="col-data">
+              [[entry.unit]]
+              (Progress bar here)
+            </span>
+          </div>
+          <div slot="row-data-details">
+            <div class="row-details-content">
+              <span class="rdc-title">Unicef Focal Point</span>
+              <span>[[entry.unicef_focal_point_names]]</span>
+            </div>
+            <div class="row-details-content">
+              <span class="rdc-title">Sectors</span>
+              <span>[[entry.sectors]]</span>
+            </div>
+          </div>
+        </etools-data-table-row>
+      </template>
+
+      <etools-data-table-footer
+          page-size="[[pageSize]]"
+          page-number="[[pageNumber]]"
+          total-results="[[totalResults]]"
+          visible-range="{{visibleRange}}"
+          on-page-size-changed="_pageSizeSelected"
+          on-page-number-changed="_pageNumberChanged">
+      </etools-data-table-footer>
+  </template>
+  <script>
+    Polymer({
+      is: 'list-view-indicators',
+    });
+  </script>
+</dom-module>
