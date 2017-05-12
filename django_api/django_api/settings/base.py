@@ -33,6 +33,16 @@ ENV = os.getenv('ENV')
 if not ENV:
     raise Exception('Environment variable ENV is required!')
 
+DATA_VOLUME = '/data'
+
+UPLOADS_DIR_NAME = 'uploads'
+MEDIA_URL = '/%s/' % UPLOADS_DIR_NAME
+MEDIA_ROOT = os.path.join(DATA_VOLUME, '%s' % UPLOADS_DIR_NAME)
+
+FILE_UPLOAD_MAX_MEMORY_SIZE = 4194304  # 4mb
+MEDIA_ROOT = os.path.join(DATA_VOLUME, '%s' % UPLOADS_DIR_NAME)
+STATIC_ROOT = '%s/staticserve' % DATA_VOLUME
+
 # Sendgrid stuff
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
