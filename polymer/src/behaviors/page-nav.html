@@ -10,10 +10,8 @@
       ],
 
       _selectedChanged: function (selected) {
-        var self = this;
-
         this.async(function () {
-          self._forEach('paper-submenu', function (submenu) {
+          this._forEach('paper-submenu', function (submenu) {
             var isSelected = !!Polymer.dom(submenu).querySelector('[name="' + selected + '"]');
 
             switch (true) {

@@ -2,7 +2,12 @@
 <link rel="import" href="../../bower_components/app-route/app-route.html">
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
 
-<link rel="import" href=" ../behaviors/utils.html">
+<link rel="import" href="../elements/etools-prp-countries.html">
+<link rel="import" href="../elements/etools-prp-ajax.html">
+<link rel="import" href="../behaviors/utils.html">
+<link rel="import" href="../redux/actions.html">
+<link rel="import" href="../redux/store.html">
+<link rel="import" href="../endpoints.html">
 
 <dom-module id="page-app">
   <template>
@@ -12,9 +17,19 @@
       }
     </style>
 
+    <etools-prp-countries
+        id="countries"
+        all="{{countries}}">
+    </etools-prp-countries>
+
+    <etools-prp-ajax
+        id="interventions"
+        url="[[interventionsUrl]]">
+    </etools-prp-ajax>
+
     <app-route
         route="{{route}}"
-        pattern="/:app"
+        pattern="/:country_code/:app"
         data="{{routeData}}"
         tail="{{subroute}}">
     </app-route>
@@ -44,6 +59,7 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
       ],
 
       properties: {
@@ -51,16 +67,77 @@
           type: String,
           observer: '_pageChanged',
         },
+
+        interventionsUrl: {
+          type: String,
+          value: App.Endpoints.interventions(),
+        }
       },
 
       observers: [
+        '_routeCountryChanged(routeData.country_code)',
         '_routeAppChanged(routeData.app)',
       ],
 
-      _routeAppChanged: function (app) {
-        if (!app) {
-          this.set('route.path', 'ip-reporting'); // FIXME: correct default?
+      _redirectToCountry: function (country) {
+        var code = country.code;
+
+        this.set('route.path', '/' + code + '/');
+        this.set('routeData.country_code', code);
+      },
+
+      _redirectToApp: function (app) {
+        this.set('route.path', '/' + this.routeData.country_code + '/' + app);
+      },
+
+      _handleCountriesAsync: function (e, change) {
+        var country;
+
+        try {
+          if (change.value.length) {
+            this.unlisten(this.$.countries, 'all-changed', '_handleCountriesAsync');
+
+            country = change.value[0];
+
+            this._redirectToCountry(country);
+          }
+        } catch (err) {}
+      },
+
+      _routeCountryChanged: function (country_code) {
+        var country;
+
+        if (!country_code) {
+          this.dispatch(App.Actions.reset()); // Switch country === wipe all the data
+
+          if (this.countries.length) {
+
+            // Default to first
+            country = this.countries[0];
+
+            this._redirectToCountry(country);
+          } else {
+            // Wait until countries are available, then pick one & redirect
+            this.listen(this.$.countries, 'all-changed', '_handleCountriesAsync');
+          }
         } else {
+          this.dispatch(App.Actions.setCountry(country_code));
+        }
+      },
+
+      _routeAppChanged: function (app) {
+        var defaultApp = 'ip-reporting'; // FIXME: correct default?
+
+        if (!this.routeData.country_code) {
+          return;
+        }
+
+        if (!app) {
+          this._redirectToApp(defaultApp);
+        } else {
+          this.dispatch(App.Actions.setApp(app));
+
+          // Render
           this.page = app;
         }
       },
@@ -72,7 +149,25 @@
       },
 
       _notFound: function () {
-        window.location.href = '/';
+        window.location.href = '/not-found';
+      },
+
+      _handleInterventions: function (res) {
+        var countries = (res.data || [])
+            .map(function (intervention) {
+              return {
+                id: intervention.id,
+                code: intervention.country_code,
+                name: intervention.country_name,
+              };
+            });
+
+        this.dispatch(App.Actions.setCountries(countries));
+      },
+
+      attached: function () {
+        this.$.interventions.thunk()()
+            .then(this._handleInterventions.bind(this));
       },
     });
   </script>

@@ -6,6 +6,6 @@
   "maximumLineLength": 100,
   "validateIndentation": null,
   "requireOperatorBeforeLineBreak": null,
-  "requireCamelCaseOrUpperCaseIdentifiers": {"ignoreProperties": true},
+  "requireCamelCaseOrUpperCaseIdentifiers": null,
   "excludeFiles": ["node_modules/**"]
 }

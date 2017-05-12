@@ -4,8 +4,8 @@ from model_utils import Choices
 
 
 CSO_TYPES = Choices(
-    ('International', 'International', 'International'),
-    ('National', 'National', 'National'),
+    ('Int', 'International', 'International'),
+    ('Nat', 'National', 'National'),
     ('CBO', 'CBO', 'Community Based Organization'),
     ('AI', 'AI', 'Academic Institution'),
 )
