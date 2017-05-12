@@ -82,11 +82,11 @@
           </page-ip-reporting-overview>
         </template>
 
-        <template is="dom-if" if="[[_equals(page, 'pd-reports')]]" restamp="true">
-          <page-ip-reporting-pd-reports
-              name="pd-reports"
+        <template is="dom-if" if="[[_equals(page, 'pd')]]" restamp="true">
+          <page-ip-reporting-pd
+              name="pd"
               route="{{subroute}}">
-          </page-ip-reporting-pd-reports>
+          </page-ip-reporting-pd>
         </template>
 
         <template is="dom-if" if="[[_equals(page, 'indicators')]]" restamp="true">
