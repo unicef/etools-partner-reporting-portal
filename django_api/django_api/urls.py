@@ -24,6 +24,7 @@ urlpatterns = [
     url(r'^api/admin/', admin.site.urls),
     url(r'^api/core/', include('core.urls')),
     url(r'^api/indicator/', include('indicator.urls')),
+    url(r'^api/partner/', include('partner.urls')),
 ]
 
 if settings.DEBUG:
