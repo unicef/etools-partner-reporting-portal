@@ -8,43 +8,49 @@ def ssh(service):
     :param service: ['django_api', 'polymer', 'proxy', 'db']
     """
     assert service in ['django_api', 'polymer', 'proxy', 'db'], "%s is unrecognized service"
-    try:
-        local('docker exec -it etoolspartnerreportingportal_%s_1 bash' % service)
-    except:
-        print "Try to ssh service as /bin/sh instead of bash"
-        local('docker exec -it etoolspartnerreportingportal_%s_1 /bin/sh' % service)
+    if service == 'polymer':
+        local('docker-compose exec polymer ash')
+    else:
+        local('docker-compose exec %s bash' % service)
 
 
 def up_recreate():
     """
     Recreate containers even if their configuration and image haven't changed.
     """
-    local('docker-compose -f docker-compose.yml up --force-recreate')
+    local('docker-compose up && docker-compose down')
 
 
 def up():
     """
     Create and start containers.
     """
-    local('docker-compose -f docker-compose.yml up')
+    local('docker-compose up')
 
 
 def down():
     """
     Stop all containers.
     """
-    local('docker-compose -f docker-compose.yml down')
+    local('docker-compose down')
 
 
 def rebuild():
     """
     Re-build docker images for containers.
     """
-    local('docker-compose -f docker-compose.yml build')
+    local('docker-compose build')
 
 
 def ps():
     """
     Display all containers.
     """
-    local('docker-compose -f docker-compose.yml ps')
+    local('docker-compose ps')
+
+
+def stop():
+    """
+    Stop services.
+    """
+    local('docker-compose stop')
