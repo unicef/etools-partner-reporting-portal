@@ -74,7 +74,7 @@ class Intervention(TimeStampedModel):
         return ", ".join(self.street_address, self.city, self.postal_code, self.country_name)
 
 
-class Location(models.Model):
+class Location(TimeStampedModel):
     title = models.CharField(max_length=255)
     reportable = models.ForeignKey('indicator.Reportable', related_name="locations")
 
