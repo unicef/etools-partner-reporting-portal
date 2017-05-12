@@ -2,18 +2,24 @@
 
 <link rel="import" href="redux.html">
 <link rel="import" href="reducers/auth.html">
+<link rel="import" href="reducers/countries.html">
+<link rel="import" href="reducers/app.html">
 
 <script src="../../bower_components/redux-thunk/index.js"></script>
 
 <script>
   (function () {
+    var composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || Redux.compose;
+
     var rootReducer = Redux.combineReducers({
       auth: App.Reducers.Auth,
+      countries: App.Reducers.Countries,
+      app: App.Reducers.App,
     });
 
     var store = Redux.createStore(
       rootReducer,
-      Redux.applyMiddleware(ReduxThunk.default)
+      composeEnhancers(Redux.applyMiddleware(ReduxThunk.default))
     );
 
     App.Store = App.Store || store;

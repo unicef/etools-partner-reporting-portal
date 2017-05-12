@@ -1,0 +1,53 @@
+<script>
+  (function () {
+    'use strict';
+
+    App.Behaviors = App.Behaviors || {};
+
+    var BEHAVIOR_NAME = 'RoutingBehavior';
+
+    App.Behaviors[BEHAVIOR_NAME] = {
+      properties: {
+        _$currentCountry: {
+          type: String,
+          statePath: 'countries.current',
+        },
+
+        _$currentApp: {
+          type: String,
+          statePath: 'app.current',
+        },
+
+        _baseUrl: {
+          type: String,
+          computed: '_$computeBaseUrl(_$currentCountry, _$currentApp)',
+        }
+      },
+
+      _$computeBaseUrl: function(country, app) {
+        return '/app/' + country + '/' + app;
+      },
+
+      /**
+       * Need pass baseUrl so polymer knew when to update the
+       * expression within the template.
+       */
+      buildUrl: function (baseUrl, tail) {
+        if (tail.length && tail[0] !== '/') {
+          tail = '/' + tail;
+        }
+
+        return baseUrl + tail;
+      },
+
+      attached: function () {
+        this.async(function () {
+          if (typeof this.dispatch !== 'function') { // Duck typing
+            throw new Error(BEHAVIOR_NAME + ' requires ReduxBehavior');
+          }
+        });
+      },
+    };
+
+  }());
+</script>
