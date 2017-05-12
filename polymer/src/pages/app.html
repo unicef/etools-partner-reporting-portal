@@ -71,7 +71,17 @@
         interventionsUrl: {
           type: String,
           value: App.Endpoints.interventions(),
-        }
+        },
+
+        _countryCode: {
+          type: String,
+          statePath: 'countries.current',
+        },
+
+        _app: {
+          type: String,
+          statePath: 'app.current',
+        },
       },
 
       observers: [
@@ -120,7 +130,7 @@
             // Wait until countries are available, then pick one & redirect
             this.listen(this.$.countries, 'all-changed', '_handleCountriesAsync');
           }
-        } else {
+        } else if (!this._countryCode) {
           this.dispatch(App.Actions.setCountry(country_code));
         }
       },
@@ -134,7 +144,7 @@
 
         if (!app) {
           this._redirectToApp(defaultApp);
-        } else {
+        } else if (!this._app) {
           this.dispatch(App.Actions.setApp(app));
 
           // Render
