@@ -18,7 +18,7 @@ def up_recreate():
     """
     Recreate containers even if their configuration and image haven't changed.
     """
-    local('docker-compose up && docker-compose down')
+    local('docker-compose down && docker-compose up')
 
 
 def up():
