@@ -26,8 +26,7 @@
     "redux": "https://npmcdn.com/redux/dist/redux.min.js",
     "redux-thunk": "https://npmcdn.com/redux-thunk/dist/redux-thunk.min.js",
     "paper-button": "PolymerElements/paper-button#^1.0.14",
-    "etools-data-table": "^1.0.0",
-    "etools-ajax": "^1.2.2"
+    "etools-data-table": "^1.0.0"
   },
   "devDependencies": {
     "web-component-tester": "^5.0.1"

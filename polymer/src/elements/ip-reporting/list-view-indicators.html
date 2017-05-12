@@ -3,6 +3,7 @@
 <link rel="import" href="../../../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../../../bower_components/etools-data-table/etools-data-table.html">
 
+<link rel="import" href="../etools-prp-ajax.html">
 
 <link rel="import" href="../../styles/page-headers.html">
 
@@ -14,21 +15,21 @@
         padding: 25px;
       }
     </style>
-    <indicator-list-data id="indicators" />
-      <h3>List of Indicators</h3>
-      <etools-data-table-header
-        id="listHeader"
-        label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
-        <etools-data-table-column class="col-2" field="number" sortable>
-          PD/SSFA ToR ref.#
-        </etools-data-table-column>
-        <etools-data-table-column class="col-4" field="indicator"  sortable>
-          Indicator
-        </etools-data-table-column>
-        <etools-data-table-column class="flex-c" field="progress" sortable>
-          Current progress
-        </etools-data-table-column>
-      </etools-data-table-header>
+
+    <h3>List of Indicators</h3>
+    <etools-data-table-header
+      id="listHeader"
+      label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
+      <etools-data-table-column class="col-2" field="number" sortable>
+        PD/SSFA ToR ref.#
+      </etools-data-table-column>
+      <etools-data-table-column class="col-4" field="indicator"  sortable>
+        Indicator
+      </etools-data-table-column>
+      <etools-data-table-column class="flex-c" field="progress" sortable>
+        Current progress
+      </etools-data-table-column>
+    </etools-data-table-header>
 
       <template id="rows" is="dom-repeat" items="[[governments]]" as="entry">
         <etools-data-table-row details-opened="[[detailsOpened]]">
@@ -67,6 +68,8 @@
           on-page-size-changed="_pageSizeSelected"
           on-page-number-changed="_pageNumberChanged">
       </etools-data-table-footer>
+
+      <etools-prp-ajax url='/api/indicators/' auto=true/>
   </template>
   <script>
     Polymer({
