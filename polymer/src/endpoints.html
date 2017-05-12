@@ -1,0 +1,17 @@
+<script>
+  (function () {
+    'use strict';
+
+    var BASE_URL = '/api';
+
+    App.Endpoints = {
+      _buildUrl: function (tail) {
+        return BASE_URL + tail;
+      },
+
+      interventions: function () {
+        return this._buildUrl('/core/simple-intervention/');
+      },
+    };
+  }());
+</script>
