@@ -7,5 +7,5 @@ class IsAuthenticated(BasePermission):
     """
 
     def has_permission(self, request, view):
-        # we can extend persiossion verification in future!
-        return request.user and request.user.is_authenticated()
+        # we can extend permissions verification in future!
+        return request.user.is_authenticated()
