@@ -1,5 +1,7 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
 
+<link rel="import" href="../../../elements/page-header.html">
+<link rel="import" href="../../../elements/page-body.html">
 <link rel="import" href="../../../elements/ip-reporting/partner-details.html">
 <link rel="import" href="../../../elements/ip-reporting/risk-rating.html">
 <link rel="import" href="../../../elements/etools-prp-ajax.html">
@@ -12,7 +14,6 @@
     <style>
       :host {
         display: block;
-        padding: 25px;
       }
     </style>
 
@@ -21,9 +22,12 @@
         url="[[partnerDetailsUrl]]">
     </etools-prp-ajax>
 
-    <partner-details></partner-details>
+    <page-header title="Overview"></page-header>
 
-    <risk-rating></risk-rating>
+    <page-body>
+      <partner-details></partner-details>
+      <risk-rating></risk-rating>
+    </page-body>
   </template>
 
   <script>
@@ -45,7 +49,7 @@
         var partnerThunk = this.$.partnerDetails.thunk();
 
          this.dispatch(App.Actions.fetchPartner(partnerThunk))
-            .catch(function (err) {
+            .catch(function (err) { // jshint ignore:line
               // TODO: error handling
             });
       },

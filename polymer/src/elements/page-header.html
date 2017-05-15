@@ -1,0 +1,33 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+
+<dom-module id="page-header">
+  <template>
+    <style>
+      :host {
+        display: block;
+        padding: 25px;
+        background: white;
+        box-shadow: 0 1px 2px 1px rgba(0, 0, 0, .1);
+      }
+
+      h1 {
+        @apply(--paper-font-title);
+
+        margin: 0;
+      }
+    </style>
+
+    <h1>[[title]]</h1>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'page-header',
+
+      properties: {
+        title: String,
+      },
+    });
+  </script>
+</dom-module>

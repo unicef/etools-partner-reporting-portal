@@ -20,6 +20,7 @@
     "Polymer": true,
     "Redux": true,
     "ReduxThunk": true,
+    "Reselect": true,
     "PolymerRedux": true
   }
 }

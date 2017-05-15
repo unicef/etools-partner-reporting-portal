@@ -166,7 +166,7 @@
         var interventionsThunk = this.$.interventions.thunk();
 
         this.dispatch(App.Actions.fetchCountries(interventionsThunk))
-            .catch(function (err) {
+            .catch(function (err) { // jshint ignore:line
               // TODO: error handling
             });
       },
