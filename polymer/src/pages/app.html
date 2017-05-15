@@ -162,22 +162,13 @@
         window.location.href = '/not-found';
       },
 
-      _handleInterventions: function (res) {
-        var countries = (res.data || [])
-            .map(function (intervention) {
-              return {
-                id: intervention.id,
-                code: intervention.country_code,
-                name: intervention.country_name,
-              };
-            });
-
-        this.dispatch(App.Actions.setCountries(countries));
-      },
-
       attached: function () {
-        this.$.interventions.thunk()()
-            .then(this._handleInterventions.bind(this));
+        var interventionsThunk = this.$.interventions.thunk();
+
+        this.dispatch(App.Actions.fetchCountries(interventionsThunk))
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
       },
     });
   </script>

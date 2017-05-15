@@ -6,6 +6,8 @@
     'use strict';
 
     App.Actions = {
+
+      // Auth
       setToken: function (token) {
         return {
           type: App.Constants.SET_TOKEN,
@@ -39,6 +41,25 @@
         };
       },
 
+      // Countries
+      fetchCountries: function (interventionsThunk) {
+        return function (dispatch) {
+          return interventionsThunk()
+              .then(function (res) {
+                var countries = (res.data || [])
+                    .map(function (intervention) {
+                      return {
+                        id: intervention.id,
+                        code: intervention.country_code,
+                        name: intervention.country_name,
+                      };
+                    });
+
+                dispatch(App.Actions.setCountries(countries));
+              });
+        };
+      },
+
       setCountry: function (newCountry) {
         return {
           type: App.Constants.SET_COUNTRY,
@@ -60,6 +81,26 @@
         };
       },
 
+      // Partner data
+      fetchPartner: function (partnerThunk) {
+        return function (dispatch) {
+          return partnerThunk()
+              .then(function (res) {
+                var partnerDetails = res.data;
+
+                dispatch(App.Actions.setPartner(partnerDetails));
+              });
+        };
+      },
+
+      setPartner: function (partnerData) {
+        return {
+          type: App.Constants.SET_PARTNER,
+          partnerData: partnerData,
+        };
+      },
+
+      // Master reset
       reset: function () {
         return {
           type: App.Constants.RESET,

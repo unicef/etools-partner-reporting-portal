@@ -11,41 +11,20 @@
         return a === b;
       },
 
-      _extend: (function () {
-        return typeof Object.assign === 'function' ?
-            Object.assign.bind(Object) :
-            function (target) {
-              var nextSource;
-              var nextKey;
-              var index;
-              var to;
-
-              if (target == null) { // jshint ignore:line
-                throw new TypeError('Cannot convert undefined or null to object');
-              }
-
-              to = Object(target);
-
-              for (index = 1; index < arguments.length; index++) {
-                nextSource = arguments[index];
-
-                if (nextSource != null) { // jshint ignore:line
-                  for (nextKey in nextSource) {
-                    if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
-                      to[nextKey] = nextSource[nextKey];
-                    }
-                  }
-                }
-              }
-            };
-      }()),
-
       _forEach: function (selector, fn) {
         [].forEach.call(
           Polymer.dom(this.root).querySelectorAll(selector),
           fn,
           this
         );
+      },
+
+      _withDefault: function(value, defaultValue) {
+        if (!defaultValue) {
+          defaultValue = '...';
+        }
+
+        return typeof value !== 'undefined' ? value : defaultValue;
       },
     };
 

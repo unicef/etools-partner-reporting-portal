@@ -35,120 +35,118 @@
   </template>
 
   <script>
-    (function () {
-      Polymer({
-        is: 'etools-prp-ajax',
+    Polymer({
+      is: 'etools-prp-ajax',
 
-        behaviors: [
-          App.Behaviors.ReduxBehavior,
-          App.Behaviors.UtilsBehavior,
-        ],
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.UtilsBehavior,
+      ],
 
-        properties: {
-          token: {
-            type: String,
-            statePath: 'auth.token',
-          },
-
-          headers: {
-            type: Object,
-            value: {},
-          },
-
-          loading: {
-            type: Boolean,
-            notify: true,
-          },
-
-          customHeaders: {
-            type: Object,
-            computed: '_computeHeaders(headers, token)',
-          },
-
-          lastRequest: {
-            notify: true,
-          },
-
-          lastResponse: {
-            notify: true,
-          },
-
-          lastError: {
-            notify: true,
-          },
-
-          activeRequests: {
-            notify: true,
-          },
+      properties: {
+        token: {
+          type: String,
+          statePath: 'auth.token',
         },
 
-        _computeHeaders: function (headers, token) {
-          return this._extend({}, {
-            Authorization: 'Bearer ' + token,
-          }, headers);
+        headers: {
+          type: Object,
+          value: {},
         },
 
-        listeners: {
-          'ajax.response': '_handleResponse',
-          'ajax.request': '_handleRequest',
-          'ajax.error': '_handleError',
+        loading: {
+          type: Boolean,
+          notify: true,
         },
 
-        _handleResponse: function (e, request) {
-          var token = request.xhr.getResponseHeader('token');
-
-          if (token) {
-            this.dispatch(App.Actions.setToken(token));
-          }
-
-          this.fire.apply(this, ['response'].concat(arguments));
+        customHeaders: {
+          type: Object,
+          computed: '_computeHeaders(headers, token)',
         },
 
-        _handleRequest: function () {
-          this.fire.apply(this, ['request'].concat(arguments));
+        lastRequest: {
+          notify: true,
         },
 
-        _handleError: function () {
-          var status = this.lastError.status;
-
-          if (status === 401) {
-            this.dispatch(App.Actions.resetToken());
-          }
-
-          this.fire.apply(this, ['error'].concat(arguments));
+        lastResponse: {
+          notify: true,
         },
 
-        _buildResponse: function (req) {
-          return {
-            status: req.status,
-            data: req.parseResponse(),
-            xhr: req.xhr,
-          };
+        lastError: {
+          notify: true,
         },
 
-        generateRequest: function () {
-          return this.$.ajax.generateRequest.apply(this.$.ajax, arguments);
+        activeRequests: {
+          notify: true,
         },
+      },
 
-        toRequestOptions: function () {
-          return this.$.ajax.toRequestOptions.apply(this.$.ajax, arguments);
-        },
+      _computeHeaders: function (headers, token) {
+        return Object.assign({}, {
+          Authorization: 'Bearer ' + token,
+        }, headers);
+      },
 
-        thunk: function () {
-          return (function () {
-            var req = this.generateRequest();
-            var self = this;
+      listeners: {
+        'ajax.response': '_handleResponse',
+        'ajax.request': '_handleRequest',
+        'ajax.error': '_handleError',
+      },
 
-            return req.completes
-                .then(function () {
-                  return self._buildResponse(req);
-                })
-                .catch(function () {
-                  return Promise.reject(self._buildResponse(req));
-                });
-          }.bind(this));
-        },
-      });
-    }());
+      _handleResponse: function (e, request) {
+        var token = request.xhr.getResponseHeader('token');
+
+        if (token) {
+          this.dispatch(App.Actions.setToken(token));
+        }
+
+        this.fire.apply(this, ['response'].concat(arguments));
+      },
+
+      _handleRequest: function () {
+        this.fire.apply(this, ['request'].concat(arguments));
+      },
+
+      _handleError: function () {
+        var status = this.lastError.status;
+
+        if (status === 401) {
+          this.dispatch(App.Actions.resetToken());
+        }
+
+        this.fire.apply(this, ['error'].concat(arguments));
+      },
+
+      _buildResponse: function (req) {
+        return {
+          status: req.status,
+          data: req.parseResponse(),
+          xhr: req.xhr,
+        };
+      },
+
+      generateRequest: function () {
+        return this.$.ajax.generateRequest.apply(this.$.ajax, arguments);
+      },
+
+      toRequestOptions: function () {
+        return this.$.ajax.toRequestOptions.apply(this.$.ajax, arguments);
+      },
+
+      thunk: function () {
+        return (function () {
+          var req = this.generateRequest();
+          var self = this;
+
+          return req.completes
+              .then(function () {
+                return self._buildResponse(req);
+              })
+              .catch(function () {
+                return Promise.reject(self._buildResponse(req));
+              });
+        }.bind(this));
+      },
+    });
   </script>
 </dom-module>
