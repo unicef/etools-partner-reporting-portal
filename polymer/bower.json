@@ -8,11 +8,11 @@
     "app-route": "PolymerElements/app-route#^0.9.3",
     "app-layout": "PolymerElements/app-layout#^0.10.7",
     "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.3.2",
-    "iron-icon": "PolymerElements/iron-icon#^1.0.12",
+    "iron-icon": "^1.0.13",
     "iron-iconset-svg": "PolymerElements/iron-iconset-svg#^1.1.0",
     "iron-pages": "PolymerElements/iron-pages#^1.0.8",
     "iron-ajax": "PolymerElements/iron-ajax#^1.4.3",
-    "iron-icons": "PolymerElements/iron-icons#^1.2.0",
+    "iron-icons": "^1.2.1",
     "paper-styles": "PolymerElements/paper-styles#^1.2.0",
     "paper-tabs": "PolymerElements/paper-tabs#^1.8.0",
     "paper-menu": "PolymerElements/paper-menu#^1.2.2",
@@ -22,12 +22,15 @@
     "iron-media-query": "PolymerElements/iron-media-query#^1.0.8",
     "promise-polyfill": "polymerlabs/promise-polyfill#^1.0.0",
     "polymer-redux": "^0.4.2",
-    "redux": "https://npmcdn.com/redux/dist/redux.min.js",
-    "redux-thunk": "https://npmcdn.com/redux-thunk/dist/redux-thunk.min.js",
+    "redux": "https://unpkg.com/redux@3.6.0/dist/redux.min.js",
+    "redux-thunk": "https://unpkg.com/redux-thunk@2.2.0/dist/redux-thunk.min.js",
+    "reselect": "https://unpkg.com/reselect@3.0.1/dist/reselect.js",
     "paper-button": "PolymerElements/paper-button#^1.0.14",
     "paper-datatable": "^0.9.8",
     "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#^1.5.1",
-    "paper-listbox": "PolymerElements/paper-listbox#^1.1.3"
+    "paper-listbox": "PolymerElements/paper-listbox#^1.1.3",
+    "etools-content-panel": "^1.0.3",
+    "etools-loading": "^1.0.8"
   },
   "devDependencies": {
     "web-component-tester": "^5.0.1"
@@ -35,6 +38,7 @@
   "resolutions": {
     "paper-styles": "^1.2.0",
     "paper-item": "^1.2.1",
-    "polymer": "^1.8.1"
+    "polymer": "^1.8.1",
+    "paper-icon-button": "^1.1.3"
   }
 }

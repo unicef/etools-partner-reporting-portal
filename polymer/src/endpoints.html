@@ -2,7 +2,7 @@
   (function () {
     'use strict';
 
-    var BASE_URL = '/api';
+    var BASE_URL = '/api'; // TODO: versioning?
 
     App.Endpoints = {
       _buildUrl: function (tail) {
@@ -11,6 +11,10 @@
 
       interventions: function () {
         return this._buildUrl('/core/simple-intervention/');
+      },
+
+      partnerDetails: function () {
+        return this._buildUrl('/partner/partner-details/');
       },
     };
   }());
