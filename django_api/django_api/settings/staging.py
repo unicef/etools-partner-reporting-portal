@@ -7,6 +7,6 @@ DEBUG = False
 IS_STAGING = True
 
 # domains/hosts etc.
-DOMAIN_NAME = 'staging.domain_name.com'
+DOMAIN_NAME = 'staging.etools-prp.com'
 WWW_ROOT = 'http://%s/' % DOMAIN_NAME
-ALLOWED_HOSTS = [DOMAIN_NAME]
+ALLOWED_HOSTS = [DOMAIN_NAME, 'tivix1.cf-cd.com', "*"]
