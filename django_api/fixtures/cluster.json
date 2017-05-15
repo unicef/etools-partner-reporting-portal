@@ -1,0 +1,13 @@
+[
+  {
+    "model": "cluster.cluster",
+    "pk": 1,
+    "fields": {
+      "created": "2017-05-12T07:48:05.239Z",
+      "modified": "2017-05-12T07:48:05.242Z",
+      "title": "cluster test",
+      "intervention": 1,
+      "user": 1
+    }
+  }
+]

@@ -10,6 +10,9 @@ class Cluster(TimeStampedModel):
     intervention = models.ForeignKey('core.Intervention', related_name="clusters")
     user = models.ForeignKey('account.User', related_name="clusters")
 
+    def __unicode__(self):
+        return self.title
+
 
 class ClusterObjective(TimeStampedModel):
     title = models.CharField(max_length=255)

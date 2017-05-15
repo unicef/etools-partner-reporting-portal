@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 from fabric.api import local, env, settings
+from fabric.operations import run
 
 
 def ssh(service):
@@ -54,3 +55,14 @@ def stop():
     Stop services.
     """
     local('docker-compose stop')
+
+
+def fixtures():
+    """
+    Load example data (every file from fixtures directory to initial system.
+    """
+    data_files = local('ls django_api/fixtures', capture=True).split()
+    local('docker-compose exec django_api python manage.py loaddata ' + " ".join(data_files))
+    print "superuser account:"
+    print "\tusername: tivix"
+    print "\tpassword: Tivixpl12!"
