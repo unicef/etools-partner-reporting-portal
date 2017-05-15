@@ -10,7 +10,28 @@ class PartnerDetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Partner
-        fields = ('id', 'title', 'short_title', 'alternate_title', 'vendor_number', 'partner_type', 'partner_type_long',
-                  'shared_partner_long', 'shared_partner', 'last_assessment_date', 'core_values_assessment_date',
-                  'address', 'street_address', 'city', 'postal_code', 'country', 'country_code', 'email',
-                  'phone_number')
+        fields = (
+            # Partner Details part
+            'id',
+            'title',
+            'short_title',
+            'alternate_title',
+            'vendor_number',
+            'partner_type',
+            'partner_type_long',
+            'shared_partner_long',
+            'shared_partner',
+            'core_values_assessment_date',
+            'address',
+            'street_address',
+            'city',
+            'postal_code',
+            'country',
+            'country_code',
+            'email',
+            'phone_number',
+            # Risk Rating part
+            'last_assessment_date',
+            'type_of_assessment',
+            'rating'
+        )
