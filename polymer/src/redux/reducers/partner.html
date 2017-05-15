@@ -7,21 +7,21 @@
 
     App.Reducers = App.Reducers || {};
 
-    App.Reducers.App = Redux.combineReducers({
-      current: currentAppReducer,
+    App.Reducers.Partner = Redux.combineReducers({
+      current: currentPartnerReducer,
     });
 
-    function currentAppReducer(state, action) {
+    function currentPartnerReducer(state, action) {
       if (typeof state === 'undefined') {
-        state = '';
+        state = {};
       }
 
       switch (action.type) {
-        case App.Constants.SET_APP:
-          return action.app;
+        case App.Constants.SET_PARTNER:
+          return Object.assign({}, action.partnerData);
 
         case App.Constants.RESET:
-          return '';
+          return {};
 
         default:
           return state;

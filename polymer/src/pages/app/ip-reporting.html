@@ -9,7 +9,7 @@
 <link rel="import" href="../../behaviors/utils.html">
 
 <link rel="import" href="../../elements/ip-reporting/nav.html">
-<link rel="import" href="../../elements/ip-reporting/page-header.html">
+<link rel="import" href="../../elements/ip-reporting/app-header.html">
 
 <dom-module id="page-ip-reporting">
   <template>
@@ -63,7 +63,7 @@
         </ip-reporting-nav>
       </app-drawer>
 
-      <ip-reporting-page-header></ip-reporting-page-header>
+      <ip-reporting-app-header></ip-reporting-app-header>
 
       <iron-pages
           selected="[[page]]"
@@ -120,7 +120,7 @@
 
       _routePageChanged: function (page) {
         if (!page) {
-          this.set('route.path', '/dashboard');
+          this.set('route.path', '/dashboard'); // FIXME: correct default?
         } else {
           this.page = page;
         }
