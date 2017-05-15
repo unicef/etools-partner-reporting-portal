@@ -3,13 +3,15 @@
   "shell": "src/app-shell.html",
   "fragments": [
     "src/pages/login.html",
-    "src/pages/app.html",
     "src/pages/not-found.html",
+
+    "src/pages/app.html",
     "src/pages/app/ip-reporting.html",
     "src/pages/app/ip-reporting/dashboard.html",
     "src/pages/app/ip-reporting/overview.html",
-    "src/pages/app/ip-reporting/pd-reports.html",
+    "src/pages/app/ip-reporting/pd.html",
     "src/pages/app/ip-reporting/indicators.html",
+
     "src/pages/app/cluster-reporting.html"
   ],
   "sourceGlobs": [

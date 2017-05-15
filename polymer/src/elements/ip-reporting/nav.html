@@ -4,6 +4,8 @@
 
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/page-nav.html">
+<link rel="import" href="../../behaviors/routing.html">
+<link rel="import" href="../../redux/store.html">
 
 <link rel="import" href="../../styles/page-nav.html">
 
@@ -19,25 +21,25 @@
         key-event-target="null">
 
       <paper-item name="dashboard">
-        <a href="/app/ip-reporting/dashboard">
+        <a href="[[buildUrl(_baseUrl, '/dashboard')]]">
           <span>Dashboard</span>
         </a>
       </paper-item>
 
       <paper-item name="overview">
-        <a href="/app/ip-reporting/overview">
+        <a href="[[buildUrl(_baseUrl, '/overview')]]">
           <span>Overview</span>
         </a>
       </paper-item>
 
-      <paper-item name="pd-reports">
-        <a href="/app/ip-reporting/pd-reports">
-          <span>PD Reports</span>
+      <paper-item name="pd">
+        <a href="[[buildUrl(_baseUrl, '/pd')]]">
+          <span>Programme Documents</span>
         </a>
       </paper-item>
 
       <paper-item name="indicators">
-        <a href="/app/ip-reporting/indicators">
+        <a href="[[buildUrl(_baseUrl, '/indicators')]]">
           <span>Indicators</span>
         </a>
       </paper-item>
@@ -51,6 +53,8 @@
       behaviors: [
         App.Behaviors.UtilsBehavior,
         App.Behaviors.PageNavBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.RoutingBehavior,
       ],
     });
   </script>
