@@ -1,0 +1,31 @@
+<link rel="import" href="../redux.html">
+<link rel="import" href="../../constants.html">
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Reducers = App.Reducers || {};
+
+    App.Reducers.Indicators = Redux.combineReducers({
+      all: allIndicatorsReducer,
+    });
+
+    function allIndicatorsReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = {};
+      }
+
+      switch (action.type) {
+        case App.Constants.SET_INDICATORS:
+          return Object.assign({}, action.indicatorsData);
+
+        case App.Constants.RESET:
+          return {};
+
+        default:
+          return state;
+      }
+    }
+  }());
+</script>

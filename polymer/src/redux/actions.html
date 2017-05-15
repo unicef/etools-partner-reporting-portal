@@ -81,6 +81,25 @@
         };
       },
 
+      // Indicator Data
+      fetchIndicators: function (indicatorsThunk) {
+        return function (dispatch) {
+          return indicatorsThunk()
+              .then(function (res) {
+                var indicators = res.data;
+
+                dispatch(App.Actions.setIndicators(indicators));
+              });
+        };
+      },
+
+      setIndicators: function (indicatorsData) {
+        return {
+          type: App.Constants.SET_INDICATORS,
+          indicatorsData: indicatorsData,
+        };
+      },
+
       // Partner data
       fetchPartner: function (partnerThunk) {
         return function (dispatch) {

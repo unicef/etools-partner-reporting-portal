@@ -5,6 +5,7 @@
 <link rel="import" href="reducers/countries.html">
 <link rel="import" href="reducers/app.html">
 <link rel="import" href="reducers/partner.html">
+<link rel="import" href="reducers/indicators.html">
 
 <script src="../../bower_components/redux-thunk/index.js"></script>
 
@@ -17,6 +18,7 @@
       countries: App.Reducers.Countries,
       app: App.Reducers.App,
       partner: App.Reducers.Partner,
+      indicators: App.Reducers.Indicators,
     });
 
     var store = Redux.createStore(

@@ -3,8 +3,6 @@
 <link rel="import" href="../../../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../../../bower_components/etools-data-table/etools-data-table.html">
 
-<link rel="import" href="../etools-prp-ajax.html">
-
 <link rel="import" href="../../styles/page-headers.html">
 
 <dom-module id="list-view-indicators">
@@ -68,7 +66,6 @@
           on-page-number-changed="_pageNumberChanged">
       </etools-data-table-footer>
 
-      <etools-prp-ajax url='/api/indicators/' auto=true/>
   </template>
   <script>
     Polymer({
