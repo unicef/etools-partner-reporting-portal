@@ -14,39 +14,37 @@
   </template>
 
   <script>
-    (function () {
-      Polymer({
-        is: 'etools-prp-auth',
+    Polymer({
+      is: 'etools-prp-auth',
 
-        behaviors: [
-          App.Behaviors.ReduxBehavior,
-        ],
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+      ],
 
-        properties: {
-          token: {
-            type: String,
-            statePath: 'auth.token',
-          },
-          authenticated: {
-            type: Boolean,
-            notify: true,
-            computed: '_computeAuthenticated(token)',
-          },
+      properties: {
+        token: {
+          type: String,
+          statePath: 'auth.token',
         },
-
-        attached: function () {
-          // Use saved token, if present
-          var savedToken = this.$.storage.value;
-
-          if (savedToken && !this.token) {
-            this.dispatch(App.Actions.setToken(savedToken));
-          }
+        authenticated: {
+          type: Boolean,
+          notify: true,
+          computed: '_computeAuthenticated(token)',
         },
+      },
 
-        _computeAuthenticated: function (token) {
-          return !!token;
-        },
-      });
-    }());
+      attached: function () {
+        // Use saved token, if present
+        var savedToken = this.$.storage.value;
+
+        if (savedToken && !this.token) {
+          this.dispatch(App.Actions.setToken(savedToken));
+        }
+      },
+
+      _computeAuthenticated: function (token) {
+        return !!token;
+      },
+    });
   </script>
 </dom-module>

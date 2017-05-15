@@ -123,6 +123,10 @@ class Partner(TimeStampedModel):
         null=True,
         verbose_name='Risk Rating'
     )
+    type_of_assessment = models.CharField(
+        max_length=50,
+        null=True,
+    )
 
     cluster = models.ManyToManyField('cluster.Cluster', related_name="partners")
 

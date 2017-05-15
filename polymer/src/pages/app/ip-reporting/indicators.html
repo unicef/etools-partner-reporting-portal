@@ -5,13 +5,15 @@
 
 <link rel="import" href="../../../styles/page-headers.html">
 
+<link rel="import" href="../../../elements/page-header.html">
+<link rel="import" href="../../../elements/page-body.html">
+
 <dom-module id="page-ip-reporting-indicators">
   <template>
-    <paper-material class="subheader" elevation="0">
-      <style include="page-headers"></style>
-      <h2>Indicators</h2>
-    </paper-material>
-    <list-view-indicators />
+    <page-header title="Indicators"></page-header>
+    <page-body>
+      <list-view-indicators />
+    </page-body>
   </template>
   <script>
     Polymer({
