@@ -8,26 +8,8 @@
     App.Reducers = App.Reducers || {};
 
     App.Reducers.Partner = Redux.combineReducers({
-      loading: partnerLoadingReducer,
       current: currentPartnerReducer,
     });
-
-    function partnerLoadingReducer(state, action) {
-      if (typeof state === 'undefined') {
-        state = false;
-      }
-
-      switch (action.type) {
-        case App.Constants.PARTNER_LOADING_START:
-          return true;
-
-        case App.Constants.PARTNER_LOADING_COMPLETE:
-          return false;
-
-        default:
-          return state;
-      }
-    }
 
     function currentPartnerReducer(state, action) {
       if (typeof state === 'undefined') {
