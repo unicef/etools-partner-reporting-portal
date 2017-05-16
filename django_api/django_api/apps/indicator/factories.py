@@ -16,7 +16,7 @@ from indicator.models import (
 
 class IndicatorBlueprintFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "indicator_blueprint_%d" % n)
-    reportable = factory.RelatedFactory(ReportableFactory, 'indicator_blueprint')
+    reportable = factory.RelatedFactory(ReportableFactory, 'blueprint')
 
     class Meta:
         model = IndicatorBlueprint
@@ -48,7 +48,6 @@ class IndicatorDataSpecificationFactory(factory.django.DjangoModelFactory):
 
 class IndicatorReportFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "indicator_report_%d" % n)
-    # progress_report = models.ForeignKey('unicef.ProgressReport', related_name="indicator_reports", null=True)
 
     class Meta:
         model = IndicatorReport

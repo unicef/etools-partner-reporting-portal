@@ -33,8 +33,6 @@ class UserFactory(factory.django.DjangoModelFactory):
 
 
 class UserProfileFactory(factory.django.DjangoModelFactory):
-    user = factory.SubFactory(UserFactory)
-
     class Meta:
         model = UserProfile
 

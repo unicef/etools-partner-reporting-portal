@@ -31,7 +31,7 @@ class ClusterObjectiveFactory(factory.django.DjangoModelFactory):
 class ClusterActivityFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "cluster_activity_%d" % n)
     indicator_blueprint = factory.RelatedFactory(IndicatorBlueprintFactory, 'cluster_activity')
-    partner_activity = factory.RelatedFactory(PartnerActivityFactory, cluster_activity)
+    partner_activity = factory.RelatedFactory(PartnerActivityFactory, 'cluster_activity')
 
     class Meta:
         model = ClusterActivity

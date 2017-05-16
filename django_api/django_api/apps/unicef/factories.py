@@ -5,7 +5,7 @@ from factory import fuzzy
 
 from core.factories import LocationFactory
 from cluster.factories import ClusterFactory
-from indicator.factories import ReportableFactory
+from indicator.factories import ReportableFactory, IndicatorReportFactory
 
 from unicef.models import (
     ProgressReport,
@@ -16,6 +16,7 @@ from unicef.models import (
 
 
 class ProgressReportFactory(factory.django.DjangoModelFactory):
+    indicator_report = factory.RelatedFactory(IndicatorReportFactory, 'progress_report')
 
     class Meta:
         model = ProgressReport
