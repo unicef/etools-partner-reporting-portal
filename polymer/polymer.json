@@ -9,7 +9,11 @@
     "src/pages/app/ip-reporting.html",
     "src/pages/app/ip-reporting/dashboard.html",
     "src/pages/app/ip-reporting/overview.html",
+
     "src/pages/app/ip-reporting/pd.html",
+    "src/pages/app/ip-reporting/pd/pd-index.html",
+    "src/pages/app/ip-reporting/pd/pd-details.html",
+
     "src/pages/app/ip-reporting/indicators.html",
 
     "src/pages/app/cluster-reporting.html"
