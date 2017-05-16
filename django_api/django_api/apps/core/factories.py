@@ -4,6 +4,8 @@ from django.contrib.auth.models import Group
 from django.db.models.signals import post_save
 from django.contrib.contenttypes.models import ContentType
 
+from psycopg2.extras import NumericRange
+
 import factory
 from factory import fuzzy
 
@@ -100,7 +102,7 @@ class GroupFactory(factory.django.DjangoModelFactory):
 
 
 class UserFactory(factory.django.DjangoModelFactory):
-    username = factory.Sequence(lambda n: "user_%d" % n)
+    username = fuzzy.FuzzyText()
     email = factory.Sequence(lambda n: "user{}@notanemail.com".format(n))
     password = factory.PostGenerationMethodCall('set_password', 'test')
 
@@ -179,6 +181,7 @@ class ReportableFactory(factory.django.DjangoModelFactory):
     project = factory.SubFactory(PartnerProjectFactory)
     objective = factory.SubFactory(ClusterObjectiveFactory)
     object_id = factory.SelfAttribute('content_object.id')
+    parent_indicator = None
     content_type = factory.LazyAttribute(
         lambda o: ContentType.objects.get_for_model(o.content_object))
 
@@ -211,6 +214,7 @@ class ReportableToPartnerActivityFactory(ReportableFactory):
 class IndicatorDisaggregationFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "indicator_disaggregation_%d" % n)
     indicator = factory.SubFactory(ReportableToPartnerActivityFactory)
+    range = NumericRange(0, 200)
 
     class Meta:
         model = IndicatorDisaggregation
@@ -219,6 +223,7 @@ class IndicatorDisaggregationFactory(factory.django.DjangoModelFactory):
 class IndicatorDataSpecificationFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "indicator_data_specification_%d" % n)
     indicator = factory.SubFactory(ReportableToPartnerActivityFactory)
+    frequency = fuzzy.FuzzyInteger(100)
 
     class Meta:
         model = IndicatorDataSpecification
@@ -227,6 +232,7 @@ class IndicatorDataSpecificationFactory(factory.django.DjangoModelFactory):
 class LocationFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "location_%d" % n)
     reportable = factory.SubFactory(ReportableToPartnerActivityFactory)
+    parent = None
 
     class Meta:
         model = Location
