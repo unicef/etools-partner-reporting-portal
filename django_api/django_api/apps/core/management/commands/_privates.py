@@ -34,6 +34,7 @@ from core.factories import (
     ReportableToIndicatorReportFactory,
     ReportableToClusterActivityFactory,
     ReportableToPartnerActivityFactory,
+    ReportableToLowerLevelOutputFactory,
     IndicatorDisaggregationFactory,
     IndicatorDataSpecificationFactory,
     IndicatorReportFactory,
@@ -100,6 +101,9 @@ def generate_fake_data(quantity=3):
 
     ReportableToPartnerActivityFactory.create_batch(quantity)
     print "{} ReportableToPartnerActivity objects created".format(quantity)
+
+    ReportableToLowerLevelOutputFactory.create_batch(quantity)
+    print "{} ReportableToLowerLevelOutput objects created".format(quantity)
 
     IndicatorDisaggregationFactory.create_batch(quantity)
     print "{} IndicatorDisaggregation objects created".format(quantity)

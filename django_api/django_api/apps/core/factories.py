@@ -192,6 +192,17 @@ class ReportableFactory(factory.django.DjangoModelFactory):
 
 class ReportableToIndicatorReportFactory(ReportableFactory):
     content_object = factory.SubFactory('core.factories.IndicatorReportFactory')
+    target = '5000'
+    baseline = '0'
+
+    class Meta:
+        model = Reportable
+
+
+class ReportableToLowerLevelOutputFactory(ReportableFactory):
+    content_object = factory.SubFactory('core.factories.LowerLevelOutputFactory')
+    target = '5000'
+    baseline = '0'
 
     class Meta:
         model = Reportable
@@ -199,6 +210,8 @@ class ReportableToIndicatorReportFactory(ReportableFactory):
 
 class ReportableToClusterActivityFactory(ReportableFactory):
     content_object = factory.SubFactory('core.factories.ClusterActivityFactory')
+    target = '5000'
+    baseline = '0'
 
     class Meta:
         model = Reportable
@@ -206,6 +219,8 @@ class ReportableToClusterActivityFactory(ReportableFactory):
 
 class ReportableToPartnerActivityFactory(ReportableFactory):
     content_object = factory.SubFactory('core.factories.PartnerActivityFactory')
+    target = '5000'
+    baseline = '0'
 
     class Meta:
         model = Reportable
@@ -213,7 +228,7 @@ class ReportableToPartnerActivityFactory(ReportableFactory):
 
 class IndicatorDisaggregationFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "indicator_disaggregation_%d" % n)
-    indicator = factory.SubFactory(ReportableToPartnerActivityFactory)
+    indicator = factory.SubFactory(ReportableToLowerLevelOutputFactory)
     range = NumericRange(0, 200)
 
     class Meta:
@@ -222,7 +237,7 @@ class IndicatorDisaggregationFactory(factory.django.DjangoModelFactory):
 
 class IndicatorDataSpecificationFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "indicator_data_specification_%d" % n)
-    indicator = factory.SubFactory(ReportableToPartnerActivityFactory)
+    indicator = factory.SubFactory(ReportableToLowerLevelOutputFactory)
     frequency = fuzzy.FuzzyInteger(100)
 
     class Meta:
@@ -231,7 +246,7 @@ class IndicatorDataSpecificationFactory(factory.django.DjangoModelFactory):
 
 class LocationFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "location_%d" % n)
-    reportable = factory.SubFactory(ReportableToPartnerActivityFactory)
+    reportable = factory.SubFactory(ReportableToLowerLevelOutputFactory)
     parent = None
 
     class Meta:
@@ -241,7 +256,7 @@ class LocationFactory(factory.django.DjangoModelFactory):
 class IndicatorReportFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "indicator_report_%d" % n)
     location = factory.SubFactory(LocationFactory)
-    reportable = factory.SubFactory(ReportableToPartnerActivityFactory)
+    reportable = factory.SubFactory(ReportableToLowerLevelOutputFactory)
 
     class Meta:
         model = IndicatorReport
@@ -254,6 +269,7 @@ class ProgressReportFactory(factory.django.DjangoModelFactory):
 
 class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "programme_document_%d" % n)
+    ref = fuzzy.FuzzyText()
 
     class Meta:
         model = ProgrammeDocument

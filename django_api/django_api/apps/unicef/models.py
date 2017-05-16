@@ -14,6 +14,7 @@ class ProgressReport(TimeStampedModel):
 
 class ProgrammeDocument(TimeStampedModel):
     title = models.CharField(max_length=255)
+    ref = models.CharField(max_length=16)
 
 
 class CountryProgrammeOutput(TimeStampedModel):
