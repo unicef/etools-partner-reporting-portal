@@ -30,6 +30,7 @@
     "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#^1.5.1",
     "paper-listbox": "PolymerElements/paper-listbox#^1.1.3",
     "etools-content-panel": "^1.0.3",
+    "etools-data-table": "^1.0.2",
     "etools-loading": "^1.0.8"
   },
   "devDependencies": {

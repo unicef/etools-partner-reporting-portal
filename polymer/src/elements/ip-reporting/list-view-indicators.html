@@ -1,13 +1,13 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../../bower_components/paper-material/paper-material.html">
-<link rel="import" href="../../../../bower_components/paper-item/paper-item.html">
+
 <link rel="import" href="../../../../bower_components/etools-data-table/etools-data-table.html">
+<link rel="import" href="../../../../bower_components/etools-data-table/data-table-styles.html">
 
 <link rel="import" href="../../styles/page-headers.html">
 
 <dom-module id="list-view-indicators">
   <template>
-    <style include='page-headers'>
+    <style include='page-headers data-table-styles'>
       :host {
         display: block;
       }
@@ -20,7 +20,7 @@
       <etools-data-table-column class="col-2" field="number" sortable>
         PD/SSFA ToR ref.#
       </etools-data-table-column>
-      <etools-data-table-column class="col-4" field="indicator"  sortable>
+      <etools-data-table-column class="col-4" field="indicator">
         Indicator
       </etools-data-table-column>
       <etools-data-table-column class="flex-c" field="progress" sortable>
@@ -28,48 +28,50 @@
       </etools-data-table-column>
     </etools-data-table-header>
 
-      <template id="rows" is="dom-repeat" items="[[governments]]" as="entry">
+    <template id="rows" is="dom-repeat" items="[[indicators]]" as="indicator">
         <etools-data-table-row details-opened="[[detailsOpened]]">
           <div slot="row-data">
-            <span class="col-data">
-              [[entry.code]]
+            <span class="col-data col-2">
+              [[indicator.code]]
               2016/000-0
             </span>
-            <span class="col-data">
-              [[[entry.title]]
+            <span class="col-data col-4">
+              [[indicator.title]]
               Lorem ipsum dolor sit amet, etiam mattis, quisque dapibus proin et. Etiam arcu est mollis amet nulla, id ut morbi.
             </span>
-            <span class="col-data">
-              [[entry.unit]]
+            <span class="col-data flex-c">
+              [[indicator.unit]]
               (Progress bar here)
             </span>
           </div>
-          <div slot="row-data-details">
-            <div class="row-details-content">
-              <span class="rdc-title">Unicef Focal Point</span>
-              <span>[[entry.unicef_focal_point_names]]</span>
-            </div>
-            <div class="row-details-content">
-              <span class="rdc-title">Sectors</span>
-              <span>[[entry.sectors]]</span>
-            </div>
-          </div>
+          <div slot="row-data-details"></div>
         </etools-data-table-row>
-      </template>
+    </template>
 
-      <etools-data-table-footer
-          page-size="[[pageSize]]"
-          page-number="[[pageNumber]]"
-          total-results="[[totalResults]]"
-          visible-range="{{visibleRange}}"
-          on-page-size-changed="_pageSizeSelected"
-          on-page-number-changed="_pageNumberChanged">
-      </etools-data-table-footer>
+    <etools-data-table-footer
+        page-size="[[pageSize]]"
+        page-number="[[pageNumber]]"
+        total-results="[[totalResults]]"
+        visible-range="{{visibleRange}}"
+        on-page-size-changed="_pageSizeSelected"
+        on-page-number-changed="_pageNumberChanged">
+    </etools-data-table-footer>
 
   </template>
   <script>
     Polymer({
       is: 'list-view-indicators',
+      properties: {
+        // TODO: Remove this when fakedata ready.
+        indicators: {
+          type: Object,
+          value: [{'test': []}, {'test2': []}],
+        },
+        detailsOpened: {
+          type: Boolean,
+          value: false
+        }
+      }
     });
   </script>
 </dom-module>
