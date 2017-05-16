@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 from fabric.api import local, env, settings
+from fabric.operations import run
 
 
 def ssh(service):
@@ -54,3 +55,11 @@ def stop():
     Stop services.
     """
     local('docker-compose stop')
+
+
+def fixtures():
+    """
+    Load example data from generate_fake_data management command.
+    """
+    local('docker-compose exec django_api python manage.py generate_fake_data --clean_before')
+    print "Fake data generated!"

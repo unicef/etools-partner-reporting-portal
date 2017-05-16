@@ -105,6 +105,10 @@ TEMPLATES = [
     },
 ]
 
+FIXTURE_DIRS = [
+    '/code/fixtures/',
+]
+
 WSGI_APPLICATION = 'django_api.wsgi.application'
 
 
