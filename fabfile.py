@@ -59,10 +59,7 @@ def stop():
 
 def fixtures():
     """
-    Load example data (every file from fixtures directory to initial system.
+    Load example data from generate_fake_data management command.
     """
-    data_files = local('ls django_api/fixtures', capture=True).split()
-    local('docker-compose exec django_api python manage.py loaddata ' + " ".join(data_files))
-    print "superuser account:"
-    print "\tusername: tivix"
-    print "\tpassword: Tivixpl12!"
+    local('docker-compose exec django_api python manage.py generate_fake_data --clean_before')
+    print "Fake data generated!"

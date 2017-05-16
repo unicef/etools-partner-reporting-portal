@@ -28,9 +28,9 @@ Here are some docker tips:
    ```
    3. Stop all containers
    ```
-   $ docker-compose down
+   $ fab stop
    ```
    4. Re-build docker images for containers
    ```
-   $ docker-compose build
+   $ fab rebuild
    ```
