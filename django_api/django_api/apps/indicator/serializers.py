@@ -1,15 +1,22 @@
 from rest_framework import serializers
 
-from .models import Reportable
+from .models import Reportable, IndicatorBlueprint
+
+
+class IndicatorBlueprintSimpleSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = IndicatorBlueprint
+        fields = (
+            'id', 'title', 'unit', 'code'
+        )
 
 
 class IndicatorListSerializer(serializers.ModelSerializer):
-    title = serializers.CharField(source='blueprint__title')
-    unit = serializers.CharField(source='blueprint__unit')
-    code = serializers.CharField(source='blueprint__code')
+    blueprint = IndicatorBlueprintSimpleSerializer()
 
     class Meta:
         model = Reportable
         fields = (
-            'id', 'target', 'baseline', 'total', 'blueprint__title', 'blueprint__unit', 'blueprint__code'
+            'id', 'target', 'baseline', 'blueprint'
         )
