@@ -24,6 +24,7 @@ urlpatterns = [
     url(r'^api/admin/', admin.site.urls),
     url(r'^api/core/', include('core.urls')),
     url(r'^api/partner/', include('partner.urls')),
+    url(r'^api/unicef/', include('unicef.urls')),
 ]
 
 if settings.DEBUG:
