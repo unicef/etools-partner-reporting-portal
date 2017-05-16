@@ -1,66 +1,84 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
 
+<link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../redux/selectors/indicators.html">
+
+<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../bower_components/paper-progress/paper-progress.html">
+
+<link rel="import" href="../../../../bower_components/etools-content-panel/etools-content-panel.html">
 <link rel="import" href="../../../../bower_components/etools-data-table/etools-data-table.html">
 <link rel="import" href="../../../../bower_components/etools-data-table/data-table-styles.html">
+<link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
 
 <link rel="import" href="../../styles/page-headers.html">
+<link rel="import" href="../../styles/progress-bar.html">
 
 <dom-module id="list-view-indicators">
   <template>
-    <style include='page-headers data-table-styles'>
+    <style is="custom-style" include='iron-flex iron-flex-factors progress-bar data-table-styles'>
       :host {
         display: block;
       }
     </style>
 
-    <h3>List of Indicators</h3>
-    <etools-data-table-header
-      id="listHeader"
-      label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
-      <etools-data-table-column class="col-2" field="number" sortable>
-        PD/SSFA ToR ref.#
-      </etools-data-table-column>
-      <etools-data-table-column class="col-4" field="indicator">
-        Indicator
-      </etools-data-table-column>
-      <etools-data-table-column class="flex-c" field="progress" sortable>
-        Current progress
-      </etools-data-table-column>
-    </etools-data-table-header>
+    <etools-content-panel title="List of Indicators">
+      <etools-loading active="[[loading]]"></etools-loading>
+      <etools-data-table-header
+        id="listHeader"
+        label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
+        <etools-data-table-column class="flex-2" field="number" sortable>
+          PD/SSFA ToR ref.#
+        </etools-data-table-column>
+        <etools-data-table-column class="flex-6" field="indicator">
+          Indicator
+        </etools-data-table-column>
+        <etools-data-table-column  class="flex-4" field="progress" sortable>
+          Current progress
+        </etools-data-table-column>
+      </etools-data-table-header>
 
-    <template id="rows" is="dom-repeat" items="[[indicators]]" as="indicator">
+      <template id="rows" is="dom-repeat" items="[[indicators]]" as="indicator">
         <etools-data-table-row details-opened="[[detailsOpened]]">
           <div slot="row-data">
-            <span class="col-data col-2">
+            <span class="col-data flex-2">
               [[indicator.code]]
-              2016/000-0
+              <a href="/">2016/000-0</a>
             </span>
-            <span class="col-data col-4">
+            <span class="col-data flex-6">
               [[indicator.title]]
-              Lorem ipsum dolor sit amet, etiam mattis, quisque dapibus proin et. Etiam arcu est mollis amet nulla, id ut morbi.
+              Lorem ipsum dolor sit amet, etiam mattis, quisque dapibus proin et.
             </span>
-            <span class="col-data flex-c">
-              [[indicator.unit]]
-              (Progress bar here)
+            <span class="col-data flex-4">
+              <paper-progress value="40" class="blue"></paper-progress>
+              <span>[[indicator.unit]] 40%</span>
             </span>
           </div>
-          <div slot="row-data-details"></div>
+          <div slot="row-data-details">[Indicator details here.]</div>
         </etools-data-table-row>
-    </template>
+      </template>
 
-    <etools-data-table-footer
-        page-size="[[pageSize]]"
-        page-number="[[pageNumber]]"
-        total-results="[[totalResults]]"
-        visible-range="{{visibleRange}}"
-        on-page-size-changed="_pageSizeSelected"
-        on-page-number-changed="_pageNumberChanged">
-    </etools-data-table-footer>
-
+      <etools-data-table-footer
+          page-size="[[pageSize]]"
+          page-number="[[pageNumber]]"
+          total-results="[[totalResults]]"
+          visible-range="{{visibleRange}}"
+          on-page-size-changed="_pageSizeSelected"
+          on-page-number-changed="_pageNumberChanged">
+      </etools-data-table-footer>
+    </etools-content-panel>
   </template>
   <script>
     Polymer({
       is: 'list-view-indicators',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+      ],
+
       properties: {
         // TODO: Remove this when fakedata ready.
         indicators: {
@@ -70,7 +88,11 @@
         detailsOpened: {
           type: Boolean,
           value: false
-        }
+        },
+        loading: {
+          type: Boolean,
+          statePath: App.Selectors.Indicators.loading,
+        },
       }
     });
   </script>

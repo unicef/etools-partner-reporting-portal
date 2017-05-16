@@ -1,0 +1,23 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="progress-bar">
+  <template>
+    <style is="custom-style">
+        paper-progress {
+          --paper-progress-height: 15px;
+          margin-right: 15px;
+        }
+        #primaryProgress, #secondaryProgress {
+          height: 15px;
+        }
+        paper-progress.blue {
+          --paper-progress-active-color: var(--paper-light-blue-500);
+          --paper-progress-secondary-color: var(--paper-light-blue-100);
+        }
+        paper-progress.green {
+          --paper-progress-active-color: var(--paper-green-500);
+          --paper-progress-secondary-color: var(--paper-green-100);
+        }
+    </style>
+  </template>
+</dom-module>

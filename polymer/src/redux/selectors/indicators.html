@@ -1,0 +1,20 @@
+<link rel="import" href="../reselect.html">
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Selectors = App.Selectors || {};
+
+    App.Selectors.Indicators = {
+      loading: Reselect.createSelector(
+        function (state) {
+          return state.indicators.all;
+        },
+        function (indicators) {
+          return typeof indicators === 'undefined';
+        }
+      ),
+    };
+  }());
+</script>
