@@ -176,7 +176,7 @@ class IndicatorBlueprintFactory(factory.django.DjangoModelFactory):
 
 class ReportableFactory(factory.django.DjangoModelFactory):
     blueprint = factory.SubFactory(IndicatorBlueprintFactory)
-    partner_project = factory.SubFactory(PartnerProjectFactory)
+    project = factory.SubFactory(PartnerProjectFactory)
     objective = factory.SubFactory(ClusterObjectiveFactory)
     object_id = factory.SelfAttribute('content_object.id')
     content_type = factory.LazyAttribute(
@@ -187,16 +187,30 @@ class ReportableFactory(factory.django.DjangoModelFactory):
         abstract = True
 
 
-class ReportableToClusterActivityFactory(factory.django.DjangoModelFactory):
+class ReportableToIndicatorReportFactory(ReportableFactory):
     content_object = factory.SubFactory('core.factories.IndicatorReportFactory')
 
     class Meta:
-        model = ReportableFactory
+        model = Reportable
+
+
+class ReportableToClusterActivityFactory(ReportableFactory):
+    content_object = factory.SubFactory('core.factories.ClusterActivityFactory')
+
+    class Meta:
+        model = Reportable
+
+
+class ReportableToPartnerActivityFactory(ReportableFactory):
+    content_object = factory.SubFactory('core.factories.PartnerActivityFactory')
+
+    class Meta:
+        model = Reportable
 
 
 class IndicatorDisaggregationFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "indicator_disaggregation_%d" % n)
-    indicator = factory.SubFactory(ReportableToClusterActivityFactory)
+    indicator = factory.SubFactory(ReportableToPartnerActivityFactory)
 
     class Meta:
         model = IndicatorDisaggregation
@@ -204,7 +218,7 @@ class IndicatorDisaggregationFactory(factory.django.DjangoModelFactory):
 
 class IndicatorDataSpecificationFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "indicator_data_specification_%d" % n)
-    indicator = factory.SubFactory(ReportableToClusterActivityFactory)
+    indicator = factory.SubFactory(ReportableToPartnerActivityFactory)
 
     class Meta:
         model = IndicatorDataSpecification
@@ -212,7 +226,7 @@ class IndicatorDataSpecificationFactory(factory.django.DjangoModelFactory):
 
 class LocationFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "location_%d" % n)
-    reportable = factory.SubFactory(ReportableToClusterActivityFactory)
+    reportable = factory.SubFactory(ReportableToPartnerActivityFactory)
 
     class Meta:
         model = Location
@@ -221,7 +235,7 @@ class LocationFactory(factory.django.DjangoModelFactory):
 class IndicatorReportFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "indicator_report_%d" % n)
     location = factory.SubFactory(LocationFactory)
-    reportable = factory.SubFactory(ReportableToClusterActivityFactory)
+    reportable = factory.SubFactory(ReportableToPartnerActivityFactory)
 
     class Meta:
         model = IndicatorReport
