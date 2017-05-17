@@ -4,12 +4,23 @@ from django.db import models
 
 from model_utils.models import TimeStampedModel
 
+from core.common import ADMINISTRATIVE_LEVEL, FREQUENCY_LEVEL, INDICATOR_REPORT_STATUS
+from indicator.models import IndicatorReport
+
 
 class ProgressReport(TimeStampedModel):
     partner_contribution_to_date = models.CharField(max_length=256)
     funds_received_to_date = models.CharField(max_length=256)
     challenges_in_the_reporting_period = models.CharField(max_length=256)
     proposed_way_forward = models.CharField(max_length=256)
+    # attachements ???
+
+
+class Section(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __unicode__(self):
+        return self.name
 
 
 class ProgrammeDocument(TimeStampedModel):
@@ -18,18 +29,13 @@ class ProgrammeDocument(TimeStampedModel):
     reference_number = models.CharField(max_length=255, verbose_name='Reference Number')
     title = models.CharField(max_length=255, verbose_name='PD/SSFA ToR Title')
     start_date = models.DateField(
-        blank=True,
-        null=True
+        verbose_name='Start Programme Date',
     )
     end_date = models.DateField(
-        blank=True,
-        null=True,
         verbose_name='Due Date',
     )
     population_focus = models.CharField(
         max_length=256,
-        blank=True,
-        null=True,
         verbose_name='Population Focus')
     response_to_HRP = models.CharField(
         max_length=256,
@@ -38,31 +44,105 @@ class ProgrammeDocument(TimeStampedModel):
         verbose_name='In response to an HRP')
     status = models.CharField(
         max_length=256,
-        blank=True,
-        null=True,
-        verbose_name='PD/SSFA status')
+        verbose_name='PD/SSFA status'
+    )
+    sections = models.ManyToManyField(Section)
+    contributing_to_cluser = models.BooleanField(
+        default=True,
+        verbose_name='Contributing to Cluser'
+    )
+    cluster_leds = models.ManyToManyField(
+        'cluster.Cluster',
+        help_text='Select Cluster involved in program.',
+    )
+    administrative_level = models.CharField(
+        max_length=3,
+        choices=ADMINISTRATIVE_LEVEL,
+        verbose_name='Locations - administrative level'
+    )
+    locations = models.ManyToManyField(
+        'core.Location',
+        help_text='Select Administrative location for chosen level',
+    )
+    frequency = models.CharField(
+        max_length=3,
+        choices=FREQUENCY_LEVEL,
+        default=FREQUENCY_LEVEL.monthly,
+        verbose_name='Frequency of reporting'
+    )
+    # TODO:
+    # cron job will create new report with due period !!!
+
+
+    # if we choose monthly and during time someone will change it to weekly that make capprisiosa on plate :/
+    # we need edge condition that will not allow to change it if there exist any reports I guess ???
+
+    __due_date = None
+    __report_status = None
+
+    @property
+    def contain_overdue_report(self):
+        return IndicatorReport.objects.filter(
+            programme_document=self,
+            time_period__lt=date.today(),
+            report_status=INDICATOR_REPORT_STATUS.ontrack
+        ).order_by('time_period').exists()
+
+    @property
+    def contain_nothing_due_report(self):
+        if not self.contain_overdue_report:
+            ontop_report = IndicatorReport.objects.filter(programme_document=self).order_by('time_period').last()
+            if ontop_report and ontop_report.report_status != INDICATOR_REPORT_STATUS.ontrack:
+                return True
+        return False
 
     @property
     def report_status(self):
-        return 'Overdue' or 'Nothing due' or 'Due'  # where due is '30 days to - current month to deadline'
+        # TODO: this should be cached (it's expensive) - redis will be perfect with midnight reset !!!
+        if self.__report_status is not None:
+            return self.__report_status
+        if self.contain_overdue_report:
+            self.__report_status = 'Overdue'
+        elif self.contain_nothing_due_report:
+            self.__report_status = 'Nothing due'
+        else:
+            self.__report_status = 'Due'
+        return self.__report_status
 
     @property
     def due_date(self):
-        pass  # calculate on reports details related to PD ???
-        # fixture for display value for better develop on front end
-        return date.today()
+        # TODO: this can be cached - redis will be perfect with midnight reset !!!
+        if self.__due_date is not None:
+            return self.__due_date
+
+        due_raport = IndicatorReport.objects.filter(
+            programme_document=self,
+            time_period__lt=date.today(),
+            report_status=INDICATOR_REPORT_STATUS.ontrack
+        ).order_by('time_period').first()
+        if due_raport:
+            self.__due_date = due_raport.time_period
+        else:
+            due_raport = IndicatorReport.objects.filter(
+                programme_document=self
+            ).order_by('time_period').last()
+            self.__due_date = due_raport and due_raport.time_period
+
+        return self.__due_date
 
     @property
-    def is_draft(self):
-        return True or False  # TODO
+    def frequency_delta_days(self):
+        if self.frequency == FREQUENCY_LEVEL.weekly:
+            return 7
+        elif self.frequency == FREQUENCY_LEVEL.monthly:
+            return 30
+        elif self.frequency == FREQUENCY_LEVEL.quartely:
+            return 90
+        else:
+            raise NotImplemented("Not recognized FREQUENCY_LEVEL.")
 
-    @property
-    def label_link(self):
-        return 'Go to draft' or 'Reports'
-
-    @property
-    def link_to_document(self):
-        return 'url'
+    def __unicode__(self):
+        return self.title
 
 
 class CountryProgrammeOutput(TimeStampedModel):

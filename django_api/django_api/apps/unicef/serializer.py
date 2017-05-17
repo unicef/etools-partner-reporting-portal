@@ -19,8 +19,4 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
             'status',
             'report_status',
             'due_date',
-            'is_draft',
-            'label_link',
-            'link_to_document',
         )
-
