@@ -14,7 +14,9 @@
     "node": ">=4.0"
   },
   "scripts": {
-    "dev": "./node_modules/lite-server/bin/lite-server"
+    "dev": "./node_modules/lite-server/bin/lite-server",
+    "bundle": "polymer build --bundle",
+    "serve": "./node_modules/lite-server/bin/lite-server --baseDir='bundle'",
   },
   "private": true,
   "devDependencies": {

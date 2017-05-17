@@ -1,0 +1,11 @@
+polymer:
+  image: unicef/etools-prp-polymer
+  build:
+    context: ./polymer
+    dockerfile: ./Dockerfile
+  volumes:
+      - ./polymer/:/code
+      - /code/node_modules
+      - /code/bower_components
+      - /code/bundled
+  command: ash -c "npm run bundle && npm run serve"
