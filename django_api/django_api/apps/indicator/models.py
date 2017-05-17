@@ -49,6 +49,7 @@ class Reportable(TimeStampedModel):
     baseline = models.CharField(max_length=255, null=True, blank=True)
     assumptions = models.TextField(null=True, blank=True)
     means_of_verification = models.CharField(max_length=255, null=True, blank=True)
+    is_cluster_indicator = models.BooleanField(default=False)
 
     # Current total, transactional and dynamically calculated based on IndicatorReports
     total = models.IntegerField(null=True, blank=True, default=0,
