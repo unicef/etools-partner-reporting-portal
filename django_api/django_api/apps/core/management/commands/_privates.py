@@ -16,6 +16,7 @@ from indicator.models import (
 )
 from unicef.models import (
     ProgressReport,
+    Section,
     ProgrammeDocument,
     CountryProgrammeOutput,
     LowerLevelOutput,
@@ -38,6 +39,7 @@ from core.factories import (
     IndicatorDataSpecificationFactory,
     IndicatorReportFactory,
     ProgressReportFactory,
+    SectionFactory,
     ProgrammeDocumentFactory,
     CountryProgrammeOutputFactory,
     LowerLevelOutputFactory,
@@ -107,14 +109,20 @@ def generate_fake_data(quantity=3):
     IndicatorDataSpecificationFactory.create_batch(quantity)
     print "{} IndicatorDataSpecification objects created".format(quantity)
 
-    IndicatorReportFactory.create_batch(quantity)
-    print "{} IndicatorReport objects created".format(quantity)
-
     ProgressReportFactory.create_batch(quantity)
     print "{} ProgressReport objects created".format(quantity)
 
+    SectionFactory.create_batch(quantity)
+    print "{} Section objects created".format(quantity)
+
     ProgrammeDocumentFactory.create_batch(quantity)
+    pd = ProgrammeDocument.objects.first()
+    pd.sections.add(Section.objects.first())
     print "{} ProgrammeDocument objects created".format(quantity)
+
+    # TODO: more sens for IndicatorReport objects - important logic exist with frequency of PD
+    IndicatorReportFactory.create_batch(quantity)
+    print "{} IndicatorReport objects created".format(quantity)
 
     CountryProgrammeOutputFactory.create_batch(quantity)
     print "{} CountryProgrammeOutput objects created".format(quantity)

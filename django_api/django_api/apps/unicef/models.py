@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 from datetime import date
-from django.db import models
+from django.db import models, transaction
 
 from model_utils.models import TimeStampedModel
 
@@ -58,6 +58,7 @@ class ProgrammeDocument(TimeStampedModel):
     administrative_level = models.CharField(
         max_length=3,
         choices=ADMINISTRATIVE_LEVEL,
+        default=ADMINISTRATIVE_LEVEL.country,
         verbose_name='Locations - administrative level'
     )
     locations = models.ManyToManyField(
@@ -73,12 +74,15 @@ class ProgrammeDocument(TimeStampedModel):
     # TODO:
     # cron job will create new report with due period !!!
 
-
-    # if we choose monthly and during time someone will change it to weekly that make capprisiosa on plate :/
-    # we need edge condition that will not allow to change it if there exist any reports I guess ???
-
     __due_date = None
     __report_status = None
+    __reports_exists = None
+
+    @property
+    def reports_exists(self):
+        if self.__reports_exists is None:
+            self.__reports_exists = IndicatorReport.objects.filter(programme_document=self).exists()
+        return self.__reports_exists
 
     @property
     def contain_overdue_report(self):
@@ -101,7 +105,9 @@ class ProgrammeDocument(TimeStampedModel):
         # TODO: this should be cached (it's expensive) - redis will be perfect with midnight reset !!!
         if self.__report_status is not None:
             return self.__report_status
-        if self.contain_overdue_report:
+        if not self.reports_exists:
+            self.__report_status = 'Nothing due'
+        elif self.contain_overdue_report:
             self.__report_status = 'Overdue'
         elif self.contain_nothing_due_report:
             self.__report_status = 'Nothing due'
@@ -114,19 +120,21 @@ class ProgrammeDocument(TimeStampedModel):
         # TODO: this can be cached - redis will be perfect with midnight reset !!!
         if self.__due_date is not None:
             return self.__due_date
+        elif not self.reports_exists:
+            return None
 
-        due_raport = IndicatorReport.objects.filter(
+        due_report = IndicatorReport.objects.filter(
             programme_document=self,
             time_period__lt=date.today(),
             report_status=INDICATOR_REPORT_STATUS.ontrack
         ).order_by('time_period').first()
-        if due_raport:
-            self.__due_date = due_raport.time_period
+        if due_report:
+            self.__due_date = due_report.time_period
         else:
-            due_raport = IndicatorReport.objects.filter(
+            due_report = IndicatorReport.objects.filter(
                 programme_document=self
             ).order_by('time_period').last()
-            self.__due_date = due_raport and due_raport.time_period
+            self.__due_date = due_report and due_report.time_period
 
         return self.__due_date
 
@@ -143,6 +151,17 @@ class ProgrammeDocument(TimeStampedModel):
 
     def __unicode__(self):
         return self.title
+
+    # @transaction.atomic
+    # def save(self, *args, **kwargs):
+    #     is_new = self.pk is None
+    #     super(ProgrammeDocument, self).save(*args, **kwargs)
+    #     if is_new:
+    #         IndicatorReport.objects.create(
+    #             title='enter data',
+    #             programme_document=self,
+    #             time_period=self.start_date,
+    #         )
 
 
 class CountryProgrammeOutput(TimeStampedModel):

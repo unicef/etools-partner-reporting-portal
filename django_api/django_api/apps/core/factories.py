@@ -24,14 +24,15 @@ from indicator.models import (
     IndicatorReport,
 )
 from unicef.models import (
+    Section,
     ProgressReport,
     ProgrammeDocument,
     CountryProgrammeOutput,
     LowerLevelOutput,
 )
-
-
+from core.common import FREQUENCY_LEVEL
 from core.models import Intervention, Location
+
 
 
 class PartnerFactory(factory.django.DjangoModelFactory):
@@ -238,6 +239,33 @@ class LocationFactory(factory.django.DjangoModelFactory):
         model = Location
 
 
+class ProgressReportFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = ProgressReport
+
+
+class SectionFactory(factory.django.DjangoModelFactory):
+    name = factory.Sequence(lambda n: "Section %d" % n)
+
+    class Meta:
+        model = Section
+
+
+class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
+    title = factory.Sequence(lambda n: "programme_document_%d" % n)
+    agreement = factory.Sequence(lambda n: "agreement_%d" % n)
+    reference_number = factory.Sequence(lambda n: "reference_number_%d" % n)
+    start_date = datetime.date.today()
+    end_date = datetime.date.today()+datetime.timedelta(days=70)
+    population_focus = factory.Sequence(lambda n: "population_focus%d" % n)
+    response_to_HRP = factory.Sequence(lambda n: "response_to_HRP%d" % n)
+    status = factory.Sequence(lambda n: "PD/SSFA status %d" % n)
+    frequency = FREQUENCY_LEVEL.weekly
+
+    class Meta:
+        model = ProgrammeDocument
+
+
 class IndicatorReportFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "indicator_report_%d" % n)
     location = factory.SubFactory(LocationFactory)
@@ -245,18 +273,6 @@ class IndicatorReportFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = IndicatorReport
-
-
-class ProgressReportFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = ProgressReport
-
-
-class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
-    title = factory.Sequence(lambda n: "programme_document_%d" % n)
-
-    class Meta:
-        model = ProgrammeDocument
 
 
 class CountryProgrammeOutputFactory(factory.django.DjangoModelFactory):
