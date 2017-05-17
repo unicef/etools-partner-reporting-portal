@@ -1,0 +1,29 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+
+<dom-module id="table-styles">
+  <template>
+    <style>
+      :host {
+        --data-table-header: {
+          box-sizing: border-box;
+          width: 100%;
+        };
+      }
+
+      etools-data-table-row {
+        display: block;
+        border-bottom: 1px solid var(--paper-grey-300);
+      }
+
+      etools-data-table-column,
+      .table-cell {
+        @apply(--layout-flex);
+      }
+
+      .table-cell:not(:last-of-type) {
+        padding-right: 15px;
+      }
+    </style>
+  </template>
+</dom-module>

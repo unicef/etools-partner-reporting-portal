@@ -1,0 +1,124 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/etools-content-panel/etools-content-panel.html">
+<link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
+<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/etools-data-table/etools-data-table.html">
+
+<link rel="import" href="../../elements/list-paginator.html">
+<link rel="import" href="../../behaviors/data-table.html">
+<link rel="import" href="../../styles/table-styles.html">
+
+<dom-module id="pd-list">
+  <template>
+    <style include="data-table-styles table-styles">
+      :host {
+        display: block;
+
+        --ecp-content: {
+          padding: 0;
+        };
+      }
+    </style>
+
+    <list-paginator
+        data="[[data]]"
+        page-size="[[pageSize]]"
+        page-number="[[pageNumber]]"
+        paginated="{{paginatedData}}">
+    </list-paginator>
+
+    <etools-content-panel title="List of PDs">
+
+      <etools-data-table-header
+          no-collapse
+          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
+        <etools-data-table-column field="id">
+          ID
+        </etools-data-table-column>
+
+        <etools-data-table-column field="first_name">
+          First name
+        </etools-data-table-column>
+
+        <etools-data-table-column field="last_name">
+          Last name
+        </etools-data-table-column>
+      </etools-data-table-header>
+
+      <template
+          id="list"
+          is="dom-repeat"
+          items="[[paginatedData]]"
+          as="pd"
+          initial-count="[[pageSize]]">
+        <etools-data-table-row no-collapse>
+          <div slot="row-data">
+            <div class="table-cell">
+              [[pd.id]]
+            </div>
+            <div class="table-cell">
+              [[pd.first_name]]
+            </div>
+            <div class="table-cell">
+              [[pd.last_name]]
+            </div>
+          </div>
+        </etools-data-table-row>
+      </template>
+
+      <etools-data-table-footer
+          page-size="[[pageSize]]"
+          page-number="[[pageNumber]]"
+          total-results="[[totalResults]]"
+          visible-range="{{visibleRange}}"
+          on-page-size-changed="_pageSizeChanged"
+          on-page-number-changed="_pageNumberChanged">
+      </etools-data-table-footer>
+
+      <etools-loading active="[[loading]]"></etools-loading>
+    </etools-content-panel>
+  </template>
+
+  <script>
+    Polymer({
+      id: 'pd-list',
+
+      behaviors: [
+        App.Behaviors.DataTableBehavior,
+      ],
+
+      properties: {
+        loading: {
+          type: Boolean,
+          value: false, // FIXME
+        },
+
+        // FIXME!
+        data: {
+          type: Array,
+          value: [{id:1,first_name:"Katine",last_name:"Menzies"},{id:2,first_name:"Amabel",last_name:"Grolle"},{id:3,first_name:"Sean",last_name:"Rawstorne"},{id:4,first_name:"Sisile",last_name:"Gloy"},{id:5,first_name:"Garnet",last_name:"Jakubowski"},{id:6,first_name:"Lilli",last_name:"Mehaffey"},{id:7,first_name:"Danny",last_name:"Hebborn"},{id:8,first_name:"Georgeanne",last_name:"Cescon"},{id:9,first_name:"Billye",last_name:"Stavers"},{id:10,first_name:"Faythe",last_name:"Murrow"},{id:11,first_name:"Teresa",last_name:"Nolton"},{id:12,first_name:"Aggie",last_name:"Sayward"},{id:13,first_name:"Vanya",last_name:"Tweede"},{id:14,first_name:"Lura",last_name:"Bawle"},{id:15,first_name:"Darcey",last_name:"Moulds"},{id:16,first_name:"Leandra",last_name:"Fayter"},{id:17,first_name:"Allegra",last_name:"Bricham"},{id:18,first_name:"Griselda",last_name:"Housecroft"},{id:19,first_name:"Blondell",last_name:"Bergstrand"},{id:20,first_name:"Bernette",last_name:"Verdie"},{id:21,first_name:"Flora",last_name:"Dowrey"},{id:22,first_name:"Delores",last_name:"Blanshard"},{id:23,first_name:"Amelina",last_name:"Tothacot"},{id:24,first_name:"Kelly",last_name:"Cudiff"},{id:25,first_name:"Rachele",last_name:"Durrance"},{id:26,first_name:"Missy",last_name:"Arsmith"},{id:27,first_name:"Hyacinthe",last_name:"Dries"},{id:28,first_name:"Olivie",last_name:"Roxbrough"},{id:29,first_name:"Fernanda",last_name:"Carreyette"},{id:30,first_name:"Taryn",last_name:"Witty"},{id:31,first_name:"Otha",last_name:"Franey"},{id:32,first_name:"Fanchette",last_name:"Sealey"},{id:33,first_name:"Suellen",last_name:"Deane"},{id:34,first_name:"Amandi",last_name:"Gozard"},{id:35,first_name:"Noni",last_name:"Skippon"},{id:36,first_name:"Zoe",last_name:"Lightbourne"},{id:37,first_name:"Alvira",last_name:"Schooling"},{id:38,first_name:"Bethanne",last_name:"Brettel"},{id:39,first_name:"Garnet",last_name:"Greening"},{id:40,first_name:"Vivienne",last_name:"Yve"},{id:41,first_name:"Kamillah",last_name:"Healing"},{id:42,first_name:"Bertine",last_name:"Gravett"},{id:43,first_name:"Crysta",last_name:"Ziem"},{id:44,first_name:"Andra",last_name:"Frankcom"},{id:45,first_name:"Darcie",last_name:"Slyme"},{id:46,first_name:"Ivy",last_name:"Downgate"},{id:47,first_name:"Betsy",last_name:"Mangam"},{id:48,first_name:"Bibi",last_name:"Church"},{id:49,first_name:"Sharron",last_name:"Bulfoy"},{id:50,first_name:"Alikee",last_name:"Hallihane"},{id:51,first_name:"Dora",last_name:"Chazier"},{id:52,first_name:"Marla",last_name:"Bartley"},{id:53,first_name:"Goldia",last_name:"Broseke"},{id:54,first_name:"Marquita",last_name:"Whaymand"},{id:55,first_name:"Nettle",last_name:"Passe"},{id:56,first_name:"Terrye",last_name:"Gero"},{id:57,first_name:"Benedikta",last_name:"Sommerville"},{id:58,first_name:"Tiffany",last_name:"Syde"},{id:59,first_name:"Viole",last_name:"Domeny"},{id:60,first_name:"Brooks",last_name:"Livsey"},{id:61,first_name:"Dolli",last_name:"Ponceford"},{id:62,first_name:"Maurizia",last_name:"Cubitt"},{id:63,first_name:"Jackqueline",last_name:"Skpsey"},{id:64,first_name:"Josselyn",last_name:"Chaplin"},{id:65,first_name:"Jo-anne",last_name:"Dumpleton"},{id:66,first_name:"Etty",last_name:"Millward"},{id:67,first_name:"Sileas",last_name:"Hague"},{id:68,first_name:"Torie",last_name:"Jeromson"},{id:69,first_name:"Devora",last_name:"Basey"},{id:70,first_name:"Sarena",last_name:"Eam"},{id:71,first_name:"Penelopa",last_name:"Keavy"},{id:72,first_name:"Berry",last_name:"Fuzzard"},{id:73,first_name:"Anet",last_name:"Graveson"},{id:74,first_name:"Lorrie",last_name:"Pitrollo"},{id:75,first_name:"Calypso",last_name:"Dorre"},{id:76,first_name:"Erna",last_name:"Zanotti"},{id:77,first_name:"Catha",last_name:"Egiloff"},{id:78,first_name:"Billi",last_name:"Durham"},{id:79,first_name:"Colline",last_name:"Rosgen"},{id:80,first_name:"Gerri",last_name:"Delgardillo"},{id:81,first_name:"Carry",last_name:"Glas"},{id:82,first_name:"Debee",last_name:"Cayet"},{id:83,first_name:"Nettie",last_name:"Pesterfield"},{id:84,first_name:"Jill",last_name:"Mateja"},{id:85,first_name:"Lisette",last_name:"Rubinowicz"},{id:86,first_name:"Karin",last_name:"Jarrelt"},{id:87,first_name:"Wallie",last_name:"Rayer"},{id:88,first_name:"Sidonnie",last_name:"Rouff"},{id:89,first_name:"Judith",last_name:"Dulen"},{id:90,first_name:"Audre",last_name:"Castelot"},{id:91,first_name:"Jean",last_name:"Reuven"},{id:92,first_name:"Roberta",last_name:"Geraghty"},{id:93,first_name:"Catlin",last_name:"Kem"},{id:94,first_name:"Mirabelle",last_name:"Bullimore"},{id:95,first_name:"Stesha",last_name:"Litel"},{id:96,first_name:"Catharina",last_name:"Ellard"},{id:97,first_name:"Damaris",last_name:"Witcombe"},{id:98,first_name:"Francyne",last_name:"Dregan"},{id:99,first_name:"Garnet",last_name:"Woodrow"},{id:100,first_name:"Anabal",last_name:"Dumsday"}],
+        },
+
+        pageSize: {
+          type: Number,
+          value: 10,
+        },
+
+        pageNumber: {
+          type: Number,
+          value: 1,
+        },
+
+        totalResults: {
+          type: Number,
+          computed: '_computeTotalResults(data)',
+        },
+      },
+
+      _computeTotalResults: function (data) {
+        return data.length;
+      },
+    });
+  </script>
+</dom-module>
