@@ -15,6 +15,14 @@
           return typeof indicators === 'undefined';
         }
       ),
+      totalResults: Reselect.createSelector(
+        function (state) {
+          return state.indicators.all;
+        },
+        function (indicators) {
+          return indicators.length;
+        }
+      ),
     };
   }());
 </script>

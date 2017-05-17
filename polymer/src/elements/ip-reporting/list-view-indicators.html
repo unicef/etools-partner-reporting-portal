@@ -13,15 +13,15 @@
 <link rel="import" href="../../../../bower_components/etools-data-table/data-table-styles.html">
 <link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
 
-<link rel="import" href="../../styles/page-headers.html">
+<link rel="import" href="../../behaviors/pagination.html">
+
+<link rel="import" href="../../styles/data-table-custom.html">
 <link rel="import" href="../../styles/progress-bar.html">
 
 <dom-module id="list-view-indicators">
   <template>
-    <style is="custom-style" include='iron-flex iron-flex-factors progress-bar data-table-styles'>
-      :host {
-        display: block;
-      }
+    <style is="custom-style"
+           include='iron-flex iron-flex-factors data-table-styles data-table-custom progress-bar '>
     </style>
 
     <etools-content-panel title="List of Indicators">
@@ -29,13 +29,13 @@
       <etools-data-table-header
         id="listHeader"
         label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
-        <etools-data-table-column class="flex-2" field="number" sortable>
+        <etools-data-table-column class="flex-2" field="number">
           PD/SSFA ToR ref.#
         </etools-data-table-column>
         <etools-data-table-column class="flex-6" field="indicator">
           Indicator
         </etools-data-table-column>
-        <etools-data-table-column  class="flex-4" field="progress" sortable>
+        <etools-data-table-column  class="flex-4" field="progress">
           Current progress
         </etools-data-table-column>
       </etools-data-table-header>
@@ -44,16 +44,16 @@
         <etools-data-table-row details-opened="[[detailsOpened]]">
           <div slot="row-data">
             <span class="col-data flex-2">
-              [[indicator.code]]
-              <a href="/">2016/000-0</a>
+              <a href="/">[[indicator.blueprint.id]]</a>
             </span>
             <span class="col-data flex-6">
-              [[indicator.title]]
-              Lorem ipsum dolor sit amet, etiam mattis, quisque dapibus proin et.
+              [[indicator.blueprint.title]]
             </span>
             <span class="col-data flex-4">
+              <!-- TODO: percentage is going to be returned from the backend -->
+              <!-- TODO: Change color to green if it's a cluster item (not in this sprint). -->
               <paper-progress value="40" class="blue"></paper-progress>
-              <span>[[indicator.unit]] 40%</span>
+              <span>40%</span>
             </span>
           </div>
           <div slot="row-data-details">[Indicator details here.]</div>
@@ -65,25 +65,26 @@
           page-number="[[pageNumber]]"
           total-results="[[totalResults]]"
           visible-range="{{visibleRange}}"
-          on-page-size-changed="_pageSizeSelected"
+          on-page-size-changed="_pageSizeChanged"
           on-page-number-changed="_pageNumberChanged">
       </etools-data-table-footer>
+
     </etools-content-panel>
   </template>
   <script>
+
     Polymer({
       is: 'list-view-indicators',
 
       behaviors: [
-        App.Behaviors.UtilsBehavior,
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.PaginationBehavior,
       ],
 
       properties: {
-        // TODO: Remove this when fakedata ready.
         indicators: {
           type: Object,
-          value: [{'test': []}, {'test2': []}],
+          statePath: 'indicators.all',
         },
         detailsOpened: {
           type: Boolean,
@@ -91,7 +92,15 @@
         },
         loading: {
           type: Boolean,
-          statePath: App.Selectors.Indicators.loading,
+          statePath: App.Selectors.Indicators.loading
+        },
+        totalResults: {
+          type: Number,
+          statePath: App.Selectors.Indicators.totalResults || 0
+        },
+        pageSize: {
+          type: Number,
+          value: App.Behaviors.PaginationBehavior.defaultListsSize.value
         },
       }
     });

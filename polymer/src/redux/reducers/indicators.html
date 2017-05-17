@@ -18,7 +18,7 @@
 
       switch (action.type) {
         case App.Constants.SET_INDICATORS:
-          return Object.assign({}, action.indicatorsData);
+          return Object.assign([], action.indicatorsData);
 
         case App.Constants.RESET:
           return {};
