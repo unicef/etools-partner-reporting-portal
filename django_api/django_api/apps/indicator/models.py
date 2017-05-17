@@ -7,6 +7,8 @@ from django.db import models
 
 from model_utils.models import TimeStampedModel
 
+from unicef.models import LowerLevelOutput
+
 from core.common import INDICATOR_REPORT_STATUS
 
 
@@ -73,6 +75,31 @@ class Reportable(TimeStampedModel):
     objective = models.ForeignKey('cluster.ClusterObjective', null=True, related_name="reportables")
 
     parent_indicator = models.ForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
+
+    @property
+    def ref_num(self):
+        if isinstance(self.content_object, LowerLevelOutput):
+            return self.content_object.indicator.programme_document.ref
+        else:
+            return ''
+
+    @property
+    def achieved(self):
+        if self.indicator_reports.exists():
+            return self.indicator_reports.last().total
+        else:
+            return None
+
+    @property
+    def progress_percentage(self):
+        # if self.blueprint.unit == IndicatorBlueprint.NUMBER:
+            # pass
+        percentage = 0.0
+
+        if self.achieved:
+            percentage = (self.achieved - float(self.baseline)) / (float(self.target) - float(self.baseline))
+
+        return percentage
 
 
 class IndicatorDisaggregation(TimeStampedModel):
