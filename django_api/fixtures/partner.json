@@ -1,0 +1,31 @@
+[
+  {
+    "model": "partner.partner",
+    "pk": 1,
+    "fields": {
+      "created": "2017-05-12T07:48:07.676Z",
+      "modified": "2017-05-15T10:21:45.298Z",
+      "title": "Tivix Europa S.A.",
+      "short_title": "Tivix PL",
+      "partner_type": "Gov",
+      "shared_partner": "U&U",
+      "cso_type": "Int",
+      "email": "admin@tivix.com",
+      "phone_number": "0014156801299",
+      "last_assessment_date": "2017-05-12",
+      "core_values_assessment_date": "2017-05-12",
+      "street_address": "Morskie Oko",
+      "city": "Bielsko-Bia\u0142a",
+      "postal_code": "43-316",
+      "country_code": "PL",
+      "total_ct_cp": "1000.00",
+      "total_ct_cy": "1000.00",
+      "vendor_number": "#542342MOP",
+      "alternate_id": 123,
+      "alternate_title": "Title alternate hihihi",
+      "rating": "very strong",
+      "type_of_assessment": "medium",
+      "cluster": [1]
+    }
+  }
+]
