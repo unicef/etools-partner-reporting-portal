@@ -32,4 +32,5 @@ if settings.DEBUG:
         url(r'^__debug__/', include(debug_toolbar.urls)),
     ] + urlpatterns
 
-    urlpatterns += staticfiles_urlpatterns('/api/static/')
+# Serving staticserve files for both dev and remote environments
+urlpatterns += staticfiles_urlpatterns('/api/static/')
