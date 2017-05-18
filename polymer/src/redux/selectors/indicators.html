@@ -12,17 +12,9 @@
           return state.indicators.all;
         },
         function (indicators) {
-          return typeof indicators === 'undefined';
+          return !Array.isArray(indicators)
         }
-      ),
-      totalResults: Reselect.createSelector(
-        function (state) {
-          return state.indicators.all;
-        },
-        function (indicators) {
-          return indicators.length;
-        }
-      ),
+      )
     };
   }());
 </script>

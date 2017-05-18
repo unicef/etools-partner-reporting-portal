@@ -8,43 +8,59 @@
 <link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../../bower_components/paper-progress/paper-progress.html">
 
-<link rel="import" href="../../../../bower_components/etools-content-panel/etools-content-panel.html">
-<link rel="import" href="../../../../bower_components/etools-data-table/etools-data-table.html">
-<link rel="import" href="../../../../bower_components/etools-data-table/data-table-styles.html">
+<link rel="import" href="../../../bower_components/etools-content-panel/etools-content-panel.html">
+<link rel="import" href="../../../bower_components/etools-data-table/etools-data-table.html">
 <link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
 
-<link rel="import" href="../../behaviors/pagination.html">
+<link rel="import" href="../../behaviors/data-table.html">
+<link rel="import" href="../../elements/list-paginator.html">
 
-<link rel="import" href="../../styles/data-table-custom.html">
+<link rel="import" href="../../styles/table-styles.html">
 <link rel="import" href="../../styles/progress-bar.html">
 
 <dom-module id="list-view-indicators">
   <template>
     <style is="custom-style"
-           include='iron-flex iron-flex-factors data-table-styles data-table-custom progress-bar '>
+           include='iron-flex iron-flex-factors data-table-styles table-styles progress-bar'>
     </style>
+
+    <list-paginator
+      data="[[indicators.all]]"
+      page-size="[[pageSize]]"
+      page-number="[[pageNumber]]"
+      paginated={{paginatedData}}>
+    </list-paginator>
 
     <etools-content-panel title="List of Indicators">
       <etools-loading active="[[loading]]"></etools-loading>
       <etools-data-table-header
         id="listHeader"
         label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
+
         <etools-data-table-column class="flex-2" field="number">
           PD/SSFA ToR ref.#
         </etools-data-table-column>
+
         <etools-data-table-column class="flex-6" field="indicator">
           Indicator
         </etools-data-table-column>
+
         <etools-data-table-column  class="flex-4" field="progress">
           Current progress
         </etools-data-table-column>
+
       </etools-data-table-header>
 
-      <template id="rows" is="dom-repeat" items="[[indicators]]" as="indicator">
+      <template id="rows"
+                is="dom-repeat"
+                items="{{indicators}}"
+                initial-count="[[pageSize]]"
+                as="indicator">
         <etools-data-table-row details-opened="[[detailsOpened]]">
           <div slot="row-data">
             <span class="col-data flex-2">
-              <a href="/">[[indicator.blueprint.id]]</a>
+              <!-- TODO: Add link when it is available. -->
+              <a href="/">[[indicator.ref_num]]</a>
             </span>
             <span class="col-data flex-6">
               [[indicator.blueprint.title]]
@@ -52,8 +68,10 @@
             <span class="col-data flex-4">
               <!-- TODO: percentage is going to be returned from the backend -->
               <!-- TODO: Change color to green if it's a cluster item (not in this sprint). -->
-              <paper-progress value="40" class="blue"></paper-progress>
-              <span>40%</span>
+              <paper-progress value="{{_computeProgressPercentage(indicator.progress_percentage)}}"
+                              class="blue">
+              </paper-progress>
+              <span>{{_computeProgressPercentage(indicator.progress_percentage)}}%</span>
             </span>
           </div>
           <div slot="row-data-details">[Indicator details here.]</div>
@@ -78,7 +96,7 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
-        App.Behaviors.PaginationBehavior,
+        App.Behaviors.DataTableBehavior,
       ],
 
       properties: {
@@ -94,14 +112,26 @@
           type: Boolean,
           statePath: App.Selectors.Indicators.loading
         },
-        totalResults: {
-          type: Number,
-          statePath: App.Selectors.Indicators.totalResults || 0
-        },
         pageSize: {
           type: Number,
-          value: App.Behaviors.PaginationBehavior.defaultListsSize.value
+          value: 10
         },
+        pageNumber: {
+          type: Number,
+          value: 1
+        },
+        totalResults: {
+          type: Number,
+          computed: '_computeTotalResults(indicators)',
+        },
+      },
+
+      _computeProgressPercentage: function(num) {
+        return Math.round(num * 100);
+      },
+
+      _computeTotalResults: function (data) {
+         return data.length;
       }
     });
   </script>

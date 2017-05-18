@@ -1,0 +1,23 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="list-paginator">
+  <script>
+    Polymer({
+      is: 'list-paginator',
+      properties: {
+        data: Array,
+        pageSize: Number,
+        pageNumber: Number,
+        paginated: {
+          type: Array,
+          notify: true,
+          computed: '_computePaginated(data, pageSize, pageNumber)',
+        },
+      },
+      _computePaginated: function (data, pageSize, pageNumber) {
+        var start = (pageNumber - 1) * pageSize;
+        return data.slice(start, start + pageSize);
+      },
+    });
+  </script>
+</dom-module>
