@@ -6,7 +6,7 @@ class ProgrammeDocumentForm(forms.Form):
     ref_title = forms.CharField(required=False, max_length=256)
     status = forms.CharField(required=False, max_length=256)
     locations = forms.CharField(required=False, max_length=256)
-    report_status = forms.CharField(required=False, max_length=128)
+    report_status = forms.IntegerField(required=False)
     due_date = forms.DateField(
         required=False,
         help_text=(

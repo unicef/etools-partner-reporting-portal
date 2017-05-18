@@ -57,3 +57,9 @@ FREQUENCY_LEVEL = Choices(
     ('Mon', 'monthly', 'Monthly'),
     ('Qua', 'quarterly', 'Quarterly'),
 )
+
+PD_LIST_REPORT_STATUS = Choices(
+    (1, 'nothing_due', 'Nothing due'),
+    (2, 'overdue', 'Overdue'),
+    (3, 'due', 'Due'),
+)

@@ -4,7 +4,7 @@ from django.db import models, transaction
 
 from model_utils.models import TimeStampedModel
 
-from core.common import ADMINISTRATIVE_LEVEL, FREQUENCY_LEVEL, INDICATOR_REPORT_STATUS
+from core.common import ADMINISTRATIVE_LEVEL, FREQUENCY_LEVEL, INDICATOR_REPORT_STATUS, PD_LIST_REPORT_STATUS
 from indicator.models import IndicatorReport
 
 
@@ -106,13 +106,13 @@ class ProgrammeDocument(TimeStampedModel):
         if self.__report_status is not None:
             return self.__report_status
         if not self.reports_exists:
-            self.__report_status = 'Nothing due'
+            self.__report_status = PD_LIST_REPORT_STATUS.nothing_due
         elif self.contain_overdue_report:
-            self.__report_status = 'Overdue'
+            self.__report_status = PD_LIST_REPORT_STATUS.overdue
         elif self.contain_nothing_due_report:
-            self.__report_status = 'Nothing due'
+            self.__report_status = PD_LIST_REPORT_STATUS.nothing_due
         else:
-            self.__report_status = 'Due'
+            self.__report_status = PD_LIST_REPORT_STATUS.due
         return self.__report_status
 
     @property
