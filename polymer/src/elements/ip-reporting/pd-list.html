@@ -7,6 +7,7 @@
 
 <link rel="import" href="../../elements/list-paginator.html">
 <link rel="import" href="../../behaviors/data-table.html">
+<link rel="import" href="../../redux/selectors/programmeDocuments.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../styles/table-styles.html">
 
@@ -102,7 +103,7 @@
           on-page-number-changed="_pageNumberChanged">
       </etools-data-table-footer>
 
-      <etools-loading active="[[loading]]"></etools-loading>
+      <etools-loading active="[[!loaded]]"></etools-loading>
     </etools-content-panel>
   </template>
 
@@ -116,9 +117,9 @@
       ],
 
       properties: {
-        loading: {
+        loaded: {
           type: Boolean,
-          value: false, // FIXME
+          statePath: App.Selectors.ProgrammeDocuments.loaded,
         },
 
         data: {
