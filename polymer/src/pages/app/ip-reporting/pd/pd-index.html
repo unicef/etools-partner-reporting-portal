@@ -2,6 +2,12 @@
 
 <link rel="import" href="../../../../elements/page-header.html">
 <link rel="import" href="../../../../elements/page-body.html">
+<link rel="import" href="../../../../elements/ip-reporting/pd-list.html">
+
+<link rel="import" href="../../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../../endpoints.html">
+<link rel="import" href="../../../../redux/actions.html">
+<link rel="import" href="../../../../redux/store.html">
 
 <dom-module id="page-ip-reporting-pd-index">
   <template>
@@ -11,15 +17,41 @@
       }
     </style>
 
+    <etools-prp-ajax
+        id="programmeDocuments"
+        url="[[programmeDocumentsUrl]]">
+    </etools-prp-ajax>
+
     <page-header title="Programme Documents"></page-header>
 
     <page-body>
+      <pd-list></pd-list>
     </page-body>
   </template>
 
   <script>
     Polymer({
       is: 'page-ip-reporting-pd-index',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        programmeDocumentsUrl: {
+          type: String,
+          value: App.Endpoints.programmeDocuments(),
+        },
+      },
+
+      attached: function () {
+        var pdThunk = this.$.programmeDocuments.thunk();
+
+        this.dispatch(App.Actions.fetchProgrammeDocuments(pdThunk))
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
+      },
     });
   </script>
 </dom-module>
