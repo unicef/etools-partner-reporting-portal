@@ -4,8 +4,11 @@
 <link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../../bower_components/etools-data-table/etools-data-table.html">
+<link rel="import" href="../../../bower_components/paper-tooltip/paper-tooltip.html">
 
 <link rel="import" href="../../elements/list-paginator.html">
+<link rel="import" href="../../elements/report-status.html">
+<link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/data-table.html">
 <link rel="import" href="../../redux/selectors/programmeDocuments.html">
 <link rel="import" href="../../redux/store.html">
@@ -50,7 +53,10 @@
           <div class="table-column">PD/SSFA ToR Title</div>
         </etools-data-table-column>
         <etools-data-table-column field="budget">
-          <div class="table-column">Budget</div>
+          <div class="table-column">
+            Budget
+            <paper-tooltip>Total budget $ (Disbursements to date %)</paper-tooltip>
+          </div>
         </etools-data-table-column>
         <etools-data-table-column field="report_status">
           <div class="table-column">Report status</div>
@@ -70,22 +76,22 @@
         <etools-data-table-row no-collapse>
           <div slot="row-data">
             <div class="table-cell table-cell--text">
-              <a href="/TODO">[[pd.reference_number]]</a>
+              <a href="/TODO">[[_withDefault(pd.reference_number)]]</a>
             </div>
             <div class="table-cell table-cell--text">
-              [[pd.reference_number]]
+              [[_withDefault(pd.reference_number)]]
             </div>
             <div class="table-cell table-cell--text" flex-3>
-              [[pd.title]]
+              [[_withDefault(pd.title)]]
             </div>
             <div class="table-cell table-cell--text">
-              [[pd.budget]]
+              [[_withDefault(pd.budget)]]
             </div>
             <div class="table-cell table-cell--text">
-              [[pd.report_status]]
+              <report-status status="[[pd.report_status]]"></report-status>
             </div>
             <div class="table-cell table-cell--text">
-              [[pd.due_date]]
+              [[_withDefault(pd.due_date)]]
             </div>
             <div class="table-cell table-cell--text cell-reports">
               <a href="/TODO">Reports</a>
@@ -114,6 +120,7 @@
       behaviors: [
         App.Behaviors.ReduxBehavior,
         App.Behaviors.DataTableBehavior,
+        App.Behaviors.UtilsBehavior,
       ],
 
       properties: {
