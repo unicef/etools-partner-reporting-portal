@@ -26,9 +26,7 @@ RUN apt-get install -y --no-install-recommends \
 RUN apt-get install -y --no-install-recommends \
     python-dev \
     python-software-properties \
-    python-setuptools \
-    uwsgi \
-    uwsgi-plugin-python
+    python-setuptools
 RUN apt-get install -y --no-install-recommends \
     postgresql-client \
     libpq-dev \
@@ -53,12 +51,13 @@ ENV CPLUS_INCLUDE_PATH /usr/include/gdal
 ENV C_INCLUDE_PATH /usr/include/gdal
 
 ADD ./requirements/* /tmp/
-ADD . /code/
-VOLUME /code
 
 # Install PyPi dependencies
 WORKDIR /tmp
 RUN pip install -r $REQUIREMENT_FILE
+
+ADD . /code/
+VOLUME /code
 
 RUN mkdir -p /data/django_api/logs
 RUN touch /data/django_api/logs/django.log
