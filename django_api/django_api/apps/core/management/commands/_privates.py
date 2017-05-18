@@ -74,6 +74,7 @@ def generate_fake_data(quantity=3):
         'is_staff': True
     })
     admin.set_password('Passw0rd!')
+    admin.save()
     print "Superuser created:{}/{}".format(admin.username, 'Passw0rd!')
 
     UserFactory.create_batch(quantity)
