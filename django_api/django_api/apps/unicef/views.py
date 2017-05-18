@@ -26,7 +26,6 @@ class ProgrammeDocumentAPIView(ListAPIView):
             return ProgrammeDocument.objects.all()
 
         queryset = ProgrammeDocument.objects
-
         ref_title = form.cleaned_data.get('ref_title')
         if ref_title:
             queryset = queryset.filter(
@@ -45,6 +44,6 @@ class ProgrammeDocumentAPIView(ListAPIView):
                 return Response(form.errors.items())
             queryset = self.get_queryset(form)
         else:
-            queryset = self.get_queryset(request)
+            queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=statuses.HTTP_200_OK)
