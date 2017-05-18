@@ -32,4 +32,4 @@ if settings.DEBUG:
         url(r'^__debug__/', include(debug_toolbar.urls)),
     ] + urlpatterns
 
-    urlpatterns += staticfiles_urlpatterns('/static/')
+    urlpatterns += staticfiles_urlpatterns('/api/static/')
