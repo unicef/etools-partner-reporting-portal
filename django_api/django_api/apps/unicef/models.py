@@ -80,6 +80,7 @@ class ProgrammeDocument(TimeStampedModel):
     __due_date = None
     __report_status = None
     __reports_exists = None
+    __budget = None
 
     @property
     def reports_exists(self):
@@ -143,6 +144,8 @@ class ProgrammeDocument(TimeStampedModel):
 
     @property
     def budget(self):
+        if self.__budget is not None:
+            return self.__budget
         consumed = self.reportable.total
         total = (
             self.reportable.project and
@@ -150,7 +153,8 @@ class ProgrammeDocument(TimeStampedModel):
             self.reportable.project.partner.total_ct_cp
         )
         if (total is None) or (consumed is None):
-            return ""
+            self.__budget = ""
+            return self.__budget
         try:
             percentage = Decimal(consumed) / Decimal(total)
             percentage = int(percentage * 100)
@@ -158,7 +162,8 @@ class ProgrammeDocument(TimeStampedModel):
             # TODO log
             percentage = 0
 
-        return "{total} ({consumed} %)".format(total=total, consumed=consumed)
+        self.__budget = "{total} ({consumed} %)".format(total=total, consumed=consumed)
+        return self.__budget
 
     @property
     def frequency_delta_days(self):
