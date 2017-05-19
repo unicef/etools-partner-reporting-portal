@@ -1,0 +1,68 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="report-status">
+  <template>
+    <style>
+      :host {
+        display: inline-block;
+      }
+
+      .status-icon {
+        display: inline-block;
+        vertical-align: middle;
+        width: 1em;
+        height: 1em;
+        margin-right: .25em;
+        border-radius: .5em;
+        position: relative;
+        top: -1px;
+        line-height: 1;
+      }
+    </style>
+
+    <span class="status-icon" style="background: [[bgColor]];"></span>
+    [[label]]
+  </template>
+
+  <script>
+    Polymer({
+      is: 'report-status',
+
+      properties: {
+        status: Number,
+
+        label: {
+          type: String,
+          computed: '_computeLabel(status)',
+        },
+
+        bgColor: {
+          type: String,
+          computed: '_computeBgColor(status)',
+        },
+      },
+
+      _computeLabel: function (status) {
+        switch (status) {
+          case 1:
+            return 'Nothing due';
+          case 2:
+            return 'Overdue';
+          case 3:
+            return 'Due';
+        }
+      },
+
+      _computeBgColor: function (status) {
+        switch (status) {
+          case 1:
+            return '#72c300';
+          case 2:
+            return '#d0021b';
+          case 3:
+            return '#d8d8d8';
+        }
+      },
+    });
+  </script>
+</dom-module>
