@@ -1,11 +1,12 @@
 from __future__ import unicode_literals
+from decimal import Decimal
 from datetime import date
 from django.db import models, transaction
 
 from model_utils.models import TimeStampedModel
 
 from core.common import ADMINISTRATIVE_LEVEL, FREQUENCY_LEVEL, INDICATOR_REPORT_STATUS, PD_LIST_REPORT_STATUS
-from indicator.models import IndicatorReport
+from indicator.models import IndicatorReport, Reportable
 
 
 class ProgressReport(TimeStampedModel):
@@ -71,6 +72,8 @@ class ProgrammeDocument(TimeStampedModel):
         default=FREQUENCY_LEVEL.monthly,
         verbose_name='Frequency of reporting'
     )
+    reportable = models.ForeignKey(Reportable, null=True)
+
     # TODO:
     # cron job will create new report with due period !!!
 
@@ -137,6 +140,25 @@ class ProgrammeDocument(TimeStampedModel):
             self.__due_date = due_report and due_report.time_period
 
         return self.__due_date
+
+    @property
+    def budget(self):
+        consumed = self.reportable.total
+        total = (
+            self.reportable.project and
+            self.reportable.project.partner and
+            self.reportable.project.partner.total_ct_cp
+        )
+        if (total is None) or (consumed is None):
+            return ""
+        try:
+            percentage = Decimal(consumed) / Decimal(total)
+            percentage = int(percentage * 100)
+        except Exception as exp:
+            # TODO log
+            percentage = 0
+
+        return "{total} ({consumed} %)".format(total=total, consumed=consumed)
 
     @property
     def frequency_delta_days(self):
