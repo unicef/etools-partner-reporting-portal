@@ -1,4 +1,5 @@
 import datetime
+from decimal import Decimal
 
 from django.contrib.auth.models import Group
 from django.db.models.signals import post_save
@@ -34,9 +35,9 @@ from core.common import FREQUENCY_LEVEL
 from core.models import Intervention, Location
 
 
-
 class PartnerFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "partner_%d" % n)
+    total_ct_cp = fuzzy.FuzzyInteger(1000, 10000, 100)
 
     @factory.post_generation
     def cluster(self, create, extracted, **kwargs):
@@ -185,6 +186,7 @@ class ReportableFactory(factory.django.DjangoModelFactory):
     parent_indicator = None
     content_type = factory.LazyAttribute(
         lambda o: ContentType.objects.get_for_model(o.content_object))
+    total = fuzzy.FuzzyInteger(10, 100, 5)
 
     class Meta:
         exclude = ['content_object']
@@ -261,6 +263,7 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     response_to_HRP = factory.Sequence(lambda n: "response_to_HRP%d" % n)
     status = factory.Sequence(lambda n: "PD/SSFA status %d" % n)
     frequency = FREQUENCY_LEVEL.weekly
+    reportable = factory.SubFactory(ReportableToPartnerActivityFactory)
 
     class Meta:
         model = ProgrammeDocument

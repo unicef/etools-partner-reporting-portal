@@ -69,6 +69,7 @@ def clean_up_data():
 
         print "All ORM objects deleted"
 
+
 def generate_fake_data(quantity=3):
     UserFactory.create_batch(quantity)
     print "{} User objects created".format(quantity)
