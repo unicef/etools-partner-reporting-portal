@@ -32,6 +32,12 @@ class ProgrammeDocumentAPIView(ListAPIView):
                 Q(reference_number__icontains=ref_title) | Q(title__icontains=ref_title)
             )
 
+        status = form.cleaned_data.get('status')
+        if status:
+            queryset = queryset.filter(status__icontains=status)
+
+
+
         return queryset
 
     def list(self, request, *args, **kwargs):
