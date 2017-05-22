@@ -3,6 +3,7 @@ Django==1.10.6
 
 # REST framework
 djangorestframework==3.6.2
+django-filter==1.0.4
 
 # Other Python packages
 psycopg2==2.7.1
