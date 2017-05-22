@@ -18,4 +18,4 @@ class TestIndicatorListAPIView(APITestCase):
         response = self.client.get(url, format='json')
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(response.data), len(self.reports))
+        self.assertEquals(len(response.data['results']), len(self.reports))
