@@ -7,5 +7,6 @@ class IndicatorFilter(filters.FilterSet):
     class Meta:
         model = Reportable
         fields = (
-            'id', 'target', 'baseline', 'blueprint'
+            'id', 'target', 'baseline', 'blueprint',
+            'indicator_reports'
         )
