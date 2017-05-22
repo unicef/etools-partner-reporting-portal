@@ -168,7 +168,6 @@ class ClusterActivityFactory(factory.django.DjangoModelFactory):
 
 class IndicatorBlueprintFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "indicator_blueprint_%d" % n)
-    cluster_activity = factory.SubFactory(ClusterActivityFactory)
 
     class Meta:
         model = IndicatorBlueprint
@@ -176,8 +175,6 @@ class IndicatorBlueprintFactory(factory.django.DjangoModelFactory):
 
 class ReportableFactory(factory.django.DjangoModelFactory):
     blueprint = factory.SubFactory(IndicatorBlueprintFactory)
-    project = factory.SubFactory(PartnerProjectFactory)
-    objective = factory.SubFactory(ClusterObjectiveFactory)
     object_id = factory.SelfAttribute('content_object.id')
     parent_indicator = None
     content_type = factory.LazyAttribute(
