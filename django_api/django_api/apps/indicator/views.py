@@ -36,22 +36,22 @@ class IndicatorListCreateAPIView(ListCreateAPIView):
         # pd_statuses = self.request.query_params.get('pd_statuses', None)
 
         if locations:
-            location_list = map(lambda item: int(item), locations.split(','))
+            location_list = map(lambda item: int(item), filter(lambda item: item != '', locations.split(',')))
             q_list.append(Q(locations__id__in=location_list))
 
         if pds:
-            pd_list = map(lambda item: int(item), pds.split(','))
+            pd_list = map(lambda item: int(item), filter(lambda item: item != '', pds.split(',')))
             q_list.append(Q(lower_level_outputs__indicator__programme_document__id__in=pd_list))
 
         if clusters:
-            cluster_list = map(lambda item: int(item), clusters.split(','))
+            cluster_list = map(lambda item: int(item), filter(lambda item: item != '', clusters.split(',')))
             q_list.append(Q(cluster_activities__cluster__id__in=cluster_list))
 
         # if pd_statuses:
-        #     pd_status_list = map(lambda item: int(item), pd_statuses.split(','))
+            # pd_status_list = map(lambda item: int(item), filter(lambda item: item != '', pd_statuses.split(',')))
         #     q_list.append(Q(lower_level_outputs__indicator__programme_document__status__in=pd_status_list))
 
         if q_list:
-            queryset = queryset.filter(reduce(operator.or_, q_list))
+            queryset = queryset.filter(reduce(operator.and_, q_list))
 
         return queryset
