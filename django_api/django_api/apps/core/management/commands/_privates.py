@@ -21,6 +21,10 @@ from unicef.models import (
     CountryProgrammeOutput,
     LowerLevelOutput,
 )
+from core.models import (
+    Intervention,
+    Location,
+)
 
 from core.factories import (
     UserFactory,
@@ -66,6 +70,8 @@ def clean_up_data():
         ProgrammeDocument.objects.all().delete()
         CountryProgrammeOutput.objects.all().delete()
         LowerLevelOutput.objects.all().delete()
+        Intervention.objects.all().delete()
+        Location.objects.all().delete()
 
         print "All ORM objects deleted"
 
