@@ -19,8 +19,6 @@ from partner.models import (
 from indicator.models import (
     IndicatorBlueprint,
     Reportable,
-    IndicatorDisaggregation,
-    IndicatorDataSpecification,
     IndicatorReport,
 )
 from unicef.models import (
@@ -224,24 +222,6 @@ class ReportableToPartnerActivityFactory(ReportableFactory):
 
     class Meta:
         model = Reportable
-
-
-class IndicatorDisaggregationFactory(factory.django.DjangoModelFactory):
-    title = factory.Sequence(lambda n: "indicator_disaggregation_%d" % n)
-    indicator = factory.SubFactory(ReportableToLowerLevelOutputFactory)
-    range = NumericRange(0, 200)
-
-    class Meta:
-        model = IndicatorDisaggregation
-
-
-class IndicatorDataSpecificationFactory(factory.django.DjangoModelFactory):
-    title = factory.Sequence(lambda n: "indicator_data_specification_%d" % n)
-    indicator = factory.SubFactory(ReportableToLowerLevelOutputFactory)
-    frequency = fuzzy.FuzzyInteger(100)
-
-    class Meta:
-        model = IndicatorDataSpecification
 
 
 class LocationFactory(factory.django.DjangoModelFactory):

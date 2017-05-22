@@ -10,8 +10,6 @@ from partner.models import (
 from indicator.models import (
     IndicatorBlueprint,
     Reportable,
-    IndicatorDisaggregation,
-    IndicatorDataSpecification,
     IndicatorReport,
 )
 from unicef.models import (
@@ -32,8 +30,6 @@ from core.factories import (
     PartnerActivityFactory,
     IndicatorBlueprintFactory,
     ReportableToLowerLevelOutputFactory,
-    IndicatorDisaggregationFactory,
-    IndicatorDataSpecificationFactory,
     IndicatorReportFactory,
     ProgressReportFactory,
     ProgrammeDocumentFactory,
@@ -55,8 +51,6 @@ def clean_up_data():
         PartnerActivity.objects.all().delete()
         IndicatorBlueprint.objects.all().delete()
         Reportable.objects.all().delete()
-        IndicatorDisaggregation.objects.all().delete()
-        IndicatorDataSpecification.objects.all().delete()
         IndicatorReport.objects.all().delete()
         ProgressReport.objects.all().delete()
         ProgrammeDocument.objects.all().delete()
@@ -101,12 +95,6 @@ def generate_fake_data(quantity=3):
 
     ReportableToLowerLevelOutputFactory.create_batch(quantity)
     print "{} ReportableToLowerLevelOutput objects created".format(quantity)
-
-    IndicatorDisaggregationFactory.create_batch(quantity)
-    print "{} IndicatorDisaggregation objects created".format(quantity)
-
-    IndicatorDataSpecificationFactory.create_batch(quantity)
-    print "{} IndicatorDataSpecification objects created".format(quantity)
 
     IndicatorReportFactory.create_batch(quantity)
     print "{} IndicatorReport objects created".format(quantity)
