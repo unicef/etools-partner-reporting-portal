@@ -31,6 +31,8 @@ class IndicatorListCreateAPIView(ListCreateAPIView):
 
         locations = self.request.query_params.get('locations', None)
         pds = self.request.query_params.get('pds', None)
+
+        # TODO: Create Cluster List API endpoint when we start working on Cluster Reporting
         clusters = self.request.query_params.get('clusters', None)
         # TODO: Turn this back on when feature-pd-list branch is merged
         # pd_statuses = self.request.query_params.get('pd_statuses', None)
