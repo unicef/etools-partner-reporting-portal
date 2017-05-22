@@ -25,7 +25,7 @@ class IndicatorListCreateAPIView(ListCreateAPIView):
     filter_class = IndicatorFilter
 
     def get_queryset(self):
-        queryset = Reportable.objects.filter(indicator_reports__isnull=False, content_type=ContentType.objects.get_for_model(LowerLevelOutput))
+        queryset = Reportable.objects.filter(lower_level_outputs__reportables__isnull=False)
 
         q_list = []
 
