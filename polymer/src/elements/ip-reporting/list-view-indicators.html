@@ -21,13 +21,13 @@
     </style>
 
     <list-paginator
-      data="[[indicators.all]]"
+      data="[[data]]"
       page-size="[[pageSize]]"
       page-number="[[pageNumber]]"
       paginated="{{paginatedData}}">
     </list-paginator>
 
-    <etools-content-panel title="List of Indicators">
+    <etools-content-panel panel-title="List of Indicators">
       <etools-loading active="[[loading]]"></etools-loading>
       <etools-data-table-header
         id="listHeader"
@@ -86,7 +86,6 @@
     </etools-content-panel>
   </template>
   <script>
-
     Polymer({
       is: 'list-view-indicators',
 
@@ -96,9 +95,9 @@
       ],
 
       properties: {
-        indicators: {
+        data: {
           type: Object,
-          statePath: 'indicators.all',
+          statePath: 'indicators.all'
         },
         detailsOpened: {
           type: Boolean,
@@ -106,7 +105,7 @@
         },
         loading: {
           type: Boolean,
-          statePath: App.Selectors.Indicators.loading
+          statePath: 'indicators.loading'
         },
         pageSize: {
           type: Number,
@@ -118,17 +117,13 @@
         },
         totalResults: {
           type: Number,
-          computed: '_computeTotalResults(indicators)',
+          statePath: 'indicators.count'
         },
       },
 
       _computeProgressPercentage: function(num) {
         return Math.round(num * 100);
       },
-
-      _computeTotalResults: function (data) {
-         return data.length;
-      }
     });
   </script>
 </dom-module>
