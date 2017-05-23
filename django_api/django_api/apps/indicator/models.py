@@ -107,7 +107,5 @@ class IndicatorReport(TimeStampedModel):
         max_length=3
     )
 
-    programme_document = models.ForeignKey('unicef.ProgrammeDocument', null=True)
-
     def __unicode__(self):
         return self.title

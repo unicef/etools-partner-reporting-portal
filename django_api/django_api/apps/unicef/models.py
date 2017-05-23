@@ -85,7 +85,7 @@ class ProgrammeDocument(TimeStampedModel):
     @property
     def reports_exists(self):
         if self.__reports_exists is None:
-            self.__reports_exists = IndicatorReport.objects.filter(programme_document=self).exists()
+            self.__reports_exists = IndicatorReport.objects.filter(reportable=self.reportable).exists()
         return self.__reports_exists
 
     @property
