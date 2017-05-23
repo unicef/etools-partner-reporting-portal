@@ -139,8 +139,7 @@ class ProgrammeDocument(TimeStampedModel):
         if due_report:
             self.__due_date = due_report.time_period
         else:
-            due_report = self.reportable_queryset \
-                .order_by('time_period') \
+            due_report = self.reportable_queryset.order_by('time_period') \
                 .last() \
                 .indicator_reports.last()
             self.__due_date = due_report and due_report.time_period
