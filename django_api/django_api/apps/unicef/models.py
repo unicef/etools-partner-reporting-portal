@@ -52,19 +52,11 @@ class ProgrammeDocument(TimeStampedModel):
         default=True,
         verbose_name='Contributing to Cluser'
     )
-    cluster_leds = models.ManyToManyField(
-        'cluster.Cluster',
-        help_text='Select Cluster involved in program.',
-    )
     administrative_level = models.CharField(
         max_length=3,
         choices=ADMINISTRATIVE_LEVEL,
         default=ADMINISTRATIVE_LEVEL.country,
         verbose_name='Locations - administrative level'
-    )
-    locations = models.ManyToManyField(
-        'core.Location',
-        help_text='Select Administrative location for chosen level',
     )
     frequency = models.CharField(
         max_length=3,
@@ -72,7 +64,6 @@ class ProgrammeDocument(TimeStampedModel):
         default=FREQUENCY_LEVEL.monthly,
         verbose_name='Frequency of reporting'
     )
-    reportable = models.ForeignKey(Reportable, null=True)
 
     # TODO:
     # cron job will create new report with due period !!!

@@ -32,6 +32,7 @@ from core.factories import (
     PartnerProjectFactory,
     PartnerActivityFactory,
     IndicatorBlueprintFactory,
+    ReportableToLowerLevelOutputFactory,
     ReportableToIndicatorReportFactory,
     ReportableToClusterActivityFactory,
     ReportableToPartnerActivityFactory,
@@ -125,17 +126,13 @@ def generate_fake_data(quantity=3):
     SectionFactory.create_batch(quantity)
     print "{} Section objects created".format(quantity)
 
-    ProgrammeDocumentFactory.create_batch(quantity)
-    pd = ProgrammeDocument.objects.first()
-    pd.sections.add(Section.objects.first())
-    print "{} ProgrammeDocument objects created".format(quantity)
-
     # TODO: more sens for IndicatorReport objects - important logic exist with frequency of PD
+    # IndicatorReport will create LowerLevelOutput, CountryProgrammeOutput, and ProgrammeDocument automatically
     IndicatorReportFactory.create_batch(quantity)
     print "{} IndicatorReport objects created".format(quantity)
 
-    CountryProgrammeOutputFactory.create_batch(quantity)
-    print "{} CountryProgrammeOutput objects created".format(quantity)
+    for idx in xrange(quantity):
+        indicator_report = IndicatorReport.objects.all()[idx]
+        pd = indicator_report.reportable.content_object.indicator.programme_document
 
-    LowerLevelOutputFactory.create_batch(quantity)
-    print "{} LowerLevelOutput objects created".format(quantity)
+        pd.sections.add(Section.objects.all()[idx])
