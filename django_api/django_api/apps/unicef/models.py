@@ -4,6 +4,7 @@ from datetime import date
 
 from django.db import models, transaction
 from django.contrib.contenttypes.fields import GenericRelation
+from django.utils.functional import cached_property
 
 from model_utils.models import TimeStampedModel
 
@@ -76,24 +77,31 @@ class ProgrammeDocument(TimeStampedModel):
     __reports_exists = None
     __budget = None
 
+    @cached_property
+    def reportable_queryset(self):
+        return Reportable.objects.filter(
+            lower_level_outputs__indicator__programme_document=self)
+
     @property
     def reports_exists(self):
         if self.__reports_exists is None:
-            self.__reports_exists = IndicatorReport.objects.filter(reportable=self.reportable).exists()
+            self.__reports_exists = self.reportable_queryset.exists()
         return self.__reports_exists
 
     @property
     def contain_overdue_report(self):
-        return IndicatorReport.objects.filter(
-            programme_document=self,
-            time_period__lt=date.today(),
-            report_status=INDICATOR_REPORT_STATUS.ontrack
-        ).order_by('time_period').exists()
+        return self.reportable_queryset.filter(
+            indicator_reports__time_period__lt=date.today(),
+            indicator_reports__report_status=INDICATOR_REPORT_STATUS.ontrack
+        ).exists()
 
     @property
     def contain_nothing_due_report(self):
         if not self.contain_overdue_report:
-            ontop_report = IndicatorReport.objects.filter(programme_document=self).order_by('time_period').last()
+            ontop_report = self.reportable_queryset \
+                .order_by('indicator_reports__time_period') \
+                .indicator_reports.last()
+
             if ontop_report and ontop_report.report_status != INDICATOR_REPORT_STATUS.ontrack:
                 return True
         return False
@@ -121,17 +129,20 @@ class ProgrammeDocument(TimeStampedModel):
         elif not self.reports_exists:
             return None
 
-        due_report = IndicatorReport.objects.filter(
-            programme_document=self,
-            time_period__lt=date.today(),
-            report_status=INDICATOR_REPORT_STATUS.ontrack
-        ).order_by('time_period').first()
+        due_report = self.reportable_queryset.filter(
+            indicator_reports__time_period__lt=date.today(),
+            indicator_reports__report_status=INDICATOR_REPORT_STATUS.ontrack
+        ) \
+            .order_by('indicator_reports__time_period') \
+            .last().indicator_reports.last()
+
         if due_report:
             self.__due_date = due_report.time_period
         else:
-            due_report = IndicatorReport.objects.filter(
-                programme_document=self
-            ).order_by('time_period').last()
+            due_report = self.reportable_queryset \
+                .order_by('time_period') \
+                .last() \
+                .indicator_reports.last()
             self.__due_date = due_report and due_report.time_period
 
         return self.__due_date
@@ -140,15 +151,16 @@ class ProgrammeDocument(TimeStampedModel):
     def budget(self):
         if self.__budget is not None:
             return self.__budget
-        consumed = self.reportable.total
-        total = (
-            self.reportable.project and
-            self.reportable.project.partner and
-            self.reportable.project.partner.total_ct_cp
-        )
-        if (total is None) or (consumed is None):
+
+        total = self.budget
+        consumed = None
+
+        if not self.reportable_queryset.exists():
             self.__budget = ""
             return self.__budget
+        else:
+            consumed = self.reportable_queryset.last().total
+
         try:
             percentage = Decimal(consumed) / Decimal(total)
             percentage = int(percentage * 100)
