@@ -18,7 +18,7 @@ class ProgrammeDocumentAPIView(ListAPIView):
     Endpoint for getting Programme Document.
     """
     serializer_class = ProgrammeDocumentSerializer
-    permission_classes = (IsAuthenticated, )
+    # permission_classes = (IsAuthenticated, )
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
     filter_class = ProgrammeDocumentFilter
 
