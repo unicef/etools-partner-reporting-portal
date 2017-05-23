@@ -1,0 +1,32 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="filter-list">
+  <template>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'filter-list',
+
+      properties: {
+        filters: {
+          type: Object,
+          notify: true,
+          readOnly: true,
+          // FIXME
+          value: {
+            foo: 'bar',
+          },
+        },
+      },
+
+      attached: function () {
+        // FIXME
+        this.async(function () {
+          this._setFilters(Object.assign({}, this.filters, { foo: 'baz' }));
+        }, 3000);
+      },
+    });
+  </script>
+</dom-module>

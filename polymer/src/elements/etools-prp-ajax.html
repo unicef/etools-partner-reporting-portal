@@ -147,6 +147,10 @@
               });
         }.bind(this));
       },
+
+      abort: function () {
+        this.lastRequest && this.lastRequest.xhr.abort();
+      },
     });
   </script>
 </dom-module>

@@ -1,10 +1,11 @@
 <link rel="import" href="../../../../../bower_components/polymer/polymer.html">
 
+<link rel="import" href="../../../../behaviors/utils.html">
 <link rel="import" href="../../../../elements/page-header.html">
 <link rel="import" href="../../../../elements/page-body.html">
-<link rel="import" href="../../../../elements/ip-reporting/pd-list.html">
-
 <link rel="import" href="../../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../../elements/filter-list.html">
+<link rel="import" href="../../../../elements/ip-reporting/pd-list.html">
 <link rel="import" href="../../../../endpoints.html">
 <link rel="import" href="../../../../redux/actions.html">
 <link rel="import" href="../../../../redux/store.html">
@@ -25,6 +26,10 @@
     <page-header title="Programme Documents"></page-header>
 
     <page-body>
+      <filter-list
+          filters="{{filters}}">
+      </filter-list>
+
       <pd-list></pd-list>
     </page-body>
   </template>
@@ -35,17 +40,31 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.UtilsBehavior,
       ],
 
       properties: {
         programmeDocumentsUrl: {
           type: String,
-          value: App.Endpoints.programmeDocuments(),
+          computed: '_computeProgrammeDocumentsUrl(country, filters)',
+          observer: '_onUrlChanged',
+        },
+
+        country: {
+          type: String,
+          statePath: 'countries.current',
         },
       },
 
-      attached: function () {
+      _computeProgrammeDocumentsUrl: function (country, newFilters) {
+        return App.Endpoints.programmeDocuments(country, this._qs(newFilters));
+      },
+
+      _onUrlChanged: function (newUrl) {
         var pdThunk = this.$.programmeDocuments.thunk();
+
+        // Cancel the current request
+        this.$.programmeDocuments.abort();
 
         this.dispatch(App.Actions.fetchProgrammeDocuments(pdThunk))
             .catch(function (err) { // jshint ignore:line
