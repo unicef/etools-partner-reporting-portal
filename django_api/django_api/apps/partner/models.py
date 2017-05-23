@@ -151,7 +151,6 @@ class PartnerProject(TimeStampedModel):
     start_date = models.DateField()
     end_date = models.DateField()
     status = models.CharField(max_length=100)
-    budget = models.FloatField()
 
     cluster = models.ManyToManyField('cluster.Cluster', related_name="partner_projects")
     location = models.ManyToManyField('core.Location', related_name="partner_projects")

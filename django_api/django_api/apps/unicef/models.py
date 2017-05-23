@@ -48,9 +48,9 @@ class ProgrammeDocument(TimeStampedModel):
         verbose_name='PD/SSFA status'
     )
     sections = models.ManyToManyField(Section)
-    contributing_to_cluser = models.BooleanField(
+    contributing_to_cluster = models.BooleanField(
         default=True,
-        verbose_name='Contributing to Cluser'
+        verbose_name='Contributing to Cluster'
     )
     administrative_level = models.CharField(
         max_length=3,
@@ -64,6 +64,7 @@ class ProgrammeDocument(TimeStampedModel):
         default=FREQUENCY_LEVEL.monthly,
         verbose_name='Frequency of reporting'
     )
+    budget = models.FloatField()
 
     # TODO:
     # cron job will create new report with due period !!!
