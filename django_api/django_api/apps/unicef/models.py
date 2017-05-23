@@ -148,7 +148,7 @@ class ProgrammeDocument(TimeStampedModel):
         return self.__due_date
 
     @property
-    def budget(self):
+    def calculated_budget(self):
         if self.__budget is not None:
             return self.__budget
 
