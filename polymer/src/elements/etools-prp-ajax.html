@@ -149,7 +149,9 @@
       },
 
       abort: function () {
-        this.lastRequest && this.lastRequest.xhr.abort();
+        if (this.lastRequest) {
+          this.lastRequest.xhr.abort();
+        }
       },
     });
   </script>

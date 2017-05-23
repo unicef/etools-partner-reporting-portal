@@ -24,7 +24,9 @@
       attached: function () {
         // FIXME
         this.async(function () {
-          this._setFilters(Object.assign({}, this.filters, { foo: 'baz' }));
+          this._setFilters(Object.assign({}, this.filters, {
+            foo: 'baz'
+          }));
         }, 3000);
       },
     });

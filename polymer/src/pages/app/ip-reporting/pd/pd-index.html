@@ -60,7 +60,7 @@
         return App.Endpoints.programmeDocuments(country, this._qs(newFilters));
       },
 
-      _onUrlChanged: function (newUrl) {
+      _onUrlChanged: function () {
         var pdThunk = this.$.programmeDocuments.thunk();
 
         // Cancel the current request
