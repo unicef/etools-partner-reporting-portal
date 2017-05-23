@@ -103,11 +103,22 @@
       // Programme documents
       fetchProgrammeDocuments: function (pdThunk) {
         return function (dispatch) {
+          var loadingStop = App.Actions.programmeDocumentsLoadingStop;
+
+          dispatch(App.Actions.programmeDocumentsLoadingStart());
+
           return pdThunk()
               .then(function (res) {
                 var pdData = res.data;
 
                 dispatch(App.Actions.setProgrammeDocuments(pdData));
+                dispatch(loadingStop());
+              })
+              .catch(function (err) {
+                dispatch(loadingStop());
+
+                // Return the original error to the caller
+                return Promise.reject(err);
               });
         };
       },
@@ -116,6 +127,18 @@
         return {
           type: App.Constants.SET_PROGRAMME_DOCUMENTS,
           data: data,
+        };
+      },
+
+      programmeDocumentsLoadingStart: function () {
+        return {
+          type: App.Constants.PROGRAMME_DOCUMENTS_LOADING_START,
+        };
+      },
+
+      programmeDocumentsLoadingStop: function () {
+        return {
+          type: App.Constants.PROGRAMME_DOCUMENTS_LOADING_STOP,
         };
       },
 
