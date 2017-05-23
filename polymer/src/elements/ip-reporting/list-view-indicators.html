@@ -1,34 +1,30 @@
-<link rel="import" href="../../../../bower_components/polymer/polymer.html">
-
-<link rel="import" href="../../redux/store.html">
-<link rel="import" href="../../redux/selectors/indicators.html">
-
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../../bower_components/paper-progress/paper-progress.html">
-
 <link rel="import" href="../../../bower_components/etools-content-panel/etools-content-panel.html">
 <link rel="import" href="../../../bower_components/etools-data-table/etools-data-table.html">
 <link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
 
+<link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../redux/selectors/indicators.html">
 <link rel="import" href="../../behaviors/data-table.html">
 <link rel="import" href="../../elements/list-paginator.html">
-
 <link rel="import" href="../../styles/table-styles.html">
 <link rel="import" href="../../styles/progress-bar.html">
 
 <dom-module id="list-view-indicators">
   <template>
     <style is="custom-style"
-           include='iron-flex iron-flex-factors data-table-styles table-styles progress-bar'>
+           include="iron-flex iron-flex-factors data-table-styles table-styles progress-bar">
     </style>
 
     <list-paginator
       data="[[indicators.all]]"
       page-size="[[pageSize]]"
       page-number="[[pageNumber]]"
-      paginated={{paginatedData}}>
+      paginated="{{paginatedData}}">
     </list-paginator>
 
     <etools-content-panel title="List of Indicators">
@@ -51,9 +47,9 @@
 
       </etools-data-table-header>
 
-      <template id="rows"
+      <template id="list"
                 is="dom-repeat"
-                items="{{indicators}}"
+                items="[[paginatedData]]"
                 initial-count="[[pageSize]]"
                 as="indicator">
         <etools-data-table-row details-opened="[[detailsOpened]]">
