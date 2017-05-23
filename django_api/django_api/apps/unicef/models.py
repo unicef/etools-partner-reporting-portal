@@ -1,7 +1,9 @@
 from __future__ import unicode_literals
 from decimal import Decimal
 from datetime import date
+
 from django.db import models, transaction
+from django.contrib.contenttypes.fields import GenericRelation
 
 from model_utils.models import TimeStampedModel
 
@@ -193,3 +195,5 @@ class LowerLevelOutput(TimeStampedModel):
     title = models.CharField(max_length=255)
 
     indicator = models.ForeignKey(CountryProgrammeOutput, related_name="ll_outputs")
+
+    reportables = GenericRelation('indicator.Reportable', related_query_name='lower_level_outputs')

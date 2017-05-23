@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.contrib.contenttypes.fields import GenericRelation
 
 from model_utils.models import TimeStampedModel
 
@@ -155,6 +156,7 @@ class PartnerProject(TimeStampedModel):
     cluster = models.ManyToManyField('cluster.Cluster', related_name="partner_projects")
     location = models.ManyToManyField('core.Location', related_name="partner_projects")
     partner = models.ForeignKey(Partner, null=True, related_name="partner_projects")
+    reportables = GenericRelation('indicator.Reportable', related_query_name='partner_projects')
 
 
 class PartnerActivity(TimeStampedModel):
@@ -162,3 +164,4 @@ class PartnerActivity(TimeStampedModel):
     project = models.ForeignKey(PartnerProject, null=True, related_name="partner_activities")
     partner = models.ForeignKey(Partner, related_name="partner_activities")
     cluster_activity = models.ForeignKey('cluster.ClusterActivity', related_name="partner_activities")
+    reportables = GenericRelation('indicator.Reportable', related_query_name='partner_projects')
