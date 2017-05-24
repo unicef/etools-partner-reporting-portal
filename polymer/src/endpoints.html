@@ -22,6 +22,10 @@
 
         return this._buildUrl('/unicef/programme-document/?' + filters);
       },
+
+      programmeDocumentDetail: function (pdId) {
+        return this._buildUrl('/unicef/programme-document/details/' + pdId);
+      },
     };
   }());
 </script>

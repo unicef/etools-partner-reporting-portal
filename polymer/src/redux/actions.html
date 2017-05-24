@@ -119,6 +119,23 @@
         };
       },
 
+      fetchProgrammeDocumentDetails: function (pdDetailsThunk) {
+        return function (dispatch) {
+          return pdDetailsThunk()
+            .then(function (res) {
+              var pdDetailsData = res.data;
+              dispatch(App.Actions.setProgrammeDocumentDetails(pdDetailsData));
+            });
+        };
+      },
+
+      setProgrammeDocumentDetails: function (pdDetailsData) {
+        return {
+          type: App.Constants.SET_PROGRAMME_DOCUMENT_DETAILS,
+          pdDetailsData: pdDetailsData,
+        };
+      },
+
       // Master reset
       reset: function () {
         return {
