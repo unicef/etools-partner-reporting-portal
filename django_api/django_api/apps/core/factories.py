@@ -67,7 +67,6 @@ class PartnerProjectFactory(factory.django.DjangoModelFactory):
     start_date = fuzzy.FuzzyDate(datetime.date.today())
     end_date = fuzzy.FuzzyDate(datetime.date.today())
     status = fuzzy.FuzzyText()
-    budget = fuzzy.FuzzyFloat(1000)
 
     @factory.post_generation
     def cluster(self, create, extracted, **kwargs):
@@ -272,6 +271,7 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     response_to_HRP = factory.Sequence(lambda n: "response_to_HRP%d" % n)
     status = factory.Sequence(lambda n: "PD/SSFA status %d" % n)
     frequency = FREQUENCY_LEVEL.weekly
+    budget = fuzzy.FuzzyFloat(1000)
 
     class Meta:
         model = ProgrammeDocument
