@@ -281,6 +281,8 @@ class IndicatorReportFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "indicator_report_%d" % n)
     location = factory.SubFactory(LocationFactory)
     reportable = factory.SubFactory(ReportableToLowerLevelOutputFactory)
+    time_period_start = fuzzy.FuzzyDate(datetime.date.today())
+    time_period_end = fuzzy.FuzzyDate(datetime.date.today())
 
     class Meta:
         model = IndicatorReport
