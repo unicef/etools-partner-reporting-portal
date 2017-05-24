@@ -52,7 +52,7 @@
         <etools-data-table-column field="title" flex-3>
           <div class="table-column">PD/SSFA ToR Title</div>
         </etools-data-table-column>
-        <etools-data-table-column field="budget">
+        <etools-data-table-column field="calculated_budget">
           <div class="table-column">
             Budget
             <paper-tooltip>Total budget $ (Disbursements to date %)</paper-tooltip>
@@ -85,7 +85,7 @@
               [[_withDefault(pd.title)]]
             </div>
             <div class="table-cell table-cell--text">
-              [[_withDefault(pd.budget)]]
+              [[_withDefault(pd.calculated_budget)]]
             </div>
             <div class="table-cell table-cell--text">
               <report-status status="[[pd.report_status]]"></report-status>
