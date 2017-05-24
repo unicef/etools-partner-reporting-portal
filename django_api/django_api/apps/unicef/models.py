@@ -93,6 +93,9 @@ class ProgrammeDocument(TimeStampedModel):
 
     # TODO:
     # cron job will create new report with due period !!!
+    #
+    # TODO:
+    # report status for ProgrammeDocument
 
     __due_date = None
     __report_status = None
