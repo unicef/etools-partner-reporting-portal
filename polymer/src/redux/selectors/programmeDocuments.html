@@ -6,15 +6,15 @@
 
     App.Selectors = App.Selectors || {};
 
-    App.Selectors.Indicators = {
-      loading: Reselect.createSelector(
+    App.Selectors.ProgrammeDocuments = {
+      loaded: Reselect.createSelector(
         function (state) {
-          return state.indicators.all;
+          return state.programmeDocuments.all;
         },
-        function (indicators) {
-          return !Array.isArray(indicators)
+        function (docs) {
+          return !!docs.length;
         }
-      )
+      ),
     };
   }());
 </script>

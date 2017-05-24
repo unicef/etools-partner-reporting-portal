@@ -24,7 +24,7 @@
           defaultValue = '...';
         }
 
-        return typeof value !== 'undefined' ? value : defaultValue;
+        return value == null /* undefinded & null */ ? defaultValue : value; // jshint ignore:line
       },
     };
 

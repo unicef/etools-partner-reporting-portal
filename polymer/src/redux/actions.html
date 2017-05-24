@@ -84,12 +84,14 @@
       // Indicator Data
       fetchIndicators: function (indicatorsThunk) {
         return function (dispatch) {
+          dispatch(App.Actions.indicatorsLoadingStart());
           return indicatorsThunk()
-              .then(function (res) {
-                var indicators = res.data;
-
-                dispatch(App.Actions.setIndicators(indicators));
-              });
+            .then(function (res) {
+              var indicators = res.data;
+              dispatch(App.Actions.setIndicators(indicators));
+              dispatch(App.Actions.indicatorsLoadingStop());
+              dispatch(App.Actions.setIndicatorsCount(indicators));
+            });
         };
       },
 
@@ -97,6 +99,25 @@
         return {
           type: App.Constants.SET_INDICATORS,
           indicatorsData: indicatorsData,
+        };
+      },
+
+      indicatorsLoadingStart: function () {
+        return {
+          type: App.Constants.INDICATORS_LOADING_START,
+        };
+      },
+
+      indicatorsLoadingStop: function () {
+        return {
+          type: App.Constants.INDICATORS_LOADING_STOP,
+        };
+      },
+
+      setIndicatorsCount: function (indicators) {
+        return {
+          type: App.Constants.SET_INDICATORS_COUNT,
+          count: indicators.count
         };
       },
 
@@ -116,6 +137,25 @@
         return {
           type: App.Constants.SET_PARTNER,
           partnerData: partnerData,
+        };
+      },
+
+      // Programme documents
+      fetchProgrammeDocuments: function (pdThunk) {
+        return function (dispatch) {
+          return pdThunk()
+              .then(function (res) {
+                var pdData = res.data;
+
+                dispatch(App.Actions.setProgrammeDocuments(pdData));
+              });
+        };
+      },
+
+      setProgrammeDocuments: function (data) {
+        return {
+          type: App.Constants.SET_PROGRAMME_DOCUMENTS,
+          data: data,
         };
       },
 

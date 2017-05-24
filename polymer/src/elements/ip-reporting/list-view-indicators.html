@@ -1,37 +1,29 @@
-<link rel="import" href="../../../../bower_components/polymer/polymer.html">
-
-<link rel="import" href="../../redux/store.html">
-<link rel="import" href="../../redux/selectors/indicators.html">
-
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
-<link rel="import" href="../../../bower_components/paper-progress/paper-progress.html">
-
 <link rel="import" href="../../../bower_components/etools-content-panel/etools-content-panel.html">
 <link rel="import" href="../../../bower_components/etools-data-table/etools-data-table.html">
 <link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
 
+<link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../behaviors/data-table.html">
 <link rel="import" href="../../elements/list-paginator.html">
-
+<link rel="import" href="../../elements/etools-prp-progress-bar.html">
 <link rel="import" href="../../styles/table-styles.html">
-<link rel="import" href="../../styles/progress-bar.html">
 
 <dom-module id="list-view-indicators">
   <template>
-    <style is="custom-style"
-           include='iron-flex iron-flex-factors data-table-styles table-styles progress-bar'>
+    <style include="iron-flex iron-flex-factors data-table-styles table-styles">
     </style>
 
     <list-paginator
-      data="[[indicators.all]]"
+      data="[[data]]"
       page-size="[[pageSize]]"
-      page-number="[[pageNumber]]"
-      paginated={{paginatedData}}>
+      page-number="[[pageNumber]]">
     </list-paginator>
 
-    <etools-content-panel title="List of Indicators">
+    <etools-content-panel panel-title="List of Indicators">
       <etools-loading active="[[loading]]"></etools-loading>
       <etools-data-table-header
         id="listHeader"
@@ -51,9 +43,9 @@
 
       </etools-data-table-header>
 
-      <template id="rows"
+      <template id="list"
                 is="dom-repeat"
-                items="{{indicators}}"
+                items="[[data]]"
                 initial-count="[[pageSize]]"
                 as="indicator">
         <etools-data-table-row details-opened="[[detailsOpened]]">
@@ -66,12 +58,7 @@
               [[indicator.blueprint.title]]
             </span>
             <span class="col-data flex-4">
-              <!-- TODO: percentage is going to be returned from the backend -->
-              <!-- TODO: Change color to green if it's a cluster item (not in this sprint). -->
-              <paper-progress value="{{_computeProgressPercentage(indicator.progress_percentage)}}"
-                              class="blue">
-              </paper-progress>
-              <span>{{_computeProgressPercentage(indicator.progress_percentage)}}%</span>
+              <etools-prp-progress-bar number="[[indicator.progress_percentage]]">
             </span>
           </div>
           <div slot="row-data-details">[Indicator details here.]</div>
@@ -90,7 +77,6 @@
     </etools-content-panel>
   </template>
   <script>
-
     Polymer({
       is: 'list-view-indicators',
 
@@ -100,7 +86,7 @@
       ],
 
       properties: {
-        indicators: {
+        data: {
           type: Object,
           statePath: 'indicators.all',
         },
@@ -110,29 +96,24 @@
         },
         loading: {
           type: Boolean,
-          statePath: App.Selectors.Indicators.loading
+          statePath: 'indicators.loading'
         },
         pageSize: {
           type: Number,
-          value: 10
+          value: 10,
+          notify: true
         },
         pageNumber: {
           type: Number,
-          value: 1
+          value: 1,
+          notify: true
         },
         totalResults: {
           type: Number,
-          computed: '_computeTotalResults(indicators)',
+          statePath: 'indicators.count'
         },
       },
 
-      _computeProgressPercentage: function(num) {
-        return Math.round(num * 100);
-      },
-
-      _computeTotalResults: function (data) {
-         return data.length;
-      }
     });
   </script>
 </dom-module>

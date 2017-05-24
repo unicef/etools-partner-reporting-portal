@@ -14,6 +14,7 @@ from indicator.models import (
 )
 from unicef.models import (
     ProgressReport,
+    Section,
     ProgrammeDocument,
     CountryProgrammeOutput,
     LowerLevelOutput,
@@ -32,6 +33,7 @@ from core.factories import (
     ReportableToLowerLevelOutputFactory,
     IndicatorReportFactory,
     ProgressReportFactory,
+    SectionFactory,
     ProgrammeDocumentFactory,
     CountryProgrammeOutputFactory,
     LowerLevelOutputFactory,
@@ -58,6 +60,7 @@ def clean_up_data():
         LowerLevelOutput.objects.all().delete()
 
         print "All ORM objects deleted"
+
 
 def generate_fake_data(quantity=3):
     admin, created = User.objects.get_or_create(username='admin', defaults={
@@ -102,11 +105,16 @@ def generate_fake_data(quantity=3):
     ProgressReportFactory.create_batch(quantity)
     print "{} ProgressReport objects created".format(quantity)
 
-    ProgrammeDocumentFactory.create_batch(quantity)
-    print "{} ProgrammeDocument objects created".format(quantity)
+    SectionFactory.create_batch(quantity)
+    print "{} Section objects created".format(quantity)
 
-    CountryProgrammeOutputFactory.create_batch(quantity)
-    print "{} CountryProgrammeOutput objects created".format(quantity)
+    # TODO: more sens for IndicatorReport objects - important logic exist with frequency of PD
+    # IndicatorReport will create LowerLevelOutput, CountryProgrammeOutput, and ProgrammeDocument automatically
+    IndicatorReportFactory.create_batch(quantity)
+    print "{} IndicatorReport objects created".format(quantity)
 
-    LowerLevelOutputFactory.create_batch(quantity)
-    print "{} LowerLevelOutput objects created".format(quantity)
+    for idx in xrange(quantity):
+        indicator_report = IndicatorReport.objects.all()[idx]
+        pd = indicator_report.reportable.content_object.indicator.programme_document
+
+        pd.sections.add(Section.objects.all()[idx])
