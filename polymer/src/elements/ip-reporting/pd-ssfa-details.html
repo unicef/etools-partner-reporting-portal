@@ -10,7 +10,7 @@
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../elements/labelled-item.html">
 
-<dom-module id="pd-partnership-info">
+<dom-module id="pd-ssfa-details">
   <template>
     <style include="app-grid-style">
       :host {
@@ -55,44 +55,30 @@
       }
     </style>
 
-    <etools-content-panel panel-title="Partnership Information">
+    <etools-content-panel panel-title="PD or SSFA Details">
       <etools-loading active="[[!loaded]]"></etools-loading>
       <ul class="app-grid">
         <li class="item">
-          <labelled-item label="Agreement">
-            <span class="field-value">[[_withDefault(pd.agreement)]]</span>
+          <labelled-item label="In response to an HRP">
+            <span class="field-value">[[_withDefault(pd.response_to_HRP)]]</span>
           </labelled-item>
         </li>
         <li class="item">
-          <labelled-item label="Document Type">
-            <span class="field-value">[[_withDefault(pd.document_type)]]</span>
+          <labelled-item label="Start date">
+            <span class="field-value">[[_withDefault(pd.start_date)]]</span>
           </labelled-item>
         </li>
         <li class="item">
-          <labelled-item label="Reference Number">
-            <span class="field-value">[[_withDefault(pd.reference_number)]]</span>
-          </labelled-item>
-        </li>
-        <li class="item full-width">
-          <labelled-item label="Title">
-            <span class="field-value">[[_withDefault(pd.title)]]</span>
+          <labelled-item label="End date">
+            <span class="field-value">[[_withDefault(pd.end_date)]]</span>
           </labelled-item>
         </li>
         <li class="item">
-          <labelled-item label="UNICEF Office(s)">
-            <span class="field-value">[[_withDefault(pd.unicef_office)]]</span>
+          <labelled-item label="Population Focus">
+            <span class="field-value">[[_withDefault(pd.population_focus)]]</span>
           </labelled-item>
         </li>
-        <li class="item">
-          <labelled-item label="UNICEF Focal Point(s)">
-            <span class="field-value">[[_withDefault(pd.unicef_focal_point)]]</span>
-          </labelled-item>
-        </li>
-        <li class="item">
-          <labelled-item label="Partner Focal Point(s)">
-            <span class="field-value">[[_withDefault(pd.partner_focal_point)]]</span>
-          </labelled-item>
-        </li>
+
       </ul>
     </etools-content-panel>
 
@@ -100,7 +86,7 @@
 
   <script>
     Polymer({
-      is: 'pd-partnership-info',
+      is: 'pd-ssfa-details',
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
