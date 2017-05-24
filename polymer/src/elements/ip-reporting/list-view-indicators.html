@@ -8,7 +8,6 @@
 <link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
 
 <link rel="import" href="../../redux/store.html">
-<link rel="import" href="../../redux/selectors/indicators.html">
 <link rel="import" href="../../behaviors/data-table.html">
 <link rel="import" href="../../elements/list-paginator.html">
 <link rel="import" href="../../styles/table-styles.html">
@@ -23,8 +22,7 @@
     <list-paginator
       data="[[data]]"
       page-size="[[pageSize]]"
-      page-number="[[pageNumber]]"
-      paginated="{{paginatedData}}">
+      page-number="[[pageNumber]]">
     </list-paginator>
 
     <etools-content-panel panel-title="List of Indicators">
@@ -49,7 +47,7 @@
 
       <template id="list"
                 is="dom-repeat"
-                items="[[paginatedData]]"
+                items="[[data]]"
                 initial-count="[[pageSize]]"
                 as="indicator">
         <etools-data-table-row details-opened="[[detailsOpened]]">
@@ -97,7 +95,7 @@
       properties: {
         data: {
           type: Object,
-          statePath: 'indicators.all'
+          statePath: 'indicators.all',
         },
         detailsOpened: {
           type: Boolean,
@@ -109,11 +107,13 @@
         },
         pageSize: {
           type: Number,
-          value: 10
+          value: 10,
+          notify: true
         },
         pageNumber: {
           type: Number,
-          value: 1
+          value: 1,
+          notify: true
         },
         totalResults: {
           type: Number,
