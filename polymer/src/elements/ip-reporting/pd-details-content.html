@@ -10,7 +10,7 @@
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../elements/labelled-item.html">
 
-<dom-module id="pd-partnership-info">
+<dom-module id="pd-details-content">
   <template>
     <style include="app-grid-style">
       :host {
@@ -96,11 +96,38 @@
       </ul>
     </etools-content-panel>
 
+    <etools-content-panel panel-title="PD or SSFA Details">
+      <etools-loading active="[[!loaded]]"></etools-loading>
+      <ul class="app-grid">
+        <li class="item">
+          <labelled-item label="In response to an HRP">
+            <span class="field-value">[[_withDefault(pd.response_to_HRP)]]</span>
+          </labelled-item>
+        </li>
+        <li class="item">
+          <labelled-item label="Start date">
+            <span class="field-value">[[_withDefault(pd.start_date)]]</span>
+          </labelled-item>
+        </li>
+        <li class="item">
+          <labelled-item label="End date">
+            <span class="field-value">[[_withDefault(pd.end_date)]]</span>
+          </labelled-item>
+        </li>
+        <li class="item">
+          <labelled-item label="Population Focus">
+            <span class="field-value">[[_withDefault(pd.population_focus)]]</span>
+          </labelled-item>
+        </li>
+
+      </ul>
+    </etools-content-panel>
+
   </template>
 
   <script>
     Polymer({
-      is: 'pd-partnership-info',
+      is: 'pd-details-content',
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
