@@ -67,7 +67,13 @@ class ProgrammeDocument(TimeStampedModel):
         default=FREQUENCY_LEVEL.monthly,
         verbose_name='Frequency of reporting'
     )
-    budget = models.FloatField()
+    budget = models.DecimalField(
+        decimal_places=2,
+        max_digits=12,
+        blank=True,
+        null=True,
+        help_text='Total Budget'
+    )
 
     # TODO:
     # cron job will create new report with due period !!!
@@ -167,7 +173,7 @@ class ProgrammeDocument(TimeStampedModel):
             # TODO log
             percentage = 0
 
-        self.__budget = "{total} ({consumed} %)".format(total=total, consumed=consumed)
+        self.__budget = "{total} ({consumed}%)".format(total=total, consumed=consumed)
         return self.__budget
 
     @property

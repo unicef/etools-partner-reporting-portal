@@ -271,7 +271,7 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     response_to_HRP = factory.Sequence(lambda n: "response_to_HRP%d" % n)
     status = factory.Sequence(lambda n: "PD/SSFA status %d" % n)
     frequency = FREQUENCY_LEVEL.weekly
-    budget = fuzzy.FuzzyFloat(1000)
+    budget = fuzzy.FuzzyDecimal(low=1000.0, high=100000.0, precision=2)
 
     class Meta:
         model = ProgrammeDocument
