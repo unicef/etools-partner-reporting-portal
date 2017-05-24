@@ -1,0 +1,72 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../../bower_components/paper-item/paper-item.html">
+
+<dom-module id="dropdown-filter">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <paper-dropdown-menu
+        id="field"
+        label="[[label]]"
+        always-float-label>
+      <paper-listbox
+          slot="dropdown-content"
+          class="dropdown-content"
+          selected="[[selected]]">
+        <template
+            id="repeat"
+            is="dom-repeat"
+            items="[[data]]">
+          <paper-item>[[item.label]]</paper-item>
+        </template>
+      </paper-listbox>
+    </paper-dropdown-menu>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'dropdown-filter',
+
+      properties: {
+        label: String,
+
+        name: String,
+
+        data: Array,
+
+        selected: {
+          type: String,
+          value: '0',
+        },
+
+        lastValue: {
+          type: String,
+          value: '',
+        },
+      },
+
+      listeners: {
+        'field.iron-select': '_handleChange',
+      },
+
+      _handleChange: function (e) {
+        var newValue = this.$.repeat.itemForElement(e.detail.item).value;
+
+        if (newValue !== this.lastValue) {
+          this.lastValue = newValue;
+
+          this.fire('filter-changed', {
+            name: this.name,
+            value: newValue,
+          });
+        }
+      },
+    });
+  </script>
+</dom-module>

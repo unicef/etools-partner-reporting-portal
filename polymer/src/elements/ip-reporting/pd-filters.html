@@ -3,6 +3,7 @@
 
 <link rel="import" href="../../elements/filter-list.html">
 <link rel="import" href="../../elements/filters/text-filter.html">
+<link rel="import" href="../../elements/filters/dropdown-filter.html">
 
 <dom-module id="pd-filters">
   <template>
@@ -26,6 +27,13 @@
           label="PD/SSFA ToR ref. # and Title"
           name="ref_title">
       </text-filter>
+
+      <dropdown-filter
+          class="item"
+          label="PD/SSFA status"
+          name="status"
+          data="[[statuses]]">
+      </dropdown-filter>
     </filter-list>
   </template>
 
@@ -37,6 +45,16 @@
         filters: {
           type: Object,
           notify: true,
+        },
+
+        statuses: {
+          type: Array,
+          value: [
+            { label: 'All', value: '' },
+            { label: 'Draft', value: 'Dra' },
+            { label: 'Active', value: 'Act' },
+            { label: 'Implemented', value: 'Imp' },
+          ],
         },
       },
     });
