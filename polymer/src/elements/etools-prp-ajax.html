@@ -147,6 +147,12 @@
               });
         }.bind(this));
       },
+
+      abort: function () {
+        if (this.lastRequest) {
+          this.lastRequest.xhr.abort();
+        }
+      },
     });
   </script>
 </dom-module>

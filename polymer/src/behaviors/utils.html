@@ -26,6 +26,14 @@
 
         return value == null /* undefinded & null */ ? defaultValue : value; // jshint ignore:line
       },
+
+      _qs: function(obj) {
+        return Object.keys(obj)
+            .map(function (key) {
+              return encodeURIComponent(key) + '=' + encodeURIComponent(obj[key]);
+            })
+            .join('&');
+      }
     };
 
   }());

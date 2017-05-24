@@ -10,7 +10,6 @@
 <link rel="import" href="../../elements/report-status.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/data-table.html">
-<link rel="import" href="../../redux/selectors/programmeDocuments.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../styles/table-styles.html">
 
@@ -109,7 +108,7 @@
           on-page-number-changed="_pageNumberChanged">
       </etools-data-table-footer>
 
-      <etools-loading active="[[!loaded]]"></etools-loading>
+      <etools-loading active="[[loading]]"></etools-loading>
     </etools-content-panel>
   </template>
 
@@ -124,9 +123,9 @@
       ],
 
       properties: {
-        loaded: {
+        loading: {
           type: Boolean,
-          statePath: App.Selectors.ProgrammeDocuments.loaded,
+          statePath: 'programmeDocuments.loading',
         },
 
         data: {

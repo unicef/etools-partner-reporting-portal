@@ -17,8 +17,10 @@
         return this._buildUrl('/partner/partner-details/');
       },
 
-      programmeDocuments: function () {
-        return this._buildUrl('/unicef/programme-document/');
+      programmeDocuments: function (country, filters) {
+        // TODO: country as a param
+
+        return this._buildUrl('/unicef/programme-document/?' + filters);
       },
     };
   }());
