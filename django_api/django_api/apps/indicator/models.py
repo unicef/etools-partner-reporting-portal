@@ -95,7 +95,7 @@ class IndicatorReport(TimeStampedModel):
     reportable = models.ForeignKey(Reportable, related_name="indicator_reports")
     progress_report = models.ForeignKey('unicef.ProgressReport', related_name="indicator_reports", null=True)
     location = models.OneToOneField('core.Location', related_name="indicator_report", null=True)
-    time_period = models.DateTimeField(auto_now=True)
+    time_period = models.DateField(auto_now=True)  # first day of defined frequency mode
 
     total = models.PositiveIntegerField(blank=True, null=True)
     is_disaggregated_report = models.BooleanField(default=False)
@@ -106,3 +106,6 @@ class IndicatorReport(TimeStampedModel):
         default=INDICATOR_REPORT_STATUS.ontrack,
         max_length=3
     )
+
+    def __unicode__(self):
+        return self.title

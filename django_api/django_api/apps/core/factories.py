@@ -1,4 +1,5 @@
 import datetime
+from decimal import Decimal
 
 from django.contrib.auth.models import Group
 from django.db.models.signals import post_save
@@ -24,18 +25,19 @@ from indicator.models import (
     IndicatorReport,
 )
 from unicef.models import (
+    Section,
     ProgressReport,
     ProgrammeDocument,
     CountryProgrammeOutput,
     LowerLevelOutput,
 )
-
-
+from core.common import FREQUENCY_LEVEL
 from core.models import Intervention, Location
 
 
 class PartnerFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "partner_%d" % n)
+    total_ct_cp = fuzzy.FuzzyInteger(1000, 10000, 100)
 
     @factory.post_generation
     def cluster(self, create, extracted, **kwargs):
@@ -65,7 +67,6 @@ class PartnerProjectFactory(factory.django.DjangoModelFactory):
     start_date = fuzzy.FuzzyDate(datetime.date.today())
     end_date = fuzzy.FuzzyDate(datetime.date.today())
     status = fuzzy.FuzzyText()
-    budget = fuzzy.FuzzyFloat(1000)
 
     @factory.post_generation
     def cluster(self, create, extracted, **kwargs):
@@ -184,6 +185,7 @@ class ReportableFactory(factory.django.DjangoModelFactory):
     parent_indicator = None
     content_type = factory.LazyAttribute(
         lambda o: ContentType.objects.get_for_model(o.content_object))
+    total = fuzzy.FuzzyInteger(10, 100, 5)
 
     class Meta:
         exclude = ['content_object']
@@ -192,6 +194,15 @@ class ReportableFactory(factory.django.DjangoModelFactory):
 
 class ReportableToIndicatorReportFactory(ReportableFactory):
     content_object = factory.SubFactory('core.factories.IndicatorReportFactory')
+
+    class Meta:
+        model = Reportable
+
+
+class ReportableToLowerLevelOutputFactory(ReportableFactory):
+    content_object = factory.SubFactory('core.factories.LowerLevelOutputFactory')
+    target = '5000'
+    baseline = '0'
 
     class Meta:
         model = Reportable
@@ -238,25 +249,41 @@ class LocationFactory(factory.django.DjangoModelFactory):
         model = Location
 
 
-class IndicatorReportFactory(factory.django.DjangoModelFactory):
-    title = factory.Sequence(lambda n: "indicator_report_%d" % n)
-    location = factory.SubFactory(LocationFactory)
-    reportable = factory.SubFactory(ReportableToPartnerActivityFactory)
-
-    class Meta:
-        model = IndicatorReport
-
-
 class ProgressReportFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = ProgressReport
 
 
+class SectionFactory(factory.django.DjangoModelFactory):
+    name = factory.Sequence(lambda n: "Section %d" % n)
+
+    class Meta:
+        model = Section
+
+
 class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "programme_document_%d" % n)
+    agreement = factory.Sequence(lambda n: "agreement_%d" % n)
+    reference_number = factory.Sequence(lambda n: "reference_number_%d" % n)
+    start_date = datetime.date.today()
+    end_date = datetime.date.today()+datetime.timedelta(days=70)
+    population_focus = factory.Sequence(lambda n: "population_focus%d" % n)
+    response_to_HRP = factory.Sequence(lambda n: "response_to_HRP%d" % n)
+    status = factory.Sequence(lambda n: "PD/SSFA status %d" % n)
+    frequency = FREQUENCY_LEVEL.weekly
+    budget = fuzzy.FuzzyDecimal(low=1000.0, high=100000.0, precision=2)
 
     class Meta:
         model = ProgrammeDocument
+
+
+class IndicatorReportFactory(factory.django.DjangoModelFactory):
+    title = factory.Sequence(lambda n: "indicator_report_%d" % n)
+    location = factory.SubFactory(LocationFactory)
+    reportable = factory.SubFactory(ReportableToLowerLevelOutputFactory)
+
+    class Meta:
+        model = IndicatorReport
 
 
 class CountryProgrammeOutputFactory(factory.django.DjangoModelFactory):

@@ -1,0 +1,19 @@
+<script>
+  (function () {
+    'use strict';
+
+    App.Behaviors = App.Behaviors || {};
+
+    App.Behaviors.DataTableBehavior = {
+      _pageSizeChanged: function (e) {
+        this.set('pageSize', +e.detail.value);
+        this.set('pageNumber', 1);
+      },
+
+      _pageNumberChanged: function (e) {
+        this.set('pageNumber', +e.detail.value);
+      },
+    };
+
+  }());
+</script>

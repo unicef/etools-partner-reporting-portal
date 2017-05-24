@@ -1,0 +1,53 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="table-styles">
+  <template>
+    <style include="shared-styles">
+      :host {
+        --data-table-header: {
+          box-sizing: border-box;
+          width: 100%;
+        };
+      }
+
+      etools-data-table-column {
+        min-width: 0;
+        display: block;
+      }
+
+      etools-data-table-row {
+        display: block;
+        border-bottom: 1px solid var(--paper-grey-300);
+      }
+
+      etools-data-table-column,
+      .table-cell {
+        @apply(--layout-flex);
+      }
+
+      etools-data-table-column[flex-2],
+      .table-cell[flex-2] {
+        @apply(--layout-flex-2);
+      }
+
+      etools-data-table-column[flex-3],
+      .table-cell[flex-3] {
+        @apply(--layout-flex-3);
+      }
+
+      .table-column,
+      .table-cell--text {
+        @apply(--truncate);
+
+        width: 100%;
+      }
+
+      .table-cell:not(:last-of-type) {
+        padding-right: 15px;
+      }
+    </style>
+  </template>
+</dom-module>

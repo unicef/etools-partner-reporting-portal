@@ -45,3 +45,21 @@ INDICATOR_REPORT_STATUS = Choices(
     ('NP', 'noprogress', 'No Progress'),
     ('TM', 'targetmet', 'Target Met')
 )
+
+ADMINISTRATIVE_LEVEL = Choices(
+    ('Cou', 'country', 'Country level'),
+    ('Reg', 'region', 'Region level'),
+    ('Cit', 'city', 'City level'),
+)
+
+FREQUENCY_LEVEL = Choices(
+    ('Wee', 'weekly', 'Weekly'),
+    ('Mon', 'monthly', 'Monthly'),
+    ('Qua', 'quarterly', 'Quarterly'),
+)
+
+PD_LIST_REPORT_STATUS = Choices(
+    (1, 'nothing_due', 'Nothing due'),
+    (2, 'overdue', 'Overdue'),
+    (3, 'due', 'Due'),
+)
