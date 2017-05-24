@@ -19,5 +19,5 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
             'status',
             'report_status',
             'due_date',
-            'budget',
+            'calculated_budget',
         )
