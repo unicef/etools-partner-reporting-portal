@@ -68,7 +68,4 @@ PD_STATUS = Choices(
     ("Dra", "draft", "Draft"),
     ("Act", "active", "Active"),
     ("Imp", "implemented", "Implemented"),
-    ("Sus", "suspended", "Suspended"),
-    ("Ter", "terminated", "Terminated"),
-    ("Can", "cancelled", "Cancelled"),
 )
