@@ -2,7 +2,7 @@
 
 <dom-module id="filter-list">
   <template>
-
+    <content></content>
   </template>
 
   <script>
@@ -14,20 +14,31 @@
           type: Object,
           notify: true,
           readOnly: true,
-          // FIXME
-          value: {
-            foo: 'bar',
-          },
+          value: {},
         },
       },
 
-      attached: function () {
-        // FIXME
-        this.async(function () {
-          this._setFilters(Object.assign({}, this.filters, {
-            foo: 'baz'
-          }));
-        }, 3000);
+      listeners: {
+        'filter-changed': '_onFilterChanged',
+      },
+
+      _onFilterChanged: function (e, change) {
+        e.stopPropagation();
+
+        /**
+         * If we ever decide to debounce accross filters,
+         * here's the place to put the logic for it.
+         */
+
+        var newFilters = Object.assign({}, this.filters);
+
+        if (change.value.length) {
+          newFilters[change.name] = change.value;
+        } else {
+          delete newFilters[change.name];
+        }
+
+        this._setFilters(newFilters);
       },
     });
   </script>

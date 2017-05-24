@@ -1,0 +1,72 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+
+<link rel="import" href="../../behaviors/filter.html">
+
+<dom-module id="text-filter">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <paper-input
+        id="field"
+        type="[[type]]"
+        label="[[label]]"
+        always-float-label>
+    </paper-input>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'text-filter',
+
+      behaviors: [
+        App.Behaviors.FilterBehavior,
+      ],
+
+      properties: {
+        label: String,
+
+        name: String,
+
+        lastValue: {
+          type: String,
+          value: '',
+        },
+
+        type: {
+          type: String,
+          value: 'text',
+        },
+      },
+
+      listeners: {
+        'field.input': '_handleInput',
+      },
+
+      _handleInput: function () {
+        this.debounce('input', function propagateChange() {
+          var newValue = this.$.field.value.trim();
+
+          if (newValue !== this.lastValue) {
+            this.set('lastValue', newValue);
+
+            this.fire('filter-changed', {
+              name: this.name,
+              value: newValue,
+            });
+          }
+        }, this._debounceDelay);
+      },
+
+      detached: function () {
+        if (this.isDebouncerActive('input')) {
+          this.cancelDebouncer('input');
+        }
+      },
+    });
+  </script>
+</dom-module>

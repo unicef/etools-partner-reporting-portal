@@ -4,7 +4,7 @@
 <link rel="import" href="../../../../elements/page-header.html">
 <link rel="import" href="../../../../elements/page-body.html">
 <link rel="import" href="../../../../elements/etools-prp-ajax.html">
-<link rel="import" href="../../../../elements/filter-list.html">
+<link rel="import" href="../../../../elements/ip-reporting/pd-filters.html">
 <link rel="import" href="../../../../elements/ip-reporting/pd-list.html">
 <link rel="import" href="../../../../endpoints.html">
 <link rel="import" href="../../../../redux/actions.html">
@@ -26,10 +26,7 @@
     <page-header title="Programme Documents"></page-header>
 
     <page-body>
-      <filter-list
-          filters="{{filters}}">
-      </filter-list>
-
+      <pd-filters filters="{{filters}}"></pd-filters>
       <pd-list></pd-list>
     </page-body>
   </template>
@@ -54,6 +51,8 @@
           type: String,
           statePath: 'countries.current',
         },
+
+        filters: Object,
       },
 
       _computeProgrammeDocumentsUrl: function (country, newFilters) {
@@ -63,7 +62,7 @@
       _onUrlChanged: function () {
         var pdThunk = this.$.programmeDocuments.thunk();
 
-        // Cancel the current request
+        // Cancel the pending request, if any
         this.$.programmeDocuments.abort();
 
         this.dispatch(App.Actions.fetchProgrammeDocuments(pdThunk))

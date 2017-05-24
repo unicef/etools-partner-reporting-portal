@@ -20,7 +20,8 @@
       programmeDocuments: function (country, filters) {
         // TODO: country as a param
 
-        return this._buildUrl('/unicef/programme-document/?' + filters);
+        return this._buildUrl('/unicef/programme-document/' +
+            (filters ? '?' + filters : ''));
       },
     };
   }());
