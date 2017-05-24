@@ -67,7 +67,6 @@ class PartnerProjectFactory(factory.django.DjangoModelFactory):
     start_date = fuzzy.FuzzyDate(datetime.date.today())
     end_date = fuzzy.FuzzyDate(datetime.date.today())
     status = fuzzy.FuzzyText()
-    budget = fuzzy.FuzzyFloat(1000)
 
     @factory.post_generation
     def cluster(self, create, extracted, **kwargs):
@@ -200,6 +199,15 @@ class ReportableToIndicatorReportFactory(ReportableFactory):
         model = Reportable
 
 
+class ReportableToLowerLevelOutputFactory(ReportableFactory):
+    content_object = factory.SubFactory('core.factories.LowerLevelOutputFactory')
+    target = '5000'
+    baseline = '0'
+
+    class Meta:
+        model = Reportable
+
+
 class ReportableToClusterActivityFactory(ReportableFactory):
     content_object = factory.SubFactory('core.factories.ClusterActivityFactory')
 
@@ -263,7 +271,7 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     response_to_HRP = factory.Sequence(lambda n: "response_to_HRP%d" % n)
     status = factory.Sequence(lambda n: "PD/SSFA status %d" % n)
     frequency = FREQUENCY_LEVEL.weekly
-    reportable = factory.SubFactory(ReportableToPartnerActivityFactory)
+    budget = fuzzy.FuzzyDecimal(low=1000.0, high=100000.0, precision=2)
 
     class Meta:
         model = ProgrammeDocument
@@ -272,7 +280,7 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
 class IndicatorReportFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "indicator_report_%d" % n)
     location = factory.SubFactory(LocationFactory)
-    reportable = factory.SubFactory(ReportableToPartnerActivityFactory)
+    reportable = factory.SubFactory(ReportableToLowerLevelOutputFactory)
 
     class Meta:
         model = IndicatorReport

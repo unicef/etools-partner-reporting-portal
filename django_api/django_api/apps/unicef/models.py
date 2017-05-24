@@ -1,7 +1,10 @@
 from __future__ import unicode_literals
 from decimal import Decimal
 from datetime import date
+
 from django.db import models, transaction
+from django.contrib.contenttypes.fields import GenericRelation
+from django.utils.functional import cached_property
 
 from model_utils.models import TimeStampedModel
 
@@ -48,13 +51,9 @@ class ProgrammeDocument(TimeStampedModel):
         verbose_name='PD/SSFA status'
     )
     sections = models.ManyToManyField(Section)
-    contributing_to_cluser = models.BooleanField(
+    contributing_to_cluster = models.BooleanField(
         default=True,
-        verbose_name='Contributing to Cluser'
-    )
-    cluster_leds = models.ManyToManyField(
-        'cluster.Cluster',
-        help_text='Select Cluster involved in program.',
+        verbose_name='Contributing to Cluster'
     )
     administrative_level = models.CharField(
         max_length=3,
@@ -62,17 +61,19 @@ class ProgrammeDocument(TimeStampedModel):
         default=ADMINISTRATIVE_LEVEL.country,
         verbose_name='Locations - administrative level'
     )
-    locations = models.ManyToManyField(
-        'core.Location',
-        help_text='Select Administrative location for chosen level',
-    )
     frequency = models.CharField(
         max_length=3,
         choices=FREQUENCY_LEVEL,
         default=FREQUENCY_LEVEL.monthly,
         verbose_name='Frequency of reporting'
     )
-    reportable = models.ForeignKey(Reportable, null=True)
+    budget = models.DecimalField(
+        decimal_places=2,
+        max_digits=12,
+        blank=True,
+        null=True,
+        help_text='Total Budget'
+    )
 
     # TODO:
     # cron job will create new report with due period !!!
@@ -82,24 +83,31 @@ class ProgrammeDocument(TimeStampedModel):
     __reports_exists = None
     __budget = None
 
+    @cached_property
+    def reportable_queryset(self):
+        return Reportable.objects.filter(
+            lower_level_outputs__indicator__programme_document=self)
+
     @property
     def reports_exists(self):
         if self.__reports_exists is None:
-            self.__reports_exists = IndicatorReport.objects.filter(programme_document=self).exists()
+            self.__reports_exists = self.reportable_queryset.exists()
         return self.__reports_exists
 
     @property
     def contain_overdue_report(self):
-        return IndicatorReport.objects.filter(
-            programme_document=self,
-            time_period__lt=date.today(),
-            report_status=INDICATOR_REPORT_STATUS.ontrack
-        ).order_by('time_period').exists()
+        return self.reportable_queryset.filter(
+            indicator_reports__time_period__lt=date.today(),
+            indicator_reports__report_status=INDICATOR_REPORT_STATUS.ontrack
+        ).exists()
 
     @property
     def contain_nothing_due_report(self):
         if not self.contain_overdue_report:
-            ontop_report = IndicatorReport.objects.filter(programme_document=self).order_by('time_period').last()
+            ontop_report = self.reportable_queryset \
+                .order_by('indicator_reports__time_period') \
+                .indicator_reports.last()
+
             if ontop_report and ontop_report.report_status != INDICATOR_REPORT_STATUS.ontrack:
                 return True
         return False
@@ -127,34 +135,37 @@ class ProgrammeDocument(TimeStampedModel):
         elif not self.reports_exists:
             return None
 
-        due_report = IndicatorReport.objects.filter(
-            programme_document=self,
-            time_period__lt=date.today(),
-            report_status=INDICATOR_REPORT_STATUS.ontrack
-        ).order_by('time_period').first()
+        due_report = self.reportable_queryset.filter(
+            indicator_reports__time_period__lt=date.today(),
+            indicator_reports__report_status=INDICATOR_REPORT_STATUS.ontrack
+        ) \
+            .order_by('indicator_reports__time_period') \
+            .last().indicator_reports.last()
+
         if due_report:
             self.__due_date = due_report.time_period
         else:
-            due_report = IndicatorReport.objects.filter(
-                programme_document=self
-            ).order_by('time_period').last()
+            due_report = self.reportable_queryset.order_by('time_period') \
+                .last() \
+                .indicator_reports.last()
             self.__due_date = due_report and due_report.time_period
 
         return self.__due_date
 
     @property
-    def budget(self):
+    def calculated_budget(self):
         if self.__budget is not None:
             return self.__budget
-        consumed = self.reportable.total
-        total = (
-            self.reportable.project and
-            self.reportable.project.partner and
-            self.reportable.project.partner.total_ct_cp
-        )
-        if (total is None) or (consumed is None):
+
+        total = self.budget
+        consumed = None
+
+        if not self.reportable_queryset.exists():
             self.__budget = ""
             return self.__budget
+        else:
+            consumed = self.reportable_queryset.last().total
+
         try:
             percentage = Decimal(consumed) / Decimal(total)
             percentage = int(percentage * 100)
@@ -162,7 +173,7 @@ class ProgrammeDocument(TimeStampedModel):
             # TODO log
             percentage = 0
 
-        self.__budget = "{total} ({consumed} %)".format(total=total, consumed=consumed)
+        self.__budget = "{total} ({consumed}%)".format(total=total, consumed=consumed)
         return self.__budget
 
     @property
@@ -201,3 +212,5 @@ class LowerLevelOutput(TimeStampedModel):
     title = models.CharField(max_length=255)
 
     indicator = models.ForeignKey(CountryProgrammeOutput, related_name="ll_outputs")
+
+    reportables = GenericRelation('indicator.Reportable', related_query_name='lower_level_outputs')
