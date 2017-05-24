@@ -48,9 +48,9 @@
       attached: function () {
         var partnerThunk = this.$.partnerDetails.thunk();
 
-         this.dispatch(App.Actions.fetchPartner(partnerThunk))
+        this.dispatch(App.Actions.fetchPartner(partnerThunk))
             .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
+            // TODO: error handling
             });
       },
     });

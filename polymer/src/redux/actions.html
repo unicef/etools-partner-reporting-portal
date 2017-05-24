@@ -140,6 +140,25 @@
         };
       },
 
+      // Programme documents
+      fetchProgrammeDocuments: function (pdThunk) {
+        return function (dispatch) {
+          return pdThunk()
+              .then(function (res) {
+                var pdData = res.data;
+
+                dispatch(App.Actions.setProgrammeDocuments(pdData));
+              });
+        };
+      },
+
+      setProgrammeDocuments: function (data) {
+        return {
+          type: App.Constants.SET_PROGRAMME_DOCUMENTS,
+          data: data,
+        };
+      },
+
       // Master reset
       reset: function () {
         return {

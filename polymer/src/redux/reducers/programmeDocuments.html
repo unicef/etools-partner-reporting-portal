@@ -1,0 +1,31 @@
+<link rel="import" href="../redux.html">
+<link rel="import" href="../../constants.html">
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Reducers = App.Reducers || {};
+
+    App.Reducers.ProgrammeDocuments = Redux.combineReducers({
+      all: allPDsReducer,
+    });
+
+    function allPDsReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = [];
+      }
+
+      switch (action.type) {
+        case App.Constants.SET_PROGRAMME_DOCUMENTS:
+          return action.data.slice();
+
+        case App.Constants.RESET:
+          return [];
+
+        default:
+          return state;
+      }
+    }
+  }());
+</script>

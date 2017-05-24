@@ -6,6 +6,7 @@
 <link rel="import" href="reducers/app.html">
 <link rel="import" href="reducers/partner.html">
 <link rel="import" href="reducers/indicators.html">
+<link rel="import" href="reducers/programmeDocuments.html">
 
 <script src="../../bower_components/redux-thunk/index.js"></script>
 
@@ -19,6 +20,7 @@
       app: App.Reducers.App,
       partner: App.Reducers.Partner,
       indicators: App.Reducers.Indicators,
+      programmeDocuments: App.Reducers.ProgrammeDocuments,
     });
 
     var store = Redux.createStore(

@@ -1,7 +1,8 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../../bower_components/iron-pages/iron-pages.html">
 
-<link rel="import" href="../../../elements/page-header.html">
-<link rel="import" href="../../../elements/page-body.html">
+<link rel="import" href="../../../behaviors/utils.html">
 
 <dom-module id="page-ip-reporting-pd">
   <template>
@@ -11,16 +12,65 @@
       }
     </style>
 
+    <app-route
+        route="{{route}}"
+        pattern="/:pd_id"
+        data="{{routeData}}"
+        tail="{{subroute}}">
+    </app-route>
 
-    <page-header title="Programme Documents"></page-header>
+    <iron-pages
+        selected="[[page]]"
+        attr-for-selected="name">
+      <template is="dom-if" if="[[_equals(page, 'pd-index')]]" restamp="true">
+        <page-ip-reporting-pd-index
+            name="pd-index"
+            route="{{subroute}}">
+        </page-ip-reporting-pd-index>
+      </template>
 
-    <page-body>
-    </page-body>
+      <template is="dom-if" if="[[_equals(page, 'pd-details')]]" restamp="true">
+        <page-ip-reporting-pd-details
+            name="pd-details"
+            route="{{subroute}}"
+            pd-id="[[routeData.pd_id]]">
+        </page-ip-reporting-pd-details>
+      </template>
+    </iron-pages>
   </template>
 
   <script>
     Polymer({
       is: 'page-ip-reporting-pd',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+      ],
+
+      properties: {
+        page: {
+          type: String,
+          observer: '_pageChanged',
+        },
+      },
+
+      observers: [
+        '_routePdIdChanged(routeData.pd_id)',
+      ],
+
+      _routePdIdChanged: function (pd_id) {
+        this.page = pd_id ? 'pd-details' : 'pd-index';
+      },
+
+      _pageChanged: function (page) {
+        var resolvedPageUrl = this.resolveUrl('pd/' + page + '.html');
+
+        this.importHref(resolvedPageUrl, null, this._notFound, true);
+      },
+
+      _notFound: function () {
+        window.location.href = '/not-found';
+      },
     });
   </script>
 </dom-module>
