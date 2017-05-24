@@ -7,8 +7,6 @@ from django.db import models
 
 from model_utils.models import TimeStampedModel
 
-from unicef.models import LowerLevelOutput
-
 from core.common import INDICATOR_REPORT_STATUS
 
 
@@ -78,8 +76,9 @@ class Reportable(TimeStampedModel):
 
     @property
     def ref_num(self):
+        from unicef.models import LowerLevelOutput
         if isinstance(self.content_object, LowerLevelOutput):
-            return self.content_object.indicator.programme_document.ref
+            return self.content_object.indicator.programme_document.reference_number
         else:
             return ''
 
