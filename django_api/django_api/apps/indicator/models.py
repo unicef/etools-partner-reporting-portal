@@ -94,7 +94,6 @@ class IndicatorReport(TimeStampedModel):
     title = models.CharField(max_length=255)
     reportable = models.ForeignKey(Reportable, related_name="indicator_reports")
     progress_report = models.ForeignKey('unicef.ProgressReport', related_name="indicator_reports", null=True)
-    location = models.OneToOneField('core.Location', related_name="indicator_report", null=True)
     time_period_start = models.DateField(auto_now=True)  # first day of defined frequency mode
     time_period_end = models.DateField()  # first day of defined frequency mode
 

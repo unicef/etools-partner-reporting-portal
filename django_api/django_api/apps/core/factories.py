@@ -1,4 +1,5 @@
 import datetime
+import json
 from decimal import Decimal
 
 from django.contrib.auth.models import Group
@@ -21,6 +22,7 @@ from indicator.models import (
     IndicatorBlueprint,
     Reportable,
     IndicatorReport,
+    IndicatorLocationData,
 )
 from unicef.models import (
     Section,
@@ -31,6 +33,19 @@ from unicef.models import (
 )
 from core.common import FREQUENCY_LEVEL
 from core.models import Intervention, Location
+
+
+# https://stackoverflow.com/a/41154232/2363915
+class JSONFactory(factory.DictFactory):
+    """
+    Use with factory.Dict to make JSON strings.
+    """
+    @classmethod
+    def _build(cls, model_class, *args, **kwargs):
+        if args:
+            raise ValueError(
+                "DictFactory %r does not support Meta.inline_args.", cls)
+        return json.dumps(model_class(**kwargs))
 
 
 class PartnerFactory(factory.django.DjangoModelFactory):
@@ -262,7 +277,6 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
 
 class IndicatorReportFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "indicator_report_%d" % n)
-    location = factory.SubFactory(LocationFactory)
     reportable = factory.SubFactory(ReportableToLowerLevelOutputFactory)
     time_period_start = fuzzy.FuzzyDate(datetime.date.today())
     time_period_end = fuzzy.FuzzyDate(datetime.date.today())
@@ -286,3 +300,12 @@ class LowerLevelOutputFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = LowerLevelOutput
+
+
+class IndicatorLocationDataFactory(factory.django.DjangoModelFactory):
+    indicator_report = factory.RelatedFactory(IndicatorReportFactory, 'indicator_location_data')
+    location = factory.RelatedFactory(LocationFactory, 'indicator_location_data')
+    disaggregation = JSONFactory()
+
+    class Meta:
+        model = IndicatorReport

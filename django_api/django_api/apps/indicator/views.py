@@ -1,16 +1,20 @@
 import operator
 
 from django.db.models import Q
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.contrib.contenttypes.models import ContentType
 
+from rest_framework import status
 from rest_framework.generics import ListCreateAPIView
+from rest_framework.views import APIView
+from rest_framework.response import Response
+
 import django_filters.rest_framework
 
 from core.paginations import SmallPagination
 from unicef.models import LowerLevelOutput
 
-from .serializers import IndicatorListSerializer
+from .serializers import IndicatorListSerializer, IndicatorReportListSerializer
 from .filters import IndicatorFilter
 from .models import Reportable
 
@@ -57,3 +61,20 @@ class IndicatorListCreateAPIView(ListCreateAPIView):
             queryset = queryset.filter(reduce(operator.and_, q_list))
 
         return queryset
+
+
+class IndicatorReportListAPIView(APIView):
+    """
+    REST API endpoint to get a list of IndicatorReport objects, including each set of disaggregation data per report.
+    """
+    serializer_class = IndicatorReportListSerializer
+
+    def get_queryset(self, pk):
+        reportable = get_object_or_404(Reportable, pk=pk)
+
+        return reportable.indicator_reports.all()
+
+    def get(self, request, pk, format='json'):
+        indicator_reports = self.get_queryset(pk)
+
+        return Response({}, status=status.HTTP_200_OK)
