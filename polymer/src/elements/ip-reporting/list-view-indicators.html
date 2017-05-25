@@ -8,7 +8,6 @@
 
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../behaviors/data-table.html">
-<link rel="import" href="../../elements/list-paginator.html">
 <link rel="import" href="../../elements/etools-prp-progress-bar.html">
 <link rel="import" href="../../styles/table-styles.html">
 
@@ -16,12 +15,6 @@
   <template>
     <style include="iron-flex iron-flex-factors data-table-styles table-styles">
     </style>
-
-    <list-paginator
-      data="[[data]]"
-      page-size="[[pageSize]]"
-      page-number="[[pageNumber]]">
-    </list-paginator>
 
     <etools-content-panel panel-title="List of Indicators">
       <etools-loading active="[[loading]]"></etools-loading>
