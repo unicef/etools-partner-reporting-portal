@@ -1,9 +1,13 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 
 <dom-module id="page-header">
   <template>
-    <style>
+    <style include="iron-flex">
       :host {
         display: block;
         padding: 25px;
@@ -11,14 +15,33 @@
         box-shadow: 0 1px 2px 1px rgba(0, 0, 0, .1);
       }
 
+      .container {
+        @apply --layout-horizontal;
+        @apply --layout-center;
+      }
+
       h1 {
         @apply(--paper-font-title);
-
         margin: 0;
       }
-    </style>
 
-    <h1>[[title]]</h1>
+      paper-button {
+        color:#666;
+        margin-right:15px;
+        margin-left:-.35em;
+        line-height:1em;
+      }
+
+    </style>
+    <div class="container">
+      <template is="dom-if" if="[[ back ]]">
+        <paper-button id="goBack" on-tap="_goBack">
+          <iron-icon icon="chevron-left"></iron-icon>
+          back
+        </paper-button>
+        </template>
+      <h1 class="flex">[[title]]</h1>
+    </div>
   </template>
 
   <script>
@@ -27,7 +50,19 @@
 
       properties: {
         title: String,
+        back: {
+          type: Boolean,
+          value: false
+        }
       },
+
+      listeners: {
+        'goBackTap': '_goBack',
+      },
+
+      _goBack: function() {
+        window.history.back();
+      }
     });
   </script>
 </dom-module>

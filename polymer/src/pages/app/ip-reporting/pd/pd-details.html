@@ -1,5 +1,13 @@
 <link rel="import" href="../../../../../bower_components/polymer/polymer.html">
 
+<link rel="import" href="../../../../elements/page-body.html">
+<link rel="import" href="../../../../elements/ip-reporting/pd-page-header.html">
+<link rel="import" href="../../../../elements/ip-reporting/pd-details-content.html">
+<link rel="import" href="../../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../../endpoints.html">
+<link rel="import" href="../../../../redux/actions.html">
+<link rel="import" href="../../../../redux/store.html">
+
 <dom-module id="page-ip-reporting-pd-details">
   <template>
     <style>
@@ -8,16 +16,54 @@
       }
     </style>
 
-    <h1>TODO: PD [[pdId]] details</h1>
+    <etools-prp-ajax
+        id="programmeDocumentDetails"
+        url="[[ programmeDocumentDetailsUrl ]]">
+    </etools-prp-ajax>
+
+    <pd-page-header title="[[ pdTitle ]]" back></pd-page-header>
+
+    <page-body>
+      <pd-details-content></pd-details-content>
+    </page-body>
+
   </template>
 
   <script>
     Polymer({
       is: 'page-ip-reporting-pd-details',
 
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+      ],
+
       properties: {
-        pdId: String,
+
+        programmeDocumentDetailsUrl: {
+          type: String,
+          computed: '_computeProgrammeDocumentDetailsUrl(pdId)',
+        },
+
+        pdId: Number,
+
+        pdTitle: {
+          type: String,
+          statePath: 'programmeDocumentDetails.current.title',
+        }
       },
+
+      _computeProgrammeDocumentDetailsUrl: function(pdId){
+        return App.Endpoints.programmeDocumentDetail(pdId);
+      },
+
+      attached: function () {
+        var pdDetailsThunk = this.$.programmeDocumentDetails.thunk();
+
+        this.dispatch(App.Actions.fetchProgrammeDocumentDetails(pdDetailsThunk))
+          .catch(function (err) {// jshint ignore:line
+            console.error(err);
+          })
+      }
     });
   </script>
 </dom-module>
