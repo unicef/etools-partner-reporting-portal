@@ -1,19 +1,34 @@
 <link rel="import" href="../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../../../../../bower_components/paper-tabs/paper-tabs.html">
 
-<link rel="import" href="../../../../elements/page-body.html">
-<link rel="import" href="../../../../elements/ip-reporting/pd-page-header.html">
-<link rel="import" href="../../../../elements/ip-reporting/pd-details-content.html">
+<link rel="import" href="../../../../elements/page-header.html">
+<link rel="import" href="../../../../elements/ip-reporting/pd-details-overview.html">
+<link rel="import" href="../../../../elements/ip-reporting/pd-details-reports.html">
 <link rel="import" href="../../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../../endpoints.html">
 <link rel="import" href="../../../../redux/actions.html">
 <link rel="import" href="../../../../redux/store.html">
+<link rel="import" href="../../../../styles/shared-styles.html">
+
+<link rel="import" href="../../../../behaviors/utils.html">
 
 <dom-module id="page-ip-reporting-pd-details">
   <template>
-    <style>
+    <style include="shared-styles">
       :host {
         display: block;
       }
+      .page-top-content {
+        box-shadow: 0 1px 2px 1px rgba(0, 0, 0, .1);
+      }
+      .page-top-content page-header {
+        padding-bottom:10px;
+      }
+      .top-content-row {
+        padding-left:25px;
+      }
+
     </style>
 
     <etools-prp-ajax
@@ -21,11 +36,53 @@
         url="[[ programmeDocumentDetailsUrl ]]">
     </etools-prp-ajax>
 
-    <pd-page-header title="[[ pdTitle ]]" back></pd-page-header>
+    <app-route
+      route="{{route}}"
+      pattern="/:dashTab"
+      data="{{routeData}}">
+    </app-route>
 
-    <page-body>
-      <pd-details-content></pd-details-content>
-    </page-body>
+    <div class="page-top-content">
+
+      <page-header title="[[ pdTitle ]]" back></page-header>
+
+      <div class="top-content-row">
+
+        <paper-tabs
+          selected="{{ routeData.dashTab }}"
+          attr-for-selected="name"
+          fallback-selection="details"
+          noink
+          bottom-item>
+
+          <paper-tab name="details" link>
+            <span class="tab-content">Details</span>
+          </paper-tab>
+
+          <paper-tab name="reports" link>
+            <span class="tab-content">Reports</span>
+          </paper-tab>
+
+        </paper-tabs>
+
+      </div>
+
+    </div>
+
+    <iron-pages
+      selected="[[ pdTab ]]"
+      attr-for-selected="name"
+      fallback-selection="details">
+
+      <template is="dom-if" if="[[_equals(pdTab, 'details')]]" restamp="true">
+          <pd-details-overview name="details"></pd-details-overview>
+      </template>
+
+      <template is="dom-if" if="[[_equals(pdTab, 'reports')]]" restamp="true">
+          <pd-details-reports name="reports"></pd-details-reports>
+      </template>
+
+    </iron-pages>
 
   </template>
 
@@ -35,9 +92,18 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.UtilsBehavior,
       ],
 
       properties: {
+
+        pdTab: {
+          type: String,
+        },
+
+        routeData: {
+          type: Object,
+        },
 
         programmeDocumentDetailsUrl: {
           type: String,
@@ -50,6 +116,17 @@
           type: String,
           statePath: 'programmeDocumentDetails.current.title',
         }
+      },
+
+      observers: [
+        '_updateUrlTab(routeData.dashTab)',
+      ],
+
+      _updateUrlTab: function(dashTab) {
+        if (!dashTab) {
+          return;
+        }
+        this.set('pdTab', dashTab);
       },
 
       _computeProgrammeDocumentDetailsUrl: function(pdId){

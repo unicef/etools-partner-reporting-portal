@@ -1,0 +1,43 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/etools-content-panel/etools-content-panel.html">
+<link rel="import" href="../../../bower_components/iron-icons/communication-icons.html">
+<link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
+
+<link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../redux/selectors/programmeDocumentDetails.html">
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../elements/labelled-item.html">
+
+<dom-module id="pd-details-reports">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <page-body>
+      <etools-content-panel panel-title="Reports">
+        <h3>TODO</h3>
+      </etools-content-panel>
+
+    </page-body>
+
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'pd-details-reports',
+
+      // TODO: There must be a better way of doing this. The iron-selected class is not being added
+      // by iron-pages when this component is activated
+
+      attached: function(){
+        this.className += 'iron-selected';
+      }
+    });
+  </script>
+</dom-module>
