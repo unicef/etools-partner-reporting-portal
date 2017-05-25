@@ -4,8 +4,9 @@
 # Docker environment file
 .env
 
-# PyCharm
+# PyCharm etc.
 .idea/
+.vscode/
 
 # Python compiled
 *.pyc
