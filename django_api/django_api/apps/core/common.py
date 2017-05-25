@@ -67,5 +67,5 @@ PD_LIST_REPORT_STATUS = Choices(
 PD_DOCUMENT_TYPE = Choices(
     ('PD', 'PD', 'Programme Document'),
     ('SHP', 'SHPD', 'Simplified Humanitarian Programme Document'),
-    ('SSF', 'SSFA', u'Small-Scale Funding Agreement'),
+    ('SSF', 'SSFA_TOR', u'SSFA TOR'),
 )
