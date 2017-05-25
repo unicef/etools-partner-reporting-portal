@@ -100,7 +100,7 @@ class ProgrammeDocument(TimeStampedModel):
     @property
     def contain_overdue_report(self):
         return self.reportable_queryset.filter(
-            indicator_reports__time_period__lt=date.today(),
+            indicator_reports__time_period_start__lt=date.today(),
             indicator_reports__report_status=INDICATOR_REPORT_STATUS.ontrack
         ).exists()
 
@@ -108,7 +108,7 @@ class ProgrammeDocument(TimeStampedModel):
     def contain_nothing_due_report(self):
         if not self.contain_overdue_report:
             ontop_report = self.reportable_queryset \
-                .order_by('indicator_reports__time_period') \
+                .order_by('indicator_reports__time_period_start') \
                 .indicator_reports.last()
 
             if ontop_report and ontop_report.report_status != INDICATOR_REPORT_STATUS.ontrack:
@@ -139,19 +139,19 @@ class ProgrammeDocument(TimeStampedModel):
             return None
 
         due_report = self.reportable_queryset.filter(
-            indicator_reports__time_period__lt=date.today(),
+            indicator_reports__time_period_start__lt=date.today(),
             indicator_reports__report_status=INDICATOR_REPORT_STATUS.ontrack
         ) \
-            .order_by('indicator_reports__time_period') \
+            .order_by('indicator_reports__time_period_start') \
             .last().indicator_reports.last()
 
         if due_report:
-            self.__due_date = due_report.time_period
+            self.__due_date = due_report.time_period_start
         else:
-            due_report = self.reportable_queryset.order_by('time_period') \
+            due_report = self.reportable_queryset.order_by('indicator_reports__time_period_start') \
                 .last() \
                 .indicator_reports.last()
-            self.__due_date = due_report and due_report.time_period
+            self.__due_date = due_report and due_report.time_period_start
 
         return self.__due_date
 
