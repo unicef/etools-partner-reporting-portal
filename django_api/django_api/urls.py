@@ -22,9 +22,10 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 urlpatterns = [
     url(r'^api/admin/', admin.site.urls),
-    url(r'^api/core/', include('core.urls')),
-    url(r'^api/partner/', include('partner.urls')),
-    url(r'^api/unicef/', include('unicef.urls')),
+    url(r'^api/', include('core.urls')),
+    url(r'^api/', include('partner.urls')),
+    url(r'^api/', include('unicef.urls')),
+    url(r'^api/', include('indicator.urls')),
 ]
 
 if settings.DEBUG:

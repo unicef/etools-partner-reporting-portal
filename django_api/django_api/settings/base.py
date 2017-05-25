@@ -168,3 +168,5 @@ STATIC_URL = '/api/static/'
 
 # Authentication settings
 AUTH_USER_MODEL = 'account.User'
+
+PRINT_DATA_FORMAT = "%d %b %Y"

@@ -96,7 +96,8 @@ class IndicatorReport(TimeStampedModel):
     progress_report = models.ForeignKey('unicef.ProgressReport', related_name="indicator_reports", null=True)
     location = models.OneToOneField('core.Location', related_name="indicator_report", null=True)
     time_period_start = models.DateField(auto_now=True)  # first day of defined frequency mode
-    time_period_end = models.DateField()  # first day of defined frequency mode
+    time_period_end = models.DateField()  # last day of defined frequency mode
+    # submission_date = models.DateField(null=True, blank=True, verbose_name="Date of submission")
 
     total = models.PositiveIntegerField(blank=True, null=True)
 
