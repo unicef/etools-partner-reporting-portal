@@ -1,6 +1,7 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../../bower_components/paper-material/paper-material.html">
 
+<link rel="import" href="../../../behaviors/data-table.html">
 <link rel="import" href="../../../elements/ip-reporting/list-view-indicators.html">
 <link rel="import" href="../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../elements/page-header.html">
@@ -37,6 +38,7 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.DataTableBehavior,
       ],
 
       properties: {
@@ -55,15 +57,8 @@
         indicatorsUrl: {
           type: String,
           observer: '_urlParametersChanged',
-          computed: '_computeUrl(pageSize, pageNumber)',
+          computed: '_computePaginatedUrl(indicatorsBaseUrl, pageSize, pageNumber)',
         }
-      },
-
-      // TODO: Figure out why just passing params to etools-prp-ajax instead isn't working.
-      _computeUrl: function (pageSize, pageNumber) {
-        var size = '?page_size=' + pageSize;
-        var page = '&page=' + pageNumber
-        return this.indicatorsBaseUrl + size + page;
       },
 
       _indicatorsAjax: function() {
@@ -72,11 +67,13 @@
         var indicatorsThunk = this.$.indicators.thunk();
         this.dispatch(App.Actions.fetchIndicators(indicatorsThunk))
           .catch(function (err) {
+              // TODO: error handling.
               return Promise.reject(err);
           });
       },
 
       _urlParametersChanged: function() {
+        this.$.indicators.abort();
         return this._indicatorsAjax();
       },
 
