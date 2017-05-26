@@ -95,11 +95,11 @@ class IndicatorReport(TimeStampedModel):
     reportable = models.ForeignKey(Reportable, related_name="indicator_reports")
     progress_report = models.ForeignKey('unicef.ProgressReport', related_name="indicator_reports", null=True)
     location = models.OneToOneField('core.Location', related_name="indicator_report", null=True)
-    time_period = models.DateField(auto_now=True)  # first day of defined frequency mode
+    time_period_start = models.DateField(auto_now=True)  # first day of defined frequency mode
+    time_period_end = models.DateField()  # first day of defined frequency mode
 
     total = models.PositiveIntegerField(blank=True, null=True)
-    is_disaggregated_report = models.BooleanField(default=False)
-    disaggregation = JSONField(default=dict)
+
     remarks = models.TextField(blank=True, null=True)
     report_status = models.CharField(
         choices=INDICATOR_REPORT_STATUS,
@@ -109,3 +109,18 @@ class IndicatorReport(TimeStampedModel):
 
     def __unicode__(self):
         return self.title
+
+    @property
+    def status(self):
+        # TODO: Check all disaggregation data across locations and return status
+        return 'fulfilled'
+
+
+class IndicatorLocationData(TimeStampedModel):
+    indicator_report = models.ForeignKey(IndicatorReport, related_name="indicator_location_data")
+    location = models.ForeignKey('core.Location', related_name="indicator_location_data")
+
+    disaggregation = JSONField(default=dict)
+
+    def __unicode__(self):
+        return "{} Location Data for {}".format(location, indicator_report)
