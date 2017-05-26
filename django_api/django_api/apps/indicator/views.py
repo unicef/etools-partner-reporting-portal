@@ -71,7 +71,12 @@ class IndicatorReportListAPIView(APIView):
     def get_queryset(self, pk):
         reportable = get_object_or_404(Reportable, pk=pk)
 
-        return reportable.indicator_reports.all()
+        indicator_reports = reportable.indicator_reports.all().order_by('-time_period_start')
+
+        if 'limit' in self.request.query_params:
+            indicator_reports = indicator_reports[:2]
+
+        return indicator_reports
 
     def get(self, request, pk, format='json'):
         indicator_reports = self.get_queryset(pk)
