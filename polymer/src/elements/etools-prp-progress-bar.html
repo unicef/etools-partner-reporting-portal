@@ -1,0 +1,43 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
+
+<link rel="import" href="../behaviors/utils.html">
+<link rel="import" href="../styles/progress-bar.html">
+
+<dom-module id="etools-prp-progress-bar">
+  <template>
+  <style include="progress-bar"></style>
+    <!-- TODO: percentage is going to be returned from the backend -->
+    <!-- TODO: Change color to green if it's a cluster item (not in this sprint). -->
+    <paper-progress value="[[percentage]]"
+                    class="blue">
+    </paper-progress>
+    <span>[[percentage]]%</span>
+  </template>
+
+  <script>
+    (function () {
+      Polymer({
+        is: 'etools-prp-progress-bar',
+
+        properties: {
+
+          number: {
+            type: Number,
+            value: 0
+          },
+
+          percentage: {
+            type: Number,
+            computed: '_computePercentage(number)'
+          }
+        },
+
+        _computePercentage: function(num) {
+          return Math.round(num * 100);
+        }
+
+      });
+    }());
+  </script>
+</dom-module>
