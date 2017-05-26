@@ -3,6 +3,8 @@
 <link rel="import" href="../../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../../bower_components/paper-item/paper-item.html">
 
+<link rel="import" href="../../polyfills/es6-shim.html">
+
 <dom-module id="dropdown-filter">
   <template>
     <style>
@@ -42,11 +44,19 @@
 
         name: String,
 
-        data: Array,
+        data: {
+          type: Array,
+          value: [],
+        },
+
+        value: {
+          type: String,
+          value: '',
+        },
 
         selected: {
-          type: String,
-          value: '0',
+          type: Number,
+          computed: '_computeSelected(value)',
         },
 
         lastValue: {
@@ -70,6 +80,12 @@
             value: newValue,
           });
         }
+      },
+
+      _computeSelected: function (value) {
+        return this.data.findIndex(function (item) {
+          return item.value === value;
+        });
       },
     });
   </script>

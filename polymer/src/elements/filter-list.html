@@ -1,7 +1,18 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../bower_components/iron-location/iron-query-params.html">
 
 <dom-module id="filter-list">
   <template>
+    <iron-location
+        query="{{query}}">
+    </iron-location>
+
+    <iron-query-params
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
+    </iron-query-params>
+
     <content></content>
   </template>
 
@@ -10,12 +21,7 @@
       is: 'filter-list',
 
       properties: {
-        filters: {
-          type: Object,
-          notify: true,
-          readOnly: true,
-          value: {},
-        },
+        queryParams: Object,
       },
 
       listeners: {
@@ -30,15 +36,15 @@
          * here's the place to put the logic for it.
          */
 
-        var newFilters = Object.assign({}, this.filters);
+        var newParams = Object.assign({}, this.queryParams);
 
         if (change.value.length) {
-          newFilters[change.name] = change.value;
+          newParams[change.name] = change.value;
         } else {
-          delete newFilters[change.name];
+          delete newParams[change.name];
         }
 
-        this._setFilters(newFilters);
+        this.set('queryParams', newParams);
       },
     });
   </script>
