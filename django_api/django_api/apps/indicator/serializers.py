@@ -40,7 +40,7 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
         model = IndicatorLocationData
         fields = (
             'id',
-            'location'
+            'location',
             'disaggregation',
         )
 

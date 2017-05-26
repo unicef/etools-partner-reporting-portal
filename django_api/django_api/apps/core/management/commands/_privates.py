@@ -11,6 +11,7 @@ from indicator.models import (
     IndicatorBlueprint,
     Reportable,
     IndicatorReport,
+    IndicatorLocationData,
 )
 from unicef.models import (
     ProgressReport,
@@ -30,6 +31,8 @@ from core.factories import (
     PartnerProjectFactory,
     PartnerActivityFactory,
     IndicatorBlueprintFactory,
+    IndicatorLocationDataFactory,
+    LocationFactory,
     ReportableToLowerLevelOutputFactory,
     IndicatorReportFactory,
     ProgressReportFactory,
@@ -54,6 +57,7 @@ def clean_up_data():
         IndicatorBlueprint.objects.all().delete()
         Reportable.objects.all().delete()
         IndicatorReport.objects.all().delete()
+        IndicatorLocationData.objects.all().delete()
         ProgressReport.objects.all().delete()
         ProgrammeDocument.objects.all().delete()
         CountryProgrammeOutput.objects.all().delete()
@@ -75,32 +79,14 @@ def generate_fake_data(quantity=3):
     UserFactory.create_batch(quantity)
     print "{} User objects created".format(quantity)
 
-    ClusterFactory.create_batch(quantity)
-    print "{} Cluster objects created".format(quantity)
-
-    ClusterObjectiveFactory.create_batch(quantity)
-    print "{} ClusterObjective objects created".format(quantity)
-
     ClusterActivityFactory.create_batch(quantity)
     print "{} ClusterActivity objects created".format(quantity)
-
-    PartnerFactory.create_batch(quantity)
-    print "{} Partner objects created".format(quantity)
 
     PartnerProjectFactory.create_batch(quantity)
     print "{} PartnerProject objects created".format(quantity)
 
     PartnerActivityFactory.create_batch(quantity)
     print "{} PartnerActivity objects created".format(quantity)
-
-    IndicatorBlueprintFactory.create_batch(quantity)
-    print "{} IndicatorBlueprint objects created".format(quantity)
-
-    ReportableToLowerLevelOutputFactory.create_batch(quantity)
-    print "{} ReportableToLowerLevelOutput objects created".format(quantity)
-
-    IndicatorReportFactory.create_batch(quantity)
-    print "{} IndicatorReport objects created".format(quantity)
 
     ProgressReportFactory.create_batch(quantity)
     print "{} ProgressReport objects created".format(quantity)
@@ -109,9 +95,9 @@ def generate_fake_data(quantity=3):
     print "{} Section objects created".format(quantity)
 
     # TODO: more sens for IndicatorReport objects - important logic exist with frequency of PD
-    # IndicatorReport will create LowerLevelOutput, CountryProgrammeOutput, and ProgrammeDocument automatically
-    IndicatorReportFactory.create_batch(quantity)
-    print "{} IndicatorReport objects created".format(quantity)
+    # IndicatorLocationData will create IndicatorReport, Location, LowerLevelOutput, CountryProgrammeOutput, and ProgrammeDocument automatically
+    IndicatorLocationDataFactory.create_batch(quantity)
+    print "{} IndicatorLocationData objects created".format(quantity)
 
     for idx in xrange(quantity):
         indicator_report = IndicatorReport.objects.all()[idx]

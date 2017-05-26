@@ -67,7 +67,6 @@ class IndicatorReportListAPIView(APIView):
     """
     REST API endpoint to get a list of IndicatorReport objects, including each set of disaggregation data per report.
     """
-    serializer_class = IndicatorReportListSerializer
 
     def get_queryset(self, pk):
         reportable = get_object_or_404(Reportable, pk=pk)
@@ -77,4 +76,6 @@ class IndicatorReportListAPIView(APIView):
     def get(self, request, pk, format='json'):
         indicator_reports = self.get_queryset(pk)
 
-        return Response({}, status=status.HTTP_200_OK)
+        serializer = IndicatorReportListSerializer(indicator_reports, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)

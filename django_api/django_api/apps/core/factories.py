@@ -240,8 +240,8 @@ class ReportableToPartnerActivityFactory(ReportableFactory):
 
 class LocationFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "location_%d" % n)
-    reportable = factory.SubFactory(ReportableToLowerLevelOutputFactory)
     parent = None
+    reportable = factory.SubFactory('core.factories.ReportableToLowerLevelOutputFactory')
 
     class Meta:
         model = Location
@@ -303,9 +303,10 @@ class LowerLevelOutputFactory(factory.django.DjangoModelFactory):
 
 
 class IndicatorLocationDataFactory(factory.django.DjangoModelFactory):
-    indicator_report = factory.RelatedFactory(IndicatorReportFactory, 'indicator_location_data')
-    location = factory.RelatedFactory(LocationFactory, 'indicator_location_data')
+    indicator_report = factory.SubFactory('core.factories.IndicatorReportFactory')
+    location = factory.SubFactory('core.factories.LocationFactory')
+
     disaggregation = JSONFactory()
 
     class Meta:
-        model = IndicatorReport
+        model = IndicatorLocationData
