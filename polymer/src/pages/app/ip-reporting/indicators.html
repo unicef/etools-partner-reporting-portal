@@ -67,6 +67,7 @@
         var indicatorsThunk = this.$.indicators.thunk();
         this.dispatch(App.Actions.fetchIndicators(indicatorsThunk))
           .catch(function (err) {
+              // TODO: error handling.
               return Promise.reject(err);
           });
       },
