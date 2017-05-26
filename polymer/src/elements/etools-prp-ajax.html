@@ -108,9 +108,7 @@
       },
 
       _handleError: function () {
-        var status = this.lastError.status;
-
-        if (status === 401) {
+        if (this.lastError && this.lastError.status === 401) {
           this.dispatch(App.Actions.resetToken());
         }
 
