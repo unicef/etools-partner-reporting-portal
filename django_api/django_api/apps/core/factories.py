@@ -215,6 +215,79 @@ class ReportableToLowerLevelOutputFactory(ReportableFactory):
     content_object = factory.SubFactory('core.factories.LowerLevelOutputFactory')
     target = '5000'
     baseline = '0'
+    disaggregation_logic = {
+        "extrashort": {
+            "1-2m": {
+                "male": "int",
+                "female": "int",
+                "other": "int",
+            },
+            "3-5m": {
+                "male": "int",
+                "female": "int",
+                "other": "int",
+            },
+            "6-10m": {
+                "male": "int",
+                "female": "int",
+                "other": "int",
+            }
+        },
+
+        "short": {
+            "1-2m": {
+                "male": "int",
+                "female": "int",
+                "other": "int",
+            },
+            "3-5m": {
+                "male": "int",
+                "female": "int",
+                "other": "int",
+            },
+            "6-10m": {
+                "male": "int",
+                "female": "int",
+                "other": "int",
+            }
+        },
+
+        "medium": {
+            "1-2m": {
+                "male": "int",
+                "female": "int",
+                "other": "int",
+            },
+            "3-5m": {
+                "male": "int",
+                "female": "int",
+                "other": "int",
+            },
+            "6-10m": {
+                "male": "int",
+                "female": "int",
+                "other": "int",
+            }
+        },
+
+        "tall": {
+            "1-2m": {
+                "male": "int",
+                "female": "int",
+                "other": "int",
+            },
+            "3-5m": {
+                "male": "int",
+                "female": "int",
+                "other": "int",
+            },
+            "6-10m": {
+                "male": "int",
+                "female": "int",
+                "other": "int",
+            }
+        }
+    }
 
     class Meta:
         model = Reportable
@@ -306,7 +379,80 @@ class IndicatorLocationDataFactory(factory.django.DjangoModelFactory):
     indicator_report = factory.SubFactory('core.factories.IndicatorReportFactory')
     location = factory.SubFactory('core.factories.LocationFactory')
 
-    disaggregation = JSONFactory()
+    # disaggregation = JSONFactory()
+    disaggregation = {
+        "extrashort": {
+            "1-2m": {
+                "male": 50,
+                "female": 50,
+                "other": 50,
+            },
+            "3-5m": {
+                "male": 50,
+                "female": 50,
+                "other": 50,
+            },
+            "6-10m": {
+                "male": 50,
+                "female": 50,
+                "other": 50,
+            }
+        },
+
+        "short": {
+            "1-2m": {
+                "male": 50,
+                "female": 50,
+                "other": 50,
+            },
+            "3-5m": {
+                "male": 50,
+                "female": 50,
+                "other": 50,
+            },
+            "6-10m": {
+                "male": 50,
+                "female": 50,
+                "other": 50,
+            }
+        },
+
+        "medium": {
+            "1-2m": {
+                "male": 50,
+                "female": 50,
+                "other": 50,
+            },
+            "3-5m": {
+                "male": 50,
+                "female": 50,
+                "other": 50,
+            },
+            "6-10m": {
+                "male": 50,
+                "female": 50,
+                "other": 50,
+            }
+        },
+
+        "tall": {
+            "1-2m": {
+                "male": 50,
+                "female": 50,
+                "other": 50,
+            },
+            "3-5m": {
+                "male": 50,
+                "female": 50,
+                "other": 50,
+            },
+            "6-10m": {
+                "male": 50,
+                "female": 50,
+                "other": 50,
+            }
+        }
+    }
 
     class Meta:
         model = IndicatorLocationData
