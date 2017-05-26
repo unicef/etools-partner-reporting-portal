@@ -86,6 +86,9 @@
         return function (dispatch) {
           dispatch(App.Actions.indicatorsLoadingStart());
           return indicatorsThunk()
+            .catch(function (err) {
+              dispatch(App.Actions.indicatorsLoadingStop());
+            })
             .then(function (res) {
               var indicators = res.data;
               dispatch(App.Actions.setIndicators(indicators));

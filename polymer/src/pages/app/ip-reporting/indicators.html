@@ -67,11 +67,13 @@
         var indicatorsThunk = this.$.indicators.thunk();
         this.dispatch(App.Actions.fetchIndicators(indicatorsThunk))
           .catch(function (err) {
+              dispatch(App.Actions.indicatorsLoadingStop());
               return Promise.reject(err);
           });
       },
 
       _urlParametersChanged: function() {
+        this.$.indicators.abort();
         return this._indicatorsAjax();
       },
 
