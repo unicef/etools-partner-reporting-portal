@@ -16,7 +16,7 @@
 <body>
   <test-fixture id="text-filter-fixture">
     <template>
-      <text-filter label="lorem" name="ipsum"></text-filter>
+      <text-filter label="lorem" name="ipsum" value="dolor"></text-filter>
     </template>
   </test-fixture>
 
@@ -35,6 +35,10 @@
 
       teardown(function () {
         clock.restore();
+      });
+
+      test('allows for setting initial value', function () {
+        assert.equal(field.value, 'dolor');
       });
 
       test('debounces input', function (done) {
