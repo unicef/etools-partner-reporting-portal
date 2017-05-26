@@ -3,9 +3,9 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from core.factories import IndicatorReportFactory
+from core.factories import IndicatorReportFactory, IndicatorLocationDataFactory
 
-from indicator.models import Reportable, IndicatorReport
+from indicator.models import Reportable, IndicatorReport, IndicatorLocationData
 
 
 class TestIndicatorListAPIView(APITestCase):
@@ -42,3 +42,19 @@ class TestIndicatorListAPIView(APITestCase):
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(len(response.data['results']), self.count)
+
+
+class TestIndicatorReportListAPIView(APITestCase):
+
+    def setUp(self):
+        self.reports = IndicatorLocationDataFactory.create_batch(5)
+
+    def test_list_api(self):
+        indicator_report = IndicatorReport.objects.last()
+
+        url = reverse('indicator-report-list-api', kwargs={'pk': indicator_report.reportable.id})
+        response = self.client.get(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(len(response.data), 1)
+        self.assertNotEquals(response.data[0]['indicator_location_data'][0]['disaggregation'], {})
