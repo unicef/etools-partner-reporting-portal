@@ -4,6 +4,7 @@
 <link rel="import" href="../../../bower_components/paper-item/paper-item.html">
 
 <link rel="import" href="../../polyfills/es6-shim.html">
+<link rel="import" href="../../behaviors/filter.html">
 
 <dom-module id="dropdown-filter">
   <template>
@@ -39,13 +40,11 @@
     Polymer({
       is: 'dropdown-filter',
 
+      behaviors: [
+        App.Behaviors.FilterBehavior,
+      ],
+
       properties: {
-        label: String,
-
-        name: String,
-
-        lastValue: String,
-
         data: {
           type: Array,
           value: [],
@@ -70,8 +69,6 @@
         var newValue = this.$.repeat.itemForElement(e.detail.item).value;
 
         if (newValue !== this.lastValue) {
-          this.lastValue = newValue;
-
           this.fire('filter-changed', {
             name: this.name,
             value: newValue,
