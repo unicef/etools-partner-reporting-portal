@@ -2,6 +2,8 @@
 <link rel="import" href="../../bower_components/iron-location/iron-location.html">
 <link rel="import" href="../../bower_components/iron-location/iron-query-params.html">
 
+<link rel="import" href="../behaviors/pagination.html">
+
 <dom-module id="list-paginator">
   <template>
     <iron-location
@@ -17,6 +19,11 @@
   <script>
     Polymer({
       is: 'list-paginator',
+
+      behaviors: [
+        App.Behaviors.PaginationBehavior,
+      ],
+
       properties: {
         data: Array,
 
@@ -31,21 +38,6 @@
           notify: true,
           computed: '_computePaginated(data, pageSize, pageNumber)',
         },
-      },
-
-      observers: [
-        '_updateQueryParams(pageSize, pageNumber)',
-      ],
-
-      _updateQueryParams: function (pageSize, pageNumber) {
-        var newParams = Object.assign({}, this.queryParams, {
-          page_size: pageSize,
-          page: pageNumber,
-        });
-
-        this.async(function () {
-          this.set('queryParams', newParams);
-        });
       },
 
       _computePaginated: function (data, pageSize, pageNumber) {
