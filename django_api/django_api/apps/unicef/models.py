@@ -14,6 +14,7 @@ from core.common import (
     INDICATOR_REPORT_STATUS,
     PD_LIST_REPORT_STATUS,
     PD_DOCUMENT_TYPE,
+    PROGRESS_REPORT_STATUS,
 )
 from indicator.models import IndicatorReport, Reportable
 
@@ -23,6 +24,7 @@ class ProgressReport(TimeStampedModel):
     funds_received_to_date = models.CharField(max_length=256)
     challenges_in_the_reporting_period = models.CharField(max_length=256)
     proposed_way_forward = models.CharField(max_length=256)
+    status = models.CharField(max_length=3, choices=PROGRESS_REPORT_STATUS, default=PROGRESS_REPORT_STATUS.due)
     # attachements ???
 
 

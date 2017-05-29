@@ -6,5 +6,5 @@ from .views import (
 
 
 urlpatterns = [
-    url(r'^programme-document/details/(?P<pk>\d+)/reports/$', PDReportsAPIView.as_view(), name="programme-document-reports"),
+    url(r'^programme-document/details/(?P<pd_id>\d+)/reports/$', PDReportsAPIView.as_view(), name="programme-document-reports"),
 ]

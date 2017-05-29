@@ -6,6 +6,7 @@ from rest_framework.test import APITestCase, APIClient
 from core.factories import IndicatorReportFactory
 # from indicator.models import IndicatorReport
 from unicef.models import ProgrammeDocument
+from indicator.models import IndicatorReport
 from account.models import User
 
 
@@ -29,11 +30,13 @@ class TestPDReportsAPIView(APITestCase):
 
     def test_list_api(self):
         pd = ProgrammeDocument.objects.first()
-        url = reverse('programme-document-reports', kwargs={'pk': pd.pk})
+        url = reverse('programme-document-reports', kwargs={'pd_id': pd.pk})
         response = self.client.get(url, format='json')
 
         self.assertTrue(status.is_success(response.status_code))
 
-        # TODO count how much reports should be on list
-        # self.assertEquals(len(response.data), 1)
+        pd = ProgrammeDocument.objects.get(pk=pd.id)
+        pks = pd.reportable_queryset.values_list('indicator_reports__pk', flat=True)
+        count = IndicatorReport.objects.filter(id__in=pks).count()
 
+        self.assertEquals(len(response.data), count)
