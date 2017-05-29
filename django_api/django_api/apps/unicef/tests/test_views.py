@@ -33,7 +33,7 @@ class TestProgrammeDocumentAPIView(APITestCase):
         response = self.client.get(url, format='json')
 
         self.assertTrue(status.is_success(response.status_code))
-        self.assertEquals(len(response.data), self.count)
+        self.assertEquals(len(response.data['results']), self.count)
 
     def test_list_filter_api(self):
         url = reverse('programme-document')
@@ -42,7 +42,7 @@ class TestProgrammeDocumentAPIView(APITestCase):
             format='json'
         )
         self.assertTrue(status.is_success(response.status_code))
-        self.assertEquals(len(response.data), self.count)
+        self.assertEquals(len(response.data['results']), self.count)
 
         document = ProgrammeDocument.objects.first()
         response = self.client.get(
@@ -50,13 +50,14 @@ class TestProgrammeDocumentAPIView(APITestCase):
             format='json'
         )
         self.assertTrue(status.is_success(response.status_code))
-        self.assertEquals(len(response.data), 1)
-        self.assertEquals(response.data[0]['title'], document.title)
+        self.assertEquals(len(response.data['results']), 1)
+        self.assertEquals(response.data['results'][0]['title'], document.title)
 
         response = self.client.get(
             url+"?ref_title=&status=%s" % document.status,
             format='json'
         )
         self.assertTrue(status.is_success(response.status_code))
-        self.assertEquals(len(response.data), ProgrammeDocument.objects.filter(status=document.status).count())
-        self.assertEquals(response.data[0]['status'], document.get_status_display())
+        self.assertEquals(len(response.data['results']),
+                          ProgrammeDocument.objects.filter(status=document.status).count())
+        self.assertEquals(response.data['results'][0]['status'], document.get_status_display())
