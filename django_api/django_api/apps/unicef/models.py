@@ -36,7 +36,6 @@ class Section(models.Model):
 
 
 class ProgrammeDocument(TimeStampedModel):
-
     agreement = models.CharField(max_length=255, verbose_name='Agreement')
     document_type = models.CharField(
         max_length=3,

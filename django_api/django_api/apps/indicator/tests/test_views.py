@@ -4,7 +4,6 @@ from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 
 from core.factories import IndicatorReportFactory
-# from indicator.models import IndicatorReport
 from unicef.models import ProgrammeDocument
 from indicator.models import IndicatorReport
 from account.models import User
@@ -48,3 +47,16 @@ class TestPDReportsAPIView(APITestCase):
         response = self.client.get(filter_url, format='json')
         self.assertTrue(status.is_success(response.status_code))
         self.assertTrue(first_ir.id in [x["id"] for x in response.data])
+
+
+class TestIndicatorListAPIView(APITestCase):
+
+    def setUp(self):
+        self.reports = IndicatorReportFactory.create_batch(5)
+
+    def test_list_api(self):
+        url = reverse('indicator-list-create-api')
+        response = self.client.get(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(len(response.data['results']), len(self.reports))

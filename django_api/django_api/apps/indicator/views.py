@@ -1,13 +1,18 @@
+from django.contrib.contenttypes.models import ContentType
 from django.http import Http404
 from rest_framework.response import Response
 from rest_framework import status as statuses
-from rest_framework.generics import ListAPIView
-from core.permissions import IsAuthenticated
+from rest_framework.generics import ListAPIView, ListCreateAPIView
 import django_filters
-from .models import IndicatorReport
+from core.permissions import IsAuthenticated
+from core.paginations import SmallPagination
+from unicef.models import LowerLevelOutput
+
+from .models import IndicatorReport, Reportable
 from .filters import PDReportsFilter
-from .serializer import (
+from .serializers import (
     PDReportsSerializer,
+    IndicatorListSerializer,
 )
 
 
@@ -36,3 +41,14 @@ class PDReportsAPIView(ListAPIView):
         filtered = PDReportsFilter(request.GET, queryset=queryset)
         serializer = self.get_serializer(filtered.qs, many=True)
         return Response(serializer.data, status=statuses.HTTP_200_OK)
+
+
+class IndicatorListCreateAPIView(ListCreateAPIView):
+    """
+    REST API endpoint to get a list of Indicator objects and to create a new Indicator object.
+    """
+    serializer_class = IndicatorListSerializer
+    pagination_class = SmallPagination
+
+    def get_queryset(self):
+        return Reportable.objects.filter(indicator_reports__isnull=False, content_type=ContentType.objects.get_for_model(LowerLevelOutput))
