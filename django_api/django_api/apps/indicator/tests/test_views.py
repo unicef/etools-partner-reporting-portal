@@ -38,5 +38,13 @@ class TestPDReportsAPIView(APITestCase):
         pd = ProgrammeDocument.objects.get(pk=pd.id)
         pks = pd.reportable_queryset.values_list('indicator_reports__pk', flat=True)
         count = IndicatorReport.objects.filter(id__in=pks).count()
-
         self.assertEquals(len(response.data), count)
+
+        first_ir = IndicatorReport.objects.filter(id__in=pks).first()
+        filter_url = "%s?status=%s" % (
+            url,
+            first_ir.progress_report.get_status_display()
+        )
+        response = self.client.get(filter_url, format='json')
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertTrue(first_ir.id in [x["id"] for x in response.data])
