@@ -30,6 +30,10 @@
       _debug: function (val) {
         return JSON.stringify(val, null, 2);
       },
+
+      _toNumber: function (val) {
+        return Number(val);
+      },
     };
 
   }());

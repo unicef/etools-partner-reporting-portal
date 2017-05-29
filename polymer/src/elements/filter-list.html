@@ -74,6 +74,8 @@
         }
 
         this.set('queryParams', newParams);
+
+        this._resetPageNumber();
       },
 
       _registerFilter: function (e, name) {
@@ -107,6 +109,14 @@
 
               return prev;
             }, {}));
+
+        this._resetPageNumber();
+      },
+
+      _resetPageNumber: function () {
+        this.set('queryParams', Object.assign({}, this.queryParams, {
+          page: 1,
+        }));
       },
     });
   </script>
