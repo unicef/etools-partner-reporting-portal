@@ -34,7 +34,6 @@ class Section(models.Model):
 
 
 class ProgrammeDocument(TimeStampedModel):
-
     agreement = models.CharField(max_length=255, verbose_name='Agreement')
     reference_number = models.CharField(max_length=255, verbose_name='Reference Number')
     title = models.CharField(max_length=255, verbose_name='PD/SSFA ToR Title')

@@ -195,6 +195,8 @@ class ReportableFactory(factory.django.DjangoModelFactory):
 
 class ReportableToIndicatorReportFactory(ReportableFactory):
     content_object = factory.SubFactory('core.factories.IndicatorReportFactory')
+    target = '5000'
+    baseline = '0'
 
     class Meta:
         model = Reportable
@@ -211,6 +213,8 @@ class ReportableToLowerLevelOutputFactory(ReportableFactory):
 
 class ReportableToClusterActivityFactory(ReportableFactory):
     content_object = factory.SubFactory('core.factories.ClusterActivityFactory')
+    target = '5000'
+    baseline = '0'
 
     class Meta:
         model = Reportable
@@ -218,6 +222,8 @@ class ReportableToClusterActivityFactory(ReportableFactory):
 
 class ReportableToPartnerActivityFactory(ReportableFactory):
     content_object = factory.SubFactory('core.factories.PartnerActivityFactory')
+    target = '5000'
+    baseline = '0'
 
     class Meta:
         model = Reportable
@@ -225,7 +231,7 @@ class ReportableToPartnerActivityFactory(ReportableFactory):
 
 class IndicatorDisaggregationFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "indicator_disaggregation_%d" % n)
-    indicator = factory.SubFactory(ReportableToPartnerActivityFactory)
+    indicator = factory.SubFactory(ReportableToLowerLevelOutputFactory)
     range = NumericRange(0, 200)
 
     class Meta:
@@ -234,7 +240,7 @@ class IndicatorDisaggregationFactory(factory.django.DjangoModelFactory):
 
 class IndicatorDataSpecificationFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "indicator_data_specification_%d" % n)
-    indicator = factory.SubFactory(ReportableToPartnerActivityFactory)
+    indicator = factory.SubFactory(ReportableToLowerLevelOutputFactory)
     frequency = fuzzy.FuzzyInteger(100)
 
     class Meta:
@@ -243,7 +249,7 @@ class IndicatorDataSpecificationFactory(factory.django.DjangoModelFactory):
 
 class LocationFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "location_%d" % n)
-    reportable = factory.SubFactory(ReportableToPartnerActivityFactory)
+    reportable = factory.SubFactory(ReportableToLowerLevelOutputFactory)
     parent = None
 
     class Meta:
@@ -284,6 +290,7 @@ class IndicatorReportFactory(factory.django.DjangoModelFactory):
     reportable = factory.SubFactory(ReportableToLowerLevelOutputFactory)
     time_period_start = fuzzy.FuzzyDate(datetime.date.today())
     time_period_end = fuzzy.FuzzyDate(datetime.date.today())
+    total = fuzzy.FuzzyInteger(0, 3000, 100)
 
     class Meta:
         model = IndicatorReport
