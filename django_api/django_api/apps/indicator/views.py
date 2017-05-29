@@ -19,6 +19,7 @@ from .serializers import (
 class PDReportsAPIView(ListAPIView):
 
     serializer_class = PDReportsSerializer
+    pagination_class = SmallPagination
     permission_classes = (IsAuthenticated, )
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     filter_class = PDReportsFilter
