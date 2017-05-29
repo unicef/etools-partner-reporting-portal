@@ -49,6 +49,7 @@ class Reportable(TimeStampedModel):
     baseline = models.CharField(max_length=255, null=True, blank=True)
     assumptions = models.TextField(null=True, blank=True)
     means_of_verification = models.CharField(max_length=255, null=True, blank=True)
+    is_cluster_indicator = models.BooleanField(default=False)
 
     # Current total, transactional and dynamically calculated based on IndicatorReports
     total = models.IntegerField(null=True, blank=True, default=0,
@@ -73,6 +74,32 @@ class Reportable(TimeStampedModel):
 
     parent_indicator = models.ForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
 
+    @property
+    def ref_num(self):
+        from unicef.models import LowerLevelOutput
+        if isinstance(self.content_object, LowerLevelOutput):
+            return self.content_object.indicator.programme_document.reference_number
+        else:
+            return ''
+
+    @property
+    def achieved(self):
+        if self.indicator_reports.exists():
+            return self.indicator_reports.last().total
+        else:
+            return None
+
+    @property
+    def progress_percentage(self):
+        # if self.blueprint.unit == IndicatorBlueprint.NUMBER:
+            # pass
+        percentage = 0.0
+
+        if self.achieved:
+            percentage = (self.achieved - float(self.baseline)) / (float(self.target) - float(self.baseline))
+
+        return percentage
+
 
 class IndicatorDisaggregation(TimeStampedModel):
     title = models.CharField(max_length=255)
@@ -95,11 +122,11 @@ class IndicatorReport(TimeStampedModel):
     reportable = models.ForeignKey(Reportable, related_name="indicator_reports")
     progress_report = models.ForeignKey('unicef.ProgressReport', related_name="indicator_reports", null=True)
     location = models.OneToOneField('core.Location', related_name="indicator_report", null=True)
-    time_period = models.DateField(auto_now=True)  # first day of defined frequency mode
+    time_period_start = models.DateField(auto_now=True)  # first day of defined frequency mode
+    time_period_end = models.DateField()  # first day of defined frequency mode
 
     total = models.PositiveIntegerField(blank=True, null=True)
-    is_disaggregated_report = models.BooleanField(default=False)
-    disaggregation = JSONField(default=dict)
+
     remarks = models.TextField(blank=True, null=True)
     report_status = models.CharField(
         choices=INDICATOR_REPORT_STATUS,
@@ -109,3 +136,18 @@ class IndicatorReport(TimeStampedModel):
 
     def __unicode__(self):
         return self.title
+
+    @property
+    def status(self):
+        # TODO: Check all disaggregation data across locations and return status
+        return 'fulfilled'
+
+
+class IndicatorLocationData(TimeStampedModel):
+    indicator_report = models.ForeignKey(IndicatorReport, related_name="indicator_location_data")
+    location = models.ForeignKey('core.Location', related_name="indicator_location_data")
+
+    disaggregation = JSONField(default=dict)
+
+    def __unicode__(self):
+        return "{} Location Data for {}".format(location, indicator_report)
