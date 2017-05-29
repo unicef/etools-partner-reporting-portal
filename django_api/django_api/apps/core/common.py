@@ -69,3 +69,10 @@ PD_DOCUMENT_TYPE = Choices(
     ('SHP', 'SHPD', 'Simplified Humanitarian Programme Document'),
     ('SSF', 'SSFA_TOR', u'SSFA TOR'),
 )
+
+PROGRESS_REPORT_STATUS = Choices(
+    ('Due', 'due', 'Due'),
+    ('Ove', 'over_due', 'Over due'),
+    ('Sub', 'submitted', 'Submitted'),
+    ('Rej', 'rejected', 'Rejected'),
+)

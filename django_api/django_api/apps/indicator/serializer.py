@@ -7,18 +7,18 @@ from .models import IndicatorReport
 class PDReportsSerializer(serializers.ModelSerializer):
 
     reporting_period = serializers.SerializerMethodField()
-    # submission_date = serializers.SerializerMethodField()
+    submission_date = serializers.SerializerMethodField()
+    due_date = serializers.SerializerMethodField()
 
     class Meta:
         model = IndicatorReport
         fields = (
             'id',
-            'title',
-            'time_period_start',
-            'time_period_end',
             'reporting_period',
-            'report_status',
-            # 'submission_date',
+            'progress_report_status',
+            'submission_date',
+            'is_draft',
+            'due_date',
         )
 
     def get_reporting_period(self, obj):
@@ -28,4 +28,7 @@ class PDReportsSerializer(serializers.ModelSerializer):
         )
 
     def get_submission_date(self, obj):
-        return obj.submission_date.strftime(settings.PRINT_DATA_FORMAT)
+        return obj.submission_date and obj.submission_date.strftime(settings.PRINT_DATA_FORMAT)
+
+    def get_due_date(self, obj):
+        return obj.due_date and obj.due_date.strftime(settings.PRINT_DATA_FORMAT)

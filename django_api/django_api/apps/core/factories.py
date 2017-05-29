@@ -286,6 +286,8 @@ class IndicatorReportFactory(factory.django.DjangoModelFactory):
     reportable = factory.SubFactory(ReportableToLowerLevelOutputFactory)
     time_period_start = fuzzy.FuzzyDate(datetime.date.today())
     time_period_end = fuzzy.FuzzyDate(datetime.date.today())
+    progress_report = factory.SubFactory(ProgressReportFactory)
+    due_date = fuzzy.FuzzyDate(datetime.date.today())
 
     class Meta:
         model = IndicatorReport

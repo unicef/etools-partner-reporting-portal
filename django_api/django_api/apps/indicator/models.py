@@ -7,7 +7,7 @@ from django.db import models
 
 from model_utils.models import TimeStampedModel
 
-from core.common import INDICATOR_REPORT_STATUS
+from core.common import INDICATOR_REPORT_STATUS, PROGRESS_REPORT_STATUS
 
 
 class IndicatorBlueprint(TimeStampedModel):
@@ -97,7 +97,8 @@ class IndicatorReport(TimeStampedModel):
     location = models.OneToOneField('core.Location', related_name="indicator_report", null=True)
     time_period_start = models.DateField(auto_now=True)  # first day of defined frequency mode
     time_period_end = models.DateField()  # last day of defined frequency mode
-    # submission_date = models.DateField(null=True, blank=True, verbose_name="Date of submission")
+    due_date = models.DateField()  # can be few days/weeks out of the "end date"
+    submission_date = models.DateField(null=True, blank=True, verbose_name="Date of submission")
 
     total = models.PositiveIntegerField(blank=True, null=True)
 
@@ -112,6 +113,19 @@ class IndicatorReport(TimeStampedModel):
         return self.title
 
     @property
+    def is_draft(self):
+        if self.submission_date is None and IndicatorLocationData.objects.filter(indicator_report=self).exists():
+            return True
+        return False
+
+    @property
+    def progress_report_status(self):
+        if self.progress_report:
+            return self.progress_report.get_status_display()
+        else:
+            return PROGRESS_REPORT_STATUS.due
+
+    @property
     def status(self):
         # TODO: Check all disaggregation data across locations and return status
         return 'fulfilled'
@@ -124,4 +138,4 @@ class IndicatorLocationData(TimeStampedModel):
     disaggregation = JSONField(default=dict)
 
     def __unicode__(self):
-        return "{} Location Data for {}".format(location, indicator_report)
+        return "{} Location Data for {}".format(self.location, self.indicator_report)

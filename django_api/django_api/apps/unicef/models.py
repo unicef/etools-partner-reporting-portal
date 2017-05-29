@@ -14,6 +14,7 @@ from core.common import (
     INDICATOR_REPORT_STATUS,
     PD_LIST_REPORT_STATUS,
     PD_DOCUMENT_TYPE,
+    PROGRESS_REPORT_STATUS,
 )
 from indicator.models import IndicatorReport, Reportable
 
@@ -23,6 +24,7 @@ class ProgressReport(TimeStampedModel):
     funds_received_to_date = models.CharField(max_length=256)
     challenges_in_the_reporting_period = models.CharField(max_length=256)
     proposed_way_forward = models.CharField(max_length=256)
+    status = models.CharField(max_length=3, choices=PROGRESS_REPORT_STATUS, default=PROGRESS_REPORT_STATUS.due)
     # attachements ???
 
 
@@ -116,7 +118,7 @@ class ProgrammeDocument(TimeStampedModel):
     @property
     def contain_overdue_report(self):
         return self.reportable_queryset.filter(
-            indicator_reports__time_period__lt=date.today(),
+            indicator_reports__time_period_end__lt=date.today(),
             indicator_reports__report_status=INDICATOR_REPORT_STATUS.ontrack
         ).exists()
 
@@ -124,7 +126,7 @@ class ProgrammeDocument(TimeStampedModel):
     def contain_nothing_due_report(self):
         if not self.contain_overdue_report:
             ontop_report = self.reportable_queryset \
-                .order_by('indicator_reports__time_period') \
+                .order_by('indicator_reports__time_period_end') \
                 .indicator_reports.last()
 
             if ontop_report and ontop_report.report_status != INDICATOR_REPORT_STATUS.ontrack:
@@ -155,19 +157,19 @@ class ProgrammeDocument(TimeStampedModel):
             return None
 
         due_report = self.reportable_queryset.filter(
-            indicator_reports__time_period__lt=date.today(),
+            indicator_reports__time_period_end__lt=date.today(),
             indicator_reports__report_status=INDICATOR_REPORT_STATUS.ontrack
         ) \
-            .order_by('indicator_reports__time_period') \
+            .order_by('indicator_reports__time_period_end') \
             .last().indicator_reports.last()
 
         if due_report:
-            self.__due_date = due_report.time_period
+            self.__due_date = due_report.time_period_end
         else:
-            due_report = self.reportable_queryset.order_by('time_period') \
+            due_report = self.reportable_queryset.order_by('time_period_end') \
                 .last() \
                 .indicator_reports.last()
-            self.__due_date = due_report and due_report.time_period
+            self.__due_date = due_report and due_report.time_period_end
 
         return self.__due_date
 
