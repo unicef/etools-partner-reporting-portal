@@ -32,8 +32,10 @@ from unicef.models import (
 )
 from core.common import FREQUENCY_LEVEL, PD_STATUS
 from core.models import Intervention, Location
+from core.countries import COUNTRIES_ALPHA2_CODE
 
 PD_STATUS_LIST = [x[0] for x in PD_STATUS]
+COUNTRIES_LIST = [x[0] for x in COUNTRIES_ALPHA2_CODE]
 
 
 class PartnerFactory(factory.django.DjangoModelFactory):
@@ -134,7 +136,7 @@ class InterventionFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "intervention_%d" % n)
     document_type = 'PD'
     number = fuzzy.FuzzyText(length=64)
-    country_code = 'US'
+    country_code = fuzzy.FuzzyChoice(COUNTRIES_LIST)
     status = 'Dra'
     start = fuzzy.FuzzyDate(datetime.date.today())
     end = fuzzy.FuzzyDate(datetime.date.today())
