@@ -1,4 +1,5 @@
 from rest_framework.generics import ListAPIView
+from .permissions import IsAuthenticated
 from .models import Intervention
 from .serializer import (
     SimpleInterventionSerializer,
