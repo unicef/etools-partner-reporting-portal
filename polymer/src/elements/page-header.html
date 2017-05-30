@@ -32,14 +32,20 @@
         line-height:1em;
       }
 
+      .back-button {
+        text-decoration: none;
+      }
+
     </style>
     <div class="container">
       <template is="dom-if" if="[[ back ]]">
-        <paper-button id="goBack" on-tap="_goBack">
-          <iron-icon icon="chevron-left"></iron-icon>
-          back
-        </paper-button>
-        </template>
+        <a href="[[ backUrl ]]" class="back-button">
+          <paper-button>
+            <iron-icon icon="chevron-left"></iron-icon>
+            back
+          </paper-button>
+        </a>
+      </template>
       <h1 class="flex">[[title]]</h1>
     </div>
   </template>
@@ -48,20 +54,27 @@
     Polymer({
       is: 'page-header',
 
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.RoutingBehavior,
+      ],
+
       properties: {
         title: String,
-        back: {
-          type: Boolean,
-          value: false
+
+        back: String,
+
+        backUrl: {
+          type: String,
+          value: ''
         }
+
       },
 
-      listeners: {
-        'goBackTap': '_goBack',
-      },
-
-      _goBack: function() {
-        // TODO: are we replacing the back button?
+      attached: function(){
+        if(this.back){
+          this.backUrl = this.buildUrl(this._baseUrl, this.back);
+        }
       }
     });
   </script>
