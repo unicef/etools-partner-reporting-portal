@@ -1,0 +1,64 @@
+<link rel="import" href="../redux.html">
+<link rel="import" href="../../constants.html">
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Reducers = App.Reducers || {};
+
+    App.Reducers.Indicators = Redux.combineReducers({
+      all: allIndicatorsReducer,
+      loading: loadingIndicatorsReducer,
+      count: indicatorsCountReducer,
+    });
+
+    function allIndicatorsReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = [];
+      }
+
+      switch (action.type) {
+        case App.Constants.SET_INDICATORS:
+          return action.indicatorsData.results.slice();
+
+        case App.Constants.RESET:
+          return [];
+
+        default:
+          return state;
+      }
+    }
+
+    function indicatorsCountReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = 0;
+      }
+
+      switch (action.type) {
+        case App.Constants.SET_INDICATORS_COUNT:
+          return action.count;
+
+        default:
+          return state;
+      }
+    }
+
+    function loadingIndicatorsReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = false;
+      }
+
+      switch (action.type) {
+        case App.Constants.INDICATORS_LOADING_START:
+          return true;
+
+        case App.Constants.INDICATORS_LOADING_STOP:
+          return false;
+
+        default:
+          return state;
+      }
+    }
+  }());
+</script>
