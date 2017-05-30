@@ -3,7 +3,7 @@ import django_filters
 from django_filters.filters import ChoiceFilter, CharFilter, DateFilter, ModelChoiceFilter
 
 from core.common import PD_LIST_REPORT_STATUS, PD_STATUS
-from indicator.models import Reportable
+from core.models import Location
 from .models import ProgrammeDocument
 
 
@@ -30,10 +30,14 @@ class ProgrammeDocumentFilter(django_filters.FilterSet):
             #TODO: log exception
             return queryset
 
-        pd_ids = Reportable.objects.filter(
-            locations__id__in=location_ids
+        pd_ids = Location.objects.filter(
+            Q(id__in=location_ids) |
+            Q(parent_id__in=location_ids) |
+            Q(parent__parent_id__in=location_ids) |
+            Q(parent__parent__parent_id__in=location_ids) |
+            Q(parent__parent__parent__parent_id__in=location_ids)
         ).values_list(
-             'lower_level_outputs__indicator__programme_document__id',
+             'reportable__lower_level_outputs__indicator__programme_document__id',
              flat=True
         )
         return queryset.filter(pk__in=pd_ids)

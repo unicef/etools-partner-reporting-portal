@@ -16,3 +16,9 @@ class SimpleInterventionSerializer(serializers.ModelSerializer):
         loc = obj.locations.filter(parent__isnull=True).first()
         return loc and loc.id
 
+
+class ChildrenLocationSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Intervention
+        fields = ('id', 'title')
