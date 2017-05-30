@@ -3,13 +3,14 @@ import django_filters
 from django_filters.filters import ChoiceFilter, CharFilter, DateFilter, ModelChoiceFilter
 
 from core.common import PD_LIST_REPORT_STATUS, PD_STATUS
+from indicator.models import Reportable
 from .models import ProgrammeDocument
 
 
 class ProgrammeDocumentFilter(django_filters.FilterSet):
     ref_title = CharFilter(method='get_reference_number_title')
     status = ChoiceFilter(choices=PD_STATUS)
-    # locations = CharFilter(method='get_locations')
+    locations = CharFilter(method='get_locations')
     # report_status = ChoiceFilter(choices=PD_LIST_REPORT_STATUS, method='get_report_status')
     # due_date = DateFilter(method='get_due_date')
 
@@ -22,10 +23,20 @@ class ProgrammeDocumentFilter(django_filters.FilterSet):
             Q(reference_number__icontains=value) | Q(title__icontains=value)
         )
 
-    # def get_locations(self, queryset, name, value):
-    #     return queryset.filter(
-    #
-    #     )
+    def get_locations(self, queryset, name, value):
+        try:
+            location_ids = [int(x) for x in value.split(",")]
+        except Exception as exp:
+            #TODO: log exception
+            return queryset
+
+        pd_ids = Reportable.objects.filter(
+            locations__id__in=location_ids
+        ).values_list(
+             'lower_level_outputs__indicator__programme_document__id',
+             flat=True
+        )
+        return queryset.filter(pk__in=pd_ids)
 
     # def get_report_status(self, queryset, name, value):
     #     # reports not exists OR property contain_nothing_due_report
