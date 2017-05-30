@@ -28,7 +28,7 @@ class ChildrenLocationAPIView(ListAPIView):
     permission_classes = (IsAuthenticated, )
 
     def get_queryset(self):
-        # IMO we want to display via Country -> Region > City > District -> Point
+        # IMO we want to display via Country -> Region and/or City and/or District and/or Point
         # That should be enough.
         return Location.objects.filter(
             Q(parent_id=self.location_id) |
