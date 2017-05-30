@@ -20,13 +20,6 @@
           this.set('_pageNumberInitialized', true);
         });
       },
-
-      // TODO: Figure out why just passing params to etools-prp-ajax instead isn't working.
-      _computePaginatedUrl: function (baseUrl, pageSize, pageNumber) {
-        var size = '?page_size=' + pageSize;
-        var page = '&page=' + pageNumber;
-        return baseUrl + size + page;
-      },
     };
 
   }());
