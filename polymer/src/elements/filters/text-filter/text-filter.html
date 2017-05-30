@@ -1,7 +1,7 @@
-<link rel="import" href="../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/paper-input/paper-input.html">
 
-<link rel="import" href="../../behaviors/filter.html">
+<link rel="import" href="../../../behaviors/filter.html">
 
 <dom-module id="text-filter">
   <template>
@@ -15,6 +15,7 @@
         id="field"
         type="[[type]]"
         label="[[label]]"
+        value="[[value]]"
         always-float-label>
     </paper-input>
   </template>
@@ -28,14 +29,7 @@
       ],
 
       properties: {
-        label: String,
-
-        name: String,
-
-        lastValue: {
-          type: String,
-          value: '',
-        },
+        value: String,
 
         type: {
           type: String,
@@ -52,8 +46,6 @@
           var newValue = this.$.field.value.trim();
 
           if (newValue !== this.lastValue) {
-            this.set('lastValue', newValue);
-
             this.fire('filter-changed', {
               name: this.name,
               value: newValue,

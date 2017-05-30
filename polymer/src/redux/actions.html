@@ -86,7 +86,7 @@
         return function (dispatch) {
           dispatch(App.Actions.indicatorsLoadingStart());
           return indicatorsThunk()
-            .catch(function (err) {
+            .catch(function () {
               dispatch(App.Actions.indicatorsLoadingStop());
             })
             .then(function (res) {
@@ -154,7 +154,8 @@
               .then(function (res) {
                 var pdData = res.data;
 
-                dispatch(App.Actions.setProgrammeDocuments(pdData));
+                dispatch(App.Actions.setProgrammeDocuments(pdData.results));
+                dispatch(App.Actions.setProgrammeDocumentsCount(pdData.count));
                 dispatch(loadingStop());
               })
               .catch(function (err) {
@@ -170,6 +171,13 @@
         return {
           type: App.Constants.SET_PROGRAMME_DOCUMENTS,
           data: data,
+        };
+      },
+
+      setProgrammeDocumentsCount: function (count) {
+        return {
+          type: App.Constants.SET_PROGRAMME_DOCUMENTS_COUNT,
+          count: count,
         };
       },
 

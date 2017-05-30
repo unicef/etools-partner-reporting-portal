@@ -3,6 +3,9 @@
 <link rel="import" href="../../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../../bower_components/paper-item/paper-item.html">
 
+<link rel="import" href="../../polyfills/es6-shim.html">
+<link rel="import" href="../../behaviors/filter.html">
+
 <dom-module id="dropdown-filter">
   <template>
     <style>
@@ -37,21 +40,24 @@
     Polymer({
       is: 'dropdown-filter',
 
+      behaviors: [
+        App.Behaviors.FilterBehavior,
+      ],
+
       properties: {
-        label: String,
-
-        name: String,
-
-        data: Array,
-
-        selected: {
-          type: String,
-          value: '0',
+        data: {
+          type: Array,
+          value: [],
         },
 
-        lastValue: {
+        value: {
           type: String,
           value: '',
+        },
+
+        selected: {
+          type: Number,
+          computed: '_computeSelected(value)',
         },
       },
 
@@ -63,13 +69,17 @@
         var newValue = this.$.repeat.itemForElement(e.detail.item).value;
 
         if (newValue !== this.lastValue) {
-          this.lastValue = newValue;
-
           this.fire('filter-changed', {
             name: this.name,
             value: newValue,
           });
         }
+      },
+
+      _computeSelected: function (value) {
+        return this.data.findIndex(function (item) {
+          return item.value === value;
+        });
       },
     });
   </script>

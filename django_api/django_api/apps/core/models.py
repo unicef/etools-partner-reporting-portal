@@ -59,7 +59,7 @@ class Intervention(TimeStampedModel):
     signed_by_unicef_date = models.DateField(null=True, blank=True)
     signed_by_partner_date = models.DateField(null=True, blank=True)
 
-    # locations = models.ManyToMany(Location)
+    locations = models.ManyToManyField('core.Location')
 
     class Meta:
         ordering = ['number']
