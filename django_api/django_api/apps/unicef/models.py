@@ -13,7 +13,7 @@ from core.common import (
     FREQUENCY_LEVEL,
     INDICATOR_REPORT_STATUS,
     PD_LIST_REPORT_STATUS,
-    PD_DOCUMENT_TYPE,
+    PD_STATUS,
 )
 from indicator.models import IndicatorReport, Reportable
 
@@ -35,18 +35,8 @@ class Section(models.Model):
 
 class ProgrammeDocument(TimeStampedModel):
     agreement = models.CharField(max_length=255, verbose_name='Agreement')
-    document_type = models.CharField(
-        max_length=3,
-        choices=PD_DOCUMENT_TYPE,
-        default=PD_DOCUMENT_TYPE.PD,
-        verbose_name='Document Type'
-    )
     reference_number = models.CharField(max_length=255, verbose_name='Reference Number')
     title = models.CharField(max_length=255, verbose_name='PD/SSFA ToR Title')
-    unicef_office = models.CharField(max_length=255, verbose_name='UNICEF Office(s)')
-    unicef_focal_point = models.CharField(max_length=255, verbose_name='UNICEF Focal Point(s)')
-    partner_focal_point = models.CharField(max_length=255, verbose_name='Partner Focal Point(s)')
-
     start_date = models.DateField(
         verbose_name='Start Programme Date',
     )
@@ -62,6 +52,8 @@ class ProgrammeDocument(TimeStampedModel):
         null=True,
         verbose_name='In response to an HRP')
     status = models.CharField(
+        choices=PD_STATUS,
+        default=PD_STATUS.draft,
         max_length=256,
         verbose_name='PD/SSFA status'
     )
