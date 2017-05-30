@@ -1,11 +1,18 @@
-<link rel="import" href="../constants.html">
 <link rel="import" href="../../bower_components/promise-polyfill/promise-polyfill-lite.html">
+
+<link rel="import" href="../polyfills/es6-shim.html">
+<link rel="import" href="../constants.html">
+<link rel="import" href="actions/location.html">
+<link rel="import" href="actions/pd.html">
+
 
 <script>
   (function () {
     'use strict';
 
-    App.Actions = {
+    App.Actions = App.Actions || {};
+
+    Object.assign(App.Actions, {
 
       // Auth
       setToken: function (token) {
@@ -52,6 +59,7 @@
                         id: intervention.id,
                         code: intervention.country_code,
                         name: intervention.country_name,
+                        location: intervention.location_id,
                       };
                     });
 
@@ -143,62 +151,13 @@
         };
       },
 
-      // Programme documents
-      fetchProgrammeDocuments: function (pdThunk) {
-        return function (dispatch) {
-          var loadingStop = App.Actions.programmeDocumentsLoadingStop;
-
-          dispatch(App.Actions.programmeDocumentsLoadingStart());
-
-          return pdThunk()
-              .then(function (res) {
-                var pdData = res.data;
-
-                dispatch(App.Actions.setProgrammeDocuments(pdData.results));
-                dispatch(App.Actions.setProgrammeDocumentsCount(pdData.count));
-                dispatch(loadingStop());
-              })
-              .catch(function (err) {
-                dispatch(loadingStop());
-
-                // Return the original error to the caller
-                return Promise.reject(err);
-              });
-        };
-      },
-
-      setProgrammeDocuments: function (data) {
-        return {
-          type: App.Constants.SET_PROGRAMME_DOCUMENTS,
-          data: data,
-        };
-      },
-
-      setProgrammeDocumentsCount: function (count) {
-        return {
-          type: App.Constants.SET_PROGRAMME_DOCUMENTS_COUNT,
-          count: count,
-        };
-      },
-
-      programmeDocumentsLoadingStart: function () {
-        return {
-          type: App.Constants.PROGRAMME_DOCUMENTS_LOADING_START,
-        };
-      },
-
-      programmeDocumentsLoadingStop: function () {
-        return {
-          type: App.Constants.PROGRAMME_DOCUMENTS_LOADING_STOP,
-        };
-      },
-
       // Master reset
       reset: function () {
         return {
           type: App.Constants.RESET,
         };
       },
-    };
+
+    });
   }());
 </script>

@@ -53,12 +53,12 @@
       properties: {
         programmeDocumentsUrl: {
           type: String,
-          computed: '_computeProgrammeDocumentsUrl(country)',
+          computed: '_computeProgrammeDocumentsUrl(location)',
         },
 
-        country: {
+        location: {
           type: String,
-          statePath: 'countries.current',
+          statePath: 'location.id',
         },
 
         queryParams: Object,
@@ -68,8 +68,8 @@
         '_handleInputChange(programmeDocumentsUrl, queryParams)',
       ],
 
-      _computeProgrammeDocumentsUrl: function (country) {
-        return App.Endpoints.programmeDocuments(country);
+      _computeProgrammeDocumentsUrl: function (location) {
+        return App.Endpoints.programmeDocuments(location);
       },
 
       _handleInputChange: function (_, _) { // jshint ignore:line
@@ -78,7 +78,7 @@
         // Cancel the pending request, if any
         this.$.programmeDocuments.abort();
 
-        this.dispatch(App.Actions.fetchProgrammeDocuments(pdThunk))
+        this.dispatch(App.Actions.PD.fetch(pdThunk))
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
             });
