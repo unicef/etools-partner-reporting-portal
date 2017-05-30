@@ -10,47 +10,45 @@
   </template>
 
   <script>
-    (function () {
-      Polymer({
-        is: 'etools-prp-countries',
+    Polymer({
+      is: 'etools-prp-countries',
 
-        behaviors: [
-          App.Behaviors.ReduxBehavior,
-        ],
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+      ],
 
-        properties: {
-          _current: {
-            type: String,
-            statePath: 'countries.current',
-          },
-
-          _all: {
-            type: Array,
-            statePath: 'countries.all',
-          },
-
-          // State-linked properties can't notify
-          current: {
-            type: String,
-            notify: true,
-            computed: '_computeCurrent(_current)',
-          },
-
-          all: {
-            type: Array,
-            notify: true,
-            computed: '_computeAll(_all)'
-          },
+      properties: {
+        _current: {
+          type: String,
+          statePath: 'countries.current',
         },
 
-        _computeCurrent: function (_current) {
-          return _current;
+        _all: {
+          type: Array,
+          statePath: 'countries.all',
         },
 
-        _computeAll: function (_all) {
-          return _all.slice();
+        // State-linked properties can't notify
+        current: {
+          type: String,
+          notify: true,
+          computed: '_computeCurrent(_current)',
         },
-      });
-    }());
+
+        all: {
+          type: Array,
+          notify: true,
+          computed: '_computeAll(_all)'
+        },
+      },
+
+      _computeCurrent: function (_current) {
+        return _current;
+      },
+
+      _computeAll: function (_all) {
+        return _all.slice();
+      },
+    });
   </script>
 </dom-module>

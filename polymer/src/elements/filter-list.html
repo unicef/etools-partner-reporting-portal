@@ -1,0 +1,123 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../bower_components/iron-location/iron-query-params.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+
+<link rel="import" href="../polyfills/es6-shim.html">
+
+<dom-module id="filter-list">
+  <template>
+    <style>
+      :host {
+        display: block;
+        padding-bottom: 35px;
+        position: relative;
+      }
+
+      paper-button {
+        margin: 0;
+        position: absolute;
+        right: 10px;
+        bottom: 10px;
+        text-transform: uppercase;
+      }
+    </style>
+
+    <iron-location
+        query="{{query}}">
+    </iron-location>
+
+    <iron-query-params
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
+    </iron-query-params>
+
+    <content></content>
+
+    <paper-button id="clear">Clear</paper-button>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'filter-list',
+
+      properties: {
+        queryParams: Object,
+
+        filters: {
+          type: Array,
+          value: [],
+        },
+      },
+
+      listeners: {
+        'filter-changed': '_onFilterChanged',
+        'register-filter': '_registerFilter',
+        'deregister-filter': '_deregisterFilter',
+        'clear.tap': '_clearFilters',
+      },
+
+      _onFilterChanged: function (e, change) {
+        e.stopPropagation();
+
+        /**
+         * If we ever decide to debounce accross filters,
+         * here's the place to put the logic for it.
+         */
+
+        var newParams = Object.assign({}, this.queryParams);
+
+        if (change.value && change.value.length) {
+          newParams[change.name] = change.value;
+        } else {
+          delete newParams[change.name];
+        }
+
+        this.set('queryParams', newParams);
+
+        this._resetPageNumber();
+      },
+
+      _registerFilter: function (e, name) {
+        e.stopPropagation();
+
+        this.push('filters', name);
+      },
+
+      _deregisterFilter: function (e, name) {
+        e.stopPropagation();
+
+        var index = this.filters.indexOf(name);
+
+        if (index === -1) {
+          return;
+        }
+
+        this.splice('filters', index, 1);
+      },
+
+      _clearFilters: function () {
+        var self = this;
+
+        this.set('queryParams', Object.keys(this.queryParams)
+            .reduce(function (prev, curr) {
+              if (self.filters.indexOf(curr) === -1) {
+                prev[curr] = self.queryParams[curr];
+              } else {
+                prev[curr] = ''; // Can't set to undefined (does not trigger observers)
+              }
+
+              return prev;
+            }, {}));
+
+        this._resetPageNumber();
+      },
+
+      _resetPageNumber: function () {
+        this.set('queryParams', Object.assign({}, this.queryParams, {
+          page: 1,
+        }));
+      },
+    });
+  </script>
+</dom-module>

@@ -1,11 +1,18 @@
-<link rel="import" href="../constants.html">
 <link rel="import" href="../../bower_components/promise-polyfill/promise-polyfill-lite.html">
+
+<link rel="import" href="../polyfills/es6-shim.html">
+<link rel="import" href="../constants.html">
+<link rel="import" href="actions/location.html">
+<link rel="import" href="actions/pd.html">
+
 
 <script>
   (function () {
     'use strict';
 
-    App.Actions = {
+    App.Actions = App.Actions || {};
+
+    Object.assign(App.Actions, {
 
       // Auth
       setToken: function (token) {
@@ -52,6 +59,7 @@
                         id: intervention.id,
                         code: intervention.country_code,
                         name: intervention.country_name,
+                        location: intervention.location_id,
                       };
                     });
 
@@ -86,7 +94,7 @@
         return function (dispatch) {
           dispatch(App.Actions.indicatorsLoadingStart());
           return indicatorsThunk()
-            .catch(function (err) {
+            .catch(function () {
               dispatch(App.Actions.indicatorsLoadingStop());
             })
             .then(function (res) {
@@ -143,31 +151,13 @@
         };
       },
 
-      // Programme documents
-      fetchProgrammeDocuments: function (pdThunk) {
-        return function (dispatch) {
-          return pdThunk()
-              .then(function (res) {
-                var pdData = res.data;
-
-                dispatch(App.Actions.setProgrammeDocuments(pdData));
-              });
-        };
-      },
-
-      setProgrammeDocuments: function (data) {
-        return {
-          type: App.Constants.SET_PROGRAMME_DOCUMENTS,
-          data: data,
-        };
-      },
-
       // Master reset
       reset: function () {
         return {
           type: App.Constants.RESET,
         };
       },
-    };
+
+    });
   }());
 </script>

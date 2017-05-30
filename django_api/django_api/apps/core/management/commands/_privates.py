@@ -21,6 +21,10 @@ from unicef.models import (
     CountryProgrammeOutput,
     LowerLevelOutput,
 )
+from core.models import (
+    Intervention,
+    Location,
+)
 
 from core.factories import (
     UserFactory,
@@ -64,6 +68,8 @@ def clean_up_data():
         ProgrammeDocument.objects.all().delete()
         CountryProgrammeOutput.objects.all().delete()
         LowerLevelOutput.objects.all().delete()
+        Intervention.objects.all().delete()
+        Location.objects.all().delete()
 
         print "All ORM objects deleted"
 
@@ -127,3 +133,6 @@ def generate_fake_data(quantity=3):
         pd = indicator_report.reportable.content_object.indicator.programme_document
 
         pd.sections.add(Section.objects.all()[idx])
+
+        inter = Intervention.objects.all()[idx]
+        inter.locations.add(Location.objects.all()[idx])
