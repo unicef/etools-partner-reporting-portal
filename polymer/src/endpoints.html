@@ -21,8 +21,12 @@
         return this._buildUrl('/partner/partner-details/');
       },
 
-      programmeDocuments: function (location) {
-        return this._buildUrl('/unicef/' + location + '/programme-document/');
+      programmeDocuments: function (locationId) {
+        return this._buildUrl('/unicef/' + locationId + '/programme-document/');
+      },
+
+      childLocations: function (locationId) {
+        return this._buildUrl('/core/' + locationId + '/children-location/');
       },
     };
   }());
