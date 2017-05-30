@@ -32,8 +32,11 @@
     </style>
 
     <etools-prp-ajax
+        auto
         id="programmeDocumentDetails"
-        url="[[ programmeDocumentDetailsUrl ]]">
+        url="[[ programmeDocumentDetailsUrl ]]"
+        handle-as="json"
+        on-response="handleResponse">
     </etools-prp-ajax>
 
     <app-route
@@ -44,7 +47,7 @@
 
     <div class="page-top-content">
 
-      <page-header title="[[ pdTitle ]]" back></page-header>
+      <page-header title="[[ pd.title ]]" back></page-header>
 
       <div class="top-content-row">
 
@@ -76,7 +79,7 @@
       on-iron-items-changed="_updateTabSelection">
 
       <template is="dom-if" if="[[_equals(pdTab, 'details')]]" restamp="true">
-          <pd-details-overview name="details"></pd-details-overview>
+          <pd-details-overview name="details" pd="[[ pd ]]" loaded="[[ loaded ]]"></pd-details-overview>
       </template>
 
       <template is="dom-if" if="[[_equals(pdTab, 'reports')]]" restamp="true">
@@ -100,6 +103,17 @@
 
         pdTab: {
           type: String,
+        },
+
+        pd: {
+          type: Object,
+          notify: true,
+          value: {}
+        },
+
+        loaded: {
+          type: Boolean,
+          value: false
         },
 
         routeData: {
@@ -136,14 +150,11 @@
         return App.Endpoints.programmeDocumentDetail(pdId);
       },
 
-      attached: function () {
-        var pdDetailsThunk = this.$.programmeDocumentDetails.thunk();
-
-        this.dispatch(App.Actions.fetchProgrammeDocumentDetails(pdDetailsThunk))
-          .catch(function (err) {// jshint ignore:line
-            console.error(err);
-          })
+      handleResponse: function(data){
+        this.pd = data.detail.response;
+        this.loaded = true
       }
+
     });
   </script>
 </dom-module>

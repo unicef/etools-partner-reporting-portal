@@ -133,21 +133,20 @@
       is: 'pd-details-overview',
 
       behaviors: [
-        App.Behaviors.ReduxBehavior,
         App.Behaviors.UtilsBehavior,
       ],
 
       properties: {
         pd: {
-          type: Object,
-          statePath: 'programmeDocumentDetails.current',
+          type: Object
         },
 
-        loading: {
+        loaded: {
           type: Boolean,
-          statePath: App.Selectors.ProgrammeDocumentDetails.loading,
+          value: false
         },
-      },
+
+      }
     });
   </script>
 </dom-module>
