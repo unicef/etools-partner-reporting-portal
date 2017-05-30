@@ -21,7 +21,9 @@
         return this._buildUrl('/partner/partner-details/');
       },
 
-      programmeDocuments: function () {
+      programmeDocuments: function (country) { // jshint ignore:line
+        // TODO: country as a param
+
         return this._buildUrl('/unicef/programme-document/');
       },
     };

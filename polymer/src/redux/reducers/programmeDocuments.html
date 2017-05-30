@@ -9,6 +9,8 @@
 
     App.Reducers.ProgrammeDocuments = Redux.combineReducers({
       all: allPDsReducer,
+      count: PDsCountReducer,
+      loading: loadingPDsReducer,
     });
 
     function allPDsReducer(state, action) {
@@ -22,6 +24,37 @@
 
         case App.Constants.RESET:
           return [];
+
+        default:
+          return state;
+      }
+    }
+
+    function PDsCountReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = 0;
+      }
+
+      switch (action.type) {
+        case App.Constants.SET_PROGRAMME_DOCUMENTS_COUNT:
+          return action.count;
+
+        default:
+          return state;
+      }
+    }
+
+    function loadingPDsReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = false;
+      }
+
+      switch (action.type) {
+        case App.Constants.PROGRAMME_DOCUMENTS_LOADING_START:
+          return true;
+
+        case App.Constants.PROGRAMME_DOCUMENTS_LOADING_STOP:
+          return false;
 
         default:
           return state;
