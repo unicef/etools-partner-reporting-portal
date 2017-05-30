@@ -39,6 +39,12 @@ class ProgrammeDocumentAPIView(ListCreateAPIView):
         self.location_id = location_id
         queryset = self.get_queryset()
         filtered = ProgrammeDocumentFilter(request.GET, queryset=queryset)
+
+        page = self.paginate_queryset(filtered.qs)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
         serializer = self.get_serializer(filtered.qs, many=True)
         return Response(
             serializer.data,
