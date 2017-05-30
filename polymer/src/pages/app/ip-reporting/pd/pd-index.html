@@ -78,7 +78,7 @@
         // Cancel the pending request, if any
         this.$.programmeDocuments.abort();
 
-        this.dispatch(App.Actions.fetchProgrammeDocuments(pdThunk))
+        this.dispatch(App.Actions.PD.fetch(pdThunk))
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
             });
