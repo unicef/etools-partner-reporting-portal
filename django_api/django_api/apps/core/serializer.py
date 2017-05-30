@@ -18,7 +18,9 @@ class SimpleInterventionSerializer(serializers.ModelSerializer):
 
 
 class ChildrenLocationSerializer(serializers.ModelSerializer):
-
+    """
+    Endpoint for drop down meny on PD list filterset - location.
+    """
     id = serializers.SerializerMethodField()
 
     class Meta:
