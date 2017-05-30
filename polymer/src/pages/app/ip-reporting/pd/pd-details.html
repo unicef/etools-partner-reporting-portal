@@ -70,9 +70,10 @@
     </div>
 
     <iron-pages
-      selected="[[ pdTab ]]"
+      id="tabContent"
       attr-for-selected="name"
-      fallback-selection="details">
+      fallback-selection="details"
+      on-iron-items-changed="_updateTabSelection">
 
       <template is="dom-if" if="[[_equals(pdTab, 'details')]]" restamp="true">
           <pd-details-overview name="details"></pd-details-overview>
@@ -103,6 +104,7 @@
 
         routeData: {
           type: Object,
+          observer: '_updateUrlTab'
         },
 
         programmeDocumentDetailsUrl: {
@@ -118,14 +120,15 @@
         }
       },
 
-      observers: [
-        '_updateUrlTab(routeData.dashTab)',
-      ],
+      _updateTabSelection: function(e) {
+        this.$.tabContent.select(this.pdTab);
+      },
 
-      _updateUrlTab: function(dashTab) {
-        if (!dashTab) {
+      _updateUrlTab: function(routeData) {
+        if (!routeData) {
           return;
         }
+        var dashTab = routeData.dashTab;
         this.set('pdTab', dashTab);
       },
 
