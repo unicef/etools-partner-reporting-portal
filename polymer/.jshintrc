@@ -8,7 +8,6 @@
   "immed": true,
   "indent": 2,
   "latedef": "nofunc",
-  "mocha": true,
   "noarg": true,
   "quotmark": "single",
   "undef": true,
@@ -22,10 +21,6 @@
     "Redux": true,
     "ReduxThunk": true,
     "Reselect": true,
-    "PolymerRedux": true,
-    "WCT": true,
-    "sinon": true,
-    "fixture": true,
-    "assert": true
+    "PolymerRedux": true
   }
 }

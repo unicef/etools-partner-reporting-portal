@@ -27,7 +27,7 @@ SHARED_PARTNER_TYPE = Choices(
 INTERVENTION_TYPES = Choices(
     ('PD', 'PD', 'Programme Document'),
     ('SHP', 'SHPD', 'Simplified Humanitarian Programme Document'),
-    ('SSF', 'SSFA', u'SSFA TOR'),
+    ('SSF', 'SSFA', u'Small-Scale Funding Agreement'),
 )
 
 INTERVENTION_STATUS = Choices(
@@ -64,8 +64,8 @@ PD_LIST_REPORT_STATUS = Choices(
     (3, 'due', 'Due'),
 )
 
-PD_STATUS = Choices(
-    ("Dra", "draft", "Draft"),
-    ("Act", "active", "Active"),
-    ("Imp", "implemented", "Implemented"),
+PD_DOCUMENT_TYPE = Choices(
+    ('PD', 'PD', 'Programme Document'),
+    ('SHP', 'SHPD', 'Simplified Humanitarian Programme Document'),
+    ('SSF', 'SSFA_TOR', u'SSFA TOR'),
 )

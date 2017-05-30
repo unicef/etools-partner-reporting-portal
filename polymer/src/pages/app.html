@@ -19,8 +19,7 @@
 
     <etools-prp-countries
         id="countries"
-        all="{{countries}}"
-        current="{{currentCountry}}">
+        all="{{countries}}">
     </etools-prp-countries>
 
     <etools-prp-ajax
@@ -88,7 +87,6 @@
       observers: [
         '_routeCountryChanged(routeData.country_code)',
         '_routeAppChanged(routeData.app)',
-        '_handleCountryChange(currentCountry, countries)',
       ],
 
       _redirectToCountry: function (country) {
@@ -162,20 +160,6 @@
 
       _notFound: function () {
         window.location.href = '/not-found';
-      },
-
-      _handleCountryChange: function (currentCountry, countries) {
-        var currentCountryData;
-
-        if (!currentCountry || !countries.length) {
-          return;
-        }
-
-        currentCountryData = countries.filter(function (country) {
-          return country.code === currentCountry;
-        })[0];
-
-        this.dispatch(App.Actions.Location.set(currentCountryData.location));
       },
 
       attached: function () {

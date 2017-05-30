@@ -133,6 +133,3 @@ def generate_fake_data(quantity=3):
         pd = indicator_report.reportable.content_object.indicator.programme_document
 
         pd.sections.add(Section.objects.all()[idx])
-
-        inter = Intervention.objects.all()[idx]
-        inter.locations.add(Location.objects.all()[idx])

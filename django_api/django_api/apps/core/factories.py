@@ -1,4 +1,5 @@
 import datetime
+from decimal import Decimal
 
 from django.contrib.auth.models import Group
 from django.db.models.signals import post_save
@@ -30,12 +31,8 @@ from unicef.models import (
     CountryProgrammeOutput,
     LowerLevelOutput,
 )
-from core.common import FREQUENCY_LEVEL, PD_STATUS
+from core.common import FREQUENCY_LEVEL
 from core.models import Intervention, Location
-from core.countries import COUNTRIES_ALPHA2_CODE
-
-PD_STATUS_LIST = [x[0] for x in PD_STATUS]
-COUNTRIES_LIST = [x[0] for x in COUNTRIES_ALPHA2_CODE]
 
 
 class PartnerFactory(factory.django.DjangoModelFactory):
@@ -136,7 +133,7 @@ class InterventionFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "intervention_%d" % n)
     document_type = 'PD'
     number = fuzzy.FuzzyText(length=64)
-    country_code = fuzzy.FuzzyChoice(COUNTRIES_LIST)
+    country_code = 'US'
     status = 'Dra'
     start = fuzzy.FuzzyDate(datetime.date.today())
     end = fuzzy.FuzzyDate(datetime.date.today())
@@ -278,7 +275,7 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     end_date = datetime.date.today()+datetime.timedelta(days=70)
     population_focus = factory.Sequence(lambda n: "Population %d" % n)
     response_to_HRP = factory.Sequence(lambda n: "response_to_HRP%d" % n)
-    status = factory.fuzzy.FuzzyChoice(PD_STATUS_LIST)
+    status = factory.Sequence(lambda n: "PD/SSFA status %d" % n)
     frequency = FREQUENCY_LEVEL.weekly
     budget = fuzzy.FuzzyDecimal(low=1000.0, high=100000.0, precision=2)
     unicef_office = factory.Sequence(lambda n: "JCO country programme %d" % n)
