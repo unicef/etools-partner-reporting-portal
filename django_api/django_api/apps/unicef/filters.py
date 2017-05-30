@@ -10,32 +10,26 @@ from .models import ProgrammeDocument
 class ProgrammeDocumentFilter(django_filters.FilterSet):
     ref_title = CharFilter(method='get_reference_number_title')
     status = ChoiceFilter(choices=PD_STATUS)
-    locations = CharFilter(method='get_locations')
+    location = CharFilter(method='get_location')
     # report_status = ChoiceFilter(choices=PD_LIST_REPORT_STATUS, method='get_report_status')
     # due_date = DateFilter(method='get_due_date')
 
     class Meta:
         model = ProgrammeDocument
-        fields = ['ref_title', 'status']
+        fields = ['ref_title', 'status', 'location']
 
     def get_reference_number_title(self, queryset, name, value):
         return queryset.filter(
             Q(reference_number__icontains=value) | Q(title__icontains=value)
         )
 
-    def get_locations(self, queryset, name, value):
-        try:
-            location_ids = [int(x) for x in value.split(",")]
-        except Exception as exp:
-            #TODO: log exception
-            return queryset
-
+    def get_location(self, queryset, name, value):
         pd_ids = Location.objects.filter(
-            Q(id__in=location_ids) |
-            Q(parent_id__in=location_ids) |
-            Q(parent__parent_id__in=location_ids) |
-            Q(parent__parent__parent_id__in=location_ids) |
-            Q(parent__parent__parent__parent_id__in=location_ids)
+            Q(id=value) |
+            Q(parent_id=value) |
+            Q(parent__parent_id=value) |
+            Q(parent__parent__parent_id=value) |
+            Q(parent__parent__parent__parent_id=value)
         ).values_list(
              'reportable__lower_level_outputs__indicator__programme_document__id',
              flat=True
