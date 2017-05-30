@@ -141,6 +141,17 @@ class InterventionFactory(factory.django.DjangoModelFactory):
     signed_by_unicef_date = fuzzy.FuzzyDate(datetime.date.today())
     signed_by_partner_date = fuzzy.FuzzyDate(datetime.date.today())
 
+    @factory.post_generation
+    def locations(self, create, extracted, **kwargs):
+        if not create:
+            # Simple build, do nothing.
+            return
+
+        if extracted:
+            # A list of groups were passed in, use them
+            for location in extracted:
+                self.locations.add(location)
+
     class Meta:
         model = Intervention
 
