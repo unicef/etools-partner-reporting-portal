@@ -1,27 +1,30 @@
 from django.http import Http404
-from rest_framework.generics import RetrieveAPIView, ListAPIView
+
+from rest_framework.generics import RetrieveAPIView, ListAPIView, ListCreateAPIView
 from rest_framework.response import Response
 from rest_framework import status as statuses
 
 import django_filters.rest_framework
 
+from core.paginations import SmallPagination
 from core.permissions import IsAuthenticated
+
 from .serializer import (
     ProgrammeDocumentSerializer,
     ProgrammeDocumentDetailSerializer,
 )
-
 from .models import ProgrammeDocument
 from .filters import ProgrammeDocumentFilter
 
 
-class ProgrammeDocumentAPIView(ListAPIView):
+class ProgrammeDocumentAPIView(ListCreateAPIView):
     """
     Endpoint for getting Programme Document.
     """
     serializer_class = ProgrammeDocumentSerializer
     permission_classes = (IsAuthenticated, )
-    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
+    pagination_class = SmallPagination
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     filter_class = ProgrammeDocumentFilter
 
     def get_queryset(self):

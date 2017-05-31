@@ -1,4 +1,3 @@
-<link rel="import" href="../../polyfills/es6-shim.html">
 <link rel="import" href="../../constants.html">
 <link rel="import" href="../redux.html">
 
@@ -8,21 +7,21 @@
 
     App.Reducers = App.Reducers || {};
 
-    App.Reducers.Partner = Redux.combineReducers({
-      current: currentPartnerReducer,
+    App.Reducers.Location = Redux.combineReducers({
+      id: locationIdReducer,
     });
 
-    function currentPartnerReducer(state, action) {
+    function locationIdReducer(state, action) {
       if (typeof state === 'undefined') {
-        state = {};
+        state = '';
       }
 
       switch (action.type) {
-        case App.Constants.SET_PARTNER:
-          return Object.assign({}, action.partnerData);
+        case App.Constants.SET_LOCATION:
+          return action.locationId;
 
         case App.Constants.RESET:
-          return {};
+          return '';
 
         default:
           return state;

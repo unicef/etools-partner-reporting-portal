@@ -13,8 +13,12 @@ from core.common import (
     FREQUENCY_LEVEL,
     INDICATOR_REPORT_STATUS,
     PD_LIST_REPORT_STATUS,
+<<<<<<< HEAD
     PD_DOCUMENT_TYPE,
     PROGRESS_REPORT_STATUS,
+=======
+    PD_STATUS,
+>>>>>>> develop
 )
 from indicator.models import IndicatorReport, Reportable
 
@@ -64,6 +68,8 @@ class ProgrammeDocument(TimeStampedModel):
         null=True,
         verbose_name='In response to an HRP')
     status = models.CharField(
+        choices=PD_STATUS,
+        default=PD_STATUS.draft,
         max_length=256,
         verbose_name='PD/SSFA status'
     )

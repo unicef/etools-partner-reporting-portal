@@ -1,0 +1,23 @@
+<script>
+  (function () {
+    'use strict';
+
+    App.Behaviors = App.Behaviors || {};
+
+    App.Behaviors.PaginationBehavior = {
+      observers: [
+        '_updateQueryParams(pageSize, pageNumber)',
+      ],
+
+      _updateQueryParams: function (pageSize, pageNumber) {
+        var newParams = Object.assign({}, this.queryParams, {
+          page_size: pageSize,
+          page: pageNumber,
+        });
+
+        this.set('queryParams', newParams);
+      },
+    };
+
+  }());
+</script>

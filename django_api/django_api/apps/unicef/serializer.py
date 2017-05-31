@@ -5,6 +5,8 @@ from .models import ProgrammeDocument, Section
 
 class ProgrammeDocumentSerializer(serializers.ModelSerializer):
 
+    status = serializers.CharField(source='get_status_display')
+
     class Meta:
         model = ProgrammeDocument
         fields = (

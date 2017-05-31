@@ -1,10 +1,11 @@
 <link rel="import" href="../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../../../bower_components/iron-location/iron-query-params.html">
 
-<link rel="import" href="../../../../behaviors/utils.html">
 <link rel="import" href="../../../../elements/page-header.html">
 <link rel="import" href="../../../../elements/page-body.html">
 <link rel="import" href="../../../../elements/etools-prp-ajax.html">
-<link rel="import" href="../../../../elements/filter-list.html">
+<link rel="import" href="../../../../elements/ip-reporting/pd-filters.html">
 <link rel="import" href="../../../../elements/ip-reporting/pd-list.html">
 <link rel="import" href="../../../../endpoints.html">
 <link rel="import" href="../../../../redux/actions.html">
@@ -18,18 +19,25 @@
       }
     </style>
 
+    <iron-location
+        query="{{query}}">
+    </iron-location>
+
+    <iron-query-params
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
+    </iron-query-params>
+
     <etools-prp-ajax
         id="programmeDocuments"
-        url="[[programmeDocumentsUrl]]">
+        url="[[programmeDocumentsUrl]]"
+        params="[[queryParams]]">
     </etools-prp-ajax>
 
     <page-header title="Programme Documents"></page-header>
 
     <page-body>
-      <filter-list
-          filters="{{filters}}">
-      </filter-list>
-
+      <pd-filters></pd-filters>
       <pd-list></pd-list>
     </page-body>
   </template>
@@ -40,33 +48,37 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
-        App.Behaviors.UtilsBehavior,
       ],
 
       properties: {
         programmeDocumentsUrl: {
           type: String,
-          computed: '_computeProgrammeDocumentsUrl(country, filters)',
-          observer: '_onUrlChanged',
+          computed: '_computeProgrammeDocumentsUrl(country)',
         },
 
         country: {
           type: String,
           statePath: 'countries.current',
         },
+
+        queryParams: Object,
       },
 
-      _computeProgrammeDocumentsUrl: function (country, newFilters) {
-        return App.Endpoints.programmeDocuments(country, this._qs(newFilters));
+      observers: [
+        '_handleInputChange(programmeDocumentsUrl, queryParams)',
+      ],
+
+      _computeProgrammeDocumentsUrl: function (country) {
+        return App.Endpoints.programmeDocuments(country);
       },
 
-      _onUrlChanged: function () {
+      _handleInputChange: function (_, _) { // jshint ignore:line
         var pdThunk = this.$.programmeDocuments.thunk();
 
-        // Cancel the current request
+        // Cancel the pending request, if any
         this.$.programmeDocuments.abort();
 
-        this.dispatch(App.Actions.fetchProgrammeDocuments(pdThunk))
+        this.dispatch(App.Actions.PD.fetch(pdThunk))
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
             });

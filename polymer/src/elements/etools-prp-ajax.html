@@ -2,6 +2,7 @@
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../../bower_components/promise-polyfill/promise-polyfill-lite.html">
 
+<link rel="import" href="../polyfills/es6-shim.html">
 <link rel="import" href="../redux/store.html">
 <link rel="import" href="../behaviors/utils.html">
 
@@ -108,9 +109,7 @@
       },
 
       _handleError: function () {
-        var status = this.lastError.status;
-
-        if (status === 401) {
+        if (this.lastError && this.lastError.status === 401) {
           this.dispatch(App.Actions.resetToken());
         }
 
