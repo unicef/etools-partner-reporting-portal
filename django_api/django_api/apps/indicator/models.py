@@ -125,4 +125,4 @@ class IndicatorLocationData(TimeStampedModel):
     disaggregation = JSONField(default=dict)
 
     def __str__(self):
-        return "{} Location Data for {}".format(location, indicator_report)
+        return "{} Location Data for {}".format(self.location, self.indicator_report)
