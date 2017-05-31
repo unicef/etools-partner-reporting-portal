@@ -121,6 +121,7 @@ class IndicatorDataSpecification(TimeStampedModel):
 
 
 class IndicatorReport(TimeStampedModel):
+    # TODO: probably we should add overall status & narrative ssessemnt here
     title = models.CharField(max_length=255)
     reportable = models.ForeignKey(Reportable, related_name="indicator_reports")
     progress_report = models.ForeignKey('unicef.ProgressReport', related_name="indicator_reports", null=True)
@@ -153,4 +154,4 @@ class IndicatorLocationData(TimeStampedModel):
     disaggregation = JSONField(default=dict)
 
     def __str__(self):
-        return "{} Location Data for {}".format(location, indicator_report)
+        return "{} Location Data for {}".format(self.location, self.indicator_report)
