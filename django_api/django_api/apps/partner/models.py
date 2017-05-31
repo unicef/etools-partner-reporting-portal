@@ -135,7 +135,7 @@ class Partner(TimeStampedModel):
         ordering = ['title']
         unique_together = ('title', 'vendor_number')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     @property

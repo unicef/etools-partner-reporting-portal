@@ -11,7 +11,7 @@ class Cluster(TimeStampedModel):
     intervention = models.ForeignKey('core.Intervention', related_name="clusters")
     user = models.ForeignKey('account.User', related_name="clusters")
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
 
