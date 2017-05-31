@@ -6,7 +6,7 @@ from .permissions import IsAuthenticated
 from .models import Intervention, Location
 from .serializer import (
     SimpleInterventionSerializer,
-    SimpleLocationSerializer
+    SimpleLocationSerializer,
     ChildrenLocationSerializer,
 )
 
