@@ -1,0 +1,64 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-datatable/paper-datatable.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+
+<!-- <link rel="import" href="../behaviors/utils.html"> -->
+<link rel="import" href="../styles/detail-table.html">
+
+<dom-module id="etools-prp-detail-table">
+  <template>
+
+    <style include="detail-table"></style>
+
+    <paper-datatable data="{{data}}">
+
+      <paper-datatable-column>
+        <template>
+          <span></span>
+        </template>
+      </paper-datatable-column>
+
+        <paper-datatable-column header="Male">
+          <template>
+            <span>{{item.value}}</span>
+          </template>
+        </paper-datatable-column>
+
+        <paper-datatable-column header="Female">
+          <template>
+            <span>{{item.value}}</span>
+          </template>
+        </paper-datatable-column>
+
+        <paper-datatable-column header="Other">
+          <template>
+            <span>{{item.value}}</span>
+          </template>
+        </paper-datatable-column>
+
+        <paper-datatable-column header="Total">
+          <template></template>
+        </paper-datatable-column>
+
+    </paper-datatable>
+
+  </template>
+
+  <script>
+    (function () {
+      Polymer({
+        is: 'etools-prp-detail-table',
+
+        properties: {
+          data: {
+            type: Array,
+            value: [
+
+            ],
+          }
+        }
+
+      });
+    }());
+  </script>
+</dom-module>
