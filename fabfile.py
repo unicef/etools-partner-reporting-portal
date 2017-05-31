@@ -63,3 +63,10 @@ def fixtures():
     """
     local('docker-compose exec django_api python manage.py generate_fake_data --clean_before')
     print "Fake data generated!"
+
+
+def remove_untagged_images():
+    """
+    Delete all untagged (<none>) images
+    """
+    local('docker rmi $(docker images | grep "^<none>" | awk "{print $3}")')
