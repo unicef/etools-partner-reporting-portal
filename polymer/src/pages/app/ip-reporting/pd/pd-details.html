@@ -1,23 +1,162 @@
 <link rel="import" href="../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../../../../../bower_components/paper-tabs/paper-tabs.html">
+
+<link rel="import" href="../../../../elements/page-header.html">
+<link rel="import" href="../../../../elements/ip-reporting/pd-details-overview.html">
+<link rel="import" href="../../../../elements/ip-reporting/pd-details-reports.html">
+<link rel="import" href="../../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../../endpoints.html">
+<link rel="import" href="../../../../redux/actions.html">
+<link rel="import" href="../../../../redux/store.html">
+<link rel="import" href="../../../../styles/shared-styles.html">
+
+<link rel="import" href="../../../../behaviors/utils.html">
 
 <dom-module id="page-ip-reporting-pd-details">
   <template>
-    <style>
+    <style include="shared-styles">
       :host {
         display: block;
       }
+      .page-top-content {
+        box-shadow: 0 1px 2px 1px rgba(0, 0, 0, .1);
+      }
+      .page-top-content page-header {
+        padding-bottom:10px;
+      }
+      .top-content-row {
+        padding-left:25px;
+      }
+
     </style>
 
-    <h1>TODO: PD [[pdId]] details</h1>
+    <etools-prp-ajax
+        id="programmeDocumentDetails"
+        url="[[ programmeDocumentDetailsUrl ]]">
+    </etools-prp-ajax>
+
+    <app-route
+      route="{{route}}"
+      pattern="/:dashTab"
+      data="{{routeData}}">
+    </app-route>
+
+    <div class="page-top-content">
+
+      <page-header title="[[ pd.title ]]" back="pd"></page-header>
+
+      <div class="top-content-row">
+
+        <paper-tabs
+          selected="{{ routeData.dashTab }}"
+          attr-for-selected="name"
+          fallback-selection="details"
+          noink
+          bottom-item>
+
+          <paper-tab name="details" link>
+            <span class="tab-content">Details</span>
+          </paper-tab>
+
+          <paper-tab name="reports" link>
+            <span class="tab-content">Reports</span>
+          </paper-tab>
+
+        </paper-tabs>
+
+      </div>
+
+    </div>
+
+    <iron-pages
+      id="tabContent"
+      attr-for-selected="name"
+      fallback-selection="details"
+      on-iron-items-changed="_updateTabSelection">
+
+      <template is="dom-if" if="[[_equals(pdTab, 'details')]]" restamp="true">
+          <pd-details-overview name="details" pd="[[ pd ]]" loaded="[[ loaded ]]"></pd-details-overview>
+      </template>
+
+      <template is="dom-if" if="[[_equals(pdTab, 'reports')]]" restamp="true">
+          <pd-details-reports name="reports"></pd-details-reports>
+      </template>
+
+    </iron-pages>
+
   </template>
 
   <script>
     Polymer({
       is: 'page-ip-reporting-pd-details',
 
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.UtilsBehavior,
+      ],
+
       properties: {
-        pdId: String,
+
+        pdTab: {
+          type: String,
+        },
+
+        pd: {
+          type: Object,
+          notify: true,
+          value: {}
+        },
+
+        loaded: {
+          type: Boolean,
+          value: false
+        },
+
+        routeData: {
+          type: Object,
+          observer: '_updateUrlTab'
+        },
+
+        programmeDocumentDetailsUrl: {
+          type: String,
+          computed: '_computeProgrammeDocumentDetailsUrl(pdId)',
+        },
+
+        pdId: Number,
+
+        pdTitle: {
+          type: String,
+          statePath: 'programmeDocumentDetails.current.title',
+        }
       },
+
+      _updateTabSelection: function(e) {
+        this.$.tabContent.select(this.pdTab);
+      },
+
+      _updateUrlTab: function(routeData) {
+        if (!routeData) {
+          return;
+        }
+        var dashTab = routeData.dashTab;
+        this.set('pdTab', dashTab);
+      },
+
+      _computeProgrammeDocumentDetailsUrl: function(pdId){
+        return App.Endpoints.programmeDocumentDetail(pdId);
+      },
+
+      attached: function(){
+        var self = this;
+
+        this.$.programmeDocumentDetails.thunk()()
+          .then(function (res) {
+            self.pd = res.data;
+            self.loaded = true;
+          })
+      }
+
     });
   </script>
 </dom-module>

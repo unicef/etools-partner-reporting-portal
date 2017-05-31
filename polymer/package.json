@@ -14,8 +14,7 @@
     "node": ">=4.0"
   },
   "scripts": {
-    "dev": "./node_modules/lite-server/bin/lite-server",
-    "test": "wct"
+    "dev": "./node_modules/lite-server/bin/lite-server"
   },
   "private": true,
   "devDependencies": {

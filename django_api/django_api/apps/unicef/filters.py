@@ -1,6 +1,6 @@
 from django.db.models import Q
 import django_filters
-from django_filters.filters import ChoiceFilter, CharFilter, DateFilter, ModelChoiceFilter
+from django_filters.filters import ChoiceFilter, CharFilter
 
 from core.common import PD_LIST_REPORT_STATUS, PD_STATUS
 from core.models import Location

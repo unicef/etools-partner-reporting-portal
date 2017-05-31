@@ -3,8 +3,10 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 
-from account.models import User
 from core.factories import IndicatorReportFactory
+
+from account.models import User
+from unicef.models import ProgrammeDocument
 from core.models import Intervention, Location
 from indicator.models import IndicatorReport, Reportable
 
@@ -87,3 +89,13 @@ class TestProgrammeDocumentAPIView(APITestCase):
         )
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(len(response.data), 4)
+
+
+    def test_detail_api(self):
+        pd = ProgrammeDocument.objects.first()
+        url = reverse('programme-document-details', kwargs={'pk': pd.pk})
+        response = self.client.get(url, format='json')
+
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(pd.agreement, response.data['agreement'])
+        self.assertEquals(pd.reference_number, response.data['reference_number'])

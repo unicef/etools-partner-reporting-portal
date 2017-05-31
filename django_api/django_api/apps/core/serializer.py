@@ -5,8 +5,6 @@ from .models import Intervention
 
 class SimpleInterventionSerializer(serializers.ModelSerializer):
 
-    location_id = serializers.SerializerMethodField()
-
     class Meta:
         model = Intervention
         fields = ('id', 'title', 'country_name', 'country_code', 'location_id')

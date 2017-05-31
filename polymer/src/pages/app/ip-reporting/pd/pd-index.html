@@ -1,11 +1,10 @@
 <link rel="import" href="../../../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../../../bower_components/iron-location/iron-location.html">
-<link rel="import" href="../../../../../bower_components/iron-location/iron-query-params.html">
 
+<link rel="import" href="../../../../behaviors/utils.html">
 <link rel="import" href="../../../../elements/page-header.html">
 <link rel="import" href="../../../../elements/page-body.html">
 <link rel="import" href="../../../../elements/etools-prp-ajax.html">
-<link rel="import" href="../../../../elements/ip-reporting/pd-filters.html">
+<link rel="import" href="../../../../elements/filter-list.html">
 <link rel="import" href="../../../../elements/ip-reporting/pd-list.html">
 <link rel="import" href="../../../../endpoints.html">
 <link rel="import" href="../../../../redux/actions.html">
@@ -19,25 +18,18 @@
       }
     </style>
 
-    <iron-location
-        query="{{query}}">
-    </iron-location>
-
-    <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-    </iron-query-params>
-
     <etools-prp-ajax
         id="programmeDocuments"
-        url="[[programmeDocumentsUrl]]"
-        params="[[queryParams]]">
+        url="[[programmeDocumentsUrl]]">
     </etools-prp-ajax>
 
     <page-header title="Programme Documents"></page-header>
 
     <page-body>
-      <pd-filters></pd-filters>
+      <filter-list
+          filters="{{filters}}">
+      </filter-list>
+
       <pd-list></pd-list>
     </page-body>
   </template>
@@ -48,6 +40,7 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.UtilsBehavior,
       ],
 
       properties: {
@@ -60,8 +53,6 @@
           type: String,
           statePath: 'location.id',
         },
-
-        queryParams: Object,
       },
 
       observers: [
@@ -72,13 +63,13 @@
         return App.Endpoints.programmeDocuments(location);
       },
 
-      _handleInputChange: function (_, _) { // jshint ignore:line
+      _onUrlChanged: function () {
         var pdThunk = this.$.programmeDocuments.thunk();
 
-        // Cancel the pending request, if any
+        // Cancel the current request
         this.$.programmeDocuments.abort();
 
-        this.dispatch(App.Actions.PD.fetch(pdThunk))
+        this.dispatch(App.Actions.fetchProgrammeDocuments(pdThunk))
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
             });

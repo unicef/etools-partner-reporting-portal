@@ -1,9 +1,11 @@
 from django.db.models import Q
 from rest_framework.generics import ListAPIView
+
 from rest_framework.response import Response
 from rest_framework import status as statuses
 from .permissions import IsAuthenticated
 from .models import Intervention, Location
+
 from .serializer import (
     SimpleInterventionSerializer,
     ChildrenLocationSerializer,
@@ -12,10 +14,9 @@ from .serializer import (
 
 class SimpleInterventionAPIView(ListAPIView):
     """
-    Endpoint for getting Intervention.
-    Intervention need to have defined location to be displayed on drop down menu.
+    Endpoint for getting Intervention to make dropdown menu with countries and interventions.
     """
-    queryset = Intervention.objects.filter(locations__isnull=False)
+    queryset = Intervention.objects.all()
     serializer_class = SimpleInterventionSerializer
     permission_classes = (IsAuthenticated, )
 
