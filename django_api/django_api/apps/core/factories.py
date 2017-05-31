@@ -1,5 +1,6 @@
 import datetime
 import json
+import random
 from decimal import Decimal
 
 from django.contrib.auth.models import Group
@@ -398,73 +399,73 @@ class IndicatorLocationDataFactory(factory.django.DjangoModelFactory):
     disaggregation = {
         "extrashort": {
             "1-2m": {
-                "male": 50,
-                "female": 50,
-                "other": 50,
+                "male": random.randint(50, 200),
+                "female": random.randint(50, 200),
+                "other": random.randint(50, 200),
             },
             "3-5m": {
-                "male": 50,
-                "female": 50,
-                "other": 50,
+                "male": random.randint(50, 200),
+                "female": random.randint(50, 200),
+                "other": random.randint(50, 200),
             },
             "6-10m": {
-                "male": 50,
-                "female": 50,
-                "other": 50,
+                "male": random.randint(50, 200),
+                "female": random.randint(50, 200),
+                "other": random.randint(50, 200),
             }
         },
 
         "short": {
             "1-2m": {
-                "male": 50,
-                "female": 50,
-                "other": 50,
+                "male": random.randint(50, 200),
+                "female": random.randint(50, 200),
+                "other": random.randint(50, 200),
             },
             "3-5m": {
-                "male": 50,
-                "female": 50,
-                "other": 50,
+                "male": random.randint(50, 200),
+                "female": random.randint(50, 200),
+                "other": random.randint(50, 200),
             },
             "6-10m": {
-                "male": 50,
-                "female": 50,
-                "other": 50,
+                "male": random.randint(50, 200),
+                "female": random.randint(50, 200),
+                "other": random.randint(50, 200),
             }
         },
 
         "medium": {
             "1-2m": {
-                "male": 50,
-                "female": 50,
-                "other": 50,
+                "male": random.randint(50, 200),
+                "female": random.randint(50, 200),
+                "other": random.randint(50, 200),
             },
             "3-5m": {
-                "male": 50,
-                "female": 50,
-                "other": 50,
+                "male": random.randint(50, 200),
+                "female": random.randint(50, 200),
+                "other": random.randint(50, 200),
             },
             "6-10m": {
-                "male": 50,
-                "female": 50,
-                "other": 50,
+                "male": random.randint(50, 200),
+                "female": random.randint(50, 200),
+                "other": random.randint(50, 200),
             }
         },
 
         "tall": {
             "1-2m": {
-                "male": 50,
-                "female": 50,
-                "other": 50,
+                "male": random.randint(50, 200),
+                "female": random.randint(50, 200),
+                "other": random.randint(50, 200),
             },
             "3-5m": {
-                "male": 50,
-                "female": 50,
-                "other": 50,
+                "male": random.randint(50, 200),
+                "female": random.randint(50, 200),
+                "other": random.randint(50, 200),
             },
             "6-10m": {
-                "male": 50,
-                "female": 50,
-                "other": 50,
+                "male": random.randint(50, 200),
+                "female": random.randint(50, 200),
+                "other": random.randint(50, 200),
             }
         }
     }

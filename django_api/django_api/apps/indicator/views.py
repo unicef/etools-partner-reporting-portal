@@ -84,7 +84,8 @@ class IndicatorReportListAPIView(APIView):
         indicator_reports = reportable.indicator_reports.all().order_by('-time_period_start')
 
         if 'limit' in self.request.query_params:
-            indicator_reports = indicator_reports[:2]
+            limit = self.request.query_params.get('limit', 2)
+            indicator_reports = indicator_reports[:limit]
 
         return indicator_reports
 
