@@ -31,8 +31,12 @@ from unicef.models import (
     CountryProgrammeOutput,
     LowerLevelOutput,
 )
-from core.common import FREQUENCY_LEVEL
+from core.common import FREQUENCY_LEVEL, PD_STATUS
 from core.models import Intervention, Location
+from core.countries import COUNTRIES_ALPHA2_CODE
+
+PD_STATUS_LIST = [x[0] for x in PD_STATUS]
+COUNTRIES_LIST = [x[0] for x in COUNTRIES_ALPHA2_CODE]
 
 
 # https://stackoverflow.com/a/41154232/2363915
@@ -146,12 +150,23 @@ class InterventionFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "intervention_%d" % n)
     document_type = 'PD'
     number = fuzzy.FuzzyText(length=64)
-    country_code = 'US'
+    country_code = fuzzy.FuzzyChoice(COUNTRIES_LIST)
     status = 'Dra'
     start = fuzzy.FuzzyDate(datetime.date.today())
     end = fuzzy.FuzzyDate(datetime.date.today())
     signed_by_unicef_date = fuzzy.FuzzyDate(datetime.date.today())
     signed_by_partner_date = fuzzy.FuzzyDate(datetime.date.today())
+
+    @factory.post_generation
+    def locations(self, create, extracted, **kwargs):
+        if not create:
+            # Simple build, do nothing.
+            return
+
+        if extracted:
+            # A list of groups were passed in, use them
+            for location in extracted:
+                self.locations.add(location)
 
     class Meta:
         model = Intervention
@@ -340,7 +355,7 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     end_date = datetime.date.today()+datetime.timedelta(days=70)
     population_focus = factory.Sequence(lambda n: "population_focus%d" % n)
     response_to_HRP = factory.Sequence(lambda n: "response_to_HRP%d" % n)
-    status = factory.Sequence(lambda n: "PD/SSFA status %d" % n)
+    status = factory.fuzzy.FuzzyChoice(PD_STATUS_LIST)
     frequency = FREQUENCY_LEVEL.weekly
     budget = fuzzy.FuzzyDecimal(low=1000.0, high=100000.0, precision=2)
 

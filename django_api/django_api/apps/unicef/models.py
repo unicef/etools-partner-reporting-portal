@@ -8,7 +8,13 @@ from django.utils.functional import cached_property
 
 from model_utils.models import TimeStampedModel
 
-from core.common import ADMINISTRATIVE_LEVEL, FREQUENCY_LEVEL, INDICATOR_REPORT_STATUS, PD_LIST_REPORT_STATUS
+from core.common import (
+    ADMINISTRATIVE_LEVEL,
+    FREQUENCY_LEVEL,
+    INDICATOR_REPORT_STATUS,
+    PD_LIST_REPORT_STATUS,
+    PD_STATUS,
+)
 from indicator.models import IndicatorReport, Reportable
 
 
@@ -23,7 +29,7 @@ class ProgressReport(TimeStampedModel):
 class Section(models.Model):
     name = models.CharField(max_length=255)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -46,6 +52,8 @@ class ProgrammeDocument(TimeStampedModel):
         null=True,
         verbose_name='In response to an HRP')
     status = models.CharField(
+        choices=PD_STATUS,
+        default=PD_STATUS.draft,
         max_length=256,
         verbose_name='PD/SSFA status'
     )
@@ -189,7 +197,7 @@ class ProgrammeDocument(TimeStampedModel):
         else:
             raise NotImplemented("Not recognized FREQUENCY_LEVEL.")
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     # @transaction.atomic
