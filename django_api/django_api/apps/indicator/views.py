@@ -18,6 +18,17 @@ from .models import Reportable
 class IndicatorListCreateAPIView(ListCreateAPIView):
     """
     REST API endpoint to get a list of Indicator objects and to create a new Indicator object.
+
+    List filtering keywords:
+    - locations (A comma-separated location id list)
+    - pds (A comma-separated programme document id list)
+    - pd_statuses (A comma-separated PD_STATUS string list)
+    - blueprint__title (string as Indicator title)
+
+    Filtering list Example:
+     - /api/indicator/?blueprint__title=indicator_blueprint_0
+     - /api/indicator/&locations=20,21,24&blueprint__title=indicator_blueprint_17
+     - /api/indicator?pds=37,63,65
     """
     serializer_class = IndicatorListSerializer
     pagination_class = SmallPagination
@@ -34,8 +45,7 @@ class IndicatorListCreateAPIView(ListCreateAPIView):
 
         # TODO: Create Cluster List API endpoint when we start working on Cluster Reporting
         clusters = self.request.query_params.get('clusters', None)
-        # TODO: Turn this back on when feature-pd-list branch is merged
-        # pd_statuses = self.request.query_params.get('pd_statuses', None)
+        pd_statuses = self.request.query_params.get('pd_statuses', None)
 
         if locations:
             location_list = map(lambda item: int(item), filter(lambda item: item != '', locations.split(',')))
@@ -49,11 +59,11 @@ class IndicatorListCreateAPIView(ListCreateAPIView):
             cluster_list = map(lambda item: int(item), filter(lambda item: item != '', clusters.split(',')))
             q_list.append(Q(cluster_activities__cluster__id__in=cluster_list))
 
-        # if pd_statuses:
-            # pd_status_list = map(lambda item: int(item), filter(lambda item: item != '', pd_statuses.split(',')))
-        #     q_list.append(Q(lower_level_outputs__indicator__programme_document__status__in=pd_status_list))
+        if pd_statuses:
+            pd_status_list = map(lambda item: int(item), filter(lambda item: item != '', pd_statuses.split(',')))
+            q_list.append(Q(lower_level_outputs__indicator__programme_document__status__in=pd_status_list))
 
         if q_list:
-            queryset = queryset.filter(reduce(operator.and_, q_list))
+            queryset = queryset.filter(reduce(operator.or_, q_list))
 
         return queryset
