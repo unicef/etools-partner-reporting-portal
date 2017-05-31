@@ -1,4 +1,6 @@
+from django.http import Http404
 from django.db.models import Q
+
 from rest_framework.generics import RetrieveAPIView, ListAPIView
 from rest_framework.response import Response
 from rest_framework import status as statuses
@@ -11,6 +13,7 @@ from core.permissions import IsAuthenticated
 from core.models import Location
 from .serializer import (
     ProgrammeDocumentSerializer,
+    ProgrammeDocumentDetailSerializer,
 )
 
 from .models import ProgrammeDocument
@@ -55,3 +58,25 @@ class ProgrammeDocumentAPIView(ListAPIView):
             serializer.data,
             status=statuses.HTTP_200_OK
         )
+
+
+class ProgrammeDocumentDetailsAPIView(RetrieveAPIView):
+
+    serializer_class = ProgrammeDocumentDetailSerializer
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request, pk, *args, **kwargs):
+        """
+        Get Programme Document Details by given pk.
+        """
+        serializer = self.get_serializer(
+            self.get_object(pk)
+        )
+        return Response(serializer.data, status=statuses.HTTP_200_OK)
+
+    def get_object(self, pk):
+        # TODO: permission to object should be checked and raise 403 if fail!!!
+        try:
+            return ProgrammeDocument.objects.get(pk=pk)
+        except ProgrammeDocument.DoesNotExist:
+            raise Http404

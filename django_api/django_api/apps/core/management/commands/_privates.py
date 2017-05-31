@@ -139,10 +139,10 @@ def generate_fake_data(quantity=3):
         inter = Intervention.objects.all()[idx]
         inter.locations.add(locations[idx])
 
-    for idx in xrange(quantity):
-        for subindx in xrange(quantity):
-            Location.objects.create(
-                parent=locations[idx],
-                title=("%s child of %s" % (['first', 'second', 'third'][subindx], locations[idx].title)),
-                reportable_id=Reportable.objects.all()[quantity+idx+subindx].id,
-            )
+    # for idx in xrange(quantity):
+    #     for subindx in xrange(quantity):
+    #         Location.objects.create(
+    #             parent=locations[idx],
+    #             title=("%s child of %s" % (['first', 'second', 'third'][subindx], locations[idx].title)),
+    #             reportable_id=Reportable.objects.all()[quantity+idx+subindx].id,
+    #         )
