@@ -64,7 +64,6 @@ PD_LIST_REPORT_STATUS = Choices(
     (3, 'due', 'Due'),
 )
 
-<<<<<<< HEAD
 PD_DOCUMENT_TYPE = Choices(
     ('PD', 'PD', 'Programme Document'),
     ('SHP', 'SHPD', 'Simplified Humanitarian Programme Document'),
@@ -76,10 +75,9 @@ PROGRESS_REPORT_STATUS = Choices(
     ('Ove', 'over_due', 'Over due'),
     ('Sub', 'submitted', 'Submitted'),
     ('Rej', 'rejected', 'Rejected'),
-=======
+
 PD_STATUS = Choices(
     ("Dra", "draft", "Draft"),
     ("Act", "active", "Active"),
     ("Imp", "implemented", "Implemented"),
->>>>>>> develop
 )
