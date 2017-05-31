@@ -13,12 +13,9 @@ from core.common import (
     FREQUENCY_LEVEL,
     INDICATOR_REPORT_STATUS,
     PD_LIST_REPORT_STATUS,
-<<<<<<< HEAD
     PD_DOCUMENT_TYPE,
     PROGRESS_REPORT_STATUS,
-=======
     PD_STATUS,
->>>>>>> develop
 )
 from indicator.models import IndicatorReport, Reportable
 
