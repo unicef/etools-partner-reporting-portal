@@ -1,7 +1,9 @@
 <link rel="import" href="../../../../../bower_components/polymer/polymer.html">
 
+<link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../elements/etools-prp-detail-table.html">
+<link rel="import" href="../../behaviors/utils.html">
 
 <dom-module id="ip-reporting-indicator-details">
   <template>
@@ -16,38 +18,54 @@
         url="[[indicatorDetailUrl]]">
     </etools-prp-ajax>
 
-    <!-- <span>location</span>
-    <span>Current Cumulative progress</span>
-    <span>Progress in last reporting period</span> -->
-    <etools-prp-detail-table data={{data}}>
-    </etools-prp-detail-table>
+    <!-- Data will contain a list of objects, each representing a different location. -->
+    <template id="reports"
+              is="dom-repeat"
+              items="[[data]]">
+      <p>Location: [[item.indicator_location_data.0.location.title]]</p>
+      <p>Progress in reporting period [[item.time_period_start]] - [[item.time_period_end]]</p>
+      <template id="reports"
+                is="dom-repeat"
+                items="[[data]]">
+      </template>
+      <etools-prp-detail-table report={{item.indicator_location_data}}></etools-prp-detail-table>
+    </template>
   </template>
 
   <script>
     Polymer({
       is: 'ip-reporting-indicator-details',
-      
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+      ],
+
       properties: {
         indicatorDetailUrl: {
           type: String,
-          value: ''
+          computed: '_computeIndicatorReportsUrl(indicatorId)',
         },
+
+        indicatorId: Number,
 
         data: {
           type: Array,
-          value: [],
-        },
+          value: []
+        }
 
       },
 
+      _computeIndicatorReportsUrl: function (indicatorId) {
+        return App.Endpoints.indicatorReports(indicatorId);
+      },
+
       attached: function () {
-        console.log("component is attached")
         var self = this;
 
         this.$.indicatorDetail.thunk()()
           .then(function (res) {
-            console.log("reponse", res)
-          });
+            self.data = res.data;
+          })
       },
 
       detached: function () {
