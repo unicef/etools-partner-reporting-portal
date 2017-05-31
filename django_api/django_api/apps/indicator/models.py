@@ -100,6 +100,9 @@ class Reportable(TimeStampedModel):
 
         return percentage
 
+    def __unicode__(self):
+        return "Reportable <pk:%s>" % self.id
+
 
 class IndicatorDisaggregation(TimeStampedModel):
     title = models.CharField(max_length=255)

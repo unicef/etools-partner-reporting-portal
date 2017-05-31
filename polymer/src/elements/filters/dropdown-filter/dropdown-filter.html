@@ -1,10 +1,10 @@
-<link rel="import" href="../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
-<link rel="import" href="../../../bower_components/paper-listbox/paper-listbox.html">
-<link rel="import" href="../../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../../../bower_components/paper-item/paper-item.html">
 
-<link rel="import" href="../../polyfills/es6-shim.html">
-<link rel="import" href="../../behaviors/filter.html">
+<link rel="import" href="../../../polyfills/es6-shim.html">
+<link rel="import" href="../../../behaviors/filter.html">
 
 <dom-module id="dropdown-filter">
   <template>
@@ -30,7 +30,7 @@
             id="repeat"
             is="dom-repeat"
             items="[[data]]">
-          <paper-item>[[item.label]]</paper-item>
+          <paper-item>[[item.title]]</paper-item>
         </template>
       </paper-listbox>
     </paper-dropdown-menu>
@@ -66,19 +66,19 @@
       },
 
       _handleChange: function (e) {
-        var newValue = this.$.repeat.itemForElement(e.detail.item).value;
+        var newValue = this.$.repeat.itemForElement(e.detail.item).id;
 
         if (newValue !== this.lastValue) {
           this.fire('filter-changed', {
             name: this.name,
-            value: newValue,
+            value: String(newValue),
           });
         }
       },
 
       _computeSelected: function (value) {
         return this.data.findIndex(function (item) {
-          return item.value === value;
+          return item.id === value;
         });
       },
     });
