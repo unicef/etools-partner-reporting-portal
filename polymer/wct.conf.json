@@ -1,0 +1,13 @@
+{
+  "plugins": {
+    "local": {
+      "browsers": [
+        "chrome",
+        "firefox"
+      ]
+    }
+  },
+  "suites": [
+    "src/**/test"
+  ]
+}

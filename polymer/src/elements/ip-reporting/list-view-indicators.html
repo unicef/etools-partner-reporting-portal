@@ -9,6 +9,8 @@
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../behaviors/data-table.html">
 <link rel="import" href="../../elements/ip-reporting/indicator-details.html">
+<link rel="import" href="../../behaviors/pagination.html">
+<link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../elements/etools-prp-progress-bar.html">
 <link rel="import" href="../../styles/table-styles.html">
 
@@ -16,6 +18,15 @@
   <template>
     <style include="iron-flex iron-flex-factors data-table-styles table-styles">
     </style>
+
+    <iron-location
+        query="{{query}}">
+    </iron-location>
+
+    <iron-query-params
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
+    </iron-query-params>
 
     <etools-content-panel panel-title="List of Indicators">
       <etools-loading active="[[loading]]"></etools-loading>
@@ -62,8 +73,8 @@
       </template>
 
       <etools-data-table-footer
-          page-size="[[pageSize]]"
-          page-number="[[pageNumber]]"
+          page-size="[[_computeParamValue(queryParams, 'page_size', 10)]]"
+          page-number="[[_computeParamValue(queryParams, 'page', 1)]]"
           total-results="[[totalResults]]"
           visible-range="{{visibleRange}}"
           on-page-size-changed="_pageSizeChanged"
@@ -79,6 +90,8 @@
       behaviors: [
         App.Behaviors.ReduxBehavior,
         App.Behaviors.DataTableBehavior,
+        App.Behaviors.PaginationBehavior,
+        App.Behaviors.UtilsBehavior,
       ],
 
       properties: {
@@ -86,28 +99,33 @@
           type: Object,
           statePath: 'indicators.all',
         },
+
         detailsOpened: {
           type: Boolean,
           value: false
         },
+
         loading: {
           type: Boolean,
           statePath: 'indicators.loading'
         },
-        pageSize: {
-          type: Number,
-          value: 10,
-          notify: true
-        },
-        pageNumber: {
-          type: Number,
-          value: 1,
-          notify: true
-        },
+
+        queryParams: Object,
+
+        query: String,
+
+        pageSize: Number,
+
+        pageNumber: Number,
+
         totalResults: {
           type: Number,
           statePath: 'indicators.count'
         },
+      },
+
+      _computeParamValue: function (qs, name, defaultValue) {
+        return this._toNumber(this._withDefault(qs[name], defaultValue));
       },
 
     });

@@ -7,20 +7,19 @@
     App.Behaviors.DataTableBehavior = {
       _pageSizeChanged: function (e) {
         this.set('pageSize', +e.detail.value);
-        this.set('pageNumber', 1);
+
+        if (this._pageNumberInitialized) {
+          this.set('pageNumber', 1);
+        }
       },
 
       _pageNumberChanged: function (e) {
         this.set('pageNumber', +e.detail.value);
-      },
 
-      // TODO: Figure out why just passing params to etools-prp-ajax instead isn't working.
-      _computePaginatedUrl: function (baseUrl, pageSize, pageNumber) {
-        var size = '?page_size=' + pageSize;
-        var page = '&page=' + pageNumber
-        return baseUrl + size + page;
+        this.async(function () {
+          this.set('_pageNumberInitialized', true);
+        });
       },
-
     };
 
   }());
