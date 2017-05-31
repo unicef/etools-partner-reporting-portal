@@ -1,0 +1,86 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../../../bower_components/paper-item/paper-item.html">
+
+<link rel="import" href="../../../polyfills/es6-shim.html">
+<link rel="import" href="../../../behaviors/filter.html">
+
+<dom-module id="dropdown-filter">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      paper-dropdown-menu {
+        width: 100%;
+      }
+    </style>
+
+    <paper-dropdown-menu
+        id="field"
+        label="[[label]]"
+        always-float-label>
+      <paper-listbox
+          slot="dropdown-content"
+          class="dropdown-content"
+          selected="[[selected]]">
+        <template
+            id="repeat"
+            is="dom-repeat"
+            items="[[data]]">
+          <paper-item>[[item.title]]</paper-item>
+        </template>
+      </paper-listbox>
+    </paper-dropdown-menu>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'dropdown-filter',
+
+      behaviors: [
+        App.Behaviors.FilterBehavior,
+      ],
+
+      properties: {
+        data: {
+          type: Array,
+          value: [],
+        },
+
+        value: {
+          type: String,
+          value: '',
+        },
+
+        selected: {
+          type: Number,
+          computed: '_computeSelected(value)',
+        },
+      },
+
+      listeners: {
+        'field.iron-select': '_handleChange',
+      },
+
+      _handleChange: function (e) {
+        var newValue = this.$.repeat.itemForElement(e.detail.item).id;
+
+        if (newValue !== this.lastValue) {
+          this.fire('filter-changed', {
+            name: this.name,
+            value: String(newValue),
+          });
+        }
+      },
+
+      _computeSelected: function (value) {
+        return this.data.findIndex(function (item) {
+          return item.id === value;
+        });
+      },
+    });
+  </script>
+</dom-module>

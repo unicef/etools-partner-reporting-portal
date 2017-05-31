@@ -100,6 +100,9 @@ class Reportable(TimeStampedModel):
 
         return percentage
 
+    def __str__(self):
+        return "Reportable <pk:%s>" % self.id
+
 
 class IndicatorDisaggregation(TimeStampedModel):
     title = models.CharField(max_length=255)
@@ -134,7 +137,7 @@ class IndicatorReport(TimeStampedModel):
         max_length=3
     )
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     @property
@@ -149,5 +152,5 @@ class IndicatorLocationData(TimeStampedModel):
 
     disaggregation = JSONField(default=dict)
 
-    def __unicode__(self):
+    def __str__(self):
         return "{} Location Data for {}".format(location, indicator_report)

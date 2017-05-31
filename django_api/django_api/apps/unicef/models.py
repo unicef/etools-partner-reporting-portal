@@ -29,7 +29,7 @@ class ProgressReport(TimeStampedModel):
 class Section(models.Model):
     name = models.CharField(max_length=255)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -205,7 +205,7 @@ class ProgrammeDocument(TimeStampedModel):
         else:
             raise NotImplemented("Not recognized FREQUENCY_LEVEL.")
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     # @transaction.atomic
