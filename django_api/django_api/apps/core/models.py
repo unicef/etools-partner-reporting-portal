@@ -64,7 +64,7 @@ class Intervention(TimeStampedModel):
     class Meta:
         ordering = ['number']
 
-    def __unicode__(self):
+    def __str__(self):
         return self.number
 
     @property
@@ -105,7 +105,7 @@ class Location(TimeStampedModel):
         unique_together = ('title', 'p_code')
         ordering = ['title']
 
-    def __unicode__(self):
+    def __str__(self):
         if self.p_code:
             return "%s {PCode: %s}" % (self.title, self.p_code)
         return self.title
