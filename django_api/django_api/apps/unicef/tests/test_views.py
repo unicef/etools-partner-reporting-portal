@@ -71,15 +71,14 @@ class TestProgrammeDocumentAPIView(APITestCase):
         self.assertEquals(len(response.data['results']), 1)
         self.assertEquals(response.data['results'][0]['title'], document['title'])
 
-        # TODO: Status filter test is failing
-        # response = self.client.get(
-        #     url+"?ref_title=&status=%s&location=" % document['status'][:3],
-        #     format='json'
-        # )
-        # self.assertTrue(status.is_success(response.status_code))
-        # self.assertEquals(response.data['results'][0]['status'], document['status'])
-        # self.assertEquals(response.data['results'][0]['title'], document['title'])
-        # self.assertEquals(response.data['results'][0]['reference_number'], document['reference_number'])
+        response = self.client.get(
+            url+"?ref_title=&status=%s&location=" % document['status'][:3],
+            format='json'
+        )
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(response.data['results'][0]['status'], document['status'])
+        self.assertEquals(response.data['results'][0]['title'], document['title'])
+        self.assertEquals(response.data['results'][0]['reference_number'], document['reference_number'])
 
         # location filtering
         loc = Location.objects.filter(parent__isnull=True).first()

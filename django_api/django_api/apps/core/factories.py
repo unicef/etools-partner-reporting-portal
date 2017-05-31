@@ -278,7 +278,7 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     end_date = datetime.date.today()+datetime.timedelta(days=70)
     population_focus = factory.Sequence(lambda n: "Population %d" % n)
     response_to_HRP = factory.Sequence(lambda n: "response_to_HRP%d" % n)
-    status = factory.Sequence(lambda n: "PD/SSFA status %d" % n)
+    status = fuzzy.FuzzyChoice(PD_STATUS_LIST)
     frequency = FREQUENCY_LEVEL.weekly
     budget = fuzzy.FuzzyDecimal(low=1000.0, high=100000.0, precision=2)
     unicef_office = factory.Sequence(lambda n: "JCO country programme %d" % n)
