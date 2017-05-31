@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status as statuses
 from .permissions import IsAuthenticated
 from .models import Intervention, Location
-from .serializer import (
+from .serializers import (
     SimpleInterventionSerializer,
     SimpleLocationSerializer,
     ChildrenLocationSerializer,
