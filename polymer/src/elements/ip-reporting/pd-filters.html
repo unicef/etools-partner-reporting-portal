@@ -6,7 +6,8 @@
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../elements/filter-list.html">
 <link rel="import" href="../../elements/filters/text-filter/text-filter.html">
-<link rel="import" href="../../elements/filters/dropdown-filter.html">
+<link rel="import" href="../../elements/filters/dropdown-filter/dropdown-filter.html">
+<link rel="import" href="../../elements/filters/location-filter/location-filter.html">
 
 <dom-module id="pd-filters">
   <template>
@@ -48,6 +49,11 @@
           value="[[_withDefault(queryParams.status, '')]]"
           data="[[statuses]]">
       </dropdown-filter>
+
+      <location-filter
+          class="item"
+          value="[[_withDefault(queryParams.location, '')]]">
+      </location-filter>
     </filter-list>
   </template>
 
@@ -70,10 +76,10 @@
         statuses: {
           type: Array,
           value: [
-            {label: 'All', value: ''},
-            {label: 'Draft', value: 'Dra'},
-            {label: 'Active', value: 'Act'},
-            {label: 'Implemented', value: 'Imp'},
+            {title: 'All', id: ''},
+            {title: 'Draft', id: 'Dra'},
+            {title: 'Active', id: 'Act'},
+            {title: 'Implemented', id: 'Imp'},
           ],
         },
       },
