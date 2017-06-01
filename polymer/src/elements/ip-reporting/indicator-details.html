@@ -25,19 +25,24 @@
               is="dom-repeat"
               items="[[data]]">
       <p>
-        <div class="flex-6">
-          <iron-icon icon="maps:place"></iron-icon>
-          Location: [[item.indicator_location_data.0.location.title]]
+        <div>
+          <h3>
+            <iron-icon icon="maps:place"></iron-icon>
+            [[item.indicator_location_data.0.location.title]]
+          </h3>
         </div>
-        <div class="flex-6">
-          Progress in reporting period [[item.time_period_start]] - [[item.time_period_end]]
+        <div>
+          <h4>
+            Progress in reporting period
+            <span>[[item.time_period_start]] - [[item.time_period_end]]<span>
+          </h4>
         </div>
       </p>
       <template id="report-table"
                 is="dom-repeat"
                 items="[[item.indicator_location_data]]"
                 as="report">
-        <etools-prp-detail-table report={{report}}></etools-prp-detail-table>
+        <etools-prp-detail-table report=[[report]]></etools-prp-detail-table>
       </template>
     </template>
   </template>
@@ -62,7 +67,6 @@
           type: Array,
           value: []
         }
-
       },
 
       _computeIndicatorReportsUrl: function (indicatorId) {
@@ -75,6 +79,9 @@
         this.$.indicatorDetail.thunk()()
           .then(function (res) {
             self.data = res.data;
+            // Each returns a list of objects.
+            // Each object is a report with a different time period.
+            console.log(res.data)
           })
       },
 
