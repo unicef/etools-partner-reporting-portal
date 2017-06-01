@@ -31,7 +31,6 @@ class BaseIndicatorDataSerializer(serializers.ModelSerializer):
 
     llo_name = serializers.SerializerMethodField()
     llo_id = serializers.SerializerMethodField()
-    indicators = serializers.SerializerMethodField()
 
     class Meta:
         model = Reportable
