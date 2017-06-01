@@ -100,7 +100,7 @@ class Reportable(TimeStampedModel):
 
         return percentage
 
-    def __unicode__(self):
+    def __str__(self):
         return "Reportable <pk:%s>" % self.id
 
 
@@ -121,6 +121,7 @@ class IndicatorDataSpecification(TimeStampedModel):
 
 
 class IndicatorReport(TimeStampedModel):
+    # TODO: probably we should add overall status & narrative ssessemnt here
     title = models.CharField(max_length=255)
     reportable = models.ForeignKey(Reportable, related_name="indicator_reports")
     progress_report = models.ForeignKey('unicef.ProgressReport', related_name="indicator_reports", null=True)
@@ -137,7 +138,7 @@ class IndicatorReport(TimeStampedModel):
         max_length=3
     )
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     @property
@@ -152,5 +153,5 @@ class IndicatorLocationData(TimeStampedModel):
 
     disaggregation = JSONField(default=dict)
 
-    def __unicode__(self):
-        return "{} Location Data for {}".format(location, indicator_report)
+    def __str__(self):
+        return "{} Location Data for {}".format(self.location, self.indicator_report)
