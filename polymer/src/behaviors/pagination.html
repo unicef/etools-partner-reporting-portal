@@ -5,6 +5,7 @@
     App.Behaviors = App.Behaviors || {};
 
     App.Behaviors.PaginationBehavior = {
+
       observers: [
         '_updateQueryParams(pageSize, pageNumber)',
       ],

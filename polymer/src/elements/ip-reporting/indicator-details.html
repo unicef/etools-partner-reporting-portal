@@ -1,0 +1,76 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../../bower_components/iron-pages/iron-pages.html">
+
+<link rel="import" href="../status-badge.html">
+
+<dom-module id="indicator-details">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      paper-tabs {
+        border-bottom: 1px solid var(--paper-grey-300);
+      }
+
+      paper-tab status-badge {
+        margin-left: 5px;
+        position: relative;
+        top: -5px;
+      }
+
+      .tab-content {
+        padding: 25px;
+      }
+    </style>
+
+
+    <paper-tabs selected="{{selected}}" scrollable>
+      <paper-tab>
+        AADOUS 001
+        <status-badge type="success"></status-badge>
+      </paper-tab>
+      <paper-tab>
+        A'AIN EL-MIR (EL ESTABL) 001
+        <status-badge type="success"></status-badge>
+      </paper-tab>
+    </paper-tabs>
+
+    <iron-pages selected="[[selected]]">
+      <div class="tab-content">AADOUS 001</div>
+      <div class="tab-content">A'AIN EL-MIR (EL ESTABL) 001</div>
+    </iron-pages>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'indicator-details',
+
+      properties: {
+        initialized: {
+          type: Boolean,
+          value: false,
+        },
+
+        selected: {
+          type: Number,
+          value: 0,
+        },
+      },
+
+      init: function () {
+        if (this.initialized) {
+          return;
+        }
+
+        this.set('initialized', true);
+
+        // TODO
+        console.log('fetching indicator data');
+      },
+    });
+  </script>
+</dom-module>
