@@ -194,7 +194,6 @@ class IndicatorBlueprintFactory(factory.django.DjangoModelFactory):
 
 class ReportableFactory(factory.django.DjangoModelFactory):
     blueprint = factory.SubFactory(IndicatorBlueprintFactory)
-    project = factory.SubFactory(PartnerProjectFactory)
     object_id = factory.SelfAttribute('content_object.id')
     content_type = factory.LazyAttribute(
         lambda o: ContentType.objects.get_for_model(o.content_object))
