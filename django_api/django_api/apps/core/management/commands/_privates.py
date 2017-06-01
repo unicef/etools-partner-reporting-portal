@@ -36,10 +36,7 @@ from core.factories import (
     PartnerActivityFactory,
     IndicatorBlueprintFactory,
     IndicatorLocationDataFactory,
-<<<<<<< HEAD
-=======
     InterventionFactory,
->>>>>>> feature-indicator-list-filtering-#20
     LocationFactory,
     ReportableToLowerLevelOutputFactory,
     IndicatorReportFactory,
@@ -89,19 +86,6 @@ def generate_fake_data(quantity=3):
     UserFactory.create_batch(quantity)
     print "{} User objects created".format(quantity)
 
-<<<<<<< HEAD
-    ClusterActivityFactory.create_batch(quantity)
-    print "{} ClusterActivity objects created".format(quantity)
-
-    PartnerProjectFactory.create_batch(quantity)
-    print "{} PartnerProject objects created".format(quantity)
-
-    PartnerActivityFactory.create_batch(quantity)
-    print "{} PartnerActivity objects created".format(quantity)
-
-    ProgressReportFactory.create_batch(quantity)
-    print "{} ProgressReport objects created".format(quantity)
-=======
     # Intervention creates Cluster and Locations
     InterventionFactory.create_batch(quantity)
     print "{} Intervention objects created".format(quantity)
@@ -112,20 +96,12 @@ def generate_fake_data(quantity=3):
         PartnerFactory(partner_activity__cluster_activity=cluster_activity)
 
     print "{} Partner objects created".format(quantity)
->>>>>>> feature-indicator-list-filtering-#20
 
     SectionFactory.create_batch(quantity)
     print "{} Section objects created".format(quantity)
 
-<<<<<<< HEAD
-    # TODO: more sens for IndicatorReport objects - important logic exist with frequency of PD
-    # IndicatorLocationData will create IndicatorReport, Location, LowerLevelOutput, CountryProgrammeOutput, and ProgrammeDocument automatically
-    IndicatorLocationDataFactory.create_batch(quantity)
-    print "{} IndicatorLocationData objects created".format(quantity)
-=======
     ProgrammeDocumentFactory.create_batch(quantity)
     print "{} ProgrammeDocument objects created".format(quantity)
->>>>>>> feature-indicator-list-filtering-#20
 
     # Linking the followings:
     # created LowerLevelOutput - ReportableToLowerLevelOutput
@@ -138,11 +114,6 @@ def generate_fake_data(quantity=3):
 
         reportable.content_object.indicator.programme_document.sections.add(Section.objects.all()[idx])
 
-<<<<<<< HEAD
-        locations[idx] = Location.objects.all()[idx]
-        inter = Intervention.objects.all()[idx]
-        inter.locations.add(locations[idx])
-=======
         indicator_report = reportable.indicator_reports.first()
         indicator_report.progress_report = ProgressReportFactory()
         indicator_report.save()
@@ -162,4 +133,3 @@ def generate_fake_data(quantity=3):
     print "{} ReportableToLowerLevelOutput objects created".format(quantity)
     print "{} ProgressReport objects created".format(quantity)
     print "{} IndicatorLocationData objects created".format(quantity)
->>>>>>> feature-indicator-list-filtering-#20
