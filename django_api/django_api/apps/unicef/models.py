@@ -16,6 +16,7 @@ from core.common import (
     PD_DOCUMENT_TYPE,
     PROGRESS_REPORT_STATUS,
     PD_STATUS,
+    PD_DOCUMENT_TYPE,
 )
 from indicator.models import IndicatorReport, Reportable
 

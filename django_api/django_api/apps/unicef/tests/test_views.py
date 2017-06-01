@@ -5,9 +5,17 @@ from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 
 from account.models import User
-from core.factories import IndicatorReportFactory
 from core.models import Intervention, Location
-from indicator.models import IndicatorReport, Reportable
+from core.factories import (
+    IndicatorReportFactory, ProgrammeDocumentFactory, ReportableToLowerLevelOutputFactory,
+    ProgressReportFactory,
+    SectionFactory,
+    InterventionFactory,
+    IndicatorLocationDataFactory,
+)
+from indicator.models import Reportable, IndicatorBlueprint, IndicatorReport
+
+from unicef.models import LowerLevelOutput, Section, ProgrammeDocument
 
 from unicef.models import ProgrammeDocument
 
@@ -15,26 +23,34 @@ from unicef.models import ProgrammeDocument
 class TestProgrammeDocumentAPIView(APITestCase):
 
     def setUp(self):
-        # By calling this factory, we're creating
-        # IndicatorReport -> Reportable -> LowerLevelOutput -> CountryProgrammeOutput -> ProgrammeDocument
-        IndicatorReportFactory.create_batch(5)
+        self.quantity = 5
 
-        locations = {}
-        quantity = 3
-        for idx in xrange(quantity):
-            indicator_report = IndicatorReport.objects.all()[idx]
-            pd = indicator_report.reportable.content_object.indicator.programme_document
-            locations[idx] = Location.objects.all()[idx]
-            inter = Intervention.objects.all()[idx]
-            inter.locations.add(locations[idx])
+        ProgrammeDocumentFactory.create_batch(self.quantity)
+        print "{} ProgrammeDocument objects created".format(self.quantity)
 
-        for idx in xrange(quantity):
-            for subindx in xrange(quantity):
-                Location.objects.create(
-                    parent=locations[idx],
-                    title=("%s child of %s" % (['first', 'second', 'third'][subindx], locations[idx].title)),
-                    reportable_id=Reportable.objects.all()[quantity+idx+subindx].id,
-                )
+        SectionFactory.create_batch(self.quantity)
+        print "{} Section objects created".format(self.quantity)
+
+        # Linking the followings:
+        # created LowerLevelOutput - ReportableToLowerLevelOutput
+        # Section - ProgrammeDocument via ReportableToLowerLevelOutput
+        # ProgressReport - IndicatorReport from ReportableToLowerLevelOutput
+        # IndicatorReport & Location from ReportableToLowerLevelOutput - IndicatorLocationData
+        for idx in xrange(self.quantity):
+            llo = LowerLevelOutput.objects.all()[idx]
+            reportable = ReportableToLowerLevelOutputFactory(content_object=llo)
+
+            reportable.content_object.indicator.programme_document.sections.add(Section.objects.all()[idx])
+
+            indicator_report = reportable.indicator_reports.first()
+            indicator_report.progress_report = ProgressReportFactory()
+            indicator_report.save()
+
+            indicator_location_data = IndicatorLocationDataFactory(indicator_report=indicator_report, location=reportable.locations.first())
+
+        # Intervention creates Cluster and Locations
+        InterventionFactory.create_batch(self.quantity, locations=Location.objects.all())
+        print "{} Intervention objects created".format(self.quantity)
 
         # Make all requests in the context of a logged in session.
         admin, created = User.objects.get_or_create(username='admin', defaults={
@@ -56,20 +72,7 @@ class TestProgrammeDocumentAPIView(APITestCase):
         response = self.client.get(url, format='json')
 
         self.assertTrue(status.is_success(response.status_code))
-
-        pd_ids = Location.objects.filter(
-            Q(id=location_id) |
-            Q(parent_id=location_id) |
-            Q(parent__parent_id=location_id) |
-            Q(parent__parent__parent_id=location_id) |
-            Q(parent__parent__parent__parent_id=location_id)
-        ).values_list(
-             'reportable__lower_level_outputs__indicator__programme_document__id',
-             flat=True
-        )
-
-        count = ProgrammeDocument.objects.filter(pk__in=pd_ids).count()
-        self.assertEquals(len(response.data['results']), count)
+        self.assertEquals(len(response.data['results']), 1)
 
     def test_list_filter_api(self):
         intervention = Intervention.objects.filter(locations__isnull=False).first()
@@ -79,7 +82,7 @@ class TestProgrammeDocumentAPIView(APITestCase):
             format='json'
         )
         self.assertTrue(status.is_success(response.status_code))
-        self.assertEquals(len(response.data['results']), 4)
+        self.assertEquals(len(response.data['results']), 1)
 
         document = response.data['results'][0]
         response = self.client.get(

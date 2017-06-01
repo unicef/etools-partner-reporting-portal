@@ -36,6 +36,9 @@ from core.factories import (
     PartnerProjectFactory,
     PartnerActivityFactory,
     IndicatorBlueprintFactory,
+    IndicatorLocationDataFactory,
+    InterventionFactory,
+    LocationFactory,
     ReportableToLowerLevelOutputFactory,
     IndicatorDisaggregationFactory,
     IndicatorDataSpecificationFactory,
@@ -87,62 +90,50 @@ def generate_fake_data(quantity=3):
     UserFactory.create_batch(quantity)
     print "{} User objects created".format(quantity)
 
-    ClusterFactory.create_batch(quantity)
-    print "{} Cluster objects created".format(quantity)
-
-    ClusterObjectiveFactory.create_batch(quantity)
-    print "{} ClusterObjective objects created".format(quantity)
-
-    ClusterActivityFactory.create_batch(quantity)
-    print "{} ClusterActivity objects created".format(quantity)
-
-    PartnerFactory.create_batch(quantity)
     print "{} Partner objects created".format(quantity)
-
-    PartnerProjectFactory.create_batch(quantity)
-    print "{} PartnerProject objects created".format(quantity)
-
-    PartnerActivityFactory.create_batch(quantity)
-    print "{} PartnerActivity objects created".format(quantity)
-
-    IndicatorBlueprintFactory.create_batch(quantity)
-    print "{} IndicatorBlueprint objects created".format(quantity)
-
-    ReportableToLowerLevelOutputFactory.create_batch(quantity)
-    print "{} ReportableToLowerLevelOutput objects created".format(quantity)
-
-    IndicatorDisaggregationFactory.create_batch(quantity)
-    print "{} IndicatorDisaggregation objects created".format(quantity)
-
-    IndicatorDataSpecificationFactory.create_batch(quantity)
-    print "{} IndicatorDataSpecification objects created".format(quantity)
-
-    ProgressReportFactory.create_batch(quantity)
-    print "{} ProgressReport objects created".format(quantity)
 
     SectionFactory.create_batch(quantity)
     print "{} Section objects created".format(quantity)
 
-    # TODO: more sens for IndicatorReport objects - important logic exist with frequency of PD
-    # IndicatorReport will create LowerLevelOutput, CountryProgrammeOutput, and ProgrammeDocument automatically
-    IndicatorReportFactory.create_batch(quantity)
-    print "{} IndicatorReport objects created".format(quantity)
+    ProgrammeDocumentFactory.create_batch(quantity)
+    print "{} ProgrammeDocument objects created".format(quantity)
 
-    locations = {}
+    # Linking the followings:
+    # created LowerLevelOutput - ReportableToLowerLevelOutput
+    # Section - ProgrammeDocument via ReportableToLowerLevelOutput
+    # ProgressReport - IndicatorReport from ReportableToLowerLevelOutput
+    # IndicatorReport & Location from ReportableToLowerLevelOutput - IndicatorLocationData
     for idx in xrange(quantity):
-        indicator_report = IndicatorReport.objects.all()[idx]
-        pd = indicator_report.reportable.content_object.indicator.programme_document
+        llo = LowerLevelOutput.objects.all()[idx]
+        reportable = ReportableToLowerLevelOutputFactory(content_object=llo)
 
-        pd.sections.add(Section.objects.all()[idx])
+        reportable.content_object.indicator.programme_document.sections.add(Section.objects.all()[idx])
 
-        locations[idx] = Location.objects.all()[idx]
-        inter = Intervention.objects.all()[idx]
-        inter.locations.add(locations[idx])
+        indicator_report = reportable.indicator_reports.first()
+        indicator_report.progress_report = ProgressReportFactory()
+        indicator_report.save()
 
+        indicator_location_data = IndicatorLocationDataFactory(indicator_report=indicator_report, location=reportable.locations.first())
+
+    # Intervention creates Cluster and Locations
+    InterventionFactory.create_batch(quantity, locations=Location.objects.all())
+    print "{} Intervention objects created".format(quantity)
+
+    # Linking ClusterActivity - PartnerActivity
     for idx in xrange(quantity):
-        for subindx in xrange(quantity):
-            Location.objects.create(
-                parent=locations[idx],
-                title=("%s child of %s" % (['first', 'second', 'third'][subindx], locations[idx].title)),
-                reportable_id=Reportable.objects.all()[quantity+idx+subindx].id,
-            )
+        cluster_activity = ClusterActivity.objects.all()[idx]
+        PartnerFactory(partner_activity__cluster_activity=cluster_activity)
+
+    # Adding extra IndicatorReport to each ReportableToLowerLevelOutput
+    for reportable in Reportable.objects.filter(lower_level_outputs__reportables__isnull=False):
+        # Creating N more IndicatorReport objects
+        for idx in xrange(quantity):
+            indicator_report = IndicatorReportFactory(reportable=reportable)
+            indicator_report.progress_report = reportable.indicator_reports.first().progress_report
+            indicator_report.save()
+
+            indicator_location_data = IndicatorLocationDataFactory(indicator_report=indicator_report, location=reportable.locations.first())
+
+    print "{} ReportableToLowerLevelOutput objects created".format(quantity)
+    print "{} ProgressReport objects created".format(quantity)
+    print "{} IndicatorLocationData objects created".format(quantity)

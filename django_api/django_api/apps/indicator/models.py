@@ -35,8 +35,6 @@ class IndicatorBlueprint(TimeStampedModel):
     # calculation_formula (how the children totals add up to this indicator's total value)
     # aggregation_formulas (how the total value is aggregated from the reports if possible)
 
-    cluster_activity = models.ForeignKey('cluster.ClusterActivity', related_name="indicator_blueprints")
-
     def save(self, *args, **kwargs):
         # Prevent from saving empty strings as code because of the unique together constraint
         if self.code == '':
