@@ -1,4 +1,6 @@
 <link rel="import" href="../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../elements/etools-prp-ajax.html">
@@ -22,13 +24,21 @@
     <template id="reports"
               is="dom-repeat"
               items="[[data]]">
-      <p>Location: [[item.indicator_location_data.0.location.title]]</p>
-      <p>Progress in reporting period [[item.time_period_start]] - [[item.time_period_end]]</p>
-      <template id="reports"
+      <p>
+        <div class="flex-6">
+          <iron-icon icon="maps:place"></iron-icon>
+          Location: [[item.indicator_location_data.0.location.title]]
+        </div>
+        <div class="flex-6">
+          Progress in reporting period [[item.time_period_start]] - [[item.time_period_end]]
+        </div>
+      </p>
+      <template id="report-table"
                 is="dom-repeat"
-                items="[[data]]">
+                items="[[item.indicator_location_data]]"
+                as="report">
+        <etools-prp-detail-table report={{report}}></etools-prp-detail-table>
       </template>
-      <etools-prp-detail-table report={{item.indicator_location_data}}></etools-prp-detail-table>
     </template>
   </template>
 
