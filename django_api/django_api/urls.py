@@ -26,7 +26,6 @@ urlpatterns = [
     url(r'^api/indicator/', include('indicator.urls')),
     url(r'^api/partner/', include('partner.urls')),
     url(r'^api/unicef/', include('unicef.urls')),
-    url(r'^api/indicator/', include('indicator.urls')),
 ]
 
 if settings.DEBUG:
