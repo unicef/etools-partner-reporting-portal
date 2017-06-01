@@ -39,25 +39,15 @@
 
     </style>
 
-<<<<<<< HEAD
-=======
     <iron-location
         query="{{query}}">
     </iron-location>
 
->>>>>>> develop
     <etools-prp-ajax
         id="programmeDocumentDetails"
         url="[[ programmeDocumentDetailsUrl ]]">
     </etools-prp-ajax>
 
-<<<<<<< HEAD
-    <pd-page-header title="[[ pdTitle ]]" back></pd-page-header>
-
-    <page-body>
-      <pd-details-content></pd-details-content>
-    </page-body>
-=======
     <app-route
       route="{{route}}"
       pattern="/:dashTab"
@@ -106,7 +96,6 @@
       </template>
 
     </iron-pages>
->>>>>>> develop
 
   </template>
 
@@ -116,41 +105,11 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
-<<<<<<< HEAD
-=======
         App.Behaviors.UtilsBehavior,
->>>>>>> develop
       ],
 
       properties: {
 
-<<<<<<< HEAD
-        programmeDocumentDetailsUrl: {
-          type: String,
-          computed: '_computeProgrammeDocumentDetailsUrl(pdId)',
-        },
-
-        pdId: Number,
-
-        pdTitle: {
-          type: String,
-          statePath: 'programmeDocumentDetails.current.title',
-        }
-      },
-
-      _computeProgrammeDocumentDetailsUrl: function(pdId){
-        return App.Endpoints.programmeDocumentDetail(pdId);
-      },
-
-      attached: function () {
-        var pdDetailsThunk = this.$.programmeDocumentDetails.thunk();
-
-        this.dispatch(App.Actions.fetchProgrammeDocumentDetails(pdDetailsThunk))
-          .catch(function (err) {// jshint ignore:line
-            console.error(err);
-          })
-      }
-=======
         pdTab: {
           type: String,
         },
@@ -211,7 +170,6 @@
           })
       }
 
->>>>>>> develop
     });
   </script>
 </dom-module>

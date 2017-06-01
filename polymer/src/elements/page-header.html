@@ -32,16 +32,6 @@
         line-height:1em;
       }
 
-<<<<<<< HEAD
-    </style>
-    <div class="container">
-      <template is="dom-if" if="[[ back ]]">
-        <paper-button id="goBack" on-tap="_goBack">
-          <iron-icon icon="chevron-left"></iron-icon>
-          back
-        </paper-button>
-        </template>
-=======
       .back-button {
         text-decoration: none;
       }
@@ -56,7 +46,7 @@
           </paper-button>
         </a>
       </template>
->>>>>>> develop
+
       <h1 class="flex">[[title]]</h1>
     </div>
   </template>
@@ -72,20 +62,6 @@
 
       properties: {
         title: String,
-<<<<<<< HEAD
-        back: {
-          type: Boolean,
-          value: false
-        }
-      },
-
-      listeners: {
-        'goBackTap': '_goBack',
-      },
-
-      _goBack: function() {
-        window.history.back();
-=======
 
         back: String,
 
@@ -100,8 +76,8 @@
         if(this.back){
           this.backUrl = this.buildUrl(this._baseUrl, this.back);
         }
->>>>>>> develop
-      }
+      },
+
     });
   </script>
 </dom-module>
