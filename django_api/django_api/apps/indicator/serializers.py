@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from unicef.models import LowerLevelOutput
-from .models import Reportable, IndicatorBlueprint
+from .models import Reportable, IndicatorBlueprint, IndicatorReport
 
 
 class IndicatorBlueprintSimpleSerializer(serializers.ModelSerializer):
@@ -10,6 +10,41 @@ class IndicatorBlueprintSimpleSerializer(serializers.ModelSerializer):
         model = IndicatorBlueprint
         fields = (
             'id', 'title', 'unit',
+        )
+
+
+class IndicatorReportSimpleSerializer(serializers.ModelSerializer):
+
+    indicator_name = serializers.SerializerMethodField()
+    target = serializers.SerializerMethodField()
+    achieved = serializers.SerializerMethodField()
+
+    class Meta:
+        model = IndicatorReport
+        fields = (
+            'id', 'indicator_name', 'target', 'achieved'
+        )
+
+    def get_indicator_name(self, obj):
+        # indicator_name can be indicator serialized or comes from blueprint
+        # but when should be presented from blueprint? when entering data?
+        return obj.title
+
+    def get_target(self, obj):
+        return obj.reportable and obj.reportable.target
+
+    def get_achieved(self, obj):
+        return str(obj.total)
+
+
+class IndicatorReportStatusSerializer(serializers.ModelSerializer):
+
+    report_status = serializers.CharField(source='get_report_status_display')
+
+    class Meta:
+        model = IndicatorReport
+        fields = (
+            'remarks', 'report_status'
         )
 
 
@@ -27,27 +62,24 @@ class IndicatorListSerializer(serializers.ModelSerializer):
         )
 
 
-class BaseIndicatorDataSerializer(serializers.ModelSerializer):
+class IndicatorDataSerializer(serializers.ModelSerializer):
 
-    llo_name = serializers.SerializerMethodField()
+    name = serializers.SerializerMethodField()
     llo_id = serializers.SerializerMethodField()
-    overall_status = serializers.SerializerMethodField()
-    narrative_assessemnt = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField()
+    indicator_reports = serializers.SerializerMethodField()
 
     class Meta:
         model = Reportable
         fields = (
             'id',
-            'llo_name',
+            'name',
             'llo_id',
-            'target',
-            'baseline',
-            'achieved',
-            'overall_status',
-            'narrative_assessemnt',
+            'status',
+            'indicator_reports',
         )
 
-    def get_llo_name(self, obj):
+    def get_name(self, obj):
         if isinstance(obj.content_object, LowerLevelOutput):
             return obj.content_object.title
         else:
@@ -59,32 +91,13 @@ class BaseIndicatorDataSerializer(serializers.ModelSerializer):
         else:
             return ''
 
-    def get_overall_status(self, obj):
-        return None  # TODO later
+    def get_status(self, obj):
+        # first indicator report associated with this output
+        indicator_report = IndicatorReport.objects.filter(reportable=obj.id).first()
+        serializer = IndicatorReportStatusSerializer(indicator_report)
+        return serializer.data
 
-    def get_narrative_assessemnt(self, obj):
-        return None  # TODO later
-
-
-class IndicatorDataSerializer(BaseIndicatorDataSerializer):
-
-    indicators = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Reportable
-        fields = (
-            'id',
-            'llo_name',
-            'llo_id',
-            'target',
-            'baseline',
-            'achieved',
-            'overall_status',
-            'narrative_assessemnt',
-            'indicators',
-        )
-
-    def get_indicators(self, obj):
-        children = Reportable.objects.filter(parent_indicator=obj.id)
-        serializer = BaseIndicatorDataSerializer(children, many=True)
+    def get_indicator_reports(self, obj):
+        children = IndicatorReport.objects.filter(reportable=obj.id)
+        serializer = IndicatorReportSimpleSerializer(children, many=True)
         return serializer.data

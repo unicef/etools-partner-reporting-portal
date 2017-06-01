@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import ProgrammeDocument
+from .models import ProgrammeDocument, ProgressReport
 
 
 class ProgrammeDocumentSerializer(serializers.ModelSerializer):
@@ -22,4 +22,17 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
             'report_status',
             'due_date',
             'calculated_budget',
+        )
+
+
+class ProgressReportSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ProgressReport
+        fields = (
+            'partner_contribution_to_date',
+            'funds_received_to_date',
+            'challenges_in_the_reporting_period',
+            'proposed_way_forward',
+            'attachements',
         )

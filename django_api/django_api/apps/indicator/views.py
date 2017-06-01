@@ -6,9 +6,10 @@ from rest_framework.generics import ListCreateAPIView, ListAPIView
 from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
 from unicef.models import LowerLevelOutput
+from unicef.serializer import ProgressReportSerializer
 
 from .serializers import IndicatorListSerializer, IndicatorDataSerializer
-from .models import Reportable
+from .models import Reportable, IndicatorReport
 
 
 class IndicatorListCreateAPIView(ListCreateAPIView):
@@ -33,11 +34,27 @@ class IndicatorDataAPIView(ListAPIView):
             content_type=ContentType.objects.get_for_model(LowerLevelOutput)
         )
 
+    def get_indicator_report(self, id):
+        try:
+            return IndicatorReport.objects.get(id=id)
+        except IndicatorReport.DoesNotExist:
+            return None
+
+    def get_narrative_object(self, id):
+        ir = self.get_indicator_report(id)
+        return ir and ir.progress_report
+
     def list(self, request, ir_id, *args, **kwargs):
         self.ir_id = ir_id
+        ir = self.get_indicator_report(ir_id)
+        narrative = self.get_narrative_object(ir_id)
+        response = ProgressReportSerializer(narrative).data
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
+
+        response['outputs'] = serializer.data
+
         return Response(
-            serializer.data,
+            response,
             status=statuses.HTTP_200_OK
         )
