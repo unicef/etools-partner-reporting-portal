@@ -142,8 +142,6 @@ class InterventionFactory(factory.django.DjangoModelFactory):
     signed_by_unicef_date = fuzzy.FuzzyDate(datetime.date.today())
     signed_by_partner_date = fuzzy.FuzzyDate(datetime.date.today())
 
-<<<<<<< Updated upstream
-=======
     cluster = factory.RelatedFactory('core.factories.ClusterFactory', 'intervention')
 
     @factory.post_generation
@@ -157,7 +155,6 @@ class InterventionFactory(factory.django.DjangoModelFactory):
             for location in extracted:
                 self.locations.add(location)
 
->>>>>>> Stashed changes
     class Meta:
         model = Intervention
 
@@ -261,11 +258,6 @@ class IndicatorDataSpecificationFactory(factory.django.DjangoModelFactory):
 
 class LocationFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "location_%d" % n)
-<<<<<<< Updated upstream
-    reportable = factory.SubFactory(ReportableToLowerLevelOutputFactory)
-    parent = None
-=======
->>>>>>> Stashed changes
 
     class Meta:
         model = Location
@@ -306,11 +298,6 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
 
 class IndicatorReportFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "indicator_report_%d" % n)
-<<<<<<< Updated upstream
-    location = factory.SubFactory(LocationFactory)
-    reportable = factory.SubFactory(ReportableToLowerLevelOutputFactory)
-=======
->>>>>>> Stashed changes
     time_period_start = fuzzy.FuzzyDate(datetime.date.today())
     time_period_end = fuzzy.FuzzyDate(datetime.date.today())
     total = fuzzy.FuzzyInteger(0, 3000, 100)
@@ -332,8 +319,6 @@ class LowerLevelOutputFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = LowerLevelOutput
-<<<<<<< Updated upstream
-=======
 
 
 class IndicatorLocationDataFactory(factory.django.DjangoModelFactory):
@@ -414,4 +399,3 @@ class IndicatorLocationDataFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = IndicatorLocationData
->>>>>>> Stashed changes
