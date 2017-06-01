@@ -121,7 +121,7 @@ class IndicatorDataSpecification(TimeStampedModel):
 
 
 class IndicatorReport(TimeStampedModel):
-    # TODO: probably we should add overall status & narrative ssessemnt here
+    # TODO: probably we should add overall status & narrative assessemnt
     title = models.CharField(max_length=255)
     reportable = models.ForeignKey(Reportable, related_name="indicator_reports")
     progress_report = models.ForeignKey('unicef.ProgressReport', related_name="indicator_reports", null=True)

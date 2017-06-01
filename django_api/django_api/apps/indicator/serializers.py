@@ -31,11 +31,20 @@ class BaseIndicatorDataSerializer(serializers.ModelSerializer):
 
     llo_name = serializers.SerializerMethodField()
     llo_id = serializers.SerializerMethodField()
+    overall_status = serializers.SerializerMethodField()
+    narrative_assessemnt = serializers.SerializerMethodField()
 
     class Meta:
         model = Reportable
         fields = (
-            'id', 'llo_name', 'llo_id', 'target', 'baseline'
+            'id',
+            'llo_name',
+            'llo_id',
+            'target',
+            'baseline',
+            'achieved',
+            'overall_status',
+            'narrative_assessemnt',
         )
 
     def get_llo_name(self, obj):
@@ -50,6 +59,12 @@ class BaseIndicatorDataSerializer(serializers.ModelSerializer):
         else:
             return ''
 
+    def get_overall_status(self, obj):
+        return None  # TODO later
+
+    def get_narrative_assessemnt(self, obj):
+        return None  # TODO later
+
 
 class IndicatorDataSerializer(BaseIndicatorDataSerializer):
 
@@ -58,7 +73,15 @@ class IndicatorDataSerializer(BaseIndicatorDataSerializer):
     class Meta:
         model = Reportable
         fields = (
-            'id', 'llo_name', 'llo_id', 'target', 'baseline', 'indicators'
+            'id',
+            'llo_name',
+            'llo_id',
+            'target',
+            'baseline',
+            'achieved',
+            'overall_status',
+            'narrative_assessemnt',
+            'indicators',
         )
 
     def get_indicators(self, obj):
