@@ -57,11 +57,12 @@ def stop():
     local('docker-compose stop')
 
 
-def fixtures():
+def fixtures(quantity=50):
     """
     Load example data from generate_fake_data management command.
     """
-    local('docker-compose exec django_api python manage.py generate_fake_data --clean_before')
+    local('docker-compose exec django_api python manage.py generate_fake_data %d --clean_before' % (int(quantity)))
+
     print "Fake data generated!"
 
 
