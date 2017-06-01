@@ -118,7 +118,7 @@
               </dl>
               <dl class="layout horizontal justified">
                 <dt class="flex-3">Achievement in reporting period:</dt>
-                <dd class="flex">[[indicator.achievement]]</dd>
+                <dd class="flex">[[indicator.achieved]]</dd>
               </dl>
             </div>
             <div class="indicator-header__toggle layout vertical center-justified">
@@ -159,10 +159,12 @@
         return opened ? 'less' : 'more';
       },
 
-      _handleOpenedChanged: function (e) {
+      _handleOpenedChanged: function (e, data) {
         e.stopPropagation();
 
-        Polymer.dom(e.srcElement).querySelector('indicator-details').init();
+        if (data.value) {
+          Polymer.dom(e.srcElement).querySelector('indicator-details').init();
+        }
       },
     });
   </script>
