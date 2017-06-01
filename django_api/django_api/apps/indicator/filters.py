@@ -13,4 +13,7 @@ class PDReportsFilter(django_filters.FilterSet):
         fields = ['status', ]
 
     def get_status(self, queryset, name, value):
-        return queryset.filter(progress_report__status=value)
+        if value == PROGRESS_REPORT_STATUS.due:
+            return queryset.filter(progress_report__isnull=True)
+        else:
+            return queryset.filter(progress_report__status=value)
