@@ -12,7 +12,12 @@
           return state.indicatorData.byReport;
         },
         function () {
-          return '5'; // FIXME: need to have current report id on the state
+          /**
+           * FIXME: need to have current report id on the state.
+           * Need to set it as soon as /pd/:pdId/report/:reportId
+           * is navigated to in order to support permalinks.
+           */
+           return '5';
         },
         function (byId, id) {
           return byId[id];
