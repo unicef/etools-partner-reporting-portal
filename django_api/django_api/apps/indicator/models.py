@@ -27,6 +27,14 @@ class IndicatorBlueprint(TimeStampedModel):
     subdomain = models.CharField(max_length=255, null=True, blank=True)
     disaggregatable = models.BooleanField(default=False)
 
+    # TODO: add:
+    # siblings (similar inidcators to this indicator)
+    # other_representation (exact copies with different names for some random reason)
+    # children (indicators that aggregate up to this or contribute to this indicator through a formula)
+    # aggregation_types (potential aggregation types: geographic, time-periods ?)
+    # calculation_formula (how the children totals add up to this indicator's total value)
+    # aggregation_formulas (how the total value is aggregated from the reports if possible)
+
     def save(self, *args, **kwargs):
         # Prevent from saving empty strings as code because of the unique together constraint
         if self.code == '':
@@ -125,4 +133,4 @@ class IndicatorLocationData(TimeStampedModel):
     disaggregation = JSONField(default=dict)
 
     def __str__(self):
-        return "{} Location Data for {}".format(location, indicator_report)
+        return "{} Location Data for {}".format(self.location, self.indicator_report)

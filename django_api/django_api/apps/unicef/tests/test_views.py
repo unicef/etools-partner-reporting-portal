@@ -6,6 +6,7 @@ from rest_framework.test import APITestCase, APIClient
 from account.models import User
 from core.factories import IndicatorReportFactory
 from core.models import Intervention, Location
+from unicef.models import ProgrammeDocument
 from indicator.models import IndicatorReport, Reportable
 
 
@@ -87,3 +88,14 @@ class TestProgrammeDocumentAPIView(APITestCase):
         )
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(len(response.data), 4)
+
+    def test_detail_api(self):
+        pd = ProgrammeDocument.objects.first()
+        intervention = Intervention.objects.filter(locations__isnull=False).first()
+        location = intervention.locations.first()
+        url = reverse('programme-document-details', kwargs={'pk': pd.pk, 'location_id': location.id})
+        response = self.client.get(url, format='json')
+
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(pd.agreement, response.data['agreement'])
+        self.assertEquals(pd.reference_number, response.data['reference_number'])

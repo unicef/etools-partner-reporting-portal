@@ -56,6 +56,9 @@ class JSONFactory(factory.DictFactory):
 class PartnerFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "partner_%d" % n)
     total_ct_cp = fuzzy.FuzzyInteger(1000, 10000, 100)
+    partner_activity = factory.RelatedFactory('core.factories.PartnerActivityFactory', 'partner')
+    partner_project = factory.RelatedFactory('core.factories.PartnerProjectFactory', 'partner')
+    user = factory.RelatedFactory('core.factories.UserFactory', 'partner')
 
     @factory.post_generation
     def cluster(self, create, extracted, **kwargs):
@@ -72,8 +75,6 @@ class PartnerFactory(factory.django.DjangoModelFactory):
 
 class PartnerActivityFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "partner_activity_%d" % n)
-    cluster_activity = factory.SubFactory('core.factories.ClusterActivityFactory')
-    partner = factory.SubFactory(PartnerFactory)
 
     class Meta:
         model = PartnerActivity
@@ -81,7 +82,6 @@ class PartnerActivityFactory(factory.django.DjangoModelFactory):
 
 class PartnerProjectFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "partner_project_%d" % n)
-    partner = factory.SubFactory(PartnerFactory)
     start_date = fuzzy.FuzzyDate(datetime.date.today())
     end_date = fuzzy.FuzzyDate(datetime.date.today())
     status = fuzzy.FuzzyText()
@@ -126,7 +126,6 @@ class UserFactory(factory.django.DjangoModelFactory):
     password = factory.PostGenerationMethodCall('set_password', 'test')
 
     profile = factory.RelatedFactory(UserProfileFactory, 'user')
-    partner = factory.SubFactory(PartnerFactory)
 
     @classmethod
     def _generate(cls, create, attrs):
@@ -158,6 +157,8 @@ class InterventionFactory(factory.django.DjangoModelFactory):
     signed_by_unicef_date = fuzzy.FuzzyDate(datetime.date.today())
     signed_by_partner_date = fuzzy.FuzzyDate(datetime.date.today())
 
+    cluster = factory.RelatedFactory('core.factories.ClusterFactory', 'intervention')
+
     @factory.post_generation
     def locations(self, create, extracted, **kwargs):
         if not create:
@@ -175,8 +176,9 @@ class InterventionFactory(factory.django.DjangoModelFactory):
 
 class ClusterFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "cluster_%d" % n)
-    intervention = factory.SubFactory(InterventionFactory)
     user = factory.SubFactory(UserFactory)
+
+    objective = factory.RelatedFactory('core.factories.ClusterObjectiveFactory', 'cluster')
 
     class Meta:
         model = Cluster
@@ -184,7 +186,8 @@ class ClusterFactory(factory.django.DjangoModelFactory):
 
 class ClusterObjectiveFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "cluster_objective_%d" % n)
-    cluster = factory.SubFactory(ClusterFactory)
+
+    objective = factory.RelatedFactory('core.factories.ClusterActivityFactory', 'cluster_objective')
 
     class Meta:
         model = ClusterObjective
@@ -192,7 +195,6 @@ class ClusterObjectiveFactory(factory.django.DjangoModelFactory):
 
 class ClusterActivityFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "cluster_activity_%d" % n)
-    cluster_objective = factory.SubFactory(ClusterObjectiveFactory)
 
     class Meta:
         model = ClusterActivity
@@ -208,7 +210,6 @@ class IndicatorBlueprintFactory(factory.django.DjangoModelFactory):
 class ReportableFactory(factory.django.DjangoModelFactory):
     blueprint = factory.SubFactory(IndicatorBlueprintFactory)
     object_id = factory.SelfAttribute('content_object.id')
-    parent_indicator = None
     content_type = factory.LazyAttribute(
         lambda o: ContentType.objects.get_for_model(o.content_object))
     total = fuzzy.FuzzyInteger(10, 100, 5)
@@ -216,15 +217,6 @@ class ReportableFactory(factory.django.DjangoModelFactory):
     class Meta:
         exclude = ['content_object']
         abstract = True
-
-
-class ReportableToIndicatorReportFactory(ReportableFactory):
-    content_object = factory.SubFactory('core.factories.IndicatorReportFactory')
-    target = '5000'
-    baseline = '0'
-
-    class Meta:
-        model = Reportable
 
 
 class ReportableToLowerLevelOutputFactory(ReportableFactory):
@@ -305,11 +297,16 @@ class ReportableToLowerLevelOutputFactory(ReportableFactory):
         }
     }
 
+    indicator_report = factory.RelatedFactory('core.factories.IndicatorReportFactory', 'reportable')
+
+    location = factory.RelatedFactory('core.factories.LocationFactory', 'reportable', parent=None)
+
     class Meta:
         model = Reportable
 
 
 class ReportableToClusterActivityFactory(ReportableFactory):
+    objective = factory.SubFactory(ClusterObjectiveFactory)
     content_object = factory.SubFactory('core.factories.ClusterActivityFactory')
     target = '5000'
     baseline = '0'
@@ -329,8 +326,6 @@ class ReportableToPartnerActivityFactory(ReportableFactory):
 
 class LocationFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "location_%d" % n)
-    parent = None
-    reportable = factory.SubFactory('core.factories.ReportableToLowerLevelOutputFactory')
 
     class Meta:
         model = Location
@@ -350,15 +345,20 @@ class SectionFactory(factory.django.DjangoModelFactory):
 
 class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "programme_document_%d" % n)
-    agreement = factory.Sequence(lambda n: "agreement_%d" % n)
+    agreement = factory.Sequence(lambda n: "JOR/PCA2017%d" % n)
     reference_number = factory.Sequence(lambda n: "reference_number_%d" % n)
     start_date = datetime.date.today()
     end_date = datetime.date.today()+datetime.timedelta(days=70)
-    population_focus = factory.Sequence(lambda n: "population_focus%d" % n)
+    population_focus = factory.Sequence(lambda n: "Population %d" % n)
     response_to_HRP = factory.Sequence(lambda n: "response_to_HRP%d" % n)
-    status = factory.fuzzy.FuzzyChoice(PD_STATUS_LIST)
+    status = fuzzy.FuzzyChoice(PD_STATUS_LIST)
     frequency = FREQUENCY_LEVEL.weekly
     budget = fuzzy.FuzzyDecimal(low=1000.0, high=100000.0, precision=2)
+    unicef_office = factory.Sequence(lambda n: "JCO country programme %d" % n)
+    unicef_focal_point = factory.Sequence(lambda n: "Abdallah Yakhola %d" % n)
+    partner_focal_point = factory.Sequence(lambda n: "Hanin Odeh %d" % n)
+
+    cp_output = factory.RelatedFactory('core.factories.CountryProgrammeOutputFactory', 'programme_document')
 
     class Meta:
         model = ProgrammeDocument
@@ -366,7 +366,6 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
 
 class IndicatorReportFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "indicator_report_%d" % n)
-    reportable = factory.SubFactory(ReportableToLowerLevelOutputFactory)
     time_period_start = fuzzy.FuzzyDate(datetime.date.today())
     time_period_end = fuzzy.FuzzyDate(datetime.date.today())
     total = fuzzy.FuzzyInteger(0, 3000, 100)
@@ -377,7 +376,7 @@ class IndicatorReportFactory(factory.django.DjangoModelFactory):
 
 class CountryProgrammeOutputFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "country_programme_%d" % n)
-    programme_document = factory.SubFactory(ProgrammeDocumentFactory)
+    lower_level_output = factory.RelatedFactory('core.factories.LowerLevelOutputFactory', 'indicator')
 
     class Meta:
         model = CountryProgrammeOutput
@@ -385,16 +384,12 @@ class CountryProgrammeOutputFactory(factory.django.DjangoModelFactory):
 
 class LowerLevelOutputFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "lower_level_output_%d" % n)
-    indicator = factory.SubFactory(CountryProgrammeOutputFactory)
 
     class Meta:
         model = LowerLevelOutput
 
 
 class IndicatorLocationDataFactory(factory.django.DjangoModelFactory):
-    indicator_report = factory.SubFactory('core.factories.IndicatorReportFactory')
-    location = factory.SubFactory('core.factories.LocationFactory')
-
     # disaggregation = JSONFactory()
     disaggregation = {
         "extrashort": {

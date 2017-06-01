@@ -79,7 +79,7 @@
         <etools-data-table-row no-collapse>
           <div slot="row-data">
             <div class="table-cell table-cell--text">
-              <a href="/TODO">[[_withDefault(pd.reference_number)]]</a>
+              <a href="pd/[[ pd.id ]]/">[[_withDefault(pd.reference_number)]]</a>
             </div>
             <div class="table-cell table-cell--text">
               [[_withDefault(pd.status)]]
@@ -97,7 +97,7 @@
               [[_withDefault(pd.due_date, '-')]]
             </div>
             <div class="table-cell table-cell--text cell-reports">
-              <a href="/TODO">Reports</a>
+              <a href="pd/[[ pd.id ]]/reports">Reports</a>
             </div>
           </div>
         </etools-data-table-row>
