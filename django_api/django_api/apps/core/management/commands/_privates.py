@@ -134,11 +134,6 @@ def generate_fake_data(quantity=3):
 
             indicator_location_data = IndicatorLocationDataFactory(indicator_report=indicator_report, location=reportable.locations.first())
 
-    for idx, reportable in enumerate(Reportable.objects.filter(indicator_reports__isnull=False)):
-        childe = Reportable.objects.filter(indicator_reports__isnull=True)[idx]
-        childe.parent_indicator = reportable
-        childe.save()
-
     print "{} ReportableToLowerLevelOutput objects created".format(quantity)
     print "{} ProgressReport objects created".format(quantity)
     print "{} IndicatorLocationData objects created".format(quantity)

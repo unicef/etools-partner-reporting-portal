@@ -24,7 +24,14 @@ class ProgressReport(TimeStampedModel):
     funds_received_to_date = models.CharField(max_length=256)
     challenges_in_the_reporting_period = models.CharField(max_length=256)
     proposed_way_forward = models.CharField(max_length=256)
-    # attachements ???
+
+    @property
+    def attachements(self):
+        # TODO: probably list of links
+        return []
+
+    def __str__(self):
+        return "ProgressReport <pk:%s>" % self.id
 
 
 class Section(models.Model):
