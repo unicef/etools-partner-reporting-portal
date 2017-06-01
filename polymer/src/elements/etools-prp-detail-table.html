@@ -17,10 +17,9 @@
 
       <!-- <etools-data-table-header no-collapse=true> -->
         <!-- e.g. Male/Female/etc. -->
-        <etools-data-table-row no-collapse=true> 
+        <etools-data-table-row no-collapse="true">
           <div slot="row-data" class="flex-3"></div>
-          <template id="headings"
-                    is="dom-repeat"
+          <template is="dom-repeat"
                     items="[[displayColumnNames]]"
                     as="columnName">
             <div slot="row-data" class="flex-3">
@@ -30,136 +29,155 @@
       </etools-data-table-row>
 
       <!-- e.g. Tall/Short/etc. -->
-      <template id="disaggregations"
-                is="dom-repeat"
+      <template is="dom-repeat"
                 items="[[disaggregationList]]"
                 as="disaggregation">
 
-        <etools-data-table-row no-collapse=true>
+        <etools-data-table-row no-collapse="true">
           <div slot="row-data" class="header-cells">
             <div class="col-data flex-3">[[disaggregation.name]]</div>
           </div>
         </etools-data-table-row>
 
         <!-- New row for each item in the disaggregation data. -->
-        <template id="disaggregations"
-                  is="dom-repeat"
+        <template is="dom-repeat"
                   items="[[disaggregation.data]]"
                   as="dataRow">
 
-            <etools-data-table-row no-collapse=true>
+            <etools-data-table-row no-collapse="true">
               <div slot="row-data" class="content-cells">
-                <template id="disaggregations"
-                          is="dom-repeat"
+                <template is="dom-repeat"
                           items="[[dataRow]]"
                           as="data">
-                          <div class="col-data flex-3">[[data]]</div>
+                  <div class="col-data flex-3">[[data]]</div>
                 </template>
               </div>
             </etools-data-table-row>
+        </template>
+      </template>
 
+      <!-- Totals table at the bottom. -->
+      <etools-data-table-row no-collapse="true">
+        <div slot="row-data" class="totals">
+          <div class="col-data flex-3">Totals</div>
+        </div>
+      </etools-data-table-row>
+
+      <!-- TODO: Display totals.  This may be in redesigned/broken into different tables. -->
+        <template id="totals"
+                  is="dom-repeat"
+                  items="[[disaggregationSubcategories]]"
+                  as="subcategory">
+            <etools-data-table-row no-collapse=true>
+              <div slot="row-data">
+                <div class="col-data flex-3">[[subcategory]]</div>
+                <div class="col-data flex-3"></div>
+                <div class="col-data flex-3"></div>
+                <div class="col-data flex-3"></div>
+              </div>
+            </etools-data-table-row>
         </template>
 
-      </template>
+
     </etools-prp-detail-table>
 
   </template>
 
   <script>
-    (function () {
-      Polymer({
-        is: 'etools-prp-detail-table',
+    Polymer({
+      is: 'etools-prp-detail-table',
 
-        behaviors: [
-          App.Behaviors.UtilsBehavior,
-        ],
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+      ],
 
-        properties: {
-          report: {
-            type: Object,
-            value: {}
-          },
-
-          disaggregationList: {
-            type: Array,
-            computed: '_determineDisaggregationList(report, disaggregations, disaggregationSubcategories, columnNames)'
-          },
-
-          disaggregations: {
-            type: Array,
-            computed: '_determineDisaggregations(report)'
-          },
-
-          disaggregationSubcategories: {
-            type: Array,
-            computed: '_determineDisaggregationSubcatetories(report, disaggregations)'
-          },
-
-          columnNames: {
-            type: Array,
-            computed: '_determineColumnNames(report, disaggregations, disaggregationSubcategories)'
-          },
-
-          displayColumnNames: {
-            type: Array,
-            computed: '_displayColumnNames(columnNames)'
-          },
+      properties: {
+        report: {
+          type: Object,
+          value: {}
         },
 
-        _determineDisaggregations: function(report) {
-          return Object.keys(report.disaggregation);
+        disaggregationList: {
+          type: Array,
+          computed: '_determineDisaggregationList(report, disaggregations, disaggregationSubcategories, columnNames)'
         },
 
-        // Creates the list to loop through in the template.
-        _determineDisaggregationList: function(report, disaggregations, disaggregationSubcategories, columnName) {
-          var newList = [];
-          for (var x=0; x < (disaggregations.length); x++) {
-            var newObject = {};
-            var key = disaggregations[x];
-            var rows = this._determineRows(report, key, disaggregationSubcategories, columnName )
-            newObject['name'] = key[0].toUpperCase() + key.substring(1);
-            newObject['data'] = rows;
-            newList.push(newObject)
-          }
-          return newList;
+        disaggregations: {
+          type: Array,
+          computed: '_determineDisaggregations(report)'
         },
 
-        _determineDisaggregationSubcatetories: function(report, disaggregations) {
-          var key = disaggregations[0];
-          return Object.keys(report.disaggregation[key]);
+        disaggregationSubcategories: {
+          type: Array,
+          computed: '_determineDisaggregationSubcatetories(report, disaggregations)'
         },
 
-        _displayColumnNames: function(columnNames) {
-          return columnNames.map( function(x) {
-            return x[0].toUpperCase() + x.substring(1);
-          } );
+        columnNames: {
+          type: Array,
+          computed: '_determineColumnNames(report, disaggregations, disaggregationSubcategories)'
         },
 
-        _determineColumnNames: function(report, disaggregations, subcategories) {
-          var key = disaggregations[0];
-          var subcategoryKey = subcategories[0];
-          return Object.keys(report.disaggregation[key][subcategoryKey]);
+        displayColumnNames: {
+          type: Array,
+          computed: '_displayColumnNames(columnNames)'
         },
+      },
 
-        _determineRows: function(report, disaggregationKey, subcategories, columnNames) {
-          var rows = [];
-          for (var x=0; x < subcategories.length; x++) {
-            // for each subcat, e.g. 6-10, want to add a new row to the rows list.
-            var subcategoryKey = subcategories[x];
-            var subcategoryValue = report.disaggregation[disaggregationKey][subcategoryKey];
-            var row = [subcategoryKey];
+      _determineDisaggregations: function(report) {
+        return Object.keys(report.disaggregation);
+      },
 
-            for (var j=0; j < columnNames.length; j++) {
-              var row3 = []
-              var column = columnNames[j];
-              var value = subcategoryValue[column];
-              row.push(value);
-            }
-            rows.push(row)
-          }
-          return rows;
+      // Creates the list to loop through in the template.
+      _determineDisaggregationList: function(report, disaggregations, disaggregationSubcategories, columnName) {
+        var newList = [];
+        for (var x=0; x < (disaggregations.length); x++) {
+          var newObject = {};
+          var key = disaggregations[x];
+          var rows = this._determineRows(report, key, disaggregationSubcategories, columnName )
+          newObject['name'] = key[0].toUpperCase() + key.substring(1);
+          newObject['data'] = rows;
+          newList.push(newObject)
         }
-      });
-    }());
+        return newList;
+      },
+
+      _determineDisaggregationSubcatetories: function(report, disaggregations) {
+        var key = disaggregations[0];
+        return Object.keys(report.disaggregation[key]);
+      },
+
+      _displayColumnNames: function(columnNames) {
+        return columnNames.map( function(x) {
+          return x[0].toUpperCase() + x.substring(1);
+        } );
+      },
+
+      _determineColumnNames: function(report, disaggregations, subcategories) {
+        // TODO: columns should always be the disaggregation with the fewest items.
+        var key = disaggregations[0];
+        var subcategoryKey = subcategories[0];
+        var keys = Object.keys(report.disaggregation[key][subcategoryKey]);
+        keys.push('total');
+        return keys;
+      },
+
+      _determineRows: function(report, disaggregationKey, subcategories, columnNames) {
+        var rows = [];
+        for (var x=0; x < subcategories.length; x++) {
+          // for each subcat, e.g. 6-10, want to add a new row to the rows list.
+          var subcategoryKey = subcategories[x];
+          var subcategoryValue = report.disaggregation[disaggregationKey][subcategoryKey];
+          var row = [subcategoryKey];
+
+          for (var j=0; j < columnNames.length; j++) {
+            var column = columnNames[j];
+            var value = subcategoryValue[column];
+            row.push(value);
+          }
+          rows.push(row)
+        }
+        return rows;
+      }
+    });
   </script>
 </dom-module>
