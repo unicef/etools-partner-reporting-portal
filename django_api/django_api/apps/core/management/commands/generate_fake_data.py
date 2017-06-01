@@ -7,6 +7,8 @@ class Command(BaseCommand):
     help = 'Creates a set of ORM objects for initial data'
 
     def add_arguments(self, parser):
+        parser.add_argument('quantity', type=int)
+
         parser.add_argument(
             '--clean_before',
             action='store_true',
@@ -16,11 +18,11 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        quantity = 3
+        quantity = 50
 
         if options['clean_before']:
             clean_up_data()
 
-        generate_fake_data(quantity=3)
+        generate_fake_data(options['quantity'])
 
         print "Fake data are generated! :D"

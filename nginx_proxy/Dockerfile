@@ -1,9 +1,9 @@
 FROM nginx
 
-RUN apt-get update
-# fix certificates for easy_install "certificate verify failed"
-RUN apt-get install --assume-yes --reinstall ca-certificates
-RUN apt-get install --assume-yes python-dev python-setuptools
+RUN apt-get update && \
+    # fix certificates for easy_install "certificate verify failed"
+    apt-get install --assume-yes --reinstall ca-certificates && \
+    apt-get install --assume-yes python-dev python-setuptools
 RUN easy_install j2cli
 
 ADD nginx.conf.j2 /
