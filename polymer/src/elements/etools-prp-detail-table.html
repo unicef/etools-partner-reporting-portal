@@ -15,18 +15,19 @@
     </style>
     <etools-data-table class="detail-table">
 
-      <!-- e.g. Male/Female/etc. -->
-      <etools-data-table-header no-collapse=true>
-        <etools-data-table-column class="flex-3"></etools-data-table-column>
-        <template id="headings"
-                  is="dom-repeat"
-                  items="[[displayColumnNames]]"
-                  as="columnName">
-          <etools-data-table-column class="flex-3">
-            [[columnName]]
-          </etools-data-table-column>
+      <!-- <etools-data-table-header no-collapse=true> -->
+        <!-- e.g. Male/Female/etc. -->
+        <etools-data-table-row no-collapse=true> 
+          <div slot="row-data" class="flex-3"></div>
+          <template id="headings"
+                    is="dom-repeat"
+                    items="[[displayColumnNames]]"
+                    as="columnName">
+            <div slot="row-data" class="flex-3">
+              [[columnName]]
+            </div>
         </template>
-      </etools-data-table-header>
+      </etools-data-table-row>
 
       <!-- e.g. Tall/Short/etc. -->
       <template id="disaggregations"
