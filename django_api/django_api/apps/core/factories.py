@@ -272,15 +272,18 @@ class SectionFactory(factory.django.DjangoModelFactory):
 
 class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "programme_document_%d" % n)
-    agreement = factory.Sequence(lambda n: "agreement_%d" % n)
+    agreement = factory.Sequence(lambda n: "JOR/PCA2017%d" % n)
     reference_number = factory.Sequence(lambda n: "reference_number_%d" % n)
     start_date = datetime.date.today()
     end_date = datetime.date.today()+datetime.timedelta(days=70)
-    population_focus = factory.Sequence(lambda n: "population_focus%d" % n)
+    population_focus = factory.Sequence(lambda n: "Population %d" % n)
     response_to_HRP = factory.Sequence(lambda n: "response_to_HRP%d" % n)
-    status = factory.fuzzy.FuzzyChoice(PD_STATUS_LIST)
+    status = fuzzy.FuzzyChoice(PD_STATUS_LIST)
     frequency = FREQUENCY_LEVEL.weekly
     budget = fuzzy.FuzzyDecimal(low=1000.0, high=100000.0, precision=2)
+    unicef_office = factory.Sequence(lambda n: "JCO country programme %d" % n)
+    unicef_focal_point = factory.Sequence(lambda n: "Abdallah Yakhola %d" % n)
+    partner_focal_point = factory.Sequence(lambda n: "Hanin Odeh %d" % n)
 
     class Meta:
         model = ProgrammeDocument
