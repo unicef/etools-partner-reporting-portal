@@ -5,6 +5,19 @@
     App.Behaviors = App.Behaviors || {};
 
     App.Behaviors.PaginationBehavior = {
+
+      properties: {
+        pageSize: {
+          type: Number,
+          value: 10,
+        },
+
+        pageNumber: {
+          type: Number,
+          value: 1,
+        },
+      },
+
       observers: [
         '_updateQueryParams(pageSize, pageNumber)',
       ],

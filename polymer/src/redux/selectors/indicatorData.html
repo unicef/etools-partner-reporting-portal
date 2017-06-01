@@ -1,0 +1,23 @@
+<link rel="import" href="../reselect.html">
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Selectors = App.Selectors || {};
+
+    App.Selectors.IndicatorData = {
+      all: Reselect.createSelector(
+        function (state) {
+          return state.indicatorData.byReport;
+        },
+        function () {
+          return '5'; // FIXME: need to have current report id on the state
+        },
+        function (byId, id) {
+          return byId[id];
+        }
+      ),
+    };
+  }());
+</script>

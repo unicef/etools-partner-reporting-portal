@@ -28,6 +28,10 @@
       childLocations: function (locationId) {
         return this._buildUrl('/core/' + locationId + '/children-location/');
       },
+
+      indicatorData: function (reportId) {
+        return this._buildUrl('/indicator/indicator-data/' + reportId + '/');
+      },
     };
   }());
 </script>

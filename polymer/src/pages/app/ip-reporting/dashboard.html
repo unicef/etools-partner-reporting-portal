@@ -3,6 +3,16 @@
 <link rel="import" href="../../../elements/page-header.html">
 <link rel="import" href="../../../elements/page-body.html">
 
+
+<!-- FIXME -->
+<link rel="import" href="../../../elements/ip-reporting/pd-output.html">
+<link rel="import" href="../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../endpoints.html">
+<link rel="import" href="../../../redux/store.html">
+<link rel="import" href="../../../redux/actions.html">
+<link rel="import" href="../../../redux/selectors/indicatorData.html">
+<!-- FIXME -->
+
 <dom-module id="page-ip-reporting-dashboard">
   <template>
     <style>
@@ -11,15 +21,78 @@
       }
     </style>
 
+    <!-- FIXME -->
+    <etools-prp-ajax
+        id="indicatorData"
+        url="[[indicatorDataUrl]]">
+    </etools-prp-ajax>
+    <!-- FIXME -->
+
     <page-header title="Dashboard"></page-header>
 
     <page-body>
+
+      <!-- FIXME -->
+      <template
+          is="dom-repeat"
+          items="[[data]]">
+        <pd-output data="[[item]]"></pd-output>
+      </template>
+    <!-- FIXME -->
+
     </page-body>
   </template>
 
   <script>
     Polymer({
       is: 'page-ip-reporting-dashboard',
+
+      // FIXME
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        reportId: {
+          type: String,
+          value: '5', // FIXME: statePath: 'reports.current'
+        },
+
+        indicatorDataUrl: {
+          type: String,
+          computed: '_computeIndicatorDataUrl(reportId)',
+        },
+
+        data: {
+          type: Object,
+          statePath: App.Selectors.IndicatorData.all,
+        },
+      },
+
+      observers: [
+        '_handleInputChange(indicatorDataUrl)',
+      ],
+
+      _computeIndicatorDataUrl: function (reportId) {
+        return App.Endpoints.indicatorData(reportId);
+      },
+
+      _handleInputChange: function () {
+        var indicatorDataThunk = this.$.indicatorData.thunk();var self = this;
+
+        // Cancel the pending request, if any
+        this.$.indicatorData.abort();
+
+        this.dispatch(
+          App.Actions.IndicatorData.fetch(indicatorDataThunk, this.reportId)
+        )
+            .then(function () {
+              console.log(self, data);
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
+      },
     });
   </script>
 </dom-module>
