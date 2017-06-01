@@ -40,6 +40,13 @@ class PDReportsAPIView(ListAPIView):
         self.pd_id = pd_id
         queryset = self.get_queryset()
         filtered = PDReportsFilter(request.GET, queryset=queryset)
+
+        page = self.paginate_queryset(filtered.qs)
+
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
         serializer = self.get_serializer(filtered.qs, many=True)
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
