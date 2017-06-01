@@ -9,9 +9,27 @@
 
 <dom-module id="ip-reporting-indicator-details">
   <template>
-    <style>
+    <style include="iron-flex iron-flex-factors">
       :host {
         display: block;
+      }
+      iron-icon {
+        color: var(--accent-color)
+      }
+      h3 {
+        width: 100%;
+        float: left;
+      }
+      h4 {
+        font-weight: 400;
+      }
+      h4 span {
+        color: gray;
+        font-weight: 400;
+      }
+      .wrapper {
+        float: left;
+        margin: 0 10px 10px 10px;
       }
     </style>
 
@@ -24,25 +42,22 @@
     <template id="reports"
               is="dom-repeat"
               items="[[data]]">
-      <p>
-        <div>
-          <h3>
-            <iron-icon icon="maps:place"></iron-icon>
-            [[item.indicator_location_data.0.location.title]]
-          </h3>
-        </div>
-        <div>
-          <h4>
-            Progress in reporting period
-            <span>[[item.time_period_start]] - [[item.time_period_end]]<span>
-          </h4>
-        </div>
-      </p>
+      <h3>
+        <iron-icon icon="maps:place"></iron-icon>
+        [[item.indicator_location_data.0.location.title]]
+      </h3>
+
       <template id="report-table"
                 is="dom-repeat"
                 items="[[item.indicator_location_data]]"
                 as="report">
-        <etools-prp-detail-table report=[[report]]></etools-prp-detail-table>
+        <div class="wrapper">
+          <h4>
+            Progress in reporting period
+            <span>[[item.time_period_start]] - [[item.time_period_end]]<span>
+          </h4>
+          <etools-prp-detail-table report=[[report]]></etools-prp-detail-table>
+        </div>
       </template>
     </template>
   </template>
@@ -79,8 +94,8 @@
         this.$.indicatorDetail.thunk()()
           .then(function (res) {
             self.data = res.data;
-            // Each returns a list of objects.
-            // Each object is a report with a different time period.
+            // Each returns a list of report with a different time period.
+            // TODO: sort on the frontend by location.
             console.log(res.data)
           })
       },

@@ -20,7 +20,7 @@
         <etools-data-table-column class="flex-3"></etools-data-table-column>
         <template id="headings"
                   is="dom-repeat"
-                  items="[[columnNames]]"
+                  items="[[displayColumnNames]]"
                   as="columnName">
           <etools-data-table-column class="flex-3">
             [[columnName]]
@@ -98,6 +98,11 @@
             type: Array,
             computed: '_determineColumnNames(report, disaggregations, disaggregationSubcategories)'
           },
+
+          displayColumnNames: {
+            type: Array,
+            computed: '_displayColumnNames(columnNames)'
+          },
         },
 
         _determineDisaggregations: function(report) {
@@ -111,7 +116,7 @@
             var newObject = {};
             var key = disaggregations[x];
             var rows = this._determineRows(report, key, disaggregationSubcategories, columnName )
-            newObject['name'] = key;
+            newObject['name'] = key[0].toUpperCase() + key.substring(1);
             newObject['data'] = rows;
             newList.push(newObject)
           }
@@ -121,6 +126,12 @@
         _determineDisaggregationSubcatetories: function(report, disaggregations) {
           var key = disaggregations[0];
           return Object.keys(report.disaggregation[key]);
+        },
+
+        _displayColumnNames: function(columnNames) {
+          return columnNames.map( function(x) {
+            return x[0].toUpperCase() + x.substring(1);
+          } );
         },
 
         _determineColumnNames: function(report, disaggregations, subcategories) {
