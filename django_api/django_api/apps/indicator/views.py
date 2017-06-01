@@ -64,7 +64,7 @@ class IndicatorListCreateAPIView(ListCreateAPIView):
             q_list.append(Q(cluster_activities__cluster__id__in=cluster_list))
 
         if pd_statuses:
-            pd_status_list = map(lambda item: int(item), filter(lambda item: item != '', pd_statuses.split(',')))
+            pd_status_list = map(lambda item: item, filter(lambda item: item != '', pd_statuses.split(',')))
             q_list.append(Q(lower_level_outputs__indicator__programme_document__status__in=pd_status_list))
 
         if q_list:

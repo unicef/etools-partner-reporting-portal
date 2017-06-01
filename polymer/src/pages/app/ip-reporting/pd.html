@@ -56,10 +56,17 @@
 
       observers: [
         '_routePdIdChanged(routeData.pd_id)',
+        '_routePathChanged(route.path)',
       ],
 
       _routePdIdChanged: function (pd_id) {
         this.page = pd_id ? 'pd-details' : 'pd-index';
+      },
+
+      _routePathChanged: function (path) {
+        if(path.length === 0){
+          this.page = 'pd-index';
+        }
       },
 
       _pageChanged: function (page) {
