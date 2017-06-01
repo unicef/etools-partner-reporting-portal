@@ -1,0 +1,73 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="progress-report-status">
+  <template>
+    <style>
+      :host {
+        display: inline-block;
+      }
+
+      .status-icon {
+        display: inline-block;
+        vertical-align: middle;
+        width: 1em;
+        height: 1em;
+        margin-right: .25em;
+        border-radius: .5em;
+        position: relative;
+        top: -1px;
+        line-height: 1;
+      }
+    </style>
+
+    <span class="status-icon" style="background: [[bgColor]];"></span>
+
+    [[label]]
+  </template>
+
+  <script>
+    Polymer({
+      is: 'progress-report-status',
+
+      properties: {
+        status: String,
+
+        label: {
+          type: String,
+          computed: '_computeLabel(status)',
+        },
+
+        bgColor: {
+          type: String,
+          computed: '_computeBgColor(status)',
+        },
+      },
+
+      _computeLabel: function (status) {
+        switch (status) {
+          case 'Due':
+            return 'Due';
+          case 'Ove':
+            return 'Overdue';
+          case 'Sub':
+            return 'Submitted';
+          case 'Rej':
+            return 'Rejected';
+        }
+      },
+
+      _computeBgColor: function (status) {
+        switch (status) {
+          case 'Due':
+            return '#d8d8d8';
+          case 'Ove':
+            return '#d0021b';
+          case 'Sub':
+            return '#72c300';
+          case 'Rej':
+            return '#ffcc00';
+        }
+      },
+    });
+  </script>
+</dom-module>

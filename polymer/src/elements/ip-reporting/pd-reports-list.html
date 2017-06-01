@@ -1,0 +1,154 @@
+
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/etools-content-panel/etools-content-panel.html">
+<link rel="import" href="../../../bower_components/etools-data-table/etools-data-table.html">
+<link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
+<link rel="import" href="../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../bower_components/iron-location/iron-query-params.html">
+
+<link rel="import" href="../../elements/progress-report-status.html">
+
+<link rel="import" href="../../behaviors/data-table.html">
+<link rel="import" href="../../behaviors/pagination.html">
+
+<link rel="import" href="../../styles/table-styles.html">
+
+<dom-module id="pd-reports-list">
+  <template>
+    <style include="data-table-styles table-styles">
+      :host {
+        display: block;
+
+        --ecp-content: {
+          padding: 0;
+        };
+      }
+
+      .cell-reports {
+        text-align: right;
+        text-transform: uppercase;
+      }
+    </style>
+
+    <iron-location
+        query="{{query}}">
+    </iron-location>
+
+    <iron-query-params
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
+    </iron-query-params>
+
+    <etools-content-panel panel-title="List of Reports">
+
+      <etools-data-table-header
+        no-collapse
+        label="[[visibleRange.0]]-[[visibleRange.1]] of [[data.count]] results to show">
+        <etools-data-table-column field="status">
+          <div class="table-column">Report Status</div>
+        </etools-data-table-column>
+        <etools-data-table-column field="due_date">
+          <div class="table-column">Due date</div>
+        </etools-data-table-column>
+        <etools-data-table-column field="date_of_submission">
+          <div class="table-column">Date of submission</div>
+        </etools-data-table-column>
+        <etools-data-table-column field="period">
+          <div class="table-column">Reporting period</div>
+        </etools-data-table-column>
+        <etools-data-table-column field="draft">
+          <div class="table-column">Draft</div>
+        </etools-data-table-column>
+        <etools-data-table-column></etools-data-table-column>
+      </etools-data-table-header>
+
+      <template
+        id="list"
+        is="dom-repeat"
+        items="[[data.results]]"
+        as="report"
+        initial-count="[[pageSize]]">
+        <etools-data-table-row no-collapse>
+          <div slot="row-data">
+            <div class="table-cell table-cell--text">
+              <progress-report-status status="[[report.progress_report_status]]"></progress-report-status>
+            </div>
+            <div class="table-cell table-cell--text">
+              [[_withDefault(report.due_date, '-')]]
+            </div>
+            <div class="table-cell table-cell--text">
+              [[_withDefault(report.submission_date)]]
+            </div>
+            <div class="table-cell table-cell--text">
+              [[_withDefault(report.reporting_period)]]
+            </div>
+            <div class="table-cell table-cell--text">
+              [[_withDefault(report.is_draft)]]
+            </div>
+            <div class="table-cell table-cell--text cell-reports">
+              <a href="TODO">Enter Data</a>
+            </div>
+          </div>
+        </etools-data-table-row>
+      </template>
+
+      <etools-data-table-footer
+        page-size="[[_computeParamValue(queryParams, 'page_size', 10)]]"
+        page-number="[[_computeParamValue(queryParams, 'page', 1)]]"
+        total-results="[[data.count]]"
+        visible-range="{{visibleRange}}"
+        on-page-size-changed="_pageSizeChanged"
+        on-page-number-changed="_pageNumberChanged">
+      </etools-data-table-footer>
+
+      <etools-loading active="[[!loaded]]"></etools-loading>
+    </etools-content-panel>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'pd-reports-list',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.DataTableBehavior,
+        App.Behaviors.PaginationBehavior,
+        App.Behaviors.UtilsBehavior,
+      ],
+
+      properties: {
+        loaded: Boolean,
+
+        data: {
+          type: Array,
+        },
+
+        queryParams: Object,
+
+        pageSize: {
+          type: Number,
+          value: 10,
+          notify: true
+        },
+
+        pageNumber: {
+          type: Number,
+          value: 1,
+          notify: true
+        },
+
+        totalResults: {
+          type: Number,
+          computed: '_computeTotalResults(data)',
+        },
+      },
+
+      _computeParamValue: function (qs, name, defaultValue) {
+        return this._toNumber(this._withDefault(qs[name], defaultValue));
+      },
+
+    });
+  </script>
+
+</dom-module>

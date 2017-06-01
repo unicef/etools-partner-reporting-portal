@@ -1,30 +1,14 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../bower_components/etools-content-panel/etools-content-panel.html">
-<link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
-<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
-<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="../../../bower_components/etools-data-table/etools-data-table.html">
-<link rel="import" href="../../../bower_components/paper-tooltip/paper-tooltip.html">
 <link rel="import" href="../../../bower_components/iron-location/iron-location.html">
 <link rel="import" href="../../../bower_components/iron-location/iron-query-params.html">
-
-<link rel="import" href="../../elements/report-status.html">
-<link rel="import" href="../../behaviors/utils.html">
-<link rel="import" href="../../behaviors/data-table.html">
-<link rel="import" href="../../behaviors/pagination.html">
-<link rel="import" href="../../redux/store.html">
-<link rel="import" href="../../styles/table-styles.html">
+<link rel="import" href="../../elements/ip-reporting/pd-report-filters.html">
+<link rel="import" href="../../elements/ip-reporting/pd-reports-list.html">
 
 <dom-module id="pd-details-reports">
   <template>
     <style include="data-table-styles table-styles">
       :host {
         display: block;
-      }
-
-      .cell-reports {
-        text-align: right;
-        text-transform: uppercase;
       }
     </style>
 
@@ -44,74 +28,9 @@
     </etools-prp-ajax>
 
     <page-body>
-
-      <etools-content-panel panel-title="List of Reports">
-
-        <etools-data-table-header
-          no-collapse
-          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
-          <etools-data-table-column field="status">
-            <div class="table-column">Report Status</div>
-          </etools-data-table-column>
-          <etools-data-table-column field="due_date">
-            <div class="table-column">Due date</div>
-          </etools-data-table-column>
-          <etools-data-table-column field="date_of_submission">
-            <div class="table-column">Date of submission</div>
-          </etools-data-table-column>
-          <etools-data-table-column field="period">
-            <div class="table-column">Reporting period</div>
-          </etools-data-table-column>
-          <etools-data-table-column field="draft">
-            <div class="table-column">Draft</div>
-          </etools-data-table-column>
-          <etools-data-table-column></etools-data-table-column>
-        </etools-data-table-header>
-
-        <template
-          id="list"
-          is="dom-repeat"
-          items="[[data]]"
-          as="report"
-          initial-count="[[pageSize]]">
-          <etools-data-table-row no-collapse>
-            <div slot="row-data">
-              <div class="table-cell table-cell--text">
-                <report-status status="[[report.status]]"></report-status>
-              </div>
-              <div class="table-cell table-cell--text">
-                [[_withDefault(report.due_date, '-')]]
-              </div>
-              <div class="table-cell table-cell--text">
-                [[_withDefault(report.date_of_submission)]]
-              </div>
-              <div class="table-cell table-cell--text">
-                [[_withDefault(report.period)]]
-              </div>
-              <div class="table-cell table-cell--text">
-                [[_withDefault(report.draft)]]
-              </div>
-              <div class="table-cell table-cell--text cell-reports">
-                <a href="TODO">Enter Data</a>
-              </div>
-            </div>
-          </etools-data-table-row>
-        </template>
-
-        <etools-data-table-footer
-            page-size="[[_computeParamValue(queryParams, 'page_size', 10)]]"
-            page-number="[[_computeParamValue(queryParams, 'page', 1)]]"
-            total-results="[[totalResults]]"
-            visible-range="{{visibleRange}}"
-            on-page-size-changed="_pageSizeChanged"
-            on-page-number-changed="_pageNumberChanged">
-        </etools-data-table-footer>
-
-        <etools-loading active="[[loading]]"></etools-loading>
-      </etools-content-panel>
-
+      <pd-report-filters></pd-report-filters>
+      <pd-reports-list data="[[ data ]]" loaded="[[ loaded ]]"></pd-reports-list>
     </page-body>
-
 
   </template>
 
@@ -119,88 +38,41 @@
     Polymer({
       is: 'pd-details-reports',
 
-      behaviors: [
-        App.Behaviors.ReduxBehavior,
-        App.Behaviors.DataTableBehavior,
-        App.Behaviors.PaginationBehavior,
-        App.Behaviors.UtilsBehavior,
-      ],
-
       properties: {
-        loading: {
+        loaded: {
           type: Boolean,
-
+          value: false
         },
+
+        pdId: Number,
 
         pdReportsUrl: {
           type: String,
-          computed: '_computePDReportsUrl(location)',
+          computed: '_computePDReportsUrl(pdId)',
         },
 
-        location: {
-          type: String,
-          statePath: 'location.id',
-        },
+        data: Array,
 
-        data: {
-          type: Array,
-          value: [
-            {
-              "status": 1,
-              "due_date": "14 Jul 2017",
-              "date_of_submission": "",
-              "period": "14 Jun 2017 - 13 Jul 2017",
-              "draft": false,
-            },
-            {
-              "status": 1,
-              "due_date": "14 Jul 2017",
-              "date_of_submission": "",
-              "period": "14 Jun 2017 - 13 Jul 2017",
-              "draft": false,
-            },
-          ]
-        },
-
-        pageSize: Number,
-
-        pageNumber: Number,
-
-        totalResults: {
-          type: Number,
-          value: 2
-        },
-
-        queryParams: Object,
-
-        visibleRange: {
-          type: Array,
-          value: [1,2]
-        }
       },
 
       observers: [
         '_handleInputChange(pdReportsUrl, queryParams)',
       ],
 
-      _computePDReportsUrl: function (location) {
-        return App.Endpoints.programmeDocuments(location);
+      _computePDReportsUrl: function (pdId) {
+        return App.Endpoints.programmeDocumentReports(pdId);
       },
 
-      _handleInputChange: function (_, _) { // jshint ignore:line
-        // var pdThunk = this.$.programmeDocuments.thunk();
+      _handleInputChange: function (url, params) { // jshint ignore:line
+        var self = this;
 
-        // // Cancel the pending request, if any
-        // this.$.programmeDocuments.abort();
+        this.$.pdReports.thunk()()
+          .then(function (res) {
+            self.data = res.data;
+            self.loaded = true;
+          });
+      },
 
-        // this.dispatch(App.Actions.PD.fetch(pdThunk))
-        //     .catch(function (err) { // jshint ignore:line
-        //       // TODO: error handling
-        //     });
-      },
-      _computeParamValue: function (qs, name, defaultValue) {
-        return this._toNumber(this._withDefault(qs[name], defaultValue));
-      },
     });
   </script>
 </dom-module>
