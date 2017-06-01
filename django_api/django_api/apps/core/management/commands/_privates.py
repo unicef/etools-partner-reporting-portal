@@ -86,15 +86,6 @@ def generate_fake_data(quantity=3):
     UserFactory.create_batch(quantity)
     print "{} User objects created".format(quantity)
 
-    # Intervention creates Cluster and Locations
-    InterventionFactory.create_batch(quantity)
-    print "{} Intervention objects created".format(quantity)
-
-    # Linking ClusterActivity - PartnerActivity
-    for idx in xrange(quantity):
-        cluster_activity = ClusterActivity.objects.all()[idx]
-        PartnerFactory(partner_activity__cluster_activity=cluster_activity)
-
     print "{} Partner objects created".format(quantity)
 
     SectionFactory.create_batch(quantity)
@@ -119,6 +110,15 @@ def generate_fake_data(quantity=3):
         indicator_report.save()
 
         indicator_location_data = IndicatorLocationDataFactory(indicator_report=indicator_report, location=reportable.locations.first())
+
+    # Intervention creates Cluster and Locations
+    InterventionFactory.create_batch(quantity, locations=Location.objects.all())
+    print "{} Intervention objects created".format(quantity)
+
+    # Linking ClusterActivity - PartnerActivity
+    for idx in xrange(quantity):
+        cluster_activity = ClusterActivity.objects.all()[idx]
+        PartnerFactory(partner_activity__cluster_activity=cluster_activity)
 
     # Adding extra IndicatorReport to each ReportableToLowerLevelOutput
     locations = Location.objects.all()
