@@ -90,9 +90,6 @@ def generate_fake_data(quantity=3):
     UserFactory.create_batch(quantity)
     print "{} User objects created".format(quantity)
 
-    PartnerFactory.create_batch(quantity)
-    print "{} Partner objects created".format(quantity)
-
     # Intervention creates Cluster and Locations
     InterventionFactory.create_batch(quantity)
     print "{} Intervention objects created".format(quantity)
@@ -100,10 +97,9 @@ def generate_fake_data(quantity=3):
     # Linking ClusterActivity - PartnerActivity
     for idx in xrange(quantity):
         cluster_activity = ClusterActivity.objects.all()[idx]
-        partner_activity = PartnerActivity.objects.all()[idx]
+        PartnerFactory(partner_activity__cluster_activity=cluster_activity)
 
-        cluster_activity.partner_activities.add(partner_activity)
-        cluster_activity.save()
+    print "{} Partner objects created".format(quantity)
 
     SectionFactory.create_batch(quantity)
     print "{} Section objects created".format(quantity)

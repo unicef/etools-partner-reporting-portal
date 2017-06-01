@@ -1,4 +1,5 @@
 import datetime
+import random
 
 from django.contrib.auth.models import Group
 from django.db.models.signals import post_save
@@ -22,6 +23,7 @@ from indicator.models import (
     IndicatorDisaggregation,
     IndicatorDataSpecification,
     IndicatorReport,
+    IndicatorLocationData,
 )
 from unicef.models import (
     Section,
@@ -187,7 +189,6 @@ class ClusterActivityFactory(factory.django.DjangoModelFactory):
 
 class IndicatorBlueprintFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "indicator_blueprint_%d" % n)
-    cluster_activity = factory.SubFactory(ClusterActivityFactory)
 
     class Meta:
         model = IndicatorBlueprint
@@ -196,7 +197,6 @@ class IndicatorBlueprintFactory(factory.django.DjangoModelFactory):
 class ReportableFactory(factory.django.DjangoModelFactory):
     blueprint = factory.SubFactory(IndicatorBlueprintFactory)
     project = factory.SubFactory(PartnerProjectFactory)
-    objective = factory.SubFactory(ClusterObjectiveFactory)
     object_id = factory.SelfAttribute('content_object.id')
     content_type = factory.LazyAttribute(
         lambda o: ContentType.objects.get_for_model(o.content_object))
@@ -221,6 +221,7 @@ class ReportableToLowerLevelOutputFactory(ReportableFactory):
 
 
 class ReportableToClusterActivityFactory(ReportableFactory):
+    objective = factory.SubFactory(ClusterObjectiveFactory)
     content_object = factory.SubFactory('core.factories.ClusterActivityFactory')
     target = '5000'
     baseline = '0'
