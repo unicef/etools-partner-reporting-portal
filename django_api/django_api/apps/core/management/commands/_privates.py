@@ -146,3 +146,8 @@ def generate_fake_data(quantity=3):
                 title=("%s child of %s" % (['first', 'second', 'third'][subindx], locations[idx].title)),
                 reportable_id=Reportable.objects.all()[quantity+idx+subindx].id,
             )
+
+    for idx, reportable in enumerate(Reportable.objects.filter(indicator_reports__isnull=False)):
+        childe = Reportable.objects.filter(indicator_reports__isnull=True)[idx]
+        childe.parent_indicator = reportable
+        childe.save()
