@@ -121,14 +121,29 @@ def generate_fake_data(quantity=3):
         indicator_location_data = IndicatorLocationDataFactory(indicator_report=indicator_report, location=reportable.locations.first())
 
     # Adding extra IndicatorReport to each ReportableToLowerLevelOutput
-    for reportable in Reportable.objects.filter(lower_level_outputs__reportables__isnull=False):
-        # Creating N more IndicatorReport objects
-        for idx in xrange(quantity):
-            indicator_report = IndicatorReportFactory(reportable=reportable)
-            indicator_report.progress_report = reportable.indicator_reports.first().progress_report
-            indicator_report.save()
+    locations = Location.objects.all()
 
-            indicator_location_data = IndicatorLocationDataFactory(indicator_report=indicator_report, location=reportable.locations.first())
+    for reportable in Reportable.objects.filter(lower_level_outputs__reportables__isnull=False):
+        if reportable.locations.count() != 0:
+            first_reportable_location_id = reportable.locations.first().id
+
+        else:
+            first_reportable_location_id = None
+
+        for location_idx in xrange(3):
+            if first_reportable_location_id and first_reportable_location_id != locations[idx].id:
+                reportable.locations.add(locations[idx])
+                reportable.save()
+
+        # Creating extra IndicatorReport object per location in reportable
+        for location in reportable.locations.all():
+            if first_reportable_location_id and location.id != first_reportable_location_id:
+                indicator_report = IndicatorReportFactory(reportable=reportable)
+                indicator_report.progress_report = reportable.indicator_reports.first().progress_report
+                indicator_report.save()
+
+                for extra_indicator_report_idx in xrange(3):
+                    indicator_location_data = IndicatorLocationDataFactory(indicator_report=indicator_report, location=location)
 
     print "{} ReportableToLowerLevelOutput objects created".format(quantity)
     print "{} ProgressReport objects created".format(quantity)
