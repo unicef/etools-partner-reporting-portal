@@ -129,7 +129,7 @@ class Partner(TimeStampedModel):
         null=True,
     )
 
-    cluster = models.ManyToManyField('cluster.Cluster', related_name="partners")
+    clusters = models.ManyToManyField('cluster.Cluster', related_name="partners")
 
     class Meta:
         ordering = ['title']
@@ -153,8 +153,8 @@ class PartnerProject(TimeStampedModel):
     end_date = models.DateField()
     status = models.CharField(max_length=100)
 
-    cluster = models.ManyToManyField('cluster.Cluster', related_name="partner_projects")
-    location = models.ManyToManyField('core.Location', related_name="partner_projects")
+    clusters = models.ManyToManyField('cluster.Cluster', related_name="partner_projects")
+    locations = models.ManyToManyField('core.Location', related_name="partner_projects")
     partner = models.ForeignKey(Partner, null=True, related_name="partner_projects")
     reportables = GenericRelation('indicator.Reportable', related_query_name='partner_projects')
 

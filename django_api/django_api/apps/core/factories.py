@@ -48,13 +48,13 @@ class PartnerFactory(factory.django.DjangoModelFactory):
     user = factory.RelatedFactory('core.factories.UserFactory', 'partner')
 
     @factory.post_generation
-    def cluster(self, create, extracted, **kwargs):
+    def clusters(self, create, extracted, **kwargs):
         if not create:
             return
 
         if extracted:
             for cluster in extracted:
-                self.cluster.add(cluster)
+                self.clusters.add(cluster)
 
     class Meta:
         model = Partner
@@ -74,22 +74,22 @@ class PartnerProjectFactory(factory.django.DjangoModelFactory):
     status = fuzzy.FuzzyText()
 
     @factory.post_generation
-    def cluster(self, create, extracted, **kwargs):
+    def clusters(self, create, extracted, **kwargs):
         if not create:
             return
 
         if extracted:
             for cluster in extracted:
-                self.cluster.add(cluster)
+                self.clusters.add(cluster)
 
     @factory.post_generation
-    def location(self, create, extracted, **kwargs):
+    def locations(self, create, extracted, **kwargs):
         if not create:
             return
 
         if extracted:
             for cluster in extracted:
-                self.location.add(cluster)
+                self.locations.add(cluster)
 
     class Meta:
         model = PartnerProject
