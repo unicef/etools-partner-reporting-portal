@@ -2,10 +2,9 @@
 <link rel="import" href="../../../../../bower_components/iron-icons/maps-icons.html">
 <link rel="import" href="../../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
+<link rel="import" href="../etools-prp-ajax.html">
+<link rel="import" href="../etools-prp-detail-table.html">
 <link rel="import" href="../../endpoints.html">
-<link rel="import" href="../../elements/etools-prp-ajax.html">
-<link rel="import" href="../../elements/etools-prp-detail-table.html">
-<link rel="import" href="../../behaviors/utils.html">
 
 <dom-module id="ip-reporting-indicator-details">
   <template>
@@ -67,10 +66,6 @@
   <script>
     Polymer({
       is: 'ip-reporting-indicator-details',
-
-      behaviors: [
-        App.Behaviors.UtilsBehavior,
-      ],
 
       properties: {
         indicatorDetailUrl: {

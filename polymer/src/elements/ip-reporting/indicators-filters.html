@@ -1,10 +1,9 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
 
-<link rel="import" href="../../behaviors/utils.html">
-<link rel="import" href="../../elements/filter-list.html">
-<link rel="import" href="../../elements/filters/text-filter/text-filter.html">
-<link rel="import" href="../../elements/filters/dropdown-filter.html">
+<link rel="import" href="../filter-list.html">
+<link rel="import" href="../filters/text-filter/text-filter.html">
+<link rel="import" href="../filters/dropdown-filter.html">
 
 <dom-module id="indicators-filters">
   <template>
@@ -20,9 +19,7 @@
       }
     </style>
 
-    <filter-list
-        filters="{{filters}}"
-        class="app-grid">
+    <filter-list class="app-grid">
 
       <text-filter
           class="item"
@@ -38,20 +35,10 @@
     Polymer({
       id: 'indicators-filters',
 
-      behaviors: [
-        App.Behaviors.UtilsBehavior,
-      ],
-
       properties: {
         queryParams: Object,
-
-        query: String,
-
-        filters: {
-          type: Object,
-          notify: true,
-        },
       },
+
     });
   </script>
 </dom-module>

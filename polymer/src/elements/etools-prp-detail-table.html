@@ -135,7 +135,7 @@
           var newObject = {};
           var key = disaggregations[x];
           var rows = this._determineRows(key, disaggregationSubcategories);
-          newObject.name = key[0].toUpperCase() + key.substring(1);
+          newObject.name = this._capitalizeFirstLetter(key);
           newObject.data = rows;
           newList.push(newObject);
         }
@@ -148,25 +148,26 @@
       },
 
       _displayColumnNames: function() {
+        var self = this;
         return this.columnNames.map(function(x) {
-          return x[0].toUpperCase() + x.substring(1);
+          return self._capitalizeFirstLetter(x);
         });
       },
 
-      _determineColumnNames: function(disaggregations) {
+      _determineColumnNames: function() {
         // TODO: columns should always be the disaggregation with the fewest items.
-        var key = disaggregations[0];
+        var key = this.disaggregations[0];
         var subcategoryKey = this.disaggregationSubcategories[0];
         var keys = Object.keys(this.report.disaggregation[key][subcategoryKey]);
         keys.push('total');
         return keys;
       },
 
-      _determineRows: function(disaggregationKey, subcategories) {
+      _determineRows: function(disaggregationKey) {
         var rows = [];
-        for (var x = 0; x < subcategories.length; x++) {
+        for (var x = 0; x < this.disaggregationSubcategories.length; x++) {
           // for each subcat, e.g. 6-10, want to add a new row to the rows list.
-          var subcategoryKey = subcategories[x];
+          var subcategoryKey = this.disaggregationSubcategories[x];
           var subcategoryValue =
             this.report.disaggregation[disaggregationKey][subcategoryKey];
           var row = [subcategoryKey];
