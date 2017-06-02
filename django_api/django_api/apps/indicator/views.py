@@ -1,7 +1,7 @@
 from django.contrib.contenttypes.models import ContentType
 from rest_framework.response import Response
 from rest_framework import status as statuses
-from rest_framework.generics import ListCreateAPIView, ListAPIView
+from rest_framework.generics import ListCreateAPIView, APIView
 
 from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
@@ -23,9 +23,8 @@ class IndicatorListCreateAPIView(ListCreateAPIView):
         return Reportable.objects.filter(indicator_reports__isnull=False, content_type=ContentType.objects.get_for_model(LowerLevelOutput))
 
 
-class IndicatorDataAPIView(ListAPIView):
+class IndicatorDataAPIView(APIView):
 
-    serializer_class = IndicatorDataSerializer
     permission_classes = (IsAuthenticated, )
 
     def get_queryset(self):
@@ -50,7 +49,7 @@ class IndicatorDataAPIView(ListAPIView):
         narrative = self.get_narrative_object(ir_id)
         response = ProgressReportSerializer(narrative).data
         queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
+        serializer = IndicatorDataSerializer(queryset, many=True)
 
         response['outputs'] = serializer.data
 
