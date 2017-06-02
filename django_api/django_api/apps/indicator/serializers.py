@@ -93,7 +93,7 @@ class IndicatorDataSerializer(serializers.ModelSerializer):
 
     def get_status(self, obj):
         # first indicator report associated with this output
-        indicator_report = IndicatorReport.objects.filter(reportable=obj.id).first()
+        indicator_report = obj.indicator_reports.first()
         serializer = IndicatorReportStatusSerializer(indicator_report)
         return serializer.data
 
