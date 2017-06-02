@@ -1,7 +1,8 @@
 from django.contrib.contenttypes.models import ContentType
 from rest_framework.response import Response
 from rest_framework import status as statuses
-from rest_framework.generics import ListCreateAPIView, APIView
+from rest_framework.generics import ListCreateAPIView
+from rest_framework.views import APIView
 
 from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
@@ -43,7 +44,7 @@ class IndicatorDataAPIView(APIView):
         ir = self.get_indicator_report(id)
         return ir and ir.progress_report
 
-    def list(self, request, ir_id, *args, **kwargs):
+    def get(self, request, ir_id, *args, **kwargs):
         self.ir_id = ir_id
         ir = self.get_indicator_report(ir_id)
         narrative = self.get_narrative_object(ir_id)
