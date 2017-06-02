@@ -7,7 +7,7 @@ from django.db import models
 
 from model_utils.models import TimeStampedModel
 
-from core.common import INDICATOR_REPORT_STATUS
+from core.common import INDICATOR_REPORT_STATUS, FREQUENCY_LEVEL
 
 
 class IndicatorBlueprint(TimeStampedModel):
@@ -125,6 +125,12 @@ class IndicatorReport(TimeStampedModel):
     location = models.OneToOneField('core.Location', related_name="indicator_report", null=True)
     time_period_start = models.DateField(auto_now=True)  # first day of defined frequency mode
     time_period_end = models.DateField()  # first day of defined frequency mode
+    frequency = models.CharField(
+        max_length=3,
+        choices=FREQUENCY_LEVEL,
+        default=FREQUENCY_LEVEL.monthly,
+        verbose_name='Frequency of reporting'
+    )
 
     total = models.PositiveIntegerField(blank=True, null=True)
 
