@@ -81,7 +81,7 @@ class IndicatorDataSerializer(serializers.ModelSerializer):
 
     def get_name(self, obj):
         if isinstance(obj.content_object, LowerLevelOutput):
-            return obj.reportable.blueprint.title
+            return obj.blueprint.title
         else:
             return ''
 
