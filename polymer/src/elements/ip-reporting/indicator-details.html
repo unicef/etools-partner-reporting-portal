@@ -38,7 +38,9 @@
         url="[[indicatorDetailUrl]]">
     </etools-prp-ajax>
 
-    <!-- Data will contain a list of objects, each representing a different location. -->
+    <etools-loading active="[[loading]]"></etools-loading>
+
+    <!-- TODO: group data objects by location; only display location header once. -->
     <template id="reports"
               is="dom-repeat"
               items="[[data]]">
@@ -76,7 +78,14 @@
           computed: '_computeIndicatorReportsUrl(indicatorId)',
         },
 
+        isOpen: {
+          type: Boolean,
+          observer: '_openChanged',
+        },
+
         indicatorId: Number,
+
+        loading: Boolean,
 
         data: {
           type: Array,
@@ -88,21 +97,21 @@
         return App.Endpoints.indicatorReports(indicatorId);
       },
 
-      attached: function () {
+      _openChanged: function (isOpen) {
         var self = this;
-
-        this.$.indicatorDetail.thunk()()
-          .then(function (res) {
-            self.data = res.data;
-            // Each returns a list of report with a different time period.
-            // TODO: sort on the frontend by location.
-            console.log(res.data)
-          })
-      },
-
-      detached: function () {
-        this.$.indicatorDetail.abort();
+        if (this.isOpen) {
+          self.loading = true;
+          this.$.indicatorDetail.thunk()()
+            .then(function (res) {
+              self.data = res.data;
+              self.loading = false;
+            })
+            // TODO: error handling.
+        } else {
+          this.$.indicatorDetail.abort();
+        }
       }
+
     });
   </script>
 </dom-module>
