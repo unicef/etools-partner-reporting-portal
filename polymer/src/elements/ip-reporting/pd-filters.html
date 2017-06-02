@@ -9,6 +9,10 @@
 <link rel="import" href="../../elements/filters/dropdown-filter/dropdown-filter.html">
 <link rel="import" href="../../elements/filters/location-filter/location-filter.html">
 
+
+
+<link rel="import" href="../../elements/filters/checkbox-filter/checkbox-filter.html">
+
 <dom-module id="pd-filters">
   <template>
     <style include="app-grid-style">
@@ -20,6 +24,11 @@
         --app-grid-columns: 4;
         --app-grid-gutter: 25px;
         --app-grid-item-height: auto;
+        --app-grid-expandible-item-columns: 4;
+      }
+
+      .incomplete {
+        @apply --app-grid-expandible-item;
       }
     </style>
 
@@ -54,6 +63,13 @@
           class="item"
           value="[[_withDefault(queryParams.location, '')]]">
       </location-filter>
+
+      <checkbox-filter
+          class="incomplete"
+          name="incomplete"
+          value="[[_withDefault(queryParams.incomplete, '')]]">
+        <span class="checkbox-label">Show incomplete indicators only</span>
+      </checkbox-filter>
     </filter-list>
   </template>
 
