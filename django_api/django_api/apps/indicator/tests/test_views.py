@@ -70,7 +70,7 @@ class TestIndicatorDataAPIView(APITestCase):
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         expected_reportable = Reportable.objects.filter(
             indicator_reports__id=ir_id,
-            content_type=ContentType.objects.get_for_model(LowerLevelOutput)
+            lower_level_outputs__isnull=False
         )
         self.assertEquals(len(response.data), expected_reportable.count())
         expected_reportable_ids = expected_reportable.values_list('id', flat=True)

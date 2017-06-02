@@ -31,7 +31,7 @@ class IndicatorDataAPIView(ListAPIView):
     def get_queryset(self):
         return Reportable.objects.filter(
             indicator_reports__id=self.ir_id,
-            content_type=ContentType.objects.get_for_model(LowerLevelOutput)
+            lower_level_outputs__isnull=False
         )
 
     def get_indicator_report(self, id):
