@@ -9,7 +9,7 @@ from core.paginations import SmallPagination
 from unicef.models import LowerLevelOutput
 from unicef.serializer import ProgressReportSerializer
 
-from .serializers import IndicatorListSerializer, IndicatorDataSerializer
+from .serializers import IndicatorListSerializer, IndicatorLLoutputsSerializer
 from .models import Reportable, IndicatorReport
 
 
@@ -28,9 +28,9 @@ class IndicatorDataAPIView(APIView):
 
     permission_classes = (IsAuthenticated, )
 
-    def get_queryset(self):
+    def get_queryset(self, id):
         return Reportable.objects.filter(
-            indicator_reports__id=self.ir_id,
+            indicator_reports__id=id,
             lower_level_outputs__isnull=False
         )
 
@@ -45,12 +45,11 @@ class IndicatorDataAPIView(APIView):
         return ir and ir.progress_report
 
     def get(self, request, ir_id, *args, **kwargs):
-        self.ir_id = ir_id
         ir = self.get_indicator_report(ir_id)
         narrative = self.get_narrative_object(ir_id)
         response = ProgressReportSerializer(narrative).data
-        queryset = self.get_queryset()
-        serializer = IndicatorDataSerializer(queryset, many=True)
+        queryset = self.get_queryset(ir_id)
+        serializer = IndicatorLLoutputsSerializer(queryset, many=True)
 
         response['outputs'] = serializer.data
 

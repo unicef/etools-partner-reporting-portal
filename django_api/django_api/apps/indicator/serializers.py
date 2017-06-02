@@ -62,7 +62,7 @@ class IndicatorListSerializer(serializers.ModelSerializer):
         )
 
 
-class IndicatorDataSerializer(serializers.ModelSerializer):
+class IndicatorLLoutputsSerializer(serializers.ModelSerializer):
 
     name = serializers.SerializerMethodField()
     llo_id = serializers.SerializerMethodField()
