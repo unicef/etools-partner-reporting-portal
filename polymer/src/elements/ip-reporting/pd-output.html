@@ -86,7 +86,7 @@
       }
     </style>
 
-    <etools-content-panel panel-title="[[data.llo_name]]">
+    <etools-content-panel panel-title="[[data.name]]">
       <div class="header">
         <labelled-item label="Overall status">
           <status-badge type="neutral"></status-badge> On track
@@ -100,7 +100,7 @@
       <template
           id="indicators"
           is="dom-repeat"
-          items="[[data.indicators]]"
+          items="[[data.indicator_reports]]"
           as="indicator">
         <div class="indicator">
           <div class="indicator-header layout horizontal">
@@ -109,7 +109,7 @@
                 <div class="status-badge layout vertical center-justified">
                   <status-badge type="success"></status-badge>
                 </div>
-                <h3>[[indicator.llo_name]]</h3>
+                <h3>[[indicator.indicator_name]]</h3>
               </div>
             </div>
             <div class="indicator-header__target flex-none layout vertical center-justified">
