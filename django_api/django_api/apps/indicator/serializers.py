@@ -98,6 +98,6 @@ class IndicatorDataSerializer(serializers.ModelSerializer):
         return serializer.data
 
     def get_indicator_reports(self, obj):
-        children = IndicatorReport.objects.filter(reportable=obj.id)
+        children = obj.indicator_reports.all()
         serializer = IndicatorReportSimpleSerializer(children, many=True)
         return serializer.data
