@@ -81,7 +81,8 @@ def generate_fake_data(quantity=3):
     admin, created = User.objects.get_or_create(username='admin', defaults={
         'email': 'admin@unicef.org',
         'is_superuser': True,
-        'is_staff': True
+        'is_staff': True,
+        'organization': 'Tivix'
     })
     admin.set_password('Passw0rd!')
     admin.save()
@@ -137,3 +138,6 @@ def generate_fake_data(quantity=3):
     print "{} ReportableToLowerLevelOutput objects created".format(quantity)
     print "{} ProgressReport objects created".format(quantity)
     print "{} IndicatorLocationData objects created".format(quantity)
+
+    admin.partner_id = Partner.objects.first().id
+    admin.save()
