@@ -23,10 +23,20 @@
           padding: 0;
         };
       }
-
+      .cell-icon {
+        text-align:center;
+      }
+      .cell-icon iron-icon {
+        --iron-icon-width: 20px;
+        --iron-icon-height: 20px;
+        --iron-icon-fill-color: #999;
+      }
       .cell-reports {
         text-align: right;
         text-transform: uppercase;
+      }
+      .cell-reports a {
+        text-decoration: none;
       }
     </style>
 
@@ -53,10 +63,10 @@
         <etools-data-table-column field="date_of_submission">
           <div class="table-column">Date of submission</div>
         </etools-data-table-column>
-        <etools-data-table-column field="period">
+        <etools-data-table-column field="period" flex-2>
           <div class="table-column">Reporting period</div>
         </etools-data-table-column>
-        <etools-data-table-column field="draft">
+        <etools-data-table-column field="draft" class="cell-icon">
           <div class="table-column">Draft</div>
         </etools-data-table-column>
         <etools-data-table-column></etools-data-table-column>
@@ -79,21 +89,26 @@
             <div class="table-cell table-cell--text">
               [[_withDefault(report.submission_date)]]
             </div>
-            <div class="table-cell table-cell--text">
+            <div class="table-cell table-cell--text" flex-2>
               [[_withDefault(report.reporting_period)]]
             </div>
-            <div class="table-cell table-cell--text">
-              [[_withDefault(report.is_draft)]]
+            <div class="table-cell table-cell--text cell-icon">
+              <template is="dom-if" if="[[_isDraft(report.is_draft)]]">
+                <iron-icon icon="check"></iron-icon>
+              </template>
+              <template is="dom-if" if="[[!_isDraft(report.is_draft)]]">
+                —
+              </template>
             </div>
             <div class="table-cell table-cell--text cell-reports">
-              <a href="TODO">Enter Data</a>
+                <a href="TODO">[[_linkText(report)]]</a>
             </div>
           </div>
         </etools-data-table-row>
       </template>
 
       <etools-data-table-footer
-        page-size="[[_computeParamValue(queryParams, 'page_size', 10)]]"
+        page-size="[[_computeParamValue(queryParams, 'page_size', 20)]]"
         page-number="[[_computeParamValue(queryParams, 'page', 1)]]"
         total-results="[[data.count]]"
         visible-range="{{visibleRange}}"
@@ -138,10 +153,22 @@
           notify: true
         },
 
-        totalResults: {
-          type: Number,
-          computed: '_computeTotalResults(data)',
-        },
+        totalResults: Number,
+
+      },
+
+      _isDraft: function(is_draft) {
+        return is_draft;
+      },
+
+      _linkText: function(report) {
+        if(report.is_draft){
+          return 'Go To Draft'
+        }else if(report.progress_report_status == 'Sub'){
+          return 'View Report'
+        }else {
+          return 'Enter Data'
+        }
       },
 
       _computeParamValue: function (qs, name, defaultValue) {
