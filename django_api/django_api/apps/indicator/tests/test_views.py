@@ -22,12 +22,8 @@ class TestIndicatorListAPIView(APITestCase):
 
     def setUp(self):
         self.quantity = 5
-
         ProgrammeDocumentFactory.create_batch(self.quantity)
-        print "{} ProgrammeDocument objects created".format(self.quantity)
-
         SectionFactory.create_batch(self.quantity)
-        print "{} Section objects created".format(self.quantity)
 
         # Linking the followings:
         # created LowerLevelOutput - ReportableToLowerLevelOutput
@@ -59,6 +55,7 @@ class TestIndicatorDataAPIView(APITestCase):
     def setUp(self):
         with suppress_stdout():
             generate_fake_data(quantity=3)
+
         self.client = APIClient()
         self.client.login(username='admin', password='Passw0rd!')
 
@@ -72,11 +69,11 @@ class TestIndicatorDataAPIView(APITestCase):
             indicator_reports__id=ir_id,
             lower_level_outputs__isnull=False
         )
-        self.assertEquals(len(response.data), expected_reportable.count())
+        self.assertEquals(len(response.data['outputs']), expected_reportable.count())
         expected_reportable_ids = expected_reportable.values_list('id', flat=True)
-        for resp_data in response.data:
+        for resp_data in response.data['outputs']:
             self.assertTrue(resp_data['id'] in expected_reportable_ids)
             self.assertEquals(
-                len(resp_data['indicators']),
-                Reportable.objects.filter(parent_indicator=resp_data['id']).count()
+                len(resp_data['indicator_reports']),
+                expected_reportable.get(lower_level_outputs__id=resp_data['llo_id']).indicator_reports.all().count()
             )
