@@ -12,7 +12,7 @@
         return function (dispatch) {
           return indicatorDataThunk()
               .then(function (res) {
-                dispatch(App.Actions.IndicatorData.set(reportId, res.data));
+                dispatch(App.Actions.IndicatorData.set(reportId, res.data.outputs));
               });
         };
       },
