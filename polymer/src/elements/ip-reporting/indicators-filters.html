@@ -1,9 +1,13 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../bower_components/iron-location/iron-query-params.html">
 
+<link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../filter-list.html">
 <link rel="import" href="../filters/text-filter/text-filter.html">
-<link rel="import" href="../filters/dropdown-filter.html">
+<link rel="import" href="../filters/dropdown-filter/dropdown-filter.html">
+<link rel="import" href="../filters/location-filter/location-filter.html">
 
 <dom-module id="indicators-filters">
   <template>
@@ -19,7 +23,29 @@
       }
     </style>
 
-    <filter-list class="app-grid">
+    <iron-location
+        query="{{query}}">
+    </iron-location>
+
+    <iron-query-params
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
+    </iron-query-params>
+
+    <filter-list filters="{{filters}}" class="app-grid">
+
+      <dropdown-filter
+          class="item"
+          label="PD status"
+          name="pd_statuses"
+          value="[[_withDefault(queryParams.pd_statuses, '')]]"
+          data="[[pd_statuses]]">
+      </dropdown-filter>
+
+      <location-filter
+          class="item"
+          value="[[_withDefault(queryParams.location, '')]]">
+      </location-filter>
 
       <text-filter
           class="item"
@@ -35,8 +61,22 @@
     Polymer({
       id: 'indicators-filters',
 
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+      ],
+
       properties: {
         queryParams: Object,
+
+        pd_statuses: {
+          type: Array,
+          value: [
+            {title: 'All', id: ''},
+            {title: 'Draft', id: 'Dra'},
+            {title: 'Active', id: 'Act'},
+            {title: 'Implemented', id: 'Imp'},
+          ],
+        },
       },
 
     });
