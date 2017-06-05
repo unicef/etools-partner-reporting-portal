@@ -47,20 +47,31 @@
           case 1:
             return 'Nothing due';
           case 2:
+          case 'Ove':
             return 'Overdue';
           case 3:
+          case 'Due':
             return 'Due';
+          case 'Sub':
+            return 'Submitted';
+          case 'Rej':
+            return 'Rejected';
         }
       },
 
       _computeBgColor: function (status) {
         switch (status) {
           case 1:
+          case 'Sub':
             return '#72c300';
           case 2:
+          case 'Ove':
             return '#d0021b';
           case 3:
+          case 'Due':
             return '#d8d8d8';
+          case 'Rej':
+            return '#ffcc00';
         }
       },
     });
