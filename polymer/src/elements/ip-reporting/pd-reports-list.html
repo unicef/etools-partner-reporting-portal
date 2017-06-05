@@ -144,12 +144,12 @@
       },
 
       _linkText: function(report) {
-        if(report.is_draft){
-          return 'Go To Draft'
-        }else if(report.progress_report_status == 'Sub'){
-          return 'View Report'
-        }else {
-          return 'Enter Data'
+        if (report.is_draft) {
+          return 'Go To Draft';
+        } else if (report.progress_report_status === 'Sub') {
+          return 'View Report';
+        } else {
+          return 'Enter Data';
         }
       },
     });
