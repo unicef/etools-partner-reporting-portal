@@ -1,0 +1,80 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../../behaviors/data-table.html">
+<link rel="import" href="../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../elements/page-header.html">
+<link rel="import" href="../../../elements/page-body.html">
+<link rel="import" href="../../../endpoints.html">
+<link rel="import" href="../../../redux/actions.html">
+<link rel="import" href="../../../redux/store.html">
+
+
+<dom-module id="page-ip-progress-reports">
+  <template>
+
+    <style>
+      :host {
+        display:block;
+      }
+    </style>
+
+    <!-- <etools-prp-ajax id="reports"
+     url="[[indicatorsUrl]]">
+    </etools-prp-ajax> -->
+
+    <page-header title="Progress Reports"></page-header>
+    <page-body>
+      progress-report-list component
+    </page-body>
+
+  </template>
+
+  <script>
+
+    Polymer({
+      is: 'page-ip-progress-reports',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.DataTableBehavior,
+      ],
+
+      properties: {
+        // reportsBaseUrl: {
+        //   type: String,
+        //   value: App.Endpoints.progressReports(),
+        // },
+        // pageSize: {
+        //   type: Number,
+        //   value: 10
+        // },
+        // pageNumber: {
+        //   type: Number,
+        //   value: 1
+        // },
+        // indicatorsUrl: {
+        //   type: String,
+        //   observer: '_urlParametersChanged',
+        //   computed: '_computePaginatedUrl(reportsBaseUrl, pageSize, pageNumber)',
+        // }
+      },
+
+      // _reportsAjax: function() {
+      //   var progressReportsThunk = this.$.reports.thunk();
+      //   this.dispatch(App.Actions.fetchProgressReports(progressReportsThunk))
+      //     .catch(function(err) {
+      //       return Promise.reject(err);;
+      //     })
+      // },
+
+      // _urlParametersChanged: function() {
+      //   this.$.indicators.abort();
+      //   return this._indicatorsAjax();
+      // },
+
+      // attached: function () {
+      //   return this._indicatorsAjax();
+      // },
+    })
+  </script>
+</dom-module>
