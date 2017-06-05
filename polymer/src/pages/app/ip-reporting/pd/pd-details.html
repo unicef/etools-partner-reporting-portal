@@ -101,7 +101,6 @@
       ],
 
       properties: {
-
         pdTab: {
           type: String,
         },
@@ -133,34 +132,34 @@
         },
 
         pdId: Number,
-
       },
 
-      _updateTabSelection: function(e) {
+      _updateTabSelection: function () {
         this.$.tabContent.select(this.pdTab);
       },
 
-      _updateUrlTab: function(routeData) {
+      _updateUrlTab: function (routeData) {
         if (!routeData) {
           return;
         }
+
         var dashTab = routeData.dashTab;
         this.set('pdTab', dashTab);
       },
 
-      _computeProgrammeDocumentDetailsUrl: function(location, pdId){
+      _computeProgrammeDocumentDetailsUrl: function (location, pdId) {
         return App.Endpoints.programmeDocumentDetail(location, pdId);
       },
 
-      attached: function(){
+      attached: function () {
         var self = this;
 
         this.$.programmeDocumentDetails.thunk()()
           .then(function (res) {
             self.pd = res.data;
             self.loaded = true;
-          })
-      }
+          });
+      },
 
     });
   </script>

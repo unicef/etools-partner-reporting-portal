@@ -72,8 +72,14 @@
         return App.Endpoints.programmeDocuments(location);
       },
 
-      _handleInputChange: function (_, _) { // jshint ignore:line
-        var pdThunk = this.$.programmeDocuments.thunk();
+      _handleInputChange: function (_, queryParams) { // jshint ignore:line
+        var pdThunk;
+
+        if (!Object.keys(queryParams).length) {
+          return;
+        }
+
+        pdThunk = this.$.programmeDocuments.thunk();
 
         // Cancel the pending request, if any
         this.$.programmeDocuments.abort();
