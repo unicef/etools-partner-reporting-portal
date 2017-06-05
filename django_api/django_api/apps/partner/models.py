@@ -15,6 +15,9 @@ from core.countries import COUNTRIES_ALPHA2_CODE_DICT, COUNTRIES_ALPHA2_CODE
 
 
 class Partner(TimeStampedModel):
+    """
+    Partner model describe in details who is it and his activity humanitarian goals (clusters).
+    """
     title = models.CharField(
         max_length=255,
         verbose_name='Full Name',
@@ -148,6 +151,9 @@ class Partner(TimeStampedModel):
 
 
 class PartnerProject(TimeStampedModel):
+    """
+    PartnerProject model is a container for defined group of PartnerActivities model.
+    """
     title = models.CharField(max_length=255)
     start_date = models.DateField()
     end_date = models.DateField()
@@ -160,6 +166,10 @@ class PartnerProject(TimeStampedModel):
 
 
 class PartnerActivity(TimeStampedModel):
+    """
+    PartnerActivity model define action that are not present in cluster activity.
+    Partner is allowed to define their ideas that wasn't defined.
+    """
     title = models.CharField(max_length=255)
     project = models.ForeignKey(PartnerProject, null=True, related_name="partner_activities")
     partner = models.ForeignKey(Partner, related_name="partner_activities")

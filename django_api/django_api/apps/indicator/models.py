@@ -11,6 +11,9 @@ from core.common import INDICATOR_REPORT_STATUS, FREQUENCY_LEVEL
 
 
 class IndicatorBlueprint(TimeStampedModel):
+    """
+    IndicatorBlueprint module is a pattern for indicator (here we setup basic parameter).
+    """
     NUMBER = u'number'
     PERCENTAGE = u'percentage'
     YESNO = u'yesno'
@@ -102,6 +105,9 @@ class Reportable(TimeStampedModel):
 
 
 class IndicatorDisaggregation(TimeStampedModel):
+    """
+    IndicatorDisaggregation module
+    """
     title = models.CharField(max_length=255)
     range = FloatRangeField()
 
@@ -109,6 +115,9 @@ class IndicatorDisaggregation(TimeStampedModel):
 
 
 class IndicatorDataSpecification(TimeStampedModel):
+    """
+    IndicatorDataSpecification module
+    """
     title = models.CharField(max_length=255)
     calculation_method = models.CharField(max_length=255)
     frequency = models.IntegerField()
@@ -118,6 +127,9 @@ class IndicatorDataSpecification(TimeStampedModel):
 
 
 class IndicatorReport(TimeStampedModel):
+    """
+    IndicatorReport module is a result of partner staff activity (what they done in defined frequency scope).
+    """
     title = models.CharField(max_length=255)
     reportable = models.ForeignKey(Reportable, related_name="indicator_reports")
     progress_report = models.ForeignKey('unicef.ProgressReport', related_name="indicator_reports", null=True)
@@ -150,6 +162,9 @@ class IndicatorReport(TimeStampedModel):
 
 
 class IndicatorLocationData(TimeStampedModel):
+    """
+    IndicatorLocationData module it includes indicators for chosen location.
+    """
     indicator_report = models.ForeignKey(IndicatorReport, related_name="indicator_location_data")
     location = models.ForeignKey('core.Location', related_name="indicator_location_data")
 
@@ -160,6 +175,9 @@ class IndicatorLocationData(TimeStampedModel):
 
 
 class Disaggregation(TimeStampedModel):
+    """
+    Disaggregation module. For example: <Gender, Age>
+    """
     name = models.CharField(max_length=255, verbose_name="Disaggregation by", null=True, blank=True)
     reportable = models.ForeignKey(Reportable, related_name="disaggregation")
     active = models.BooleanField(default=False)
@@ -169,6 +187,9 @@ class Disaggregation(TimeStampedModel):
 
 
 class DisaggregationValue(TimeStampedModel):
+    """
+    Disaggregation Value module. For example: Gender <Male, Female, Other>
+    """
     disaggregation = models.ForeignKey(Disaggregation, related_name="disaggregation_value")
     value = models.CharField(max_length=255, null=True, blank=True)
     active = models.BooleanField(default=False)

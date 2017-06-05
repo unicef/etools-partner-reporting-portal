@@ -14,6 +14,10 @@ from .countries import COUNTRIES_ALPHA2_CODE_DICT, COUNTRIES_ALPHA2_CODE
 
 
 class Intervention(TimeStampedModel):
+    """
+    Intervention (response/emergency) model.
+    It's used for drop down menu in right top corner (where location are in country level (without parents)).
+    """
     document_type = models.CharField(
         choices=INTERVENTION_TYPES,
         max_length=255,
@@ -77,6 +81,10 @@ class Intervention(TimeStampedModel):
 
 
 class Location(TimeStampedModel):
+    """
+    Location model define place where agents are working.
+    The background of the location can be: Country > Region > City > District/Point.
+    """
     title = models.CharField(max_length=255)
     reportable = models.ForeignKey('indicator.Reportable', related_name="locations")
 
