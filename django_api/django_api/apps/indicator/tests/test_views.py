@@ -3,14 +3,16 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 
+from account.models import User
 from core.factories import (
     IndicatorReportFactory, ProgrammeDocumentFactory, ReportableToLowerLevelOutputFactory,
     ProgressReportFactory,
     SectionFactory,
     IndicatorLocationDataFactory,
 )
+from indicator.models import IndicatorReport
 
-from unicef.models import LowerLevelOutput, Section
+from unicef.models import LowerLevelOutput, Section, ProgrammeDocument
 
 
 class TestPDReportsAPIView(APITestCase):
