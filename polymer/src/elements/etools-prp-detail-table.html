@@ -1,18 +1,15 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/etools-data-table/etools-data-table.html">
-<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/etools-content-panel/etools-content-panel.html">
 
 <link rel="import" href="../behaviors/utils.html">
 <link rel="import" href="../styles/detail-table.html">
-<link rel="import" href="../styles/table-styles.html">
 
 <dom-module id="etools-prp-detail-table">
   <template>
 
-    <style include="iron-flex iron-flex-factors data-table-styles table-styles detail-table">
-    </style>
+    <style include="detail-table"></style>
+
     <etools-data-table class="detail-table">
 
       <!-- <etools-data-table-header no-collapse=true> -->
@@ -63,9 +60,8 @@
         </div>
       </etools-data-table-row>
 
-      <!-- TODO: Display totals.  This may be in redesigned/broken into different tables. -->
-        <template id="totals"
-                  is="dom-repeat"
+      <!-- TODO: Totals. May be redesigned/broken into different tables. -->
+        <template is="dom-repeat"
                   items="[[disaggregationSubcategories]]"
                   as="subcategory">
             <etools-data-table-row no-collapse=true>
@@ -99,7 +95,8 @@
 
         disaggregationList: {
           type: Array,
-          computed: '_determineDisaggregationList(disaggregations, disaggregationSubcategories, columnNames)'
+          computed: '_determineDisaggregationList' +
+            '(disaggregations, disaggregationSubcategories, columnNames)'
         },
 
         //Passing report as a param is required to trigger update.
@@ -131,15 +128,16 @@
       },
 
       // Creates the list to loop through in the template.
-      _determineDisaggregationList: function(disaggregations, disaggregationSubcategories) {
+      _determineDisaggregationList: function(disaggregations,
+                                             disaggregationSubcategories) {
         var newList = [];
-        for (var x=0; x < (disaggregations.length); x++) {
+        for (var x = 0; x < (disaggregations.length); x++) {
           var newObject = {};
           var key = disaggregations[x];
           var rows = this._determineRows(key, disaggregationSubcategories);
-          newObject['name'] = key[0].toUpperCase() + key.substring(1);
-          newObject['data'] = rows;
-          newList.push(newObject)
+          newObject.name = this._capitalizeFirstLetter(key);
+          newObject.data = rows;
+          newList.push(newObject);
         }
         return newList;
       },
@@ -150,34 +148,36 @@
       },
 
       _displayColumnNames: function() {
-        return this.columnNames.map( function(x) {
-          return x[0].toUpperCase() + x.substring(1);
-        } );
+        var self = this;
+        return this.columnNames.map(function(x) {
+          return self._capitalizeFirstLetter(x);
+        });
       },
 
-      _determineColumnNames: function(disaggregations) {
+      _determineColumnNames: function() {
         // TODO: columns should always be the disaggregation with the fewest items.
-        var key = disaggregations[0];
+        var key = this.disaggregations[0];
         var subcategoryKey = this.disaggregationSubcategories[0];
         var keys = Object.keys(this.report.disaggregation[key][subcategoryKey]);
         keys.push('total');
         return keys;
       },
 
-      _determineRows: function(disaggregationKey, subcategories) {
+      _determineRows: function(disaggregationKey) {
         var rows = [];
-        for (var x=0; x < subcategories.length; x++) {
+        for (var x = 0; x < this.disaggregationSubcategories.length; x++) {
           // for each subcat, e.g. 6-10, want to add a new row to the rows list.
-          var subcategoryKey = subcategories[x];
-          var subcategoryValue = this.report.disaggregation[disaggregationKey][subcategoryKey];
+          var subcategoryKey = this.disaggregationSubcategories[x];
+          var subcategoryValue =
+            this.report.disaggregation[disaggregationKey][subcategoryKey];
           var row = [subcategoryKey];
 
-          for (var j=0; j < this.columnNames.length; j++) {
+          for (var j = 0; j < this.columnNames.length; j++) {
             var column = this.columnNames[j];
             var value = subcategoryValue[column];
             row.push(value);
           }
-          rows.push(row)
+          rows.push(row);
         }
         return rows;
       }
