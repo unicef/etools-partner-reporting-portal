@@ -42,7 +42,28 @@ class IndicatorBlueprint(TimeStampedModel):
         super(IndicatorBlueprint, self).save(*args, **kwargs)
 
 
+class DisaggregationValue(TimeStampedModel):
+    disaggregation = models.ForeignKey(Disaggregation, related_name="disaggregation_value")
+    value = models.CharField(max_length=255, null=True, blank=True)
+    active = models.BooleanField(default=False)
+
+    def __str__(self):
+        return "Disaggregation Value <pk:%s>" % self.id
+
+
+class Disaggregation(TimeStampedModel):
+    name = models.CharField(max_length=255, verbose_name="Disaggregation by", null=True, blank=True)
+    reportable = models.ForeignKey(Reportable, related_name="disaggregation")
+    active = models.BooleanField(default=False)
+
+    def __str__(self):
+        return "Disaggregation <pk:%s>" % self.id
+
+
 class Reportable(TimeStampedModel):
+    """
+    Reportable / Applied Indicator model.
+    """
     target = models.CharField(max_length=255, null=True, blank=True)
     baseline = models.CharField(max_length=255, null=True, blank=True)
     assumptions = models.TextField(null=True, blank=True)
@@ -52,10 +73,6 @@ class Reportable(TimeStampedModel):
     # Current total, transactional and dynamically calculated based on IndicatorReports
     total = models.IntegerField(null=True, blank=True, default=0,
                                 verbose_name="Current Total")
-
-    # variable disaggregation's that may be present in the work plan
-    # this can only be present if the indicatorBlueprint has dissagregatable = true
-    disaggregation_logic = JSONField(null=True)
 
     # unique code for this indicator within the current context
     # eg: (1.1) result code 1 - indicator code 1
