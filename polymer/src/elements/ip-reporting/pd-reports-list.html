@@ -1,4 +1,3 @@
-
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/etools-content-panel/etools-content-panel.html">
 <link rel="import" href="../../../bower_components/etools-data-table/etools-data-table.html">
@@ -8,6 +7,7 @@
 
 <link rel="import" href="../../elements/progress-report-status.html">
 
+<link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/data-table.html">
 <link rel="import" href="../../behaviors/pagination.html">
 
@@ -108,8 +108,8 @@
       </template>
 
       <etools-data-table-footer
-        page-size="[[_computeParamValue(queryParams, 'page_size', 20)]]"
-        page-number="[[_computeParamValue(queryParams, 'page', 1)]]"
+        page-size="[[pageSize]]"
+        page-number="[[pageNumber]]"
         total-results="[[data.count]]"
         visible-range="{{visibleRange}}"
         on-page-size-changed="_pageSizeChanged"
@@ -126,7 +126,6 @@
       is: 'pd-reports-list',
 
       behaviors: [
-        App.Behaviors.ReduxBehavior,
         App.Behaviors.DataTableBehavior,
         App.Behaviors.PaginationBehavior,
         App.Behaviors.UtilsBehavior,
@@ -135,26 +134,9 @@
       properties: {
         loaded: Boolean,
 
-        data: {
-          type: Array,
-        },
-
-        queryParams: Object,
-
-        pageSize: {
-          type: Number,
-          value: 10,
-          notify: true
-        },
-
-        pageNumber: {
-          type: Number,
-          value: 1,
-          notify: true
-        },
+        data: Array,
 
         totalResults: Number,
-
       },
 
       _isDraft: function(is_draft) {
@@ -170,11 +152,6 @@
           return 'Enter Data'
         }
       },
-
-      _computeParamValue: function (qs, name, defaultValue) {
-        return this._toNumber(this._withDefault(qs[name], defaultValue));
-      },
-
     });
   </script>
 
