@@ -28,7 +28,7 @@ class IndicatorReportSimpleSerializer(serializers.ModelSerializer):
     def get_indicator_name(self, obj):
         # indicator_name can be indicator serialized or comes from blueprint
         # but when should be presented from blueprint? when entering data?
-        return obj.title
+        return obj.reportable.blueprint.title
 
     def get_target(self, obj):
         return obj.reportable and obj.reportable.target
