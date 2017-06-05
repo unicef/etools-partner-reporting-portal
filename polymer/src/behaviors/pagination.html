@@ -1,3 +1,5 @@
+<link rel="import" href="../polyfills/es6-shim.html">
+
 <script>
   (function () {
     'use strict';
@@ -5,9 +7,31 @@
     App.Behaviors = App.Behaviors || {};
 
     App.Behaviors.PaginationBehavior = {
+      properties: {
+        queryParams: Object,
+
+        pageSize: {
+          type: Number,
+          computed: '_computePageSize(queryParams)',
+        },
+
+        pageNumber: {
+          type: Number,
+          computed: '_computePageNumber(queryParams)',
+        },
+      },
+
       observers: [
         '_updateQueryParams(pageSize, pageNumber)',
       ],
+
+      _computePageSize: function (queryParams) {
+        return this._toNumber(queryParams.page_size || 10);
+      },
+
+      _computePageNumber: function (queryParams) {
+        return this._toNumber(queryParams.page || 1);
+      },
 
       _updateQueryParams: function (pageSize, pageNumber) {
         var newParams = Object.assign({}, this.queryParams, {
@@ -15,7 +39,9 @@
           page: pageNumber,
         });
 
-        this.set('queryParams', newParams);
+        this.async(function () {
+          this.set('queryParams', newParams);
+        });
       },
     };
 
