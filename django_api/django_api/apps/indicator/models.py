@@ -42,24 +42,6 @@ class IndicatorBlueprint(TimeStampedModel):
         super(IndicatorBlueprint, self).save(*args, **kwargs)
 
 
-class DisaggregationValue(TimeStampedModel):
-    disaggregation = models.ForeignKey(Disaggregation, related_name="disaggregation_value")
-    value = models.CharField(max_length=255, null=True, blank=True)
-    active = models.BooleanField(default=False)
-
-    def __str__(self):
-        return "Disaggregation Value <pk:%s>" % self.id
-
-
-class Disaggregation(TimeStampedModel):
-    name = models.CharField(max_length=255, verbose_name="Disaggregation by", null=True, blank=True)
-    reportable = models.ForeignKey(Reportable, related_name="disaggregation")
-    active = models.BooleanField(default=False)
-
-    def __str__(self):
-        return "Disaggregation <pk:%s>" % self.id
-
-
 class Reportable(TimeStampedModel):
     """
     Reportable / Applied Indicator model.
@@ -175,3 +157,21 @@ class IndicatorLocationData(TimeStampedModel):
 
     def __str__(self):
         return "{} Location Data for {}".format(location, indicator_report)
+
+
+class Disaggregation(TimeStampedModel):
+    name = models.CharField(max_length=255, verbose_name="Disaggregation by", null=True, blank=True)
+    reportable = models.ForeignKey(Reportable, related_name="disaggregation")
+    active = models.BooleanField(default=False)
+
+    def __str__(self):
+        return "Disaggregation <pk:%s>" % self.id
+
+
+class DisaggregationValue(TimeStampedModel):
+    disaggregation = models.ForeignKey(Disaggregation, related_name="disaggregation_value")
+    value = models.CharField(max_length=255, null=True, blank=True)
+    active = models.BooleanField(default=False)
+
+    def __str__(self):
+        return "Disaggregation Value <pk:%s>" % self.id
