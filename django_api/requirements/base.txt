@@ -3,6 +3,7 @@ Django==1.10.6
 
 # REST framework
 djangorestframework==3.6.2
+django-filter==1.0.4
 
 # Other Python packages
 psycopg2==2.7.1
@@ -14,3 +15,6 @@ astroid==1.5.2
 isort==4.2.5
 pylint==1.7.1
 factory_boy==2.8.1
+
+# WSGI
+uwsgi==2.0.15

@@ -17,6 +17,7 @@
     "dev": "./node_modules/lite-server/bin/lite-server",
     "bundle": "polymer build --bundle",
     "serve": "./node_modules/lite-server/bin/lite-server --baseDir='bundle'",
+    "test": "wct"
   },
   "private": true,
   "devDependencies": {

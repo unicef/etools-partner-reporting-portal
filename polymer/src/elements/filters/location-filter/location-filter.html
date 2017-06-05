@@ -1,0 +1,89 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../dropdown-filter/dropdown-filter.html">
+<link rel="import" href="../../etools-prp-ajax.html">
+<link rel="import" href="../../../endpoints.html">
+<link rel="import" href="../../../redux/store.html">
+
+<dom-module id="location-filter">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <etools-prp-ajax
+        id="childLocations"
+        url="[[childLocationsUrl]]">
+    </etools-prp-ajax>
+
+    <template is="dom-if" if="[[!loading]]">
+      <dropdown-filter
+          label="PD Location"
+          name="location"
+          value="[[value]]"
+          data="[[data]]">
+      </dropdown-filter>
+    </template>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'location-filter',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        childLocationsUrl: {
+          type: String,
+          computed: '_computeChildLocationsUrl(location)',
+        },
+
+        location: {
+          type: String,
+          statePath: 'location.id',
+        },
+
+        loading: {
+          type: Boolean,
+          value: true,
+          computed: '_computeLoading(data)',
+        },
+
+        data: {
+          type: Array,
+          value: [],
+        },
+
+        value: String,
+      },
+
+      _computeChildLocationsUrl: function (location) {
+        return App.Endpoints.childLocations(location);
+      },
+
+      _computeLoading: function (data) {
+        return !data.length;
+      },
+
+      attached: function () {
+        var self = this;
+
+        this.$.childLocations.thunk()()
+            .then(function (res) {
+              self.data = [{
+                id: '',
+                title: 'All'
+              }].concat(res.data);
+            });
+      },
+
+      detached: function () {
+        this.$.childLocations.abort();
+      },
+    });
+  </script>
+</dom-module>

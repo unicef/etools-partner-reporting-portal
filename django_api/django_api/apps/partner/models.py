@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.contrib.contenttypes.fields import GenericRelation
 
 from model_utils.models import TimeStampedModel
 
@@ -134,7 +135,7 @@ class Partner(TimeStampedModel):
         ordering = ['title']
         unique_together = ('title', 'vendor_number')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     @property
@@ -151,11 +152,11 @@ class PartnerProject(TimeStampedModel):
     start_date = models.DateField()
     end_date = models.DateField()
     status = models.CharField(max_length=100)
-    budget = models.FloatField()
 
     cluster = models.ManyToManyField('cluster.Cluster', related_name="partner_projects")
     location = models.ManyToManyField('core.Location', related_name="partner_projects")
     partner = models.ForeignKey(Partner, null=True, related_name="partner_projects")
+    reportables = GenericRelation('indicator.Reportable', related_query_name='partner_projects')
 
 
 class PartnerActivity(TimeStampedModel):
@@ -163,3 +164,4 @@ class PartnerActivity(TimeStampedModel):
     project = models.ForeignKey(PartnerProject, null=True, related_name="partner_activities")
     partner = models.ForeignKey(Partner, related_name="partner_activities")
     cluster_activity = models.ForeignKey('cluster.ClusterActivity', related_name="partner_activities")
+    reportables = GenericRelation('indicator.Reportable', related_query_name='partner_projects')

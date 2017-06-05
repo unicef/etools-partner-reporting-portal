@@ -1,0 +1,37 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="shared-styles">
+  <template>
+    <style>
+      :host {
+        --truncate: {
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        };
+      }
+      .top-content-row {
+        @apply(--layout-horizontal);
+        @apply(--layout-start-justified);
+        background-color:white;
+      }
+      .top-content-row paper-tabs {
+        --paper-tabs-selection-bar-color: var(--accent-color);
+      }
+      .top-content-row paper-tab {
+        --paper-tab-ink: var(--accent-color);
+        padding: 0 10px;
+      }
+      .top-content-row paper-tab:nth-child(n+2){
+        margin-left:25px;
+      }
+      .top-content-row paper-tab .tab-content {
+        color: var(--dark-secondary-text-color);
+        text-transform: uppercase;
+      }
+      .top-content-row paper-tab.iron-selected .tab-content {
+        color: var(--accent-color);
+      }
+    </style>
+  </template>
+</dom-module>

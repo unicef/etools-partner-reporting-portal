@@ -23,7 +23,9 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 urlpatterns = [
     url(r'^api/admin/', admin.site.urls),
     url(r'^api/core/', include('core.urls')),
+    url(r'^api/indicator/', include('indicator.urls')),
     url(r'^api/partner/', include('partner.urls')),
+    url(r'^api/unicef/', include('unicef.urls')),
 ]
 
 if settings.DEBUG:
@@ -32,4 +34,5 @@ if settings.DEBUG:
         url(r'^__debug__/', include(debug_toolbar.urls)),
     ] + urlpatterns
 
-    urlpatterns += staticfiles_urlpatterns('/static/')
+# Serving staticserve files for both dev and remote environments
+urlpatterns += staticfiles_urlpatterns('/api/static/')

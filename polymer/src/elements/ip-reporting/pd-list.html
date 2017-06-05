@@ -1,0 +1,148 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/etools-content-panel/etools-content-panel.html">
+<link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
+<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/etools-data-table/etools-data-table.html">
+<link rel="import" href="../../../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../bower_components/iron-location/iron-query-params.html">
+
+<link rel="import" href="../../elements/report-status.html">
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/data-table.html">
+<link rel="import" href="../../behaviors/pagination.html">
+<link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../styles/table-styles.html">
+
+<dom-module id="pd-list">
+  <template>
+    <style include="data-table-styles table-styles">
+      :host {
+        display: block;
+
+        --ecp-content: {
+          padding: 0;
+        };
+      }
+
+      .cell-reports {
+        text-align: right;
+        text-transform: uppercase;
+      }
+    </style>
+
+    <iron-location
+        query="{{query}}">
+    </iron-location>
+
+    <iron-query-params
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
+    </iron-query-params>
+
+    <etools-content-panel panel-title="List of PDs">
+
+      <etools-data-table-header
+          no-collapse
+          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
+        <etools-data-table-column field="reference_number">
+          <div class="table-column">PD/SSFA ToR ref. #</div>
+        </etools-data-table-column>
+        <etools-data-table-column field="status">
+          <div class="table-column">PD/SSFA status</div>
+        </etools-data-table-column>
+        <etools-data-table-column field="title" flex-3>
+          <div class="table-column">PD/SSFA ToR Title</div>
+        </etools-data-table-column>
+        <etools-data-table-column field="calculated_budget">
+          <div class="table-column">
+            Budget
+            <paper-tooltip>Total budget $ (Disbursements to date %)</paper-tooltip>
+          </div>
+        </etools-data-table-column>
+        <etools-data-table-column field="report_status">
+          <div class="table-column">Report status</div>
+        </etools-data-table-column>
+        <etools-data-table-column field="due_date">
+          <div class="table-column">Due date</div>
+        </etools-data-table-column>
+        <etools-data-table-column></etools-data-table-column>
+      </etools-data-table-header>
+
+      <template
+          id="list"
+          is="dom-repeat"
+          items="[[data]]"
+          as="pd"
+          initial-count="[[pageSize]]">
+        <etools-data-table-row no-collapse>
+          <div slot="row-data">
+            <div class="table-cell table-cell--text">
+              <a href="pd/[[ pd.id ]]/">[[_withDefault(pd.reference_number)]]</a>
+            </div>
+            <div class="table-cell table-cell--text">
+              [[_withDefault(pd.status)]]
+            </div>
+            <div class="table-cell table-cell--text" flex-3>
+              [[_withDefault(pd.title)]]
+            </div>
+            <div class="table-cell table-cell--text">
+              [[_withDefault(pd.calculated_budget)]]
+            </div>
+            <div class="table-cell table-cell--text">
+              <report-status status="[[pd.report_status]]"></report-status>
+            </div>
+            <div class="table-cell table-cell--text">
+              [[_withDefault(pd.due_date, '-')]]
+            </div>
+            <div class="table-cell table-cell--text cell-reports">
+              <a href="pd/[[ pd.id ]]/reports">Reports</a>
+            </div>
+          </div>
+        </etools-data-table-row>
+      </template>
+
+      <etools-data-table-footer
+          page-size="[[pageSize]]"
+          page-number="[[pageNumber]]"
+          total-results="[[totalResults]]"
+          visible-range="{{visibleRange}}"
+          on-page-size-changed="_pageSizeChanged"
+          on-page-number-changed="_pageNumberChanged">
+      </etools-data-table-footer>
+
+      <etools-loading active="[[loading]]"></etools-loading>
+    </etools-content-panel>
+  </template>
+
+  <script>
+    Polymer({
+      id: 'pd-list',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.DataTableBehavior,
+        App.Behaviors.PaginationBehavior,
+        App.Behaviors.UtilsBehavior,
+      ],
+
+      properties: {
+        loading: {
+          type: Boolean,
+          statePath: 'programmeDocuments.loading',
+        },
+
+        data: {
+          type: Array,
+          statePath: 'programmeDocuments.all',
+        },
+
+        totalResults: {
+          type: Number,
+          statePath: 'programmeDocuments.count',
+        },
+      },
+    });
+  </script>
+</dom-module>

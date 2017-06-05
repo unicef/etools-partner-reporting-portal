@@ -9,7 +9,7 @@ IS_DEV = True
 # domains/hosts etc.
 DOMAIN_NAME = '127.0.0.1:8000'
 WWW_ROOT = 'http://%s/' % DOMAIN_NAME
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "django_api"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "*"]
 
 # other
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

@@ -1,11 +1,18 @@
-<link rel="import" href="../constants.html">
 <link rel="import" href="../../bower_components/promise-polyfill/promise-polyfill-lite.html">
+
+<link rel="import" href="../polyfills/es6-shim.html">
+<link rel="import" href="../constants.html">
+<link rel="import" href="actions/location.html">
+<link rel="import" href="actions/pd.html">
+
 
 <script>
   (function () {
     'use strict';
 
-    App.Actions = {
+    App.Actions = App.Actions || {};
+
+    Object.assign(App.Actions, {
 
       // Auth
       setToken: function (token) {
@@ -52,6 +59,7 @@
                         id: intervention.id,
                         code: intervention.country_code,
                         name: intervention.country_name,
+                        location: intervention.location_id,
                       };
                     });
 
@@ -81,6 +89,49 @@
         };
       },
 
+      // Indicator Data
+      fetchIndicators: function (indicatorsThunk) {
+        return function (dispatch) {
+          dispatch(App.Actions.indicatorsLoadingStart());
+          return indicatorsThunk()
+            .catch(function () {
+              dispatch(App.Actions.indicatorsLoadingStop());
+            })
+            .then(function (res) {
+              var indicators = res.data;
+              dispatch(App.Actions.setIndicators(indicators));
+              dispatch(App.Actions.indicatorsLoadingStop());
+              dispatch(App.Actions.setIndicatorsCount(indicators));
+            });
+        };
+      },
+
+      setIndicators: function (indicatorsData) {
+        return {
+          type: App.Constants.SET_INDICATORS,
+          indicatorsData: indicatorsData,
+        };
+      },
+
+      indicatorsLoadingStart: function () {
+        return {
+          type: App.Constants.INDICATORS_LOADING_START,
+        };
+      },
+
+      indicatorsLoadingStop: function () {
+        return {
+          type: App.Constants.INDICATORS_LOADING_STOP,
+        };
+      },
+
+      setIndicatorsCount: function (indicators) {
+        return {
+          type: App.Constants.SET_INDICATORS_COUNT,
+          count: indicators.count
+        };
+      },
+
       // Partner data
       fetchPartner: function (partnerThunk) {
         return function (dispatch) {
@@ -106,6 +157,7 @@
           type: App.Constants.RESET,
         };
       },
-    };
+
+    });
   }());
 </script>

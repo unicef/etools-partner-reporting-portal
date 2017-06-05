@@ -27,7 +27,7 @@ SHARED_PARTNER_TYPE = Choices(
 INTERVENTION_TYPES = Choices(
     ('PD', 'PD', 'Programme Document'),
     ('SHP', 'SHPD', 'Simplified Humanitarian Programme Document'),
-    ('SSF', 'SSFA', u'SSFA TOR'),
+    ('SSF', 'SSFA', u'Small-Scale Funding Agreement'),
 )
 
 INTERVENTION_STATUS = Choices(
@@ -44,4 +44,34 @@ INDICATOR_REPORT_STATUS = Choices(
     ('Con', 'constrained', 'Constrained'),
     ('NP', 'noprogress', 'No Progress'),
     ('TM', 'targetmet', 'Target Met')
+)
+
+ADMINISTRATIVE_LEVEL = Choices(
+    ('Cou', 'country', 'Country level'),
+    ('Reg', 'region', 'Region level'),
+    ('Cit', 'city', 'City level'),
+)
+
+FREQUENCY_LEVEL = Choices(
+    ('Wee', 'weekly', 'Weekly'),
+    ('Mon', 'monthly', 'Monthly'),
+    ('Qua', 'quarterly', 'Quarterly'),
+)
+
+PD_LIST_REPORT_STATUS = Choices(
+    (1, 'nothing_due', 'Nothing due'),
+    (2, 'overdue', 'Overdue'),
+    (3, 'due', 'Due'),
+)
+
+PD_DOCUMENT_TYPE = Choices(
+    ('PD', 'PD', 'Programme Document'),
+    ('SHP', 'SHPD', 'Simplified Humanitarian Programme Document'),
+    ('SSF', 'SSFA_TOR', u'SSFA TOR'),
+)
+
+PD_STATUS = Choices(
+    ("Dra", "draft", "Draft"),
+    ("Act", "active", "Active"),
+    ("Imp", "implemented", "Implemented"),
 )
