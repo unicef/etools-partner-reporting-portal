@@ -1,7 +1,9 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../../bower_components/iron-location/iron-query-params.html">
 
-<link rel="import" href="../../../behaviors/data-table.html">
+<link rel="import" href="../../../elements/ip-reporting/indicators-filters.html">
 <link rel="import" href="../../../elements/ip-reporting/list-view-indicators.html">
 <link rel="import" href="../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../elements/page-header.html">
@@ -9,7 +11,6 @@
 <link rel="import" href="../../../endpoints.html">
 <link rel="import" href="../../../redux/actions.html">
 <link rel="import" href="../../../redux/store.html">
-
 
 <dom-module id="page-ip-reporting-indicators">
   <template>
@@ -20,14 +21,29 @@
       }
     </style>
 
+    <iron-location
+        query="{{query}}">
+    </iron-location>
+
+    <iron-query-params
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
+    </iron-query-params>
+
     <etools-prp-ajax id="indicators"
-                     url="[[indicatorsUrl]]">
+                     url="[[indicatorsUrl]]"
+                     params="[[queryParams]]">
     </etools-prp-ajax>
 
     <page-header title="Indicators"></page-header>
     <page-body>
+      <indicators-filters query="[[query]]"
+                          params="[[queryParams]]">
+      </indicators-filters>
       <list-view-indicators page-size="{{pageSize}}"
-                            page-number="{{pageNumber}}"/>
+                            page-number="{{pageNumber}}"
+                            query="[[query]]"
+                            params="[[queryParams]]"/>
     </page-body>
   </template>
 
@@ -38,28 +54,32 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
-        App.Behaviors.DataTableBehavior,
       ],
 
       properties: {
-        indicatorsBaseUrl: {
+        indicatorsUrl: {
           type: String,
           value: App.Endpoints.indicators(),
         },
+
         pageSize: {
           type: Number,
           value: 10
         },
+
         pageNumber: {
           type: Number,
           value: 1
         },
-        indicatorsUrl: {
-          type: String,
-          observer: '_urlParametersChanged',
-          computed: '_computePaginatedUrl(indicatorsBaseUrl, pageSize, pageNumber)',
-        }
+
+        query: String,
+
+        queryParams: Object,
       },
+
+      observers: [
+        '_indicatorsAjax(indicatorsUrl, queryParams)',
+      ],
 
       _indicatorsAjax: function() {
         // 'this.$.indicators' references the ID given above to etools-prp-ajax.

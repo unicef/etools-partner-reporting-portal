@@ -1,0 +1,112 @@
+<!-- This adjusts the etools data-table-row to notify the parent component when the
+row is toggled open.
+This allows Ajax calls to be made only upon click. -->
+
+<link rel="import" href="../polymer/polymer.html">
+
+<dom-module id="etools-prp-data-table-row">
+
+  <template>
+
+    <style>
+      *[hidden] {
+        display: none !important;
+      }
+
+      :host {
+        --row-width: {
+          width: calc(100% - 96px);
+        }
+        display: block;
+        border-bottom: 1px solid var(--list-divider-color, #9D9D9D);
+      }
+
+      :host(:hover) paper-material {
+        background-color: var(--list-second-bg-color, #eeeeee);
+        @apply(--hover-setting);
+      }
+
+      paper-material {
+        @apply(--layout-horizontal);
+        @apply(--layout-center);
+        padding-right: 24px;
+        font-size: 13px;
+        color: var(--list-text-color, #2b2b2b);
+        background-color: var(--list-bg-color, #FFFFFF);
+      }
+
+      paper-material ::slotted(*) {
+        @apply(--row-width);
+        text-overflow: ellipsis;
+      }
+
+      #iconWrapper {
+        height: 48px;
+        line-height: 48px;
+        padding: 0 24px;
+        cursor: pointer;
+        width: 24px;
+      }
+
+      iron-icon {
+        color: var(--list-icon-color, #2b2b2b);
+      }
+      iron-icon:hover {
+        color: var(--list-icon-hover-color, rgba(0, 0, 0, 0.87));
+      }
+
+      #collapse-wrapper {
+        padding: 15px 24px 15px 72px;
+        background-color: var(--list-second-bg-color, #eeeeee);
+        border-top: 1px solid var(--list-divider-color, #9D9D9D);
+      }
+
+    </style>
+
+    <paper-material id="wrapper" elevation="0">
+      <div id="iconWrapper">
+        <iron-icon id="more" icon="expand-more" hidden$="[[detailsOpened]]" on-tap="_toggleRowDetails"></iron-icon>
+        <iron-icon id="less" icon="expand-less" hidden$="[[!detailsOpened]]" on-tap="_toggleRowDetails"></iron-icon>
+      </div>
+      <slot name="row-data"></slot>
+    </paper-material>
+
+    <iron-collapse id="details" opened="{{detailsOpened}}">
+      <div id="collapse-wrapper">
+        <slot name="row-data-details"></slot>
+      </div>
+    </iron-collapse>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'etools-prp-data-table-row',
+      properties: {
+        detailsOpened: {
+          type: Boolean,
+          value: false,
+          notify: true
+        },
+        noCollapse: {
+          type: Boolean,
+          observer: '_noCollapse'
+        }
+      },
+
+      _toggleRowDetails: function() {
+        this.$.details.toggle();
+      },
+      // disables collapsable content when no-collapse attribute set
+      _noCollapse: function() {
+        this.$.details.style.display = 'none';
+        this.$.wrapper.style.padding = '0 24px';
+        this.$.iconWrapper.style.display = 'none';
+        this.customStyle['--hover-setting'] = 'background : transparent';
+        this.customStyle['--row-width'] = 'width : 100%';
+        this.updateStyles();
+      }
+    });
+  </script>
+
+</dom-module>

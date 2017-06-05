@@ -66,15 +66,14 @@ class Reportable(TimeStampedModel):
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
 
-    project = models.ForeignKey('partner.PartnerProject', null=True, related_name="reportables")
     blueprint = models.ForeignKey(IndicatorBlueprint, null=True, related_name="reportables")
-    objective = models.ForeignKey('cluster.ClusterObjective', null=True, related_name="reportables")
 
     parent_indicator = models.ForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
 
     @property
     def ref_num(self):
         from unicef.models import LowerLevelOutput
+
         if isinstance(self.content_object, LowerLevelOutput):
             return self.content_object.indicator.programme_document.reference_number
         else:
@@ -102,27 +101,10 @@ class Reportable(TimeStampedModel):
         return "Reportable <pk:%s>" % self.id
 
 
-class IndicatorDisaggregation(TimeStampedModel):
-    title = models.CharField(max_length=255)
-    range = FloatRangeField()
-
-    indicator = models.ForeignKey(Reportable, related_name="indicator_disaggregations")
-
-
-class IndicatorDataSpecification(TimeStampedModel):
-    title = models.CharField(max_length=255)
-    calculation_method = models.CharField(max_length=255)
-    frequency = models.IntegerField()
-    unit = models.CharField(max_length=255)
-
-    indicator = models.ForeignKey(Reportable, related_name="indicator_data_specifications")
-
-
 class IndicatorReport(TimeStampedModel):
     title = models.CharField(max_length=255)
     reportable = models.ForeignKey(Reportable, related_name="indicator_reports")
     progress_report = models.ForeignKey('unicef.ProgressReport', related_name="indicator_reports", null=True)
-    location = models.OneToOneField('core.Location', related_name="indicator_report", null=True)
     time_period_start = models.DateField(auto_now=True)  # first day of defined frequency mode
     time_period_end = models.DateField()  # first day of defined frequency mode
 
@@ -151,4 +133,4 @@ class IndicatorLocationData(TimeStampedModel):
     disaggregation = JSONField(default=dict)
 
     def __str__(self):
-        return "{} Location Data for {}".format(location, indicator_report)
+        return "{} Location Data for {}".format(self.location, self.indicator_report)
