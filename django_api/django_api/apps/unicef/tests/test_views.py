@@ -26,10 +26,7 @@ class TestProgrammeDocumentAPIView(APITestCase):
         self.quantity = 5
 
         ProgrammeDocumentFactory.create_batch(self.quantity)
-        print "{} ProgrammeDocument objects created".format(self.quantity)
-
         SectionFactory.create_batch(self.quantity)
-        print "{} Section objects created".format(self.quantity)
 
         # Linking the followings:
         # created LowerLevelOutput - ReportableToLowerLevelOutput
@@ -50,7 +47,6 @@ class TestProgrammeDocumentAPIView(APITestCase):
 
         # Intervention creates Cluster and Locations
         InterventionFactory.create_batch(self.quantity, locations=Location.objects.all())
-        print "{} Intervention objects created".format(self.quantity)
 
         # Make all requests in the context of a logged in session.
         admin, created = User.objects.get_or_create(username='admin', defaults={
@@ -110,14 +106,13 @@ class TestProgrammeDocumentAPIView(APITestCase):
         )
 
         self.assertTrue(status.is_success(response.status_code))
-
-        # Document status is Draft
-        self.assertEquals(len(response.data['results']), 4)
-        self.assertEquals(response.data['results'][0]['status'], document['status'])
+        for result in response.data['results']:
+            self.assertEquals(result['title'], document['title'])
 
     def test_detail_api(self):
         pd = ProgrammeDocument.objects.first()
-        url = reverse('programme-document-details', kwargs={'pk': pd.pk})
+        # location_id is redundantly!
+        url = reverse('programme-document-details', kwargs={'location_id': 1, 'pk': pd.pk})
         response = self.client.get(url, format='json')
 
         self.assertTrue(status.is_success(response.status_code))
