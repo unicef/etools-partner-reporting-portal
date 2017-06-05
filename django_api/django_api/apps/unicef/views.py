@@ -5,17 +5,16 @@ from rest_framework.generics import RetrieveAPIView, ListAPIView
 from rest_framework.response import Response
 from rest_framework import status as statuses
 
-import django_filters
 import django_filters.rest_framework
 
 from core.paginations import SmallPagination
 from core.permissions import IsAuthenticated
 from core.models import Location
+
 from .serializer import (
     ProgrammeDocumentSerializer,
     ProgrammeDocumentDetailSerializer,
 )
-
 from .models import ProgrammeDocument
 from .filters import ProgrammeDocumentFilter
 

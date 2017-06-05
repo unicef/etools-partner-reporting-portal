@@ -13,6 +13,14 @@
 
 <link rel="import" href="../../../../behaviors/utils.html">
 
+<link rel="import" href="../../../../elements/page-body.html">
+<link rel="import" href="../../../../elements/ip-reporting/pd-page-header.html">
+<link rel="import" href="../../../../elements/ip-reporting/pd-details-content.html">
+<link rel="import" href="../../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../../endpoints.html">
+<link rel="import" href="../../../../redux/actions.html">
+<link rel="import" href="../../../../redux/store.html">
+
 <dom-module id="page-ip-reporting-pd-details">
   <template>
     <style include="shared-styles">
@@ -84,7 +92,7 @@
       </template>
 
       <template is="dom-if" if="[[_equals(pdTab, 'reports')]]" restamp="true">
-          <pd-details-reports name="reports"></pd-details-reports>
+          <pd-details-reports name="reports" pd-id="[[ pd.id ]]"></pd-details-reports>
       </template>
 
     </iron-pages>
@@ -118,7 +126,6 @@
 
         routeData: {
           type: Object,
-          observer: '_updateUrlTab'
         },
 
         programmeDocumentDetailsUrl: {
@@ -129,21 +136,25 @@
         location: {
           type: String,
           statePath: 'location.id',
+          observer: '_locationSet'
         },
 
         pdId: Number,
       },
 
+      observers: [
+        '_updateUrlTab(routeData.dashTab)'
+      ],
+
       _updateTabSelection: function () {
         this.$.tabContent.select(this.pdTab);
       },
 
-      _updateUrlTab: function (routeData) {
-        if (!routeData) {
+      _updateUrlTab: function (dashTab) {
+        if (!dashTab) {
           return;
         }
 
-        var dashTab = routeData.dashTab;
         this.set('pdTab', dashTab);
       },
 
@@ -151,16 +162,19 @@
         return App.Endpoints.programmeDocumentDetail(location, pdId);
       },
 
-      attached: function () {
-        var self = this;
+      _locationSet: function(location) {
+        if (location) {
+          var self = this;
 
-        this.$.programmeDocumentDetails.thunk()()
-          .then(function (res) {
-            self.pd = res.data;
-            self.loaded = true;
-          });
+          this.$.programmeDocumentDetails.thunk()()
+            .then(function (res) {
+              self.pd = res.data;
+              self.loaded = true;
+            });
+        } else {
+          return;
+        }
       },
-
     });
   </script>
 </dom-module>

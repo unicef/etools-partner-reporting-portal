@@ -1,35 +1,77 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../bower_components/etools-content-panel/etools-content-panel.html">
-<link rel="import" href="../../../bower_components/iron-icons/communication-icons.html">
-<link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
-<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
-<link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
-
-<link rel="import" href="../../redux/store.html">
-<link rel="import" href="../../behaviors/utils.html">
-<link rel="import" href="../../elements/labelled-item.html">
+<link rel="import" href="../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../bower_components/iron-location/iron-query-params.html">
+<link rel="import" href="../../elements/ip-reporting/pd-report-filters.html">
+<link rel="import" href="../../elements/ip-reporting/pd-reports-list.html">
 
 <dom-module id="pd-details-reports">
   <template>
-    <style>
+    <style include="data-table-styles table-styles">
       :host {
         display: block;
       }
     </style>
 
+    <iron-location
+        query="{{query}}">
+    </iron-location>
+
+    <iron-query-params
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
+    </iron-query-params>
+
+    <etools-prp-ajax
+        id="pdReports"
+        url="[[pdReportsUrl]]"
+        params="[[queryParams]]">
+    </etools-prp-ajax>
+
     <page-body>
-      <etools-content-panel panel-title="Reports">
-        <h3>TODO</h3>
-      </etools-content-panel>
-
+      <pd-report-filters></pd-report-filters>
+      <pd-reports-list data="[[ data ]]" loaded="[[ loaded ]]"></pd-reports-list>
     </page-body>
-
 
   </template>
 
   <script>
     Polymer({
       is: 'pd-details-reports',
+
+      properties: {
+        loaded: {
+          type: Boolean,
+          value: false
+        },
+
+        pdId: Number,
+
+        pdReportsUrl: {
+          type: String,
+          computed: '_computePDReportsUrl(pdId)',
+        },
+
+        data: Array,
+
+      },
+
+      observers: [
+        '_handleInputChange(pdReportsUrl, queryParams)',
+      ],
+
+      _computePDReportsUrl: function (pdId) {
+        return App.Endpoints.programmeDocumentReports(pdId);
+      },
+
+      _handleInputChange: function (url, params) { // jshint ignore:line
+        var self = this;
+
+        this.$.pdReports.thunk()()
+          .then(function (res) {
+            self.data = res.data;
+            self.loaded = true;
+          });
+      },
 
     });
   </script>
