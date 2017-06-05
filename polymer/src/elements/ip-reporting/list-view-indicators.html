@@ -56,8 +56,8 @@
       </template>
 
       <etools-data-table-footer
-          page-size="[[_computeParamValue(queryParams, 'page_size', 10)]]"
-          page-number="[[_computeParamValue(queryParams, 'page', 1)]]"
+          page-size="[[pageSize]]"
+          page-number="[[pageNumber]]"
           total-results="[[totalResults]]"
           visible-range="{{visibleRange}}"
           on-page-size-changed="_pageSizeChanged"
