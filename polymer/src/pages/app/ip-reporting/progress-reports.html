@@ -18,9 +18,9 @@
       }
     </style>
 
-    <!-- <etools-prp-ajax id="reports"
+    <etools-prp-ajax id="reports"
      url="[[indicatorsUrl]]">
-    </etools-prp-ajax> -->
+    </etools-prp-ajax>
 
     <page-header title="Progress Reports"></page-header>
     <page-body>
@@ -40,41 +40,41 @@
       ],
 
       properties: {
-        // reportsBaseUrl: {
-        //   type: String,
-        //   value: App.Endpoints.progressReports(),
-        // },
-        // pageSize: {
-        //   type: Number,
-        //   value: 10
-        // },
-        // pageNumber: {
-        //   type: Number,
-        //   value: 1
-        // },
-        // indicatorsUrl: {
-        //   type: String,
-        //   observer: '_urlParametersChanged',
-        //   computed: '_computePaginatedUrl(reportsBaseUrl, pageSize, pageNumber)',
-        // }
+        reportsBaseUrl: {
+          type: String,
+          value: App.Endpoints.progressReports(),
+        },
+        pageSize: {
+          type: Number,
+          value: 10
+        },
+        pageNumber: {
+          type: Number,
+          value: 1
+        },
+        indicatorsUrl: {
+          type: String,
+          observer: '_urlParametersChanged',
+          computed: '_computePaginatedUrl(reportsBaseUrl, pageSize, pageNumber)',
+        }
       },
 
-      // _reportsAjax: function() {
-      //   var progressReportsThunk = this.$.reports.thunk();
-      //   this.dispatch(App.Actions.fetchProgressReports(progressReportsThunk))
-      //     .catch(function(err) {
-      //       return Promise.reject(err);;
-      //     })
-      // },
+      _reportsAjax: function() {
+        var progressReportsThunk = this.$.reports.thunk();
+        this.dispatch(App.Actions.ProgressReports.fetch(progressReportsThunk))
+          .catch(function(err) {
+            return Promise.reject(err);;
+          })
+      },
 
-      // _urlParametersChanged: function() {
-      //   this.$.indicators.abort();
-      //   return this._indicatorsAjax();
-      // },
+      _urlParametersChanged: function() {
+        this.$.reports.abort();
+        return this._reportsAjax();
+      },
 
-      // attached: function () {
-      //   return this._indicatorsAjax();
-      // },
+      attached: function () {
+        return this._reportsAjax();
+      },
     })
   </script>
 </dom-module>
