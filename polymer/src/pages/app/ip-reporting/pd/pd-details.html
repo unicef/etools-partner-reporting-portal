@@ -126,7 +126,6 @@
 
         routeData: {
           type: Object,
-          observer: '_updateUrlTab'
         },
 
         programmeDocumentDetailsUrl: {
@@ -137,22 +136,25 @@
         location: {
           type: String,
           statePath: 'location.id',
-          observer: '_locationChanged'
+          observer: '_locationSet'
         },
 
         pdId: Number,
       },
 
+      observers: [
+        '_updateUrlTab(routeData.dashTab)'
+      ],
+
       _updateTabSelection: function () {
         this.$.tabContent.select(this.pdTab);
       },
 
-      _updateUrlTab: function (routeData) {
-        if (!routeData) {
+      _updateUrlTab: function (dashTab) {
+        if (!dashTab) {
           return;
         }
 
-        var dashTab = routeData.dashTab;
         this.set('pdTab', dashTab);
       },
 
@@ -160,7 +162,7 @@
         return App.Endpoints.programmeDocumentDetail(location, pdId);
       },
 
-      _locationChanged: function(location) {
+      _locationSet: function(location) {
         if (location) {
           var self = this;
 
