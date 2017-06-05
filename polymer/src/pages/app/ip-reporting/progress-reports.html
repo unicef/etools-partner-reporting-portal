@@ -63,8 +63,8 @@
         var progressReportsThunk = this.$.reports.thunk();
         this.dispatch(App.Actions.ProgressReports.fetch(progressReportsThunk))
           .catch(function(err) {
-            return Promise.reject(err);;
-          })
+            return Promise.reject(err);
+          });
       },
 
       _urlParametersChanged: function() {
@@ -75,6 +75,6 @@
       attached: function () {
         return this._reportsAjax();
       },
-    })
+    });
   </script>
 </dom-module>
