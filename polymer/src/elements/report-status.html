@@ -1,4 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="status-badge.html">
 
 <dom-module id="report-status">
   <template>
@@ -6,21 +7,9 @@
       :host {
         display: inline-block;
       }
-
-      .status-icon {
-        display: inline-block;
-        vertical-align: middle;
-        width: 1em;
-        height: 1em;
-        margin-right: .25em;
-        border-radius: .5em;
-        position: relative;
-        top: -1px;
-        line-height: 1;
-      }
     </style>
 
-    <span class="status-icon" style="background: [[bgColor]];"></span>
+    <status-badge type="[[type]]"></status-badge>
     [[label]]
   </template>
 
@@ -30,16 +19,29 @@
 
       properties: {
         status: Number,
-
+        type: {
+          type: String,
+          computed: '_computeType(status)',
+        },
         label: {
           type: String,
           computed: '_computeLabel(status)',
         },
-
-        bgColor: {
-          type: String,
-          computed: '_computeBgColor(status)',
-        },
+      },
+      _computeType: function(status) {
+        switch (status) {
+          case 1:
+          case 'Sub':
+            return 'success';
+          case 2:
+          case 'Ove':
+            return 'error';
+          case 3:
+          case 'Due':
+            return 'neutral';
+          case 'Rej':
+            return 'warning';
+        }
       },
 
       _computeLabel: function (status) {
@@ -47,22 +49,18 @@
           case 1:
             return 'Nothing due';
           case 2:
+          case 'Ove':
             return 'Overdue';
           case 3:
+          case 'Due':
             return 'Due';
+          case 'Sub':
+            return 'Submitted';
+          case 'Rej':
+            return 'Rejected';
         }
       },
 
-      _computeBgColor: function (status) {
-        switch (status) {
-          case 1:
-            return '#72c300';
-          case 2:
-            return '#d0021b';
-          case 3:
-            return '#d8d8d8';
-        }
-      },
     });
   </script>
 </dom-module>
