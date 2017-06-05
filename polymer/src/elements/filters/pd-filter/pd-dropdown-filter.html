@@ -1,0 +1,90 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../dropdown-filter/dropdown-filter.html">
+<link rel="import" href="../../etools-prp-ajax.html">
+<link rel="import" href="../../../endpoints.html">
+<link rel="import" href="../../../redux/store.html">
+
+<dom-module id="pd-dropdown-filter">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <etools-prp-ajax
+        id="programmeDocuments"
+        url="[[programmeDocumentsUrl]]">
+    </etools-prp-ajax>
+
+    <template is="dom-if" if="[[!loading]]">
+      <dropdown-filter
+        class="item"
+        label="PD"
+        name="pds"
+        value="[[_withDefault(queryParams.pds, '')]]"
+        data="[[data]]">
+      </dropdown-filter>
+    </template>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'pd-dropdown-filter',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        programmeDocumentsUrl: {
+          type: String,
+          computed: '_computeProgrammeDocumentsUrl(location)',
+        },
+
+        location: {
+          type: String,
+          statePath: 'location.id',
+        },
+
+        loading: {
+          type: Boolean,
+          value: true,
+          computed: '_computeLoading(data)',
+        },
+
+        data: {
+          type: Array,
+          value: [],
+        },
+
+        value: String,
+      },
+
+      _computeProgrammeDocumentsUrl: function (location) {
+        return App.Endpoints.programmeDocuments(location);
+      },
+
+      _computeLoading: function (data) {
+        return !data.length;
+      },
+
+      attached: function () {
+        var self = this;
+        this.$.programmeDocuments.thunk()()
+          .then(function (res) {
+            self.data = [{
+              id: '',
+              title: 'All'
+            }].concat(res.data.results);
+          });
+      },
+
+      detached: function () {
+        this.$.programmeDocuments.abort();
+      },
+
+    });
+  </script>
+</dom-module>

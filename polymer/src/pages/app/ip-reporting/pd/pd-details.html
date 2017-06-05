@@ -134,7 +134,7 @@
         pdId: Number,
       },
 
-      _updateTabSelection: function () {
+      _updateTabSelection: function() {
         this.$.tabContent.select(this.pdTab);
       },
 
@@ -147,11 +147,11 @@
         this.set('pdTab', dashTab);
       },
 
-      _computeProgrammeDocumentDetailsUrl: function (location, pdId) {
+      _computeProgrammeDocumentDetailsUrl: function(location, pdId) {
         return App.Endpoints.programmeDocumentDetail(location, pdId);
       },
 
-      attached: function () {
+      attached: function() {
         var self = this;
 
         this.$.programmeDocumentDetails.thunk()()
