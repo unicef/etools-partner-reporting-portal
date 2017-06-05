@@ -109,7 +109,6 @@
       ],
 
       properties: {
-
         pdTab: {
           type: String,
         },
@@ -142,22 +141,22 @@
         },
 
         pdId: Number,
-
       },
 
-      _updateTabSelection: function(e) {
+      _updateTabSelection: function () {
         this.$.tabContent.select(this.pdTab);
       },
 
-      _updateUrlTab: function(routeData) {
+      _updateUrlTab: function (routeData) {
         if (!routeData) {
           return;
         }
+
         var dashTab = routeData.dashTab;
         this.set('pdTab', dashTab);
       },
 
-      _computeProgrammeDocumentDetailsUrl: function(location, pdId){
+      _computeProgrammeDocumentDetailsUrl: function (location, pdId) {
         return App.Endpoints.programmeDocumentDetail(location, pdId);
       },
 
@@ -173,8 +172,7 @@
         } else {
           return;
         }
-      }
-
+      },
     });
   </script>
 </dom-module>
