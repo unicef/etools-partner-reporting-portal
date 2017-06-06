@@ -200,6 +200,9 @@ class Disaggregation(TimeStampedModel):
     reportable = models.ForeignKey(Reportable, related_name="disaggregation")
     active = models.BooleanField(default=False)
 
+    class Meta:
+        unique_together = ('name', 'reportable')
+
     def __str__(self):
         return "Disaggregation <pk:%s>" % self.id
 
