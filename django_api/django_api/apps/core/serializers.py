@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Intervention
+from .models import Intervention, Location
 
 
 class SimpleInterventionSerializer(serializers.ModelSerializer):
@@ -15,6 +15,13 @@ class SimpleInterventionSerializer(serializers.ModelSerializer):
         # for example: Ukrain, Luhansk, Sorokyne .. we want to have only Ukrain (no parent - always one)
         loc = obj.locations.filter(parent__isnull=True).first()
         return loc and str(loc.id)
+
+
+class SimpleLocationSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Location
+        fields = ('id', 'title', 'latitude', 'longitude', 'p_code')
 
 
 class ChildrenLocationSerializer(serializers.ModelSerializer):

@@ -5,35 +5,54 @@ from rest_framework.test import APITestCase, APIClient
 from account.models import User
 from core.tests.base import BaseAPITestCase
 from core.factories import (
-    IndicatorReportFactory, ProgrammeDocumentFactory, ReportableToLowerLevelOutputFactory,
-    ProgressReportFactory,
-    SectionFactory,
-    IndicatorLocationDataFactory,
+    LocationFactory, InterventionFactory,
+    ProgrammeDocumentFactory, ReportableToLowerLevelOutputFactory, ProgressReportFactory, IndicatorLocationDataFactory,
+    SectionFactory
 )
-from indicator.models import IndicatorReport
 from unicef.models import LowerLevelOutput, Section, ProgrammeDocument
 
+from indicator.models import Reportable, IndicatorReport, IndicatorLocationData
 
-class TestPDReportsAPIView(BaseAPITestCase):
 
-    generate_fake_data_quantity = 5
+def generate_test_data(quantity):
+    SectionFactory.create_batch(quantity)
+    ProgrammeDocumentFactory.create_batch(quantity)
+
+    # Linking the followings:
+    # created LowerLevelOutput - ReportableToLowerLevelOutput
+    # Section - ProgrammeDocument via ReportableToLowerLevelOutput
+    # ProgressReport - IndicatorReport from ReportableToLowerLevelOutput
+    # IndicatorReport & Location from ReportableToLowerLevelOutput - IndicatorLocationData
+    for idx in xrange(quantity):
+        llo = LowerLevelOutput.objects.all()[idx]
+        reportable = ReportableToLowerLevelOutputFactory(content_object=llo)
+
+        reportable.content_object.indicator.programme_document.sections.add(Section.objects.all()[idx])
+
+        indicator_report = reportable.indicator_reports.first()
+        indicator_report.progress_report = ProgressReportFactory()
+        indicator_report.save()
+
+        indicator_location_data = IndicatorLocationDataFactory(indicator_report=indicator_report, location=reportable.locations.first())
+
+
+class TestPDReportsAPIView(APITestCase):
 
     def setUp(self):
-        super(TestPDReportsAPIView, self).setUp()
-        for idx in xrange(self.generate_fake_data_quantity):
-            llo = LowerLevelOutput.objects.all()[idx]
-            reportable = ReportableToLowerLevelOutputFactory(content_object=llo)
+        self.quantity = 5
 
-            reportable.content_object.indicator.programme_document.sections.add(Section.objects.all()[idx])
+        generate_test_data(self.quantity)
 
-            indicator_report = reportable.indicator_reports.first()
-            indicator_report.progress_report = ProgressReportFactory()
-            indicator_report.save()
-
-            indicator_location_data = IndicatorLocationDataFactory(
-                indicator_report=indicator_report,
-                location=reportable.locations.first()
-            )
+        # Make all requests in the context of a logged in session.
+        admin, created = User.objects.get_or_create(username='admin', defaults={
+            'email': 'admin@unicef.org',
+            'is_superuser': True,
+            'is_staff': True
+        })
+        admin.set_password('Passw0rd!')
+        admin.save()
+        self.client = APIClient()
+        self.client.login(username='admin', password='Passw0rd!')
 
     def test_list_api(self):
         pd = ProgrammeDocument.objects.first()
@@ -59,28 +78,7 @@ class TestIndicatorListAPIView(APITestCase):
     def setUp(self):
         self.quantity = 5
 
-        ProgrammeDocumentFactory.create_batch(self.quantity)
-        print "{} ProgrammeDocument objects created".format(self.quantity)
-
-        SectionFactory.create_batch(self.quantity)
-        print "{} Section objects created".format(self.quantity)
-
-        # Linking the followings:
-        # created LowerLevelOutput - ReportableToLowerLevelOutput
-        # Section - ProgrammeDocument via ReportableToLowerLevelOutput
-        # ProgressReport - IndicatorReport from ReportableToLowerLevelOutput
-        # IndicatorReport & Location from ReportableToLowerLevelOutput - IndicatorLocationData
-        for idx in xrange(self.quantity):
-            llo = LowerLevelOutput.objects.all()[idx]
-            reportable = ReportableToLowerLevelOutputFactory(content_object=llo)
-
-            reportable.content_object.indicator.programme_document.sections.add(Section.objects.all()[idx])
-
-            indicator_report = reportable.indicator_reports.first()
-            indicator_report.progress_report = ProgressReportFactory()
-            indicator_report.save()
-
-            indicator_location_data = IndicatorLocationDataFactory(indicator_report=indicator_report, location=reportable.locations.first())
+        generate_test_data(self.quantity)
 
     def test_list_api(self):
         url = reverse('indicator-list-create-api')
@@ -88,3 +86,45 @@ class TestIndicatorListAPIView(APITestCase):
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(len(response.data['results']), self.quantity)
+
+    def test_list_api_filter_by_locations(self):
+        self.reports = Reportable.objects.filter(lower_level_outputs__reportables__isnull=False, locations__isnull=False)
+
+        location_ids = map(lambda item: str(item), self.reports.values_list('locations__id', flat=True))
+        location_id_list_string = ','.join(location_ids)
+
+        url = reverse('indicator-list-create-api')
+        url += '?locations=' + location_id_list_string
+        response = self.client.get(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(len(response.data['results']), len(self.reports))
+
+    def test_list_api_filter_by_pd_ids(self):
+        self.reports = Reportable.objects.filter(lower_level_outputs__reportables__isnull=False)
+
+        pd_ids = map(lambda item: str(item), self.reports.values_list('lower_level_outputs__indicator__programme_document__id', flat=True))
+        pd_id_list_string = ','.join(pd_ids)
+
+        url = reverse('indicator-list-create-api')
+        url += '?pds=' + pd_id_list_string
+        response = self.client.get(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(len(response.data['results']), len(self.reports))
+
+
+class TestIndicatorReportListAPIView(APITestCase):
+
+    def setUp(self):
+        generate_test_data(5)
+
+    def test_list_api(self):
+        indicator_report = IndicatorReport.objects.last()
+
+        url = reverse('indicator-report-list-api', kwargs={'pk': indicator_report.reportable.id})
+        response = self.client.get(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(len(response.data), 1)
+        self.assertNotEquals(response.data[0]['indicator_location_data'][0]['disaggregation'], {})
