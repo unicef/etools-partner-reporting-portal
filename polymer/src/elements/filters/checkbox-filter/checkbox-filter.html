@@ -49,7 +49,7 @@
         'field.change': '_handleInput',
       },
 
-      _handleInput: function (e) {
+      _handleInput: function () {
         this.debounce('change', function propagateChange() {
           var newValue = '' + this._toNumber(this.$.field.checked);
 
