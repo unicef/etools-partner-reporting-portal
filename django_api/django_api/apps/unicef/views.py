@@ -11,12 +11,14 @@ from core.paginations import SmallPagination
 from core.permissions import IsAuthenticated
 from core.models import Location
 
-from .serializer import (
+from .serializers import (
     ProgrammeDocumentSerializer,
     ProgrammeDocumentDetailSerializer,
+    ProgressReportSerializer,
 )
-from .models import ProgrammeDocument
-from .filters import ProgrammeDocumentFilter
+
+from .models import ProgrammeDocument, ProgressReport
+from .filters import ProgrammeDocumentFilter, ProgressReportFilter
 
 
 class ProgrammeDocumentAPIView(ListAPIView):
@@ -79,3 +81,16 @@ class ProgrammeDocumentDetailsAPIView(RetrieveAPIView):
             return ProgrammeDocument.objects.get(pk=pk)
         except ProgrammeDocument.DoesNotExist:
             raise Http404
+
+
+class ProgressReportAPIView(ListAPIView):
+    """
+    Endpoint for getting list of all PD Progress Reports
+    """
+    queryset = ProgressReport.objects.all()
+    serializer_class = ProgressReportSerializer
+    pagination_class = SmallPagination
+    permission_classes = (IsAuthenticated, )
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
+    filter_class = ProgressReportFilter
+

@@ -2,9 +2,9 @@ from django.db.models import Q
 import django_filters
 from django_filters.filters import ChoiceFilter, CharFilter, DateFilter, ModelChoiceFilter
 
-from core.common import PD_LIST_REPORT_STATUS, PD_STATUS
+from core.common import PD_LIST_REPORT_STATUS, PD_STATUS, PROGRESS_REPORT_STATUS
 from core.models import Location
-from .models import ProgrammeDocument
+from .models import ProgrammeDocument, ProgressReport
 
 
 class ProgrammeDocumentFilter(django_filters.FilterSet):
@@ -52,3 +52,24 @@ class ProgrammeDocumentFilter(django_filters.FilterSet):
     #         return queryset.filter(
     #
     #         )
+
+
+class ProgressReportFilter(django_filters.FilterSet):
+    status = ChoiceFilter(choices=PROGRESS_REPORT_STATUS)
+    pd_title = CharFilter(method='get_pd_title')
+    due_date = DateFilter(method='get_due_date')
+
+    class Meta:
+        model = ProgressReport
+        fields = ['status', 'pd_title', 'due_date']
+
+    def get_status(self, queryset, name, value):
+        return queryset.filter(status=value)
+
+    def get_pd_title(self, queryset, name, value):
+        return queryset.filter(
+            Q(programme_document__reference_number__icontains=value) | Q(programme_document__title__icontains=value)
+        )
+
+    def get_due_date(self, queryset, name, value):
+        return queryset.filter(indicator_reports__due_date=value)
