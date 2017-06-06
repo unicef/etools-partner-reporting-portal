@@ -70,6 +70,13 @@ PD_DOCUMENT_TYPE = Choices(
     ('SSF', 'SSFA_TOR', u'SSFA TOR'),
 )
 
+PROGRESS_REPORT_STATUS = Choices(
+    ('Due', 'due', 'Due'),
+    ('Ove', 'over_due', 'Over due'),
+    ('Sub', 'submitted', 'Submitted'),
+    ('Rej', 'rejected', 'Rejected'),
+)
+
 PD_STATUS = Choices(
     ("Dra", "draft", "Draft"),
     ("Act", "active", "Active"),

@@ -5,18 +5,53 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.contenttypes.models import ContentType
 
 from rest_framework import status
-from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import ListCreateAPIView, ListAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
 import django_filters.rest_framework
 
+from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
 from unicef.models import LowerLevelOutput
 
-from .serializers import IndicatorListSerializer, IndicatorReportListSerializer
-from .filters import IndicatorFilter
-from .models import Reportable
+from .serializers import IndicatorListSerializer, IndicatorReportListSerializer, PDReportsSerializer
+from .filters import IndicatorFilter, PDReportsFilter
+from .models import IndicatorReport, Reportable
+
+
+class PDReportsAPIView(ListAPIView):
+
+    serializer_class = PDReportsSerializer
+    pagination_class = SmallPagination
+    permission_classes = (IsAuthenticated, )
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
+    filter_class = PDReportsFilter
+
+    def get_queryset(self):
+        from unicef.models import ProgrammeDocument
+
+        pd = get_object_or_404(ProgrammeDocument, pk=self.pd_id)
+
+        pks = pd.reportable_queryset.values_list('indicator_reports__pk', flat=True)
+        return IndicatorReport.objects.filter(id__in=pks)
+
+    def list(self, request, pd_id, *args, **kwargs):
+        """
+        Get Programme Document Details by given pk.
+        """
+        self.pd_id = pd_id
+        queryset = self.get_queryset()
+        filtered = PDReportsFilter(request.GET, queryset=queryset)
+
+        page = self.paginate_queryset(filtered.qs)
+
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(filtered.qs, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class IndicatorListCreateAPIView(ListCreateAPIView):

@@ -33,9 +33,14 @@
         return this._buildUrl('/unicef/' + locationId + '/programme-document/details/' + pdId);
       },
 
+      programmeDocumentReports: function (pdId) {
+        return this._buildUrl('/indicator/programme-document/details/' + pdId + '/reports/');
+      },
+
       childLocations: function (locationId) {
         return this._buildUrl('/core/' + locationId + '/children-location/');
       },
+
     };
   }());
 </script>

@@ -5,16 +5,46 @@ from rest_framework.test import APIClient, APITestCase
 
 from account.models import User
 
-from core.factories import LocationFactory, InterventionFactory
+from core.factories import (
+    LocationFactory, InterventionFactory,
+    ProgrammeDocumentFactory, ReportableToLowerLevelOutputFactory, ProgressReportFactory, IndicatorLocationDataFactory,
+    SectionFactory
+)
 from core.models import Location, Intervention
+
+from unicef.models import LowerLevelOutput, Section
+
+
+def generate_test_data(quantity):
+    SectionFactory.create_batch(quantity)
+    ProgrammeDocumentFactory.create_batch(quantity)
+
+    # Linking the followings:
+    # created LowerLevelOutput - ReportableToLowerLevelOutput
+    # Section - ProgrammeDocument via ReportableToLowerLevelOutput
+    # ProgressReport - IndicatorReport from ReportableToLowerLevelOutput
+    # IndicatorReport & Location from ReportableToLowerLevelOutput - IndicatorLocationData
+    for idx in xrange(quantity):
+        llo = LowerLevelOutput.objects.all()[idx]
+        reportable = ReportableToLowerLevelOutputFactory(content_object=llo)
+
+        reportable.content_object.indicator.programme_document.sections.add(Section.objects.all()[idx])
+
+        indicator_report = reportable.indicator_reports.first()
+        indicator_report.progress_report = ProgressReportFactory()
+        indicator_report.save()
+
+        indicator_location_data = IndicatorLocationDataFactory(indicator_report=indicator_report, location=reportable.locations.first())
 
 
 class TestInterventionListAPIView(APITestCase):
 
     def setUp(self):
-        self.locations = LocationFactory.create_batch(5)
+        generate_test_data(5)
 
-        self.interventions = InterventionFactory.create_batch(5, locations=self.locations)
+        self.locations = Location.objects.all()
+
+        self.interventions = Intervention.objects.filter(locations=self.locations)
         self.count = Intervention.objects.count()
 
         # Make all requests in the context of a logged in session.
@@ -39,7 +69,9 @@ class TestInterventionListAPIView(APITestCase):
 class TestLocationListAPIView(APITestCase):
 
     def setUp(self):
-        self.locations = LocationFactory.create_batch(5)
+        generate_test_data(5)
+
+        self.locations = Location.objects.all()
         self.count = Location.objects.count()
 
     def test_list_api(self):
