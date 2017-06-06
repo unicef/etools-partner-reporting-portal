@@ -5,7 +5,7 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.contenttypes.models import ContentType
 
 from rest_framework import status
-from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import ListCreateAPIView, ListAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
@@ -15,7 +15,7 @@ from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
 from unicef.models import LowerLevelOutput
 
-from .serializers import IndicatorListSerializer, IndicatorReportListSerializer, PDReportsSerializer,
+from .serializers import IndicatorListSerializer, IndicatorReportListSerializer, PDReportsSerializer
 from .filters import IndicatorFilter, PDReportsFilter
 from .models import IndicatorReport, Reportable
 

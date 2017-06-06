@@ -15,7 +15,7 @@ class IndicatorFilter(filters.FilterSet):
         )
 
 
-class PDReportsFilter(django_filters.FilterSet):
+class PDReportsFilter(filters.FilterSet):
     status = ChoiceFilter(choices=PROGRESS_REPORT_STATUS, method="get_status")
 
     class Meta:
