@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 from decimal import Decimal
 from datetime import date
 
-from django.db import models, transaction
+from django.db import models
 from django.contrib.contenttypes.fields import GenericRelation
 from django.utils.functional import cached_property
 
@@ -16,18 +16,8 @@ from core.common import (
     PD_DOCUMENT_TYPE,
     PROGRESS_REPORT_STATUS,
     PD_STATUS,
-    PD_DOCUMENT_TYPE,
 )
-from indicator.models import IndicatorReport, Reportable
-
-
-class ProgressReport(TimeStampedModel):
-    partner_contribution_to_date = models.CharField(max_length=256)
-    funds_received_to_date = models.CharField(max_length=256)
-    challenges_in_the_reporting_period = models.CharField(max_length=256)
-    proposed_way_forward = models.CharField(max_length=256)
-    status = models.CharField(max_length=3, choices=PROGRESS_REPORT_STATUS, default=PROGRESS_REPORT_STATUS.due)
-    # attachements ???
+from indicator.models import Reportable
 
 
 class Section(models.Model):
@@ -224,6 +214,16 @@ class ProgrammeDocument(TimeStampedModel):
     #             programme_document=self,
     #             time_period=self.start_date,
     #         )
+
+
+class ProgressReport(TimeStampedModel):
+    partner_contribution_to_date = models.CharField(max_length=256)
+    funds_received_to_date = models.CharField(max_length=256)
+    challenges_in_the_reporting_period = models.CharField(max_length=256)
+    proposed_way_forward = models.CharField(max_length=256)
+    status = models.CharField(max_length=3, choices=PROGRESS_REPORT_STATUS, default=PROGRESS_REPORT_STATUS.due)
+    programme_document = models.ForeignKey(ProgrammeDocument, related_name="progress_reports")
+    # attachements ???
 
 
 class CountryProgrammeOutput(TimeStampedModel):

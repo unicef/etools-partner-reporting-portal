@@ -292,6 +292,7 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     partner_focal_point = factory.Sequence(lambda n: "Hanin Odeh %d" % n)
 
     cp_output = factory.RelatedFactory('core.factories.CountryProgrammeOutputFactory', 'programme_document')
+    progress_reports = factory.RelatedFactory(ProgressReportFactory, 'programme_document')
 
     class Meta:
         model = ProgrammeDocument
