@@ -1,4 +1,5 @@
 from django.urls import reverse
+from django.db.models import Q
 
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
@@ -16,6 +17,8 @@ from indicator.models import Reportable, IndicatorBlueprint, IndicatorReport
 
 from unicef.models import LowerLevelOutput, Section, ProgrammeDocument
 
+from unicef.models import ProgrammeDocument
+
 
 class TestProgrammeDocumentAPIView(APITestCase):
 
@@ -23,10 +26,7 @@ class TestProgrammeDocumentAPIView(APITestCase):
         self.quantity = 5
 
         ProgrammeDocumentFactory.create_batch(self.quantity)
-        print "{} ProgrammeDocument objects created".format(self.quantity)
-
         SectionFactory.create_batch(self.quantity)
-        print "{} Section objects created".format(self.quantity)
 
         # Linking the followings:
         # created LowerLevelOutput - ReportableToLowerLevelOutput
@@ -47,7 +47,6 @@ class TestProgrammeDocumentAPIView(APITestCase):
 
         # Intervention creates Cluster and Locations
         InterventionFactory.create_batch(self.quantity, locations=Location.objects.all())
-        print "{} Intervention objects created".format(self.quantity)
 
         # Make all requests in the context of a logged in session.
         admin, created = User.objects.get_or_create(username='admin', defaults={
@@ -62,7 +61,10 @@ class TestProgrammeDocumentAPIView(APITestCase):
 
     def test_list_api(self):
         intervention = Intervention.objects.filter(locations__isnull=False).first()
-        url = reverse('programme-document', kwargs={'location_id': intervention.locations.first().id})
+
+        location_id = intervention.locations.first().id
+
+        url = reverse('programme-document', kwargs={'location_id': location_id})
         response = self.client.get(url, format='json')
 
         self.assertTrue(status.is_success(response.status_code))
@@ -102,14 +104,15 @@ class TestProgrammeDocumentAPIView(APITestCase):
             url+"?ref_title=&status=&location=%s" % loc.id,
             format='json'
         )
+
         self.assertTrue(status.is_success(response.status_code))
-        self.assertEquals(len(response.data), 4)
+        for result in response.data['results']:
+            self.assertEquals(result['title'], document['title'])
 
     def test_detail_api(self):
         pd = ProgrammeDocument.objects.first()
-        intervention = Intervention.objects.filter(locations__isnull=False).first()
-        location = intervention.locations.first()
-        url = reverse('programme-document-details', kwargs={'pk': pd.pk, 'location_id': location.id})
+        # location_id is redundantly!
+        url = reverse('programme-document-details', kwargs={'location_id': 1, 'pk': pd.pk})
         response = self.client.get(url, format='json')
 
         self.assertTrue(status.is_success(response.status_code))

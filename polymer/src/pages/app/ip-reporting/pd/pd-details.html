@@ -13,6 +13,14 @@
 
 <link rel="import" href="../../../../behaviors/utils.html">
 
+<link rel="import" href="../../../../elements/page-body.html">
+<link rel="import" href="../../../../elements/ip-reporting/pd-page-header.html">
+<link rel="import" href="../../../../elements/ip-reporting/pd-details-content.html">
+<link rel="import" href="../../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../../endpoints.html">
+<link rel="import" href="../../../../redux/actions.html">
+<link rel="import" href="../../../../redux/store.html">
+
 <dom-module id="page-ip-reporting-pd-details">
   <template>
     <style include="shared-styles">
@@ -84,7 +92,7 @@
       </template>
 
       <template is="dom-if" if="[[_equals(pdTab, 'reports')]]" restamp="true">
-          <pd-details-reports name="reports"></pd-details-reports>
+          <pd-details-reports name="reports" pd-id="[[ pd.id ]]"></pd-details-reports>
       </template>
 
     </iron-pages>
@@ -101,9 +109,11 @@
       ],
 
       properties: {
-        pdTab: {
-          type: String,
-        },
+        pdTab: String,
+
+        pdId: Number,
+
+        routeData: Object,
 
         pd: {
           type: Object,
@@ -113,51 +123,51 @@
 
         loaded: {
           type: Boolean,
-          value: false
-        },
-
-        routeData: {
-          type: Object,
-          observer: '_updateUrlTab'
+          value: false,
+          computed: '_computeLoaded(pd)',
         },
 
         programmeDocumentDetailsUrl: {
           type: String,
           computed: '_computeProgrammeDocumentDetailsUrl(location, pdId)',
+          observer: '_fetchData',
         },
 
         location: {
           type: String,
           statePath: 'location.id',
         },
-
-        pdId: Number,
       },
 
-      _updateTabSelection: function() {
+      observers: [
+        '_updateUrlTab(routeData.dashTab)',
+      ],
+
+      _updateTabSelection: function () {
         this.$.tabContent.select(this.pdTab);
       },
 
-      _updateUrlTab: function (routeData) {
-        if (!routeData) {
-          return;
-        }
-
-        var dashTab = routeData.dashTab;
+      _updateUrlTab: function (dashTab) {
         this.set('pdTab', dashTab);
       },
 
-      _computeProgrammeDocumentDetailsUrl: function(location, pdId) {
+      _computeLoaded: function (pd) {
+        return !!pd.id;
+      },
+
+      _computeProgrammeDocumentDetailsUrl: function (location, pdId) {
         return App.Endpoints.programmeDocumentDetail(location, pdId);
       },
 
-      attached: function() {
+      _fetchData: function (_) { // jshint ignore:line
         var self = this;
 
         this.$.programmeDocumentDetails.thunk()()
           .then(function (res) {
-            self.pd = res.data;
-            self.loaded = true;
+            self.set('pd', res.data);
+          })
+          .catch(function (err) { // jshint ignore:line
+            // TODO: error handling
           });
       },
     });
