@@ -292,7 +292,6 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     partner_focal_point = factory.Sequence(lambda n: "Hanin Odeh %d" % n)
 
     cp_output = factory.RelatedFactory('core.factories.CountryProgrammeOutputFactory', 'programme_document')
-    progress_reports = factory.RelatedFactory(ProgressReportFactory, 'programme_document')
 
     class Meta:
         model = ProgrammeDocument
@@ -302,7 +301,6 @@ class IndicatorReportFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "indicator_report_%d" % n)
     time_period_start = fuzzy.FuzzyDate(datetime.date.today())
     time_period_end = fuzzy.FuzzyDate(datetime.date.today())
-    progress_report = factory.SubFactory(ProgressReportFactory)
     due_date = fuzzy.FuzzyDate(datetime.date.today())
     total = fuzzy.FuzzyInteger(0, 3000, 100)
 
