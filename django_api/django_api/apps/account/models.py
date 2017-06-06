@@ -11,6 +11,9 @@ from model_utils.models import TimeStampedModel
 class User(AbstractUser):
     """
     User model inherited after AbstractUser class.
+
+    related models:
+        partner.Partnern (ForeignKey): "partner"
     """
     partner = models.ForeignKey('partner.Partner', related_name="users", null=True, blank=True)
     organization = models.CharField(max_length=255)
@@ -25,6 +28,9 @@ class User(AbstractUser):
 class UserProfile(TimeStampedModel):
     """
     User Profile model related with user as profile.
+
+    related models:
+        account.User (OneToOne): "user"
     """
     user = models.OneToOneField(User, related_name="profile")
 

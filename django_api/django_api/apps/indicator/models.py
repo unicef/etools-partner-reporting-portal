@@ -51,6 +51,14 @@ class IndicatorBlueprint(TimeStampedModel):
 class Reportable(TimeStampedModel):
     """
     Reportable / Applied Indicator model.
+
+    related models:
+        ContentType (ForeignKey): "content_type"
+        content_type & object_id fields (GenericForeignKey): "content_object"
+        partner.PartnerProject (ForeignKey): "project"
+        indicator.IndicatorBlueprint (ForeignKey): "blueprint"
+        cluster.ClusterObjective (ForeignKey): "content_object"
+        self (ForeignKey): "parent_indicator"
     """
     target = models.CharField(max_length=255, null=True, blank=True)
     baseline = models.CharField(max_length=255, null=True, blank=True)
@@ -110,6 +118,9 @@ class Reportable(TimeStampedModel):
 class IndicatorDisaggregation(TimeStampedModel):
     """
     IndicatorDisaggregation module
+
+    related models:
+        indicator.Reportable (ForeignKey): "indicator"
     """
     title = models.CharField(max_length=255)
     range = FloatRangeField()
@@ -120,6 +131,9 @@ class IndicatorDisaggregation(TimeStampedModel):
 class IndicatorDataSpecification(TimeStampedModel):
     """
     IndicatorDataSpecification module
+
+    related models:
+        indicator.Reportable (ForeignKey): "indicator"
     """
     title = models.CharField(max_length=255)
     calculation_method = models.CharField(max_length=255)
@@ -132,6 +146,11 @@ class IndicatorDataSpecification(TimeStampedModel):
 class IndicatorReport(TimeStampedModel):
     """
     IndicatorReport module is a result of partner staff activity (what they done in defined frequency scope).
+
+    related models:
+        indicator.Reportable (ForeignKey): "indicator"
+        unicef.ProgressReport (ForeignKey): "progress_report"
+        core.Location (OneToOneField): "location"
     """
     title = models.CharField(max_length=255)
     reportable = models.ForeignKey(Reportable, related_name="indicator_reports")
@@ -182,6 +201,10 @@ class IndicatorReport(TimeStampedModel):
 class IndicatorLocationData(TimeStampedModel):
     """
     IndicatorLocationData module it includes indicators for chosen location.
+
+    related models:
+        indicator.IndicatorReport (ForeignKey): "indicator_report"
+        core.Location (OneToOneField): "location"
     """
     indicator_report = models.ForeignKey(IndicatorReport, related_name="indicator_location_data")
     location = models.ForeignKey('core.Location', related_name="indicator_location_data")
@@ -195,6 +218,9 @@ class IndicatorLocationData(TimeStampedModel):
 class Disaggregation(TimeStampedModel):
     """
     Disaggregation module. For example: <Gender, Age>
+
+    related models:
+        indicator.Reportable (ForeignKey): "reportable"
     """
     name = models.CharField(max_length=255, verbose_name="Disaggregation by", null=True, blank=True)
     reportable = models.ForeignKey(Reportable, related_name="disaggregation")
@@ -210,6 +236,9 @@ class Disaggregation(TimeStampedModel):
 class DisaggregationValue(TimeStampedModel):
     """
     Disaggregation Value module. For example: Gender <Male, Female, Other>
+
+    related models:
+        indicator.Disaggregation (ForeignKey): "disaggregation"
     """
     disaggregation = models.ForeignKey(Disaggregation, related_name="disaggregation_value")
     value = models.CharField(max_length=255, null=True, blank=True)

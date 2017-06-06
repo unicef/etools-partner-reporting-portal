@@ -47,6 +47,9 @@ class ProgrammeDocument(TimeStampedModel):
     """
     ProgrammeDocument model describe agreement between UNICEF & Partner to realize document and
     reports are feedback for this assignment.
+
+    related models:
+        unicef.Section (ManyToManyField): "sections"
     """
     agreement = models.CharField(max_length=255, verbose_name='Agreement')
     document_type = models.CharField(
@@ -239,6 +242,9 @@ class ProgrammeDocument(TimeStampedModel):
 class CountryProgrammeOutput(TimeStampedModel):
     """
     CountryProgrammeOutput (LLO Parent) module.
+
+    related models:
+        unicef.ProgrammeDocument (ForeignKey): "programme_document"
     """
     title = models.CharField(max_length=255)
     programme_document = models.ForeignKey(ProgrammeDocument, related_name="cp_outputs")
@@ -247,6 +253,10 @@ class CountryProgrammeOutput(TimeStampedModel):
 class LowerLevelOutput(TimeStampedModel):
     """
     LowerLevelOutput (PD output) module describe the goals to reach in PD scope.
+
+    related models:
+        unicef.CountryProgrammeOutput (ForeignKey): "indicator"
+        indicator.Reportable (GenericRelation): "reportables"
     """
     title = models.CharField(max_length=255)
     indicator = models.ForeignKey(CountryProgrammeOutput, related_name="ll_outputs")

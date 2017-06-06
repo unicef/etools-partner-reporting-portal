@@ -17,6 +17,9 @@ class Intervention(TimeStampedModel):
     """
     Intervention (response/emergency) model.
     It's used for drop down menu in right top corner (where location are in country level (without parents)).
+
+    related models:
+        core.Location (ManyToManyField): "locations"
     """
     document_type = models.CharField(
         choices=INTERVENTION_TYPES,
@@ -84,6 +87,10 @@ class Location(TimeStampedModel):
     """
     Location model define place where agents are working.
     The background of the location can be: Country > Region > City > District/Point.
+
+    related models:
+        indicator.Reportable (ForeignKey): "reportable"
+        core.Location (ForeignKey): "self"
     """
     title = models.CharField(max_length=255)
     reportable = models.ForeignKey('indicator.Reportable', related_name="locations")
