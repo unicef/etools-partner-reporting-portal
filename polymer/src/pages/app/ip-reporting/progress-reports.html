@@ -1,13 +1,17 @@
-<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../../../bower_components/iron-location/iron-query-params.html">
 
-<link rel="import" href="../../../behaviors/data-table.html">
-<link rel="import" href="../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../elements/page-header.html">
 <link rel="import" href="../../../elements/page-body.html">
+<link rel="import" href="../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../behaviors/data-table.html">
+
 <link rel="import" href="../../../endpoints.html">
 <link rel="import" href="../../../redux/actions.html">
 <link rel="import" href="../../../redux/store.html">
 
+<link rel="import" href="../../../elements/ip-reporting/progress-reports-list.html">
 
 <dom-module id="page-ip-progress-reports">
   <template>
@@ -18,13 +22,25 @@
       }
     </style>
 
-    <etools-prp-ajax id="reports"
-     url="[[indicatorsUrl]]">
+     <iron-location
+        query="{{query}}">
+    </iron-location>
+
+    <iron-query-params
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
+    </iron-query-params>
+
+    <etools-prp-ajax
+      id="reports"
+      url="[[reportsUrl]]"
+      params="[[queryParams]]">
     </etools-prp-ajax>
 
     <page-header title="Progress Reports"></page-header>
+
     <page-body>
-      progress-report-list component
+      <progress-reports-list></progress-reports-list>
     </page-body>
 
   </template>
@@ -36,45 +52,40 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
-        App.Behaviors.DataTableBehavior,
       ],
 
       properties: {
-        reportsBaseUrl: {
+
+        reportsUrl: {
           type: String,
           value: App.Endpoints.progressReports(),
         },
-        pageSize: {
-          type: Number,
-          value: 10
-        },
-        pageNumber: {
-          type: Number,
-          value: 1
-        },
-        indicatorsUrl: {
-          type: String,
-          observer: '_urlParametersChanged',
-          computed: '_computePaginatedUrl(reportsBaseUrl, pageSize, pageNumber)',
+
+        queryParams: Object,
+
+      },
+      observers: [
+        '_handleInputChange(reportsUrl, queryParams)',
+      ],
+
+      _handleInputChange: function (_, queryParams) { // jshint ignore:line
+        var progressReportsThunk;
+
+        if (!Object.keys(queryParams).length) {
+          return;
         }
-      },
 
-      _reportsAjax: function() {
-        var progressReportsThunk = this.$.reports.thunk();
-        this.dispatch(App.Actions.ProgressReports.fetch(progressReportsThunk))
-          .catch(function(err) {
-            return Promise.reject(err);
-          });
-      },
+        progressReportsThunk = this.$.reports.thunk();
 
-      _urlParametersChanged: function() {
+        // Cancel the pending request, if any
         this.$.reports.abort();
-        return this._reportsAjax();
+
+        this.dispatch(App.Actions.ProgressReports.fetch(progressReportsThunk))
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
       },
 
-      attached: function () {
-        return this._reportsAjax();
-      },
     });
   </script>
 </dom-module>

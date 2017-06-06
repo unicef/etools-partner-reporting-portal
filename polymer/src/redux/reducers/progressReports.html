@@ -20,7 +20,7 @@
 
       switch (action.type) {
         case App.Constants.SET_PROGRESS_REPORTS:
-          return action.data.slice()[0];
+          return action.data.slice();
 
         case App.Constants.RESET:
           return [];
