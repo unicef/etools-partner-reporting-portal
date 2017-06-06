@@ -6,6 +6,9 @@ from .models import ProgrammeDocument, Section
 class ProgrammeDocumentSerializer(serializers.ModelSerializer):
 
     status = serializers.CharField(source='get_status_display')
+    cso_contribution = serializers.SerializerMethodField()
+    total_unicef_cash = serializers.SerializerMethodField()
+    total_unicef_supplies = serializers.SerializerMethodField()
 
     class Meta:
         model = ProgrammeDocument
@@ -22,10 +25,20 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
             'population_focus',
             'response_to_HRP',
             'status',
-            'report_status',
-            'due_date',
             'calculated_budget',
+            'cso_contribution',
+            'total_unicef_cash',
+            'total_unicef_supplies',
         )
+
+    def get_cso_contribution(self, obj):
+        return ""  #TODO
+
+    def get_total_unicef_cash(self, obj):
+        return ""  #TODO
+
+    def get_total_unicef_supplies(self, obj):
+        return ""  #TODO
 
 
 class SectionSerializer(serializers.ModelSerializer):
