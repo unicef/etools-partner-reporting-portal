@@ -1,11 +1,21 @@
-import django_filters
+from django_filters import rest_framework as filters
 from django_filters.filters import ChoiceFilter
 
 from core.common import PROGRESS_REPORT_STATUS
-from .models import IndicatorReport
+
+from indicator.models import Reportable, IndicatorBlueprint, IndicatorReport
 
 
-class PDReportsFilter(django_filters.FilterSet):
+class IndicatorFilter(filters.FilterSet):
+    class Meta:
+        model = Reportable
+        fields = (
+            'id', 'target', 'baseline', 'blueprint__title',
+            'blueprint__unit', 'indicator_reports'
+        )
+
+
+class PDReportsFilter(filters.FilterSet):
     status = ChoiceFilter(choices=PROGRESS_REPORT_STATUS, method="get_status")
 
     class Meta:

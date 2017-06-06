@@ -17,6 +17,10 @@
         return this._buildUrl('/indicator/');
       },
 
+      indicatorReports: function (indicatorId) {
+        return this._buildUrl('/indicator/' + indicatorId + '/indicator-reports/');
+      },
+
       partnerDetails: function () {
         return this._buildUrl('/partner/partner-details/');
       },

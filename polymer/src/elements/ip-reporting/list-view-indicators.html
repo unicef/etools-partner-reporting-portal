@@ -1,6 +1,4 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
-<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../../bower_components/etools-content-panel/etools-content-panel.html">
 <link rel="import" href="../../../bower_components/etools-data-table/etools-data-table.html">
@@ -8,13 +6,24 @@
 
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../behaviors/data-table.html">
-<link rel="import" href="../../elements/etools-prp-progress-bar.html">
+<link rel="import" href="../../behaviors/pagination.html">
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../ip-reporting/list-view-single-indicator.html">
 <link rel="import" href="../../styles/table-styles.html">
 
 <dom-module id="list-view-indicators">
   <template>
     <style include="iron-flex iron-flex-factors data-table-styles table-styles">
     </style>
+
+    <iron-location
+        query="{{query}}">
+    </iron-location>
+
+    <iron-query-params
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
+    </iron-query-params>
 
     <etools-content-panel panel-title="List of Indicators">
       <etools-loading active="[[loading]]"></etools-loading>
@@ -41,26 +50,12 @@
                 items="[[data]]"
                 initial-count="[[pageSize]]"
                 as="indicator">
-        <etools-data-table-row details-opened="[[detailsOpened]]">
-          <div slot="row-data">
-            <span class="col-data flex-2">
-              <!-- TODO: Add link when it is available. -->
-              <a href="/">[[indicator.ref_num]]</a>
-            </span>
-            <span class="col-data flex-6">
-              [[indicator.blueprint.title]]
-            </span>
-            <span class="col-data flex-4">
-              <etools-prp-progress-bar number="[[indicator.progress_percentage]]">
-            </span>
-          </div>
-          <div slot="row-data-details">[Indicator details here.]</div>
-        </etools-data-table-row>
+        <list-view-single-indicator indicator="{{indicator}}"></list-view-single-indicator>
       </template>
 
       <etools-data-table-footer
-          page-size="[[pageSize]]"
-          page-number="[[pageNumber]]"
+          page-size="[[_computeParamValue(queryParams, 'page_size', 10)]]"
+          page-number="[[_computeParamValue(queryParams, 'page', 1)]]"
           total-results="[[totalResults]]"
           visible-range="{{visibleRange}}"
           on-page-size-changed="_pageSizeChanged"
@@ -76,6 +71,8 @@
       behaviors: [
         App.Behaviors.ReduxBehavior,
         App.Behaviors.DataTableBehavior,
+        App.Behaviors.PaginationBehavior,
+        App.Behaviors.UtilsBehavior,
       ],
 
       properties: {
@@ -83,28 +80,28 @@
           type: Object,
           statePath: 'indicators.all',
         },
-        detailsOpened: {
-          type: Boolean,
-          value: false
-        },
+
         loading: {
           type: Boolean,
           statePath: 'indicators.loading'
         },
-        pageSize: {
-          type: Number,
-          value: 10,
-          notify: true
-        },
-        pageNumber: {
-          type: Number,
-          value: 1,
-          notify: true
-        },
+
+        queryParams: Object,
+
+        query: String,
+
+        pageSize: Number,
+
+        pageNumber: Number,
+
         totalResults: {
           type: Number,
           statePath: 'indicators.count'
         },
+      },
+
+      _computeParamValue: function (qs, name, defaultValue) {
+        return this._toNumber(this._withDefault(qs[name], defaultValue));
       },
 
     });
