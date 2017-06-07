@@ -1,9 +1,9 @@
 from django.urls import reverse
-
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 
 from account.models import User
+from core.tests.base import BaseAPITestCase
 from core.factories import (
     LocationFactory, InterventionFactory,
     ProgrammeDocumentFactory, ReportableToLowerLevelOutputFactory, ProgressReportFactory, IndicatorLocationDataFactory,
