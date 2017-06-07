@@ -6,5 +6,5 @@ from .models import DisaggregationValue, Disaggregation
 
 @receiver(post_save, sender=Disaggregation, dispatch_uid="disable_disagg_value")
 def disable_disagg_value(sender, instance, **kwargs):
-    if instance.active is False:
+    if not instance.active:
         DisaggregationValue.objects.filter(disaggregation=instance).update(active=False)
