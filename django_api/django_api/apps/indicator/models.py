@@ -112,34 +112,6 @@ class Reportable(TimeStampedModel):
         return "Reportable <pk:%s>" % self.id
 
 
-class IndicatorDisaggregation(TimeStampedModel):
-    """
-    IndicatorDisaggregation module
-
-    related models:
-        indicator.Reportable (ForeignKey): "indicator"
-    """
-    title = models.CharField(max_length=255)
-    range = FloatRangeField()
-
-    indicator = models.ForeignKey(Reportable, related_name="indicator_disaggregations")
-
-
-class IndicatorDataSpecification(TimeStampedModel):
-    """
-    IndicatorDataSpecification module
-
-    related models:
-        indicator.Reportable (ForeignKey): "indicator"
-    """
-    title = models.CharField(max_length=255)
-    calculation_method = models.CharField(max_length=255)
-    frequency = models.IntegerField()
-    unit = models.CharField(max_length=255)
-
-    indicator = models.ForeignKey(Reportable, related_name="indicator_data_specifications")
-
-
 class IndicatorReport(TimeStampedModel):
     """
     IndicatorReport module is a result of partner staff activity (what they done in defined frequency scope).
