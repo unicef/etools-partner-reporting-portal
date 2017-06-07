@@ -1,39 +1,22 @@
 from django.urls import reverse
-from django.db.models import Q
-
 from rest_framework import status
-from rest_framework.test import APITestCase, APIClient
-
-from account.models import User
+from core.tests.base import BaseAPITestCase
 from core.models import Intervention, Location
 from core.factories import (
-    IndicatorReportFactory, ProgrammeDocumentFactory, ReportableToLowerLevelOutputFactory,
+    ReportableToLowerLevelOutputFactory,
     ProgressReportFactory,
-    SectionFactory,
-    InterventionFactory,
     IndicatorLocationDataFactory,
 )
-from indicator.models import Reportable, IndicatorBlueprint, IndicatorReport
-
 from unicef.models import LowerLevelOutput, Section, ProgrammeDocument
 
-from unicef.models import ProgrammeDocument
 
+class TestProgrammeDocumentAPIView(BaseAPITestCase):
 
-class TestProgrammeDocumentAPIView(APITestCase):
+    generate_fake_data_quantity = 5
 
     def setUp(self):
-        self.quantity = 5
-
-        ProgrammeDocumentFactory.create_batch(self.quantity)
-        SectionFactory.create_batch(self.quantity)
-
-        # Linking the followings:
-        # created LowerLevelOutput - ReportableToLowerLevelOutput
-        # Section - ProgrammeDocument via ReportableToLowerLevelOutput
-        # ProgressReport - IndicatorReport from ReportableToLowerLevelOutput
-        # IndicatorReport & Location from ReportableToLowerLevelOutput - IndicatorLocationData
-        for idx in xrange(self.quantity):
+        super(TestProgrammeDocumentAPIView, self).setUp()
+        for idx in xrange(self.generate_fake_data_quantity):
             llo = LowerLevelOutput.objects.all()[idx]
             reportable = ReportableToLowerLevelOutputFactory(content_object=llo)
 
@@ -43,21 +26,10 @@ class TestProgrammeDocumentAPIView(APITestCase):
             indicator_report.progress_report = ProgressReportFactory()
             indicator_report.save()
 
-            indicator_location_data = IndicatorLocationDataFactory(indicator_report=indicator_report, location=reportable.locations.first())
-
-        # Intervention creates Cluster and Locations
-        InterventionFactory.create_batch(self.quantity, locations=Location.objects.all())
-
-        # Make all requests in the context of a logged in session.
-        admin, created = User.objects.get_or_create(username='admin', defaults={
-            'email': 'admin@unicef.org',
-            'is_superuser': True,
-            'is_staff': True
-        })
-        admin.set_password('Passw0rd!')
-        admin.save()
-        self.client = APIClient()
-        self.client.login(username='admin', password='Passw0rd!')
+            IndicatorLocationDataFactory(
+                indicator_report=indicator_report,
+                location=reportable.locations.first()
+            )
 
     def test_list_api(self):
         intervention = Intervention.objects.filter(locations__isnull=False).first()

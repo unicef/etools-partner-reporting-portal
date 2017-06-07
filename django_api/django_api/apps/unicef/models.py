@@ -17,7 +17,8 @@ from core.common import (
     PROGRESS_REPORT_STATUS,
     PD_STATUS,
 )
-from indicator.models import Reportable
+
+from indicator.models import Reportable  # IndicatorReport
 
 
 class Section(models.Model):
