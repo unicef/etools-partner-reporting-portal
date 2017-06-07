@@ -64,13 +64,23 @@
       },
 
       _routePathChanged: function (path) {
-        if (path.length === 0) {
-          this.page = 'pd-index';
+        if (!path.length) {
+          this.page = '';
+
+          this.async(function () {
+            this.set('route.path', '/');
+          });
         }
       },
 
       _pageChanged: function (page) {
-        var resolvedPageUrl = this.resolveUrl('pd/' + page + '.html');
+        var resolvedPageUrl;
+
+        if (!page) {
+          return;
+        }
+
+        resolvedPageUrl = this.resolveUrl('pd/' + page + '.html');
 
         this.importHref(resolvedPageUrl, null, this._notFound, true);
       },

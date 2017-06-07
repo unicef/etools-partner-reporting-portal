@@ -38,7 +38,8 @@
     "iron-location": "PolymerElements/iron-location#^2.0.0",
     "es6-shim": "^0.35.3",
     "iron-collapse": "PolymerElements/iron-collapse#^2.0.0",
-    "paper-icon-button": "PolymerElements/paper-icon-button#^2.0.0"
+    "paper-icon-button": "PolymerElements/paper-icon-button#^2.0.0",
+    "paper-checkbox": "PolymerElements/paper-checkbox#^2.0.0"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0"
@@ -52,6 +53,7 @@
     "paper-input": "^1.0.9",
     "webcomponentsjs": "^0.7.24",
     "iron-location": "^0.8.1",
-    "iron-collapse": "^1.2.1"
+    "iron-collapse": "^1.2.1",
+    "paper-checkbox": "~1.0.13"
   }
 }

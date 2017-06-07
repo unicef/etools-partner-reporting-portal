@@ -1,76 +1,111 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../bower_components/paper-tabs/paper-tab.html">
-<link rel="import" href="../../../bower_components/paper-tabs/paper-tabs.html">
-<link rel="import" href="../../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
-<link rel="import" href="../status-badge.html">
+<link rel="import" href="../etools-prp-ajax.html">
+<link rel="import" href="../etools-prp-detail-table.html">
+<link rel="import" href="../../endpoints.html">
 
-<dom-module id="indicator-details">
+<dom-module id="ip-reporting-indicator-details">
   <template>
-    <style>
+    <style include="iron-flex iron-flex-factors">
       :host {
         display: block;
       }
-
-      paper-tabs {
-        border-bottom: 1px solid var(--paper-grey-300);
+      iron-icon {
+        color: var(--accent-color)
       }
-
-      paper-tab status-badge {
-        margin-left: 5px;
-        position: relative;
-        top: -5px;
+      h3 {
+        width: 100%;
+        float: left;
       }
-
-      .tab-content {
-        padding: 25px;
+      h4 {
+        font-weight: 400;
+      }
+      h4 span {
+        color: gray;
+        font-weight: 400;
+      }
+      .wrapper {
+        float: left;
+        margin: 0 10px 10px 10px;
       }
     </style>
 
+    <etools-prp-ajax
+        id="indicatorDetail"
+        url="[[indicatorDetailUrl]]">
+    </etools-prp-ajax>
 
-    <paper-tabs selected="{{selected}}" scrollable>
-      <paper-tab>
-        AADOUS 001
-        <status-badge type="success"></status-badge>
-      </paper-tab>
-      <paper-tab>
-        A'AIN EL-MIR (EL ESTABL) 001
-        <status-badge type="success"></status-badge>
-      </paper-tab>
-    </paper-tabs>
+    <etools-loading active="[[loading]]"></etools-loading>
 
-    <iron-pages selected="[[selected]]">
-      <div class="tab-content">AADOUS 001</div>
-      <div class="tab-content">A'AIN EL-MIR (EL ESTABL) 001</div>
-    </iron-pages>
+    <!-- TODO: group data objects by location; only display location header once. -->
+    <template id="reports"
+              is="dom-repeat"
+              items="[[data]]">
+      <h3>
+        <iron-icon icon="maps:place"></iron-icon>
+        [[item.indicator_location_data.0.location.title]]
+      </h3>
+
+      <template id="report-table"
+                is="dom-repeat"
+                items="[[item.indicator_location_data]]"
+                as="report">
+        <div class="wrapper">
+          <h4>
+            Progress in reporting period
+            <span>[[item.time_period_start]] - [[item.time_period_end]]<span>
+          </h4>
+          <etools-prp-detail-table report=[[report]]></etools-prp-detail-table>
+        </div>
+      </template>
+    </template>
   </template>
 
   <script>
     Polymer({
-      is: 'indicator-details',
+      is: 'ip-reporting-indicator-details',
 
       properties: {
-        initialized: {
+        indicatorDetailUrl: {
+          type: String,
+          computed: '_computeIndicatorReportsUrl(indicatorId)',
+        },
+
+        isOpen: {
           type: Boolean,
-          value: false,
+          observer: '_openChanged',
         },
 
-        selected: {
-          type: Number,
-          value: 0,
-        },
-      },
+        indicatorId: Number,
 
-      init: function () {
-        if (this.initialized) {
-          return;
+        loading: Boolean,
+
+        data: {
+          type: Array,
+          value: []
         }
-
-        this.set('initialized', true);
-
-        // TODO
-        console.log('fetching indicator data');
       },
+
+      _computeIndicatorReportsUrl: function (indicatorId) {
+        return App.Endpoints.indicatorReports(indicatorId);
+      },
+
+      _openChanged: function () {
+        var self = this;
+        if (this.isOpen) {
+          self.loading = true;
+          this.$.indicatorDetail.thunk()()
+            .then(function (res) {
+              self.data = res.data;
+              self.loading = false;
+            });
+            // TODO: error handling.
+        } else {
+          this.$.indicatorDetail.abort();
+        }
+      }
     });
   </script>
 </dom-module>

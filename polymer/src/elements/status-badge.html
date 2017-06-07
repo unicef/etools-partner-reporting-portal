@@ -9,13 +9,14 @@
     <style>
       :host {
         display: inline-block;
-        vertical-align: middle;
+        vertical-align: top;
 
         --iron-icon-height: 16px;
         --iron-icon-width: 16px;
-      }
 
-      :host ::content iron-icon {
+        margin-right:4px;
+      }
+      :host iron-icon {
         line-height: 1;
       }
     </style>
@@ -49,6 +50,7 @@
           case 'success':
             return 'icons:check-circle';
           case 'error':
+          case 'warning':
             return 'icons:error';
           case 'neutral':
             return 'image:lens';
@@ -62,7 +64,9 @@
           case 'error':
             return '#d0021b';
           case 'neutral':
-            return '#bfe6d4';
+            return '#d8d8d8';
+          case 'warning':
+            return '#ffcc00';
         }
       },
     });

@@ -46,6 +46,7 @@
           </paper-button>
         </a>
       </template>
+
       <h1 class="flex">[[title]]</h1>
     </div>
   </template>
@@ -70,7 +71,7 @@
         },
       },
 
-      attached: function () {
+      attached: function() {
         if (this.back) {
           this.backUrl = this.buildUrl(this._baseUrl, this.back);
         }

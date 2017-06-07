@@ -1,11 +1,10 @@
 import datetime
+import json
 import random
 
 from django.contrib.auth.models import Group
 from django.db.models.signals import post_save
 from django.contrib.contenttypes.models import ContentType
-
-from psycopg2.extras import NumericRange
 
 import factory
 from factory import fuzzy
@@ -20,8 +19,6 @@ from partner.models import (
 from indicator.models import (
     IndicatorBlueprint,
     Reportable,
-    IndicatorDisaggregation,
-    IndicatorDataSpecification,
     IndicatorReport,
     IndicatorLocationData,
 )
@@ -38,6 +35,19 @@ from core.countries import COUNTRIES_ALPHA2_CODE
 
 PD_STATUS_LIST = [x[0] for x in PD_STATUS]
 COUNTRIES_LIST = [x[0] for x in COUNTRIES_ALPHA2_CODE]
+
+
+# https://stackoverflow.com/a/41154232/2363915
+class JSONFactory(factory.DictFactory):
+    """
+    Use with factory.Dict to make JSON strings.
+    """
+    @classmethod
+    def _build(cls, model_class, *args, **kwargs):
+        if args:
+            raise ValueError(
+                "DictFactory %r does not support Meta.inline_args.", cls)
+        return json.dumps(model_class(**kwargs))
 
 
 class PartnerFactory(factory.django.DjangoModelFactory):
@@ -196,7 +206,6 @@ class IndicatorBlueprintFactory(factory.django.DjangoModelFactory):
 
 class ReportableFactory(factory.django.DjangoModelFactory):
     blueprint = factory.SubFactory(IndicatorBlueprintFactory)
-    project = factory.SubFactory(PartnerProjectFactory)
     object_id = factory.SelfAttribute('content_object.id')
     content_type = factory.LazyAttribute(
         lambda o: ContentType.objects.get_for_model(o.content_object))
@@ -211,6 +220,79 @@ class ReportableToLowerLevelOutputFactory(ReportableFactory):
     content_object = factory.SubFactory('core.factories.LowerLevelOutputFactory')
     target = '5000'
     baseline = '0'
+    disaggregation_logic = {
+        "extrashort": {
+            "1-2m": {
+                "male": "int",
+                "female": "int",
+                "other": "int",
+            },
+            "3-5m": {
+                "male": "int",
+                "female": "int",
+                "other": "int",
+            },
+            "6-10m": {
+                "male": "int",
+                "female": "int",
+                "other": "int",
+            }
+        },
+
+        "short": {
+            "1-2m": {
+                "male": "int",
+                "female": "int",
+                "other": "int",
+            },
+            "3-5m": {
+                "male": "int",
+                "female": "int",
+                "other": "int",
+            },
+            "6-10m": {
+                "male": "int",
+                "female": "int",
+                "other": "int",
+            }
+        },
+
+        "medium": {
+            "1-2m": {
+                "male": "int",
+                "female": "int",
+                "other": "int",
+            },
+            "3-5m": {
+                "male": "int",
+                "female": "int",
+                "other": "int",
+            },
+            "6-10m": {
+                "male": "int",
+                "female": "int",
+                "other": "int",
+            }
+        },
+
+        "tall": {
+            "1-2m": {
+                "male": "int",
+                "female": "int",
+                "other": "int",
+            },
+            "3-5m": {
+                "male": "int",
+                "female": "int",
+                "other": "int",
+            },
+            "6-10m": {
+                "male": "int",
+                "female": "int",
+                "other": "int",
+            }
+        }
+    }
 
     indicator_report = factory.RelatedFactory('core.factories.IndicatorReportFactory', 'reportable')
 
@@ -237,24 +319,6 @@ class ReportableToPartnerActivityFactory(ReportableFactory):
 
     class Meta:
         model = Reportable
-
-
-class IndicatorDisaggregationFactory(factory.django.DjangoModelFactory):
-    title = factory.Sequence(lambda n: "indicator_disaggregation_%d" % n)
-    indicator = factory.SubFactory(ReportableToLowerLevelOutputFactory)
-    range = NumericRange(0, 200)
-
-    class Meta:
-        model = IndicatorDisaggregation
-
-
-class IndicatorDataSpecificationFactory(factory.django.DjangoModelFactory):
-    title = factory.Sequence(lambda n: "indicator_data_specification_%d" % n)
-    indicator = factory.SubFactory(ReportableToLowerLevelOutputFactory)
-    frequency = fuzzy.FuzzyInteger(100)
-
-    class Meta:
-        model = IndicatorDataSpecification
 
 
 class LocationFactory(factory.django.DjangoModelFactory):
@@ -301,6 +365,8 @@ class IndicatorReportFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "indicator_report_%d" % n)
     time_period_start = fuzzy.FuzzyDate(datetime.date.today())
     time_period_end = fuzzy.FuzzyDate(datetime.date.today())
+    progress_report = factory.SubFactory(ProgressReportFactory)
+    due_date = fuzzy.FuzzyDate(datetime.date.today())
     total = fuzzy.FuzzyInteger(0, 3000, 100)
 
     class Meta:

@@ -10,7 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
-import os, sys
+import os
+import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -168,3 +169,5 @@ STATIC_URL = '/api/static/'
 
 # Authentication settings
 AUTH_USER_MODEL = 'account.User'
+
+PRINT_DATA_FORMAT = "%d %b %Y"
