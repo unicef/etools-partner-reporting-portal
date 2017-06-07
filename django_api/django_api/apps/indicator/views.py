@@ -1,9 +1,12 @@
+import operator
+
+from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import get_object_or_404
-from rest_framework.response import Response
 
 from rest_framework import status
 from rest_framework.generics import ListCreateAPIView, ListAPIView
+from rest_framework.response import Response
 from rest_framework.views import APIView
 
 import django_filters.rest_framework
@@ -73,7 +76,39 @@ class IndicatorListCreateAPIView(ListCreateAPIView):
     filter_class = IndicatorFilter
 
     def get_queryset(self):
-        return Reportable.objects.filter(indicator_reports__isnull=False, content_type=ContentType.objects.get_for_model(LowerLevelOutput))
+        queryset = Reportable.objects.filter(indicator_reports__isnull=False, lower_level_outputs__isnull=False)
+
+        q_list = []
+
+        locations = self.request.query_params.get('locations', None)
+        pds = self.request.query_params.get('pds', None)
+
+        # TODO: Create Cluster List API endpoint when we start working on Cluster Reporting
+        clusters = self.request.query_params.get('clusters', None)
+        pd_statuses = self.request.query_params.get('pd_statuses', None)
+
+        if locations:
+            location_list = map(lambda item: int(item), filter(lambda item: item != '', locations.split(',')))
+            q_list.append(Q(locations__id__in=location_list))
+
+        if pds:
+            pd_list = map(lambda item: int(item), filter(lambda item: item != '', pds.split(',')))
+            q_list.append(Q(lower_level_outputs__indicator__programme_document__id__in=pd_list))
+
+        if clusters:
+            cluster_list = map(lambda item: int(item), filter(lambda item: item != '', clusters.split(',')))
+            q_list.append(Q(cluster_activities__cluster__id__in=cluster_list))
+
+        if pd_statuses:
+            pd_status_list = map(lambda item: item, filter(lambda item: item != '', pd_statuses.split(',')))
+            q_list.append(Q(lower_level_outputs__indicator__programme_document__status__in=pd_status_list))
+
+        if q_list:
+            queryset = queryset.filter(reduce(operator.or_, q_list))
+
+        queryset = queryset.distinct()
+
+        return queryset
 
 
 class IndicatorDataAPIView(APIView):

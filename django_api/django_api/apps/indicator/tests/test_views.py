@@ -106,7 +106,7 @@ class TestIndicatorDataAPIView(APITestCase):
         self.reports = Reportable.objects.filter(
             lower_level_outputs__reportables__isnull=False,
             locations__isnull=False
-        )
+        ).distinct()
 
         location_ids = map(lambda item: str(item), self.reports.values_list('locations__id', flat=True))
         location_id_list_string = ','.join(location_ids)
