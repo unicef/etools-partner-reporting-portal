@@ -29,6 +29,10 @@
         return this._buildUrl('/unicef/' + locationId + '/programme-document/details/' + pdId);
       },
 
+      programmeDocumentReports: function (pdId) {
+        return this._buildUrl('/indicator/programme-document/details/' + pdId + '/reports/');
+      },
+
       progressReports: function() {
         return this._buildUrl('/unicef/progress-reports');
       },
