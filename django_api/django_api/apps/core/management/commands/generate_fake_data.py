@@ -18,8 +18,6 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        quantity = 50
-
         if options['clean_before']:
             clean_up_data()
 
