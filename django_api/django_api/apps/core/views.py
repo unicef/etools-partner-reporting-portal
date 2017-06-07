@@ -4,8 +4,9 @@ from rest_framework.response import Response
 from rest_framework import status as statuses
 from .permissions import IsAuthenticated
 from .models import Intervention, Location
-from .serializer import (
+from .serializers import (
     SimpleInterventionSerializer,
+    SimpleLocationSerializer,
     ChildrenLocationSerializer,
 )
 
@@ -15,9 +16,17 @@ class SimpleInterventionAPIView(ListAPIView):
     Endpoint for getting Intervention.
     Intervention need to have defined location to be displayed on drop down menu.
     """
-    queryset = Intervention.objects.filter(locations__isnull=False).distinct()
+    queryset = Intervention.objects.prefetch_related('locations').filter(locations__isnull=False).distinct()
     serializer_class = SimpleInterventionSerializer
     permission_classes = (IsAuthenticated, )
+
+
+class SimpleLocationListAPIView(ListAPIView):
+    """
+    Endpoint for getting all Location objects.
+    """
+    queryset = Location.objects.all()
+    serializer_class = SimpleLocationSerializer
 
 
 class ChildrenLocationAPIView(ListAPIView):

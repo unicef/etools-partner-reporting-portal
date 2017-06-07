@@ -5,7 +5,7 @@
 <link rel="import" href="../../../endpoints.html">
 <link rel="import" href="../../../redux/store.html">
 
-<dom-module id="location-filter">
+<dom-module id="pd-dropdown-filter">
   <template>
     <style>
       :host {
@@ -14,33 +14,34 @@
     </style>
 
     <etools-prp-ajax
-        id="childLocations"
-        url="[[childLocationsUrl]]">
+        id="programmeDocuments"
+        url="[[programmeDocumentsUrl]]">
     </etools-prp-ajax>
 
     <template is="dom-if" if="[[!loading]]">
       <dropdown-filter
-          label="PD Location"
-          name="location"
-          value="[[value]]"
-          data="[[data]]">
+        class="item"
+        label="PD"
+        name="pds"
+        value="[[value]]"
+        data="[[data]]">
       </dropdown-filter>
     </template>
   </template>
 
   <script>
     Polymer({
-      is: 'location-filter',
+      is: 'pd-dropdown-filter',
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
       ],
 
       properties: {
-        childLocationsUrl: {
+        programmeDocumentsUrl: {
           type: String,
-          computed: '_computeChildLocationsUrl(locationId)',
-          observer: '_fetchChildLocations',
+          computed: '_computeProgrammeDocumentsUrl(locationId)',
+          observer: '_fetchPDs',
         },
 
         locationId: {
@@ -62,29 +63,29 @@
         value: String,
       },
 
-      _computeChildLocationsUrl: function (locationId) {
-        return locationId ? App.Endpoints.childLocations(locationId) : '';
+      _computeProgrammeDocumentsUrl: function (locationId) {
+        return locationId ? App.Endpoints.programmeDocuments(locationId) : '';
       },
 
       _computeLoading: function (data) {
         return !data.length;
       },
 
-      _fetchChildLocations: function (url) {
+      _fetchPDs: function (url) {
         var self = this;
 
         if (!url) {
           return;
         }
 
-        this.$.childLocations.abort();
+        this.$.programmeDocuments.abort();
 
-        this.$.childLocations.thunk()()
+        this.$.programmeDocuments.thunk()()
             .then(function (res) {
               self.set('data', [{
                 id: '',
                 title: 'All',
-              }].concat(res.data));
+              }].concat(res.data.results));
             })
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
@@ -92,8 +93,9 @@
       },
 
       detached: function () {
-        this.$.childLocations.abort();
+        this.$.programmeDocuments.abort();
       },
+
     });
   </script>
 </dom-module>

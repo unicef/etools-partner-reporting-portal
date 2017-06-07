@@ -35,6 +35,10 @@
       _toNumber: function (val) {
         return Number(val);
       },
+
+      _capitalizeFirstLetter: function (text) {
+        return text[0].toUpperCase() + text.substring(1);
+      },
     };
 
   }());
