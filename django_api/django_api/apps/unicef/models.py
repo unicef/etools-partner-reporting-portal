@@ -104,7 +104,7 @@ class ProgrammeDocument(TimeStampedModel):
         verbose_name='CSO Contribution'
     )
     # intervention budged model from etool !!!
-    unicef_cash = models.DecimalField(
+    total_unicef_cash = models.DecimalField(
         decimal_places=2,
         max_digits=12,
         default=0,
@@ -200,7 +200,7 @@ class ProgrammeDocument(TimeStampedModel):
 
     @property
     def total_unicef_contribution(self):
-        return self.unicef_cash + self.in_kind_amount
+        return self.total_unicef_cash + self.in_kind_amount
 
     @property
     def calculated_budget(self):

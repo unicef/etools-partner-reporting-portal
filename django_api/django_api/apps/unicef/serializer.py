@@ -25,7 +25,7 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
             'status',
             'calculated_budget',
             'cso_contribution',
-            'unicef_cash',
+            'total_unicef_cash',
             'total_unicef_supplies',
         )
 
