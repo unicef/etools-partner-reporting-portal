@@ -15,7 +15,7 @@ class SimpleInterventionAPIView(ListAPIView):
     Endpoint for getting Intervention.
     Intervention need to have defined location to be displayed on drop down menu.
     """
-    queryset = Intervention.objects.filter(locations__isnull=False)
+    queryset = Intervention.objects.filter(locations__isnull=False).distinct()
     serializer_class = SimpleInterventionSerializer
     permission_classes = (IsAuthenticated, )
 
