@@ -13,7 +13,7 @@ from core.paginations import SmallPagination
 from unicef.models import LowerLevelOutput
 from unicef.serializer import ProgressReportSerializer
 
-from .serializers import IndicatorListSerializer, IndicatorLLoutputsSerializer, PDReportsSerializer
+from .serializers import IndicatorListSerializer, IndicatorLLoutputsSerializer, PDReportsSerializer, IndicatorReportListSerializer
 from .models import Reportable, IndicatorReport
 from .filters import IndicatorFilter, PDReportsFilter
 
@@ -109,3 +109,27 @@ class IndicatorDataAPIView(APIView):
             response,
             status=status.HTTP_200_OK
         )
+
+
+class IndicatorReportListAPIView(APIView):
+    """
+    REST API endpoint to get a list of IndicatorReport objects, including each set of disaggregation data per report.
+    """
+
+    def get_queryset(self, pk):
+        reportable = get_object_or_404(Reportable, pk=pk)
+
+        indicator_reports = reportable.indicator_reports.all().order_by('-time_period_start')
+
+        if 'limit' in self.request.query_params:
+            limit = self.request.query_params.get('limit', 2)
+            indicator_reports = indicator_reports[:limit]
+
+        return indicator_reports
+
+    def get(self, request, pk, format='json'):
+        indicator_reports = self.get_queryset(pk)
+
+        serializer = IndicatorReportListSerializer(indicator_reports, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)

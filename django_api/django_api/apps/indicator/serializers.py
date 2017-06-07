@@ -123,6 +123,22 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
         )
 
 
+class IndicatorReportListSerializer(serializers.ModelSerializer):
+    indicator_location_data = SimpleIndicatorLocationDataListSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = IndicatorReport
+        fields = (
+            'id', 'title',
+            'indicator_location_data',
+            'time_period_start',
+            'time_period_end',
+            'total',
+            'remarks',
+            'report_status',
+        )
+
+
 class PDReportsSerializer(serializers.ModelSerializer):
 
     reporting_period = serializers.SerializerMethodField()
