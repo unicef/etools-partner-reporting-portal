@@ -3,15 +3,13 @@ from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 
 from account.models import User
-from core.tests.base import BaseAPITestCase
 from core.factories import (
-    LocationFactory, InterventionFactory,
     ProgrammeDocumentFactory, ReportableToLowerLevelOutputFactory, ProgressReportFactory, IndicatorLocationDataFactory,
     SectionFactory
 )
 from unicef.models import LowerLevelOutput, Section, ProgrammeDocument
 
-from indicator.models import Reportable, IndicatorReport, IndicatorLocationData
+from indicator.models import Reportable, IndicatorReport
 
 
 def generate_test_data(quantity):
@@ -33,7 +31,7 @@ def generate_test_data(quantity):
         indicator_report.progress_report = ProgressReportFactory()
         indicator_report.save()
 
-        indicator_location_data = IndicatorLocationDataFactory(indicator_report=indicator_report, location=reportable.locations.first())
+        IndicatorLocationDataFactory(indicator_report=indicator_report, location=reportable.locations.first())
 
 
 class TestPDReportsAPIView(APITestCase):
@@ -88,7 +86,10 @@ class TestIndicatorListAPIView(APITestCase):
         self.assertEquals(len(response.data['results']), self.quantity)
 
     def test_list_api_filter_by_locations(self):
-        self.reports = Reportable.objects.filter(lower_level_outputs__reportables__isnull=False, locations__isnull=False)
+        self.reports = Reportable.objects.filter(
+            lower_level_outputs__reportables__isnull=False,
+            locations__isnull=False
+        )
 
         location_ids = map(lambda item: str(item), self.reports.values_list('locations__id', flat=True))
         location_id_list_string = ','.join(location_ids)
@@ -103,7 +104,10 @@ class TestIndicatorListAPIView(APITestCase):
     def test_list_api_filter_by_pd_ids(self):
         self.reports = Reportable.objects.filter(lower_level_outputs__reportables__isnull=False)
 
-        pd_ids = map(lambda item: str(item), self.reports.values_list('lower_level_outputs__indicator__programme_document__id', flat=True))
+        pd_ids = map(
+            lambda item: str(item),
+            self.reports.values_list('lower_level_outputs__indicator__programme_document__id', flat=True)
+        )
         pd_id_list_string = ','.join(pd_ids)
 
         url = reverse('indicator-list-create-api')
