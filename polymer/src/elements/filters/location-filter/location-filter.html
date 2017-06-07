@@ -39,10 +39,11 @@
       properties: {
         childLocationsUrl: {
           type: String,
-          computed: '_computeChildLocationsUrl(location)',
+          computed: '_computeChildLocationsUrl(locationId)',
+          observer: '_fetchChildLocations',
         },
 
-        location: {
+        locationId: {
           type: String,
           statePath: 'location.id',
         },
@@ -61,23 +62,32 @@
         value: String,
       },
 
-      _computeChildLocationsUrl: function (location) {
-        return App.Endpoints.childLocations(location);
+      _computeChildLocationsUrl: function (locationId) {
+        return locationId ? App.Endpoints.childLocations(locationId) : '';
       },
 
       _computeLoading: function (data) {
         return !data.length;
       },
 
-      attached: function () {
+      _fetchChildLocations: function (url) {
         var self = this;
+
+        if (!url) {
+          return;
+        }
+
+        this.$.childLocations.abort();
 
         this.$.childLocations.thunk()()
             .then(function (res) {
-              self.data = [{
+              self.set('data', [{
                 id: '',
-                title: 'All'
-              }].concat(res.data);
+                title: 'All',
+              }].concat(res.data));
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
             });
       },
 
