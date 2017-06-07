@@ -115,6 +115,8 @@ def generate_fake_data(quantity=3):
         PartnerFactory(partner_activity__cluster_activity=cluster_activity)
 
     # Adding extra IndicatorReport to each ReportableToLowerLevelOutput
+    locations = Location.objects.all()
+
     for reportable in Reportable.objects.filter(lower_level_outputs__reportables__isnull=False):
         # Creating N more IndicatorReport objects
         for idx in xrange(quantity):
