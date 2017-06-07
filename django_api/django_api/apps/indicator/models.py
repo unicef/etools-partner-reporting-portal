@@ -78,16 +78,13 @@ class Reportable(TimeStampedModel):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
-
-    project = models.ForeignKey('partner.PartnerProject', null=True, related_name="reportables")
     blueprint = models.ForeignKey(IndicatorBlueprint, null=True, related_name="reportables")
-    objective = models.ForeignKey('cluster.ClusterObjective', null=True, related_name="reportables")
-
     parent_indicator = models.ForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
 
     @property
     def ref_num(self):
         from unicef.models import LowerLevelOutput
+
         if isinstance(self.content_object, LowerLevelOutput):
             return self.content_object.indicator.programme_document.reference_number
         else:
@@ -155,10 +152,9 @@ class IndicatorReport(TimeStampedModel):
     title = models.CharField(max_length=255)
     reportable = models.ForeignKey(Reportable, related_name="indicator_reports")
     progress_report = models.ForeignKey('unicef.ProgressReport', related_name="indicator_reports", null=True)
-    location = models.OneToOneField('core.Location', related_name="indicator_report", null=True)
-    time_period_start = models.DateField(auto_now=True) # first day of defined frequency mode
-    time_period_end = models.DateField() # last day of defined frequency mode
-    due_date = models.DateField() # can be few days/weeks out of the "end date"
+    time_period_start = models.DateField(auto_now=True)  # first day of defined frequency mode
+    time_period_end = models.DateField()  # last day of defined frequency mode
+    due_date = models.DateField()  # can be few days/weeks out of the "end date"
     submission_date = models.DateField(null=True, blank=True, verbose_name="Date of submission")
     frequency = models.CharField(
         max_length=3,
