@@ -81,4 +81,5 @@ PD_STATUS = Choices(
     ("Dra", "draft", "Draft"),
     ("Act", "active", "Active"),
     ("Imp", "implemented", "Implemented"),
+    ('Rej', 'rejected', 'Rejected'),
 )

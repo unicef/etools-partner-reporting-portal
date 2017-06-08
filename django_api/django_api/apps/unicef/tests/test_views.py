@@ -3,10 +3,8 @@ from rest_framework import status
 from core.tests.base import BaseAPITestCase
 from core.models import Intervention, Location
 from core.factories import (
-    IndicatorReportFactory, ProgrammeDocumentFactory, ReportableToLowerLevelOutputFactory,
+    ReportableToLowerLevelOutputFactory,
     ProgressReportFactory,
-    SectionFactory,
-    InterventionFactory,
     IndicatorLocationDataFactory,
 )
 from unicef.models import LowerLevelOutput, Section, ProgrammeDocument
@@ -28,7 +26,7 @@ class TestProgrammeDocumentAPIView(BaseAPITestCase):
             indicator_report.progress_report = ProgressReportFactory()
             indicator_report.save()
 
-            indicator_location_data = IndicatorLocationDataFactory(
+            IndicatorLocationDataFactory(
                 indicator_report=indicator_report,
                 location=reportable.locations.first()
             )

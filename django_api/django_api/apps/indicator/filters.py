@@ -3,7 +3,7 @@ from django_filters.filters import ChoiceFilter
 
 from core.common import PROGRESS_REPORT_STATUS
 
-from indicator.models import Reportable, IndicatorBlueprint, IndicatorReport
+from indicator.models import Reportable, IndicatorReport
 
 
 class IndicatorFilter(filters.FilterSet):

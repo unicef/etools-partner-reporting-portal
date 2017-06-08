@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 from decimal import Decimal
 from datetime import date
 
-from django.db import models, transaction
+from django.db import models
 from django.contrib.contenttypes.fields import GenericRelation
 from django.utils.functional import cached_property
 
@@ -16,9 +16,8 @@ from core.common import (
     PD_DOCUMENT_TYPE,
     PROGRESS_REPORT_STATUS,
     PD_STATUS,
-    PD_DOCUMENT_TYPE,
 )
-from indicator.models import IndicatorReport, Reportable
+from indicator.models import Reportable  # IndicatorReport
 
 
 class ProgressReport(TimeStampedModel):

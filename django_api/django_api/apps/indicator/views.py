@@ -1,8 +1,7 @@
 import operator
 
 from django.db.models import Q
-from django.shortcuts import render, get_object_or_404
-from django.contrib.contenttypes.models import ContentType
+from django.shortcuts import get_object_or_404
 
 from rest_framework import status
 from rest_framework.generics import ListCreateAPIView, ListAPIView
@@ -13,7 +12,6 @@ import django_filters.rest_framework
 
 from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
-from unicef.models import LowerLevelOutput
 
 from .serializers import IndicatorListSerializer, IndicatorReportListSerializer, PDReportsSerializer
 from .filters import IndicatorFilter, PDReportsFilter

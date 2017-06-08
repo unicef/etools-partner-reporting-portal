@@ -6,7 +6,6 @@ from rest_framework.test import APIClient, APITestCase
 from account.models import User
 
 from core.factories import (
-    LocationFactory, InterventionFactory,
     ProgrammeDocumentFactory, ReportableToLowerLevelOutputFactory, ProgressReportFactory, IndicatorLocationDataFactory,
     SectionFactory
 )
@@ -34,7 +33,10 @@ def generate_test_data(quantity):
         indicator_report.progress_report = ProgressReportFactory()
         indicator_report.save()
 
-        indicator_location_data = IndicatorLocationDataFactory(indicator_report=indicator_report, location=reportable.locations.first())
+        IndicatorLocationDataFactory(
+            indicator_report=indicator_report,
+            location=reportable.locations.first()
+        )
 
 
 class TestInterventionListAPIView(APITestCase):

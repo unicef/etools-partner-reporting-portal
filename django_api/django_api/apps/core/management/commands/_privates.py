@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from account.models import User, UserProfile
+from account.models import User
 from cluster.models import Cluster, ClusterObjective, ClusterActivity
 from partner.models import (
     Partner,
@@ -27,24 +27,14 @@ from core.models import (
 
 from core.factories import (
     UserFactory,
-    UserProfileFactory,
-    ClusterFactory,
-    ClusterObjectiveFactory,
-    ClusterActivityFactory,
     PartnerFactory,
-    PartnerProjectFactory,
-    PartnerActivityFactory,
-    IndicatorBlueprintFactory,
     IndicatorLocationDataFactory,
     InterventionFactory,
-    LocationFactory,
     ReportableToLowerLevelOutputFactory,
     IndicatorReportFactory,
     ProgressReportFactory,
     SectionFactory,
     ProgrammeDocumentFactory,
-    CountryProgrammeOutputFactory,
-    LowerLevelOutputFactory,
 )
 
 
@@ -109,7 +99,7 @@ def generate_fake_data(quantity=3):
         indicator_report.progress_report = ProgressReportFactory()
         indicator_report.save()
 
-        indicator_location_data = IndicatorLocationDataFactory(indicator_report=indicator_report, location=reportable.locations.first())
+        IndicatorLocationDataFactory(indicator_report=indicator_report, location=reportable.locations.first())
 
     # Intervention creates Cluster and Locations
     InterventionFactory.create_batch(quantity, locations=Location.objects.all())
@@ -143,7 +133,7 @@ def generate_fake_data(quantity=3):
                 indicator_report.save()
 
                 for extra_indicator_report_idx in xrange(3):
-                    indicator_location_data = IndicatorLocationDataFactory(indicator_report=indicator_report, location=location)
+                    IndicatorLocationDataFactory(indicator_report=indicator_report, location=location)
 
     print "{} ReportableToLowerLevelOutput objects created".format(quantity)
     print "{} ProgressReport objects created".format(quantity)
