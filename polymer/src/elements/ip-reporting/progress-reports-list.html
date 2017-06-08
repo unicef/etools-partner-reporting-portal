@@ -162,7 +162,7 @@
       _linkText: function(report) {
         if (report.is_draft) {
           return 'Go To Draft';
-        } else if (report.progress_report_status === 'Sub') {
+        } else if (report.progress_report_status === 'Sub' || report.progress_report_status === 'Rej') {
           return 'View Report';
         } else {
           return 'Enter Data';
