@@ -1,9 +1,9 @@
-<link rel="import" href="../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../bower_components/iron-icons/maps-icons.html">
-<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
 <link rel="import" href="../etools-prp-ajax.html">
-<link rel="import" href="../etools-prp-detail-table.html">
+<link rel="import" href="../disaggregations/disaggregation-table.html">
 <link rel="import" href="../../endpoints.html">
 
 <dom-module id="ip-reporting-indicator-details">
@@ -51,13 +51,14 @@
       <template id="report-table"
                 is="dom-repeat"
                 items="[[item.indicator_location_data]]"
-                as="report">
+                as="data">
         <div class="wrapper">
           <h4>
             Progress in reporting period
             <span>[[item.time_period_start]] - [[item.time_period_end]]<span>
           </h4>
-          <etools-prp-detail-table report=[[report]]></etools-prp-detail-table>
+          <disaggregation-table></disaggregation-table>
+          <!-- <disaggregation-table data=[[data]]></disaggregation-table> -->
         </div>
       </template>
     </template>

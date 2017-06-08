@@ -1,0 +1,179 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/etools-data-table/etools-data-table.html">
+
+<link rel="import" href="../../../behaviors/utils.html">
+<link rel="import" href="../../../styles/detail-table.html">
+
+<dom-module id="three-disaggregations">
+  <template>
+    <style include="detail-table"></style>
+
+      <!-- <etools-data-table-header no-collapse=true> -->
+        <!-- e.g. Male/Female/etc. -->
+        <etools-data-table-row no-collapse="true">
+          <div slot="row-data" class="flex-3"></div>
+          <template is="dom-repeat"
+                    items="[[displayColumnNames]]"
+                    as="columnName">
+            <div slot="row-data" class="flex-3">
+              [[columnName]]
+            </div>
+        </template>
+      </etools-data-table-row>
+
+      <!-- e.g. Tall/Short/etc. -->
+      <template is="dom-repeat"
+                items="[[disaggregationList]]"
+                as="disaggregation">
+
+        <etools-data-table-row no-collapse="true">
+          <div slot="row-data" class="header-cells">
+            <div class="col-data flex-3">[[disaggregation.name]]</div>
+          </div>
+        </etools-data-table-row>
+
+        <!-- New row for each item in the disaggregation data. -->
+        <template is="dom-repeat"
+                  items="[[disaggregation.data]]"
+                  as="dataRow">
+
+            <etools-data-table-row no-collapse="true">
+              <div slot="row-data" class="content-cells">
+                <template is="dom-repeat"
+                          items="[[dataRow]]"
+                          as="data">
+                  <div class="col-data flex-3">[[data]]</div>
+                </template>
+              </div>
+            </etools-data-table-row>
+        </template>
+      </template>
+
+      <!-- Totals table at the bottom. -->
+      <etools-data-table-row no-collapse="true">
+        <div slot="row-data" class="totals">
+          <div class="col-data flex-3">Totals</div>
+        </div>
+      </etools-data-table-row>
+
+      <!-- TODO: Totals. May be redesigned/broken into different tables. -->
+      <template is="dom-repeat"
+                items="[[disaggregationSubcategories]]"
+                as="subcategory">
+          <etools-data-table-row no-collapse=true>
+            <div slot="row-data">
+              <div class="col-data flex-3">[[subcategory]]</div>
+              <div class="col-data flex-3"></div>
+              <div class="col-data flex-3"></div>
+              <div class="col-data flex-3"></div>
+            </div>
+          </etools-data-table-row>
+      </template>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'three-disaggregations',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+      ],
+
+      properties: {
+        data: {
+          type: Object,
+          value: {}
+        },
+
+        disaggregationList: {
+          type: Array,
+          computed: '_determineDisaggregationList' +
+            '(disaggregations, disaggregationSubcategories, columnNames)'
+        },
+
+        //Passing data as a param is required to trigger update.
+        disaggregations: {
+          type: Array,
+          computed: '_determineDisaggregations(data)'
+        },
+
+        //Passing disaggregations as a param is required to trigger update.
+        disaggregationSubcategories: {
+          type: Array,
+          computed: '_determineDisaggregationSubcatetories(disaggregations)'
+        },
+
+        columnNames: {
+          type: Array,
+          computed: '_determineColumnNames(disaggregations)'
+        },
+
+        //Passing columnNames as a param is required to trigger update.
+        displayColumnNames: {
+          type: Array,
+          computed: '_displayColumnNames(columnNames)'
+        },
+      },
+
+      _determineDisaggregations: function() {
+        return Object.keys(this.data.disaggregation);
+      },
+
+      // Creates the list to loop through in the template.
+      _determineDisaggregationList: function(disaggregations,
+                                             disaggregationSubcategories) {
+        var newList = [];
+        for (var x = 0; x < (disaggregations.length); x++) {
+          var newObject = {};
+          var key = disaggregations[x];
+          var rows = this._determineRows(key, disaggregationSubcategories);
+          newObject.name = this._capitalizeFirstLetter(key);
+          newObject.data = rows;
+          newList.push(newObject);
+        }
+        return newList;
+      },
+
+      _determineDisaggregationSubcatetories: function() {
+        var key = this.disaggregations[0];
+        return Object.keys(this.data.disaggregation[key]);
+      },
+
+      _displayColumnNames: function() {
+        var self = this;
+        return this.columnNames.map(function(x) {
+          return self._capitalizeFirstLetter(x);
+        });
+      },
+
+      _determineColumnNames: function() {
+        // TODO: columns should always be the disaggregation with the fewest items.
+        var key = this.disaggregations[0];
+        var subcategoryKey = this.disaggregationSubcategories[0];
+        var keys = Object.keys(this.data.disaggregation[key][subcategoryKey]);
+        keys.push('total');
+        return keys;
+      },
+
+      _determineRows: function(disaggregationKey) {
+        var rows = [];
+        for (var x = 0; x < this.disaggregationSubcategories.length; x++) {
+          // for each subcat, e.g. 6-10, want to add a new row to the rows list.
+          var subcategoryKey = this.disaggregationSubcategories[x];
+          var subcategoryValue =
+            this.data.disaggregation[disaggregationKey][subcategoryKey];
+          var row = [subcategoryKey];
+
+          for (var j = 0; j < this.columnNames.length; j++) {
+            var column = this.columnNames[j];
+            var value = subcategoryValue[column];
+            row.push(value);
+          }
+          rows.push(row);
+        }
+        return rows;
+      }
+    });
+  </script>
+</dom-module>

@@ -1,0 +1,98 @@
+<!--
+Checks the format of data received from the parent element to determine which
+disaggregation-table component to display.
+ -->
+
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/etools-data-table/etools-data-table.html">
+<link rel="import" href="../../../../bower_components/etools-content-panel/etools-content-panel.html">
+
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../styles/detail-table.html">
+<link rel="import" href="table-content/three-disaggregations.html">
+<link rel="import" href="table-content/two-disaggregations.html">
+<link rel="import" href="table-content/one-disaggregation.html">
+<link rel="import" href="table-content/zero-disaggregations.html">
+
+<dom-module id="disaggregation-table">
+  <template>
+
+    <style include="detail-table"></style>
+
+    <etools-data-table class="detail-table">
+
+      <template is="dom-if" if="[[_isSameNumberOfDisaggregations(data, 0)]]">
+        <zero-disaggregations></zero-disaggregations>
+      </template>
+
+      <template is="dom-if" if="[[_isSameNumberOfDisaggregations(data, 1)]]">
+        <one-disaggregation></one-disaggregation>
+      </template>
+
+      <template is="dom-if" if="[[_isSameNumberOfDisaggregations(data, 2)]]">
+        <two-disaggregations></two-disaggregations>
+      </template>
+
+      <template is="dom-if" if="[[_isSameNumberOfDisaggregations(data, 3)]]">
+        <three-disaggregations></three-disaggregations>
+      </template>
+
+    </etools-prp-detail-table>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'disaggregation-table',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+      ],
+
+      properties: {
+        // data: {
+        //   type: Object,
+        //   value: {}
+        // },
+        data: {
+          type: Object,
+          value: {"num_disaggregation": 2,
+                  "lookup_map": [
+                      {
+                          disagg_title: "height",
+                          choices: [
+                               {id:4, title: "tall"},
+                               {id:5, title: "medium"},
+                               {id:6, title: "extrashort"},
+                               {id:7, title: "short"},
+                        ]
+                     },
+                      {
+                          disagg_title: "age",
+                          choices: [
+                               {id:8, title: "1-2m"},
+                               {id:9, title: "3-5m"},
+                               {id:99, title: "6-10m"},
+                        ]
+                     },
+                      {
+                          disagg_title: "gender",
+                          choices: [
+                               {id:11, title: "male"},
+                               {id:22, title: "female"},
+                               {id:33, title: "other"},
+                        ]
+                     },
+                  ],
+              }
+        },
+      },
+      _isSameNumberOfDisaggregations(data, num) {
+        if (num === data.num_disaggregation) {
+          return true;
+        }
+        return false;
+      },
+    });
+  </script>
+</dom-module>
