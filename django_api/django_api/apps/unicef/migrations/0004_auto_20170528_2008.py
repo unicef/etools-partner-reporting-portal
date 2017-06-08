@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('unicef', '0002_progressreport_status'),
+        ('unicef', '0003_auto_20170528_2133'),
     ]
 
     operations = [
