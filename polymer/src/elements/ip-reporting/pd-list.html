@@ -52,20 +52,26 @@
         <etools-data-table-column field="status">
           <div class="table-column">PD/SSFA status</div>
         </etools-data-table-column>
-        <etools-data-table-column field="title" flex-3>
-          <div class="table-column">PD/SSFA ToR Title</div>
+        <etools-data-table-column field="start_date">
+          <div class="table-column">Start date</div>
+        </etools-data-table-column>
+        <etools-data-table-column field="end_date">
+          <div class="table-column">End date</div>
+        </etools-data-table-column>
+        <etools-data-table-column field="cso_contribution">
+          <div class="table-column">CSO contribution</div>
+        </etools-data-table-column>
+        <etools-data-table-column field="total_unicef_cash">
+          <div class="table-column">Total UNICEF cash</div>
+        </etools-data-table-column>
+        <etools-data-table-column field="total_unicef_supplies">
+          <div class="table-column">Total UNICEF supplies</div>
         </etools-data-table-column>
         <etools-data-table-column field="calculated_budget">
           <div class="table-column">
             Budget
             <paper-tooltip>Total budget $ (Disbursements to date %)</paper-tooltip>
           </div>
-        </etools-data-table-column>
-        <etools-data-table-column field="report_status">
-          <div class="table-column">Report status</div>
-        </etools-data-table-column>
-        <etools-data-table-column field="due_date">
-          <div class="table-column">Due date</div>
         </etools-data-table-column>
         <etools-data-table-column></etools-data-table-column>
       </etools-data-table-header>
@@ -80,21 +86,28 @@
           <div slot="row-data">
             <div class="table-cell table-cell--text">
               <a href="[[ pd.id ]]/">[[_withDefault(pd.reference_number)]]</a>
+              <paper-tooltip>[[pd.title]]</paper-tooltip>
             </div>
             <div class="table-cell table-cell--text">
               [[_withDefault(pd.status)]]
             </div>
-            <div class="table-cell table-cell--text" flex-3>
-              [[_withDefault(pd.title)]]
+            <div class="table-cell table-cell--text">
+              [[_withDefault(pd.start_date)]]
+            </div>
+            <div class="table-cell table-cell--text">
+              [[_withDefault(pd.end_date)]]
+            </div>
+            <div class="table-cell table-cell--text">
+              [[_withDefault(pd.cso_contribution)]]
+            </div>
+            <div class="table-cell table-cell--text">
+              [[_withDefault(pd.total_unicef_cash)]]
+            </div>
+            <div class="table-cell table-cell--text">
+              [[_withDefault(pd.total_unicef_supplies)]]
             </div>
             <div class="table-cell table-cell--text">
               [[_withDefault(pd.calculated_budget)]]
-            </div>
-            <div class="table-cell table-cell--text">
-              <report-status status="[[pd.report_status]]"></report-status>
-            </div>
-            <div class="table-cell table-cell--text">
-              [[_withDefault(pd.due_date, '-')]]
             </div>
             <div class="table-cell table-cell--text cell-reports">
               <a href="[[ pd.id ]]/reports">Reports</a>
