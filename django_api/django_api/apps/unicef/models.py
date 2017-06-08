@@ -226,7 +226,7 @@ class ProgressReport(TimeStampedModel):
     programme_document = models.ForeignKey(ProgrammeDocument, related_name="progress_reports")
     # attachements ???
 
-    @property
+    @cached_property
     def latest_indicator_report(self):
         return self.indicator_reports.all().order_by('-created').first()
 

@@ -140,6 +140,11 @@
           statePath: 'progressReports.all',
         },
 
+        totalResults: {
+          type: Number,
+          statePath: 'progressReports.count',
+        },
+
         pageSize: {
           type: Number,
           value: 10
@@ -149,10 +154,6 @@
           value: 1
         },
 
-        totalResults: {
-          type: Number,
-          statePath: 'progressReports.count',
-        },
       },
        _isDraft: function(is_draft) {
         return is_draft;

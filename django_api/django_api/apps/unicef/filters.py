@@ -1,10 +1,14 @@
 from django.db.models import Q
 import django_filters
-from django_filters.filters import ChoiceFilter, CharFilter, DateFilter
+from distutils.util import strtobool
+from django_filters.filters import ChoiceFilter, CharFilter, DateFilter, TypedChoiceFilter
 
 from core.common import PD_LIST_REPORT_STATUS, PD_STATUS, PROGRESS_REPORT_STATUS
 from core.models import Location
+from indicator.models import IndicatorReport
 from .models import ProgrammeDocument, ProgressReport
+
+BOOLEAN_CHOICES = (('0', 'False'), ('1', 'True'),)
 
 
 class ProgrammeDocumentFilter(django_filters.FilterSet):
@@ -55,16 +59,22 @@ class ProgrammeDocumentFilter(django_filters.FilterSet):
 
 
 class ProgressReportFilter(django_filters.FilterSet):
-    status = ChoiceFilter(choices=PROGRESS_REPORT_STATUS)
-    pd_title = CharFilter(method='get_pd_title')
-    due_date = DateFilter(method='get_due_date')
+    status = ChoiceFilter(name='status', choices=PROGRESS_REPORT_STATUS)
+    pd_ref_title = CharFilter(name='title', method='get_pd_title')
+    due_date = DateFilter(name='due date', method='get_due_date')
+    due = TypedChoiceFilter(name='due', choices=BOOLEAN_CHOICES, coerce=strtobool, method='get_due_status')
 
     class Meta:
         model = ProgressReport
-        fields = ['status', 'pd_title', 'due_date']
+        fields = ['status', 'pd_ref_title', 'due_date']
 
     def get_status(self, queryset, name, value):
         return queryset.filter(status=value)
+
+    def get_due_status(self, queryset, name, value):
+        if value:
+            return queryset.filter(status__in=[PROGRESS_REPORT_STATUS.due, PROGRESS_REPORT_STATUS.over_due])
+        return queryset
 
     def get_pd_title(self, queryset, name, value):
         return queryset.filter(
@@ -72,4 +82,10 @@ class ProgressReportFilter(django_filters.FilterSet):
         )
 
     def get_due_date(self, queryset, name, value):
-        return queryset.filter(indicator_reports__due_date=value)
+        ir_ids = IndicatorReport.objects \
+                .filter(progress_report_id__in=queryset.values_list('id', flat=True)) \
+                .filter(due_date=value) \
+                .values_list('progress_report_id') \
+                .distinct()
+
+        return queryset.filter(id__in=ir_ids)
