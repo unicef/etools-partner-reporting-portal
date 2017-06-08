@@ -80,6 +80,8 @@ class IndicatorListCreateAPIView(ListCreateAPIView):
         locations = self.request.query_params.get('locations', None)
         pds = self.request.query_params.get('pds', None)
 
+        pd_active = self.request.query_params.get('pd_active', None)
+
         # TODO: Create Cluster List API endpoint when we start working on Cluster Reporting
         clusters = self.request.query_params.get('clusters', None)
         pd_statuses = self.request.query_params.get('pd_statuses', None)
@@ -91,6 +93,9 @@ class IndicatorListCreateAPIView(ListCreateAPIView):
         if pds:
             pd_list = map(lambda item: int(item), filter(lambda item: item != '', pds.split(',')))
             q_list.append(Q(lower_level_outputs__indicator__programme_document__id__in=pd_list))
+
+        if pd_active:
+            q_list.append(Q(lower_level_outputs__indicator__programme_document__status="Act"))
 
         if clusters:
             cluster_list = map(lambda item: int(item), filter(lambda item: item != '', clusters.split(',')))
