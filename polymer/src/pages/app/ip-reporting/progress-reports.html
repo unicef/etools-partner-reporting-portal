@@ -5,7 +5,6 @@
 <link rel="import" href="../../../elements/page-header.html">
 <link rel="import" href="../../../elements/page-body.html">
 <link rel="import" href="../../../elements/etools-prp-ajax.html">
-<link rel="import" href="../../../behaviors/data-table.html">
 
 <link rel="import" href="../../../endpoints.html">
 <link rel="import" href="../../../redux/actions.html">
@@ -66,11 +65,12 @@
         queryParams: Object,
 
       },
+
       observers: [
         '_handleInputChange(reportsUrl, queryParams)',
       ],
 
-      _handleInputChange: function (_, queryParams) { // jshint ignore:line
+      _handleInputChange: function (queryParams) { // jshint ignore:line
         var progressReportsThunk;
 
         if (!Object.keys(queryParams).length) {
