@@ -7,6 +7,7 @@ from .models import ProgrammeDocument, Section, ProgressReport
 class ProgrammeDocumentSerializer(serializers.ModelSerializer):
 
     status = serializers.CharField(source='get_status_display')
+    total_unicef_supplies = serializers.SerializerMethodField()
 
     class Meta:
         model = ProgrammeDocument
@@ -23,10 +24,14 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
             'population_focus',
             'response_to_HRP',
             'status',
-            'report_status',
-            'due_date',
             'calculated_budget',
+            'cso_contribution',
+            'total_unicef_cash',
+            'total_unicef_supplies',
         )
+
+    def get_total_unicef_supplies(self, obj):
+        return str(obj.in_kind_amount)
 
 
 class SectionSerializer(serializers.ModelSerializer):

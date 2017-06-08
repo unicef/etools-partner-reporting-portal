@@ -355,6 +355,10 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     unicef_focal_point = factory.Sequence(lambda n: "Abdallah Yakhola %d" % n)
     partner_focal_point = factory.Sequence(lambda n: "Hanin Odeh %d" % n)
 
+    cso_contribution = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
+    total_unicef_cash = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
+    in_kind_amount = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
+
     cp_output = factory.RelatedFactory('core.factories.CountryProgrammeOutputFactory', 'programme_document')
 
     class Meta:

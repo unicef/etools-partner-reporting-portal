@@ -87,6 +87,28 @@ class ProgrammeDocument(TimeStampedModel):
         help_text='Total Budget'
     )
 
+    # intervention budged model from etool !!!
+    cso_contribution = models.DecimalField(
+        decimal_places=2,
+        max_digits=12,
+        default=0,
+        verbose_name='CSO Contribution'
+    )
+    # intervention budged model from etool !!!
+    total_unicef_cash = models.DecimalField(
+        decimal_places=2,
+        max_digits=12,
+        default=0,
+        verbose_name='UNICEF cash'
+    )
+    # intervention budged model from etool !!!
+    in_kind_amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        default=0,
+        verbose_name='UNICEF Supplies'
+    )
+
     # TODO:
     # cron job will create new report with due period !!!
     #
@@ -166,6 +188,10 @@ class ProgrammeDocument(TimeStampedModel):
             self.__due_date = due_report and due_report.time_period_start
 
         return self.__due_date
+
+    @property
+    def total_unicef_contribution(self):
+        return self.total_unicef_cash + self.in_kind_amount
 
     @property
     def calculated_budget(self):
