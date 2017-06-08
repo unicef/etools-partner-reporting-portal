@@ -74,7 +74,7 @@ class TestPDReportsAPIView(APITestCase):
 class TestIndicatorListAPIView(APITestCase):
 
     def setUp(self):
-        self.quantity = 5
+        self.quantity = 15
 
         generate_test_data(self.quantity)
 
@@ -112,6 +112,16 @@ class TestIndicatorListAPIView(APITestCase):
 
         url = reverse('indicator-list-create-api')
         url += '?pds=' + pd_id_list_string
+        response = self.client.get(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(len(response.data['results']), len(self.reports))
+
+    def test_list_api_filter_by_pd_active(self):
+        self.reports = Reportable.objects.filter(lower_level_outputs__reportables__isnull=False, lower_level_outputs__indicator__programme_document__status="Act")
+
+        url = reverse('indicator-list-create-api')
+        url += '?pd_active=true'
         response = self.client.get(url, format='json')
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
