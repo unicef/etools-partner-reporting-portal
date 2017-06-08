@@ -81,6 +81,11 @@ class IndicatorListCreateAPIView(ListCreateAPIView):
         pds = self.request.query_params.get('pds', None)
 
         pd_active = self.request.query_params.get('pd_active', None)
+        if pd_active and pd_active.lower() == 'true':
+            pd_active = True
+
+        else:
+            pd_active = False
 
         # TODO: Create Cluster List API endpoint when we start working on Cluster Reporting
         clusters = self.request.query_params.get('clusters', None)
