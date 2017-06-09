@@ -1,3 +1,5 @@
+from datetime import datetime
+from django.conf import settings
 from django.db.models import Q
 import django_filters
 from distutils.util import strtobool
@@ -59,10 +61,13 @@ class ProgrammeDocumentFilter(django_filters.FilterSet):
 
 
 class ProgressReportFilter(django_filters.FilterSet):
-    status = ChoiceFilter(name='status', choices=PROGRESS_REPORT_STATUS)
-    pd_ref_title = CharFilter(name='title', method='get_pd_title')
-    due_date = DateFilter(name='due date', method='get_due_date')
-    due = TypedChoiceFilter(name='due', choices=BOOLEAN_CHOICES, coerce=strtobool, method='get_due_status')
+    status = ChoiceFilter(name='status', choices=PROGRESS_REPORT_STATUS, label='Status')
+    pd_ref_title = CharFilter(name='pd ref title', method='get_pd_ref_title',
+                              label='PD/Ref # title')
+    due_date = DateFilter(name='due date', method='get_due_date', label='Due date',
+                          input_formats=[settings.PRINT_DATA_FORMAT])
+    due = TypedChoiceFilter(name='due', choices=BOOLEAN_CHOICES, coerce=strtobool,
+                            method='get_due_overdue_status', label='Show only due or overdue')
 
     class Meta:
         model = ProgressReport
@@ -71,21 +76,23 @@ class ProgressReportFilter(django_filters.FilterSet):
     def get_status(self, queryset, name, value):
         return queryset.filter(status=value)
 
-    def get_due_status(self, queryset, name, value):
+    def get_due_overdue_status(self, queryset, name, value):
         if value:
-            return queryset.filter(status__in=[PROGRESS_REPORT_STATUS.due, PROGRESS_REPORT_STATUS.over_due])
+            return queryset.filter(
+                status__in=[PROGRESS_REPORT_STATUS.due, PROGRESS_REPORT_STATUS.over_due])
         return queryset
 
-    def get_pd_title(self, queryset, name, value):
+    def get_pd_ref_title(self, queryset, name, value):
         return queryset.filter(
-            Q(programme_document__reference_number__icontains=value) | Q(programme_document__title__icontains=value)
+            Q(programme_document__reference_number__icontains=value) |
+            Q(programme_document__title__icontains=value)
         )
 
     def get_due_date(self, queryset, name, value):
         ir_ids = IndicatorReport.objects \
-                .filter(progress_report_id__in=queryset.values_list('id', flat=True)) \
-                .filter(due_date=value) \
-                .values_list('progress_report_id') \
-                .distinct()
+            .filter(progress_report_id__in=queryset.values_list('id', flat=True)) \
+            .filter(due_date=value) \
+            .values_list('progress_report_id') \
+            .distinct()
 
         return queryset.filter(id__in=ir_ids)
