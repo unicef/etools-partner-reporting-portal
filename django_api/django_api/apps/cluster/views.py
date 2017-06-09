@@ -54,3 +54,23 @@ class ClusterObjectiveAPIView(RetrieveAPIView):
         instance = self.get_instance(request)
         instance.delete()
         return Response(status=statuses.HTTP_204_NO_CONTENT)
+
+
+class ClusterObjectiveListAPIView(ListAPIView):
+
+    serializer_class = ClusterObjectiveSerializer
+    permission_classes = (IsAuthenticated, )
+    pagination_class = SmallPagination
+    # filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
+    # filter_class = ClusterObjectiveFilter
+
+    def get_queryset(self):
+        return ClusterObjective.objects.all()
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(
+            serializer.data,
+            status=statuses.HTTP_200_OK
+        )
