@@ -99,16 +99,16 @@ class IndicatorListCreateAPIView(ListCreateAPIView):
             pd_list = map(lambda item: int(item), filter(lambda item: item != '', pds.split(',')))
             q_list.append(Q(lower_level_outputs__indicator__programme_document__id__in=pd_list))
 
-        if pd_active:
+        if pd_statuses:
+            pd_status_list = map(lambda item: item, filter(lambda item: item != '', pd_statuses.split(',')))
+            q_list.append(Q(lower_level_outputs__indicator__programme_document__status__in=pd_status_list))
+
+        if not pd_statuses and pd_active:
             q_list.append(Q(lower_level_outputs__indicator__programme_document__status="Act"))
 
         if clusters:
             cluster_list = map(lambda item: int(item), filter(lambda item: item != '', clusters.split(',')))
             q_list.append(Q(cluster_activities__cluster__id__in=cluster_list))
-
-        if pd_statuses:
-            pd_status_list = map(lambda item: item, filter(lambda item: item != '', pd_statuses.split(',')))
-            q_list.append(Q(lower_level_outputs__indicator__programme_document__status__in=pd_status_list))
 
         if q_list:
             queryset = queryset.filter(reduce(operator.or_, q_list))
