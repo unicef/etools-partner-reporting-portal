@@ -69,13 +69,8 @@
           name: this.name,
           value: newValue,
         });
-      },
+      }
 
-      detached: function () {
-        if (this.isDebouncerActive('input')) {
-          this.cancelDebouncer('input');
-          }
-        },
       });
   </script>
 </dom-module>
