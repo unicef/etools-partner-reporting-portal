@@ -68,9 +68,13 @@ class ClusterObjectiveListAPIView(ListAPIView):
     filter_class = ClusterObjectiveFilter
 
     def get_queryset(self):
-        return ClusterObjective.objects.all().select_related('cluster')
+        queryset = ClusterObjective.objects.select_related('cluster')
+        if self.cluster_id:
+            return queryset.filter(cluster_id=self.cluster_id)
+        return queryset.all()
 
     def list(self, request, *args, **kwargs):
+        self.cluster_id = kwargs.get('cluster_id')
         queryset = self.get_queryset()
 
         filtered = ClusterObjectiveFilter(request.GET, queryset=queryset)
