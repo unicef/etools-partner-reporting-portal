@@ -1,10 +1,11 @@
 from django.http import Http404
 
 from rest_framework.response import Response
-from rest_framework.generics import RetrieveAPIView
+from rest_framework.generics import RetrieveAPIView, ListAPIView
 from rest_framework import status as statuses, serializers
 
 from core.permissions import IsAuthenticated
+from core.paginations import SmallPagination
 from .models import ClusterObjective
 from .serializers import ClusterObjectiveSerializer
 
@@ -16,19 +17,27 @@ class ClusterObjectiveAPIView(RetrieveAPIView):
     serializer_class = ClusterObjectiveSerializer
     # permission_classes = (IsAuthenticated, )
 
+    def get_instance(self, request, pk=None):
+        try:
+            instance = ClusterObjective.objects.get(id=(pk or request.data['id']))
+        except ClusterObjective.DoesNotExist:
+            # TODO: log exception
+            raise Http404
+        return instance
+
+    def get(self, request, pk, *args, **kwargs):
+        instance = self.get_instance(request, pk)
+        serializer = self.get_serializer(instance=instance)
+        return Response(serializer.data, status=statuses.HTTP_200_OK)
+
     def post(self, request, *args, **kwargs):
         """
-        Create ClusterObjective object
+        Create or Update (if id is given to posted data) on ClusterObjective model
         :return: ClusterObjective object id
         """
         if 'id' in request.data.keys():
-            try:
-                co = ClusterObjective.objects.get(id=request.data['id'])
-            except ClusterObjective.DoesNotExist:
-                # TODO: log exception
-                raise Http404
             serializer = self.get_serializer(
-                instance=co,
+                instance=self.get_instance(request),
                 data=request.data
             )
         else:
@@ -41,3 +50,7 @@ class ClusterObjectiveAPIView(RetrieveAPIView):
 
         return Response({'id': serializer.instance.id}, status=statuses.HTTP_200_OK)
 
+    def delete(self, request, *args, **kwargs):
+        instance = self.get_instance(request)
+        instance.delete()
+        return Response(status=statuses.HTTP_204_NO_CONTENT)
