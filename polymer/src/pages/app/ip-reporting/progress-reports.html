@@ -59,7 +59,12 @@
 
         reportsUrl: {
           type: String,
-          value: App.Endpoints.progressReports(),
+          computed: '_computeProgressReportsUrl(locationId)',
+        },
+
+        locationId: {
+          type: String,
+          statePath: 'location.id',
         },
 
         queryParams: Object,
@@ -69,6 +74,10 @@
       observers: [
         '_handleInputChange(reportsUrl, queryParams)',
       ],
+
+      _computeProgressReportsUrl: function(locationId) {
+        return locationId ? App.Endpoints.progressReports(locationId) : '';
+      },
 
       _handleInputChange: function (queryParams) { // jshint ignore:line
         var progressReportsThunk;

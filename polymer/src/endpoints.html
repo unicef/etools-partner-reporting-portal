@@ -37,8 +37,8 @@
         return this._buildUrl('/indicator/programme-document/details/' + pdId + '/reports/');
       },
 
-      progressReports: function() {
-        return this._buildUrl('/unicef/progress-reports');
+      progressReports: function(locationId) {
+        return this._buildUrl('/unicef/' + locationId + '/progress-reports');
       },
 
       childLocations: function (locationId) {
