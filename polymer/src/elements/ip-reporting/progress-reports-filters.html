@@ -53,7 +53,8 @@
           label="Report status"
           name="status"
           value="[[_withDefault(queryParams.status, '')]]"
-          data="[[statuses]]">
+          data="[[statuses]]"
+          disabled="[[disableStatus]]">
         </dropdown-filter>
 
         <location-filter
@@ -69,6 +70,7 @@
         </date-filter>
 
         <checkbox-filter
+          id="due_checkbox"
           class="due"
           name="due"
           value="[[_withDefault(queryParams.due, '')]]">
@@ -106,7 +108,21 @@
             {title: 'Rejected', id: 'Rej'},
           ],
         },
+
+        disableStatus: {
+          type: Boolean,
+        },
+
       },
+
+      observers: [
+        '_toggleStatusFilter(queryParams.due)'
+      ],
+
+      _toggleStatusFilter: function(checked){
+        this.set('disableStatus', !!this._toNumber(checked))
+      },
+
     });
   </script>
 </dom-module>
