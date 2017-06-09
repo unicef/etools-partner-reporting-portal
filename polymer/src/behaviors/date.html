@@ -6,6 +6,9 @@
 <link rel="import" href="../../bower_components/moment-element/moment-import.html">
 
 <script>
+  /* global
+    moment
+  */
   (function () {
     'use strict';
 
@@ -22,7 +25,8 @@
         if (typeof dateString === 'string' && dateString !== '') {
           var date = new Date(dateString);
           if (date.toString() !== 'Invalid Date') {
-            // using moment.utc() ensures that the date will not be changed no matter timezone the user has set
+            // using moment.utc() ensures that the date will not be changed
+            // no matter timezone the user has set
             return moment.utc(date).format(format);
           }
         }

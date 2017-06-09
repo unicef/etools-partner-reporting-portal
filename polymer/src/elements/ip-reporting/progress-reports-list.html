@@ -76,7 +76,9 @@
         <etools-data-table-row no-collapse>
           <div slot="row-data">
             <div class="table-cell table-cell--text">
-              <a href="../pd/[[ report.programme_document.id ]]">[[_withDefault(report.programme_document.reference_number, '-')]]</a>
+              <a href="../pd/[[ report.programme_document.id ]]">
+                [[_withDefault(report.programme_document.reference_number, '-')]]
+              </a>
             </div>
             <div class="table-cell table-cell--text">
               <report-status status="[[report.status]]"></report-status>
@@ -153,7 +155,8 @@
       _linkText: function(report) {
         if (report.is_draft) {
           return 'Go To Draft';
-        } else if (report.progress_report_status === 'Sub' || report.progress_report_status === 'Rej') {
+        } else if (report.progress_report_status === 'Sub' ||
+                   report.progress_report_status === 'Rej') {
           return 'View Report';
         } else {
           return 'Enter Data';
