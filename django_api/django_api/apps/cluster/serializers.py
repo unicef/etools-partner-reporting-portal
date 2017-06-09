@@ -1,11 +1,12 @@
 from rest_framework import serializers
-
+from core.common import FREQUENCY_LEVEL
 from .models import ClusterObjective
 
 
 class ClusterObjectiveSerializer(serializers.ModelSerializer):
 
-    frequency = serializers.CharField(source='get_frequency_display')
+    frequency = serializers.ChoiceField(choices=FREQUENCY_LEVEL)
+    cluster_title = serializers.SerializerMethodField()
 
     class Meta:
         model = ClusterObjective
@@ -14,6 +15,10 @@ class ClusterObjectiveSerializer(serializers.ModelSerializer):
             'title',
             'reference_number',
             'cluster',
+            'cluster_title',
             'frequency',
             # 'reportables',
         )
+
+    def get_cluster_title(self, obj):
+        return obj.cluster.title

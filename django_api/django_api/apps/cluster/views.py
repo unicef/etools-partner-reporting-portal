@@ -4,10 +4,13 @@ from rest_framework.response import Response
 from rest_framework.generics import RetrieveAPIView, ListAPIView
 from rest_framework import status as statuses, serializers
 
+import django_filters
+
 from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
 from .models import ClusterObjective
 from .serializers import ClusterObjectiveSerializer
+from .filters import ClusterObjectiveFilter
 
 
 class ClusterObjectiveAPIView(RetrieveAPIView):
@@ -15,7 +18,7 @@ class ClusterObjectiveAPIView(RetrieveAPIView):
     ClusterObjective CRUD endpoint
     """
     serializer_class = ClusterObjectiveSerializer
-    # permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated, )
 
     def get_instance(self, request, pk=None):
         try:
@@ -61,15 +64,24 @@ class ClusterObjectiveListAPIView(ListAPIView):
     serializer_class = ClusterObjectiveSerializer
     permission_classes = (IsAuthenticated, )
     pagination_class = SmallPagination
-    # filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
-    # filter_class = ClusterObjectiveFilter
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
+    filter_class = ClusterObjectiveFilter
 
     def get_queryset(self):
-        return ClusterObjective.objects.all()
+        return ClusterObjective.objects.all().select_related('cluster')
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
+
+        filtered = ClusterObjectiveFilter(request.GET, queryset=queryset)
+
+        page = self.paginate_queryset(filtered.qs)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(filtered.qs, many=True)
+
         return Response(
             serializer.data,
             status=statuses.HTTP_200_OK
