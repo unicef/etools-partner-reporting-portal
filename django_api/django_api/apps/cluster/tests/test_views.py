@@ -11,7 +11,7 @@ class TestClusterObjectiveAPIView(BaseAPITestCase):
         create and update unit test for ClusterObjectiveAPIView
         :return:
         """
-        count = ClusterObjective.objects.all().count()
+        base_count = ClusterObjective.objects.all().count()
         last = ClusterObjective.objects.last()
         url = reverse('cluster-objective')
         data = {
@@ -23,9 +23,9 @@ class TestClusterObjectiveAPIView(BaseAPITestCase):
 
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(response.data['id'], (last.id+1))
-        self.assertTrue(ClusterObjective.objects.all().count() > count)
+        self.assertTrue(ClusterObjective.objects.all().count() > base_count)
 
-        new_count = count + 1
+        new_count = base_count + 1
         obj_to_update_id = response.data['id']
         data.update(dict(id=obj_to_update_id))
         data['title'] = 'new updated title'
@@ -35,3 +35,14 @@ class TestClusterObjectiveAPIView(BaseAPITestCase):
         self.assertEquals(ClusterObjective.objects.get(id=response.data['id']).title, data['title'])
 
         self.assertFalse((ClusterObjective.objects.filter(title="curl post title").exists()))
+
+        response = self.client.delete(url, data=data, format='json')
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(response.data, None)
+        self.assertEquals(ClusterObjective.objects.all().count(), base_count)
+
+        url = reverse('cluster-objective', kwargs={"pk": last.pk})
+        response = self.client.get(url, format='json')
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(response.data['id'], last.id)
+        self.assertEquals(response.data['title'], last.title)
