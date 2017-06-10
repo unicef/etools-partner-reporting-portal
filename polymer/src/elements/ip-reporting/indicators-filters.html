@@ -10,7 +10,7 @@
 <link rel="import" href="../filters/pd-filter/pd-dropdown-filter.html">
 <link rel="import" href="../filters/checkbox-filter/checkbox-filter.html">
 <link rel="import" href="../../behaviors/utils.html">
-
+<link rel="import" href="../../behaviors/filter.html">
 
 <dom-module id="indicators-filters">
   <template>
@@ -46,7 +46,8 @@
           class="item"
           label="PD status"
           name="pd_statuses"
-          value="[[_withDefault(queryParams.pd_statuses, '')]]"
+          disabled="[[_isFilterDisabled(queryParams.pd_active)]]"
+          value="[[_getPdStatusesValue(queryParams.pd_active)]]"
           data="[[pd_statuses]]">
       </dropdown-filter>
 
@@ -68,10 +69,10 @@
       </text-filter>
 
       <checkbox-filter
-        class="incomplete"
-        name="incomplete"
-        value="[[_withDefault(queryParams.incomplete, '')]]">
-        <span class="checkbox-label">Show incomplete indicators only</span>
+        class="pd_active"
+        name="pd_active"
+        value="[[_withDefault(queryParams.pd_active, '')]]">
+        <span class="checkbox-label">Show active PDs only</span>
       </checkbox-filter>
 
     </filter-list>
@@ -83,6 +84,7 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.FilterBehavior,
       ],
 
       properties: {
@@ -100,6 +102,20 @@
         },
 
       },
+
+      _isFilterDisabled: function() {
+        if (Number(this.queryParams.pd_active) === 1) {
+          return true;
+        }
+        return false;
+      },
+
+      _getPdStatusesValue: function() {
+        if (Number(this.queryParams.pd_active) === 1) {
+          return 'Act';
+        }
+        return this._withDefault(this.queryParams.pd_statuses, '');
+      }
 
     });
   </script>

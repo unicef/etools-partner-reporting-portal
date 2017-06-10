@@ -81,7 +81,7 @@ class TestIndicatorListAPIView(BaseAPITestCase):
         self.reports = Reportable.objects.filter(lower_level_outputs__reportables__isnull=False, lower_level_outputs__indicator__programme_document__status="Act")
 
         url = reverse('indicator-list-create-api')
-        url += '?pd_active=true'
+        url += '?pd_active=1'
         response = self.client.get(url, format='json')
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)

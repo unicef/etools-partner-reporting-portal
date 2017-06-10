@@ -81,9 +81,8 @@ class IndicatorListCreateAPIView(ListCreateAPIView):
         pds = self.request.query_params.get('pds', None)
 
         pd_active = self.request.query_params.get('pd_active', None)
-        if pd_active and pd_active.lower() == 'true':
+        if pd_active and int(pd_active) == 1:
             pd_active = True
-
         else:
             pd_active = False
 
@@ -99,11 +98,11 @@ class IndicatorListCreateAPIView(ListCreateAPIView):
             pd_list = map(lambda item: int(item), filter(lambda item: item != '', pds.split(',')))
             q_list.append(Q(lower_level_outputs__indicator__programme_document__id__in=pd_list))
 
-        if pd_statuses:
+        if not pd_active and pd_statuses:
             pd_status_list = map(lambda item: item, filter(lambda item: item != '', pd_statuses.split(',')))
             q_list.append(Q(lower_level_outputs__indicator__programme_document__status__in=pd_status_list))
 
-        if not pd_statuses and pd_active:
+        if pd_active:
             q_list.append(Q(lower_level_outputs__indicator__programme_document__status="Act"))
 
         if clusters:
