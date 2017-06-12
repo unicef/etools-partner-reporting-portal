@@ -23,7 +23,7 @@
         class="item"
         label="PD"
         name="pds"
-        value="[[_withDefault(queryParams.pds, '')]]"
+        value="[[value]]"
         data="[[data]]">
       </dropdown-filter>
     </template>
@@ -40,10 +40,11 @@
       properties: {
         programmeDocumentsUrl: {
           type: String,
-          computed: '_computeProgrammeDocumentsUrl(location)',
+          computed: '_computeProgrammeDocumentsUrl(locationId)',
+          observer: '_fetchPDs',
         },
 
-        location: {
+        locationId: {
           type: String,
           statePath: 'location.id',
         },
@@ -62,23 +63,33 @@
         value: String,
       },
 
-      _computeProgrammeDocumentsUrl: function (location) {
-        return App.Endpoints.programmeDocuments(location);
+      _computeProgrammeDocumentsUrl: function (locationId) {
+        return locationId ? App.Endpoints.programmeDocuments(locationId) : '';
       },
 
       _computeLoading: function (data) {
         return !data.length;
       },
 
-      attached: function () {
+      _fetchPDs: function (url) {
         var self = this;
+
+        if (!url) {
+          return;
+        }
+
+        this.$.programmeDocuments.abort();
+
         this.$.programmeDocuments.thunk()()
-          .then(function (res) {
-            self.data = [{
-              id: '',
-              title: 'All'
-            }].concat(res.data.results);
-          });
+            .then(function (res) {
+              self.set('data', [{
+                id: '',
+                title: 'All',
+              }].concat(res.data.results));
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
       },
 
       detached: function () {

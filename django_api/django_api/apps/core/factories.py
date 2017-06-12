@@ -1,13 +1,10 @@
 import datetime
 import json
 import random
-from decimal import Decimal
 
 from django.contrib.auth.models import Group
 from django.db.models.signals import post_save
 from django.contrib.contenttypes.models import ContentType
-
-from psycopg2.extras import NumericRange
 
 import factory
 from factory import fuzzy
@@ -284,6 +281,10 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     unicef_office = factory.Sequence(lambda n: "JCO country programme %d" % n)
     unicef_focal_point = factory.Sequence(lambda n: "Abdallah Yakhola %d" % n)
     partner_focal_point = factory.Sequence(lambda n: "Hanin Odeh %d" % n)
+
+    cso_contribution = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
+    total_unicef_cash = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
+    in_kind_amount = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
 
     cp_output = factory.RelatedFactory('core.factories.CountryProgrammeOutputFactory', 'programme_document')
 
