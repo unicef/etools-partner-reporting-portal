@@ -253,13 +253,24 @@ class ProgrammeDocument(TimeStampedModel):
     #         )
 
 
+def find_first_programme_document_id():
+    try:
+        pd_id = ProgrammeDocument.objects.first().id
+    except AttributeError:
+        from core.factories import ProgrammeDocumentFactory
+        pd = ProgrammeDocumentFactory()
+        pd_id = pd.id
+    else:
+        return pd_id
+
+
 class ProgressReport(TimeStampedModel):
     partner_contribution_to_date = models.CharField(max_length=256)
     funds_received_to_date = models.CharField(max_length=256)
     challenges_in_the_reporting_period = models.CharField(max_length=256)
     proposed_way_forward = models.CharField(max_length=256)
     status = models.CharField(max_length=3, choices=PROGRESS_REPORT_STATUS, default=PROGRESS_REPORT_STATUS.due)
-    programme_document = models.ForeignKey(ProgrammeDocument, related_name="progress_reports")
+    programme_document = models.ForeignKey(ProgrammeDocument, related_name="progress_reports", default=find_first_programme_document_id)
     # attachements ???
 
     @cached_property
