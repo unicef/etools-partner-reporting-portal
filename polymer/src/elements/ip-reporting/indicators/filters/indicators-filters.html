@@ -1,16 +1,16 @@
-<link rel="import" href="../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
-<link rel="import" href="../../../bower_components/iron-location/iron-location.html">
-<link rel="import" href="../../../bower_components/iron-location/iron-query-params.html">
+<link rel="import" href="../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../../../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../../../bower_components/iron-location/iron-query-params.html">
 
-<link rel="import" href="../filter-list.html">
-<link rel="import" href="../filters/text-filter/text-filter.html">
-<link rel="import" href="../filters/dropdown-filter/dropdown-filter.html">
-<link rel="import" href="../filters/location-filter/location-filter.html">
-<link rel="import" href="../filters/pd-filter/pd-dropdown-filter.html">
-<link rel="import" href="../filters/checkbox-filter/checkbox-filter.html">
-<link rel="import" href="../../behaviors/utils.html">
-<link rel="import" href="../../behaviors/filter.html">
+<link rel="import" href="../../../filter-list.html">
+<link rel="import" href="../../../filters/text-filter/text-filter.html">
+<link rel="import" href="../../../filters/dropdown-filter/dropdown-filter.html">
+<link rel="import" href="../../../filters/location-filter/location-filter.html">
+<link rel="import" href="../../../filters/pd-filter/pd-dropdown-filter.html">
+<link rel="import" href="../../../filters/checkbox-filter/checkbox-filter.html">
+<link rel="import" href="../../../../behaviors/utils.html">
+<link rel="import" href="../../../../behaviors/filter.html">
 
 <dom-module id="indicators-filters">
   <template>
@@ -46,7 +46,7 @@
           class="item"
           label="PD status"
           name="pd_statuses"
-          disabled="[[_isFilterDisabled(queryParams.pd_active)]]"
+          disabled="[[_isPdStatusesFilterDisabled(queryParams.pd_active)]]"
           value="[[_getPdStatusesValue(queryParams.pd_active)]]"
           data="[[pd_statuses]]">
       </dropdown-filter>
@@ -103,7 +103,7 @@
 
       },
 
-      _isFilterDisabled: function() {
+      _isPdStatusesFilterDisabled: function() {
         if (Number(this.queryParams.pd_active) === 1) {
           return true;
         }
