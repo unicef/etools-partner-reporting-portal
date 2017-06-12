@@ -12,6 +12,8 @@ from indicator.models import (
     Reportable,
     IndicatorReport,
     IndicatorLocationData,
+    Disaggregation,
+    DisaggregationValue,
 )
 from unicef.models import (
     ProgressReport,
@@ -35,6 +37,8 @@ from core.factories import (
     ProgressReportFactory,
     SectionFactory,
     ProgrammeDocumentFactory,
+    DisaggregationFactory,
+    DisaggregationValueFactory,
 )
 
 
@@ -100,6 +104,7 @@ def generate_fake_data(quantity=3):
         indicator_report.save()
 
         IndicatorLocationDataFactory(indicator_report=indicator_report, location=reportable.locations.first())
+    print "{} ProgrammeDocument <-> ReportableToLowerLevelOutput <-> IndicatorReport objects linked".format(quantity)
 
     # Intervention creates Cluster and Locations
     InterventionFactory.create_batch(quantity, locations=Location.objects.all())
@@ -109,11 +114,28 @@ def generate_fake_data(quantity=3):
     for idx in xrange(quantity):
         cluster_activity = ClusterActivity.objects.all()[idx]
         PartnerFactory(partner_activity__cluster_activity=cluster_activity)
+    print "{} ClusterActivity <-> PartnerActivity objects linked".format(quantity)
 
     # Adding extra IndicatorReport to each ReportableToLowerLevelOutput
     locations = Location.objects.all()
 
-    for reportable in Reportable.objects.filter(lower_level_outputs__reportables__isnull=False):
+    sample_disaggregation_value_map = {
+        "height": ["tall", "medium", "short", "extrashort"],
+        "age": ["1-2m", "3-5m", "6-10m"],
+        "gender": ["male", "female", "other"],
+    }
+
+    for idx, reportable in enumerate(Reportable.objects.filter(lower_level_outputs__reportables__isnull=False)):
+        # Disaggregation generation
+        for disaggregation_title in ["height", "age", "gender"]:
+            disaggregation = DisaggregationFactory(name=disaggregation_title, reportable=reportable)
+
+            for value in sample_disaggregation_value_map[disaggregation_title]:
+                disaggregation_value = DisaggregationValueFactory(value=value, disaggregation=disaggregation)
+
+            print "Disaggregation (and DisaggregationValue) objects for ReportableToLowerLevelOutput {} created".format(idx)
+
+        # -- Extra IndicatorReport and IndicatorLocationReport --
         if reportable.locations.count() != 0:
             first_reportable_location_id = reportable.locations.first().id
 
@@ -134,6 +156,8 @@ def generate_fake_data(quantity=3):
 
                 for extra_indicator_report_idx in xrange(3):
                     IndicatorLocationDataFactory(indicator_report=indicator_report, location=location)
+
+        # -- Extra IndicatorReport and IndicatorLocationReport --
 
     print "{} ReportableToLowerLevelOutput objects created".format(quantity)
     print "{} ProgressReport objects created".format(quantity)

@@ -21,6 +21,8 @@ from indicator.models import (
     Reportable,
     IndicatorReport,
     IndicatorLocationData,
+    Disaggregation,
+    DisaggregationValue,
 )
 from unicef.models import (
     Section,
@@ -211,6 +213,9 @@ class ReportableFactory(factory.django.DjangoModelFactory):
         lambda o: ContentType.objects.get_for_model(o.content_object))
     total = fuzzy.FuzzyInteger(10, 100, 5)
 
+    # Commented out so that we can create Disaggregation and DisaggregationValue objects manually
+    # disaggregation = factory.RelatedFactory('core.factories.DisaggregationFactory', 'reportable')
+
     class Meta:
         exclude = ['content_object']
         abstract = True
@@ -290,6 +295,23 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = ProgrammeDocument
+
+
+class DisaggregationFactory(factory.django.DjangoModelFactory):
+    active = True
+
+    # Commented out so that we can create Disaggregation and DisaggregationValue objects manually
+    # disaggregation_value = factory.RelatedFactory('core.factories.DisaggregationValueFactory', 'disaggregation')
+
+    class Meta:
+        model = Disaggregation
+
+
+class DisaggregationValueFactory(factory.django.DjangoModelFactory):
+    active = True
+
+    class Meta:
+        model = DisaggregationValue
 
 
 class IndicatorReportFactory(factory.django.DjangoModelFactory):
