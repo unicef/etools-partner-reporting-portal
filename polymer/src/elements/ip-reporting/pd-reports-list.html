@@ -101,7 +101,7 @@
               </template>
             </div>
             <div class="table-cell table-cell--text cell-reports">
-                <a href="TODO">[[_linkText(report)]]</a>
+              <a href="[[_getLink(report)]]">[[_getLinkText(report)]]</a>
             </div>
           </div>
         </etools-data-table-row>
@@ -143,7 +143,21 @@
         return is_draft;
       },
 
-      _linkText: function(report) {
+      _getLink: function (report) {
+        var suffix;
+
+        if (report.is_draft) {
+          suffix = 'draft';
+        } else if (report.progress_report_status === 'Sub') {
+          suffix = 'view';
+        } else {
+          suffix = 'edit';
+        }
+
+        return 'reports/' + report.id + '/' + suffix;
+      },
+
+      _getLinkText: function(report) {
         if (report.is_draft) {
           return 'Go To Draft';
         } else if (report.progress_report_status === 'Sub') {
