@@ -66,27 +66,11 @@ class ClusterObjectiveListAPIView(ListAPIView):
     pagination_class = SmallPagination
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     filter_class = ClusterObjectiveFilter
+    lookup_field = lookup_url_kwarg = 'cluster_id'
 
-    def get_queryset(self):
+    def get_queryset(self, *args, **kwargs):
         queryset = ClusterObjective.objects.select_related('cluster')
-        if self.cluster_id:
-            return queryset.filter(cluster_id=self.cluster_id)
+        cluster_id = self.kwargs.get(self.lookup_field)
+        if cluster_id:
+            return queryset.filter(cluster_id=cluster_id)
         return queryset.all()
-
-    def list(self, request, *args, **kwargs):
-        self.cluster_id = kwargs.get('cluster_id')
-        queryset = self.get_queryset()
-
-        filtered = ClusterObjectiveFilter(request.GET, queryset=queryset)
-
-        page = self.paginate_queryset(filtered.qs)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(filtered.qs, many=True)
-
-        return Response(
-            serializer.data,
-            status=statuses.HTTP_200_OK
-        )
