@@ -58,13 +58,13 @@ class PartnerFactory(factory.django.DjangoModelFactory):
     user = factory.RelatedFactory('core.factories.UserFactory', 'partner')
 
     @factory.post_generation
-    def cluster(self, create, extracted, **kwargs):
+    def clusters(self, create, extracted, **kwargs):
         if not create:
             return
 
         if extracted:
             for cluster in extracted:
-                self.cluster.add(cluster)
+                self.clusters.add(cluster)
 
     class Meta:
         model = Partner
@@ -84,22 +84,22 @@ class PartnerProjectFactory(factory.django.DjangoModelFactory):
     status = fuzzy.FuzzyText()
 
     @factory.post_generation
-    def cluster(self, create, extracted, **kwargs):
+    def clusters(self, create, extracted, **kwargs):
         if not create:
             return
 
         if extracted:
             for cluster in extracted:
-                self.cluster.add(cluster)
+                self.clusters.add(cluster)
 
     @factory.post_generation
-    def location(self, create, extracted, **kwargs):
+    def locations(self, create, extracted, **kwargs):
         if not create:
             return
 
         if extracted:
             for cluster in extracted:
-                self.location.add(cluster)
+                self.locations.add(cluster)
 
     class Meta:
         model = PartnerProject
@@ -220,79 +220,6 @@ class ReportableToLowerLevelOutputFactory(ReportableFactory):
     content_object = factory.SubFactory('core.factories.LowerLevelOutputFactory')
     target = '5000'
     baseline = '0'
-    disaggregation_logic = {
-        "extrashort": {
-            "1-2m": {
-                "male": "int",
-                "female": "int",
-                "other": "int",
-            },
-            "3-5m": {
-                "male": "int",
-                "female": "int",
-                "other": "int",
-            },
-            "6-10m": {
-                "male": "int",
-                "female": "int",
-                "other": "int",
-            }
-        },
-
-        "short": {
-            "1-2m": {
-                "male": "int",
-                "female": "int",
-                "other": "int",
-            },
-            "3-5m": {
-                "male": "int",
-                "female": "int",
-                "other": "int",
-            },
-            "6-10m": {
-                "male": "int",
-                "female": "int",
-                "other": "int",
-            }
-        },
-
-        "medium": {
-            "1-2m": {
-                "male": "int",
-                "female": "int",
-                "other": "int",
-            },
-            "3-5m": {
-                "male": "int",
-                "female": "int",
-                "other": "int",
-            },
-            "6-10m": {
-                "male": "int",
-                "female": "int",
-                "other": "int",
-            }
-        },
-
-        "tall": {
-            "1-2m": {
-                "male": "int",
-                "female": "int",
-                "other": "int",
-            },
-            "3-5m": {
-                "male": "int",
-                "female": "int",
-                "other": "int",
-            },
-            "6-10m": {
-                "male": "int",
-                "female": "int",
-                "other": "int",
-            }
-        }
-    }
 
     indicator_report = factory.RelatedFactory('core.factories.IndicatorReportFactory', 'reportable')
 

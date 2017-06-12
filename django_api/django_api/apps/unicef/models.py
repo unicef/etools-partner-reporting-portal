@@ -22,6 +22,9 @@ from indicator.models import Reportable  # IndicatorReport
 
 
 class Section(models.Model):
+    """
+    Section model define atomic act of help like: bottle of water, blanket.
+    """
     name = models.CharField(max_length=255)
 
     def __str__(self):
@@ -29,6 +32,13 @@ class Section(models.Model):
 
 
 class ProgrammeDocument(TimeStampedModel):
+    """
+    ProgrammeDocument model describe agreement between UNICEF & Partner to realize document and
+    reports are feedback for this assignment.
+
+    related models:
+        unicef.Section (ManyToManyField): "sections"
+    """
     agreement = models.CharField(max_length=255, verbose_name='Agreement')
     document_type = models.CharField(
         max_length=3,
@@ -258,14 +268,24 @@ class ProgressReport(TimeStampedModel):
 
 
 class CountryProgrammeOutput(TimeStampedModel):
-    title = models.CharField(max_length=255)
+    """
+    CountryProgrammeOutput (LLO Parent) module.
 
+    related models:
+        unicef.ProgrammeDocument (ForeignKey): "programme_document"
+    """
+    title = models.CharField(max_length=255)
     programme_document = models.ForeignKey(ProgrammeDocument, related_name="cp_outputs")
 
 
 class LowerLevelOutput(TimeStampedModel):
+    """
+    LowerLevelOutput (PD output) module describe the goals to reach in PD scope.
+
+    related models:
+        unicef.CountryProgrammeOutput (ForeignKey): "indicator"
+        indicator.Reportable (GenericRelation): "reportables"
+    """
     title = models.CharField(max_length=255)
-
     indicator = models.ForeignKey(CountryProgrammeOutput, related_name="ll_outputs")
-
     reportables = GenericRelation('indicator.Reportable', related_query_name='lower_level_outputs')

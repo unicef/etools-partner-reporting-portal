@@ -15,6 +15,11 @@ from core.countries import COUNTRIES_ALPHA2_CODE_DICT, COUNTRIES_ALPHA2_CODE
 
 
 class Partner(TimeStampedModel):
+    """
+    Partner model describe in details who is it and his activity humanitarian goals (clusters).
+    related models:
+        cluster.Cluster (ManyToManyField): "clusters"
+    """
     title = models.CharField(
         max_length=255,
         verbose_name='Full Name',
@@ -129,7 +134,7 @@ class Partner(TimeStampedModel):
         null=True,
     )
 
-    cluster = models.ManyToManyField('cluster.Cluster', related_name="partners")
+    clusters = models.ManyToManyField('cluster.Cluster', related_name="partners")
 
     class Meta:
         ordering = ['title']
@@ -148,18 +153,37 @@ class Partner(TimeStampedModel):
 
 
 class PartnerProject(TimeStampedModel):
+    """
+    PartnerProject model is a container for defined group of PartnerActivities model.
+
+    related models:
+        cluster.Cluster (ManyToManyField): "clusters"
+        core.Location (ManyToManyField): "locations"
+        partner.Partner (ForeignKey): "partner"
+        indicator.Reportable (GenericRelation): "reportables"
+    """
     title = models.CharField(max_length=255)
     start_date = models.DateField()
     end_date = models.DateField()
     status = models.CharField(max_length=100)
 
-    cluster = models.ManyToManyField('cluster.Cluster', related_name="partner_projects")
-    location = models.ManyToManyField('core.Location', related_name="partner_projects")
+    clusters = models.ManyToManyField('cluster.Cluster', related_name="partner_projects")
+    locations = models.ManyToManyField('core.Location', related_name="partner_projects")
     partner = models.ForeignKey(Partner, null=True, related_name="partner_projects")
     reportables = GenericRelation('indicator.Reportable', related_query_name='partner_projects')
 
 
 class PartnerActivity(TimeStampedModel):
+    """
+    PartnerActivity model define action that are not present in cluster activity.
+    Partner is allowed to define their ideas that wasn't defined.
+
+    related models:
+        partner.PartnerProject (ForeignKey): "project"
+        partner.Partner (ForeignKey): "partner"
+        cluster.ClusterActivity (ForeignKey): "cluster_activity"
+        indicator.Reportable (GenericRelation): "reportables"
+    """
     title = models.CharField(max_length=255)
     project = models.ForeignKey(PartnerProject, null=True, related_name="partner_activities")
     partner = models.ForeignKey(Partner, related_name="partner_activities")
