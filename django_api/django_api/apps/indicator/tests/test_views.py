@@ -25,10 +25,11 @@ def generate_test_data(quantity):
         llo = LowerLevelOutput.objects.all()[idx]
         reportable = ReportableToLowerLevelOutputFactory(content_object=llo)
 
+        pd = ProgrammeDocument.objects.all()[idx]
         reportable.content_object.indicator.programme_document.sections.add(Section.objects.all()[idx])
 
         indicator_report = reportable.indicator_reports.first()
-        indicator_report.progress_report = ProgressReportFactory()
+        indicator_report.progress_report = ProgressReportFactory(programme_document=pd)
         indicator_report.save()
 
         IndicatorLocationDataFactory(indicator_report=indicator_report, location=reportable.locations.first())
