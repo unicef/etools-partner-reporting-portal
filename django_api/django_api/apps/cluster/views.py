@@ -86,8 +86,8 @@ class ClusterActivityListAPIView(ListAPIView):
     serializer_class = ClusterActivitySerializer
     permission_classes = (IsAuthenticated, )
     pagination_class = SmallPagination
-    #filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
-    #filter_class = ClusterActivityFilter
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
+    filter_class = ClusterActivityFilter
     lookup_field = lookup_url_kwarg = 'cluster_id'
 
     def get_queryset(self, *args, **kwargs):
