@@ -24,7 +24,7 @@
           defaultValue = '...';
         }
 
-        return (value == null /* undefinded & null */ || !value.length) ? // jshint ignore:line
+        return value == null /* undefinded & null */ ? // jshint ignore:line
             defaultValue : value;
       },
 
