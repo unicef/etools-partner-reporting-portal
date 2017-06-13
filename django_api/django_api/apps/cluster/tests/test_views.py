@@ -127,16 +127,30 @@ class TestClusterActivityAPIView(BaseAPITestCase):
         }
 
     def test_read_cluster_activity(self):
+        """
+        get list unit test for TestClusterActivityAPIView
+        """
         url = reverse('cluster-activity-list')
         response = self.client.get(url, format='json')
 
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(response.data['count'], ClusterActivity.objects.all().count())
 
+    def test_filter_list_cluster_activity(self):
+        """
+        get list unit test for TestClusterActivityAPIView
+        """
+        last = ClusterActivity.objects.last()
+        url = reverse('cluster-activity-list')
+        response = self.client.get(url + "?title=%s"%last.title, format='json')
+
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(response.data['count'], 1)
+        self.assertEquals(response.data['results'][0]['id'], last.id)
+
     def test_create_cluster_activity(self):
         """
-        create and update unit test for ClusterObjectiveAPIView
-        :return:
+        create unit test for TestClusterActivityAPIView
         """
         base_count = ClusterActivity.objects.all().count()
         last = ClusterActivity.objects.last()

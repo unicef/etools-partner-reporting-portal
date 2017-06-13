@@ -20,13 +20,11 @@ class ClusterObjectiveFilter(django_filters.FilterSet):
 
 class ClusterActivityFilter(django_filters.FilterSet):
 
-    ref_title = CharFilter(method='get_reference_number_title')
+    title = CharFilter(method='get_title')
 
     class Meta:
         model = ClusterActivity
-        fields = ['ref_title', ]
+        fields = ['title', ]
 
-    def get_reference_number_title(self, queryset, name, value):
-        return queryset.filter(
-            Q(cluster_objective__reference_number__icontains=value) | Q(cluster_objective__title__icontains=value)
-        )
+    def get_title(self, queryset, name, value):
+        return queryset.filter(title__icontains=value)
