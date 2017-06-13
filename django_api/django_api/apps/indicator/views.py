@@ -109,12 +109,23 @@ class IndicatorListCreateAPIView(ListCreateAPIView):
 class IndicatorReportListAPIView(APIView):
     """
     REST API endpoint to get a list of IndicatorReport objects, including each set of disaggregation data per report.
+
+    kwargs:
+    - reportable_id: Reportable pk (if given, the API will only return IndicatorReport objects tied to this Reportable)
+
+    GET parameter:
+    - pks = A comma-separated string for IndicatorReport pks (If this GET parameter is given, Reportable pk kwargs will be ignored)
     """
 
-    def get_queryset(self, pk):
-        reportable = get_object_or_404(Reportable, pk=pk)
+    def get_queryset(self, reportable_id=None, pks=None):
+        indicator_reports = None
 
-        indicator_reports = reportable.indicator_reports.all().order_by('-time_period_start')
+        if pks:
+            indicator_reports = IndicatorReport.objects.filter(id__in=pks)
+
+        else:
+            reportable = get_object_or_404(Reportable, pk=reportable_id)
+            indicator_reports = reportable.indicator_reports.all().order_by('-time_period_start')
 
         if 'limit' in self.request.query_params:
             limit = self.request.query_params.get('limit', 2)
@@ -122,8 +133,9 @@ class IndicatorReportListAPIView(APIView):
 
         return indicator_reports
 
-    def get(self, request, pk, format='json'):
-        indicator_reports = self.get_queryset(pk)
+    def get(self, request, reportable_id, format='json'):
+        pks = self.request.query_params.get('pks', None)
+        indicator_reports = self.get_queryset(reportable_id=reportable_id, pks=pks)
 
         serializer = IndicatorReportListSerializer(indicator_reports, many=True)
 

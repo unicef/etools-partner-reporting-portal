@@ -84,7 +84,7 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
     def test_list_api(self):
         indicator_report = IndicatorReport.objects.last()
 
-        url = reverse('indicator-report-list-api', kwargs={'pk': indicator_report.reportable.id})
+        url = reverse('indicator-report-list-api', kwargs={'reportable_id': indicator_report.reportable.id})
         response = self.client.get(url, format='json')
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)

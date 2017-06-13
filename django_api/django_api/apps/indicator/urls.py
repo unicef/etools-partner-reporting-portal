@@ -12,5 +12,6 @@ urlpatterns = [
         PDReportsAPIView.as_view(),
         name="programme-document-reports"),
     url(r'^$', IndicatorListCreateAPIView.as_view(), name='indicator-list-create-api'),
-    url(r'^(?P<pk>\d+)/indicator-reports/$', IndicatorReportListAPIView.as_view(), name='indicator-report-list-api'),
+    url(r'^indicator-reports/$', IndicatorReportListAPIView.as_view(), name='indicator-report-direct-list-api'),
+    url(r'^(?P<reportable_id>\d+)/indicator-reports/$', IndicatorReportListAPIView.as_view(), name='indicator-report-list-api'),
 ]
