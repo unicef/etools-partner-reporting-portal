@@ -28,7 +28,7 @@ class TestClusterObjectiveAPIView(BaseAPITestCase):
         last = ClusterObjective.objects.last()
 
         # test for creating object
-        url = reverse('cluster-objective')
+        url = reverse('cluster-objective-list')
         response = self.client.post(url, data=self.data, format='json')
 
         self.assertTrue(status.is_success(response.status_code))
