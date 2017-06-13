@@ -152,6 +152,11 @@ class ClusterActivityAPIView(APIView):
         serializer.save()
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
+    def delete(self, request, pk, *args, **kwargs):
+        instance = self.get_instance(request, pk)
+        instance.delete()
+        return Response(status=statuses.HTTP_204_NO_CONTENT)
+
 
 class ClusterActivityListAPIView(ListCreateAPIView):
 

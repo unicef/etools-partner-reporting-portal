@@ -195,7 +195,7 @@ class TestClusterActivityAPIView(BaseAPITestCase):
 
     def test_update_put_cluster_activity(self):
         """
-        update object unit test for ClusterObjectiveAPIView
+        update object unit test for ClusterActivityAPIView
         """
         base_count = ClusterActivity.objects.all().count()
         last = ClusterActivity.objects.last()
@@ -211,3 +211,19 @@ class TestClusterActivityAPIView(BaseAPITestCase):
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(ClusterActivity.objects.all().count(), base_count)
         self.assertEquals(ClusterActivity.objects.get(id=response.data['id']).title, data['title'])
+
+    def test_delete_cluster_activity(self):
+        """
+        delete object unit test for ClusterActivityAPIView
+        """
+        base_count = ClusterActivity.objects.all().count()
+        last = ClusterActivity.objects.last()
+        url = reverse('cluster-activity', kwargs={"pk": last.id})
+
+        response = self.client.delete(url, data={"id": last.pk}, format='json')
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(response.data, None)
+        self.assertEquals(ClusterActivity.objects.all().count(), base_count-1)
+
+        response = self.client.delete(url, data={"id": last.pk}, format='json')
+        self.assertEquals(status.HTTP_404_NOT_FOUND, response.status_code)
