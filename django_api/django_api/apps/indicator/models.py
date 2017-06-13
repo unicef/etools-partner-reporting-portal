@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
+from itertools import combinations
 
+from django.utils.functional import cached_property
 from django.contrib.postgres.fields import JSONField
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -164,6 +166,10 @@ class IndicatorReport(TimeStampedModel):
     def status(self):
         # TODO: Check all disaggregation data across locations and return status
         return 'fulfilled'
+
+    @cached_property
+    def disaggregations(self):
+        return self.reportable.disaggregation.all()
 
 
 class IndicatorLocationData(TimeStampedModel):
