@@ -2,7 +2,7 @@ from django.urls import reverse
 from rest_framework import status
 from core.tests.base import BaseAPITestCase
 from core.common import FREQUENCY_LEVEL
-from cluster.models import ClusterObjective, Cluster
+from cluster.models import ClusterObjective, Cluster, ClusterActivity
 
 
 class TestClusterObjectiveAPIView(BaseAPITestCase):
@@ -113,3 +113,34 @@ class TestClusterObjectiveAPIView(BaseAPITestCase):
         response = self.client.get(url, format='json')
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(response.data['count'], 1)
+
+
+class TestClusterActivityAPIView(BaseAPITestCase):
+
+    @property
+    def data(self):
+        return {
+            "title": "Water for thirsty",
+            "standard": "Bottle of water with UNICEF logo.",
+            "frequency": FREQUENCY_LEVEL.weekly,
+            "cluster_objective": ClusterObjective.objects.first().id,
+        }
+
+    def test_create_cluster_activity(self):
+        """
+        create and update unit test for ClusterObjectiveAPIView
+        :return:
+        """
+        base_count = ClusterActivity.objects.all().count()
+        last = ClusterActivity.objects.last()
+
+        # test for creating object
+        url = reverse('cluster-activity-list')
+        response = self.client.post(url, data=self.data, format='json')
+
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(response.data['id'], (last.id+1))
+        created_obj = ClusterActivity.objects.get(id=response.data['id'])
+        self.assertEquals(created_obj.title, self.data["title"])
+        self.assertEquals(created_obj.frequency, FREQUENCY_LEVEL.weekly)
+        self.assertEquals(ClusterActivity.objects.all().count(),  base_count + 1)

@@ -53,10 +53,12 @@ class ClusterActivitySerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'title',
+            'standard',
             'co_cluster_title',
             'co_title',
             'co_reference_number',
             'frequency',
+            'cluster_objective',
         )
 
     def get_co_cluster_title(self, obj):

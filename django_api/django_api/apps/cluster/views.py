@@ -10,7 +10,11 @@ import django_filters
 from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
 from .models import ClusterObjective, ClusterActivity
-from .serializers import ClusterObjectiveSerializer, ClusterObjectivePatchSerializer, ClusterActivitySerializer
+from .serializers import (
+    ClusterObjectiveSerializer,
+    ClusterObjectivePatchSerializer,
+    ClusterActivitySerializer,
+)
 from .filters import ClusterObjectiveFilter, ClusterActivityFilter
 
 
@@ -119,3 +123,16 @@ class ClusterActivityListAPIView(ListCreateAPIView):
         if cluster_id:
             return queryset.filter(cluster_objective__cluster_id=cluster_id)
         return queryset.all()
+
+    def post(self, request, *args, **kwargs):
+        """
+        Create on ClusterActivity model
+        :return: ClusterActivity object id
+        """
+        serializer = ClusterActivitySerializer(data=self.request.data)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=statuses.HTTP_400_BAD_REQUEST)
+
+        serializer.save()
+        return Response({'id': serializer.instance.id}, status=statuses.HTTP_200_OK)
