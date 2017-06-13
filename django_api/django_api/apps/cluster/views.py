@@ -34,21 +34,6 @@ class ClusterObjectiveAPIView(APIView):
         serializer = ClusterObjectiveSerializer(instance=instance)
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
-    def _create_update(self):
-        if 'id' in self.request.data.keys():
-            serializer = ClusterObjectiveSerializer(
-                instance=self.get_instance(self.request),
-                data=self.request.data
-            )
-        else:
-            serializer = ClusterObjectiveSerializer(data=self.request.data)
-
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=statuses.HTTP_400_BAD_REQUEST)
-
-        serializer.save()
-        return serializer
-
     def patch(self, request, *args, **kwargs):
         serializer = ClusterObjectivePatchSerializer(
             instance=self.get_instance(self.request),
@@ -64,16 +49,19 @@ class ClusterObjectiveAPIView(APIView):
         Update on ClusterObjective model
         :return: ClusterObjective serializer data
         """
-        serializer = self._create_update()
-        return Response(serializer.data, status=statuses.HTTP_200_OK)
+        if 'id' in self.request.data.keys():
+            serializer = ClusterObjectiveSerializer(
+                instance=self.get_instance(self.request),
+                data=self.request.data
+            )
+        else:
+            return Response({"id": "This filed is reqired!"}, status=statuses.HTTP_400_BAD_REQUEST)
 
-    def post(self, request, *args, **kwargs):
-        """
-        Create on ClusterObjective model
-        :return: ClusterObjective object id
-        """
-        serializer = self._create_update()
-        return Response({'id': serializer.instance.id}, status=statuses.HTTP_200_OK)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=statuses.HTTP_400_BAD_REQUEST)
+
+        serializer.save()
+        return Response(serializer.data, status=statuses.HTTP_200_OK)
 
     def delete(self, request, *args, **kwargs):
         instance = self.get_instance(request)
@@ -81,7 +69,7 @@ class ClusterObjectiveAPIView(APIView):
         return Response(status=statuses.HTTP_204_NO_CONTENT)
 
 
-class ClusterObjectiveListAPIView(ListCreateAPIView):
+class ClusterObjectiveListCreateAPIView(ListCreateAPIView):
 
     serializer_class = ClusterObjectiveSerializer
     permission_classes = (IsAuthenticated, )
@@ -96,3 +84,16 @@ class ClusterObjectiveListAPIView(ListCreateAPIView):
         if cluster_id:
             return queryset.filter(cluster_id=cluster_id)
         return queryset.all()
+
+    def post(self, request, *args, **kwargs):
+        """
+        Create on ClusterObjective model
+        :return: ClusterObjective object id
+        """
+        serializer = ClusterObjectiveSerializer(data=self.request.data)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=statuses.HTTP_400_BAD_REQUEST)
+
+        serializer.save()
+        return Response({'id': serializer.instance.id}, status=statuses.HTTP_200_OK)
