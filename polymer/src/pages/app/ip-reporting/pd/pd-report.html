@@ -3,13 +3,12 @@
 
 <link rel="import" href="../../../../elements/page-header.html">
 <link rel="import" href="../../../../elements/page-body.html">
-<link rel="import" href="../../../../elements/ip-reporting/pd-output.html">
+<link rel="import" href="../../../../elements/ip-reporting/pd-output-list.html">
 <link rel="import" href="../../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../../endpoints.html">
 <link rel="import" href="../../../../redux/store.html">
 <link rel="import" href="../../../../redux/actions.html">
 <link rel="import" href="../../../../redux/selectors/programmeDocuments.html">
-<link rel="import" href="../../../../redux/selectors/indicatorData.html">
 
 <dom-module id="page-ip-reporting-pd-report">
   <template>
@@ -36,11 +35,7 @@
     </page-header>
 
     <page-body>
-      <template
-          is="dom-repeat"
-          items="[[data]]">
-        <pd-output data="[[item]]"></pd-output>
-      </template>
+      <pd-output-list></pd-output-list>
     </page-body>
   </template>
 
