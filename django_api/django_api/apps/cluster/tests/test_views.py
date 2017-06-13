@@ -38,7 +38,7 @@ class TestClusterObjectiveAPIView(BaseAPITestCase):
         self.assertEquals(created_obj.frequency, FREQUENCY_LEVEL.weekly)
         self.assertEquals(ClusterObjective.objects.all().count(),  base_count + 1)
 
-    def test_update_cluster_objective(self):
+    def test_update_put_cluster_objective(self):
         """
         update object unit test for ClusterObjectiveAPIView
         """
@@ -48,8 +48,25 @@ class TestClusterObjectiveAPIView(BaseAPITestCase):
         data = self.data
         data.update(dict(id=last.id))
         data['title'] = 'new updated title'
+        data['reference_number'] = 'new updated reference_number'
+        data['frequency'] = FREQUENCY_LEVEL.quarterly
+        data['cluster'] = Cluster.objects.last().id
         url = reverse('cluster-objective')
-        response = self.client.post(url, data=data, format='json')
+        response = self.client.put(url, data=data, format='json')
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(ClusterObjective.objects.all().count(), base_count)
+        self.assertEquals(ClusterObjective.objects.get(id=response.data['id']).title, data['title'])
+
+    def test_update_patch_cluster_objective(self):
+        """
+        patch object unit test for ClusterObjectiveAPIView
+        """
+        base_count = ClusterObjective.objects.all().count()
+        last = ClusterObjective.objects.last()
+
+        data = dict(id=last.id, title='new updated title')
+        url = reverse('cluster-objective')
+        response = self.client.patch(url, data=data, format='json')
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(ClusterObjective.objects.all().count(), base_count)
         self.assertEquals(ClusterObjective.objects.get(id=response.data['id']).title, data['title'])
