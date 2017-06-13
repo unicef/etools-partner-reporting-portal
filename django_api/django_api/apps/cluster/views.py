@@ -14,6 +14,7 @@ from .serializers import (
     ClusterObjectiveSerializer,
     ClusterObjectivePatchSerializer,
     ClusterActivitySerializer,
+    ClusterActivityPatchSerializer,
 )
 from .filters import ClusterObjectiveFilter, ClusterActivityFilter
 
@@ -104,8 +105,23 @@ class ClusterObjectiveListCreateAPIView(ListCreateAPIView):
 
 
 class ClusterActivityAPIView(APIView):
-    pass
-    # TODO
+    """
+    ClusterActivity CRUD endpoint
+    """
+    permission_classes = (IsAuthenticated, )
+
+    def get_instance(self, request, pk=None):
+        try:
+            instance = ClusterActivity.objects.get(id=(pk or request.data['id']))
+        except ClusterActivity.DoesNotExist:
+            # TODO: log exception
+            raise Http404
+        return instance
+
+    def get(self, request, pk, *args, **kwargs):
+        instance = self.get_instance(request, pk)
+        serializer = ClusterActivitySerializer(instance=instance)
+        return Response(serializer.data, status=statuses.HTTP_200_OK)
 
 
 class ClusterActivityListAPIView(ListCreateAPIView):

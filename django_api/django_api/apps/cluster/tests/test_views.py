@@ -126,7 +126,7 @@ class TestClusterActivityAPIView(BaseAPITestCase):
             "cluster_objective": ClusterObjective.objects.first().id,
         }
 
-    def test_read_cluster_activity(self):
+    def test_list_cluster_activity(self):
         """
         get list unit test for TestClusterActivityAPIView
         """
@@ -165,3 +165,16 @@ class TestClusterActivityAPIView(BaseAPITestCase):
         self.assertEquals(created_obj.title, self.data["title"])
         self.assertEquals(created_obj.frequency, FREQUENCY_LEVEL.weekly)
         self.assertEquals(ClusterActivity.objects.all().count(),  base_count + 1)
+
+    def test_get_cluster_activity(self):
+        """
+        get obj unit test for TestClusterActivityAPIView
+        """
+        first = ClusterActivity.objects.first()
+        url = reverse('cluster-activity', kwargs={"pk": first.id})
+        response = self.client.get(url, format='json')
+
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(response.data['id'], first.id)
+        self.assertEquals(response.data['title'], first.title)
+        self.assertEquals(response.data['standard'], first.standard)
