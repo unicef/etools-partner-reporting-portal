@@ -1,7 +1,8 @@
 from django.http import Http404
 
+from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.generics import RetrieveAPIView, ListAPIView
+from rest_framework.generics import ListCreateAPIView
 from rest_framework import status as statuses, serializers
 
 import django_filters
@@ -9,11 +10,11 @@ import django_filters
 from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
 from .models import ClusterObjective, ClusterActivity
-from .serializers import ClusterObjectiveSerializer, ClusterActivitySerializer
+from .serializers import ClusterObjectiveSerializer, ClusterObjectivePatchSerializer, ClusterActivitySerializer
 from .filters import ClusterObjectiveFilter, ClusterActivityFilter
 
 
-class ClusterObjectiveAPIView(RetrieveAPIView):
+class ClusterObjectiveAPIView(APIView):
     """
     ClusterObjective CRUD endpoint
     """
@@ -30,28 +31,37 @@ class ClusterObjectiveAPIView(RetrieveAPIView):
 
     def get(self, request, pk, *args, **kwargs):
         instance = self.get_instance(request, pk)
-        serializer = self.get_serializer(instance=instance)
+        serializer = ClusterObjectiveSerializer(instance=instance)
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
-    def post(self, request, *args, **kwargs):
+    def patch(self, request, *args, **kwargs):
+        serializer = ClusterObjectivePatchSerializer(
+            instance=self.get_instance(self.request),
+            data=self.request.data
+        )
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=statuses.HTTP_400_BAD_REQUEST)
+        serializer.save()
+        return Response(serializer.data, status=statuses.HTTP_200_OK)
+
+    def put(self, request, *args, **kwargs):
         """
-        Create or Update (if id is given to posted data) on ClusterObjective model
-        :return: ClusterObjective object id
+        Update on ClusterObjective model
+        :return: ClusterObjective serializer data
         """
-        if 'id' in request.data.keys():
-            serializer = self.get_serializer(
-                instance=self.get_instance(request),
-                data=request.data
+        if 'id' in self.request.data.keys():
+            serializer = ClusterObjectiveSerializer(
+                instance=self.get_instance(self.request),
+                data=self.request.data
             )
         else:
-            serializer = self.get_serializer(data=request.data)
+            return Response({"id": "This filed is reqired!"}, status=statuses.HTTP_400_BAD_REQUEST)
 
         if not serializer.is_valid():
             return Response(serializer.errors, status=statuses.HTTP_400_BAD_REQUEST)
 
         serializer.save()
-
-        return Response({'id': serializer.instance.id}, status=statuses.HTTP_200_OK)
+        return Response(serializer.data, status=statuses.HTTP_200_OK)
 
     def delete(self, request, *args, **kwargs):
         instance = self.get_instance(request)
@@ -59,7 +69,7 @@ class ClusterObjectiveAPIView(RetrieveAPIView):
         return Response(status=statuses.HTTP_204_NO_CONTENT)
 
 
-class ClusterObjectiveListAPIView(ListAPIView):
+class ClusterObjectiveListCreateAPIView(ListCreateAPIView):
 
     serializer_class = ClusterObjectiveSerializer
     permission_classes = (IsAuthenticated, )
@@ -75,13 +85,26 @@ class ClusterObjectiveListAPIView(ListAPIView):
             return queryset.filter(cluster_id=cluster_id)
         return queryset.all()
 
+    def post(self, request, *args, **kwargs):
+        """
+        Create on ClusterObjective model
+        :return: ClusterObjective object id
+        """
+        serializer = ClusterObjectiveSerializer(data=self.request.data)
 
-class ClusterActivityAPIView(RetrieveAPIView):
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=statuses.HTTP_400_BAD_REQUEST)
+
+        serializer.save()
+        return Response({'id': serializer.instance.id}, status=statuses.HTTP_200_OK)
+
+
+class ClusterActivityAPIView(APIView):
     pass
     # TODO
 
 
-class ClusterActivityListAPIView(ListAPIView):
+class ClusterActivityListAPIView(ListCreateAPIView):
 
     serializer_class = ClusterActivitySerializer
     permission_classes = (IsAuthenticated, )

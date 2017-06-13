@@ -24,6 +24,24 @@ class ClusterObjectiveSerializer(serializers.ModelSerializer):
         return obj.cluster.title
 
 
+class ClusterObjectivePatchSerializer(ClusterObjectiveSerializer):
+
+    title = serializers.CharField(required=False)
+    reference_number = serializers.CharField(required=False)
+    cluster = serializers.CharField(required=False)
+    frequency = serializers.ChoiceField(choices=FREQUENCY_LEVEL, required=False)
+
+    class Meta:
+        model = ClusterObjective
+        fields = (
+            'id',
+            'title',
+            'reference_number',
+            'cluster',
+            'frequency',
+        )
+
+
 class ClusterActivitySerializer(serializers.ModelSerializer):
 
     co_cluster_title = serializers.SerializerMethodField()
