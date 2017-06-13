@@ -7,10 +7,16 @@ from django.db import models
 
 from model_utils.models import TimeStampedModel
 
-from core.common import INDICATOR_REPORT_STATUS, PROGRESS_REPORT_STATUS
+from core.common import (
+    INDICATOR_REPORT_STATUS, FREQUENCY_LEVEL,
+    PROGRESS_REPORT_STATUS
+)
 
 
 class IndicatorBlueprint(TimeStampedModel):
+    """
+    IndicatorBlueprint module is a pattern for indicator (here we setup basic parameter).
+    """
     NUMBER = u'number'
     PERCENTAGE = u'percentage'
     YESNO = u'yesno'
@@ -43,6 +49,17 @@ class IndicatorBlueprint(TimeStampedModel):
 
 
 class Reportable(TimeStampedModel):
+    """
+    Reportable / Applied Indicator model.
+
+    related models:
+        ContentType (ForeignKey): "content_type"
+        content_type & object_id fields (GenericForeignKey): "content_object"
+        partner.PartnerProject (ForeignKey): "project"
+        indicator.IndicatorBlueprint (ForeignKey): "blueprint"
+        cluster.ClusterObjective (ForeignKey): "content_object"
+        self (ForeignKey): "parent_indicator"
+    """
     target = models.CharField(max_length=255, null=True, blank=True)
     baseline = models.CharField(max_length=255, null=True, blank=True)
     assumptions = models.TextField(null=True, blank=True)
@@ -53,10 +70,6 @@ class Reportable(TimeStampedModel):
     total = models.IntegerField(null=True, blank=True, default=0,
                                 verbose_name="Current Total")
 
-    # variable disaggregation's that may be present in the work plan
-    # this can only be present if the indicatorBlueprint has dissagregatable = true
-    disaggregation_logic = JSONField(null=True)
-
     # unique code for this indicator within the current context
     # eg: (1.1) result code 1 - indicator code 1
     context_code = models.CharField(max_length=50, null=True, blank=True,
@@ -65,9 +78,7 @@ class Reportable(TimeStampedModel):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
-
     blueprint = models.ForeignKey(IndicatorBlueprint, null=True, related_name="reportables")
-
     parent_indicator = models.ForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
 
     @property
@@ -103,6 +114,14 @@ class Reportable(TimeStampedModel):
 
 class IndicatorReport(TimeStampedModel):
     # TODO: probably we should add overall status & narrative assessemnt
+    """
+    IndicatorReport module is a result of partner staff activity (what they done in defined frequency scope).
+
+    related models:
+        indicator.Reportable (ForeignKey): "indicator"
+        unicef.ProgressReport (ForeignKey): "progress_report"
+        core.Location (OneToOneField): "location"
+    """
     title = models.CharField(max_length=255)
     reportable = models.ForeignKey(Reportable, related_name="indicator_reports")
     progress_report = models.ForeignKey('unicef.ProgressReport', related_name="indicator_reports", null=True)
@@ -110,6 +129,12 @@ class IndicatorReport(TimeStampedModel):
     time_period_end = models.DateField()  # last day of defined frequency mode
     due_date = models.DateField()  # can be few days/weeks out of the "end date"
     submission_date = models.DateField(null=True, blank=True, verbose_name="Date of submission")
+    frequency = models.CharField(
+        max_length=3,
+        choices=FREQUENCY_LEVEL,
+        default=FREQUENCY_LEVEL.monthly,
+        verbose_name='Frequency of reporting'
+    )
 
     total = models.PositiveIntegerField(blank=True, null=True)
 
@@ -143,6 +168,13 @@ class IndicatorReport(TimeStampedModel):
 
 
 class IndicatorLocationData(TimeStampedModel):
+    """
+    IndicatorLocationData module it includes indicators for chosen location.
+
+    related models:
+        indicator.IndicatorReport (ForeignKey): "indicator_report"
+        core.Location (OneToOneField): "location"
+    """
     indicator_report = models.ForeignKey(IndicatorReport, related_name="indicator_location_data")
     location = models.ForeignKey('core.Location', related_name="indicator_location_data")
 
@@ -150,3 +182,36 @@ class IndicatorLocationData(TimeStampedModel):
 
     def __unicode__(self):
         return "{} Location Data for {}".format(self.location, self.indicator_report)
+
+
+class Disaggregation(TimeStampedModel):
+    """
+    Disaggregation module. For example: <Gender, Age>
+
+    related models:
+        indicator.Reportable (ForeignKey): "reportable"
+    """
+    name = models.CharField(max_length=255, verbose_name="Disaggregation by", null=True, blank=True)
+    reportable = models.ForeignKey(Reportable, related_name="disaggregation")
+    active = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('name', 'reportable')
+
+    def __str__(self):
+        return "Disaggregation <pk:%s>" % self.id
+
+
+class DisaggregationValue(TimeStampedModel):
+    """
+    Disaggregation Value module. For example: Gender <Male, Female, Other>
+
+    related models:
+        indicator.Disaggregation (ForeignKey): "disaggregation"
+    """
+    disaggregation = models.ForeignKey(Disaggregation, related_name="disaggregation_value")
+    value = models.CharField(max_length=255, null=True, blank=True)
+    active = models.BooleanField(default=False)
+
+    def __str__(self):
+        return "Disaggregation Value <pk:%s>" % self.id

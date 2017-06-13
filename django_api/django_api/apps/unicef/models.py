@@ -21,6 +21,9 @@ from indicator.models import Reportable  # IndicatorReport
 
 
 class ProgressReport(TimeStampedModel):
+    """
+    ProgressReport model - narrative for LLoutput/PDoutput indicators.
+    """
     partner_contribution_to_date = models.CharField(max_length=256)
     funds_received_to_date = models.CharField(max_length=256)
     challenges_in_the_reporting_period = models.CharField(max_length=256)
@@ -37,6 +40,9 @@ class ProgressReport(TimeStampedModel):
 
 
 class Section(models.Model):
+    """
+    Section model define atomic act of help like: bottle of water, blanket.
+    """
     name = models.CharField(max_length=255)
 
     def __str__(self):
@@ -44,6 +50,13 @@ class Section(models.Model):
 
 
 class ProgrammeDocument(TimeStampedModel):
+    """
+    ProgrammeDocument model describe agreement between UNICEF & Partner to realize document and
+    reports are feedback for this assignment.
+
+    related models:
+        unicef.Section (ManyToManyField): "sections"
+    """
     agreement = models.CharField(max_length=255, verbose_name='Agreement')
     document_type = models.CharField(
         max_length=3,
@@ -100,6 +113,28 @@ class ProgrammeDocument(TimeStampedModel):
         blank=True,
         null=True,
         help_text='Total Budget'
+    )
+
+    # intervention budged model from etool !!!
+    cso_contribution = models.DecimalField(
+        decimal_places=2,
+        max_digits=12,
+        default=0,
+        verbose_name='CSO Contribution'
+    )
+    # intervention budged model from etool !!!
+    total_unicef_cash = models.DecimalField(
+        decimal_places=2,
+        max_digits=12,
+        default=0,
+        verbose_name='UNICEF cash'
+    )
+    # intervention budged model from etool !!!
+    in_kind_amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        default=0,
+        verbose_name='UNICEF Supplies'
     )
 
     # TODO:
@@ -183,6 +218,10 @@ class ProgrammeDocument(TimeStampedModel):
         return self.__due_date
 
     @property
+    def total_unicef_contribution(self):
+        return self.total_unicef_cash + self.in_kind_amount
+
+    @property
     def calculated_budget(self):
         if self.__budget is not None:
             return self.__budget
@@ -233,14 +272,24 @@ class ProgrammeDocument(TimeStampedModel):
 
 
 class CountryProgrammeOutput(TimeStampedModel):
-    title = models.CharField(max_length=255)
+    """
+    CountryProgrammeOutput (LLO Parent) module.
 
+    related models:
+        unicef.ProgrammeDocument (ForeignKey): "programme_document"
+    """
+    title = models.CharField(max_length=255)
     programme_document = models.ForeignKey(ProgrammeDocument, related_name="cp_outputs")
 
 
 class LowerLevelOutput(TimeStampedModel):
+    """
+    LowerLevelOutput (PD output) module describe the goals to reach in PD scope.
+
+    related models:
+        unicef.CountryProgrammeOutput (ForeignKey): "indicator"
+        indicator.Reportable (GenericRelation): "reportables"
+    """
     title = models.CharField(max_length=255)
-
     indicator = models.ForeignKey(CountryProgrammeOutput, related_name="ll_outputs")
-
     reportables = GenericRelation('indicator.Reportable', related_query_name='lower_level_outputs')
