@@ -5,6 +5,7 @@ from .models import ProgrammeDocument, Section, ProgressReport
 
 class ProgrammeDocumentSerializer(serializers.ModelSerializer):
 
+    id = serializers.SerializerMethodField()
     status = serializers.CharField(source='get_status_display')
     total_unicef_supplies = serializers.SerializerMethodField()
 
@@ -28,6 +29,9 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
             'total_unicef_cash',
             'total_unicef_supplies',
         )
+
+    def get_id(self, obj):
+        return str(obj.id)
 
     def get_total_unicef_supplies(self, obj):
         return str(obj.in_kind_amount)
