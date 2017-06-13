@@ -15,7 +15,6 @@
 
 <link rel="import" href="../../../../elements/page-body.html">
 <link rel="import" href="../../../../elements/ip-reporting/pd-page-header.html">
-<link rel="import" href="../../../../elements/ip-reporting/pd-details-content.html">
 <link rel="import" href="../../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../../endpoints.html">
 <link rel="import" href="../../../../redux/actions.html">
@@ -88,13 +87,12 @@
       on-iron-items-changed="_updateTabSelection">
 
       <template is="dom-if" if="[[_equals(pdTab, 'details')]]" restamp="true">
-          <pd-details-overview name="details" pd="[[ pd ]]" loaded="[[ loaded ]]"></pd-details-overview>
+        <pd-details-overview name="details"></pd-details-overview>
       </template>
 
       <template is="dom-if" if="[[_equals(pdTab, 'reports')]]" restamp="true">
-          <pd-details-reports name="reports" pd-id="[[ pd.id ]]"></pd-details-reports>
+        <pd-details-reports name="reports" ></pd-details-reports>
       </template>
-
     </iron-pages>
 
   </template>
@@ -111,29 +109,20 @@
       properties: {
         pdTab: String,
 
-        pdId: Number,
+        pdId: {
+          type: String,
+          statePath: 'programmeDocuments.current',
+        },
 
         routeData: Object,
 
-        pd: {
-          type: Object,
-          notify: true,
-          value: {}
-        },
-
-        loaded: {
-          type: Boolean,
-          value: false,
-          computed: '_computeLoaded(pd)',
-        },
-
         programmeDocumentDetailsUrl: {
           type: String,
-          computed: '_computeProgrammeDocumentDetailsUrl(location, pdId)',
+          computed: '_computeProgrammeDocumentDetailsUrl(locationId, pdId)',
           observer: '_fetchData',
         },
 
-        location: {
+        locationId: {
           type: String,
           statePath: 'location.id',
         },
@@ -151,16 +140,17 @@
         this.set('pdTab', dashTab);
       },
 
-      _computeLoaded: function (pd) {
-        return !!pd.id;
+      _computeProgrammeDocumentDetailsUrl: function (locationId, pdId) {
+        return (locationId && pdId) ?
+            App.Endpoints.programmeDocumentDetail(locationId, pdId) : '';
       },
 
-      _computeProgrammeDocumentDetailsUrl: function (location, pdId) {
-        return App.Endpoints.programmeDocumentDetail(location, pdId);
-      },
-
-      _fetchData: function (_) { // jshint ignore:line
+      _fetchData: function (url) {
         var self = this;
+
+        if (!url) {
+          return;
+        }
 
         this.$.programmeDocumentDetails.thunk()()
           .then(function (res) {

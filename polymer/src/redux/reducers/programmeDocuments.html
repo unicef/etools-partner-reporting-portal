@@ -9,6 +9,7 @@
 
     App.Reducers.ProgrammeDocuments = Redux.combineReducers({
       all: allPDsReducer,
+      current: currentPDReducer,
       count: PDsCountReducer,
       loading: loadingPDsReducer,
     });
@@ -24,6 +25,23 @@
 
         case App.Constants.RESET:
           return [];
+
+        default:
+          return state;
+      }
+    }
+
+    function currentPDReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = '';
+      }
+
+      switch (action.type) {
+        case App.Constants.SET_CURRENT_PD:
+          return action.pdId;
+
+        case App.Constants.RESET:
+          return '';
 
         default:
           return state;

@@ -1,0 +1,28 @@
+<link rel="import" href="../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../../../bower_components/iron-pages/iron-pages.html">
+
+<dom-module id="page-ip-reporting-pd-report">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <app-route
+        route="{{route}}"
+        pattern="/:report_id"
+        data="{{routeData}}"
+        tail="{{subroute}}">
+    </app-route>
+
+    <h1>PD report: [[routeData.report_id]]</h1>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'page-ip-reporting-pd-report',
+    });
+  </script>
+</dom-module>

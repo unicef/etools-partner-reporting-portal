@@ -1,0 +1,38 @@
+<link rel="import" href="../../constants.html">
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Actions = App.Actions || {};
+
+    App.Actions.PDReports = {
+
+      fetch: function (pdReportsThunk, pdId) {
+        return function (dispatch) {
+          return pdReportsThunk()
+              .then(function (res) {
+                dispatch(App.Actions.PDReports.set(pdId, res.data.results));
+                dispatch(App.Actions.PDReports.setCount(pdId, res.data.count));
+              });
+        };
+      },
+
+      set: function (pdId, data) {
+        return {
+          type: App.Constants.SET_PD_REPORTS,
+          pdId: pdId,
+          data: data,
+        };
+      },
+
+      setCount: function (pdId, count) {
+        return {
+          type: App.Constants.SET_PD_REPORTS_COUNT,
+          pdId: pdId,
+          count: count,
+        };
+      },
+    };
+  }());
+</script>

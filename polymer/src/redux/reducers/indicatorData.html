@@ -43,7 +43,13 @@
 
       switch (action.type) {
         case App.Constants.SET_INDICATOR_DATA:
-          return state.concat([action.reportId]);
+          return (function () {
+            if (state.indexOf(action.reportId) === -1) {
+              return state.concat([action.reportId]);
+            }
+
+            return state;
+          }());
 
         case App.Constants.RESET:
           return [];

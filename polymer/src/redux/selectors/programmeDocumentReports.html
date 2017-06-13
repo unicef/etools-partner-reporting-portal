@@ -1,0 +1,35 @@
+<link rel="import" href="../reselect.html">
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Selectors = App.Selectors || {};
+
+    App.Selectors.ProgrammeDocumentReports = {
+      all: Reselect.createSelector(
+        function (state) {
+          return state.programmeDocumentReports.byPD;
+        },
+        function (state) {
+           return state.programmeDocuments.current;
+        },
+        function (byPD, id) {
+          return byPD[id];
+        }
+      ),
+
+      count: Reselect.createSelector(
+        function (state) {
+          return state.programmeDocumentReports.countByPD;
+        },
+         function (state) {
+           return state.programmeDocuments.current;
+        },
+        function (countByPD, id) {
+          return countByPD[id];
+        }
+      ),
+    };
+  }());
+</script>
