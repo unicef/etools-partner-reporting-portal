@@ -133,6 +133,25 @@ class ClusterActivityAPIView(APIView):
         serializer.save()
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
+    def put(self, request, pk, *args, **kwargs):
+        """
+        Update on ClusterActivity model
+        :return: ClusterActivity serializer data
+        """
+        if 'id' in self.request.data.keys():
+            serializer = ClusterActivitySerializer(
+                instance=self.get_instance(self.request, pk=pk),
+                data=self.request.data
+            )
+        else:
+            return Response({"id": "This filed is reqired!"}, status=statuses.HTTP_400_BAD_REQUEST)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=statuses.HTTP_400_BAD_REQUEST)
+
+        serializer.save()
+        return Response(serializer.data, status=statuses.HTTP_200_OK)
+
 
 class ClusterActivityListAPIView(ListCreateAPIView):
 
