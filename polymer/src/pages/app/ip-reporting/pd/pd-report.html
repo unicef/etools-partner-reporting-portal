@@ -3,6 +3,7 @@
 <link rel="import" href="../../../../elements/page-body.html">
 
 <link rel="import" href="../../../../redux/store.html">
+<link rel="import" href="../../../../redux/selectors/programmeDocuments.html">
 
 <dom-module id="page-ip-reporting-pd-report">
   <template>
@@ -13,7 +14,7 @@
     </style>
 
     <page-header
-        title="Report for"
+        title="Report for [[currentPDRefNo]]"
         back="[[backLink]]">
     </page-header>
 
@@ -40,6 +41,17 @@
           statePath: 'programmeDocuments.current',
         },
 
+        currentPD: {
+          type: Object,
+          value: {},
+          statePath: App.Selectors.ProgrammeDocuments.current,
+        },
+
+        currentPDRefNo: {
+          type: String,
+          computed: '_computeCurrentPDRefNo(currentPD)',
+        },
+
         backLink: {
           type: String,
           computed: '_computeBackLink(pdId)',
@@ -48,6 +60,10 @@
 
       _computeBackLink: function (pdId) {
         return 'pd/' + pdId + '/view/reports';
+      },
+
+      _computeCurrentPDRefNo: function (pd) {
+        return pd.reference_number;
       },
     });
   </script>
