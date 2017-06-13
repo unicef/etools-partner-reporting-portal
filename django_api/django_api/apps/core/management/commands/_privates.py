@@ -1,3 +1,5 @@
+import random
+
 from django.conf import settings
 
 from account.models import User
@@ -26,6 +28,7 @@ from core.models import (
     Intervention,
     Location,
 )
+from core.utils import get_combination_pairs
 
 from core.factories import (
     UserFactory,
@@ -63,8 +66,24 @@ def clean_up_data():
         LowerLevelOutput.objects.all().delete()
         Intervention.objects.all().delete()
         Location.objects.all().delete()
+        Disaggregation.objects.all().delete()
+        DisaggregationValue.objects.all().delete()
 
         print "All ORM objects deleted"
+
+
+def generate_data_combination_dict(array, r=3):
+    output_dict = {}
+
+    for idx in xrange(1, r + 1):
+        id_pairs = get_combination_pairs(array, idx)
+
+        for id_tuple in id_pairs:
+            output_dict[str(id_tuple)] = random.randint(50, 200)
+
+    output_dict[str(tuple())] = random.randint(50, 200)
+
+    return output_dict
 
 
 def generate_fake_data(quantity=3):
@@ -103,7 +122,6 @@ def generate_fake_data(quantity=3):
         indicator_report.progress_report = ProgressReportFactory()
         indicator_report.save()
 
-        IndicatorLocationDataFactory(indicator_report=indicator_report, location=reportable.locations.first(), disaggregation_reported_on=list(reportable.disaggregation.values_list('id', flat=True)))
     print "{} ProgrammeDocument <-> ReportableToLowerLevelOutput <-> IndicatorReport objects linked".format(quantity)
 
     # Intervention creates Cluster and Locations
@@ -121,7 +139,7 @@ def generate_fake_data(quantity=3):
 
     sample_disaggregation_value_map = {
         "height": ["tall", "medium", "short", "extrashort"],
-        "age": ["1-2m", "3-5m", "6-10m"],
+        "age": ["1-2m", "3-4m", "5-6m", '7-10m'],
         "gender": ["male", "female", "other"],
     }
 
@@ -143,8 +161,8 @@ def generate_fake_data(quantity=3):
             first_reportable_location_id = None
 
         for location_idx in xrange(3):
-            if first_reportable_location_id and first_reportable_location_id != locations[idx].id:
-                reportable.locations.add(locations[idx])
+            if first_reportable_location_id and first_reportable_location_id != locations[location_idx].id:
+                reportable.locations.add(locations[location_idx])
                 reportable.save()
 
         # Creating extra IndicatorReport object per location in reportable
@@ -154,9 +172,11 @@ def generate_fake_data(quantity=3):
                 indicator_report.progress_report = reportable.indicator_reports.first().progress_report
                 indicator_report.save()
 
-                for extra_indicator_report_idx in xrange(3):
-                    IndicatorLocationDataFactory(indicator_report=indicator_report, location=location, disaggregation_reported_on=list(reportable.disaggregation.values_list('id', flat=True)))
-
+        for indicator_report_from_reportable in reportable.indicator_reports.all():
+            location_data = IndicatorLocationDataFactory(
+                indicator_report=indicator_report_from_reportable,
+                location=location, disaggregation_reported_on=list(indicator_report_from_reportable.disaggregations.values_list('id', flat=True)),
+                disaggregation=generate_data_combination_dict(reduce(lambda acc, curr: acc + curr, indicator_report_from_reportable.disaggregation_values(id_only=True))))
         # -- Extra IndicatorReport and IndicatorLocationReport --
 
     print "{} ReportableToLowerLevelOutput objects created".format(quantity)

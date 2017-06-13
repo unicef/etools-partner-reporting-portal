@@ -171,6 +171,20 @@ class IndicatorReport(TimeStampedModel):
     def disaggregations(self):
         return self.reportable.disaggregation.all()
 
+    def disaggregation_values(self, id_only=False):
+        output_list = []
+
+        for disaggregation in self.disaggregations:
+            if not id_only:
+                disaggregation_value = disaggregation.disaggregation_value.values_list('id', 'value')
+
+            else:
+                disaggregation_value = disaggregation.disaggregation_value.values_list('id', flat=True)
+
+            output_list.append(list(disaggregation_value))
+
+        return output_list
+
 
 class IndicatorLocationData(TimeStampedModel):
     """
