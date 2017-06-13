@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 from itertools import combinations
 
 from django.utils.functional import cached_property
-from django.contrib.postgres.fields import JSONField
+from django.contrib.postgres.fields import JSONField, ArrayField
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
@@ -184,6 +184,11 @@ class IndicatorLocationData(TimeStampedModel):
     location = models.ForeignKey('core.Location', related_name="indicator_location_data")
 
     disaggregation = JSONField(default=dict)
+    num_disaggregation = models.IntegerField()
+    level_reported = models.IntegerField()
+    disaggregation_reported_on = ArrayField(
+        models.IntegerField(), default=list
+    )
 
     def __unicode__(self):
         return "{} Location Data for {}".format(self.location, self.indicator_report)

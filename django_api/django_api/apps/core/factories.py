@@ -416,6 +416,9 @@ class IndicatorLocationDataFactory(factory.django.DjangoModelFactory):
             }
         }
     }
+    num_disaggregation = 3
+    level_reported = 3
+    disaggregation_reported_on = []
 
     class Meta:
         model = IndicatorLocationData

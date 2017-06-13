@@ -67,6 +67,9 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
             'id',
             'location',
             'disaggregation',
+            'num_disaggregation',
+            'level_reported',
+            'disaggregation_reported_on',
         )
 
 
@@ -89,7 +92,6 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
             lookup_array.append(list(disaggregation_value))
 
         lookup_array.sort(key=len)
-        lookup_array[0], lookup_array[1] = lookup_array[1], lookup_array[0]
 
         return lookup_array
 

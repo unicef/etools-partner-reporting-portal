@@ -103,7 +103,7 @@ def generate_fake_data(quantity=3):
         indicator_report.progress_report = ProgressReportFactory()
         indicator_report.save()
 
-        IndicatorLocationDataFactory(indicator_report=indicator_report, location=reportable.locations.first())
+        IndicatorLocationDataFactory(indicator_report=indicator_report, location=reportable.locations.first(), disaggregation_reported_on=list(reportable.disaggregation.values_list('id', flat=True)))
     print "{} ProgrammeDocument <-> ReportableToLowerLevelOutput <-> IndicatorReport objects linked".format(quantity)
 
     # Intervention creates Cluster and Locations
@@ -155,7 +155,7 @@ def generate_fake_data(quantity=3):
                 indicator_report.save()
 
                 for extra_indicator_report_idx in xrange(3):
-                    IndicatorLocationDataFactory(indicator_report=indicator_report, location=location)
+                    IndicatorLocationDataFactory(indicator_report=indicator_report, location=location, disaggregation_reported_on=list(reportable.disaggregation.values_list('id', flat=True)))
 
         # -- Extra IndicatorReport and IndicatorLocationReport --
 
