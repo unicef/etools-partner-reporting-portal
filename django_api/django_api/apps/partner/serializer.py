@@ -1,6 +1,9 @@
 from rest_framework import serializers
 
-from .models import Partner
+from .models import (
+    Partner,
+    PartnerProject,
+)
 
 
 class PartnerDetailsSerializer(serializers.ModelSerializer):
@@ -34,4 +37,22 @@ class PartnerDetailsSerializer(serializers.ModelSerializer):
             'last_assessment_date',
             'type_of_assessment',
             'rating'
+        )
+
+
+class PartnerProjectSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PartnerProject
+        fields = (
+            'id',
+            'title',
+            'start_date',
+            'end_date',
+            'status',
+
+            #'clusters',
+            #'locations',
+            #'partner',
+            #'reportables',
         )
