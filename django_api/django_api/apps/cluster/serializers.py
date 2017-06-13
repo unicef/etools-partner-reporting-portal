@@ -69,3 +69,21 @@ class ClusterActivitySerializer(serializers.ModelSerializer):
 
     def get_co_reference_number(self, obj):
         return obj.cluster_objective.reference_number
+
+
+class ClusterActivityPatchSerializer(serializers.ModelSerializer):
+
+    title = serializers.CharField(required=False)
+    standard = serializers.CharField(required=False)
+    frequency = serializers.ChoiceField(choices=FREQUENCY_LEVEL, required=False)
+    cluster_objective = serializers.CharField(required=False)
+
+    class Meta:
+        model = ClusterActivity
+        fields = (
+            'id',
+            'title',
+            'standard',
+            'frequency',
+            'cluster_objective',
+        )

@@ -128,7 +128,7 @@ class TestClusterActivityAPIView(BaseAPITestCase):
 
     def test_list_cluster_activity(self):
         """
-        get list unit test for TestClusterActivityAPIView
+        get list unit test for ClusterActivityAPIView
         """
         url = reverse('cluster-activity-list')
         response = self.client.get(url, format='json')
@@ -138,7 +138,7 @@ class TestClusterActivityAPIView(BaseAPITestCase):
 
     def test_filter_list_cluster_activity(self):
         """
-        get list unit test for TestClusterActivityAPIView
+        get list unit test for ClusterActivityAPIView
         """
         last = ClusterActivity.objects.last()
         url = reverse('cluster-activity-list')
@@ -150,7 +150,7 @@ class TestClusterActivityAPIView(BaseAPITestCase):
 
     def test_create_cluster_activity(self):
         """
-        create unit test for TestClusterActivityAPIView
+        create unit test for ClusterActivityAPIView
         """
         base_count = ClusterActivity.objects.all().count()
         last = ClusterActivity.objects.last()
@@ -168,7 +168,7 @@ class TestClusterActivityAPIView(BaseAPITestCase):
 
     def test_get_cluster_activity(self):
         """
-        get obj unit test for TestClusterActivityAPIView
+        get obj unit test for ClusterActivityAPIView
         """
         first = ClusterActivity.objects.first()
         url = reverse('cluster-activity', kwargs={"pk": first.id})
@@ -178,3 +178,17 @@ class TestClusterActivityAPIView(BaseAPITestCase):
         self.assertEquals(response.data['id'], first.id)
         self.assertEquals(response.data['title'], first.title)
         self.assertEquals(response.data['standard'], first.standard)
+
+    def test_update_patch_cluster_objective(self):
+        """
+        patch object unit test for ClusterActivityAPIView
+        """
+        base_count = ClusterActivity.objects.all().count()
+        last = ClusterActivity.objects.last()
+
+        data = dict(id=last.id, title='new updated title')
+        url = reverse('cluster-activity', kwargs={"pk": last.id})
+        response = self.client.patch(url, data=data, format='json')
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(ClusterActivity.objects.all().count(), base_count)
+        self.assertEquals(ClusterActivity.objects.get(id=response.data['id']).title, data['title'])
