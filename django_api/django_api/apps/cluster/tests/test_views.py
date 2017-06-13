@@ -126,6 +126,13 @@ class TestClusterActivityAPIView(BaseAPITestCase):
             "cluster_objective": ClusterObjective.objects.first().id,
         }
 
+    def test_read_cluster_activity(self):
+        url = reverse('cluster-activity-list')
+        response = self.client.get(url, format='json')
+
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(response.data['count'], ClusterActivity.objects.all().count())
+
     def test_create_cluster_activity(self):
         """
         create and update unit test for ClusterObjectiveAPIView
