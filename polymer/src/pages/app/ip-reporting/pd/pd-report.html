@@ -1,9 +1,15 @@
 <link rel="import" href="../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../bower_components/app-route/app-route.html">
+
 <link rel="import" href="../../../../elements/page-header.html">
 <link rel="import" href="../../../../elements/page-body.html">
-
+<link rel="import" href="../../../../elements/ip-reporting/pd-output.html">
+<link rel="import" href="../../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../../endpoints.html">
 <link rel="import" href="../../../../redux/store.html">
+<link rel="import" href="../../../../redux/actions.html">
 <link rel="import" href="../../../../redux/selectors/programmeDocuments.html">
+<link rel="import" href="../../../../redux/selectors/indicatorData.html">
 
 <dom-module id="page-ip-reporting-pd-report">
   <template>
@@ -12,6 +18,17 @@
         display: block;
       }
     </style>
+
+    <app-route
+        route="{{route}}"
+        pattern="/:report_id/:mode"
+        data="{{routeData}}">
+    </app-route>
+
+    <etools-prp-ajax
+        id="indicatorData"
+        url="[[indicatorDataUrl]]">
+    </etools-prp-ajax>
 
     <page-header
         title="Report for [[currentPDRefNo]]"
@@ -36,6 +53,18 @@
       ],
 
       properties: {
+        mode: String,
+
+        reportId: {
+          type: String,
+          statePath: 'programmeDocumentReports.current',
+        },
+
+        indicatorDataUrl: {
+          type: String,
+          computed: '_computeIndicatorDataUrl(reportId)',
+        },
+
         pdId: {
           type: String,
           statePath: 'programmeDocuments.current',
@@ -58,12 +87,45 @@
         },
       },
 
+      observers: [
+        '_onReportIdChanged(routeData.report_id)',
+        '_handleInputChange(indicatorDataUrl)',
+      ],
+
       _computeBackLink: function (pdId) {
         return 'pd/' + pdId + '/view/reports';
       },
 
       _computeCurrentPDRefNo: function (pd) {
         return pd.reference_number;
+      },
+
+      _onReportIdChanged: function (reportId) {
+        this.dispatch(App.Actions.PDReports.setCurrent(reportId));
+      },
+
+      _computeIndicatorDataUrl: function (reportId) {
+        return reportId ? App.Endpoints.indicatorData(reportId) : '';
+      },
+
+      _handleInputChange: function (url) {
+        var indicatorDataThunk;
+
+        if (!url) {
+          return;
+        }
+
+        indicatorDataThunk = this.$.indicatorData.thunk();
+
+        // Cancel the pending request, if any
+        this.$.indicatorData.abort();
+
+        this.dispatch(
+          App.Actions.IndicatorData.fetch(indicatorDataThunk, this.reportId)
+        )
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
       },
     });
   </script>

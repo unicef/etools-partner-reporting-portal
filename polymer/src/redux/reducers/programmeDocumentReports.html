@@ -12,6 +12,7 @@
       byPD: reportsByPDReducer,
       countByPD: reportsCountByPDReducer,
       allIds: pdIdsReducer,
+      current: currentPDReportReducer,
     });
 
     function reportsByPDReducer(state, action) {
@@ -74,6 +75,23 @@
 
         case App.Constants.RESET:
           return [];
+
+        default:
+          return state;
+      }
+    }
+
+    function currentPDReportReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = '';
+      }
+
+      switch (action.type) {
+        case App.Constants.SET_CURRENT_PD_REPORT:
+          return action.reportId;
+
+        case App.Constants.RESET:
+          return '';
 
         default:
           return state;
