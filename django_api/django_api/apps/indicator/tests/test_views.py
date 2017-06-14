@@ -88,5 +88,5 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
         response = self.client.get(url, format='json')
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(response.data), 2)
+        self.assertEquals(len(response.data), indicator_report.reportable.indicator_reports.count())
         self.assertNotEquals(response.data[0]['indicator_location_data'][0]['disaggregation'], {})
