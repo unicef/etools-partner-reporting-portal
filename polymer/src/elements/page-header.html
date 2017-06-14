@@ -1,9 +1,8 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
-<link rel="import" href="../../bower_components/app-layout/app-grid/app-grid-style.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
 <dom-module id="page-header">
   <template>
@@ -15,29 +14,31 @@
         box-shadow: 0 1px 2px 1px rgba(0, 0, 0, .1);
       }
 
-      .container {
-        @apply --layout-horizontal;
-        @apply --layout-center;
+      .title {
+        position: relative;
       }
 
-      h1 {
+      .title h1 {
         @apply(--paper-font-title);
         margin: 0;
       }
 
-      paper-button {
-        color:#666;
-        margin-right:15px;
-        margin-left:-.35em;
-        line-height:1em;
+      .above-title {
+        @apply --page-header-above-title;
       }
 
       .back-button {
         text-decoration: none;
       }
 
+      .back-button paper-button {
+        margin: 0 15px 0 -.35em;
+        line-height: 1;
+        color: #666;
+      }
     </style>
-    <div class="container">
+
+    <div class="layout horizontal center">
       <template is="dom-if" if="[[ back ]]">
         <a href="[[ backUrl ]]" class="back-button">
           <paper-button>
@@ -47,7 +48,13 @@
         </a>
       </template>
 
-      <h1 class="flex">[[title]]</h1>
+      <div class="title">
+        <div class="above-title">
+          <content select=".above-title"></content>
+        </div>
+        <h1>[[title]]</h1>
+      </div>
+
     </div>
   </template>
 

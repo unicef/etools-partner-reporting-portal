@@ -4,6 +4,7 @@
 <link rel="import" href="../../../../elements/page-header.html">
 <link rel="import" href="../../../../elements/page-body.html">
 <link rel="import" href="../../../../elements/ip-reporting/pd-output-list.html">
+<link rel="import" href="../../../../elements/reporting-period.html">
 <link rel="import" href="../../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../../endpoints.html">
 <link rel="import" href="../../../../redux/store.html">
@@ -16,6 +17,12 @@
     <style>
       :host {
         display: block;
+
+        --page-header-above-title: {
+          position: absolute;
+          left: 0;
+          top: -23px;
+        };
       }
     </style>
 
@@ -38,6 +45,10 @@
     <page-header
         title="[[headingText]]"
         back="[[backLink]]">
+      <reporting-period
+          class="above-title"
+          range="[[currentReport.reporting_period]]">
+      </reporting-period>
     </page-header>
 
     <page-body>
