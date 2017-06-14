@@ -1,0 +1,33 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/etools-data-table/etools-data-table.html">
+
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../styles/detail-table.html">
+
+<dom-module id="disaggregation-table-cell">
+  <template>
+
+    <style include='detail-table'>
+      .cell {
+        word-break: break-word;
+      }
+    </style>
+
+    [[value]] [[title]] [[total]]
+    
+  </template>
+
+  <script>
+    Polymer({
+      is: 'disaggregation-table-cell',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+      ],
+
+      properties: {
+        value: Number,
+        title: String,
+      },
+    })
+</script>
