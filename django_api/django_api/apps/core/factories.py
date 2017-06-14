@@ -81,7 +81,6 @@ class PartnerProjectFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "partner_project_%d" % n)
     start_date = fuzzy.FuzzyDate(datetime.date.today())
     end_date = fuzzy.FuzzyDate(datetime.date.today())
-    status = fuzzy.FuzzyText()
 
     description = factory.Sequence(lambda n: "description %d" % n)
     additional_information = factory.Sequence(lambda n: "additional_information %d" % n)
