@@ -36,7 +36,7 @@ class TestPDReportsAPIView(BaseAPITestCase):
 
 
 class TestIndicatorListAPIView(BaseAPITestCase):
-    generate_fake_data_quantity = 5
+    generate_fake_data_quantity = 15
 
     def test_list_api(self):
         url = reverse('indicator-list-create-api')
@@ -77,6 +77,15 @@ class TestIndicatorListAPIView(BaseAPITestCase):
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(len(response.data['results']), len(self.reports))
 
+    def test_list_api_filter_by_pd_active(self):
+        self.reports = Reportable.objects.filter(lower_level_outputs__reportables__isnull=False, lower_level_outputs__indicator__programme_document__status="Act")
+
+        url = reverse('indicator-list-create-api')
+        url += '?pd_active=1'
+        response = self.client.get(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(len(response.data['results']), len(self.reports))
 
 class TestIndicatorReportListAPIView(BaseAPITestCase):
     generate_fake_data_quantity = 5
@@ -88,5 +97,5 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
         response = self.client.get(url, format='json')
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(response.data), 2)
+        self.assertEquals(len(response.data), indicator_report.reportable.indicator_reports.count())
         self.assertNotEquals(response.data[0]['indicator_location_data'][0]['disaggregation'], {})
