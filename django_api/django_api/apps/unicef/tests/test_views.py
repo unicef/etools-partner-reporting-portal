@@ -84,12 +84,10 @@ class TestProgrammeDocumentAPIView(BaseAPITestCase):
 class TestProgressReportAPIView(BaseAPITestCase):
 
     generate_fake_data_quantity = 5
-    intervention = Intervention.objects.filter(locations__isnull=False).first()
 
     def setUp(self):
         super(TestProgressReportAPIView, self).setUp()
-        intervention = Intervention.objects.filter(locations__isnull=False).first()
-        self.location_id = intervention.locations.first().id
+        self.location_id = Intervention.objects.filter(locations__isnull=False).first().locations.first().id
         self.queryset = self.get_queryset()
 
     def get_queryset(self):
