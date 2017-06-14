@@ -55,6 +55,9 @@ class PDReportsAPIView(ListAPIView):
         serializer = self.get_serializer(filtered.qs, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+class PDReportsDetailAPIView(APIView):
+
     def get_indicator_report(self, report_id):
         try:
             return IndicatorReport.objects.get(id=report_id)
@@ -63,7 +66,7 @@ class PDReportsAPIView(ListAPIView):
 
     def get(self, request, pd_id, report_id, *args, **kwargs):
         indicator_report = self.get_indicator_report(report_id)
-        serializer = self.get_serializer(indicator_report)
+        serializer = PDReportsSerializer(indicator_report)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 

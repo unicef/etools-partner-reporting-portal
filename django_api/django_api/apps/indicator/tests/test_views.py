@@ -37,6 +37,15 @@ class TestPDReportsAPIView(BaseAPITestCase):
         response = self.client.get(filter_url, format='json')
         self.assertTrue(status.is_success(response.status_code))
 
+    def test_get_indicator_report(self):
+        pd = ProgrammeDocument.objects.first()
+        report_id = pd.reportable_queryset.values_list('indicator_reports__pk', flat=True)[0]
+
+        url = reverse('programme-document-reports-detail', kwargs={'pd_id': pd.pk, 'report_id': report_id})
+        response = self.client.get(url, format='json')
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(response.data['id'], report_id)
+
 
 class TestIndicatorListAPIView(BaseAPITestCase):
     generate_fake_data_quantity = 5
