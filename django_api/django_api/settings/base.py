@@ -171,3 +171,4 @@ STATIC_URL = '/api/static/'
 AUTH_USER_MODEL = 'account.User'
 
 PRINT_DATA_FORMAT = "%d %b %Y"
+INPUT_DATA_FORMAT = "%Y-%m-%d"
