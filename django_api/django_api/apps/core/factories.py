@@ -343,79 +343,10 @@ class LowerLevelOutputFactory(factory.django.DjangoModelFactory):
 
 class IndicatorLocationDataFactory(factory.django.DjangoModelFactory):
     # disaggregation = JSONFactory()
-    disaggregation = {
-        "extrashort": {
-            "1-2m": {
-                "male": random.randint(50, 200),
-                "female": random.randint(50, 200),
-                "other": random.randint(50, 200),
-            },
-            "3-5m": {
-                "male": random.randint(50, 200),
-                "female": random.randint(50, 200),
-                "other": random.randint(50, 200),
-            },
-            "6-10m": {
-                "male": random.randint(50, 200),
-                "female": random.randint(50, 200),
-                "other": random.randint(50, 200),
-            }
-        },
-
-        "short": {
-            "1-2m": {
-                "male": random.randint(50, 200),
-                "female": random.randint(50, 200),
-                "other": random.randint(50, 200),
-            },
-            "3-5m": {
-                "male": random.randint(50, 200),
-                "female": random.randint(50, 200),
-                "other": random.randint(50, 200),
-            },
-            "6-10m": {
-                "male": random.randint(50, 200),
-                "female": random.randint(50, 200),
-                "other": random.randint(50, 200),
-            }
-        },
-
-        "medium": {
-            "1-2m": {
-                "male": random.randint(50, 200),
-                "female": random.randint(50, 200),
-                "other": random.randint(50, 200),
-            },
-            "3-5m": {
-                "male": random.randint(50, 200),
-                "female": random.randint(50, 200),
-                "other": random.randint(50, 200),
-            },
-            "6-10m": {
-                "male": random.randint(50, 200),
-                "female": random.randint(50, 200),
-                "other": random.randint(50, 200),
-            }
-        },
-
-        "tall": {
-            "1-2m": {
-                "male": random.randint(50, 200),
-                "female": random.randint(50, 200),
-                "other": random.randint(50, 200),
-            },
-            "3-5m": {
-                "male": random.randint(50, 200),
-                "female": random.randint(50, 200),
-                "other": random.randint(50, 200),
-            },
-            "6-10m": {
-                "male": random.randint(50, 200),
-                "female": random.randint(50, 200),
-                "other": random.randint(50, 200),
-            }
-        }
-    }
+    disaggregation = dict()
+    num_disaggregation = 3
+    level_reported = 3
+    disaggregation_reported_on = list()
 
     class Meta:
         model = IndicatorLocationData

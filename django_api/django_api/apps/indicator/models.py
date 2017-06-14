@@ -1,6 +1,8 @@
 from __future__ import unicode_literals
+from itertools import combinations
 
-from django.contrib.postgres.fields import JSONField
+from django.utils.functional import cached_property
+from django.contrib.postgres.fields import JSONField, ArrayField
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
@@ -165,6 +167,29 @@ class IndicatorReport(TimeStampedModel):
         # TODO: Check all disaggregation data across locations and return status
         return 'fulfilled'
 
+    @cached_property
+    def disaggregations(self):
+        return self.reportable.disaggregation.all()
+
+    def disaggregation_values(self, id_only=False, filter_by_id__in=None):
+        output_list = []
+
+        disaggregations = self.disaggregations
+
+        if filter_by_id__in:
+            disaggregations = disaggregations.filter(id__in=filter_by_id__in)
+
+        for disaggregation in disaggregations:
+            if not id_only:
+                disaggregation_value = disaggregation.disaggregation_value.values_list('id', 'value')
+
+            else:
+                disaggregation_value = disaggregation.disaggregation_value.values_list('id', flat=True)
+
+            output_list.append(list(disaggregation_value))
+
+        return output_list
+
 
 class IndicatorLocationData(TimeStampedModel):
     """
@@ -178,6 +203,11 @@ class IndicatorLocationData(TimeStampedModel):
     location = models.ForeignKey('core.Location', related_name="indicator_location_data")
 
     disaggregation = JSONField(default=dict)
+    num_disaggregation = models.IntegerField()
+    level_reported = models.IntegerField()
+    disaggregation_reported_on = ArrayField(
+        models.IntegerField(), default=list
+    )
 
     def __unicode__(self):
         return "{} Location Data for {}".format(self.location, self.indicator_report)

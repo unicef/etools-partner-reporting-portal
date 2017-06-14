@@ -5,7 +5,8 @@ from core.serializers import SimpleLocationSerializer
 
 from .models import (
     Reportable, IndicatorBlueprint,
-    IndicatorReport, IndicatorLocationData
+    IndicatorReport, IndicatorLocationData,
+    Disaggregation, DisaggregationValue,
 )
 
 
@@ -18,17 +19,40 @@ class IndicatorBlueprintSimpleSerializer(serializers.ModelSerializer):
         )
 
 
+class DisaggregationValueListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = DisaggregationValue
+        fields = (
+            'id', 'value',
+            'active',
+        )
+
+
+class DisaggregationListSerializer(serializers.ModelSerializer):
+    choices = DisaggregationValueListSerializer(many=True, read_only=True, source='disaggregation_value')
+
+    class Meta:
+        model = Disaggregation
+        fields = (
+            'id', 'name',
+            'active',
+            'choices',
+        )
+
+
 class IndicatorListSerializer(serializers.ModelSerializer):
     blueprint = IndicatorBlueprintSimpleSerializer()
     ref_num = serializers.CharField()
     achieved = serializers.IntegerField()
     progress_percentage = serializers.FloatField()
 
+
     class Meta:
         model = Reportable
         fields = (
             'id', 'target', 'baseline', 'blueprint',
-            'ref_num', 'achieved', 'progress_percentage'
+            'ref_num', 'achieved', 'progress_percentage',
         )
 
 
@@ -43,11 +67,27 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
             'id',
             'location',
             'disaggregation',
+            'num_disaggregation',
+            'level_reported',
+            'disaggregation_reported_on',
         )
 
 
 class IndicatorReportListSerializer(serializers.ModelSerializer):
     indicator_location_data = SimpleIndicatorLocationDataListSerializer(many=True, read_only=True)
+    disagg_lookup_map = serializers.SerializerMethodField()
+    disagg_choice_lookup_map = serializers.SerializerMethodField()
+
+    def get_disagg_lookup_map(self, obj):
+        serializer = DisaggregationListSerializer(obj.disaggregations, many=True)
+
+        return serializer.data
+
+    def get_disagg_choice_lookup_map(self, obj):
+        lookup_array = obj.disaggregation_values(id_only=False)
+        lookup_array.sort(key=len)
+
+        return lookup_array
 
     class Meta:
         model = IndicatorReport
@@ -59,6 +99,8 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
             'total',
             'remarks',
             'report_status',
+            'disagg_lookup_map',
+            'disagg_choice_lookup_map',
         )
 
 
