@@ -9,6 +9,7 @@
 <link rel="import" href="../../../../redux/store.html">
 <link rel="import" href="../../../../redux/actions.html">
 <link rel="import" href="../../../../redux/selectors/programmeDocuments.html">
+<link rel="import" href="../../../../redux/selectors/programmeDocumentReports.html">
 
 <dom-module id="page-ip-reporting-pd-report">
   <template>
@@ -27,6 +28,11 @@
     <etools-prp-ajax
         id="indicatorData"
         url="[[indicatorDataUrl]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
+        id="report"
+        url="[[reportUrl]]">
     </etools-prp-ajax>
 
     <page-header
@@ -65,6 +71,11 @@
           computed: '_computeIndicatorDataUrl(reportId)',
         },
 
+        reportUrl: {
+          type: String,
+          computed: '_computeReportUrl(pdId, reportId)',
+        },
+
         pdId: {
           type: String,
           statePath: 'programmeDocuments.current',
@@ -72,8 +83,13 @@
 
         currentPD: {
           type: Object,
-          value: {},
           statePath: App.Selectors.ProgrammeDocuments.current,
+        },
+
+        currentReport: {
+          type: Object,
+          statePath: App.Selectors.ProgrammeDocumentReports.current,
+          observer: '_fetchReportDataIfNeeded',
         },
 
         headingText: {
@@ -140,6 +156,10 @@
         return reportId ? App.Endpoints.indicatorData(reportId) : '';
       },
 
+      _computeReportUrl: function (pdId, reportId) {
+        return App.Endpoints.programmeDocumentReport(pdId, reportId);
+      },
+
       _handleInputChange: function (url) {
         var indicatorDataThunk;
 
@@ -154,6 +174,19 @@
 
         this.dispatch(
           App.Actions.IndicatorData.fetch(indicatorDataThunk, this.reportId)
+        )
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
+      },
+
+      _fetchReportDataIfNeeded: function (report) {
+        if (report.id) {
+          return;
+        }
+
+        this.dispatch(
+          App.Actions.PDReports.fetchSingle(this.$.report.thunk(), this.pdId)
         )
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling

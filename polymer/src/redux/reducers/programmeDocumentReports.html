@@ -30,6 +30,15 @@
             return Object.assign({}, state, change);
           }());
 
+        case App.Constants.SET_PD_REPORT:
+          return (function () {
+            var change = {};
+
+            change[action.pdId] = (state[action.pdId] || []).concat(action.data);
+
+            return Object.assign({}, state, change);
+          }());
+
         case App.Constants.RESET:
           return {};
 

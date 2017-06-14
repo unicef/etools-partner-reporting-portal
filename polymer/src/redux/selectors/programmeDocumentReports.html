@@ -14,8 +14,8 @@
         function (state) {
            return state.programmeDocuments.current;
         },
-        function (byPD, id) {
-          return byPD[id];
+        function (byPD, pdId) {
+          return byPD[pdId];
         }
       ),
 
@@ -26,8 +26,25 @@
          function (state) {
            return state.programmeDocuments.current;
         },
-        function (countByPD, id) {
-          return countByPD[id];
+        function (countByPD, pdId) {
+          return countByPD[pdId];
+        }
+      ),
+
+      current: Reselect.createSelector(
+        function (state) {
+          return state.programmeDocumentReports.byPD;
+        },
+        function (state) {
+          return state.programmeDocuments.current;
+        },
+        function (state) {
+          return state.programmeDocumentReports.current;
+        },
+        function (byPD, pdId, reportId) {
+          return (byPD[pdId] || []).filter(function (report) {
+            return report.id === reportId;
+          })[0] || {};
         }
       ),
     };

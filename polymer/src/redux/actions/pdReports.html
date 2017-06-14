@@ -18,9 +18,26 @@
         };
       },
 
+      fetchSingle: function (reportThunk, pdId) {
+        return function (dispatch) {
+          return reportThunk()
+              .then(function (res) {
+                dispatch(App.Actions.PDReports.setSingle(pdId, res.data));
+              });
+        };
+      },
+
       set: function (pdId, data) {
         return {
           type: App.Constants.SET_PD_REPORTS,
+          pdId: pdId,
+          data: data,
+        };
+      },
+
+      setSingle: function (pdId, data) {
+        return {
+          type: App.Constants.SET_PD_REPORT,
           pdId: pdId,
           data: data,
         };

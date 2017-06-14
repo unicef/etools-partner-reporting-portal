@@ -37,6 +37,10 @@
         return this._buildUrl('/indicator/programme-document/details/' + pdId + '/reports/');
       },
 
+      programmeDocumentReport: function (pdId, reportId) {
+        return this.programmeDocumentReports(pdId) + reportId + '/';
+      },
+
       childLocations: function (locationId) {
         return this._buildUrl('/core/' + locationId + '/children-location/');
       },
