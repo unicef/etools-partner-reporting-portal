@@ -171,10 +171,15 @@ class IndicatorReport(TimeStampedModel):
     def disaggregations(self):
         return self.reportable.disaggregation.all()
 
-    def disaggregation_values(self, id_only=False):
+    def disaggregation_values(self, id_only=False, filter_by_id__in=None):
         output_list = []
 
-        for disaggregation in self.disaggregations:
+        disaggregations = self.disaggregations
+
+        if filter_by_id__in:
+            disaggregations = disaggregations.filter(id__in=filter_by_id__in)
+
+        for disaggregation in disaggregations:
             if not id_only:
                 disaggregation_value = disaggregation.disaggregation_value.values_list('id', 'value')
 

@@ -1,4 +1,5 @@
 import random
+from itertools import combinations
 
 from django.conf import settings
 
@@ -111,7 +112,6 @@ def generate_fake_data(quantity=3):
     # created LowerLevelOutput - ReportableToLowerLevelOutput
     # Section - ProgrammeDocument via ReportableToLowerLevelOutput
     # ProgressReport - IndicatorReport from ReportableToLowerLevelOutput
-    # IndicatorReport & Location from ReportableToLowerLevelOutput - IndicatorLocationData
     for idx in xrange(quantity):
         llo = LowerLevelOutput.objects.all()[idx]
         reportable = ReportableToLowerLevelOutputFactory(content_object=llo)
@@ -153,31 +153,80 @@ def generate_fake_data(quantity=3):
 
             print "Disaggregation (and DisaggregationValue) objects for ReportableToLowerLevelOutput {} created".format(idx)
 
-        # -- Extra IndicatorReport and IndicatorLocationReport --
+        # -- Extra IndicatorReport and IndicatorLocationData --
         if reportable.locations.count() != 0:
             first_reportable_location_id = reportable.locations.first().id
 
         else:
             first_reportable_location_id = None
 
-        for location_idx in xrange(3):
-            if first_reportable_location_id and first_reportable_location_id != locations[location_idx].id:
+        # Adding more locations to Reportable
+        for location_idx in xrange(locations.count()):
+            if not first_reportable_location_id or (first_reportable_location_id and first_reportable_location_id != locations[location_idx].id):
                 reportable.locations.add(locations[location_idx])
                 reportable.save()
 
         # Creating extra IndicatorReport object per location in reportable
-        for location in reportable.locations.all():
-            if first_reportable_location_id and location.id != first_reportable_location_id:
+        for idx, location in enumerate(reportable.locations.all()):
+            if not first_reportable_location_id or (first_reportable_location_id and first_reportable_location_id != location.id):
+                # ProgressReport - IndicatorReport from ReportableToLowerLevelOutput
                 indicator_report = IndicatorReportFactory(reportable=reportable)
                 indicator_report.progress_report = reportable.indicator_reports.first().progress_report
                 indicator_report.save()
 
-        for indicator_report_from_reportable in reportable.indicator_reports.all():
-            location_data = IndicatorLocationDataFactory(
-                indicator_report=indicator_report_from_reportable,
-                location=location, disaggregation_reported_on=list(indicator_report_from_reportable.disaggregations.values_list('id', flat=True)),
-                disaggregation=generate_data_combination_dict(reduce(lambda acc, curr: acc + curr, indicator_report_from_reportable.disaggregation_values(id_only=True))))
-        # -- Extra IndicatorReport and IndicatorLocationReport --
+            # IndicatorReport from ReportableToLowerLevelOutput - IndicatorLocationData
+            indicator_report_from_reportable = reportable.indicator_reports.all()[idx]
+
+            if idx == 0:
+                # 3 num_disaggregation & 3 level_reported
+                location_data = IndicatorLocationDataFactory(
+                    indicator_report=indicator_report_from_reportable,
+                    location=location,
+                    num_disaggregation=3,
+                    level_reported=3,
+                    disaggregation_reported_on=list(indicator_report_from_reportable.disaggregations.values_list('id', flat=True)),
+                    disaggregation=generate_data_combination_dict(reduce(lambda acc, curr: acc + curr, indicator_report_from_reportable.disaggregation_values(id_only=True))))
+
+            elif idx == 1:
+                # 3 num_disaggregation & 2 level_reported
+                disaggregation_comb_2_pairs = list(combinations(list(indicator_report_from_reportable.disaggregations.values_list('id', flat=True)), 2))
+
+                for pair in disaggregation_comb_2_pairs:
+                    location_data = IndicatorLocationDataFactory(
+                        indicator_report=indicator_report_from_reportable,
+                        location=location,
+                        num_disaggregation=3,
+                        level_reported=2,
+                        disaggregation_reported_on=pair,
+                        disaggregation=generate_data_combination_dict(reduce(lambda acc, curr: acc + curr, indicator_report_from_reportable.disaggregation_values(id_only=True, filter_by_id__in=pair)), r=2))
+
+            elif idx == 2:
+                # 3 num_disaggregation & 1 level_reported
+                disaggregation_comb_1_pairs = list(combinations(list(indicator_report_from_reportable.disaggregations.values_list('id', flat=True)), 1))
+
+                for pair in disaggregation_comb_1_pairs:
+                    location_data = IndicatorLocationDataFactory(
+                        indicator_report=indicator_report_from_reportable,
+                        location=location,
+                        num_disaggregation=3,
+                        level_reported=1,
+                        disaggregation_reported_on=pair,
+                        disaggregation=generate_data_combination_dict(reduce(lambda acc, curr: acc + curr, indicator_report_from_reportable.disaggregation_values(id_only=True, filter_by_id__in=pair)), r=1))
+
+            elif idx == 3:
+                # 3 num_disaggregation & 0 level_reported
+                disaggregation_comb_0_pairs = list(combinations(list(indicator_report_from_reportable.disaggregations.values_list('id', flat=True)), 0))
+
+                for pair in disaggregation_comb_0_pairs:
+                    location_data = IndicatorLocationDataFactory(
+                        indicator_report=indicator_report_from_reportable,
+                        location=location,
+                        num_disaggregation=3,
+                        level_reported=0,
+                        disaggregation_reported_on=pair,
+                        disaggregation=generate_data_combination_dict(reduce(lambda acc, curr: acc + curr, indicator_report_from_reportable.disaggregation_values(id_only=True, filter_by_id__in=pair)), r=0))
+
+        # -- Extra IndicatorReport and IndicatorLocationData --
 
     print "{} ReportableToLowerLevelOutput objects created".format(quantity)
     print "{} ProgressReport objects created".format(quantity)
