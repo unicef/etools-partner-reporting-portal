@@ -14,23 +14,6 @@ class TestProgrammeDocumentAPIView(BaseAPITestCase):
 
     generate_fake_data_quantity = 5
 
-    def setUp(self):
-        super(TestProgrammeDocumentAPIView, self).setUp()
-        for idx in xrange(self.generate_fake_data_quantity):
-            llo = LowerLevelOutput.objects.all()[idx]
-            reportable = ReportableToLowerLevelOutputFactory(content_object=llo)
-
-            reportable.content_object.indicator.programme_document.sections.add(Section.objects.all()[idx])
-
-            indicator_report = reportable.indicator_reports.first()
-            indicator_report.progress_report = ProgressReportFactory()
-            indicator_report.save()
-
-            IndicatorLocationDataFactory(
-                indicator_report=indicator_report,
-                location=reportable.locations.first()
-            )
-
     def test_list_api(self):
         intervention = Intervention.objects.filter(locations__isnull=False).first()
 

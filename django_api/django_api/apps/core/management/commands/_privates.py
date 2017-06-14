@@ -80,9 +80,9 @@ def generate_data_combination_dict(array, r=3):
         id_pairs = get_combination_pairs(array, idx)
 
         for id_tuple in id_pairs:
-            output_dict[str(id_tuple)] = random.randint(50, 200)
+            output_dict[str(id_tuple)] = {'v': random.randint(50, 200), 'd': None, 'c': None}
 
-    output_dict[str(tuple())] = random.randint(50, 200)
+    output_dict[str(tuple())] = {'v': random.randint(50, 200), 'd': None, 'c': None}
 
     return output_dict
 
