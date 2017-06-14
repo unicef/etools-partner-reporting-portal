@@ -94,9 +94,6 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
 
 class TestIndicatorReportDetailAPIView(APITestCase):
 
-    def setUp(self):
-        generate_test_data(5)
-
     def test_list_api(self):
         self.reportable = Reportable.objects.filter(
             lower_level_outputs__reportables__isnull=False
