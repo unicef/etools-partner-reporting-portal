@@ -45,3 +45,16 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
         if cluster_id:
             return queryset.filter(cluster_id=cluster_id)
         return queryset.all()
+
+    def post(self, request, *args, **kwargs):
+        """
+        Create on PartnerProject model
+        :return: PartnerProject object id
+        """
+        serializer = self.get_serializer(data=self.request.data)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer.save()
+        return Response({'id': serializer.instance.id}, status=status.HTTP_201_CREATED)
