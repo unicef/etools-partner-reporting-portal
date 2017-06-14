@@ -30,7 +30,7 @@
     </etools-prp-ajax>
 
     <page-header
-        title="Report for [[currentPDRefNo]]"
+        title="[[headingText]]"
         back="[[backLink]]">
     </page-header>
 
@@ -48,7 +48,12 @@
       ],
 
       properties: {
-        mode: String,
+        routeData: Object,
+
+        mode: {
+          type: String,
+          computed: '_computeMode(routeData)',
+        },
 
         reportId: {
           type: String,
@@ -71,9 +76,9 @@
           statePath: App.Selectors.ProgrammeDocuments.current,
         },
 
-        currentPDRefNo: {
+        headingText: {
           type: String,
-          computed: '_computeCurrentPDRefNo(currentPD)',
+          computed: '_computeHeadingText(currentPD, mode)',
         },
 
         backLink: {
@@ -87,6 +92,18 @@
         '_handleInputChange(indicatorDataUrl)',
       ],
 
+      _computeMode: function (routeData) {
+        switch (routeData.mode) {
+          case 'view':
+          case 'draft':
+          case 'edit':
+            return routeData.mode;
+
+          default:
+            return 'view';
+        }
+      },
+
       _computeBackLink: function (pdId) {
         return 'pd/' + pdId + '/view/reports';
       },
@@ -97,6 +114,26 @@
 
       _onReportIdChanged: function (reportId) {
         this.dispatch(App.Actions.PDReports.setCurrent(reportId));
+      },
+
+      _computeHeadingText: function (pd, mode) {
+        var prefix;
+
+        switch (mode) {
+          case 'view':
+            prefix = 'Report for';
+            break;
+
+          case 'edit':
+            prefix = 'Enter data for';
+            break;
+
+          case 'draft':
+            prefix = 'Draft for';
+            break;
+        }
+
+        return prefix + ' ' + pd.reference_number;
       },
 
       _computeIndicatorDataUrl: function (reportId) {
