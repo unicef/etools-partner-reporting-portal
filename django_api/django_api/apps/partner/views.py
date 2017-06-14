@@ -11,6 +11,7 @@ from core.permissions import IsAuthenticated
 from .serializer import (
     PartnerDetailsSerializer,
     PartnerProjectSerializer,
+    PartnerProjectPatchSerializer,
 )
 from .models import PartnerProject
 
@@ -106,4 +107,14 @@ class PartnerProjectAPIView(APIView):
     def get(self, request, pk, *args, **kwargs):
         instance = self.get_instance(request, pk)
         serializer = PartnerProjectSerializer(instance=instance)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def patch(self, request, *args, **kwargs):
+        serializer = PartnerProjectPatchSerializer(
+            instance=self.get_instance(self.request),
+            data=self.request.data
+        )
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)

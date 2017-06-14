@@ -74,3 +74,17 @@ class TestPartnerProjectAPIView(BaseAPITestCase):
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(response.data['id'], str(first.id))
         self.assertEquals(response.data['title'], first.title)
+
+    def test_update_patch_cluster_objective(self):
+        """
+        patch object unit test for PartnerProjectAPIView
+        """
+        base_count = PartnerProject.objects.all().count()
+        last = PartnerProject.objects.last()
+
+        data = dict(id=last.id, title='new updated title')
+        url = reverse('partner-project-details', kwargs={"pk": last.id})
+        response = self.client.patch(url, data=data, format='json')
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(PartnerProject.objects.all().count(), base_count)
+        self.assertEquals(PartnerProject.objects.get(id=response.data['id']).title, data['title'])
