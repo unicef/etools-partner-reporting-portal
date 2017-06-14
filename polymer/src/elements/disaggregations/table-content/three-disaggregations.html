@@ -23,17 +23,20 @@
       </template>
       <th class='flex cell'>Total</th>
     </tr>
+
     <template is="dom-repeat"
               items="[[outerRowsForDisplay]]"
               as="outerRow">
       <disaggregation-table-row data=[[outerRow]] type="outerRow"></disaggregation-table-row>
-      <!-- [[outerRow.id]] -->
       <template is="dom-repeat"
                 items="[[_determineMiddleRows(outerRow.id)]]"
                 as="middleRow">
         <disaggregation-table-row data=[[middleRow]]></disaggregation-table-row>
       </template>
-    </template>
+   </template>
+
+   <!-- <disaggregation-table-row data=[[columnTotalRow]]></disaggregation-table-row> -->
+
   </template>
 
   <script>
@@ -71,7 +74,15 @@
           computed: '_getMiddleRows(mapping)'
         },
 
-        outerRowsForDisplay: Array
+        outerRowsForDisplay: {
+          type: Array,
+          computed: '_determineOuterRows(mapping)'
+        },
+
+        totalsForDisplay: {
+          type: Array,
+          computed: '_determineTotals(mapping)'
+        }
       },
 
       _getColumns: function(mapping) {
@@ -79,7 +90,6 @@
       },
 
       _getOuterRows: function(mapping) {
-        this._test()
         return this.mapping[1].choices;
       },
 
@@ -92,6 +102,30 @@
         var sortedString = ids.sort().join(", ");
         var formatted = '(' + sortedString + ')';
         return this.data.disaggregation[formatted];
+      },
+
+      _determineOuterRows: function() {
+        var self = this;
+        var columnChoices = this.mapping[0].choices;
+        var outerRows = this.mapping[1].choices;
+        var middleRows = this.mapping[2].choices;
+        var outerRowsForDisplay = [];
+
+        outerRows.map(function(x) {
+          var title = x.value;
+          var outerRowData = columnChoices.map(function(z) {
+            return self._getData([x.id, z.id]);
+          });
+          var outerRowTotal = self._getData([x.id]);
+
+          outerRowsForDisplay.push({
+            title: x.value,
+            data: outerRowData,
+            id: x.id,
+            total: outerRowTotal
+          });
+        });
+        return outerRowsForDisplay
       },
 
       _determineMiddleRows(outerRowID) {
@@ -108,40 +142,27 @@
 
           middleRowsForDisplay.push({
             title: y.value,
-            values: data,
+            data: data,
             id: y.id,
             total: total
           });
         });
-
         return middleRowsForDisplay;
       },
 
-      _determineOuterRows: function() {
+      _determineTotals: function() {
         var self = this;
         var columnChoices = this.mapping[0].choices;
-        var outerRows = this.mapping[1].choices;
         var middleRows = this.mapping[2].choices;
-        var outerRowsForDisplay = [];
+        var middleRowsForDisplay = [];
+        var columnTotalRow = {}
 
+        var columnData = columnChoices.map(function(z) {
+          return self._getData([z.id]) ;
+        });
 
-        outerRows.map(function(x) {
-          var title = x.value;
-          var outerRowData = columnChoices.map(function(z) {
-            return self._getData([x.id, z.id]);
-          });
-          var outerRowTotal = self._getData([x.id]);
-          outerRowsForDisplay.push({
-            title: x.value,
-            values: outerRowData,
-            id: x.id,
-            total: outerRowTotal
-          });
-        })
-        self.outerRowsForDisplay = outerRowsForDisplay
+      },
 
-        // Then totals table.
-      }
     });
   </script>
 </dom-module>

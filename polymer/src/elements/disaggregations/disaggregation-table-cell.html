@@ -13,8 +13,10 @@
       }
     </style>
 
-    [[value]] [[title]] [[total]]
-    
+    <!-- Todo: sub-divide cells for more detailed data. -->
+
+    <span>[[value]] [[title]] [[total]] </span>
+
   </template>
 
   <script>
@@ -28,6 +30,10 @@
       properties: {
         value: Number,
         title: String,
+        total: Number,
       },
+
     })
-</script>
+  </script>
+
+</dom-module>

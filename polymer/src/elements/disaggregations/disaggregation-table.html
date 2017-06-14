@@ -19,25 +19,31 @@ disaggregation-table component to display.
 
     <table class='vertical layout'>
 
-      <!-- <template is="dom-if" if="[[_isSameNumberOfDisaggregations(data, 0)]]">
-        <zero-disaggregations
+      <!-- Note: Need to pass in mapping to these or an empty mapping is passed
+      to the content component. -->
+
+      <template is="dom-if" if="[[_isSameNumberOfDisaggregations(data, 0)]]">
+        Zero disaggregations table
+        <!-- <zero-disaggregations
           data=[[data]]
           mapping=[[mapping]]>
-        </zero-disaggregations>
+        </zero-disaggregations> -->
       </template>
 
       <template is="dom-if" if="[[_isSameNumberOfDisaggregations(data, 1)]]">
-        <one-disaggregation></one-disaggregation>
+        One disaggregations table
+        <!-- <one-disaggregation></one-disaggregation> -->
       </template>
 
       <template is="dom-if" if="[[_isSameNumberOfDisaggregations(data, 2)]]">
-        <two-disaggregations></two-disaggregations>
-      </template> -->
+        Two disaggregations table
+        <!-- <two-disaggregations></two-disaggregations> -->
+      </template>
 
       <template is="dom-if" if="[[_isSameNumberOfDisaggregations(data, 3, mapping)]]">
         <three-disaggregations
-          data=[[data]]
-          mapping=[[mapping]]>
+          data="[[data]]"
+          mapping="[[mapping]]">
         </three-disaggregations>
       </template>
 
@@ -56,12 +62,12 @@ disaggregation-table component to display.
 
       properties: {
         data: {
-          type: Array,
-          value: []
+          type: Object,
+          value: {}
         },
         mapping: {
-          type: Array,
-          value: []
+          type: Object,
+          value: {}
         }
       },
 
