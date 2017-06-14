@@ -2,6 +2,7 @@ import operator
 
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
+from django.http import Http404
 
 from rest_framework import status
 from rest_framework.generics import ListCreateAPIView, ListAPIView
@@ -13,7 +14,11 @@ import django_filters.rest_framework
 from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
 
-from .serializers import IndicatorListSerializer, IndicatorReportListSerializer, PDReportsSerializer
+from .serializers import (
+    IndicatorListSerializer,
+    IndicatorReportListSerializer,
+    PDReportsSerializer, IndicatorReportDetailSerializer,
+)
 from .filters import IndicatorFilter, PDReportsFilter
 from .models import IndicatorReport, Reportable
 
@@ -126,5 +131,27 @@ class IndicatorReportListAPIView(APIView):
         indicator_reports = self.get_queryset(pk)
 
         serializer = IndicatorReportListSerializer(indicator_reports, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class IndicatorReportDetailAPIView(APIView):
+    """
+    REST API endpoint to get a IndicatorReport object, including disaggregation data set.
+    """
+
+    def get_object(self, pk, indicator_report_pk):
+        reportable = get_object_or_404(Reportable, pk=pk)
+
+        try:
+            indicator_report = reportable.indicator_reports.get(id=indicator_report_pk)
+
+            return indicator_report
+        except Exception as e:
+            raise Http404
+
+    def get(self, request, pk, indicator_report_pk, format='json'):
+        indicator_report = self.get_object(pk, indicator_report_pk)
+        serializer = IndicatorReportDetailSerializer(indicator_report)
 
         return Response(serializer.data, status=status.HTTP_200_OK)

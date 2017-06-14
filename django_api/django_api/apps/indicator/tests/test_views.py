@@ -90,3 +90,22 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(len(response.data), 2)
         self.assertNotEquals(response.data[0]['indicator_location_data'][0]['disaggregation'], {})
+
+
+class TestIndicatorReportDetailAPIView(BaseAPITestCase):
+    generate_fake_data_quantity = 5
+
+    def test_list_api(self):
+        self.reportable = Reportable.objects.filter(
+            lower_level_outputs__reportables__isnull=False
+        ).last()
+
+        self.indicator_report = self.reportable.indicator_reports.last()
+
+        url = reverse('indicator-report-detail-api', kwargs={'pk': self.reportable.id, 'indicator_report_pk': self.indicator_report.id})
+        response = self.client.get(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertNotEquals(response.data, {})
+        self.assertEquals(response.data['id'], self.indicator_report.id)
+        self.assertNotEquals(response.data['indicator_location_data'][0]['disaggregation'], {})
