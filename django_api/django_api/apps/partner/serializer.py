@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from cluster.serializers import ClusterSimpleSerializer
+from core.serializers import SimpleLocationSerializer
 from .models import (
     Partner,
     PartnerProject,
@@ -42,6 +44,11 @@ class PartnerDetailsSerializer(serializers.ModelSerializer):
 
 class PartnerProjectSerializer(serializers.ModelSerializer):
 
+    id = serializers.SerializerMethodField()
+    clusters = ClusterSimpleSerializer(many=True)
+    locations = SimpleLocationSerializer(many=True)
+    partner = serializers.SerializerMethodField()
+
     class Meta:
         model = PartnerProject
         fields = (
@@ -50,9 +57,14 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
             'start_date',
             'end_date',
             'status',
-
-            #'clusters',
-            #'locations',
-            #'partner',
-            #'reportables',
+            'clusters',
+            'locations',
+            'partner',
+            # 'reportables',
         )
+
+    def get_id(self, obj):
+        return str(obj.id)
+
+    def get_partner(self, obj):
+        return obj.partner and str(obj.partner_id)

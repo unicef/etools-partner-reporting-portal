@@ -1,6 +1,16 @@
 from rest_framework import serializers
 from core.common import FREQUENCY_LEVEL
-from .models import ClusterObjective, ClusterActivity
+from .models import ClusterObjective, ClusterActivity, Cluster
+
+
+class ClusterSimpleSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Cluster
+        fields = (
+            'id',
+            'title',
+        )
 
 
 class ClusterObjectiveSerializer(serializers.ModelSerializer):
