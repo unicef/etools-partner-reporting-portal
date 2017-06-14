@@ -16,6 +16,8 @@
 
     "src/pages/app/ip-reporting/indicators.html",
 
+    "src/pages/app/ip-reporting/progress-reports.html",
+
     "src/pages/app/cluster-reporting.html"
   ],
   "sourceGlobs": [

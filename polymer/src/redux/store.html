@@ -8,6 +8,7 @@
 <link rel="import" href="reducers/partner.html">
 <link rel="import" href="reducers/indicators.html">
 <link rel="import" href="reducers/programmeDocuments.html">
+<link rel="import" href="reducers/progressReports.html">
 <link rel="import" href="reducers/programmeDocumentDetails.html">
 
 <script src="../../bower_components/redux-thunk/index.js"></script>
@@ -25,6 +26,7 @@
       indicators: App.Reducers.Indicators,
       programmeDocuments: App.Reducers.ProgrammeDocuments,
       programmeDocumentDetails: App.Reducers.ProgrammeDocumentDetails,
+      progressReports: App.Reducers.ProgressReports
     });
 
     var store = Redux.createStore(
