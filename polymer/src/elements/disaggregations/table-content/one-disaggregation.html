@@ -3,12 +3,31 @@
 
 <link rel="import" href="../../../behaviors/utils.html">
 <link rel="import" href="../../../styles/detail-table.html">
+<link rel="import" href="../disaggregation-table-row.html">
 
 <dom-module id="one-disaggregation">
   <template>
 
-    <style include="detail-table"></style>
-    <h4> One disaggregation table </h4>
+    <style include='detail-table'>
+      .cell {
+        word-break: break-word;
+      }
+    </style>
+
+    <tr class='horizontal layout'>
+      <th class='flex cell'></th>
+      <th class='flex cell'>Total</th>
+    </tr>
+
+    <!-- TODO: fix first child styling here. -->
+    <template is="dom-repeat"
+              items="[[rows]]"
+              as="row">
+      <tr class='horizontal layout'>
+        <td class='flex cell'>[[_capitalizeFirstLetter(row.title)]]</td>
+        <td class='flex cell'>[[row.value]]</td>
+      </tr>
+    </template>
 
   </template>
 
@@ -25,7 +44,56 @@
           type: Object,
           value: {}
         },
-      }
+
+        mapping: {
+          type: Array,
+          value: []
+        },
+
+        //Passing columnNames as a param is required to trigger update.
+        columns: {
+          type: Array,
+          computed: '_getColumns(mapping)'
+        },
+
+        rows: {
+          type: Object,
+          computed: '_determineRows(mapping)'
+        }
+      },
+
+      _getColumns: function(mapping) {
+        return this.mapping[0].choices;
+      },
+
+
+      // Accepts a list of IDs, sorts them, and structures them in "()" format.
+      _getData(ids) {
+        var sortedString = '';
+        if (ids.length === 1) {
+          sortedString = ids[0] + ',';
+        } else {
+          sortedString = ids.sort().join(", ");
+        };
+        var formatted = '(' + sortedString + ')';
+        return this.data.disaggregation[formatted];
+      },
+
+      _determineRows: function() {
+        var self = this;
+        var columnChoices = this.mapping[0].choices;
+        var columnData = []
+
+        columnChoices.map(function(z) {
+          var forDisplay = {};
+          forDisplay['title'] = z.value;
+          forDisplay['value'] = self._getData([z.id]);
+          columnData.push(forDisplay)
+        });
+
+        return columnData;
+      },
+
     });
   </script>
 </dom-module>

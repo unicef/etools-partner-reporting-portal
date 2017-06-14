@@ -3,12 +3,35 @@
 
 <link rel="import" href="../../../behaviors/utils.html">
 <link rel="import" href="../../../styles/detail-table.html">
+<link rel="import" href="../disaggregation-table-row.html">
 
 <dom-module id="two-disaggregations">
   <template>
 
-    <style include="detail-table"></style>
-    <h4> Two disaggregation table </h4>
+    <style include='detail-table'>
+      .cell {
+        word-break: break-word;
+      }
+    </style>
+
+    <tr class='horizontal layout'>
+      <th class='flex cell'></th>
+      <template is="dom-repeat"
+                items="[[columns]]"
+                as="column">
+        <th class='flex cell'>[[_capitalizeFirstLetter(column.value)]]</th>
+      </template>
+      <th class='flex cell'>Total</th>
+    </tr>
+
+    <template is="dom-repeat"
+              items="[[outerRowsForDisplay]]"
+              as="outerRow">
+      <disaggregation-table-row data=[[outerRow]]></disaggregation-table-row>
+   </template>
+
+   <disaggregation-table-row data=[[columnTotalRow]] type="headerRow"></disaggregation-table-row>
+
   </template>
 
   <script>
@@ -24,7 +47,100 @@
           type: Object,
           value: {}
         },
-      }
+
+        mapping: {
+          type: Array,
+          value: []
+        },
+
+        //Passing columnNames as a param is required to trigger update.
+        columns: {
+          type: Array,
+          computed: '_getColumns(mapping)'
+        },
+
+        outerRows: {
+          type: Array,
+          computed: '_getOuterRows(mapping)'
+        },
+
+        outerRowsForDisplay: {
+          type: Array,
+          computed: '_determineOuterRows(mapping)'
+        },
+
+        totalsForDisplay: {
+          type: Array,
+          computed: '_determineTotals(mapping)'
+        },
+
+        columnTotalRow: {
+          type: Object,
+          value: {}
+        }
+      },
+
+      _getColumns: function(mapping) {
+        return this.mapping[0].choices;
+      },
+
+      _getOuterRows: function(mapping) {
+        return this.mapping[1].choices;
+      },
+
+      // Accepts a list of IDs, sorts them, and structures them in "()" format.
+      _getData(ids) {
+        var sortedString = '';
+        if (ids.length === 1) {
+          sortedString = ids[0] + ',';
+        } else {
+          sortedString = ids.sort().join(", ");
+        };
+        var formatted = '(' + sortedString + ')';
+        return this.data.disaggregation[formatted];
+      },
+
+      _determineOuterRows: function() {
+        var self = this;
+        var columnChoices = this.mapping[0].choices;
+        var outerRows = this.mapping[1].choices;
+        var outerRowsForDisplay = [];
+
+        outerRows.map(function(x) {
+          var title = x.value;
+          var outerRowData = columnChoices.map(function(z) {
+            return self._getData([x.id, z.id]);
+          });
+          var outerRowTotal = self._getData([x.id]);
+
+          outerRowsForDisplay.push({
+            title: x.value,
+            data: outerRowData,
+            id: x.id,
+            total: outerRowTotal
+          });
+        });
+        return outerRowsForDisplay
+      },
+
+      _determineTotals: function() {
+        var self = this;
+        var columnChoices = this.mapping[0].choices;
+
+        // TODO: fix.
+        var columnData = columnChoices.map(function(z) {
+          return self._getData([z.id]) ;
+        });
+
+        // TODO: totals
+        var columnTotalRow = {
+          data: columnData,
+          title: 'total',
+          total: undefined
+        };
+        this.columnTotalRow = columnTotalRow;
+      },
+
     });
   </script>
 </dom-module>

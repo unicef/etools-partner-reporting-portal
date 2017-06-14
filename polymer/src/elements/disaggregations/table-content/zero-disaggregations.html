@@ -1,14 +1,17 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../../bower_components/etools-data-table/etools-data-table.html">
 
-<link rel="import" href="../../../behaviors/utils.html">
 <link rel="import" href="../../../styles/detail-table.html">
 
 <dom-module id="zero-disaggregations">
   <template>
 
-    <style include="detail-table"></style>
-    <h4> Zero disaggregations table </h4>
+    <style include='detail-table'></style>
+
+    <tr class='horizontal layout'>
+      <td class='flex cell'>Total</td>
+      <td class='flex cell'>[[total]]</td>
+    </tr>
 
   </template>
 
@@ -16,16 +19,10 @@
     Polymer({
       is: 'zero-disaggregations',
 
-      behaviors: [
-        App.Behaviors.UtilsBehavior,
-      ],
-
       properties: {
-        data: {
-          type: Object,
-          value: {}
-        },
-      }
+        total: Number
+      },
+
     });
   </script>
 </dom-module>

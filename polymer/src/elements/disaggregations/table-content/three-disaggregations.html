@@ -110,7 +110,12 @@
 
       // Accepts a list of IDs, sorts them, and structures them in "()" format.
       _getData(ids) {
-        var sortedString = ids.sort().join(", ");
+        var sortedString = '';
+        if (ids.length === 1) {
+          sortedString = ids[0] + ',';
+        } else {
+          sortedString = ids.sort().join(", ");
+        };
         var formatted = '(' + sortedString + ')';
         return this.data.disaggregation[formatted];
       },
@@ -167,10 +172,8 @@
         var middleRows = this.mapping[2].choices;
         var bottomRows = [];
 
-        // TODO: fix.
         var columnData = columnChoices.map(function(z) {
-          return undefined;
-          // return self._getData([z.id]) ;
+          return self._getData([z.id]) ;
         });
 
         // TODO: totals

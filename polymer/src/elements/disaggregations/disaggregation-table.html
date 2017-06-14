@@ -23,21 +23,26 @@ disaggregation-table component to display.
       to the content component. -->
 
       <template is="dom-if" if="[[_isSameNumberOfDisaggregations(data, 0)]]">
-        Zero disaggregations table
-        <!-- <zero-disaggregations
-          data=[[data]]
-          mapping=[[mapping]]>
-        </zero-disaggregations> -->
+        <zero-disaggregations
+          data="[[data]]"
+          total="[[total]]"
+          mapping="[[mapping]]">
+        </zero-disaggregations>
       </template>
 
-      <template is="dom-if" if="[[_isSameNumberOfDisaggregations(data, 1)]]">
-        One disaggregations table
-        <!-- <one-disaggregation></one-disaggregation> -->
+      <template is="dom-if" if="[[_isSameNumberOfDisaggregations(data, 1, mapping)]]">
+        <one-disaggregation
+          data="[[data]]"
+          total="[[total]]"
+          mapping="[[mapping]]">
+        </one-disaggregation>
       </template>
 
-      <template is="dom-if" if="[[_isSameNumberOfDisaggregations(data, 2)]]">
-        Two disaggregations table
-        <!-- <two-disaggregations></two-disaggregations> -->
+      <template is="dom-if" if="[[_isSameNumberOfDisaggregations(data, 2, mapping)]]">
+        <two-disaggregations
+          data="[[data]]"
+          mapping="[[mapping]]">
+        </two-disaggregations>
       </template>
 
       <template is="dom-if" if="[[_isSameNumberOfDisaggregations(data, 3, mapping)]]">
@@ -68,7 +73,8 @@ disaggregation-table component to display.
         mapping: {
           type: Object,
           value: {}
-        }
+        },
+        total: Number
       },
 
       _isSameNumberOfDisaggregations(data, num) {
