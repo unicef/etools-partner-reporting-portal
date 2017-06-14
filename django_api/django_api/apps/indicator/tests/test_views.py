@@ -92,7 +92,8 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
         self.assertNotEquals(response.data[0]['indicator_location_data'][0]['disaggregation'], {})
 
 
-class TestIndicatorReportDetailAPIView(APITestCase):
+class TestIndicatorReportDetailAPIView(BaseAPITestCase):
+    generate_fake_data_quantity = 5
 
     def test_list_api(self):
         self.reportable = Reportable.objects.filter(
