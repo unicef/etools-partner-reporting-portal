@@ -1,5 +1,6 @@
 import operator
 
+from django.http import Http404
 from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import get_object_or_404
@@ -52,6 +53,17 @@ class PDReportsAPIView(ListAPIView):
             return self.get_paginated_response(serializer.data)
 
         serializer = self.get_serializer(filtered.qs, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def get_indicator_report(self, report_id):
+        try:
+            return IndicatorReport.objects.get(id=report_id)
+        except IndicatorReport.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pd_id, report_id, *args, **kwargs):
+        indicator_report = self.get_indicator_report(report_id)
+        serializer = self.get_serializer(indicator_report)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
