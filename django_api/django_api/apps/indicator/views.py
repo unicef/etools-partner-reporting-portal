@@ -2,6 +2,7 @@ import operator
 
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
+from django.http import Http404
 
 from rest_framework import status
 from rest_framework.generics import ListCreateAPIView, ListAPIView
@@ -85,19 +86,19 @@ class IndicatorListCreateAPIView(ListCreateAPIView):
         pd_statuses = self.request.query_params.get('pd_statuses', None)
 
         if locations:
-            location_list = map(lambda item: int(item), filter(lambda item: item != '', locations.split(',')))
+            location_list = map(lambda item: int(item), filter(lambda item: item != '' and item.isdigit(), locations.split(',')))
             q_list.append(Q(locations__id__in=location_list))
 
         if pds:
-            pd_list = map(lambda item: int(item), filter(lambda item: item != '', pds.split(',')))
+            pd_list = map(lambda item: int(item), filter(lambda item: item != '' and item.isdigit(), pds.split(',')))
             q_list.append(Q(lower_level_outputs__indicator__programme_document__id__in=pd_list))
 
         if clusters:
-            cluster_list = map(lambda item: int(item), filter(lambda item: item != '', clusters.split(',')))
+            cluster_list = map(lambda item: int(item), filter(lambda item: item != '' and item.isdigit(), clusters.split(',')))
             q_list.append(Q(cluster_activities__cluster__id__in=cluster_list))
 
         if pd_statuses:
-            pd_status_list = map(lambda item: item, filter(lambda item: item != '', pd_statuses.split(',')))
+            pd_status_list = map(lambda item: item, filter(lambda item: item != '' and item.isdigit(), pd_statuses.split(',')))
             q_list.append(Q(lower_level_outputs__indicator__programme_document__status__in=pd_status_list))
 
         if q_list:
@@ -117,11 +118,18 @@ class IndicatorReportListAPIView(APIView):
     - pks = A comma-separated string for IndicatorReport pks (If this GET parameter is given, Reportable pk kwargs will be ignored)
     """
 
-    def get_queryset(self, reportable_id=None, pks=None):
+    def get_queryset(self, *args, **kwargs):
         indicator_reports = None
 
+        pks = self.request.query_params.get('pks', None)
+        reportable_id = self.kwargs.get('reportable_id', None)
+
+        if not pks and not reportable_id:
+            raise Http404
+
         if pks:
-            indicator_reports = IndicatorReport.objects.filter(id__in=pks)
+            pk_list = map(lambda item: int(item), filter(lambda item: item != '' and item.isdigit(), pks.split(',')))
+            indicator_reports = IndicatorReport.objects.filter(id__in=pk_list)
 
         else:
             reportable = get_object_or_404(Reportable, pk=reportable_id)
@@ -133,9 +141,8 @@ class IndicatorReportListAPIView(APIView):
 
         return indicator_reports
 
-    def get(self, request, reportable_id, format='json'):
-        pks = self.request.query_params.get('pks', None)
-        indicator_reports = self.get_queryset(reportable_id=reportable_id, pks=pks)
+    def get(self, request, *args, **kwargs):
+        indicator_reports = self.get_queryset()
 
         serializer = IndicatorReportListSerializer(indicator_reports, many=True)
 
