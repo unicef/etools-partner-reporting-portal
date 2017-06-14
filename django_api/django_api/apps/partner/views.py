@@ -43,7 +43,7 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
         queryset = PartnerProject.objects.select_related('partner').prefetch_related('clusters', 'locations')
         cluster_id = self.kwargs.get(self.lookup_field)
         if cluster_id:
-            return queryset.filter(cluster_id=cluster_id)
+            return queryset.filter(clusters__in=[cluster_id])
         return queryset.all()
 
     def post(self, request, *args, **kwargs):
