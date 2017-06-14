@@ -55,7 +55,7 @@ class ClusterObjectiveAPIView(APIView):
                 data=self.request.data
             )
         else:
-            return Response({"id": "This filed is reqired!"}, status=statuses.HTTP_400_BAD_REQUEST)
+            return Response({"id": "This field is required!"}, status=statuses.HTTP_400_BAD_REQUEST)
 
         if not serializer.is_valid():
             return Response(serializer.errors, status=statuses.HTTP_400_BAD_REQUEST)
