@@ -64,6 +64,23 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
         self.assertEquals(created_obj.title, self.data['title'])
         self.assertEquals(PartnerProject.objects.all().count(),  base_count + 1)
 
+    def test_list_filters_partner_project(self):
+        """
+        get list unit test for PartnerProjectListCreateAPIView
+        """
+        pp = PartnerProject.objects.first()
+        location = Location.objects.first()
+        pp.locations.add(location)
+        url = reverse('partner-project-list')
+        url += "?location=%d" % location.id
+        response = self.client.get(url, format='json')
+
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(response.data['count'], 1)
+        self.assertEquals(response.data['results'][0]['id'], str(pp.id))
+        self.assertEquals(response.data['results'][0]['title'], pp.title)
+        self.assertEquals(response.data['results'][0]['locations'][0]['id'], str(location.id))
+
 
 class TestPartnerProjectAPIView(BaseAPITestCase):
 
