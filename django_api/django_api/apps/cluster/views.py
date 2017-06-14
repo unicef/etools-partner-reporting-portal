@@ -96,4 +96,4 @@ class ClusterObjectiveListCreateAPIView(ListCreateAPIView):
             return Response(serializer.errors, status=statuses.HTTP_400_BAD_REQUEST)
 
         serializer.save()
-        return Response({'id': serializer.instance.id}, status=statuses.HTTP_200_OK)
+        return Response({'id': serializer.instance.id}, status=statuses.HTTP_201_CREATED)
