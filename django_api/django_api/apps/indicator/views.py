@@ -6,7 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import get_object_or_404
 
 from rest_framework import status
-from rest_framework.generics import ListCreateAPIView, ListAPIView
+from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -56,7 +56,10 @@ class PDReportsAPIView(ListAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class PDReportsDetailAPIView(APIView):
+class PDReportsDetailAPIView(RetrieveAPIView):
+
+    serializer_class = PDReportsSerializer
+    permission_classes = (IsAuthenticated, )
 
     def get_indicator_report(self, report_id):
         try:
@@ -66,7 +69,7 @@ class PDReportsDetailAPIView(APIView):
 
     def get(self, request, pd_id, report_id, *args, **kwargs):
         indicator_report = self.get_indicator_report(report_id)
-        serializer = PDReportsSerializer(indicator_report)
+        serializer = self.get_serializer(indicator_report)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
