@@ -238,7 +238,7 @@ def generate_indicator_report_location_disaggregation_quantity_data():
 
     sample_disaggregation_value_map = {
         "height": ["tall", "medium", "short", "extrashort"],
-        "age": ["1-2m", "3-4m", "5-6m", '7-10m'],
+        "age": ["1-2m", "3-4m", "5-6m", '7-10m', '11-13m', '14-16m'],
         "gender": ["male", "female", "other"],
     }
 
