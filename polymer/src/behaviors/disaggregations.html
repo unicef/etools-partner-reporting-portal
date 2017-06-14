@@ -1,0 +1,23 @@
+<script>
+  (function () {
+    'use strict';
+
+    App.Behaviors = App.Behaviors || {};
+
+    App.Behaviors.DisaggregationBehavior = {
+      // Accepts a list of disaggregation IDs, sorts them, and
+      // structures them in "()" format for lookup.
+      _formatDisaggregationIds(ids) {
+        var sortedString = '';
+        if (ids.length === 1) {
+          sortedString = ids[0] + ',';
+        } else {
+          sortedString = ids.sort().join(", ");
+        };
+        var formatted = '(' + sortedString + ')';
+        return formatted;
+      },
+    };
+
+  }());
+</script>

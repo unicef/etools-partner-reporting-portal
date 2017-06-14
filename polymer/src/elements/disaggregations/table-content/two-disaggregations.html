@@ -1,6 +1,7 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../../bower_components/etools-data-table/etools-data-table.html">
 
+<link rel="import" href="../../../behaviors/disaggregations.html">
 <link rel="import" href="../../../behaviors/utils.html">
 <link rel="import" href="../../../styles/detail-table.html">
 <link rel="import" href="../disaggregation-table-row.html">
@@ -15,13 +16,13 @@
     </style>
 
     <tr class='horizontal layout'>
-      <th class='flex cell'></th>
+      <th class='flex cell border'></th>
       <template is="dom-repeat"
                 items="[[columns]]"
                 as="column">
-        <th class='flex cell'>[[_capitalizeFirstLetter(column.value)]]</th>
+        <th class='flex cell border'>[[_capitalizeFirstLetter(column.value)]]</th>
       </template>
-      <th class='flex cell'>Total</th>
+      <th class='flex cell border'>Total</th>
     </tr>
 
     <template is="dom-repeat"
@@ -40,6 +41,7 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.DisaggregationBehavior,
       ],
 
       properties: {
@@ -88,18 +90,6 @@
         return this.mapping[1].choices;
       },
 
-      // Accepts a list of IDs, sorts them, and structures them in "()" format.
-      _getData(ids) {
-        var sortedString = '';
-        if (ids.length === 1) {
-          sortedString = ids[0] + ',';
-        } else {
-          sortedString = ids.sort().join(", ");
-        };
-        var formatted = '(' + sortedString + ')';
-        return this.data.disaggregation[formatted];
-      },
-
       _determineOuterRows: function() {
         var self = this;
         var columnChoices = this.mapping[0].choices;
@@ -109,9 +99,11 @@
         outerRows.map(function(x) {
           var title = x.value;
           var outerRowData = columnChoices.map(function(z) {
-            return self._getData([x.id, z.id]);
+            var formatted = self._formatDisaggregationIds([x.id, z.id]);
+            return self.data.disaggregation[formatted];
           });
-          var outerRowTotal = self._getData([x.id]);
+          var formatted = self._formatDisaggregationIds([x.id]);
+          var outerRowTotal = self.data.disaggregation[formatted];
 
           outerRowsForDisplay.push({
             title: x.value,
@@ -129,7 +121,8 @@
 
         // TODO: fix.
         var columnData = columnChoices.map(function(z) {
-          return self._getData([z.id]) ;
+          var formatted = self._formatDisaggregationIds([z.id]);
+          return self.data.disaggregation[formatted];
         });
 
         // TODO: totals

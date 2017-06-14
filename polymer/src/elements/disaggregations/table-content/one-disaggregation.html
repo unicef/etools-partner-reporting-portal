@@ -2,6 +2,7 @@
 <link rel="import" href="../../../../bower_components/etools-data-table/etools-data-table.html">
 
 <link rel="import" href="../../../behaviors/utils.html">
+<link rel="import" href="../../../behaviors/disaggregations.html">
 <link rel="import" href="../../../styles/detail-table.html">
 <link rel="import" href="../disaggregation-table-row.html">
 
@@ -15,8 +16,8 @@
     </style>
 
     <tr class='horizontal layout'>
-      <th class='flex cell'></th>
-      <th class='flex cell'>Total</th>
+      <th class='flex cell border'></th>
+      <th class='flex cell border'>Total</th>
     </tr>
 
     <!-- TODO: fix first child styling here. -->
@@ -24,8 +25,8 @@
               items="[[rows]]"
               as="row">
       <tr class='horizontal layout'>
-        <td class='flex cell'>[[_capitalizeFirstLetter(row.title)]]</td>
-        <td class='flex cell'>[[row.value]]</td>
+        <td class='flex cell border'>[[_capitalizeFirstLetter(row.title)]]</td>
+        <td class='flex cell border'>[[row.value]]</td>
       </tr>
     </template>
 
@@ -37,6 +38,7 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.DisaggregationBehavior,
       ],
 
       properties: {
@@ -66,29 +68,17 @@
         return this.mapping[0].choices;
       },
 
-
-      // Accepts a list of IDs, sorts them, and structures them in "()" format.
-      _getData(ids) {
-        var sortedString = '';
-        if (ids.length === 1) {
-          sortedString = ids[0] + ',';
-        } else {
-          sortedString = ids.sort().join(", ");
-        };
-        var formatted = '(' + sortedString + ')';
-        return this.data.disaggregation[formatted];
-      },
-
       _determineRows: function() {
         var self = this;
         var columnChoices = this.mapping[0].choices;
-        var columnData = []
+        var columnData = [];
 
         columnChoices.map(function(z) {
+          var formatted = self._formatDisaggregationIds([z.id]);
           var forDisplay = {};
           forDisplay['title'] = z.value;
-          forDisplay['value'] = self._getData([z.id]);
-          columnData.push(forDisplay)
+          forDisplay['value'] = self.data.disaggregation[formatted];
+          columnData.push(forDisplay);
         });
 
         return columnData;

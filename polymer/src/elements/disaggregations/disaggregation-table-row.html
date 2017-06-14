@@ -11,19 +11,22 @@
     <style include='detail-table'></style>
     <tr class='horizontal layout' id='[[type]]'>
 
-      <td class='flex cell' id='[[data.id]]'>
-        <disaggregation-table-cell title="[[data.title]]"></disaggregation-table-cell>
+      <td class='flex cell border' id='[[data.id]]'>
+        <disaggregation-table-cell title="[[data.title]]">
+        </disaggregation-table-cell>
       </td>
 
       <template is="dom-repeat"
                 items="[[data.data]]">
-        <td class='flex cell'>
-          <disaggregation-table-cell value=[[item]]></disaggregation-table-cell>
+        <td class='flex cell border'>
+          <disaggregation-table-cell value=[[item]]>
+          </disaggregation-table-cell>
         </td>
       </template>
 
-      <td class='flex cell'>
-        <disaggregation-table-cell total=[[item.total]]></disaggregation-table-cell>
+      <td class='flex cell border'>
+        <disaggregation-table-cell total=[[item.total]]>
+        </disaggregation-table-cell>
       </td>
 
     </tr>
