@@ -63,3 +63,14 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
         created_obj = PartnerProject.objects.get(id=response.data['id'])
         self.assertEquals(created_obj.title, self.data['title'])
         self.assertEquals(PartnerProject.objects.all().count(),  base_count + 1)
+
+
+class TestPartnerProjectAPIView(BaseAPITestCase):
+
+    def test_get_instance(self):
+        first = PartnerProject.objects.first()
+        url = reverse('partner-project-details', kwargs={"pk": first.id})
+        response = self.client.get(url, format='json')
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(response.data['id'], str(first.id))
+        self.assertEquals(response.data['title'], first.title)

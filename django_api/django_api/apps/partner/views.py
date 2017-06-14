@@ -1,4 +1,5 @@
-from django.http import HttpResponseBadRequest
+from django.http import Http404
+from rest_framework.views import APIView
 from rest_framework.generics import RetrieveAPIView, ListCreateAPIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -86,3 +87,23 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
             return Response(errors, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({'id': serializer.instance.id}, status=status.HTTP_201_CREATED)
+
+
+class PartnerProjectAPIView(APIView):
+    """
+    PartnerProject CRUD endpoint
+    """
+    permission_classes = (IsAuthenticated, )
+
+    def get_instance(self, request, pk=None):
+        try:
+            instance = PartnerProject.objects.get(id=(pk or request.data['id']))
+        except PartnerProject.DoesNotExist:
+            # TODO: log exception
+            raise Http404
+        return instance
+
+    def get(self, request, pk, *args, **kwargs):
+        instance = self.get_instance(request, pk)
+        serializer = PartnerProjectSerializer(instance=instance)
+        return Response(serializer.data, status=status.HTTP_200_OK)
