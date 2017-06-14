@@ -87,7 +87,6 @@ class TestIndicatorListAPIView(BaseAPITestCase):
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(len(response.data['results']), len(self.reports))
 
-
 class TestIndicatorReportListAPIView(BaseAPITestCase):
     generate_fake_data_quantity = 5
 
