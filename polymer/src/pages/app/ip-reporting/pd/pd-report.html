@@ -1,12 +1,18 @@
 <link rel="import" href="../../../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../../../bower_components/paper-menu-button/paper-menu-button.html">
+<link rel="import" href="../../../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../../../../bower_components/paper-item/paper-item.html">
 
 <link rel="import" href="../../../../elements/page-header.html">
 <link rel="import" href="../../../../elements/page-body.html">
 <link rel="import" href="../../../../elements/ip-reporting/pd-output-list.html">
 <link rel="import" href="../../../../elements/reporting-period.html">
+<link rel="import" href="../../../../elements/report-status.html">
 <link rel="import" href="../../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../../endpoints.html">
+<link rel="import" href="../../../../behaviors/utils.html">
 <link rel="import" href="../../../../redux/store.html">
 <link rel="import" href="../../../../redux/actions.html">
 <link rel="import" href="../../../../redux/selectors/programmeDocuments.html">
@@ -49,6 +55,25 @@
           class="above-title"
           range="[[currentReport.reporting_period]]">
       </reporting-period>
+
+      <div class="toolbar">
+        <template
+            is="dom-if"
+            if="[[_equals(mode, 'edit')]]">
+          <report-status status="[[currentReport.progress_report_status]]"></report-status>
+        </template>
+
+        <paper-menu-button>
+          <paper-icon-button
+              icon="icons:more-vert"
+              class="dropdown-trigger">
+          </paper-icon-button>
+          <paper-menu class="dropdown-content">
+            <paper-item>Lorem</paper-item>
+            <paper-item>Ipsum</paper-item>
+          </paper-menu>
+        </paper-menu-button>
+      </div>
     </page-header>
 
     <page-body>
@@ -62,6 +87,7 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.UtilsBehavior,
       ],
 
       properties: {
