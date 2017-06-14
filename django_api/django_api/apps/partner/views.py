@@ -4,7 +4,7 @@ from rest_framework.generics import RetrieveAPIView, ListCreateAPIView
 from rest_framework.response import Response
 from rest_framework import status
 
-#import django_filters
+import django_filters
 
 from core.paginations import SmallPagination
 from core.permissions import IsAuthenticated
@@ -14,6 +14,7 @@ from .serializer import (
     PartnerProjectPatchSerializer,
 )
 from .models import PartnerProject
+from .filters import PartnerProjectFilter
 
 
 class PartnerDetailsAPIView(RetrieveAPIView):
@@ -38,8 +39,8 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
     serializer_class = PartnerProjectSerializer
     permission_classes = (IsAuthenticated, )
     pagination_class = SmallPagination
-    #filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
-    #filter_class =
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
+    filter_class = PartnerProjectFilter
     lookup_field = lookup_url_kwarg = 'cluster_id'
 
     def get_queryset(self, *args, **kwargs):
