@@ -60,7 +60,7 @@ class ClusterObjectiveAPIView(APIView):
                 data=self.request.data
             )
         else:
-            return Response({"id": "This filed is reqired!"}, status=statuses.HTTP_400_BAD_REQUEST)
+            return Response({"id": "This field is required!"}, status=statuses.HTTP_400_BAD_REQUEST)
 
         if not serializer.is_valid():
             return Response(serializer.errors, status=statuses.HTTP_400_BAD_REQUEST)
@@ -101,7 +101,7 @@ class ClusterObjectiveListCreateAPIView(ListCreateAPIView):
             return Response(serializer.errors, status=statuses.HTTP_400_BAD_REQUEST)
 
         serializer.save()
-        return Response({'id': serializer.instance.id}, status=statuses.HTTP_200_OK)
+        return Response({'id': serializer.instance.id}, status=statuses.HTTP_201_CREATED)
 
 
 class ClusterActivityAPIView(APIView):
@@ -185,4 +185,4 @@ class ClusterActivityListAPIView(ListCreateAPIView):
             return Response(serializer.errors, status=statuses.HTTP_400_BAD_REQUEST)
 
         serializer.save()
-        return Response({'id': serializer.instance.id}, status=statuses.HTTP_200_OK)
+        return Response({'id': serializer.instance.id}, status=statuses.HTTP_201_CREATED)
