@@ -1,3 +1,4 @@
+from django.http import HttpResponseBadRequest
 from rest_framework.generics import RetrieveAPIView, ListCreateAPIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -46,6 +47,29 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
             return queryset.filter(clusters__in=[cluster_id])
         return queryset.all()
 
+    def add_many_to_many_relations(self, instance):
+        """
+        Adding other many to many relations that can be posted like clusters and locations.
+        :param instance:
+        :return: list of errors or False
+        """
+        errors = []
+        try:
+            for location in self.request.data['locations']:
+                instance.locations.add(int(location['id']))
+        except Exception as exp:
+            # TODO log
+            errors.append({"locations": "list of dict ids fail."})
+
+        try:
+            for cluster in self.request.data['clusters']:
+                instance.clusters.add(int(cluster['id']))
+        except Exception as exp:
+            # TODO log
+            errors.append({"clusters": "list of dict ids fail."})
+
+        return errors or False
+
     def post(self, request, *args, **kwargs):
         """
         Create on PartnerProject model
@@ -57,4 +81,8 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         serializer.save()
+        errors = self.add_many_to_many_relations(serializer.instance)
+        if errors:
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+
         return Response({'id': serializer.instance.id}, status=status.HTTP_201_CREATED)

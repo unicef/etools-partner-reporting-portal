@@ -6,6 +6,7 @@ from .models import ClusterObjective, ClusterActivity, Cluster
 class ClusterSimpleSerializer(serializers.ModelSerializer):
 
     id = serializers.SerializerMethodField()
+    title = serializers.CharField(read_only=True)
 
     class Meta:
         model = Cluster

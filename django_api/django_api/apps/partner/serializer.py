@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from cluster.serializers import ClusterSimpleSerializer
-from core.serializers import SimpleLocationSerializer
+from core.serializers import ShortLocationSerializer
 from .models import (
     Partner,
     PartnerProject,
@@ -45,8 +45,8 @@ class PartnerDetailsSerializer(serializers.ModelSerializer):
 class PartnerProjectSerializer(serializers.ModelSerializer):
 
     id = serializers.SerializerMethodField()
-    clusters = ClusterSimpleSerializer(many=True)
-    locations = SimpleLocationSerializer(many=True)
+    clusters = ClusterSimpleSerializer(many=True, read_only=True)
+    locations = ShortLocationSerializer(many=True, read_only=True)
     partner = serializers.SerializerMethodField()
 
     class Meta:

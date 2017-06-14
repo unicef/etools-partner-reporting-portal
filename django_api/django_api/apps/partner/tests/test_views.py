@@ -4,6 +4,7 @@ from django.conf import settings
 from rest_framework import status
 from core.tests.base import BaseAPITestCase
 from core.common import FREQUENCY_LEVEL
+from core.models import Location
 from cluster.models import Cluster
 from partner.models import PartnerProject
 
@@ -13,11 +14,16 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
     @property
     def data(self):
         return {
-            "clusters": [Cluster.objects.first().id],
+            'clusters': [{"id": Cluster.objects.first().id}],
+            'locations': [{"id": Location.objects.first().id}, {"id": Location.objects.last().id}],
             'title': 'partner project title',
             'start_date': datetime.date.today().strftime(settings.INPUT_DATA_FORMAT),
             'end_date': datetime.date.today().strftime(settings.INPUT_DATA_FORMAT),
             'status': 'Dra',
+            'description': "description",
+            'additional_information': "additional_information",
+            'total_budget': 100000,
+            'funding_source': "UNICEF",
         }
 
     def test_list_partner_project(self):
