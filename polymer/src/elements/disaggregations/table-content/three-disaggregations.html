@@ -3,73 +3,37 @@
 
 <link rel="import" href="../../../behaviors/utils.html">
 <link rel="import" href="../../../styles/detail-table.html">
+<link rel="import" href="../disaggregation-table-row.html">
 
 <dom-module id="three-disaggregations">
   <template>
-    <style include="detail-table"></style>
 
-      <!-- <etools-data-table-header no-collapse=true> -->
-        <!-- e.g. Male/Female/etc. -->
-        <etools-data-table-row no-collapse="true">
-          <div slot="row-data" class="flex-3"></div>
-          <template is="dom-repeat"
-                    items="[[displayColumnNames]]"
-                    as="columnName">
-            <div slot="row-data" class="flex-3">
-              [[columnName]]
-            </div>
-        </template>
-      </etools-data-table-row>
+    <style include='detail-table'>
+      .cell {
+        word-break: break-word;
+      }
+    </style>
 
-      <!-- e.g. Tall/Short/etc. -->
+    <tr class='horizontal layout'>
+      <th class='flex cell'></th>
       <template is="dom-repeat"
-                items="[[disaggregationList]]"
-                as="disaggregation">
-
-        <etools-data-table-row no-collapse="true">
-          <div slot="row-data" class="header-cells">
-            <div class="col-data flex-3">[[disaggregation.name]]</div>
-          </div>
-        </etools-data-table-row>
-
-        <!-- New row for each item in the disaggregation data. -->
-        <template is="dom-repeat"
-                  items="[[disaggregation.data]]"
-                  as="dataRow">
-
-            <etools-data-table-row no-collapse="true">
-              <div slot="row-data" class="content-cells">
-                <template is="dom-repeat"
-                          items="[[dataRow]]"
-                          as="data">
-                  <div class="col-data flex-3">[[data]]</div>
-                </template>
-              </div>
-            </etools-data-table-row>
-        </template>
+                items="[[columns]]"
+                as="column">
+        <th class='flex cell'>[[_capitalizeFirstLetter(column.value)]]</th>
       </template>
-
-      <!-- Totals table at the bottom. -->
-      <etools-data-table-row no-collapse="true">
-        <div slot="row-data" class="totals">
-          <div class="col-data flex-3">Totals</div>
-        </div>
-      </etools-data-table-row>
-
-      <!-- TODO: Totals. May be redesigned/broken into different tables. -->
+      <th class='flex cell'>Total</th>
+    </tr>
+    <template is="dom-repeat"
+              items="[[outerRowsForDisplay]]"
+              as="outerRow">
+      <disaggregation-table-row data=[[outerRow]] type="outerRow"></disaggregation-table-row>
+      <!-- [[outerRow.id]] -->
       <template is="dom-repeat"
-                items="[[disaggregationSubcategories]]"
-                as="subcategory">
-          <etools-data-table-row no-collapse=true>
-            <div slot="row-data">
-              <div class="col-data flex-3">[[subcategory]]</div>
-              <div class="col-data flex-3"></div>
-              <div class="col-data flex-3"></div>
-              <div class="col-data flex-3"></div>
-            </div>
-          </etools-data-table-row>
+                items="[[_determineMiddleRows(outerRow.id)]]"
+                as="middleRow">
+        <disaggregation-table-row data=[[middleRow]]></disaggregation-table-row>
       </template>
-
+    </template>
   </template>
 
   <script>
@@ -86,93 +50,97 @@
           value: {}
         },
 
-        disaggregationList: {
+        mapping: {
           type: Array,
-          computed: '_determineDisaggregationList' +
-            '(disaggregations, disaggregationSubcategories, columnNames)'
-        },
-
-        //Passing data as a param is required to trigger update.
-        disaggregations: {
-          type: Array,
-          computed: '_determineDisaggregations(data)'
-        },
-
-        //Passing disaggregations as a param is required to trigger update.
-        disaggregationSubcategories: {
-          type: Array,
-          computed: '_determineDisaggregationSubcatetories(disaggregations)'
-        },
-
-        columnNames: {
-          type: Array,
-          computed: '_determineColumnNames(disaggregations)'
+          value: []
         },
 
         //Passing columnNames as a param is required to trigger update.
-        displayColumnNames: {
+        columns: {
           type: Array,
-          computed: '_displayColumnNames(columnNames)'
+          computed: '_getColumns(mapping)'
         },
+
+        outerRows: {
+          type: Array,
+          computed: '_getOuterRows(mapping)'
+        },
+
+        middleRows: {
+          type: Array,
+          computed: '_getMiddleRows(mapping)'
+        },
+
+        outerRowsForDisplay: Array
       },
 
-      _determineDisaggregations: function() {
-        return Object.keys(this.data.disaggregation);
+      _getColumns: function(mapping) {
+        return this.mapping[0].choices;
       },
 
-      // Creates the list to loop through in the template.
-      _determineDisaggregationList: function(disaggregations,
-                                             disaggregationSubcategories) {
-        var newList = [];
-        for (var x = 0; x < (disaggregations.length); x++) {
-          var newObject = {};
-          var key = disaggregations[x];
-          var rows = this._determineRows(key, disaggregationSubcategories);
-          newObject.name = this._capitalizeFirstLetter(key);
-          newObject.data = rows;
-          newList.push(newObject);
-        }
-        return newList;
+      _getOuterRows: function(mapping) {
+        this._test()
+        return this.mapping[1].choices;
       },
 
-      _determineDisaggregationSubcatetories: function() {
-        var key = this.disaggregations[0];
-        return Object.keys(this.data.disaggregation[key]);
+      _getMiddleRows: function(mapping) {
+        return this.mapping[2].choices;
       },
 
-      _displayColumnNames: function() {
+      // Accepts a list of IDs, sorts them, and structures them in "()" format.
+      _getData(ids) {
+        var sortedString = ids.sort().join(", ");
+        var formatted = '(' + sortedString + ')';
+        return this.data.disaggregation[formatted];
+      },
+
+      _determineMiddleRows(outerRowID) {
         var self = this;
-        return this.columnNames.map(function(x) {
-          return self._capitalizeFirstLetter(x);
+        var columnChoices = this.mapping[0].choices;
+        var middleRows = this.mapping[2].choices;
+        var middleRowsForDisplay = [];
+
+        middleRows.map(function(y) {
+          var data = columnChoices.map(function(z) {
+            return self._getData( [outerRowID, y.id, z.id] ) ;
+          });
+          var total = self._getData([y.id]);
+
+          middleRowsForDisplay.push({
+            title: y.value,
+            values: data,
+            id: y.id,
+            total: total
+          });
         });
+
+        return middleRowsForDisplay;
       },
 
-      _determineColumnNames: function() {
-        // TODO: columns should always be the disaggregation with the fewest items.
-        var key = this.disaggregations[0];
-        var subcategoryKey = this.disaggregationSubcategories[0];
-        var keys = Object.keys(this.data.disaggregation[key][subcategoryKey]);
-        keys.push('total');
-        return keys;
-      },
+      _determineOuterRows: function() {
+        var self = this;
+        var columnChoices = this.mapping[0].choices;
+        var outerRows = this.mapping[1].choices;
+        var middleRows = this.mapping[2].choices;
+        var outerRowsForDisplay = [];
 
-      _determineRows: function(disaggregationKey) {
-        var rows = [];
-        for (var x = 0; x < this.disaggregationSubcategories.length; x++) {
-          // for each subcat, e.g. 6-10, want to add a new row to the rows list.
-          var subcategoryKey = this.disaggregationSubcategories[x];
-          var subcategoryValue =
-            this.data.disaggregation[disaggregationKey][subcategoryKey];
-          var row = [subcategoryKey];
 
-          for (var j = 0; j < this.columnNames.length; j++) {
-            var column = this.columnNames[j];
-            var value = subcategoryValue[column];
-            row.push(value);
-          }
-          rows.push(row);
-        }
-        return rows;
+        outerRows.map(function(x) {
+          var title = x.value;
+          var outerRowData = columnChoices.map(function(z) {
+            return self._getData([x.id, z.id]);
+          });
+          var outerRowTotal = self._getData([x.id]);
+          outerRowsForDisplay.push({
+            title: x.value,
+            values: outerRowData,
+            id: x.id,
+            total: outerRowTotal
+          });
+        })
+        self.outerRowsForDisplay = outerRowsForDisplay
+
+        // Then totals table.
       }
     });
   </script>
