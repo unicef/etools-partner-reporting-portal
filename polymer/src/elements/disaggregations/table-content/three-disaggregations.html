@@ -35,7 +35,13 @@
       </template>
    </template>
 
-   <!-- <disaggregation-table-row data=[[columnTotalRow]]></disaggregation-table-row> -->
+   <disaggregation-table-row data=[[columnTotalRow]] type="headerRow"></disaggregation-table-row>
+
+   <template is="dom-repeat"
+             items="[[bottomRows]]"
+             as="bottomRow">
+     <disaggregation-table-row data=[[bottomRow]] type="totalsRow"></disaggregation-table-row>
+  </template>
 
   </template>
 
@@ -82,6 +88,11 @@
         totalsForDisplay: {
           type: Array,
           computed: '_determineTotals(mapping)'
+        },
+
+        columnTotalRow: {
+          type: Object,
+          value: {}
         }
       },
 
@@ -154,13 +165,38 @@
         var self = this;
         var columnChoices = this.mapping[0].choices;
         var middleRows = this.mapping[2].choices;
-        var middleRowsForDisplay = [];
-        var columnTotalRow = {}
+        var bottomRows = [];
 
+        // TODO: fix.
         var columnData = columnChoices.map(function(z) {
-          return self._getData([z.id]) ;
+          return undefined;
+          // return self._getData([z.id]) ;
         });
 
+        // TODO: totals
+        var columnTotalRow = {
+          data: columnData,
+          title: 'total',
+          total: undefined
+        };
+        this.columnTotalRow = columnTotalRow;
+
+        middleRows.map(function(y) {
+          var data = columnChoices.map(function(z) {
+            return self._getData([y.id, z.id]) ;
+          });
+
+          var total = self._getData([y.id]);
+
+          bottomRows.push({
+            title: y.value,
+            data: data,
+            id: y.id,
+            total: total
+          });
+        });
+
+        this.bottomRows = bottomRows;
       },
 
     });

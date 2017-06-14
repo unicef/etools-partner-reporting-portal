@@ -9,9 +9,6 @@
           min-width: 450px;
           background-color: #f0f0f0;
         }
-        #outerRow {
-          background-color: #c4e3f7;
-        }
         .cell {
           padding: 5px;
           display: block;
@@ -25,8 +22,14 @@
         td:not(:first-child) {
           background-color: #edf8ff;
         }
-        #outerRow td:not(:first-child) {
+        #headerRow,  #headerRow td:not(:first-child){
+          background-color: var(--paper-grey-300);
+        }
+        #outerRow,  #outerRow td:not(:first-child) {
           background-color: #c4e3f7;
+        }
+        #totalsRow, #totalsRow td:not(:first-child) {
+          background-color: #f0f0f0;
         }
     </style>
   </template>
