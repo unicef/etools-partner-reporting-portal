@@ -9,18 +9,13 @@
 <dom-module id="one-disaggregation">
   <template>
 
-    <style include='detail-table'>
-      .cell {
-        word-break: break-word;
-      }
-    </style>
+    <style include='detail-table'></style>
 
     <tr class='horizontal layout'>
       <th class='flex cell border'></th>
       <th class='flex cell border'>Total</th>
     </tr>
 
-    <!-- TODO: fix first child styling here. -->
     <template is="dom-repeat"
               items="[[rows]]"
               as="row">
@@ -29,6 +24,12 @@
         <td class='flex cell border'>[[row.value]]</td>
       </tr>
     </template>
+
+    <tr class='horizontal layout'>
+      <td class='flex cell border'>Total</td>
+      <td class='flex cell border'>[[total]]</td>
+    </tr>
+
 
   </template>
 
@@ -51,6 +52,8 @@
           type: Array,
           value: []
         },
+
+        total: Number,
 
         //Passing columnNames as a param is required to trigger update.
         columns: {

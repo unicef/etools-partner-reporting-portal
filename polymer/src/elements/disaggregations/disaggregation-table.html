@@ -41,6 +41,7 @@ disaggregation-table component to display.
       <template is="dom-if" if="[[_isSameNumberOfDisaggregations(data, 2, mapping)]]">
         <two-disaggregations
           data="[[data]]"
+          total="[[total]]"
           mapping="[[mapping]]">
         </two-disaggregations>
       </template>
@@ -48,6 +49,7 @@ disaggregation-table component to display.
       <template is="dom-if" if="[[_isSameNumberOfDisaggregations(data, 3, mapping)]]">
         <three-disaggregations
           data="[[data]]"
+          total="[[total]]"
           mapping="[[mapping]]">
         </three-disaggregations>
       </template>

@@ -9,24 +9,23 @@
   <template>
 
     <style include='detail-table'></style>
-    <tr class='horizontal layout' id='[[type]]'>
+    <tr class='horizontal layout' id="[[type]]">
 
-      <td class='flex cell border' id='[[data.id]]'>
-        <disaggregation-table-cell title="[[data.title]]">
-        </disaggregation-table-cell>
+      <td class='flex cell border' id="[[data.id]]">
+        [[_capitalizeFirstLetter(data.title)]]
       </td>
 
       <template is="dom-repeat"
                 items="[[data.data]]">
         <td class='flex cell border'>
-          <disaggregation-table-cell value=[[item]]>
+          <disaggregation-table-cell value="[[item]]">
           </disaggregation-table-cell>
         </td>
       </template>
 
       <td class='flex cell border'>
-        <disaggregation-table-cell total=[[item.total]]>
-        </disaggregation-table-cell>
+        <!-- TODO: make this consistent. -->
+        [[total]] [[data.total]]
       </td>
 
     </tr>

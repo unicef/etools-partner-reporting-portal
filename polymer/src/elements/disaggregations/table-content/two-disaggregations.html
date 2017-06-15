@@ -9,11 +9,7 @@
 <dom-module id="two-disaggregations">
   <template>
 
-    <style include='detail-table'>
-      .cell {
-        word-break: break-word;
-      }
-    </style>
+    <style include='detail-table'></style>
 
     <tr class='horizontal layout'>
       <th class='flex cell border'></th>
@@ -31,7 +27,11 @@
       <disaggregation-table-row data=[[outerRow]]></disaggregation-table-row>
    </template>
 
-   <disaggregation-table-row data=[[columnTotalRow]] type="headerRow"></disaggregation-table-row>
+   <disaggregation-table-row
+    data=[[columnTotalRow]]
+    total=[[total]]
+    type="headerRow">
+  </disaggregation-table-row>
 
   </template>
 
@@ -55,20 +55,12 @@
           value: []
         },
 
+        total: Number,
+
         //Passing columnNames as a param is required to trigger update.
         columns: {
           type: Array,
           computed: '_getColumns(mapping)'
-        },
-
-        outerRows: {
-          type: Array,
-          computed: '_getOuterRows(mapping)'
-        },
-
-        outerRowsForDisplay: {
-          type: Array,
-          computed: '_determineOuterRows(mapping)'
         },
 
         totalsForDisplay: {
@@ -76,18 +68,19 @@
           computed: '_determineTotals(mapping)'
         },
 
+        outerRowsForDisplay: {
+          type: Array,
+          computed: '_determineOuterRows(mapping)'
+        },
+
         columnTotalRow: {
           type: Object,
           value: {}
-        }
+        },
       },
 
       _getColumns: function(mapping) {
         return this.mapping[0].choices;
-      },
-
-      _getOuterRows: function(mapping) {
-        return this.mapping[1].choices;
       },
 
       _determineOuterRows: function() {
@@ -112,24 +105,22 @@
             total: outerRowTotal
           });
         });
-        return outerRowsForDisplay
+        return outerRowsForDisplay;
       },
 
       _determineTotals: function() {
         var self = this;
         var columnChoices = this.mapping[0].choices;
 
-        // TODO: fix.
         var columnData = columnChoices.map(function(z) {
           var formatted = self._formatDisaggregationIds([z.id]);
           return self.data.disaggregation[formatted];
         });
 
-        // TODO: totals
         var columnTotalRow = {
           data: columnData,
           title: 'total',
-          total: undefined
+          total: this.total
         };
         this.columnTotalRow = columnTotalRow;
       },

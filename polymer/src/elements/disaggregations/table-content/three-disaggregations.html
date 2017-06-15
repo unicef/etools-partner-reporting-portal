@@ -9,11 +9,7 @@
 <dom-module id="three-disaggregations">
   <template>
 
-    <style include='detail-table'>
-      .cell {
-        word-break: break-word;
-      }
-    </style>
+    <style include='detail-table'></style>
 
     <tr class='horizontal layout'>
       <th class='flex cell'></th>
@@ -36,12 +32,17 @@
       </template>
    </template>
 
-   <disaggregation-table-row data=[[columnTotalRow]] type="headerRow"></disaggregation-table-row>
+   <disaggregation-table-row data=[[columnTotalRow]]
+                             total=[[total]]
+                             type="headerRow">
+   </disaggregation-table-row>
 
    <template is="dom-repeat"
              items="[[bottomRows]]"
              as="bottomRow">
-     <disaggregation-table-row data=[[bottomRow]] type="totalsRow"></disaggregation-table-row>
+     <disaggregation-table-row data=[[bottomRow]]
+                               type="totalsRow">
+     </disaggregation-table-row>
   </template>
 
   </template>
@@ -66,20 +67,12 @@
           value: []
         },
 
+        total: Number,
+
         //Passing columnNames as a param is required to trigger update.
         columns: {
           type: Array,
           computed: '_getColumns(mapping)'
-        },
-
-        outerRows: {
-          type: Array,
-          computed: '_getOuterRows(mapping)'
-        },
-
-        middleRows: {
-          type: Array,
-          computed: '_getMiddleRows(mapping)'
         },
 
         outerRowsForDisplay: {
@@ -100,10 +93,6 @@
 
       _getColumns: function(mapping) {
         return this.mapping[0].choices;
-      },
-
-      _getOuterRows: function(mapping) {
-        return this.mapping[1].choices;
       },
 
       _getMiddleRows: function(mapping) {
@@ -127,6 +116,7 @@
           var formatted = self._formatDisaggregationIds([x.id]);
           var outerRowTotal = self.data.disaggregation[formatted];
 
+          console.log("outer row total?", outerRowTotal)
           outerRowsForDisplay.push({
             title: x.value,
             data: outerRowData,
@@ -134,7 +124,7 @@
             total: outerRowTotal
           });
         });
-        return outerRowsForDisplay
+        return outerRowsForDisplay;
       },
 
       _determineMiddleRows(outerRowID) {
@@ -143,14 +133,16 @@
         var middleRows = this.mapping[2].choices;
         var middleRowsForDisplay = [];
 
+
         middleRows.map(function(y) {
           var data = columnChoices.map(function(z) {
             var formatted = self._formatDisaggregationIds([outerRowID, y.id, z.id]);
             return self.data.disaggregation[formatted];
           });
-          formatted = self._formatDisaggregationIds([y.id]);
-          var total = self.data.disaggregation[formatted];
 
+          formatted = self._formatDisaggregationIds([outerRowID, y.id]);
+          var total = self.data.disaggregation[formatted];
+          
           middleRowsForDisplay.push({
             title: y.value,
             data: data,
@@ -172,11 +164,10 @@
           return self.data.disaggregation[formatted];
         });
 
-        // TODO: totals
         var columnTotalRow = {
           data: columnData,
           title: 'total',
-          total: undefined
+          total: this.total
         };
         this.columnTotalRow = columnTotalRow;
 
