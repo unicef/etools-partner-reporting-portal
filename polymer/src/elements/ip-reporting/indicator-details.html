@@ -46,41 +46,46 @@
 
     <!-- TODO: group data objects by location; only display location header once. -->
 
-    <template is="dom-repeat"
-              items="[[data]]">
       <template is="dom-repeat"
-                items="[[item.indicator_location_data]]"
+                items="[[locations]]"
                 as="location">
 
         <h3>
           <iron-icon icon="maps:place"></iron-icon>
-          [[location.location.title]]
+          [[location.0.location.title]]
         </h3>
 
-        <div class="wrapper">
-          <h4>
-            Progress in reporting period
-            <span>[[item.time_period_start]] - [[item.time_period_end]]<span>
-          </h4>
-          <h4>
-            Total
-            <span>[[item.total]]<span>
-          </h4>
-          <paper-button raised modal-id="[[_generateModalID(item.id, location.id)]]" on-tap="_openEditModal">Edit data</paper-button raised>
-          <disaggregation-table
-            total=[[item.total]]
-            data=[[location]]
-            mapping=[[item.disagg_lookup_map]]>
-          </disaggregation-table>
-          <edit-disaggregation-modal
-            id="[[_generateModalID(item.id, location.id)]]"
-            item=[[item]]
-            data=[[location]]
-            mapping=[[item.disagg_lookup_map]]>
-          </edit-disaggregation-modal>
-        </div>
+        <template is="dom-repeat"
+                  items="[[location]]"
+                  as="item">
+          <div class="wrapper">
+            <h4>
+              Progress in reporting period
+              <span>[[data.time_period_start]] - [[data.time_period_end]]<span>
+            </h4>
+            <h4>
+              Total
+              <span>[[data.total]]<span>
+            </h4>
 
-      </template>
+            <paper-button raised modal-id="[[_generateModalID(item.id, location.id)]]" on-tap="_openEditModal">Edit data</paper-button raised>
+
+            <disaggregation-table
+              total=[[data.total]]
+              data=[[item]]
+              mapping=[[data.disagg_lookup_map]]>
+            </disaggregation-table>
+
+            <edit-disaggregation-modal
+              id="[[_generateModalID(data.id, item.id)]]"
+              item=[[data]]
+              data=[[item]]
+              mapping=[[data.disagg_lookup_map]]>
+            </edit-disaggregation-modal>
+          </div>
+
+        </template>
+
     </template>
   </template>
 
@@ -109,51 +114,49 @@
         loading: Boolean,
 
         data: {
-          type: Array,
-          value: []
+          type: Object,
+          value: {}
         },
-        // locations: {
-        //   type: Object,
-        //   computed: '_bucketByLocation(data)'
-        // }
+
+        locations: {
+          type: Array,
+          computed: '_bucketByLocation(data)'
+        }
+
       },
 
       _computeIndicatorReportsUrl: function (indicatorId) {
         return App.Endpoints.indicatorReports(indicatorId);
       },
+
       _generateModalID: function(indicator_id, location_id){
         return 'ind' + indicator_id + 'loc' + location_id;
       },
-      // _bucketByLocation: function (data) {
-      //   // TODO: Fix this.
-      //   var self = this;
-      //   locations = {}
-      //
-      //   if (Object.keys(this.data).length > 0) {
-      //     this.data.map(function(indicator) {
-      //       // The object also has a location object.
-      //       indicator.indicator_location_data.map(function(x) {
-      //         if (locations[x.location.id]) {
-      //           var currentArray = locations[x.location.id];
-      //           var newArray = currentArray;
-      //           newArray.push(indicator)
-      //           locations[x.location.id] = newArray;
-      //         } else {
-      //           locations[x.location.id] = [indicator];
-      //           console.log(indicator)
-      //         }
-      //       });
-      //     });
-      //   }
 
-      //   var locationList = [];
-      //   var keys = Object.keys(locations)
-      //   keys.map(function(i) {
-      //     locationList.push(locations[i])
-      //   })
-      //
-      //   return locationList
-      // },
+      _bucketByLocation: function (data) {
+        var self = this;
+        locations = {};
+
+        if (Object.keys(data).length > 0) {
+          data.indicator_location_data.map(function(report) {
+            if (locations[report.location.id]) {
+              var currentArray = locations[report.location.id];
+              var newArray = currentArray;
+              newArray.push(report);
+              locations[report.location.id] = newArray;
+            } else {
+              locations[report.location.id] = [report]
+            }
+          });
+        }
+        var locationList = [];
+        var locationKeys = Object.keys(locations)
+
+        Object.keys(locations).map(function(i) {
+          locationList.push(locations[i]);
+        })
+        return locationList;
+      },
 
       _openChanged: function () {
         var self = this;
@@ -161,7 +164,19 @@
           self.loading = true;
           this.$.indicatorDetail.thunk()()
             .then(function (res) {
-              self.data = res.data;
+              var data = res.data;
+
+              //TODO: Remove when API doesn't return all permutations anymore.
+              //Strips out the 1-2 unwanted objects (fakedata glitch):
+              if (data.length === 6) {
+                res.data.shift();
+              }
+              if (data.length === 5) {
+                res.data.shift();
+              }
+              var numDisaggs = 0;
+              self.data = res.data[numDisaggs];
+
               self.loading = false;
             });
             // TODO: error handling.
