@@ -19,9 +19,15 @@
     <template is="dom-repeat"
               items="[[rows]]"
               as="row">
+      <!-- TODO: Use disaggregation-table-row -->
       <tr class='horizontal layout'>
-        <td class='flex cell border'>[[_capitalizeFirstLetter(row.title)]]</td>
-        <td class='flex cell border'>[[row.value]]</td>
+        <td class='flex cell border'>
+          [[row.title]]
+        </td>
+
+        <td class='flex cell border'>
+          [[row.data.v]]
+        </td>
       </tr>
     </template>
 
@@ -29,7 +35,6 @@
       <td class='flex cell border'>Total</td>
       <td class='flex cell border'>[[total]]</td>
     </tr>
-
 
   </template>
 
@@ -62,7 +67,7 @@
         },
 
         rows: {
-          type: Object,
+          type: Array,
           computed: '_determineRows(mapping)'
         }
       },
@@ -74,17 +79,16 @@
       _determineRows: function() {
         var self = this;
         var columnChoices = this.mapping[0].choices;
-        var columnData = [];
+        var data = [];
 
         columnChoices.map(function(z) {
           var formatted = self._formatDisaggregationIds([z.id]);
           var forDisplay = {};
           forDisplay['title'] = z.value;
-          forDisplay['value'] = self.data.disaggregation[formatted];
-          columnData.push(forDisplay);
+          forDisplay['data'] = self.data.disaggregation[formatted];
+          data.push(forDisplay);
         });
-
-        return columnData;
+        return data;
       },
 
     });

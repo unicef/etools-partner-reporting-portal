@@ -7,13 +7,17 @@
     App.Behaviors.DisaggregationBehavior = {
       // Accepts a list of disaggregation IDs, sorts them, and
       // structures them in "()" format for lookup.
-      _formatDisaggregationIds(ids) {
+      _formatDisaggregationIds(unsortedIds) {
+        // IDs must be in descending order.
+        var ids = unsortedIds.sort(function (a, b) {return a - b;}).reverse();
         var sortedString = '';
+
         if (ids.length === 1) {
           sortedString = ids[0] + ',';
         } else {
-          sortedString = ids.sort().join(", ");
-        };
+          sortedString = ids.join(', ');
+        }
+
         var formatted = '(' + sortedString + ')';
         return formatted;
       },
