@@ -1,0 +1,48 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../elements/disaggregations/disaggregation-table.html">
+
+<dom-module id="edit-disaggregation-table">
+  <template>
+    <style>
+      :host {
+        display:block;
+      }
+    </style>
+    <disaggregation-table
+      total=[[total]]
+      data=[[data]]
+      mapping=[[mapping]]
+      class="fullWidth"
+      editable=[[editable]]>
+    </disaggregation-table>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'edit-disaggregation-table',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        data: {
+          type: Object,
+          value: {}
+        },
+        mapping: {
+          type: Object,
+          value: {}
+        },
+        total: Number,
+        editable: Boolean,
+      },
+
+      listeners: {
+
+      },
+
+    })
+  </script>
+</dom-module>

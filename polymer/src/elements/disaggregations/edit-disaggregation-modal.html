@@ -1,0 +1,64 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+
+<link rel="import" href="../../elements/disaggregations/edit-disaggregation-table.html">
+
+<dom-module id="edit-disaggregation-modal">
+  <template>
+    <style>
+      :host {
+        display:block;
+      }
+    </style>
+
+    <paper-dialog modal with-backdrop id="dialog">
+      <h2>Edit data</h2>
+
+      <paper-dialog-scrollable>
+
+        <edit-disaggregation-table
+          total=[[total]]
+          data=[[data]]
+          mapping=[[mapping]]>
+        </edit-disaggregation-table>
+
+      </paper-dialog-scrollable>
+
+      <div class="buttons">
+        <paper-button raised dialog-dismiss>Cancel</paper-button>
+        <paper-button raised dialog-confirm>Save</paper-button>
+      </div>
+
+    </paper-dialog>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'edit-disaggregation-modal',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        data: {
+          type: Object,
+          value: {}
+        },
+        mapping: {
+          type: Object,
+          value: {}
+        },
+        total: Number
+      },
+
+      listeners: {
+
+      },
+      open: function(){
+        this.$.dialog.open();
+      }
+    })
+  </script>
+</dom-module>
