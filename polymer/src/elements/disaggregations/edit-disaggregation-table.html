@@ -10,11 +10,11 @@
       }
     </style>
     <disaggregation-table
-      total=[[total]]
+      total=[[item.total]]
       data=[[data]]
       mapping=[[mapping]]
       class="fullWidth"
-      editable=[[editable]]>
+      editable>
     </disaggregation-table>
   </template>
 
@@ -35,14 +35,21 @@
           type: Object,
           value: {}
         },
-        total: Number,
-        editable: Boolean,
+        item: {
+          type: Object,
+          value: {}
+        },
       },
 
       listeners: {
-
+        'field-changed': '_onFieldChanged',
       },
-
+      _onFieldChanged: function(e){
+        console.log(e.detail);
+      },
+      attached: function(){
+        console.log('set this data in state with indicator ' + this.item.id + ' and location data ' + this.data.id)
+      }
     })
   </script>
 </dom-module>

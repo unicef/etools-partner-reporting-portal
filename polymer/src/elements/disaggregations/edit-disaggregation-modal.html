@@ -10,19 +10,27 @@
       :host {
         display:block;
       }
+      paper-dialog {
+        min-width:640px;
+      }
     </style>
 
-    <paper-dialog modal with-backdrop id="dialog">
-      <h2>Edit data</h2>
+    <paper-dialog id="dialog" modal with-backdrop opened="[[isOpen]]">
+      <div class="header">
+        <h2>Edit data</h2>
+        <span>Time period: [[item.time_period_start]] - [[item.time_period_end]]</span>
+        <paper-icon-button icon="icons:close" title="Close" dialog-dismiss></paper-icon-button>
+      </div>
 
       <paper-dialog-scrollable>
-
-        <edit-disaggregation-table
-          total=[[total]]
-          data=[[data]]
-          mapping=[[mapping]]>
-        </edit-disaggregation-table>
-
+        <template is="dom-if" if="[[isOpen]]" restamp="true">
+          <edit-disaggregation-table
+            total=[[item.total]]
+            item=[[item]]
+            data=[[data]]
+            mapping=[[mapping]]>
+          </edit-disaggregation-table>
+        </template>
       </paper-dialog-scrollable>
 
       <div class="buttons">
@@ -50,15 +58,29 @@
           type: Object,
           value: {}
         },
-        total: Number
+        item: {
+          type: Object,
+          value: {}
+        },
+
+        period: String,
+
+        isOpen: Boolean,
+
       },
 
       listeners: {
-
+        'dialog.iron-overlay-closed': 'close',
       },
-      open: function(){
-        this.$.dialog.open();
-      }
+
+      open: function() {
+        this.set('isOpen', true);
+      },
+
+      close: function() {
+        this.set('isOpen', false);
+      },
+
     })
   </script>
 </dom-module>

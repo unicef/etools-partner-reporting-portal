@@ -1,0 +1,67 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/etools-data-table/etools-data-table.html">
+
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../styles/detail-table.html">
+
+<dom-module id="edit-disaggregation-table-cell">
+  <template>
+
+    <style include='detail-table'>
+      paper-input {
+        --paper-input-container-input: {
+          font-size:14px;
+        };
+      }
+
+    </style>
+
+    <paper-input id="field" value="[[value.v]]" no-label-float ></paper-input>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'edit-disaggregation-table-cell',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+      ],
+
+      properties: {
+        value: Number,
+        title: String,
+        total: Number,
+      },
+
+      listeners: {
+        'field.input': '_handleInput',
+      },
+
+      _debounceDelay: 400,
+
+      _handleInput: function () {
+        this.debounce('input', function propagateChange() {
+
+          var newValue = this.$.field.value.trim();
+          if (newValue !== this.lastValue) {
+
+            this.fire('field-changed', {
+              name: this.name,
+              value: newValue,
+            });
+
+          }
+        }, this._debounceDelay);
+      },
+
+      detached: function () {
+        if (this.isDebouncerActive('input')) {
+          this.cancelDebouncer('input');
+        }
+      },
+
+    });
+  </script>
+
+</dom-module>

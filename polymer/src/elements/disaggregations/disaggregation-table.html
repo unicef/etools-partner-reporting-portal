@@ -15,7 +15,11 @@ disaggregation-table component to display.
 <dom-module id="disaggregation-table">
   <template>
 
-    <style include="detail-table"></style>
+    <style include="detail-table">
+      :host(.fullWidth) table {
+        width:100%;
+      }
+    </style>
 
     <table class='vertical layout'>
 
@@ -34,7 +38,8 @@ disaggregation-table component to display.
         <one-disaggregation
           data="[[data]]"
           total="[[total]]"
-          mapping="[[mapping]]">
+          mapping="[[mapping]]"
+          editable="[[editable]]">
         </one-disaggregation>
       </template>
 
@@ -42,7 +47,8 @@ disaggregation-table component to display.
         <two-disaggregations
           data="[[data]]"
           total="[[total]]"
-          mapping="[[mapping]]">
+          mapping="[[mapping]]"
+          editable="[[editable]]">
         </two-disaggregations>
       </template>
 
@@ -50,7 +56,8 @@ disaggregation-table component to display.
         <three-disaggregations
           data="[[data]]"
           total="[[total]]"
-          mapping="[[mapping]]">
+          mapping="[[mapping]]"
+          editable="[[editable]]">
         </three-disaggregations>
       </template>
 
@@ -76,7 +83,8 @@ disaggregation-table component to display.
           type: Object,
           value: {}
         },
-        total: Number
+        total: Number,
+        editable: Boolean
       },
 
       _isSameNumberOfDisaggregations(data, num) {

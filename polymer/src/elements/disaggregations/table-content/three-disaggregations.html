@@ -28,7 +28,7 @@
       <template is="dom-repeat"
                 items="[[_determineMiddleRows(outerRow.id)]]"
                 as="middleRow">
-        <disaggregation-table-row data=[[middleRow]]></disaggregation-table-row>
+        <disaggregation-table-row data=[[middleRow]] editable=[[editable]]></disaggregation-table-row>
       </template>
    </template>
 
@@ -68,6 +68,8 @@
         },
 
         total: Number,
+
+        editable: Boolean,
 
         //Passing columnNames as a param is required to trigger update.
         columns: {

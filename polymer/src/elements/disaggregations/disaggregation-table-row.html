@@ -4,6 +4,7 @@
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../styles/detail-table.html">
 <link rel="import" href="disaggregation-table-cell.html">
+<link rel="import" href="edit-disaggregation-table-cell.html">
 
 <dom-module id="disaggregation-table-row">
   <template>
@@ -18,8 +19,17 @@
       <template is="dom-repeat"
                 items="[[data.data]]">
         <td class='flex cell border'>
-          <disaggregation-table-cell value="[[item]]">
-          </disaggregation-table-cell>
+
+          <template is="dom-if" if="[[editable]]">
+            <edit-disaggregation-table-cell value="[[item]]">
+            </edit-disaggregation-table-cell>
+          </template>
+
+          <template is="dom-if" if="[[!editable]]">
+            <disaggregation-table-cell value="[[item]]">
+            </disaggregation-table-cell>
+          </template>
+
         </td>
       </template>
 
@@ -43,6 +53,10 @@
           type: Object,
           value: {}
         },
+        editable: {
+          type: Boolean,
+          value: false
+        }
       },
 
     });

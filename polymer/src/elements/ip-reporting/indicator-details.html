@@ -7,6 +7,7 @@
 =
 <link rel="import" href="../etools-prp-ajax.html">
 <link rel="import" href="../../elements/disaggregations/disaggregation-table.html">
+<link rel="import" href="../../elements/disaggregations/edit-disaggregation-modal.html">
 <link rel="import" href="../../endpoints.html">
 
 <dom-module id="ip-reporting-indicator-details">
@@ -65,11 +66,18 @@
             Total
             <span>[[item.total]]<span>
           </h4>
+          <paper-button raised modal-id="[[_generateModalID(item.id, location.id)]]" on-tap="_openEditModal">Edit data</paper-button raised>
           <disaggregation-table
             total=[[item.total]]
             data=[[location]]
             mapping=[[item.disagg_lookup_map]]>
           </disaggregation-table>
+          <edit-disaggregation-modal
+            id="[[_generateModalID(item.id, location.id)]]"
+            item=[[item]]
+            data=[[location]]
+            mapping=[[item.disagg_lookup_map]]>
+          </edit-disaggregation-modal>
         </div>
 
       </template>
@@ -104,7 +112,6 @@
           type: Array,
           value: []
         },
-
         // locations: {
         //   type: Object,
         //   computed: '_bucketByLocation(data)'
@@ -114,7 +121,9 @@
       _computeIndicatorReportsUrl: function (indicatorId) {
         return App.Endpoints.indicatorReports(indicatorId);
       },
-
+      _generateModalID: function(indicator_id, location_id){
+        return 'ind' + indicator_id + 'loc' + location_id;
+      },
       // _bucketByLocation: function (data) {
       //   // TODO: Fix this.
       //   var self = this;
@@ -159,7 +168,13 @@
         } else {
           this.$.indicatorDetail.abort();
         }
+      },
+      _openEditModal: function(e){
+        var modalId = '#' + e.target.modalId;
+        var el = Polymer.dom(this.root).querySelector(modalId);
+        el.open();
       }
+
 
     });
   </script>
