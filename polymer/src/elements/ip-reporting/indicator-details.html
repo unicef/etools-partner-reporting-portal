@@ -125,7 +125,7 @@
             if (locations[report.location.id]) {
               var currentArray = locations[report.location.id];
               var newArray = currentArray;
-              newArray.push(report)
+              newArray.push(report);
               locations[report.location.id] = newArray;
             } else {
               locations[report.location.id] = [report]
@@ -136,9 +136,9 @@
         var locationKeys = Object.keys(locations)
 
         Object.keys(locations).map(function(i) {
-          locationList.push(locations[i])
+          locationList.push(locations[i]);
         })
-        return locationList
+        return locationList;
       },
 
       _openChanged: function () {
@@ -147,8 +147,19 @@
           self.loading = true;
           this.$.indicatorDetail.thunk()()
             .then(function (res) {
-              //TODO: Remove when API doesn't return all disag permutations anymore.
-              self.data = res.data[3];
+              var data = res.data;
+
+              //TODO: Remove when API doesn't return all permutations anymore.
+              //Strips out the 1-2 unwanted objects (fakedata glitch):
+              if (data.length === 6) {
+                res.data.shift();
+              }
+              if (data.length === 5) {
+                res.data.shift();
+              }
+              var numDisaggs = 0;
+              self.data = res.data[numDisaggs];
+
               self.loading = false;
             });
             // TODO: error handling.
