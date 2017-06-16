@@ -98,7 +98,158 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
 
     def test_put_api(self):
         indicator_location_data = IndicatorLocationData.objects.last()
-        data = [{'id': indicator_location_data.id, 'disaggregation': {}}]
+        data = [{
+            "id": 1047,
+            "location": {
+              "id": 257,
+              "title": "location_2",
+              "latitude": null,
+              "longitude": null,
+              "p_code": null
+            },
+            "disaggregation": {
+              "(1773,)": {
+                "c": null,
+                "d": null,
+                "v": 58
+              },
+              "()": {
+                "c": null,
+                "d": null,
+                "v": 169
+              },
+              "(1776,)": {
+                "c": null,
+                "d": null,
+                "v": 93
+              },
+              "(1775,)": {
+                "c": null,
+                "d": null,
+                "v": 127
+              },
+              "(1774,)": {
+                "c": null,
+                "d": null,
+                "v": 150
+              }
+            },
+            "num_disaggregation": 3,
+            "level_reported": 1,
+            "disaggregation_reported_on": [
+              509
+            ]
+          },
+          {
+            "id": 1048,
+            "location": {
+              "id": 257,
+              "title": "location_2",
+              "latitude": null,
+              "longitude": null,
+              "p_code": null
+            },
+            "disaggregation": {
+              "(1778,)": {
+                "c": null,
+                "d": null,
+                "v": 135
+              },
+              "(1781,)": {
+                "c": null,
+                "d": null,
+                "v": 141
+              },
+              "(1779,)": {
+                "c": null,
+                "d": null,
+                "v": 72
+              },
+              "(1780,)": {
+                "c": null,
+                "d": null,
+                "v": 190
+              },
+              "()": {
+                "c": null,
+                "d": null,
+                "v": 191
+              },
+              "(1782,)": {
+                "c": null,
+                "d": null,
+                "v": 167
+              },
+              "(1777,)": {
+                "c": null,
+                "d": null,
+                "v": 106
+              }
+            },
+            "num_disaggregation": 3,
+            "level_reported": 1,
+            "disaggregation_reported_on": [
+              510
+            ]
+          },
+          {
+            "id": 1049,
+            "location": {
+              "id": 257,
+              "title": "location_2",
+              "latitude": null,
+              "longitude": null,
+              "p_code": null
+            },
+            "disaggregation": {
+              "(1785,)": {
+                "c": null,
+                "d": null,
+                "v": 195
+              },
+              "(1784,)": {
+                "c": null,
+                "d": null,
+                "v": 132
+              },
+              "()": {
+                "c": null,
+                "d": null,
+                "v": 103
+              },
+              "(1783,)": {
+                "c": null,
+                "d": null,
+                "v": 63
+              }
+            },
+            "num_disaggregation": 3,
+            "level_reported": 1,
+            "disaggregation_reported_on": [
+              511
+            ]
+          },
+          {
+            "id": 1050,
+            "location": {
+              "id": 258,
+              "title": "location_3",
+              "latitude": null,
+              "longitude": null,
+              "p_code": null
+            },
+            "disaggregation": {
+              "()": {
+                "c": null,
+                "d": null,
+                "v": 50
+              }
+            },
+            "num_disaggregation": 3,
+            "level_reported": 0,
+            "disaggregation_reported_on": []
+          }
+        ]
 
         url = reverse('indicator-location-data-entries-put-api')
         response = self.client.put(url, data, format='json')
