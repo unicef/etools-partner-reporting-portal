@@ -7,10 +7,11 @@ from core.factories import (
     ProgrammeDocumentFactory, ReportableToLowerLevelOutputFactory, ProgressReportFactory, IndicatorLocationDataFactory,
     SectionFactory
 )
+from core.management.commands._privates import generate_data_combination_dict
 from core.tests.base import BaseAPITestCase
 from unicef.models import LowerLevelOutput, Section, ProgrammeDocument
 
-from indicator.models import Reportable, IndicatorReport
+from indicator.models import Reportable, IndicatorReport, IndicatorLocationData
 
 
 class TestPDReportsAPIView(BaseAPITestCase):
@@ -90,3 +91,17 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(len(response.data), indicator_report.reportable.indicator_reports.count())
         self.assertNotEquals(response.data[0]['indicator_location_data'][0]['disaggregation'], {})
+
+
+class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
+    generate_fake_data_quantity = 5
+
+    def test_put_api(self):
+        indicator_location_data = IndicatorLocationData.objects.last()
+        data = [{'id': indicator_location_data.id, 'disaggregation': {}}]
+
+        url = reverse('indicator-location-data-entries-put-api')
+        response = self.client.put(url, data, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(response.data, data)
