@@ -68,13 +68,6 @@
       <iron-pages
           selected="[[page]]"
           attr-for-selected="name">
-        <template is="dom-if" if="[[_equals(page, 'dashboard')]]" restamp="true">
-          <page-ip-reporting-dashboard
-              name="dashboard"
-              route="{{subroute}}">
-          </page-ip-reporting-dashboard>
-        </template>
-
         <template is="dom-if" if="[[_equals(page, 'overview')]]" restamp="true">
           <page-ip-reporting-overview
               name="overview"
@@ -127,7 +120,7 @@
 
       _routePageChanged: function (page) {
         if (!page) {
-          this.set('route.path', '/dashboard'); // FIXME: correct default?
+          this.set('route.path', '/overview'); // FIXME: correct default?
         } else {
           this.page = page;
         }

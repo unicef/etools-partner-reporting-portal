@@ -7,9 +7,12 @@
 
 <link rel="import" href="../../elements/report-status.html">
 
+<link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../redux/selectors/programmeDocumentReports.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/data-table.html">
 <link rel="import" href="../../behaviors/pagination.html">
+<link rel="import" href="../../behaviors/routing.html">
 
 <link rel="import" href="../../styles/table-styles.html">
 
@@ -75,7 +78,7 @@
       <template
         id="list"
         is="dom-repeat"
-        items="[[data.results]]"
+        items="[[data]]"
         as="report"
         initial-count="[[pageSize]]">
         <etools-data-table-row no-collapse>
@@ -101,7 +104,7 @@
               </template>
             </div>
             <div class="table-cell table-cell--text cell-reports">
-                <a href="TODO">[[_linkText(report)]]</a>
+              <a href="[[_getLink(report)]]">[[_getLinkText(report)]]</a>
             </div>
           </div>
         </etools-data-table-row>
@@ -110,7 +113,7 @@
       <etools-data-table-footer
         page-size="[[pageSize]]"
         page-number="[[pageNumber]]"
-        total-results="[[data.count]]"
+        total-results="[[totalResults]]"
         visible-range="{{visibleRange}}"
         on-page-size-changed="_pageSizeChanged"
         on-page-number-changed="_pageNumberChanged">
@@ -129,21 +132,51 @@
         App.Behaviors.DataTableBehavior,
         App.Behaviors.PaginationBehavior,
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.RoutingBehavior,
       ],
 
       properties: {
+        pdId: {
+          type: String,
+          statePath: 'programmeDocuments.current',
+        },
+
         loaded: Boolean,
 
-        data: Array,
+        data: {
+          type: Array,
+          statePath: App.Selectors.ProgrammeDocumentReports.all,
+        },
 
-        totalResults: Number,
+        totalResults: {
+          type: Number,
+          statePath: App.Selectors.ProgrammeDocumentReports.count,
+        },
       },
 
       _isDraft: function(is_draft) {
         return is_draft;
       },
 
-      _linkText: function(report) {
+      _getLink: function (report) {
+        var suffix;
+
+        if (report.is_draft) {
+          suffix = 'draft';
+        } else if (report.progress_report_status === 'Sub') {
+          suffix = 'view';
+        } else {
+          suffix = 'edit';
+        }
+
+        return this.buildUrl(
+          this._baseUrl,
+          '/pd/' + this.pdId + '/report/' + report.id + '/' + suffix
+        );
+      },
+
+      _getLinkText: function(report) {
         if (report.is_draft) {
           return 'Go To Draft';
         } else if (report.progress_report_status === 'Sub') {

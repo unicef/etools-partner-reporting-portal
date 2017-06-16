@@ -113,6 +113,7 @@ class Reportable(TimeStampedModel):
 
 
 class IndicatorReport(TimeStampedModel):
+    # TODO: probably we should add overall status & narrative assessemnt
     """
     IndicatorReport module is a result of partner staff activity (what they done in defined frequency scope).
 

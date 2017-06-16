@@ -20,7 +20,6 @@ from core.common import (
 
 from indicator.models import Reportable  # IndicatorReport
 
-
 class Section(models.Model):
     """
     Section model define atomic act of help like: bottle of water, blanket.

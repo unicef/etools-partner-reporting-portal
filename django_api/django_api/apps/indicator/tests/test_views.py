@@ -2,15 +2,18 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 
+from core.management.commands._privates import generate_fake_data
+from core.helpers import suppress_stdout
+
 from account.models import User
+
 from core.factories import (
     ProgrammeDocumentFactory, ReportableToLowerLevelOutputFactory, ProgressReportFactory, IndicatorLocationDataFactory,
     SectionFactory
 )
 from core.tests.base import BaseAPITestCase
 from unicef.models import LowerLevelOutput, Section, ProgrammeDocument
-
-from indicator.models import Reportable, IndicatorReport
+from indicator.models import IndicatorReport, Reportable
 
 
 class TestPDReportsAPIView(BaseAPITestCase):
@@ -34,22 +37,44 @@ class TestPDReportsAPIView(BaseAPITestCase):
         response = self.client.get(filter_url, format='json')
         self.assertTrue(status.is_success(response.status_code))
 
+    def test_get_indicator_report(self):
+        pd = ProgrammeDocument.objects.first()
+        report_id = pd.reportable_queryset.values_list('indicator_reports__pk', flat=True)[0]
+
+        url = reverse('programme-document-reports-detail', kwargs={'pd_id': pd.pk, 'report_id': report_id})
+        response = self.client.get(url, format='json')
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(response.data['id'], str(report_id))
+
 
 class TestIndicatorListAPIView(BaseAPITestCase):
     generate_fake_data_quantity = 5
 
     def test_list_api(self):
-        url = reverse('indicator-list-create-api')
+        ir_id = IndicatorReport.objects.first().id
+        url = reverse('indicator-data', kwargs={'ir_id': ir_id})
         response = self.client.get(url, format='json')
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(response.data['results']), self.generate_fake_data_quantity)
+
+        expected_reportable = Reportable.objects.filter(
+            indicator_reports__id=ir_id,
+            lower_level_outputs__isnull=False
+        )
+        self.assertEquals(len(response.data['outputs']), expected_reportable.count())
+        expected_reportable_ids = expected_reportable.values_list('id', flat=True)
+        for resp_data in response.data['outputs']:
+            self.assertTrue(resp_data['id'] in expected_reportable_ids)
+            self.assertEquals(
+                len(resp_data['indicator_reports']),
+                expected_reportable.get(lower_level_outputs__id=resp_data['llo_id']).indicator_reports.all().count()
+            )
 
     def test_list_api_filter_by_locations(self):
         self.reports = Reportable.objects.filter(
             lower_level_outputs__reportables__isnull=False,
             locations__isnull=False
-        )
+        ).distinct()
 
         location_ids = map(lambda item: str(item), self.reports.values_list('locations__id', flat=True))
         location_id_list_string = ','.join(location_ids)

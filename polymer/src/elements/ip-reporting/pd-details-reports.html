@@ -1,8 +1,11 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/iron-location/iron-location.html">
 <link rel="import" href="../../../bower_components/iron-location/iron-query-params.html">
+
 <link rel="import" href="../../elements/ip-reporting/pd-report-filters.html">
 <link rel="import" href="../../elements/ip-reporting/pd-reports-list.html">
+<link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../redux/actions.html">
 
 <dom-module id="pd-details-reports">
   <template>
@@ -29,7 +32,7 @@
 
     <page-body>
       <pd-report-filters></pd-report-filters>
-      <pd-reports-list data="[[ data ]]" loaded="[[ loaded ]]"></pd-reports-list>
+      <pd-reports-list></pd-reports-list>
     </page-body>
 
   </template>
@@ -38,21 +41,20 @@
     Polymer({
       is: 'pd-details-reports',
 
-      properties: {
-        loaded: {
-          type: Boolean,
-          value: false
-        },
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+      ],
 
-        pdId: Number,
+      properties: {
+        pdId: {
+          type: String,
+          statePath: 'programmeDocuments.current',
+        },
 
         pdReportsUrl: {
           type: String,
           computed: '_computePDReportsUrl(pdId)',
         },
-
-        data: Array,
-
       },
 
       observers: [
@@ -60,17 +62,25 @@
       ],
 
       _computePDReportsUrl: function (pdId) {
-        return App.Endpoints.programmeDocumentReports(pdId);
+        return pdId ? App.Endpoints.programmeDocumentReports(pdId) : '';
       },
 
-      _handleInputChange: function (url, params) { // jshint ignore:line
-        var self = this;
+      _handleInputChange: function (url) {
+        var pdReportsThunk;
 
-        this.$.pdReports.thunk()()
-          .then(function (res) {
-            self.data = res.data;
-            self.loaded = true;
-          });
+        if (!url) {
+          return;
+        }
+
+        pdReportsThunk = this.$.pdReports.thunk();
+
+        // Cancel the pending request, if any
+        this.$.pdReports.abort();
+
+        this.dispatch(App.Actions.PDReports.fetch(pdReportsThunk, this.pdId))
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
       },
 
     });

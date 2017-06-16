@@ -1,21 +1,25 @@
 import operator
 
+from django.http import Http404
 from django.db.models import Q
+from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import get_object_or_404
 
 from rest_framework import status
-from rest_framework.generics import ListCreateAPIView, ListAPIView
-from rest_framework.views import APIView
+from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 import django_filters.rest_framework
 
 from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
+from unicef.models import LowerLevelOutput
+from unicef.serializer import ProgressReportSerializer
 
-from .serializers import IndicatorListSerializer, IndicatorReportListSerializer, PDReportsSerializer
+from .serializers import IndicatorListSerializer, IndicatorLLoutputsSerializer, PDReportsSerializer, IndicatorReportListSerializer
+from .models import Reportable, IndicatorReport
 from .filters import IndicatorFilter, PDReportsFilter
-from .models import IndicatorReport, Reportable
 
 
 class PDReportsAPIView(ListAPIView):
@@ -52,6 +56,23 @@ class PDReportsAPIView(ListAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class PDReportsDetailAPIView(RetrieveAPIView):
+
+    serializer_class = PDReportsSerializer
+    permission_classes = (IsAuthenticated, )
+
+    def get_indicator_report(self, report_id):
+        try:
+            return IndicatorReport.objects.get(id=report_id)
+        except IndicatorReport.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pd_id, report_id, *args, **kwargs):
+        indicator_report = self.get_indicator_report(report_id)
+        serializer = self.get_serializer(indicator_report)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 class IndicatorListCreateAPIView(ListCreateAPIView):
     """
     REST API endpoint to get a list of Indicator objects and to create a new Indicator object.
@@ -73,7 +94,7 @@ class IndicatorListCreateAPIView(ListCreateAPIView):
     filter_class = IndicatorFilter
 
     def get_queryset(self):
-        queryset = Reportable.objects.filter(lower_level_outputs__reportables__isnull=False)
+        queryset = Reportable.objects.filter(indicator_reports__isnull=False, lower_level_outputs__isnull=False)
 
         q_list = []
 
@@ -103,7 +124,44 @@ class IndicatorListCreateAPIView(ListCreateAPIView):
         if q_list:
             queryset = queryset.filter(reduce(operator.or_, q_list))
 
+        queryset = queryset.distinct()
+
         return queryset
+
+
+class IndicatorDataAPIView(APIView):
+
+    permission_classes = (IsAuthenticated, )
+
+    def get_queryset(self, id):
+        return Reportable.objects.filter(
+            indicator_reports__id=id,
+            lower_level_outputs__isnull=False
+        )
+
+    def get_indicator_report(self, id):
+        try:
+            return IndicatorReport.objects.get(id=id)
+        except IndicatorReport.DoesNotExist:
+            return None
+
+    def get_narrative_object(self, id):
+        ir = self.get_indicator_report(id)
+        return ir and ir.progress_report
+
+    def get(self, request, ir_id, *args, **kwargs):
+        ir = self.get_indicator_report(ir_id)
+        narrative = self.get_narrative_object(ir_id)
+        response = ProgressReportSerializer(narrative).data
+        queryset = self.get_queryset(ir_id)
+        serializer = IndicatorLLoutputsSerializer(queryset, many=True)
+
+        response['outputs'] = serializer.data
+
+        return Response(
+            response,
+            status=status.HTTP_200_OK
+        )
 
 
 class IndicatorReportListAPIView(APIView):

@@ -15,6 +15,20 @@
           return !!docs.length;
         }
       ),
+
+      current: Reselect.createSelector(
+        function (state) {
+          return state.programmeDocuments.all;
+        },
+        function (state) {
+          return state.programmeDocuments.current;
+        },
+        function (pds, currentPdId) {
+          return pds.filter(function (pd) {
+            return pd.id === currentPdId;
+          })[0] || {};
+        }
+      ),
     };
   }());
 </script>

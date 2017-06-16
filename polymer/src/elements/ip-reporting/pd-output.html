@@ -1,0 +1,175 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/iron-collapse/iron-collapse.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../bower_components/etools-content-panel/etools-content-panel.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../report-status.html">
+<link rel="import" href="../labelled-item.html">
+<link rel="import" href="indicator-details.html">
+
+<dom-module id="pd-output">
+  <template>
+    <style include="iron-flex iron-flex-factors">
+      :host {
+        display: block;
+        margin-bottom: 25px;
+
+        --ecp-content: {
+          padding: 0;
+        };
+
+        --paper-icon-button: {
+          color: var(--theme-secondary-text-color);
+        };
+      }
+
+      .header {
+        padding: 25px;
+      }
+
+      .header labelled-item {
+        font-size: 16px;
+      }
+
+      .header status-badge {
+        position: relative;
+        top: -2px;
+      }
+
+      .header labelled-item:not(:last-child) {
+        margin-bottom: 25px;
+      }
+
+      .indicator:not(:last-child) {
+        margin-bottom: 25px;
+      }
+
+      .indicator-header {
+        padding: 10px 10px 10px 25px;
+        background: var(--theme-secondary-color-a);
+      }
+
+      .indicator-header__title h3 {
+        margin: 0;
+        font-size: 14px;
+      }
+
+      .status-badge {
+        margin-right: 10px;
+      }
+
+      .indicator-header__target {
+        width: 250px;
+        padding-left: 10px;
+      }
+
+      .indicator-header__target dl {
+        margin: 0;
+        text-align: right;
+        font-size: 12px;
+      }
+
+      .indicator-header__target dt {
+        color: var(--theme-secondary-text-color);
+      }
+
+      .indicator-header__target dd {
+        margin: 0;
+        font-weight: bold;
+      }
+
+      .indicator-header__toggle {
+        padding-left: 20px;
+      }
+    </style>
+
+    <etools-content-panel panel-title="[[data.name]]">
+      <div class="header">
+        <labelled-item label="Overall status">
+          <report-status status="[[data.status.report_status]]"></report-status>
+        </labelled-item>
+
+        <labelled-item label="Narrative assessment">
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Unde quis quaerat quae ipsum.
+        </labelled-item>
+      </div>
+
+      <template
+          id="indicators"
+          is="dom-repeat"
+          items="[[data.indicator_reports]]"
+          as="indicator">
+        <div class="indicator">
+          <div class="indicator-header layout horizontal">
+            <div class="indicator-header__title flex-3 layout vertical center-justified">
+              <div class="layout horizontal">
+                <div class="status-badge layout vertical center-justified">
+                  <status-badge type="success"></status-badge>
+                </div>
+                <h3>[[indicator.indicator_name]]</h3>
+              </div>
+            </div>
+            <div class="indicator-header__target flex-none layout vertical center-justified">
+              <dl class="layout horizontal justified">
+                <dt class="flex-3">Target:</dt>
+                <dd class="flex">[[_withDefault(indicator.target)]]</dd>
+              </dl>
+              <dl class="layout horizontal justified">
+                <dt class="flex-3">Achievement in reporting period:</dt>
+                <dd class="flex">[[_withDefault(indicator.achieved)]]</dd>
+              </dl>
+            </div>
+            <div class="indicator-header__toggle layout vertical center-justified">
+              <paper-icon-button
+                  on-tap="_toggle"
+                  toggles="[[index]]"
+                  icon="icons:expand-[[_computeIcon(indicator.opened)]]">
+              </paper-icon-button>
+            </div>
+          </div>
+
+          <iron-collapse
+              id="collapse-[[index]]"
+              opened="{{indicator.opened}}"
+              on-opened-changed="_handleOpenedChanged"
+              no-animation>
+            <indicator-details></indicator-details>
+          </iron-collapse>
+        </div>
+      </template>
+    </etools-content-panel>
+  </template>
+
+  <script>
+    Polymer({
+      id: 'pd-output',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+      ],
+
+      properties: {
+        data: Object,
+      },
+
+      _toggle: function (e) {
+        this.$$('#collapse-' + e.target.toggles).toggle();
+      },
+
+      _computeIcon: function (opened) {
+        return opened ? 'less' : 'more';
+      },
+
+      _handleOpenedChanged: function (e, data) {
+        e.stopPropagation();
+
+        if (data.value) {
+          Polymer.dom(e.srcElement).querySelector('indicator-details').init();
+        }
+      },
+    });
+  </script>
+</dom-module>

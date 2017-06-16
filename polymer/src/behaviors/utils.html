@@ -24,7 +24,7 @@
           defaultValue = '...';
         }
 
-        return (value == null /* undefinded & null */ || !value.length) ? // jshint ignore:line
+        return value == null /* undefinded & null */ ? // jshint ignore:line
             defaultValue : value;
       },
 
@@ -38,6 +38,10 @@
 
       _capitalizeFirstLetter: function (text) {
         return text[0].toUpperCase() + text.substring(1);
+      },
+
+      _notFound: function () {
+        window.location.href = '/not-found';
       },
     };
 

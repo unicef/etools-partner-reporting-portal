@@ -7,7 +7,6 @@
 
     "src/pages/app.html",
     "src/pages/app/ip-reporting.html",
-    "src/pages/app/ip-reporting/dashboard.html",
     "src/pages/app/ip-reporting/overview.html",
 
     "src/pages/app/ip-reporting/pd.html",
