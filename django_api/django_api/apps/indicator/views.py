@@ -15,7 +15,7 @@ import django_filters.rest_framework
 from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
 from unicef.models import LowerLevelOutput
-from unicef.serializer import ProgressReportSerializer
+from unicef.serializers import ProgressReportSerializer
 
 from .serializers import IndicatorListSerializer, IndicatorLLoutputsSerializer, PDReportsSerializer, IndicatorReportListSerializer
 from .models import Reportable, IndicatorReport
