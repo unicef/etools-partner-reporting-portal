@@ -82,12 +82,12 @@
 
         backUrl: {
           type: String,
-          computed: '_computeBackUrl(back)',
+          computed: '_computeBackUrl(back, _baseUrl)',
         },
       },
 
-      _computeBackUrl: function (tail) {
-        return tail ? this.buildUrl(this._baseUrl, tail) : '';
+      _computeBackUrl: function (tail, baseUrl) {
+        return tail ? this.buildUrl(baseUrl, tail) : '';
       },
     });
   </script>
