@@ -44,12 +44,23 @@
       listeners: {
         'field-changed': '_onFieldChanged',
       },
-      _onFieldChanged: function(e){
-        console.log(e.detail);
+      _onFieldChanged: function (e) {
+        var disaggKey = '(' + this.mapping[0].choices[e.detail.colIndex].id +
+                        ', ' + this.mapping[1].choices[e.detail.rowIndex].id + ')';
+        var payload = {
+          'indicator': this.item.id,
+          'location': this.data.id,
+          'key': disaggKey,
+          'value': +e.detail.value
+        };
+        // Send to Redux
+        console.log(payload);
       },
-      attached: function(){
-        console.log('set this data in state with indicator ' + this.item.id + ' and location data ' + this.data.id)
+      attached: function () {
+        // Find the existing indicator data in Redux using these IDs and clone it;
+        // this will be the new version.
+        console.log('indicator ID: ' + this.item.id + ', location ID: ' + this.data.id);
       }
-    })
+    });
   </script>
 </dom-module>

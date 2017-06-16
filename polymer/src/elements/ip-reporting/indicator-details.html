@@ -68,7 +68,7 @@
               <span>[[data.total]]<span>
             </h4>
 
-            <paper-button raised modal-id="[[_generateModalID(item.id, location.id)]]" on-tap="_openEditModal">Edit data</paper-button raised>
+            <paper-button raised modal-id="[[_generateModalID(data.id, item.id)]]" on-tap="_openEditModal">Edit data</paper-button raised>
 
             <disaggregation-table
               total=[[data.total]]
@@ -129,7 +129,7 @@
         return App.Endpoints.indicatorReports(indicatorId);
       },
 
-      _generateModalID: function(indicator_id, location_id){
+      _generateModalID: function (indicator_id, location_id) {
         return 'ind' + indicator_id + 'loc' + location_id;
       },
 
@@ -138,7 +138,8 @@
         locations = {};
 
         if (Object.keys(data).length > 0) {
-          data.indicator_location_data.map(function(report) {
+          data.indicator_location_data.map(function (report) {
+
             if (locations[report.location.id]) {
               var currentArray = locations[report.location.id];
               var newArray = currentArray;
@@ -152,7 +153,7 @@
         var locationList = [];
         var locationKeys = Object.keys(locations)
 
-        Object.keys(locations).map(function(i) {
+        Object.keys(locations).map(function (i) {
           locationList.push(locations[i]);
         })
         return locationList;
@@ -184,7 +185,8 @@
           this.$.indicatorDetail.abort();
         }
       },
-      _openEditModal: function(e){
+
+      _openEditModal: function (e) {
         var modalId = '#' + e.target.modalId;
         var el = Polymer.dom(this.root).querySelector(modalId);
         el.open();

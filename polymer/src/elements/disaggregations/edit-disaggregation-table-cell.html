@@ -16,7 +16,7 @@
 
     </style>
 
-    <paper-input id="field" value="[[value.v]]" no-label-float ></paper-input>
+    <paper-input id="field" value="[[value.v]]" type="number" no-label-float ></paper-input>
 
   </template>
 
@@ -32,6 +32,8 @@
         value: Number,
         title: String,
         total: Number,
+        rowIndex: Number,
+        colIndex: Number
       },
 
       listeners: {
@@ -41,6 +43,7 @@
       _debounceDelay: 400,
 
       _handleInput: function () {
+        var self = this;
         this.debounce('input', function propagateChange() {
 
           var newValue = this.$.field.value.trim();
@@ -49,6 +52,8 @@
             this.fire('field-changed', {
               name: this.name,
               value: newValue,
+              rowIndex: self.rowIndex,
+              colIndex: self.colIndex,
             });
 
           }

@@ -21,7 +21,7 @@
         <td class='flex cell border'>
 
           <template is="dom-if" if="[[editable]]">
-            <edit-disaggregation-table-cell value="[[item]]">
+            <edit-disaggregation-table-cell value="[[item]]" col-index="[[index]]" row-index="[[rowIndex]]">
             </edit-disaggregation-table-cell>
           </template>
 
@@ -56,7 +56,8 @@
         editable: {
           type: Boolean,
           value: false
-        }
+        },
+        rowIndex: Number
       },
 
     });
