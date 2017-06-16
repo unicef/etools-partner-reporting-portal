@@ -52,6 +52,7 @@
     "paper-tooltip": "~1.1.1",
     "paper-input": "^1.0.9",
     "iron-location": "^0.8.1",
-    "paper-checkbox": "~1.0.13"
+    "paper-checkbox": "~1.0.13",
+    "webcomponentsjs": "^0.7.24"
   }
 }
