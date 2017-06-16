@@ -11,16 +11,11 @@
         function (state) {
           return state.indicatorData.byReport;
         },
-        function () {
-          /**
-           * FIXME: need to have current report id on the state.
-           * Need to set it as soon as /pd/:pdId/report/:reportId
-           * is navigated to in order to support permalinks.
-           */
-           return '9';
+        function (state) {
+          return state.programmeDocumentReports.current;
         },
-        function (byId, id) {
-          return byId[id];
+        function (byReport, reportId) {
+          return byReport[reportId];
         }
       ),
     };
