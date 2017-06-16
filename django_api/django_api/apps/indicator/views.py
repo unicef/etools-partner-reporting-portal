@@ -14,9 +14,14 @@ import django_filters.rest_framework
 from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
 
-from .serializers import IndicatorListSerializer, IndicatorReportListSerializer, PDReportsSerializer
+from .serializers import (
+    IndicatorListSerializer, IndicatorReportListSerializer, PDReportsSerializer, SimpleIndicatorLocationDataListSerializer,
+)
 from .filters import IndicatorFilter, PDReportsFilter
-from .models import IndicatorReport, Reportable
+from .models import (
+    IndicatorReport, Reportable, Disaggregation,
+    DisaggregationValue
+)
 
 
 class PDReportsAPIView(ListAPIView):
@@ -147,3 +152,19 @@ class IndicatorReportListAPIView(APIView):
         serializer = IndicatorReportListSerializer(indicator_reports, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class IndicatorLocationDataUpdateAPIView(APIView):
+    """
+    REST API endpoint to update a set of IndicatorLocationData objects, including each set of disaggregation data.
+    """
+
+    def put(self, request, *args, **kwargs):
+        serializer = SimpleIndicatorLocationDataListSerializer(request.data, many=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

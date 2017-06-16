@@ -1,4 +1,7 @@
+from ast import literal_eval as make_tuple
+
 from django.conf import settings
+
 from rest_framework import serializers
 
 from core.serializers import SimpleLocationSerializer
@@ -65,12 +68,41 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
         model = IndicatorLocationData
         fields = (
             'id',
+            'indicator_report',
             'location',
             'disaggregation',
             'num_disaggregation',
             'level_reported',
             'disaggregation_reported_on',
         )
+
+    def validate(self, data):
+        """
+        Check IndicatorLocationData object's disaggregation field is correctly
+        mapped to the disaggregation values.
+        """
+
+        # Disaggregation data coordinate space check from level_reported
+        for key in data['disaggregation'].keys():
+            if len(make_tuple(key)) > data['level_reported']:
+                raise serializers.ValidationError("%s Disaggregation data coordinate space cannot be higher than specified level_reported" % key)
+
+        try:
+            indicator_report = IndicatorReport.objects.get(id=data['indicator_report'])
+
+        except IndicatorReport.DoesNotExist:
+            raise serializers.ValidationError("IndicatorReport ID %d does not exist for IndicatorLocationData ID %d" % (data['indicator_report'], data['id']))
+
+        disaggregation_value_id_list = indicator_report.disaggregation_values(id_only=True, flat=True)
+
+        # Disaggregation data coordinate space check from disaggregation choice ids
+        for key in data['disaggregation'].keys():
+            tuple_key = make_tuple(key)
+
+            if not all(map(lambda key_item: key_item not in disaggregation_value_id_list, tuple_key)):
+                raise serializers.ValidationError("%s coordinate space does not belong to disaggregation value id list" % (key))
+
+        return data
 
 
 class IndicatorReportListSerializer(serializers.ModelSerializer):

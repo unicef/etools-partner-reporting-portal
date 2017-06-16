@@ -171,7 +171,7 @@ class IndicatorReport(TimeStampedModel):
     def disaggregations(self):
         return self.reportable.disaggregation.all()
 
-    def disaggregation_values(self, id_only=False, filter_by_id__in=None):
+    def disaggregation_values(self, id_only=False, filter_by_id__in=None, flat=False):
         output_list = []
 
         disaggregations = self.disaggregations
@@ -187,6 +187,9 @@ class IndicatorReport(TimeStampedModel):
                 disaggregation_value = disaggregation.disaggregation_value.values_list('id', flat=True)
 
             output_list.append(list(disaggregation_value))
+
+        if flat:
+            output_list = set(reduce(lambda acc, curr: acc + curr, output_list))
 
         return output_list
 
