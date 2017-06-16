@@ -6,7 +6,7 @@
 <link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
 <link rel="import" href="../../behaviors/utils.html">
-<link rel="import" href="../status-badge.html">
+<link rel="import" href="../report-status.html">
 <link rel="import" href="../labelled-item.html">
 <link rel="import" href="indicator-details.html">
 
@@ -89,7 +89,7 @@
     <etools-content-panel panel-title="[[data.name]]">
       <div class="header">
         <labelled-item label="Overall status">
-          <status-badge type="neutral"></status-badge> On track
+          <report-status status="[[data.status.report_status]]"></report-status>
         </labelled-item>
 
         <labelled-item label="Narrative assessment">
