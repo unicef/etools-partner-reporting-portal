@@ -88,6 +88,13 @@
               route="{{subroute}}">
           </page-ip-reporting-indicators>
         </template>
+
+        <template is="dom-if" if="[[_equals(page, 'progress-reports')]]" restamp="true">
+          <page-ip-progress-reports
+              name="progress-reports"
+              route="{{subroute}}">
+          </page-ip-progress-reports>
+        </template>
       </iron-pages>
     </app-drawer-layout>
   </template>

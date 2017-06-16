@@ -86,18 +86,22 @@ def generate_fake_data(quantity=3):
     print "{} ProgrammeDocument objects created".format(quantity)
 
     # Linking the followings:
+    # ProgressReport - ProgrammeDocument
     # created LowerLevelOutput - ReportableToLowerLevelOutput
     # Section - ProgrammeDocument via ReportableToLowerLevelOutput
     # ProgressReport - IndicatorReport from ReportableToLowerLevelOutput
     # IndicatorReport & Location from ReportableToLowerLevelOutput - IndicatorLocationData
     for idx in xrange(quantity):
+        pd = ProgrammeDocument.objects.all()[idx]
+        progress_report = ProgressReportFactory(programme_document=pd)
+
         llo = LowerLevelOutput.objects.all()[idx]
-        reportable = ReportableToLowerLevelOutputFactory(content_object=llo)
+        reportable = ReportableToLowerLevelOutputFactory(content_object=llo, indicator_report__progress_report=None)
 
         reportable.content_object.indicator.programme_document.sections.add(Section.objects.all()[idx])
 
         indicator_report = reportable.indicator_reports.first()
-        indicator_report.progress_report = ProgressReportFactory()
+        indicator_report.progress_report = progress_report
         indicator_report.save()
 
         IndicatorLocationDataFactory(indicator_report=indicator_report, location=reportable.locations.first())
@@ -113,6 +117,13 @@ def generate_fake_data(quantity=3):
 
     # Adding extra IndicatorReport to each ReportableToLowerLevelOutput
     locations = Location.objects.all()
+
+    for reportable in Reportable.objects.filter(lower_level_outputs__reportables__isnull=False):
+        # Creating N more IndicatorReport objects
+        for idx in xrange(quantity):
+            indicator_report = IndicatorReportFactory(reportable=reportable)
+            indicator_report.progress_report = reportable.content_object.indicator.programme_document.progress_reports.first()
+            indicator_report.save()
 
     for reportable in Reportable.objects.filter(lower_level_outputs__reportables__isnull=False):
         if reportable.locations.count() != 0:

@@ -109,9 +109,22 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
     def test_list_api(self):
         indicator_report = IndicatorReport.objects.last()
 
+        reportable = Reportable.objects.get(pk=indicator_report.reportable.id)
+        indicator_reports = reportable.indicator_reports.all()
+
         url = reverse('indicator-report-list-api', kwargs={'pk': indicator_report.reportable.id})
         response = self.client.get(url, format='json')
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(response.data), 2)
+        self.assertEquals(len(response.data), indicator_reports.count())
         self.assertNotEquals(response.data[0]['indicator_location_data'][0]['disaggregation'], {})
+
+    def test_list_api_with_limit(self):
+        indicator_report = IndicatorReport.objects.last()
+
+        url = reverse('indicator-report-list-api', kwargs={'pk': indicator_report.reportable.id})
+        url += '?limit=2'
+        response = self.client.get(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(len(response.data), 2)

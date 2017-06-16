@@ -41,6 +41,10 @@
         return this.programmeDocumentReports(pdId) + reportId + '/';
       },
 
+      progressReports: function(locationId) {
+        return this._buildUrl('/unicef/' + locationId + '/progress-reports');
+      },
+
       childLocations: function (locationId) {
         return this._buildUrl('/core/' + locationId + '/children-location/');
       },
@@ -48,7 +52,6 @@
       indicatorData: function (reportId) {
         return this._buildUrl('/indicator/indicator-data/' + reportId + '/');
       },
-
     };
   }());
 </script>

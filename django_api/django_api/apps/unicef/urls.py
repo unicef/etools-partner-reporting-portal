@@ -3,6 +3,7 @@ from django.conf.urls import url
 from .views import (
     ProgrammeDocumentAPIView,
     ProgrammeDocumentDetailsAPIView,
+    ProgressReportAPIView,
 )
 
 
@@ -13,4 +14,7 @@ urlpatterns = [
     url(r'^(?P<location_id>\d+)/programme-document/details/(?P<pk>\d+)/$',
         ProgrammeDocumentDetailsAPIView.as_view(),
         name="programme-document-details"),
+    url(r'^(?P<location_id>\d+)/progress-reports/$',
+        ProgressReportAPIView.as_view(),
+        name="progress-reports"),
 ]
