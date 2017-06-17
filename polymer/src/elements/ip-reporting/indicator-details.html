@@ -2,37 +2,27 @@
 <link rel="import" href="../../../../bower_components/iron-icons/maps-icons.html">
 <link rel="import" href="../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
-
 <link rel="import" href="../../behaviors/utils.html">
-=
 <link rel="import" href="../etools-prp-ajax.html">
 <link rel="import" href="../../elements/disaggregations/disaggregation-table.html">
 <link rel="import" href="../../endpoints.html">
 
 <dom-module id="ip-reporting-indicator-details">
   <template>
-    <style include="iron-flex iron-flex-factors">
+
+    <!-- Styles the headers above the disaggregation tables and outer containers.
+    The tables themselves are styled in disaggregation-table-styles. -->
+    <style include="iron-flex iron-flex-factors disaggregation-table-styles">
       :host {
         display: block;
+        width: 100%;
       }
       iron-icon {
-        color: var(--accent-color)
+        color: var(--accent-color);
       }
       h3 {
         width: 100%;
         float: left;
-      }
-      h4 {
-        font-weight: 400;
-      }
-      h4 span {
-        color: gray;
-        font-weight: 400;
-      }
-      .wrapper {
-        float: left;
-        margin: 0 10px 10px 10px;
-        width: 100%;
       }
     </style>
 
@@ -43,8 +33,6 @@
 
     <etools-loading active="[[loading]]"></etools-loading>
 
-    <!-- TODO: group data objects by location; only display location header once. -->
-
       <template is="dom-repeat"
                 items="[[locations]]"
                 as="location">
@@ -54,27 +42,32 @@
           [[location.0.location.title]]
         </h3>
 
-        <template is="dom-repeat"
-                  items="[[location]]"
-                  as="item">
-          <div class="wrapper">
-            <h4>
-              Progress in reporting period
-              <span>[[data.time_period_start]] - [[data.time_period_end]]<span>
-            </h4>
-            <h4>
-              Total
-              <span>[[data.total]]<span>
-            </h4>
-            <disaggregation-table
-              total=[[data.total]]
-              data=[[item]]
-              mapping=[[data.disagg_lookup_map]]>
-            </disaggregation-table>
-          </div>
+        <div class="container">
+          <template is="dom-repeat"
+                    items="[[location]]"
+                    as="item">
 
-        </template>
+            <div class="item">
+              <h4>
+                <span>
+                  <strong>Progress in reporting period: </strong>
+                  [[data.time_period_start]] - [[data.time_period_end]]
+                </span>
+                <span class="total">
+                  <strong>Total: </strong>[[data.total]]
+                </span>
+              </h4>
+              <disaggregation-table
+                total=[[data.total]]
+                data=[[item]]
+                mapping=[[data.disagg_lookup_map]]>
+              </disaggregation-table>
+            </div>
+          </template>
+        </div>
+
     </template>
+
   </template>
 
   <script>
@@ -117,27 +110,25 @@
       },
 
       _bucketByLocation: function (data) {
-        var self = this;
-        locations = {};
+        var locations = {};
 
         if (Object.keys(data).length > 0) {
-          data.indicator_location_data.map(function(report) {
+          data.indicator_location_data.forEach(function(report) {
             if (locations[report.location.id]) {
               var currentArray = locations[report.location.id];
               var newArray = currentArray;
               newArray.push(report);
               locations[report.location.id] = newArray;
             } else {
-              locations[report.location.id] = [report]
+              locations[report.location.id] = [report];
             }
           });
         }
         var locationList = [];
-        var locationKeys = Object.keys(locations)
 
-        Object.keys(locations).map(function(i) {
+        Object.keys(locations).forEach(function(i) {
           locationList.push(locations[i]);
-        })
+        });
         return locationList;
       },
 
@@ -157,7 +148,7 @@
               if (data.length === 5) {
                 res.data.shift();
               }
-              var numDisaggs = 0;
+              var numDisaggs = 2;
               self.data = res.data[numDisaggs];
 
               self.loading = false;

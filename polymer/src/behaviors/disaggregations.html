@@ -1,3 +1,5 @@
+<script src="../../bower_components/es6-shim/es6-shim.min.js"></script>
+
 <script>
   (function () {
     'use strict';
@@ -7,7 +9,7 @@
     App.Behaviors.DisaggregationBehavior = {
       // Accepts a list of disaggregation IDs, sorts them, and
       // structures them in "()" format for lookup.
-      _formatDisaggregationIds(unsortedIds) {
+      _formatDisaggregationIds: function(unsortedIds) {
         // IDs must be in descending order.
         var ids = unsortedIds.sort(function (a, b) {return a - b;}).reverse();
         var sortedString = '';
@@ -18,8 +20,7 @@
           sortedString = ids.join(', ');
         }
 
-        var formatted = '(' + sortedString + ')';
-        return formatted;
+        return '(' + sortedString + ')';
       },
     };
 

@@ -1,27 +1,25 @@
 <!--
-Checks the format of data received from the parent element to determine which
-disaggregation-table component to display.
+Determines which disaggregation-table component to display based on number.
  -->
 
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
 
-<link rel="import" href="../../behaviors/utils.html">
-<link rel="import" href="../../styles/detail-table.html">
 <link rel="import" href="table-content/three-disaggregations.html">
 <link rel="import" href="table-content/two-disaggregations.html">
 <link rel="import" href="table-content/one-disaggregation.html">
 <link rel="import" href="table-content/zero-disaggregations.html">
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../styles/disaggregation-table-styles.html">
 
 <dom-module id="disaggregation-table">
   <template>
 
-    <style include="detail-table"></style>
+    <style include="disaggregation-table-styles"></style>
 
     <table class='vertical layout'>
 
       <!-- Note: Need to pass in mapping to these or an empty mapping is passed
       to the content component. -->
-
       <template is="dom-if" if="[[_isSameNumberOfDisaggregations(data, 0)]]">
         <zero-disaggregations
           data="[[data]]"
@@ -79,11 +77,8 @@ disaggregation-table component to display.
         total: Number
       },
 
-      _isSameNumberOfDisaggregations(data, num) {
-        if (num === data.num_disaggregation) {
-          return true;
-        }
-        return false;
+      _isSameNumberOfDisaggregations: function(data, num) {
+        return (num === data.num_disaggregation);
       },
     });
   </script>

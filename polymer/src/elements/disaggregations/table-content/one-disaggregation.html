@@ -1,40 +1,33 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../../bower_components/etools-data-table/etools-data-table.html">
 
 <link rel="import" href="../../../behaviors/utils.html">
 <link rel="import" href="../../../behaviors/disaggregations.html">
-<link rel="import" href="../../../styles/detail-table.html">
+<link rel="import" href="../../../styles/disaggregation-table-styles.html">
 <link rel="import" href="../disaggregation-table-row.html">
 
 <dom-module id="one-disaggregation">
   <template>
 
-    <style include='detail-table'></style>
+    <style include='disaggregation-table-styles'></style>
 
-    <tr class='horizontal layout'>
-      <th class='flex cell border'></th>
-      <th class='flex cell border'>Total</th>
+    <tr class='horizontal layout headerRow'>
+      <th class='flex'></th>
+      <th class='flex'>Total</th>
     </tr>
 
     <template is="dom-repeat"
               items="[[rows]]"
               as="row">
-      <!-- TODO: Use disaggregation-table-row -->
-      <tr class='horizontal layout'>
-        <td class='flex cell border'>
-          [[row.title]]
-        </td>
-
-        <td class='flex cell border'>
-          [[row.data.v]]
-        </td>
-      </tr>
+      <disaggregation-table-row data=[[row]] row-type="middleRow">
+      </disaggregation-table-row>
     </template>
 
-    <tr class='horizontal layout'>
-      <td class='flex cell border'>Total</td>
-      <td class='flex cell border'>[[total]]</td>
-    </tr>
+    <disaggregation-table-row data=[[totalRow]]
+                              total=[[total]]
+                              row-type="totalsRow">
+    </disaggregation-table-row>
+
+
 
   </template>
 
@@ -58,6 +51,11 @@
           value: []
         },
 
+        totalRow: {
+          type: Array,
+          computed: '_determineTotalRow(mapping)'
+        },
+
         total: Number,
 
         //Passing columnNames as a param is required to trigger update.
@@ -76,16 +74,24 @@
         return this.mapping[0].choices;
       },
 
+      _determineTotalRow: function() {
+        var totalRow = {
+          title: 'total',
+          total: this.total
+        };
+        return totalRow;
+      },
+
       _determineRows: function() {
         var self = this;
         var columnChoices = this.mapping[0].choices;
         var data = [];
 
-        columnChoices.map(function(z) {
+        columnChoices.forEach(function(z) {
           var formatted = self._formatDisaggregationIds([z.id]);
           var forDisplay = {};
           forDisplay['title'] = z.value;
-          forDisplay['data'] = self.data.disaggregation[formatted];
+          forDisplay['total'] = self.data.disaggregation[formatted];
           data.push(forDisplay);
         });
         return data;

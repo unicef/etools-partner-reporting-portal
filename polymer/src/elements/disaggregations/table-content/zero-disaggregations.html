@@ -1,17 +1,17 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../../bower_components/etools-data-table/etools-data-table.html">
 
-<link rel="import" href="../../../styles/detail-table.html">
+<link rel="import" href="../../../styles/disaggregation-table-styles.html">
+<link rel="import" href="../disaggregation-table-row.html">
 
 <dom-module id="zero-disaggregations">
   <template>
 
-    <style include='detail-table'></style>
+    <style include='disaggregation-table-styles'></style>
 
-    <tr class='horizontal layout'>
-      <td class='flex cell border'>Total</td>
-      <td class='flex cell border'>[[total]]</td>
-    </tr>
+    <disaggregation-table-row data=[[totalRow]]
+                              total=[[total]]
+                              row-type="totalsRow">
+    </disaggregation-table-row>
 
   </template>
 
@@ -20,7 +20,20 @@
       is: 'zero-disaggregations',
 
       properties: {
-        total: Number
+        total: Number,
+
+        totalRow: {
+          type: Array,
+          computed: '_determineTotalRow(mapping)'
+        },
+      },
+
+      _determineTotalRow: function() {
+        var totalRow = {
+          title: 'total',
+          total: this.total
+        };
+        return totalRow;
       },
 
     });
