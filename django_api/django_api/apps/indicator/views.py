@@ -1,8 +1,7 @@
 import operator
-
+import logging
 from django.http import Http404
 from django.db.models import Q
-from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import get_object_or_404
 
 from rest_framework import status
@@ -14,12 +13,13 @@ import django_filters.rest_framework
 
 from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
-from unicef.models import LowerLevelOutput
 from unicef.serializers import ProgressReportSerializer
 
 from .serializers import IndicatorListSerializer, IndicatorLLoutputsSerializer, PDReportsSerializer, IndicatorReportListSerializer
 from .models import Reportable, IndicatorReport
 from .filters import IndicatorFilter, PDReportsFilter
+
+logger = logging.getLogger(__name__)
 
 
 class PDReportsAPIView(ListAPIView):
@@ -64,7 +64,13 @@ class PDReportsDetailAPIView(RetrieveAPIView):
     def get_indicator_report(self, report_id):
         try:
             return IndicatorReport.objects.get(id=report_id)
-        except IndicatorReport.DoesNotExist:
+        except IndicatorReport.DoesNotExist as exp:
+            logger.exception({
+                "endpoint": "PDReportsDetailAPIView",
+                "request.data": self.request.data,
+                "report_id": report_id,
+                "exception": exp,
+            })
             raise Http404
 
     def get(self, request, pd_id, report_id, *args, **kwargs):
@@ -142,7 +148,13 @@ class IndicatorDataAPIView(APIView):
     def get_indicator_report(self, id):
         try:
             return IndicatorReport.objects.get(id=id)
-        except IndicatorReport.DoesNotExist:
+        except IndicatorReport.DoesNotExist as exp:
+            logger.exception({
+                "endpoint": "IndicatorDataAPIView",
+                "request.data": self.request.data,
+                "id": id,
+                "exception": exp,
+            })
             return None
 
     def get_narrative_object(self, id):
@@ -150,7 +162,6 @@ class IndicatorDataAPIView(APIView):
         return ir and ir.progress_report
 
     def get(self, request, ir_id, *args, **kwargs):
-        ir = self.get_indicator_report(ir_id)
         narrative = self.get_narrative_object(ir_id)
         response = ProgressReportSerializer(narrative).data
         queryset = self.get_queryset(ir_id)
