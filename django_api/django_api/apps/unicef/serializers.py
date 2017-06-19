@@ -88,7 +88,6 @@ class ProgressReportSerializer(serializers.ModelSerializer):
             'funds_received_to_date',
             'challenges_in_the_reporting_period',
             'proposed_way_forward',
-            'attachements',
             'id',
             'programme_document',
             'status',
