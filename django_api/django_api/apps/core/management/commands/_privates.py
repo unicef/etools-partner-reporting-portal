@@ -97,14 +97,15 @@ def generate_data_combination_dict(array, r=3):
 
 
 def generate_0_num_disagg_quantity_data(indicator_report_from_reportable):
-    disagg_idx = 19
+    disagg_idx = 0
+    locations = Location.objects.all().order_by('id')
 
     # 0 num_disaggregation & 0 level_reported
     disaggregation_comb_0_pairs = list(combinations(list(
         indicator_report_from_reportable.disaggregations.values_list('id', flat=True)), 0))
 
     for pair in disaggregation_comb_0_pairs:
-        location = Location.objects.all()[disagg_idx]
+        location = locations[disagg_idx]
 
         location_data = IndicatorLocationDataFactory(
             indicator_report=indicator_report_from_reportable,
@@ -118,14 +119,15 @@ def generate_0_num_disagg_quantity_data(indicator_report_from_reportable):
 
 
 def generate_1_num_disagg_quantity_data(indicator_report_from_reportable):
-    disagg_idx = 15
+    disagg_idx = 0
+    locations = Location.objects.all().order_by('id')
 
     # 1 num_disaggregation & 1 level_reported
     disaggregation_comb_1_pairs = list(combinations(list(
         indicator_report_from_reportable.disaggregations.values_list('id', flat=True)), 1))
 
     for pair in disaggregation_comb_1_pairs:
-        location = Location.objects.all()[disagg_idx]
+        location = locations[disagg_idx]
 
         location_data = IndicatorLocationDataFactory(
             indicator_report=indicator_report_from_reportable,
@@ -144,7 +146,7 @@ def generate_1_num_disagg_quantity_data(indicator_report_from_reportable):
         indicator_report_from_reportable.disaggregations.values_list('id', flat=True)), 0))
 
     for pair in disaggregation_comb_0_pairs:
-        location = Location.objects.all()[disagg_idx]
+        location = locations[disagg_idx]
 
         location_data = IndicatorLocationDataFactory(
             indicator_report=indicator_report_from_reportable,
@@ -160,14 +162,15 @@ def generate_1_num_disagg_quantity_data(indicator_report_from_reportable):
 
 
 def generate_2_num_disagg_quantity_data(indicator_report_from_reportable):
-    disagg_idx = 8
+    disagg_idx = 0
+    locations = Location.objects.all().order_by('id')
 
     # 2 num_disaggregation & 2 level_reported
     disaggregation_comb_2_pairs = list(combinations(list(
         indicator_report_from_reportable.disaggregations.values_list('id', flat=True)), 2))
 
     for pair in disaggregation_comb_2_pairs:
-        location = Location.objects.all()[disagg_idx]
+        location = locations[disagg_idx]
 
         location_data = IndicatorLocationDataFactory(
             indicator_report=indicator_report_from_reportable,
@@ -184,7 +187,7 @@ def generate_2_num_disagg_quantity_data(indicator_report_from_reportable):
         indicator_report_from_reportable.disaggregations.values_list('id', flat=True)), 1))
 
     for pair in disaggregation_comb_1_pairs:
-        location = Location.objects.all()[disagg_idx]
+        location = locations[disagg_idx]
 
         location_data = IndicatorLocationDataFactory(
             indicator_report=indicator_report_from_reportable,
@@ -201,7 +204,7 @@ def generate_2_num_disagg_quantity_data(indicator_report_from_reportable):
         indicator_report_from_reportable.disaggregations.values_list('id', flat=True)), 0))
 
     for pair in disaggregation_comb_0_pairs:
-        location = Location.objects.all()[disagg_idx]
+        location = locations[disagg_idx]
 
         location_data = IndicatorLocationDataFactory(
             indicator_report=indicator_report_from_reportable,
@@ -216,7 +219,8 @@ def generate_2_num_disagg_quantity_data(indicator_report_from_reportable):
 
 def generate_3_num_disagg_quantity_data(indicator_report_from_reportable):
     disagg_idx = 0
-    location = Location.objects.all()[disagg_idx]
+    locations = Location.objects.all().order_by('id')
+    location = locations[disagg_idx]
 
     # 3 num_disaggregation & 3 level_reported
     location_data = IndicatorLocationDataFactory(
@@ -237,7 +241,7 @@ def generate_3_num_disagg_quantity_data(indicator_report_from_reportable):
         indicator_report_from_reportable.disaggregations.values_list('id', flat=True)), 2))
 
     for pair in disaggregation_comb_2_pairs:
-        location = Location.objects.all()[disagg_idx]
+        location = locations[disagg_idx]
 
         location_data = IndicatorLocationDataFactory(
             indicator_report=indicator_report_from_reportable,
@@ -254,7 +258,7 @@ def generate_3_num_disagg_quantity_data(indicator_report_from_reportable):
         indicator_report_from_reportable.disaggregations.values_list('id', flat=True)), 1))
 
     for pair in disaggregation_comb_1_pairs:
-        location = Location.objects.all()[disagg_idx]
+        location = locations[disagg_idx]
 
         location_data = IndicatorLocationDataFactory(
             indicator_report=indicator_report_from_reportable,
@@ -271,7 +275,7 @@ def generate_3_num_disagg_quantity_data(indicator_report_from_reportable):
         indicator_report_from_reportable.disaggregations.values_list('id', flat=True)), 0))
 
     for pair in disaggregation_comb_0_pairs:
-        location = Location.objects.all()[disagg_idx]
+        location = locations[disagg_idx]
 
         location_data = IndicatorLocationDataFactory(
             indicator_report=indicator_report_from_reportable,
@@ -341,22 +345,22 @@ def generate_indicator_report_location_disaggregation_quantity_data():
 
             # 3 num_disaggregation
             if ir_idx == 0:
-                generate_3_num_disagg_quantity_data(
+                generate_0_num_disagg_quantity_data(
                     indicator_report_from_reportable)
 
             # 2 num_disaggregation
             elif ir_idx == 1:
-                generate_2_num_disagg_quantity_data(
+                generate_1_num_disagg_quantity_data(
                     indicator_report_from_reportable)
 
             # 1 num_disaggregation
             elif ir_idx == 2:
-                generate_1_num_disagg_quantity_data(
+                generate_2_num_disagg_quantity_data(
                     indicator_report_from_reportable)
 
             # 0 num_disaggregation
             elif ir_idx == 3:
-                generate_0_num_disagg_quantity_data(
+                generate_3_num_disagg_quantity_data(
                     indicator_report_from_reportable)
 
             else:
