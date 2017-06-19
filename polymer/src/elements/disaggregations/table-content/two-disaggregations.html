@@ -84,25 +84,7 @@
         var self = this;
         var columnChoices = this.mapping[0].choices;
         var rows = this.mapping[1].choices;
-        var rowsForDisplay = [];
-
-        rows.map(function(x) {
-          var formatted = '';
-          var rowData = columnChoices.map(function(z) {
-            formatted = self._formatDisaggregationIds([x.id, z.id]);
-            return self.data.disaggregation[formatted];
-          });
-          formatted = self._formatDisaggregationIds([x.id]);
-          var rowTotal = self.data.disaggregation[formatted];
-
-          rowsForDisplay.push({
-            title: x.value,
-            data: rowData,
-            id: x.id,
-            total: rowTotal
-          });
-        });
-        return rowsForDisplay;
+        return this._determineRows(this, rows, columnChoices);
       },
 
       _determineTotals: function() {

@@ -7,6 +7,31 @@
     App.Behaviors = App.Behaviors || {};
 
     App.Behaviors.DisaggregationBehavior = {
+
+      //Used to display rows for two and three disaggregations.
+      //It will NOT work for one and zero disaggregations.
+      _determineRows: function(self, rows, columns) {
+        var rowsForDisplay = [];
+        rows.forEach(function(x) {
+          var formatted = '';
+          var rowData = columns.map(function(z) {
+            formatted = self._formatDisaggregationIds([x.id, z.id]);
+            return self.data.disaggregation[formatted];
+          });
+          formatted = self._formatDisaggregationIds([x.id]);
+          var rowTotal = self.data.disaggregation[formatted];
+
+          rowsForDisplay.push({
+            title: x.value,
+            data: rowData,
+            id: x.id,
+            total: rowTotal
+          });
+        });
+
+        return rowsForDisplay;
+      },
+
       // Accepts a list of disaggregation IDs, sorts them, and
       // structures them in "()" format for lookup.
       _formatDisaggregationIds: function(unsortedIds) {
@@ -24,5 +49,5 @@
       },
     };
 
-  }());
+}());
 </script>

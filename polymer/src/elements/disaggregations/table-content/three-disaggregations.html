@@ -63,6 +63,10 @@
         App.Behaviors.DisaggregationBehavior,
       ],
 
+      observers: [
+        '_determineTotals(mapping)'
+      ],
+
       properties: {
         data: {
           type: Object,
@@ -87,11 +91,6 @@
           computed: '_determineOuterRows(mapping)'
         },
 
-        totalsForDisplay: {
-          type: Array,
-          computed: '_determineTotals(mapping)'
-        },
-
         columnTotalRow: {
           type: Object,
           value: {}
@@ -103,53 +102,16 @@
       },
 
       _determineOuterRows: function() {
-        var self = this;
         var columnChoices = this.mapping[0].choices;
         var outerRows = this.mapping[1].choices;
-        var outerRowsForDisplay = [];
-
-        outerRows.map(function(x) {
-          var formatted = '';
-          var outerRowData = columnChoices.map(function(z) {
-            formatted = self._formatDisaggregationIds([x.id, z.id]);
-            return self.data.disaggregation[formatted];
-          });
-          formatted = self._formatDisaggregationIds([x.id]);
-          var total = self.data.disaggregation[formatted];
-
-          outerRowsForDisplay.push({
-            title: x.value,
-            data: outerRowData,
-            id: x.id,
-            total: total
-          });
-        });
-        return outerRowsForDisplay;
+        return this._determineRows(this, outerRows, columnChoices);
       },
 
       _determineMiddleRows: function(outerRowID) {
         var self = this;
         var columnChoices = this.mapping[0].choices;
         var middleRows = this.mapping[2].choices;
-        var middleRowsForDisplay = [];
-
-        middleRows.forEach(function(y) {
-          var data = columnChoices.map(function(z) {
-            var formatted = self._formatDisaggregationIds([outerRowID, y.id, z.id]);
-            return self.data.disaggregation[formatted];
-          });
-
-          formatted = self._formatDisaggregationIds([outerRowID, y.id]);
-          var total = self.data.disaggregation[formatted];
-
-          middleRowsForDisplay.push({
-            title: y.value,
-            data: data,
-            id: y.id,
-            total: total
-          });
-        });
-        return middleRowsForDisplay;
+        return this._determineRows(this, middleRows, columnChoices);
       },
 
       _determineTotals: function() {
@@ -170,24 +132,7 @@
         };
         this.columnTotalRow = columnTotalRow;
 
-        middleRows.forEach(function(y) {
-          var data = columnChoices.map(function(z) {
-            var formatted = self._formatDisaggregationIds([y.id, z.id]);
-            return self.data.disaggregation[formatted];
-          });
-
-          var formatted = self._formatDisaggregationIds([y.id]);
-          var total = self.data.disaggregation[formatted];
-
-          bottomRows.push({
-            title: y.value,
-            data: data,
-            id: y.id,
-            total: total
-          });
-        });
-
-        this.bottomRows = bottomRows;
+        this.bottomRows = this._determineRows(this, middleRows, columnChoices);
       },
 
     });
