@@ -91,6 +91,13 @@ class TestPartnerProjectAPIView(BaseAPITestCase):
         self.assertEquals(response.data['id'], str(first.id))
         self.assertEquals(response.data['title'], first.title)
 
+    def test_get_non_existent_instance(self):
+        last = PartnerProject.objects.last()
+        url = reverse('partner-project-details', kwargs={"pk": last.id+1})
+        response = self.client.get(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_update_patch_partner_project(self):
         """
         patch object unit test for PartnerProjectAPIView
@@ -105,6 +112,18 @@ class TestPartnerProjectAPIView(BaseAPITestCase):
         self.assertEquals(PartnerProject.objects.all().count(), base_count)
         self.assertEquals(PartnerProject.objects.get(id=response.data['id']).title, data['title'])
 
+    def test_update_patch_non_existent_partner_project(self):
+        """
+        patch object unit test for PartnerProjectAPIView
+        """
+        last = PartnerProject.objects.last()
+
+        data = dict(id=last.id+1, title='new updated title')
+        url = reverse('partner-project-details', kwargs={"pk": last.id+1})
+        response = self.client.patch(url, data=data, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_delete_partner_project(self):
         base_count = PartnerProject.objects.all().count()
         last = PartnerProject.objects.last()
@@ -114,3 +133,12 @@ class TestPartnerProjectAPIView(BaseAPITestCase):
         self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEquals(response.data, None)
         self.assertEquals(PartnerProject.objects.all().count(), base_count-1)
+
+    def test_delete_non_existent_partner_project(self):
+        base_count = PartnerProject.objects.all().count()
+        last = PartnerProject.objects.last()
+        url = reverse('partner-project-details', kwargs={"pk": last.id+1})
+        response = self.client.delete(url, data={"id": last.pk+1}, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEquals(PartnerProject.objects.all().count(), base_count)
