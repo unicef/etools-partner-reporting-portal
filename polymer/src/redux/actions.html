@@ -134,6 +134,13 @@
         };
       },
 
+      setIndicatorDisaggregations: function (data) {
+        return {
+          type: App.Constants.SET_INDICATOR_DISAGGREGATIONS,
+          disaggregations: data
+        };
+      },
+
       // Partner data
       fetchPartner: function (partnerThunk) {
         return function (dispatch) {

@@ -1,0 +1,41 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../../styles/disaggregation-table-styles.html">
+<link rel="import" href="../disaggregation-table-row.html">
+
+<dom-module id="zero-disaggregations">
+  <template>
+
+    <style include='disaggregation-table-styles'></style>
+
+    <disaggregation-table-row data=[[totalRow]]
+                              total=[[total]]
+                              row-type="totalsRow">
+    </disaggregation-table-row>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'zero-disaggregations',
+
+      properties: {
+        total: Number,
+
+        totalRow: {
+          type: Array,
+          computed: '_determineTotalRow(mapping)'
+        },
+      },
+
+      _determineTotalRow: function() {
+        var totalRow = {
+          title: 'total',
+          total: this.total
+        };
+        return totalRow;
+      },
+
+    });
+  </script>
+</dom-module>

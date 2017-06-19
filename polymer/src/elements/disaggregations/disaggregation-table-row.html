@@ -1,0 +1,56 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/etools-data-table/etools-data-table.html">
+
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../styles/disaggregation-table-styles.html">
+<link rel="import" href="disaggregation-table-cell.html">
+
+<dom-module id="disaggregation-table-row">
+  <template>
+
+    <style include="disaggregation-table-styles"></style>
+    <tr class$="[[computeClass(rowType)]]">
+      <td class="flex">
+        [[_capitalizeFirstLetter(data.title)]]
+      </td>
+
+      <template is="dom-repeat"
+                items="[[data.data]]">
+        <td class="flex">
+          <disaggregation-table-cell value="[[item]]">
+          </disaggregation-table-cell>
+        </td>
+      </template>
+
+      <td class="flex">
+        [[total]] [[data.total.v]]
+      </td>
+
+    </tr>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'disaggregation-table-row',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+      ],
+
+      properties: {
+        data: {
+          type: Object,
+          value: {}
+        },
+        rowType: {
+          type: String,
+          value: ''
+        },
+      },
+
+      computeClass: function (rowType) {
+       return rowType;
+     }
+    });
+  </script>
+  </dom-module>
