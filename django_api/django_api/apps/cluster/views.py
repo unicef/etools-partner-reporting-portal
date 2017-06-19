@@ -123,9 +123,9 @@ class ClusterActivityAPIView(APIView):
         serializer = ClusterActivitySerializer(instance=instance)
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
-    def patch(self, request, *args, **kwargs):
+    def patch(self, request, pk, *args, **kwargs):
         serializer = ClusterActivityPatchSerializer(
-            instance=self.get_instance(self.request),
+            instance=self.get_instance(self.request, pk),
             data=self.request.data
         )
         if not serializer.is_valid():

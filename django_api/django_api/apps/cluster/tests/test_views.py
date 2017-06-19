@@ -179,6 +179,16 @@ class TestClusterActivityAPIView(BaseAPITestCase):
         self.assertEquals(response.data['title'], first.title)
         self.assertEquals(response.data['standard'], first.standard)
 
+    def test_get_non_existent_cluster_activity(self):
+        """
+        get obj unit test for ClusterActivityAPIView
+        """
+        last = ClusterActivity.objects.last()
+        url = reverse('cluster-activity', kwargs={"pk": last.id+1})
+        response = self.client.get(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_update_patch_cluster_activity(self):
         """
         patch object unit test for ClusterActivityAPIView
@@ -192,6 +202,18 @@ class TestClusterActivityAPIView(BaseAPITestCase):
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(ClusterActivity.objects.all().count(), base_count)
         self.assertEquals(ClusterActivity.objects.get(id=response.data['id']).title, data['title'])
+
+    def test_update_patch_non_existent_cluster_activity(self):
+        """
+        patch object unit test for ClusterActivityAPIView
+        """
+        last = ClusterActivity.objects.last()
+
+        data = dict(id=last.id, title='new updated title')
+        url = reverse('cluster-activity', kwargs={"pk": last.id+1})
+        response = self.client.patch(url, data=data, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_update_put_cluster_activity(self):
         """
@@ -211,6 +233,19 @@ class TestClusterActivityAPIView(BaseAPITestCase):
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(ClusterActivity.objects.all().count(), base_count)
         self.assertEquals(ClusterActivity.objects.get(id=response.data['id']).title, data['title'])
+
+    def test_update_put_non_existent_cluster_activity(self):
+        """
+        update object unit test for ClusterActivityAPIView
+        """
+        last = ClusterActivity.objects.last()
+
+        data = self.data
+        data.update(dict(id=last.id))
+        url = reverse('cluster-activity', kwargs={"pk": last.id+1})
+        response = self.client.put(url, data=data, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_delete_cluster_activity(self):
         """
