@@ -3,7 +3,6 @@ from django.urls import reverse
 from django.conf import settings
 from rest_framework import status
 from core.tests.base import BaseAPITestCase
-from core.common import FREQUENCY_LEVEL
 from core.models import Location
 from cluster.models import Cluster
 from partner.models import PartnerProject
@@ -11,9 +10,9 @@ from partner.models import PartnerProject
 
 class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
 
-    @property
-    def data(self):
-        return {
+    def setUp(self):
+        super(TestPartnerProjectListCreateAPIView, self).setUp()
+        self.data = {
             'clusters': [{"id": Cluster.objects.first().id}],
             'locations': [{"id": Location.objects.first().id}, {"id": Location.objects.last().id}],
             'title': 'partner project title',

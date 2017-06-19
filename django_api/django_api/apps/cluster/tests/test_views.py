@@ -10,9 +10,9 @@ class TestClusterObjectiveAPIView(BaseAPITestCase):
     title = "client post title"
     reference_number = "ref no 123"
 
-    @property
-    def data(self):
-        return {
+    def setUp(self):
+        super(TestClusterObjectiveAPIView, self).setUp()
+        self.data = {
             "cluster": Cluster.objects.first().id,
             "reference_number": self.reference_number,
             "title": self.title,
