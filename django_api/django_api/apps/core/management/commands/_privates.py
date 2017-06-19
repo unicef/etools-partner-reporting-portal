@@ -29,7 +29,7 @@ from core.models import (
     Intervention,
     Location,
 )
-from core.utils import get_combination_pairs
+from core.helpers import get_combination_pairs
 
 from core.factories import (
     UserFactory,
