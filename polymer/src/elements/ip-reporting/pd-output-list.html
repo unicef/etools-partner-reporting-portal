@@ -1,0 +1,37 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../elements/ip-reporting/pd-output.html">
+<link rel="import" href="../../redux/selectors/indicatorData.html">
+
+<dom-module id="pd-output-list">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <template
+        is="dom-repeat"
+        items="[[data]]">
+      <pd-output data="[[item]]"></pd-output>
+    </template>
+  </template>
+
+  <script>
+    Polymer({
+      id: 'pd-output-list',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        data: {
+          type: Array,
+          statePath: App.Selectors.IndicatorData.all,
+        },
+      },
+    });
+  </script>
+</dom-module>

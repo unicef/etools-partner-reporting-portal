@@ -20,12 +20,6 @@
         selectable="paper-item"
         key-event-target="null">
 
-      <paper-item name="dashboard">
-        <a href="[[buildUrl(_baseUrl, '/dashboard')]]">
-          <span>Dashboard</span>
-        </a>
-      </paper-item>
-
       <paper-item name="overview">
         <a href="[[buildUrl(_baseUrl, '/overview')]]">
           <span>Overview</span>
@@ -38,11 +32,18 @@
         </a>
       </paper-item>
 
+      <paper-item name="progress-reports">
+        <a href="[[buildUrl(_baseUrl, '/progress-reports')]]">
+          <span>Progress Reports</span>
+        </a>
+      </paper-item>
+
       <paper-item name="indicators">
         <a href="[[buildUrl(_baseUrl, '/indicators')]]">
           <span>Indicators</span>
         </a>
       </paper-item>
+
     </paper-menu>
   </template>
 

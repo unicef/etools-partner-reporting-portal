@@ -1,22 +1,21 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/etools-content-panel/etools-content-panel.html">
-<link rel="import" href="../../../bower_components/etools-data-table/etools-data-table.html">
 <link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
+<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/etools-data-table/etools-data-table.html">
 <link rel="import" href="../../../bower_components/iron-location/iron-location.html">
 <link rel="import" href="../../../bower_components/iron-location/iron-query-params.html">
 
 <link rel="import" href="../../elements/report-status.html">
 
-<link rel="import" href="../../redux/store.html">
-<link rel="import" href="../../redux/selectors/programmeDocumentReports.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/data-table.html">
 <link rel="import" href="../../behaviors/pagination.html">
-<link rel="import" href="../../behaviors/routing.html">
-
+<link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../styles/table-styles.html">
 
-<dom-module id="pd-reports-list">
+<dom-module id="progress-reports-list">
   <template>
     <style include="data-table-styles table-styles">
       :host {
@@ -26,20 +25,10 @@
           padding: 0;
         };
       }
-      .cell-icon {
-        text-align:center;
-      }
-      .cell-icon iron-icon {
-        --iron-icon-width: 20px;
-        --iron-icon-height: 20px;
-        --iron-icon-fill-color: #999;
-      }
+
       .cell-reports {
         text-align: right;
         text-transform: uppercase;
-      }
-      .cell-reports a {
-        text-decoration: none;
       }
     </style>
 
@@ -56,7 +45,10 @@
 
       <etools-data-table-header
         no-collapse
-        label="[[visibleRange.0]]-[[visibleRange.1]] of [[data.count]] results to show">
+        label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
+        <etools-data-table-column field="">
+          <div class="table-column">PD/SSFA ToR ref. #</div>
+        </etools-data-table-column>
         <etools-data-table-column field="status">
           <div class="table-column">Report Status</div>
         </etools-data-table-column>
@@ -84,7 +76,12 @@
         <etools-data-table-row no-collapse>
           <div slot="row-data">
             <div class="table-cell table-cell--text">
-              <report-status status="[[report.progress_report_status]]"></report-status>
+              <a href="../pd/[[ report.programme_document.id ]]">
+                [[_withDefault(report.programme_document.reference_number, '-')]]
+              </a>
+            </div>
+            <div class="table-cell table-cell--text">
+              <report-status status="[[report.status]]"></report-status>
             </div>
             <div class="table-cell table-cell--text">
               [[_withDefault(report.due_date, '-')]]
@@ -104,7 +101,7 @@
               </template>
             </div>
             <div class="table-cell table-cell--text cell-reports">
-              <a href="[[_getLink(report)]]">[[_getLinkText(report)]]</a>
+                <a href="TODO">[[_linkText(report)]]</a>
             </div>
           </div>
         </etools-data-table-row>
@@ -119,74 +116,52 @@
         on-page-number-changed="_pageNumberChanged">
       </etools-data-table-footer>
 
-      <etools-loading active="[[!loaded]]"></etools-loading>
+      <etools-loading active="[[loading]]"></etools-loading>
     </etools-content-panel>
-
   </template>
 
   <script>
     Polymer({
-      is: 'pd-reports-list',
+      id: 'progress-reports-list',
 
       behaviors: [
+        App.Behaviors.ReduxBehavior,
         App.Behaviors.DataTableBehavior,
         App.Behaviors.PaginationBehavior,
         App.Behaviors.UtilsBehavior,
-        App.Behaviors.ReduxBehavior,
-        App.Behaviors.RoutingBehavior,
       ],
 
       properties: {
-        pdId: {
-          type: String,
-          statePath: 'programmeDocuments.current',
+        loading: {
+          type: Boolean,
+          statePath: 'progressReports.loading',
         },
-
-        loaded: Boolean,
 
         data: {
           type: Array,
-          statePath: App.Selectors.ProgrammeDocumentReports.all,
+          statePath: 'progressReports.all',
         },
 
         totalResults: {
           type: Number,
-          statePath: App.Selectors.ProgrammeDocumentReports.count,
+          statePath: 'progressReports.count',
         },
-      },
 
-      _isDraft: function(is_draft) {
+      },
+       _isDraft: function(is_draft) {
         return is_draft;
       },
 
-      _getLink: function (report) {
-        var suffix;
-
-        if (report.is_draft) {
-          suffix = 'draft';
-        } else if (report.progress_report_status === 'Sub') {
-          suffix = 'view';
-        } else {
-          suffix = 'edit';
-        }
-
-        return this.buildUrl(
-          this._baseUrl,
-          '/pd/' + this.pdId + '/report/' + report.id + '/' + suffix
-        );
-      },
-
-      _getLinkText: function(report) {
+      _linkText: function(report) {
         if (report.is_draft) {
           return 'Go To Draft';
-        } else if (report.progress_report_status === 'Sub') {
+        } else if (report.progress_report_status === 'Sub' ||
+                   report.progress_report_status === 'Rej') {
           return 'View Report';
         } else {
           return 'Enter Data';
         }
       },
-
     });
   </script>
-
 </dom-module>
