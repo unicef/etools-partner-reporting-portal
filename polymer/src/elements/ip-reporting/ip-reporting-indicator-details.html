@@ -10,7 +10,6 @@
 
 <dom-module id="ip-reporting-indicator-details">
   <template>
-
     <!-- Styles the headers above the disaggregation tables.
     The tables themselves are styled in disaggregation-table-styles. -->
     <style include="iron-flex iron-flex-factors disaggregation-table-styles">
@@ -65,14 +64,13 @@
               </disaggregation-table>
             </div>
           </template>
-        </div>
+  </div>
 
-    </template>
+  </template>
 
   </template>
 
   <script>
-
     Polymer({
       is: 'ip-reporting-indicator-details',
 
@@ -108,11 +106,11 @@
         }
       },
 
-      _computeIndicatorReportsUrl: function (indicatorId) {
+      _computeIndicatorReportsUrl: function(indicatorId) {
         return App.Endpoints.indicatorReports(indicatorId);
       },
 
-      _bucketByLocation: function (data) {
+      _bucketByLocation: function(data) {
         var locations = {};
 
         if (Object.keys(data).length > 0) {
@@ -135,16 +133,16 @@
         return locationList;
       },
 
-      _updateDisaggregationStore: function (data) {
+      _updateDisaggregationStore: function(data) {
         this.dispatch(App.Actions.setIndicatorDisaggregations(data));
       },
 
-      _openChanged: function () {
+      _openChanged: function() {
         var self = this;
         if (this.isOpen) {
           self.loading = true;
           this.$.indicatorDetail.thunk()()
-            .then(function (res) {
+            .then(function(res) {
               var data = res.data;
 
               //TODO: Remove when API doesn't return all permutations anymore.
@@ -162,12 +160,11 @@
               self.loading = false;
               self._updateDisaggregationStore(selectedData);
             });
-            // TODO: error handling.
+          // TODO: error handling.
         } else {
           this.$.indicatorDetail.abort();
         }
       },
-
     });
   </script>
 </dom-module>

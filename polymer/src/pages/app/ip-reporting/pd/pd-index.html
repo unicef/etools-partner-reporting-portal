@@ -1,15 +1,9 @@
 <link rel="import" href="../../../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../../../bower_components/iron-location/iron-location.html">
-<link rel="import" href="../../../../../bower_components/iron-location/iron-query-params.html">
 
 <link rel="import" href="../../../../elements/page-header.html">
 <link rel="import" href="../../../../elements/page-body.html">
-<link rel="import" href="../../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../../elements/ip-reporting/pd-filters.html">
 <link rel="import" href="../../../../elements/ip-reporting/pd-list.html">
-<link rel="import" href="../../../../endpoints.html">
-<link rel="import" href="../../../../redux/actions.html">
-<link rel="import" href="../../../../redux/store.html">
 
 <dom-module id="page-ip-reporting-pd-index">
   <template>
@@ -18,21 +12,6 @@
         display: block;
       }
     </style>
-
-    <iron-location
-        query="{{query}}">
-    </iron-location>
-
-    <iron-query-params
-        params-string="{{query}}"
-        params-object="{{queryParams}}">
-    </iron-query-params>
-
-    <etools-prp-ajax
-        id="programmeDocuments"
-        url="[[programmeDocumentsUrl]]"
-        params="[[queryParams]]">
-    </etools-prp-ajax>
 
     <page-header title="Programme Documents"></page-header>
 
@@ -45,50 +24,6 @@
   <script>
     Polymer({
       is: 'page-ip-reporting-pd-index',
-
-      behaviors: [
-        App.Behaviors.ReduxBehavior,
-      ],
-
-      properties: {
-        programmeDocumentsUrl: {
-          type: String,
-          computed: '_computeProgrammeDocumentsUrl(locationId)',
-        },
-
-        locationId: {
-          type: String,
-          statePath: 'location.id',
-        },
-
-        queryParams: Object,
-      },
-
-      observers: [
-        '_handleInputChange(programmeDocumentsUrl, queryParams)',
-      ],
-
-      _computeProgrammeDocumentsUrl: function (locationId) {
-        return locationId ? App.Endpoints.programmeDocuments(locationId) : '';
-      },
-
-      _handleInputChange: function (programmeDocumentsUrl, queryParams) {
-        var pdThunk;
-
-        if (!programmeDocumentsUrl || !Object.keys(queryParams).length) {
-          return;
-        }
-
-        pdThunk = this.$.programmeDocuments.thunk();
-
-        // Cancel the pending request, if any
-        this.$.programmeDocuments.abort();
-
-        this.dispatch(App.Actions.PD.fetch(pdThunk))
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-            });
-      },
     });
   </script>
 </dom-module>

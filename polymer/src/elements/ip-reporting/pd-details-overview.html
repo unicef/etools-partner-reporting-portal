@@ -8,6 +8,7 @@
 <link rel="import" href="../../elements/page-body.html">
 
 <link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../redux/selectors/programmeDocuments.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../elements/labelled-item.html">
 
@@ -124,7 +125,6 @@
         </ul>
       </etools-content-panel>
     </page-body>
-
   </template>
 
   <script>
@@ -133,13 +133,26 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
       ],
 
       properties: {
-        pd: Object,
+        pd: {
+          type: Object,
+          value: {},
+          statePath: App.Selectors.ProgrammeDocuments.current,
+        },
 
-        loaded: Boolean,
-      }
+        loaded: {
+          type: Boolean,
+          value: false,
+          computed: '_computeLoaded(pd)',
+        },
+      },
+
+      _computeLoaded: function (pd) {
+        return !!pd.id;
+      },
     });
   </script>
 </dom-module>

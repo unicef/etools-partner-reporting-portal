@@ -303,7 +303,8 @@ def generate_fake_data(quantity=5):
     admin, created = User.objects.get_or_create(username='admin', defaults={
         'email': 'admin@unicef.org',
         'is_superuser': True,
-        'is_staff': True
+        'is_staff': True,
+        'organization': 'Tivix'
     })
     admin.set_password('Passw0rd!')
     admin.save()
@@ -321,17 +322,21 @@ def generate_fake_data(quantity=5):
     print "{} ProgrammeDocument objects created".format(quantity)
 
     # Linking the followings:
+    # ProgressReport - ProgrammeDocument
     # created LowerLevelOutput - ReportableToLowerLevelOutput
     # Section - ProgrammeDocument via ReportableToLowerLevelOutput
     # ProgressReport - IndicatorReport from ReportableToLowerLevelOutput
     for idx in xrange(quantity):
+        pd = ProgrammeDocument.objects.all()[idx]
+        progress_report = ProgressReportFactory(programme_document=pd)
+
         llo = LowerLevelOutput.objects.all()[idx]
-        reportable = ReportableToLowerLevelOutputFactory(content_object=llo)
+        reportable = ReportableToLowerLevelOutputFactory(content_object=llo, indicator_report__progress_report=None)
 
         reportable.content_object.indicator.programme_document.sections.add(Section.objects.all()[idx])
 
         indicator_report = reportable.indicator_reports.first()
-        indicator_report.progress_report = ProgressReportFactory()
+        indicator_report.progress_report = progress_report
         indicator_report.save()
 
     print "{} ProgrammeDocument <-> ReportableToLowerLevelOutput <-> IndicatorReport objects linked".format(quantity)
@@ -347,3 +352,6 @@ def generate_fake_data(quantity=5):
     print "{} ClusterActivity <-> PartnerActivity objects linked".format(quantity)
 
     generate_indicator_report_location_disaggregation_quantity_data()
+
+    admin.partner_id = Partner.objects.first().id
+    admin.save()

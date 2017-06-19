@@ -1,21 +1,20 @@
 <link rel="import" href="../../../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../../../bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="../../../../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../../../../bower_components/iron-pages/iron-pages.html">
 
 <link rel="import" href="../../../../elements/page-header.html">
 <link rel="import" href="../../../../elements/ip-reporting/pd-details-overview.html">
 <link rel="import" href="../../../../elements/ip-reporting/pd-details-reports.html">
-<link rel="import" href="../../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../../endpoints.html">
 <link rel="import" href="../../../../redux/actions.html">
 <link rel="import" href="../../../../redux/store.html">
+<link rel="import" href="../../../../redux/selectors/programmeDocumentReports.html">
 <link rel="import" href="../../../../styles/shared-styles.html">
 
 <link rel="import" href="../../../../behaviors/utils.html">
 
 <link rel="import" href="../../../../elements/page-body.html">
-<link rel="import" href="../../../../elements/ip-reporting/pd-page-header.html">
-<link rel="import" href="../../../../elements/ip-reporting/pd-details-content.html">
 <link rel="import" href="../../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../../endpoints.html">
 <link rel="import" href="../../../../redux/actions.html">
@@ -39,15 +38,6 @@
 
     </style>
 
-    <iron-location
-        query="{{query}}">
-    </iron-location>
-
-    <etools-prp-ajax
-        id="programmeDocumentDetails"
-        url="[[ programmeDocumentDetailsUrl ]]">
-    </etools-prp-ajax>
-
     <app-route
       route="{{route}}"
       pattern="/:dashTab"
@@ -63,7 +53,6 @@
         <paper-tabs
           selected="{{ routeData.dashTab }}"
           attr-for-selected="name"
-          fallback-selection="details"
           noink
           bottom-item>
 
@@ -88,13 +77,12 @@
       on-iron-items-changed="_updateTabSelection">
 
       <template is="dom-if" if="[[_equals(pdTab, 'details')]]" restamp="true">
-          <pd-details-overview name="details" pd="[[ pd ]]" loaded="[[ loaded ]]"></pd-details-overview>
+        <pd-details-overview name="details"></pd-details-overview>
       </template>
 
       <template is="dom-if" if="[[_equals(pdTab, 'reports')]]" restamp="true">
-          <pd-details-reports name="reports" pd-id="[[ pd.id ]]"></pd-details-reports>
+        <pd-details-reports name="reports" ></pd-details-reports>
       </template>
-
     </iron-pages>
 
   </template>
@@ -111,32 +99,13 @@
       properties: {
         pdTab: String,
 
-        pdId: Number,
-
-        routeData: Object,
-
         pd: {
           type: Object,
-          notify: true,
-          value: {}
+          value: {},
+          statePath: App.Selectors.ProgrammeDocuments.current,
         },
 
-        loaded: {
-          type: Boolean,
-          value: false,
-          computed: '_computeLoaded(pd)',
-        },
-
-        programmeDocumentDetailsUrl: {
-          type: String,
-          computed: '_computeProgrammeDocumentDetailsUrl(location, pdId)',
-          observer: '_fetchData',
-        },
-
-        location: {
-          type: String,
-          statePath: 'location.id',
-        },
+        routeData: Object,
       },
 
       observers: [
@@ -149,26 +118,6 @@
 
       _updateUrlTab: function (dashTab) {
         this.set('pdTab', dashTab);
-      },
-
-      _computeLoaded: function (pd) {
-        return !!pd.id;
-      },
-
-      _computeProgrammeDocumentDetailsUrl: function (location, pdId) {
-        return App.Endpoints.programmeDocumentDetail(location, pdId);
-      },
-
-      _fetchData: function (_) { // jshint ignore:line
-        var self = this;
-
-        this.$.programmeDocumentDetails.thunk()()
-          .then(function (res) {
-            self.set('pd', res.data);
-          })
-          .catch(function (err) { // jshint ignore:line
-            // TODO: error handling
-          });
       },
     });
   </script>

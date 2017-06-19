@@ -17,20 +17,8 @@ from core.common import (
     PROGRESS_REPORT_STATUS,
     PD_STATUS,
 )
+
 from indicator.models import Reportable  # IndicatorReport
-
-
-class ProgressReport(TimeStampedModel):
-    """
-    ProgressReport model - narrative for LLoutput/PDoutput indicators.
-    """
-    partner_contribution_to_date = models.CharField(max_length=256)
-    funds_received_to_date = models.CharField(max_length=256)
-    challenges_in_the_reporting_period = models.CharField(max_length=256)
-    proposed_way_forward = models.CharField(max_length=256)
-    status = models.CharField(max_length=3, choices=PROGRESS_REPORT_STATUS, default=PROGRESS_REPORT_STATUS.due)
-    # attachements ???
-
 
 class Section(models.Model):
     """
@@ -262,6 +250,31 @@ class ProgrammeDocument(TimeStampedModel):
     #             programme_document=self,
     #             time_period=self.start_date,
     #         )
+
+
+def find_first_programme_document_id():
+    try:
+        pd_id = ProgrammeDocument.objects.first().id
+    except AttributeError:
+        from core.factories import ProgrammeDocumentFactory
+        pd = ProgrammeDocumentFactory()
+        pd_id = pd.id
+    else:
+        return pd_id
+
+
+class ProgressReport(TimeStampedModel):
+    partner_contribution_to_date = models.CharField(max_length=256)
+    funds_received_to_date = models.CharField(max_length=256)
+    challenges_in_the_reporting_period = models.CharField(max_length=256)
+    proposed_way_forward = models.CharField(max_length=256)
+    status = models.CharField(max_length=3, choices=PROGRESS_REPORT_STATUS, default=PROGRESS_REPORT_STATUS.due)
+    programme_document = models.ForeignKey(ProgrammeDocument, related_name="progress_reports", default=find_first_programme_document_id)
+    # attachements ???
+
+    @cached_property
+    def latest_indicator_report(self):
+        return self.indicator_reports.all().order_by('-created').first()
 
 
 class CountryProgrammeOutput(TimeStampedModel):
