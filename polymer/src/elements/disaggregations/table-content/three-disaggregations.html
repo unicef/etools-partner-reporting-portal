@@ -135,7 +135,7 @@
         var middleRows = this.mapping[2].choices;
         var middleRowsForDisplay = [];
 
-        middleRows.map(function(y) {
+        middleRows.forEach(function(y) {
           var data = columnChoices.map(function(z) {
             var formatted = self._formatDisaggregationIds([outerRowID, y.id, z.id]);
             return self.data.disaggregation[formatted];
@@ -172,7 +172,7 @@
         };
         this.columnTotalRow = columnTotalRow;
 
-        middleRows.map(function(y) {
+        middleRows.forEach(function(y) {
           var data = columnChoices.map(function(z) {
             var formatted = self._formatDisaggregationIds([y.id, z.id]);
             return self.data.disaggregation[formatted];

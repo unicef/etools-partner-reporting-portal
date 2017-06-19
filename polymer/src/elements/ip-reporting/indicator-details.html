@@ -5,12 +5,13 @@
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../etools-prp-ajax.html">
 <link rel="import" href="../../elements/disaggregations/disaggregation-table.html">
+<link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../endpoints.html">
 
 <dom-module id="ip-reporting-indicator-details">
   <template>
 
-    <!-- Styles the headers above the disaggregation tables and outer containers.
+    <!-- Styles the headers above the disaggregation tables.
     The tables themselves are styled in disaggregation-table-styles. -->
     <style include="iron-flex iron-flex-factors disaggregation-table-styles">
       :host {
@@ -77,6 +78,7 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
       ],
 
       properties: {
@@ -94,6 +96,7 @@
 
         loading: Boolean,
 
+        // TODO: finish hooking up Redux so changes to the store will be reflected.
         data: {
           type: Object,
           value: {}
@@ -132,6 +135,10 @@
         return locationList;
       },
 
+      _updateDisaggregationStore: function (data) {
+        this.dispatch(App.Actions.setIndicatorDisaggregations(data));
+      },
+
       _openChanged: function () {
         var self = this;
         if (this.isOpen) {
@@ -148,16 +155,18 @@
               if (data.length === 5) {
                 res.data.shift();
               }
-              var numDisaggs = 2;
-              self.data = res.data[numDisaggs];
+              var numDisaggs = 3;
+              var selectedData = data[numDisaggs];
+              self.data = selectedData;
 
               self.loading = false;
+              self._updateDisaggregationStore(selectedData);
             });
             // TODO: error handling.
         } else {
           this.$.indicatorDetail.abort();
         }
-      }
+      },
 
     });
   </script>
