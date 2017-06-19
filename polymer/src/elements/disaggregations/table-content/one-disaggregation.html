@@ -90,8 +90,8 @@
         columnChoices.forEach(function(z) {
           var formatted = self._formatDisaggregationIds([z.id]);
           var forDisplay = {};
-          forDisplay['title'] = z.value;
-          forDisplay['total'] = self.data.disaggregation[formatted];
+          forDisplay.title = z.value;
+          forDisplay.total = self.data.disaggregation[formatted];
           data.push(forDisplay);
         });
         return data;

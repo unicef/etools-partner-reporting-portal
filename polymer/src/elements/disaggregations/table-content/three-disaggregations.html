@@ -106,17 +106,15 @@
         var self = this;
         var columnChoices = this.mapping[0].choices;
         var outerRows = this.mapping[1].choices;
-        var middleRows = this.mapping[2].choices;
         var outerRowsForDisplay = [];
 
         outerRows.map(function(x) {
-          var title = x.value;
-
+          var formatted = '';
           var outerRowData = columnChoices.map(function(z) {
-            var formatted = self._formatDisaggregationIds([x.id, z.id]);
+            formatted = self._formatDisaggregationIds([x.id, z.id]);
             return self.data.disaggregation[formatted];
           });
-          var formatted = self._formatDisaggregationIds([x.id]);
+          formatted = self._formatDisaggregationIds([x.id]);
           var total = self.data.disaggregation[formatted];
 
           outerRowsForDisplay.push({
@@ -129,7 +127,7 @@
         return outerRowsForDisplay;
       },
 
-      _determineMiddleRows(outerRowID) {
+      _determineMiddleRows: function(outerRowID) {
         var self = this;
         var columnChoices = this.mapping[0].choices;
         var middleRows = this.mapping[2].choices;
@@ -162,7 +160,7 @@
 
         var columnData = columnChoices.map(function(z) {
           var formatted = self._formatDisaggregationIds([z.id]);
-          return d = self.data.disaggregation[formatted];
+          return self.data.disaggregation[formatted];
         });
 
         var columnTotalRow = {
