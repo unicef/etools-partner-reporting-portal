@@ -57,6 +57,15 @@ class TestClusterObjectiveAPIView(BaseAPITestCase):
         self.assertEquals(ClusterObjective.objects.all().count(), base_count)
         self.assertEquals(ClusterObjective.objects.get(id=response.data['id']).title, data['title'])
 
+    def test_update_put_non_existent_cluster_objective(self):
+        last = ClusterObjective.objects.last()
+        data = self.data
+        data.update(dict(id=last.id+1, title='new updated title'))
+        url = reverse('cluster-objective')
+        response = self.client.put(url, data=data, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_update_patch_cluster_objective(self):
         """
         patch object unit test for ClusterObjectiveAPIView
@@ -71,6 +80,14 @@ class TestClusterObjectiveAPIView(BaseAPITestCase):
         self.assertEquals(ClusterObjective.objects.all().count(), base_count)
         self.assertEquals(ClusterObjective.objects.get(id=response.data['id']).title, data['title'])
 
+    def test_update_patch_non_existent_cluster_objective(self):
+        last = ClusterObjective.objects.last()
+        data = dict(id=last.id+1, title='new updated title')
+        url = reverse('cluster-objective')
+        response = self.client.patch(url, data=data, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_delete_cluster_objective(self):
         """
         delete object unit test for ClusterObjectiveAPIView
@@ -82,6 +99,13 @@ class TestClusterObjectiveAPIView(BaseAPITestCase):
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(response.data, None)
         self.assertEquals(ClusterObjective.objects.all().count(), base_count-1)
+
+    def test_delete_non_existent_cluster_objective(self):
+        last = ClusterObjective.objects.last()
+        url = reverse('cluster-objective')
+        response = self.client.delete(url, data={"id": last.pk+1}, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_read_cluster_objective(self):
         """
@@ -113,6 +137,16 @@ class TestClusterObjectiveAPIView(BaseAPITestCase):
         response = self.client.get(url, format='json')
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(response.data['count'], 1)
+
+    def test_read_non_existent_cluster_objective(self):
+        """
+        read object unit test for ClusterObjectiveAPIView
+        """
+        last = ClusterObjective.objects.last()
+        url = reverse('cluster-objective', kwargs={"pk": last.pk+1})
+        response = self.client.get(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
 class TestClusterActivityAPIView(BaseAPITestCase):
