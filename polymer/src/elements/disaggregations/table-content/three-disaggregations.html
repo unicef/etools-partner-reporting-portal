@@ -1,0 +1,140 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../../behaviors/disaggregations.html">
+<link rel="import" href="../../../behaviors/utils.html">
+<link rel="import" href="../../../styles/disaggregation-table-styles.html">
+<link rel="import" href="../disaggregation-table-row.html">
+
+<dom-module id="three-disaggregations">
+  <template>
+
+    <style include='disaggregation-table-styles'></style>
+
+    <!-- Column names -->
+    <tr class="horizontal layout headerRow">
+      <th class='flex'></th>
+      <template is="dom-repeat"
+                items="[[columns]]"
+                as="column">
+        <th class='flex'>[[_capitalizeFirstLetter(column.value)]]</th>
+      </template>
+      <th class='flex'>Total</th>
+    </tr>
+
+    <!-- Data rows: outer and middle. -->
+    <template is="dom-repeat"
+              items="[[outerRowsForDisplay]]"
+              as="outerRow">
+      <disaggregation-table-row data=[[outerRow]] row-type="outerRow">
+      </disaggregation-table-row>
+
+      <template is="dom-repeat"
+                items="[[_determineMiddleRows(outerRow.id)]]"
+                as="middleRow">
+        <disaggregation-table-row data=[[middleRow]] row-type="middleRow">
+        </disaggregation-table-row>
+      </template>
+
+   </template>
+
+   <!-- Totals row -->
+   <disaggregation-table-row data=[[columnTotalRow]]
+                             total=[[total]]
+                             row-type="totalsRow">
+   </disaggregation-table-row>
+
+   <!-- Bottom table -->
+   <template is="dom-repeat"
+             items="[[bottomRows]]"
+             as="bottomRow">
+     <disaggregation-table-row data=[[bottomRow]]
+                               row-type="bottomRow">
+     </disaggregation-table-row>
+  </template>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'three-disaggregations',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.DisaggregationBehavior,
+      ],
+
+      observers: [
+        '_determineTotals(mapping)'
+      ],
+
+      properties: {
+        data: {
+          type: Object,
+          value: {}
+        },
+
+        mapping: {
+          type: Array,
+          value: []
+        },
+
+        total: Number,
+
+        //Passing columnNames as a param is required to trigger update.
+        columns: {
+          type: Array,
+          computed: '_getColumns(mapping)'
+        },
+
+        outerRowsForDisplay: {
+          type: Array,
+          computed: '_determineOuterRows(mapping)'
+        },
+
+        columnTotalRow: {
+          type: Object,
+          value: {}
+        }
+      },
+
+      _getColumns: function(mapping) {
+        return this.mapping[0].choices;
+      },
+
+      _determineOuterRows: function() {
+        var columnChoices = this.mapping[0].choices;
+        var outerRows = this.mapping[1].choices;
+        return this._determineRows(this, outerRows, columnChoices);
+      },
+
+      _determineMiddleRows: function(outerRowID) {
+        var self = this;
+        var columnChoices = this.mapping[0].choices;
+        var middleRows = this.mapping[2].choices;
+        return this._determineRows(this, middleRows, columnChoices);
+      },
+
+      _determineTotals: function() {
+        var self = this;
+        var columnChoices = this.mapping[0].choices;
+        var middleRows = this.mapping[2].choices;
+        var bottomRows = [];
+
+        var columnData = columnChoices.map(function(z) {
+          var formatted = self._formatDisaggregationIds([z.id]);
+          return self.data.disaggregation[formatted];
+        });
+
+        var columnTotalRow = {
+          data: columnData,
+          title: 'total',
+          total: this.total
+        };
+        this.columnTotalRow = columnTotalRow;
+
+        this.bottomRows = this._determineRows(this, middleRows, columnChoices);
+      },
+
+    });
+  </script>
+</dom-module>

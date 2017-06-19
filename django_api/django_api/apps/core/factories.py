@@ -21,6 +21,8 @@ from indicator.models import (
     Reportable,
     IndicatorReport,
     IndicatorLocationData,
+    Disaggregation,
+    DisaggregationValue,
 )
 from unicef.models import (
     Section,
@@ -211,6 +213,9 @@ class ReportableFactory(factory.django.DjangoModelFactory):
         lambda o: ContentType.objects.get_for_model(o.content_object))
     total = fuzzy.FuzzyInteger(10, 100, 5)
 
+    # Commented out so that we can create Disaggregation and DisaggregationValue objects manually
+    # disaggregation = factory.RelatedFactory('core.factories.DisaggregationFactory', 'reportable')
+
     class Meta:
         exclude = ['content_object']
         abstract = True
@@ -292,6 +297,23 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
         model = ProgrammeDocument
 
 
+class DisaggregationFactory(factory.django.DjangoModelFactory):
+    active = True
+
+    # Commented out so that we can create Disaggregation and DisaggregationValue objects manually
+    # disaggregation_value = factory.RelatedFactory('core.factories.DisaggregationValueFactory', 'disaggregation')
+
+    class Meta:
+        model = Disaggregation
+
+
+class DisaggregationValueFactory(factory.django.DjangoModelFactory):
+    active = True
+
+    class Meta:
+        model = DisaggregationValue
+
+
 class IndicatorReportFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "indicator_report_%d" % n)
     time_period_start = fuzzy.FuzzyDate(datetime.date.today())
@@ -320,79 +342,10 @@ class LowerLevelOutputFactory(factory.django.DjangoModelFactory):
 
 class IndicatorLocationDataFactory(factory.django.DjangoModelFactory):
     # disaggregation = JSONFactory()
-    disaggregation = {
-        "extrashort": {
-            "1-2m": {
-                "male": random.randint(50, 200),
-                "female": random.randint(50, 200),
-                "other": random.randint(50, 200),
-            },
-            "3-5m": {
-                "male": random.randint(50, 200),
-                "female": random.randint(50, 200),
-                "other": random.randint(50, 200),
-            },
-            "6-10m": {
-                "male": random.randint(50, 200),
-                "female": random.randint(50, 200),
-                "other": random.randint(50, 200),
-            }
-        },
-
-        "short": {
-            "1-2m": {
-                "male": random.randint(50, 200),
-                "female": random.randint(50, 200),
-                "other": random.randint(50, 200),
-            },
-            "3-5m": {
-                "male": random.randint(50, 200),
-                "female": random.randint(50, 200),
-                "other": random.randint(50, 200),
-            },
-            "6-10m": {
-                "male": random.randint(50, 200),
-                "female": random.randint(50, 200),
-                "other": random.randint(50, 200),
-            }
-        },
-
-        "medium": {
-            "1-2m": {
-                "male": random.randint(50, 200),
-                "female": random.randint(50, 200),
-                "other": random.randint(50, 200),
-            },
-            "3-5m": {
-                "male": random.randint(50, 200),
-                "female": random.randint(50, 200),
-                "other": random.randint(50, 200),
-            },
-            "6-10m": {
-                "male": random.randint(50, 200),
-                "female": random.randint(50, 200),
-                "other": random.randint(50, 200),
-            }
-        },
-
-        "tall": {
-            "1-2m": {
-                "male": random.randint(50, 200),
-                "female": random.randint(50, 200),
-                "other": random.randint(50, 200),
-            },
-            "3-5m": {
-                "male": random.randint(50, 200),
-                "female": random.randint(50, 200),
-                "other": random.randint(50, 200),
-            },
-            "6-10m": {
-                "male": random.randint(50, 200),
-                "female": random.randint(50, 200),
-                "other": random.randint(50, 200),
-            }
-        }
-    }
+    disaggregation = dict()
+    num_disaggregation = 3
+    level_reported = 3
+    disaggregation_reported_on = list()
 
     class Meta:
         model = IndicatorLocationData

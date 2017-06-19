@@ -11,6 +11,7 @@
       all: allIndicatorsReducer,
       loading: loadingIndicatorsReducer,
       count: indicatorsCountReducer,
+      disaggregations: indicatorDisaggregationReducer,
     });
 
     function allIndicatorsReducer(state, action) {
@@ -55,6 +56,30 @@
 
         case App.Constants.INDICATORS_LOADING_STOP:
           return false;
+
+        default:
+          return state;
+      }
+    }
+
+    function indicatorDisaggregationReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = {};
+      }
+
+      switch (action.type) {
+        case App.Constants.SET_INDICATOR_DISAGGREGATIONS:
+
+          // Make a copy of the existing disaggregations state.
+          var copy = Object.assign({}, state.disaggregations);
+          copy[action.disaggregations.id] = action.disaggregations;
+
+          // Add the updated disaggregations state to the full state.
+          var fullCopy = Object.assign({}, state, {
+            disaggregations: copy
+          });
+
+          return fullCopy;
 
         default:
           return state;

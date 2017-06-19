@@ -1,34 +1,28 @@
-<link rel="import" href="../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../bower_components/iron-icons/maps-icons.html">
-<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
+<link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../etools-prp-ajax.html">
-<link rel="import" href="../etools-prp-detail-table.html">
+<link rel="import" href="../../elements/disaggregations/disaggregation-table.html">
+<link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../endpoints.html">
 
 <dom-module id="ip-reporting-indicator-details">
   <template>
-    <style include="iron-flex iron-flex-factors">
+    <!-- Styles the headers above the disaggregation tables.
+    The tables themselves are styled in disaggregation-table-styles. -->
+    <style include="iron-flex iron-flex-factors disaggregation-table-styles">
       :host {
         display: block;
+        width: 100%;
       }
       iron-icon {
-        color: var(--accent-color)
+        color: var(--accent-color);
       }
       h3 {
         width: 100%;
         float: left;
-      }
-      h4 {
-        font-weight: 400;
-      }
-      h4 span {
-        color: gray;
-        font-weight: 400;
-      }
-      .wrapper {
-        float: left;
-        margin: 0 10px 10px 10px;
       }
     </style>
 
@@ -39,33 +33,51 @@
 
     <etools-loading active="[[loading]]"></etools-loading>
 
-    <!-- TODO: group data objects by location; only display location header once. -->
-    <template id="reports"
-              is="dom-repeat"
-              items="[[data]]">
-      <h3>
-        <iron-icon icon="maps:place"></iron-icon>
-        [[item.indicator_location_data.0.location.title]]
-      </h3>
+      <template is="dom-repeat"
+                items="[[locations]]"
+                as="location">
 
-      <template id="report-table"
-                is="dom-repeat"
-                items="[[item.indicator_location_data]]"
-                as="report">
-        <div class="wrapper">
-          <h4>
-            Progress in reporting period
-            <span>[[item.time_period_start]] - [[item.time_period_end]]<span>
-          </h4>
-          <etools-prp-detail-table report=[[report]]></etools-prp-detail-table>
-        </div>
-      </template>
-    </template>
+        <h3>
+          <iron-icon icon="maps:place"></iron-icon>
+          [[location.0.location.title]]
+        </h3>
+
+        <div class="container">
+          <template is="dom-repeat"
+                    items="[[location]]"
+                    as="item">
+
+            <div class="item">
+              <h4>
+                <span>
+                  <strong>Progress in reporting period: </strong>
+                  [[data.time_period_start]] - [[data.time_period_end]]
+                </span>
+                <span class="total">
+                  <strong>Total: </strong>[[data.total]]
+                </span>
+              </h4>
+              <disaggregation-table
+                total=[[data.total]]
+                data=[[item]]
+                mapping=[[data.disagg_lookup_map]]>
+              </disaggregation-table>
+            </div>
+          </template>
+  </div>
+
+  </template>
+
   </template>
 
   <script>
     Polymer({
       is: 'ip-reporting-indicator-details',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+      ],
 
       properties: {
         indicatorDetailUrl: {
@@ -82,30 +94,77 @@
 
         loading: Boolean,
 
+        // TODO: finish hooking up Redux so changes to the store will be reflected.
         data: {
-          type: Array,
-          value: []
+          type: Object,
+          value: {}
         },
+
+        locations: {
+          type: Array,
+          computed: '_bucketByLocation(data)'
+        }
       },
 
-      _computeIndicatorReportsUrl: function (indicatorId) {
+      _computeIndicatorReportsUrl: function(indicatorId) {
         return App.Endpoints.indicatorReports(indicatorId);
       },
 
-      _openChanged: function () {
+      _bucketByLocation: function(data) {
+        var locations = {};
+
+        if (Object.keys(data).length > 0) {
+          data.indicator_location_data.forEach(function(report) {
+            if (locations[report.location.id]) {
+              var currentArray = locations[report.location.id];
+              var newArray = currentArray;
+              newArray.push(report);
+              locations[report.location.id] = newArray;
+            } else {
+              locations[report.location.id] = [report];
+            }
+          });
+        }
+        var locationList = [];
+
+        Object.keys(locations).forEach(function(i) {
+          locationList.push(locations[i]);
+        });
+        return locationList;
+      },
+
+      _updateDisaggregationStore: function(data) {
+        this.dispatch(App.Actions.setIndicatorDisaggregations(data));
+      },
+
+      _openChanged: function() {
         var self = this;
         if (this.isOpen) {
           self.loading = true;
           this.$.indicatorDetail.thunk()()
-            .then(function (res) {
-              self.data = res.data;
+            .then(function(res) {
+              var data = res.data;
+
+              //TODO: Remove when API doesn't return all permutations anymore.
+              //Strips out the 1-2 unwanted objects (fakedata glitch):
+              if (data.length === 6) {
+                res.data.shift();
+              }
+              if (data.length === 5) {
+                res.data.shift();
+              }
+              var numDisaggs = 3;
+              var selectedData = data[numDisaggs];
+              self.data = selectedData;
+
               self.loading = false;
+              self._updateDisaggregationStore(selectedData);
             });
-            // TODO: error handling.
+          // TODO: error handling.
         } else {
           this.$.indicatorDetail.abort();
         }
-      }
+      },
     });
   </script>
 </dom-module>

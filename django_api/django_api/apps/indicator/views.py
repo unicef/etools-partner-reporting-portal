@@ -4,6 +4,7 @@ from django.http import Http404
 from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import get_object_or_404
+from django.http import Http404
 
 from rest_framework import status
 from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveAPIView
@@ -17,9 +18,15 @@ from core.paginations import SmallPagination
 from unicef.models import LowerLevelOutput
 from unicef.serializers import ProgressReportSerializer
 
-from .serializers import IndicatorListSerializer, IndicatorLLoutputsSerializer, PDReportsSerializer, IndicatorReportListSerializer
-from .models import Reportable, IndicatorReport
+from .serializers import (
+    IndicatorListSerializer, IndicatorReportListSerializer, PDReportsSerializer, SimpleIndicatorLocationDataListSerializer,
+    IndicatorLLoutputsSerializer,
+)
 from .filters import IndicatorFilter, PDReportsFilter
+from .models import (
+    IndicatorReport, Reportable, Disaggregation,
+    DisaggregationValue
+)
 
 
 class PDReportsAPIView(ListAPIView):
@@ -106,19 +113,19 @@ class IndicatorListCreateAPIView(ListCreateAPIView):
         pd_statuses = self.request.query_params.get('pd_statuses', None)
 
         if locations:
-            location_list = map(lambda item: int(item), filter(lambda item: item != '', locations.split(',')))
+            location_list = map(lambda item: int(item), filter(lambda item: item != '' and item.isdigit(), locations.split(',')))
             q_list.append(Q(locations__id__in=location_list))
 
         if pds:
-            pd_list = map(lambda item: int(item), filter(lambda item: item != '', pds.split(',')))
+            pd_list = map(lambda item: int(item), filter(lambda item: item != '' and item.isdigit(), pds.split(',')))
             q_list.append(Q(lower_level_outputs__indicator__programme_document__id__in=pd_list))
 
         if clusters:
-            cluster_list = map(lambda item: int(item), filter(lambda item: item != '', clusters.split(',')))
+            cluster_list = map(lambda item: int(item), filter(lambda item: item != '' and item.isdigit(), clusters.split(',')))
             q_list.append(Q(cluster_activities__cluster__id__in=cluster_list))
 
         if pd_statuses:
-            pd_status_list = map(lambda item: item, filter(lambda item: item != '', pd_statuses.split(',')))
+            pd_status_list = map(lambda item: item, filter(lambda item: item != '' and item.isdigit(), pd_statuses.split(',')))
             q_list.append(Q(lower_level_outputs__indicator__programme_document__status__in=pd_status_list))
 
         if q_list:
@@ -167,12 +174,30 @@ class IndicatorDataAPIView(APIView):
 class IndicatorReportListAPIView(APIView):
     """
     REST API endpoint to get a list of IndicatorReport objects, including each set of disaggregation data per report.
+
+    kwargs:
+    - reportable_id: Reportable pk (if given, the API will only return IndicatorReport objects tied to this Reportable)
+
+    GET parameter:
+    - pks = A comma-separated string for IndicatorReport pks (If this GET parameter is given, Reportable pk kwargs will be ignored)
     """
 
-    def get_queryset(self, pk):
-        reportable = get_object_or_404(Reportable, pk=pk)
+    def get_queryset(self, *args, **kwargs):
+        indicator_reports = None
 
-        indicator_reports = reportable.indicator_reports.all().order_by('-time_period_start')
+        pks = self.request.query_params.get('pks', None)
+        reportable_id = self.kwargs.get('reportable_id', None)
+
+        if not pks and not reportable_id:
+            raise Http404
+
+        if pks:
+            pk_list = map(lambda item: int(item), filter(lambda item: item != '' and item.isdigit(), pks.split(',')))
+            indicator_reports = IndicatorReport.objects.filter(id__in=pk_list)
+
+        else:
+            reportable = get_object_or_404(Reportable, pk=reportable_id)
+            indicator_reports = reportable.indicator_reports.all().order_by('-time_period_start')
 
         if 'limit' in self.request.query_params:
             limit = self.request.query_params.get('limit', 2)
@@ -180,9 +205,25 @@ class IndicatorReportListAPIView(APIView):
 
         return indicator_reports
 
-    def get(self, request, pk, format='json'):
-        indicator_reports = self.get_queryset(pk)
+    def get(self, request, *args, **kwargs):
+        indicator_reports = self.get_queryset()
 
         serializer = IndicatorReportListSerializer(indicator_reports, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class IndicatorLocationDataUpdateAPIView(APIView):
+    """
+    REST API endpoint to update a set of IndicatorLocationData objects, including each set of disaggregation data.
+    """
+
+    def put(self, request, *args, **kwargs):
+        serializer = SimpleIndicatorLocationDataListSerializer(data=request.data, many=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
