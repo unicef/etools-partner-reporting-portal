@@ -40,10 +40,12 @@ INTERVENTION_STATUS = Choices(
 )
 
 INDICATOR_REPORT_STATUS = Choices(
-    ('OT', 'ontrack', 'On Track'),
-    ('Con', 'constrained', 'Constrained'),
-    ('NP', 'noprogress', 'No Progress'),
-    ('TM', 'targetmet', 'Target Met')
+    ('Ove', 'overdue', 'Overdue'),  #red
+    ('Sub', 'submitted', 'Submitted'),  #orange
+    ('Acc', 'accepted', 'Accepted'),  #green
+    ('Sen', 'sent_back', 'Sent back to partner'),  #red
+    ('Due', 'due', 'Due'),  #grey
+    ('Not', 'nothing_due', 'Nothing due'),  #no colour
 )
 
 ADMINISTRATIVE_LEVEL = Choices(

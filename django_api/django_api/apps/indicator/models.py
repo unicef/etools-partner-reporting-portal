@@ -141,7 +141,7 @@ class IndicatorReport(TimeStampedModel):
     remarks = models.TextField(blank=True, null=True)
     report_status = models.CharField(
         choices=INDICATOR_REPORT_STATUS,
-        default=INDICATOR_REPORT_STATUS.ontrack,
+        default=INDICATOR_REPORT_STATUS.due,
         max_length=3
     )
 
