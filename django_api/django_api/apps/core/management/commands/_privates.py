@@ -30,7 +30,7 @@ from core.models import (
     Intervention,
     Location,
 )
-from core.helpers import get_combination_pairs
+from core.helpers import generate_data_combination_entries
 
 from core.factories import (
     UserFactory,
@@ -75,28 +75,6 @@ def clean_up_data():
         print "All ORM objects deleted"
 
 
-def generate_data_combination_dict(array, r=3):
-    output_dict = {}
-
-    for idx in xrange(1, r + 1):
-        id_pairs = get_combination_pairs(array, idx)
-
-        for id_tuple in id_pairs:
-            output_dict[str(id_tuple)] = {
-                'v': random.randint(50, 1000),
-                'd': None,
-                'c': None
-            }
-
-    output_dict[str(tuple())] = {
-        'v': random.randint(50, 1000),
-        'd': None,
-        'c': None
-    }
-
-    return output_dict
-
-
 def generate_0_num_disagg_quantity_data(reportable):
     # IndicatorReport from ReportableToLowerLevelOutput -
     # IndicatorLocationData
@@ -118,7 +96,7 @@ def generate_0_num_disagg_quantity_data(reportable):
                 num_disaggregation=0,
                 level_reported=0,
                 disaggregation_reported_on=pair,
-                disaggregation=generate_data_combination_dict(reduce(
+                disaggregation=generate_data_combination_entries(reduce(
                     lambda acc, curr: acc + curr, indicator_report_from_reportable.disaggregation_values(id_only=True, filter_by_id__in=pair)), r=0)
             )
 
@@ -146,7 +124,7 @@ def generate_1_num_disagg_quantity_data(reportable):
                 num_disaggregation=1,
                 level_reported=0,
                 disaggregation_reported_on=pair,
-                disaggregation=generate_data_combination_dict(reduce(
+                disaggregation=generate_data_combination_entries(reduce(
                     lambda acc, curr: acc + curr, indicator_report_from_reportable.disaggregation_values(id_only=True, filter_by_id__in=pair)), r=0)
             )
 
@@ -165,7 +143,7 @@ def generate_1_num_disagg_quantity_data(reportable):
                 num_disaggregation=1,
                 level_reported=1,
                 disaggregation_reported_on=pair,
-                disaggregation=generate_data_combination_dict(reduce(lambda acc, curr: acc + curr, indicator_report_from_reportable.disaggregation_values(id_only=True, filter_by_id__in=pair)), r=1))
+                disaggregation=generate_data_combination_entries(reduce(lambda acc, curr: acc + curr, indicator_report_from_reportable.disaggregation_values(id_only=True, filter_by_id__in=pair)), r=1))
 
             disagg_idx += 1
 
@@ -191,7 +169,7 @@ def generate_2_num_disagg_quantity_data(reportable):
                 num_disaggregation=2,
                 level_reported=0,
                 disaggregation_reported_on=pair,
-                disaggregation=generate_data_combination_dict(reduce(
+                disaggregation=generate_data_combination_entries(reduce(
                     lambda acc, curr: acc + curr, indicator_report_from_reportable.disaggregation_values(id_only=True, filter_by_id__in=pair)), r=0)
             )
 
@@ -210,7 +188,7 @@ def generate_2_num_disagg_quantity_data(reportable):
                 num_disaggregation=2,
                 level_reported=1,
                 disaggregation_reported_on=pair,
-                disaggregation=generate_data_combination_dict(reduce(lambda acc, curr: acc + curr, indicator_report_from_reportable.disaggregation_values(id_only=True, filter_by_id__in=pair)), r=1))
+                disaggregation=generate_data_combination_entries(reduce(lambda acc, curr: acc + curr, indicator_report_from_reportable.disaggregation_values(id_only=True, filter_by_id__in=pair)), r=1))
 
             disagg_idx += 1
 
@@ -227,7 +205,7 @@ def generate_2_num_disagg_quantity_data(reportable):
                 num_disaggregation=2,
                 level_reported=2,
                 disaggregation_reported_on=pair,
-                disaggregation=generate_data_combination_dict(reduce(lambda acc, curr: acc + curr, indicator_report_from_reportable.disaggregation_values(id_only=True, filter_by_id__in=pair)), r=2))
+                disaggregation=generate_data_combination_entries(reduce(lambda acc, curr: acc + curr, indicator_report_from_reportable.disaggregation_values(id_only=True, filter_by_id__in=pair)), r=2))
 
             disagg_idx += 1
 
@@ -253,7 +231,7 @@ def generate_3_num_disagg_quantity_data(reportable):
                 num_disaggregation=3,
                 level_reported=0,
                 disaggregation_reported_on=pair,
-                disaggregation=generate_data_combination_dict(reduce(
+                disaggregation=generate_data_combination_entries(reduce(
                     lambda acc, curr: acc + curr, indicator_report_from_reportable.disaggregation_values(id_only=True, filter_by_id__in=pair)), r=0)
             )
 
@@ -272,7 +250,7 @@ def generate_3_num_disagg_quantity_data(reportable):
                 num_disaggregation=3,
                 level_reported=1,
                 disaggregation_reported_on=pair,
-                disaggregation=generate_data_combination_dict(reduce(lambda acc, curr: acc + curr, indicator_report_from_reportable.disaggregation_values(id_only=True, filter_by_id__in=pair)), r=1))
+                disaggregation=generate_data_combination_entries(reduce(lambda acc, curr: acc + curr, indicator_report_from_reportable.disaggregation_values(id_only=True, filter_by_id__in=pair)), r=1))
 
             disagg_idx += 1
 
@@ -289,7 +267,7 @@ def generate_3_num_disagg_quantity_data(reportable):
                 num_disaggregation=3,
                 level_reported=2,
                 disaggregation_reported_on=pair,
-                disaggregation=generate_data_combination_dict(reduce(lambda acc, curr: acc + curr, indicator_report_from_reportable.disaggregation_values(id_only=True, filter_by_id__in=pair)), r=2))
+                disaggregation=generate_data_combination_entries(reduce(lambda acc, curr: acc + curr, indicator_report_from_reportable.disaggregation_values(id_only=True, filter_by_id__in=pair)), r=2))
 
             disagg_idx += 1
 
@@ -303,7 +281,7 @@ def generate_3_num_disagg_quantity_data(reportable):
             level_reported=3,
             disaggregation_reported_on=list(
                 indicator_report_from_reportable.disaggregations.values_list('id', flat=True)),
-            disaggregation=generate_data_combination_dict(reduce(
+            disaggregation=generate_data_combination_entries(reduce(
                 lambda acc, curr: acc + curr, indicator_report_from_reportable.disaggregation_values(id_only=True)))
         )
 
@@ -320,7 +298,7 @@ def generate_3_num_disagg_quantity_data(reportable):
                 level_reported=3,
                 disaggregation_reported_on=list(
                     indicator_report_from_reportable.disaggregations.values_list('id', flat=True)),
-                disaggregation=generate_data_combination_dict(reduce(
+                disaggregation=generate_data_combination_entries(reduce(
                     lambda acc, curr: acc + curr, indicator_report_from_reportable.disaggregation_values(id_only=True)))
             )
 
