@@ -39,34 +39,53 @@
 
         <h3>
           <iron-icon icon="maps:place"></iron-icon>
-          [[location.0.location.title]]
+          [[location.name]]
         </h3>
 
         <div class="container">
-          <template is="dom-repeat"
-                    items="[[location]]"
-                    as="item">
-
+          <template is="dom-if" if="[[location.current]]">
             <div class="item">
               <h4>
                 <span>
-                  <strong>Progress in reporting period: </strong>
-                  [[data.time_period_start]] - [[data.time_period_end]]
+                  <strong>Progress in current reporting period: </strong>
+                  [[location.reportInfo.time_period_start]] -
+                  [[location.reportInfo.time_period_end]]
                 </span>
                 <span class="total">
-                  <strong>Total: </strong>[[data.total]]
+                  <strong>Total: </strong>[[location.reportInfo.total]]
                 </span>
               </h4>
+              <!-- TODO: check - wrong use of total? -->
               <disaggregation-table
-                total=[[data.total]]
-                data=[[item]]
-                mapping=[[data.disagg_lookup_map]]>
+                total=[[location.reportInfo.total]]
+                data=[[location.current]]
+                mapping=[[location.reportInfo.disagg_lookup_map]]>
               </disaggregation-table>
             </div>
           </template>
-  </div>
 
-  </template>
+          <template is="dom-if" if="[[location.previous]]">
+            <div class="item">
+              <h4>
+                <span>
+                  <strong>Progress in previous reporting period: </strong>
+                  [[location.reportInfo.time_period_start]] -
+                  [[location.reportInfo.time_period_end]]
+                </span>
+                <span class="total">
+                  <strong>Total: </strong>[[location.reportInfo.total]]
+                </span>
+              </h4>
+              <disaggregation-table
+                total=[[location.reportInfo.total]]
+                data=[[location.previous]]
+                mapping=[[location.reportInfo.disagg_lookup_map]]>
+              </disaggregation-table>
+            </div>
+          </template>
+        </div>
+
+      </template>
 
   </template>
 
@@ -96,8 +115,8 @@
 
         // TODO: finish hooking up Redux so changes to the store will be reflected.
         data: {
-          type: Object,
-          value: {}
+          type: Array,
+          value: []
         },
 
         locations: {
@@ -107,29 +126,44 @@
       },
 
       _computeIndicatorReportsUrl: function(indicatorId) {
-        return App.Endpoints.indicatorReports(indicatorId);
+        return App.Endpoints.indicatorReports(indicatorId) + '?limit=2';
       },
 
       _bucketByLocation: function(data) {
+        //API gives us two objects, one for current reporting period and
+        //one for previous. We want to create a list of locations, each with a
+        //current and/or previous report.
         var locations = {};
 
-        if (Object.keys(data).length > 0) {
-          data.indicator_location_data.forEach(function(report) {
-            if (locations[report.location.id]) {
-              var currentArray = locations[report.location.id];
-              var newArray = currentArray;
-              newArray.push(report);
-              locations[report.location.id] = newArray;
+        if (!data) { return []; }
+
+        data.forEach(function(report, index) {
+          var timeframe = 'current';
+          if (index === 1) {
+            timeframe = 'previous';
+          }
+
+          report.indicator_location_data.forEach(function(locationReport) {
+            if (locations[locationReport.location.id]) {
+              var toUpdate = locations[locationReport.location.id];
+              toUpdate[timeframe] = locationReport;
+              locations[locationReport.location.id] = toUpdate;
             } else {
-              locations[report.location.id] = [report];
+              var newDict = {};
+              newDict[timeframe] = locationReport;
+              newDict.name = locationReport.location.title;
+              newDict.reportInfo = report;
+              locations[locationReport.location.id] = newDict;
             }
           });
-        }
+        });
+
         var locationList = [];
 
         Object.keys(locations).forEach(function(i) {
           locationList.push(locations[i]);
         });
+
         return locationList;
       },
 
@@ -144,21 +178,9 @@
           this.$.indicatorDetail.thunk()()
             .then(function(res) {
               var data = res.data;
-
-              //TODO: Remove when API doesn't return all permutations anymore.
-              //Strips out the 1-2 unwanted objects (fakedata glitch):
-              if (data.length === 6) {
-                res.data.shift();
-              }
-              if (data.length === 5) {
-                res.data.shift();
-              }
-              var numDisaggs = 3;
-              var selectedData = data[numDisaggs];
-              self.data = selectedData;
-
+              self.data = data;
               self.loading = false;
-              self._updateDisaggregationStore(selectedData);
+              // self._updateDisaggregationStore(selectedData);
             });
           // TODO: error handling.
         } else {
