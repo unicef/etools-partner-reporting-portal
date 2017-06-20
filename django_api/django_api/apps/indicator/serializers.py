@@ -1,4 +1,5 @@
 from ast import literal_eval as make_tuple
+from itertools import combinations
 
 from django.conf import settings
 
@@ -6,6 +7,7 @@ from rest_framework import serializers
 
 from unicef.models import LowerLevelOutput
 from core.serializers import SimpleLocationSerializer
+from core.helpers import get_combination_pairs
 
 from .models import (
     Reportable, IndicatorBlueprint,
@@ -166,14 +168,83 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
             'disaggregation_reported_on',
         )
 
+
+class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
+
+    disaggregation = serializers.JSONField()
+
+    class Meta:
+        model = IndicatorLocationData
+        fields = (
+            'id',
+            'indicator_report',
+            'disaggregation',
+            'num_disaggregation',
+            'level_reported',
+            'disaggregation_reported_on',
+        )
+
     def validate(self, data):
         """
         Check IndicatorLocationData object's disaggregation
         field is correctly mapped to the disaggregation values.
         """
 
+        # level_reported and num_disaggregation validation
+        if data['level_reported'] > data['num_disaggregation']:
+            raise serializers.ValidationError(
+                "level_reported cannot be higher than "
+                + "its num_disaggregation"
+            )
+
+        # num_disaggregation assertion from its reportable link
+        if data['indicator_report'].disaggregations.count() != data['num_disaggregation']:
+            raise serializers.ValidationError(
+                "num_disaggregation cannot be different than "
+                + "actual value stored"
+            )
+
+        # level_reported and disaggregation_reported_on validation
+        if data['level_reported'] != len(data['disaggregation_reported_on']):
+            raise serializers.ValidationError(
+                "disaggregation_reported_on list must have "
+                + "level_reported # of elements"
+            )
+
+        # disaggregation_reported_on element-wise assertion
+        for disagg_id in data['disaggregation_reported_on']:
+            if disagg_id not in data['indicator_report'].disaggregations.values_list('id', flat=True):
+                raise serializers.ValidationError(
+                    "disaggregation_reported_on list must have "
+                    + "all its elements mapped to disaggregation ids"
+                )
+
+        valid_disaggregation_value_entry_list = map(lambda key_item: str(key_item), combinations(list(
+            data['indicator_report'].disaggregations.values_list('id', flat=True)), data['level_reported']))
+
+        if '()' not in valid_disaggregation_value_entry_list:
+            valid_disaggregation_value_entry_list.append('()')
+
+        disaggregation_data_keys = data['disaggregation'].keys()
+
+        valid_entry_count = len(valid_disaggregation_value_entry_list)
+        disaggregation_data_key_count = len(disaggregation_data_keys)
+
+        # # Assertion on all combinatoric entries for num_disaggregation and level_reported against submitted disaggregation data
+        if valid_entry_count > disaggregation_data_key_count:
+            raise serializers.ValidationError(
+                "Submitted disaggregation data entries does not contain "
+                + "all possible combination pair keys"
+            )
+
+        if valid_entry_count < disaggregation_data_key_count:
+            raise serializers.ValidationError(
+                "Submitted disaggregation data entries contains "
+                + "extra combination pair keys"
+            )
+
         # Disaggregation data coordinate space check from level_reported
-        for key in data['disaggregation'].keys():
+        for key in disaggregation_data_keys:
             if len(make_tuple(key)) > data['level_reported']:
                 raise serializers.ValidationError(
                     "%s Disaggregation data coordinate " % (key)
@@ -181,29 +252,13 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
                     + "specified level_reported"
                 )
 
-        try:
-            indicator_report = IndicatorReport.objects.get(
-                id=data['indicator_report'])
-
-        except IndicatorReport.DoesNotExist:
-            raise serializers.ValidationError(
-                "IndicatorReport ID %d" % (data['indicator_report'])
-                + "does not exist for "
-                + "IndicatorLocationData ID %d" % (data['id']))
-
         disaggregation_value_id_list = \
-            indicator_report.disaggregation_values(id_only=True, flat=True)
+            data['indicator_report'].disaggregation_values(id_only=True, flat=True)
 
         # Disaggregation data coordinate space check
         # from disaggregation choice ids
-        for key in data['disaggregation'].keys():
-            tuple_key = make_tuple(key)
-
-            disagg_value_check_list = map(
-                lambda k: k not in disaggregation_value_id_list, tuple_key
-            )
-
-            if not all(disagg_value_check_list):
+        for key in disaggregation_data_keys:
+            if key not in valid_disaggregation_value_entry_list:
                 raise serializers.ValidationError(
                     "%s coordinate space does not " % (key)
                     + "belong to disaggregation value id list")
