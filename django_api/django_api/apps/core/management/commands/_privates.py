@@ -37,6 +37,7 @@ from core.factories import (
     PartnerFactory,
     IndicatorLocationDataFactory,
     InterventionFactory,
+    LocationFactory,
     ReportableToLowerLevelOutputFactory,
     IndicatorReportFactory,
     ProgressReportFactory,
@@ -99,6 +100,9 @@ def generate_data_combination_dict(array, r=3):
 def generate_0_num_disagg_quantity_data(reportable):
     # IndicatorReport from ReportableToLowerLevelOutput -
     # IndicatorLocationData
+    if reportable.locations.count() == 0:
+        LocationFactory(reportable=reportable)
+
     location = reportable.locations.first()
     disagg_idx = 0
 
@@ -303,8 +307,12 @@ def generate_3_num_disagg_quantity_data(reportable):
                 lambda acc, curr: acc + curr, indicator_report_from_reportable.disaggregation_values(id_only=True)))
         )
 
+        disagg_idx += 1
+
         # Extra IndicatorLocationData for last IndicatorReport for 3 num_disaggregation with unique location
         if idx == reportable.indicator_reports.count() - 1:
+            location = locations[disagg_idx]
+
             location_data = IndicatorLocationDataFactory(
                 indicator_report=indicator_report_from_reportable,
                 location=location,
@@ -357,11 +365,11 @@ def generate_indicator_report_location_disaggregation_quantity_data():
         # -- IndicatorLocationData --
 
         # 0 num_disaggregation
-        if idx == 0:
+        if idx % 4 == 0:
             generate_0_num_disagg_quantity_data(reportable)
 
         # 1 num_disaggregation
-        elif idx == 1:
+        elif idx % 4 == 1:
             generate_1_num_disagg_quantity_data(reportable)
 
             for location_id in list(reportable.indicator_reports.values_list('indicator_location_data__location', flat=True)):
@@ -371,7 +379,7 @@ def generate_indicator_report_location_disaggregation_quantity_data():
             reportable.save()
 
         # 2 num_disaggregation
-        elif idx == 2:
+        elif idx % 4 == 2:
             generate_2_num_disagg_quantity_data(reportable)
 
             for location_id in list(reportable.indicator_reports.values_list('indicator_location_data__location', flat=True)):
@@ -381,7 +389,7 @@ def generate_indicator_report_location_disaggregation_quantity_data():
             reportable.save()
 
         # 3 num_disaggregation
-        elif idx == 3:
+        elif idx % 4 == 3:
             generate_3_num_disagg_quantity_data(reportable)
 
             for location_id in list(reportable.indicator_reports.values_list('indicator_location_data__location', flat=True)):
@@ -390,8 +398,7 @@ def generate_indicator_report_location_disaggregation_quantity_data():
 
             reportable.save()
 
-        else:
-            break
+        print "IndicatorReport and its Disaggregation data entries for ReportableToLowerLevelOutput {} created".format(idx)
 
     # Making the rest of IndicatorReport objects not latest so that IndicatorReport objects with location data are guaranteed to show up first
     today = datetime.date.today()
