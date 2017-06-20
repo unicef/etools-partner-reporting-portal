@@ -49,12 +49,10 @@
       properties: {
         data: {
           type: Object,
-          value: {}
         },
 
         mapping: {
           type: Array,
-          value: []
         },
 
         total: Number,
@@ -67,17 +65,17 @@
 
         totalsForDisplay: {
           type: Array,
-          computed: '_determineTotals(mapping)'
+          computed: '_determineTotals(columns, data)',
         },
 
         rowsForDisplay: {
           type: Array,
-          computed: '_determineMiddleRows(mapping)'
+          computed: '_determineMiddleRows(mapping, data)'
         },
       },
 
       _getColumns: function(mapping) {
-        return this.mapping[0].choices;
+        return mapping[0].choices;
       },
 
       _determineMiddleRows: function() {
@@ -93,18 +91,28 @@
         var columnData = columnChoices.map(function(z) {
           var formatted = self._formatDisaggregationIds([z.id]);
           var data = self.data.disaggregation[formatted];
-          return data;
+
+          return {
+            key: formatted,
+            data: data,
+          };
         });
 
         var columnTotalRow = {
-          data: columnData,
           title: 'total',
-          total: this.total
+          data: columnData,
+          total: {
+            key: '', // unused,
+            data: {
+              c: null,
+              d: null,
+              v: this.total,
+            },
+          },
         };
 
         return columnTotalRow;
       },
-
     });
   </script>
 </dom-module>

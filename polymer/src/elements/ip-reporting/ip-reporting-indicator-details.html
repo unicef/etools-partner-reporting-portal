@@ -116,7 +116,6 @@
         // TODO: finish hooking up Redux so changes to the store will be reflected.
         data: {
           type: Array,
-          value: []
         },
 
         locations: {
@@ -178,6 +177,7 @@
           this.$.indicatorDetail.thunk()()
             .then(function(res) {
               var data = res.data;
+
               self.data = data;
               self.loading = false;
               // self._updateDisaggregationStore(selectedData);

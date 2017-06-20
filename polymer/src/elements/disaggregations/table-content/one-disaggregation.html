@@ -41,17 +41,15 @@
       properties: {
         data: {
           type: Object,
-          value: {}
         },
 
         mapping: {
           type: Array,
-          value: []
         },
 
         totalRow: {
           type: Array,
-          computed: '_determineTotalRow(mapping)'
+          computed: '_determineTotalRow(mapping, total)'
         },
 
         total: Number,
@@ -64,37 +62,46 @@
 
         rows: {
           type: Array,
-          computed: '_determineRows(mapping)'
-        }
+          computed: '_determineRows(columns, data)',
+        },
       },
 
       _getColumns: function(mapping) {
         return this.mapping[0].choices;
       },
 
-      _determineTotalRow: function() {
+      _determineTotalRow: function (_, total) { // jshint ignore:line
         var totalRow = {
           title: 'total',
-          total: this.total
+          total: {
+            key: '', // unused
+            data: {
+              c: null,
+              d: null,
+              v: total,
+            },
+          },
         };
         return totalRow;
       },
 
-      _determineRows: function() {
+      _determineRows: function(columns, _) { // jshint ignore:line
         var self = this;
-        var columnChoices = this.mapping[0].choices;
         var data = [];
 
-        columnChoices.forEach(function(z) {
+        columns.forEach(function(z) {
           var formatted = self._formatDisaggregationIds([z.id]);
-          var forDisplay = {};
-          forDisplay.title = z.value;
-          forDisplay.total = self.data.disaggregation[formatted];
+          var forDisplay = {
+            title: z.value,
+            data: [{
+              key: formatted,
+              data: self.data.disaggregation[formatted],
+            }],
+          };
           data.push(forDisplay);
         });
         return data;
       },
-
     });
   </script>
 </dom-module>

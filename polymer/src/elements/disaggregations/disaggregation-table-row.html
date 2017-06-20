@@ -9,6 +9,7 @@
   <template>
 
     <style include="disaggregation-table-styles"></style>
+
     <tr class$="[[computeClass(rowType)]]">
       <td class="flex">
         [[_capitalizeFirstLetter(data.title)]]
@@ -17,15 +18,16 @@
       <template is="dom-repeat"
                 items="[[data.data]]">
         <td class="flex">
-          <disaggregation-table-cell value="[[item]]">
+          <disaggregation-table-cell coords="[[item.key]]" data="[[item.data]]">
           </disaggregation-table-cell>
         </td>
       </template>
 
-      <td class="flex">
-        [[total]] [[data.total.v]]
-      </td>
-
+      <template is="dom-if" if="[[data.total]]">
+        <td class="flex">
+          [[data.total.data.v]]
+        </td>
+      </template>
     </tr>
   </template>
 
@@ -38,19 +40,13 @@
       ],
 
       properties: {
-        data: {
-          type: Object,
-          value: {}
-        },
-        rowType: {
-          type: String,
-          value: ''
-        },
+        data: Object,
+        rowType: String,
       },
 
       computeClass: function (rowType) {
-       return rowType;
-     }
+        return rowType;
+      },
     });
   </script>
   </dom-module>
