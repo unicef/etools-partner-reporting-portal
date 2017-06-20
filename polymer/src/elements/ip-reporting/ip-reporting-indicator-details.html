@@ -141,21 +141,21 @@
           var timeframe = 'current';
           if (index === 1) {
             timeframe = 'previous';
-          };
+          }
 
           report.indicator_location_data.forEach(function(locationReport) {
             if (locations[locationReport.location.id]) {
-              var toUpdate = locations[locationReport.location.id]
+              var toUpdate = locations[locationReport.location.id];
               toUpdate[timeframe] = locationReport;
               locations[locationReport.location.id] = toUpdate;
             } else {
-              var newDict = {}
+              var newDict = {};
               newDict[timeframe] = locationReport;
               newDict.name = locationReport.location.title;
               newDict.reportInfo = report;
               locations[locationReport.location.id] = newDict;
             }
-          })
+          });
         });
 
         var locationList = [];
