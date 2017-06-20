@@ -69,8 +69,7 @@ class Reportable(TimeStampedModel):
     is_cluster_indicator = models.BooleanField(default=False)
 
     # Current total, transactional and dynamically calculated based on IndicatorReports
-    total = models.IntegerField(null=True, blank=True, default=0,
-                                verbose_name="Current Total")
+    total = JSONField(default=dict([('c', None), ('d', None), ('v', 0)]))
 
     # unique code for this indicator within the current context
     # eg: (1.1) result code 1 - indicator code 1
@@ -138,7 +137,7 @@ class IndicatorReport(TimeStampedModel):
         verbose_name='Frequency of reporting'
     )
 
-    total = models.PositiveIntegerField(blank=True, null=True)
+    total = JSONField(default=dict([('c', None), ('d', None), ('v', 0)]))
 
     remarks = models.TextField(blank=True, null=True)
     report_status = models.CharField(
