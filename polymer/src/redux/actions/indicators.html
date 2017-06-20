@@ -61,7 +61,7 @@
               var formattedById = {};
               formattedById[id] = res.data;
               dispatch(App.Actions.Indicators.indicatorDetailsLoadingStop());
-              dispatch(App.Actions.Indicators.setIndicatorDetails(id));
+              dispatch(App.Actions.Indicators.setIndicatorDetails(formattedById));
             });
         };
       },
