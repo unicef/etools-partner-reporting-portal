@@ -10,6 +10,7 @@
     App.Reducers.Indicators = Redux.combineReducers({
       all: allIndicatorsReducer,
       loading: loadingIndicatorsReducer,
+      loadingDetails: loadingDetailsReducer,
       count: indicatorsCountReducer,
       details: indicatorDetailsReducer,
     });
@@ -62,6 +63,23 @@
       }
     }
 
+    function loadingDetailsReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = false;
+      }
+
+      switch (action.type) {
+        case App.Constants.INDICATOR_DETAILS_LOADING_START:
+          return true;
+
+        case App.Constants.INDICATOR_DETAILS_LOADING_STOP:
+          return false;
+
+        default:
+          return state;
+      }
+    }
+
     function indicatorDetailsReducer(state, action) {
       if (typeof state === 'undefined') {
         state = {};
@@ -88,5 +106,6 @@
           return state;
       }
     }
+
   }());
 </script>

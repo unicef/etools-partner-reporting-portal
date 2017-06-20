@@ -16,6 +16,8 @@
       :host {
         display: block;
         width: 100%;
+        /*Required so the loading message isn't cut off:*/
+        min-height: 250px;
       }
       iron-icon {
         color: var(--accent-color);
@@ -24,6 +26,9 @@
         width: 100%;
         float: left;
       }
+      .loading-wrapper {
+        padding: 15px;
+      }
     </style>
 
     <etools-prp-ajax
@@ -31,61 +36,65 @@
         url="[[indicatorDetailUrl]]">
     </etools-prp-ajax>
 
-    <etools-loading active="[[loading]]"></etools-loading>
+    <template is="dom-if" if="[[loading]]">
+      <div class="loading-wrapper">
+        <etools-loading no-overlay></etools-loading>
+      <div>
+    </template>
 
-      <template is="dom-repeat"
-                items="[[locations]]"
-                as="location">
+    <template is="dom-repeat"
+              items="[[locations]]"
+              as="location">
 
-        <h3>
-          <iron-icon icon="maps:place"></iron-icon>
-          [[location.name]]
-        </h3>
+      <h3>
+        <iron-icon icon="maps:place"></iron-icon>
+        [[location.name]]
+      </h3>
 
-        <div class="container">
-          <template is="dom-if" if="[[location.current]]">
-            <div class="item">
-              <h4>
-                <span>
-                  <strong>Progress in current reporting period: </strong>
-                  [[location.reportInfo.time_period_start]] -
-                  [[location.reportInfo.time_period_end]]
-                </span>
-                <span class="total">
-                  <strong>Total: </strong>[[location.reportInfo.total]]
-                </span>
-              </h4>
-              <!-- TODO: check - wrong use of total? -->
-              <disaggregation-table
-                total=[[location.reportInfo.total]]
-                data=[[location.current]]
-                mapping=[[location.reportInfo.disagg_lookup_map]]>
-              </disaggregation-table>
-            </div>
-          </template>
+      <div class="container">
+        <template is="dom-if" if="[[location.current]]">
+          <div class="item">
+            <h4>
+              <span>
+                <strong>Progress in current reporting period: </strong>
+                [[location.reportInfo.time_period_start]] -
+                [[location.reportInfo.time_period_end]]
+              </span>
+              <span class="total">
+                <strong>Total: </strong>[[location.reportInfo.total]]
+              </span>
+            </h4>
+            <!-- TODO: check - wrong use of total? -->
+            <disaggregation-table
+              total=[[location.reportInfo.total]]
+              data=[[location.current]]
+              mapping=[[location.reportInfo.disagg_lookup_map]]>
+            </disaggregation-table>
+          </div>
+        </template>
 
-          <template is="dom-if" if="[[location.previous]]">
-            <div class="item">
-              <h4>
-                <span>
-                  <strong>Progress in previous reporting period: </strong>
-                  [[location.reportInfo.time_period_start]] -
-                  [[location.reportInfo.time_period_end]]
-                </span>
-                <span class="total">
-                  <strong>Total: </strong>[[location.reportInfo.total]]
-                </span>
-              </h4>
-              <disaggregation-table
-                total=[[location.reportInfo.total]]
-                data=[[location.previous]]
-                mapping=[[location.reportInfo.disagg_lookup_map]]>
-              </disaggregation-table>
-            </div>
-          </template>
-        </div>
+        <template is="dom-if" if="[[location.previous]]">
+          <div class="item">
+            <h4>
+              <span>
+                <strong>Progress in previous reporting period: </strong>
+                [[location.reportInfo.time_period_start]] -
+                [[location.reportInfo.time_period_end]]
+              </span>
+              <span class="total">
+                <strong>Total: </strong>[[location.reportInfo.total]]
+              </span>
+            </h4>
+            <disaggregation-table
+              total=[[location.reportInfo.total]]
+              data=[[location.previous]]
+              mapping=[[location.reportInfo.disagg_lookup_map]]>
+            </disaggregation-table>
+          </div>
+        </template>
+      </div>
 
-      </template>
+    </template>
 
   </template>
 
@@ -111,7 +120,10 @@
 
         indicatorId: Number,
 
-        loading: Boolean,
+        loading: {
+          type: Boolean,
+          statePath: 'indicators.loadingDetails'
+        },
 
         data: {
           type: Array,
@@ -130,7 +142,7 @@
       },
 
       observers: [
-        '_getDataByKey(dataDict)',
+        '_getDataByKey(dataDict)'
       ],
 
       _computeIndicatorReportsUrl: function(indicatorId) {
@@ -187,21 +199,14 @@
       },
 
       _openChanged: function() {
-        var self = this;
         if (this.isOpen) {
-          // TODO: loading in actions instead.
-          self.loading = true;
           var thunk = this.$.indicatorDetail.thunk();
-          this.dispatch(App.Actions.fetchIndicatorDetails(thunk, this.indicatorId))
+          var action = App.Actions.Indicators;
+          this.dispatch(action.fetchIndicatorDetails(thunk, this.indicatorId))
             .catch(function (err) {
                 // TODO: error handling.
-                return Promise.reject(err);
-            })
-            .then(function(res) {
-              self.loading = false;
+              return Promise.reject(err);
             });
-          // TODO: error handling.
-
         } else {
           this.$.indicatorDetail.abort();
         }
