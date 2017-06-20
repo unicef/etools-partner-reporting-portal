@@ -21,11 +21,24 @@ class IndicatorBlueprint(TimeStampedModel):
     """
     NUMBER = u'number'
     PERCENTAGE = u'percentage'
+    LIKERT = u'likert'
     YESNO = u'yesno'
     UNIT_CHOICES = (
         (NUMBER, NUMBER),
         (PERCENTAGE, PERCENTAGE),
-        (YESNO, YESNO)
+        (LIKERT, LIKERT),
+        (YESNO, YESNO),
+    )
+
+    SUM = u'sum'
+    MAX = u'max'
+    AVG = u'avg'
+    MIN = u'min'
+    CALC_CHOICES = (
+        (SUM, SUM),
+        (MAX, MAX),
+        (AVG, AVG),
+        (MIN, MIN),
     )
 
     title = models.CharField(max_length=1024)
@@ -35,12 +48,13 @@ class IndicatorBlueprint(TimeStampedModel):
     subdomain = models.CharField(max_length=255, null=True, blank=True)
     disaggregatable = models.BooleanField(default=False)
 
+    calculation_formula = models.CharField(max_length=3, choices=CALC_CHOICES, default=SUM)
+
     # TODO: add:
     # siblings (similar inidcators to this indicator)
     # other_representation (exact copies with different names for some random reason)
     # children (indicators that aggregate up to this or contribute to this indicator through a formula)
     # aggregation_types (potential aggregation types: geographic, time-periods ?)
-    # calculation_formula (how the children totals add up to this indicator's total value)
     # aggregation_formulas (how the total value is aggregated from the reports if possible)
 
     def save(self, *args, **kwargs):
