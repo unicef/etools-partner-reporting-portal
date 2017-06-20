@@ -113,10 +113,14 @@
 
         loading: Boolean,
 
-        // TODO: finish hooking up Redux so changes to the store will be reflected.
         data: {
           type: Array,
           value: []
+        },
+
+        dataDict: {
+          type: Object,
+          statePath: 'indicators.details'
         },
 
         locations: {
@@ -124,6 +128,10 @@
           computed: '_bucketByLocation(data)'
         }
       },
+
+      observers: [
+        '_getDataByKey(dataDict)',
+      ],
 
       _computeIndicatorReportsUrl: function(indicatorId) {
         return App.Endpoints.indicatorReports(indicatorId) + '?limit=2';
@@ -135,8 +143,9 @@
         //current and/or previous report.
         var locations = {};
 
-        if (!data) { return []; }
-
+        if (!data) {
+          return [];
+        }
         data.forEach(function(report, index) {
           var timeframe = 'current';
           if (index === 1) {
@@ -171,18 +180,28 @@
         this.dispatch(App.Actions.setIndicatorDisaggregations(data));
       },
 
+      _getDataByKey: function(dataDict) {
+        if (dataDict.details) {
+          this.data = dataDict.details[this.indicatorId];
+        }
+      },
+
       _openChanged: function() {
         var self = this;
         if (this.isOpen) {
+          // TODO: loading in actions instead.
           self.loading = true;
-          this.$.indicatorDetail.thunk()()
+          var thunk = this.$.indicatorDetail.thunk();
+          this.dispatch(App.Actions.fetchIndicatorDetails(thunk, this.indicatorId))
+            .catch(function (err) {
+                // TODO: error handling.
+                return Promise.reject(err);
+            })
             .then(function(res) {
-              var data = res.data;
-              self.data = data;
               self.loading = false;
-              // self._updateDisaggregationStore(selectedData);
             });
           // TODO: error handling.
+
         } else {
           this.$.indicatorDetail.abort();
         }

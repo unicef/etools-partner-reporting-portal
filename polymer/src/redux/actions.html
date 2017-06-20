@@ -134,10 +134,27 @@
         };
       },
 
-      setIndicatorDisaggregations: function (data) {
+      fetchIndicatorDetails: function (indicatorsThunk, indicatorId) {
+        return function (dispatch) {
+          // dispatch(App.Actions.indicatorsLoadingStart());
+          return indicatorsThunk()
+            .catch(function () {
+              // dispatch(App.Actions.indicatorsLoadingStop());
+            })
+            .then(function (res) {
+              // dispatch(App.Actions.setIndicators(indicators));
+              // dispatch(App.Actions.indicatorsLoadingStop());
+              var formattedById = {}
+              formattedById[indicatorId] = res.data;
+              dispatch(App.Actions.setIndicatorDetails(formattedById));
+            });
+        };
+      },
+
+      setIndicatorDetails: function (data) {
         return {
-          type: App.Constants.SET_INDICATOR_DISAGGREGATIONS,
-          disaggregations: data
+          type: App.Constants.SET_INDICATOR_DETAILS,
+          details: data,
         };
       },
 
