@@ -16,23 +16,26 @@
       <template is="dom-repeat"
                 items="[[columns]]"
                 as="column">
-        <th class='flex'>[[_capitalizeFirstLetter(column.value)]]</th>
+        <th class="flex">[[_capitalizeFirstLetter(column.value)]]</th>
       </template>
 
       <th class='flex'>Total</th>
     </tr>
 
     <template is="dom-repeat"
-              items="[[rowsForDisplay]]"
-              as="row">
-      <disaggregation-table-row data=[[row]] row-type="middleRow">
+        items="[[rowsForDisplay]]"
+        as="row">
+      <disaggregation-table-row
+          data=[[row]]
+          row-type="middleRow"
+          editable="[[editable]]">
       </disaggregation-table-row>
-   </template>
+    </template>
 
    <disaggregation-table-row
-    data=[[totalsForDisplay]]
-    total=[[total]]
-    row-type="totalsRow">
+      data=[[totalsForDisplay]]
+      total=[[total]]
+      row-type="totalsRow">
   </disaggregation-table-row>
 
   </template>
@@ -47,13 +50,11 @@
       ],
 
       properties: {
-        data: {
-          type: Object,
-        },
+        editable: Boolean,
 
-        mapping: {
-          type: Array,
-        },
+        data: Object,
+
+        mapping: Array,
 
         total: Number,
 

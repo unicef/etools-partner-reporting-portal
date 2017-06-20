@@ -9,7 +9,8 @@
     <style include='disaggregation-table-styles'></style>
 
     <disaggregation-table-row data=[[totalRow]]
-                              row-type="totalsRow">
+                              row-type="totalsRow"
+                              editable="[[editable]]">
     </disaggregation-table-row>
 
   </template>
@@ -19,9 +20,11 @@
       is: 'zero-disaggregations',
 
       properties: {
-        total: Number,
+        editable: Boolean,
 
         data: Object,
+
+        total: Number,
 
         totalRow: {
           type: Array,
@@ -42,7 +45,6 @@
           },
         };
       },
-
     });
   </script>
 </dom-module>

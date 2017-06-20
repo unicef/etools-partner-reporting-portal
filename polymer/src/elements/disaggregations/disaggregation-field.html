@@ -1,0 +1,71 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+
+<dom-module id="disaggregation-field">
+  <template>
+    <style>
+      :host {
+        display: block;
+
+        --paper-input-container: {
+          padding: 0;
+        };
+
+        --paper-input-container-input: {
+          font-size: 13px;
+        };
+      }
+    </style>
+
+    <paper-input
+        id="field"
+        value="[[data.v]]"
+        type="number"
+        invalid="{{invalid}}"
+        no-label-float
+        required
+        auto-validate>
+    </paper-input>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'disaggregation-field',
+
+      properties: {
+        data: Object,
+
+        coords: String,
+
+        invalid: {
+          type: Boolean,
+          notify: true,
+        },
+      },
+
+      listeners: {
+        'field.input': '_handleInput',
+      },
+
+      attached: function () {
+        this.fire('register-field', this);
+      },
+
+      detached: function () {
+        this.fire('deregister-field', this);
+      },
+
+      validate: function () {
+        return this.$.field.validate();
+      },
+
+      _handleInput: function (e) {
+        this.fire('field-value-changed', {
+          key: this.coords,
+          value: e.target.value,
+        });
+      },
+    });
+  </script>
+
+</dom-module>

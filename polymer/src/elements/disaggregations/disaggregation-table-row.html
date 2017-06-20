@@ -7,25 +7,31 @@
 
 <dom-module id="disaggregation-table-row">
   <template>
-
     <style include="disaggregation-table-styles"></style>
 
     <tr class$="[[computeClass(rowType)]]">
-      <td class="flex">
-        [[_capitalizeFirstLetter(data.title)]]
+      <td class="flex cellTitle">
+        <span class="cellValue">[[_capitalizeFirstLetter(data.title)]]</span>
       </td>
 
       <template is="dom-repeat"
                 items="[[data.data]]">
         <td class="flex">
-          <disaggregation-table-cell coords="[[item.key]]" data="[[item.data]]">
+          <disaggregation-table-cell
+              coords="[[item.key]]"
+              data="[[item.data]]"
+              editable="[[editable]]">
           </disaggregation-table-cell>
         </td>
       </template>
 
       <template is="dom-if" if="[[data.total]]">
-        <td class="flex">
-          [[data.total.data.v]]
+        <td class="flex cellTotal">
+          <disaggregation-table-cell
+              coords="[[data.total.key]]"
+              data="[[data.total.data]]"
+              editable="[[isEditable(data.total)]]">
+          </disaggregation-table-cell>
         </td>
       </template>
     </tr>
@@ -41,11 +47,18 @@
 
       properties: {
         data: Object,
+
         rowType: String,
+
+        editable: Boolean,
       },
 
       computeClass: function (rowType) {
         return rowType;
+      },
+
+      isEditable: function (item) {
+        return item.key === '()'; // Zero
       },
     });
   </script>

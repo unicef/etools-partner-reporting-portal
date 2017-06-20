@@ -55,11 +55,12 @@
                   <strong>Total: </strong>[[location.reportInfo.total]]
                 </span>
               </h4>
-              <!-- TODO: check - wrong use of total? -->
+
               <disaggregation-table
-                total=[[location.reportInfo.total]]
-                data=[[location.current]]
-                mapping=[[location.reportInfo.disagg_lookup_map]]>
+                  total="[[location.reportInfo.total]]"
+                  data="[[location.current]]"
+                  mapping="[[location.reportInfo.disagg_lookup_map]]"
+                  editable>
               </disaggregation-table>
             </div>
           </template>
@@ -79,7 +80,8 @@
               <disaggregation-table
                 total=[[location.reportInfo.total]]
                 data=[[location.previous]]
-                mapping=[[location.reportInfo.disagg_lookup_map]]>
+                mapping=[[location.reportInfo.disagg_lookup_map]]
+                editable>
               </disaggregation-table>
             </div>
           </template>

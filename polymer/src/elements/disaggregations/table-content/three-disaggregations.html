@@ -28,10 +28,14 @@
       <disaggregation-table-row data=[[outerRow]] row-type="outerRow">
       </disaggregation-table-row>
 
-      <template is="dom-repeat"
-                items="[[_determineMiddleRows(outerRow.id)]]"
-                as="middleRow">
-        <disaggregation-table-row data=[[middleRow]] row-type="middleRow">
+      <template
+          is="dom-repeat"
+          items="[[_determineMiddleRows(outerRow.id)]]"
+          as="middleRow">
+        <disaggregation-table-row
+            data=[[middleRow]]
+            row-type="middleRow"
+            editable="[[editable]]">
         </disaggregation-table-row>
       </template>
 
@@ -68,15 +72,15 @@
       ],
 
       properties: {
-        data: {
-          type: Object,
-        },
+        editable: Boolean,
 
-        mapping: {
-          type: Array,
-        },
+        data: Object,
+
+        mapping: Array,
 
         total: Number,
+
+        columnTotalRow: Object,
 
         //Passing columnNames as a param is required to trigger update.
         columns: {
@@ -88,10 +92,6 @@
           type: Array,
           computed: '_determineOuterRows(mapping, data)'
         },
-
-        columnTotalRow: {
-          type: Object,
-        }
       },
 
       _getColumns: function(mapping) {
