@@ -1,12 +1,14 @@
 from ast import literal_eval as make_tuple
 
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from unicef.models import LowerLevelOutput
 from core.serializers import SimpleLocationSerializer
-
+from cluster.models import ClusterObjective
 from .models import (
     Reportable, IndicatorBlueprint,
     IndicatorReport, IndicatorLocationData,
@@ -277,3 +279,44 @@ class PDReportsSerializer(serializers.ModelSerializer):
 
     def get_due_date(self, obj):
         return obj.due_date and obj.due_date.strftime(settings.PRINT_DATA_FORMAT)
+
+
+class IndicatorBlueprintSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = IndicatorBlueprint
+        fields = (
+            'id',
+            'title',
+            'unit',
+            'description',
+            'disaggregatable',
+        )
+
+
+class ClusterIndicatorSerializer(serializers.ModelSerializer):
+
+    cluster_objective_id = serializers.CharField(source='object_id')
+    blueprint = IndicatorBlueprintSerializer()
+
+    class Meta:
+        model = Reportable
+        fields = (
+            'id',
+            'means_of_verification',
+            'blueprint',
+            'cluster_objective_id',
+        )
+
+    def create(self, validated_data):
+        blueprint = IndicatorBlueprintSerializer(data=validated_data['blueprint'])
+        if blueprint.is_valid():
+            blueprint.save()
+        else:
+            raise ValidationError(blueprint.errors)
+
+        validated_data['blueprint'] = blueprint.instance
+        validated_data['content_type'] = ContentType.objects.get_for_model(ClusterObjective)
+        validated_data['is_cluster_indicator'] = True
+        self.instance = Reportable.objects.create(**validated_data)
+        return self.instance

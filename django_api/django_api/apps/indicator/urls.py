@@ -7,6 +7,7 @@ from .views import (
     IndicatorReportListAPIView,
     IndicatorLocationDataUpdateAPIView,
     IndicatorDataAPIView,
+    ClusterIndicatorAPIView,
 )
 
 
@@ -22,4 +23,5 @@ urlpatterns = [
     url(r'^indicator-location-data-entries/$', IndicatorLocationDataUpdateAPIView.as_view(), name='indicator-location-data-entries-put-api'),
     url(r'^indicator-reports/$', IndicatorReportListAPIView.as_view(), name='indicator-report-direct-list-api'),
     url(r'^(?P<reportable_id>\d+)/indicator-reports/$', IndicatorReportListAPIView.as_view(), name='indicator-report-list-api'),
+    url(r'^cluster-indicator/$', ClusterIndicatorAPIView.as_view(), name='cluster-indicator'),
 ]

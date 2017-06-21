@@ -19,12 +19,20 @@ from unicef.models import LowerLevelOutput
 from unicef.serializers import ProgressReportSerializer
 
 from .serializers import (
-    IndicatorListSerializer, IndicatorReportListSerializer, PDReportsSerializer, SimpleIndicatorLocationDataListSerializer,
+    IndicatorListSerializer,
+    IndicatorReportListSerializer,
+    PDReportsSerializer,
+    SimpleIndicatorLocationDataListSerializer,
     IndicatorLLoutputsSerializer,
+    ClusterIndicatorSerializer,
+    IndicatorBlueprintSerializer,
 )
 from .filters import IndicatorFilter, PDReportsFilter
 from .models import (
-    IndicatorReport, Reportable, Disaggregation,
+    IndicatorReport,
+    Reportable,
+    IndicatorBlueprint,
+    Disaggregation,
     DisaggregationValue
 )
 
@@ -227,3 +235,34 @@ class IndicatorLocationDataUpdateAPIView(APIView):
 
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ClusterIndicatorAPIView(APIView):
+    """
+    Add and Update Indicator on cluster reporting screen.
+    """
+
+    serializer_class = ClusterIndicatorSerializer
+    permission_classes = (IsAuthenticated, )
+
+    def get_serializer(self, data, instance=None, many=False, read_only=False):
+        return self.serializer_class(
+            data=data,
+            instance=instance,
+            many=many,
+            read_only=read_only,
+        )
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer.save()
+        return Response(
+            {
+                'reportable_id': serializer.instance.id,
+                'blueprint_id': serializer.instance.blueprint.id
+            },
+            status=status.HTTP_200_OK
+        )
