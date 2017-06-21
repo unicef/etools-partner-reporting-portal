@@ -1,0 +1,32 @@
+<link rel="import" href="../../constants.html">
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Actions = App.Actions || {};
+
+    App.Actions.Disaggregations = {
+
+      fetch: function (disaggregationsThunk, indicatorId) {
+        return function (dispatch) {
+          return disaggregationsThunk()
+              .then(function (res) {
+                var firstItem = res.data[0];
+
+                dispatch(App.Actions.Disaggregations.set(indicatorId, firstItem));
+              });
+        };
+      },
+
+      set: function (indicatorId, data) {
+        return {
+          type: App.Constants.SET_DISAGGREGATIONS,
+          indicatorId: indicatorId,
+          data: data,
+        };
+      },
+
+    };
+  }());
+</script>

@@ -136,7 +136,10 @@
               opened="{{indicator.opened}}"
               on-opened-changed="_handleOpenedChanged"
               no-animation>
-            <indicator-details></indicator-details>
+            <indicator-details
+                reportable-id="[[data.id]]"
+                indicator-id="[[indicator.id]]">
+            </indicator-details>
           </iron-collapse>
         </div>
       </template>
