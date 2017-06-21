@@ -5,7 +5,6 @@ from .models import ClusterObjective, ClusterActivity, Cluster
 
 class ClusterSimpleSerializer(serializers.ModelSerializer):
 
-    id = serializers.SerializerMethodField()
     title = serializers.CharField(read_only=True)
 
     class Meta:
@@ -14,9 +13,6 @@ class ClusterSimpleSerializer(serializers.ModelSerializer):
             'id',
             'title',
         )
-
-    def get_id(self, obj):
-        return str(obj.id)
 
 
 class ClusterObjectiveSerializer(serializers.ModelSerializer):
