@@ -1,3 +1,5 @@
+import logging
+
 from django.http import Http404
 
 from rest_framework.views import APIView
@@ -18,6 +20,8 @@ from .serializers import (
 )
 from .filters import ClusterObjectiveFilter, ClusterActivityFilter
 
+logger = logging.getLogger(__name__)
+
 
 class ClusterObjectiveAPIView(APIView):
     """
@@ -29,8 +33,13 @@ class ClusterObjectiveAPIView(APIView):
     def get_instance(self, request, pk=None):
         try:
             instance = ClusterObjective.objects.get(id=(pk or request.data['id']))
-        except ClusterObjective.DoesNotExist:
-            # TODO: log exception
+        except ClusterObjective.DoesNotExist as exp:
+            logger.exception({
+                "endpoint": "ClusterObjectiveAPIView",
+                "request.data": self.request.data,
+                "pk": pk,
+                "exception": exp,
+            })
             raise Http404
         return instance
 

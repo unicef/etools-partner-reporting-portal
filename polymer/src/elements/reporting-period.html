@@ -1,0 +1,33 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="reporting-period">
+  <template>
+    <style>
+      :host {
+        display: inline-block;
+        padding: 1px 3px;
+        border: 1px solid var(--paper-grey-500);
+        font-size: 10px;
+        text-transform: uppercase;
+        white-space: nowrap;
+        color: var(--paper-grey-500);
+      }
+
+      .range {
+        color: var(--theme-primary-text-color-dark);
+      }
+    </style>
+
+    Reporting period: <span class="range">[[range]]</span>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'reporting-period',
+
+      properties: {
+        range: String,
+      },
+    });
+  </script>
+</dom-module>

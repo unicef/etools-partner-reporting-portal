@@ -1,0 +1,218 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../etools-prp-ajax.html">
+<link rel="import" href="../../elements/disaggregations/disaggregation-table.html">
+<link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../endpoints.html">
+
+<dom-module id="ip-reporting-indicator-details">
+  <template>
+    <!-- Styles the headers above the disaggregation tables.
+    The tables themselves are styled in disaggregation-table-styles. -->
+    <style include="iron-flex iron-flex-factors disaggregation-table-styles">
+      :host {
+        display: block;
+        width: 100%;
+        /*Required so the loading message isn't cut off:*/
+        min-height: 250px;
+      }
+      iron-icon {
+        color: var(--accent-color);
+      }
+      h3 {
+        width: 100%;
+        float: left;
+      }
+      .loading-wrapper {
+        padding: 15px;
+      }
+    </style>
+
+    <etools-prp-ajax
+        id="indicatorDetail"
+        url="[[indicatorDetailUrl]]">
+    </etools-prp-ajax>
+
+    <template is="dom-if" if="[[loading]]">
+      <div class="loading-wrapper">
+        <etools-loading no-overlay></etools-loading>
+      <div>
+    </template>
+
+    <template is="dom-repeat"
+              items="[[locations]]"
+              as="location">
+
+      <h3>
+        <iron-icon icon="maps:place"></iron-icon>
+        [[location.name]]
+      </h3>
+
+      <div class="container">
+        <template is="dom-if" if="[[location.current]]">
+          <div class="item">
+            <h4>
+              <span>
+                <strong>Progress in current reporting period: </strong>
+                [[location.reportInfo.time_period_start]] -
+                [[location.reportInfo.time_period_end]]
+              </span>
+              <span class="total">
+                <strong>Total: </strong>[[location.reportInfo.total]]
+              </span>
+            </h4>
+            <p>Level reported: [[location.current.level_reported]]</p>
+            <!-- TODO: check - wrong use of total? -->
+            <disaggregation-table
+              total=[[location.reportInfo.total]]
+              data=[[location.current]]
+              mapping=[[location.reportInfo.disagg_lookup_map]]>
+            </disaggregation-table>
+          </div>
+        </template>
+
+        <template is="dom-if" if="[[location.previous]]">
+          <div class="item">
+            <h4>
+              <span>
+                <strong>Progress in previous reporting period: </strong>
+                [[location.reportInfo.time_period_start]] -
+                [[location.reportInfo.time_period_end]]
+              </span>
+              <span class="total">
+                <strong>Total: </strong>[[location.reportInfo.total]]
+              </span>
+            </h4>
+            <p>Level reported: [[location.previous.level_reported]]</p>
+            <disaggregation-table
+              total=[[location.reportInfo.total]]
+              data=[[location.previous]]
+              mapping=[[location.reportInfo.disagg_lookup_map]]>
+            </disaggregation-table>
+          </div>
+        </template>
+      </div>
+
+    </template>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'ip-reporting-indicator-details',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        indicatorDetailUrl: {
+          type: String,
+          computed: '_computeIndicatorReportsUrl(indicatorId)',
+        },
+
+        isOpen: {
+          type: Boolean,
+          observer: '_openChanged',
+        },
+
+        indicatorId: Number,
+
+        loading: {
+          type: Boolean,
+          statePath: 'indicators.loadingDetails'
+        },
+
+        data: {
+          type: Array,
+          value: []
+        },
+
+        dataDict: {
+          type: Object,
+          statePath: 'indicators.details'
+        },
+
+        locations: {
+          type: Array,
+          computed: '_bucketByLocation(data)'
+        }
+      },
+
+      observers: [
+        '_getDataByKey(dataDict)'
+      ],
+
+      _computeIndicatorReportsUrl: function(indicatorId) {
+        return App.Endpoints.indicatorReports(indicatorId) + '?limit=2';
+      },
+
+      _bucketByLocation: function(data) {
+        //API gives us two objects, one for current reporting period and
+        //one for previous. We want to create a list of locations, each with a
+        //current and/or previous report.
+        var locations = {};
+
+        if (!data) {
+          return [];
+        }
+        data.forEach(function(report, index) {
+          var timeframe = 'current';
+          if (index === 1) {
+            timeframe = 'previous';
+          }
+
+          report.indicator_location_data.forEach(function(locationReport) {
+            if (locations[locationReport.location.id]) {
+              var toUpdate = locations[locationReport.location.id];
+              toUpdate[timeframe] = locationReport;
+              locations[locationReport.location.id] = toUpdate;
+            } else {
+              var newDict = {};
+              newDict[timeframe] = locationReport;
+              newDict.name = locationReport.location.title;
+              newDict.reportInfo = report;
+              locations[locationReport.location.id] = newDict;
+            }
+          });
+        });
+
+        var locationList = [];
+
+        Object.keys(locations).forEach(function(i) {
+          locationList.push(locations[i]);
+        });
+
+        return locationList;
+      },
+
+      _updateDisaggregationStore: function(data) {
+        this.dispatch(App.Actions.setIndicatorDisaggregations(data));
+      },
+
+      _getDataByKey: function(dataDict) {
+        if (dataDict.details) {
+          this.data = dataDict.details[this.indicatorId];
+        }
+      },
+
+      _openChanged: function() {
+        if (this.isOpen) {
+          var thunk = this.$.indicatorDetail.thunk();
+          var action = App.Actions.Indicators;
+          this.dispatch(action.fetchIndicatorDetails(thunk, this.indicatorId))
+            .catch(function (err) {
+                // TODO: error handling.
+              return Promise.reject(err);
+            });
+        } else {
+          this.$.indicatorDetail.abort();
+        }
+      },
+    });
+  </script>
+</dom-module>

@@ -1,0 +1,30 @@
+<link rel="import" href="../../constants.html">
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Actions = App.Actions || {};
+
+    App.Actions.IndicatorData = {
+
+      fetch: function (indicatorDataThunk, reportId) {
+        return function (dispatch) {
+          return indicatorDataThunk()
+              .then(function (res) {
+                dispatch(App.Actions.IndicatorData.set(reportId, res.data.outputs));
+              });
+        };
+      },
+
+      set: function (reportId, data) {
+        return {
+          type: App.Constants.SET_INDICATOR_DATA,
+          reportId: reportId,
+          data: data,
+        };
+      },
+
+    };
+  }());
+</script>

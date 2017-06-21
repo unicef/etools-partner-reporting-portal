@@ -171,4 +171,37 @@ STATIC_URL = '/api/static/'
 AUTH_USER_MODEL = 'account.User'
 
 PRINT_DATA_FORMAT = "%d %b %Y"
+
 INPUT_DATA_FORMAT = "%Y-%m-%d"
+
+LOGS_PATH = os.path.join(DATA_VOLUME, 'django_api', 'logs')
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'standard': {
+            'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
+        },
+        'json': {
+            '()': 'pythonjsonlogger.jsonlogger.JsonFormatter',
+            'fmt': '%(levelname)s %(asctime)s',
+        },
+    },
+    'handlers': {
+        'default': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(LOGS_PATH, 'django.log'),
+            'maxBytes': 1024 * 1024 * 5,  # 5 MB
+            'backupCount': 5,
+            'formatter': 'standard'
+        },
+    },
+    'loggers': {
+        '': {
+            'handlers': ['default'],
+            'level': 'INFO',
+            'propagate': True},
+    }
+}

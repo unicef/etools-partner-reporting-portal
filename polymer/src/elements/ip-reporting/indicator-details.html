@@ -1,112 +1,37 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../bower_components/iron-icons/maps-icons.html">
-<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
-<link rel="import" href="../etools-prp-ajax.html">
-<link rel="import" href="../etools-prp-detail-table.html">
-<link rel="import" href="../../endpoints.html">
-
-<dom-module id="ip-reporting-indicator-details">
+<dom-module id="indicator-details">
   <template>
-    <style include="iron-flex iron-flex-factors">
+    <style>
       :host {
         display: block;
       }
-      iron-icon {
-        color: var(--accent-color)
-      }
-      h3 {
-        width: 100%;
-        float: left;
-      }
-      h4 {
-        font-weight: 400;
-      }
-      h4 span {
-        color: gray;
-        font-weight: 400;
-      }
-      .wrapper {
-        float: left;
-        margin: 0 10px 10px 10px;
-      }
     </style>
 
-    <etools-prp-ajax
-        id="indicatorDetail"
-        url="[[indicatorDetailUrl]]">
-    </etools-prp-ajax>
-
-    <etools-loading active="[[loading]]"></etools-loading>
-
-    <!-- TODO: group data objects by location; only display location header once. -->
-    <template id="reports"
-              is="dom-repeat"
-              items="[[data]]">
-      <h3>
-        <iron-icon icon="maps:place"></iron-icon>
-        [[item.indicator_location_data.0.location.title]]
-      </h3>
-
-      <template id="report-table"
-                is="dom-repeat"
-                items="[[item.indicator_location_data]]"
-                as="report">
-        <div class="wrapper">
-          <h4>
-            Progress in reporting period
-            <span>[[item.time_period_start]] - [[item.time_period_end]]<span>
-          </h4>
-          <etools-prp-detail-table report=[[report]]></etools-prp-detail-table>
-        </div>
-      </template>
-    </template>
+    <h1>TODO</h1>
   </template>
 
   <script>
     Polymer({
-      is: 'ip-reporting-indicator-details',
+      id: 'indicator-details',
 
       properties: {
-        indicatorDetailUrl: {
-          type: String,
-          computed: '_computeIndicatorReportsUrl(indicatorId)',
-        },
-
-        isOpen: {
+        initialized: {
           type: Boolean,
-          observer: '_openChanged',
-        },
-
-        indicatorId: Number,
-
-        loading: Boolean,
-
-        data: {
-          type: Array,
-          value: []
+          value: false,
         }
       },
 
-      _computeIndicatorReportsUrl: function (indicatorId) {
-        return App.Endpoints.indicatorReports(indicatorId);
-      },
-
-      _openChanged: function () {
-        var self = this;
-        if (this.isOpen) {
-          self.loading = true;
-          this.$.indicatorDetail.thunk()()
-            .then(function (res) {
-              self.data = res.data;
-              self.loading = false;
-            });
-            // TODO: error handling.
-        } else {
-          this.$.indicatorDetail.abort();
+      init: function () {
+        if (this.initialized) {
+          return;
         }
-      }
 
+        this.set('initialized', true);
+
+        // <-- TODO: Fetch data here
+        console.log('initialized', this);
+      },
     });
   </script>
 </dom-module>

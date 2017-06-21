@@ -1,0 +1,249 @@
+<link rel="import" href="../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../../../bower_components/paper-menu-button/paper-menu-button.html">
+<link rel="import" href="../../../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../../../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../../../../bower_components/paper-item/paper-icon-item.html">
+<link rel="import" href="../../../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../../../bower_components/iron-icon/iron-icon.html">
+
+<link rel="import" href="../../../../elements/page-header.html">
+<link rel="import" href="../../../../elements/page-body.html">
+<link rel="import" href="../../../../elements/ip-reporting/pd-output-list.html">
+<link rel="import" href="../../../../elements/reporting-period.html">
+<link rel="import" href="../../../../elements/report-status.html">
+<link rel="import" href="../../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../../endpoints.html">
+<link rel="import" href="../../../../behaviors/utils.html">
+<link rel="import" href="../../../../redux/store.html">
+<link rel="import" href="../../../../redux/actions.html">
+<link rel="import" href="../../../../redux/selectors/programmeDocuments.html">
+<link rel="import" href="../../../../redux/selectors/programmeDocumentReports.html">
+
+<dom-module id="page-ip-reporting-pd-report">
+  <template>
+    <style>
+      :host {
+        display: block;
+
+        --page-header-above-title: {
+          position: absolute;
+          left: 0;
+          top: -23px;
+        };
+
+        --paper-item-icon: {
+          width: auto;
+          margin-right: 5px;
+        };
+
+        --paper-item: {
+          white-space: nowrap;
+        };
+      }
+    </style>
+
+    <app-route
+        route="{{route}}"
+        pattern="/:report_id/:mode"
+        data="{{routeData}}">
+    </app-route>
+
+    <etools-prp-ajax
+        id="indicatorData"
+        url="[[indicatorDataUrl]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
+        id="report"
+        url="[[reportUrl]]">
+    </etools-prp-ajax>
+
+    <page-header
+        title="[[headingText]]"
+        back="[[backLink]]">
+      <reporting-period
+          class="above-title"
+          range="[[currentReport.reporting_period]]">
+      </reporting-period>
+
+      <div class="toolbar">
+        <template
+            is="dom-if"
+            if="[[_equals(mode, 'edit')]]">
+          <report-status status="[[currentReport.progress_report_status]]"></report-status>
+        </template>
+
+        <paper-menu-button dynamic-align>
+          <paper-icon-button
+              icon="icons:more-vert"
+              class="dropdown-trigger">
+          </paper-icon-button>
+          <paper-menu class="dropdown-content">
+            <paper-item>PD details</paper-item>
+            <paper-icon-item>
+              <iron-icon icon="icons:file-upload" item-icon></iron-icon>
+              <span class="flex">Export</span>
+            </paper-icon-item>
+          </paper-menu>
+        </paper-menu-button>
+      </div>
+    </page-header>
+
+    <page-body>
+      <pd-output-list></pd-output-list>
+    </page-body>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'page-ip-reporting-pd-report',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.UtilsBehavior,
+      ],
+
+      properties: {
+        routeData: Object,
+
+        mode: {
+          type: String,
+          computed: '_computeMode(routeData)',
+        },
+
+        reportId: {
+          type: String,
+          statePath: 'programmeDocumentReports.current',
+        },
+
+        indicatorDataUrl: {
+          type: String,
+          computed: '_computeIndicatorDataUrl(reportId)',
+        },
+
+        reportUrl: {
+          type: String,
+          computed: '_computeReportUrl(pdId, reportId)',
+        },
+
+        pdId: {
+          type: String,
+          statePath: 'programmeDocuments.current',
+        },
+
+        currentPD: {
+          type: Object,
+          statePath: App.Selectors.ProgrammeDocuments.current,
+        },
+
+        currentReport: {
+          type: Object,
+          statePath: App.Selectors.ProgrammeDocumentReports.current,
+          observer: '_fetchReportDataIfNeeded',
+        },
+
+        headingText: {
+          type: String,
+          computed: '_computeHeadingText(currentPD, mode)',
+        },
+
+        backLink: {
+          type: String,
+          computed: '_computeBackLink(pdId)',
+        },
+      },
+
+      observers: [
+        '_onReportIdChanged(routeData.report_id)',
+        '_handleInputChange(indicatorDataUrl)',
+      ],
+
+      _computeMode: function (routeData) {
+        switch (routeData.mode) {
+          case 'view':
+          case 'draft':
+          case 'edit':
+            return routeData.mode;
+
+          default:
+            return 'view';
+        }
+      },
+
+      _computeBackLink: function (pdId) {
+        return 'pd/' + pdId + '/view/reports';
+      },
+
+      _computeCurrentPDRefNo: function (pd) {
+        return pd.reference_number;
+      },
+
+      _onReportIdChanged: function (reportId) {
+        this.dispatch(App.Actions.PDReports.setCurrent(reportId));
+      },
+
+      _computeHeadingText: function (pd, mode) {
+        var prefix;
+
+        switch (mode) {
+          case 'view':
+            prefix = 'Report for';
+            break;
+
+          case 'edit':
+            prefix = 'Enter data for';
+            break;
+
+          case 'draft':
+            prefix = 'Draft for';
+            break;
+        }
+
+        return prefix + ' ' + pd.reference_number;
+      },
+
+      _computeIndicatorDataUrl: function (reportId) {
+        return reportId ? App.Endpoints.indicatorData(reportId) : '';
+      },
+
+      _computeReportUrl: function (pdId, reportId) {
+        return App.Endpoints.programmeDocumentReport(pdId, reportId);
+      },
+
+      _handleInputChange: function (url) {
+        var indicatorDataThunk;
+
+        if (!url) {
+          return;
+        }
+
+        indicatorDataThunk = this.$.indicatorData.thunk();
+
+        // Cancel the pending request, if any
+        this.$.indicatorData.abort();
+
+        this.dispatch(
+          App.Actions.IndicatorData.fetch(indicatorDataThunk, this.reportId)
+        )
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
+      },
+
+      _fetchReportDataIfNeeded: function (report) {
+        if (report.id) {
+          return;
+        }
+
+        this.dispatch(
+          App.Actions.PDReports.fetchSingle(this.$.report.thunk(), this.pdId)
+        )
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
+      },
+    });
+  </script>
+</dom-module>

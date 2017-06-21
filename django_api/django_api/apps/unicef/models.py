@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 from decimal import Decimal
 from datetime import date
+import logging
 
 from django.db import models
 from django.contrib.contenttypes.fields import GenericRelation
@@ -19,17 +20,7 @@ from core.common import (
 )
 from indicator.models import Reportable  # IndicatorReport
 
-
-class ProgressReport(TimeStampedModel):
-    """
-    ProgressReport model - narrative for LLoutput/PDoutput indicators.
-    """
-    partner_contribution_to_date = models.CharField(max_length=256)
-    funds_received_to_date = models.CharField(max_length=256)
-    challenges_in_the_reporting_period = models.CharField(max_length=256)
-    proposed_way_forward = models.CharField(max_length=256)
-    status = models.CharField(max_length=3, choices=PROGRESS_REPORT_STATUS, default=PROGRESS_REPORT_STATUS.due)
-    # attachements ???
+logger = logging.getLogger(__name__)
 
 
 class Section(models.Model):
@@ -232,7 +223,12 @@ class ProgrammeDocument(TimeStampedModel):
             percentage = Decimal(consumed) / Decimal(total)
             percentage = int(percentage * 100)
         except Exception as exp:
-            # TODO log
+            logger.exception({
+                "model": "ProgrammeDocument",
+                "def": 'calculated_budget',
+                "pk": self.id,
+                "exception": exp
+            })
             percentage = 0
 
         self.__budget = "{total} ({consumed}%)".format(total=total, consumed=consumed)
@@ -262,6 +258,31 @@ class ProgrammeDocument(TimeStampedModel):
     #             programme_document=self,
     #             time_period=self.start_date,
     #         )
+
+
+def find_first_programme_document_id():
+    try:
+        pd_id = ProgrammeDocument.objects.first().id
+    except AttributeError:
+        from core.factories import ProgrammeDocumentFactory
+        pd = ProgrammeDocumentFactory()
+        pd_id = pd.id
+    else:
+        return pd_id
+
+
+class ProgressReport(TimeStampedModel):
+    partner_contribution_to_date = models.CharField(max_length=256)
+    funds_received_to_date = models.CharField(max_length=256)
+    challenges_in_the_reporting_period = models.CharField(max_length=256)
+    proposed_way_forward = models.CharField(max_length=256)
+    status = models.CharField(max_length=3, choices=PROGRESS_REPORT_STATUS, default=PROGRESS_REPORT_STATUS.due)
+    programme_document = models.ForeignKey(ProgrammeDocument, related_name="progress_reports", default=find_first_programme_document_id)
+    # attachements ???
+
+    @cached_property
+    def latest_indicator_report(self):
+        return self.indicator_reports.all().order_by('-created').first()
 
 
 class CountryProgrammeOutput(TimeStampedModel):

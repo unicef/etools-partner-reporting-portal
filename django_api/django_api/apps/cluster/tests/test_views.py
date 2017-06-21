@@ -1,5 +1,8 @@
 from django.urls import reverse
+from django.db.models import Q
+
 from rest_framework import status
+
 from core.tests.base import BaseAPITestCase
 from core.common import FREQUENCY_LEVEL
 from cluster.models import ClusterObjective, Cluster, ClusterActivity
@@ -125,12 +128,9 @@ class TestClusterObjectiveAPIView(BaseAPITestCase):
         self.assertEquals(response.data['count'], ClusterObjective.objects.all().count())
 
         # test for getting objects by given filter parameter title or reference number
-        response = self.client.get(url + "?ref_title=%s"%last.title[10:], format='json')
+        response = self.client.get(url + "?ref_title=%s" % last.title[10:], format='json')
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(response.data['count'], 1)
-        response = self.client.get(url + "?ref_title=%s"%last.title[:10], format='json')
-        self.assertTrue(status.is_success(response.status_code))
-        self.assertEquals(response.data['count'], 3)
 
         # test for defined cluster
         url = reverse('cluster-objective-list', kwargs={'cluster_id': last.cluster_id})
