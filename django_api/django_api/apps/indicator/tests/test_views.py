@@ -1,17 +1,5 @@
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase, APIClient
-
-from core.management.commands._privates import generate_fake_data
-from core.helpers import suppress_stdout
-
-from account.models import User
-
-from core.factories import (
-    ProgrammeDocumentFactory, ReportableToLowerLevelOutputFactory, ProgressReportFactory, IndicatorLocationDataFactory,
-    SectionFactory
-)
-from core.management.commands._privates import generate_data_combination_dict
 from core.tests.base import BaseAPITestCase
 from unicef.models import LowerLevelOutput, Section, ProgrammeDocument
 from cluster.models import ClusterObjective
