@@ -14,7 +14,7 @@
           dispatch(App.Actions.Indicators.indicatorsLoadingStart());
           return indicatorsThunk()
             .catch(function () {
-              dispatch(App.Actions.indicatorsLoadingStop());
+              dispatch(App.Actions.Indicators.indicatorsLoadingStop());
             })
             .then(function (res) {
               dispatch(App.Actions.Indicators.setIndicators(res.data));
