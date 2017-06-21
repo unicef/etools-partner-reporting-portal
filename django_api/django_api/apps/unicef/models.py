@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 from decimal import Decimal
 from datetime import date
+import logging
 
 from django.db import models
 from django.contrib.contenttypes.fields import GenericRelation
@@ -17,8 +18,10 @@ from core.common import (
     PROGRESS_REPORT_STATUS,
     PD_STATUS,
 )
-
 from indicator.models import Reportable  # IndicatorReport
+
+logger = logging.getLogger(__name__)
+
 
 class Section(models.Model):
     """
@@ -144,7 +147,7 @@ class ProgrammeDocument(TimeStampedModel):
     def contain_overdue_report(self):
         return self.reportable_queryset.filter(
             indicator_reports__time_period_start__lt=date.today(),
-            indicator_reports__report_status=INDICATOR_REPORT_STATUS.ontrack
+            indicator_reports__report_status=INDICATOR_REPORT_STATUS.due
         ).exists()
 
     @property
@@ -154,7 +157,7 @@ class ProgrammeDocument(TimeStampedModel):
                 .order_by('indicator_reports__time_period_start') \
                 .indicator_reports.last()
 
-            if ontop_report and ontop_report.report_status != INDICATOR_REPORT_STATUS.ontrack:
+            if ontop_report and ontop_report.report_status != INDICATOR_REPORT_STATUS.due:
                 return True
         return False
 
@@ -183,7 +186,7 @@ class ProgrammeDocument(TimeStampedModel):
 
         due_report = self.reportable_queryset.filter(
             indicator_reports__time_period_start__lt=date.today(),
-            indicator_reports__report_status=INDICATOR_REPORT_STATUS.ontrack
+            indicator_reports__report_status=INDICATOR_REPORT_STATUS.due
         ) \
             .order_by('indicator_reports__time_period_start') \
             .last().indicator_reports.last()
@@ -220,7 +223,12 @@ class ProgrammeDocument(TimeStampedModel):
             percentage = Decimal(consumed) / Decimal(total)
             percentage = int(percentage * 100)
         except Exception as exp:
-            # TODO log
+            logger.exception({
+                "model": "ProgrammeDocument",
+                "def": 'calculated_budget',
+                "pk": self.id,
+                "exception": exp
+            })
             percentage = 0
 
         self.__budget = "{total} ({consumed}%)".format(total=total, consumed=consumed)
