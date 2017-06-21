@@ -7,7 +7,8 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from unicef.models import LowerLevelOutput
-from core.serializers import SimpleLocationSerializer
+from core.serializers import SimpleLocationSerializer, IdLocationSerializer
+from core.models import Location
 from cluster.models import ClusterObjective
 from .models import (
     Reportable, IndicatorBlueprint,
@@ -298,6 +299,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
     cluster_objective_id = serializers.CharField(source='object_id')
     blueprint = IndicatorBlueprintSerializer()
+    locations = IdLocationSerializer(many=True)
 
     class Meta:
         model = Reportable
@@ -306,9 +308,18 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             'means_of_verification',
             'blueprint',
             'cluster_objective_id',
+            'locations',
         )
 
+    def check_location(self, locations):
+        if not isinstance(locations, (list, dict)) or\
+                False in [loc.get('id', False) for loc in locations]:
+            raise ValidationError({"locations": "List of dict location or one dict location expected"})
+
     def create(self, validated_data):
+
+        self.check_location(self.initial_data.get('locations'))
+
         blueprint = IndicatorBlueprintSerializer(data=validated_data['blueprint'])
         if blueprint.is_valid():
             blueprint.save()
@@ -318,5 +329,11 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         validated_data['blueprint'] = blueprint.instance
         validated_data['content_type'] = ContentType.objects.get_for_model(ClusterObjective)
         validated_data['is_cluster_indicator'] = True
+        del validated_data['locations']
+
         self.instance = Reportable.objects.create(**validated_data)
+
+        for location in self.initial_data.get('locations'):
+            self.instance.locations.add(Location.objects.get(id=location.get('id')))
+
         return self.instance
