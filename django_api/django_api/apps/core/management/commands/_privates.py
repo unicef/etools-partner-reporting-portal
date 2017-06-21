@@ -111,6 +111,14 @@ def generate_0_num_disagg_quantity_data(reportable):
         disaggregation_comb_0_pairs = list(combinations(list(
             indicator_report_from_reportable.disaggregations.values_list('id', flat=True)), 0))
 
+        disaggregation = {
+            "()": {
+                'v': random.randint(50, 1000),
+                'd': None,
+                'c': None
+            }
+        }
+
         for pair in disaggregation_comb_0_pairs:
             location_data = IndicatorLocationDataFactory(
                 indicator_report=indicator_report_from_reportable,
@@ -118,8 +126,7 @@ def generate_0_num_disagg_quantity_data(reportable):
                 num_disaggregation=0,
                 level_reported=0,
                 disaggregation_reported_on=pair,
-                disaggregation=generate_data_combination_dict(reduce(
-                    lambda acc, curr: acc + curr, indicator_report_from_reportable.disaggregation_values(id_only=True, filter_by_id__in=pair)), r=0)
+                disaggregation=disaggregation
             )
 
             disagg_idx += 1
@@ -325,6 +332,22 @@ def generate_3_num_disagg_quantity_data(reportable):
             )
 
 
+def generate_disaggregation_and_disaggregation_values(reportable, disaggregation_map, num_disaggregation=3):
+    if len(disaggregation_map.keys()) < num_disaggregation:
+        raise Exception("disaggregation_map has less # of num_disaggregation")
+
+    # Disaggregation generation
+    for disagg_idx in xrange(num_disaggregation):
+        disaggregation_title = disaggregation_map.keys()[disagg_idx]
+
+        disaggregation = DisaggregationFactory(
+            name=disaggregation_title, reportable=reportable)
+
+        for value in disaggregation_map[disaggregation_title]:
+            disaggregation_value = DisaggregationValueFactory(
+                value=value, disaggregation=disaggregation)
+                
+
 def generate_indicator_report_location_disaggregation_quantity_data():
     # Adding extra IndicatorReport to each ReportableToLowerLevelOutput
     locations = Location.objects.all()
@@ -336,17 +359,6 @@ def generate_indicator_report_location_disaggregation_quantity_data():
     }
 
     for idx, reportable in enumerate(Reportable.objects.filter(lower_level_outputs__reportables__isnull=False)):
-        # Disaggregation generation
-        for disaggregation_title in ["height", "age", "gender"]:
-            disaggregation = DisaggregationFactory(
-                name=disaggregation_title, reportable=reportable)
-
-            for value in sample_disaggregation_value_map[disaggregation_title]:
-                disaggregation_value = DisaggregationValueFactory(
-                    value=value, disaggregation=disaggregation)
-
-            print "Disaggregation (and DisaggregationValue) objects for ReportableToLowerLevelOutput {} created".format(idx)
-
         # -- Extra IndicatorReport and IndicatorLocationData --
         if reportable.locations.count() != 0:
             first_reportable_location_id = reportable.locations.first().id
@@ -370,6 +382,9 @@ def generate_indicator_report_location_disaggregation_quantity_data():
 
         # 1 num_disaggregation
         elif idx % 4 == 1:
+            generate_disaggregation_and_disaggregation_values(reportable, sample_disaggregation_value_map, num_disaggregation=1)
+            print "Disaggregation (and DisaggregationValue) objects for ReportableToLowerLevelOutput {} created".format(idx)
+
             generate_1_num_disagg_quantity_data(reportable)
 
             for location_id in list(reportable.indicator_reports.values_list('indicator_location_data__location', flat=True)):
@@ -380,6 +395,9 @@ def generate_indicator_report_location_disaggregation_quantity_data():
 
         # 2 num_disaggregation
         elif idx % 4 == 2:
+            generate_disaggregation_and_disaggregation_values(reportable, sample_disaggregation_value_map, num_disaggregation=2)
+            print "Disaggregation (and DisaggregationValue) objects for ReportableToLowerLevelOutput {} created".format(idx)
+
             generate_2_num_disagg_quantity_data(reportable)
 
             for location_id in list(reportable.indicator_reports.values_list('indicator_location_data__location', flat=True)):
@@ -390,6 +408,9 @@ def generate_indicator_report_location_disaggregation_quantity_data():
 
         # 3 num_disaggregation
         elif idx % 4 == 3:
+            generate_disaggregation_and_disaggregation_values(reportable, sample_disaggregation_value_map, num_disaggregation=3)
+            print "Disaggregation (and DisaggregationValue) objects for ReportableToLowerLevelOutput {} created".format(idx)
+
             generate_3_num_disagg_quantity_data(reportable)
 
             for location_id in list(reportable.indicator_reports.values_list('indicator_location_data__location', flat=True)):
