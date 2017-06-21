@@ -1,6 +1,7 @@
 from django.urls import reverse
 from rest_framework import status
 from core.tests.base import BaseAPITestCase
+from core.models import Location
 from unicef.models import LowerLevelOutput, Section, ProgrammeDocument
 from cluster.models import ClusterObjective
 from indicator.models import Reportable, IndicatorReport, IndicatorLocationData, IndicatorBlueprint
@@ -296,6 +297,10 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
         data = {
             'cluster_objective_id': co.id,
             'means_of_verification': 'IMO/CC calculation',
+            'locations': [
+                {'id': Location.objects.first().id},
+                {'id': Location.objects.last().id},
+            ],
             'blueprint': {
                 'title': 'of temporary classrooms',
                 'unit': IndicatorBlueprint.NUMBER,
@@ -308,3 +313,11 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(Reportable.objects.count(), reportable_count+1)
         self.assertEquals(IndicatorBlueprint.objects.count(), blueprint_count+1)
+
+        data['locations'].append(dict(failkey=1))
+        response = self.client.post(url, data=data, format='json')
+        self.assertFalse(status.is_success(response.status_code))
+        self.assertEquals(
+            response.data,
+            {"locations": "List of dict location or one dict location expected"}
+        )
