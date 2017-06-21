@@ -100,14 +100,33 @@
 
       _determineOuterRows: function() {
         var columnChoices = this.mapping[0].choices;
-        var outerRows = this.mapping[1].choices;
-        return this._determineRows(this, outerRows, columnChoices);
+        var rows = this.mapping[1].choices;
+        return this._determineRows(this, rows, columnChoices);
       },
 
       _determineMiddleRows: function(outerRowID) {
         var columnChoices = this.mapping[0].choices;
         var middleRows = this.mapping[2].choices;
-        return this._determineRows(this, middleRows, columnChoices);
+        var middleRowsForDisplay = [];
+        var formatted = '';
+
+        middleRows.forEach(function(y) {
+          var data = columnChoices.map(function(z) {
+            formatted = self._formatDisaggregationIds([outerRowID, y.id, z.id]);
+            return self.data.disaggregation[formatted];
+          });
+
+          formatted = self._formatDisaggregationIds([outerRowID, y.id]);
+          var total = self.data.disaggregation[formatted];
+
+          middleRowsForDisplay.push({
+            title: y.value,
+            data: data,
+            id: y.id,
+            total: total
+          });
+        });
+        return middleRowsForDisplay;
       },
 
       _determineTotals: function() {
@@ -138,7 +157,24 @@
         };
         this.columnTotalRow = columnTotalRow;
 
-        this.bottomRows = this._determineRows(this, middleRows, columnChoices);
+        middleRows.forEach(function(y) {
+          var data = columnChoices.map(function(z) {
+            var formatted = self._formatDisaggregationIds([y.id, z.id]);
+            return self.data.disaggregation[formatted];
+          });
+
+          var formatted = self._formatDisaggregationIds([y.id]);
+          var total = self.data.disaggregation[formatted];
+
+          bottomRows.push({
+            title: y.value,
+            data: data,
+            id: y.id,
+            total: total
+          });
+        });
+
+        this.bottomRows = bottomRows;
       },
 
     });

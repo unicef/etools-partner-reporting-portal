@@ -24,6 +24,19 @@ class SimpleLocationSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'latitude', 'longitude', 'p_code')
 
 
+class ShortLocationSerializer(serializers.ModelSerializer):
+
+    id = serializers.SerializerMethodField()
+    title = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = Location
+        fields = ('id', 'title')
+
+    def get_id(self, obj):
+        return str(obj.id)
+
+
 class ChildrenLocationSerializer(serializers.ModelSerializer):
     """
     Endpoint for drop down meny on PD list filterset - location.
