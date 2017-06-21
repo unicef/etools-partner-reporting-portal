@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 from decimal import Decimal
 from datetime import date
+import logging
 
 from django.db import models
 from django.contrib.contenttypes.fields import GenericRelation
@@ -17,8 +18,10 @@ from core.common import (
     PROGRESS_REPORT_STATUS,
     PD_STATUS,
 )
-
 from indicator.models import Reportable  # IndicatorReport
+
+logger = logging.getLogger(__name__)
+
 
 class Section(models.Model):
     """
@@ -220,7 +223,12 @@ class ProgrammeDocument(TimeStampedModel):
             percentage = Decimal(consumed) / Decimal(total)
             percentage = int(percentage * 100)
         except Exception as exp:
-            # TODO log
+            logger.exception({
+                "model": "ProgrammeDocument",
+                "def": 'calculated_budget',
+                "pk": self.id,
+                "exception": exp
+            })
             percentage = 0
 
         self.__budget = "{total} ({consumed}%)".format(total=total, consumed=consumed)
