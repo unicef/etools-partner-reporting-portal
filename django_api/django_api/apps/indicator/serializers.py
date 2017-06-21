@@ -238,19 +238,19 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
         valid_entry_count = len(valid_combination_entries)
         disaggregation_data_key_count = len(disaggregation_data_keys)
 
-        # # Assertion on all combinatoric entries for num_disaggregation and level_reported against submitted disaggregation data
-        if valid_entry_count > disaggregation_data_key_count:
-            raise serializers.ValidationError(
-                "Submitted disaggregation data entries does not contain "
-                + "all possible combination pair keys"
-            )
-
-        if valid_entry_count < disaggregation_data_key_count:
-            raise serializers.ValidationError(
-                "Submitted disaggregation data entries contains "
-                + "extra combination pair keys"
-                + "%d %d %s %s" % (valid_entry_count, disaggregation_data_key_count, valid_combination_entries, disaggregation_data_keys)
-            )
+        # # # Assertion on all combinatoric entries for num_disaggregation and level_reported against submitted disaggregation data
+        # if valid_entry_count > disaggregation_data_key_count:
+        #     raise serializers.ValidationError(
+        #         "Submitted disaggregation data entries does not contain "
+        #         + "all possible combination pair keys"
+        #     )
+        #
+        # if valid_entry_count < disaggregation_data_key_count:
+        #     raise serializers.ValidationError(
+        #         "Submitted disaggregation data entries contains "
+        #         + "extra combination pair keys"
+        #         + "%d %d %s %s" % (valid_entry_count, disaggregation_data_key_count, valid_combination_entries, disaggregation_data_keys)
+        #     )
 
         # Disaggregation data coordinate space check from level_reported
         for key in disaggregation_data_keys:
@@ -261,13 +261,13 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
                     + "specified level_reported"
                 )
 
-        # Disaggregation data coordinate space check
-        # from disaggregation choice ids
-        for key in disaggregation_data_keys:
-            if key not in valid_combination_entries:
-                raise serializers.ValidationError(
-                    "%s coordinate space does not " % (key)
-                    + "belong to disaggregation value id list")
+        # # Disaggregation data coordinate space check
+        # # from disaggregation choice ids
+        # for key in disaggregation_data_keys:
+        #     if key not in valid_combination_entries:
+        #         raise serializers.ValidationError(
+        #             "%s coordinate space does not " % (key)
+        #             + "belong to disaggregation value id list")
 
         return data
 
