@@ -14,8 +14,8 @@ from core.factories import (
 from core.management.commands._privates import generate_data_combination_dict
 from core.tests.base import BaseAPITestCase
 from unicef.models import LowerLevelOutput, Section, ProgrammeDocument
-
-from indicator.models import Reportable, IndicatorReport, IndicatorLocationData
+from cluster.models import ClusterObjective
+from indicator.models import Reportable, IndicatorReport, IndicatorLocationData, IndicatorBlueprint
 
 
 class TestPDReportsAPIView(BaseAPITestCase):
@@ -293,3 +293,30 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
 #
 #         self.assertEquals(response.status_code, status.HTTP_200_OK)
 #         self.assertEquals(response.data, data)
+
+
+class TestClusterIndicatorAPIView(BaseAPITestCase):
+
+    generate_fake_data_quantity = 2
+
+    def test_list_api(self):
+        reportable_count = Reportable.objects.count()
+        blueprint_count = IndicatorBlueprint.objects.count()
+
+        co = ClusterObjective.objects.first()
+        url = reverse('cluster-indicator')
+        data = {
+            'cluster_objective_id': co.id,
+            'means_of_verification': 'IMO/CC calculation',
+            'blueprint': {
+                'title': 'of temporary classrooms',
+                'unit': IndicatorBlueprint.NUMBER,
+                'description': 'Average measure for the month',
+                'disaggregatable': True,
+            },
+        }
+        response = self.client.post(url, data=data, format='json')
+
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(Reportable.objects.count(), reportable_count+1)
+        self.assertEquals(IndicatorBlueprint.objects.count(), blueprint_count+1)
