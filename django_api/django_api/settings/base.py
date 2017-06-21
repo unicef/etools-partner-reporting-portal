@@ -172,6 +172,8 @@ AUTH_USER_MODEL = 'account.User'
 
 PRINT_DATA_FORMAT = "%d %b %Y"
 
+INPUT_DATA_FORMAT = "%Y-%m-%d"
+
 LOGS_PATH = os.path.join(DATA_VOLUME, 'django_api', 'logs')
 
 LOGGING = {
