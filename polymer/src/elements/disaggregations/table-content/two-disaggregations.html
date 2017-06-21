@@ -72,15 +72,15 @@
 
         rowsForDisplay: {
           type: Array,
-          computed: '_determineMiddleRows(mapping)'
+          computed: '_determineRowsForDisplay(mapping)'
         },
       },
 
       _getColumns: function(mapping) {
-        return this.mapping[0].choices;
+        return mapping[0].choices;
       },
 
-      _determineMiddleRows: function() {
+      _determineRowsForDisplay: function() {
         var columnChoices = this.mapping[0].choices;
         var rows = this.mapping[1].choices;
         return this._determineRows(this, rows, columnChoices);
