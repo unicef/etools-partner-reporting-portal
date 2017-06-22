@@ -212,6 +212,8 @@ class IndicatorLocationData(TimeStampedModel):
     disaggregation_reported_on = ArrayField(
         models.IntegerField(), default=list
     )
+    location_progress = JSONField(default=dict)
+    previous_location_progress = JSONField(default=dict)
 
     def __unicode__(self):
         return "{} Location Data for {}".format(self.location, self.indicator_report)

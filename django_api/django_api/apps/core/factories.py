@@ -350,6 +350,8 @@ class IndicatorLocationDataFactory(factory.django.DjangoModelFactory):
     num_disaggregation = 3
     level_reported = 3
     disaggregation_reported_on = list()
+    location_progress = dict()
+    previous_location_progress = dict()
 
     class Meta:
         model = IndicatorLocationData
