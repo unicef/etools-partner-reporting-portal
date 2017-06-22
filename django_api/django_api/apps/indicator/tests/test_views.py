@@ -288,14 +288,15 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
 
     generate_fake_data_quantity = 2
 
-    def test_list_api(self):
-        reportable_count = Reportable.objects.count()
-        blueprint_count = IndicatorBlueprint.objects.count()
+    def setUp(self):
+        super(TestClusterIndicatorAPIView, self).setUp()
+        self.reportable_count = Reportable.objects.count()
+        self.blueprint_count = IndicatorBlueprint.objects.count()
 
-        co = ClusterObjective.objects.first()
-        url = reverse('cluster-indicator')
-        data = {
-            'cluster_objective_id': co.id,
+        self.co = ClusterObjective.objects.first()
+        self.url = reverse('cluster-indicator')
+        self.data = {
+            'cluster_objective_id': self.co.id,
             'means_of_verification': 'IMO/CC calculation',
             'locations': [
                 {'id': Location.objects.first().id},
@@ -308,16 +309,42 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
                 'disaggregatable': True,
             },
         }
-        response = self.client.post(url, data=data, format='json')
+
+    def test_create_indicator_cluster_reporting(self):
+        response = self.client.post(self.url, data=self.data, format='json')
 
         self.assertTrue(status.is_success(response.status_code))
-        self.assertEquals(Reportable.objects.count(), reportable_count+1)
-        self.assertEquals(IndicatorBlueprint.objects.count(), blueprint_count+1)
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+        self.assertEquals(Reportable.objects.count(), self.reportable_count+1)
+        self.assertEquals(IndicatorBlueprint.objects.count(), self.blueprint_count+1)
 
-        data['locations'].append(dict(failkey=1))
-        response = self.client.post(url, data=data, format='json')
+        self.data['locations'].append(dict(failkey=1))
+        response = self.client.post(self.url, data=self.data, format='json')
         self.assertFalse(status.is_success(response.status_code))
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEquals(
             response.data,
             {"locations": "List of dict location or one dict location expected"}
+        )
+
+    def test_update_indicator_cluster_reporting(self):
+        response = self.client.post(self.url, data=self.data, format='json')
+        self.assertTrue(status.is_success(response.status_code))
+
+        self.data.update({"id": response.data.get("reportable_id")})
+        new_means_of_verification = 'IMO/CC calculation - updated'
+        self.data['means_of_verification'] = new_means_of_verification
+        new_title = 'of temporary classrooms - updated'
+        self.data['blueprint']['title'] = new_title
+        self.data['locations'] = [{'id': Location.objects.first().id}]
+        response = self.client.put(self.url, data=self.data, format='json')
+
+        self.assertTrue(status.is_success(response.status_code))
+        reportable = Reportable.objects.get(id=response.data['id'])
+        self.assertEquals(reportable.means_of_verification, new_means_of_verification)
+        self.assertEquals(reportable.blueprint.title, new_title)
+        self.assertEquals(reportable.locations.count(), 1)
+        self.assertEquals(
+            reportable.locations.first().id,
+            Location.objects.first().id
         )
