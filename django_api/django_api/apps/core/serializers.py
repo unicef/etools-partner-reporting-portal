@@ -36,6 +36,7 @@ class ShortLocationSerializer(serializers.ModelSerializer):
     def get_id(self, obj):
         return str(obj.id)
 
+
 class IdLocationSerializer(serializers.ModelSerializer):
 
     class Meta:
