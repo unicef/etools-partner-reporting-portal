@@ -275,5 +275,19 @@ class ClusterIndicatorAPIView(APIView):
                 'reportable_id': serializer.instance.id,
                 'blueprint_id': serializer.instance.blueprint.id
             },
-            status=status.HTTP_200_OK
+            status=status.HTTP_201_CREATED
         )
+
+    def get_object(self):
+        return get_object_or_404(Reportable, pk=self.request.data.get("id"))
+
+    def put(self, request, *args, **kwargs):
+        serializer = self.get_serializer(
+            instance=self.get_object(),
+            data=request.data
+        )
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer.save()
+        return Response({'id': serializer.instance.id}, status=status.HTTP_200_OK)

@@ -337,3 +337,29 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             self.instance.locations.add(Location.objects.get(id=location.get('id')))
 
         return self.instance
+
+    def update(self, instance, validated_data):
+        # cluster_objective_id should not be changed in this endpoint !
+        self.check_location(self.initial_data.get('locations'))
+
+        instance.means_of_verification = validated_data.get(
+            'means_of_verification', instance.means_of_verification)
+        instance.blueprint.title = \
+            validated_data.get('blueprint', {}).get('title', instance.blueprint.title)
+        instance.blueprint.unit = \
+            validated_data.get('blueprint', {}).get('unit', instance.blueprint.unit)
+        instance.blueprint.description = \
+            validated_data.get('blueprint', {}).get('description', instance.blueprint.description)
+        instance.blueprint.disaggregatable = \
+            validated_data.get('blueprint', {}).get('disaggregatable', instance.blueprint.disaggregatable)
+
+        exclude_ids = [loc['id'] for loc in self.initial_data.get('locations')]
+        Location.objects.filter(reportable_id=instance.id).exclude(id__in=exclude_ids).update(reportable=None)
+
+        for location in self.initial_data.get('locations'):
+            instance.locations.add(Location.objects.get(id=location.get('id')))
+
+        instance.blueprint.save()
+        instance.save()
+
+        return instance
