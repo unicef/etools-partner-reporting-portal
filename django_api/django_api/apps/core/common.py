@@ -85,3 +85,8 @@ PD_STATUS = Choices(
     ("Imp", "implemented", "Implemented"),
     ('Rej', 'rejected', 'Rejected'),
 )
+
+RESPONSE_PLAN_TYPE = Choices(
+    ("HRP", "hrp", "HRP"),
+    ("FA", "fa", "FA"),
+)

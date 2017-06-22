@@ -9,6 +9,7 @@ from model_utils.models import TimeStampedModel
 from .common import (
     INTERVENTION_TYPES,
     INTERVENTION_STATUS,
+    RESPONSE_PLAN_TYPE,
 )
 from .countries import COUNTRIES_ALPHA2_CODE_DICT, COUNTRIES_ALPHA2_CODE
 
@@ -81,6 +82,39 @@ class Intervention(TimeStampedModel):
     @property
     def address(self):
         return ", ".join(self.street_address, self.city, self.postal_code, self.country_name)
+
+
+
+class ResponsePlan(TimeStampedModel):
+    """
+    ResponsePlan model present response of intervention.
+
+    related models:
+        ....
+    """
+    title = models.CharField(max_length=255, verbose_name='Response Plan')
+    plan_type = models.CharField(
+        max_length=3,
+        choices=RESPONSE_PLAN_TYPE,
+        default=RESPONSE_PLAN_TYPE.hrp,
+        verbose_name='Plan Type'
+    )
+    start = models.DateField(
+        null=True,
+        blank=True,
+        verbose_name='Start date'
+    )
+    end = models.DateField(
+        null=True,
+        blank=True,
+        verbose_name='End date'
+    )
+    intervention = models.ForeignKey('core.Intervention', related_name="response_plans")
+    # location = models.ForeignKey('core.Location', related_name="response_plan")
+
+    @property
+    def documents(self):
+        return []  # TODO probably create file field
 
 
 class Location(TimeStampedModel):
