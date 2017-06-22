@@ -1,3 +1,4 @@
+from ast import literal_eval as make_tuple
 from collections import OrderedDict
 
 from django.conf import settings
@@ -155,7 +156,21 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
     disaggregation = serializers.SerializerMethodField()
 
     def get_disaggregation(self, obj):
-        return OrderedDict(sorted(obj.disaggregation.items()))
+        ordered_dict = obj.disaggregation.copy()
+        keys = ordered_dict.keys()
+
+        for key in keys:
+            ordered_dict[make_tuple(key)] = ordered_dict[key]
+            ordered_dict.pop(key)
+
+        ordered_dict = OrderedDict(sorted(ordered_dict.items()), reverse=True)
+        keys = ordered_dict.keys()
+
+        for key in keys:
+            ordered_dict[str(key)] = ordered_dict[key]
+            ordered_dict.pop(key)
+
+        return ordered_dict
 
     class Meta:
         model = IndicatorLocationData
