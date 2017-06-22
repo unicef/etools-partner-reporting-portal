@@ -115,7 +115,7 @@
 
         reportId: {
           type: String,
-          statePath: 'programmeDocumentReports.current',
+          statePath: 'programmeDocumentReports.current.id',
         },
 
         indicatorDataUrl: {
@@ -156,7 +156,7 @@
       },
 
       observers: [
-        '_onReportIdChanged(routeData.report_id)',
+        '_onReportChanged(routeData.report_id, routeData.mode)',
         '_handleInputChange(indicatorDataUrl)',
       ],
 
@@ -180,8 +180,8 @@
         return pd.reference_number;
       },
 
-      _onReportIdChanged: function (reportId) {
-        this.dispatch(App.Actions.PDReports.setCurrent(reportId));
+      _onReportChanged: function (reportId, mode) {
+        this.dispatch(App.Actions.PDReports.setCurrent(reportId, mode));
       },
 
       _computeHeadingText: function (pd, mode) {

@@ -39,7 +39,7 @@
           return state.programmeDocuments.current;
         },
         function (state) {
-          return state.programmeDocumentReports.current;
+          return state.programmeDocumentReports.current.id;
         },
         function (byPD, pdId, reportId) {
           return (byPD[pdId] || []).filter(function (report) {

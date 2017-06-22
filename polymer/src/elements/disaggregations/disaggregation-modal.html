@@ -1,0 +1,109 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+
+<dom-module id="disaggregation-modal">
+  <template>
+    <style include="iron-flex iron-flex-alignment">
+      :host {
+        display: block;
+
+        --paper-dialog: {
+          min-width: 640px;
+
+          & > * {
+            margin: 0;
+          }
+        };
+      }
+
+      .header {
+        height: 48px;
+        padding: 0 19px 0 25px;
+        margin: 0;
+        color: white;
+        background: var(--theme-primary-color);
+      }
+
+      .header h2 {
+        @apply(--paper-font-title);
+
+        margin: 0;
+        line-height: 48px;
+      }
+
+     .header paper-icon-button {
+       width: 25px;
+       height: 25px;
+       padding: 0;
+       margin-left: 1em;
+       color: white;
+     }
+
+     .content {
+       padding: 24px 0;
+     }
+    </style>
+
+    <paper-dialog
+        id="dialog"
+        with-backdrop
+        opened="[[opened]]">
+      <div class="header layout horizontal justified">
+        <h2>Enter data</h2>
+
+        <div class="layout horizontal">
+          <p>Reporting period: [[reportingPeriod]]</p>
+
+          <paper-icon-button
+              class="self-center"
+              on-tap="close"
+              icon="icons:close">
+          </paper-icon-button>
+        </div>
+      </div>
+
+      <paper-dialog-scrollable>
+        <div class="content">
+          <content></content>
+        </div>
+      </paper-dialog-scrollable>
+
+      <div class="buttons">
+        asd
+      </div>
+    </paper-dialog>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'disaggregation-modal',
+
+      properties: {
+        reportingPeriod: String,
+
+        opened: {
+          type: Boolean,
+          value: false,
+        },
+      },
+
+      listeners: {
+        'dialog.iron-overlay-closed': 'close',
+      },
+
+      close: function (e) {
+        this.set('opened', false);
+      },
+
+      open: function () {
+        this.set('opened', true);
+      },
+    });
+  </script>
+</dom-module>
