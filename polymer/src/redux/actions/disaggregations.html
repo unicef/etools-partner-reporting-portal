@@ -27,6 +27,29 @@
         };
       },
 
+      updateForLocation: function (updateThunk, indicatorId, locationId) {
+        return function (dispatch) {
+          return updateThunk()
+              .then(function (res) {
+                dispatch(
+                  App.Actions.Disaggregations.setForLocation(
+                    indicatorId,
+                    locationId,
+                    res.data
+                  )
+                );
+              });
+        }
+      },
+
+      setForLocation: function(indicatorId, locationId, data) {
+        return {
+          type: App.Constants.SET_DISAGGREGATIONS_FOR_LOCATION,
+          indicatorId: indicatorId,
+          locationId: locationId,
+          data: data,
+        };
+      },
     };
   }());
 </script>

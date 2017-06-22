@@ -4,6 +4,8 @@
 <link rel="import" href="../../../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../../../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../bower_components/iron-icons/maps-icons.html">
 <link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
 <link rel="import" href="../../../bower_components/paper-button/paper-button.html">
 
@@ -15,10 +17,13 @@
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
 <link rel="import" href="../../redux/selectors/programmeDocumentReports.html">
+<link rel="import" href="../../redux/selectors/programmeDocuments.html">
+<link rel="import" href="../../polyfills/es6-shim.html">
+<link rel="import" href="../../styles/buttons.html">
 
 <dom-module id="indicator-details">
   <template>
-    <style include="iron-flex iron-flex-alignment app-grid-style">
+    <style include="button-styles iron-flex iron-flex-alignment app-grid-style">
       :host {
         display: block;
         min-height: 150px;
@@ -38,11 +43,6 @@
         padding: 10px 25px;
         border-bottom: 1px solid var(--paper-grey-300);
         background: var(--paper-grey-100);
-      }
-
-      .tab-header paper-button {
-        color: white;
-        background: var(--theme-primary-color);
       }
 
       .tab-header dl {
@@ -71,6 +71,36 @@
       .table-container {
         max-height: 500px;
         overflow: auto;
+      }
+
+      .location {
+        margin: 0;
+        font-weight: bold;
+      }
+
+      .location iron-icon {
+        margin-left: -3px;
+        color: var(--theme-primary-color);
+      }
+
+      .current-pd {
+        margin: 0 0 1em;
+        font-size: 12px;
+        color: var(--theme-primary-text-color-medium);
+      }
+
+      .location-progress {
+        text-align: right;
+      }
+
+      .location-progress dt,
+      .location-progress dd {
+        display: inline;
+        margin: 0;
+      }
+
+      .location-progress dt {
+        font-weight: bold;
       }
     </style>
 
@@ -106,15 +136,16 @@
             <div class="tab-header layout horizontal justified">
               <dl>
                 <dt>Location progress:</dt>
-                <dd>0</dd>
+                <dd>[[location.location_progress.v]]</dd>
                 <dt>Previous location progress:</dt>
-                <dd>3199</dd>
+                <dd>[[location.previous_location_progress.v]]</dd>
               </dl>
               <div>
                 <template
                     is="dom-if"
                     if="[[_equals(mode, 'edit')]]">
                   <paper-button
+                      class="btn-primary"
                       modal-index="[[index]]"
                       on-tap="_openModal"
                       raised>
@@ -138,10 +169,25 @@
                   <disaggregation-modal
                       id="modal-[[index]]"
                       reporting-period="[[currentReport.reporting_period]]">
+                    <div class="meta">
+                      <h3>[[indicatorName]]</h3>
+                      <p class="location">
+                        <iron-icon icon="maps:place"></iron-icon>
+                        [[location.location.title]]
+                      </p>
+                      <p class="current-pd">
+                        [[currentPD.agreement]] | [[currentPD.title]]
+                      </p>
+                      <dl class="location-progress">
+                        <dt>Location progress:</dt>
+                        <dd>[[location.location_progress.v]]</dd>
+                      </dl>
+                    </div>
                     <disaggregation-table
                         total="[[disaggregations.total]]"
                         data="[[location]]"
                         mapping="[[disaggregations.disagg_lookup_map]]"
+                        indicator-id="[[indicatorId]]"
                         editable>
                     </disaggregation-table>
                   </disaggregation-modal>
@@ -168,6 +214,8 @@
       properties: {
         indicatorId: Number,
 
+        indicatorName: String,
+
         reportableId: Number,
 
         selected: {
@@ -183,6 +231,11 @@
         loading: {
           type: Boolean,
           value: true,
+        },
+
+        currentPD: {
+          type: Object,
+          statePath: App.Selectors.ProgrammeDocuments.current,
         },
 
         disaggregationsUrl: {
@@ -254,7 +307,7 @@
       },
 
       _computeDisaggregations: function (data, key) {
-        return data[key];
+        return this._clone(data[key]);
       },
 
       _openModal: function (e) {

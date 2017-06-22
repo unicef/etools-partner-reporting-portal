@@ -110,7 +110,7 @@
 
         mode: {
           type: String,
-          computed: '_computeMode(routeData)',
+          statePath: 'programmeDocumentReports.current.mode',
         },
 
         reportId: {
@@ -159,18 +159,6 @@
         '_onReportChanged(routeData.report_id, routeData.mode)',
         '_handleInputChange(indicatorDataUrl)',
       ],
-
-      _computeMode: function (routeData) {
-        switch (routeData.mode) {
-          case 'view':
-          case 'draft':
-          case 'edit':
-            return routeData.mode;
-
-          default:
-            return 'view';
-        }
-      },
 
       _computeBackLink: function (pdId) {
         return 'pd/' + pdId + '/view/reports';

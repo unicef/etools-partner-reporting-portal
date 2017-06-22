@@ -1,22 +1,30 @@
-<!--
-Determines which disaggregation-table component to display based on number.
- -->
-
-<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/promise-polyfill/promise-polyfill-lite.html">
 
 <link rel="import" href="table-content/three-disaggregations.html">
 <link rel="import" href="table-content/two-disaggregations.html">
 <link rel="import" href="table-content/one-disaggregation.html">
 <link rel="import" href="table-content/zero-disaggregations.html">
+<link rel="import" href="../etools-prp-ajax.html">
+<link rel="import" href="../../endpoints.html">
+<link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../redux/actions.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../styles/disaggregation-table-styles.html">
 
 <dom-module id="disaggregation-table">
   <template>
-
     <style include="disaggregation-table-styles"></style>
 
-    <table class='vertical layout'>
+    <etools-prp-ajax
+        id="update"
+        url="[[updateUrl]]"
+        body="[[localData]]"
+        content-type="application/json"
+        method="put">
+    </etools-prp-ajax>
+
+    <table class="vertical layout">
 
       <!-- Note: Need to pass in mapping to these or an empty mapping is passed
       to the content component. -->
@@ -67,6 +75,7 @@ Determines which disaggregation-table component to display based on number.
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
       ],
 
       properties: {
@@ -77,7 +86,17 @@ Determines which disaggregation-table component to display based on number.
 
         fields: Array,
 
-        data: Object,
+        data: {
+          type: Object,
+          observer: '_cloneData',
+        },
+
+        updateUrl: {
+          type: String,
+          value: App.Endpoints.indicatorLocationDataEntries(),
+        },
+
+        localData: Object,
 
         mapping: Object,
 
@@ -87,6 +106,7 @@ Determines which disaggregation-table component to display based on number.
       listeners: {
         'register-field': '_registerField',
         'deregister-field': '_deregisterField',
+        'field-value-changed': '_fieldValueChanged',
       },
 
       _registerField: function (e, field) {
@@ -111,11 +131,30 @@ Determines which disaggregation-table component to display based on number.
         this.splice('fields', index, 1);
       },
 
+      _fieldValueChanged: function (e, change) {
+        e.stopPropagation();
+
+        this.set(['localData.disaggregation', change.key], {
+          c: null,
+          d: null,
+          v: change.value,
+        });
+      },
+
+      _cloneData: function (data) {
+        if (!this.editable) {
+          return;
+        }
+
+        this.set('localData', this._clone(data));
+      },
+
       save: function () {
+        var updateThunk;
         var valid;
 
         if (!this.editable) {
-          return;
+          return Promise.reject();
         }
 
         this.fields.forEach(function (field) {
@@ -127,10 +166,20 @@ Determines which disaggregation-table component to display based on number.
         });
 
         if (!valid) {
-          return;
+          return Promise.reject();
         }
 
-        // TODO
+        updateThunk = this.$.update.thunk();
+
+        this.$.update.abort();
+
+        return this.dispatch(
+          App.Actions.Disaggregations.updateForLocation(
+            updateThunk,
+            this.indicatorId,
+            this.data.location.id
+          )
+        );
       },
     });
   </script>

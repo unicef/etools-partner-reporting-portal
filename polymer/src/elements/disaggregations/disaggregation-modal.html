@@ -7,14 +7,16 @@
 <link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../../bower_components/paper-button/paper-button.html">
 
+<link rel="import" href="../../styles/buttons.html">
+
 <dom-module id="disaggregation-modal">
   <template>
-    <style include="iron-flex iron-flex-alignment">
+    <style include="button-styles iron-flex iron-flex-alignment iron-flex-reverse">
       :host {
         display: block;
 
         --paper-dialog: {
-          min-width: 640px;
+          min-width: 500px;
 
           & > * {
             margin: 0;
@@ -24,7 +26,7 @@
 
       .header {
         height: 48px;
-        padding: 0 19px 0 25px;
+        padding: 0 19px 0 24px;
         margin: 0;
         color: white;
         background: var(--theme-primary-color);
@@ -37,17 +39,17 @@
         line-height: 48px;
       }
 
-     .header paper-icon-button {
-       width: 25px;
-       height: 25px;
-       padding: 0;
-       margin-left: 1em;
-       color: white;
-     }
+      .header paper-icon-button {
+        width: 25px;
+        height: 25px;
+        padding: 0;
+        margin-left: 1em;
+        color: white;
+      }
 
-     .content {
-       padding: 24px 0;
-     }
+      .buttons {
+        padding: 24px;
+      }
     </style>
 
     <paper-dialog
@@ -69,13 +71,25 @@
       </div>
 
       <paper-dialog-scrollable>
-        <div class="content">
-          <content></content>
-        </div>
+        <content select=".meta"></content>
+        <content
+            select="disaggregation-table"
+            class="table">
+        </content>
       </paper-dialog-scrollable>
 
-      <div class="buttons">
-        asd
+      <div class="buttons layout horizontal-reverse">
+        <paper-button
+            class="btn-primary"
+            on-tap="_save"
+            raised>
+          Save
+        </paper-button>
+
+        <paper-button
+            on-tap="close">
+          Cancel
+        </paper-button>
       </div>
     </paper-dialog>
   </template>
@@ -103,6 +117,19 @@
 
       open: function () {
         this.set('opened', true);
+      },
+
+      _save: function () {
+        var table = this.getContentChildNodes('.table')[0];
+        var self = this;
+
+        table.save()
+            .then(function () {
+              self.close();
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
       },
     });
   </script>
