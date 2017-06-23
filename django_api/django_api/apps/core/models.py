@@ -84,7 +84,6 @@ class Intervention(TimeStampedModel):
         return ", ".join(self.street_address, self.city, self.postal_code, self.country_name)
 
 
-
 class ResponsePlan(TimeStampedModel):
     """
     ResponsePlan model present response of intervention.
