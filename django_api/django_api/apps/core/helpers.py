@@ -73,10 +73,10 @@ def get_sorted_ordered_dict_by_keys(dictionary, reverse=True):
     Returns a copy of passed-in dictionary as OrderedDict instance,
     after sorting the items by key.
     """
-    return OrderedDict(sorted(dictionary.items()), reverse=reverse)
+    return OrderedDict(sorted(dictionary.items(), reverse=reverse))
 
 
-def cast_dictionary_keys_as_tuple(dictionary):
+def get_cast_dictionary_keys_as_tuple(dictionary):
     """
     Returns a copy of passed-in dictionary as dict instance,
     after casting all of its keys as tuple.
@@ -91,7 +91,7 @@ def cast_dictionary_keys_as_tuple(dictionary):
     return casted_dictionary
 
 
-def cast_dictionary_keys_as_string(dictionary):
+def get_cast_dictionary_keys_as_string(dictionary):
     """
     Returns a copy of passed-in dictionary as dict instance,
     after casting all of its keys as string.

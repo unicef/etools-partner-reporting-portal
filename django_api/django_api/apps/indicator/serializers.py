@@ -11,8 +11,8 @@ from core.serializers import SimpleLocationSerializer
 from core.helpers import (
     generate_data_combination_entries,
     get_sorted_ordered_dict_by_keys,
-    cast_dictionary_keys_as_tuple,
-    cast_dictionary_keys_as_string,
+    get_cast_dictionary_keys_as_tuple,
+    get_cast_dictionary_keys_as_string,
 )
 
 from .models import (
@@ -163,12 +163,12 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
     disaggregation = serializers.SerializerMethodField()
 
     def get_disaggregation(self, obj):
-        ordered_dict = cast_dictionary_keys_as_tuple(obj.disaggregation)
+        ordered_dict = get_cast_dictionary_keys_as_tuple(obj.disaggregation)
 
         ordered_dict = get_sorted_ordered_dict_by_keys(
             ordered_dict, reverse=True)
 
-        ordered_dict = cast_dictionary_keys_as_string(ordered_dict)
+        ordered_dict = get_cast_dictionary_keys_as_string(ordered_dict)
 
         return ordered_dict
 
