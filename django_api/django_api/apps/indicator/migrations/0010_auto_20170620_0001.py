@@ -9,16 +9,24 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('indicator', '0008_auto_20170613_2011'),
+        ('indicator', '0009_auto_20170531_1030'),
     ]
 
     operations = [
-        migrations.AlterField(
+        migrations.RemoveField(
+            model_name='indicatorreport',
+            name='total'
+        ),
+        migrations.RemoveField(
+            model_name='reportable',
+            name='total'
+        ),
+        migrations.AddField(
             model_name='indicatorreport',
             name='total',
             field=django.contrib.postgres.fields.jsonb.JSONField(default={'c': None, 'd': None, 'v': 0}),
         ),
-        migrations.AlterField(
+        migrations.AddField(
             model_name='reportable',
             name='total',
             field=django.contrib.postgres.fields.jsonb.JSONField(default={'c': None, 'd': None, 'v': 0}),
