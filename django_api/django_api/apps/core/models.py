@@ -109,7 +109,6 @@ class ResponsePlan(TimeStampedModel):
         verbose_name='End date'
     )
     intervention = models.ForeignKey('core.Intervention', related_name="response_plans")
-    # location = models.ForeignKey('core.Location', related_name="response_plan")
 
     @property
     def documents(self):
