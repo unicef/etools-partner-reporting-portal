@@ -119,7 +119,7 @@ class Reportable(TimeStampedModel):
         percentage = 0.0
 
         if self.achieved:
-            percentage = (self.achieved - float(self.baseline)) / (float(self.target) - float(self.baseline))
+            percentage = (self.achieved['v'] - float(self.baseline)) / (float(self.target) - float(self.baseline))
 
         return percentage
 
