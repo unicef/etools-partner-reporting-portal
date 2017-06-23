@@ -1,4 +1,5 @@
 from ast import literal_eval as make_tuple
+from collections import OrderedDict
 
 from django.conf import settings
 
@@ -152,7 +153,24 @@ class IndicatorLLoutputsSerializer(serializers.ModelSerializer):
 class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
 
     location = SimpleLocationSerializer(read_only=True)
-    disaggregation = serializers.JSONField()
+    disaggregation = serializers.SerializerMethodField()
+
+    def get_disaggregation(self, obj):
+        ordered_dict = obj.disaggregation.copy()
+        keys = ordered_dict.keys()
+
+        for key in keys:
+            ordered_dict[make_tuple(key)] = ordered_dict[key]
+            ordered_dict.pop(key)
+
+        ordered_dict = OrderedDict(sorted(ordered_dict.items()), reverse=True)
+        keys = ordered_dict.keys()
+
+        for key in keys:
+            ordered_dict[str(key)] = ordered_dict[key]
+            ordered_dict.pop(key)
+
+        return ordered_dict
 
     class Meta:
         model = IndicatorLocationData
@@ -165,50 +183,6 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
             'level_reported',
             'disaggregation_reported_on',
         )
-
-    def validate(self, data):
-        """
-        Check IndicatorLocationData object's disaggregation
-        field is correctly mapped to the disaggregation values.
-        """
-
-        # Disaggregation data coordinate space check from level_reported
-        for key in data['disaggregation'].keys():
-            if len(make_tuple(key)) > data['level_reported']:
-                raise serializers.ValidationError(
-                    "%s Disaggregation data coordinate " % (key)
-                    + "space cannot be higher than "
-                    + "specified level_reported"
-                )
-
-        try:
-            indicator_report = IndicatorReport.objects.get(
-                id=data['indicator_report'])
-
-        except IndicatorReport.DoesNotExist:
-            raise serializers.ValidationError(
-                "IndicatorReport ID %d" % (data['indicator_report'])
-                + "does not exist for "
-                + "IndicatorLocationData ID %d" % (data['id']))
-
-        disaggregation_value_id_list = \
-            indicator_report.disaggregation_values(id_only=True, flat=True)
-
-        # Disaggregation data coordinate space check
-        # from disaggregation choice ids
-        for key in data['disaggregation'].keys():
-            tuple_key = make_tuple(key)
-
-            disagg_value_check_list = map(
-                lambda k: k not in disaggregation_value_id_list, tuple_key
-            )
-
-            if not all(disagg_value_check_list):
-                raise serializers.ValidationError(
-                    "%s coordinate space does not " % (key)
-                    + "belong to disaggregation value id list")
-
-        return data
 
 
 class IndicatorReportListSerializer(serializers.ModelSerializer):

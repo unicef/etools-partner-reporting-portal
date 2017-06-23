@@ -156,7 +156,7 @@ class IndicatorReport(TimeStampedModel):
     remarks = models.TextField(blank=True, null=True)
     report_status = models.CharField(
         choices=INDICATOR_REPORT_STATUS,
-        default=INDICATOR_REPORT_STATUS.ontrack,
+        default=INDICATOR_REPORT_STATUS.due,
         max_length=3
     )
 
@@ -195,10 +195,10 @@ class IndicatorReport(TimeStampedModel):
 
         for disaggregation in disaggregations:
             if not id_only:
-                disaggregation_value = disaggregation.disaggregation_value.values_list('id', 'value')
+                disaggregation_value = disaggregation.disaggregation_value.order_by('id').values_list('id', 'value')
 
             else:
-                disaggregation_value = disaggregation.disaggregation_value.values_list('id', flat=True)
+                disaggregation_value = disaggregation.disaggregation_value.order_by('id').values_list('id', flat=True)
 
             output_list.append(list(disaggregation_value))
 
