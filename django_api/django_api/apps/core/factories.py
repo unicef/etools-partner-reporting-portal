@@ -32,7 +32,7 @@ from unicef.models import (
     LowerLevelOutput,
 )
 from core.common import FREQUENCY_LEVEL, PD_STATUS
-from core.models import Intervention, Location
+from core.models import Intervention, Location, ResponsePlan
 from core.countries import COUNTRIES_ALPHA2_CODE
 
 PD_STATUS_LIST = [x[0] for x in PD_STATUS]
@@ -160,7 +160,8 @@ class InterventionFactory(factory.django.DjangoModelFactory):
     signed_by_unicef_date = fuzzy.FuzzyDate(datetime.date.today())
     signed_by_partner_date = fuzzy.FuzzyDate(datetime.date.today())
 
-    cluster = factory.RelatedFactory('core.factories.ClusterFactory', 'intervention')
+    # cluster = factory.RelatedFactory('core.factories.ClusterFactory', 'intervention')
+    response_plan = factory.RelatedFactory('core.factories.ResponsePlanFactory', 'intervention')
 
     @factory.post_generation
     def locations(self, create, extracted, **kwargs):
@@ -175,6 +176,17 @@ class InterventionFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = Intervention
+
+
+class ResponsePlanFactory(factory.django.DjangoModelFactory):
+    title = factory.Sequence(lambda n: "response plan %d" % n)
+    start = fuzzy.FuzzyDate(datetime.date.today())
+    end = fuzzy.FuzzyDate(datetime.date.today())
+
+    cluster = factory.RelatedFactory('core.factories.ClusterFactory', 'response_plan')
+
+    class Meta:
+        model = ResponsePlan
 
 
 class ClusterFactory(factory.django.DjangoModelFactory):
