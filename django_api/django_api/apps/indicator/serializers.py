@@ -95,7 +95,7 @@ class IndicatorReportStatusSerializer(serializers.ModelSerializer):
 class IndicatorListSerializer(serializers.ModelSerializer):
     blueprint = IndicatorBlueprintSimpleSerializer()
     ref_num = serializers.CharField()
-    achieved = serializers.IntegerField()
+    achieved = serializers.JSONField()
     progress_percentage = serializers.FloatField()
 
     class Meta:
@@ -296,6 +296,7 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
         SimpleIndicatorLocationDataListSerializer(many=True, read_only=True)
     disagg_lookup_map = serializers.SerializerMethodField()
     disagg_choice_lookup_map = serializers.SerializerMethodField()
+    total = serializers.JSONField()
 
     def get_disagg_lookup_map(self, obj):
         serializer = DisaggregationListSerializer(
