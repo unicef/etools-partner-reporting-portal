@@ -184,8 +184,6 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
             'num_disaggregation',
             'level_reported',
             'disaggregation_reported_on',
-            'location_progress',
-            'previous_location_progress',
         )
 
 
@@ -202,8 +200,6 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
             'num_disaggregation',
             'level_reported',
             'disaggregation_reported_on',
-            'location_progress',
-            'previous_location_progress',
         )
 
     def validate(self, data):

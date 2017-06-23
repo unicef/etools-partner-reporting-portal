@@ -11,7 +11,6 @@ from core.factories import (
     ProgrammeDocumentFactory, ReportableToLowerLevelOutputFactory, ProgressReportFactory, IndicatorLocationDataFactory,
     SectionFactory
 )
-from core.management.commands._privates import generate_data_combination_dict
 from core.tests.base import BaseAPITestCase
 from unicef.models import LowerLevelOutput, Section, ProgrammeDocument
 

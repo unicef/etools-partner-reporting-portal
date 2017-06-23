@@ -95,8 +95,6 @@ def generate_0_num_disagg_quantity_data(reportable):
                 location=location,
                 num_disaggregation=0,
                 level_reported=0,
-                location_progress={"c": None, "d": None, "v": random.randint(50, 1000)},
-                previous_location_progress={"c": None, "d": None, "v": random.randint(50, 1000)},
                 disaggregation_reported_on=pair,
                 disaggregation={
                     "()": {
@@ -130,8 +128,6 @@ def generate_1_num_disagg_quantity_data(reportable):
                 location=location,
                 num_disaggregation=1,
                 level_reported=0,
-                location_progress={"c": None, "d": None, "v": random.randint(50, 1000)},
-                previous_location_progress={"c": None, "d": None, "v": random.randint(50, 1000)},
                 disaggregation_reported_on=pair,
                 disaggregation={
                     "()": {
@@ -156,8 +152,6 @@ def generate_1_num_disagg_quantity_data(reportable):
                 location=location,
                 num_disaggregation=1,
                 level_reported=1,
-                location_progress={"c": None, "d": None, "v": random.randint(50, 1000)},
-                previous_location_progress={"c": None, "d": None, "v": random.randint(50, 1000)},
                 disaggregation_reported_on=pair,
                 disaggregation=generate_data_combination_entries(reduce(lambda acc, curr: acc + curr, indicator_report_from_reportable.disaggregation_values(id_only=True, filter_by_id__in=pair)), r=1))
 
@@ -184,8 +178,6 @@ def generate_2_num_disagg_quantity_data(reportable):
                 location=location,
                 num_disaggregation=2,
                 level_reported=0,
-                location_progress={"c": None, "d": None, "v": random.randint(50, 1000)},
-                previous_location_progress={"c": None, "d": None, "v": random.randint(50, 1000)},
                 disaggregation_reported_on=pair,
                 disaggregation={
                     "()": {
@@ -210,8 +202,6 @@ def generate_2_num_disagg_quantity_data(reportable):
                 location=location,
                 num_disaggregation=2,
                 level_reported=1,
-                location_progress={"c": None, "d": None, "v": random.randint(50, 1000)},
-                previous_location_progress={"c": None, "d": None, "v": random.randint(50, 1000)},
                 disaggregation_reported_on=pair,
                 disaggregation=generate_data_combination_entries(reduce(lambda acc, curr: acc + curr, indicator_report_from_reportable.disaggregation_values(id_only=True, filter_by_id__in=pair)), r=1))
 
@@ -229,8 +219,6 @@ def generate_2_num_disagg_quantity_data(reportable):
                 location=location,
                 num_disaggregation=2,
                 level_reported=2,
-                location_progress={"c": None, "d": None, "v": random.randint(50, 1000)},
-                previous_location_progress={"c": None, "d": None, "v": random.randint(50, 1000)},
                 disaggregation_reported_on=pair,
                 disaggregation=generate_data_combination_entries(reduce(lambda acc, curr: acc + curr, indicator_report_from_reportable.disaggregation_values(id_only=True, filter_by_id__in=pair)), r=2))
 
@@ -257,8 +245,6 @@ def generate_3_num_disagg_quantity_data(reportable):
                 location=location,
                 num_disaggregation=3,
                 level_reported=0,
-                location_progress={"c": None, "d": None, "v": random.randint(50, 1000)},
-                previous_location_progress={"c": None, "d": None, "v": random.randint(50, 1000)},
                 disaggregation_reported_on=pair,
                 disaggregation={
                     "()": {
@@ -283,8 +269,6 @@ def generate_3_num_disagg_quantity_data(reportable):
                 location=location,
                 num_disaggregation=3,
                 level_reported=1,
-                location_progress={"c": None, "d": None, "v": random.randint(50, 1000)},
-                previous_location_progress={"c": None, "d": None, "v": random.randint(50, 1000)},
                 disaggregation_reported_on=pair,
                 disaggregation=generate_data_combination_entries(reduce(lambda acc, curr: acc + curr, indicator_report_from_reportable.disaggregation_values(id_only=True, filter_by_id__in=pair)), r=1))
 
@@ -302,8 +286,6 @@ def generate_3_num_disagg_quantity_data(reportable):
                 location=location,
                 num_disaggregation=3,
                 level_reported=2,
-                location_progress={"c": None, "d": None, "v": random.randint(50, 1000)},
-                previous_location_progress={"c": None, "d": None, "v": random.randint(50, 1000)},
                 disaggregation_reported_on=pair,
                 disaggregation=generate_data_combination_entries(reduce(lambda acc, curr: acc + curr, indicator_report_from_reportable.disaggregation_values(id_only=True, filter_by_id__in=pair)), r=2))
 
