@@ -8,7 +8,12 @@ from rest_framework import serializers
 
 from unicef.models import LowerLevelOutput
 from core.serializers import SimpleLocationSerializer
-from core.helpers import generate_data_combination_entries
+from core.helpers import (
+    generate_data_combination_entries,
+    get_sorted_ordered_dict_by_keys,
+    cast_dictionary_keys_as_tuple,
+    cast_dictionary_keys_as_string,
+)
 
 from .models import (
     Reportable, IndicatorBlueprint,
@@ -158,19 +163,12 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
     disaggregation = serializers.SerializerMethodField()
 
     def get_disaggregation(self, obj):
-        ordered_dict = obj.disaggregation.copy()
-        keys = ordered_dict.keys()
+        ordered_dict = cast_dictionary_keys_as_tuple(obj.disaggregation)
 
-        for key in keys:
-            ordered_dict[make_tuple(key)] = ordered_dict[key]
-            ordered_dict.pop(key)
+        ordered_dict = get_sorted_ordered_dict_by_keys(
+            ordered_dict, reverse=True)
 
-        ordered_dict = OrderedDict(sorted(ordered_dict.items()), reverse=True)
-        keys = ordered_dict.keys()
-
-        for key in keys:
-            ordered_dict[str(key)] = ordered_dict[key]
-            ordered_dict.pop(key)
+        ordered_dict = cast_dictionary_keys_as_string(ordered_dict)
 
         return ordered_dict
 

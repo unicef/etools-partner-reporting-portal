@@ -1,8 +1,10 @@
 import sys
 import os
 import random
+from ast import literal_eval
 from contextlib import contextmanager
 from itertools import combinations
+from collections import OrderedDict
 
 
 @contextmanager
@@ -64,3 +66,41 @@ def generate_data_combination_entries(array, entries_only=False, r=3):
         }
 
     return output
+
+
+def get_sorted_ordered_dict_by_keys(dictionary, reverse=True):
+    """
+    Returns a copy of passed-in dictionary as OrderedDict instance,
+    after sorting the items by key.
+    """
+    return OrderedDict(sorted(dictionary.items()), reverse=reverse)
+
+
+def cast_dictionary_keys_as_tuple(dictionary):
+    """
+    Returns a copy of passed-in dictionary as dict instance,
+    after casting all of its keys as tuple.
+    """
+    casted_dictionary = dictionary.copy()
+    keys = casted_dictionary.keys()
+
+    for key in keys:
+        casted_dictionary[literal_eval(key)] = casted_dictionary[key]
+        casted_dictionary.pop(key)
+
+    return casted_dictionary
+
+
+def cast_dictionary_keys_as_string(dictionary):
+    """
+    Returns a copy of passed-in dictionary as dict instance,
+    after casting all of its keys as string.
+    """
+    casted_dictionary = dictionary.copy()
+    keys = casted_dictionary.keys()
+
+    for key in keys:
+        casted_dictionary[str(key)] = casted_dictionary[key]
+        casted_dictionary.pop(key)
+
+    return casted_dictionary
