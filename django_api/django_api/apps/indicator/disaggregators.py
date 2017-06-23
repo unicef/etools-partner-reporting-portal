@@ -1,6 +1,12 @@
 from itertools import combinations
 
-from indicator.models import Reportable, IndicatorReport
+from core.helpers import (
+    get_sorted_ordered_dict_by_keys,
+    get_cast_dictionary_keys_as_tuple,
+    get_cast_dictionary_keys_as_string,
+)
+
+from indicator.models import Reportable, IndicatorReport, IndicatorBlueprint
 
 
 class BaseDisaggregator(object):
@@ -29,14 +35,40 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
         raise NotImplementedError()
 
     @staticmethod
-    def post_process(data_dict, disaggregation_id_map):
+    def post_process(indicator_location_data):
         # TODO: Auto-calculate n - 1 level_reported combination total entries
-        for location_data in data_dict['indicator_location_data']:
-            num_disaggregation = location_data["num_disaggregation"]
-            level_reported = location_data["level_reported"]
-            disaggs_reported_on = location_data["disaggs_reported_on"]
+        num_disaggregation = indicator_location_data.num_disaggregation
+        level_reported = indicator_location_data.level_reported
+        blueprint = indicator_location_data \
+            .indicator_report.reportable.blueprint
 
-        return data_dict
+        ordered_dict = get_cast_dictionary_keys_as_tuple(
+            indicator_location_data.disaggregation)
+
+        ordered_dict = get_sorted_ordered_dict_by_keys(
+            ordered_dict, reverse=True)
+
+        if level_reported != 0:
+            # Reset all subtotals
+            for key in ordered_dict:
+                if len(key) < level_reported:
+                    ordered_dict[key]["v"] = 0
+                    ordered_dict[key]["d"] = 0
+                    ordered_dict[key]["c"] = 0
+
+            # Calculating subtotals
+            for key in ordered_dict:
+                if len(key) != 0:
+                    subtotal_key = key[:-1]
+
+                    if blueprint.calculation_formula == IndicatorBlueprint.SUM:
+                        ordered_dict[subtotal_key]["v"] += \
+                            ordered_dict[key]["v"]
+
+        ordered_dict = get_cast_dictionary_keys_as_string(ordered_dict)
+
+        indicator_location_data.disaggregation = ordered_dict
+        indicator_location_data.save()
 
 
 class RatioIndicatorDisaggregator(BaseDisaggregator):
