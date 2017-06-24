@@ -3,7 +3,7 @@ import os
 import random
 from ast import literal_eval
 from contextlib import contextmanager
-from itertools import combinations
+from itertools import combinations, product
 from collections import OrderedDict
 
 
@@ -41,8 +41,21 @@ def generate_data_combination_entries(array, entries_only=False, r=3):
     else:
         output = {}
 
-    for idx in xrange(1, r + 1):
-        id_pairs = get_combination_pairs(array, idx)
+    for idx in xrange(r):
+        id_pairs = []
+
+        if idx == 0:
+            for id_list in array:
+                id_pairs.extend(list(product(id_list)))
+
+        elif idx == 1:
+            combination_id_list_pairs = get_combination_pairs(array, r=2)
+
+            for id_list_pair in combination_id_list_pairs:
+                id_pairs.extend(list(product(*id_list_pair)))
+
+        elif idx == 2:
+            id_pairs = list(product(*array))
 
         for id_tuple in id_pairs:
             if entries_only:

@@ -30,7 +30,9 @@ from core.models import (
     Intervention,
     Location,
 )
-from core.helpers import generate_data_combination_entries
+from core.helpers import (
+    generate_data_combination_entries,
+)
 
 from core.factories import (
     UserFactory,
@@ -86,26 +88,20 @@ def generate_0_num_disagg_quantity_data(reportable):
 
     for idx, indicator_report_from_reportable in enumerate(reportable.indicator_reports.all()):
         # 0 num_disaggregation & 0 level_reported
-        disaggregation_comb_0_pairs = list(combinations(list(
-            indicator_report_from_reportable.disaggregations.values_list('id', flat=True)), 0))
-
-        for pair in disaggregation_comb_0_pairs:
-            location_data = IndicatorLocationDataFactory(
-                indicator_report=indicator_report_from_reportable,
-                location=location,
-                num_disaggregation=0,
-                level_reported=0,
-                disaggregation_reported_on=pair,
-                disaggregation={
-                    "()": {
-                        'v': random.randint(50, 1000),
-                        'd': None,
-                        'c': None
-                    }
+        location_data = IndicatorLocationDataFactory(
+            indicator_report=indicator_report_from_reportable,
+            location=location,
+            num_disaggregation=0,
+            level_reported=0,
+            disaggregation_reported_on=list(),
+            disaggregation={
+                "()": {
+                    'v': random.randint(50, 1000),
+                    'd': None,
+                    'c': None
                 }
-            )
-
-            disagg_idx += 1
+            }
+        )
 
 
 def generate_1_num_disagg_quantity_data(reportable):
@@ -117,28 +113,24 @@ def generate_1_num_disagg_quantity_data(reportable):
         disagg_idx = 0
 
         # 1 num_disaggregation & 0 level_reported
-        disaggregation_comb_0_pairs = list(combinations(list(
-            indicator_report_from_reportable.disaggregations.values_list('id', flat=True)), 0))
+        location = locations[disagg_idx]
 
-        for pair in disaggregation_comb_0_pairs:
-            location = locations[disagg_idx]
-
-            location_data = IndicatorLocationDataFactory(
-                indicator_report=indicator_report_from_reportable,
-                location=location,
-                num_disaggregation=1,
-                level_reported=0,
-                disaggregation_reported_on=pair,
-                disaggregation={
-                    "()": {
-                        'v': random.randint(50, 1000),
-                        'd': None,
-                        'c': None
-                    }
+        location_data = IndicatorLocationDataFactory(
+            indicator_report=indicator_report_from_reportable,
+            location=location,
+            num_disaggregation=1,
+            level_reported=0,
+            disaggregation_reported_on=list(),
+            disaggregation={
+                "()": {
+                    'v': random.randint(50, 1000),
+                    'd': None,
+                    'c': None
                 }
-            )
+            }
+        )
 
-            disagg_idx += 1
+        disagg_idx += 1
 
         # 1 num_disaggregation & 1 level_reported
         disaggregation_comb_1_pairs = list(combinations(list(
@@ -153,7 +145,11 @@ def generate_1_num_disagg_quantity_data(reportable):
                 num_disaggregation=1,
                 level_reported=1,
                 disaggregation_reported_on=pair,
-                disaggregation=generate_data_combination_entries(reduce(lambda acc, curr: acc + curr, indicator_report_from_reportable.disaggregation_values(id_only=True, filter_by_id__in=pair)), r=1))
+                disaggregation=generate_data_combination_entries(
+                    indicator_report_from_reportable.disaggregation_values(
+                        id_only=True, filter_by_id__in=pair), r=1
+                )
+            )
 
             disagg_idx += 1
 
@@ -167,28 +163,24 @@ def generate_2_num_disagg_quantity_data(reportable):
         disagg_idx = 0
 
         # 2 num_disaggregation & 0 level_reported
-        disaggregation_comb_0_pairs = list(combinations(list(
-            indicator_report_from_reportable.disaggregations.values_list('id', flat=True)), 0))
+        location = locations[disagg_idx]
 
-        for pair in disaggregation_comb_0_pairs:
-            location = locations[disagg_idx]
-
-            location_data = IndicatorLocationDataFactory(
-                indicator_report=indicator_report_from_reportable,
-                location=location,
-                num_disaggregation=2,
-                level_reported=0,
-                disaggregation_reported_on=pair,
-                disaggregation={
-                    "()": {
-                        'v': random.randint(50, 1000),
-                        'd': None,
-                        'c': None
-                    }
+        location_data = IndicatorLocationDataFactory(
+            indicator_report=indicator_report_from_reportable,
+            location=location,
+            num_disaggregation=2,
+            level_reported=0,
+            disaggregation_reported_on=list(),
+            disaggregation={
+                "()": {
+                    'v': random.randint(50, 1000),
+                    'd': None,
+                    'c': None
                 }
-            )
+            }
+        )
 
-            disagg_idx += 1
+        disagg_idx += 1
 
         # 2 num_disaggregation & 1 level_reported
         disaggregation_comb_1_pairs = list(combinations(list(
@@ -203,7 +195,11 @@ def generate_2_num_disagg_quantity_data(reportable):
                 num_disaggregation=2,
                 level_reported=1,
                 disaggregation_reported_on=pair,
-                disaggregation=generate_data_combination_entries(reduce(lambda acc, curr: acc + curr, indicator_report_from_reportable.disaggregation_values(id_only=True, filter_by_id__in=pair)), r=1))
+                disaggregation=generate_data_combination_entries(
+                    indicator_report_from_reportable.disaggregation_values(
+                        id_only=True, filter_by_id__in=pair), r=1
+                )
+            )
 
             disagg_idx += 1
 
@@ -220,7 +216,11 @@ def generate_2_num_disagg_quantity_data(reportable):
                 num_disaggregation=2,
                 level_reported=2,
                 disaggregation_reported_on=pair,
-                disaggregation=generate_data_combination_entries(reduce(lambda acc, curr: acc + curr, indicator_report_from_reportable.disaggregation_values(id_only=True, filter_by_id__in=pair)), r=2))
+                disaggregation=generate_data_combination_entries(
+                    indicator_report_from_reportable.disaggregation_values(
+                        id_only=True, filter_by_id__in=pair), r=2
+                )
+            )
 
             disagg_idx += 1
 
@@ -234,28 +234,24 @@ def generate_3_num_disagg_quantity_data(reportable):
         disagg_idx = 0
 
         # 3 num_disaggregation & 0 level_reported
-        disaggregation_comb_0_pairs = list(combinations(list(
-            indicator_report_from_reportable.disaggregations.values_list('id', flat=True)), 0))
+        location = locations[disagg_idx]
 
-        for pair in disaggregation_comb_0_pairs:
-            location = locations[disagg_idx]
-
-            location_data = IndicatorLocationDataFactory(
-                indicator_report=indicator_report_from_reportable,
-                location=location,
-                num_disaggregation=3,
-                level_reported=0,
-                disaggregation_reported_on=pair,
-                disaggregation={
-                    "()": {
-                        'v': random.randint(50, 1000),
-                        'd': None,
-                        'c': None
-                    }
+        location_data = IndicatorLocationDataFactory(
+            indicator_report=indicator_report_from_reportable,
+            location=location,
+            num_disaggregation=3,
+            level_reported=0,
+            disaggregation_reported_on=list(),
+            disaggregation={
+                "()": {
+                    'v': random.randint(50, 1000),
+                    'd': None,
+                    'c': None
                 }
-            )
+            }
+        )
 
-            disagg_idx += 1
+        disagg_idx += 1
 
         # 3 num_disaggregation & 1 level_reported
         disaggregation_comb_1_pairs = list(combinations(list(
@@ -270,7 +266,11 @@ def generate_3_num_disagg_quantity_data(reportable):
                 num_disaggregation=3,
                 level_reported=1,
                 disaggregation_reported_on=pair,
-                disaggregation=generate_data_combination_entries(reduce(lambda acc, curr: acc + curr, indicator_report_from_reportable.disaggregation_values(id_only=True, filter_by_id__in=pair)), r=1))
+                disaggregation=generate_data_combination_entries(
+                    indicator_report_from_reportable.disaggregation_values(
+                        id_only=True, filter_by_id__in=pair), r=1
+                )
+            )
 
             disagg_idx += 1
 
@@ -287,7 +287,11 @@ def generate_3_num_disagg_quantity_data(reportable):
                 num_disaggregation=3,
                 level_reported=2,
                 disaggregation_reported_on=pair,
-                disaggregation=generate_data_combination_entries(reduce(lambda acc, curr: acc + curr, indicator_report_from_reportable.disaggregation_values(id_only=True, filter_by_id__in=pair)), r=2))
+                disaggregation=generate_data_combination_entries(
+                    indicator_report_from_reportable.disaggregation_values(
+                        id_only=True, filter_by_id__in=pair), r=2
+                )
+            )
 
             disagg_idx += 1
 
@@ -300,9 +304,12 @@ def generate_3_num_disagg_quantity_data(reportable):
             num_disaggregation=3,
             level_reported=3,
             disaggregation_reported_on=list(
-                indicator_report_from_reportable.disaggregations.values_list('id', flat=True)),
-            disaggregation=generate_data_combination_entries(reduce(
-                lambda acc, curr: acc + curr, indicator_report_from_reportable.disaggregation_values(id_only=True)))
+                indicator_report_from_reportable.disaggregations.values_list(
+                    'id', flat=True)),
+            disaggregation=generate_data_combination_entries(
+                indicator_report_from_reportable.disaggregation_values(
+                    id_only=True), r=3
+            )
         )
 
         disagg_idx += 1
@@ -318,8 +325,10 @@ def generate_3_num_disagg_quantity_data(reportable):
                 level_reported=3,
                 disaggregation_reported_on=list(
                     indicator_report_from_reportable.disaggregations.values_list('id', flat=True)),
-                disaggregation=generate_data_combination_entries(reduce(
-                    lambda acc, curr: acc + curr, indicator_report_from_reportable.disaggregation_values(id_only=True)))
+                disaggregation=generate_data_combination_entries(
+                    indicator_report_from_reportable.disaggregation_values(
+                        id_only=True), r=3
+                )
             )
 
 
