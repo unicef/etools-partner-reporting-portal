@@ -19,6 +19,9 @@ from indicator.models import (
     Disaggregation,
     DisaggregationValue,
 )
+from indicator.disaggregators import (
+    QuantityIndicatorDisaggregator,
+)
 from unicef.models import (
     ProgressReport,
     Section,
@@ -130,6 +133,8 @@ def generate_1_num_disagg_quantity_data(reportable):
             }
         )
 
+        QuantityIndicatorDisaggregator.post_process(location_data)
+
         disagg_idx += 1
 
         # 1 num_disaggregation & 1 level_reported
@@ -150,6 +155,8 @@ def generate_1_num_disagg_quantity_data(reportable):
                         id_only=True, filter_by_id__in=pair), r=1
                 )
             )
+
+            QuantityIndicatorDisaggregator.post_process(location_data)
 
             disagg_idx += 1
 
@@ -180,6 +187,8 @@ def generate_2_num_disagg_quantity_data(reportable):
             }
         )
 
+        QuantityIndicatorDisaggregator.post_process(location_data)
+
         disagg_idx += 1
 
         # 2 num_disaggregation & 1 level_reported
@@ -201,6 +210,8 @@ def generate_2_num_disagg_quantity_data(reportable):
                 )
             )
 
+            QuantityIndicatorDisaggregator.post_process(location_data)
+
             disagg_idx += 1
 
         # 2 num_disaggregation & 2 level_reported
@@ -221,6 +232,8 @@ def generate_2_num_disagg_quantity_data(reportable):
                         id_only=True, filter_by_id__in=pair), r=2
                 )
             )
+
+            QuantityIndicatorDisaggregator.post_process(location_data)
 
             disagg_idx += 1
 
@@ -251,6 +264,8 @@ def generate_3_num_disagg_quantity_data(reportable):
             }
         )
 
+        QuantityIndicatorDisaggregator.post_process(location_data)
+
         disagg_idx += 1
 
         # 3 num_disaggregation & 1 level_reported
@@ -271,6 +286,8 @@ def generate_3_num_disagg_quantity_data(reportable):
                         id_only=True, filter_by_id__in=pair), r=1
                 )
             )
+
+            QuantityIndicatorDisaggregator.post_process(location_data)
 
             disagg_idx += 1
 
@@ -293,6 +310,8 @@ def generate_3_num_disagg_quantity_data(reportable):
                 )
             )
 
+            QuantityIndicatorDisaggregator.post_process(location_data)
+
             disagg_idx += 1
 
         location = locations[disagg_idx]
@@ -312,6 +331,8 @@ def generate_3_num_disagg_quantity_data(reportable):
             )
         )
 
+        QuantityIndicatorDisaggregator.post_process(location_data)
+
         disagg_idx += 1
 
         # Extra IndicatorLocationData for last IndicatorReport for 3 num_disaggregation with unique location
@@ -330,6 +351,8 @@ def generate_3_num_disagg_quantity_data(reportable):
                         id_only=True), r=3
                 )
             )
+
+            QuantityIndicatorDisaggregator.post_process(location_data)
 
 
 def generate_disaggregation_and_disaggregation_values(reportable, disaggregation_map, disaggregation_targets):

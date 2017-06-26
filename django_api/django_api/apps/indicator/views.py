@@ -16,6 +16,9 @@ from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
 from unicef.serializers import ProgressReportSerializer
 
+from .disaggregators import (
+    QuantityIndicatorDisaggregator,
+)
 from .serializers import (
     IndicatorListSerializer, IndicatorReportListSerializer, PDReportsSerializer, SimpleIndicatorLocationDataListSerializer,
     IndicatorLLoutputsSerializer, IndicatorLocationDataUpdateSerializer,
@@ -244,6 +247,8 @@ class IndicatorLocationDataUpdateAPIView(APIView):
 
         if serializer.is_valid():
             serializer.save()
+
+            QuantityIndicatorDisaggregator.post_process(indicator_location_data)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         else:
