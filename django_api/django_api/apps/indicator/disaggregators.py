@@ -1,7 +1,7 @@
 from itertools import combinations
 
 from core.helpers import (
-    get_sorted_ordered_dict_by_keys,
+    get_combination_pairs,
     get_cast_dictionary_keys_as_tuple,
     get_cast_dictionary_keys_as_string,
 )
@@ -36,17 +36,12 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
 
     @staticmethod
     def post_process(indicator_location_data):
-        # TODO: Auto-calculate n - 1 level_reported combination total entries
-        num_disaggregation = indicator_location_data.num_disaggregation
         level_reported = indicator_location_data.level_reported
         blueprint = indicator_location_data \
             .indicator_report.reportable.blueprint
 
         ordered_dict = get_cast_dictionary_keys_as_tuple(
             indicator_location_data.disaggregation)
-
-        ordered_dict = get_sorted_ordered_dict_by_keys(
-            ordered_dict, reverse=True)
 
         if level_reported != 0:
             # Reset all subtotals
@@ -58,12 +53,14 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
 
             # Calculating subtotals
             for key in ordered_dict:
-                if len(key) != 0:
-                    subtotal_key = key[:-1]
+                if len(key) == level_reported:
+                    subkey_combinations = get_combination_pairs(key)
 
+                    # TODO: Handle different calculation method here. May need to refactor each calculation method as each method
                     if blueprint.calculation_formula == IndicatorBlueprint.SUM:
-                        ordered_dict[subtotal_key]["v"] += \
-                            ordered_dict[key]["v"]
+                        for subkey in subkey_combinations:
+                            ordered_dict[subkey]["v"] += \
+                                ordered_dict[key]["v"]
 
         ordered_dict = get_cast_dictionary_keys_as_string(ordered_dict)
 
