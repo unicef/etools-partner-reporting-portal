@@ -223,6 +223,14 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
         disaggregation_id_list = data[
             'indicator_report'].disaggregations.values_list('id', flat=True)
 
+        # num_disaggregation validation with actual Disaggregation count
+        # from Reportable
+        if data['num_disaggregation'] != len(disaggregation_id_list):
+            raise serializers.ValidationError(
+                "num_disaggregation is not matched with "
+                + "its IndicatorReport's Reportable disaggregation counts"
+            )
+
         # disaggregation_reported_on element-wise assertion
         for disagg_id in data['disaggregation_reported_on']:
             if disagg_id not in disaggregation_id_list:
@@ -236,19 +244,20 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
         disaggregation_value_id_list = \
             data['indicator_report'].disaggregation_values(
                 id_only=True,
-                filter_by_id__in=data['disaggregation_reported_on'],
-                flat=True)
+                filter_by_id__in=data['disaggregation_reported_on'])
 
-        valid_disaggregation_value_combination_pairs = \
-            list(combinations(list(
-                disaggregation_value_id_list), data['level_reported']))
+        valid_disaggregation_value_pairs = \
+            generate_data_combination_entries(
+                disaggregation_value_id_list,
+                entries_only=True, r=data['level_reported'])
 
-        if tuple() not in valid_disaggregation_value_combination_pairs:
-            valid_disaggregation_value_combination_pairs.append(tuple())
+        if unicode(tuple()) not in valid_disaggregation_value_pairs:
+            valid_disaggregation_value_pairs.append(
+                unicode(tuple()))
 
         disaggregation_data_keys = data['disaggregation'].keys()
 
-        valid_entry_count = len(valid_disaggregation_value_combination_pairs)
+        valid_entry_count = len(valid_disaggregation_value_pairs)
         disaggregation_data_key_count = len(disaggregation_data_keys)
 
         # Assertion on all combinatoric entries for num_disaggregation and
@@ -277,7 +286,7 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
         # Disaggregation data coordinate space check
         # from disaggregation choice ids
         for key in disaggregation_data_keys:
-            if make_tuple(key) not in valid_disaggregation_value_combination_pairs:
+            if key not in valid_disaggregation_value_pairs:
                 raise serializers.ValidationError(
                     "%s coordinate space does not " % (key)
                     + "belong to disaggregation value id list")

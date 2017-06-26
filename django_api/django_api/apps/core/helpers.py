@@ -59,7 +59,7 @@ def generate_data_combination_entries(array, entries_only=False, string_key=True
 
         for id_tuple in id_pairs:
             if string_key:
-                key = str(id_tuple)
+                key = unicode(id_tuple)
 
             else:
                 key = id_tuple
@@ -75,7 +75,7 @@ def generate_data_combination_entries(array, entries_only=False, string_key=True
                 }
 
     if string_key:
-        key = str(tuple())
+        key = unicode(tuple())
 
     else:
         key = tuple()
@@ -125,7 +125,7 @@ def get_cast_dictionary_keys_as_string(dictionary):
     keys = casted_dictionary.keys()
 
     for key in keys:
-        casted_dictionary[str(key)] = casted_dictionary[key]
+        casted_dictionary[unicode(key)] = casted_dictionary[key]
         casted_dictionary.pop(key)
 
     return casted_dictionary

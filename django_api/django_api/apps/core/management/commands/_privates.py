@@ -98,10 +98,10 @@ def generate_0_num_disagg_quantity_data(reportable):
             level_reported=0,
             disaggregation_reported_on=list(),
             disaggregation={
-                "()": {
-                    'v': random.randint(50, 1000),
-                    'd': None,
-                    'c': None
+                u'()': {
+                    u'v': random.randint(50, 1000),
+                    u'd': None,
+                    u'c': None
                 }
             }
         )
@@ -125,10 +125,10 @@ def generate_1_num_disagg_quantity_data(reportable):
             level_reported=0,
             disaggregation_reported_on=list(),
             disaggregation={
-                "()": {
-                    'v': random.randint(50, 1000),
-                    'd': None,
-                    'c': None
+                u'()': {
+                    u'v': random.randint(50, 1000),
+                    u'd': None,
+                    u'c': None
                 }
             }
         )
@@ -179,10 +179,10 @@ def generate_2_num_disagg_quantity_data(reportable):
             level_reported=0,
             disaggregation_reported_on=list(),
             disaggregation={
-                "()": {
-                    'v': random.randint(50, 1000),
-                    'd': None,
-                    'c': None
+                u'()': {
+                    u'v': random.randint(50, 1000),
+                    u'd': None,
+                    u'c': None
                 }
             }
         )
@@ -256,10 +256,10 @@ def generate_3_num_disagg_quantity_data(reportable):
             level_reported=0,
             disaggregation_reported_on=list(),
             disaggregation={
-                "()": {
-                    'v': random.randint(50, 1000),
-                    'd': None,
-                    'c': None
+                u'()': {
+                    u'v': random.randint(50, 1000),
+                    u'd': None,
+                    u'c': None
                 }
             }
         )
