@@ -236,6 +236,14 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
                     + "all its elements mapped to disaggregation ids"
                 )
 
+        # IndicatorReport membership validation
+        if not self.instance.id in data['indicator_report'] \
+                .indicator_location_data.values_list('id', flat=True):
+            raise serializers.ValidationError(
+                "IndicatorLocationData does not belong to "
+                + "this {}".format(data['indicator_report'])
+            )
+
         # Filter disaggregation option IDs
         # from given disaggregation_reported_on Disaggregation IDs
         disaggregation_value_id_list = \
