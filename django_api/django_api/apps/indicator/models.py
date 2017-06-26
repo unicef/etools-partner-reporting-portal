@@ -108,7 +108,11 @@ class Reportable(TimeStampedModel):
     @property
     def achieved(self):
         if self.indicator_reports.exists():
-            return self.indicator_reports.last().total
+            total = self.indicator_reports.last().total
+
+            if not isinstance(total, dict):
+                total = dict(total)
+            return total
         else:
             return None
 
