@@ -281,12 +281,21 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
 
         # Disaggregation data coordinate space check from level_reported
         for key in disaggregation_data_keys:
-            if len(make_tuple(key)) > data['level_reported']:
+            try:
+                parsed_tuple = make_tuple(key)
+
+            except Exception as e:
                 raise serializers.ValidationError(
-                    "%s Disaggregation data coordinate " % (key)
-                    + "space cannot be higher than "
-                    + "specified level_reported"
+                    "%s key is not in tuple format" % (key)
                 )
+
+            else:
+                if len(parsed_tuple) > data['level_reported']:
+                    raise serializers.ValidationError(
+                        "%s Disaggregation data coordinate " % (key)
+                        + "space cannot be higher than "
+                        + "specified level_reported"
+                    )
 
         # Disaggregation data coordinate space check
         # from disaggregation choice ids
@@ -295,6 +304,16 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     "%s coordinate space does not " % (key)
                     + "belong to disaggregation value id list")
+
+            elif not isinstance(data['disaggregation'][key], dict):
+                raise serializers.ValidationError(
+                    "%s coordinate space does not " % (key)
+                    + "have a correct value dictionary")
+
+            elif data['disaggregation'][key].keys() != [u'c', u'd', u'v']:
+                raise serializers.ValidationError(
+                    "%s coordinate space value does not " % (key)
+                    + "have correct value key structure: c, d, v")
 
         return data
 
