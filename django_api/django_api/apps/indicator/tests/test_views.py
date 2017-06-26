@@ -11,9 +11,13 @@ from core.factories import (
     ProgrammeDocumentFactory, ReportableToLowerLevelOutputFactory, ProgressReportFactory, IndicatorLocationDataFactory,
     SectionFactory
 )
+from core.helpers import (
+    get_cast_dictionary_keys_as_tuple,
+)
 from core.tests.base import BaseAPITestCase
 from unicef.models import LowerLevelOutput, Section, ProgrammeDocument
 
+from indicator.serializers import IndicatorLocationDataUpdateSerializer
 from indicator.models import Reportable, IndicatorReport, IndicatorLocationData
 
 
@@ -128,167 +132,106 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
             self.assertEquals(len(response.data), 2)
 
 
-# TODO: Re-enable this test case at #35 branch
-# class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
-#     generate_fake_data_quantity = 5
-#
-#     def test_put_api(self):
-#         indicator_location_data = IndicatorLocationData.objects.last()
-#         data = [{
-#             "id": 1047,
-#             "location": {
-#               "id": 257,
-#               "title": "location_2",
-#               "latitude": None,
-#               "longitude": None,
-#               "p_code": None
-#             },
-#             "disaggregation": {
-#               "(1773,)": {
-#                 "c": None,
-#                 "d": None,
-#                 "v": 58
-#               },
-#               "()": {
-#                 "c": None,
-#                 "d": None,
-#                 "v": 169
-#               },
-#               "(1776,)": {
-#                 "c": None,
-#                 "d": None,
-#                 "v": 93
-#               },
-#               "(1775,)": {
-#                 "c": None,
-#                 "d": None,
-#                 "v": 127
-#               },
-#               "(1774,)": {
-#                 "c": None,
-#                 "d": None,
-#                 "v": 150
-#               }
-#             },
-#             "num_disaggregation": 3,
-#             "level_reported": 1,
-#             "disaggregation_reported_on": [
-#               509
-#             ]
-#           },
-#           {
-#             "id": 1048,
-#             "location": {
-#               "id": 257,
-#               "title": "location_2",
-#               "latitude": None,
-#               "longitude": None,
-#               "p_code": None
-#             },
-#             "disaggregation": {
-#               "(1778,)": {
-#                 "c": None,
-#                 "d": None,
-#                 "v": 135
-#               },
-#               "(1781,)": {
-#                 "c": None,
-#                 "d": None,
-#                 "v": 141
-#               },
-#               "(1779,)": {
-#                 "c": None,
-#                 "d": None,
-#                 "v": 72
-#               },
-#               "(1780,)": {
-#                 "c": None,
-#                 "d": None,
-#                 "v": 190
-#               },
-#               "()": {
-#                 "c": None,
-#                 "d": None,
-#                 "v": 191
-#               },
-#               "(1782,)": {
-#                 "c": None,
-#                 "d": None,
-#                 "v": 167
-#               },
-#               "(1777,)": {
-#                 "c": None,
-#                 "d": None,
-#                 "v": 106
-#               }
-#             },
-#             "num_disaggregation": 3,
-#             "level_reported": 1,
-#             "disaggregation_reported_on": [
-#               510
-#             ]
-#           },
-#           {
-#             "id": 1049,
-#             "location": {
-#               "id": 257,
-#               "title": "location_2",
-#               "latitude": None,
-#               "longitude": None,
-#               "p_code": None
-#             },
-#             "disaggregation": {
-#               "(1785,)": {
-#                 "c": None,
-#                 "d": None,
-#                 "v": 195
-#               },
-#               "(1784,)": {
-#                 "c": None,
-#                 "d": None,
-#                 "v": 132
-#               },
-#               "()": {
-#                 "c": None,
-#                 "d": None,
-#                 "v": 103
-#               },
-#               "(1783,)": {
-#                 "c": None,
-#                 "d": None,
-#                 "v": 63
-#               }
-#             },
-#             "num_disaggregation": 3,
-#             "level_reported": 1,
-#             "disaggregation_reported_on": [
-#               511
-#             ]
-#           },
-#           {
-#             "id": 1050,
-#             "location": {
-#               "id": 258,
-#               "title": "location_3",
-#               "latitude": None,
-#               "longitude": None,
-#               "p_code": None
-#             },
-#             "disaggregation": {
-#               "()": {
-#                 "c": None,
-#                 "d": None,
-#                 "v": 50
-#               }
-#             },
-#             "num_disaggregation": 3,
-#             "level_reported": 0,
-#             "disaggregation_reported_on": []
-#           }
-#         ]
-#
-#         url = reverse('indicator-location-data-entries-put-api')
-#         response = self.client.put(url, data, format='json')
-#
-#         self.assertEquals(response.status_code, status.HTTP_200_OK)
-#         self.assertEquals(response.data, data)
+class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
+    generate_fake_data_quantity = 20
+
+    def test_update_level_reported_0(self):
+        indicator_location_data = IndicatorLocationData.objects.filter(
+            level_reported=0, num_disaggregation=3).first()
+
+        update_data = IndicatorLocationDataUpdateSerializer(
+            indicator_location_data).data
+
+        update_data['disaggregation']['()']['v'] = 1000
+
+        url = reverse('indicator-location-data-entries-put-api')
+        response = self.client.put(url, update_data, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(
+            response.data['disaggregation']['()']['v'],
+            update_data['disaggregation']['()']['v'])
+
+    def test_update_level_reported_1(self):
+        indicator_location_data = IndicatorLocationData.objects.filter(
+            level_reported=1, num_disaggregation=3).first()
+
+        update_data = IndicatorLocationDataUpdateSerializer(
+            indicator_location_data).data
+
+        level_reported_1_key = None
+        tuple_disaggregation = get_cast_dictionary_keys_as_tuple(
+            update_data['disaggregation'])
+
+        for key in tuple_disaggregation:
+            if len(key) == 1:
+                level_reported_1_key = key
+                break
+
+        correct_total = update_data['disaggregation']['()']['v'] \
+            - update_data['disaggregation'][unicode(level_reported_1_key)]['v']
+        update_data['disaggregation'][unicode(level_reported_1_key)]['v'] = 0
+
+        url = reverse('indicator-location-data-entries-put-api')
+        response = self.client.put(url, update_data, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(
+            response.data['disaggregation']['()']['v'],
+            correct_total)
+
+    def test_update_level_reported_2(self):
+        indicator_location_data = IndicatorLocationData.objects.filter(
+            level_reported=2, num_disaggregation=3).first()
+
+        update_data = IndicatorLocationDataUpdateSerializer(
+            indicator_location_data).data
+
+        level_reported_2_key = None
+        tuple_disaggregation = get_cast_dictionary_keys_as_tuple(
+            update_data['disaggregation'])
+
+        for key in tuple_disaggregation:
+            if len(key) == 2:
+                level_reported_2_key = key
+                break
+
+        correct_total = update_data['disaggregation']['()']['v'] \
+            - update_data['disaggregation'][unicode(level_reported_2_key)]['v']
+        update_data['disaggregation'][unicode(level_reported_2_key)]['v'] = 0
+
+        url = reverse('indicator-location-data-entries-put-api')
+        response = self.client.put(url, update_data, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(
+            response.data['disaggregation']['()']['v'],
+            correct_total)
+
+    def test_update_level_reported_3(self):
+        indicator_location_data = IndicatorLocationData.objects.filter(
+            level_reported=3, num_disaggregation=3).first()
+
+        update_data = IndicatorLocationDataUpdateSerializer(
+            indicator_location_data).data
+
+        level_reported_3_key = None
+        tuple_disaggregation = get_cast_dictionary_keys_as_tuple(
+            update_data['disaggregation'])
+
+        for key in tuple_disaggregation:
+            if len(key) == 3:
+                level_reported_3_key = key
+                break
+
+        correct_total = update_data['disaggregation']['()']['v'] \
+            - update_data['disaggregation'][unicode(level_reported_3_key)]['v']
+        update_data['disaggregation'][unicode(level_reported_3_key)]['v'] = 0
+
+        url = reverse('indicator-location-data-entries-put-api')
+        response = self.client.put(url, update_data, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(
+            response.data['disaggregation']['()']['v'],
+            correct_total)
