@@ -26,7 +26,8 @@ from .serializers import (
 from .filters import IndicatorFilter, PDReportsFilter
 from .models import (
     IndicatorReport, Reportable, Disaggregation,
-    DisaggregationValue, IndicatorLocationData
+    DisaggregationValue, IndicatorLocationData,
+    IndicatorBlueprint
 )
 
 logger = logging.getLogger(__name__)
@@ -248,7 +249,13 @@ class IndicatorLocationDataUpdateAPIView(APIView):
         if serializer.is_valid():
             serializer.save()
 
-            QuantityIndicatorDisaggregator.post_process(indicator_location_data)
+            blueprint = indicator_location_data.indicator_report \
+                .reportable.blueprint
+
+            if blueprint.unit == IndicatorBlueprint.NUMBER:
+                QuantityIndicatorDisaggregator.post_process(
+                    indicator_location_data)
+
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         else:
