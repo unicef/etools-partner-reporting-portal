@@ -92,7 +92,7 @@ class ProgrammeDocumentDetailsAPIView(RetrieveAPIView):
             raise Http404
 
 
-class ProgressReportAPIView(ListAPIView):
+class ProgressReportListAPIView(ListAPIView):
     """
     Endpoint for getting list of all PD Progress Reports
     """
