@@ -68,6 +68,25 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
         indicator_location_data.disaggregation = ordered_dict
         indicator_location_data.save()
 
+        # IndicatorReport total calculation
+        if blueprint.calculation_formula == IndicatorBlueprint.SUM:
+            indicator_report = indicator_location_data.indicator_report
+
+            # Reset the total
+            indicator_report.total = {
+                u'c': 0,
+                u'd': 0,
+                u'v': 0,
+            }
+
+            for loc_data in indicator_report.indicator_location_data.all():
+                loc_total = loc_data['disaggregation'][u'()']
+                indicator_report.total[u'v'] += loc_total[u'v']
+                indicator_report.total[u'd'] += loc_total[u'd']
+                indicator_report.total[u'c'] += loc_total[u'c']
+
+            indicator_report.save()
+
 
 class RatioIndicatorDisaggregator(BaseDisaggregator):
     """
