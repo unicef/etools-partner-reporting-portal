@@ -1,7 +1,7 @@
 from itertools import combinations
 
 from core.helpers import (
-    get_combination_pairs,
+    generate_data_combination_entries,
     get_cast_dictionary_keys_as_tuple,
     get_cast_dictionary_keys_as_string,
 )
@@ -54,7 +54,8 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
             # Calculating subtotals
             for key in ordered_dict:
                 if len(key) == level_reported:
-                    subkey_combinations = get_combination_pairs(key)
+                    packed_key = map(lambda item: tuple([item]), key)
+                    subkey_combinations = generate_data_combination_entries(packed_key, entries_only=True, string_key=False, r=level_reported)
 
                     # TODO: Handle different calculation method here. May need to refactor each calculation method as each method
                     if blueprint.calculation_formula == IndicatorBlueprint.SUM:

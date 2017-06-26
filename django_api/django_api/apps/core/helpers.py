@@ -34,7 +34,7 @@ def get_combination_pairs(array, r=3):
     return list(combinations(array, r))
 
 
-def generate_data_combination_entries(array, entries_only=False, r=3):
+def generate_data_combination_entries(array, entries_only=False, string_key=True, r=3):
     if entries_only:
         output = []
 
@@ -58,21 +58,33 @@ def generate_data_combination_entries(array, entries_only=False, r=3):
             id_pairs = list(product(*array))
 
         for id_tuple in id_pairs:
-            if entries_only:
-                output.append(str(id_tuple))
+            if string_key:
+                key = str(id_tuple)
 
             else:
-                output[str(id_tuple)] = {
+                key = id_tuple
+
+            if entries_only:
+                output.append(key)
+
+            else:
+                output[key] = {
                     'v': random.randint(50, 1000),
                     'd': None,
                     'c': None
                 }
 
-    if entries_only:
-        output.append(str(tuple()))
+    if string_key:
+        key = str(tuple())
 
     else:
-        output[str(tuple())] = {
+        key = tuple()
+
+    if entries_only:
+        output.append(key)
+
+    else:
+        output[key] = {
             'v': random.randint(50, 1000),
             'd': None,
             'c': None
