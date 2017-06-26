@@ -12,6 +12,7 @@ from rest_framework.views import APIView
 
 import django_filters.rest_framework
 
+from core.common import PROGRESS_REPORT_STATUS
 from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
 from unicef.serializers import ProgressReportSerializer, ProgressReportPUTSerializer
@@ -243,18 +244,23 @@ class IndicatorLocationDataUpdateAPIView(APIView):
 
 class ProgressReportAPIView(APIView):
 
+    PUT_TO_SUBMITTED_ERROR_MSG = "Progress Report can't be in submitted status."
+
     def get_narrative_object(self):
         return get_object_or_404(ProgressReport, pk=self.request.data.get('id'))
 
     def put(self, request, *args, **kwargs):
-
+        instance=self.get_narrative_object()
         serializer = ProgressReportPUTSerializer(
-            instance=self.get_narrative_object(),
+            instance=instance,
             data=request.data
         )
 
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        elif instance.status == PROGRESS_REPORT_STATUS.submitted:
+
+            return Response({"status": [self.PUT_TO_SUBMITTED_ERROR_MSG]}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)

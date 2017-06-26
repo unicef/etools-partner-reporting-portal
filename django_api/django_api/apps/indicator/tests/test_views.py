@@ -13,9 +13,11 @@ from core.factories import (
 )
 from core.management.commands._privates import generate_data_combination_dict
 from core.tests.base import BaseAPITestCase
+from core.common import PROGRESS_REPORT_STATUS
 from unicef.models import LowerLevelOutput, Section, ProgrammeDocument, ProgressReport
 
 from indicator.models import Reportable, IndicatorReport, IndicatorLocationData
+from indicator.views import ProgressReportAPIView
 
 
 class TestPDReportsAPIView(BaseAPITestCase):
@@ -314,6 +316,14 @@ class TestProgressReportAPIView(BaseAPITestCase):
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(response.data['partner_contribution_to_date'], updated_pr.partner_contribution_to_date)
         self.assertEquals(response.data['partner_contribution_to_date'], "updated field")
+
+        updated_pr.status = PROGRESS_REPORT_STATUS.submitted
+        updated_pr.save()
+
+        response = self.client.put(url, data=data, format='json')
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEquals(response.data['status'],
+                          [ProgressReportAPIView.PUT_TO_SUBMITTED_ERROR_MSG])
 
         data.pop('funds_received_to_date')
         response = self.client.put(url, data=data, format='json')
