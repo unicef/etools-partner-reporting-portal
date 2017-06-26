@@ -31,7 +31,6 @@
       <template is="dom-if" if="[[_equals(data.num_disaggregation, 0)]]">
         <zero-disaggregations
             data="[[data]]"
-            total="[[total]]"
             mapping="[[mapping]]"
             editable="[[editable]]">
         </zero-disaggregations>
@@ -40,7 +39,6 @@
       <template is="dom-if" if="[[_equals(data.num_disaggregation, 1)]]">
         <one-disaggregation
             data="[[data]]"
-            total="[[total]]"
             mapping="[[mapping]]"
             editable="[[editable]]">
         </one-disaggregation>
@@ -49,7 +47,6 @@
       <template is="dom-if" if="[[_equals(data.num_disaggregation, 2)]]">
         <two-disaggregations
             data="[[data]]"
-            total="[[total]]"
             mapping="[[mapping]]"
             editable="[[editable]]">
         </two-disaggregations>
@@ -58,7 +55,6 @@
       <template is="dom-if" if="[[_equals(data.num_disaggregation, 3)]]">
         <three-disaggregations
             data="[[data]]"
-            total="[[total]]"
             mapping="[[mapping]]"
             editable="[[editable]]">
         </three-disaggregations>
@@ -80,11 +76,9 @@
 
       properties: {
         editable: {
-          type: Boolean,
-          value: false,
+          type: Number,
+          value: 0,
         },
-
-        fields: Array,
 
         data: {
           type: Object,
@@ -96,11 +90,11 @@
           value: App.Endpoints.indicatorLocationDataEntries(),
         },
 
+        fields: Array,
+
         localData: Object,
 
         mapping: Object,
-
-        total: Number,
       },
 
       listeners: {

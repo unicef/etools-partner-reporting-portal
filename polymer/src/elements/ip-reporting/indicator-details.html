@@ -158,7 +158,6 @@
             <div class="table-container app-grid">
               <div class="item">
                 <disaggregation-table
-                    total="[[disaggregations.total]]"
                     data="[[location]]"
                     mapping="[[disaggregations.disagg_lookup_map]]">
                 </disaggregation-table>
@@ -184,11 +183,10 @@
                       </dl>
                     </div>
                     <disaggregation-table
-                        total="[[disaggregations.total]]"
                         data="[[location]]"
                         mapping="[[disaggregations.disagg_lookup_map]]"
                         indicator-id="[[indicatorId]]"
-                        editable>
+                        editable="1">
                     </disaggregation-table>
                   </disaggregation-modal>
                 </template>

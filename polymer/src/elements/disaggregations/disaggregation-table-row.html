@@ -9,10 +9,11 @@
   <template>
     <style include="disaggregation-table-styles"></style>
 
-    <tr class$="[[computeClass(rowType)]]">
+    <tr class$="[[_computeClass(rowType)]]">
       <td class="flex cellTitle">
         <span class="cellValue">[[_capitalizeFirstLetter(data.title)]]</span>
       </td>
+
 
       <template is="dom-repeat"
                 items="[[data.data]]">
@@ -30,7 +31,7 @@
           <disaggregation-table-cell
               coords="[[data.total.key]]"
               data="[[data.total.data]]"
-              editable="[[isEditable(data.total)]]">
+              editable="[[editable]]">
           </disaggregation-table-cell>
         </td>
       </template>
@@ -50,15 +51,14 @@
 
         rowType: String,
 
-        editable: Boolean,
+        editable: {
+          type: Number,
+          value: 0,
+        },
       },
 
-      computeClass: function (rowType) {
+      _computeClass: function (rowType) {
         return rowType;
-      },
-
-      isEditable: function (item) {
-        return item.key === '()'; // Zero
       },
     });
   </script>

@@ -61,13 +61,12 @@
                 [[location.reportInfo.time_period_end]]
               </span>
               <span class="total">
-                <strong>Total: </strong>[[location.reportInfo.total]]
+                <strong>Total: </strong>[[location.reportInfo.total.v]]
               </span>
             </h4>
             <p>Level reported: [[location.current.level_reported]]</p>
             <!-- TODO: check - wrong use of total? -->
             <disaggregation-table
-              total=[[location.reportInfo.total]]
               data=[[location.current]]
               mapping=[[location.reportInfo.disagg_lookup_map]]>
             </disaggregation-table>
@@ -83,12 +82,11 @@
                 [[location.reportInfo.time_period_end]]
               </span>
               <span class="total">
-                <strong>Total: </strong>[[location.reportInfo.total]]
+                <strong>Total: </strong>[[location.reportInfo.total.v]]
               </span>
             </h4>
             <p>Level reported: [[location.previous.level_reported]]</p>
             <disaggregation-table
-              total=[[location.reportInfo.total]]
               data=[[location.previous]]
               mapping=[[location.reportInfo.disagg_lookup_map]]>
             </disaggregation-table>

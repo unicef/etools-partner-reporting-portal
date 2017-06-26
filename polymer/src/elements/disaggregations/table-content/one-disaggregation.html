@@ -27,7 +27,6 @@
 
     <disaggregation-table-row
         data=[[totalRow]]
-        total=[[total]]
         row-type="totalsRow">
     </disaggregation-table-row>
   </template>
@@ -42,17 +41,15 @@
       ],
 
       properties: {
-        editable: Boolean,
+        editable: Number,
 
         data: Object,
 
         mapping: Array,
 
-        total: Number,
-
         totalRow: {
           type: Array,
-          computed: '_determineTotalRow(mapping, total)'
+          computed: '_determineTotalRow(mapping, data)'
         },
 
         //Passing columnNames as a param is required to trigger update.
@@ -71,16 +68,12 @@
         return mapping[0].choices;
       },
 
-      _determineTotalRow: function (_, total) { // jshint ignore:line
+      _determineTotalRow: function (_, data) { // jshint ignore:line
         var totalRow = {
           title: 'total',
           total: {
             key: '', // unused
-            data: {
-              c: null,
-              d: null,
-              v: total,
-            },
+            data: data.disaggregation['()'],
           },
         };
         return totalRow;

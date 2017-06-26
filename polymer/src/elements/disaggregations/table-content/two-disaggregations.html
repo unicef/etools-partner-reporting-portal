@@ -34,7 +34,6 @@
 
    <disaggregation-table-row
       data=[[totalsForDisplay]]
-      total=[[total]]
       row-type="totalsRow">
   </disaggregation-table-row>
 
@@ -50,13 +49,11 @@
       ],
 
       properties: {
-        editable: Boolean,
+        editable: Number,
 
         data: Object,
 
         mapping: Array,
-
-        total: Number,
 
         //Passing columnNames as a param is required to trigger update.
         columns: {
@@ -65,13 +62,13 @@
         },
 
         totalsForDisplay: {
-          type: Array,
+          type: Object,
           computed: '_determineTotals(columns, data)',
         },
 
         rowsForDisplay: {
-          type: Array,
-          computed: '_determineRowsForDisplay(mapping)'
+          type: Object,
+          computed: '_determineRowsForDisplay(mapping, data)'
         },
       },
 
@@ -85,17 +82,16 @@
         return this._determineRows(this, rows, columnChoices);
       },
 
-      _determineTotals: function() {
+      _determineTotals: function(_, data) {
         var self = this;
         var columnChoices = this.mapping[0].choices;
 
         var columnData = columnChoices.map(function(z) {
           var formatted = self._formatDisaggregationIds([z.id]);
-          var data = self.data.disaggregation[formatted];
 
           return {
             key: formatted,
-            data: data,
+            data: data.disaggregation[formatted],
           };
         });
 
@@ -104,11 +100,7 @@
           data: columnData,
           total: {
             key: '', // unused,
-            data: {
-              c: null,
-              d: null,
-              v: this.total,
-            },
+            data: data.disaggregation['()'],
           },
         };
 

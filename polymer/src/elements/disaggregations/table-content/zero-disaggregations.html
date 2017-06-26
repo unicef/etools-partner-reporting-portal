@@ -20,28 +20,22 @@
       is: 'zero-disaggregations',
 
       properties: {
-        editable: Boolean,
+        editable: Number,
 
         data: Object,
 
-        total: Number,
-
         totalRow: {
           type: Array,
-          computed: '_determineTotalRow(mapping, total)'
+          computed: '_determineTotalRow(mapping, data)'
         },
       },
 
-      _determineTotalRow: function (_, total) { // jshint ignore:line
+      _determineTotalRow: function (_, data) { // jshint ignore:line
         return {
           title: 'total',
           total: {
             key: '()',
-            data: {
-              c: null,
-              d: null,
-              v: total,
-            },
+            data: data.disaggregation['()'],
           },
         };
       },
