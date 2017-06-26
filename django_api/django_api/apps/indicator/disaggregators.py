@@ -55,7 +55,7 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
             for key in ordered_dict:
                 if len(key) == level_reported:
                     packed_key = map(lambda item: tuple([item]), key)
-                    subkey_combinations = generate_data_combination_entries(packed_key, entries_only=True, string_key=False, r=level_reported)
+                    subkey_combinations = generate_data_combination_entries(packed_key, entries_only=True, string_key=False, r=level_reported - 1)
 
                     # TODO: Handle different calculation method here. May need to refactor each calculation method as each method
                     if blueprint.calculation_formula == IndicatorBlueprint.SUM:
