@@ -36,6 +36,7 @@
           as="middleRow">
         <disaggregation-table-row
             data="[[middleRow]]"
+            level-reported="[[data.level_reported]]"
             row-type="middleRow"
             editable="[[editable]]">
         </disaggregation-table-row>
@@ -46,6 +47,7 @@
    <!-- Totals row -->
    <disaggregation-table-row
       data="[[columnTotalRow]]"
+      level-reported="[[data.level_reported]]"
       row-type="totalsRow">
    </disaggregation-table-row>
 
@@ -55,6 +57,7 @@
              as="bottomRow">
     <disaggregation-table-row
         data="[[bottomRow]]"
+        level-reported="[[data.level_reported]]"
         row-type="bottomRow">
     </disaggregation-table-row>
   </template>

@@ -19,14 +19,16 @@
               items="[[rows]]"
               as="row">
       <disaggregation-table-row
-          data=[[row]]
+          data="[[row]]"
+          level-reported="[[data.level_reported]]"
           row-type="middleRow"
           editable="[[editable]]">
       </disaggregation-table-row>
     </template>
 
     <disaggregation-table-row
-        data=[[totalRow]]
+        data="[[totalRow]]"
+        level-reported="[[data.level_reported]]"
         row-type="totalsRow">
     </disaggregation-table-row>
   </template>

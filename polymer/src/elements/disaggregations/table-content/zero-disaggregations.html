@@ -8,9 +8,11 @@
 
     <style include='disaggregation-table-styles'></style>
 
-    <disaggregation-table-row data=[[totalRow]]
-                              row-type="totalsRow"
-                              editable="[[editable]]">
+    <disaggregation-table-row
+        data="[[totalRow]]"
+        level-reported="[[data.level_reported]]"
+        row-type="totalsRow"
+        editable="[[editable]]">
     </disaggregation-table-row>
 
   </template>

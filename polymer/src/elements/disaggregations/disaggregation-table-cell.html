@@ -14,7 +14,7 @@
 
     <template
         is="dom-if"
-        if="[[_isEditable(editable)]]">
+        if="[[editableBool]]">
       <disaggregation-field
           data="[[data]]"
           coords="[[coords]]">
@@ -23,7 +23,7 @@
 
     <template
         is="dom-if"
-        if="[[!_isEditable(editable)]]">
+        if="[[!editableBool]]">
       <span class="cellValue">[[data.v]]</span>
     </template>
   </template>
@@ -36,10 +36,15 @@
         data: Object,
         coords: String,
         editable: Number,
+
+        editableBool: {
+          type: Boolean,
+          computed: '_computeEditableBool(editable)',
+        },
       },
 
-      _isEditable: function (editable) {
-        return !!editable;
+      _computeEditableBool: function (editable) {
+        return editable === 1;
       },
     });
   </script>

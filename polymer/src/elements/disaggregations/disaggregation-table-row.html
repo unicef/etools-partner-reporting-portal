@@ -26,12 +26,14 @@
         </td>
       </template>
 
-      <template is="dom-if" if="[[data.total]]">
+      <template
+          is="dom-if"
+          if="[[data.total]]">
         <td class="flex cellTotal">
           <disaggregation-table-cell
               coords="[[data.total.key]]"
               data="[[data.total.data]]"
-              editable="[[editable]]">
+              editable="[[totalEditable]]">
           </disaggregation-table-cell>
         </td>
       </template>
@@ -49,16 +51,34 @@
       properties: {
         data: Object,
 
+        levelReported: Number,
+
         rowType: String,
 
         editable: {
           type: Number,
           value: 0,
         },
+
+        totalEditable: {
+          type: Number,
+          value: 0,
+        },
       },
+
+      observers: [
+        '_setTotalEditable(data.total.key, levelReported, editable)',
+      ],
 
       _computeClass: function (rowType) {
         return rowType;
+      },
+
+      _setTotalEditable: function (coords, levelReported, editable) {
+        this.set(
+          'totalEditable',
+          (coords === '()' && levelReported === 0) ? editable : 0
+        );
       },
     });
   </script>
