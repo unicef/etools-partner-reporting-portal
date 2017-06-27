@@ -158,6 +158,8 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
 
     location = SimpleLocationSerializer(read_only=True)
     disaggregation = serializers.SerializerMethodField()
+    location_progress = serializers.SerializerMethodField()
+    previous_location_progress = serializers.SerializerMethodField()
 
     def get_disaggregation(self, obj):
         ordered_dict = get_cast_dictionary_keys_as_tuple(obj.disaggregation)
@@ -169,6 +171,31 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
 
         return ordered_dict
 
+    def get_location_progress(self, obj):
+        return obj.disaggregation[u'()']
+
+    def get_previous_location_progress(self, obj):
+        current_ir_id = obj.indicator_report.id
+        previous_indicator_reports = obj.indicator_report \
+            .reportable.indicator_reports.filter(id__lt=current_ir_id)
+
+        empty_progress = {u'c': None, u'd': None, u'v': None}
+
+        if not previous_indicator_reports.exists():
+            return empty_progress
+
+        previous_report = previous_indicator_reports.last()
+        previous_indicator_location_data_id_list = previous_report \
+            .indicator_location_data \
+            .values_list('id', flat=True)
+
+        if obj.id in previous_indicator_location_data_id_list:
+            loc_data = previous_report.indicator_location_data.get(id=obj.id)
+            return loc_data.disaggregation[u'()']
+
+        else:
+            return empty_progress
+
     class Meta:
         model = IndicatorLocationData
         fields = (
@@ -179,6 +206,8 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
             'num_disaggregation',
             'level_reported',
             'disaggregation_reported_on',
+            'location_progress',
+            'previous_location_progress',
         )
 
 
