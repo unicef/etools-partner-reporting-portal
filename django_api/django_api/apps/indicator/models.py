@@ -6,6 +6,8 @@ from django.contrib.postgres.fields import JSONField, ArrayField
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from model_utils.models import TimeStampedModel
 
@@ -210,6 +212,29 @@ class IndicatorReport(TimeStampedModel):
             output_list = set(reduce(lambda acc, curr: acc + curr, output_list))
 
         return output_list
+
+
+@receiver(post_save, sender=IndicatorReport, dispatch_uid="recalculate_reportable_total")
+def recalculate_reportable_total(sender, instance, **kwargs):
+    reportable = instance.reportable
+    blueprint = reportable.blueprint
+
+    # Reset the reportable total
+    reportable_total = {
+        u'c': 0,
+        u'd': 0,
+        u'v': 0,
+    }
+
+    # IndicatorReport total calculation
+    if blueprint.calculation_formula == IndicatorBlueprint.SUM:
+        for indicator_report in reportable.indicator_reports.all():
+            reportable_total[u'v'] += indicator_report.total[u'v']
+            reportable_total[u'd'] += indicator_report.total[u'd']
+            reportable_total[u'c'] += indicator_report.total[u'c']
+
+    reportable.total = reportable_total
+    reportable.save()
 
 
 class IndicatorLocationData(TimeStampedModel):

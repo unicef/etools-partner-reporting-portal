@@ -55,7 +55,12 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
             for key in ordered_dict:
                 if len(key) == level_reported:
                     packed_key = map(lambda item: tuple([item]), key)
-                    subkey_combinations = generate_data_combination_entries(packed_key, entries_only=True, string_key=False, r=level_reported - 1)
+                    subkey_combinations = generate_data_combination_entries(
+                        packed_key,
+                        entries_only=True,
+                        string_key=False,
+                        r=level_reported - 1
+                    )
 
                     # TODO: Handle different calculation method here. May need to refactor each calculation method as each method
                     if blueprint.calculation_formula == IndicatorBlueprint.SUM:
@@ -68,24 +73,25 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
         indicator_location_data.disaggregation = ordered_dict
         indicator_location_data.save()
 
+        # Reset the IndicatorReport total
+        ir_total = {
+            u'c': 0,
+            u'd': 0,
+            u'v': 0,
+        }
+
+        indicator_report = indicator_location_data.indicator_report
+
         # IndicatorReport total calculation
         if blueprint.calculation_formula == IndicatorBlueprint.SUM:
-            indicator_report = indicator_location_data.indicator_report
-
-            # Reset the total
-            indicator_report.total = {
-                u'c': 0,
-                u'd': 0,
-                u'v': 0,
-            }
-
             for loc_data in indicator_report.indicator_location_data.all():
                 loc_total = loc_data['disaggregation'][u'()']
-                indicator_report.total[u'v'] += loc_total[u'v']
-                indicator_report.total[u'd'] += loc_total[u'd']
-                indicator_report.total[u'c'] += loc_total[u'c']
+                ir_total[u'v'] += loc_total[u'v']
+                ir_total[u'd'] += loc_total[u'd']
+                ir_total[u'c'] += loc_total[u'c']
 
-            indicator_report.save()
+        indicator_report.total = ir_total
+        indicator_report.save()
 
 
 class RatioIndicatorDisaggregator(BaseDisaggregator):
