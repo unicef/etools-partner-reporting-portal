@@ -86,8 +86,20 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
         if blueprint.calculation_formula == IndicatorBlueprint.SUM:
             for loc_data in indicator_report.indicator_location_data.all():
                 loc_total = loc_data['disaggregation'][u'()']
+
+                if loc_total[u'v'] is None:
+                    loc_total[u'v'] = 0
+
                 ir_total[u'v'] += loc_total[u'v']
+
+                if loc_total[u'd'] is None:
+                    loc_total[u'd'] = 0
+
                 ir_total[u'd'] += loc_total[u'd']
+
+                if loc_total[u'c'] is None:
+                    loc_total[u'c'] = 0
+
                 ir_total[u'c'] += loc_total[u'c']
 
         indicator_report.total = ir_total
