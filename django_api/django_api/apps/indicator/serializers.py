@@ -316,15 +316,15 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
                     + "have correct value key structure: c, d, v")
 
             # Sanitizing data value
-            if isinstance(data['disaggregation'][key][u'c'], str):
+            if isinstance(data['disaggregation'][key][u'c'], unicode):
                 data['disaggregation'][key][u'c'] = \
                     int(data['disaggregation'][key][u'c'])
 
-            if isinstance(data['disaggregation'][key][u'd'], str):
+            if isinstance(data['disaggregation'][key][u'd'], unicode):
                 data['disaggregation'][key][u'd'] = \
                     int(data['disaggregation'][key][u'd'])
 
-            if isinstance(data['disaggregation'][key][u'v'], str):
+            if isinstance(data['disaggregation'][key][u'v'], unicode):
                 data['disaggregation'][key][u'v'] = \
                     int(data['disaggregation'][key][u'v'])
 
