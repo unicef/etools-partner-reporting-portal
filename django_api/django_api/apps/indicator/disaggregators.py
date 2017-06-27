@@ -43,13 +43,21 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
         ordered_dict = get_cast_dictionary_keys_as_tuple(
             indicator_location_data.disaggregation)
 
-        if level_reported != 0:
+        if level_reported == 0:
+            ordered_dict[tuple()]["d"] = 1
+            ordered_dict[tuple()]["c"] = ordered_dict[tuple()]["v"]
+
+        else:
             # Reset all subtotals
             for key in ordered_dict:
+                ordered_dict[key]["d"] = 1
+
                 if len(key) < level_reported:
-                    ordered_dict[key]["v"] = 0
-                    ordered_dict[key]["d"] = 0
                     ordered_dict[key]["c"] = 0
+                    ordered_dict[key]["v"] = 0
+
+                elif len(key) == level_reported:
+                    ordered_dict[key]["c"] = ordered_dict[key]["v"]
 
             # Calculating subtotals
             for key in ordered_dict:
@@ -68,6 +76,9 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
                             ordered_dict[subkey]["v"] += \
                                 ordered_dict[key]["v"]
 
+                            ordered_dict[subkey]["c"] += \
+                                ordered_dict[key]["c"]
+
         ordered_dict = get_cast_dictionary_keys_as_string(ordered_dict)
 
         indicator_location_data.disaggregation = ordered_dict
@@ -79,6 +90,7 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
             u'd': 0,
             u'v': 0,
         }
+        ir_total[u'd'] = 1
 
         indicator_report = indicator_location_data.indicator_report
 
@@ -91,11 +103,6 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
                     loc_total[u'v'] = 0
 
                 ir_total[u'v'] += loc_total[u'v']
-
-                if loc_total[u'd'] is None:
-                    loc_total[u'd'] = 0
-
-                ir_total[u'd'] += loc_total[u'd']
 
                 if loc_total[u'c'] is None:
                     loc_total[u'c'] = 0

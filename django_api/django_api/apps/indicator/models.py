@@ -227,22 +227,20 @@ def recalculate_reportable_total(sender, instance, **kwargs):
     }
 
     # IndicatorReport total calculation
-    if blueprint.calculation_formula == IndicatorBlueprint.SUM:
-        for indicator_report in reportable.indicator_reports.all():
-            if indicator_report.total[u'v'] is None:
-                indicator_report.total[u'v'] = 0
+    if blueprint.unit == IndicatorBlueprint.NUMBER:
+        reportable_total[u'd'] = 1
 
-            reportable_total[u'v'] += indicator_report.total[u'v']
+        if blueprint.calculation_formula == IndicatorBlueprint.SUM:
+            for indicator_report in reportable.indicator_reports.all():
+                if indicator_report.total[u'v'] is None:
+                    indicator_report.total[u'v'] = 0
 
-            if indicator_report.total[u'd'] is None:
-                indicator_report.total[u'd'] = 0
+                reportable_total[u'v'] += indicator_report.total[u'v']
 
-            reportable_total[u'd'] += indicator_report.total[u'd']
+                if indicator_report.total[u'c'] is None:
+                    indicator_report.total[u'c'] = 0
 
-            if indicator_report.total[u'c'] is None:
-                indicator_report.total[u'c'] = 0
-
-            reportable_total[u'c'] += indicator_report.total[u'c']
+                reportable_total[u'c'] += indicator_report.total[u'c']
 
     reportable.total = reportable_total
     reportable.save()
