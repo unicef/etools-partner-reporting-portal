@@ -28,7 +28,7 @@
 
       <!-- Note: Need to pass in mapping to these or an empty mapping is passed
       to the content component. -->
-      <template is="dom-if" if="[[_equals(data.num_disaggregation, 0)]]">
+      <template is="dom-if" if="[[_equals(data.level_reported, 0)]]">
         <zero-disaggregations
             data="[[data]]"
             mapping="[[mapping]]"
@@ -36,7 +36,7 @@
         </zero-disaggregations>
       </template>
 
-      <template is="dom-if" if="[[_equals(data.num_disaggregation, 1)]]">
+      <template is="dom-if" if="[[_equals(data.level_reported, 1)]]">
         <one-disaggregation
             data="[[data]]"
             mapping="[[mapping]]"
@@ -44,7 +44,7 @@
         </one-disaggregation>
       </template>
 
-      <template is="dom-if" if="[[_equals(data.num_disaggregation, 2)]]">
+      <template is="dom-if" if="[[_equals(data.level_reported, 2)]]">
         <two-disaggregations
             data="[[data]]"
             mapping="[[mapping]]"
@@ -52,7 +52,7 @@
         </two-disaggregations>
       </template>
 
-      <template is="dom-if" if="[[_equals(data.num_disaggregation, 3)]]">
+      <template is="dom-if" if="[[_equals(data.level_reported, 3)]]">
         <three-disaggregations
             data="[[data]]"
             mapping="[[mapping]]"
@@ -61,6 +61,7 @@
       </template>
 
     </table>
+
   </template>
 
   <script>
