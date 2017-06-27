@@ -315,6 +315,19 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
                     "%s coordinate space value does not " % (key)
                     + "have correct value key structure: c, d, v")
 
+            # Sanitizing data value
+            if isinstance(data['disaggregation'][key][u'c'], str):
+                data['disaggregation'][key][u'c'] = \
+                    int(data['disaggregation'][key][u'c'])
+
+            if isinstance(data['disaggregation'][key][u'd'], str):
+                data['disaggregation'][key][u'd'] = \
+                    int(data['disaggregation'][key][u'd'])
+
+            if isinstance(data['disaggregation'][key][u'v'], str):
+                data['disaggregation'][key][u'v'] = \
+                    int(data['disaggregation'][key][u'v'])
+
         return data
 
 
