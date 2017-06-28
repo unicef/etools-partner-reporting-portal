@@ -25,6 +25,10 @@
       },
 
       _$computeBaseUrl: function(country, app) {
+        var planId = '000';   // TODO: remove hard-coding in #134
+        if (app === 'cluster-reporting') {
+          return '/app/' + country + '/' + app + '/' + planId;
+        }
         return '/app/' + country + '/' + app;
       },
 
@@ -36,7 +40,6 @@
         if (tail.length && tail[0] !== '/') {
           tail = '/' + tail;
         }
-
         return baseUrl + tail;
       },
 

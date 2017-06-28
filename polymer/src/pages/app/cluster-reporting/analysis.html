@@ -1,0 +1,29 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../../elements/page-header.html">
+<link rel="import" href="../../../elements/page-body.html">
+
+<dom-module id="page-cluster-reporting-analysis">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <page-header title="Analysis"></page-header>
+
+    <page-body></page-body>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'page-cluster-reporting-analysis',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+      ],
+    });
+  </script>
+</dom-module>
