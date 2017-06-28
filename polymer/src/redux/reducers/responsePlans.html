@@ -1,0 +1,49 @@
+<link rel="import" href="../redux.html">
+<link rel="import" href="../../constants.html">
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Reducers = App.Reducers || {};
+
+    App.Reducers.ResponsePlans = Redux.combineReducers({
+      all: allResponsePlansReducer,
+      current: currentResponsePlanReducer,
+    });
+
+    function allResponsePlansReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = [];
+      }
+
+      switch (action.type) {
+        case App.Constants.SET_RESPONSE_PLANS:
+          return action.plans;
+
+        case App.Constants.RESET:
+          return [];
+
+        default:
+          return state;
+      }
+    }
+
+    function currentResponsePlanReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = '';
+      }
+
+      switch (action.type) {
+        case App.Constants.SET_CURRENT_RESPONSE_PLAN:
+          return action.plan;
+
+        case App.Constants.RESET:
+          return '';
+
+        default:
+          return state;
+      }
+    }
+  }());
+</script>

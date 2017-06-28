@@ -28,6 +28,11 @@
         url="[[interventionsUrl]]">
     </etools-prp-ajax>
 
+    <etools-prp-ajax
+        id="responsePlans"
+        url="[[responsePlansUrl]]">
+    </etools-prp-ajax>
+
     <app-route
         route="{{route}}"
         pattern="/:country_code/:app"
@@ -69,10 +74,17 @@
           observer: '_pageChanged',
         },
 
+        responsePlansUrl: {
+          type: String,
+          computed: '_computeResponsePlansUrl(countryId)'
+        },
+
         interventionsUrl: {
           type: String,
           value: App.Endpoints.interventions(),
         },
+
+        countryId: Number,
 
         _countryCode: {
           type: String,
@@ -90,6 +102,10 @@
         '_routeAppChanged(routeData.app)',
         '_handleCountryChange(currentCountry, countries)',
       ],
+
+      _computeResponsePlansUrl: function() {
+        return App.Endpoints.responsePlans(this.countryId);
+      },
 
       _redirectToCountry: function (country) {
         var code = country.code;
@@ -164,6 +180,15 @@
         window.location.href = '/not-found';
       },
 
+      _getResponsePlansForCountry: function(countryId) {
+        var responsePlansThunk = this.$.responsePlans.thunk();
+
+        this.dispatch(App.Actions.fetchResponsePlans(responsePlansThunk))
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
+      },
+
       _handleCountryChange: function (currentCountry, countries) {
         var currentCountryData;
 
@@ -175,7 +200,11 @@
           return country.code === currentCountry;
         })[0];
 
+        this.countryId = currentCountryData.id;
+
         this.dispatch(App.Actions.Location.set(currentCountryData.location));
+
+        this._getResponsePlansForCountry();
       },
 
       attached: function () {

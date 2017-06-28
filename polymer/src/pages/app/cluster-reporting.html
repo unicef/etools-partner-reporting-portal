@@ -102,6 +102,11 @@
             route="{{subroute}}">
         </page-ip-reporting-analysis>
       </template>
+
+      <template is="dom-if" if="[[_equals(page, 'select-plan')]]" restamp="true">
+        <page-select-plan name="select-plan"></page-select-plan>
+      </template>
+
     </iron-pages>
 
    </app-drawer-layout>

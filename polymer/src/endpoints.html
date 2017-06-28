@@ -45,6 +45,10 @@
         return this._buildUrl('/unicef/' + locationId + '/progress-reports');
       },
 
+      responsePlans: function (interventionId) {
+        return this._buildUrl('/core/' + interventionId + '/' + 'response-plan/');
+      },
+
       childLocations: function (locationId) {
         return this._buildUrl('/core/' + locationId + '/children-location/');
       },

@@ -1,0 +1,101 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../../bower_components/etools-content-panel/etools-content-panel.html">
+<link rel="import" href="../../../../bower_components/etools-data-table/etools-data-table.html">
+
+<link rel="import" href="../../../behaviors/responsive.html">
+<link rel="import" href="../../../settings.html">
+<link rel="import" href="../../../redux/actions.html">
+<link rel="import" href="../../../redux/store.html">
+
+<dom-module id="page-select-plan">
+  <template>
+    <style>
+      :host {
+        display: block;
+        height: 100%;
+      }
+
+      .container {
+        @apply(--layout-vertical);
+        @apply(--layout-center-justified);
+
+        box-sizing: border-box;
+        min-height: 100%;
+        padding: 1em;
+      }
+
+    </style>
+
+    <div class="container">
+     <h2> Select Response Plan</h2>
+
+     <paper-card class="flex vertical">
+
+      <etools-data-table-header label="">
+        <etools-data-table-column field="response">
+          Response Plan
+        </etools-data-table-column>
+        <etools-data-table-column field="type">
+          Plan Type
+        </etools-data-table-column>
+        <etools-data-table-column field="start">
+          Start Date
+        </etools-data-table-column>
+        <etools-data-table-column field="end">
+          End Date
+        </etools-data-table-column>
+        <etools-data-table-column field="location">
+          Location
+        </etools-data-table-column>
+      </etools-data-table-header>
+
+      <template id="list"
+                is="dom-repeat"
+                items="[[responsePlans]]"
+                as="plan">
+        <etools-data-table-row collapse>
+          <div slot="row-data">
+            <div class="table-cell">
+              [[plan.title]]
+            </div>
+            <div class="table-cell">
+              [[plan.plan_type]]
+            </div>
+            <div class="table-cell">
+              [[plan.start]]
+            </div>
+             <div class="table-cell">
+              [[plan.end]]
+            </div>
+             <div class="table-cell">
+              [[plan.location]]
+            </div>
+          </div>
+        </etools-data-table-row>
+      </template>
+
+     </paper-card>
+    </div>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'page-select-plan',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        responsePlans: {
+          type: Array,
+          statePath: 'responsePlans.all',
+        },
+      }
+
+    });
+
+  </script>
+</dom-module>
