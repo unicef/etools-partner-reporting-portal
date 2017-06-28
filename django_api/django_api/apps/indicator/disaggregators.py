@@ -71,13 +71,21 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
                     )
 
                     # TODO: Handle different calculation method here. May need to refactor each calculation method as each method
-                    if blueprint.calculation_formula == IndicatorBlueprint.SUM:
-                        for subkey in subkey_combinations:
+                    for subkey in subkey_combinations:
+                        if blueprint.calculation_formula == IndicatorBlueprint.SUM:
                             ordered_dict[subkey]["v"] += \
                                 ordered_dict[key]["v"]
 
                             ordered_dict[subkey]["c"] += \
                                 ordered_dict[key]["c"]
+
+                        elif blueprint.calculation_formula == IndicatorBlueprint.MAX:
+                            if ordered_dict[subkey]["v"] < ordered_dict[key]["v"]:
+                                ordered_dict[subkey]["v"] = \
+                                    ordered_dict[key]["v"]
+
+                                ordered_dict[subkey]["c"] = \
+                                    ordered_dict[key]["c"]
 
         ordered_dict = get_cast_dictionary_keys_as_string(ordered_dict)
 
@@ -108,6 +116,11 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
                     loc_total[u'c'] = 0
 
                 ir_total[u'c'] += loc_total[u'c']
+
+        elif blueprint.calculation_formula == IndicatorBlueprint.MAX:
+            max_total_loc = max(indicator_report.indicator_location_data.all(), key=lambda item: item.disaggregation[u'()'][u'v'])
+
+            ir_total = max_total_loc.disaggregation[u'()']
 
         indicator_report.total = ir_total
         indicator_report.save()

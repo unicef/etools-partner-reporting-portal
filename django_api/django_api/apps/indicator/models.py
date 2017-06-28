@@ -242,6 +242,12 @@ def recalculate_reportable_total(sender, instance, **kwargs):
 
                 reportable_total[u'c'] += indicator_report.total[u'c']
 
+        elif blueprint.calculation_formula == IndicatorBlueprint.MAX:
+            max_total_ir = max(
+                reportable.indicaor_reports.all(),
+                key=lambda item: item.total[u'v'])
+            reportable_total = max_total_ir.total
+
     reportable.total = reportable_total
     reportable.save()
 
