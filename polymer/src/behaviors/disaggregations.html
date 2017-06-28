@@ -43,7 +43,7 @@
 
       // Accepts a list of disaggregation IDs, sorts them, and
       // structures them in "()" format for lookup.
-      _formatDisaggregationIds: function(unsortedIds) {
+      _formatDisaggregationIds: function (unsortedIds) {
         // IDs must be in ascending order.
         var ids = unsortedIds.sort(function (a, b) {return a - b;}).reverse();
         var sortedString = '';
@@ -55,6 +55,60 @@
         }
 
         return '(' + sortedString + ')';
+      },
+
+      regenerate_disaggregation_key_entries: function (
+        new_level_reported,
+        new_disaggregation_reported_on,
+        disagg_lookup_map
+      ) {
+        var new_disaggregation = {};
+
+        /*
+        * We first filter disaggregation choice ids from disagg_lookup_map based on
+        * Disaggregation IDs that new_disaggregation_reported_on has.
+        *
+        * Then, extract integer id only from each filtered disaggregation object's choice object list.
+        *
+        * This would return as [[1,2,3], [4,5,6], [7,8]] format, where each nested array is the disaggregation choice id list for selected disaggregation.
+        */
+        var filtered_disagg_choice_ids = disagg_lookup_map.filter(function (disagg_item) {
+          return new_disaggregation_reported_on.indexOf(disagg_item.id) !== -1;
+        }).map(function (filtered_disagg_item) {
+          return filtered_disagg_item.choices.map(function (choice_object) {
+            return choice_object.id;
+          });
+        });
+
+        // This loops from N level_reported to 0 level_reported.
+        // Each iteration generates a set of cartesian product of each given combination for filtered disaggregation choice integer id arrays
+        for (var i = new_level_reported; i >= 0; i--) {
+          // Get nCr entries for each level_reported
+          var level_combination_entries = this._combinations(filtered_disagg_choice_ids, i);
+
+          for (var j = 0; j < level_combination_entries.length; j++) {
+            // Create a cartesian product set for each combination entry
+            var product_ids = this._cartesianProduct(level_combination_entries[j]);
+
+            // Format each generated combination key according to backend format
+            var formatted_product_ids = product_ids.map(function(item) {
+              var formatted_id = item.join(', ');
+
+              if (item.length == 1) {
+                formatted_id = formatted_id + ',';
+              }
+
+              return '(' + formatted_id + ')';
+            });
+
+            // Populate each new key into empty disaggregation object
+            for (var k = 0; k < formatted_product_ids.length; k++) {
+              new_disaggregation[formatted_product_ids[k]] = {};
+            }
+          }
+        }
+
+        return new_disaggregation;
       },
     };
 

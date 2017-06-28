@@ -1,0 +1,64 @@
+<script>
+  (function () {
+    'use strict';
+
+    App.Behaviors = App.Behaviors || {};
+
+    App.Behaviors.MathBehavior = {
+
+      _combinations: (function () {
+        var res = [];
+
+        function combinations(arr, k, start, idx, current) {
+          if (idx === k) {
+            res.push(current.slice());
+            return;
+          }
+
+          for (var i = start; i < arr.length; i++) {
+            current[idx] = arr[i];
+
+            combinations(arr, k, i + 1, idx + 1, current);
+          }
+        }
+
+        return function (arr, k) {
+          res = [];
+
+          combinations(arr, k, 0, 0, []);
+
+          var temp = res;
+
+          res = null;
+
+          return temp;
+        };
+      }()),
+
+      _cartesianProduct: (function () {
+        var result;
+
+        function cartesianProduct(sets, index, current) {
+          if (index === sets.length) {
+            return result.push(current.slice());
+          }
+
+          for (var i = 0; i < sets[index].length; i++) {
+            current[index] = sets[index][i];
+
+            cartesianProduct(sets, index + 1, current);
+          }
+        }
+
+        return function (sets) {
+          result = [];
+
+          cartesianProduct(sets, 0, []);
+
+          return result;
+        };
+      }()),
+
+    };
+  }());
+</script>

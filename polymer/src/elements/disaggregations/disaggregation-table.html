@@ -5,6 +5,7 @@
 <link rel="import" href="table-content/two-disaggregations.html">
 <link rel="import" href="table-content/one-disaggregation.html">
 <link rel="import" href="table-content/zero-disaggregations.html">
+<link rel="import" href="disaggregation-switches.html">
 <link rel="import" href="../etools-prp-ajax.html">
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../redux/store.html">
@@ -14,7 +15,21 @@
 
 <dom-module id="disaggregation-table">
   <template>
-    <style include="disaggregation-table-styles"></style>
+    <style include="disaggregation-table-styles">
+      .location-progress {
+        text-align: right;
+      }
+
+      .location-progress dt,
+      .location-progress dd {
+        display: inline;
+        margin: 0;
+      }
+
+      .location-progress dt {
+        font-weight: bold;
+      }
+    </style>
 
     <etools-prp-ajax
         id="update"
@@ -24,43 +39,57 @@
         method="put">
     </etools-prp-ajax>
 
-    <table class="vertical layout">
+    <div>
+      <disaggregation-switches
+          data="[[data]]"
+          mapping="[[mapping]]"
+          editable="[[editable]]"
+          formatted-data="{{formattedData}}">
+      </disaggregation-switches>
 
-      <!-- Note: Need to pass in mapping to these or an empty mapping is passed
-      to the content component. -->
-      <template is="dom-if" if="[[_equals(data.level_reported, 0)]]">
-        <zero-disaggregations
-            data="[[data]]"
-            mapping="[[mapping]]"
-            editable="[[editable]]">
-        </zero-disaggregations>
+      <template
+          is="dom-if"
+          if="[[editableBool]]">
+        <dl class="location-progress">
+          <dt>Location progress:</dt>
+          <dd>[[formattedData.location_progress.v]]</dd>
+        </dl>
       </template>
 
-      <template is="dom-if" if="[[_equals(data.level_reported, 1)]]">
-        <one-disaggregation
-            data="[[data]]"
-            mapping="[[mapping]]"
-            editable="[[editable]]">
-        </one-disaggregation>
-      </template>
+      <table class="vertical layout">
+        <template is="dom-if" if="[[_equals(formattedData.level_reported, 0)]]">
+          <zero-disaggregations
+              data="[[formattedData]]"
+              mapping="[[mapping]]"
+              editable="[[editable]]">
+          </zero-disaggregations>
+        </template>
 
-      <template is="dom-if" if="[[_equals(data.level_reported, 2)]]">
-        <two-disaggregations
-            data="[[data]]"
-            mapping="[[mapping]]"
-            editable="[[editable]]">
-        </two-disaggregations>
-      </template>
+        <template is="dom-if" if="[[_equals(formattedData.level_reported, 1)]]">
+          <one-disaggregation
+              data="[[formattedData]]"
+              mapping="[[mapping]]"
+              editable="[[editable]]">
+          </one-disaggregation>
+        </template>
 
-      <template is="dom-if" if="[[_equals(data.level_reported, 3)]]">
-        <three-disaggregations
-            data="[[data]]"
-            mapping="[[mapping]]"
-            editable="[[editable]]">
-        </three-disaggregations>
-      </template>
+        <template is="dom-if" if="[[_equals(formattedData.level_reported, 2)]]">
+          <two-disaggregations
+              data="[[formattedData]]"
+              mapping="[[mapping]]"
+              editable="[[editable]]">
+          </two-disaggregations>
+        </template>
 
-    </table>
+        <template is="dom-if" if="[[_equals(formattedData.level_reported, 3)]]">
+          <three-disaggregations
+              data="[[formattedData]]"
+              mapping="[[mapping]]"
+              editable="[[editable]]">
+          </three-disaggregations>
+        </template>
+      </table>
+    </div>
 
   </template>
 
@@ -80,7 +109,9 @@
           value: 0,
         },
 
-        data: {
+        data: Object,
+
+        formattedData: {
           type: Object,
           observer: '_cloneData',
         },
@@ -90,11 +121,16 @@
           value: App.Endpoints.indicatorLocationDataEntries(),
         },
 
+        editableBool: {
+          type: Boolean,
+          computed: '_computeEditableBool(editable)',
+        },
+
         fields: Array,
 
         localData: Object,
 
-        mapping: Object,
+        mapping: Array,
       },
 
       listeners: {
@@ -135,12 +171,16 @@
         });
       },
 
-      _cloneData: function (data) {
+      _cloneData: function (formattedData) {
         if (!this.editable) {
           return;
         }
 
-        this.set('localData', this._clone(data));
+        this.set('localData', this._clone(formattedData));
+      },
+
+      _computeEditableBool: function (editable) {
+        return editable === 1;
       },
 
       save: function () {
@@ -171,7 +211,7 @@
           App.Actions.Disaggregations.updateForLocation(
             updateThunk,
             this.indicatorId,
-            this.data.location.id
+            this.formattedData.location.id
           )
         );
       },

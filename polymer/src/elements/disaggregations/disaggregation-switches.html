@@ -1,0 +1,107 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/paper-checkbox/paper-checkbox.html">
+
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/disaggregations.html">
+<link rel="import" href="../../behaviors/math.html">
+
+<dom-module id="disaggregation-switches">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      .container {
+        padding: 10px 24px;
+        margin: 0 -24px;
+        background: var(--paper-grey-100);
+      }
+
+      .container h4 {
+        margin: 0 0 10px;
+        font-size: 12px;
+        line-height: 1;
+      }
+
+      .container paper-checkbox:not(:first-of-type) {
+        margin-left: 24px;
+      }
+    </style>
+
+    <template
+        is="dom-if"
+        if="[[editableBool]]"
+        restamp>
+      <div class="container">
+        <h4>Enter data by disaggregation</h4>
+        <template
+            is="dom-repeat"
+            items="[[mapping]]"
+            as="field">
+          <paper-checkbox
+              id="[[field.id]]"
+              checked="[[_computeChecked(field.id)]]">
+            [[_formatFieldName(field.name)]]
+          </paper-checkbox>
+        </template>
+      </div>
+    </template>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'disaggregation-switches',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.DisaggregationBehavior,
+        App.Behaviors.MathBehavior,
+      ],
+
+      properties: {
+        localData: Object,
+
+        mapping: Object,
+
+        editable: Number,
+
+        formattedData: {
+          type: Object,
+          notify: true,
+          computed: '_computeFormattedData(localData)',
+        },
+
+        data: {
+          type: Object,
+          observer: '_cloneData',
+        },
+
+        editableBool: {
+          type: Boolean,
+          computed: '_computeEditableBool(editable)',
+        },
+      },
+
+      _computeFormattedData: function (localData) {
+        return localData;
+      },
+
+      _computeEditableBool: function (editable) {
+        return editable === 1;
+      },
+
+      _cloneData: function (data) {
+        this.set('localData', this._clone(data));
+      },
+
+      _computeChecked: function (id) {
+        return this.localData.disaggregation_reported_on.indexOf(id) !== -1;
+      },
+
+      _formatFieldName: function (name) {
+        return this._capitalizeFirstLetter(name);
+      },
+    });
+  </script>
+</dom-module>

@@ -88,20 +88,6 @@
         font-size: 12px;
         color: var(--theme-primary-text-color-medium);
       }
-
-      .location-progress {
-        text-align: right;
-      }
-
-      .location-progress dt,
-      .location-progress dd {
-        display: inline;
-        margin: 0;
-      }
-
-      .location-progress dt {
-        font-weight: bold;
-      }
     </style>
 
     <etools-prp-ajax
@@ -177,10 +163,6 @@
                       <p class="current-pd">
                         [[currentPD.agreement]] | [[currentPD.title]]
                       </p>
-                      <dl class="location-progress">
-                        <dt>Location progress:</dt>
-                        <dd>[[location.location_progress.v]]</dd>
-                      </dl>
                     </div>
                     <disaggregation-table
                         data="[[location]]"
