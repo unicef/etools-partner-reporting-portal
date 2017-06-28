@@ -1,0 +1,75 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../../bower_components/paper-item/paper-item.html">
+
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/page-nav.html">
+<link rel="import" href="../../behaviors/routing.html">
+<link rel="import" href="../../redux/store.html">
+
+<link rel="import" href="../../styles/page-nav.html">
+
+<dom-module id="cluster-reporting-nav">
+  <template>
+    <style include="page-nav-styles">
+      :host {
+        --paper-item-selected: {
+          color: var(--theme-primary-color-cluster);
+          background: var(--theme-selected-item-background-color);
+        };
+      }
+    </style>
+    
+    <paper-menu
+        id="menu"
+        selected="{{selected}}"
+        attr-for-selected="name"
+        selectable="paper-item"
+        key-event-target="null">
+
+      <paper-item name="dashboard">
+        <a href="[[buildUrl(_baseUrl, '/dashboard')]]">
+          <span>Dashboard</span>
+        </a>
+      </paper-item>
+
+      <paper-item name="response-parameters">
+        <a href="[[buildUrl(_baseUrl, '/response-parameters')]]">
+          <span>Response Parameters</span>
+        </a>
+      </paper-item>
+
+      <paper-item name="planned-action">
+        <a href="[[buildUrl(_baseUrl, '/planned-action')]]">
+          <span>My Planned Action</span>
+        </a>
+      </paper-item>
+
+      <paper-item name="results">
+        <a href="[[buildUrl(_baseUrl, '/results')]]">
+          <span>Results</span>
+        </a>
+      </paper-item>
+
+      <paper-item name="analysis">
+        <a href="[[buildUrl(_baseUrl, '/analysis')]]">
+          <span>Analysis</span>
+        </a>
+      </paper-item>
+
+    </paper-menu>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'cluster-reporting-nav',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.PageNavBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.RoutingBehavior,
+      ],
+    });
+  </script>
+</dom-module>

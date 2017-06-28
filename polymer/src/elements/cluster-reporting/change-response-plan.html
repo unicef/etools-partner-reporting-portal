@@ -1,0 +1,42 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../redux/actions.html">
+<link rel="import" href="../../behaviors/routing.html">
+
+<dom-module id="change-response-plan">
+  <template>
+    <style>
+      :host {
+        display: block;
+        float: left;
+        margin: auto 30px;
+        height: 64px;
+        line-height: 64px;
+
+        color: var(--theme-primary-text-color-medium);
+        font-size: 15px;
+        font-weight: 200;
+      }
+
+      a {
+        color: var(--theme-primary-color-cluster-b);
+        font-size: 13px;
+      }
+    </style>
+
+    <span>HRP 2017</span>
+    <a href="/TODO in issue #134">change</a>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'change-response-plan',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.RoutingBehavior,
+      ],
+    });
+  </script>
+</dom-module>
