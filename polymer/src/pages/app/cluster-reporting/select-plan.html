@@ -3,8 +3,8 @@
 <link rel="import" href="../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../../../bower_components/etools-content-panel/etools-content-panel.html">
 <link rel="import" href="../../../../bower_components/etools-data-table/etools-data-table.html">
+<link rel="import" href="../../../../bower_components/paper-button/paper-button.html">
 
-<link rel="import" href="../../../behaviors/responsive.html">
 <link rel="import" href="../../../settings.html">
 <link rel="import" href="../../../redux/actions.html">
 <link rel="import" href="../../../redux/store.html">
@@ -58,7 +58,7 @@
         <etools-data-table-row collapse>
           <div slot="row-data">
             <div class="table-cell">
-              [[plan.title]]
+              <b>[[plan.title]]</b>
             </div>
             <div class="table-cell">
               [[plan.plan_type]]
@@ -74,8 +74,10 @@
             </div>
           </div>
         </etools-data-table-row>
-      </template>
 
+      </template>
+        <paper-button id="cancel" on-tap="_cancel" raised>Cancel</paper-button>
+        <paper-button id="confirm" on-tap="_confirm" raised>Confirm</paper-button>
      </paper-card>
     </div>
   </template>
@@ -93,7 +95,18 @@
           type: Array,
           statePath: 'responsePlans.all',
         },
-      }
+        
+      },
+
+      _cancel: function () {
+        // TODO: Clear any selection
+      },
+
+      _confirm: function () {
+        // TODO: remove this hard-coding and let user select the plan.
+        var selectedPlan =  this.responsePlans[0];
+        this.dispatch(App.Actions.setCurrentResponsePlan(selectedPlan));
+      },
 
     });
 

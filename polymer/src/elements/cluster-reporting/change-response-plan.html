@@ -1,7 +1,6 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 
 <link rel="import" href="../../redux/store.html">
-<link rel="import" href="../../redux/actions.html">
 <link rel="import" href="../../behaviors/routing.html">
 
 <dom-module id="change-response-plan">
@@ -25,8 +24,8 @@
       }
     </style>
 
-    <span>HRP 2017</span>
-    <a href="/TODO in issue #134">change</a>
+    <span>[[responsePlan.title]]</span>
+    <a id="change" on-tap="_change">change</a>
   </template>
 
   <script>
@@ -35,8 +34,19 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
-        App.Behaviors.RoutingBehavior,
       ],
+
+      properties: {
+        responsePlan: {
+          type: Object,
+          statePath: 'responsePlans.current',
+        },
+      },
+
+      _change: function() {
+        //Reset the current response plan so the user will be redirected to the Select screen.
+        this.dispatch(App.Actions.setCurrentResponsePlan({}));
+      }
     });
   </script>
 </dom-module>

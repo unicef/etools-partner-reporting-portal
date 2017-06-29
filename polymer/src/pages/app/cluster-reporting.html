@@ -6,7 +6,11 @@
 <link rel="import" href="../../../bower_components/app-layout/app-toolbar/app-toolbar.html">
 <link rel="import" href="../../../bower_components/iron-pages/iron-pages.html">
 
+
 <link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../redux/actions.html">
+<link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../endpoints.html">
 
 <link rel="import" href="../../elements/cluster-reporting/nav.html">
 <link rel="import" href="../../elements/cluster-reporting/app-header.html">
@@ -45,6 +49,26 @@
        tail="{{subroute}}">
    </app-route>
 
+  <etools-prp-ajax
+      id="responsePlans"
+      url="[[_plansUrl]]">
+  </etools-prp-ajax>
+
+  <template is="dom-if" if="[[_equals(page, 'select-plan')]]">
+     <iron-pages
+      selected="[[page]]"
+      attr-for-selected="name">
+        <template is="dom-if" if="[[_equals(page, 'select-plan')]]" restamp="true">
+          <page-select-plan
+              name="select-plan"
+              route="{{subroute}}">
+          </page-select-plan>
+        </template>
+    </iron-pages>
+  </template>
+
+
+  <template is="dom-if" if="[[! _equals(page, 'select-plan')]]">
    <app-drawer-layout persistent responsive-width="0px">
      <app-drawer>
        <app-header fixed>
@@ -86,38 +110,36 @@
         <page-cluster-reporting-planned-action
             name="planned-action"
             route="{{subroute}}">
-        </page-ip-reporting-indicators>
+        </page-cluster-reporting-planned-action>
       </template>
 
       <template is="dom-if" if="[[_equals(page, 'results')]]" restamp="true">
         <page-cluster-reporting-results
             name="results"
             route="{{subroute}}">
-        </page-ip-reporting-results>
+        </page-cluster-reporting-results>
       </template>
 
       <template is="dom-if" if="[[_equals(page, 'analysis')]]" restamp="true">
         <page-cluster-reporting-analysis
             name="analysis"
             route="{{subroute}}">
-        </page-ip-reporting-analysis>
-      </template>
-
-      <template is="dom-if" if="[[_equals(page, 'select-plan')]]" restamp="true">
-        <page-select-plan name="select-plan"></page-select-plan>
+        </page-cluster-reporting-analysis>
       </template>
 
     </iron-pages>
 
    </app-drawer-layout>
+   </template>
+
 
   </template>
 
   <script>
     Polymer({
       is: 'page-cluster-reporting',
-
       behaviors: [
+        App.Behaviors.ReduxBehavior,
         App.Behaviors.UtilsBehavior,
       ],
 
@@ -126,27 +148,86 @@
           type: String,
           observer: '_pageChanged',
         },
-        plan: {
+
+        _countryCode: {
           type: String,
-          value: '000'
+          statePath: 'countries.current',
+        },
+
+        _countries: {
+          type: Array,
+          statePath: 'countries.all',
+        },
+
+        _currentPlan: {
+          type: Object,
+          statePath: 'responsePlans.current',
+        },
+
+
+        _plansUrl: {
+          type: String,
+          computed:'_computeResponsePlansUrl(_countryCode, _countries)'
         }
+
       },
 
       observers: [
         '_routePageChanged(routeData.page)',
+        '_routePlanChanged(_currentPlan)',
       ],
 
+      _computeResponsePlansUrl: function(countryCode, countries) {
+        var currentCountryId = null;
+
+        countries.forEach(function(country) {
+          if (countryCode === country.code) {
+            currentCountryId = country.id;
+          }
+        });
+
+        return App.Endpoints.responsePlans(currentCountryId);
+      },
+
+      _redirectToPlanSelection: function() {
+        //If there is no plan already set, redirect.
+        if (!this.routeData.plan || this.routeData.plan === 'undefined') {
+          this.set('route.path', '//select-plan');
+        }
+        return false;
+      },
+
+      attached: function() {
+        this._getResponsePlansForCountry(this.countryId);
+        this._redirectToPlanSelection();
+      },
+
+      _getResponsePlansForCountry: function() {
+        var responsePlansThunk = this.$.responsePlans.thunk();
+
+        this.dispatch(App.Actions.fetchResponsePlans(responsePlansThunk))
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
+      },
+
       _routePageChanged: function (page) {
-        if (!page) {
-          this.set('route.path', this.plan + '/dashboard');
-        } else {
-          this.page = page;
+        if (!this._redirectToPlanSelection()) {
+          if (!page) {
+            this.set('route.path', this.routeData.plan + '/dashboard');
+          } else {
+            this.page = page;
+          }
         }
       },
 
       _pageChanged: function (page) {
         var resolvedPageUrl = this.resolveUrl('cluster-reporting/' + page + '.html');
         this.importHref(resolvedPageUrl, null, this._notFound, true);
+      },
+
+      _routePlanChanged: function (plan) {
+       this.set('route.path', '/' + plan.id + '/dashboard');
       },
 
       _notFound: function () {
