@@ -10,6 +10,7 @@
 <link rel="import" href="../../../bower_components/paper-button/paper-button.html">
 
 <link rel="import" href="../etools-prp-ajax.html">
+<link rel="import" href="../status-badge.html">
 <link rel="import" href="../disaggregations/disaggregation-table.html">
 <link rel="import" href="../disaggregations/disaggregation-modal.html">
 <link rel="import" href="../../endpoints.html">
@@ -107,7 +108,10 @@
             is="dom-repeat"
             items="[[disaggregations.indicator_location_data]]"
             as="location">
-          <paper-tab name="location-[[location.location.id]]">[[location.location.title]]</paper-tab>
+          <paper-tab name="location-[[location.location.id]]">
+            <status-badge type="[[_computeClompletionString(location)]]"></status-badge>
+            [[location.location.title]]
+          </paper-tab>
         </template>
       </paper-tabs>
 
@@ -288,6 +292,11 @@
 
       _computeDisaggregations: function (data, key) {
         return this._clone(data[key]);
+      },
+
+      _computeClompletionString: function (location) {
+        return location.level_reported === location.num_disaggregation ?
+            'complete' : 'incomplete';
       },
 
       _openModal: function (e) {

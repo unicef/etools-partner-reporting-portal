@@ -48,9 +48,11 @@
       _computeIcon: function (type) {
         switch (type) {
           case 'success':
+          case 'complete':
             return 'icons:check-circle';
           case 'error':
           case 'warning':
+          case 'incomplete':
             return 'icons:error';
           case 'neutral':
             return 'image:lens';
@@ -60,8 +62,10 @@
       _computeColor: function (type) {
         switch (type) {
           case 'success':
+          case 'complete':
             return '#009951';
           case 'error':
+          case 'incomplete':
             return '#d0021b';
           case 'neutral':
             return '#d8d8d8';
