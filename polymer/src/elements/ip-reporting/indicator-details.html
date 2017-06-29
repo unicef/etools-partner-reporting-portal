@@ -157,7 +157,8 @@
                     if="[[_equals(mode, 'edit')]]">
                   <disaggregation-modal
                       id="modal-[[index]]"
-                      reporting-period="[[currentReport.reporting_period]]">
+                      reporting-period="[[currentReport.reporting_period]]"
+                      on-opened-changed="_updateModals">
                     <div class="meta">
                       <h3>[[indicatorName]]</h3>
                       <p class="location">
@@ -168,12 +169,17 @@
                         [[currentPD.agreement]] | [[currentPD.title]]
                       </p>
                     </div>
-                    <disaggregation-table
-                        data="[[location]]"
-                        mapping="[[disaggregations.disagg_lookup_map]]"
-                        indicator-id="[[indicatorId]]"
-                        editable="1">
-                    </disaggregation-table>
+                    <template
+                        is="dom-if"
+                        if="[[_computeTableVisibility(opened, index)]]"
+                        restamp="true">
+                      <disaggregation-table
+                          data="[[location]]"
+                          mapping="[[disaggregations.disagg_lookup_map]]"
+                          indicator-id="[[indicatorId]]"
+                          editable="1">
+                      </disaggregation-table>
+                    </template>
                   </disaggregation-modal>
                 </template>
               </div>
@@ -201,6 +207,8 @@
         indicatorName: String,
 
         reportableId: Number,
+
+        opened: Object,
 
         selected: {
           type: Number,
@@ -301,6 +309,29 @@
 
       _openModal: function (e) {
         this.$$('#modal-' + e.target.modalIndex).open();
+      },
+
+      _updateModals: function (e, data) {
+        var id = e.target.id;
+        var change;
+
+        if (!id) {
+          return;
+        }
+
+        change = {};
+
+        change[id] = data.value;
+
+        this.set('opened', Object.assign({}, this.opened, change));
+      },
+
+      _computeTableVisibility: function (opened, index) {
+        return !!opened['modal-' + index];
+      },
+
+      attached: function () {
+        this.set('opened', {});
       },
     });
   </script>

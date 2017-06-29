@@ -53,7 +53,7 @@
     <paper-dialog
         id="dialog"
         with-backdrop
-        opened="[[opened]]">
+        opened="{{opened}}">
       <div class="header layout horizontal justified">
         <h2>Enter data</h2>
 
@@ -103,7 +103,7 @@
 
         opened: {
           type: Boolean,
-          value: false,
+          notify: true,
         },
 
         updatePending: {
@@ -115,14 +115,6 @@
       listeners: {
         'dialog.iron-overlay-closed': 'close',
         'disaggregation-modal-refit': '_adjustPosition',
-      },
-
-      close: function () {
-        this.set('opened', false);
-      },
-
-      open: function () {
-        this.set('opened', true);
       },
 
       _save: function () {
@@ -147,6 +139,14 @@
         e.stopPropagation();
 
         this.$.dialog.refit();
+      },
+
+      close: function () {
+        this.set('opened', false);
+      },
+
+      open: function () {
+        this.set('opened', true);
       },
     });
   </script>
