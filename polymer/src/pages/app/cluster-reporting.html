@@ -86,21 +86,21 @@
         <page-cluster-reporting-planned-action
             name="planned-action"
             route="{{subroute}}">
-        </page-ip-reporting-indicators>
+        </page-cluster-reporting-planned-action>
       </template>
 
       <template is="dom-if" if="[[_equals(page, 'results')]]" restamp="true">
         <page-cluster-reporting-results
             name="results"
             route="{{subroute}}">
-        </page-ip-reporting-results>
+        </page-cluster-reporting-results>
       </template>
 
       <template is="dom-if" if="[[_equals(page, 'analysis')]]" restamp="true">
         <page-cluster-reporting-analysis
             name="analysis"
             route="{{subroute}}">
-        </page-ip-reporting-analysis>
+        </page-cluster-reporting-analysis>
       </template>
     </iron-pages>
 
