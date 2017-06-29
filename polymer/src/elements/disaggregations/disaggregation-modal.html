@@ -114,6 +114,7 @@
 
       listeners: {
         'dialog.iron-overlay-closed': 'close',
+        'disaggregation-modal-refit': '_adjustPosition',
       },
 
       close: function () {
@@ -140,6 +141,12 @@
 
               self.set('updatePending', false);
             });
+      },
+
+      _adjustPosition: function (e) {
+        e.stopPropagation();
+
+        this.$.dialog.refit();
       },
     });
   </script>

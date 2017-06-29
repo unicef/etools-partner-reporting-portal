@@ -1,6 +1,7 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/paper-checkbox/paper-checkbox.html">
 
+<link rel="import" href="../../polyfills/es6-shim.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/disaggregations.html">
 <link rel="import" href="../../behaviors/math.html">
@@ -41,7 +42,8 @@
             as="field">
           <paper-checkbox
               id="[[field.id]]"
-              checked="[[_computeChecked(field.id)]]">
+              checked="[[_computeChecked(field.id)]]"
+              on-change="_fieldValueChanged">
             [[_formatFieldName(field.name)]]
           </paper-checkbox>
         </template>
@@ -60,16 +62,18 @@
       ],
 
       properties: {
-        localData: Object,
-
         mapping: Object,
 
         editable: Number,
 
+        reportedOn: {
+          type: Array,
+          value: [],
+        },
+
         formattedData: {
           type: Object,
           notify: true,
-          computed: '_computeFormattedData(localData)',
         },
 
         data: {
@@ -83,24 +87,66 @@
         },
       },
 
-      _computeFormattedData: function (localData) {
-        return localData;
-      },
-
       _computeEditableBool: function (editable) {
         return editable === 1;
       },
 
       _cloneData: function (data) {
-        this.set('localData', this._clone(data));
+        this.set('formattedData', this._clone(data));
       },
 
       _computeChecked: function (id) {
-        return this.localData.disaggregation_reported_on.indexOf(id) !== -1;
+        return this.formattedData.disaggregation_reported_on.indexOf(id) !== -1;
       },
 
       _formatFieldName: function (name) {
         return this._capitalizeFirstLetter(name);
+      },
+
+      _fieldValueChanged: function (e) {
+        var id = Number(e.target.id);
+        var checked = e.target.checked;
+
+        this.debounce('fieldValueChanged', function () {
+          if (checked) {
+            this.push('reportedOn', id);
+          } else {
+            this.splice('reportedOn', this.reportedOn.indexOf(id), 1);
+          }
+
+          this.set('formattedData', Object.assign({}, this.formattedData, {
+            disaggregation: this._preserveDisaggregationValues(
+              this.formattedData.disaggregation,
+              this.regenerate_disaggregation_key_entries(
+                this.reportedOn.length,
+                this.reportedOn,
+                this.mapping
+              )
+            ),
+            level_reported: this.reportedOn.length,
+            disaggregation_reported_on: this.reportedOn,
+          }));
+        }, 100);
+      },
+
+      _preserveDisaggregationValues: function (from, to) {
+        return Object.keys(from).reduce(function (prev, curr) {
+          if (typeof prev[curr] !== 'undefined') {
+            prev[curr] = from[curr];
+          }
+
+          return prev;
+        }, to);
+      },
+
+      attached: function () {
+        this.set('reportedOn', []);
+      },
+
+      detached: function () {
+        if (this.isDebouncerActive('fieldValueChanged')) {
+          this.cancelDebouncer('fieldValueChanged');
+        }
       },
     });
   </script>

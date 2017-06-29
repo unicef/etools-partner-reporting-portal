@@ -51,9 +51,11 @@
         this.fire('register-field', this);
       },
 
-      detached: function () {
-        this.fire('deregister-field', this);
-      },
+      // Cant deregister fields in lifecycle hooks due to:
+      // https://github.com/Polymer/polymer/issues/1159
+      // :( :( :(
+      //
+      // detached: function () {}
 
       validate: function () {
         return this.$.field.validate();

@@ -44,7 +44,8 @@
           data="[[data]]"
           mapping="[[mapping]]"
           editable="[[editable]]"
-          formatted-data="{{formattedData}}">
+          formatted-data="{{formattedData}}"
+          on-formatted-data-changed="_triggerModalRefit">
       </disaggregation-switches>
 
       <template
@@ -57,7 +58,10 @@
       </template>
 
       <table class="vertical layout">
-        <template is="dom-if" if="[[_equals(formattedData.level_reported, 0)]]">
+        <template
+            is="dom-if"
+            if="[[_equals(formattedData.level_reported, 0)]]"
+            restamp="true">
           <zero-disaggregations
               data="[[formattedData]]"
               mapping="[[mapping]]"
@@ -65,7 +69,10 @@
           </zero-disaggregations>
         </template>
 
-        <template is="dom-if" if="[[_equals(formattedData.level_reported, 1)]]">
+        <template
+            is="dom-if"
+            if="[[_equals(formattedData.level_reported, 1)]]"
+            restamp="true">
           <one-disaggregation
               data="[[formattedData]]"
               mapping="[[mapping]]"
@@ -73,7 +80,10 @@
           </one-disaggregation>
         </template>
 
-        <template is="dom-if" if="[[_equals(formattedData.level_reported, 2)]]">
+        <template
+            is="dom-if"
+            if="[[_equals(formattedData.level_reported, 2)]]"
+            restamp="true">
           <two-disaggregations
               data="[[formattedData]]"
               mapping="[[mapping]]"
@@ -81,7 +91,10 @@
           </two-disaggregations>
         </template>
 
-        <template is="dom-if" if="[[_equals(formattedData.level_reported, 3)]]">
+        <template
+            is="dom-if"
+            if="[[_equals(formattedData.level_reported, 3)]]"
+            restamp="true">
           <three-disaggregations
               data="[[formattedData]]"
               mapping="[[mapping]]"
@@ -135,9 +148,12 @@
 
       listeners: {
         'register-field': '_registerField',
-        'deregister-field': '_deregisterField',
         'field-value-changed': '_fieldValueChanged',
       },
+
+      observers: [
+        '_resetFields(formattedData.disaggregation_reported_on)',
+      ],
 
       _registerField: function (e, field) {
         e.stopPropagation();
@@ -147,18 +163,6 @@
         }
 
         this.push('fields', field);
-      },
-
-      _deregisterField: function (e, field) {
-        var index = this.fields.indexOf(field);
-
-        e.stopPropagation();
-
-        if (index === -1) {
-          return;
-        }
-
-        this.splice('fields', index, 1);
       },
 
       _fieldValueChanged: function (e, change) {
@@ -172,11 +176,15 @@
       },
 
       _cloneData: function (formattedData) {
-        if (!this.editable) {
+        if (!this.editableBool) {
           return;
         }
 
         this.set('localData', this._clone(formattedData));
+      },
+
+      _resetFields: function () {
+        this.set('fields', []);
       },
 
       _computeEditableBool: function (editable) {
@@ -214,6 +222,24 @@
             this.formattedData.location.id
           )
         );
+      },
+
+      _triggerModalRefit: function (e) {
+        e.stopPropagation();
+
+        if (!this.editableBool) {
+          return;
+        }
+
+        this.debounce('modal-refit', function () {
+          this.fire('disaggregation-modal-refit');
+        }, 100);
+      },
+
+      detached: function () {
+        if (this.isDebouncerActive('modal-refit')) {
+          this.cancelDebouncer('modal-refit');
+        }
       },
     });
   </script>
