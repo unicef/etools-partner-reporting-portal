@@ -54,21 +54,14 @@
       url="[[_plansUrl]]">
   </etools-prp-ajax>
 
-  <template is="dom-if" if="[[_equals(page, 'select-plan')]]">
-     <iron-pages
-      selected="[[page]]"
-      attr-for-selected="name">
-        <template is="dom-if" if="[[_equals(page, 'select-plan')]]" restamp="true">
-          <page-select-plan
-              name="select-plan"
-              route="{{subroute}}">
-          </page-select-plan>
-        </template>
-    </iron-pages>
+  <template is="dom-if" if="[[!_currentPlan.id]]">
+    <page-select-plan
+      name="select-plan"
+      route="{{subroute}}">
+    </page-select-plan>
   </template>
 
-
-  <template is="dom-if" if="[[! _equals(page, 'select-plan')]]">
+  <template is="dom-if" if="[[_currentPlan.id]]">
    <app-drawer-layout persistent responsive-width="0px">
      <app-drawer>
        <app-header fixed>
@@ -144,11 +137,6 @@
       ],
 
       properties: {
-        page: {
-          type: String,
-          observer: '_pageChanged',
-        },
-
         _countryCode: {
           type: String,
           statePath: 'countries.current',
@@ -164,17 +152,15 @@
           statePath: 'responsePlans.current',
         },
 
-
         _plansUrl: {
           type: String,
           computed:'_computeResponsePlansUrl(_countryCode, _countries)'
         }
-
       },
 
       observers: [
         '_routePageChanged(routeData.page)',
-        '_routePlanChanged(_currentPlan)',
+        '_planChanged(_currentPlan)',
       ],
 
       _computeResponsePlansUrl: function(countryCode, countries) {
@@ -189,17 +175,8 @@
         return App.Endpoints.responsePlans(currentCountryId);
       },
 
-      _redirectToPlanSelection: function() {
-        //If there is no plan already set, redirect.
-        if (!this.routeData.plan || this.routeData.plan === 'undefined') {
-          this.set('route.path', '//select-plan');
-        }
-        return false;
-      },
-
       attached: function() {
         this._getResponsePlansForCountry(this.countryId);
-        this._redirectToPlanSelection();
       },
 
       _getResponsePlansForCountry: function() {
@@ -212,22 +189,33 @@
       },
 
       _routePageChanged: function (page) {
-        if (!this._redirectToPlanSelection()) {
-          if (!page) {
-            this.set('route.path', this.routeData.plan + '/dashboard');
-          } else {
-            this.page = page;
-          }
+        if (this._isPlanSelected(this.routeData.plan)) {
+          this.set('route.path', this.routeData.plan + '/' + page);
+        } else {
+          this._redirectToPlanSelection();
         }
       },
 
-      _pageChanged: function (page) {
-        var resolvedPageUrl = this.resolveUrl('cluster-reporting/' + page + '.html');
+      _isPlanSelected: function(plan) {
+        if (!plan || plan === 'select-plan' || plan === 'undefined') {
+          return false;
+        }
+        return true;
+      },
+
+      _redirectToPlanSelection: function() {
+        //If there is no plan already set, redirect.
+        this.set('route.path', '/select-plan');
+        var resolvedPageUrl = this.resolveUrl('cluster-reporting/select-plan.html');
         this.importHref(resolvedPageUrl, null, this._notFound, true);
       },
 
-      _routePlanChanged: function (plan) {
-       this.set('route.path', '/' + plan.id + '/dashboard');
+      _planChanged: function (plan) {
+        //The plan object (not the route) has changed.
+        if (plan.id) {
+          this.set('routeData.plan', plan.id);
+          this._routePageChanged('dashboard');
+        }
       },
 
       _notFound: function () {
