@@ -60,7 +60,7 @@
       <table class="vertical layout">
         <template
             is="dom-if"
-            if="[[_equals(formattedData.level_reported, 0)]]"
+            if="[[_determineVisibility(formattedData, 0, editableBool)]]"
             restamp="true">
           <zero-disaggregations
               data="[[formattedData]]"
@@ -71,7 +71,7 @@
 
         <template
             is="dom-if"
-            if="[[_equals(formattedData.level_reported, 1)]]"
+            if="[[_determineVisibility(formattedData, 1, editableBool)]]"
             restamp="true">
           <one-disaggregation
               data="[[formattedData]]"
@@ -82,7 +82,7 @@
 
         <template
             is="dom-if"
-            if="[[_equals(formattedData.level_reported, 2)]]"
+            if="[[_determineVisibility(formattedData, 2, editableBool)]]"
             restamp="true">
           <two-disaggregations
               data="[[formattedData]]"
@@ -93,7 +93,7 @@
 
         <template
             is="dom-if"
-            if="[[_equals(formattedData.level_reported, 3)]]"
+            if="[[_determineVisibility(formattedData, 3, editableBool)]]"
             restamp="true">
           <three-disaggregations
               data="[[formattedData]]"
@@ -234,6 +234,13 @@
         this.debounce('modal-refit', function () {
           this.fire('disaggregation-modal-refit');
         }, 100);
+      },
+
+      _determineVisibility: function (formattedData, comparable, editableBool) {
+        return this._equals(
+          formattedData[editableBool ? 'level_reported' : 'num_disaggregation'],
+          comparable
+        );
       },
 
       detached: function () {
