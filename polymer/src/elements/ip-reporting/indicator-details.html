@@ -109,7 +109,7 @@
             items="[[disaggregations.indicator_location_data]]"
             as="location">
           <paper-tab name="location-[[location.location.id]]">
-            <status-badge type="[[_computeClompletionString(location)]]"></status-badge>
+            <status-badge type="success"></status-badge>
             [[location.location.title]]
           </paper-tab>
         </template>
@@ -300,11 +300,6 @@
 
       _computeDisaggregations: function (data, key) {
         return this._clone(data[key]);
-      },
-
-      _computeClompletionString: function (location) {
-        return location.level_reported === location.num_disaggregation ?
-            'complete' : 'incomplete';
       },
 
       _openModal: function (e) {
