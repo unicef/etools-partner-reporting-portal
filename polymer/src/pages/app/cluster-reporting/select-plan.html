@@ -17,22 +17,26 @@
         height: 100%;
       }
 
+      paper-button#confirm {
+        background-color: var(--theme-primary-color-cluster);
+        color: white;
+      }
+
+      .actions {
+        @apply(--layout-horizontal);
+        @apply(--layout-end-justified);
+      }
+
       .container {
         @apply(--layout-vertical);
-        @apply(--layout-center-justified);
-
-        box-sizing: border-box;
-        min-height: 100%;
         padding: 1em;
       }
 
     </style>
 
     <div class="container">
-     <h2> Select Response Plan</h2>
-
-     <paper-card class="flex vertical">
-
+      <h2> Select Response Plan</h2>
+      
       <etools-data-table-header label="">
         <etools-data-table-column field="response">
           Response Plan
@@ -74,11 +78,11 @@
             </div>
           </div>
         </etools-data-table-row>
-
       </template>
-        <paper-button id="cancel" on-tap="_cancel" raised>Cancel</paper-button>
-        <paper-button id="confirm" on-tap="_confirm" raised>Confirm</paper-button>
-     </paper-card>
+    </div>
+    <div class="actions">
+      <paper-button id="cancel" on-tap="_cancel">Cancel</paper-button>
+      <paper-button id="confirm" on-tap="_confirm" raised>Confirm</paper-button>
     </div>
   </template>
 
@@ -95,7 +99,6 @@
           type: Array,
           statePath: 'responsePlans.all',
         },
-        
       },
 
       _cancel: function () {
