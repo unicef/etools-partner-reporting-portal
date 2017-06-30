@@ -1,33 +1,50 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/etools-data-table/etools-data-table.html">
 
-<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="disaggregation-field.html">
 <link rel="import" href="../../styles/disaggregation-table-styles.html">
 
 <dom-module id="disaggregation-table-cell">
   <template>
+    <style include="disaggregation-table-styles">
+      :host {
+        display: block;
+      }
+    </style>
 
-    <style include='disaggregation-table-styles'></style>
+    <template
+        is="dom-if"
+        if="[[editableBool]]">
+      <disaggregation-field
+          data="[[data]]"
+          coords="[[coords]]">
+      </disaggregation-field>
+    </template>
 
-    <!-- Todo: sub-divide cells for more detailed data. -->
-
-    <span>[[value.v]] [[title]] [[total]] </span>
-
-
+    <template
+        is="dom-if"
+        if="[[!editableBool]]">
+      <span class="cellValue">[[data.v]]</span>
+    </template>
   </template>
 
   <script>
     Polymer({
       is: 'disaggregation-table-cell',
 
-      behaviors: [
-        App.Behaviors.UtilsBehavior,
-      ],
-
       properties: {
-        value: Number,
-        title: String,
-        total: Number,
+        data: Object,
+        coords: String,
+        editable: Number,
+
+        editableBool: {
+          type: Boolean,
+          computed: '_computeEditableBool(editable)',
+        },
+      },
+
+      _computeEditableBool: function (editable) {
+        return editable === 1;
       },
     });
   </script>

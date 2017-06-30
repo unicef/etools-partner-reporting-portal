@@ -16,14 +16,18 @@ from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
 from unicef.serializers import ProgressReportSerializer
 
+from .disaggregators import (
+    QuantityIndicatorDisaggregator,
+)
 from .serializers import (
     IndicatorListSerializer, IndicatorReportListSerializer, PDReportsSerializer, SimpleIndicatorLocationDataListSerializer,
-    IndicatorLLoutputsSerializer,
+    IndicatorLLoutputsSerializer, IndicatorLocationDataUpdateSerializer,
 )
 from .filters import IndicatorFilter, PDReportsFilter
 from .models import (
     IndicatorReport, Reportable, Disaggregation,
-    DisaggregationValue
+    DisaggregationValue, IndicatorLocationData,
+    IndicatorBlueprint
 )
 
 logger = logging.getLogger(__name__)
@@ -226,14 +230,32 @@ class IndicatorReportListAPIView(APIView):
 
 class IndicatorLocationDataUpdateAPIView(APIView):
     """
-    REST API endpoint to update a set of IndicatorLocationData objects, including each set of disaggregation data.
+    REST API endpoint to update one IndicatorLocationData, including disaggregation data.
     """
 
+    def get_object(self, request, pk=None):
+        return get_object_or_404(IndicatorLocationData, id=pk)
+
     def put(self, request, *args, **kwargs):
-        serializer = SimpleIndicatorLocationDataListSerializer(data=request.data, many=True)
+        if 'id' not in request.data:
+            raise Http404('id is required in request body')
+
+        indicator_location_data = self.get_object(
+            request, pk=request.data['id'])
+
+        serializer = IndicatorLocationDataUpdateSerializer(
+            instance=indicator_location_data, data=request.data)
 
         if serializer.is_valid():
             serializer.save()
+
+            blueprint = indicator_location_data.indicator_report \
+                .reportable.blueprint
+
+            if blueprint.unit == IndicatorBlueprint.NUMBER:
+                QuantityIndicatorDisaggregator.post_process(
+                    indicator_location_data)
+
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         else:

@@ -45,6 +45,25 @@
       _notFound: function () {
         window.location.href = '/not-found';
       },
+
+      _clone: function _clone(val) {
+        var typeStr = Object.prototype.toString.call(val);
+
+        switch (typeStr) {
+          case '[object Array]':
+            return val.map(_clone);
+
+          case '[object Object]':
+            return Object.keys(val).reduce(function (prev, curr) {
+              prev[curr] = _clone(val[curr]);
+
+              return prev;
+            }, {});
+
+          default:
+            return val;
+        }
+      },
     };
 
   }());

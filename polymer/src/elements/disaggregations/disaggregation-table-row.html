@@ -7,25 +7,36 @@
 
 <dom-module id="disaggregation-table-row">
   <template>
-
     <style include="disaggregation-table-styles"></style>
-    <tr class$="[[computeClass(rowType)]]">
-      <td class="flex">
-        [[_capitalizeFirstLetter(data.title)]]
+
+    <tr class$="[[_computeClass(rowType)]]">
+      <td class="flex cellTitle">
+        <span class="cellValue">[[_capitalizeFirstLetter(data.title)]]</span>
       </td>
+
 
       <template is="dom-repeat"
                 items="[[data.data]]">
         <td class="flex">
-          <disaggregation-table-cell value="[[item]]">
+          <disaggregation-table-cell
+              coords="[[item.key]]"
+              data="[[item.data]]"
+              editable="[[editable]]">
           </disaggregation-table-cell>
         </td>
       </template>
 
-      <td class="flex">
-        [[total]] [[data.total.v]]
-      </td>
-
+      <template
+          is="dom-if"
+          if="[[data.total]]">
+        <td class="flex cellTotal">
+          <disaggregation-table-cell
+              coords="[[data.total.key]]"
+              data="[[data.total.data]]"
+              editable="[[totalEditable]]">
+          </disaggregation-table-cell>
+        </td>
+      </template>
     </tr>
   </template>
 
@@ -38,19 +49,37 @@
       ],
 
       properties: {
-        data: {
-          type: Object,
-          value: {}
+        data: Object,
+
+        levelReported: Number,
+
+        rowType: String,
+
+        editable: {
+          type: Number,
+          value: 0,
         },
-        rowType: {
-          type: String,
-          value: ''
+
+        totalEditable: {
+          type: Number,
+          value: 0,
         },
       },
 
-      computeClass: function (rowType) {
-       return rowType;
-     }
+      observers: [
+        '_setTotalEditable(data.total.key, levelReported, editable)',
+      ],
+
+      _computeClass: function (rowType) {
+        return rowType;
+      },
+
+      _setTotalEditable: function (coords, levelReported, editable) {
+        this.set(
+          'totalEditable',
+          (coords === '()' && levelReported === 0) ? editable : 0
+        );
+      },
     });
   </script>
   </dom-module>

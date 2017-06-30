@@ -119,7 +119,7 @@
               </dl>
               <dl class="layout horizontal justified">
                 <dt class="flex-3">Achievement in reporting period:</dt>
-                <dd class="flex">[[_withDefault(indicator.achieved)]]</dd>
+                <dd class="flex">[[_withDefault(indicator.achieved.v)]]</dd>
               </dl>
             </div>
             <div class="indicator-header__toggle layout vertical center-justified">
@@ -136,7 +136,11 @@
               opened="{{indicator.opened}}"
               on-opened-changed="_handleOpenedChanged"
               no-animation>
-            <indicator-details></indicator-details>
+            <indicator-details
+                reportable-id="[[data.id]]"
+                indicator-name="[[indicator.indicator_name]]"
+                indicator-id="[[indicator.id]]">
+            </indicator-details>
           </iron-collapse>
         </div>
       </template>
