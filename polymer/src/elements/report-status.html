@@ -10,7 +10,11 @@
     </style>
 
     <status-badge type="[[type]]"></status-badge>
-    [[label]]
+    <template
+        is="dom-if"
+        if="[[!noLabel]]">
+      [[label]]
+    </template>
   </template>
 
   <script>
@@ -19,6 +23,12 @@
 
       properties: {
         status: Number,
+
+        noLabel: {
+          type: Boolean,
+          value: false,
+        },
+
         type: {
           type: String,
           computed: '_computeType(status)',
