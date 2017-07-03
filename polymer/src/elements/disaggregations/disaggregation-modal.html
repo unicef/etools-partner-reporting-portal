@@ -9,6 +9,7 @@
 <link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
 
 <link rel="import" href="../../styles/buttons.html">
+<link rel="import" href="../confirm-box.html">
 
 <dom-module id="disaggregation-modal">
   <template>
@@ -17,7 +18,7 @@
         display: block;
 
         --paper-dialog: {
-          min-width: 500px;
+          width: 550px;
 
           & > * {
             margin: 0;
@@ -90,6 +91,8 @@
         </paper-button>
       </div>
 
+      <confirm-box id="confirm"></confirm-box>
+
       <etools-loading active="[[updatePending]]"></etools-loading>
     </paper-dialog>
   </template>
@@ -115,6 +118,7 @@
       listeners: {
         'dialog.iron-overlay-closed': 'close',
         'disaggregation-modal-refit': '_adjustPosition',
+        'disaggregation-modal-confirm': '_confirm',
       },
 
       _save: function () {
@@ -138,7 +142,19 @@
       _adjustPosition: function (e) {
         e.stopPropagation();
 
-        this.$.dialog.refit();
+        this.debounce('adjust-position', function () {
+          this.$.dialog.refit();
+        }, 100);
+      },
+
+      _confirm: function (e, result) {
+        e.stopPropagation();
+
+        this.$.confirm.run({
+          body: 'Changing disaggregation will cause your previous data to be lost.' +
+              'Do you want to continue?',
+          result: result,
+        });
       },
 
       close: function () {
@@ -147,6 +163,12 @@
 
       open: function () {
         this.set('opened', true);
+      },
+
+      detached: function () {
+        if (this.isDebouncerActive('adjust-position')) {
+          this.cancelDebouncer('modal-refit');
+        }
       },
     });
   </script>

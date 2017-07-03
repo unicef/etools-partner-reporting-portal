@@ -1,10 +1,12 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../../../bower_components/promise-polyfill/promise-polyfill-lite.html">
 
 <link rel="import" href="../../polyfills/es6-shim.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/disaggregations.html">
 <link rel="import" href="../../behaviors/math.html">
+<link rel="import" href="../message-box.html">
 
 <dom-module id="disaggregation-switches">
   <template>
@@ -25,8 +27,12 @@
         line-height: 1;
       }
 
-      .container paper-checkbox:not(:first-of-type) {
+      paper-checkbox:not(:first-of-type) {
         margin-left: 24px;
+      }
+
+      message-box {
+        margin-top: 10px;
       }
     </style>
 
@@ -43,9 +49,20 @@
           <paper-checkbox
               id="[[field.id]]"
               checked="[[_computeChecked(field.id)]]"
+              on-iron-form-element-register="_initField"
               on-change="_fieldValueChanged">
             [[_formatFieldName(field.name)]]
           </paper-checkbox>
+        </template>
+
+        <template
+            is="dom-if"
+            if="[[warning]]"
+            restamp="true">
+          <message-box
+              type="warning">
+            Data is expected for each disaggregation. When you have acquired additional data, re-check the selected box(es) above to complete your report.
+          </message-box>
         </template>
       </div>
     </template>
@@ -65,6 +82,8 @@
         mapping: Object,
 
         editable: Number,
+
+        warning: Boolean,
 
         reportedOn: {
           type: Array,
@@ -87,6 +106,10 @@
         },
       },
 
+      observers: [
+        '_computeWarning(data, reportedOn.splices)',
+      ],
+
       _computeEditableBool: function (editable) {
         return editable === 1;
       },
@@ -104,26 +127,61 @@
       },
 
       _fieldValueChanged: function (e) {
-        var id = Number(e.target.id);
-        var checked = e.target.checked;
+        var field = e.target;
 
         this.debounce('fieldValueChanged', function () {
-          if (checked) {
-            this.push('reportedOn', id);
-          } else {
-            this.splice('reportedOn', this.reportedOn.indexOf(id), 1);
+          this._confirmIntent(field)
+              .then(this._commit.bind(this))
+              .catch(this._revert.bind(this));
+        }, 100);
+      },
+
+      _confirmIntent: function (field) {
+        var id = Number(field.id);
+        var checked = field.checked;
+        var deferred;
+
+        if (checked) {
+          this.push('reportedOn', id);
+
+          if (this.reportedOn.length > this.data.level_reported) {
+            deferred = this._deferred();
+
+            this.fire('disaggregation-modal-confirm', deferred);
+
+            return deferred.promise.catch(function () {
+              return Promise.reject(field);
+            });
           }
 
-          this.set('formattedData', Object.assign({}, this.formattedData, {
-            disaggregation: this.regenerate_disaggregation_key_entries(
-              this.reportedOn.length,
-              this.reportedOn,
-              this.mapping
-            ),
-            level_reported: this.reportedOn.length,
-            disaggregation_reported_on: this.reportedOn,
-          }));
-        }, 100);
+          return Promise.resolve();
+        } else {
+          this.splice('reportedOn', this.reportedOn.indexOf(id), 1);
+
+          return Promise.resolve();
+        }
+      },
+
+      _commit: function () {
+        this.set('formattedData', Object.assign({}, this.formattedData, {
+          disaggregation: this.regenerate_disaggregation_key_entries(
+            this.reportedOn.length,
+            this.reportedOn,
+            this.mapping
+          ),
+          level_reported: this.reportedOn.length,
+          disaggregation_reported_on: this.reportedOn,
+        }));
+      },
+
+      _revert: function (field) {
+        field.checked = false;
+
+        this.splice('reportedOn', this.reportedOn.length - 1, 1);
+      },
+
+      _computeWarning: function (data, _) { // jshint ignore:line
+        this.set('warning', this.reportedOn.length < data.level_reported);
       },
 
       attached: function () {
@@ -133,6 +191,15 @@
       detached: function () {
         if (this.isDebouncerActive('fieldValueChanged')) {
           this.cancelDebouncer('fieldValueChanged');
+        }
+      },
+
+      _initField: function (e) {
+        var checked = e.target.checked;
+        var id = Number(e.target.id);
+
+        if (checked) {
+          this.push('reportedOn', id);
         }
       },
     });

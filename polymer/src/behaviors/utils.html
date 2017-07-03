@@ -1,4 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/promise-polyfill/promise-polyfill-lite.html">
 
 <script>
   (function () {
@@ -67,6 +68,17 @@
           default:
             return val;
         }
+      },
+
+      _deferred: function () {
+        var defer = {};
+
+        defer.promise = new Promise(function (resolve, reject) {
+          defer.resolve = resolve;
+          defer.reject = reject;
+        });
+
+        return defer;
       },
     };
 

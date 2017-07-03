@@ -231,9 +231,7 @@
           return;
         }
 
-        this.debounce('modal-refit', function () {
-          this.fire('disaggregation-modal-refit');
-        }, 100);
+        this.fire('disaggregation-modal-refit');
       },
 
       _determineVisibility: function (formattedData, comparable, editableBool) {
@@ -241,12 +239,6 @@
           formattedData[editableBool ? 'level_reported' : 'num_disaggregation'],
           comparable
         );
-      },
-
-      detached: function () {
-        if (this.isDebouncerActive('modal-refit')) {
-          this.cancelDebouncer('modal-refit');
-        }
       },
     });
   </script>
