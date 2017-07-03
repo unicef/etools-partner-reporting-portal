@@ -218,7 +218,7 @@ class ProgrammeDocument(TimeStampedModel):
             return self.__budget
         else:
             consumed = self.reportable_queryset.last().total
-            consumed = consumed[u'c']
+            consumed = consumed['c']
 
         try:
             percentage = Decimal(consumed) / Decimal(total)

@@ -172,14 +172,14 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
         return ordered_dict
 
     def get_location_progress(self, obj):
-        return obj.disaggregation[u'()']
+        return obj.disaggregation['()']
 
     def get_previous_location_progress(self, obj):
         current_ir_id = obj.indicator_report.id
         previous_indicator_reports = obj.indicator_report \
             .reportable.indicator_reports.filter(id__lt=current_ir_id)
 
-        empty_progress = {u'c': None, u'd': None, u'v': None}
+        empty_progress = {'c': 0, 'd': 0, 'v': 0}
 
         if not previous_indicator_reports.exists():
             return empty_progress
@@ -191,7 +191,7 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
 
         if obj.id in previous_indicator_location_data_id_list:
             loc_data = previous_report.indicator_location_data.get(id=obj.id)
-            return loc_data.disaggregation[u'()']
+            return loc_data.disaggregation['()']
 
         else:
             return empty_progress
@@ -285,9 +285,9 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
                 disaggregation_value_id_list,
                 entries_only=True, r=data['level_reported'])
 
-        if unicode(tuple()) not in valid_disaggregation_value_pairs:
+        if str(tuple()) not in valid_disaggregation_value_pairs:
             valid_disaggregation_value_pairs.append(
-                unicode(tuple()))
+                str(tuple()))
 
         disaggregation_data_keys = data['disaggregation'].keys()
 
@@ -339,23 +339,23 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
                     "%s coordinate space does not " % (key)
                     + "have a correct value dictionary")
 
-            elif data['disaggregation'][key].keys() != [u'c', u'd', u'v']:
+            elif data['disaggregation'][key].keys() != ['c', 'd', 'v']:
                 raise serializers.ValidationError(
                     "%s coordinate space value does not " % (key)
                     + "have correct value key structure: c, d, v")
 
             # Sanitizing data value
-            if isinstance(data['disaggregation'][key][u'c'], unicode):
-                data['disaggregation'][key][u'c'] = \
-                    int(data['disaggregation'][key][u'c'])
+            if isinstance(data['disaggregation'][key]['c'], str):
+                data['disaggregation'][key]['c'] = \
+                    int(data['disaggregation'][key]['c'])
 
-            if isinstance(data['disaggregation'][key][u'd'], unicode):
-                data['disaggregation'][key][u'd'] = \
-                    int(data['disaggregation'][key][u'd'])
+            if isinstance(data['disaggregation'][key]['d'], str):
+                data['disaggregation'][key]['d'] = \
+                    int(data['disaggregation'][key]['d'])
 
-            if isinstance(data['disaggregation'][key][u'v'], unicode):
-                data['disaggregation'][key][u'v'] = \
-                    int(data['disaggregation'][key][u'v'])
+            if isinstance(data['disaggregation'][key]['v'], str):
+                data['disaggregation'][key]['v'] = \
+                    int(data['disaggregation'][key]['v'])
 
         return data
 

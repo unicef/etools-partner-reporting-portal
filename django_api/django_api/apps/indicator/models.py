@@ -85,7 +85,7 @@ class Reportable(TimeStampedModel):
     is_cluster_indicator = models.BooleanField(default=False)
 
     # Current total, transactional and dynamically calculated based on IndicatorReports
-    total = JSONField(default=dict([('c', None), ('d', None), ('v', 0)]))
+    total = JSONField(default=dict([('c', 0), ('d', 0), ('v', 0)]))
 
     # unique code for this indicator within the current context
     # eg: (1.1) result code 1 - indicator code 1
@@ -112,11 +112,13 @@ class Reportable(TimeStampedModel):
         if self.indicator_reports.exists():
             total = self.indicator_reports.last().total
 
+            print self.indicator_reports.last().id, total
+
             if not isinstance(total, dict):
                 total = dict(total)
             return total
         else:
-            return None
+            return {'c': 0, 'd': 0, 'v': 0}
 
     @property
     def progress_percentage(self):
@@ -125,6 +127,7 @@ class Reportable(TimeStampedModel):
         percentage = 0.0
 
         if self.achieved:
+            print self.achieved
             percentage = (self.achieved['c'] - float(self.baseline)) / (float(self.target) - float(self.baseline))
 
         return percentage
@@ -168,7 +171,7 @@ class IndicatorReport(TimeStampedModel):
         verbose_name='Frequency of reporting'
     )
 
-    total = JSONField(default=dict([('c', None), ('d', None), ('v', 0)]))
+    total = JSONField(default=dict([('c', 0), ('d', 0), ('v', 0)]))
 
     remarks = models.TextField(blank=True, null=True)
     report_status = models.CharField(

@@ -59,7 +59,7 @@ def generate_data_combination_entries(array, entries_only=False, string_key=True
 
         for id_tuple in id_pairs:
             if string_key:
-                key = unicode(id_tuple)
+                key = str(id_tuple)
 
             else:
                 key = id_tuple
@@ -70,12 +70,12 @@ def generate_data_combination_entries(array, entries_only=False, string_key=True
             else:
                 output[key] = {
                     'v': random.randint(50, 1000),
-                    'd': None,
-                    'c': None
+                    'd': 0,
+                    'c': 0
                 }
 
     if string_key:
-        key = unicode(tuple())
+        key = str(tuple())
 
     else:
         key = tuple()
@@ -86,8 +86,8 @@ def generate_data_combination_entries(array, entries_only=False, string_key=True
     else:
         output[key] = {
             'v': random.randint(50, 1000),
-            'd': None,
-            'c': None
+            'd': 0,
+            'c': 0
         }
 
     return output
@@ -131,7 +131,7 @@ def get_cast_dictionary_keys_as_string(dictionary):
     keys = casted_dictionary.keys()
 
     for key in keys:
-        casted_dictionary[unicode(key)] = casted_dictionary[key]
+        casted_dictionary[str(key)] = casted_dictionary[key]
         casted_dictionary.pop(key)
 
     return casted_dictionary

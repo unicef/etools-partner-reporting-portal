@@ -218,7 +218,7 @@ class ReportableFactory(factory.django.DjangoModelFactory):
     content_type = factory.LazyAttribute(
         lambda o: ContentType.objects.get_for_model(o.content_object))
     total = dict(
-        [('c', None), ('d', None), ('v', random.randint(0, 3000))])
+        [('c', 0), ('d', 0), ('v', random.randint(0, 3000))])
 
     # Commented out so that we can create Disaggregation and DisaggregationValue objects manually
     # disaggregation = factory.RelatedFactory('core.factories.DisaggregationFactory', 'reportable')
@@ -327,7 +327,7 @@ class IndicatorReportFactory(factory.django.DjangoModelFactory):
     time_period_end = fuzzy.FuzzyDate(datetime.date.today())
     due_date = fuzzy.FuzzyDate(datetime.date.today())
     total = dict(
-        [('c', None), ('d', None), ('v', random.randint(0, 3000))])
+        [('c', 0), ('d', 0), ('v', random.randint(0, 3000))])
     calculation_formula = random.choice(IndicatorReport.CALC_CHOICES)[0]
 
     class Meta:
