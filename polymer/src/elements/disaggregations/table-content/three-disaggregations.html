@@ -25,31 +25,41 @@
     <template is="dom-repeat"
               items="[[outerRowsForDisplay]]"
               as="outerRow">
-      <disaggregation-table-row data=[[outerRow]] row-type="outerRow">
+      <disaggregation-table-row
+          data="[[outerRow]]"
+          row-type="outerRow">
       </disaggregation-table-row>
 
-      <template is="dom-repeat"
-                items="[[_determineMiddleRows(outerRow.id)]]"
-                as="middleRow">
-        <disaggregation-table-row data=[[middleRow]] row-type="middleRow">
+      <template
+          is="dom-repeat"
+          items="[[_determineMiddleRows(outerRow.id)]]"
+          as="middleRow">
+        <disaggregation-table-row
+            data="[[middleRow]]"
+            level-reported="[[data.level_reported]]"
+            row-type="middleRow"
+            editable="[[editable]]">
         </disaggregation-table-row>
       </template>
 
    </template>
 
    <!-- Totals row -->
-   <disaggregation-table-row data=[[columnTotalRow]]
-                             total=[[total]]
-                             row-type="totalsRow">
+   <disaggregation-table-row
+      data="[[columnTotalRow]]"
+      level-reported="[[data.level_reported]]"
+      row-type="totalsRow">
    </disaggregation-table-row>
 
    <!-- Bottom table -->
    <template is="dom-repeat"
              items="[[bottomRows]]"
              as="bottomRow">
-     <disaggregation-table-row data=[[bottomRow]]
-                               row-type="bottomRow">
-     </disaggregation-table-row>
+    <disaggregation-table-row
+        data="[[bottomRow]]"
+        level-reported="[[data.level_reported]]"
+        row-type="bottomRow">
+    </disaggregation-table-row>
   </template>
 
   </template>
@@ -64,21 +74,17 @@
       ],
 
       observers: [
-        '_determineTotals(mapping)'
+        '_determineTotals(mapping, data)'
       ],
 
       properties: {
-        data: {
-          type: Object,
-          value: {}
-        },
+        editable: Number,
 
-        mapping: {
-          type: Array,
-          value: []
-        },
+        data: Object,
 
-        total: Number,
+        mapping: Array,
+
+        columnTotalRow: Object,
 
         //Passing columnNames as a param is required to trigger update.
         columns: {
@@ -88,53 +94,83 @@
 
         outerRowsForDisplay: {
           type: Array,
-          computed: '_determineOuterRows(mapping)'
+          computed: '_determineOuterRows(mapping, data)'
         },
-
-        columnTotalRow: {
-          type: Object,
-          value: {}
-        }
       },
 
       _getColumns: function(mapping) {
-        return this.mapping[0].choices;
+        return mapping[0].choices;
       },
 
       _determineOuterRows: function() {
         var columnChoices = this.mapping[0].choices;
-        var outerRows = this.mapping[1].choices;
-        return this._determineRows(this, outerRows, columnChoices);
+        var rows = this.mapping[1].choices;
+        return this._determineRows(this, rows, columnChoices);
       },
 
       _determineMiddleRows: function(outerRowID) {
         var self = this;
         var columnChoices = this.mapping[0].choices;
         var middleRows = this.mapping[2].choices;
-        return this._determineRows(this, middleRows, columnChoices);
+        var middleRowsForDisplay = [];
+
+        middleRows.forEach(function(y) {
+          var formatted = '';
+
+          var data = columnChoices.map(function(z) {
+            formatted = self._formatDisaggregationIds([outerRowID, y.id, z.id]);
+
+            return {
+              key: formatted,
+              data: self.data.disaggregation[formatted],
+            };
+          });
+
+          formatted = self._formatDisaggregationIds([outerRowID, y.id]);
+
+          middleRowsForDisplay.push({
+            title: y.value,
+            data: data,
+            id: y.id,
+            total: {
+              key: formatted,
+              data: self.data.disaggregation[formatted],
+            },
+          });
+        });
+
+        return middleRowsForDisplay;
       },
 
-      _determineTotals: function() {
+      _determineTotals: function(mapping, data) {
         var self = this;
-        var columnChoices = this.mapping[0].choices;
-        var middleRows = this.mapping[2].choices;
-        var bottomRows = [];
+        var columnChoices = mapping[0].choices;
+        var middleRows = mapping[2].choices;
 
         var columnData = columnChoices.map(function(z) {
           var formatted = self._formatDisaggregationIds([z.id]);
-          return self.data.disaggregation[formatted];
+          return {
+            key: formatted,
+            data: data.disaggregation[formatted],
+          };
         });
 
         var columnTotalRow = {
-          data: columnData,
           title: 'total',
-          total: this.total
+          data: columnData,
+          total: {
+            key: '', // unused
+            data: data.disaggregation['()'],
+          },
         };
-        this.columnTotalRow = columnTotalRow;
 
-        this.bottomRows = this._determineRows(this, middleRows, columnChoices);
+        this.columnTotalRow = columnTotalRow;
+        this.bottomRows = this._determineRows(self, middleRows, columnChoices);
       },
 
+      _foo: function (a, v) {
+        return a + ' ' + JSON.stringify(v);
+      },
     });
   </script>
 </dom-module>

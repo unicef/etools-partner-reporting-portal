@@ -1,8 +1,7 @@
 import operator
-
+import logging
 from django.http import Http404
 from django.db.models import Q
-from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import get_object_or_404
 from django.http import Http404
 
@@ -15,18 +14,23 @@ import django_filters.rest_framework
 
 from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
-from unicef.models import LowerLevelOutput
 from unicef.serializers import ProgressReportSerializer
 
+from .disaggregators import (
+    QuantityIndicatorDisaggregator,
+)
 from .serializers import (
     IndicatorListSerializer, IndicatorReportListSerializer, PDReportsSerializer, SimpleIndicatorLocationDataListSerializer,
-    IndicatorLLoutputsSerializer,
+    IndicatorLLoutputsSerializer, IndicatorLocationDataUpdateSerializer,
 )
 from .filters import IndicatorFilter, PDReportsFilter
 from .models import (
     IndicatorReport, Reportable, Disaggregation,
-    DisaggregationValue
+    DisaggregationValue, IndicatorLocationData,
+    IndicatorBlueprint
 )
+
+logger = logging.getLogger(__name__)
 
 
 class PDReportsAPIView(ListAPIView):
@@ -71,7 +75,13 @@ class PDReportsDetailAPIView(RetrieveAPIView):
     def get_indicator_report(self, report_id):
         try:
             return IndicatorReport.objects.get(id=report_id)
-        except IndicatorReport.DoesNotExist:
+        except IndicatorReport.DoesNotExist as exp:
+            logger.exception({
+                "endpoint": "PDReportsDetailAPIView",
+                "request.data": self.request.data,
+                "report_id": report_id,
+                "exception": exp,
+            })
             raise Http404
 
     def get(self, request, pd_id, report_id, *args, **kwargs):
@@ -149,7 +159,13 @@ class IndicatorDataAPIView(APIView):
     def get_indicator_report(self, id):
         try:
             return IndicatorReport.objects.get(id=id)
-        except IndicatorReport.DoesNotExist:
+        except IndicatorReport.DoesNotExist as exp:
+            logger.exception({
+                "endpoint": "IndicatorDataAPIView",
+                "request.data": self.request.data,
+                "id": id,
+                "exception": exp,
+            })
             return None
 
     def get_narrative_object(self, id):
@@ -157,7 +173,6 @@ class IndicatorDataAPIView(APIView):
         return ir and ir.progress_report
 
     def get(self, request, ir_id, *args, **kwargs):
-        ir = self.get_indicator_report(ir_id)
         narrative = self.get_narrative_object(ir_id)
         response = ProgressReportSerializer(narrative).data
         queryset = self.get_queryset(ir_id)
@@ -215,14 +230,32 @@ class IndicatorReportListAPIView(APIView):
 
 class IndicatorLocationDataUpdateAPIView(APIView):
     """
-    REST API endpoint to update a set of IndicatorLocationData objects, including each set of disaggregation data.
+    REST API endpoint to update one IndicatorLocationData, including disaggregation data.
     """
 
+    def get_object(self, request, pk=None):
+        return get_object_or_404(IndicatorLocationData, id=pk)
+
     def put(self, request, *args, **kwargs):
-        serializer = SimpleIndicatorLocationDataListSerializer(data=request.data, many=True)
+        if 'id' not in request.data:
+            raise Http404('id is required in request body')
+
+        indicator_location_data = self.get_object(
+            request, pk=request.data['id'])
+
+        serializer = IndicatorLocationDataUpdateSerializer(
+            instance=indicator_location_data, data=request.data)
 
         if serializer.is_valid():
             serializer.save()
+
+            blueprint = indicator_location_data.indicator_report \
+                .reportable.blueprint
+
+            if blueprint.unit == IndicatorBlueprint.NUMBER:
+                QuantityIndicatorDisaggregator.post_process(
+                    indicator_location_data)
+
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         else:

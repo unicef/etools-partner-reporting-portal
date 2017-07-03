@@ -6,7 +6,9 @@
 <link rel="import" href="actions/pd.html">
 <link rel="import" href="actions/pdReports.html">
 <link rel="import" href="actions/indicatorData.html">
+<link rel="import" href="actions/indicators.html">
 <link rel="import" href="actions/progressReports.html">
+<link rel="import" href="actions/disaggregations.html">
 
 <script>
   (function () {
@@ -88,56 +90,6 @@
         return {
           type: App.Constants.SET_APP,
           app: app,
-        };
-      },
-
-      // Indicator Data
-      fetchIndicators: function (indicatorsThunk) {
-        return function (dispatch) {
-          dispatch(App.Actions.indicatorsLoadingStart());
-          return indicatorsThunk()
-            .catch(function () {
-              dispatch(App.Actions.indicatorsLoadingStop());
-            })
-            .then(function (res) {
-              var indicators = res.data;
-              dispatch(App.Actions.setIndicators(indicators));
-              dispatch(App.Actions.indicatorsLoadingStop());
-              dispatch(App.Actions.setIndicatorsCount(indicators));
-            });
-        };
-      },
-
-      setIndicators: function (indicatorsData) {
-        return {
-          type: App.Constants.SET_INDICATORS,
-          indicatorsData: indicatorsData,
-        };
-      },
-
-      indicatorsLoadingStart: function () {
-        return {
-          type: App.Constants.INDICATORS_LOADING_START,
-        };
-      },
-
-      indicatorsLoadingStop: function () {
-        return {
-          type: App.Constants.INDICATORS_LOADING_STOP,
-        };
-      },
-
-      setIndicatorsCount: function (indicators) {
-        return {
-          type: App.Constants.SET_INDICATORS_COUNT,
-          count: indicators.count
-        };
-      },
-
-      setIndicatorDisaggregations: function (data) {
-        return {
-          type: App.Constants.SET_INDICATOR_DISAGGREGATIONS,
-          disaggregations: data
         };
       },
 

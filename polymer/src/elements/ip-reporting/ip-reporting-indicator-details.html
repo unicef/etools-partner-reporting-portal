@@ -1,6 +1,6 @@
-<link rel="import" href="../../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../../bower_components/iron-icons/maps-icons.html">
-<link rel="import" href="../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../etools-prp-ajax.html">
@@ -16,6 +16,8 @@
       :host {
         display: block;
         width: 100%;
+        /*Required so the loading message isn't cut off:*/
+        min-height: 250px;
       }
       iron-icon {
         color: var(--accent-color);
@@ -24,6 +26,9 @@
         width: 100%;
         float: left;
       }
+      .loading-wrapper {
+        padding: 15px;
+      }
     </style>
 
     <etools-prp-ajax
@@ -31,61 +36,65 @@
         url="[[indicatorDetailUrl]]">
     </etools-prp-ajax>
 
-    <etools-loading active="[[loading]]"></etools-loading>
+    <template is="dom-if" if="[[loading]]">
+      <div class="loading-wrapper">
+        <etools-loading no-overlay></etools-loading>
+      <div>
+    </template>
 
-      <template is="dom-repeat"
-                items="[[locations]]"
-                as="location">
+    <template is="dom-repeat"
+              items="[[locations]]"
+              as="location">
 
-        <h3>
-          <iron-icon icon="maps:place"></iron-icon>
-          [[location.name]]
-        </h3>
+      <h3>
+        <iron-icon icon="maps:place"></iron-icon>
+        [[location.name]]
+      </h3>
 
-        <div class="container">
-          <template is="dom-if" if="[[location.current]]">
-            <div class="item">
-              <h4>
-                <span>
-                  <strong>Progress in current reporting period: </strong>
-                  [[location.reportInfo.time_period_start]] -
-                  [[location.reportInfo.time_period_end]]
-                </span>
-                <span class="total">
-                  <strong>Total: </strong>[[location.reportInfo.total]]
-                </span>
-              </h4>
-              <!-- TODO: check - wrong use of total? -->
-              <disaggregation-table
-                total=[[location.reportInfo.total]]
-                data=[[location.current]]
-                mapping=[[location.reportInfo.disagg_lookup_map]]>
-              </disaggregation-table>
-            </div>
-          </template>
+      <div class="container">
+        <template is="dom-if" if="[[location.current]]">
+          <div class="item">
+            <h4>
+              <span>
+                <strong>Progress in current reporting period: </strong>
+                [[location.reportInfo.time_period_start]] -
+                [[location.reportInfo.time_period_end]]
+              </span>
+              <span class="total">
+                <strong>Total: </strong>[[location.reportInfo.total.v]]
+              </span>
+            </h4>
+            <p>Level reported: [[location.current.level_reported]]</p>
+            <!-- TODO: check - wrong use of total? -->
+            <disaggregation-table
+              data=[[location.current]]
+              mapping=[[location.reportInfo.disagg_lookup_map]]>
+            </disaggregation-table>
+          </div>
+        </template>
 
-          <template is="dom-if" if="[[location.previous]]">
-            <div class="item">
-              <h4>
-                <span>
-                  <strong>Progress in previous reporting period: </strong>
-                  [[location.reportInfo.time_period_start]] -
-                  [[location.reportInfo.time_period_end]]
-                </span>
-                <span class="total">
-                  <strong>Total: </strong>[[location.reportInfo.total]]
-                </span>
-              </h4>
-              <disaggregation-table
-                total=[[location.reportInfo.total]]
-                data=[[location.previous]]
-                mapping=[[location.reportInfo.disagg_lookup_map]]>
-              </disaggregation-table>
-            </div>
-          </template>
-        </div>
+        <template is="dom-if" if="[[location.previous]]">
+          <div class="item">
+            <h4>
+              <span>
+                <strong>Progress in previous reporting period: </strong>
+                [[location.reportInfo.time_period_start]] -
+                [[location.reportInfo.time_period_end]]
+              </span>
+              <span class="total">
+                <strong>Total: </strong>[[location.reportInfo.total.v]]
+              </span>
+            </h4>
+            <p>Level reported: [[location.previous.level_reported]]</p>
+            <disaggregation-table
+              data=[[location.previous]]
+              mapping=[[location.reportInfo.disagg_lookup_map]]>
+            </disaggregation-table>
+          </div>
+        </template>
+      </div>
 
-      </template>
+    </template>
 
   </template>
 
@@ -111,12 +120,18 @@
 
         indicatorId: Number,
 
-        loading: Boolean,
+        loading: {
+          type: Boolean,
+          statePath: 'indicators.loadingDetails'
+        },
 
-        // TODO: finish hooking up Redux so changes to the store will be reflected.
         data: {
           type: Array,
-          value: []
+        },
+
+        dataDict: {
+          type: Object,
+          statePath: 'indicators.details'
         },
 
         locations: {
@@ -124,6 +139,10 @@
           computed: '_bucketByLocation(data)'
         }
       },
+
+      observers: [
+        '_getDataByKey(dataDict)'
+      ],
 
       _computeIndicatorReportsUrl: function(indicatorId) {
         return App.Endpoints.indicatorReports(indicatorId) + '?limit=2';
@@ -135,8 +154,9 @@
         //current and/or previous report.
         var locations = {};
 
-        if (!data) { return []; }
-
+        if (!data) {
+          return [];
+        }
         data.forEach(function(report, index) {
           var timeframe = 'current';
           if (index === 1) {
@@ -171,18 +191,21 @@
         this.dispatch(App.Actions.setIndicatorDisaggregations(data));
       },
 
+      _getDataByKey: function(dataDict) {
+        if (dataDict.details) {
+          this.data = dataDict.details[this.indicatorId];
+        }
+      },
+
       _openChanged: function() {
-        var self = this;
         if (this.isOpen) {
-          self.loading = true;
-          this.$.indicatorDetail.thunk()()
-            .then(function(res) {
-              var data = res.data;
-              self.data = data;
-              self.loading = false;
-              // self._updateDisaggregationStore(selectedData);
+          var thunk = this.$.indicatorDetail.thunk();
+          var action = App.Actions.Indicators;
+          this.dispatch(action.fetchIndicatorDetails(thunk, this.indicatorId))
+            .catch(function (err) {
+                // TODO: error handling.
+              return Promise.reject(err);
             });
-          // TODO: error handling.
         } else {
           this.$.indicatorDetail.abort();
         }

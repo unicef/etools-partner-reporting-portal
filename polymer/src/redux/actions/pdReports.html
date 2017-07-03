@@ -51,10 +51,11 @@
         };
       },
 
-      setCurrent: function (reportId) {
+      setCurrent: function (reportId, mode) {
         return {
           type: App.Constants.SET_CURRENT_PD_REPORT,
           reportId: reportId,
+          mode: mode,
         };
       },
     };

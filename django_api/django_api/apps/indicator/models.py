@@ -6,6 +6,8 @@ from django.contrib.postgres.fields import JSONField, ArrayField
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from model_utils.models import TimeStampedModel
 
@@ -21,11 +23,24 @@ class IndicatorBlueprint(TimeStampedModel):
     """
     NUMBER = u'number'
     PERCENTAGE = u'percentage'
+    LIKERT = u'likert'
     YESNO = u'yesno'
     UNIT_CHOICES = (
         (NUMBER, NUMBER),
         (PERCENTAGE, PERCENTAGE),
-        (YESNO, YESNO)
+        (LIKERT, LIKERT),
+        (YESNO, YESNO),
+    )
+
+    SUM = u'sum'
+    MAX = u'max'
+    AVG = u'avg'
+    MIN = u'min'
+    CALC_CHOICES = (
+        (SUM, SUM),
+        (MAX, MAX),
+        (AVG, AVG),
+        (MIN, MIN),
     )
 
     title = models.CharField(max_length=1024)
@@ -35,12 +50,13 @@ class IndicatorBlueprint(TimeStampedModel):
     subdomain = models.CharField(max_length=255, null=True, blank=True)
     disaggregatable = models.BooleanField(default=False)
 
+    calculation_formula = models.CharField(max_length=3, choices=CALC_CHOICES, default=SUM)
+
     # TODO: add:
     # siblings (similar inidcators to this indicator)
     # other_representation (exact copies with different names for some random reason)
     # children (indicators that aggregate up to this or contribute to this indicator through a formula)
     # aggregation_types (potential aggregation types: geographic, time-periods ?)
-    # calculation_formula (how the children totals add up to this indicator's total value)
     # aggregation_formulas (how the total value is aggregated from the reports if possible)
 
     def save(self, *args, **kwargs):
@@ -69,8 +85,7 @@ class Reportable(TimeStampedModel):
     is_cluster_indicator = models.BooleanField(default=False)
 
     # Current total, transactional and dynamically calculated based on IndicatorReports
-    total = models.IntegerField(null=True, blank=True, default=0,
-                                verbose_name="Current Total")
+    total = JSONField(default=dict([('c', None), ('d', None), ('v', 0)]))
 
     # unique code for this indicator within the current context
     # eg: (1.1) result code 1 - indicator code 1
@@ -95,7 +110,11 @@ class Reportable(TimeStampedModel):
     @property
     def achieved(self):
         if self.indicator_reports.exists():
-            return self.indicator_reports.last().total
+            total = self.indicator_reports.last().total
+
+            if not isinstance(total, dict):
+                total = dict(total)
+            return total
         else:
             return None
 
@@ -106,7 +125,7 @@ class Reportable(TimeStampedModel):
         percentage = 0.0
 
         if self.achieved:
-            percentage = (self.achieved - float(self.baseline)) / (float(self.target) - float(self.baseline))
+            percentage = (self.achieved['v'] - float(self.baseline)) / (float(self.target) - float(self.baseline))
 
         return percentage
 
@@ -138,12 +157,12 @@ class IndicatorReport(TimeStampedModel):
         verbose_name='Frequency of reporting'
     )
 
-    total = models.PositiveIntegerField(blank=True, null=True)
+    total = JSONField(default=dict([('c', None), ('d', None), ('v', 0)]))
 
     remarks = models.TextField(blank=True, null=True)
     report_status = models.CharField(
         choices=INDICATOR_REPORT_STATUS,
-        default=INDICATOR_REPORT_STATUS.ontrack,
+        default=INDICATOR_REPORT_STATUS.due,
         max_length=3
     )
 
@@ -182,10 +201,10 @@ class IndicatorReport(TimeStampedModel):
 
         for disaggregation in disaggregations:
             if not id_only:
-                disaggregation_value = disaggregation.disaggregation_value.values_list('id', 'value')
+                disaggregation_value = disaggregation.disaggregation_value.order_by('id').values_list('id', 'value')
 
             else:
-                disaggregation_value = disaggregation.disaggregation_value.values_list('id', flat=True)
+                disaggregation_value = disaggregation.disaggregation_value.order_by('id').values_list('id', flat=True)
 
             output_list.append(list(disaggregation_value))
 
@@ -193,6 +212,38 @@ class IndicatorReport(TimeStampedModel):
             output_list = set(reduce(lambda acc, curr: acc + curr, output_list))
 
         return output_list
+
+
+@receiver(post_save, sender=IndicatorReport, dispatch_uid="recalculate_reportable_total")
+def recalculate_reportable_total(sender, instance, **kwargs):
+    reportable = instance.reportable
+    blueprint = reportable.blueprint
+
+    # Reset the reportable total
+    reportable_total = {
+        u'c': 0,
+        u'd': 0,
+        u'v': 0,
+    }
+
+    # IndicatorReport total calculation
+    if blueprint.unit == IndicatorBlueprint.NUMBER:
+        reportable_total[u'd'] = 1
+
+        if blueprint.calculation_formula == IndicatorBlueprint.SUM:
+            for indicator_report in reportable.indicator_reports.all():
+                if indicator_report.total[u'v'] is None:
+                    indicator_report.total[u'v'] = 0
+
+                reportable_total[u'v'] += indicator_report.total[u'v']
+
+                if indicator_report.total[u'c'] is None:
+                    indicator_report.total[u'c'] = 0
+
+                reportable_total[u'c'] += indicator_report.total[u'c']
+
+    reportable.total = reportable_total
+    reportable.save()
 
 
 class IndicatorLocationData(TimeStampedModel):

@@ -15,7 +15,7 @@
 
         table {
           text-align: center;
-          font-size: .9em;
+          font-size: 13px;
           border-collapse: collapse;
         }
 
@@ -58,9 +58,6 @@
         .middleRow {
           background-color: #edf8ff;
         }
-        .middleRow td:first-child {
-          background-color: var(--paper-grey-100);
-        }
         /*   Totals table (three disaggregations only)   */
         .bottomRow td:not(:first-child)  {
           background-color: #f0f0f0;
@@ -68,14 +65,29 @@
 
         /*   Cells   */
         td {
+          min-height: 25px;
+          padding: 5px 10px;
           word-wrap: break-word;
           hyphens: auto;
-          padding: 5px 0;
           /*TODO: why do empty cells not have full height border without this?*/
-          min-height: 20px;
         }
+
+        .cellValue {
+          display: inline-block;
+          line-height: 25px;
+        }
+
+        td:first-child {
+          border-left: 1px solid white;
+        }
+
         td:not(:last-child)  {
           border-right: 1px solid white;
+        }
+
+        .cellTitle,
+        .cellTotal {
+          background-color: var(--paper-grey-100);
         }
     </style>
   </template>

@@ -83,7 +83,11 @@ class PartnerProjectFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "partner_project_%d" % n)
     start_date = fuzzy.FuzzyDate(datetime.date.today())
     end_date = fuzzy.FuzzyDate(datetime.date.today())
-    status = fuzzy.FuzzyText()
+
+    description = factory.Sequence(lambda n: "description %d" % n)
+    additional_information = factory.Sequence(lambda n: "additional_information %d" % n)
+    total_budget = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
+    funding_source = factory.Sequence(lambda n: "funding_source %d" % n)
 
     @factory.post_generation
     def clusters(self, create, extracted, **kwargs):
@@ -211,7 +215,8 @@ class ReportableFactory(factory.django.DjangoModelFactory):
     object_id = factory.SelfAttribute('content_object.id')
     content_type = factory.LazyAttribute(
         lambda o: ContentType.objects.get_for_model(o.content_object))
-    total = fuzzy.FuzzyInteger(10, 100, 5)
+    total = dict(
+        [('c', None), ('d', None), ('v', random.randint(0, 3000))])
 
     # Commented out so that we can create Disaggregation and DisaggregationValue objects manually
     # disaggregation = factory.RelatedFactory('core.factories.DisaggregationFactory', 'reportable')
@@ -319,7 +324,8 @@ class IndicatorReportFactory(factory.django.DjangoModelFactory):
     time_period_start = fuzzy.FuzzyDate(datetime.date.today())
     time_period_end = fuzzy.FuzzyDate(datetime.date.today())
     due_date = fuzzy.FuzzyDate(datetime.date.today())
-    total = fuzzy.FuzzyInteger(0, 3000, 100)
+    total = dict(
+        [('c', None), ('d', None), ('v', random.randint(0, 3000))])
 
     class Meta:
         model = IndicatorReport

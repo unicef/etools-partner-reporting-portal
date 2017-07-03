@@ -1,3 +1,4 @@
+import logging
 from django.http import Http404
 from django.db.models import Q
 
@@ -19,6 +20,8 @@ from .serializers import (
 
 from .models import ProgrammeDocument, ProgressReport
 from .filters import ProgrammeDocumentFilter, ProgressReportFilter
+
+logger = logging.getLogger(__name__)
 
 
 class ProgrammeDocumentAPIView(ListAPIView):
@@ -79,7 +82,13 @@ class ProgrammeDocumentDetailsAPIView(RetrieveAPIView):
         # TODO: permission to object should be checked and raise 403 if fail!!!
         try:
             return ProgrammeDocument.objects.get(pk=pk)
-        except ProgrammeDocument.DoesNotExist:
+        except ProgrammeDocument.DoesNotExist as exp:
+            logger.exception({
+                "endpoint": "ProgrammeDocumentDetailsAPIView",
+                "request.data": self.request.data,
+                "pk": pk,
+                "exception": exp,
+            })
             raise Http404
 
 
