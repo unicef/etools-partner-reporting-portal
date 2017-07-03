@@ -63,6 +63,7 @@ class IndicatorReportSimpleSerializer(serializers.ModelSerializer):
     indicator_name = serializers.SerializerMethodField()
     target = serializers.SerializerMethodField()
     achieved = serializers.JSONField(source="total")
+    report_status = serializers.CharField(source='get_report_status_display')
 
     class Meta:
         model = IndicatorReport
@@ -71,6 +72,7 @@ class IndicatorReportSimpleSerializer(serializers.ModelSerializer):
             'indicator_name',
             'target',
             'achieved',
+            'report_status',
         )
 
     def get_indicator_name(self, obj):
