@@ -37,8 +37,6 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
     @staticmethod
     def post_process(indicator_location_data):
         level_reported = indicator_location_data.level_reported
-        blueprint = indicator_location_data \
-            .indicator_report.reportable.blueprint
 
         ordered_dict = get_cast_dictionary_keys_as_tuple(
             indicator_location_data.disaggregation)
@@ -72,45 +70,13 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
                         r=level_reported - 1
                     )
 
-                    # TODO: Handle different calculation method here. May need to refactor each calculation method as each method
+                    # It is always SUM at IndicatorLocationData level
                     for subkey in subkey_combinations:
-                        if blueprint.calculation_formula == IndicatorBlueprint.MAX:
-                            if ordered_dict[subkey]["v"] < ordered_dict[key]["v"]:
-                                ordered_dict[subkey]["v"] = \
-                                    ordered_dict[key]["v"]
+                        ordered_dict[subkey]["v"] += \
+                            ordered_dict[key]["v"]
 
-                                ordered_dict[subkey]["c"] = \
-                                    ordered_dict[key]["c"]
-
-                        else:
-                            ordered_dict[subkey]["v"] += \
-                                ordered_dict[key]["v"]
-
-                            ordered_dict[subkey]["c"] += \
-                                ordered_dict[key]["c"]
-
-            # Average total calculation after summation if qualified
-            if blueprint.calculation_formula == IndicatorBlueprint.AVG:
-                subtotal_keys = filter(
-                    lambda key: len(key) != level_reported,
-                    ordered_dict_keys)
-
-                subtotal_keys = sorted(subtotal_keys, key=len, reverse=True)
-
-                def subtotal_key_in_raw_key(key, sub_key):
-                    return len(key) == len(sub_key) + 1 and \
-                        set(key) >= set(sub_key)
-
-                for sub_key in subtotal_keys:
-                    key_count_for_subtotal = 0
-
-                    for key in ordered_dict_keys:
-                        if subtotal_key_in_raw_key(key, sub_key):
-                            key_count_for_subtotal += 1
-
-                    ordered_dict[subkey]["v"] = \
-                        ordered_dict[subkey]["v"] \
-                        / float(key_count_for_subtotal)
+                        ordered_dict[subkey]["c"] += \
+                            ordered_dict[key]["c"]
 
         ordered_dict = get_cast_dictionary_keys_as_string(ordered_dict)
 
@@ -119,41 +85,41 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
 
         # Reset the IndicatorReport total
         ir_total = {
-            u'c': 0,
-            u'd': 0,
-            u'v': 0,
+            'c': 0,
+            'd': 0,
+            'v': 0,
         }
-        ir_total[u'd'] = 1
+        ir_total['d'] = 1
 
         indicator_report = indicator_location_data.indicator_report
 
         # IndicatorReport total calculation
-        if blueprint.calculation_formula == IndicatorBlueprint.MAX:
+        if indicator_report.calculation_formula == IndicatorReport.MAX:
             max_total_loc = max(
                 indicator_report.indicator_location_data.all(),
-                key=lambda item: item.disaggregation[u'()'][u'v'])
+                key=lambda item: item.disaggregation['()']['v'])
 
-            ir_total = max_total_loc.disaggregation[u'()']
+            ir_total = max_total_loc.disaggregation['()']
 
         else:
             for loc_data in indicator_report.indicator_location_data.all():
-                loc_total = loc_data.disaggregation[u'()']
+                loc_total = loc_data.disaggregation['()']
 
-                if loc_total[u'v'] is None:
-                    loc_total[u'v'] = 0
+                if loc_total['v'] is None:
+                    loc_total['v'] = 0
 
-                ir_total[u'v'] += loc_total[u'v']
+                ir_total['v'] += loc_total['v']
 
-                if loc_total[u'c'] is None:
-                    loc_total[u'c'] = 0
+                if loc_total['c'] is None:
+                    loc_total['c'] = 0
 
-                ir_total[u'c'] += loc_total[u'c']
+                ir_total['c'] += loc_total['c']
 
-        if blueprint.calculation_formula == IndicatorBlueprint.AVG:
+        if indicator_report.calculation_formula == IndicatorReport.AVG:
             loc_count = indicator_report.indicator_location_data.count()
 
-            ir_total[u'v'] = loc_total[u'v'] / float(loc_count)
-            ir_total[u'c'] = loc_total[u'c'] / float(loc_count)
+            ir_total['v'] = ir_total['v'] / float(loc_count)
+            ir_total['c'] = ir_total['c'] / float(loc_count)
 
         indicator_report.total = ir_total
         indicator_report.save()

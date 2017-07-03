@@ -205,6 +205,8 @@ class ClusterActivityFactory(factory.django.DjangoModelFactory):
 
 class IndicatorBlueprintFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "indicator_blueprint_%d" % n)
+    unit = random.choice(IndicatorBlueprint.UNIT_CHOICES)[0]
+    calculation_formula = random.choice(IndicatorBlueprint.CALC_CHOICES)[0]
 
     class Meta:
         model = IndicatorBlueprint
@@ -326,6 +328,7 @@ class IndicatorReportFactory(factory.django.DjangoModelFactory):
     due_date = fuzzy.FuzzyDate(datetime.date.today())
     total = dict(
         [('c', None), ('d', None), ('v', random.randint(0, 3000))])
+    calculation_formula = random.choice(IndicatorReport.CALC_CHOICES)[0]
 
     class Meta:
         model = IndicatorReport

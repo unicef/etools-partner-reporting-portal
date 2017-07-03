@@ -32,10 +32,10 @@ class IndicatorBlueprint(TimeStampedModel):
         (YESNO, YESNO),
     )
 
-    SUM = u'sum'
-    MAX = u'max'
-    AVG = u'avg'
-    MIN = u'min'
+    SUM = 'sum'
+    MAX = 'max'
+    AVG = 'avg'
+    MIN = 'min'
     CALC_CHOICES = (
         (SUM, SUM),
         (MAX, MAX),
@@ -125,7 +125,7 @@ class Reportable(TimeStampedModel):
         percentage = 0.0
 
         if self.achieved:
-            percentage = (self.achieved['v'] - float(self.baseline)) / (float(self.target) - float(self.baseline))
+            percentage = (self.achieved['c'] - float(self.baseline)) / (float(self.target) - float(self.baseline))
 
         return percentage
 
@@ -143,6 +143,17 @@ class IndicatorReport(TimeStampedModel):
         unicef.ProgressReport (ForeignKey): "progress_report"
         core.Location (OneToOneField): "location"
     """
+    SUM = 'sum'
+    MAX = 'max'
+    AVG = 'avg'
+    MIN = 'min'
+    CALC_CHOICES = (
+        (SUM, SUM),
+        (MAX, MAX),
+        (AVG, AVG),
+        (MIN, MIN),
+    )
+
     title = models.CharField(max_length=255)
     reportable = models.ForeignKey(Reportable, related_name="indicator_reports")
     progress_report = models.ForeignKey('unicef.ProgressReport', related_name="indicator_reports", null=True)
@@ -165,6 +176,8 @@ class IndicatorReport(TimeStampedModel):
         default=INDICATOR_REPORT_STATUS.due,
         max_length=3
     )
+
+    calculation_formula = models.CharField(max_length=3, choices=CALC_CHOICES, default=SUM)
 
     def __str__(self):
         return self.title
@@ -221,32 +234,38 @@ def recalculate_reportable_total(sender, instance, **kwargs):
 
     # Reset the reportable total
     reportable_total = {
-        u'c': 0,
-        u'd': 0,
-        u'v': 0,
+        'c': 0,
+        'd': 0,
+        'v': 0,
     }
 
     # IndicatorReport total calculation
     if blueprint.unit == IndicatorBlueprint.NUMBER:
-        reportable_total[u'd'] = 1
+        reportable_total['d'] = 1
 
-        if blueprint.calculation_formula == IndicatorBlueprint.SUM:
-            for indicator_report in reportable.indicator_reports.all():
-                if indicator_report.total[u'v'] is None:
-                    indicator_report.total[u'v'] = 0
-
-                reportable_total[u'v'] += indicator_report.total[u'v']
-
-                if indicator_report.total[u'c'] is None:
-                    indicator_report.total[u'c'] = 0
-
-                reportable_total[u'c'] += indicator_report.total[u'c']
-
-        elif blueprint.calculation_formula == IndicatorBlueprint.MAX:
+        if blueprint.calculation_formula == IndicatorBlueprint.MAX:
             max_total_ir = max(
-                reportable.indicaor_reports.all(),
-                key=lambda item: item.total[u'v'])
+                reportable.indicator_reports.all(),
+                key=lambda item: item.total['v'])
             reportable_total = max_total_ir.total
+
+        else:
+            for indicator_report in reportable.indicator_reports.all():
+                if indicator_report.total['v'] is None:
+                    indicator_report.total['v'] = 0
+
+                reportable_total['v'] += indicator_report.total['v']
+
+                if indicator_report.total['c'] is None:
+                    indicator_report.total['c'] = 0
+
+                reportable_total['c'] += indicator_report.total['c']
+
+        if blueprint.calculation_formula == IndicatorBlueprint.AVG:
+            ir_count = reportable.indicator_reports.count()
+
+            reportable_total['v'] = reportable_total['v'] / float(ir_count)
+            reportable_total['c'] = reportable_total['c'] / float(ir_count)
 
     reportable.total = reportable_total
     reportable.save()
