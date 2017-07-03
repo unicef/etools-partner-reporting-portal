@@ -1,0 +1,35 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../../elements/ip-reporting/indicators-filters.html">
+<link rel="import" href="../../../elements/ip-reporting/list-view-indicators.html">
+<link rel="import" href="../../../elements/page-header.html">
+<link rel="import" href="../../../elements/page-body.html">
+<link rel="import" href="../../../endpoints.html">
+
+<dom-module id="indicators-index">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <page-header title="Indicators"></page-header>
+
+    <page-body>
+      <indicators-filters query="[[query]]"
+                          params="[[queryParams]]">
+      </indicators-filters>
+      <list-view-indicators page-size="{{pageSize}}"
+                            page-number="{{pageNumber}}"
+                            query="[[query]]"
+                            params="[[queryParams]]"/>
+    </page-body>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'indicators-index',
+    });
+  </script>
+</dom-module>
