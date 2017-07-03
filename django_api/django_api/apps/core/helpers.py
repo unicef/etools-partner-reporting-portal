@@ -62,7 +62,7 @@ def generate_data_combination_entries(array, entries_only=False, string_key=True
                 key = unicode(id_tuple)
 
             else:
-                key = id_tuple
+                key = set(id_tuple)
 
             if entries_only:
                 output.append(key)
@@ -78,7 +78,7 @@ def generate_data_combination_entries(array, entries_only=False, string_key=True
         key = unicode(tuple())
 
     else:
-        key = tuple()
+        key = set(tuple())
 
     if entries_only:
         output.append(key)

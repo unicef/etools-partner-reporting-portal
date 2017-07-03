@@ -285,11 +285,10 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
         valid_disaggregation_value_pairs = \
             generate_data_combination_entries(
                 disaggregation_value_id_list,
-                entries_only=True, r=data['level_reported'])
+                entries_only=True, string_key=False, r=data['level_reported'])
 
-        if unicode(tuple()) not in valid_disaggregation_value_pairs:
-            valid_disaggregation_value_pairs.append(
-                unicode(tuple()))
+        if set() not in valid_disaggregation_value_pairs:
+            valid_disaggregation_value_pairs.append(set())
 
         disaggregation_data_keys = data['disaggregation'].keys()
 
@@ -328,36 +327,35 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
                         + "specified level_reported"
                     )
 
-        # Disaggregation data coordinate space check
-        # from disaggregation choice ids
-        for key in disaggregation_data_keys:
-            if key not in valid_disaggregation_value_pairs:
-                raise serializers.ValidationError(
-                    "%s coordinate space does not " % (key)
-                    + "belong to disaggregation value id list")
+                # Disaggregation data coordinate space check
+                # from disaggregation choice ids
+                if set(parsed_tuple) not in valid_disaggregation_value_pairs:
+                    raise serializers.ValidationError(
+                        "%s coordinate space does not " % (key)
+                        + "belong to disaggregation value id list")
 
-            elif not isinstance(data['disaggregation'][key], dict):
-                raise serializers.ValidationError(
-                    "%s coordinate space does not " % (key)
-                    + "have a correct value dictionary")
+                elif not isinstance(data['disaggregation'][key], dict):
+                    raise serializers.ValidationError(
+                        "%s coordinate space does not " % (key)
+                        + "have a correct value dictionary")
 
-            elif data['disaggregation'][key].keys() != [u'c', u'd', u'v']:
-                raise serializers.ValidationError(
-                    "%s coordinate space value does not " % (key)
-                    + "have correct value key structure: c, d, v")
+                elif data['disaggregation'][key].keys() != [u'c', u'd', u'v']:
+                    raise serializers.ValidationError(
+                        "%s coordinate space value does not " % (key)
+                        + "have correct value key structure: c, d, v")
 
-            # Sanitizing data value
-            if isinstance(data['disaggregation'][key][u'c'], unicode):
-                data['disaggregation'][key][u'c'] = \
-                    int(data['disaggregation'][key][u'c'])
+                # Sanitizing data value
+                if isinstance(data['disaggregation'][key][u'c'], unicode):
+                    data['disaggregation'][key][u'c'] = \
+                        int(data['disaggregation'][key][u'c'])
 
-            if isinstance(data['disaggregation'][key][u'd'], unicode):
-                data['disaggregation'][key][u'd'] = \
-                    int(data['disaggregation'][key][u'd'])
+                if isinstance(data['disaggregation'][key][u'd'], unicode):
+                    data['disaggregation'][key][u'd'] = \
+                        int(data['disaggregation'][key][u'd'])
 
-            if isinstance(data['disaggregation'][key][u'v'], unicode):
-                data['disaggregation'][key][u'v'] = \
-                    int(data['disaggregation'][key][u'v'])
+                if isinstance(data['disaggregation'][key][u'v'], unicode):
+                    data['disaggregation'][key][u'v'] = \
+                        int(data['disaggregation'][key][u'v'])
 
         return data
 
