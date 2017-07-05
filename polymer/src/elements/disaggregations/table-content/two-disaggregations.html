@@ -58,10 +58,14 @@
 
         mapping: Array,
 
-        //Passing columnNames as a param is required to trigger update.
         columns: {
           type: Array,
           computed: '_getColumns(mapping)'
+        },
+
+        rows: {
+          type: Array,
+          computed: '_getRows(mapping)',
         },
 
         totalsForDisplay: {
@@ -71,34 +75,33 @@
 
         rowsForDisplay: {
           type: Object,
-          computed: '_determineRowsForDisplay(mapping, data)'
+          computed: '_determineRowsForDisplay(columns, rows, data)'
         },
       },
 
-      _getColumns: function(mapping) {
-        return mapping[0].choices;
+      _getColumns: function (mapping) {
+        return (mapping[0] || []).choices;
       },
 
-      _determineRowsForDisplay: function() {
-        var columnChoices = this.mapping[0].choices;
-        var rows = this.mapping[1].choices;
-        return this._determineRows(this, rows, columnChoices);
+      _getRows: function (mapping) {
+        return (mapping[1] || []).choices;
       },
 
-      _determineTotals: function(_, data) {
-        var self = this;
-        var columnChoices = this.mapping[0].choices;
+      _determineRowsForDisplay: function(columns, rows) {
+        return this._determineRows(this, rows, columns);
+      },
 
-        var columnData = columnChoices.map(function(z) {
-          var formatted = self._formatDisaggregationIds([z.id]);
+      _determineTotals: function(columns, data) {
+        var columnData = columns.map(function(z) {
+          var formatted = this._formatDisaggregationIds([z.id]);
 
           return {
             key: formatted,
             data: data.disaggregation[formatted],
           };
-        });
+        }, this);
 
-        var columnTotalRow = {
+        return {
           title: 'total',
           data: columnData,
           total: {
@@ -106,8 +109,6 @@
             data: data.disaggregation['()'],
           },
         };
-
-        return columnTotalRow;
       },
     });
   </script>

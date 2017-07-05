@@ -170,7 +170,7 @@
             this.mapping
           ),
           level_reported: this.reportedOn.length,
-          disaggregation_reported_on: this.reportedOn,
+          disaggregation_reported_on: this._clone(this.reportedOn),
         }));
       },
 

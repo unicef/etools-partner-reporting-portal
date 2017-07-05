@@ -60,44 +60,44 @@
       <table class="vertical layout">
         <template
             is="dom-if"
-            if="[[_determineVisibility(formattedData, 0, editableBool)]]"
+            if="[[_equals(formattedMapping.length, 0)]]"
             restamp="true">
           <zero-disaggregations
               data="[[formattedData]]"
-              mapping="[[mapping]]"
+              mapping="[[formattedMapping]]"
               editable="[[editable]]">
           </zero-disaggregations>
         </template>
 
         <template
             is="dom-if"
-            if="[[_determineVisibility(formattedData, 1, editableBool)]]"
+            if="[[_equals(formattedMapping.length, 1)]]"
             restamp="true">
           <one-disaggregation
               data="[[formattedData]]"
-              mapping="[[mapping]]"
+              mapping="[[formattedMapping]]"
               editable="[[editable]]">
           </one-disaggregation>
         </template>
 
         <template
             is="dom-if"
-            if="[[_determineVisibility(formattedData, 2, editableBool)]]"
+            if="[[_equals(formattedMapping.length, 2)]]"
             restamp="true">
           <two-disaggregations
               data="[[formattedData]]"
-              mapping="[[mapping]]"
+              mapping="[[formattedMapping]]"
               editable="[[editable]]">
           </two-disaggregations>
         </template>
 
         <template
             is="dom-if"
-            if="[[_determineVisibility(formattedData, 3, editableBool)]]"
+            if="[[_equals(formattedMapping.length, 3)]]"
             restamp="true">
           <three-disaggregations
               data="[[formattedData]]"
-              mapping="[[mapping]]"
+              mapping="[[formattedMapping]]"
               editable="[[editable]]">
           </three-disaggregations>
         </template>
@@ -127,6 +127,11 @@
         formattedData: {
           type: Object,
           observer: '_cloneData',
+        },
+
+        formattedMapping: {
+          type: Array,
+          computed: '_computeMapping(editableBool, formattedData, mapping)',
         },
 
         updateUrl: {
@@ -234,11 +239,12 @@
         this.fire('disaggregation-modal-refit');
       },
 
-      _determineVisibility: function (formattedData, comparable, editableBool) {
-        return this._equals(
-          formattedData[editableBool ? 'level_reported' : 'num_disaggregation'],
-          comparable
-        );
+      _computeMapping: function (editableBool, formattedData, mapping) {
+        var reportedOn = formattedData.disaggregation_reported_on;
+
+        return editableBool ? mapping.filter(function (disagg) {
+          return reportedOn.indexOf(disagg.id) !== -1;
+        }) : mapping;
       },
     });
   </script>
