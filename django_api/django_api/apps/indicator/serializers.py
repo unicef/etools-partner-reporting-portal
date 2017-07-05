@@ -371,7 +371,10 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
         serializer = DisaggregationListSerializer(
             obj.disaggregations, many=True)
 
-        return serializer.data
+        disagg_lookup_list = serializer.data
+        disagg_lookup_list.sort(key=lambda item: len(item['choices']))
+
+        return disagg_lookup_list
 
     def get_disagg_choice_lookup_map(self, obj):
         lookup_array = obj.disaggregation_values(id_only=False)
