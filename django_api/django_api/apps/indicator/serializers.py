@@ -285,7 +285,7 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
         valid_disaggregation_value_pairs = \
             generate_data_combination_entries(
                 disaggregation_value_id_list,
-                entries_only=True, string_key=False, r=data['level_reported'])
+                entries_only=True, key_type=set, r=data['level_reported'])
 
         if set() not in valid_disaggregation_value_pairs:
             valid_disaggregation_value_pairs.append(set())

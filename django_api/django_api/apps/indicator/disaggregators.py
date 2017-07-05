@@ -66,7 +66,7 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
                     subkey_combinations = generate_data_combination_entries(
                         packed_key,
                         entries_only=True,
-                        string_key=False,
+                        key_type=tuple,
                         r=level_reported - 1
                     )
 
