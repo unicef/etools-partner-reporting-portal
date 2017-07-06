@@ -170,24 +170,6 @@ class IndicatorReport(TimeStampedModel):
         unicef.ProgressReport (ForeignKey): "progress_report"
         core.Location (OneToOneField): "location"
     """
-    SUM = 'sum'
-    MAX = 'max'
-    AVG = 'avg'
-    # RATIO = 'ratio'
-    # PERCENTAGE = 'percentage'
-
-    QUANTITY_CALC_CHOICES = (
-        (SUM, SUM),
-        (MAX, MAX),
-        (AVG, AVG)
-    )
-
-    # RATIO_CALC_CHOICES = (
-    #     (PERCENTAGE, PERCENTAGE),
-    #     (RATIO, RATIO)
-    # )
-
-    CALC_CHOICES = QUANTITY_CALC_CHOICES # + RATIO_CALC_CHOICES
 
     title = models.CharField(max_length=255)
     reportable = models.ForeignKey(Reportable, related_name="indicator_reports")
@@ -211,8 +193,6 @@ class IndicatorReport(TimeStampedModel):
         default=INDICATOR_REPORT_STATUS.due,
         max_length=3
     )
-
-    calculation_formula = models.CharField(max_length=10, choices=CALC_CHOICES, default=SUM)
 
     class Meta:
         ordering = ['id']
@@ -241,6 +221,14 @@ class IndicatorReport(TimeStampedModel):
     @cached_property
     def disaggregations(self):
         return self.reportable.disaggregation.all()
+
+    @cached_property
+    def display_type(self):
+        return self.reportable.blueprint.display_type
+
+    @cached_property
+    def calculation_formula(self):
+        return self.reportable.blueprint.calculation_formula
 
     def disaggregation_values(self, id_only=False, filter_by_id__in=None, flat=False):
         output_list = []

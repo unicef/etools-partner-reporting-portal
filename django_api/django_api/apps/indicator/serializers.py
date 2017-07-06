@@ -167,7 +167,7 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
     display_type = serializers.SerializerMethodField()
 
     def get_display_type(self, obj):
-        return obj.indicator_report.reportable.blueprint.display_type
+        return obj.indicator_report.display_type
 
     def get_disaggregation(self, obj):
         ordered_dict = get_cast_dictionary_keys_as_tuple(obj.disaggregation)
@@ -378,7 +378,7 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
     display_type = serializers.SerializerMethodField()
 
     def get_display_type(self, obj):
-        return obj.reportable.blueprint.display_type
+        return obj.display_type
 
     def get_disagg_lookup_map(self, obj):
         serializer = DisaggregationListSerializer(

@@ -317,7 +317,6 @@ class IndicatorReportFactory(factory.django.DjangoModelFactory):
     due_date = fuzzy.FuzzyDate(datetime.date.today())
     total = dict(
         [('c', 0), ('d', 0), ('v', random.randint(0, 3000))])
-    calculation_formula = random.choice(IndicatorReport.CALC_CHOICES)[0]
 
     class Meta:
         model = IndicatorReport
