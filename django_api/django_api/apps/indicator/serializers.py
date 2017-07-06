@@ -117,10 +117,14 @@ class IndicatorListSerializer(serializers.ModelSerializer):
 
 class IndicatorLLoutputsSerializer(serializers.ModelSerializer):
 
+    __narrative_and_assessment = None
+
     name = serializers.SerializerMethodField()
     llo_id = serializers.SerializerMethodField()
     status = serializers.SerializerMethodField()
     indicator_reports = serializers.SerializerMethodField()
+    overall_status = serializers.SerializerMethodField()
+    narrative_assessemnt = serializers.SerializerMethodField()
 
     class Meta:
         model = Reportable
@@ -129,6 +133,8 @@ class IndicatorLLoutputsSerializer(serializers.ModelSerializer):
             'name',
             'llo_id',
             'status',
+            'overall_status',
+            'narrative_assessemnt',
             'indicator_reports',
         )
 
@@ -154,6 +160,29 @@ class IndicatorLLoutputsSerializer(serializers.ModelSerializer):
         children = obj.indicator_reports.all()
         serializer = IndicatorReportSimpleSerializer(children, many=True)
         return serializer.data
+
+    def get_overall_status(self, obj):
+        capture = self.__get_narrative_and_assessment(obj)
+        if capture is not None:
+            return capture['overall_status']
+        return ''
+
+    def get_narrative_assessemnt(self, obj):
+        capture = self.__get_narrative_and_assessment(obj)
+        if capture is not None:
+            return capture['narrative_assessemnt'] or ''
+        return ''
+
+    def __get_narrative_and_assessment(self, obj):
+        if self.__narrative_and_assessment is not None:
+            return self.__narrative_and_assessment
+        indicator_report = obj.indicator_reports.first()
+        if indicator_report:
+            self.__narrative_and_assessment = Reportable.get_narrative_and_assessment(
+                indicator_report.progress_report_id)
+        return self.__narrative_and_assessment
+
+
 
 
 class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
