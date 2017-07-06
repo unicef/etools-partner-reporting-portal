@@ -142,8 +142,6 @@ class Reportable(TimeStampedModel):
         if self.indicator_reports.exists():
             total = self.indicator_reports.last().total
 
-            print self.indicator_reports.last().id, total
-
             if not isinstance(total, dict):
                 total = dict(total)
             return total
@@ -157,7 +155,6 @@ class Reportable(TimeStampedModel):
         percentage = 0.0
 
         if self.achieved:
-            print self.achieved
             percentage = (self.achieved['c'] - float(self.baseline)) / (float(self.target) - float(self.baseline))
 
         return percentage
@@ -176,13 +173,21 @@ class IndicatorReport(TimeStampedModel):
     SUM = 'sum'
     MAX = 'max'
     AVG = 'avg'
-    MIN = 'min'
-    CALC_CHOICES = (
+    # RATIO = 'ratio'
+    # PERCENTAGE = 'percentage'
+
+    QUANTITY_CALC_CHOICES = (
         (SUM, SUM),
         (MAX, MAX),
-        (AVG, AVG),
-        (MIN, MIN),
+        (AVG, AVG)
     )
+
+    # RATIO_CALC_CHOICES = (
+    #     (PERCENTAGE, PERCENTAGE),
+    #     (RATIO, RATIO)
+    # )
+
+    CALC_CHOICES = QUANTITY_CALC_CHOICES # + RATIO_CALC_CHOICES
 
     title = models.CharField(max_length=255)
     reportable = models.ForeignKey(Reportable, related_name="indicator_reports")
@@ -207,7 +212,7 @@ class IndicatorReport(TimeStampedModel):
         max_length=3
     )
 
-    calculation_formula = models.CharField(max_length=3, choices=CALC_CHOICES, default=SUM)
+    calculation_formula = models.CharField(max_length=10, choices=CALC_CHOICES, default=SUM)
 
     class Meta:
         ordering = ['id']

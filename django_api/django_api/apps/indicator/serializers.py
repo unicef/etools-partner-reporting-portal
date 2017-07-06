@@ -30,6 +30,8 @@ class IndicatorBlueprintSimpleSerializer(serializers.ModelSerializer):
             'id',
             'title',
             'unit',
+            'display_type',
+            'calculation_formula',
         )
 
 
@@ -162,6 +164,10 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
     disaggregation = serializers.SerializerMethodField()
     location_progress = serializers.SerializerMethodField()
     previous_location_progress = serializers.SerializerMethodField()
+    display_type = serializers.SerializerMethodField()
+
+    def get_display_type(self, obj):
+        return obj.indicator_report.reportable.blueprint.display_type
 
     def get_disaggregation(self, obj):
         ordered_dict = get_cast_dictionary_keys_as_tuple(obj.disaggregation)
@@ -204,6 +210,7 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
             'id',
             'indicator_report',
             'location',
+            'display_type',
             'disaggregation',
             'num_disaggregation',
             'level_reported',
@@ -368,6 +375,10 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
     disagg_lookup_map = serializers.SerializerMethodField()
     disagg_choice_lookup_map = serializers.SerializerMethodField()
     total = serializers.JSONField()
+    display_type = serializers.SerializerMethodField()
+
+    def get_display_type(self, obj):
+        return obj.reportable.blueprint.display_type
 
     def get_disagg_lookup_map(self, obj):
         serializer = DisaggregationListSerializer(
@@ -389,6 +400,7 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
             'indicator_location_data',
             'time_period_start',
             'time_period_end',
+            'display_type',
             'total',
             'remarks',
             'report_status',
