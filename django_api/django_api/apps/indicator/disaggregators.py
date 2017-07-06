@@ -43,23 +43,33 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
         ordered_dict = get_cast_dictionary_keys_as_tuple(
             indicator_location_data.disaggregation)
 
+        ordered_dict_keys = ordered_dict.keys()
+
         if level_reported == 0:
             ordered_dict[tuple()]["d"] = 1
             ordered_dict[tuple()]["c"] = ordered_dict[tuple()]["v"]
 
         else:
             # Reset all subtotals
-            for key in ordered_dict:
-                ordered_dict[key]["d"] = 1
-
-                if len(key) < level_reported:
-                    ordered_dict[key]["c"] = 0
-                    ordered_dict[key]["v"] = 0
-
-                elif len(key) == level_reported:
+            for key in ordered_dict_keys:
+                if len(key) == level_reported:
+                    ordered_dict[key]["d"] = 1
                     ordered_dict[key]["c"] = ordered_dict[key]["v"]
 
-            ordered_dict_keys = ordered_dict.keys()
+                    packed_key = map(lambda item: tuple([item]), key)
+                    subkey_combinations = generate_data_combination_entries(
+                        packed_key,
+                        entries_only=True,
+                        key_type=tuple,
+                        r=level_reported - 1
+                    )
+
+                    for subkey in subkey_combinations:
+                        ordered_dict[subkey] = {
+                            'c': 0,
+                            'd': 1,
+                            'v': 0,
+                        }
 
             # Calculating subtotals
             for key in ordered_dict_keys:
@@ -77,16 +87,6 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
                     # as each method
                     if blueprint.calculation_formula == IndicatorBlueprint.SUM:
                         for subkey in subkey_combinations:
-                            # If the subtotal key is missing
-                            # because the updated data only contained
-                            # N level_reported data entries, then default one
-                            if subkey not in ordered_dict_keys:
-                                ordered_dict[subkey] = {
-                                    'c': 0,
-                                    'd': 0,
-                                    'v': 0,
-                                }
-
                             ordered_dict[subkey]["v"] += \
                                 ordered_dict[key]["v"]
 
