@@ -75,7 +75,6 @@
       behaviors: [
         App.Behaviors.UtilsBehavior,
         App.Behaviors.DisaggregationBehavior,
-        App.Behaviors.MathBehavior,
       ],
 
       properties: {
@@ -164,11 +163,7 @@
 
       _commit: function () {
         this.set('formattedData', Object.assign({}, this.formattedData, {
-          disaggregation: this.regenerate_disaggregation_key_entries(
-            this.reportedOn.length,
-            this.reportedOn,
-            this.mapping
-          ),
+          disaggregation: {},
           level_reported: this.reportedOn.length,
           disaggregation_reported_on: this._clone(this.reportedOn),
         }));
