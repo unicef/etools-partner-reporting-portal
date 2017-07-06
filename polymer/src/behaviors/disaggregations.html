@@ -63,6 +63,7 @@
         disagg_lookup_map
       ) {
         var new_disaggregation = {};
+        var formatted_id_list = Array();
 
         /*
         * We first filter disaggregation choice ids from disagg_lookup_map based on
@@ -84,7 +85,7 @@
         // This loops from N level_reported to 0 level_reported. Each iteration generates
         // a set of cartesian product of each given combination for filtered disaggregation
         // choice integer id arrays
-        for (var i = new_level_reported; i >= 0; i--) {
+        for (var i = 0; i <= new_level_reported; i++) {
           // Get nCr entries for each level_reported
           var level_combination_entries = this._combinations(filtered_disagg_choice_ids, i);
 
@@ -103,15 +104,17 @@
               return '(' + formatted_id + ')';
             });
 
-            // Populate each new key into empty disaggregation object
-            for (var k = 0; k < formatted_product_ids.length; k++) {
-              new_disaggregation[formatted_product_ids[k]] = {
-                c: null,
-                d: null,
-                v: null,
-              };
-            }
+            Array.prototype.push.apply(formatted_id_list, formatted_product_ids)
           }
+        }
+
+        // Populate each new key into empty disaggregation object
+        for (var k = 0; k < formatted_id_list.length; k++) {
+          new_disaggregation[formatted_id_list[k]] = {
+            c: null,
+            d: null,
+            v: null,
+          };
         }
 
         return new_disaggregation;

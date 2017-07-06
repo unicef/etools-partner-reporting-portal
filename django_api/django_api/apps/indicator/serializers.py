@@ -297,16 +297,32 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
 
         # Assertion on all combinatoric entries for num_disaggregation and
         # level_reported against submitted disaggregation data
-        if valid_entry_count > disaggregation_data_key_count:
-            raise serializers.ValidationError(
-                "Submitted disaggregation data entries does not contain "
-                + "all possible combination pair keys"
-            )
-
         if valid_entry_count < disaggregation_data_key_count:
             raise serializers.ValidationError(
                 "Submitted disaggregation data entries contains "
                 + "extra combination pair keys"
+            )
+
+        try:
+            level_reported_key_count = len(filter(
+                lambda key: len(make_tuple(key)) == level_reported,
+                disaggregation_data_keys
+            ))
+
+            valid_level_reported_key_count = len(filter(
+                lambda key: len(make_tuple(key)) == level_reported,
+                valid_disaggregation_value_pairs
+            ))
+
+            if level_reported_key_count != valid_level_reported_key_count:
+                raise serializers.ValidationError(
+                    "Submitted disaggregation data entries do not contain "
+                    + "all level %d combination pair keys" % (level_reported)
+                )
+
+        except Exception as e:
+            raise serializers.ValidationError(
+                "Parsing error from tuple string: " + e.message
             )
 
         # Disaggregation data coordinate space check from level_reported
