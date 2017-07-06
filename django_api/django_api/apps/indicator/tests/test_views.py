@@ -1,12 +1,11 @@
+from ast import literal_eval as make_tuple
+
 from django.urls import reverse
+
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 
-from core.management.commands._privates import generate_fake_data
-from core.helpers import suppress_stdout
-
 from account.models import User
-
 from core.factories import (
     ProgrammeDocumentFactory,
     ReportableToLowerLevelOutputFactory,
@@ -15,8 +14,10 @@ from core.factories import (
     SectionFactory
 )
 from core.helpers import (
+    suppress_stdout,
     get_cast_dictionary_keys_as_tuple,
 )
+from core.management.commands._privates import generate_fake_data
 from core.tests.base import BaseAPITestCase
 from unicef.models import (
     LowerLevelOutput,
@@ -200,8 +201,8 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
                 break
 
         correct_total = update_data['disaggregation']['()']['v'] \
-            - update_data['disaggregation'][unicode(level_reported_1_key)]['v']
-        update_data['disaggregation'][unicode(level_reported_1_key)]['v'] = 0
+            - update_data['disaggregation'][str(level_reported_1_key)]['v']
+        update_data['disaggregation'][str(level_reported_1_key)]['v'] = 0
 
         url = reverse('indicator-location-data-entries-put-api')
         response = self.client.put(url, update_data, format='json')
@@ -228,8 +229,8 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
                 break
 
         correct_total = update_data['disaggregation']['()']['v'] \
-            - update_data['disaggregation'][unicode(level_reported_2_key)]['v']
-        update_data['disaggregation'][unicode(level_reported_2_key)]['v'] = 0
+            - update_data['disaggregation'][str(level_reported_2_key)]['v']
+        update_data['disaggregation'][str(level_reported_2_key)]['v'] = 0
 
         url = reverse('indicator-location-data-entries-put-api')
         response = self.client.put(url, update_data, format='json')
@@ -256,8 +257,8 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
                 break
 
         correct_total = update_data['disaggregation']['()']['v'] \
-            - update_data['disaggregation'][unicode(level_reported_3_key)]['v']
-        update_data['disaggregation'][unicode(level_reported_3_key)]['v'] = 0
+            - update_data['disaggregation'][str(level_reported_3_key)]['v']
+        update_data['disaggregation'][str(level_reported_3_key)]['v'] = 0
 
         url = reverse('indicator-location-data-entries-put-api')
         response = self.client.put(url, update_data, format='json')
@@ -368,24 +369,27 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
             response.data['non_field_errors'][0]
         )
 
-    def test_update_less_disaggregation_entry_count(self):
+    def test_update_not_all_level_reported_disaggregation_entry_count(self):
         indicator_location_data = IndicatorLocationData.objects.filter(
             level_reported=3, num_disaggregation=3).first()
 
         update_data = IndicatorLocationDataUpdateSerializer(
             indicator_location_data).data
 
-        first_key = update_data['disaggregation'].keys()[0]
-        update_data['disaggregation'].pop(first_key)
+        level_reported_key = filter(
+            lambda item: len(make_tuple(item)) ==
+            indicator_location_data.level_reported,
+            update_data['disaggregation'].keys())[0]
+        update_data['disaggregation'].pop(level_reported_key)
 
         url = reverse('indicator-location-data-entries-put-api')
         response = self.client.put(url, update_data, format='json')
 
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn(
-            "Submitted disaggregation data entries does not contain "
-            + "all possible combination pair keys",
-            response.data['non_field_errors'][0]
+        self.assertEquals(
+            "Submitted disaggregation data entries do not contain "
+            + "all level %d combination pair keys" % (indicator_location_data.level_reported),
+            str(response.data['non_field_errors'][0])
         )
 
     def test_update_extra_disaggregation_entry_count(self):
@@ -404,7 +408,7 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
         update_data = IndicatorLocationDataUpdateSerializer(
             indicator_location_data).data
 
-        update_data['disaggregation'][unicode(bad_key)] = {
+        update_data['disaggregation'][str(bad_key)] = {
             u'c': None,
             u'd': None,
             u'v': 100
@@ -417,7 +421,7 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
         self.assertIn(
             "Submitted disaggregation data entries contains "
             + "extra combination pair keys",
-            response.data['non_field_errors'][0]
+            str(response.data['non_field_errors'][0])
         )
 
     def test_update_higher_coordinate_space_key_validation(self):
@@ -438,10 +442,10 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
                 level_reported_3_key = key
                 break
 
-        del update_data['disaggregation'][unicode(level_reported_3_key)]
+        del update_data['disaggregation'][str(level_reported_3_key)]
         level_reported_3_key = list(level_reported_3_key)
         level_reported_3_key.append(next_disaggregation_value_id)
-        update_data['disaggregation'][unicode(tuple(level_reported_3_key))] = {}
+        update_data['disaggregation'][str(tuple(level_reported_3_key))] = {}
 
         url = reverse('indicator-location-data-entries-put-api')
         response = self.client.put(url, update_data, format='json')
@@ -472,11 +476,11 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
                 level_reported_3_key = key
                 break
 
-        del update_data['disaggregation'][unicode(level_reported_3_key)]
+        del update_data['disaggregation'][str(level_reported_3_key)]
 
         level_reported_3_key = list(level_reported_3_key[:-1])
         level_reported_3_key.append(next_disaggregation_value_id)
-        update_data['disaggregation'][unicode(tuple(level_reported_3_key))] = {}
+        update_data['disaggregation'][str(tuple(level_reported_3_key))] = {}
 
         url = reverse('indicator-location-data-entries-put-api')
         response = self.client.put(url, update_data, format='json')
@@ -504,8 +508,8 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
                 level_reported_3_key = key
                 break
 
-        value = update_data['disaggregation'][unicode(level_reported_3_key)]
-        del update_data['disaggregation'][unicode(level_reported_3_key)]
+        value = update_data['disaggregation'][str(level_reported_3_key)]
+        del update_data['disaggregation'][str(level_reported_3_key)]
         update_data['disaggregation']['bad key'] = value
 
         url = reverse('indicator-location-data-entries-put-api')
@@ -533,7 +537,7 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
                 level_reported_3_key = key
                 break
 
-        update_data['disaggregation'][unicode(level_reported_3_key)] = {}
+        update_data['disaggregation'][str(level_reported_3_key)] = {}
 
         url = reverse('indicator-location-data-entries-put-api')
         response = self.client.put(url, update_data, format='json')

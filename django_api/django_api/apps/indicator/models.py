@@ -264,7 +264,7 @@ class IndicatorLocationData(TimeStampedModel):
         models.IntegerField(), default=list
     )
 
-    def __unicode__(self):
+    def __str__(self):
         return "{} Location Data for {}".format(self.location, self.indicator_report)
 
 
