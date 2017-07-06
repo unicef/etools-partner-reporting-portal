@@ -65,6 +65,9 @@ class IndicatorBlueprint(TimeStampedModel):
             self.code = None
         super(IndicatorBlueprint, self).save(*args, **kwargs)
 
+    class Meta:
+        ordering = ['id']
+
 
 class Reportable(TimeStampedModel):
     """
@@ -97,6 +100,12 @@ class Reportable(TimeStampedModel):
     content_object = GenericForeignKey('content_type', 'object_id')
     blueprint = models.ForeignKey(IndicatorBlueprint, null=True, related_name="reportables")
     parent_indicator = models.ForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
+
+    class Meta:
+        ordering = ['id']
+
+    def __str__(self):
+        return "Reportable <pk:%s>" % self.id
 
     @property
     def ref_num(self):
@@ -131,9 +140,6 @@ class Reportable(TimeStampedModel):
             percentage = (self.achieved['c'] - float(self.baseline)) / (float(self.target) - float(self.baseline))
 
         return percentage
-
-    def __str__(self):
-        return "Reportable <pk:%s>" % self.id
 
 
 class IndicatorReport(TimeStampedModel):
@@ -181,6 +187,9 @@ class IndicatorReport(TimeStampedModel):
     )
 
     calculation_formula = models.CharField(max_length=3, choices=CALC_CHOICES, default=SUM)
+
+    class Meta:
+        ordering = ['id']
 
     def __str__(self):
         return self.title
@@ -292,7 +301,10 @@ class IndicatorLocationData(TimeStampedModel):
         models.IntegerField(), default=list
     )
 
-    def __unicode__(self):
+    class Meta:
+        ordering = ['id']
+
+    def __str__(self):
         return "{} Location Data for {}".format(self.location, self.indicator_report)
 
 

@@ -132,6 +132,12 @@ class ProgrammeDocument(TimeStampedModel):
     __reports_exists = None
     __budget = None
 
+    class Meta:
+        ordering = ['id']
+
+    def __str__(self):
+        return self.title
+
     @cached_property
     def reportable_queryset(self):
         return Reportable.objects.filter(
@@ -246,20 +252,6 @@ class ProgrammeDocument(TimeStampedModel):
         else:
             raise NotImplemented("Not recognized FREQUENCY_LEVEL.")
 
-    def __str__(self):
-        return self.title
-
-    # @transaction.atomic
-    # def save(self, *args, **kwargs):
-    #     is_new = self.pk is None
-    #     super(ProgrammeDocument, self).save(*args, **kwargs)
-    #     if is_new:
-    #         IndicatorReport.objects.create(
-    #             title='enter data',
-    #             programme_document=self,
-    #             time_period=self.start_date,
-    #         )
-
 
 def find_first_programme_document_id():
     try:
@@ -281,6 +273,9 @@ class ProgressReport(TimeStampedModel):
     programme_document = models.ForeignKey(ProgrammeDocument, related_name="progress_reports", default=find_first_programme_document_id)
     # attachements ???
 
+    class Meta:
+        ordering = ['id']
+
     @cached_property
     def latest_indicator_report(self):
         return self.indicator_reports.all().order_by('-created').first()
@@ -296,6 +291,12 @@ class CountryProgrammeOutput(TimeStampedModel):
     title = models.CharField(max_length=255)
     programme_document = models.ForeignKey(ProgrammeDocument, related_name="cp_outputs")
 
+    class Meta:
+        ordering = ['id']
+
+    def __str__(self):
+        return self.title
+
 
 class LowerLevelOutput(TimeStampedModel):
     """
@@ -308,3 +309,9 @@ class LowerLevelOutput(TimeStampedModel):
     title = models.CharField(max_length=255)
     indicator = models.ForeignKey(CountryProgrammeOutput, related_name="ll_outputs")
     reportables = GenericRelation('indicator.Reportable', related_query_name='lower_level_outputs')
+
+    class Meta:
+        ordering = ['id']
+
+    def __str__(self):
+        return self.title
