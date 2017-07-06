@@ -59,8 +59,10 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
                 elif len(key) == level_reported:
                     ordered_dict[key]["c"] = ordered_dict[key]["v"]
 
+            ordered_dict_keys = ordered_dict.keys()
+
             # Calculating subtotals
-            for key in ordered_dict:
+            for key in ordered_dict_keys:
                 if len(key) == level_reported:
                     packed_key = map(lambda item: tuple([item]), key)
                     subkey_combinations = generate_data_combination_entries(
@@ -70,9 +72,21 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
                         r=level_reported - 1
                     )
 
-                    # TODO: Handle different calculation method here. May need to refactor each calculation method as each method
+                    # TODO: Handle different calculation method here.
+                    # May need to refactor each calculation method
+                    # as each method
                     if blueprint.calculation_formula == IndicatorBlueprint.SUM:
                         for subkey in subkey_combinations:
+                            # If the subtotal key is missing
+                            # because the updated data only contained
+                            # N level_reported data entries, then default one
+                            if subkey not in ordered_dict_keys:
+                                ordered_dict[subkey] = {
+                                    'c': 0,
+                                    'd': 0,
+                                    'v': 0,
+                                }
+
                             ordered_dict[subkey]["v"] += \
                                 ordered_dict[key]["v"]
 

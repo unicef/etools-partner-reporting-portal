@@ -305,19 +305,19 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
 
         try:
             level_reported_key_count = len(filter(
-                lambda key: len(make_tuple(key)) == level_reported,
+                lambda key: len(make_tuple(key)) == data['level_reported'],
                 disaggregation_data_keys
             ))
 
             valid_level_reported_key_count = len(filter(
-                lambda key: len(make_tuple(key)) == level_reported,
+                lambda key: len(key) == data['level_reported'],
                 valid_disaggregation_value_pairs
             ))
 
             if level_reported_key_count != valid_level_reported_key_count:
                 raise serializers.ValidationError(
                     "Submitted disaggregation data entries do not contain "
-                    + "all level %d combination pair keys" % (level_reported)
+                    + "all level %d combination pair keys" % (data['level_reported'])
                 )
 
         except Exception as e:
