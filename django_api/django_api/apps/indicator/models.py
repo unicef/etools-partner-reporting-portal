@@ -184,17 +184,16 @@ class IndicatorReport(TimeStampedModel):
         max_length=3
     )
 
-<<<<<<< HEAD
+
     class Meta:
         ordering = ['id']
-=======
+
     overall_status = models.CharField(
         choices=OVERALL_STATUS,
         default=OVERALL_STATUS.on_track,
         max_length=3
     )
     narrative_assessemnt = models.CharField(max_length=255, null=True, blank=True)
->>>>>>> feature-PD-PR-overall-narrative-LLO-#79
 
     def __str__(self):
         return self.title
