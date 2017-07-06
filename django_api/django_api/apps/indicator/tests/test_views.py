@@ -9,7 +9,7 @@ from account.models import User
 
 from core.factories import (
     ProgrammeDocumentFactory,
-    ReportableToLowerLevelOutputFactory,
+    QuantityReportableToLowerLevelOutputFactory,
     ProgressReportFactory,
     IndicatorLocationDataFactory,
     SectionFactory
