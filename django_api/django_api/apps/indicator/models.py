@@ -6,6 +6,8 @@ from django.contrib.postgres.fields import JSONField, ArrayField
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from model_utils.models import TimeStampedModel
 
@@ -63,6 +65,9 @@ class IndicatorBlueprint(TimeStampedModel):
             self.code = None
         super(IndicatorBlueprint, self).save(*args, **kwargs)
 
+    class Meta:
+        ordering = ['id']
+
 
 class Reportable(TimeStampedModel):
     """
@@ -96,6 +101,12 @@ class Reportable(TimeStampedModel):
     blueprint = models.ForeignKey(IndicatorBlueprint, null=True, related_name="reportables")
     parent_indicator = models.ForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
 
+    class Meta:
+        ordering = ['id']
+
+    def __str__(self):
+        return "Reportable <pk:%s>" % self.id
+
     @property
     def ref_num(self):
         from unicef.models import LowerLevelOutput
@@ -108,7 +119,11 @@ class Reportable(TimeStampedModel):
     @property
     def achieved(self):
         if self.indicator_reports.exists():
-            return self.indicator_reports.last().total
+            total = self.indicator_reports.last().total
+
+            if not isinstance(total, dict):
+                total = dict(total)
+            return total
         else:
             return None
 
@@ -122,9 +137,6 @@ class Reportable(TimeStampedModel):
             percentage = (self.achieved['v'] - float(self.baseline)) / (float(self.target) - float(self.baseline))
 
         return percentage
-
-    def __str__(self):
-        return "Reportable <pk:%s>" % self.id
 
 
 class IndicatorReport(TimeStampedModel):
@@ -159,6 +171,9 @@ class IndicatorReport(TimeStampedModel):
         default=INDICATOR_REPORT_STATUS.due,
         max_length=3
     )
+
+    class Meta:
+        ordering = ['id']
 
     def __str__(self):
         return self.title
@@ -208,6 +223,38 @@ class IndicatorReport(TimeStampedModel):
         return output_list
 
 
+@receiver(post_save, sender=IndicatorReport, dispatch_uid="recalculate_reportable_total")
+def recalculate_reportable_total(sender, instance, **kwargs):
+    reportable = instance.reportable
+    blueprint = reportable.blueprint
+
+    # Reset the reportable total
+    reportable_total = {
+        u'c': 0,
+        u'd': 0,
+        u'v': 0,
+    }
+
+    # IndicatorReport total calculation
+    if blueprint.unit == IndicatorBlueprint.NUMBER:
+        reportable_total[u'd'] = 1
+
+        if blueprint.calculation_formula == IndicatorBlueprint.SUM:
+            for indicator_report in reportable.indicator_reports.all():
+                if indicator_report.total[u'v'] is None:
+                    indicator_report.total[u'v'] = 0
+
+                reportable_total[u'v'] += indicator_report.total[u'v']
+
+                if indicator_report.total[u'c'] is None:
+                    indicator_report.total[u'c'] = 0
+
+                reportable_total[u'c'] += indicator_report.total[u'c']
+
+    reportable.total = reportable_total
+    reportable.save()
+
+
 class IndicatorLocationData(TimeStampedModel):
     """
     IndicatorLocationData module it includes indicators for chosen location.
@@ -226,7 +273,10 @@ class IndicatorLocationData(TimeStampedModel):
         models.IntegerField(), default=list
     )
 
-    def __unicode__(self):
+    class Meta:
+        ordering = ['id']
+
+    def __str__(self):
         return "{} Location Data for {}".format(self.location, self.indicator_report)
 
 

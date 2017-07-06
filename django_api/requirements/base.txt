@@ -1,5 +1,5 @@
 # Django packages
-Django==1.10.6
+Django==1.11.2
 
 # REST framework
 djangorestframework==3.6.3

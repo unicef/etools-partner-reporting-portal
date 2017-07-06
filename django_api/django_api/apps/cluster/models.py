@@ -47,6 +47,9 @@ class ClusterObjective(TimeStampedModel):
     )
     reportables = GenericRelation('indicator.Reportable', related_query_name='cluster_objectives')
 
+    class Meta:
+        ordering = ['id']
+
     def __str__(self):
         return "<pk: %s> %s" % (self.id, self.title)
 
@@ -69,6 +72,9 @@ class ClusterActivity(TimeStampedModel):
     )
     cluster_objective = models.ForeignKey(ClusterObjective, related_name="cluster_activities")
     reportables = GenericRelation('indicator.Reportable', related_query_name='cluster_activities')
+
+    class Meta:
+        ordering = ['id']
 
     def __str__(self):
         return "<pk: %s> %s" % (self.id, self.title)

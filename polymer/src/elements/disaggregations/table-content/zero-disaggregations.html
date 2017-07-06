@@ -8,9 +8,11 @@
 
     <style include='disaggregation-table-styles'></style>
 
-    <disaggregation-table-row data=[[totalRow]]
-                              total=[[total]]
-                              row-type="totalsRow">
+    <disaggregation-table-row
+        data="[[totalRow]]"
+        level-reported="[[data.level_reported]]"
+        row-type="totalsRow"
+        editable="[[editable]]">
     </disaggregation-table-row>
 
   </template>
@@ -20,22 +22,25 @@
       is: 'zero-disaggregations',
 
       properties: {
-        total: Number,
+        editable: Number,
+
+        data: Object,
 
         totalRow: {
           type: Array,
-          computed: '_determineTotalRow(mapping)'
+          computed: '_determineTotalRow(mapping, data)'
         },
       },
 
-      _determineTotalRow: function() {
-        var totalRow = {
+      _determineTotalRow: function (_, data) { // jshint ignore:line
+        return {
           title: 'total',
-          total: this.total
+          total: {
+            key: '()',
+            data: data.disaggregation['()'],
+          },
         };
-        return totalRow;
       },
-
     });
   </script>
 </dom-module>

@@ -1,4 +1,4 @@
-<script src="../../bower_components/es6-shim/es6-shim.min.js"></script>
+<link rel="import" href="../polyfills/es6-shim.html">
 
 <script>
   (function () {
@@ -12,20 +12,29 @@
       //It will NOT work for one and zero disaggregations.
       _determineRows: function(self, rows, columns) {
         var rowsForDisplay = [];
+
         rows.forEach(function(x) {
           var formatted = '';
+
           var rowData = columns.map(function(z) {
             formatted = self._formatDisaggregationIds([x.id, z.id]);
-            return self.data.disaggregation[formatted];
+
+            return {
+              key: formatted,
+              data: self.data.disaggregation[formatted],
+            };
           });
+
           formatted = self._formatDisaggregationIds([x.id]);
-          var rowTotal = self.data.disaggregation[formatted];
 
           rowsForDisplay.push({
             title: x.value,
             data: rowData,
             id: x.id,
-            total: rowTotal
+            total: {
+              key: formatted,
+              data: self.data.disaggregation[formatted],
+            },
           });
         });
 

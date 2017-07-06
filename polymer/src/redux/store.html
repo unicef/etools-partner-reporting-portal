@@ -13,6 +13,7 @@
 <link rel="import" href="reducers/programmeDocumentDetails.html">
 <link rel="import" href="reducers/programmeDocumentReports.html">
 <link rel="import" href="reducers/responsePlans.html">
+<link rel="import" href="reducers/disaggregations.html">
 
 <script src="../../bower_components/redux-thunk/index.js"></script>
 
@@ -33,6 +34,7 @@
       programmeDocumentReports: App.Reducers.ProgrammeDocumentReports,
       progressReports: App.Reducers.ProgressReports,
       responsePlans: App.Reducers.ResponsePlans
+      disaggregations: App.Reducers.Disaggregations,
     });
 
     var store = Redux.createStore(

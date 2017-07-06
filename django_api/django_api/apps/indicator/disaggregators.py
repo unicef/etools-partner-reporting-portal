@@ -1,6 +1,12 @@
 from itertools import combinations
 
-from indicator.models import Reportable, IndicatorReport
+from core.helpers import (
+    generate_data_combination_entries,
+    get_cast_dictionary_keys_as_tuple,
+    get_cast_dictionary_keys_as_string,
+)
+
+from indicator.models import Reportable, IndicatorReport, IndicatorBlueprint
 
 
 class BaseDisaggregator(object):
@@ -9,6 +15,10 @@ class BaseDisaggregator(object):
     Each staticmethod should accept a Python dictionary
     that represents a serialized IndicatorReport object.
     """
+    @staticmethod
+    def pre_process():
+        raise NotImplementedError()
+
     @staticmethod
     def post_process():
         raise NotImplementedError()
@@ -21,14 +31,86 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
     """
 
     @staticmethod
-    def post_process(data_dict, disaggregation_id_map):
-        # TODO: Auto-calculate n - 1 level_reported combination total entries
-        for location_data in data_dict['indicator_location_data']:
-            num_disaggregation = location_data["num_disaggregation"]
-            level_reported = location_data["level_reported"]
-            disaggs_reported_on = location_data["disaggs_reported_on"]
+    def pre_process():
+        raise NotImplementedError()
 
-        return data_dict
+    @staticmethod
+    def post_process(indicator_location_data):
+        level_reported = indicator_location_data.level_reported
+        blueprint = indicator_location_data \
+            .indicator_report.reportable.blueprint
+
+        ordered_dict = get_cast_dictionary_keys_as_tuple(
+            indicator_location_data.disaggregation)
+
+        if level_reported == 0:
+            ordered_dict[tuple()]["d"] = 1
+            ordered_dict[tuple()]["c"] = ordered_dict[tuple()]["v"]
+
+        else:
+            # Reset all subtotals
+            for key in ordered_dict:
+                ordered_dict[key]["d"] = 1
+
+                if len(key) < level_reported:
+                    ordered_dict[key]["c"] = 0
+                    ordered_dict[key]["v"] = 0
+
+                elif len(key) == level_reported:
+                    ordered_dict[key]["c"] = ordered_dict[key]["v"]
+
+            # Calculating subtotals
+            for key in ordered_dict:
+                if len(key) == level_reported:
+                    packed_key = map(lambda item: tuple([item]), key)
+                    subkey_combinations = generate_data_combination_entries(
+                        packed_key,
+                        entries_only=True,
+                        string_key=False,
+                        r=level_reported - 1
+                    )
+
+                    # TODO: Handle different calculation method here. May need to refactor each calculation method as each method
+                    if blueprint.calculation_formula == IndicatorBlueprint.SUM:
+                        for subkey in subkey_combinations:
+                            ordered_dict[subkey]["v"] += \
+                                ordered_dict[key]["v"]
+
+                            ordered_dict[subkey]["c"] += \
+                                ordered_dict[key]["c"]
+
+        ordered_dict = get_cast_dictionary_keys_as_string(ordered_dict)
+
+        indicator_location_data.disaggregation = ordered_dict
+        indicator_location_data.save()
+
+        # Reset the IndicatorReport total
+        ir_total = {
+            u'c': 0,
+            u'd': 0,
+            u'v': 0,
+        }
+        ir_total[u'd'] = 1
+
+        indicator_report = indicator_location_data.indicator_report
+
+        # IndicatorReport total calculation
+        if blueprint.calculation_formula == IndicatorBlueprint.SUM:
+            for loc_data in indicator_report.indicator_location_data.all():
+                loc_total = loc_data.disaggregation[u'()']
+
+                if loc_total[u'v'] is None:
+                    loc_total[u'v'] = 0
+
+                ir_total[u'v'] += loc_total[u'v']
+
+                if loc_total[u'c'] is None:
+                    loc_total[u'c'] = 0
+
+                ir_total[u'c'] += loc_total[u'c']
+
+        indicator_report.total = ir_total
+        indicator_report.save()
 
 
 class RatioIndicatorDisaggregator(BaseDisaggregator):
@@ -41,6 +123,10 @@ class RatioIndicatorDisaggregator(BaseDisaggregator):
     1. Calculate N - 1 level_reported subtotals
     2. Calculate c value from v and d.
     """
+    @staticmethod
+    def pre_process():
+        raise NotImplementedError()
+
     @staticmethod
     def post_process(data_dict):
         return data_dict
@@ -57,6 +143,10 @@ class LikertScaleIndicatorDisaggregator(BaseDisaggregator):
     2. Calculate c value from v and d.
     """
     @staticmethod
+    def pre_process():
+        raise NotImplementedError()
+
+    @staticmethod
     def post_process(data_dict):
         return data_dict
 
@@ -71,6 +161,10 @@ class YesNoIndicatorDisaggregator(BaseDisaggregator):
     1. Calculate N - 1 level_reported subtotals
     2. Calculate c value from v and d.
     """
+    @staticmethod
+    def pre_process():
+        raise NotImplementedError()
+
     @staticmethod
     def post_process(data_dict):
         return data_dict
