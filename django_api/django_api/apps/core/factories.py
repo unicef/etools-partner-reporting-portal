@@ -160,9 +160,6 @@ class InterventionFactory(factory.django.DjangoModelFactory):
     signed_by_unicef_date = fuzzy.FuzzyDate(datetime.date.today())
     signed_by_partner_date = fuzzy.FuzzyDate(datetime.date.today())
 
-    # cluster = factory.RelatedFactory('core.factories.ClusterFactory', 'intervention')
-    response_plan = factory.RelatedFactory('core.factories.ResponsePlanFactory', 'intervention')
-
     @factory.post_generation
     def locations(self, create, extracted, **kwargs):
         if not create:

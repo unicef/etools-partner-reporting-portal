@@ -37,6 +37,7 @@ from core.factories import (
     PartnerFactory,
     IndicatorLocationDataFactory,
     InterventionFactory,
+    ResponsePlanFactory,
     LocationFactory,
     ReportableToLowerLevelOutputFactory,
     IndicatorReportFactory,
@@ -548,6 +549,11 @@ def generate_fake_data(quantity=20):
     InterventionFactory.create_batch(
         quantity, locations=Location.objects.all())
     print "{} Intervention objects created".format(quantity)
+
+    for intervention in Intervention.objects.all():
+        for idx in xrange(3):
+            ResponsePlanFactory(intervention=intervention)
+    print "{} ResponsePlan objects created".format(quantity*3)
 
     # Linking ClusterActivity - PartnerActivity
     for idx in xrange(quantity):
