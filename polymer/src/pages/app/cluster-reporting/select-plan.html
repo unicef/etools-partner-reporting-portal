@@ -10,6 +10,7 @@
 <link rel="import" href="../../../behaviors/data-table.html">
 <link rel="import" href="../../../redux/store.html">
 <link rel="import" href="../../../styles/table-styles.html">
+<link rel="import" href="../../../elements/etools-prp-data-table-row.html">
 
 <link rel="import" href="../../../settings.html">
 <link rel="import" href="../../../redux/actions.html">
@@ -30,9 +31,23 @@
         };
       }
 
+      a {
+        color: var(--theme-primary-color-cluster-bright);
+        font-size: 12px;
+      }
+
+      /*Center-aligns the radio button.*/
+      .table-cell:first-of-type {
+        text-align: center;
+      }
+
       paper-button#confirm {
         background-color: var(--theme-primary-color-cluster);
         color: white;
+      }
+
+      paper-button#confirm[disabled] {
+        background-color: var(--paper-grey-400);
       }
 
       paper-radio-button {
@@ -61,6 +76,29 @@
         margin-top: 3em;
       }
 
+      .documents, .documents h5 {
+        color: var(--paper-grey-600);
+        font-size: 12px;
+        font-weight: 400;
+        margin: 0;
+      }
+
+      ul {
+        margin: 0;
+        list-style-type: none;
+        padding: 0;
+      }
+
+      li {
+        padding: 3px 0;
+      }
+
+      iron-icon {
+        width: 22px;
+        height: 22px;
+        margin-right: 5px;
+      }
+
     </style>
 
     <div class="container">
@@ -68,22 +106,19 @@
         <h2> Select Response Plan</h2>
         <paper-card>
           <etools-data-table-header label="">
-            <etools-data-table-column field="selected">
+            <etools-data-table-column field="selected" flex-1>
             </etools-data-table-column>
-            <etools-data-table-column field="response">
+            <etools-data-table-column field="response" flex-2>
               <div class="table-column">Response Plan</div>
             </etools-data-table-column>
-            <etools-data-table-column field="type">
+            <etools-data-table-column field="type" flex-2>
               <div class="table-column">Plan Type</div>
             </etools-data-table-column>
-            <etools-data-table-column field="start">
+            <etools-data-table-column field="start" flex-2>
               <div class="table-column">Start Date</div>
             </etools-data-table-column>
-            <etools-data-table-column field="end">
+            <etools-data-table-column field="end" flex-2>
               <div class="table-column">End Date</div>
-            </etools-data-table-column>
-            <etools-data-table-column field="location">
-              <div class="table-column">Location</div>
             </etools-data-table-column>
           </etools-data-table-header>
      
@@ -91,42 +126,66 @@
                     is="dom-repeat"
                     items="[[responsePlans]]"
                     as="plan">
-            <etools-data-table-row collapse>
+            <etools-prp-data-table-row details-opened="[[detailsOpened]]">
+
               <div slot="row-data">
-                <div class="table-cell">
+                <div class="table-cell" flex-1>
                   <paper-radio-button 
                     checked="[[_determineIfChecked(selected, plan.id)]]"
                     name="[[plan.id]]"
                     on-tap="_selectRadioButton">
                   </paper-radio-button>
                 </div>
-                <div class="table-cell">
+                <div class="table-cell" flex-2>
                   [[plan.title]]
                 </div>
-                <div class="table-cell">
+                <div class="table-cell" flex-2>
                   [[plan.plan_type]]
                 </div>
-                <div class="table-cell">
+                <div class="table-cell" flex-2>
                   [[plan.start]]
                 </div>
-                 <div class="table-cell">
+                 <div class="table-cell" flex-2>
                   [[plan.end]]
                 </div>
-                 <div class="table-cell">
-                  [[plan.location]]
-                </div>
               </div>
+
               <div slot="row-data-details">
-                Documents:
+                <template is="dom-if" if="[[!plan.documents.length]]">
+                  There are no documents for this response plan.
+                </template>
+                <template is="dom-if" if="[[plan.documents.length]]">
+                  <div class="documents">
+                  <h5>Documents:</h5>
+                  <ul>
+                    <template id="documents"
+                              is="dom-repeat"
+                              items="[[plan.documents]]"
+                              as="document">
+                        <li>
+                          <iron-icon id="less" icon="attachment"></iron-icon>
+                          <a href="/">TODO: Link to document.</a>
+                        </li>
+                    </template>
+                  </ul>
+                </template>
               </div>
+
             </etools-data-table-row>
           </template>
 
         </paper-card>
       </div>
       <div class="actions">
-        <paper-button id="cancel" on-tap="_cancel">Cancel</paper-button>
-        <paper-button id="confirm" on-tap="_confirm" raised>Confirm</paper-button>
+        <template is="dom-if" if="[[previousPlan.id]]">
+          <paper-button id="cancel" on-tap="_cancel">Cancel</paper-button>
+        </template>
+        <paper-button id="confirm"
+                      on-tap="_confirm"
+                      raised
+                      disabled="[[!selected]]">
+          Confirm
+        </paper-button>
       </div>
     </div>
   </template>
@@ -145,23 +204,42 @@
           statePath: 'responsePlans.all',
         },
 
-        selected: Number,
+        previousPlan: {
+          type: Object,
+          statePath: 'responsePlans.previous',
+        },
+
+        selected: {
+          type: Number,
+          value: null
+        },
+
+        detailsOpened: {
+          type: Boolean,
+          value: false
+        },
       },
 
       _determineIfChecked: function(selected, id) {
-        if (id == this.selected) {
+        if (id === this.selected) {
           return true;
         }
         return false;
       },
 
-      // Note: paper-radio-group requires the radio buttons to be directly nested, so it does not work for this component.
+      // Note: paper-radio-group requires the radio buttons to be directly nested,
+      // so it will not work for this component.
       _selectRadioButton: function(e) {
-        this.selected = e.target.name;
+        if (e.target.checked) {
+          this.selected = e.target.name;
+        } else {
+          this.selected = null;
+        }
       },
 
       _cancel: function() {
-        // TODO: Clear any selection
+        //If there was previously a plan selected, reassign it.
+        this.dispatch(App.Actions.setCurrentResponsePlan(this.previousPlan));
       },
 
       _confirm: function() {
@@ -169,10 +247,10 @@
         var self = this;
 
         this.responsePlans.forEach(function(plan) {
-          if (plan.id == self.selected) {
+          if (plan.id === self.selected) {
             selectedPlan = plan;
           }
-        })
+        });
 
         this.dispatch(App.Actions.setCurrentResponsePlan(selectedPlan));
       },

@@ -10,6 +10,7 @@
     App.Reducers.ResponsePlans = Redux.combineReducers({
       all: allResponsePlansReducer,
       current: currentResponsePlanReducer,
+      previous: previousResponsePlanReducer,
     });
 
     function allResponsePlansReducer(state, action) {
@@ -36,6 +37,23 @@
 
       switch (action.type) {
         case App.Constants.SET_CURRENT_RESPONSE_PLAN:
+          return action.plan;
+
+        case App.Constants.RESET:
+          return '';
+
+        default:
+          return state;
+      }
+    }
+
+    function previousResponsePlanReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = '';
+      }
+
+      switch (action.type) {
+        case App.Constants.SET_PREVIOUS_RESPONSE_PLAN:
           return action.plan;
 
         case App.Constants.RESET:

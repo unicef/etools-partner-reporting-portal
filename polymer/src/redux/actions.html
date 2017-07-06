@@ -92,7 +92,7 @@
             .then(function (res) {
               dispatch(App.Actions.setResponsePlans(res.data));
             });
-        }
+        };
       },
 
       setResponsePlans: function (plans) {
@@ -106,6 +106,13 @@
         return {
           type: App.Constants.SET_CURRENT_RESPONSE_PLAN,
           plan: newPlan,
+        };
+      },
+
+      setPreviousResponsePlan: function (oldPlan) {
+        return {
+          type: App.Constants.SET_PREVIOUS_RESPONSE_PLAN,
+          plan: oldPlan,
         };
       },
 

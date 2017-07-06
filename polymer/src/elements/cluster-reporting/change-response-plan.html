@@ -19,7 +19,7 @@
       }
 
       a {
-        color: var(--theme-primary-color-cluster-b);
+        color: var(--theme-primary-color-cluster-bright);
         font-size: 13px;
       }
     </style>
@@ -44,6 +44,9 @@
       },
 
       _change: function() {
+        //Set the previous response plan.
+        //The user will return to it if they select Cancel in the Select screen.
+        this.dispatch(App.Actions.setPreviousResponsePlan(this.responsePlan));
         //Reset the current response plan so the user will be redirected to the Select screen.
         this.dispatch(App.Actions.setCurrentResponsePlan({}));
       }

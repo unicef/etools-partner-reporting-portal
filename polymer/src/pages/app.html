@@ -117,6 +117,8 @@
       },
 
       _routeCountryChanged: function (country_code) {
+        var country;
+
         if (!country_code) {
           this.dispatch(App.Actions.reset()); // Switch country === wipe all the data
 
