@@ -19,29 +19,48 @@ from core.common import (
 
 class IndicatorBlueprint(TimeStampedModel):
     """
-    IndicatorBlueprint module is a pattern for indicator (here we setup basic parameter).
+    IndicatorBlueprint module is a pattern for indicator
+    (here we setup basic parameter).
     """
-    NUMBER = u'number'
-    PERCENTAGE = u'percentage'
-    LIKERT = u'likert'
-    YESNO = u'yesno'
+    NUMBER = 'number'
+    PERCENTAGE = 'percentage'
+    LIKERT = 'likert'
+    YESNO = 'yesno'
     UNIT_CHOICES = (
         (NUMBER, NUMBER),
         (PERCENTAGE, PERCENTAGE),
-        (LIKERT, LIKERT),
-        (YESNO, YESNO),
+        # (LIKERT, LIKERT),
+        # (YESNO, YESNO),
     )
 
     SUM = 'sum'
     MAX = 'max'
     AVG = 'avg'
-    MIN = 'min'
-    CALC_CHOICES = (
+    RATIO = 'ratio'
+
+    QUANTITY_CALC_CHOICES = (
         (SUM, SUM),
         (MAX, MAX),
-        (AVG, AVG),
-        (MIN, MIN),
+        (AVG, AVG)
     )
+
+    RATIO_CALC_CHOICES = (
+        (PERCENTAGE, PERCENTAGE),
+        (RATIO, RATIO)
+    )
+
+    CALC_CHOICES = QUANTITY_CALC_CHOICES + RATIO_CALC_CHOICES
+
+    QUANTITY_DISPLAY_TYPE_CHOICES = (
+        (NUMBER, NUMBER),
+    )
+
+    RATIO_DISPLAY_TYPE_CHOICES = (
+        (PERCENTAGE, PERCENTAGE),
+        (RATIO, RATIO)
+    )
+
+    DISPLAY_TYPE_CHOICES = QUANTITY_DISPLAY_TYPE_CHOICES + RATIO_DISPLAY_TYPE_CHOICES
 
     title = models.CharField(max_length=1024)
     unit = models.CharField(max_length=10, choices=UNIT_CHOICES, default=NUMBER)
@@ -50,7 +69,9 @@ class IndicatorBlueprint(TimeStampedModel):
     subdomain = models.CharField(max_length=255, null=True, blank=True)
     disaggregatable = models.BooleanField(default=False)
 
-    calculation_formula = models.CharField(max_length=3, choices=CALC_CHOICES, default=SUM)
+    calculation_formula = models.CharField(max_length=10, choices=CALC_CHOICES, default=SUM)
+
+    display_type = models.CharField(max_length=10, choices=DISPLAY_TYPE_CHOICES, default=NUMBER)
 
     # TODO: add:
     # siblings (similar inidcators to this indicator)
