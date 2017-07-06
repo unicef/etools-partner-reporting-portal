@@ -177,6 +177,9 @@ class PartnerProject(TimeStampedModel):
     partner = models.ForeignKey(Partner, null=True, related_name="partner_projects")
     reportables = GenericRelation('indicator.Reportable', related_query_name='partner_projects')
 
+    class Meta:
+        ordering = ['id']
+
 
 class PartnerActivity(TimeStampedModel):
     """
@@ -194,3 +197,6 @@ class PartnerActivity(TimeStampedModel):
     partner = models.ForeignKey(Partner, related_name="partner_activities")
     cluster_activity = models.ForeignKey('cluster.ClusterActivity', related_name="partner_activities", null=True)
     reportables = GenericRelation('indicator.Reportable', related_query_name='partner_activities')
+
+    class Meta:
+        ordering = ['id']
