@@ -212,7 +212,8 @@ class ClusterActivityFactory(factory.django.DjangoModelFactory):
 class QuantityTypeIndicatorBlueprintFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "quantity_indicator_%d" % n)
     unit = IndicatorBlueprint.NUMBER
-    calculation_formula = fuzzy.FuzzyChoice(QUANTITY_CALC_CHOICES_LIST)
+    calculation_formula_across_locations = fuzzy.FuzzyChoice(QUANTITY_CALC_CHOICES_LIST)
+    calculation_formula_across_periods = fuzzy.FuzzyChoice(QUANTITY_CALC_CHOICES_LIST)
     display_type = fuzzy.FuzzyChoice(QUANTITY_DISPLAY_TYPE_CHOICES_LIST)
 
     class Meta:

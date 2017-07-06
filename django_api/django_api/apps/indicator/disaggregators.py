@@ -94,7 +94,7 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
         indicator_report = indicator_location_data.indicator_report
 
         # IndicatorReport total calculation
-        if indicator_report.calculation_formula == IndicatorBlueprint.MAX:
+        if indicator_report.calculation_formula_across_locations == IndicatorBlueprint.MAX:
             max_total_loc = max(
                 indicator_report.indicator_location_data.all(),
                 key=lambda item: item.disaggregation['()']['v'])
@@ -115,7 +115,7 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
 
                 ir_total['c'] += loc_total['c']
 
-        if indicator_report.calculation_formula == IndicatorBlueprint.AVG:
+        if indicator_report.calculation_formula_across_locations == IndicatorBlueprint.AVG:
             loc_count = indicator_report.indicator_location_data.count()
 
             ir_total['v'] = ir_total['v'] / float(loc_count)

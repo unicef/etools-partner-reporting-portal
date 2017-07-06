@@ -31,7 +31,8 @@ class IndicatorBlueprintSimpleSerializer(serializers.ModelSerializer):
             'title',
             'unit',
             'display_type',
-            'calculation_formula',
+            'calculation_formula_across_periods',
+            'calculation_formula_across_locations',
         )
 
 

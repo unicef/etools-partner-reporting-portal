@@ -69,7 +69,9 @@ class IndicatorBlueprint(TimeStampedModel):
     subdomain = models.CharField(max_length=255, null=True, blank=True)
     disaggregatable = models.BooleanField(default=False)
 
-    calculation_formula = models.CharField(max_length=10, choices=CALC_CHOICES, default=SUM)
+    calculation_formula_across_periods = models.CharField(max_length=10, choices=CALC_CHOICES, default=SUM)
+
+    calculation_formula_across_locations = models.CharField(max_length=10, choices=CALC_CHOICES, default=SUM)
 
     display_type = models.CharField(max_length=10, choices=DISPLAY_TYPE_CHOICES, default=NUMBER)
 
@@ -227,8 +229,8 @@ class IndicatorReport(TimeStampedModel):
         return self.reportable.blueprint.display_type
 
     @cached_property
-    def calculation_formula(self):
-        return self.reportable.blueprint.calculation_formula
+    def calculation_formula_across_periods(self):
+        return self.reportable.blueprint.calculation_formula_across_periods
 
     def disaggregation_values(self, id_only=False, filter_by_id__in=None, flat=False):
         output_list = []
@@ -269,7 +271,7 @@ def recalculate_reportable_total(sender, instance, **kwargs):
     if blueprint.unit == IndicatorBlueprint.NUMBER:
         reportable_total['d'] = 1
 
-        if blueprint.calculation_formula == IndicatorBlueprint.MAX:
+        if blueprint.calculation_formula_across_periods == IndicatorBlueprint.MAX:
             max_total_ir = max(
                 reportable.indicator_reports.all(),
                 key=lambda item: item.total['v'])
@@ -287,7 +289,7 @@ def recalculate_reportable_total(sender, instance, **kwargs):
 
                 reportable_total['c'] += indicator_report.total['c']
 
-        if blueprint.calculation_formula == IndicatorBlueprint.AVG:
+        if blueprint.calculation_formula_across_periods == IndicatorBlueprint.AVG:
             ir_count = reportable.indicator_reports.count()
 
             reportable_total['v'] = reportable_total['v'] / float(ir_count)
