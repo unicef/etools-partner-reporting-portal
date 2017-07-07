@@ -10,13 +10,14 @@
     <style include="disaggregation-table-styles"></style>
 
     <tr class$="[[_computeClass(rowType)]]">
-      <td class="cellTitle" width="[[widthPercentage]]">
+      <td class="flex cellTitle">
         <span class="cellValue">[[_capitalizeFirstLetter(data.title)]]</span>
       </td>
 
+
       <template is="dom-repeat"
                 items="[[data.data]]">
-        <td width="[[widthPercentage]]">
+        <td class="flex">
           <disaggregation-table-cell
               coords="[[item.key]]"
               data="[[item.data]]"
@@ -28,7 +29,7 @@
       <template
           is="dom-if"
           if="[[data.total]]">
-        <td class="cellTotal" width="[[widthPercentage]]">
+        <td class="flex cellTotal">
           <disaggregation-table-cell
               coords="[[data.total.key]]"
               data="[[data.total.data]]"
@@ -63,8 +64,6 @@
           type: Number,
           value: 0,
         },
-
-        widthPercentage: String
       },
 
       observers: [
