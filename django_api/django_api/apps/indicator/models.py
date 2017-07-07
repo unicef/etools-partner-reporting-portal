@@ -232,6 +232,10 @@ class IndicatorReport(TimeStampedModel):
     def calculation_formula_across_periods(self):
         return self.reportable.blueprint.calculation_formula_across_periods
 
+    @cached_property
+    def calculation_formula_across_locations(self):
+        return self.reportable.blueprint.calculation_formula_across_locations
+
     def disaggregation_values(self, id_only=False, filter_by_id__in=None, flat=False):
         output_list = []
 
