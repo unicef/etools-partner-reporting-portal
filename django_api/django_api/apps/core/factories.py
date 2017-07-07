@@ -37,6 +37,12 @@ from core.countries import COUNTRIES_ALPHA2_CODE
 
 PD_STATUS_LIST = [x[0] for x in PD_STATUS]
 COUNTRIES_LIST = [x[0] for x in COUNTRIES_ALPHA2_CODE]
+CALC_CHOICES_LIST = [x[0] for x in IndicatorBlueprint.CALC_CHOICES]
+DISPLAY_TYPE_CHOICES_LIST = [x[0] for x in IndicatorBlueprint.DISPLAY_TYPE_CHOICES]
+QUANTITY_CALC_CHOICES_LIST = [x[0] for x in IndicatorBlueprint.QUANTITY_CALC_CHOICES]
+QUANTITY_DISPLAY_TYPE_CHOICES_LIST = [x[0] for x in IndicatorBlueprint.QUANTITY_DISPLAY_TYPE_CHOICES]
+RATIO_CALC_CHOICES_LIST = [x[0] for x in IndicatorBlueprint.RATIO_CALC_CHOICES]
+RATIO_DISPLAY_TYPE_CHOICES_LIST = [x[0] for x in IndicatorBlueprint.RATIO_DISPLAY_TYPE_CHOICES]
 
 
 # https://stackoverflow.com/a/41154232/2363915
@@ -212,20 +218,23 @@ class ClusterActivityFactory(factory.django.DjangoModelFactory):
         model = ClusterActivity
 
 
-class IndicatorBlueprintFactory(factory.django.DjangoModelFactory):
-    title = factory.Sequence(lambda n: "indicator_blueprint_%d" % n)
+class QuantityTypeIndicatorBlueprintFactory(factory.django.DjangoModelFactory):
+    title = factory.Sequence(lambda n: "quantity_indicator_%d" % n)
+    unit = IndicatorBlueprint.NUMBER
+    calculation_formula_across_locations = fuzzy.FuzzyChoice(QUANTITY_CALC_CHOICES_LIST)
+    calculation_formula_across_periods = fuzzy.FuzzyChoice(QUANTITY_CALC_CHOICES_LIST)
+    display_type = IndicatorBlueprint.NUMBER
 
     class Meta:
         model = IndicatorBlueprint
 
 
 class ReportableFactory(factory.django.DjangoModelFactory):
-    blueprint = factory.SubFactory(IndicatorBlueprintFactory)
     object_id = factory.SelfAttribute('content_object.id')
     content_type = factory.LazyAttribute(
         lambda o: ContentType.objects.get_for_model(o.content_object))
     total = dict(
-        [('c', None), ('d', None), ('v', random.randint(0, 3000))])
+        [('c', 0), ('d', 0), ('v', random.randint(0, 3000))])
 
     # Commented out so that we can create Disaggregation and DisaggregationValue objects manually
     # disaggregation = factory.RelatedFactory('core.factories.DisaggregationFactory', 'reportable')
@@ -235,7 +244,7 @@ class ReportableFactory(factory.django.DjangoModelFactory):
         abstract = True
 
 
-class ReportableToLowerLevelOutputFactory(ReportableFactory):
+class QuantityReportableToLowerLevelOutputFactory(ReportableFactory):
     content_object = factory.SubFactory('core.factories.LowerLevelOutputFactory')
     target = '5000'
     baseline = '0'
@@ -244,24 +253,7 @@ class ReportableToLowerLevelOutputFactory(ReportableFactory):
 
     location = factory.RelatedFactory('core.factories.LocationFactory', 'reportable', parent=None)
 
-    class Meta:
-        model = Reportable
-
-
-class ReportableToClusterActivityFactory(ReportableFactory):
-    objective = factory.SubFactory(ClusterObjectiveFactory)
-    content_object = factory.SubFactory('core.factories.ClusterActivityFactory')
-    target = '5000'
-    baseline = '0'
-
-    class Meta:
-        model = Reportable
-
-
-class ReportableToPartnerActivityFactory(ReportableFactory):
-    content_object = factory.SubFactory('core.factories.PartnerActivityFactory')
-    target = '5000'
-    baseline = '0'
+    blueprint = factory.SubFactory(QuantityTypeIndicatorBlueprintFactory)
 
     class Meta:
         model = Reportable
@@ -334,7 +326,7 @@ class IndicatorReportFactory(factory.django.DjangoModelFactory):
     time_period_end = fuzzy.FuzzyDate(datetime.date.today())
     due_date = fuzzy.FuzzyDate(datetime.date.today())
     total = dict(
-        [('c', None), ('d', None), ('v', random.randint(0, 3000))])
+        [('c', 0), ('d', 0), ('v', random.randint(0, 3000))])
 
     class Meta:
         model = IndicatorReport

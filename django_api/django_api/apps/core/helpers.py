@@ -59,7 +59,7 @@ def generate_data_combination_entries(array, entries_only=False, string_key=True
 
         for id_tuple in id_pairs:
             if string_key:
-                key = unicode(id_tuple)
+                key = str(id_tuple)
 
             else:
                 key = id_tuple
@@ -70,12 +70,12 @@ def generate_data_combination_entries(array, entries_only=False, string_key=True
             else:
                 output[key] = {
                     'v': random.randint(50, 1000),
-                    'd': None,
-                    'c': None
+                    'd': 0,
+                    'c': 0
                 }
 
     if string_key:
-        key = unicode(tuple())
+        key = str(tuple())
 
     else:
         key = tuple()
@@ -86,19 +86,25 @@ def generate_data_combination_entries(array, entries_only=False, string_key=True
     else:
         output[key] = {
             'v': random.randint(50, 1000),
-            'd': None,
-            'c': None
+            'd': 0,
+            'c': 0
         }
 
     return output
 
 
-def get_sorted_ordered_dict_by_keys(dictionary, reverse=True):
+def get_sorted_ordered_dict_by_keys(dictionary, reverse=True, key_func=None):
     """
     Returns a copy of passed-in dictionary as OrderedDict instance,
     after sorting the items by key.
     """
-    return OrderedDict(sorted(dictionary.items(), reverse=reverse))
+    if key_func:
+        ordered_dict = OrderedDict(sorted(dictionary.items(), reverse=reverse, key=key_func))
+
+    else:
+        ordered_dict = OrderedDict(sorted(dictionary.items(), reverse=reverse))
+
+    return ordered_dict
 
 
 def get_cast_dictionary_keys_as_tuple(dictionary):
@@ -125,7 +131,7 @@ def get_cast_dictionary_keys_as_string(dictionary):
     keys = casted_dictionary.keys()
 
     for key in keys:
-        casted_dictionary[unicode(key)] = casted_dictionary[key]
+        casted_dictionary[str(key)] = casted_dictionary[key]
         casted_dictionary.pop(key)
 
     return casted_dictionary
