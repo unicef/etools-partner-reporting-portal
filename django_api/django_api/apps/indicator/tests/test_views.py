@@ -9,7 +9,7 @@ from account.models import User
 
 from core.factories import (
     ProgrammeDocumentFactory,
-    ReportableToLowerLevelOutputFactory,
+    QuantityReportableToLowerLevelOutputFactory,
     ProgressReportFactory,
     IndicatorLocationDataFactory,
     SectionFactory
@@ -200,8 +200,8 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
                 break
 
         correct_total = update_data['disaggregation']['()']['v'] \
-            - update_data['disaggregation'][unicode(level_reported_1_key)]['v']
-        update_data['disaggregation'][unicode(level_reported_1_key)]['v'] = 0
+            - update_data['disaggregation'][str(level_reported_1_key)]['v']
+        update_data['disaggregation'][str(level_reported_1_key)]['v'] = 0
 
         url = reverse('indicator-location-data-entries-put-api')
         response = self.client.put(url, update_data, format='json')
@@ -228,8 +228,8 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
                 break
 
         correct_total = update_data['disaggregation']['()']['v'] \
-            - update_data['disaggregation'][unicode(level_reported_2_key)]['v']
-        update_data['disaggregation'][unicode(level_reported_2_key)]['v'] = 0
+            - update_data['disaggregation'][str(level_reported_2_key)]['v']
+        update_data['disaggregation'][str(level_reported_2_key)]['v'] = 0
 
         url = reverse('indicator-location-data-entries-put-api')
         response = self.client.put(url, update_data, format='json')
@@ -256,8 +256,8 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
                 break
 
         correct_total = update_data['disaggregation']['()']['v'] \
-            - update_data['disaggregation'][unicode(level_reported_3_key)]['v']
-        update_data['disaggregation'][unicode(level_reported_3_key)]['v'] = 0
+            - update_data['disaggregation'][str(level_reported_3_key)]['v']
+        update_data['disaggregation'][str(level_reported_3_key)]['v'] = 0
 
         url = reverse('indicator-location-data-entries-put-api')
         response = self.client.put(url, update_data, format='json')
@@ -280,7 +280,7 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
 
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
-            u'level_reported cannot be higher than its num_disaggregation',
+            'level_reported cannot be higher than its num_disaggregation',
             response.data['non_field_errors'][0]
         )
 
@@ -298,7 +298,7 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
 
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
-            u'disaggregation_reported_on list must have '
+            'disaggregation_reported_on list must have '
             + 'level_reported # of elements',
             response.data['non_field_errors'][0]
         )
@@ -339,7 +339,7 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
 
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
-            u'disaggregation_reported_on list must have all '
+            'disaggregation_reported_on list must have all '
             + 'its elements mapped to disaggregation ids',
             response.data['non_field_errors'][0]
         )
@@ -404,10 +404,10 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
         update_data = IndicatorLocationDataUpdateSerializer(
             indicator_location_data).data
 
-        update_data['disaggregation'][unicode(bad_key)] = {
-            u'c': None,
-            u'd': None,
-            u'v': 100
+        update_data['disaggregation'][str(bad_key)] = {
+            'c': 0,
+            'd': 0,
+            'v': 100
         }
 
         url = reverse('indicator-location-data-entries-put-api')
@@ -438,10 +438,10 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
                 level_reported_3_key = key
                 break
 
-        del update_data['disaggregation'][unicode(level_reported_3_key)]
+        del update_data['disaggregation'][str(level_reported_3_key)]
         level_reported_3_key = list(level_reported_3_key)
         level_reported_3_key.append(next_disaggregation_value_id)
-        update_data['disaggregation'][unicode(tuple(level_reported_3_key))] = {}
+        update_data['disaggregation'][str(tuple(level_reported_3_key))] = {}
 
         url = reverse('indicator-location-data-entries-put-api')
         response = self.client.put(url, update_data, format='json')
@@ -472,11 +472,11 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
                 level_reported_3_key = key
                 break
 
-        del update_data['disaggregation'][unicode(level_reported_3_key)]
+        del update_data['disaggregation'][str(level_reported_3_key)]
 
         level_reported_3_key = list(level_reported_3_key[:-1])
         level_reported_3_key.append(next_disaggregation_value_id)
-        update_data['disaggregation'][unicode(tuple(level_reported_3_key))] = {}
+        update_data['disaggregation'][str(tuple(level_reported_3_key))] = {}
 
         url = reverse('indicator-location-data-entries-put-api')
         response = self.client.put(url, update_data, format='json')
@@ -504,8 +504,8 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
                 level_reported_3_key = key
                 break
 
-        value = update_data['disaggregation'][unicode(level_reported_3_key)]
-        del update_data['disaggregation'][unicode(level_reported_3_key)]
+        value = update_data['disaggregation'][str(level_reported_3_key)]
+        del update_data['disaggregation'][str(level_reported_3_key)]
         update_data['disaggregation']['bad key'] = value
 
         url = reverse('indicator-location-data-entries-put-api')
@@ -533,7 +533,7 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
                 level_reported_3_key = key
                 break
 
-        update_data['disaggregation'][unicode(level_reported_3_key)] = {}
+        update_data['disaggregation'][str(level_reported_3_key)] = {}
 
         url = reverse('indicator-location-data-entries-put-api')
         response = self.client.put(url, update_data, format='json')
