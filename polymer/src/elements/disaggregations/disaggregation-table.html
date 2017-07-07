@@ -85,7 +85,6 @@
             if="[[_equals(formattedMapping.length, 2)]]"
             restamp="true">
           <two-disaggregations
-              width-percentage="[[widthPercentage]]"
               data="[[formattedData]]"
               mapping="[[formattedMapping]]"
               editable="[[editable]]">
@@ -97,7 +96,6 @@
             if="[[_equals(formattedMapping.length, 3)]]"
             restamp="true">
           <three-disaggregations
-              width-percentage="[[widthPercentage]]"
               data="[[formattedData]]"
               mapping="[[formattedMapping]]"
               editable="[[editable]]">
@@ -151,11 +149,6 @@
         localData: Object,
 
         mapping: Array,
-
-        widthPercentage: {
-          type: String,
-          computed: '_computeWidthPercentage(mapping)'
-        }
       },
 
       listeners: {
@@ -166,14 +159,6 @@
       observers: [
         '_resetFields(formattedData.disaggregation_reported_on)',
       ],
-
-      _computeWidthPercentage: function(mapping) {
-        if (mapping[0]) {
-          var numColumns = mapping[0].choices.length + 2;
-          var percentage = Math.floor(100 / numColumns);
-          return String(percentage) + '%';
-        }
-      },
 
       _registerField: function (e, field) {
         e.stopPropagation();

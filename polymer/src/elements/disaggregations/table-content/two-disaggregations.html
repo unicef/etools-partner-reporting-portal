@@ -27,7 +27,6 @@
         items="[[rowsForDisplay]]"
         as="row">
       <disaggregation-table-row
-          width-percentage="[[widthPercentage]]"
           data="[[row]]"
           level-reported="[[data.level_reported]]"
           row-type="middleRow"
@@ -36,7 +35,6 @@
     </template>
 
    <disaggregation-table-row
-      width-percentage="[[widthPercentage]]"
       data="[[totalsForDisplay]]"
       level-reported="[[data.level_reported]]"
       row-type="totalsRow">
@@ -80,7 +78,6 @@
           computed: '_determineRowsForDisplay(columns, rows, data)'
         },
 
-        widthPercentage: String
       },
 
       _getColumns: function (mapping) {
