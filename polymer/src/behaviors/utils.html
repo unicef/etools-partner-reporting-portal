@@ -80,6 +80,10 @@
 
         return defer;
       },
+
+      _toPercentage: function (val) {
+        return typeof val == null ? val : Math.floor(val * 100) + '%';
+      },
     };
 
   }());

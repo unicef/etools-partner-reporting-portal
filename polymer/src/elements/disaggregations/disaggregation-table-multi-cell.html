@@ -1,0 +1,145 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
+
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="disaggregation-field.html">
+
+<link rel="import" href="../../styles/disaggregation-table-styles.html">
+
+<dom-module id="disaggregation-table-multi-cell">
+  <template>
+    <style include="disaggregation-table-styles app-grid-style">
+      :host {
+        display: block;
+
+        --app-grid-columns: 2;
+        --app-grid-gutter: 0px;
+        --app-grid-item-height: auto;
+        --app-grid-expandible-item-columns: 2;
+      }
+
+      .item,
+      .computed-value {
+        box-sizing: border-box;
+        min-height: calc(1em + 10px);
+        line-height: 1;
+        padding: 5px;
+      }
+
+      .item {
+        border-bottom: 1px solid white;
+      }
+
+      .item:not(:first-child) {
+        border-left: 1px solid white;
+      }
+
+      .computed-value {
+        @apply --app-grid-expandible-item;
+
+        color: var(--theme-secondary-text-color);
+      }
+    </style>
+
+    <template
+        is="dom-if"
+        if="[[editableBool]]"
+        restamp="true">
+      <div class="app-grid">
+        <div class="item">
+          <disaggregation-field
+              id="c"
+              key="c"
+              min="0"
+              value="[[data.c]]"
+              coords="[[coords]]">
+          </disaggregation-field>
+        </div>
+        <div class="item">
+          <disaggregation-field
+              id="d"
+              key="d"
+              min="0"
+              value="[[data.d]]"
+              coords="[[coords]]"
+              validator="[[vName]]">
+          </disaggregation-field>
+        </div>
+        <div class="computed-value">[[_toPercentage(data.v)]]</div>
+      </div>
+    </template>
+
+    <template
+        is="dom-if"
+        if="[[!editableBool]]">
+      <div class="app-grid">
+        <div class="item">[[data.c]]</div>
+        <div class="item">[[data.d]]</div>
+        <div class="computed-value">[[_toPercentage(data.v)]]</div>
+      </div>
+    </template>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'disaggregation-table-multi-cell',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+      ],
+
+      properties: {
+        data: Object,
+        vName: String,
+        editable: Number,
+
+        coords: {
+          type: String,
+          observer: '_bindValidation',
+        },
+
+        editableBool: {
+          type: Boolean,
+          computed: '_computeEditableBool(editable)',
+        },
+      },
+
+      listeners: {
+        'field-value-changed': '_handleInput',
+      },
+
+      _computeEditableBool: function (editable) {
+        return editable === 1;
+      },
+
+      _handleInput: function (e, data) {
+        var value = data.value;
+
+        if (typeof value.c !== 'undefined') {
+          this.$$('#d').validate();
+        }
+      },
+
+      _bindValidation: function (coords) {
+        var vName = 'v-' + coords;
+
+        var validator = {
+          validatorName: vName,
+          validatorType: 'validator',
+          validate: function (value) {
+            return Number(value) !== 0 || Number(this.$$('#c').getField().value) === 0;
+          }.bind(this),
+        };
+
+        new Polymer.IronMeta({
+          type: validator.validatorType,
+          key: validator.validatorName,
+          value: validator,
+        });
+
+        this.set('vName', vName);
+      },
+    });
+  </script>
+
+</dom-module>

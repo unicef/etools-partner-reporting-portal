@@ -1,5 +1,4 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../bower_components/etools-data-table/etools-data-table.html">
 
 <link rel="import" href="disaggregation-field.html">
 <link rel="import" href="../../styles/disaggregation-table-styles.html">
@@ -16,7 +15,8 @@
         is="dom-if"
         if="[[editableBool]]">
       <disaggregation-field
-          data="[[data]]"
+          key="v"
+          value="[[data.v]]"
           coords="[[coords]]">
       </disaggregation-field>
     </template>
