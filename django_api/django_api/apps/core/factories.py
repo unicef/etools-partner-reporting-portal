@@ -214,7 +214,7 @@ class QuantityTypeIndicatorBlueprintFactory(factory.django.DjangoModelFactory):
     unit = IndicatorBlueprint.NUMBER
     calculation_formula_across_locations = fuzzy.FuzzyChoice(QUANTITY_CALC_CHOICES_LIST)
     calculation_formula_across_periods = fuzzy.FuzzyChoice(QUANTITY_CALC_CHOICES_LIST)
-    display_type = fuzzy.FuzzyChoice(QUANTITY_DISPLAY_TYPE_CHOICES_LIST)
+    display_type = IndicatorBlueprint.NUMBER
 
     class Meta:
         model = IndicatorBlueprint
