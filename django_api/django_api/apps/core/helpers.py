@@ -117,7 +117,7 @@ def get_cast_dictionary_keys_as_string(dictionary):
     keys = casted_dictionary.keys()
 
     for key in keys:
-        casted_dictionary[unicode(key)] = casted_dictionary[key]
+        casted_dictionary[str(key)] = casted_dictionary[key]
         casted_dictionary.pop(key)
 
     return casted_dictionary

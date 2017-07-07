@@ -174,14 +174,14 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
         return ordered_dict
 
     def get_location_progress(self, obj):
-        return obj.disaggregation[u'()']
+        return obj.disaggregation['()']
 
     def get_previous_location_progress(self, obj):
         current_ir_id = obj.indicator_report.id
         previous_indicator_reports = obj.indicator_report \
             .reportable.indicator_reports.filter(id__lt=current_ir_id)
 
-        empty_progress = {u'c': None, u'd': None, u'v': None}
+        empty_progress = {'c': None, 'd': None, 'v': None}
 
         if not previous_indicator_reports.exists():
             return empty_progress
@@ -193,7 +193,7 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
 
         if obj.id in previous_indicator_location_data_id_list:
             loc_data = previous_report.indicator_location_data.get(id=obj.id)
-            return loc_data.disaggregation[u'()']
+            return loc_data.disaggregation['()']
 
         else:
             return empty_progress
@@ -303,27 +303,11 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
                 + "extra combination pair keys"
             )
 
-        try:
-            level_reported_key_count = len(filter(
-                lambda key: len(make_tuple(key)) == data['level_reported'],
-                disaggregation_data_keys
-            ))
-
-            valid_level_reported_key_count = len(filter(
-                lambda key: len(key) == data['level_reported'],
-                valid_disaggregation_value_pairs
-            ))
-
-            if level_reported_key_count != valid_level_reported_key_count:
-                raise serializers.ValidationError(
-                    "Submitted disaggregation data entries do not contain "
-                    + "all level %d combination pair keys" % (data['level_reported'])
-                )
-
-        except Exception as e:
-            raise serializers.ValidationError(
-                "Parsing error from tuple string: " + e.message
-            )
+        valid_level_reported_key_count = len(filter(
+            lambda key: len(key) == data['level_reported'],
+            valid_disaggregation_value_pairs
+        ))
+        level_reported_key_count = 0
 
         # Disaggregation data coordinate space check from level_reported
         for key in disaggregation_data_keys:
@@ -335,43 +319,51 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
                     "%s key is not in tuple format" % (key)
                 )
 
-            else:
-                if len(parsed_tuple) > data['level_reported']:
-                    raise serializers.ValidationError(
-                        "%s Disaggregation data coordinate " % (key)
-                        + "space cannot be higher than "
-                        + "specified level_reported"
-                    )
+            if len(parsed_tuple) > data['level_reported']:
+                raise serializers.ValidationError(
+                    "%s Disaggregation data coordinate " % (key)
+                    + "space cannot be higher than "
+                    + "specified level_reported"
+                )
 
-                # Disaggregation data coordinate space check
-                # from disaggregation choice ids
-                if set(parsed_tuple) not in valid_disaggregation_value_pairs:
-                    raise serializers.ValidationError(
-                        "%s coordinate space does not " % (key)
-                        + "belong to disaggregation value id list")
+            # Disaggregation data coordinate space check
+            # from disaggregation choice ids
+            elif set(parsed_tuple) not in valid_disaggregation_value_pairs:
+                raise serializers.ValidationError(
+                    "%s coordinate space does not " % (key)
+                    + "belong to disaggregation value id list")
 
-                elif not isinstance(data['disaggregation'][key], dict):
-                    raise serializers.ValidationError(
-                        "%s coordinate space does not " % (key)
-                        + "have a correct value dictionary")
+            elif not isinstance(data['disaggregation'][key], dict):
+                raise serializers.ValidationError(
+                    "%s coordinate space does not " % (key)
+                    + "have a correct value dictionary")
 
-                elif data['disaggregation'][key].keys() != [u'c', u'd', u'v']:
-                    raise serializers.ValidationError(
-                        "%s coordinate space value does not " % (key)
-                        + "have correct value key structure: c, d, v")
+            elif data['disaggregation'][key].keys() != ['c', 'd', 'v']:
+                raise serializers.ValidationError(
+                    "%s coordinate space value does not " % (key)
+                    + "have correct value key structure: c, d, v")
 
-                # Sanitizing data value
-                if isinstance(data['disaggregation'][key][u'c'], unicode):
-                    data['disaggregation'][key][u'c'] = \
-                        int(data['disaggregation'][key][u'c'])
+            if len(parsed_tuple) == data['level_reported']:
+                level_reported_key_count += 1
 
-                if isinstance(data['disaggregation'][key][u'd'], unicode):
-                    data['disaggregation'][key][u'd'] = \
-                        int(data['disaggregation'][key][u'd'])
+            # Sanitizing data value
+            if isinstance(data['disaggregation'][key]['c'], str):
+                data['disaggregation'][key]['c'] = \
+                    int(data['disaggregation'][key]['c'])
 
-                if isinstance(data['disaggregation'][key][u'v'], unicode):
-                    data['disaggregation'][key][u'v'] = \
-                        int(data['disaggregation'][key][u'v'])
+            if isinstance(data['disaggregation'][key]['d'], str):
+                data['disaggregation'][key]['d'] = \
+                    int(data['disaggregation'][key]['d'])
+
+            if isinstance(data['disaggregation'][key]['v'], str):
+                data['disaggregation'][key]['v'] = \
+                    int(data['disaggregation'][key]['v'])
+
+        if level_reported_key_count != valid_level_reported_key_count:
+            raise serializers.ValidationError(
+                "Submitted disaggregation data entries do not contain "
+                + "all level %d combination pair keys" % (data['level_reported'])
+            )
 
         return data
 
