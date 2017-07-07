@@ -20,7 +20,6 @@
         table {
           text-align: center;
           font-size: 13px;
-          border-collapse: collapse;
         }
 
         /*  Text above the table  */
@@ -46,8 +45,8 @@
 
         /*   Rows   */
         tr {
-          @apply --layout-horizontal;
-          @apply --layout-center;
+          @apply(--layout-horizontal);
+          @apply(--layout-center);
           border-bottom: 1px solid white;
         }
 
@@ -68,12 +67,14 @@
         }
 
         /*   Cells   */
-        td {
+        td, th {
+          min-width: 40px;
           min-height: 25px;
-          padding: 5px 10px;
           word-wrap: break-word;
           hyphens: auto;
-          /*TODO: why do empty cells not have full height border without this?*/
+          @apply(--layout-flex);
+          @apply(--layout-self-stretch);
+          @apply(--layout-center);
         }
 
         .cellValue {

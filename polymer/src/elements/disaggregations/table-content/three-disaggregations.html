@@ -12,13 +12,13 @@
 
     <!-- Column names -->
     <tr class="horizontal layout headerRow">
-      <th class='flex'></th>
+      <th></th>
       <template is="dom-repeat"
                 items="[[columns]]"
                 as="column">
-        <th class='flex'>[[_capitalizeFirstLetter(column.value)]]</th>
+        <th>[[_capitalizeFirstLetter(column.value)]]</th>
       </template>
-      <th class='flex'>Total</th>
+      <th>Total</th>
     </tr>
 
     <!-- Data rows: outer and middle. -->
