@@ -12,13 +12,15 @@
 
     <!-- Column names -->
     <tr class="horizontal layout headerRow">
-      <th class='flex'></th>
+      <th width="[[widthPercentage]]"></th>
       <template is="dom-repeat"
                 items="[[columns]]"
                 as="column">
-        <th class='flex'>[[_capitalizeFirstLetter(column.value)]]</th>
+        <th width="[[widthPercentage]]">
+          [[_capitalizeFirstLetter(column.value)]]
+        </th>
       </template>
-      <th class='flex'>Total</th>
+      <th width="[[widthPercentage]]">Total</th>
     </tr>
 
     <!-- Data rows: outer and middle. -->
@@ -26,6 +28,7 @@
               items="[[outerRowsForDisplay]]"
               as="outerRow">
       <disaggregation-table-row
+          width-percentage="[[widthPercentage]]"
           data="[[outerRow]]"
           row-type="outerRow">
       </disaggregation-table-row>
@@ -35,6 +38,7 @@
           items="[[_determineMiddleRows(outerRow.id, columns, middleRows, data)]]"
           as="middleRow">
         <disaggregation-table-row
+            width-percentage="[[widthPercentage]]"
             data="[[middleRow]]"
             level-reported="[[data.level_reported]]"
             row-type="middleRow"
@@ -46,6 +50,7 @@
 
    <!-- Totals row -->
    <disaggregation-table-row
+      width-percentage="[[widthPercentage]]"
       data="[[columnTotalRow]]"
       level-reported="[[data.level_reported]]"
       row-type="totalsRow">
@@ -56,6 +61,7 @@
              items="[[bottomRows]]"
              as="bottomRow">
     <disaggregation-table-row
+        width-percentage="[[widthPercentage]]"
         data="[[bottomRow]]"
         level-reported="[[data.level_reported]]"
         row-type="bottomRow">
@@ -105,6 +111,8 @@
           type: Array,
           computed: '_determineOuterRows(columns, rows, data)'
         },
+
+        widthPercentage: String
       },
 
       _getColumns: function (mapping) {

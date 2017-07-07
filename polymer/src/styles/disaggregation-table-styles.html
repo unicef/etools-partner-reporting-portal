@@ -20,7 +20,7 @@
         table {
           text-align: center;
           font-size: 13px;
-          border-collapse: collapse;
+          table-layout:fixed;
         }
 
         /*  Text above the table  */
@@ -71,9 +71,13 @@
         td {
           min-height: 25px;
           padding: 5px 10px;
+          /*TODO: why do empty cells not have full height border without this?*/
+        }
+
+        td, th {
           word-wrap: break-word;
           hyphens: auto;
-          /*TODO: why do empty cells not have full height border without this?*/
+          min-width: 40px;
         }
 
         .cellValue {
