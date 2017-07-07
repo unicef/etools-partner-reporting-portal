@@ -19,6 +19,7 @@
               items="[[rows]]"
               as="row">
       <disaggregation-table-row
+          width-percentage="50%"
           data="[[row]]"
           level-reported="[[data.level_reported]]"
           row-type="middleRow"
@@ -27,6 +28,7 @@
     </template>
 
     <disaggregation-table-row
+        width-percentage="50%"
         data="[[totalRow]]"
         level-reported="[[data.level_reported]]"
         row-type="totalsRow">
@@ -90,7 +92,7 @@
               key: formatted,
               data: data.disaggregation[formatted],
             }],
-          }
+          };
         }, this);
       },
     });
