@@ -7,7 +7,7 @@ from core.common import PROGRESS_REPORT_STATUS
 from core.tests.base import BaseAPITestCase
 from core.models import Intervention, Location
 from core.factories import (
-    ReportableToLowerLevelOutputFactory,
+    QuantityReportableToLowerLevelOutputFactory,
     ProgrammeDocumentFactory,
     ProgressReportFactory,
     IndicatorLocationDataFactory,
