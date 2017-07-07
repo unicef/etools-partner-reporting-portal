@@ -30,6 +30,9 @@
       },
 
       _computePageNumber: function (queryParams) {
+        document.querySelectorAll('* /deep/ #details').forEach(function (details) {
+          if (details.opened) details.toggle();
+        });
         return this._toNumber(queryParams.page || 1);
       },
 
