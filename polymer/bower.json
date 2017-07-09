@@ -46,7 +46,7 @@
     "paper-dialog": "PolymerElements/paper-dialog#^2.0.0",
     "paper-dialog-scrollable": "PolymerElements/paper-dialog-scrollable#^2.1.0",
     "polymer-cookie": "^1.1.1",
-    "paper-radio-button": "^2.0.0",
+    "paper-radio-button": "^2.0.0"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0",
