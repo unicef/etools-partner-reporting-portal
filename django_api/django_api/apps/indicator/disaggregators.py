@@ -24,6 +24,7 @@ class BaseDisaggregator(object):
         raise NotImplementedError()
 
 
+# TODO: Write functional test case for QuantityIndicatorDisaggregator
 class QuantityIndicatorDisaggregator(BaseDisaggregator):
     """
     A class for Quantity indicator type disaggregation processing.
@@ -137,6 +138,7 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
         indicator_report.save()
 
 
+# TODO: Write functional test case for RatioIndicatorDisaggregator
 class RatioIndicatorDisaggregator(BaseDisaggregator):
     """
     A class for Ratio indicator type disaggregation processing.
