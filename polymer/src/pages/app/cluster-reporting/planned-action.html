@@ -1,7 +1,16 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../../../../bower_components/paper-tabs/paper-tabs.html">
 
+<link rel="import" href="../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../styles/shared-styles.html">
 <link rel="import" href="../../../elements/page-header.html">
 <link rel="import" href="../../../elements/page-body.html">
+
+<link rel="import" href="../../../behaviors/data-table.html">
+<link rel="import" href="../../../behaviors/pagination.html">
+<link rel="import" href="../../../styles/table-styles.html">
+
 
 <dom-module id="page-cluster-reporting-planned-action">
   <template>
@@ -13,7 +22,57 @@
 
     <page-header title="My Planned Action"></page-header>
 
-    <page-body></page-body>
+    <etools-prp-ajax
+        id="plannedActions"
+        url="[[plannedActionsUrl]]">
+    </etools-prp-ajax>
+
+    <etools-content-panel panel-title="">
+      <etools-data-table-header
+          no-collapse
+          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
+        <etools-data-table-column field="cluster">
+          <div class="table-column">Cluster</div>
+        </etools-data-table-column>
+        <etools-data-table-column field="status">
+          <div class="table-column">Status</div>
+        </etools-data-table-column>
+        <etools-data-table-column field="project">
+          <div class="table-column">Project</div>
+        </etools-data-table-column>
+        <etools-data-table-column field="Location">
+          <div class="table-column">Location</div>
+        </etools-data-table-column>
+      </etools-data-table-header>
+
+      <template
+          id="list"
+          is="dom-repeat"
+          items="[[data]]"
+          as="pd"
+          initial-count="[[pageSize]]">
+        <etools-data-table-row no-collapse>
+          <div slot="row-data">
+            <div class="table-cell table-cell--text">
+              [[_withDefault(pd.status)]]
+            </div>
+
+          </div>
+        </etools-data-table-row>
+      </template>
+
+      <etools-data-table-footer
+          page-size="[[pageSize]]"
+          page-number="[[pageNumber]]"
+          total-results="[[totalResults]]"
+          visible-range="{{visibleRange}}"
+          on-page-size-changed="_pageSizeChanged"
+          on-page-number-changed="_pageNumberChanged">
+      </etools-data-table-footer>
+
+      <etools-loading active="[[loading]]"></etools-loading>
+    </etools-content-panel>
+  </template>
 
   </template>
 
@@ -24,6 +83,52 @@
       behaviors: [
         App.Behaviors.ReduxBehavior,
       ],
+
+      properties: {
+        plannedActionsUrl: {
+          type: String,
+          computed: '_computePlannedActionsUrl(route)'
+        },
+        plannedActions: {
+          type: Array,
+          value: []
+        },
+
+        // loading: {
+        //   type: Boolean,
+        //   statePath: 'plannedActions.loading',
+        // },
+        //
+        // data: {
+        //   type: Array,
+        //   statePath: 'plannedActions.all',
+        // },
+        //
+        // totalResults: {
+        //   type: Number,
+        //   statePath: 'plannedActions.count',
+        // },
+
+      },
+
+      _computePlannedActionsUrl: function () {
+        console.log("compute it:", App.Endpoints.plannedActions() )
+        return App.Endpoints.plannedActions();
+      },
+
+      attached: function () {
+        var self = this;
+        var thunk = this.$.plannedActions.thunk();
+        thunk()
+          .then(function (res) {
+            console.log("res", res)
+            self.set('plannedActions', res.data.results);
+          })
+          .catch(function (err) { // jshint ignore:line
+            // TODO: error handling
+          });
+
+      },
     });
   </script>
 </dom-module>
