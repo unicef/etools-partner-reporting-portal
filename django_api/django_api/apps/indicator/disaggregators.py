@@ -143,17 +143,116 @@ class RatioIndicatorDisaggregator(BaseDisaggregator):
     """
 
     """
-    post_process will perform the followings:
-    1. Calculate N - 1 level_reported subtotals
-    2. Calculate c value from v and d.
+    pre_process will perform the followings:
+    1. Calculate SUM of all v and d for all level_reported.
     """
     @staticmethod
     def pre_process():
-        raise NotImplementedError()
+        level_reported = indicator_location_data.level_reported
 
+        ordered_dict = get_cast_dictionary_keys_as_tuple(
+            indicator_location_data.disaggregation)
+
+        ordered_dict_keys = ordered_dict.keys()
+
+        # Reset all subtotals
+        for key in ordered_dict_keys:
+            if len(key) == level_reported:
+                ordered_dict[key]["c"] = 0
+
+                packed_key = map(lambda item: tuple([item]), key)
+                subkey_combinations = generate_data_combination_entries(
+                    packed_key,
+                    entries_only=True,
+                    key_type=tuple,
+                    r=level_reported - 1
+                )
+
+                for subkey in subkey_combinations:
+                    ordered_dict[subkey]['c'] = 0
+
+        # Calculating subtotals
+        for key in ordered_dict_keys:
+            if len(key) == level_reported:
+                packed_key = map(lambda item: tuple([item]), key)
+                subkey_combinations = generate_data_combination_entries(
+                    packed_key,
+                    entries_only=True,
+                    key_type=tuple,
+                    r=level_reported - 1
+                )
+
+                # It is always SUM at IndicatorLocationData level
+                for subkey in subkey_combinations:
+                    ordered_dict[subkey]["v"] += \
+                        ordered_dict[key]["v"]
+
+                    ordered_dict[subkey]["d"] += \
+                        ordered_dict[key]["d"]
+
+        ordered_dict = get_cast_dictionary_keys_as_string(ordered_dict)
+
+        indicator_location_data.disaggregation = ordered_dict
+        indicator_location_data.save()
+
+        # Reset the IndicatorReport total
+        ir_total = {
+            'c': 0,
+            'd': 0,
+            'v': 0,
+        }
+
+        indicator_report = indicator_location_data.indicator_report
+
+        for loc_data in indicator_report.indicator_location_data.all():
+            loc_total = loc_data.disaggregation['()']
+
+            if loc_total['v'] is None:
+                loc_total['v'] = 0
+
+            ir_total['v'] += loc_total['v']
+
+            if loc_total['c'] is None:
+                loc_total['c'] = 0
+
+            ir_total['c'] += loc_total['d']
+
+        indicator_report.total = ir_total
+        indicator_report.save()
+
+    """
+    post_process will perform the followings:
+    1. Calculate c value from v and d for all level_reported entries.
+    """
     @staticmethod
-    def post_process(data_dict):
-        return data_dict
+    def post_process(indicator_location_data):
+        level_reported = indicator_location_data.level_reported
+
+        ordered_dict = get_cast_dictionary_keys_as_tuple(
+            indicator_location_data.disaggregation)
+
+        ordered_dict_keys = ordered_dict.keys()
+
+        # Calculating all level_reported N c values
+        for key in ordered_dict_keys:
+            ordered_dict[key]["c"] = ordered_dict[key]["v"] / ordered_dict[key]["d"]
+
+        ordered_dict = get_cast_dictionary_keys_as_string(ordered_dict)
+
+        indicator_location_data.disaggregation = ordered_dict
+        indicator_location_data.save()
+
+        # Reset the IndicatorReport total
+        ir_total = {
+            'c': 0,
+            'd': 0,
+            'v': 0,
+        }
+
+        indicator_report = indicator_location_data.indicator_report
+
+        indicator_report.total[key]["c"] = indicator_report.total[key]["v"] / indicator_report.total[key]["d"]
+        indicator_report.save()
 
 
 class LikertScaleIndicatorDisaggregator(BaseDisaggregator):
