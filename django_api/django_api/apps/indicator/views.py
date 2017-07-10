@@ -1,6 +1,7 @@
 import operator
 import logging
 from django.http import Http404
+from django.db import transaction
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.http import Http404
@@ -14,7 +15,8 @@ import django_filters.rest_framework
 
 from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
-from unicef.serializers import ProgressReportSerializer
+from unicef.serializers import ProgressReportSerializer, ProgressReportUpdateSerializer
+from unicef.models import ProgressReport
 
 from .disaggregators import (
     QuantityIndicatorDisaggregator,
@@ -22,6 +24,7 @@ from .disaggregators import (
 from .serializers import (
     IndicatorListSerializer, IndicatorReportListSerializer, PDReportsSerializer, SimpleIndicatorLocationDataListSerializer,
     IndicatorLLoutputsSerializer, IndicatorLocationDataUpdateSerializer,
+    IndicatorReportUpdateSerializer,
 )
 from .filters import IndicatorFilter, PDReportsFilter
 from .models import (
@@ -184,6 +187,41 @@ class IndicatorDataAPIView(APIView):
             response,
             status=status.HTTP_200_OK
         )
+
+    @transaction.atomic
+    def put(self, request, ir_id, *args, **kwargs):
+        _errors = []
+        if 'progress_report' not in request.data:
+            _errors.append({"message": "No 'progress_report' in request data."})
+        if 'indicator_report' not in request.data:
+            _errors.append({"message": "No 'indicator_report' in request data."})
+        if _errors:
+            return Response({"errors": _errors},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        pr = get_object_or_404(ProgressReport, pk=request.data['progress_report'].get('id'))
+        progress_report = ProgressReportUpdateSerializer(
+            instance=pr,
+            data=request.data['progress_report']
+        )
+
+        if progress_report.is_valid():
+            progress_report.save()
+
+        for _ir in request.data['indicator_report']:
+            ir = get_object_or_404(IndicatorReport, pk=_ir['id'])
+            indicator_report = IndicatorReportUpdateSerializer(
+                instance=ir,
+                data=_ir
+            )
+
+            if indicator_report.is_valid():
+                indicator_report.save()
+            else:
+                return Response(indicator_report.errors,
+                                status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class IndicatorReportListAPIView(APIView):

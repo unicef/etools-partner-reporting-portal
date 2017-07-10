@@ -458,3 +458,15 @@ class PDReportsSerializer(serializers.ModelSerializer):
 
     def get_due_date(self, obj):
         return obj.due_date and obj.due_date.strftime(settings.PRINT_DATA_FORMAT)
+
+
+class IndicatorReportUpdateSerializer(serializers.ModelSerializer):
+
+    overall_status = serializers.SerializerMethodField()
+    narrative_assessemnt = serializers.SerializerMethodField()
+
+    class Meta:
+        model = IndicatorReport
+        fields = (
+            'reporting_period',
+        )
