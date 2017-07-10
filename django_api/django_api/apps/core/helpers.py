@@ -66,8 +66,8 @@ def generate_data_combination_entries(array, entries_only=False, key_type=str, r
             else:
                 output[key] = {
                     'v': random.randint(50, 1000),
-                    'd': None,
-                    'c': None
+                    'd': 0,
+                    'c': 0
                 }
 
     key = key_type(tuple())
@@ -78,19 +78,25 @@ def generate_data_combination_entries(array, entries_only=False, key_type=str, r
     else:
         output[key] = {
             'v': random.randint(50, 1000),
-            'd': None,
-            'c': None
+            'd': 0,
+            'c': 0
         }
 
     return output
 
 
-def get_sorted_ordered_dict_by_keys(dictionary, reverse=True):
+def get_sorted_ordered_dict_by_keys(dictionary, reverse=True, key_func=None):
     """
     Returns a copy of passed-in dictionary as OrderedDict instance,
     after sorting the items by key.
     """
-    return OrderedDict(sorted(dictionary.items(), reverse=reverse))
+    if key_func:
+        ordered_dict = OrderedDict(sorted(dictionary.items(), reverse=reverse, key=key_func))
+
+    else:
+        ordered_dict = OrderedDict(sorted(dictionary.items(), reverse=reverse))
+
+    return ordered_dict
 
 
 def get_cast_dictionary_keys_as_tuple(dictionary):

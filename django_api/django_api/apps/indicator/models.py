@@ -19,29 +19,48 @@ from core.common import (
 
 class IndicatorBlueprint(TimeStampedModel):
     """
-    IndicatorBlueprint module is a pattern for indicator (here we setup basic parameter).
+    IndicatorBlueprint module is a pattern for indicator
+    (here we setup basic parameter).
     """
-    NUMBER = u'number'
-    PERCENTAGE = u'percentage'
-    LIKERT = u'likert'
-    YESNO = u'yesno'
+    NUMBER = 'number'
+    PERCENTAGE = 'percentage'
+    LIKERT = 'likert'
+    YESNO = 'yesno'
     UNIT_CHOICES = (
         (NUMBER, NUMBER),
         (PERCENTAGE, PERCENTAGE),
-        (LIKERT, LIKERT),
-        (YESNO, YESNO),
+        # (LIKERT, LIKERT),
+        # (YESNO, YESNO),
     )
 
-    SUM = u'sum'
-    MAX = u'max'
-    AVG = u'avg'
-    MIN = u'min'
-    CALC_CHOICES = (
+    SUM = 'sum'
+    MAX = 'max'
+    AVG = 'avg'
+    RATIO = 'ratio'
+
+    QUANTITY_CALC_CHOICES = (
         (SUM, SUM),
         (MAX, MAX),
-        (AVG, AVG),
-        (MIN, MIN),
+        (AVG, AVG)
     )
+
+    RATIO_CALC_CHOICES = (
+        (PERCENTAGE, PERCENTAGE),
+        (RATIO, RATIO)
+    )
+
+    CALC_CHOICES = QUANTITY_CALC_CHOICES + RATIO_CALC_CHOICES
+
+    QUANTITY_DISPLAY_TYPE_CHOICES = (
+        (NUMBER, NUMBER),
+    )
+
+    RATIO_DISPLAY_TYPE_CHOICES = (
+        (PERCENTAGE, PERCENTAGE),
+        (RATIO, RATIO)
+    )
+
+    DISPLAY_TYPE_CHOICES = QUANTITY_DISPLAY_TYPE_CHOICES + RATIO_DISPLAY_TYPE_CHOICES
 
     title = models.CharField(max_length=1024)
     unit = models.CharField(max_length=10, choices=UNIT_CHOICES, default=NUMBER)
@@ -50,7 +69,11 @@ class IndicatorBlueprint(TimeStampedModel):
     subdomain = models.CharField(max_length=255, null=True, blank=True)
     disaggregatable = models.BooleanField(default=False)
 
-    calculation_formula = models.CharField(max_length=3, choices=CALC_CHOICES, default=SUM)
+    calculation_formula_across_periods = models.CharField(max_length=10, choices=CALC_CHOICES, default=SUM)
+
+    calculation_formula_across_locations = models.CharField(max_length=10, choices=CALC_CHOICES, default=SUM)
+
+    display_type = models.CharField(max_length=10, choices=DISPLAY_TYPE_CHOICES, default=NUMBER)
 
     # TODO: add:
     # siblings (similar inidcators to this indicator)
@@ -88,7 +111,7 @@ class Reportable(TimeStampedModel):
     is_cluster_indicator = models.BooleanField(default=False)
 
     # Current total, transactional and dynamically calculated based on IndicatorReports
-    total = JSONField(default=dict([('c', None), ('d', None), ('v', 0)]))
+    total = JSONField(default=dict([('c', 0), ('d', 0), ('v', 0)]))
 
     # unique code for this indicator within the current context
     # eg: (1.1) result code 1 - indicator code 1
@@ -125,7 +148,7 @@ class Reportable(TimeStampedModel):
                 total = dict(total)
             return total
         else:
-            return None
+            return {'c': 0, 'd': 0, 'v': 0}
 
     @property
     def progress_percentage(self):
@@ -134,7 +157,7 @@ class Reportable(TimeStampedModel):
         percentage = 0.0
 
         if self.achieved:
-            percentage = (self.achieved['v'] - float(self.baseline)) / (float(self.target) - float(self.baseline))
+            percentage = (self.achieved['c'] - float(self.baseline)) / (float(self.target) - float(self.baseline))
 
         return percentage
 
@@ -149,6 +172,7 @@ class IndicatorReport(TimeStampedModel):
         unicef.ProgressReport (ForeignKey): "progress_report"
         core.Location (OneToOneField): "location"
     """
+
     title = models.CharField(max_length=255)
     reportable = models.ForeignKey(Reportable, related_name="indicator_reports")
     progress_report = models.ForeignKey('unicef.ProgressReport', related_name="indicator_reports", null=True)
@@ -163,7 +187,7 @@ class IndicatorReport(TimeStampedModel):
         verbose_name='Frequency of reporting'
     )
 
-    total = JSONField(default=dict([('c', None), ('d', None), ('v', 0)]))
+    total = JSONField(default=dict([('c', 0), ('d', 0), ('v', 0)]))
 
     remarks = models.TextField(blank=True, null=True)
     report_status = models.CharField(
@@ -200,6 +224,18 @@ class IndicatorReport(TimeStampedModel):
     def disaggregations(self):
         return self.reportable.disaggregation.all()
 
+    @cached_property
+    def display_type(self):
+        return self.reportable.blueprint.display_type
+
+    @cached_property
+    def calculation_formula_across_periods(self):
+        return self.reportable.blueprint.calculation_formula_across_periods
+
+    @cached_property
+    def calculation_formula_across_locations(self):
+        return self.reportable.blueprint.calculation_formula_across_locations
+
     def disaggregation_values(self, id_only=False, filter_by_id__in=None, flat=False):
         output_list = []
 
@@ -230,26 +266,38 @@ def recalculate_reportable_total(sender, instance, **kwargs):
 
     # Reset the reportable total
     reportable_total = {
-        u'c': 0,
-        u'd': 0,
-        u'v': 0,
+        'c': 0,
+        'd': 0,
+        'v': 0,
     }
 
     # IndicatorReport total calculation
     if blueprint.unit == IndicatorBlueprint.NUMBER:
-        reportable_total[u'd'] = 1
+        reportable_total['d'] = 1
 
-        if blueprint.calculation_formula == IndicatorBlueprint.SUM:
+        if blueprint.calculation_formula_across_periods == IndicatorBlueprint.MAX:
+            max_total_ir = max(
+                reportable.indicator_reports.all(),
+                key=lambda item: item.total['v'])
+            reportable_total = max_total_ir.total
+
+        else:
             for indicator_report in reportable.indicator_reports.all():
-                if indicator_report.total[u'v'] is None:
-                    indicator_report.total[u'v'] = 0
+                if indicator_report.total['v'] is None:
+                    indicator_report.total['v'] = 0
 
-                reportable_total[u'v'] += indicator_report.total[u'v']
+                reportable_total['v'] += indicator_report.total['v']
 
-                if indicator_report.total[u'c'] is None:
-                    indicator_report.total[u'c'] = 0
+                if indicator_report.total['c'] is None:
+                    indicator_report.total['c'] = 0
 
-                reportable_total[u'c'] += indicator_report.total[u'c']
+                reportable_total['c'] += indicator_report.total['c']
+
+        if blueprint.calculation_formula_across_periods == IndicatorBlueprint.AVG:
+            ir_count = reportable.indicator_reports.count()
+
+            reportable_total['v'] = reportable_total['v'] / float(ir_count)
+            reportable_total['c'] = reportable_total['c'] / float(ir_count)
 
     reportable.total = reportable_total
     reportable.save()

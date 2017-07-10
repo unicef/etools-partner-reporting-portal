@@ -8,7 +8,7 @@ from rest_framework.test import APITestCase, APIClient
 from account.models import User
 from core.factories import (
     ProgrammeDocumentFactory,
-    ReportableToLowerLevelOutputFactory,
+    QuantityReportableToLowerLevelOutputFactory,
     ProgressReportFactory,
     IndicatorLocationDataFactory,
     SectionFactory
@@ -281,7 +281,7 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
 
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
-            u'level_reported cannot be higher than its num_disaggregation',
+            'level_reported cannot be higher than its num_disaggregation',
             response.data['non_field_errors'][0]
         )
 
@@ -299,7 +299,7 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
 
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
-            u'disaggregation_reported_on list must have '
+            'disaggregation_reported_on list must have '
             + 'level_reported # of elements',
             response.data['non_field_errors'][0]
         )
@@ -340,7 +340,7 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
 
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(
-            u'disaggregation_reported_on list must have all '
+            'disaggregation_reported_on list must have all '
             + 'its elements mapped to disaggregation ids',
             response.data['non_field_errors'][0]
         )
@@ -409,9 +409,9 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
             indicator_location_data).data
 
         update_data['disaggregation'][str(bad_key)] = {
-            u'c': None,
-            u'd': None,
-            u'v': 100
+            'c': 0,
+            'd': 0,
+            'v': 100
         }
 
         url = reverse('indicator-location-data-entries-put-api')
