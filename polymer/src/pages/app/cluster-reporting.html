@@ -191,11 +191,12 @@
 
       _routePageChanged: function (page) {
         if (this._isPlanSelected(this.routeData.plan)) {
-          this.set('route.path', this.routeData.plan + '/' + page);
           this.page = page;
-          var resolvedPageUrl = this.resolveUrl('cluster-reporting/' + page + '.html');
-          this.importHref(resolvedPageUrl, null, this._notFound, true);
-
+          if (!this.subroute.subpath) {
+            this.set('route.path', this.routeData.plan + '/' + page);
+            var resolvedPageUrl = this.resolveUrl('cluster-reporting/' + page + '.html');
+            this.importHref(resolvedPageUrl, null, this._notFound, true);
+          }
         } else {
           this._redirectToPlanSelection();
         }

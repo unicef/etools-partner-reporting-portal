@@ -18,8 +18,34 @@
           background: var(--theme-selected-item-background-color);
         };
       }
+
+      paper-item[name='response-parameters']  {
+        @apply(--layout-vertical);
+        align-items: left;
+        padding: 16px;
+      }
+
+      paper-item[name='response-parameters'] span {
+        padding: 0 0 8px 0;
+      }
+
+      paper-item[name='response-parameters'] a.subcategory {
+        @apply(--layout-start-justified);
+        position: relative;
+        font-size: 13px;
+        padding-left: 0;
+        line-height: auto;
+        color: inherit;
+        text-decoration: none;
+      }
+
+      paper-item[name='response-parameters'] {
+        color: black;
+      }
+
+      /*color: var(--theme-primary-color-cluster);*/
     </style>
-    
+
     <paper-menu
         id="menu"
         selected="{{selected}}"
@@ -34,8 +60,14 @@
       </paper-item>
 
       <paper-item name="response-parameters">
-        <a href="[[buildUrl(_baseUrl, '/response-parameters')]]">
+        <a class="subcategory" href="[[buildUrl(_baseUrl, '/response-parameters/')]]">
           <span>Response Parameters</span>
+        </a>
+        <a class="subcategory" href="[[buildUrl(_baseUrl, '/response-parameters/cluster')]]">
+          Cluster
+        </a>
+        <a class="subcategory" href="[[buildUrl(_baseUrl, '/response-parameters/partners')]]">
+          Partners
         </a>
       </paper-item>
 

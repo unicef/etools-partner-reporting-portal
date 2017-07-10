@@ -1,5 +1,8 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../../bower_components/iron-pages/iron-pages.html">
 
+<link rel="import" href="../../../behaviors/utils.html">
 <link rel="import" href="../../../elements/page-header.html">
 <link rel="import" href="../../../elements/page-body.html">
 
@@ -11,10 +14,29 @@
       }
     </style>
 
-    <page-header title="Response Parameters"></page-header>
+    <app-route
+        route="{{route}}"
+        pattern="/:subpage"
+        data="{{routeData}}"
+        tail="{{subroute}}">
+    </app-route>
 
-    <page-body></page-body>
-
+    <iron-pages
+       selected="[[subpage]]"
+       attr-for-selected="name">
+     <template is="dom-if" if="[[_equals(subpage, 'cluster')]]" restamp="true">
+       <page-cluster-reporting-cluster-response-parameters
+         name="cluster"
+         route="{{subroute}}">
+       </page-cluster-reporting-cluster-response-parameters>
+     </template>
+     <template is="dom-if" if="[[_equals(subpage, 'partners')]]" restamp="true">
+       <page-cluster-reporting-partners-response-parameters
+         name="partners"
+         route="{{subroute}}">
+       </page-cluster-reporting-partners-response-parameters>
+     </template>
+   </iron-pages>
   </template>
 
   <script>
@@ -24,6 +46,38 @@
       behaviors: [
         App.Behaviors.ReduxBehavior,
       ],
+
+      observers: [
+        '_subpageChanged(routeData)',
+      ],
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+      ],
+
+      properties: {
+        subpage: {
+          type: String,
+          value: 'cluster'
+        }
+      },
+
+      attached: function() {
+        this.set('route.path', '/cluster');
+        this.set('route.subpath', 'cluster');
+      },
+
+      detached: function() {
+        this.set('route.subpath', undefined);
+      },
+
+      _subpageChanged: function (routeData) {
+        var subpage = routeData.subpage || 'cluster';
+        this.subpage = routeData.subpage;
+        this.set('route.subpath', subpage);
+        var resolvedPageUrl = this.resolveUrl(subpage + '.html');
+        this.importHref(resolvedPageUrl, null, this._notFound, true);
+      },
     });
   </script>
 </dom-module>
