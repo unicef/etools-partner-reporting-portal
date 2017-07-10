@@ -336,6 +336,9 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
                 'title': 'of temporary classrooms',
                 'unit': IndicatorBlueprint.NUMBER,
                 'description': 'Average measure for the month',
+                'calculation_formula_across_periods': IndicatorBlueprint.MAX,
+                'calculation_formula_across_locations': IndicatorBlueprint.AVG,
+                'display_type': IndicatorBlueprint.NUMBER,
                 'disaggregatable': True,
             },
         }
@@ -366,6 +369,7 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
         self.data['means_of_verification'] = new_means_of_verification
         new_title = 'of temporary classrooms - updated'
         self.data['blueprint']['title'] = new_title
+        self.data['blueprint']['calculation_formula_across_locations'] = IndicatorBlueprint.MAX
         self.data['locations'] = [{'id': Location.objects.first().id}]
         response = self.client.put(self.url, data=self.data, format='json')
 
@@ -373,6 +377,7 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
         reportable = Reportable.objects.get(id=response.data['id'])
         self.assertEquals(reportable.means_of_verification, new_means_of_verification)
         self.assertEquals(reportable.blueprint.title, new_title)
+        self.assertEquals(reportable.blueprint.calculation_formula_across_locations, IndicatorBlueprint.MAX)
         self.assertEquals(reportable.locations.count(), 1)
         self.assertEquals(
             reportable.locations.first().id,
