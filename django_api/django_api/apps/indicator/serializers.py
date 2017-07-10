@@ -458,6 +458,9 @@ class IndicatorBlueprintSerializer(serializers.ModelSerializer):
             'unit',
             'description',
             'disaggregatable',
+            'calculation_formula_across_periods',
+            'calculation_formula_across_locations',
+            'display_type',
         )
 
 
@@ -518,6 +521,14 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             validated_data.get('blueprint', {}).get('description', instance.blueprint.description)
         instance.blueprint.disaggregatable = \
             validated_data.get('blueprint', {}).get('disaggregatable', instance.blueprint.disaggregatable)
+        instance.blueprint.calculation_formula_across_periods = \
+            validated_data.get('blueprint', {}).get('calculation_formula_across_periods',
+                                                    instance.blueprint.calculation_formula_across_periods)
+        instance.blueprint.calculation_formula_across_locations = \
+            validated_data.get('blueprint', {}).get('calculation_formula_across_locations',
+                                                    instance.blueprint.calculation_formula_across_locations)
+        instance.blueprint.display_type = \
+            validated_data.get('blueprint', {}).get('display_type', instance.blueprint.display_type)
 
         exclude_ids = [loc['id'] for loc in self.initial_data.get('locations')]
         Location.objects.filter(reportable_id=instance.id).exclude(id__in=exclude_ids).update(reportable=None)
