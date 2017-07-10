@@ -11,15 +11,15 @@
     <style include='disaggregation-table-styles'></style>
 
     <tr class='horizontal layout headerRow'>
-      <th class='flex'></th>
+      <th></th>
 
       <template is="dom-repeat"
                 items="[[columns]]"
                 as="column">
-        <th class="flex">[[_capitalizeFirstLetter(column.value)]]</th>
+        <th>[[_capitalizeFirstLetter(column.value)]]</th>
       </template>
 
-      <th class='flex'>Total</th>
+      <th>Total</th>
     </tr>
 
     <template
@@ -79,6 +79,7 @@
           type: Object,
           computed: '_determineRowsForDisplay(columns, rows, data)'
         },
+
       },
 
       _getColumns: function (mapping) {

@@ -11,16 +11,16 @@
     <style include="disaggregation-table-styles"></style>
 
     <tr class$="[[_computeClass(rowType)]]">
-      <td class="flex cellTitle">
+      <td class="cellTitle">
         <span class="cellValue">[[_capitalizeFirstLetter(data.title)]]</span>
       </td>
 
       <template is="dom-repeat"
                 items="[[data.data]]">
-        <td class="flex">
+        <td>
           <template
               is="dom-if"
-              if="[[_equals(indicatorType, 'number')]]"
+              if="[[_equals(indicatorType, 'percentage')]]"
               restamp="true">
             <disaggregation-table-cell
                 coords="[[item.key]]"
@@ -31,7 +31,7 @@
 
           <template
               is="dom-if"
-              if="[[_equals(indicatorType, 'percentage')]]"
+              if="[[_equals(indicatorType, 'number')]]"
               restamp="true">
             <disaggregation-table-multi-cell
                 coords="[[item.key]]"
@@ -45,10 +45,10 @@
       <template
           is="dom-if"
           if="[[data.total]]">
-        <td class="flex cellTotal">
+        <td class="cellTotal">
           <template
               is="dom-if"
-              if="[[_equals(indicatorType, 'number')]]"
+              if="[[_equals(indicatorType, 'percentage')]]"
               restamp="true">
             <disaggregation-table-cell
                 coords="[[data.total.key]]"
@@ -59,7 +59,7 @@
 
           <template
               is="dom-if"
-              if="[[_equals(indicatorType, 'percentage')]]"
+              if="[[_equals(indicatorType, 'number')]]"
               restamp="true">
             <disaggregation-table-multi-cell
                 coords="[[data.total.key]]"
@@ -98,6 +98,7 @@
           type: Number,
           value: 0,
         },
+
       },
 
       observers: [
