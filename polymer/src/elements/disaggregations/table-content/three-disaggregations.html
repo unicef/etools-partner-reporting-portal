@@ -27,6 +27,7 @@
               as="outerRow">
       <disaggregation-table-row
           data="[[outerRow]]"
+          indicator-type="[[data.display_type]]"
           row-type="outerRow">
       </disaggregation-table-row>
 
@@ -37,6 +38,7 @@
         <disaggregation-table-row
             data="[[middleRow]]"
             level-reported="[[data.level_reported]]"
+            indicator-type="[[data.display_type]]"
             row-type="middleRow"
             editable="[[editable]]">
         </disaggregation-table-row>
@@ -48,6 +50,7 @@
    <disaggregation-table-row
       data="[[columnTotalRow]]"
       level-reported="[[data.level_reported]]"
+      indicator-type="[[data.display_type]]"
       row-type="totalsRow">
    </disaggregation-table-row>
 
@@ -58,6 +61,7 @@
     <disaggregation-table-row
         data="[[bottomRow]]"
         level-reported="[[data.level_reported]]"
+        indicator-type="[[data.display_type]]"
         row-type="bottomRow">
     </disaggregation-table-row>
   </template>

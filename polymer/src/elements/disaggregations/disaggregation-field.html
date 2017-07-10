@@ -1,6 +1,8 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/paper-input/paper-input.html">
 
+<link rel="import" href="../../behaviors/disaggregation-field.html">
+
 <dom-module id="disaggregation-field">
   <template>
     <style>
@@ -37,6 +39,10 @@
   <script>
     Polymer({
       is: 'disaggregation-field',
+
+      behaviors: [
+        App.Behaviors.DisaggregationFieldBehavior,
+      ],
 
       properties: {
         key: String,
@@ -87,7 +93,7 @@
 
         this.fire('field-value-changed', {
           key: this.coords,
-          value: change,
+          value: this._toNumericValues(change),
         });
       },
     });

@@ -81,8 +81,9 @@
         return defer;
       },
 
-      _toPercentage: function (val) {
-        return typeof val == null ? val : Math.floor(val * 100) + '%';
+      _toPercentage: function (value) {
+        return value == null /* undefinded & null */ ? // jshint ignore:line
+            value : Math.floor(value * 100) + '%';
       },
     };
 

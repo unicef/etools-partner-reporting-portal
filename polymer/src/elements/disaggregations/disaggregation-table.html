@@ -54,7 +54,18 @@
           if="[[editableBool]]">
         <dl class="location-progress">
           <dt>Location progress:</dt>
-          <dd>[[formattedData.location_progress.v]]</dd>
+          <template
+              is="dom-if"
+              if="[[_equals(indicatorType, 'number')]]"
+              restamp="true">
+            <dd>[[formattedData.location_progress.v]]</dd>
+          </template>
+          <template
+              is="dom-if"
+              if="[[_equals(indicatorType, 'percentage')]]"
+              restamp="true">
+            <dd>[[_toPercentage(formattedData.location_progress.v)]]</dd>
+          </template>
         </dl>
       </template>
 
@@ -143,6 +154,11 @@
         editableBool: {
           type: Boolean,
           computed: '_computeEditableBool(editable)',
+        },
+
+        indicatorType: {
+          type: String,
+          computed: '_computeIndicatorType(data)',
         },
 
         fields: Array,
@@ -255,6 +271,10 @@
         return editableBool ? mapping.filter(function (disagg) {
           return reportedOn.indexOf(disagg.id) !== -1;
         }) : mapping;
+      },
+
+      _computeIndicatorType: function (data) {
+        return data.display_type;
       },
     });
   </script>
