@@ -12,7 +12,7 @@
           return state.indicatorData.byReport;
         },
         function (state) {
-          return state.programmeDocumentReports.current;
+          return state.programmeDocumentReports.current.id;
         },
         function (byReport, reportId) {
           return byReport[reportId];

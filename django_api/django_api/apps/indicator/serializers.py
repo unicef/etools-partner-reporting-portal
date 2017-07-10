@@ -7,9 +7,18 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from unicef.models import LowerLevelOutput
+
 from core.serializers import SimpleLocationSerializer, IdLocationSerializer
 from core.models import Location
 from cluster.models import ClusterObjective
+
+from core.helpers import (
+    generate_data_combination_entries,
+    get_sorted_ordered_dict_by_keys,
+    get_cast_dictionary_keys_as_tuple,
+    get_cast_dictionary_keys_as_string,
+)
+
 from .models import (
     Reportable, IndicatorBlueprint,
     IndicatorReport, IndicatorLocationData,
@@ -25,6 +34,9 @@ class IndicatorBlueprintSimpleSerializer(serializers.ModelSerializer):
             'id',
             'title',
             'unit',
+            'display_type',
+            'calculation_formula_across_periods',
+            'calculation_formula_across_locations',
         )
 
 
@@ -57,7 +69,8 @@ class IndicatorReportSimpleSerializer(serializers.ModelSerializer):
 
     indicator_name = serializers.SerializerMethodField()
     target = serializers.SerializerMethodField()
-    achieved = serializers.SerializerMethodField()
+    achieved = serializers.JSONField(source="total")
+    report_status = serializers.CharField(source='get_report_status_display')
 
     class Meta:
         model = IndicatorReport
@@ -66,6 +79,7 @@ class IndicatorReportSimpleSerializer(serializers.ModelSerializer):
             'indicator_name',
             'target',
             'achieved',
+            'report_status',
         )
 
     def get_indicator_name(self, obj):
@@ -75,9 +89,6 @@ class IndicatorReportSimpleSerializer(serializers.ModelSerializer):
 
     def get_target(self, obj):
         return obj.reportable and obj.reportable.target
-
-    def get_achieved(self, obj):
-        return str(obj.total)
 
 
 class IndicatorReportStatusSerializer(serializers.ModelSerializer):
@@ -95,7 +106,7 @@ class IndicatorReportStatusSerializer(serializers.ModelSerializer):
 class IndicatorListSerializer(serializers.ModelSerializer):
     blueprint = IndicatorBlueprintSimpleSerializer()
     ref_num = serializers.CharField()
-    achieved = serializers.IntegerField()
+    achieved = serializers.JSONField()
     progress_percentage = serializers.FloatField()
 
     class Meta:
@@ -155,7 +166,48 @@ class IndicatorLLoutputsSerializer(serializers.ModelSerializer):
 class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
 
     location = SimpleLocationSerializer(read_only=True)
-    disaggregation = serializers.JSONField()
+    disaggregation = serializers.SerializerMethodField()
+    location_progress = serializers.SerializerMethodField()
+    previous_location_progress = serializers.SerializerMethodField()
+    display_type = serializers.SerializerMethodField()
+
+    def get_display_type(self, obj):
+        return obj.indicator_report.display_type
+
+    def get_disaggregation(self, obj):
+        ordered_dict = get_cast_dictionary_keys_as_tuple(obj.disaggregation)
+
+        ordered_dict = get_sorted_ordered_dict_by_keys(
+            ordered_dict, reverse=True)
+
+        ordered_dict = get_cast_dictionary_keys_as_string(ordered_dict)
+
+        return ordered_dict
+
+    def get_location_progress(self, obj):
+        return obj.disaggregation['()']
+
+    def get_previous_location_progress(self, obj):
+        current_ir_id = obj.indicator_report.id
+        previous_indicator_reports = obj.indicator_report \
+            .reportable.indicator_reports.filter(id__lt=current_ir_id)
+
+        empty_progress = {'c': 0, 'd': 0, 'v': 0}
+
+        if not previous_indicator_reports.exists():
+            return empty_progress
+
+        previous_report = previous_indicator_reports.last()
+        previous_indicator_location_data_id_list = previous_report \
+            .indicator_location_data \
+            .values_list('id', flat=True)
+
+        if obj.id in previous_indicator_location_data_id_list:
+            loc_data = previous_report.indicator_location_data.get(id=obj.id)
+            return loc_data.disaggregation['()']
+
+        else:
+            return empty_progress
 
     class Meta:
         model = IndicatorLocationData
@@ -163,6 +215,25 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
             'id',
             'indicator_report',
             'location',
+            'display_type',
+            'disaggregation',
+            'num_disaggregation',
+            'level_reported',
+            'disaggregation_reported_on',
+            'location_progress',
+            'previous_location_progress',
+        )
+
+
+class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
+
+    disaggregation = serializers.JSONField()
+
+    class Meta:
+        model = IndicatorLocationData
+        fields = (
+            'id',
+            'indicator_report',
             'disaggregation',
             'num_disaggregation',
             'level_reported',
@@ -175,41 +246,130 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
         field is correctly mapped to the disaggregation values.
         """
 
-        # Disaggregation data coordinate space check from level_reported
-        for key in data['disaggregation'].keys():
-            if len(make_tuple(key)) > data['level_reported']:
+        # level_reported and num_disaggregation validation
+        if data['level_reported'] > data['num_disaggregation']:
+            raise serializers.ValidationError(
+                "level_reported cannot be higher than "
+                + "its num_disaggregation"
+            )
+
+        # level_reported and disaggregation_reported_on validation
+        if data['level_reported'] != len(data['disaggregation_reported_on']):
+            raise serializers.ValidationError(
+                "disaggregation_reported_on list must have "
+                + "level_reported # of elements"
+            )
+
+        disaggregation_id_list = data[
+            'indicator_report'].disaggregations.values_list('id', flat=True)
+
+        # num_disaggregation validation with actual Disaggregation count
+        # from Reportable
+        if data['num_disaggregation'] != len(disaggregation_id_list):
+            raise serializers.ValidationError(
+                "num_disaggregation is not matched with "
+                + "its IndicatorReport's Reportable disaggregation counts"
+            )
+
+        # disaggregation_reported_on element-wise assertion
+        for disagg_id in data['disaggregation_reported_on']:
+            if disagg_id not in disaggregation_id_list:
                 raise serializers.ValidationError(
-                    "%s Disaggregation data coordinate " % (key)
-                    + "space cannot be higher than "
-                    + "specified level_reported"
+                    "disaggregation_reported_on list must have "
+                    + "all its elements mapped to disaggregation ids"
                 )
 
-        try:
-            indicator_report = IndicatorReport.objects.get(
-                id=data['indicator_report'])
-
-        except IndicatorReport.DoesNotExist:
+        # IndicatorReport membership validation
+        if not self.instance.id in data['indicator_report'] \
+                .indicator_location_data.values_list('id', flat=True):
             raise serializers.ValidationError(
-                "IndicatorReport ID %d" % (data['indicator_report'])
-                + "does not exist for "
-                + "IndicatorLocationData ID %d" % (data['id']))
+                "IndicatorLocationData does not belong to "
+                + "this {}".format(data['indicator_report'])
+            )
 
+        # Filter disaggregation option IDs
+        # from given disaggregation_reported_on Disaggregation IDs
         disaggregation_value_id_list = \
-            indicator_report.disaggregation_values(id_only=True, flat=True)
+            data['indicator_report'].disaggregation_values(
+                id_only=True,
+                filter_by_id__in=data['disaggregation_reported_on'])
+
+        valid_disaggregation_value_pairs = \
+            generate_data_combination_entries(
+                disaggregation_value_id_list,
+                entries_only=True, r=data['level_reported'])
+
+        if str(tuple()) not in valid_disaggregation_value_pairs:
+            valid_disaggregation_value_pairs.append(
+                str(tuple()))
+
+        disaggregation_data_keys = data['disaggregation'].keys()
+
+        valid_entry_count = len(valid_disaggregation_value_pairs)
+        disaggregation_data_key_count = len(disaggregation_data_keys)
+
+        # Assertion on all combinatoric entries for num_disaggregation and
+        # level_reported against submitted disaggregation data
+        if valid_entry_count > disaggregation_data_key_count:
+            raise serializers.ValidationError(
+                "Submitted disaggregation data entries does not contain "
+                + "all possible combination pair keys"
+            )
+
+        if valid_entry_count < disaggregation_data_key_count:
+            raise serializers.ValidationError(
+                "Submitted disaggregation data entries contains "
+                + "extra combination pair keys"
+            )
+
+        # Disaggregation data coordinate space check from level_reported
+        for key in disaggregation_data_keys:
+            try:
+                parsed_tuple = make_tuple(key)
+
+            except Exception as e:
+                raise serializers.ValidationError(
+                    "%s key is not in tuple format" % (key)
+                )
+
+            else:
+                if len(parsed_tuple) > data['level_reported']:
+                    raise serializers.ValidationError(
+                        "%s Disaggregation data coordinate " % (key)
+                        + "space cannot be higher than "
+                        + "specified level_reported"
+                    )
 
         # Disaggregation data coordinate space check
         # from disaggregation choice ids
-        for key in data['disaggregation'].keys():
-            tuple_key = make_tuple(key)
-
-            disagg_value_check_list = map(
-                lambda k: k not in disaggregation_value_id_list, tuple_key
-            )
-
-            if not all(disagg_value_check_list):
+        for key in disaggregation_data_keys:
+            if key not in valid_disaggregation_value_pairs:
                 raise serializers.ValidationError(
                     "%s coordinate space does not " % (key)
                     + "belong to disaggregation value id list")
+
+            elif not isinstance(data['disaggregation'][key], dict):
+                raise serializers.ValidationError(
+                    "%s coordinate space does not " % (key)
+                    + "have a correct value dictionary")
+
+            elif data['disaggregation'][key].keys() != ['c', 'd', 'v']:
+                raise serializers.ValidationError(
+                    "%s coordinate space value does not " % (key)
+                    + "have correct value key structure: c, d, v")
+
+            # Sanitizing data value
+            if isinstance(data['disaggregation'][key]['c'], str):
+                data['disaggregation'][key]['c'] = \
+                    int(data['disaggregation'][key]['c'])
+
+            if isinstance(data['disaggregation'][key]['d'], str):
+                data['disaggregation'][key]['d'] = \
+                    int(data['disaggregation'][key]['d'])
+
+            if isinstance(data['disaggregation'][key]['v'], str):
+                data['disaggregation'][key]['v'] = \
+                    int(data['disaggregation'][key]['v'])
 
         return data
 
@@ -219,6 +379,11 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
         SimpleIndicatorLocationDataListSerializer(many=True, read_only=True)
     disagg_lookup_map = serializers.SerializerMethodField()
     disagg_choice_lookup_map = serializers.SerializerMethodField()
+    total = serializers.JSONField()
+    display_type = serializers.SerializerMethodField()
+
+    def get_display_type(self, obj):
+        return obj.display_type
 
     def get_disagg_lookup_map(self, obj):
         serializer = DisaggregationListSerializer(
@@ -240,6 +405,7 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
             'indicator_location_data',
             'time_period_start',
             'time_period_end',
+            'display_type',
             'total',
             'remarks',
             'report_status',

@@ -92,15 +92,18 @@
 
     function currentPDReportReducer(state, action) {
       if (typeof state === 'undefined') {
-        state = '';
+        state = {};
       }
 
       switch (action.type) {
         case App.Constants.SET_CURRENT_PD_REPORT:
-          return action.reportId;
+          return {
+            id: action.reportId,
+            mode: action.mode,
+          };
 
         case App.Constants.RESET:
-          return '';
+          return {};
 
         default:
           return state;

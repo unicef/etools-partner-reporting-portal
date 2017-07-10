@@ -110,12 +110,12 @@
 
         mode: {
           type: String,
-          computed: '_computeMode(routeData)',
+          statePath: 'programmeDocumentReports.current.mode',
         },
 
         reportId: {
           type: String,
-          statePath: 'programmeDocumentReports.current',
+          statePath: 'programmeDocumentReports.current.id',
         },
 
         indicatorDataUrl: {
@@ -156,21 +156,9 @@
       },
 
       observers: [
-        '_onReportIdChanged(routeData.report_id)',
+        '_onReportChanged(routeData.report_id, routeData.mode)',
         '_handleInputChange(indicatorDataUrl)',
       ],
-
-      _computeMode: function (routeData) {
-        switch (routeData.mode) {
-          case 'view':
-          case 'draft':
-          case 'edit':
-            return routeData.mode;
-
-          default:
-            return 'view';
-        }
-      },
 
       _computeBackLink: function (pdId) {
         return 'pd/' + pdId + '/view/reports';
@@ -180,8 +168,8 @@
         return pd.reference_number;
       },
 
-      _onReportIdChanged: function (reportId) {
-        this.dispatch(App.Actions.PDReports.setCurrent(reportId));
+      _onReportChanged: function (reportId, mode) {
+        this.dispatch(App.Actions.PDReports.setCurrent(reportId, mode));
       },
 
       _computeHeadingText: function (pd, mode) {
