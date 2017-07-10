@@ -98,8 +98,40 @@
           type: Number,
           statePath: 'indicators.count'
         },
+
+        openedDetails: {
+          type: Array,
+          value: []
+        }
       },
 
+      listeners: {
+        'page-number-changed': '_pageNumberModified',
+        'details-opened-changed': '_detailsChange'
+      },
+
+      _pageNumberModified: function () {
+        var tempList = this.openedDetails.slice();
+        tempList.forEach(function (details) {
+          details.detailsOpened = false;
+        });
+      },
+
+      _detailsChange: function () {
+        var element = Polymer.dom(event).rootTarget;
+        var isOpen = element.detailsOpened;
+        if (isOpen) {
+          return this.push('openedDetails', element);
+        }
+        var index = this.openedDetails.indexOf(element);
+        if (index !== -1) {
+          return this.splice('openedDetails', index, 1);
+        }
+      },
+
+      detached: function () {
+        this.openedDetails.length = 0;
+      }
     });
   </script>
 </dom-module>
