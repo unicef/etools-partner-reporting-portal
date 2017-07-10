@@ -25,18 +25,24 @@
         padding: 16px;
       }
 
-      paper-item[name='response-parameters'] span {
+      paper-item[name='response-parameters'] a {
+        @apply(--layout-start-justified);
+        display: block;
+        position: relative;
+        line-height: auto;
+        color: inherit;
+        text-decoration: none;
+      }
+
+      paper-item[name='response-parameters'] a#category {
         padding: 0 0 8px 0;
+
       }
 
       paper-item[name='response-parameters'] a.subcategory {
         @apply(--layout-start-justified);
-        position: relative;
         font-size: 13px;
         padding-left: 0;
-        line-height: auto;
-        color: inherit;
-        text-decoration: none;
       }
 
       paper-item[name='response-parameters'] {
@@ -60,8 +66,8 @@
       </paper-item>
 
       <paper-item name="response-parameters">
-        <a class="subcategory" href="[[buildUrl(_baseUrl, '/response-parameters/')]]">
-          <span>Response Parameters</span>
+        <a id="category" href="[[buildUrl(_baseUrl, '/response-parameters/')]]">
+          Response Parameters
         </a>
         <a class="subcategory" href="[[buildUrl(_baseUrl, '/response-parameters/cluster')]]">
           Cluster

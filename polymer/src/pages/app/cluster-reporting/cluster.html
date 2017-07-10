@@ -1,19 +1,66 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../../../../../bower_components/paper-tabs/paper-tabs.html">
 
+<link rel="import" href="../../../styles/shared-styles.html">
 <link rel="import" href="../../../elements/page-header.html">
 <link rel="import" href="../../../elements/page-body.html">
 
 <dom-module id="page-cluster-reporting-cluster-response-parameters">
   <template>
-    <style>
+    <style include="shared-styles">
       :host {
         display: block;
       }
+      .page-top-content {
+        box-shadow: 0 1px 2px 1px rgba(0, 0, 0, .1);
+      }
+      .page-top-content page-header {
+        padding-bottom:10px;
+      }
+      .top-content-row {
+        padding-left:25px;
+      }
+
+      /*Overrides blue:*/
+      .top-content-row paper-tabs {
+        --paper-tabs-selection-bar-color: var(--theme-primary-color-cluster);
+      }
+      .top-content-row paper-tab {
+        --paper-tab-ink: var(--theme-primary-color-cluster);
+        padding: 0 10px;
+      }
+      .top-content-row paper-tab.iron-selected .tab-content {
+        color: var(--theme-primary-color-cluster);
+      }
+
     </style>
 
     <page-header title="Clusters"></page-header>
 
-    <page-body></page-body>
+    <div class="top-content-row">
+
+      <paper-tabs
+        selected="{{ routeData.dashTab }}"
+        attr-for-selected="name"
+        noink
+        bottom-item>
+
+        <paper-tab name="details" link>
+          <span class="tab-content">Response Plans</span>
+        </paper-tab>
+
+        <paper-tab name="reports" link>
+          <span class="tab-content">Objectives</span>
+        </paper-tab>
+
+        <paper-tab name="activities" link>
+          <span class="tab-content">Activities</span>
+        </paper-tab>
+
+      </paper-tabs>
+
+    </div>
 
   </template>
 
