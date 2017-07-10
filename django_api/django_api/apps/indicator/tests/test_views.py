@@ -134,6 +134,39 @@ class TestIndicatorListAPIView(BaseAPITestCase):
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(len(response.data['results']), len(self.reports))
 
+    def test_enter_indicator(self):
+        ir = IndicatorReport.objects.first()
+        expected_reportable = Reportable.objects.filter(
+            indicator_reports__id=ir.id,
+            lower_level_outputs__isnull=False
+        )
+        self.assertEquals(ir.progress_report.partner_contribution_to_date, '')
+        self.assertEquals(ir.progress_report.challenges_in_the_reporting_period, '')
+        data = {
+            'progress_report': {
+                'id': ir.progress_report.id,
+                'partner_contribution_to_date': 'update field',
+                'challenges_in_the_reporting_period': 'new challanges',
+                'proposed_way_forward': 'update field',
+                'funds_received_to_date': 'updated funds',
+                'programme_document_id': ir.progress_report.programme_document.id,
+            },
+            'indicator_report': [
+
+            ]
+        }
+
+        url = reverse('indicator-data', kwargs={'ir_id': ir.id})
+        response = self.client.put(url, data=data, format='json')
+        updated_ir = IndicatorReport.objects.get(id=ir.id)
+        self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEquals(updated_ir.progress_report.partner_contribution_to_date, u'update field')
+        self.assertEquals(updated_ir.progress_report.challenges_in_the_reporting_period, u'new challanges')
+
+        del data['progress_report']
+        response = self.client.put(url, data=data, format='json')
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+
 
 class TestIndicatorReportListAPIView(BaseAPITestCase):
     generate_fake_data_quantity = 5
