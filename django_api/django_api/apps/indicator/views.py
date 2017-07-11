@@ -258,9 +258,6 @@ class IndicatorLocationDataUpdateAPIView(APIView):
                     indicator_location_data)
 
             if blueprint.unit == IndicatorBlueprint.PERCENTAGE:
-                RatioIndicatorDisaggregator.pre_process(
-                    indicator_location_data)
-
                 RatioIndicatorDisaggregator.post_process(
                     indicator_location_data)
 

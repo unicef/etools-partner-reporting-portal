@@ -138,11 +138,12 @@ class RatioIndicatorDisaggregator(BaseDisaggregator):
     """
 
     """
-    pre_process will perform the followings:
+    post_process will perform the followings:
     1. Calculate SUM of all v and d for all level_reported.
+    2. Calculate c value from v and d for all level_reported entries.
     """
     @staticmethod
-    def pre_process(indicator_location_data):
+    def post_process(indicator_location_data):
         level_reported = indicator_location_data.level_reported
 
         ordered_dict = get_cast_dictionary_keys_as_tuple(
@@ -152,19 +153,7 @@ class RatioIndicatorDisaggregator(BaseDisaggregator):
 
         # Reset all subtotals
         for key in ordered_dict_keys:
-            if len(key) == level_reported:
-                ordered_dict[key]["c"] = 0
-
-                packed_key = map(lambda item: tuple([item]), key)
-                subkey_combinations = generate_data_combination_entries(
-                    packed_key,
-                    entries_only=True,
-                    key_type=tuple,
-                    r=level_reported - 1
-                )
-
-                for subkey in subkey_combinations:
-                    ordered_dict[subkey]['c'] = 0
+            ordered_dict[key]["c"] = 0
 
         # Calculating subtotals
         for key in ordered_dict_keys:
@@ -185,6 +174,10 @@ class RatioIndicatorDisaggregator(BaseDisaggregator):
                     ordered_dict[subkey]["d"] += \
                         ordered_dict[key]["d"]
 
+        # Calculating all level_reported N c values
+        for key in ordered_dict_keys:
+            ordered_dict[key]["c"] = ordered_dict[key]["v"] / (ordered_dict[key]["d"] * 1.0)
+
         ordered_dict = get_cast_dictionary_keys_as_string(ordered_dict)
 
         indicator_location_data.disaggregation = ordered_dict
@@ -204,33 +197,6 @@ class RatioIndicatorDisaggregator(BaseDisaggregator):
 
             ir_total['v'] += loc_total['v']
             ir_total['d'] += loc_total['d']
-
-        indicator_report.total = ir_total
-        indicator_report.save()
-
-    """
-    post_process will perform the followings:
-    1. Calculate c value from v and d for all level_reported entries.
-    """
-    @staticmethod
-    def post_process(indicator_location_data):
-        level_reported = indicator_location_data.level_reported
-
-        ordered_dict = get_cast_dictionary_keys_as_tuple(
-            indicator_location_data.disaggregation)
-
-        ordered_dict_keys = ordered_dict.keys()
-
-        # Calculating all level_reported N c values
-        for key in ordered_dict_keys:
-            ordered_dict[key]["c"] = ordered_dict[key]["v"] / (ordered_dict[key]["d"] * 1.0)
-
-        ordered_dict = get_cast_dictionary_keys_as_string(ordered_dict)
-
-        indicator_location_data.disaggregation = ordered_dict
-        indicator_location_data.save()
-
-        indicator_report = indicator_location_data.indicator_report
 
         indicator_report.total["c"] = indicator_report.total["v"] / (indicator_report.total["d"] * 1.0)
         indicator_report.save()
