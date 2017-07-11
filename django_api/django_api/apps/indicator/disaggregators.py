@@ -118,21 +118,14 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
             for loc_data in indicator_report.indicator_location_data.all():
                 loc_total = loc_data.disaggregation['()']
 
-                if loc_total['v'] is None:
-                    loc_total['v'] = 0
-
                 ir_total['v'] += loc_total['v']
-
-                if loc_total['c'] is None:
-                    loc_total['c'] = 0
-
                 ir_total['c'] += loc_total['c']
 
         if indicator_report.calculation_formula_across_locations == IndicatorBlueprint.AVG:
             loc_count = indicator_report.indicator_location_data.count()
 
-            ir_total['v'] = ir_total['v'] / float(loc_count)
-            ir_total['c'] = ir_total['c'] / float(loc_count)
+            ir_total['v'] = ir_total['v'] / (loc_count * 1.0)
+            ir_total['c'] = ir_total['c'] / (loc_count * 1.0)
 
         indicator_report.total = ir_total
         indicator_report.save()
@@ -209,15 +202,8 @@ class RatioIndicatorDisaggregator(BaseDisaggregator):
         for loc_data in indicator_report.indicator_location_data.all():
             loc_total = loc_data.disaggregation['()']
 
-            if loc_total['v'] is None:
-                loc_total['v'] = 0
-
             ir_total['v'] += loc_total['v']
-
-            if loc_total['c'] is None:
-                loc_total['c'] = 0
-
-            ir_total['c'] += loc_total['d']
+            ir_total['d'] += loc_total['d']
 
         indicator_report.total = ir_total
         indicator_report.save()
@@ -237,23 +223,16 @@ class RatioIndicatorDisaggregator(BaseDisaggregator):
 
         # Calculating all level_reported N c values
         for key in ordered_dict_keys:
-            ordered_dict[key]["c"] = ordered_dict[key]["v"] / ordered_dict[key]["d"]
+            ordered_dict[key]["c"] = ordered_dict[key]["v"] / (ordered_dict[key]["d"] * 1.0)
 
         ordered_dict = get_cast_dictionary_keys_as_string(ordered_dict)
 
         indicator_location_data.disaggregation = ordered_dict
         indicator_location_data.save()
 
-        # Reset the IndicatorReport total
-        ir_total = {
-            'c': 0,
-            'd': 0,
-            'v': 0,
-        }
-
         indicator_report = indicator_location_data.indicator_report
 
-        indicator_report.total[key]["c"] = indicator_report.total[key]["v"] / indicator_report.total[key]["d"]
+        indicator_report.total[key]["c"] = indicator_report.total[key]["v"] / (indicator_report.total[key]["d"] * 1.0)
         indicator_report.save()
 
 
