@@ -24,11 +24,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='indicatorreport',
             name='total',
-            field=django.contrib.postgres.fields.jsonb.JSONField(default={'c': None, 'd': None, 'v': 0}),
+            field=django.contrib.postgres.fields.jsonb.JSONField(default={'c': 0, 'd': 0, 'v': 0}),
         ),
         migrations.AddField(
             model_name='reportable',
             name='total',
-            field=django.contrib.postgres.fields.jsonb.JSONField(default={'c': None, 'd': None, 'v': 0}),
+            field=django.contrib.postgres.fields.jsonb.JSONField(default={'c': 0, 'd': 0, 'v': 0}),
         ),
     ]

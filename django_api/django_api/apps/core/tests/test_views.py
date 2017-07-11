@@ -6,7 +6,7 @@ from rest_framework.test import APIClient, APITestCase
 from account.models import User
 
 from core.factories import (
-    ProgrammeDocumentFactory, ReportableToLowerLevelOutputFactory, ProgressReportFactory, IndicatorLocationDataFactory,
+    ProgrammeDocumentFactory, QuantityReportableToLowerLevelOutputFactory, ProgressReportFactory, IndicatorLocationDataFactory,
     SectionFactory
 )
 from core.models import Location, Intervention
@@ -25,7 +25,7 @@ def generate_test_data(quantity):
     # IndicatorReport & Location from ReportableToLowerLevelOutput - IndicatorLocationData
     for idx in xrange(quantity):
         llo = LowerLevelOutput.objects.all()[idx]
-        reportable = ReportableToLowerLevelOutputFactory(content_object=llo)
+        reportable = QuantityReportableToLowerLevelOutputFactory(content_object=llo)
 
         reportable.content_object.indicator.programme_document.sections.add(Section.objects.all()[idx])
 
