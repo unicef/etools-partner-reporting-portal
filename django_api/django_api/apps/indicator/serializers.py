@@ -521,14 +521,16 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             validated_data.get('blueprint', {}).get('description', instance.blueprint.description)
         instance.blueprint.disaggregatable = \
             validated_data.get('blueprint', {}).get('disaggregatable', instance.blueprint.disaggregatable)
-        instance.blueprint.calculation_formula_across_periods = \
-            validated_data.get('blueprint', {}).get('calculation_formula_across_periods',
-                                                    instance.blueprint.calculation_formula_across_periods)
-        instance.blueprint.calculation_formula_across_locations = \
-            validated_data.get('blueprint', {}).get('calculation_formula_across_locations',
-                                                    instance.blueprint.calculation_formula_across_locations)
-        instance.blueprint.display_type = \
-            validated_data.get('blueprint', {}).get('display_type', instance.blueprint.display_type)
+
+        _errors = []
+        if validated_data.get('blueprint', {}).get('calculation_formula_across_periods'):
+            _errors.append("Modify or change the `calculation_formula_across_periods` is not allowed.")
+        if validated_data.get('blueprint', {}).get('calculation_formula_across_locations'):
+            _errors.append("Modify or change the `calculation_formula_across_locations` is not allowed.")
+        if validated_data.get('blueprint', {}).get('display_type'):
+            _errors.append("Modify or change the `display_type` is not allowed.")
+        if _errors:
+            raise ValidationError({"errors": _errors})
 
         exclude_ids = [loc['id'] for loc in self.initial_data.get('locations')]
         Location.objects.filter(reportable_id=instance.id).exclude(id__in=exclude_ids).update(reportable=None)
