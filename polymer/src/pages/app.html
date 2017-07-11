@@ -178,7 +178,7 @@
         this.dispatch(App.Actions.Location.set(currentCountryData.location));
 
         //If in cluster-reporting, the response plan is reset every time the country changes.
-        this.dispatch(App.Actions.setCurrentResponsePlan({}));
+        this.dispatch(App.Actions.setCurrentResponsePlanID(''));
       },
 
       attached: function () {

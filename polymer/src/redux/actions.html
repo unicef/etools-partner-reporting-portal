@@ -103,17 +103,17 @@
         };
       },
 
+      setCurrentResponsePlanID: function (newPlanID) {
+        return {
+          type: App.Constants.SET_CURRENT_RESPONSE_PLAN_ID,
+          planID: newPlanID,
+        };
+      },
+
       setCurrentResponsePlan: function (newPlan) {
         return {
           type: App.Constants.SET_CURRENT_RESPONSE_PLAN,
           plan: newPlan,
-        };
-      },
-
-      setPreviousResponsePlan: function (oldPlan) {
-        return {
-          type: App.Constants.SET_PREVIOUS_RESPONSE_PLAN,
-          plan: oldPlan,
         };
       },
 
