@@ -37,6 +37,13 @@ class ShortLocationSerializer(serializers.ModelSerializer):
         return str(obj.id)
 
 
+class IdLocationSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Location
+        fields = ('id', )
+
+
 class ChildrenLocationSerializer(serializers.ModelSerializer):
     """
     Endpoint for drop down meny on PD list filterset - location.

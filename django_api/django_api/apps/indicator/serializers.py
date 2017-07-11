@@ -1,13 +1,17 @@
 from ast import literal_eval as make_tuple
-from itertools import combinations
-from collections import OrderedDict
 
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from unicef.models import LowerLevelOutput
-from core.serializers import SimpleLocationSerializer
+
+from core.serializers import SimpleLocationSerializer, IdLocationSerializer
+from core.models import Location
+from cluster.models import ClusterObjective
+
 from core.helpers import (
     generate_data_combination_entries,
     get_sorted_ordered_dict_by_keys,
@@ -442,3 +446,99 @@ class PDReportsSerializer(serializers.ModelSerializer):
 
     def get_due_date(self, obj):
         return obj.due_date and obj.due_date.strftime(settings.PRINT_DATA_FORMAT)
+
+
+class IndicatorBlueprintSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = IndicatorBlueprint
+        fields = (
+            'id',
+            'title',
+            'unit',
+            'description',
+            'disaggregatable',
+            'calculation_formula_across_periods',
+            'calculation_formula_across_locations',
+            'display_type',
+        )
+
+
+class ClusterIndicatorSerializer(serializers.ModelSerializer):
+
+    cluster_objective_id = serializers.CharField(source='object_id')
+    blueprint = IndicatorBlueprintSerializer()
+    locations = IdLocationSerializer(many=True)
+
+    class Meta:
+        model = Reportable
+        fields = (
+            'id',
+            'means_of_verification',
+            'blueprint',
+            'cluster_objective_id',
+            'locations',
+        )
+
+    def check_location(self, locations):
+        if not isinstance(locations, (list, dict)) or\
+                False in [loc.get('id', False) for loc in locations]:
+            raise ValidationError({"locations": "List of dict location or one dict location expected"})
+
+    def create(self, validated_data):
+
+        self.check_location(self.initial_data.get('locations'))
+
+        blueprint = IndicatorBlueprintSerializer(data=validated_data['blueprint'])
+        if blueprint.is_valid():
+            blueprint.save()
+        else:
+            raise ValidationError(blueprint.errors)
+
+        validated_data['blueprint'] = blueprint.instance
+        validated_data['content_type'] = ContentType.objects.get_for_model(ClusterObjective)
+        validated_data['is_cluster_indicator'] = True
+        del validated_data['locations']
+
+        self.instance = Reportable.objects.create(**validated_data)
+
+        for location in self.initial_data.get('locations'):
+            self.instance.locations.add(Location.objects.get(id=location.get('id')))
+
+        return self.instance
+
+    def update(self, instance, validated_data):
+        # cluster_objective_id should not be changed in this endpoint !
+        self.check_location(self.initial_data.get('locations'))
+
+        instance.means_of_verification = validated_data.get(
+            'means_of_verification', instance.means_of_verification)
+        instance.blueprint.title = \
+            validated_data.get('blueprint', {}).get('title', instance.blueprint.title)
+        instance.blueprint.unit = \
+            validated_data.get('blueprint', {}).get('unit', instance.blueprint.unit)
+        instance.blueprint.description = \
+            validated_data.get('blueprint', {}).get('description', instance.blueprint.description)
+        instance.blueprint.disaggregatable = \
+            validated_data.get('blueprint', {}).get('disaggregatable', instance.blueprint.disaggregatable)
+
+        _errors = []
+        if validated_data.get('blueprint', {}).get('calculation_formula_across_periods'):
+            _errors.append("Modify or change the `calculation_formula_across_periods` is not allowed.")
+        if validated_data.get('blueprint', {}).get('calculation_formula_across_locations'):
+            _errors.append("Modify or change the `calculation_formula_across_locations` is not allowed.")
+        if validated_data.get('blueprint', {}).get('display_type'):
+            _errors.append("Modify or change the `display_type` is not allowed.")
+        if _errors:
+            raise ValidationError({"errors": _errors})
+
+        exclude_ids = [loc['id'] for loc in self.initial_data.get('locations')]
+        Location.objects.filter(reportable_id=instance.id).exclude(id__in=exclude_ids).update(reportable=None)
+
+        for location in self.initial_data.get('locations'):
+            instance.locations.add(Location.objects.get(id=location.get('id')))
+
+        instance.blueprint.save()
+        instance.save()
+
+        return instance
