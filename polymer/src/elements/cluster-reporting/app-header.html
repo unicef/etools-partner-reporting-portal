@@ -20,7 +20,6 @@
 
       app-header {
         background: var(--theme-page-header-background-color);
-        @apply(--layout-start-justified);
       }
 
       app-toolbar {
@@ -28,15 +27,13 @@
       }
 
       country-dropdown {
-        float: left;
-        margin-top: 10px;
+        @apply(--layout-self-center);
       }
 
       .right-wrapper {
         @apply(--layout-horizontal);
-        height: 64px;
       }
-      
+
     </style>
 
     <etools-prp-countries
@@ -50,7 +47,7 @@
         <app-toolbar>
           <etools-logo size="120" text-color="#fff"></etools-logo>
           <div class="right-wrapper">
-            
+
             <country-dropdown
                 data="[[countries]]"
                 current="[[country]]">
