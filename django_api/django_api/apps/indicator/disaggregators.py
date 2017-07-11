@@ -142,7 +142,7 @@ class RatioIndicatorDisaggregator(BaseDisaggregator):
     1. Calculate SUM of all v and d for all level_reported.
     """
     @staticmethod
-    def pre_process():
+    def pre_process(indicator_location_data):
         level_reported = indicator_location_data.level_reported
 
         ordered_dict = get_cast_dictionary_keys_as_tuple(
@@ -232,7 +232,7 @@ class RatioIndicatorDisaggregator(BaseDisaggregator):
 
         indicator_report = indicator_location_data.indicator_report
 
-        indicator_report.total[key]["c"] = indicator_report.total[key]["v"] / (indicator_report.total[key]["d"] * 1.0)
+        indicator_report.total["c"] = indicator_report.total["v"] / (indicator_report.total["d"] * 1.0)
         indicator_report.save()
 
 
