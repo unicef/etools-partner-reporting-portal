@@ -1,7 +1,6 @@
 import operator
 import logging
 from django.http import Http404
-from django.db import transaction
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.http import Http404
@@ -189,7 +188,6 @@ class IndicatorDataAPIView(APIView):
             status=status.HTTP_200_OK
         )
 
-    @transaction.atomic
     def put(self, request, ir_id, *args, **kwargs):
         if 'progress_report' not in request.data:
             _errors = [{"message": "No 'progress_report' in request data."}]
