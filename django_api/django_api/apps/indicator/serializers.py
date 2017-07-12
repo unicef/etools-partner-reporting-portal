@@ -183,6 +183,15 @@ class IndicatorLLoutputsSerializer(serializers.ModelSerializer):
         return self.__narrative_and_assessment
 
 
+class OverallNarrativeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = IndicatorReport
+        fields = (
+            'id',
+            'overall_status',
+            'narrative_assessemnt',
+        )
 
 
 class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):

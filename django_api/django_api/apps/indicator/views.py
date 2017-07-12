@@ -25,6 +25,7 @@ from .serializers import (
     IndicatorListSerializer, IndicatorReportListSerializer, PDReportsSerializer, SimpleIndicatorLocationDataListSerializer,
     IndicatorLLoutputsSerializer, IndicatorLocationDataUpdateSerializer,
     IndicatorReportUpdateSerializer,
+    OverallNarrativeSerializer,
 )
 from .filters import IndicatorFilter, PDReportsFilter
 from .models import (
@@ -222,6 +223,25 @@ class IndicatorDataAPIView(APIView):
                                 status=status.HTTP_400_BAD_REQUEST)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class IndicatorDataReportableAPIView(APIView):
+
+    serializer_class = OverallNarrativeSerializer
+    permission_classes = (IsAuthenticated, )
+
+    def patch(self, request, ir_id, reportable_id, *args, **kwargs):
+        reportable = get_object_or_404(Reportable, pk=reportable_id)
+        first_indicator = reportable.indicator_reports.first()
+        if first_indicator:
+            serializer = OverallNarrativeSerializer(data=request.data, instance=first_indicator)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({"errors": "Reportable don't contain indicator."}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class IndicatorReportListAPIView(APIView):

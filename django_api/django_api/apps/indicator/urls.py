@@ -7,6 +7,7 @@ from .views import (
     IndicatorReportListAPIView,
     IndicatorLocationDataUpdateAPIView,
     IndicatorDataAPIView,
+    IndicatorDataReportableAPIView,
 )
 
 
@@ -17,6 +18,9 @@ urlpatterns = [
     url(r'^programme-document/details/(?P<pd_id>\d+)/reports/',
         PDReportsAPIView.as_view(),
         name="programme-document-reports"),
+    url(r'^indicator-data/(?P<ir_id>\d+)/reportable/(?P<reportable_id>\d+)/',
+        IndicatorDataReportableAPIView.as_view(),
+        name='indicator-data-reportable'),
     url(r'^indicator-data/(?P<ir_id>\d+)/', IndicatorDataAPIView.as_view(), name='indicator-data'),
     url(r'^$', IndicatorListCreateAPIView.as_view(), name='indicator-list-create-api'),
     url(r'^indicator-location-data-entries/$', IndicatorLocationDataUpdateAPIView.as_view(), name='indicator-location-data-entries-put-api'),
