@@ -11,8 +11,8 @@
     <style include='disaggregation-table-styles'></style>
 
     <tr class='horizontal layout headerRow'>
-      <th class='flex'></th>
-      <th class='flex'>Total</th>
+      <th></th>
+      <th>Total</th>
     </tr>
 
     <template is="dom-repeat"
@@ -51,10 +51,9 @@
 
         totalRow: {
           type: Array,
-          computed: '_determineTotalRow(mapping, data)'
+          computed: '_determineTotalRow(data)'
         },
 
-        //Passing columnNames as a param is required to trigger update.
         columns: {
           type: Array,
           computed: '_getColumns(mapping)'
@@ -67,10 +66,10 @@
       },
 
       _getColumns: function(mapping) {
-        return mapping[0].choices;
+        return (mapping[0] || []).choices;
       },
 
-      _determineTotalRow: function (_, data) { // jshint ignore:line
+      _determineTotalRow: function (data) { // jshint ignore:line
         var totalRow = {
           title: 'total',
           total: {
@@ -81,22 +80,18 @@
         return totalRow;
       },
 
-      _determineRows: function(columns, _) { // jshint ignore:line
-        var self = this;
-        var data = [];
+      _determineRows: function(columns, data) { // jshint ignore:line
+        return columns.map(function (z) {
+          var formatted = this._formatDisaggregationIds([z.id]);
 
-        columns.forEach(function(z) {
-          var formatted = self._formatDisaggregationIds([z.id]);
-          var forDisplay = {
+          return {
             title: z.value,
             data: [{
               key: formatted,
-              data: self.data.disaggregation[formatted],
+              data: data.disaggregation[formatted],
             }],
           };
-          data.push(forDisplay);
-        });
-        return data;
+        }, this);
       },
     });
   </script>

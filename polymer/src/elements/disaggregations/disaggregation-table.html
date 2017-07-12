@@ -5,6 +5,7 @@
 <link rel="import" href="table-content/two-disaggregations.html">
 <link rel="import" href="table-content/one-disaggregation.html">
 <link rel="import" href="table-content/zero-disaggregations.html">
+<link rel="import" href="disaggregation-switches.html">
 <link rel="import" href="../etools-prp-ajax.html">
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../redux/store.html">
@@ -14,7 +15,21 @@
 
 <dom-module id="disaggregation-table">
   <template>
-    <style include="disaggregation-table-styles"></style>
+    <style include="disaggregation-table-styles">
+      .location-progress {
+        text-align: right;
+      }
+
+      .location-progress dt,
+      .location-progress dd {
+        display: inline;
+        margin: 0;
+      }
+
+      .location-progress dt {
+        font-weight: bold;
+      }
+    </style>
 
     <etools-prp-ajax
         id="update"
@@ -24,43 +39,70 @@
         method="put">
     </etools-prp-ajax>
 
-    <table class="vertical layout">
+    <div>
+      <disaggregation-switches
+          data="[[data]]"
+          mapping="[[mapping]]"
+          editable="[[editable]]"
+          formatted-data="{{formattedData}}"
+          on-formatted-data-changed="_triggerModalRefit">
+      </disaggregation-switches>
 
-      <!-- Note: Need to pass in mapping to these or an empty mapping is passed
-      to the content component. -->
-      <template is="dom-if" if="[[_equals(data.level_reported, 0)]]">
-        <zero-disaggregations
-            data="[[data]]"
-            mapping="[[mapping]]"
-            editable="[[editable]]">
-        </zero-disaggregations>
+      <template
+          is="dom-if"
+          if="[[editableBool]]">
+        <dl class="location-progress">
+          <dt>Location progress:</dt>
+          <dd>[[formattedData.location_progress.v]]</dd>
+        </dl>
       </template>
 
-      <template is="dom-if" if="[[_equals(data.level_reported, 1)]]">
-        <one-disaggregation
-            data="[[data]]"
-            mapping="[[mapping]]"
-            editable="[[editable]]">
-        </one-disaggregation>
-      </template>
+      <table class="vertical layout">
+        <template
+            is="dom-if"
+            if="[[_equals(formattedMapping.length, 0)]]"
+            restamp="true">
+          <zero-disaggregations
+              data="[[formattedData]]"
+              mapping="[[formattedMapping]]"
+              editable="[[editable]]">
+          </zero-disaggregations>
+        </template>
 
-      <template is="dom-if" if="[[_equals(data.level_reported, 2)]]">
-        <two-disaggregations
-            data="[[data]]"
-            mapping="[[mapping]]"
-            editable="[[editable]]">
-        </two-disaggregations>
-      </template>
+        <template
+            is="dom-if"
+            if="[[_equals(formattedMapping.length, 1)]]"
+            restamp="true">
+          <one-disaggregation
+              data="[[formattedData]]"
+              mapping="[[formattedMapping]]"
+              editable="[[editable]]">
+          </one-disaggregation>
+        </template>
 
-      <template is="dom-if" if="[[_equals(data.level_reported, 3)]]">
-        <three-disaggregations
-            data="[[data]]"
-            mapping="[[mapping]]"
-            editable="[[editable]]">
-        </three-disaggregations>
-      </template>
+        <template
+            is="dom-if"
+            if="[[_equals(formattedMapping.length, 2)]]"
+            restamp="true">
+          <two-disaggregations
+              data="[[formattedData]]"
+              mapping="[[formattedMapping]]"
+              editable="[[editable]]">
+          </two-disaggregations>
+        </template>
 
-    </table>
+        <template
+            is="dom-if"
+            if="[[_equals(formattedMapping.length, 3)]]"
+            restamp="true">
+          <three-disaggregations
+              data="[[formattedData]]"
+              mapping="[[formattedMapping]]"
+              editable="[[editable]]">
+          </three-disaggregations>
+        </template>
+      </table>
+    </div>
 
   </template>
 
@@ -80,9 +122,16 @@
           value: 0,
         },
 
-        data: {
+        data: Object,
+
+        formattedData: {
           type: Object,
           observer: '_cloneData',
+        },
+
+        formattedMapping: {
+          type: Array,
+          computed: '_computeMapping(editableBool, formattedData, mapping)',
         },
 
         updateUrl: {
@@ -90,18 +139,26 @@
           value: App.Endpoints.indicatorLocationDataEntries(),
         },
 
+        editableBool: {
+          type: Boolean,
+          computed: '_computeEditableBool(editable)',
+        },
+
         fields: Array,
 
         localData: Object,
 
-        mapping: Object,
+        mapping: Array,
       },
 
       listeners: {
         'register-field': '_registerField',
-        'deregister-field': '_deregisterField',
         'field-value-changed': '_fieldValueChanged',
       },
+
+      observers: [
+        '_resetFields(formattedData.disaggregation_reported_on)',
+      ],
 
       _registerField: function (e, field) {
         e.stopPropagation();
@@ -111,18 +168,6 @@
         }
 
         this.push('fields', field);
-      },
-
-      _deregisterField: function (e, field) {
-        var index = this.fields.indexOf(field);
-
-        e.stopPropagation();
-
-        if (index === -1) {
-          return;
-        }
-
-        this.splice('fields', index, 1);
       },
 
       _fieldValueChanged: function (e, change) {
@@ -135,12 +180,20 @@
         });
       },
 
-      _cloneData: function (data) {
-        if (!this.editable) {
+      _cloneData: function (formattedData) {
+        if (!this.editableBool) {
           return;
         }
 
-        this.set('localData', this._clone(data));
+        this.set('localData', this._clone(formattedData));
+      },
+
+      _resetFields: function () {
+        this.set('fields', []);
+      },
+
+      _computeEditableBool: function (editable) {
+        return editable === 1;
       },
 
       save: function () {
@@ -171,9 +224,27 @@
           App.Actions.Disaggregations.updateForLocation(
             updateThunk,
             this.indicatorId,
-            this.data.location.id
+            this.formattedData.location.id
           )
         );
+      },
+
+      _triggerModalRefit: function (e) {
+        e.stopPropagation();
+
+        if (!this.editableBool) {
+          return;
+        }
+
+        this.fire('disaggregation-modal-refit');
+      },
+
+      _computeMapping: function (editableBool, formattedData, mapping) {
+        var reportedOn = formattedData.disaggregation_reported_on;
+
+        return editableBool ? mapping.filter(function (disagg) {
+          return reportedOn.indexOf(disagg.id) !== -1;
+        }) : mapping;
       },
     });
   </script>
