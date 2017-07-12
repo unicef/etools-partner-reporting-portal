@@ -176,7 +176,7 @@ class InterventionFactory(factory.django.DjangoModelFactory):
 
         if extracted:
             # A list of groups were passed in, use them
-            for location in extracted:
+            for location in extracted.order_by('?')[:2]:
                 self.locations.add(location)
 
     class Meta:

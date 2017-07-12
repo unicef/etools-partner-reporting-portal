@@ -294,6 +294,8 @@ class IndicatorLocationDataUpdateAPIView(APIView):
                 QuantityIndicatorDisaggregator.post_process(
                     indicator_location_data)
 
+            serializer.data['disaggregation'] = indicator_location_data.disaggregation
+
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         else:
