@@ -154,10 +154,18 @@ class IndicatorDataAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def get_queryset(self, id):
-        return Reportable.objects.filter(
+        queryset = Reportable.objects.filter(
             indicator_reports__id=id,
             lower_level_outputs__isnull=False
         )
+        reportable_id = self.request.query_params.get('reportable_id', None)
+        if reportable_id:
+            queryset = queryset.filter(id=reportable_id)
+
+        location = self.request.query_params.get('location', None)
+        if location:
+            queryset = queryset.filter(locations__id=location)
+        return queryset
 
     def get_indicator_report(self, id):
         try:
