@@ -48,10 +48,10 @@
       <div class="app-grid">
         <div class="item">
           <disaggregation-field
-              id="c"
-              key="c"
+              id="v"
+              key="v"
               min="0"
-              value="[[data.c]]"
+              value="[[data.v]]"
               coords="[[coords]]">
           </disaggregation-field>
         </div>
@@ -65,7 +65,7 @@
               validator="[[vName]]">
           </disaggregation-field>
         </div>
-        <div class="computed-value">[[_toPercentage(data.v)]]</div>
+        <div class="computed-value">[[_toPercentage(data.c)]]</div>
       </div>
     </template>
 
@@ -73,9 +73,9 @@
         is="dom-if"
         if="[[!editableBool]]">
       <div class="app-grid">
-        <div class="item">[[data.c]]</div>
+        <div class="item">[[data.v]]</div>
         <div class="item">[[data.d]]</div>
-        <div class="computed-value">[[_toPercentage(data.v)]]</div>
+        <div class="computed-value">[[_toPercentage(data.c)]]</div>
       </div>
     </template>
   </template>
@@ -115,7 +115,7 @@
       _handleInput: function (e, data) {
         var value = data.value;
 
-        if (typeof value.c !== 'undefined') {
+        if (typeof value.v !== 'undefined') {
           this.$$('#d').validate();
         }
       },
@@ -127,7 +127,7 @@
           validatorName: vName,
           validatorType: 'validator',
           validate: function (value) {
-            return Number(value) !== 0 || Number(this.$$('#c').getField().value) === 0;
+            return Number(value) !== 0 || Number(this.$$('#v').getField().value) === 0;
           }.bind(this),
         };
 
