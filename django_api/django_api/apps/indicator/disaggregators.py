@@ -16,10 +16,6 @@ class BaseDisaggregator(object):
     that represents a serialized IndicatorReport object.
     """
     @staticmethod
-    def pre_process():
-        raise NotImplementedError()
-
-    @staticmethod
     def post_process():
         raise NotImplementedError()
 
@@ -30,11 +26,6 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
     A class for Quantity indicator type disaggregation processing.
     post_process will auto-calculate N - 1 level_reported subtotals
     """
-
-    @staticmethod
-    def pre_process():
-        raise NotImplementedError()
-
     @staticmethod
     def post_process(indicator_location_data):
         level_reported = indicator_location_data.level_reported
@@ -151,28 +142,43 @@ class RatioIndicatorDisaggregator(BaseDisaggregator):
 
         ordered_dict_keys = ordered_dict.keys()
 
-        # Reset all subtotals
-        for key in ordered_dict_keys:
-            ordered_dict[key]["c"] = 0
+        if level_reported != 0:
+            # Reset all subtotals
+            for key in ordered_dict_keys:
+                if len(key) == level_reported:
+                    packed_key = map(lambda item: tuple([item]), key)
+                    subkey_combinations = generate_data_combination_entries(
+                        packed_key,
+                        entries_only=True,
+                        key_type=tuple,
+                        r=level_reported - 1
+                    )
 
-        # Calculating subtotals
-        for key in ordered_dict_keys:
-            if len(key) == level_reported:
-                packed_key = map(lambda item: tuple([item]), key)
-                subkey_combinations = generate_data_combination_entries(
-                    packed_key,
-                    entries_only=True,
-                    key_type=tuple,
-                    r=level_reported - 1
-                )
+                    for subkey in subkey_combinations:
+                        ordered_dict[subkey] = {
+                            'c': 0,
+                            'd': 0,
+                            'v': 0,
+                        }
 
-                # It is always SUM at IndicatorLocationData level
-                for subkey in subkey_combinations:
-                    ordered_dict[subkey]["v"] += \
-                        ordered_dict[key]["v"]
+            # Calculating subtotals
+            for key in ordered_dict_keys:
+                if len(key) == level_reported:
+                    packed_key = map(lambda item: tuple([item]), key)
+                    subkey_combinations = generate_data_combination_entries(
+                        packed_key,
+                        entries_only=True,
+                        key_type=tuple,
+                        r=level_reported - 1
+                    )
 
-                    ordered_dict[subkey]["d"] += \
-                        ordered_dict[key]["d"]
+                    # It is always SUM at IndicatorLocationData level
+                    for subkey in subkey_combinations:
+                        ordered_dict[subkey]["v"] += \
+                            ordered_dict[key]["v"]
+
+                        ordered_dict[subkey]["d"] += \
+                            ordered_dict[key]["d"]
 
         # Calculating all level_reported N c values
         for key in ordered_dict_keys:
@@ -198,7 +204,9 @@ class RatioIndicatorDisaggregator(BaseDisaggregator):
             ir_total['v'] += loc_total['v']
             ir_total['d'] += loc_total['d']
 
-        indicator_report.total["c"] = indicator_report.total["v"] / (indicator_report.total["d"] * 1.0)
+        ir_total["c"] = ir_total["v"] / (ir_total["d"] * 1.0)
+
+        indicator_report.total = ir_total
         indicator_report.save()
 
 
@@ -212,10 +220,6 @@ class LikertScaleIndicatorDisaggregator(BaseDisaggregator):
     1. Calculate N - 1 level_reported subtotals
     2. Calculate c value from v and d.
     """
-    @staticmethod
-    def pre_process():
-        raise NotImplementedError()
-
     @staticmethod
     def post_process(data_dict):
         return data_dict
@@ -231,10 +235,6 @@ class YesNoIndicatorDisaggregator(BaseDisaggregator):
     1. Calculate N - 1 level_reported subtotals
     2. Calculate c value from v and d.
     """
-    @staticmethod
-    def pre_process():
-        raise NotImplementedError()
-
     @staticmethod
     def post_process(data_dict):
         return data_dict
