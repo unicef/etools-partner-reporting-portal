@@ -17,6 +17,7 @@ from core.factories import (
 from core.helpers import (
     get_cast_dictionary_keys_as_tuple,
 )
+from core.common import OVERALL_STATUS
 from core.tests.base import BaseAPITestCase
 from unicef.models import (
     LowerLevelOutput,
@@ -166,6 +167,27 @@ class TestIndicatorListAPIView(BaseAPITestCase):
         del data['progress_report']
         response = self.client.put(url, data=data, format='json')
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class TestIndicatorDataReportableAPIView(BaseAPITestCase):
+
+    def test_overall_narrative(self):
+        ir = IndicatorReport.objects.first()
+        url = reverse('indicator-data-reportable', kwargs={'ir_id': ir.id, 'reportable_id': ir.reportable.id})
+
+        new_overall_status = OVERALL_STATUS.met
+        data = dict(overall_status=new_overall_status)
+        response = self.client.patch(url, data=data, format='json')
+        self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
+        updated_ir = IndicatorReport.objects.get(id=ir.id)
+        self.assertEquals(updated_ir.overall_status, new_overall_status)
+
+        new_narrative_assessemnt = "new narrative_assessemnt"
+        data = dict(narrative_assessemnt=new_narrative_assessemnt)
+        response = self.client.patch(url, data=data, format='json')
+        self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
+        updated_ir = IndicatorReport.objects.get(id=ir.id)
+        self.assertEquals(updated_ir.narrative_assessemnt, new_narrative_assessemnt)
 
 
 class TestIndicatorReportListAPIView(BaseAPITestCase):
