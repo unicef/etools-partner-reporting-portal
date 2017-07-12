@@ -109,7 +109,6 @@ def generate_1_num_disagg_data(reportable, indicator_type="quantity"):
             QuantityIndicatorDisaggregator.post_process(location_data)
 
         elif indicator_type == "ratio":
-            RatioIndicatorDisaggregator.pre_process(location_data)
             RatioIndicatorDisaggregator.post_process(location_data)
 
         disagg_idx += 1
@@ -137,7 +136,6 @@ def generate_1_num_disagg_data(reportable, indicator_type="quantity"):
                 QuantityIndicatorDisaggregator.post_process(location_data)
 
             elif indicator_type == "ratio":
-                RatioIndicatorDisaggregator.pre_process(location_data)
                 RatioIndicatorDisaggregator.post_process(location_data)
 
             disagg_idx += 1
@@ -185,7 +183,6 @@ def generate_2_num_disagg_data(reportable, indicator_type="quantity"):
             QuantityIndicatorDisaggregator.post_process(location_data)
 
         elif indicator_type == "ratio":
-            RatioIndicatorDisaggregator.pre_process(location_data)
             RatioIndicatorDisaggregator.post_process(location_data)
 
         disagg_idx += 1
@@ -213,7 +210,6 @@ def generate_2_num_disagg_data(reportable, indicator_type="quantity"):
                 QuantityIndicatorDisaggregator.post_process(location_data)
 
             elif indicator_type == "ratio":
-                RatioIndicatorDisaggregator.pre_process(location_data)
                 RatioIndicatorDisaggregator.post_process(location_data)
 
             disagg_idx += 1
@@ -241,7 +237,6 @@ def generate_2_num_disagg_data(reportable, indicator_type="quantity"):
                 QuantityIndicatorDisaggregator.post_process(location_data)
 
             elif indicator_type == "ratio":
-                RatioIndicatorDisaggregator.pre_process(location_data)
                 RatioIndicatorDisaggregator.post_process(location_data)
 
             disagg_idx += 1
@@ -289,7 +284,6 @@ def generate_3_num_disagg_data(reportable, indicator_type="quantity"):
             QuantityIndicatorDisaggregator.post_process(location_data)
 
         elif indicator_type == "ratio":
-            RatioIndicatorDisaggregator.pre_process(location_data)
             RatioIndicatorDisaggregator.post_process(location_data)
 
         disagg_idx += 1
@@ -317,7 +311,6 @@ def generate_3_num_disagg_data(reportable, indicator_type="quantity"):
                 QuantityIndicatorDisaggregator.post_process(location_data)
 
             elif indicator_type == "ratio":
-                RatioIndicatorDisaggregator.pre_process(location_data)
                 RatioIndicatorDisaggregator.post_process(location_data)
 
             disagg_idx += 1
@@ -345,7 +338,6 @@ def generate_3_num_disagg_data(reportable, indicator_type="quantity"):
                 QuantityIndicatorDisaggregator.post_process(location_data)
 
             elif indicator_type == "ratio":
-                RatioIndicatorDisaggregator.pre_process(location_data)
                 RatioIndicatorDisaggregator.post_process(location_data)
 
             disagg_idx += 1
@@ -371,7 +363,6 @@ def generate_3_num_disagg_data(reportable, indicator_type="quantity"):
             QuantityIndicatorDisaggregator.post_process(location_data)
 
         elif indicator_type == "ratio":
-            RatioIndicatorDisaggregator.pre_process(location_data)
             RatioIndicatorDisaggregator.post_process(location_data)
 
         disagg_idx += 1
@@ -398,7 +389,6 @@ def generate_3_num_disagg_data(reportable, indicator_type="quantity"):
                 QuantityIndicatorDisaggregator.post_process(location_data)
 
             elif indicator_type == "ratio":
-                RatioIndicatorDisaggregator.pre_process(location_data)
                 RatioIndicatorDisaggregator.post_process(location_data)
 
 
