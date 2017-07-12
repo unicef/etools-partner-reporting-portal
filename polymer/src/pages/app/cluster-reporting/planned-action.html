@@ -17,6 +17,16 @@
         display: block;
       }
 
+      .page-top-content {
+        box-shadow: 0 1px 2px 1px rgba(0, 0, 0, .1);
+      }
+      .page-top-content page-header {
+        padding-bottom:10px;
+      }
+      .top-content-row {
+        padding-left:25px;
+      }
+
       /*TODO: make separate theme file for clusters*/
       /*Overrides blue:*/
       .top-content-row paper-tabs {
@@ -38,22 +48,24 @@
         tail="{{subroute}}">
     </app-route>
 
-    <page-header title="My Planned Action"></page-header>
+    <div class="page-top-content">
+      <page-header title="My Planned Action"></page-header>
 
-    <div class="top-content-row">
-      <paper-tabs
-        selected="{{ routeData.dashTab }}"
-        attr-for-selected="name"
-        noink
-        bottom-item>
-        <paper-tab name="details" link>
-          <span class="tab-content">Projects</span>
-        </paper-tab>
+      <div class="top-content-row">
+        <paper-tabs
+          selected="{{ routeData.dashTab }}"
+          attr-for-selected="name"
+          noink
+          bottom-item>
+          <paper-tab name="details" link>
+            <span class="tab-content">Projects</span>
+          </paper-tab>
 
-        <paper-tab name="activities" link>
-          <span class="tab-content">Activities</span>
-        </paper-tab>
-      </paper-tabs>
+          <paper-tab name="activities" link>
+            <span class="tab-content">Activities</span>
+          </paper-tab>
+        </paper-tabs>
+      </div>
     </div>
 
     <page-body>
@@ -77,10 +89,6 @@
       behaviors: [
         App.Behaviors.ReduxBehavior,
       ],
-
-      properties: {
-
-      },
 
     });
   </script>

@@ -1,13 +1,24 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../../bower_components/etools-data-table/etools-data-table.html">
+<link rel="import" href="../../../../bower_components/etools-loading/etools-loading.html">
+<link rel="import" href="../../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../../bower_components/iron-location/iron-query-params.html">
+<link rel="import" href="../../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../../bower_components/paper-radio-button/paper-radio-button.html">
 
 <link rel="import" href="../../../elements/etools-prp-ajax.html">
-<link rel="import" href="../../../styles/shared-styles.html">
-
+<link rel="import" href="../../../redux/store.html">
+<link rel="import" href="../../../redux/actions.html">
 <link rel="import" href="../../../behaviors/data-table.html">
 <link rel="import" href="../../../behaviors/pagination.html">
+<link rel="import" href="../../../behaviors/utils.html">
 <link rel="import" href="../../../styles/table-styles.html">
+<link rel="import" href="../../../styles/shared-styles.html">
+<link rel="import" href="../../../elements/etools-prp-data-table-row.html">
 
+<link rel="import" href="planned-action-projects-modal.html">
 
 <dom-module id="planned-action-projects">
   <template>
@@ -15,24 +26,60 @@
       :host {
         display: block;
       }
+
+      div[slot='row-data-details'] .table-cell--text {
+        font-size: 12px;
+      }
+
+      .label {
+        display: block;
+        padding-top: 10px;
+        color: var(--paper-grey-600);
+      }
+
+      /*Center-aligns the radio button.*/
+      .table-cell:first-of-type {
+        text-align: center;
+      }
+
+      div#action {
+        margin-bottom: 25px;
+        @apply(--layout-horizontal);
+        @apply(--layout-end-justified)
+      }
+
+      paper-button {
+        background-color: var(--theme-primary-color-cluster);
+        color: white;
+      }
+
     </style>
+
+    <iron-location
+        query="{{query}}">
+    </iron-location>
+
+    <iron-query-params
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
+    </iron-query-params>
 
     <etools-prp-ajax
         id="plannedActionsProjects"
-        url="[[plannedActionsUrl]]">
+        url="[[plannedActionsProjectsUrl]]"
+        params="[[queryParams]]">
     </etools-prp-ajax>
 
-    <etools-prp-ajax
-        id="create"
-        url="[[plannedActionsUrl]]"
-        body="[[plannedActionsData]]"
-        content-type="application/json"
-        method="post">
-    </etools-prp-ajax>
+    <div id="action">
+      <paper-button id="add" on-tap="_openModal" raised>
+        Add Project
+      </paper-button>
+    </div>
+
+    <planned-action-projects-modal id="modal"></planned-action-projects-modal>
 
     <etools-content-panel panel-title="">
       <etools-data-table-header
-          no-collapse
           label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
         <etools-data-table-column field="cluster">
           <div class="table-column">Cluster</div>
@@ -54,10 +101,10 @@
           items="[[projects]]"
           as="project"
           initial-count="[[pageSize]]">
-        <etools-data-table-row no-collapse>
+        <etools-prp-data-table-row details-opened="[[detailsOpened]]">
           <div slot="row-data">
             <div class="table-cell table-cell--text">
-              Cluster?
+              <!-- TODO: loop through list -->
             </div>
             <div class="table-cell table-cell--text">
               [[project.status]]
@@ -66,10 +113,34 @@
               [[project.title]]
             </div>
             <div class="table-cell table-cell--text">
-              Location?
+              <!-- TODO: loop through list -->
             </div>
           </div>
-        </etools-data-table-row>
+          <div slot="row-data-details">
+            <div slot="row-data">
+              <div class="table-cell table-cell--text">
+                <span class="label">Start Date</span>
+                [[project.start_date]]
+                <span class="label">Total Budget</span>
+                [[project.total_budget]]
+              </div>
+              <div class="table-cell table-cell--text">
+                <span class="label">End Date</span>
+                [[project.end_date]]
+                <span class="label">Funding Source</span>
+                [[project.funding_source]]
+              </div>
+              <div class="table-cell table-cell--text">
+                <span class="label">Part of a Joint Response Plan</span>
+                <!-- [[TODO: get this]] -->
+              </div>
+              <div class="table-cell table-cell--text">
+                <span class="label">Frequency of Reporting</span>
+                <!-- [[TODO: get this]] -->
+              </div>
+            </div>
+          </div>
+        </etools-prp-data-table-row>
       </template>
 
       <etools-data-table-footer
@@ -83,7 +154,6 @@
 
       <etools-loading active="[[loading]]"></etools-loading>
     </etools-content-panel>
-  </template>
 
   </template>
 
@@ -93,82 +163,72 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.DataTableBehavior,
+        App.Behaviors.PaginationBehavior,
+        App.Behaviors.UtilsBehavior,
       ],
 
       properties: {
-        // TODO: fix this.
-        // plannedActionsUrl: {
-        //   type: String,
-        //   computed: '_computePlannedActionsUrl(route)'
-        // },
 
-        plannedActionsUrl: {
+        mode: {
           type: String,
-          value: '/api/partner/partner-project-list/',
+          value: ''
+        },
+
+        pageSize: Number,
+
+        pageNumber: Number,
+
+        query: String,
+
+        queryParams: Object,
+
+        plannedActionsProjectsUrl: {
+          type: String,
+          value: App.Endpoints.plannedActions()
         },
 
         projects: {
-          type: Array,
-          value: []
+          type: Object,
+          statePath: 'partnerProjects.all',
         },
 
-        plannedActionsData: {
-          type: Object,
-          value: {
-            title: "Testing Planned Actions projects API",
-            start_date: "2017-07-10",
-            end_date: "2017-09-18",
-            description: "Testing",
-            additional_information: "www.testing.com",
-            funding_source: "Program Name",
-            locations: [],
-            clusters: []
-          }
+        loading: {
+          type: Boolean,
+          statePath: 'partnerProjects.loading'
+        },
+
+        totalResults: {
+          type: Number,
+          statePath: 'partnerProjects.count',
+        },
+
+        detailsOpened: {
+          type: Boolean,
+          value: false
+        },
+      },
+
+      _openModal: function (e) {
+        this.$$('#modal').open();
+      },
+
+      observers: [
+        '_partnerProjectsAjax(plannedActionsProjectsUrl, queryParams)',
+      ],
+
+      _partnerProjectsAjax: function (_, queryParams) {
+        if (!Object.keys(queryParams).length) {
+          return;
         }
 
-        // loading: {
-        //   type: Boolean,
-        //   statePath: 'plannedActions.loading',
-        // },
-        //
-        // data: {
-        //   type: Array,
-        //   statePath: 'plannedActions.all',
-        // },
-        //
-        // totalResults: {
-        //   type: Number,
-        //   statePath: 'plannedActions.count',
-        // },
-
-      },
-
-      _computePlannedActionsUrl: function () {
-        return App.Endpoints.plannedActions();
-      },
-
-      attached: function () {
-        var self = this;
         var thunk = this.$.plannedActionsProjects.thunk();
-        thunk()
-          .then(function (res) {
-            self.set('projects', res.data.results);
-          })
+        this.dispatch(App.Actions.PartnerProjects.fetchPartnerProjectsList(thunk))
           .catch(function (err) { // jshint ignore:line
-            // TODO: error handling
+              // TODO: error handling.
           });
-
-          // Testing that project creation works
-          // thunk3 = this.$.create.thunk();
-          // thunk3()
-          //   .then(function (res) {
-          //     console.log("res", res)
-          //   })
-          //   .catch(function (err) { // jshint ignore:line
-          //     // TODO: error handling
-          //   });
-
       },
+
     });
   </script>
 </dom-module>

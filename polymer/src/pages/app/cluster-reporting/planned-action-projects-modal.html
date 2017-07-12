@@ -1,0 +1,202 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../../../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../../bower_components/etools-loading/etools-loading.html">
+
+<link rel="import" href="../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../styles/buttons.html">
+<link rel="import" href="../../../redux/store.html">
+<link rel="import" href="../../../redux/actions.html">
+
+<dom-module id="planned-action-projects-modal">
+  <template>
+    <style include="button-styles iron-flex iron-flex-alignment iron-flex-reverse">
+      :host {
+        display: block;
+
+        --paper-dialog: {
+          min-width: 500px;
+
+          & > * {
+            margin: 0;
+          }
+        };
+      }
+
+      .header {
+        height: 48px;
+        padding: 0 24px;
+        margin: 0;
+        color: white;
+        background: var(--theme-primary-color-cluster);
+      }
+
+      paper-button.btn-primary {
+        background-color: var(--theme-primary-color-cluster);
+        color: white;
+      }
+
+      .header h2 {
+        @apply(--paper-font-title);
+
+        margin: 0;
+        line-height: 48px;
+      }
+
+      .header paper-icon-button {
+        margin: 0 -13px 0 20px;
+        color: white;
+      }
+
+      .buttons {
+        padding: 24px;
+      }
+
+      div.row {
+        display: block;
+      }
+    </style>
+
+    <etools-prp-ajax
+        id="createProject"
+        url="[[projectCreationUrl]]"
+        body="[[data]]"
+        content-type="application/json"
+        method="post">
+    </etools-prp-ajax>
+
+    <paper-dialog
+        id="dialog"
+        with-backdrop
+        opened="[[opened]]">
+      <div class="header layout horizontal justified">
+        <h2>Add Project</h2>
+          <paper-icon-button
+              class="self-center"
+              on-tap="close"
+              icon="icons:close">
+          </paper-icon-button>
+        </div>
+      </div>
+
+      <paper-dialog-scrollable>
+        <div class="row">
+          <paper-input label="Title"></paper-input>
+        </div>
+
+        <div class="row">
+          <paper-dropdown-menu label="Cluster">
+            <paper-listbox slot="dropdown-content" selected="1">
+              <paper-item>Cluster item</paper-item>
+            </paper-listbox>
+          </paper-dropdown-menu>
+
+          <paper-dropdown-menu label="Location">
+            <paper-listbox slot="dropdown-content" selected="1">
+              <paper-item>Location item</paper-item>
+            </paper-listbox>
+          </paper-dropdown-menu>
+        </div>
+
+        <div class="row">
+          Start Date, End Date
+        </div>
+
+        <div class="row">
+          <paper-input label="Total Budget"></paper-input>
+          <paper-input label="Funding Source"></paper-input>
+        </div>
+
+        <div class="row">
+          <paper-input label="Description"></paper-input>
+        </div>
+
+        <div class="row">
+          <paper-input label="Information"></paper-input>
+        </div>
+
+      </paper-dialog-scrollable>
+
+      <div class="buttons layout horizontal-reverse">
+        <paper-button class="btn-primary" on-tap="_save" raised>
+          Save
+        </paper-button>
+
+        <paper-button
+            on-tap="close">
+          Cancel
+        </paper-button>
+      </div>
+
+      <!-- <etools-loading active="[[updatePending]]"></etools-loading> -->
+    </paper-dialog>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'planned-action-projects-modal',
+
+      properties: {
+        reportingPeriod: String,
+
+        opened: {
+          type: Boolean,
+          value: false,
+        },
+
+        updatePending: {
+          type: Boolean,
+          value: false,
+        },
+
+        // For test purposes:
+        data: {
+          type: Object,
+          value: {
+            title: "Testing Planned Actions projects API",
+            start_date: "2017-07-10",
+            end_date: "2017-09-18",
+            description: "Testing",
+            additional_information: "www.testing.com",
+            funding_source: "Program Name",
+            locations: [],
+            clusters: []
+          }
+        },
+
+        projectCreationUrl: {
+          type: String,
+          value: App.Endpoints.plannedActions()
+        },
+      },
+
+      listeners: {
+        'dialog.iron-overlay-closed': 'close',
+      },
+
+      close: function () {
+        this.set('opened', false);
+      },
+
+      open: function () {
+        this.set('opened', true);
+      },
+
+      _save: function () {
+        var thunk = this.$.createProject.thunk();
+        thunk()
+          .then(function (res) {
+            //TODO: Update the list of partner projects to show the new one.
+          })
+          .catch(function (err) { // jshint ignore:line
+            // TODO: error handling
+          });
+      },
+    });
+  </script>
+</dom-module>
