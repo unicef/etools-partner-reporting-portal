@@ -191,12 +191,8 @@ class IndicatorDataAPIView(APIView):
 
     @transaction.atomic
     def put(self, request, ir_id, *args, **kwargs):
-        _errors = []
         if 'progress_report' not in request.data:
-            _errors.append({"message": "No 'progress_report' in request data."})
-        if 'indicator_report' not in request.data:
-            _errors.append({"message": "No 'indicator_report' in request data."})
-        if _errors:
+            _errors = [{"message": "No 'progress_report' in request data."}]
             return Response({"errors": _errors},
                             status=status.HTTP_400_BAD_REQUEST)
 
@@ -208,19 +204,6 @@ class IndicatorDataAPIView(APIView):
 
         if progress_report.is_valid():
             progress_report.save()
-
-        for _ir in request.data['indicator_report']:
-            ir = get_object_or_404(IndicatorReport, pk=_ir['id'])
-            indicator_report = IndicatorReportUpdateSerializer(
-                instance=ir,
-                data=_ir
-            )
-
-            if indicator_report.is_valid():
-                indicator_report.save()
-            else:
-                return Response(indicator_report.errors,
-                                status=status.HTTP_400_BAD_REQUEST)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
