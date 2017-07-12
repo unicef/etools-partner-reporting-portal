@@ -104,7 +104,6 @@ class TestCombinatorics(TestCase):
             '(1, 1)'
         ]
 
-
         self.assertEquals(key_combinations, expected)
 
 class TestDictionaryHelpers(TestCase):
