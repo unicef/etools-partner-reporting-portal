@@ -152,10 +152,7 @@ class TestIndicatorListAPIView(BaseAPITestCase):
                 'proposed_way_forward': 'update field',
                 'funds_received_to_date': 'updated funds',
                 'programme_document_id': ir.progress_report.programme_document.id,
-            },
-            'indicator_report': [
-
-            ]
+            }
         }
 
         url = reverse('indicator-data', kwargs={'ir_id': ir.id})
