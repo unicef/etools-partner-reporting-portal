@@ -81,7 +81,10 @@
 
         editable: Number,
 
-        warning: Boolean,
+        warning: {
+          type: Boolean,
+          value: true,
+        },
 
         reportedOn: {
           type: Array,
@@ -128,6 +131,8 @@
         var field = e.target;
 
         this.debounce('fieldValueChanged', function () {
+          this._recordField(field);
+
           this._confirmIntent(field)
               .then(this._commit.bind(this))
               .catch(this._revert.bind(this));
@@ -135,47 +140,46 @@
       },
 
       _confirmIntent: function (field) {
-        var id = Number(field.id);
-        var checked = field.checked;
-        var deferred;
+        var deferred = this._deferred();
 
-        if (checked) {
-          this.push('reportedOn', id);
+        this.fire('disaggregation-modal-confirm', deferred);
 
-          if (this.reportedOn.length > this.data.level_reported) {
-            deferred = this._deferred();
-
-            this.fire('disaggregation-modal-confirm', deferred);
-
-            return deferred.promise.catch(function () {
-              return Promise.reject(field);
-            });
-          }
-
-          return Promise.resolve();
-        } else {
-          this.splice('reportedOn', this.reportedOn.indexOf(id), 1);
-
-          return Promise.resolve();
-        }
+        return deferred.promise.catch(function () {
+          return Promise.reject(field);
+        });
       },
 
       _commit: function () {
         this.set('formattedData', Object.assign({}, this.formattedData, {
           disaggregation: {},
           level_reported: this.reportedOn.length,
-          disaggregation_reported_on: this._clone(this.reportedOn),
+          disaggregation_reported_on: this.reportedOn,
         }));
       },
 
       _revert: function (field) {
-        field.checked = false;
+        field.checked = !field.checked;
 
-        this.splice('reportedOn', this.reportedOn.length - 1, 1);
+        this._recordField(field);
       },
 
       _computeWarning: function (data, _) { // jshint ignore:line
-        this.set('warning', this.reportedOn.length < data.level_reported);
+        this.set('warning', this.reportedOn.length < data.num_disaggregation);
+      },
+
+      _recordField: function (field) {
+        var id = Number(field.id);
+        var checked = field.checked;
+
+        if (checked) {
+          this.push('reportedOn', id);
+        } else {
+          this.splice('reportedOn', this.reportedOn.indexOf(id), 1);
+        }
+      },
+
+      _initField: function (e) {
+        this._recordField(e.target);
       },
 
       attached: function () {
@@ -185,15 +189,6 @@
       detached: function () {
         if (this.isDebouncerActive('fieldValueChanged')) {
           this.cancelDebouncer('fieldValueChanged');
-        }
-      },
-
-      _initField: function (e) {
-        var checked = e.target.checked;
-        var id = Number(e.target.id);
-
-        if (checked) {
-          this.push('reportedOn', id);
         }
       },
     });
