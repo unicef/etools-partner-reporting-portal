@@ -165,6 +165,11 @@ class IndicatorDataAPIView(APIView):
         location = self.request.query_params.get('location', None)
         if location:
             queryset = queryset.filter(locations__id=location)
+
+        incomplete = self.request.query_params.get('incomplete', None)
+        if incomplete:
+            queryset = queryset.filter(indicator_reports__indicator_location_data__isnull=False,
+                                       indicator_reports__submission_date__isnull=True)
         return queryset
 
     def get_indicator_report(self, id):
