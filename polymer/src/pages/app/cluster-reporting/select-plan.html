@@ -5,6 +5,7 @@
 <link rel="import" href="../../../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../../../bower_components/paper-radio-button/paper-radio-button.html">
 <link rel="import" href="../../../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../../../bower_components/app-route/app-location.html">
 
 <link rel="import" href="../../../behaviors/utils.html">
 <link rel="import" href="../../../behaviors/data-table.html">
@@ -101,6 +102,8 @@
 
     </style>
 
+    <app-location query-params="{{queryParams}}"></app-location>
+
     <div class="container">
       <div class="container-inner">
         <h2> Select Response Plan</h2>
@@ -121,7 +124,7 @@
               <div class="table-column">End Date</div>
             </etools-data-table-column>
           </etools-data-table-header>
-     
+
           <template id="list"
                     is="dom-repeat"
                     items="[[responsePlans]]"
@@ -130,7 +133,7 @@
 
               <div slot="row-data">
                 <div class="table-cell" flex-1>
-                  <paper-radio-button 
+                  <paper-radio-button
                     checked="[[_determineIfChecked(selected, plan.id)]]"
                     name="[[plan.id]]"
                     on-tap="_selectRadioButton">
@@ -162,10 +165,10 @@
                               is="dom-repeat"
                               items="[[plan.documents]]"
                               as="document">
-                        <li>
-                          <iron-icon id="less" icon="attachment"></iron-icon>
-                          <a href="/">TODO: Link to document.</a>
-                        </li>
+                      <li>
+                        <iron-icon id="less" icon="attachment"></iron-icon>
+                        <a href="/">TODO: Link to document.</a>
+                      </li>
                     </template>
                   </ul>
                 </template>
@@ -177,7 +180,7 @@
         </paper-card>
       </div>
       <div class="actions">
-        <template is="dom-if" if="[[previousPlan.id]]">
+        <template is="dom-if" if="[[queryParams.previous]]">
           <paper-button id="cancel" on-tap="_cancel">Cancel</paper-button>
         </template>
         <paper-button id="confirm"
@@ -199,14 +202,12 @@
       ],
 
       properties: {
+
+        selectedPlan: String,
+
         responsePlans: {
           type: Array,
           statePath: 'responsePlans.all',
-        },
-
-        previousPlan: {
-          type: Object,
-          statePath: 'responsePlans.previous',
         },
 
         selected: {
@@ -239,20 +240,11 @@
 
       _cancel: function() {
         //If there was previously a plan selected, reassign it.
-        this.dispatch(App.Actions.setCurrentResponsePlan(this.previousPlan));
+        this.dispatch(App.Actions.setCurrentResponsePlanID(this.queryParams.previous));
       },
 
       _confirm: function() {
-        var selectedPlan = null;
-        var self = this;
-
-        this.responsePlans.forEach(function(plan) {
-          if (plan.id === self.selected) {
-            selectedPlan = plan;
-          }
-        });
-
-        this.dispatch(App.Actions.setCurrentResponsePlan(selectedPlan));
+        this.dispatch(App.Actions.setCurrentResponsePlanID(String(this.selected)));
       },
 
     });

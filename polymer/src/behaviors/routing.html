@@ -20,20 +20,29 @@
 
         _$currentPlan: {
           type: String,
-          statePath: 'responsePlans.current',
+          statePath: 'responsePlans.currentID',
         },
 
         _baseUrl: {
           type: String,
-          computed: '_$computeBaseUrl(_$currentCountry, _$currentApp, _$currentPlan)',
+          computed: '_$computeBaseUrl(_$currentCountry, _$currentApp)',
+        },
+
+        _baseUrlCluster: {
+          type: String,
+          computed: '_$computeBaseUrlCluster(_$currentCountry, _$currentApp, _$currentPlan)',
         }
       },
 
-      _$computeBaseUrl: function(country, app, plan) {
-        if (app === 'cluster-reporting') {
-          return '/app/' + country + '/' + app + '/' + plan.id;
-        }
+      _$computeBaseUrl: function(country, app) {
         return '/app/' + country + '/' + app;
+      },
+
+      _$computeBaseUrlCluster: function(country, app, planID) {
+        if (planID) {
+          return this._baseUrl + '/' + planID;
+        }
+        return this._baseUrl;
       },
 
       /**
@@ -41,6 +50,9 @@
        * expression within the template.
        */
       buildUrl: function (baseUrl, tail) {
+        if (!baseUrl) {  //required for the cluster nav change link to work
+          baseUrl = this._baseUrl;
+        }
         if (tail.length && tail[0] !== '/') {
           tail = '/' + tail;
         }

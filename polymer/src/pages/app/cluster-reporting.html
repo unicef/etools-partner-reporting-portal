@@ -1,11 +1,11 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../../bower_components/app-route/app-location.html">
 <link rel="import" href="../../../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
 <link rel="import" href="../../../bower_components/app-layout/app-drawer/app-drawer.html">
 <link rel="import" href="../../../bower_components/app-layout/app-header/app-header.html">
 <link rel="import" href="../../../bower_components/app-layout/app-toolbar/app-toolbar.html">
 <link rel="import" href="../../../bower_components/iron-pages/iron-pages.html">
-
 
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../redux/actions.html">
@@ -42,6 +42,8 @@
     }
   </style>
 
+   <app-location query-params="{{queryParams}}"></app-location>
+
    <app-route
        route="{{route}}"
        pattern="/:plan/:page"
@@ -54,14 +56,15 @@
       url="[[_plansUrl]]">
   </etools-prp-ajax>
 
-  <template is="dom-if" if="[[!_currentPlan.id]]">
+  <template is="dom-if" if="[[_equals(plan, 'select-plan')]]" restamp="true">
     <page-select-plan
       name="select-plan"
+      selectedPlan={{plan}}
       route="{{subroute}}">
     </page-select-plan>
   </template>
 
-  <template is="dom-if" if="[[_currentPlan.id]]">
+  <template is="dom-if" if="[[!_equals(plan, 'select-plan')]]" restamp="true">
    <app-drawer-layout persistent responsive-width="0px">
      <app-drawer>
        <app-header fixed>
@@ -137,6 +140,15 @@
       ],
 
       properties: {
+        page: {
+          type: String,
+          observer: '_pageChanged',
+        },
+
+        plan: {
+          type: String,
+          observer: '_planChanged',
+        },
 
         _countryCode: {
           type: String,
@@ -148,9 +160,9 @@
           statePath: 'countries.all',
         },
 
-        _currentPlan: {
+        _currentPlanID: {
           type: Object,
-          statePath: 'responsePlans.current',
+          statePath: 'responsePlans.currentID',
         },
 
         _plansUrl: {
@@ -160,9 +172,69 @@
       },
 
       observers: [
-        '_routePageChanged(routeData.page)',
-        '_planChanged(_currentPlan)',
+        '_routePageChanged(routeData.page, routeData.plan)',
+        '_routePlanChanged(routeData.plan)',
+        '_reduxPlanChanged(_currentPlanID)'
       ],
+
+      // These functions track the plan/page values in the URL.
+      // Additional logic is in _planChanged and _pageChanged.
+      _routePlanChanged: function (plan) {
+        if (!plan) {
+          this.set('route.path', 'select-plan');
+          this.plan = 'select-plan';
+        } else {
+          this.plan = String(plan);
+        }
+      },
+
+      _routePageChanged: function (page, plan) {
+        if (!page) {
+          if (plan) {
+            this.set('routeData.page', 'dashboard');
+            this.page = 'dashboard';
+          }
+        } else {
+          this.page = page;
+        }
+      },
+
+      //The plan may be changed in Redux (set via select-plan.html).
+      _reduxPlanChanged: function(plan) {
+        if (plan) {
+          this.plan = plan;
+        }
+      },
+
+      _planChanged: function (planID) {
+        this.set('queryParams', {});
+        if (planID === 'select-plan') {
+          var htmlPage = 'cluster-reporting/select-plan.html';
+          var resolvedPageUrl = this.resolveUrl(htmlPage);
+          this.importHref(resolvedPageUrl, null, this._notFound, true);
+        } else if (planID) {
+          this.plan = planID;
+          this._pageChanged('dashboard');
+          if (this.currentPlanID !== planID) {
+            this.dispatch(App.Actions.setCurrentResponsePlanID(planID));
+          }
+        }
+      },
+
+      _pageChanged: function (page) {
+        var resolvedPageUrl = this.resolveUrl('cluster-reporting/' + page + '.html');
+        this.set('route.path', this.plan + '/' + page);
+        this.importHref(resolvedPageUrl, null, this._notFound, true);
+      },
+
+      _getResponsePlansForCountry: function() {
+        var responsePlansThunk = this.$.responsePlans.thunk();
+
+        this.dispatch(App.Actions.fetchResponsePlans(responsePlansThunk))
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
+      },
 
       _computeResponsePlansUrl: function(countryCode, countries) {
         var currentCountryId = null;
@@ -178,50 +250,6 @@
 
       attached: function() {
         this._getResponsePlansForCountry(this.countryId);
-      },
-
-      _getResponsePlansForCountry: function() {
-        var responsePlansThunk = this.$.responsePlans.thunk();
-
-        this.dispatch(App.Actions.fetchResponsePlans(responsePlansThunk))
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-            });
-      },
-
-      _routePageChanged: function (page) {
-        if (this._isPlanSelected(this.routeData.plan)) {
-          this.page = page;
-          if (!this.subroute.subpath) {
-            this.set('route.path', this.routeData.plan + '/' + page);
-            var resolvedPageUrl = this.resolveUrl('cluster-reporting/' + page + '.html');
-            this.importHref(resolvedPageUrl, null, this._notFound, true);
-          }
-        } else {
-          this._redirectToPlanSelection();
-        }
-      },
-
-      _isPlanSelected: function(plan) {
-        if (!plan || plan === 'select-plan' || plan === 'undefined') {
-          return false;
-        }
-        return true;
-      },
-
-      _redirectToPlanSelection: function() {
-        //If there is no plan already set, redirect.
-        this.set('route.path', '/select-plan');
-        var resolvedPageUrl = this.resolveUrl('cluster-reporting/select-plan.html');
-        this.importHref(resolvedPageUrl, null, this._notFound, true);
-      },
-
-      _planChanged: function (plan) {
-        //The plan object (not the route) has changed.
-        if (plan.id) {
-          this.set('routeData.plan', plan.id);
-          this._routePageChanged('dashboard');
-        }
       },
 
       _notFound: function () {
