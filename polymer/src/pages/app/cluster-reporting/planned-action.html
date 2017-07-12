@@ -1,78 +1,72 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../../bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="../../../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../../../bower_components/iron-pages/iron-pages.html">
 
-<link rel="import" href="../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../styles/shared-styles.html">
 <link rel="import" href="../../../elements/page-header.html">
 <link rel="import" href="../../../elements/page-body.html">
-
-<link rel="import" href="../../../behaviors/data-table.html">
-<link rel="import" href="../../../behaviors/pagination.html">
-<link rel="import" href="../../../styles/table-styles.html">
+<link rel="import" href="planned-action-projects.html">
 
 
 <dom-module id="page-cluster-reporting-planned-action">
   <template>
-    <style>
+    <style include="shared-styles">
       :host {
         display: block;
       }
+
+      /*TODO: make separate theme file for clusters*/
+      /*Overrides blue:*/
+      .top-content-row paper-tabs {
+        --paper-tabs-selection-bar-color: var(--theme-primary-color-cluster);
+      }
+      .top-content-row paper-tab {
+        --paper-tab-ink: var(--theme-primary-color-cluster);
+        padding: 0 10px;
+      }
+      .top-content-row paper-tab.iron-selected .tab-content {
+        color: var(--theme-primary-color-cluster);
+      }
     </style>
+
+    <app-route
+        route="{{route}}"
+        pattern="/:tree"
+        data="{{routeData}}"
+        tail="{{subroute}}">
+    </app-route>
 
     <page-header title="My Planned Action"></page-header>
 
-    <etools-prp-ajax
-        id="plannedActions"
-        url="[[plannedActionsUrl]]">
-    </etools-prp-ajax>
+    <div class="top-content-row">
+      <paper-tabs
+        selected="{{ routeData.dashTab }}"
+        attr-for-selected="name"
+        noink
+        bottom-item>
+        <paper-tab name="details" link>
+          <span class="tab-content">Projects</span>
+        </paper-tab>
 
-    <etools-content-panel panel-title="">
-      <etools-data-table-header
-          no-collapse
-          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
-        <etools-data-table-column field="cluster">
-          <div class="table-column">Cluster</div>
-        </etools-data-table-column>
-        <etools-data-table-column field="status">
-          <div class="table-column">Status</div>
-        </etools-data-table-column>
-        <etools-data-table-column field="project">
-          <div class="table-column">Project</div>
-        </etools-data-table-column>
-        <etools-data-table-column field="Location">
-          <div class="table-column">Location</div>
-        </etools-data-table-column>
-      </etools-data-table-header>
+        <paper-tab name="activities" link>
+          <span class="tab-content">Activities</span>
+        </paper-tab>
+      </paper-tabs>
+    </div>
 
-      <template
-          id="list"
-          is="dom-repeat"
-          items="[[data]]"
-          as="pd"
-          initial-count="[[pageSize]]">
-        <etools-data-table-row no-collapse>
-          <div slot="row-data">
-            <div class="table-cell table-cell--text">
-              [[_withDefault(pd.status)]]
-            </div>
-
-          </div>
-        </etools-data-table-row>
-      </template>
-
-      <etools-data-table-footer
-          page-size="[[pageSize]]"
-          page-number="[[pageNumber]]"
-          total-results="[[totalResults]]"
-          visible-range="{{visibleRange}}"
-          on-page-size-changed="_pageSizeChanged"
-          on-page-number-changed="_pageNumberChanged">
-      </etools-data-table-footer>
-
-      <etools-loading active="[[loading]]"></etools-loading>
-    </etools-content-panel>
-  </template>
+    <page-body>
+      <iron-pages
+          selected="projects"
+          attr-for-selected="name">
+        <!-- TODO: 'if' template tag and add Activities tab content -->
+        <planned-action-projects
+            name="projects"
+            route="{{subroute}}">
+        </planned-action-projects>
+      </iron-pages>
+    <page-body>
 
   </template>
 
@@ -85,50 +79,9 @@
       ],
 
       properties: {
-        plannedActionsUrl: {
-          type: String,
-          computed: '_computePlannedActionsUrl(route)'
-        },
-        plannedActions: {
-          type: Array,
-          value: []
-        },
-
-        // loading: {
-        //   type: Boolean,
-        //   statePath: 'plannedActions.loading',
-        // },
-        //
-        // data: {
-        //   type: Array,
-        //   statePath: 'plannedActions.all',
-        // },
-        //
-        // totalResults: {
-        //   type: Number,
-        //   statePath: 'plannedActions.count',
-        // },
 
       },
 
-      _computePlannedActionsUrl: function () {
-        console.log("compute it:", App.Endpoints.plannedActions() )
-        return App.Endpoints.plannedActions();
-      },
-
-      attached: function () {
-        var self = this;
-        var thunk = this.$.plannedActions.thunk();
-        thunk()
-          .then(function (res) {
-            console.log("res", res)
-            self.set('plannedActions', res.data.results);
-          })
-          .catch(function (err) { // jshint ignore:line
-            // TODO: error handling
-          });
-
-      },
     });
   </script>
 </dom-module>

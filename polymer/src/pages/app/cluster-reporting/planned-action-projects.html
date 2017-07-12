@@ -1,0 +1,174 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/etools-data-table/etools-data-table.html">
+
+<link rel="import" href="../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../styles/shared-styles.html">
+
+<link rel="import" href="../../../behaviors/data-table.html">
+<link rel="import" href="../../../behaviors/pagination.html">
+<link rel="import" href="../../../styles/table-styles.html">
+
+
+<dom-module id="planned-action-projects">
+  <template>
+    <style include="data-table-styles table-styles">
+      :host {
+        display: block;
+      }
+    </style>
+
+    <etools-prp-ajax
+        id="plannedActionsProjects"
+        url="[[plannedActionsUrl]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
+        id="create"
+        url="[[plannedActionsUrl]]"
+        body="[[plannedActionsData]]"
+        content-type="application/json"
+        method="post">
+    </etools-prp-ajax>
+
+    <etools-content-panel panel-title="">
+      <etools-data-table-header
+          no-collapse
+          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
+        <etools-data-table-column field="cluster">
+          <div class="table-column">Cluster</div>
+        </etools-data-table-column>
+        <etools-data-table-column field="status">
+          <div class="table-column">Status</div>
+        </etools-data-table-column>
+        <etools-data-table-column field="project">
+          <div class="table-column">Project</div>
+        </etools-data-table-column>
+        <etools-data-table-column field="Location">
+          <div class="table-column">Location</div>
+        </etools-data-table-column>
+      </etools-data-table-header>
+
+      <template
+          id="list"
+          is="dom-repeat"
+          items="[[projects]]"
+          as="project"
+          initial-count="[[pageSize]]">
+        <etools-data-table-row no-collapse>
+          <div slot="row-data">
+            <div class="table-cell table-cell--text">
+              Cluster?
+            </div>
+            <div class="table-cell table-cell--text">
+              [[project.status]]
+            </div>
+            <div class="table-cell table-cell--text">
+              [[project.title]]
+            </div>
+            <div class="table-cell table-cell--text">
+              Location?
+            </div>
+          </div>
+        </etools-data-table-row>
+      </template>
+
+      <etools-data-table-footer
+          page-size="[[pageSize]]"
+          page-number="[[pageNumber]]"
+          total-results="[[totalResults]]"
+          visible-range="{{visibleRange}}"
+          on-page-size-changed="_pageSizeChanged"
+          on-page-number-changed="_pageNumberChanged">
+      </etools-data-table-footer>
+
+      <etools-loading active="[[loading]]"></etools-loading>
+    </etools-content-panel>
+  </template>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'planned-action-projects',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        // TODO: fix this.
+        // plannedActionsUrl: {
+        //   type: String,
+        //   computed: '_computePlannedActionsUrl(route)'
+        // },
+
+        plannedActionsUrl: {
+          type: String,
+          value: '/api/partner/partner-project-list/',
+        },
+
+        projects: {
+          type: Array,
+          value: []
+        },
+
+        plannedActionsData: {
+          type: Object,
+          value: {
+            title: "Testing Planned Actions projects API",
+            start_date: "2017-07-10",
+            end_date: "2017-09-18",
+            description: "Testing",
+            additional_information: "www.testing.com",
+            funding_source: "Program Name",
+            locations: [],
+            clusters: []
+          }
+        }
+
+        // loading: {
+        //   type: Boolean,
+        //   statePath: 'plannedActions.loading',
+        // },
+        //
+        // data: {
+        //   type: Array,
+        //   statePath: 'plannedActions.all',
+        // },
+        //
+        // totalResults: {
+        //   type: Number,
+        //   statePath: 'plannedActions.count',
+        // },
+
+      },
+
+      _computePlannedActionsUrl: function () {
+        return App.Endpoints.plannedActions();
+      },
+
+      attached: function () {
+        var self = this;
+        var thunk = this.$.plannedActionsProjects.thunk();
+        thunk()
+          .then(function (res) {
+            self.set('projects', res.data.results);
+          })
+          .catch(function (err) { // jshint ignore:line
+            // TODO: error handling
+          });
+
+          // Testing that project creation works
+          // thunk3 = this.$.create.thunk();
+          // thunk3()
+          //   .then(function (res) {
+          //     console.log("res", res)
+          //   })
+          //   .catch(function (err) { // jshint ignore:line
+          //     // TODO: error handling
+          //   });
+
+      },
+    });
+  </script>
+</dom-module>

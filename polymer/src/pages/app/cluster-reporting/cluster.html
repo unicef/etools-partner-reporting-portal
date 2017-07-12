@@ -1,15 +1,14 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../../bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="../../../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../../../bower_components/iron-pages/iron-pages.html">
 
-<link rel="import" href="../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../styles/shared-styles.html">
 <link rel="import" href="../../../elements/page-header.html">
 <link rel="import" href="../../../elements/page-body.html">
-
-<link rel="import" href="../../../behaviors/data-table.html">
-<link rel="import" href="../../../behaviors/pagination.html">
-<link rel="import" href="../../../styles/table-styles.html">
+<link rel="import" href="cluster-activities.html">
+<link rel="import" href="cluster-objectives.html">
 
 <dom-module id="page-cluster-reporting-cluster-response-parameters">
   <template>
@@ -45,14 +44,16 @@
     <!-- TODO: Associate ajax calls with tabs. -->
 
     <etools-prp-ajax
-        id="objectives"
-        url="[[objectivesUrl]]">
-    </etools-prp-ajax>
-
-    <etools-prp-ajax
         id="activities"
         url="[[activitiesUrl]]">
     </etools-prp-ajax>
+
+    <app-route
+        route="{{route}}"
+        pattern="/:tree"
+        data="{{routeData}}"
+        tail="{{subroute}}">
+    </app-route>
 
     <page-header title="Clusters"></page-header>
 
@@ -76,147 +77,26 @@
       </paper-tabs>
     </div>
 
-
-      <etools-data-table-header
-          no-collapse
-          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
-        <etools-data-table-column field="cluster">
-          <div class="table-column">Cluster</div>
-        </etools-data-table-column>
-        <etools-data-table-column field="ref">
-          <div class="table-column">CO ref. #</div>
-        </etools-data-table-column>
-        <etools-data-table-column field="title">
-          <div class="table-column">Cluster Objective Title</div>
-        </etools-data-table-column>
-      </etools-data-table-header>
-
-      <template
-          id="list"
-          is="dom-repeat"
-          items="[[clusterObjectives]]"
-          as="objective"
-          initial-count="[[pageSize]]">
-        <etools-data-table-row no-collapse>
-          <div slot="row-data">
-            <div class="table-cell table-cell--text">
-              [[objective.cluster]]
-            </div>
-            <div class="table-cell table-cell--text">
-              [[objective.reference_number]]
-            </div>
-            <div class="table-cell table-cell--text">
-              [[objective.title]]
-            </div>
-          </div>
-        </etools-data-table-row>
-      </template>
-      Footer here.
-      <etools-loading active="[[loading]]"></etools-loading>
-
-
-
-
-      <etools-data-table-header
-          no-collapse
-          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
-        <etools-data-table-column field="cluster">
-          <div class="table-column">Cluster</div>
-        </etools-data-table-column>
-        <etools-data-table-column field="ref">
-          <div class="table-column">CO ref. #</div>
-        </etools-data-table-column>
-        <etools-data-table-column field="activity">
-          <div class="table-column">Cluster Activity</div>
-        </etools-data-table-column>
-      </etools-data-table-header>
-
-      <template
-          id="list"
-          is="dom-repeat"
-          items="[[clusterActivities]]"
-          as="activity"
-          initial-count="[[pageSize]]">
-        <etools-data-table-row no-collapse>
-          <div slot="row-data">
-            <div class="table-cell table-cell--text">
-              [[activity.co_cluster_title]]
-            </div>
-            <div class="table-cell table-cell--text">
-              [[activity.co_reference_number]]
-            </div>
-            <div class="table-cell table-cell--text">
-              [[activity.title]]
-            </div>
-          </div>
-        </etools-data-table-row>
-      </template>
-      Footer here.
-      <etools-loading active="[[loading]]"></etools-loading>
-
-
-
-
+    <page-body>
+      <iron-pages
+          selected="activities"
+          attr-for-selected="name">
+          <!-- TODO: toggle using tabs -->
+        <!-- <cluster-objectives
+            name="objectives"
+            route="{{subroute}}">
+        </cluster-objectives> -->
+        <cluster-activities
+          name="activities"
+          route="{{subroute}}">
+        </cluster-activities>
+      </iron-pages>
+    </page-body>
   </template>
 
   <script>
     Polymer({
       is: 'page-cluster-reporting-cluster-response-parameters',
-
-      behaviors: [
-        App.Behaviors.ReduxBehavior,
-      ],
-
-      properties: {
-        //Passing a param is necessary for _computeObjectivesUrl to trigger.
-        objectivesUrl: {
-          type: String,
-          computed: '_computeObjectivesUrl(route)'
-        },
-        clusterObjectives: {
-          type: Array,
-          value: []
-        },
-
-        activitiesUrl: {
-          type: String,
-          computed: '_computeActivitiesUrl(route)'
-        },
-        clusterActivities: {
-          type: Array,
-          value: []
-        },
-      },
-
-      attached: function () {
-        // TODO: Move to Redux.
-        var self = this;
-        var thunk1 = this.$.test.thunk();
-        thunk1()
-          .then(function (res) {
-            self.set('clusterObjectives', res.data.results);
-          })
-          .catch(function (err) { // jshint ignore:line
-            // TODO: error handling
-          });
-
-        thunk2 = this.$.activities.thunk();
-        thunk2()
-          .then(function (res) {
-            self.set('clusterActivities', res.data.results);
-          })
-          .catch(function (err) { // jshint ignore:line
-            // TODO: error handling
-          });
-      },
-
-      _computeObjectivesUrl: function () {
-        return App.Endpoints.responseParametersClusterObjectives();
-      },
-
-      _computeActivitiesUrl: function () {
-        return App.Endpoints.responseParametersClusterActivities();
-      },
     });
   </script>
 </dom-module>

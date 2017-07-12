@@ -1,0 +1,137 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/etools-data-table/etools-data-table.html">
+
+<link rel="import" href="../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../styles/shared-styles.html">
+
+<link rel="import" href="../../../behaviors/data-table.html">
+<link rel="import" href="../../../behaviors/pagination.html">
+<link rel="import" href="../../../styles/table-styles.html">
+
+<dom-module id="cluster-activities">
+    <template>
+    <style include="data-table-styles table-styles">
+      :host {
+        display: block;
+      }
+    </style>
+    <!-- TODO: Associate ajax calls with tabs. -->
+
+    <etools-prp-ajax
+        id="activities"
+        url="[[activitiesUrl]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
+        id="createActivity"
+        url="[[activitiesUrl]]"
+        body="[[activityData]]"
+        content-type="application/json"
+        method="post">
+    </etools-prp-ajax>
+
+    <etools-data-table-header
+        no-collapse
+        label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
+      <etools-data-table-column field="cluster">
+        <div class="table-column">Cluster</div>
+      </etools-data-table-column>
+      <etools-data-table-column field="ref">
+        <div class="table-column">CO ref. #</div>
+      </etools-data-table-column>
+      <etools-data-table-column field="activity">
+        <div class="table-column">Cluster Activity</div>
+      </etools-data-table-column>
+    </etools-data-table-header>
+
+    <template
+        id="list"
+        is="dom-repeat"
+        items="[[clusterActivities]]"
+        as="activity"
+        initial-count="[[pageSize]]">
+      <etools-data-table-row no-collapse>
+        <div slot="row-data">
+          <div class="table-cell table-cell--text">
+            [[activity.co_cluster_title]]
+          </div>
+          <div class="table-cell table-cell--text">
+            [[activity.co_reference_number]]
+          </div>
+          <div class="table-cell table-cell--text">
+            [[activity.title]]
+          </div>
+        </div>
+      </etools-data-table-row>
+    </template>
+
+    <etools-data-table-footer
+        page-size="[[pageSize]]"
+        page-number="[[pageNumber]]"
+        total-results="[[totalResults]]"
+        visible-range="{{visibleRange}}"
+        on-page-size-changed="_pageSizeChanged"
+        on-page-number-changed="_pageNumberChanged">
+    </etools-data-table-footer>
+
+    <etools-loading active="[[loading]]"></etools-loading>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'cluster-activities',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        activitiesUrl: {
+          type: String,
+          computed: '_computeActivitiesUrl(route)'
+        },
+        clusterActivities: {
+          type: Array,
+          value: []
+        },
+        //For testing create objective API
+        activityData: {
+          type: Object,
+          value: {
+            title: 'Test title for cluster activity creation',
+            standard: 'test',
+            cluster_objective: 80
+          }
+        }
+      },
+
+      attached: function () {
+        // TODO: Move to Redux.
+        thunk2 = this.$.activities.thunk();
+        thunk2()
+          .then(function (res) {
+            console.log("Res?", res.data.results)
+            this.clusterActivities = res.data.results;
+          })
+          .catch(function (err) { // jshint ignore:line
+            // TODO: error handling
+          });
+
+        // Testing that cluster objective creation works
+        thunk3 = this.$.createActivity.thunk();
+        thunk3()
+          .then(function (res) {
+            console.log("res", res)
+          })
+          .catch(function (err) { // jshint ignore:line
+            // TODO: error handling
+          });
+      },
+
+      _computeActivitiesUrl: function () {
+        return App.Endpoints.responseParametersClusterActivities();
+      },
+    });
+  </script>
+</dom-module>

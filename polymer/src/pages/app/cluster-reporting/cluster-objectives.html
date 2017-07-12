@@ -1,0 +1,142 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/etools-data-table/etools-data-table.html">
+
+<link rel="import" href="../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../styles/shared-styles.html">
+
+<link rel="import" href="../../../behaviors/data-table.html">
+<link rel="import" href="../../../behaviors/pagination.html">
+<link rel="import" href="../../../styles/table-styles.html">
+
+<dom-module id="cluster-objectives">
+    <template>
+    <style include="data-table-styles table-styles">
+      :host {
+        display: block;
+      }
+    </style>
+    <etools-prp-ajax
+        id="objectives"
+        url="[[objectivesUrl]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
+        id="activities"
+        url="[[activitiesUrl]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
+        id="createObjective"
+        url="[[objectivesUrl]]"
+        body="[[objectivesData]]"
+        content-type="application/json"
+        method="post">
+    </etools-prp-ajax>
+
+    <etools-data-table-header
+        no-collapse
+        label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
+      <etools-data-table-column field="cluster">
+        <div class="table-column">Cluster</div>
+      </etools-data-table-column>
+      <etools-data-table-column field="ref">
+        <div class="table-column">CO ref. #</div>
+      </etools-data-table-column>
+      <etools-data-table-column field="title">
+        <div class="table-column">Cluster Objective Title</div>
+      </etools-data-table-column>
+    </etools-data-table-header>
+
+    <template
+        id="list"
+        is="dom-repeat"
+        items="[[clusterObjectives]]"
+        as="objective"
+        initial-count="[[pageSize]]">
+      <etools-data-table-row no-collapse>
+        <div slot="row-data">
+          <div class="table-cell table-cell--text">
+            [[objective.cluster]]
+          </div>
+          <div class="table-cell table-cell--text">
+            [[objective.reference_number]]
+          </div>
+          <div class="table-cell table-cell--text">
+            [[objective.title]]
+          </div>
+        </div>
+      </etools-data-table-row>
+    </template>
+
+    <etools-data-table-footer
+        page-size="[[pageSize]]"
+        page-number="[[pageNumber]]"
+        total-results="[[totalResults]]"
+        visible-range="{{visibleRange}}"
+        on-page-size-changed="_pageSizeChanged"
+        on-page-number-changed="_pageNumberChanged">
+    </etools-data-table-footer>
+
+    <etools-loading active="[[loading]]"></etools-loading>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'cluster-objectives',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        //Passing a param is necessary for _computeObjectivesUrl to trigger.
+        objectivesUrl: {
+          type: String,
+          computed: '_computeObjectivesUrl(route)'
+        },
+        clusterObjectives: {
+          type: Array,
+          value: []
+        },
+
+        //For testing create objective API
+        objectivesData: {
+          type: Object,
+          value: {
+            title: 'Test title for API Creation',
+            frequency: "Wee",
+            reference_number: '909',
+            cluster: 62,
+          }
+        }
+      },
+
+      attached: function () {
+        // TODO: Move to Redux.
+        var self = this;
+        var thunk1 = this.$.objectives.thunk();
+        thunk1()
+          .then(function (res) {
+            self.set('clusterObjectives', res.data.results);
+          })
+          .catch(function (err) { // jshint ignore:line
+            // TODO: error handling
+          });
+
+        // Testing that cluster objective creation works
+        // thunk3 = this.$.createObjective.thunk();
+        // thunk3()
+        //   .then(function (res) {
+        //     console.log("res", res)
+        //   })
+        //   .catch(function (err) { // jshint ignore:line
+        //     // TODO: error handling
+        //   });
+      },
+
+      _computeObjectivesUrl: function () {
+        return App.Endpoints.responseParametersClusterObjectives();
+      },
+    });
+  </script>
+</dom-module>
