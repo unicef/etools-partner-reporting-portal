@@ -100,6 +100,14 @@ class TestIndicatorListAPIView(BaseAPITestCase):
                     lower_level_outputs__id=resp_data['llo_id']).indicator_reports.all().count()
             )
 
+        # PD output filter (reportable id)
+        reportable_id = response.data['outputs'][0]['id']
+        url = url + ("?reportable_id=%d" % reportable_id)
+        response = self.client.get(url, format='json')
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(len(response.data['outputs']), 1)
+        self.assertEquals(response.data['outputs'][0]['id'], reportable_id)
+
     def test_list_api_filter_by_locations(self):
         self.reports = Reportable.objects.filter(
             lower_level_outputs__reportables__isnull=False,
@@ -137,10 +145,6 @@ class TestIndicatorListAPIView(BaseAPITestCase):
 
     def test_enter_indicator(self):
         ir = IndicatorReport.objects.first()
-        expected_reportable = Reportable.objects.filter(
-            indicator_reports__id=ir.id,
-            lower_level_outputs__isnull=False
-        )
         self.assertEquals(ir.progress_report.partner_contribution_to_date, '')
         self.assertEquals(ir.progress_report.challenges_in_the_reporting_period, '')
         data = {
