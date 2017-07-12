@@ -6,7 +6,7 @@ from contextlib import contextmanager
 from itertools import combinations, product
 from collections import OrderedDict
 
-from django.test import TestCase
+from unittest import TestCase
 
 from core.helpers import (
     get_combination_pairs,
@@ -20,8 +20,9 @@ from core.helpers import (
 class TestCombinatorics(TestCase):
     def setUp(self):
         self.entries = [1, 2, 3, 4, 5]
+        self.combination_entry_input = [[1, 2, 3], [1, 2, 4]]
 
-    def get_combination_pairs(self):
+    def test_get_combination_pairs(self):
         self.assertEquals(get_combination_pairs(self.entries, r=0), [tuple()])
 
         r_1_result = [(1,), (2,), (3,), (4,), (5,)]
@@ -74,44 +75,84 @@ class TestCombinatorics(TestCase):
 
         self.assertEquals(get_combination_pairs(self.entries, r=6), [])
 
-    def generate_data_combination_entries(self):
-        self.entries = [[1, 2, 3], [1, 2, 4]]
-
+    def test_generate_data_combination_entries(self):
         key_combinations = generate_data_combination_entries(
-            packed_key,
+            self.combination_entry_input,
             entries_only=True,
             key_type=tuple,
             indicator_type="quantity",
-            r=level_reported - 1
+            r=2
         )
 
         key_combinations = list(set(key_combinations))
+        key_combinations.sort()
 
         expected = [
-            '(3, 1)',
-            '(1,)',
-            '(3,)',
-            '(3, 4)',
-            '(2, 4)',
-            '(2, 2)',
-            '()',
-            '(4,)',
-            '(2, 1)',
-            '(1, 2)',
-            '(3, 2)',
-            '(2,)',
-            '(1, 4)',
-            '(1, 1)'
+            (3, 1),
+            (1,),
+            (3,),
+            (3, 4),
+            (2, 4),
+            (2, 2),
+            tuple(),
+            (4,),
+            (2, 1),
+            (1, 2),
+            (3, 2),
+            (2,),
+            (1, 4),
+            (1, 1),
         ]
+        expected.sort()
 
         self.assertEquals(key_combinations, expected)
 
 class TestDictionaryHelpers(TestCase):
-    def get_sorted_ordered_dict_by_keys(self):
-        pass
+    def setUp(self):
+        self.entry_dict = {
+            (): 100,
+            (100,): 100,
+            (101,): 100,
+            (101,): 100,
+            (111,): 100,
+        }
 
-    def get_cast_dictionary_keys_as_tuple(self):
-        pass
+    def test_get_sorted_ordered_dict_by_keys(self):
+        sorted_dict = get_sorted_ordered_dict_by_keys(self.entry_dict)
 
-    def get_cast_dictionary_keys_as_string(self):
-        pass
+        expected_key_list = [(111,), (101,), (100,), ()]
+
+        self.assertEquals(sorted_dict.keys(), expected_key_list)
+
+    def test_get_sorted_ordered_dict_by_keys_ascending(self):
+        sorted_dict = get_sorted_ordered_dict_by_keys(self.entry_dict, reverse=False)
+
+        expected_key_list = [(111,), (101,), (100,), ()]
+        expected_key_list.reverse()
+
+        self.assertEquals(sorted_dict.keys(), expected_key_list)
+
+    def test_get_sorted_ordered_dict_by_keys_with_key_func(self):
+        sorted_dict = get_sorted_ordered_dict_by_keys(self.entry_dict, key_func=len)
+
+        expected_key_list = [(111,), (101,), (), (100,)]
+
+        self.assertEquals(sorted_dict.keys(), expected_key_list)
+
+    def test_get_cast_dictionary_keys_as_string(self):
+        converted_dict = get_cast_dictionary_keys_as_string(self.entry_dict)
+
+        keys = converted_dict.keys()
+
+        for key in keys:
+            self.assertIsInstance(key, str)
+
+    def test_get_cast_dictionary_keys_as_tuple(self):
+        string_dict = get_cast_dictionary_keys_as_string(self.entry_dict)
+
+        converted_dict = get_cast_dictionary_keys_as_tuple(string_dict)
+
+        keys = converted_dict.keys()
+
+        for key in keys:
+            self.assertIsInstance(key, tuple)
