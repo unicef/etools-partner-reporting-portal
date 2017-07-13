@@ -12,6 +12,8 @@
 <link rel="import" href="../../../../../bower_components/iron-pages/iron-pages.html">
 
 <link rel="import" href="../../../../pages/app/ip-reporting/pd/pd-report/results.html">
+<link rel="import" href="../../../../pages/app/ip-reporting/pd/pd-report/info.html">
+<link rel="import" href="../../../../pages/app/ip-reporting/pd/pd-report/submit.html">
 <link rel="import" href="../../../../elements/page-header.html">
 <link rel="import" href="../../../../elements/page-body.html">
 <link rel="import" href="../../../../elements/reporting-period.html">
@@ -72,11 +74,7 @@
       </reporting-period>
 
       <div class="toolbar">
-        <template
-            is="dom-if"
-            if="[[_equals(mode, 'edit')]]">
-          <report-status status="[[currentReport.progress_report_status]]"></report-status>
-        </template>
+        <report-status status="[[currentReport.progress_report_status]]"></report-status>
 
         <paper-menu-button dynamic-align>
           <paper-icon-button
@@ -129,7 +127,9 @@
             is="dom-if"
             if="[[_equals(selectedTab, 'info')]]"
             restamp="true">
-          <div name="info">Other</div>
+          <page-ip-reporting-report-info
+              name="info">
+          </page-ip-reporting-report-info>
         </template>
 
         <template
@@ -140,7 +140,9 @@
               is="dom-if"
               if="[[_equals(selectedTab, 'submit')]]"
               restamp="true">
-            <div name="submit">Submit</div>
+            <page-ip-reporting-report-submit
+                name="submit">
+            </page-ip-reporting-report-submit>
           </template>
         </template>
     </page-body>
