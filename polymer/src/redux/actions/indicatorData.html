@@ -25,6 +25,28 @@
         };
       },
 
+      updateReportable: function (updateThunk, reportId, reportableId) {
+        return function (dispatch) {
+          return updateThunk()
+              .then(function (res) {
+                dispatch(App.Actions.IndicatorData.amendReportable(
+                  reportId,
+                  reportableId,
+                  res.data
+                ));
+              });
+        };
+      },
+
+      amendReportable: function (reportId, reportableId, data) {
+        return {
+          type: App.Constants.AMEND_REPORTABLE,
+          reportId: reportId,
+          reportableId: reportableId,
+          data: data,
+        };
+      },
+
     };
   }());
 </script>

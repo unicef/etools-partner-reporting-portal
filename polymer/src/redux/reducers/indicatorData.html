@@ -28,6 +28,23 @@
             return Object.assign({}, state, change);
           }());
 
+        case App.Constants.AMEND_REPORTABLE:
+          return (function () {
+            var reportableId = Number(action.reportableId);
+            var change = {};
+
+            change[action.reportId] = state[action.reportId]
+                .map(function (reportable) {
+                  if (reportable.id !== reportableId) {
+                    return reportable;
+                  }
+
+                  return Object.assign({}, reportable, action.data);
+                });
+
+            return Object.assign({}, state, change);
+          }());
+
         case App.Constants.RESET:
           return {};
 
