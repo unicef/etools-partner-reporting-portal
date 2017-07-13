@@ -53,6 +53,10 @@
         return this._buildUrl('/indicator/indicator-data/' + reportId + '/');
       },
 
+      reportable: function (reportId, reportableId) {
+        return this.indicatorData(reportId) + 'reportable/' + reportableId + '/';
+      },
+
       indicatorLocationDataEntries: function() {
         return this._buildUrl('/indicator/indicator-location-data-entries/');
       },

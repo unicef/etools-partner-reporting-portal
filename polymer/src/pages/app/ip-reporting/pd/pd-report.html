@@ -7,10 +7,13 @@
 <link rel="import" href="../../../../../bower_components/paper-item/paper-icon-item.html">
 <link rel="import" href="../../../../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../../../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../../../../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../../../../bower_components/iron-pages/iron-pages.html">
 
+<link rel="import" href="../../../../pages/app/ip-reporting/pd/pd-report/results.html">
 <link rel="import" href="../../../../elements/page-header.html">
 <link rel="import" href="../../../../elements/page-body.html">
-<link rel="import" href="../../../../elements/ip-reporting/pd-output-list.html">
 <link rel="import" href="../../../../elements/reporting-period.html">
 <link rel="import" href="../../../../elements/report-status.html">
 <link rel="import" href="../../../../elements/etools-prp-ajax.html">
@@ -89,10 +92,57 @@
           </paper-menu>
         </paper-menu-button>
       </div>
+
+      <div class="tabs">
+        <paper-tabs
+            selected="{{selectedTab}}"
+            attr-for-selected="name"
+            scrollable
+            hide-scroll-buttons>
+          <paper-tab name="results">Reporting on results</paper-tab>
+          <paper-tab name="info">Other info</paper-tab>
+
+          <template
+              is="dom-if"
+              if="[[!_equals(mode, 'view')]]"
+              restamp="true">
+            <paper-tab name="submit">Review and submit</paper-tab>
+          </template>
+        </paper-tabs>
+      </div>
     </page-header>
 
     <page-body>
-      <pd-output-list></pd-output-list>
+      <iron-pages
+          attr-for-selected="name"
+          selected="{{selectedTab}}">
+        <template
+            is="dom-if"
+            if="[[_equals(selectedTab, 'results')]]"
+            restamp="true">
+          <page-ip-reporting-report-results
+              name="results">
+          </page-ip-reporting-report-results>
+        </template>
+
+        <template
+            is="dom-if"
+            if="[[_equals(selectedTab, 'info')]]"
+            restamp="true">
+          <div name="info">Other</div>
+        </template>
+
+        <template
+            is="dom-if"
+            if="[[!_equals(mode, 'view')]]"
+            restamp="true">
+          <template
+              is="dom-if"
+              if="[[_equals(selectedTab, 'submit')]]"
+              restamp="true">
+            <div name="submit">Submit</div>
+          </template>
+        </template>
     </page-body>
   </template>
 
@@ -152,6 +202,11 @@
         backLink: {
           type: String,
           computed: '_computeBackLink(pdId)',
+        },
+
+        selectedTab: {
+          type: String,
+          value: 'results',
         },
       },
 
