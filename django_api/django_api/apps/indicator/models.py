@@ -145,7 +145,7 @@ class Reportable(TimeStampedModel):
         progress_report = IndicatorReport.objects.filter(progress_report_id=progress_report_id).first()
         return {
             'overall_status': progress_report and progress_report.overall_status,
-            'narrative_assessemnt': progress_report and progress_report.narrative_assessemnt,
+            'narrative_assessment': progress_report and progress_report.narrative_assessment,
         }
 
     def __str__(self):
@@ -193,7 +193,7 @@ class IndicatorReport(TimeStampedModel):
         default=OVERALL_STATUS.on_track,
         max_length=3
     )
-    narrative_assessemnt = models.CharField(max_length=255, null=True, blank=True)
+    narrative_assessment = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return self.title
