@@ -1,6 +1,9 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="../../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../../bower_components/paper-menu/paper-submenu.html">
+<link rel="import" href="../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../bower_components/app-route/app-location.html">
 
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/page-nav.html">
@@ -18,38 +21,6 @@
           background: var(--theme-selected-item-background-color);
         };
       }
-
-      paper-item[name='response-parameters']  {
-        @apply(--layout-vertical);
-        align-items: left;
-        padding: 16px;
-      }
-
-      paper-item[name='response-parameters'] a {
-        @apply(--layout-start-justified);
-        display: block;
-        position: relative;
-        line-height: auto;
-        color: inherit;
-        text-decoration: none;
-      }
-
-      paper-item[name='response-parameters'] a#category {
-        padding: 0 0 8px 0;
-
-      }
-
-      paper-item[name='response-parameters'] a.subcategory {
-        @apply(--layout-start-justified);
-        font-size: 13px;
-        padding-left: 0;
-      }
-
-      paper-item[name='response-parameters'] {
-        color: black;
-      }
-
-      /*color: var(--theme-primary-color-cluster);*/
     </style>
 
     <paper-menu
@@ -65,17 +36,17 @@
         </a>
       </paper-item>
 
-      <paper-item name="response-parameters">
-        <a id="category" href="[[buildUrl(_baseUrlCluster, '/response-parameters/')]]">
-          Response Parameters
-        </a>
-        <a class="subcategory" href="[[buildUrl(_baseUrlCluster, '/response-parameters/cluster')]]">
-          Cluster
-        </a>
-        <a class="subcategory" href="[[buildUrl(_baseUrlCluster, '/response-parameters/partners')]]">
-          Partners
-        </a>
-      </paper-item>
+      <paper-submenu>
+        <paper-item class="menu-trigger">Response Parameters</paper-item>
+        <paper-menu class="menu-content">
+          <paper-item name='response-parameters'>
+            <a href="[[buildUrl(_baseUrlCluster, 'response-parameters/clusters')]]">Clusters</a>
+          </paper-item>
+          <paper-item name='response-parameters'>
+            <a href="[[buildUrl(_baseUrlCluster, 'response-parameters/partners')]]">Partners</a>
+          </a>
+        </paper-menu>
+      </paper-submenu>
 
       <paper-item name="planned-action">
         <a href="[[buildUrl(_baseUrlCluster, '/planned-action')]]">

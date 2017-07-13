@@ -1,13 +1,12 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../../../bower_components/paper-tabs/paper-tab.html">
-<link rel="import" href="../../../../../bower_components/paper-tabs/paper-tabs.html">
 
 <link rel="import" href="../../../styles/shared-styles.html">
 
 <link rel="import" href="../../../elements/page-header.html">
 <link rel="import" href="../../../elements/page-body.html">
 
-<dom-module id="page-cluster-reporting-partners-response-parameters">
+<link rel="import" href="partners-projects.html">
+<dom-module id="partners-response-parameters">
   <template>
     <style include="shared-styles">
       :host {
@@ -38,34 +37,17 @@
 
     <page-header title="Partners"></page-header>
 
-    <div class="top-content-row">
+    <page-body>
+      <partners-projects
+        route="{{subroute}}">
+      </partners-projects>
+    </page-body>
 
-      <paper-tabs
-        selected="{{ routeData.dashTab }}"
-        attr-for-selected="name"
-        noink
-        bottom-item>
-
-        <paper-tab name="contacts" link>
-          <span class="tab-content">Contacts</span>
-        </paper-tab>
-
-        <paper-tab name="projects" link>
-          <span class="tab-content">Projects</span>
-        </paper-tab>
-
-        <paper-tab name="activities" link>
-          <span class="tab-content">Activities</span>
-        </paper-tab>
-
-      </paper-tabs>
-
-    </div>
   </template>
 
   <script>
     Polymer({
-      is: 'page-cluster-reporting-partners-response-parameters',
+      is: 'partners-response-parameters',
 
       behaviors: [
         App.Behaviors.ReduxBehavior,

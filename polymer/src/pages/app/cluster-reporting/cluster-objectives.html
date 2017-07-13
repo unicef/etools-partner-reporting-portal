@@ -21,11 +21,6 @@
     </etools-prp-ajax>
 
     <etools-prp-ajax
-        id="activities"
-        url="[[activitiesUrl]]">
-    </etools-prp-ajax>
-
-    <etools-prp-ajax
         id="createObjective"
         url="[[objectivesUrl]]"
         body="[[objectivesData]]"
@@ -89,10 +84,10 @@
       ],
 
       properties: {
-        //Passing a param is necessary for _computeObjectivesUrl to trigger.
+        // TODO: Why is URL not computing?
         objectivesUrl: {
           type: String,
-          computed: '_computeObjectivesUrl(route)'
+          value: '/api/cluster/cluster-objective-list/'
         },
         clusterObjectives: {
           type: Array,
@@ -117,6 +112,7 @@
         var thunk1 = this.$.objectives.thunk();
         thunk1()
           .then(function (res) {
+            console.log("res", res)
             self.set('clusterObjectives', res.data.results);
           })
           .catch(function (err) { // jshint ignore:line

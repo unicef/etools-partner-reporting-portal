@@ -1,8 +1,8 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../../bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="../../../../bower_components/paper-tabs/paper-tabs.html">
-<link rel="import" href="../../../../../bower_components/app-route/app-route.html">
-<link rel="import" href="../../../../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../../bower_components/iron-pages/iron-pages.html">
 
 <link rel="import" href="../../../styles/shared-styles.html">
 <link rel="import" href="../../../elements/page-header.html">
@@ -10,7 +10,7 @@
 <link rel="import" href="cluster-activities.html">
 <link rel="import" href="cluster-objectives.html">
 
-<dom-module id="page-cluster-reporting-cluster-response-parameters">
+<dom-module id="clusters-response-parameters">
   <template>
     <style include="shared-styles">
       :host {
@@ -48,18 +48,12 @@
         url="[[activitiesUrl]]">
     </etools-prp-ajax>
 
-    <app-route
-        route="{{route}}"
-        pattern="/:tree"
-        data="{{routeData}}"
-        tail="{{subroute}}">
-    </app-route>
 
     <page-header title="Clusters"></page-header>
 
     <div class="top-content-row">
       <paper-tabs
-        selected="{{ routeData.dashTab }}"
+        selected="{{routeData.dashTab}}"
         attr-for-selected="name"
         noink
         bottom-item>
@@ -78,25 +72,32 @@
     </div>
 
     <page-body>
-      <iron-pages
-          selected="activities"
-          attr-for-selected="name">
-          <!-- TODO: toggle using tabs -->
-        <!-- <cluster-objectives
-            name="objectives"
-            route="{{subroute}}">
-        </cluster-objectives> -->
-        <cluster-activities
-          name="activities"
+      <cluster-objectives
+          name="objectives"
           route="{{subroute}}">
-        </cluster-activities>
-      </iron-pages>
+      </cluster-objectives>
+
+      <cluster-activities
+        name="activities"
+        route="{{subroute}}">
+      </cluster-activities>
+
     </page-body>
   </template>
 
   <script>
     Polymer({
-      is: 'page-cluster-reporting-cluster-response-parameters',
+      is: 'clusters-response-parameters',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.UtilsBehavior,
+      ],
+
+      attached: function() {
+        console.log("attaching clusters")
+      }
     });
+
   </script>
 </dom-module>

@@ -13,10 +13,11 @@
     <style include="data-table-styles table-styles">
       :host {
         display: block;
+        margin-top: 25px;
       }
     </style>
-    <!-- TODO: Associate ajax calls with tabs. -->
 
+    <!-- TODO: tabs and Redux -->
     <etools-prp-ajax
         id="activities"
         url="[[activitiesUrl]]">
@@ -89,12 +90,10 @@
       properties: {
         activitiesUrl: {
           type: String,
-          computed: '_computeActivitiesUrl(route)'
+          value: '/api/cluster/cluster-activity-list/'
+          // computed: '_computeActivitiesUrl(route)'
         },
-        clusterActivities: {
-          type: Array,
-          value: []
-        },
+        clusterActivities: Array,
         //For testing create objective API
         activityData: {
           type: Object,
@@ -107,26 +106,28 @@
       },
 
       attached: function () {
+        var self = this;
         // TODO: Move to Redux.
-        thunk2 = this.$.activities.thunk();
-        thunk2()
+        thunk = this.$.activities.thunk();
+        thunk()
           .then(function (res) {
             console.log("Res?", res.data.results)
-            this.clusterActivities = res.data.results;
+            self.set('clusterActivities', res.data.results);
+            console.log(this.clusterActivities)
           })
           .catch(function (err) { // jshint ignore:line
             // TODO: error handling
           });
 
         // Testing that cluster objective creation works
-        thunk3 = this.$.createActivity.thunk();
-        thunk3()
-          .then(function (res) {
-            console.log("res", res)
-          })
-          .catch(function (err) { // jshint ignore:line
-            // TODO: error handling
-          });
+        // thunk3 = this.$.createActivity.thunk();
+        // thunk3()
+        //   .then(function (res) {
+        //     console.log("res", res)
+        //   })
+        //   .catch(function (err) { // jshint ignore:line
+        //     // TODO: error handling
+        //   });
       },
 
       _computeActivitiesUrl: function () {

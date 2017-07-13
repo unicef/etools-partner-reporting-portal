@@ -1,10 +1,14 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../../bower_components/app-route/app-location.html">
 <link rel="import" href="../../../../bower_components/iron-pages/iron-pages.html">
 
 <link rel="import" href="../../../behaviors/utils.html">
 <link rel="import" href="../../../elements/page-header.html">
 <link rel="import" href="../../../elements/page-body.html">
+
+<link rel="import" href="clusters.html">
+<link rel="import" href="partners.html">
 
 <dom-module id="page-cluster-reporting-response-parameters">
   <template>
@@ -14,29 +18,16 @@
       }
     </style>
 
-    <app-route
-        route="{{route}}"
-        pattern="/:subpage"
-        data="{{routeData}}"
-        tail="{{subroute}}">
-    </app-route>
+     <clusters-response-parameters
+       name="clusters"
+       route="{{subroute}}">
+     </clusters-response-parameters>
 
-    <iron-pages
-       selected="[[subpage]]"
-       attr-for-selected="name">
-     <template is="dom-if" if="[[_equals(subpage, 'cluster')]]" restamp="true">
-       <page-cluster-reporting-cluster-response-parameters
-         name="cluster"
-         route="{{subroute}}">
-       </page-cluster-reporting-cluster-response-parameters>
-     </template>
-     <template is="dom-if" if="[[_equals(subpage, 'partners')]]" restamp="true">
-       <page-cluster-reporting-partners-response-parameters
-         name="partners"
-         route="{{subroute}}">
-       </page-cluster-reporting-partners-response-parameters>
-     </template>
-   </iron-pages>
+     <partners-response-parameters
+       name="partners"
+       route="{{subroute}}">
+     </partners-response-parameters>
+
   </template>
 
   <script>
@@ -45,38 +36,43 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
-      ],
-
-      observers: [
-        '_subpageChanged(routeData)',
-      ],
-
-      behaviors: [
         App.Behaviors.UtilsBehavior,
       ],
 
+      observers: [
+        '_routeChanged(route)',
+      ],
+
       properties: {
-        subpage: {
+        page: {
           type: String,
-          value: 'cluster'
+          observer: '_pageChanged',
+        },
+      },
+
+      //Tracks changes in the route ONLY.
+      //Further logic is in _subpathChanged.
+      _routeChanged: function (route) {
+        if (route.path === '/partners') {
+          this.page = 'partners';
+        } else {
+          this.page = 'clusters';
         }
       },
 
-      attached: function() {
-        this.set('route.path', '/cluster');
-        this.set('route.subpath', 'cluster');
+      _pageChanged: function (page) {
+        console.log("page changed", page)
+        if (page) {
+          // TODO: Fix. Why is this resolveUrl returning the /src/pages/ part of the URL?
+          // var resolvedPageUrl = this.resolveUrl(page + '.html');
+          this.set('route.path', '/' + page);
+          var resolvedPageUrl = 'http://localhost:8080/src/pages/app/cluster-reporting/' + page + '.html';
+          this.importHref(resolvedPageUrl, null, this._notFound, true);
+        }
       },
 
       detached: function() {
-        this.set('route.subpath', undefined);
-      },
-
-      _subpageChanged: function (routeData) {
-        var subpage = routeData.subpage || 'cluster';
-        this.subpage = routeData.subpage;
-        this.set('route.subpath', subpage);
-        var resolvedPageUrl = this.resolveUrl(subpage + '.html');
-        this.importHref(resolvedPageUrl, null, this._notFound, true);
+        this.set('route.page', undefined);
       },
     });
   </script>
