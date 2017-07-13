@@ -79,9 +79,9 @@ class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
 class TestRatioIndicatorDisaggregator(BaseAPITestCase):
     generate_fake_data_quantity = 40
 
-    def test_post_process_location_percentage_calc(self):
-        unit_type = IndicatorBlueprint.RATIO
-        calc_type = IndicatorBlueprint.PERCENTAGE
+    def test_post_process_location_ratio_calc(self):
+        unit_type = IndicatorBlueprint.PERCENTAGE
+        calc_type = IndicatorBlueprint.RATIO
 
         indicator = Reportable.objects.filter(
             blueprint__unit=unit_type,
@@ -89,10 +89,15 @@ class TestRatioIndicatorDisaggregator(BaseAPITestCase):
         ).first()
 
         indicator_report = indicator.indicator_reports.first()
-        loc_total = 0
+        v_total = 0
+        d_total = 0
+        ratio_value = 0
 
         for loc_data in indicator_report.indicator_location_data.all():
-            QuantityIndicatorDisaggregator.post_process(loc_data)
-            loc_total += loc_data.disaggregation['()']['c']
+            RatioIndicatorDisaggregator.post_process(loc_data)
+            v_total += loc_data.disaggregation['()']['v']
+            d_total += loc_data.disaggregation['()']['d']
 
-        self.assertEquals(indicator_report.total['c'], loc_total)
+        ratio_value = v_total / (d_total * 1.0)
+
+        self.assertEquals(indicator_report.total['c'], ratio_value)
