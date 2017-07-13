@@ -49,6 +49,7 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
     clusters = ClusterSimpleSerializer(many=True, read_only=True)
     locations = ShortLocationSerializer(many=True, read_only=True)
     partner = serializers.SerializerMethodField()
+    part_response_plan = serializers.SerializerMethodField()
 
     class Meta:
         model = PartnerProject
@@ -65,7 +66,7 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
             'clusters',
             'locations',
             'partner',
-            # 'reportables',
+            'part_response_plan',
         )
 
     def get_id(self, obj):
@@ -73,6 +74,10 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
 
     def get_partner(self, obj):
         return obj.partner and str(obj.partner_id)
+
+    def get_part_response_plan(self, obj):
+        first_cluster = obj.clusters.first()
+        return first_cluster and first_cluster.response_plan.title or ''
 
 
 class PartnerProjectPatchSerializer(serializers.ModelSerializer):
