@@ -127,7 +127,7 @@ class IndicatorLLoutputsSerializer(serializers.ModelSerializer):
     status = serializers.SerializerMethodField()
     indicator_reports = serializers.SerializerMethodField()
     overall_status = serializers.SerializerMethodField()
-    narrative_assessemnt = serializers.SerializerMethodField()
+    narrative_assessment = serializers.SerializerMethodField()
 
     class Meta:
         model = Reportable
@@ -137,7 +137,7 @@ class IndicatorLLoutputsSerializer(serializers.ModelSerializer):
             'llo_id',
             'status',
             'overall_status',
-            'narrative_assessemnt',
+            'narrative_assessment',
             'indicator_reports',
         )
 
@@ -170,10 +170,10 @@ class IndicatorLLoutputsSerializer(serializers.ModelSerializer):
             return capture['overall_status']
         return ''
 
-    def get_narrative_assessemnt(self, obj):
+    def get_narrative_assessment(self, obj):
         capture = self.__get_narrative_and_assessment(obj)
         if capture is not None:
-            return capture['narrative_assessemnt'] or ''
+            return capture['narrative_assessment'] or ''
         return ''
 
     def __get_narrative_and_assessment(self, obj):
@@ -193,7 +193,7 @@ class OverallNarrativeSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'overall_status',
-            'narrative_assessemnt',
+            'narrative_assessment',
         )
 
 
@@ -494,7 +494,7 @@ class PDReportsSerializer(serializers.ModelSerializer):
 class IndicatorReportUpdateSerializer(serializers.ModelSerializer):
 
     overall_status = serializers.SerializerMethodField()
-    narrative_assessemnt = serializers.SerializerMethodField()
+    narrative_assessment = serializers.SerializerMethodField()
 
     class Meta:
         model = IndicatorReport

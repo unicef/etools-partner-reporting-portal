@@ -180,16 +180,18 @@ class TestIndicatorDataReportableAPIView(BaseAPITestCase):
         new_overall_status = OVERALL_STATUS.met
         data = dict(overall_status=new_overall_status)
         response = self.client.patch(url, data=data, format='json')
-        self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(response.data['overall_status'], new_overall_status)
+
         updated_ir = IndicatorReport.objects.get(id=ir.id)
         self.assertEquals(updated_ir.overall_status, new_overall_status)
 
-        new_narrative_assessemnt = "new narrative_assessemnt"
-        data = dict(narrative_assessemnt=new_narrative_assessemnt)
+        new_narrative_assessment = "new narrative_assessment"
+        data = dict(narrative_assessment=new_narrative_assessment)
         response = self.client.patch(url, data=data, format='json')
-        self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
         updated_ir = IndicatorReport.objects.get(id=ir.id)
-        self.assertEquals(updated_ir.narrative_assessemnt, new_narrative_assessemnt)
+        self.assertEquals(updated_ir.narrative_assessment, new_narrative_assessment)
 
 
 class TestIndicatorReportListAPIView(BaseAPITestCase):
