@@ -1,5 +1,7 @@
 <link rel="import" href="../../../../../../bower_components/polymer/polymer.html">
 
+<link rel="import" href="../../../../../elements/ip-reporting/pd-output-list.html">
+
 <dom-module id="page-ip-reporting-report-submit">
   <template>
     <style>
@@ -8,7 +10,13 @@
       }
     </style>
 
-    <h1>submit</h1>
+    <pd-output-list
+        override-mode="view">
+    </pd-output-list>
+
+    <pd-report-info
+        override-mode="view">
+    </pd-report-info>
   </template>
 
   <script>

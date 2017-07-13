@@ -111,7 +111,7 @@
         <labelled-item label="Overall status">
           <template
               is="dom-if"
-              if="[[!_equals(mode, 'view')]]"
+              if="[[!_equals(computedMode, 'view')]]"
               restamp="true">
             <paper-radio-group
                 id="overall_status"
@@ -126,7 +126,7 @@
 
           <template
               is="dom-if"
-              if="[[_equals(mode, 'view')]]"
+              if="[[_equals(computedMode, 'view')]]"
               restamp="true">
               <report-status status="[[data.overall_status]]"></report-status>
           </template>
@@ -135,7 +135,7 @@
         <labelled-item label="Narrative assessment">
           <template
               is="dom-if"
-              if="[[!_equals(mode, 'view')]]"
+              if="[[!_equals(computedMode, 'view')]]"
               restamp="true">
             <paper-input-container
                 no-label-float>
@@ -150,7 +150,7 @@
 
           <template
               is="dom-if"
-              if="[[_equals(mode, 'view')]]"
+              if="[[_equals(computedMode, 'view')]]"
               restamp="true">
             [[data.narrative_assessment]]
           </template>
@@ -202,7 +202,8 @@
             <indicator-details
                 reportable-id="[[data.id]]"
                 indicator-name="[[indicator.indicator_name]]"
-                indicator-id="[[indicator.id]]">
+                indicator-id="[[indicator.id]]"
+                override-mode="[[computedMode]]">
             </indicator-details>
           </iron-collapse>
         </div>
@@ -224,9 +225,19 @@
 
         reportableData: Object,
 
+        overrideMode: {
+          type: String,
+          value: '',
+        },
+
         mode: {
           type: String,
           statePath: 'programmeDocumentReports.current.mode',
+        },
+
+        computedMode: {
+          type: String,
+          computed: '_computeMode(mode, overrideMode)',
         },
 
         reportId: {
@@ -306,6 +317,10 @@
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
             });
+      },
+
+      _computeMode: function (mode, overrideMode) {
+        return overrideMode || mode;
       },
 
       attached: function () {

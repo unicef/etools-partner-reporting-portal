@@ -18,7 +18,10 @@
     <template
         is="dom-repeat"
         items="[[data]]">
-      <pd-output data="[[item]]"></pd-output>
+      <pd-output
+          data="[[item]]"
+          override-mode="[[overrideMode]]">
+      </pd-output>
     </template>
   </template>
 
@@ -35,6 +38,8 @@
           type: Array,
           statePath: App.Selectors.IndicatorData.all,
         },
+
+        overrideMode: String,
       },
     });
   </script>

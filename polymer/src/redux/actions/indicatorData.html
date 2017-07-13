@@ -12,7 +12,7 @@
         return function (dispatch) {
           return indicatorDataThunk()
               .then(function (res) {
-                dispatch(App.Actions.IndicatorData.set(reportId, res.data.outputs));
+                dispatch(App.Actions.IndicatorData.set(reportId, res.data));
               });
         };
       },
@@ -47,6 +47,25 @@
         };
       },
 
+      updateInfo: function (updateThunk, reportId) {
+        return function (dispatch) {
+          return updateThunk()
+              .then(function (res) {
+                dispatch(App.Actions.IndicatorData.amendInfo(
+                  reportId,
+                  res.data.progress_report
+                ));
+              });
+        };
+      },
+
+      amendInfo: function (reportId, data) {
+        return {
+          type: App.Constants.AMEND_INFO,
+          reportId: reportId,
+          data: data,
+        };
+      },
     };
   }());
 </script>
