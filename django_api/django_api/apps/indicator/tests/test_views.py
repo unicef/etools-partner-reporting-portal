@@ -162,7 +162,8 @@ class TestIndicatorListAPIView(BaseAPITestCase):
         url = reverse('indicator-data', kwargs={'ir_id': ir.id})
         response = self.client.put(url, data=data, format='json')
         updated_ir = IndicatorReport.objects.get(id=ir.id)
-        self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(response.data['progress_report']['partner_contribution_to_date'], u'update field')
         self.assertEquals(updated_ir.progress_report.partner_contribution_to_date, u'update field')
         self.assertEquals(updated_ir.progress_report.challenges_in_the_reporting_period, u'new challanges')
 

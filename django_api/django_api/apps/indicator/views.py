@@ -216,7 +216,7 @@ class IndicatorDataAPIView(APIView):
         if progress_report.is_valid():
             progress_report.save()
 
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(dict(progress_report=progress_report.data), status=status.HTTP_200_OK)
 
 
 class IndicatorDataReportableAPIView(APIView):
