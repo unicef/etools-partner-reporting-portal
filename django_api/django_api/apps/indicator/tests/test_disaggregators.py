@@ -18,57 +18,81 @@ class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
     generate_fake_data_quantity = 40
 
     def test_post_process_location_sum_calc(self):
-        number_type = IndicatorBlueprint.NUMBER
-        sum_type = IndicatorBlueprint.SUM
+        unit_type = IndicatorBlueprint.NUMBER
+        calc_type = IndicatorBlueprint.SUM
 
-        quantity_type_indicator = Reportable.objects.filter(
-            blueprint__unit=number_type,
-            blueprint__calculation_formula_across_locations=sum_type,
+        indicator = Reportable.objects.filter(
+            blueprint__unit=unit_type,
+            blueprint__calculation_formula_across_locations=calc_type,
         ).first()
 
-        indicator_location_data = IndicatorLocationData.objects.filter(
-            indicator_report__reportable=quantity_type_indicator,
-        ).first()
+        indicator_report = indicator.indicator_reports.first()
+        loc_total = 0
+
+        for loc_data in indicator_report.indicator_location_data.all():
+            QuantityIndicatorDisaggregator.post_process(loc_data)
+            loc_total += loc_data.disaggregation['()']['c']
+
+        self.assertEquals(indicator_report.total['c'], loc_total)
 
     def test_post_process_location_max_calc(self):
-        number_type = IndicatorBlueprint.NUMBER
-        max_type = IndicatorBlueprint.MAX
+        unit_type = IndicatorBlueprint.NUMBER
+        calc_type = IndicatorBlueprint.MAX
 
-        quantity_type_indicator = Reportable.objects.filter(
-            blueprint__unit=number_type,
-            blueprint__calculation_formula_across_locations=max_type,
+        indicator = Reportable.objects.filter(
+            blueprint__unit=unit_type,
+            blueprint__calculation_formula_across_locations=calc_type,
         ).first()
 
-        indicator_location_data = IndicatorLocationData.objects.filter(
-            indicator_report__reportable=quantity_type_indicator,
-        ).first()
+        indicator_report = indicator.indicator_reports.first()
+        max_value = 0
+
+        for loc_data in indicator_report.indicator_location_data.all():
+            QuantityIndicatorDisaggregator.post_process(loc_data)
+
+            if loc_data.disaggregation['()']['c'] > max_value:
+                max_value = loc_data.disaggregation['()']['c']
+
+        self.assertEquals(indicator_report.total['c'], max_value)
 
     def test_post_process_location_avg_calc(self):
-        number_type = IndicatorBlueprint.NUMBER
-        avg_type = IndicatorBlueprint.AVG
+        unit_type = IndicatorBlueprint.NUMBER
+        calc_type = IndicatorBlueprint.AVG
 
-        quantity_type_indicator = Reportable.objects.filter(
-            blueprint__unit=number_type,
-            blueprint__calculation_formula_across_locations=avg_type,
+        indicator = Reportable.objects.filter(
+            blueprint__unit=unit_type,
+            blueprint__calculation_formula_across_locations=calc_type,
         ).first()
 
-        indicator_location_data = IndicatorLocationData.objects.filter(
-            indicator_report__reportable=quantity_type_indicator,
-        ).first()
+        indicator_report = indicator.indicator_reports.first()
+        avg_value = 0
+
+        for loc_data in indicator_report.indicator_location_data.all():
+            QuantityIndicatorDisaggregator.post_process(loc_data)
+            avg_value += loc_data.disaggregation['()']['c']
+
+        avg_value /= (indicator_report.indicator_location_data.count() * 1.0)
+
+        self.assertEquals(indicator_report.total['c'], avg_value)
 
 
 class TestRatioIndicatorDisaggregator(BaseAPITestCase):
     generate_fake_data_quantity = 40
 
     def test_post_process_location_percentage_calc(self):
-        number_type = IndicatorBlueprint.RATIO
-        percentage_type = IndicatorBlueprint.PERCENTAGE
+        unit_type = IndicatorBlueprint.RATIO
+        calc_type = IndicatorBlueprint.PERCENTAGE
 
-        quantity_type_indicator = Reportable.objects.filter(
-            blueprint__unit=number_type,
-            blueprint__calculation_formula_across_locations=percentage_type,
+        indicator = Reportable.objects.filter(
+            blueprint__unit=unit_type,
+            blueprint__calculation_formula_across_locations=calc_type,
         ).first()
 
-        indicator_location_data = IndicatorLocationData.objects.filter(
-            indicator_report__reportable=quantity_type_indicator,
-        ).first()
+        indicator_report = indicator.indicator_reports.first()
+        loc_total = 0
+
+        for loc_data in indicator_report.indicator_location_data.all():
+            QuantityIndicatorDisaggregator.post_process(loc_data)
+            loc_total += loc_data.disaggregation['()']['c']
+
+        self.assertEquals(indicator_report.total['c'], loc_total)
