@@ -1,14 +1,15 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../../bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="../../../../bower_components/paper-tabs/paper-tabs.html">
-<link rel="import" href="../../../../../bower_components/app-route/app-route.html">
-<link rel="import" href="../../../../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../../bower_components/app-route/app-location.html">
+<link rel="import" href="../../../../bower_components/iron-pages/iron-pages.html">
 
 <link rel="import" href="../../../styles/shared-styles.html">
 <link rel="import" href="../../../elements/page-header.html">
 <link rel="import" href="../../../elements/page-body.html">
 <link rel="import" href="planned-action-projects.html">
-
+<link rel="import" href="planned-action-activities.html">
 
 <dom-module id="page-cluster-reporting-planned-action">
   <template>
@@ -41,23 +42,27 @@
       }
     </style>
 
+    <app-location route="{{route}}"></app-location>
+
     <app-route
-        route="{{route}}"
-        pattern="/:tree"
-        data="{{routeData}}"
-        tail="{{subroute}}">
+      route="{{route}}"
+      pattern="/:dashTab"
+      data="{{routeData}}"
+      tail="{{subroute}}">
     </app-route>
 
     <div class="page-top-content">
+
       <page-header title="My Planned Action"></page-header>
 
       <div class="top-content-row">
         <paper-tabs
-          selected="{{ routeData.dashTab }}"
+          selected="{{routeData.dashTab}}"
           attr-for-selected="name"
           noink
           bottom-item>
-          <paper-tab name="details" link>
+
+          <paper-tab name="projects" link>
             <span class="tab-content">Projects</span>
           </paper-tab>
 
@@ -66,19 +71,25 @@
           </paper-tab>
         </paper-tabs>
       </div>
+
     </div>
 
     <page-body>
       <iron-pages
-          selected="projects"
-          attr-for-selected="name">
-        <!-- TODO: 'if' template tag and add Activities tab content -->
-        <planned-action-projects
-            name="projects"
-            route="{{subroute}}">
-        </planned-action-projects>
+        id="tabContent"
+        attr-for-selected="name"
+        fallback-selection="projects"
+        on-iron-items-changed="_updateTabSelection">
+
+        <template is="dom-if" if="[[_equals(tab, 'projects')]]" restamp="true">
+          <planned-action-projects name="projects"></planned-action-projects>
+        </template>
+
+        <template is="dom-if" if="[[_equals(tab, 'activities')]]" restamp="true">
+          <planned-action-activities name="activities"></planned-action-activities>
+        </template>
       </iron-pages>
-    <page-body>
+    </page-body>
 
   </template>
 
@@ -88,7 +99,34 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.UtilsBehavior,
       ],
+
+      properties: {
+        tab: String,
+      },
+
+      observers: [
+        '_updateUrlTab(routeData.dashTab)',
+      ],
+
+      _updateTabSelection: function () {
+        this.$.tabContent.select(this.tab);
+      },
+
+      attached: function() {
+        this.set('routeData.dashTab', 'projects');
+      },
+
+      _updateUrlTab: function (dashTab) {
+        //  fixme: why is dashTab getting set to 'app'?
+        if (dashTab && dashTab !== 'app') {
+          this.set('tab', dashTab);
+          // fixme: why is the dashTab not getting appended to the url?
+          // This breaks everything:
+          // this.set('route.path', '/' + dashTab);
+        }
+      },
 
     });
   </script>
