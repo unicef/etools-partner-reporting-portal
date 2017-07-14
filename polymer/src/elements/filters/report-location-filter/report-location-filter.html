@@ -1,0 +1,96 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../dropdown-filter/dropdown-filter.html">
+<link rel="import" href="../../etools-prp-ajax.html">
+<link rel="import" href="../../../endpoints.html">
+<link rel="import" href="../../../redux/store.html">
+
+<dom-module id="report-location-filter">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <etools-prp-ajax
+        id="locations"
+        url="[[locationsUrl]]">
+    </etools-prp-ajax>
+
+    <template is="dom-if" if="[[!loading]]">
+      <dropdown-filter
+          label="Location"
+          name="location"
+          value="[[value]]"
+          data="[[options]]">
+      </dropdown-filter>
+    </template>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'report-location-filter',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        value: String,
+
+        options: {
+          type: Array,
+          value: [],
+        },
+
+        reportId: {
+          type: String,
+          statePath: 'programmeDocumentReports.current.id',
+        },
+
+        locationsUrl: {
+          type: String,
+          computed: '_computeLocationsUrl(reportId)',
+          observer: '_fetchLocations',
+        },
+
+        loading: {
+          type: Boolean,
+          value: true,
+          computed: '_computeLoading(options)',
+        },
+
+      },
+
+      _computeLocationsUrl: function (reportId) {
+        return App.Endpoints.indicatorDataLocation(reportId);
+      },
+
+      _computeLoading: function (data) {
+        return !data.length;
+      },
+
+      _fetchLocations: function () {
+        var self = this;
+
+        this.$.locations.abort();
+
+        this.$.locations.thunk()()
+            .then(function (res) {
+              self.set('options', [{
+                id: '',
+                title: 'All',
+              }].concat(res.data));
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
+      },
+
+      detached: function () {
+        this.$.locations.abort();
+      },
+    });
+  </script>
+</dom-module>

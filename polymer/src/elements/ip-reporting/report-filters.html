@@ -7,6 +7,7 @@
 <link rel="import" href="../../elements/filter-list.html">
 <link rel="import" href="../../elements/filters/reportable-filter/reportable-filter.html">
 <link rel="import" href="../../elements/filters/checkbox-filter/checkbox-filter.html">
+<link rel="import" href="../../elements/filters/report-location-filter/report-location-filter.html">
 
 <dom-module id="report-filters">
   <template>
@@ -43,6 +44,11 @@
           class="item"
           value="[[_withDefault(queryParams.reportable_id, '')]]">
       </reportable-filter>
+
+      <report-location-filter
+          class="item"
+          value="[[_withDefault(queryParams.location, '')]]">
+      </report-location-filter>
 
       <checkbox-filter
           class="incomplete"

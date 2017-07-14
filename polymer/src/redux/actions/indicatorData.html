@@ -1,4 +1,5 @@
 <link rel="import" href="../../constants.html">
+<link rel="import" href="../../../bower_components/promise-polyfill/promise-polyfill-lite.html">
 
 <script>
   (function () {
@@ -10,10 +11,30 @@
 
       fetch: function (indicatorDataThunk, reportId) {
         return function (dispatch) {
+          dispatch(App.Actions.IndicatorData.loadingStart());
+
           return indicatorDataThunk()
               .then(function (res) {
+                dispatch(App.Actions.IndicatorData.loadingStop());
                 dispatch(App.Actions.IndicatorData.set(reportId, res.data));
+              })
+              .catch(function (err) {
+                dispatch(App.Actions.IndicatorData.loadingStop());
+
+                return Promise.reject(err);
               });
+        };
+      },
+
+      loadingStart: function () {
+        return {
+          type: App.Constants.INDICATOR_DATA_LOADING_START,
+        };
+      },
+
+      loadingStop: function () {
+        return {
+          type: App.Constants.INDICATOR_DATA_LOADING_STOP,
         };
       },
 
