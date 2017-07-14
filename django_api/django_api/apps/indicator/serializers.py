@@ -293,11 +293,10 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
         valid_disaggregation_value_pairs = \
             generate_data_combination_entries(
                 disaggregation_value_id_list,
-                entries_only=True, r=data['level_reported'])
+                entries_only=True, key_type=set, r=data['level_reported'])
 
-        if str(tuple()) not in valid_disaggregation_value_pairs:
-            valid_disaggregation_value_pairs.append(
-                str(tuple()))
+        if set() not in valid_disaggregation_value_pairs:
+            valid_disaggregation_value_pairs.append(set())
 
         disaggregation_data_keys = data['disaggregation'].keys()
 
@@ -306,17 +305,17 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
 
         # Assertion on all combinatoric entries for num_disaggregation and
         # level_reported against submitted disaggregation data
-        if valid_entry_count > disaggregation_data_key_count:
-            raise serializers.ValidationError(
-                "Submitted disaggregation data entries does not contain "
-                + "all possible combination pair keys"
-            )
-
         if valid_entry_count < disaggregation_data_key_count:
             raise serializers.ValidationError(
                 "Submitted disaggregation data entries contains "
                 + "extra combination pair keys"
             )
+
+        valid_level_reported_key_count = len(filter(
+            lambda key: len(key) == data['level_reported'],
+            valid_disaggregation_value_pairs
+        ))
+        level_reported_key_count = 0
 
         # Disaggregation data coordinate space check from level_reported
         for key in disaggregation_data_keys:
@@ -328,18 +327,16 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
                     "%s key is not in tuple format" % (key)
                 )
 
-            else:
-                if len(parsed_tuple) > data['level_reported']:
-                    raise serializers.ValidationError(
-                        "%s Disaggregation data coordinate " % (key)
-                        + "space cannot be higher than "
-                        + "specified level_reported"
-                    )
+            if len(parsed_tuple) > data['level_reported']:
+                raise serializers.ValidationError(
+                    "%s Disaggregation data coordinate " % (key)
+                    + "space cannot be higher than "
+                    + "specified level_reported"
+                )
 
-        # Disaggregation data coordinate space check
-        # from disaggregation choice ids
-        for key in disaggregation_data_keys:
-            if key not in valid_disaggregation_value_pairs:
+            # Disaggregation data coordinate space check
+            # from disaggregation choice ids
+            elif set(parsed_tuple) not in valid_disaggregation_value_pairs:
                 raise serializers.ValidationError(
                     "%s coordinate space does not " % (key)
                     + "belong to disaggregation value id list")
@@ -354,6 +351,9 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
                     "%s coordinate space value does not " % (key)
                     + "have correct value key structure: c, d, v")
 
+            if len(parsed_tuple) == data['level_reported']:
+                level_reported_key_count += 1
+
             # Sanitizing data value
             if isinstance(data['disaggregation'][key]['c'], str):
                 data['disaggregation'][key]['c'] = \
@@ -366,6 +366,12 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
             if isinstance(data['disaggregation'][key]['v'], str):
                 data['disaggregation'][key]['v'] = \
                     int(data['disaggregation'][key]['v'])
+
+        if level_reported_key_count != valid_level_reported_key_count:
+            raise serializers.ValidationError(
+                "Submitted disaggregation data entries do not contain "
+                + "all level %d combination pair keys" % (data['level_reported'])
+            )
 
         return data
 
@@ -385,7 +391,10 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
         serializer = DisaggregationListSerializer(
             obj.disaggregations, many=True)
 
-        return serializer.data
+        disagg_lookup_list = serializer.data
+        disagg_lookup_list.sort(key=lambda item: len(item['choices']))
+
+        return disagg_lookup_list
 
     def get_disagg_choice_lookup_map(self, obj):
         lookup_array = obj.disaggregation_values(id_only=False)
