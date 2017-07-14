@@ -67,8 +67,8 @@
         return App.Endpoints.indicatorDataLocation(reportId);
       },
 
-      _computeLoading: function (data) {
-        return !data.length;
+      _computeLoading: function (options) {
+        return !options.length;
       },
 
       _fetchLocations: function () {
