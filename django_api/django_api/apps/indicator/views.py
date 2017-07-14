@@ -173,8 +173,9 @@ class IndicatorDataAPIView(APIView):
 
         incomplete = self.request.query_params.get('incomplete', None)
         if incomplete == "1":
-            queryset = queryset.filter(indicator_reports__indicator_location_data__isnull=False,
-                                       indicator_reports__submission_date__isnull=True)
+            queryset = queryset.exclude(
+                indicator_reports__progress_report__status=PROGRESS_REPORT_STATUS.submitted
+            )
         return queryset
 
     def get_indicator_report(self, id):
