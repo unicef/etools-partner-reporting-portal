@@ -1,6 +1,8 @@
 from ast import literal_eval as make_tuple
+from datetime import date
 
 from django.urls import reverse
+from django.conf import settings
 
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
@@ -18,7 +20,7 @@ from core.helpers import (
     get_cast_dictionary_keys_as_tuple,
 )
 from core.management.commands._privates import generate_fake_data
-from core.common import OVERALL_STATUS
+from core.common import OVERALL_STATUS, PROGRESS_REPORT_STATUS
 from core.tests.base import BaseAPITestCase
 from unicef.models import (
     LowerLevelOutput,
@@ -170,6 +172,16 @@ class TestIndicatorListAPIView(BaseAPITestCase):
         del data['progress_report']
         response = self.client.put(url, data=data, format='json')
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_submit_indicator(self):
+        ir = IndicatorReport.objects.first()
+        url = reverse('indicator-data', kwargs={'ir_id': ir.id})
+        response = self.client.post(url, format='json')
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(response.data['submission_date'], date.today().strftime(settings.PRINT_DATA_FORMAT))
+        self.assertEquals(response.data['is_draft'], False)
+        self.assertEquals(response.data['progress_report_status'],
+                          PROGRESS_REPORT_STATUS._display_map[PROGRESS_REPORT_STATUS.submitted])
 
 
 class TestIndicatorDataReportableAPIView(BaseAPITestCase):
