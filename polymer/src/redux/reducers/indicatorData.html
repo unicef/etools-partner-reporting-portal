@@ -12,6 +12,7 @@
       byReport: indicatorsByReportReducer,
       infoByReport: infoByReportReducer,
       allIds: reportIdsReducer,
+      loading: loadingReducer,
     });
 
     function indicatorsByReportReducer(state, action) {
@@ -117,6 +118,23 @@
 
         case App.Constants.RESET:
           return [];
+
+        default:
+          return state;
+      }
+    }
+
+    function loadingReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = false;
+      }
+
+      switch (action.type) {
+        case App.Constants.INDICATOR_DATA_LOADING_START:
+          return true;
+
+        case App.Constants.INDICATOR_DATA_LOADING_STOP:
+          return false;
 
         default:
           return state;

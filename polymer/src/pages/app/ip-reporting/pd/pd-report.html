@@ -1,5 +1,7 @@
 <link rel="import" href="../../../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../../../bower_components/iron-location/iron-query-params.html">
 <link rel="import" href="../../../../../bower_components/paper-menu-button/paper-menu-button.html">
 <link rel="import" href="../../../../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../../../../bower_components/paper-menu/paper-menu.html">
@@ -54,6 +56,15 @@
         pattern="/:report_id/:mode"
         data="{{routeData}}">
     </app-route>
+
+    <iron-location
+        query="{{query}}">
+    </iron-location>
+
+    <iron-query-params
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
+    </iron-query-params>
 
     <etools-prp-ajax
         id="indicatorData"
@@ -217,7 +228,7 @@
 
       observers: [
         '_onReportChanged(routeData.report_id, routeData.mode)',
-        '_handleInputChange(indicatorDataUrl)',
+        '_handleInputChange(indicatorDataUrl, queryParams)',
       ],
 
       _computeBackLink: function (pdId) {
@@ -260,10 +271,10 @@
         return App.Endpoints.programmeDocumentReport(pdId, reportId);
       },
 
-      _handleInputChange: function (url) {
+      _handleInputChange: function (url, queryParams) {
         var indicatorDataThunk;
 
-        if (!url) {
+        if (!url || !Object.keys(queryParams).length) {
           return;
         }
 
