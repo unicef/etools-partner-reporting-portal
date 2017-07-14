@@ -1,7 +1,9 @@
+from datetime import date
 import operator
 import logging
 from django.http import Http404
 from django.db.models import Q
+from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.http import Http404
 
@@ -15,6 +17,7 @@ import django_filters.rest_framework
 from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
 from core.models import Location
+from core.common import PROGRESS_REPORT_STATUS, INDICATOR_REPORT_STATUS
 from core.serializers import ShortLocationSerializer
 from unicef.serializers import ProgressReportSerializer, ProgressReportUpdateSerializer
 from unicef.models import ProgressReport
@@ -219,6 +222,17 @@ class IndicatorDataAPIView(APIView):
             progress_report.save()
 
         return Response(dict(progress_report=progress_report.data), status=status.HTTP_200_OK)
+
+    @transaction.atomic
+    def post(self, request, ir_id, *args, **kwargs):
+        ir = self.get_indicator_report(ir_id)
+        ir.submission_date = date.today()
+        ir.report_status = INDICATOR_REPORT_STATUS.submitted
+        ir.save()
+        ir.progress_report.status = PROGRESS_REPORT_STATUS.submitted
+        ir.progress_report.save()
+        serializer = PDReportsSerializer(instance=ir)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class IndicatorDataReportableAPIView(APIView):
