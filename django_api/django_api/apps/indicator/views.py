@@ -227,13 +227,18 @@ class IndicatorDataAPIView(APIView):
     @transaction.atomic
     def post(self, request, ir_id, *args, **kwargs):
         ir = self.get_indicator_report(ir_id)
-        ir.submission_date = date.today()
-        ir.report_status = INDICATOR_REPORT_STATUS.submitted
-        ir.save()
-        ir.progress_report.status = PROGRESS_REPORT_STATUS.submitted
-        ir.progress_report.save()
-        serializer = PDReportsSerializer(instance=ir)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        if ir.submission_date is None or ir.status == INDICATOR_REPORT_STATUS.sent_back:
+            ir.submission_date = date.today()
+            ir.report_status = INDICATOR_REPORT_STATUS.submitted
+            ir.save()
+            ir.progress_report.status = PROGRESS_REPORT_STATUS.submitted
+            ir.progress_report.save()
+            serializer = PDReportsSerializer(instance=ir)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            _errors = [{"message": "Indicator can by submitted only once."}]
+            return Response({"errors": _errors},
+                            status=status.HTTP_400_BAD_REQUEST)
 
 
 class IndicatorDataReportableAPIView(APIView):
