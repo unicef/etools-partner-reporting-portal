@@ -84,8 +84,13 @@
           }());
 
         case App.Constants.AMEND_INFO:
-          console.log('amend', action.data);
-          return state;
+          return (function () {
+            var change = {};
+
+            change[action.reportId] = Object.assign({}, state[action.reportId], action.data);
+
+            return Object.assign({}, state, change);
+          }());
 
         case App.Constants.RESET:
           return {};
