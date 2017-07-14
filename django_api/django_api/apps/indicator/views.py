@@ -14,6 +14,8 @@ import django_filters.rest_framework
 
 from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
+from core.models import Location
+from core.serializers import ShortLocationSerializer
 from unicef.serializers import ProgressReportSerializer, ProgressReportUpdateSerializer
 from unicef.models import ProgressReport
 
@@ -314,3 +316,19 @@ class IndicatorLocationDataUpdateAPIView(APIView):
 
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class IndicatorDataLocationAPIView(ListAPIView):
+    """
+    REST API endpoint to fill location filter on PD reports screen.
+    """
+
+    serializer_class = ShortLocationSerializer
+    permission_classes = (IsAuthenticated, )
+
+    def get_queryset(self, *args, **kwargs):
+        ir_id = self.kwargs.get('ir_id', None)
+        if ir_id:
+            ir = get_object_or_404(IndicatorReport, id=ir_id)
+            return Location.objects.filter(reportable=ir.reportable_id)
+        return Location.objects.none()
