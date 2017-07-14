@@ -3,9 +3,13 @@
 <dom-module id="button-styles">
   <template>
     <style>
-      paper-button.btn-primary {
+      paper-button[raised].btn-primary {
         color: white;
         background: var(--theme-primary-color);
+      }
+
+      paper-button:not([raised]).btn-primary {
+        color: var(--theme-primary-color);
       }
     </style>
   </template>
