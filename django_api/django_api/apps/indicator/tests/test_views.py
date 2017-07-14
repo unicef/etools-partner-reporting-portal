@@ -180,8 +180,7 @@ class TestIndicatorListAPIView(BaseAPITestCase):
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(response.data['submission_date'], date.today().strftime(settings.PRINT_DATA_FORMAT))
         self.assertEquals(response.data['is_draft'], False)
-        self.assertEquals(response.data['progress_report_status'],
-                          PROGRESS_REPORT_STATUS._display_map[PROGRESS_REPORT_STATUS.submitted])
+        self.assertEquals(response.data['progress_report_status'], PROGRESS_REPORT_STATUS.submitted)
 
 
 class TestIndicatorDataReportableAPIView(BaseAPITestCase):

@@ -231,7 +231,7 @@ class IndicatorReport(TimeStampedModel):
     @property
     def progress_report_status(self):
         if self.progress_report:
-            return self.progress_report.get_status_display()
+            return self.progress_report.status
         else:
             return PROGRESS_REPORT_STATUS.due
 

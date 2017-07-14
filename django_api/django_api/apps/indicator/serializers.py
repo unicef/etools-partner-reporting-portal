@@ -88,7 +88,6 @@ class IndicatorReportSimpleSerializer(serializers.ModelSerializer):
 
 class IndicatorReportStatusSerializer(serializers.ModelSerializer):
 
-    report_status = serializers.CharField(source='get_report_status_display')
 
     class Meta:
         model = IndicatorReport
