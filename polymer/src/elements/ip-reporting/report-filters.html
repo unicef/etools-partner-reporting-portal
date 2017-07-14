@@ -5,6 +5,8 @@
 
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../elements/filter-list.html">
+<link rel="import" href="../../elements/filters/reportable-filter/reportable-filter.html">
+<link rel="import" href="../../elements/filters/checkbox-filter/checkbox-filter.html">
 
 <dom-module id="report-filters">
   <template>
@@ -17,6 +19,11 @@
         --app-grid-columns: 4;
         --app-grid-gutter: 25px;
         --app-grid-item-height: auto;
+        --app-grid-expandible-item-columns: 4;
+      }
+
+      .incomplete {
+        @apply --app-grid-expandible-item;
       }
     </style>
 
@@ -32,7 +39,17 @@
     <filter-list
         filters="{{filters}}"
         class="app-grid">
+      <reportable-filter
+          class="item"
+          value="[[_withDefault(queryParams.reportable_id, '')]]">
+      </reportable-filter>
 
+      <checkbox-filter
+          class="incomplete"
+          name="incomplete"
+          value="[[_withDefault(queryParams.incomplete, '')]]">
+        <span class="checkbox-label">Show incomplete only</span>
+      </checkbox-filter>
     </filter-list>
   </template>
 
