@@ -23,4 +23,12 @@ class Migration(migrations.Migration):
             name='response_plan',
             field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='clusters', to='core.ResponsePlan'),
         ),
+        migrations.AlterModelOptions(
+            name='clusteractivity',
+            options={'ordering': ['id']},
+        ),
+        migrations.AlterModelOptions(
+            name='clusterobjective',
+            options={'ordering': ['id']},
+        ),
     ]
