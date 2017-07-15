@@ -2,7 +2,6 @@
 <link rel="import" href="../../../../bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="../../../../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../../../../bower_components/app-route/app-route.html">
-<link rel="import" href="../../../../bower_components/app-route/app-location.html">
 <link rel="import" href="../../../../bower_components/iron-pages/iron-pages.html">
 
 <link rel="import" href="../../../styles/shared-styles.html">
@@ -42,11 +41,9 @@
       }
     </style>
 
-    <app-location route="{{route}}"></app-location>
-
     <app-route
       route="{{route}}"
-      pattern="/:dashTab"
+      pattern="/:tab"
       data="{{routeData}}"
       tail="{{subroute}}">
     </app-route>
@@ -57,7 +54,7 @@
 
       <div class="top-content-row">
         <paper-tabs
-          selected="{{routeData.dashTab}}"
+          selected="{{routeData.tab}}"
           attr-for-selected="name"
           noink
           bottom-item>
@@ -97,35 +94,31 @@
     Polymer({
       is: 'page-cluster-reporting-planned-action',
 
+      properties: {
+        tab: String
+      },
+
       behaviors: [
-        App.Behaviors.ReduxBehavior,
         App.Behaviors.UtilsBehavior,
       ],
 
-      properties: {
-        tab: String,
-      },
-
       observers: [
-        '_updateUrlTab(routeData.dashTab)',
+        '_routeTabChanged(routeData.tab)',
       ],
+
+      // Tracks the tab value in the URL only.
+      _routeTabChanged: function (tab) {
+        if (!tab) {
+          this.set('routeData.tab', 'projects');
+          this.set('route.path', '/projects/');
+        } else {
+          this.tab = tab;
+          this.set('route.path', '/' + tab);
+        }
+      },
 
       _updateTabSelection: function () {
         this.$.tabContent.select(this.tab);
-      },
-
-      attached: function() {
-        this.set('routeData.dashTab', 'projects');
-      },
-
-      _updateUrlTab: function (dashTab) {
-        //  fixme: why is dashTab getting set to 'app'?
-        if (dashTab && dashTab !== 'app') {
-          this.set('tab', dashTab);
-          // fixme: why is the dashTab not getting appended to the url?
-          // This breaks everything:
-          // this.set('route.path', '/' + dashTab);
-        }
       },
 
     });
