@@ -172,9 +172,9 @@
       },
 
       observers: [
-        '_routePageChanged(routeData.page, routeData.plan)',
         '_routePlanChanged(routeData.plan)',
-        '_reduxPlanChanged(_currentPlanID)'
+        '_reduxPlanChanged(_currentPlanID)',
+        '_routePageChanged(routeData.page, routeData.plan)',
       ],
 
       // These functions track the plan/page values in the URL.
