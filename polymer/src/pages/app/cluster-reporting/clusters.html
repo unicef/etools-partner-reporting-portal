@@ -7,8 +7,11 @@
 <link rel="import" href="../../../styles/shared-styles.html">
 <link rel="import" href="../../../elements/page-header.html">
 <link rel="import" href="../../../elements/page-body.html">
+<link rel="import" href="planned-action-projects.html">
+<link rel="import" href="planned-action-activities.html">
 <link rel="import" href="cluster-activities.html">
 <link rel="import" href="cluster-objectives.html">
+
 
 <dom-module id="clusters-response-parameters">
   <template>
@@ -16,6 +19,7 @@
       :host {
         display: block;
       }
+
       .page-top-content {
         box-shadow: 0 1px 2px 1px rgba(0, 0, 0, .1);
       }
@@ -26,6 +30,7 @@
         padding-left:25px;
       }
 
+      /*TODO: make separate theme file for clusters*/
       /*Overrides blue:*/
       .top-content-row paper-tabs {
         --paper-tabs-selection-bar-color: var(--theme-primary-color-cluster);
@@ -37,67 +42,96 @@
       .top-content-row paper-tab.iron-selected .tab-content {
         color: var(--theme-primary-color-cluster);
       }
-
     </style>
 
+    <app-route
+      route="{{route}}"
+      pattern="/:tab"
+      data="{{routeData}}"
+      tail="{{subroute}}">
+    </app-route>
 
-    <!-- TODO: Associate ajax calls with tabs. -->
+    <div class="page-top-content">
+      <page-header title="Clusters"></page-header>
 
-    <etools-prp-ajax
-        id="activities"
-        url="[[activitiesUrl]]">
-    </etools-prp-ajax>
+      <div class="top-content-row">
+        <paper-tabs
+          selected="{{routeData.tab}}"
+          attr-for-selected="name"
+          noink
+          bottom-item>
 
+          <paper-tab name="response-plans" link>
+            <span class="tab-content">Response Plans</span>
+          </paper-tab>
 
-    <page-header title="Clusters"></page-header>
+          <paper-tab name="objectives" link>
+            <span class="tab-content">Objectives</span>
+          </paper-tab>
 
-    <div class="top-content-row">
-      <paper-tabs
-        selected="{{routeData.dashTab}}"
-        attr-for-selected="name"
-        noink
-        bottom-item>
-        <paper-tab name="details" link>
-          <span class="tab-content">Response Plans</span>
-        </paper-tab>
-
-        <paper-tab name="reports" link>
-          <span class="tab-content">Objectives</span>
-        </paper-tab>
-
-        <paper-tab name="activities" link>
-          <span class="tab-content">Activities</span>
-        </paper-tab>
-      </paper-tabs>
+          <paper-tab name="activities" link>
+            <span class="tab-content">Activities</span>
+          </paper-tab>
+        </paper-tabs>
+      </div>
     </div>
 
     <page-body>
-      <cluster-objectives
-          name="objectives"
+      <iron-pages
+        id="tabContent"
+        selected=[[tab]]
+        attr-for-selected="name"
+        fallback-selection="projects"
+        on-iron-items-changed="_updateTabSelection">
+
+        <div name="response-plans">TODO</div>
+        
+        <cluster-objectives
+            name="objectives"
+            route="{{subroute}}">
+        </cluster-objectives>
+
+        <cluster-activities
+          name="activities"
           route="{{subroute}}">
-      </cluster-objectives>
+        </cluster-activities>
 
-      <cluster-activities
-        name="activities"
-        route="{{subroute}}">
-      </cluster-activities>
-
+      </iron-pages>
     </page-body>
+
   </template>
 
   <script>
     Polymer({
       is: 'clusters-response-parameters',
 
+      properties: {
+        tab: String
+      },
+
       behaviors: [
-        App.Behaviors.ReduxBehavior,
         App.Behaviors.UtilsBehavior,
       ],
 
-      attached: function() {
-        console.log("attaching clusters")
-      }
-    });
+      observers: [
+        '_routeTabChanged(routeData.tab)',
+      ],
 
+      // Tracks the tab value in the URL only.
+      _routeTabChanged: function (tab) {
+        if (!tab) {
+          this.set('routeData.tab', 'response-plans');
+          this.set('route.path', '/response-plans/');
+        } else {
+          this.tab = tab;
+          this.set('route.path', '/' + tab);
+        }
+      },
+
+      _updateTabSelection: function () {
+        this.$.tabContent.select(this.tab);
+      },
+
+    });
   </script>
 </dom-module>

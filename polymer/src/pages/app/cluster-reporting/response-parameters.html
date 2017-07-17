@@ -18,15 +18,29 @@
       }
     </style>
 
-     <clusters-response-parameters
-       name="clusters"
-       route="{{subroute}}">
-     </clusters-response-parameters>
+    <app-route
+      route="{{route}}"
+      pattern="/:page"
+      data="{{routeData}}"
+      tail="{{subroute}}">
+    </app-route>
 
-     <partners-response-parameters
-       name="partners"
-       route="{{subroute}}">
-     </partners-response-parameters>
+    <iron-pages
+      selected={{page}}
+      attr-for-selected="name"
+      fallback-selection="clusters">
+
+        <clusters-response-parameters
+          name="clusters"
+          route="{{subroute}}">
+        </clusters-response-parameters>
+
+        <partners-response-parameters
+          name="partners"
+          route="{{subroute}}">
+        </partners-response-parameters>
+
+    </iron-pages>
 
   </template>
 
@@ -50,8 +64,6 @@
         },
       },
 
-      //Tracks changes in the route ONLY.
-      //Further logic is in _subpathChanged.
       _routeChanged: function (route) {
         if (route.path === '/partners') {
           this.page = 'partners';
@@ -61,7 +73,6 @@
       },
 
       _pageChanged: function (page) {
-        console.log("page changed", page)
         if (page) {
           // TODO: Fix. Why is this resolveUrl returning the /src/pages/ part of the URL?
           // var resolvedPageUrl = this.resolveUrl(page + '.html');
@@ -71,9 +82,6 @@
         }
       },
 
-      detached: function() {
-        this.set('route.page', undefined);
-      },
     });
   </script>
 </dom-module>
