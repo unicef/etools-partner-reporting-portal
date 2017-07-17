@@ -180,6 +180,88 @@
         };
       },
 
+      fetchClusterObjectivesList: function (thunk) {
+        return function (dispatch) {
+          dispatch(App.Actions.clusterObjectivesLoadingStart());
+          return thunk()
+            .catch(function () {
+              dispatch(App.Actions.clusterObjectivesLoadingStart());
+            })
+            .then(function (res) {
+              dispatch(App.Actions.setClusterObjectivesList(res.data));
+              dispatch(App.Actions.setClusterObjectivesCount(res.data));
+              dispatch(App.Actions.clusterObjectivesLoadingStop());
+            });
+        };
+      },
+
+      setClusterObjectivesList: function (data) {
+        return {
+          type: App.Constants.SET_CLUSTER_OBJECTIVES_LIST,
+          data: data,
+        };
+      },
+
+      clusterObjectivesLoadingStart: function () {
+        return {
+          type: App.Constants.CLUSTER_OBJECTIVES_LOADING_START,
+        };
+      },
+
+      clusterObjectivesLoadingStop: function () {
+        return {
+          type: App.Constants.CLUSTER_OBJECTIVES_LOADING_STOP,
+        };
+      },
+
+      setClusterObjectivesCount: function (data) {
+        return {
+          type: App.Constants.SET_CLUSTER_OBJECTIVES_COUNT,
+          count: data.count
+        };
+      },
+
+      fetchClusterActivitiesList: function (thunk) {
+        return function (dispatch) {
+          dispatch(App.Actions.clusterActivitiesLoadingStart());
+          return thunk()
+            .catch(function () {
+              dispatch(App.Actions.clusterActivitiesLoadingStart());
+            })
+            .then(function (res) {
+              dispatch(App.Actions.setClusterActivitiesList(res.data));
+              dispatch(App.Actions.setClusterActivitiesCount(res.data));
+              dispatch(App.Actions.clusterActivitiesLoadingStop());
+            });
+        };
+      },
+
+      setClusterActivitiesList: function (data) {
+        return {
+          type: App.Constants.SET_CLUSTER_ACTIVITIES_LIST,
+          data: data,
+        };
+      },
+
+      clusterActivitiesLoadingStart: function () {
+        return {
+          type: App.Constants.CLUSTER_ACTIVITIES_LOADING_START,
+        };
+      },
+
+      clusterActivitiesLoadingStop: function () {
+        return {
+          type: App.Constants.CLUSTER_ACTIVITIES_LOADING_STOP,
+        };
+      },
+
+      setClusterActivitiesCount: function (data) {
+        return {
+          type: App.Constants.SET_CLUSTER_ACTIVITIES_COUNT,
+          count: data.count
+        };
+      },
+
       // Master reset
       reset: function () {
         return {

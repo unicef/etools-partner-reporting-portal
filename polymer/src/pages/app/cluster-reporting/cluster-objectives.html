@@ -1,11 +1,16 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../../bower_components/etools-data-table/etools-data-table.html">
+<link rel="import" href="../../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../../bower_components/iron-location/iron-query-params.html">
 
+<link rel="import" href="../../../elements/cluster-reporting/cluster-objectives-filters.html">
+<!-- <link rel="import" href="../../../elements/cluster-reporting/cluster-objectives-modal.html"> -->
 <link rel="import" href="../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../styles/shared-styles.html">
 
 <link rel="import" href="../../../behaviors/data-table.html">
 <link rel="import" href="../../../behaviors/pagination.html">
+<link rel="import" href="../../../behaviors/utils.html">
 <link rel="import" href="../../../styles/table-styles.html">
 
 <dom-module id="cluster-objectives">
@@ -14,19 +19,41 @@
       :host {
         display: block;
       }
+
+      div#action {
+        margin-bottom: 25px;
+        @apply(--layout-horizontal);
+        @apply(--layout-end-justified)
+      }
+
+      paper-button {
+        background-color: var(--theme-primary-color-cluster);
+        color: white;
+      }
     </style>
-    <etools-prp-ajax
-        id="objectives"
-        url="[[objectivesUrl]]">
-    </etools-prp-ajax>
+
+    <iron-location query="{{query}}"></iron-location>
+
+    <iron-query-params
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
+    </iron-query-params>
 
     <etools-prp-ajax
-        id="createObjective"
+        id="objectives"
         url="[[objectivesUrl]]"
-        body="[[objectivesData]]"
-        content-type="application/json"
-        method="post">
+        params="[[queryParams]]">
     </etools-prp-ajax>
+
+    <cluster-objectives-filters></cluster-objectives-filters>
+
+    <!-- <cluster-objectives-modal id="modal"></cluster-objectives-modal> -->
+
+    <div id="action">
+      <paper-button id="add" on-tap="_openModal" raised>
+        Add Cluster Objective
+      </paper-button>
+    </div>
 
     <etools-data-table-header
         no-collapse
@@ -45,7 +72,7 @@
     <template
         id="list"
         is="dom-repeat"
-        items="[[clusterObjectives]]"
+        items="[[objectives]]"
         as="objective"
         initial-count="[[pageSize]]">
       <etools-data-table-row no-collapse>
@@ -81,53 +108,60 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.DataTableBehavior,
+        App.Behaviors.PaginationBehavior,
+        App.Behaviors.UtilsBehavior,
+      ],
+
+      observers: [
+        '_clusterObjectivesAjax(objectivesUrl, queryParams)',
       ],
 
       properties: {
-        // TODO: Why is URL not computing?
+
+        pageSize: Number,
+
+        pageNumber: Number,
+
+        query: String,
+
+        queryParams: Object,
+
         objectivesUrl: {
           type: String,
-          value: '/api/cluster/cluster-objective-list/'
-        },
-        clusterObjectives: {
-          type: Array,
-          value: []
+          computed: '_computeObjectivesUrl(route)'
         },
 
-        //For testing create objective API
-        objectivesData: {
+        loading: {
+          type: Boolean,
+          statePath: 'clusterObjectives.loading'
+        },
+
+        objectives: {
           type: Object,
-          value: {
-            title: 'Test title for API Creation',
-            frequency: "Wee",
-            reference_number: '909',
-            cluster: 62,
-          }
-        }
+          statePath: 'clusterObjectives.all',
+        },
+
+        totalResults: {
+          type: Number,
+          statePath: 'clusterObjectives.count',
+        },
       },
 
-      attached: function () {
-        // TODO: Move to Redux.
-        var self = this;
-        var thunk1 = this.$.objectives.thunk();
-        thunk1()
-          .then(function (res) {
-            console.log("res", res)
-            self.set('clusterObjectives', res.data.results);
-          })
-          .catch(function (err) { // jshint ignore:line
-            // TODO: error handling
-          });
+      _openModal: function (e) {
+        this.$$('#modal').open();
+      },
 
-        // Testing that cluster objective creation works
-        // thunk3 = this.$.createObjective.thunk();
-        // thunk3()
-        //   .then(function (res) {
-        //     console.log("res", res)
-        //   })
-        //   .catch(function (err) { // jshint ignore:line
-        //     // TODO: error handling
-        //   });
+      _clusterObjectivesAjax: function (_, queryParams) {
+        if (!Object.keys(queryParams).length) {
+          return;
+        }
+
+        var thunk = this.$.objectives.thunk();
+        this.dispatch(App.Actions.fetchClusterObjectivesList(thunk))
+          .catch(function (err) { // jshint ignore:line
+              // TODO: error handling.
+          });
       },
 
       _computeObjectivesUrl: function () {

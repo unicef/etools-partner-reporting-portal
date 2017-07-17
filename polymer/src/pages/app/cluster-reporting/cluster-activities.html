@@ -1,11 +1,17 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../../bower_components/etools-data-table/etools-data-table.html">
+<link rel="import" href="../../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../../bower_components/iron-location/iron-query-params.html">
+
+<link rel="import" href="../../../elements/cluster-reporting/cluster-activities-filters.html">
+<!-- <link rel="import" href="../../../elements/cluster-reporting/cluster-activities-modal.html"> -->
 
 <link rel="import" href="../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../styles/shared-styles.html">
 
 <link rel="import" href="../../../behaviors/data-table.html">
 <link rel="import" href="../../../behaviors/pagination.html">
+<link rel="import" href="../../../behaviors/utils.html">
 <link rel="import" href="../../../styles/table-styles.html">
 
 <dom-module id="cluster-activities">
@@ -14,12 +20,30 @@
       :host {
         display: block;
       }
+
+      div#action {
+        margin-bottom: 25px;
+        @apply(--layout-horizontal);
+        @apply(--layout-end-justified)
+      }
+
+      paper-button {
+        background-color: var(--theme-primary-color-cluster);
+        color: white;
+      }
     </style>
 
-    <!-- TODO: tabs and Redux -->
+    <iron-location query="{{query}}"></iron-location>
+
+    <iron-query-params
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
+    </iron-query-params>
+
     <etools-prp-ajax
         id="activities"
-        url="[[activitiesUrl]]">
+        url="[[activitiesUrl]]"
+        params="[[queryParams]]">
     </etools-prp-ajax>
 
     <etools-prp-ajax
@@ -29,6 +53,16 @@
         content-type="application/json"
         method="post">
     </etools-prp-ajax>
+
+    <cluster-activities-filters></cluster-activities-filters>
+
+    <!-- <cluster-activities-modal id="modal"></cluster-activities-modal> -->
+
+    <div id="action">
+      <paper-button id="add" on-tap="_openModal" raised>
+        Add Cluster Activity
+      </paper-button>
+    </div>
 
     <etools-data-table-header
         no-collapse
@@ -47,7 +81,7 @@
     <template
         id="list"
         is="dom-repeat"
-        items="[[clusterActivities]]"
+        items="[[activities]]"
         as="activity"
         initial-count="[[pageSize]]">
       <etools-data-table-row no-collapse>
@@ -84,15 +118,46 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.DataTableBehavior,
+        App.Behaviors.PaginationBehavior,
+        App.Behaviors.UtilsBehavior,
+      ],
+
+
+      observers: [
+        '_clusterActivitiesAjax(activitiesUrl, queryParams)',
       ],
 
       properties: {
+
+        pageSize: Number,
+
+        pageNumber: Number,
+
+        query: String,
+
+        queryParams: Object,
+
         activitiesUrl: {
           type: String,
-          value: '/api/cluster/cluster-activity-list/'
-          // computed: '_computeActivitiesUrl(route)'
+          computed: '_computeActivitiesUrl(route)'
         },
-        clusterActivities: Array,
+
+        loading: {
+          type: Boolean,
+          statePath: 'clusterActivities.loading'
+        },
+
+        activities: {
+          type: Object,
+          statePath: 'clusterActivities.all',
+        },
+
+        totalResults: {
+          type: Number,
+          statePath: 'clusterActivities.count',
+        },
+
         //For testing create objective API
         activityData: {
           type: Object,
@@ -104,19 +169,21 @@
         }
       },
 
-      attached: function () {
-        var self = this;
-        // TODO: Move to Redux.
-        thunk = this.$.activities.thunk();
-        thunk()
-          .then(function (res) {
-            console.log("Res?", res.data.results)
-            self.set('clusterActivities', res.data.results);
-            console.log(this.clusterActivities)
-          })
+      _openModal: function (e) {
+        this.$$('#modal').open();
+      },
+
+      _clusterActivitiesAjax: function (_, queryParams) {
+        if (!Object.keys(queryParams).length) {
+          return;
+        }
+
+        var thunk = this.$.activities.thunk();
+        this.dispatch(App.Actions.fetchClusterActivitiesList(thunk))
           .catch(function (err) { // jshint ignore:line
-            // TODO: error handling
+              // TODO: error handling.
           });
+      },
 
         // Testing that cluster objective creation works
         // thunk3 = this.$.createActivity.thunk();
@@ -127,7 +194,7 @@
         //   .catch(function (err) { // jshint ignore:line
         //     // TODO: error handling
         //   });
-      },
+
 
       _computeActivitiesUrl: function () {
         return App.Endpoints.responseParametersClusterActivities();

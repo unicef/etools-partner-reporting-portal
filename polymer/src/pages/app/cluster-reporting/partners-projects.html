@@ -16,8 +16,6 @@
 <link rel="import" href="../../../styles/shared-styles.html">
 <link rel="import" href="../../../elements/etools-prp-data-table-row.html">
 
-<link rel="import" href="planned-action-projects-modal.html">
-
 <dom-module id="partners-projects">
   <template>
     <style include="data-table-styles table-styles">
@@ -198,10 +196,6 @@
           type: Boolean,
           value: false
         },
-      },
-
-      _openModal: function (e) {
-        this.$$('#modal').open();
       },
 
       observers: [

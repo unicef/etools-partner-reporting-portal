@@ -8,6 +8,8 @@
 <link rel="import" href="../../../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../../../bower_components/paper-radio-button/paper-radio-button.html">
 
+<link rel="import" href="../../../elements/cluster-reporting/planned-action-projects-filters.html">
+<link rel="import" href="../../../elements/cluster-reporting/planned-action-projects-modal.html">
 <link rel="import" href="../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../redux/store.html">
 <link rel="import" href="../../../redux/actions.html">
@@ -17,8 +19,6 @@
 <link rel="import" href="../../../styles/table-styles.html">
 <link rel="import" href="../../../styles/shared-styles.html">
 <link rel="import" href="../../../elements/etools-prp-data-table-row.html">
-
-<link rel="import" href="planned-action-projects-modal.html">
 
 <dom-module id="planned-action-projects">
   <template>
@@ -69,6 +69,8 @@
         url="[[plannedActionsProjectsUrl]]"
         params="[[queryParams]]">
     </etools-prp-ajax>
+
+    <planned-action-projects-filters></planned-action-projects-filters>
 
     <div id="action">
       <paper-button id="add" on-tap="_openModal" raised>
