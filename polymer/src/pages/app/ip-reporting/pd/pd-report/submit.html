@@ -1,15 +1,33 @@
 <link rel="import" href="../../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../../../../bower_components/iron-location/iron-location.html">
 
 <link rel="import" href="../../../../../elements/ip-reporting/pd-output-list.html">
 <link rel="import" href="../../../../../elements/ip-reporting/report-filters.html">
+<link rel="import" href="../../../../../behaviors/routing.html">
+<link rel="import" href="../../../../../redux/store.html">
+<link rel="import" href="../../../../../redux/actions.html">
+<link rel="import" href="../../../../../endpoints.html">
+<link rel="import" href="../../../../../styles/buttons.html">
 
 <dom-module id="page-ip-reporting-report-submit">
   <template>
-    <style>
+    <style include="iron-flex iron-flex-reverse button-styles">
       :host {
         display: block;
       }
     </style>
+
+    <iron-location
+        path="{{path}}">
+    </iron-location>
+
+    <etools-prp-ajax
+        id="submit"
+        url="[[submitUrl]]"
+        method="post">
+    </etools-prp-ajax>
 
     <report-filters></report-filters>
 
@@ -20,11 +38,82 @@
     <pd-report-info
         override-mode="view">
     </pd-report-info>
+
+    <div class="layout horizontal-reverse">
+      <paper-button
+          class="btn-primary"
+          on-tap="_submit"
+          disabled="[[busy]]"
+          raised>
+        Submit
+      </paper-button>
+    </div>
   </template>
 
   <script>
     Polymer({
       is: 'page-ip-reporting-report-submit',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.RoutingBehavior,
+      ],
+
+      properties: {
+        path: String,
+
+        busy: {
+          type: Boolean,
+          value: false,
+        },
+
+        pdId: {
+          type: String,
+          statePath: 'programmeDocuments.current',
+        },
+
+        reportId: {
+          type: String,
+          statePath: 'programmeDocumentReports.current.id',
+        },
+
+        submitUrl: {
+          type: String,
+          computed: '_computeSubmitUrl(reportId)',
+        },
+      },
+
+      _computeSubmitUrl: function (reportId) {
+        return App.Endpoints.indicatorData(reportId);
+      },
+
+      _submit: function () {
+        var self = this;
+
+        this.set('busy', true);
+
+        this.$.submit.thunk()()
+            .then(function (res) {
+              var newPath = self.buildUrl(
+                self._baseUrl,
+                'pd/' + self.pdId + '/view/reports'
+              );
+
+              self.dispatch(App.Actions.PDReports.updateSingle(
+                self.pdId,
+                self.reportId,
+                res.data
+              ));
+
+              self.set('busy', false);
+              self.set('path', newPath);
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+
+              self.set('busy', false);
+            });
+      },
     });
   </script>
 </dom-module>
