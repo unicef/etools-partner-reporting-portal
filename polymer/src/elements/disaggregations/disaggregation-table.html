@@ -7,6 +7,7 @@
 <link rel="import" href="table-content/zero-disaggregations.html">
 <link rel="import" href="disaggregation-switches.html">
 <link rel="import" href="../etools-prp-ajax.html">
+<link rel="import" href="../../polyfills/es6-shim.html">
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
@@ -53,7 +54,18 @@
           if="[[editableBool]]">
         <dl class="location-progress">
           <dt>Location progress:</dt>
-          <dd>[[formattedData.location_progress.v]]</dd>
+          <template
+              is="dom-if"
+              if="[[_equals(indicatorType, 'number')]]"
+              restamp="true">
+            <dd>[[formattedData.location_progress.v]]</dd>
+          </template>
+          <template
+              is="dom-if"
+              if="[[_equals(indicatorType, 'percentage')]]"
+              restamp="true">
+            <dd>[[_toPercentage(formattedData.location_progress.c)]]</dd>
+          </template>
         </dl>
       </template>
 
@@ -144,6 +156,11 @@
           computed: '_computeEditableBool(editable)',
         },
 
+        indicatorType: {
+          type: String,
+          computed: '_computeIndicatorType(data)',
+        },
+
         fields: Array,
 
         localData: Object,
@@ -171,13 +188,22 @@
       },
 
       _fieldValueChanged: function (e, change) {
+        var updatePath = ['localData.disaggregation', change.key];
+
         e.stopPropagation();
 
-        this.set(['localData.disaggregation', change.key], {
-          c: null,
-          d: null,
-          v: change.value,
-        });
+        this.set(
+          updatePath,
+          Object.assign(
+            {
+              c: null,
+              d: null,
+              v: null,
+            },
+            this.get(updatePath),
+            change.value
+          )
+        );
       },
 
       _cloneData: function (formattedData) {
@@ -245,6 +271,10 @@
         return editableBool ? mapping.filter(function (disagg) {
           return reportedOn.indexOf(disagg.id) !== -1;
         }) : mapping;
+      },
+
+      _computeIndicatorType: function (data) {
+        return data.display_type;
       },
     });
   </script>
