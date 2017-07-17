@@ -189,7 +189,6 @@ class OverallNarrativeSerializer(serializers.ModelSerializer):
     class Meta:
         model = IndicatorReport
         fields = (
-            'id',
             'overall_status',
             'narrative_assessment',
         )
