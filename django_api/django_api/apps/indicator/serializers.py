@@ -229,6 +229,7 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
 class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
 
     disaggregation = serializers.JSONField()
+    is_complete = serializers.SerializerMethodField()
 
     class Meta:
         model = IndicatorLocationData
@@ -239,7 +240,11 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
             'num_disaggregation',
             'level_reported',
             'disaggregation_reported_on',
+            'is_complete',
         )
+
+    def get_is_complete(self, obj):
+        return True if obj.disaggregation else False
 
     def validate(self, data):
         """
