@@ -150,14 +150,9 @@
           observer: '_planChanged',
         },
 
-        _countryCode: {
-          type: String,
-          statePath: 'countries.current',
-        },
-
-        _countries: {
-          type: Array,
-          statePath: 'countries.all',
+        _countryId: {
+          type: Number,
+          statePath: 'countries.currentId',
         },
 
         _currentPlanID: {
@@ -167,7 +162,7 @@
 
         _plansUrl: {
           type: String,
-          computed: '_computeResponsePlansUrl(_countryCode, _countries)'
+          computed: '_computeResponsePlansUrl(_countryId)'
         }
       },
 
@@ -236,16 +231,8 @@
             });
       },
 
-      _computeResponsePlansUrl: function(countryCode, countries) {
-        var currentCountryId = null;
-
-        countries.forEach(function(country) {
-          if (countryCode === country.code) {
-            currentCountryId = country.id;
-          }
-        });
-
-        return App.Endpoints.responsePlans(currentCountryId);
+      _computeResponsePlansUrl: function(currentCountryId) {
+        return App.Endpoints.responsePlans(String(currentCountryId));
       },
 
       attached: function() {

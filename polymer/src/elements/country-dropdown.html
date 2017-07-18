@@ -93,6 +93,10 @@
         App.Behaviors.RoutingBehavior,
       ],
 
+      observers: [
+        '_updateCountryId(country)'
+      ],
+
       properties: {
         country: {
           type: Object,
@@ -134,6 +138,10 @@
 
       _computeSelected: function (data, country) {
         return data.indexOf(country);
+      },
+
+      _updateCountryId: function (country) {
+        this.dispatch(App.Actions.setCountryId(country.id));
       },
     });
   </script>
