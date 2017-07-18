@@ -237,7 +237,7 @@ class IndicatorDataAPIView(APIView):
             serializer = PDReportsSerializer(instance=ir)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            _errors = [{"message": "Indicator can by submitted only once."}]
+            _errors = [{"message": "Indicator can be submitted only once."}]
             return Response({"errors": _errors},
                             status=status.HTTP_400_BAD_REQUEST)
 
