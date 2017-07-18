@@ -115,7 +115,7 @@ class TestIndicatorListAPIView(BaseAPITestCase):
         response = self.client.get(url, format='json')
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(response.data['results']), len(self.reports))
+        self.assertGreater(len(self.reports), len(response.data['results']))
 
     def test_list_api_filter_by_pd_ids(self):
         self.reports = Reportable.objects.filter(
@@ -133,7 +133,7 @@ class TestIndicatorListAPIView(BaseAPITestCase):
         response = self.client.get(url, format='json')
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(response.data['results']), len(self.reports))
+        self.assertGreater(len(self.reports), len(response.data['results']))
 
 
 class TestIndicatorReportListAPIView(BaseAPITestCase):

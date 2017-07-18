@@ -283,21 +283,22 @@ def recalculate_reportable_total(sender, instance, **kwargs):
 
         else:
             for indicator_report in reportable.indicator_reports.all():
-                if indicator_report.total['v'] is None:
-                    indicator_report.total['v'] = 0
-
                 reportable_total['v'] += indicator_report.total['v']
-
-                if indicator_report.total['c'] is None:
-                    indicator_report.total['c'] = 0
-
                 reportable_total['c'] += indicator_report.total['c']
 
         if blueprint.calculation_formula_across_periods == IndicatorBlueprint.AVG:
             ir_count = reportable.indicator_reports.count()
 
-            reportable_total['v'] = reportable_total['v'] / float(ir_count)
-            reportable_total['c'] = reportable_total['c'] / float(ir_count)
+            reportable_total['v'] = reportable_total['v'] / (ir_count * 1.0)
+            reportable_total['c'] = reportable_total['c'] / (ir_count * 1.0)
+
+    # IndicatorReport total calculation
+    elif blueprint.unit == IndicatorBlueprint.PERCENTAGE:
+        for indicator_report in reportable.indicator_reports.all():
+            reportable_total['v'] += indicator_report.total['v']
+            reportable_total['d'] += indicator_report.total['d']
+
+        reportable_total['c'] = reportable_total['v'] / (reportable_total['d'] * 1.0)
 
     reportable.total = reportable_total
     reportable.save()

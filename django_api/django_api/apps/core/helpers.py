@@ -26,7 +26,8 @@ def suppress_stdout():
 
 def get_combination_pairs(array, r=3):
     """
-    Returns an array of tuples where each tuple is a combination output of integer-coordinate space.
+    Returns an array of tuples where
+    each tuple is a combination output of integer-coordinate space.
 
     array: An array of unique integers
     r: # of combinations from nCr
@@ -34,7 +35,9 @@ def get_combination_pairs(array, r=3):
     return list(combinations(array, r))
 
 
-def generate_data_combination_entries(array, entries_only=False, key_type=str, r=3):
+def generate_data_combination_entries(
+    array, entries_only=False, key_type=str,
+    indicator_type="quantity", r=3):
     if entries_only:
         output = []
 
@@ -64,11 +67,19 @@ def generate_data_combination_entries(array, entries_only=False, key_type=str, r
                 output.append(key)
 
             else:
-                output[key] = {
-                    'v': random.randint(50, 1000),
-                    'd': 0,
-                    'c': 0
-                }
+                if indicator_type == "quantity":
+                    output[key] = {
+                        'v': random.randint(50, 1000),
+                        'd': 0,
+                        'c': 0
+                    }
+
+                elif indicator_type == "ratio":
+                    output[key] = {
+                        'v': random.randint(50, 1000),
+                        'd': random.randint(2000, 4000),
+                        'c': 0
+                    }
 
     key = key_type(tuple())
 
@@ -76,11 +87,19 @@ def generate_data_combination_entries(array, entries_only=False, key_type=str, r
         output.append(key)
 
     else:
-        output[key] = {
-            'v': random.randint(50, 1000),
-            'd': 0,
-            'c': 0
-        }
+        if indicator_type == "quantity":
+            output[key] = {
+                'v': random.randint(50, 1000),
+                'd': 0,
+                'c': 0
+            }
+
+        elif indicator_type == "ratio":
+            output[key] = {
+                'v': random.randint(50, 1000),
+                'd': random.randint(2000, 4000),
+                'c': 0
+            }
 
     return output
 
@@ -91,10 +110,12 @@ def get_sorted_ordered_dict_by_keys(dictionary, reverse=True, key_func=None):
     after sorting the items by key.
     """
     if key_func:
-        ordered_dict = OrderedDict(sorted(dictionary.items(), reverse=reverse, key=key_func))
+        ordered_dict = OrderedDict(
+            sorted(dictionary.items(), reverse=reverse, key=key_func))
 
     else:
-        ordered_dict = OrderedDict(sorted(dictionary.items(), reverse=reverse))
+        ordered_dict = OrderedDict(
+            sorted(dictionary.items(), reverse=reverse))
 
     return ordered_dict
 

@@ -57,7 +57,7 @@ def stop():
     local('docker-compose stop')
 
 
-def fixtures(quantity=50):
+def fixtures(quantity=40):
     """
     Load example data from generate_fake_data management command.
     """
