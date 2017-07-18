@@ -201,6 +201,10 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
     location_progress = serializers.SerializerMethodField()
     previous_location_progress = serializers.SerializerMethodField()
     display_type = serializers.SerializerMethodField()
+    is_complete = serializers.SerializerMethodField()
+
+    def get_is_complete(self, obj):
+        return True if obj.disaggregation else False
 
     def get_display_type(self, obj):
         return obj.indicator_report.display_type
@@ -253,6 +257,7 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
             'disaggregation_reported_on',
             'location_progress',
             'previous_location_progress',
+            'is_complete',
         )
 
 
