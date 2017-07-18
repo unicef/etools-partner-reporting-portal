@@ -125,10 +125,24 @@
           <div name="location-[[location.location.id]]">
             <div class="tab-header layout horizontal justified">
               <dl>
-                <dt>Location progress:</dt>
-                <dd>[[location.location_progress.v]]</dd>
-                <dt>Previous location progress:</dt>
-                <dd>[[location.previous_location_progress.v]]</dd>
+                <template
+                    is="dom-if"
+                    if="[[_equals(location.display_type, 'number')]]"
+                    restamp="true">
+                  <dt>Location progress:</dt>
+                  <dd>[[location.location_progress.v]]</dd>
+                  <dt>Previous location progress:</dt>
+                  <dd>[[location.previous_location_progress.v]]</dd>
+                </template>
+                <template
+                    is="dom-if"
+                    if="[[_equals(location.display_type, 'percentage')]]"
+                    restamp="true">
+                  <dt>Location progress:</dt>
+                  <dd>[[_toPercentage(location.location_progress.c)]]</dd>
+                  <dt>Previous location progress:</dt>
+                  <dd>[[_toPercentage(location.previous_location_progress.c)]]</dd>
+                </template>
               </dl>
               <div>
                 <template

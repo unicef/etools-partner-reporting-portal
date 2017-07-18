@@ -24,6 +24,7 @@ from unicef.models import ProgressReport
 
 from .disaggregators import (
     QuantityIndicatorDisaggregator,
+    RatioIndicatorDisaggregator,
 )
 from .serializers import (
     IndicatorListSerializer, IndicatorReportListSerializer, PDReportsSerializer, SimpleIndicatorLocationDataListSerializer,
@@ -328,6 +329,10 @@ class IndicatorLocationDataUpdateAPIView(APIView):
 
             if blueprint.unit == IndicatorBlueprint.NUMBER:
                 QuantityIndicatorDisaggregator.post_process(
+                    indicator_location_data)
+
+            if blueprint.unit == IndicatorBlueprint.PERCENTAGE:
+                RatioIndicatorDisaggregator.post_process(
                     indicator_location_data)
 
             serializer.data['disaggregation'] = indicator_location_data.disaggregation

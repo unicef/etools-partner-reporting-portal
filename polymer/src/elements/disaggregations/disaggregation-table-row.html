@@ -4,6 +4,7 @@
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../styles/disaggregation-table-styles.html">
 <link rel="import" href="disaggregation-table-cell.html">
+<link rel="import" href="disaggregation-table-multi-cell.html">
 
 <dom-module id="disaggregation-table-row">
   <template>
@@ -17,11 +18,27 @@
       <template is="dom-repeat"
                 items="[[data.data]]">
         <td>
-          <disaggregation-table-cell
-              coords="[[item.key]]"
-              data="[[item.data]]"
-              editable="[[editable]]">
-          </disaggregation-table-cell>
+          <template
+              is="dom-if"
+              if="[[_equals(indicatorType, 'number')]]"
+              restamp="true">
+            <disaggregation-table-cell
+                coords="[[item.key]]"
+                data="[[item.data]]"
+                editable="[[editable]]">
+            </disaggregation-table-cell>
+          </template>
+
+          <template
+              is="dom-if"
+              if="[[_equals(indicatorType, 'percentage')]]"
+              restamp="true">
+            <disaggregation-table-multi-cell
+                coords="[[item.key]]"
+                data="[[item.data]]"
+                editable="[[editable]]">
+            </disaggregation-table-multi-cell>
+          </template>
         </td>
       </template>
 
@@ -29,11 +46,27 @@
           is="dom-if"
           if="[[data.total]]">
         <td class="cellTotal">
-          <disaggregation-table-cell
-              coords="[[data.total.key]]"
-              data="[[data.total.data]]"
-              editable="[[totalEditable]]">
-          </disaggregation-table-cell>
+          <template
+              is="dom-if"
+              if="[[_equals(indicatorType, 'number')]]"
+              restamp="true">
+            <disaggregation-table-cell
+                coords="[[data.total.key]]"
+                data="[[data.total.data]]"
+                editable="[[totalEditable]]">
+            </disaggregation-table-cell>
+          </template>
+
+          <template
+              is="dom-if"
+              if="[[_equals(indicatorType, 'percentage')]]"
+              restamp="true">
+            <disaggregation-table-multi-cell
+                coords="[[data.total.key]]"
+                data="[[data.total.data]]"
+                editable="[[totalEditable]]">
+            </disaggregation-table-multi-cell>
+          </template>
         </td>
       </template>
     </tr>
@@ -51,6 +84,8 @@
         data: Object,
 
         levelReported: Number,
+
+        indicatorType: String,
 
         rowType: String,
 
