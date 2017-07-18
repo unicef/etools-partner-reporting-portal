@@ -29,19 +29,6 @@
       .top-content-row {
         padding-left:25px;
       }
-
-      /*TODO: make separate theme file for clusters*/
-      /*Overrides blue:*/
-      .top-content-row paper-tabs {
-        --paper-tabs-selection-bar-color: var(--theme-primary-color-cluster);
-      }
-      .top-content-row paper-tab {
-        --paper-tab-ink: var(--theme-primary-color-cluster);
-        padding: 0 10px;
-      }
-      .top-content-row paper-tab.iron-selected .tab-content {
-        color: var(--theme-primary-color-cluster);
-      }
     </style>
 
     <app-route
@@ -85,7 +72,7 @@
         on-iron-items-changed="_updateTabSelection">
 
         <div name="response-plans">TODO</div>
-        
+
         <cluster-objectives
             name="objectives"
             route="{{subroute}}">

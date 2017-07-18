@@ -10,7 +10,7 @@
 <link rel="import" href="../filters/date-filter/date-filter.html">
 <link rel="import" href="../../behaviors/utils.html">
 
-<dom-module id="planned-action-projects-filters">
+<dom-module id="partner-projects-filters">
   <template>
     <style include="app-grid-style">
       :host {
@@ -39,15 +39,30 @@
     </iron-query-params>
 
     <filter-list filters="{{filters}}">
-
-      <!-- TODO: Make first two filters 50% each. -->
       <div class="app-grid">
+
+        <!-- TODO: Needs backend support.  -->
+        <text-filter
+            class="item"
+            label="Partner"
+            name="title"
+            value="[[queryParams.partner]]">
+        </text-filter>
+
         <text-filter
             class="item"
             label="Project"
             name="title"
             value="[[queryParams.title]]">
         </text-filter>
+
+        <dropdown-filter
+            class="item"
+            label="Status"
+            name="status"
+            value="[[_withDefault(queryParams.status, '')]]"
+            data="[[statuses]]">
+        </dropdown-filter>
 
         <!-- TODO: Implement location filter/check if PD location filter is the same. -->
         <dropdown-filter
@@ -59,38 +74,13 @@
         </dropdown-filter>
       </div>
 
-      <div class="app-grid">
-        <dropdown-filter
-            class="item"
-            label="Status"
-            name="status"
-            value="[[_withDefault(queryParams.status, '')]]"
-            data="[[statuses]]">
-        </dropdown-filter>
-
-        <date-filter
-          format="YYYY-MM-DD"
-          class="item"
-          label="Start date"
-          name="start_date"
-          value="[[_withDefault(queryParams.start_date, '')]]">
-        </date-filter>
-
-        <date-filter
-          format="YYYY-MM-DD"
-          class="item"
-          label="End date"
-          name="end_date"
-          value="[[_withDefault(queryParams.end_date, '')]]">
-        </date-filter>
-      </div>
 
     </filter-list>
   </template>
 
   <script>
     Polymer({
-      id: 'planned-action-projects-filters',
+      id: 'partner-projects-filters',
 
       behaviors: [
         App.Behaviors.UtilsBehavior,

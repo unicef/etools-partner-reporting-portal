@@ -25,6 +25,7 @@
       <paper-listbox
           slot="dropdown-content"
           class="dropdown-content"
+          on-iron-select="_getValue"
           selected="{{selected}}">
         <template
             id="repeat"
@@ -46,10 +47,9 @@
           value: [],
         },
 
-        value: {
-          type: String,
-          value: '',
-        },
+        value: String,
+
+        disabled: String,
 
         selected: {
           type: Number,
@@ -57,7 +57,6 @@
           notify: true
         },
 
-        disabled: Boolean
       },
 
       attached: function() {
@@ -67,19 +66,15 @@
         });
       },
 
-      // TODO: Fix dropdown - selecting index, not ID.
-      
-      _handleChange: function (e) {
-        console.log("selected is", this.selected)
-        console.log(e.detail)
-        // var newValue = this.$.repeat.itemForElement(e.detail.item).id;
-        this.value = newValue;
-      },
-
       _computeSelected: function (value) {
         return this.data.findIndex(function (item) {
           return item.id === value;
         });
+      },
+
+      _getValue: function (e) {
+        var newValue = this.$.repeat.itemForElement(e.detail.item).id;
+        this.value = newValue;
       },
     });
   </script>

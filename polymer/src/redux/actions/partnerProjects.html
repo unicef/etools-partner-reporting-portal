@@ -48,43 +48,6 @@
           count: data.count
         };
       },
-
-      // fetchIndicatorDetails: function (indicatorsThunk, id) {
-      //   return function (dispatch) {
-      //     dispatch(App.Actions.Indicators.indicatorDetailsLoadingStart());
-      //     return indicatorsThunk()
-      //       .catch(function () {
-      //         dispatch(App.Actions.Indicators.indicatorDetailsLoadingStop());
-      //       })
-      //       .then(function (res) {
-      //         var formattedById = {};
-      //         formattedById[id] = res.data;
-      //         dispatch(App.Actions.Indicators.indicatorDetailsLoadingStop());
-      //         dispatch(App.Actions.Indicators.setIndicatorDetails(formattedById));
-      //       });
-      //   };
-      // },
-      //
-      // setIndicatorDetails: function (data) {
-      //   return {
-      //     type: App.Constants.SET_INDICATOR_DETAILS,
-      //     details: data,
-      //   };
-      // },
-
-      // // TODO: Make these reflect the specific indicator ID.
-      // indicatorDetailsLoadingStart: function () {
-      //   return {
-      //     type: App.Constants.INDICATOR_DETAILS_LOADING_START,
-      //   };
-      // },
-      //
-      // indicatorDetailsLoadingStop: function () {
-      //   return {
-      //     type: App.Constants.INDICATOR_DETAILS_LOADING_STOP,
-      //   };
-      // },
-
     };
   }());
 </script>
