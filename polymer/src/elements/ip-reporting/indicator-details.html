@@ -109,7 +109,7 @@
             items="[[disaggregations.indicator_location_data]]"
             as="location">
           <paper-tab name="location-[[location.location.id]]">
-            <status-badge type="success"></status-badge>
+            <status-badge type="[[_computeLocationStatus(location)]]"></status-badge>
             [[location.location.title]]
           </paper-tab>
         </template>
@@ -351,6 +351,10 @@
 
       _computeTableVisibility: function (opened, index) {
         return !!opened['modal-' + index];
+      },
+
+      _computeLocationStatus: function (location) {
+        return location.is_complete ? 'success' : 'error';
       },
 
       attached: function () {
