@@ -467,6 +467,7 @@ class PDReportsSerializer(serializers.ModelSerializer):
             'id',
             'reporting_period',
             'progress_report_status',
+            'report_status',
             'submission_date',
             'is_draft',
             'due_date',
