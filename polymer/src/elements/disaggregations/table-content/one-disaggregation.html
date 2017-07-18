@@ -21,6 +21,7 @@
       <disaggregation-table-row
           data="[[row]]"
           level-reported="[[data.level_reported]]"
+          indicator-type="[[data.display_type]]"
           row-type="middleRow"
           editable="[[editable]]">
       </disaggregation-table-row>
@@ -29,6 +30,7 @@
     <disaggregation-table-row
         data="[[totalRow]]"
         level-reported="[[data.level_reported]]"
+        indicator-type="[[data.display_type]]"
         row-type="totalsRow">
     </disaggregation-table-row>
   </template>
@@ -69,18 +71,17 @@
         return (mapping[0] || []).choices;
       },
 
-      _determineTotalRow: function (data) { // jshint ignore:line
-        var totalRow = {
+      _determineTotalRow: function (data) {
+        return {
           title: 'total',
           total: {
             key: '', // unused
             data: data.disaggregation['()'],
           },
         };
-        return totalRow;
       },
 
-      _determineRows: function(columns, data) { // jshint ignore:line
+      _determineRows: function(columns, data) {
         return columns.map(function (z) {
           var formatted = this._formatDisaggregationIds([z.id]);
 
