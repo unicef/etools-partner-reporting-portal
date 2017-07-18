@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('indicator', '0011_auto_20170620_0008'),
+        ('indicator', '0015_auto_20170706_2350'),
     ]
 
     operations = [
