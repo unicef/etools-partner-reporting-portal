@@ -79,7 +79,7 @@ class ProgressReportFilter(django_filters.FilterSet):
     def get_due_overdue_status(self, queryset, name, value):
         if value:
             return queryset.filter(
-                status__in=[PROGRESS_REPORT_STATUS.due, PROGRESS_REPORT_STATUS.over_due])
+                status__in=[PROGRESS_REPORT_STATUS.due, PROGRESS_REPORT_STATUS.overdue])
         return queryset
 
     def get_pd_ref_title(self, queryset, name, value):

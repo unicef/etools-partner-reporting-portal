@@ -20,7 +20,7 @@ class TestInterventionListAPIView(BaseAPITestCase):
         response = self.client.get(url, format='json')
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(response.data), self.count)
+        self.assertEquals(len(response.data), Intervention.objects.count())
 
 
 class TestLocationListAPIView(BaseAPITestCase):
@@ -32,4 +32,4 @@ class TestLocationListAPIView(BaseAPITestCase):
         response = self.client.get(url, format='json')
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(response.data), self.count)
+        self.assertEquals(len(response.data), Location.objects.count())
