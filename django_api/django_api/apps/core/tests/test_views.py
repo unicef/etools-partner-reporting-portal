@@ -7,7 +7,7 @@ from account.models import User
 
 from core.factories import (
     ProgrammeDocumentFactory,
-    ReportableToLowerLevelOutputFactory,
+    QuantityReportableToLowerLevelOutputFactory,
     ProgressReportFactory,
     IndicatorLocationDataFactory,
     SectionFactory,
@@ -99,6 +99,6 @@ class TestResponsePlanAPIView(BaseAPITestCase):
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(len(response.data), response_plan_count)
-        self.assertEquals(response.data[0].get('id'),
-                          ResponsePlan.objects.filter(intervention=intervention.id).first().id)
+        self.assertTrue(response.data[0].get('id') in
+                          ResponsePlan.objects.filter(intervention=intervention.id).values_list('id', flat=True))
         self.assertEquals(response.data[0].get('intervention'), intervention.id)
