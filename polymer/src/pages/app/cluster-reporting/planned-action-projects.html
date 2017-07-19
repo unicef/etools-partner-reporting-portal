@@ -70,7 +70,7 @@
         params="[[queryParams]]">
     </etools-prp-ajax>
 
-    <planned-action-projects-filters></planned-action-projects-filters>
+    <planned-action-projects-filters class="filters"></planned-action-projects-filters>
 
     <div id="action">
       <paper-button id="add" on-tap="_openModal" raised>
@@ -185,6 +185,11 @@
 
         queryParams: Object,
 
+        previousQueryParams: {
+          type: Object,
+          value: {}
+        },
+
         plannedActionsProjectsUrl: {
           type: String,
           value: App.Endpoints.plannedActions()
@@ -216,15 +221,22 @@
       },
 
       observers: [
-        '_partnerProjectsAjax(plannedActionsProjectsUrl, queryParams)',
+        '_partnerProjectsAjax(queryParams)',
       ],
 
-      _partnerProjectsAjax: function (_, queryParams) {
-        if (!Object.keys(queryParams).length) {
+      _partnerProjectsAjax: function (queryParams) {
+        var thunk = this.$.plannedActionsProjects.thunk();
+
+        var areNewParams = !this._areObjectsEquivalent(this.previousQueryParams, queryParams);
+        this.previousQueryParams = queryParams;
+
+        if (!Object.keys(queryParams).length || !areNewParams) {
           return;
         }
 
-        var thunk = this.$.plannedActionsProjects.thunk();
+        // Cancel the pending request, if any
+        this.$.plannedActionsProjects.abort();
+
         this.dispatch(App.Actions.PartnerProjects.fetchPartnerProjectsList(thunk))
           .catch(function (err) { // jshint ignore:line
               // TODO: error handling.

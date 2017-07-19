@@ -45,7 +45,7 @@
         params="[[queryParams]]">
     </etools-prp-ajax>
 
-    <cluster-objectives-filters></cluster-objectives-filters>
+    <cluster-objectives-filters class="filters"></cluster-objectives-filters>
 
     <cluster-objectives-modal id="modal"></cluster-objectives-modal>
 
@@ -127,6 +127,11 @@
 
         queryParams: Object,
 
+        previousQueryParams: {
+          type: Object,
+          value: {}
+        },
+
         objectivesUrl: {
           type: String,
           computed: '_computeObjectivesUrl(route)'
@@ -153,11 +158,18 @@
       },
 
       _clusterObjectivesAjax: function (_, queryParams) {
-        if (!Object.keys(queryParams).length) {
+        var thunk = this.$.objectives.thunk();
+        var areNewParams = !this._areObjectsEquivalent(this.previousQueryParams, queryParams);
+
+        this.previousQueryParams = queryParams;
+
+        if (!Object.keys(queryParams).length || !areNewParams) {
           return;
         }
 
-        var thunk = this.$.objectives.thunk();
+        // Cancel the pending request, if any
+        this.$.objectives.abort();
+
         this.dispatch(App.Actions.fetchClusterObjectivesList(thunk))
           .catch(function (err) { // jshint ignore:line
               // TODO: error handling.

@@ -62,7 +62,7 @@
         params="[[queryParams]]">
     </etools-prp-ajax>
 
-    <partner-projects-filters></partner-projects-filters>
+    <partner-projects-filters class="filters"></partner-projects-filters>
 
     <etools-content-panel panel-title="">
       <etools-data-table-header
@@ -175,6 +175,11 @@
 
         queryParams: Object,
 
+        previousQueryParams: {
+          type: Object,
+          value: {}
+        },
+
         plannedActionsProjectsUrl: {
           type: String,
           value: App.Endpoints.plannedActions()
@@ -206,11 +211,18 @@
       ],
 
       _partnerProjectsAjax: function (_, queryParams) {
-        if (!Object.keys(queryParams).length) {
+        var thunk = this.$.plannedActionsProjects.thunk();
+        var areNewParams = !this._areObjectsEquivalent(this.previousQueryParams, queryParams);
+
+        this.previousQueryParams = queryParams;
+
+        if (!Object.keys(queryParams).length || !areNewParams) {
           return;
         }
 
-        var thunk = this.$.plannedActionsProjects.thunk();
+        // Cancel the pending request, if any
+        this.$.plannedActionsProjects.abort();
+
         this.dispatch(App.Actions.PartnerProjects.fetchPartnerProjectsList(thunk))
           .catch(function (err) { // jshint ignore:line
               // TODO: error handling.

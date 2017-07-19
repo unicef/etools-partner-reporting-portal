@@ -52,7 +52,7 @@
         method="post">
     </etools-prp-ajax>
 
-    <cluster-activities-filters></cluster-activities-filters>
+    <cluster-activities-filters class="filters"></cluster-activities-filters>
 
     <cluster-activities-modal id="modal"></cluster-activities-modal>
 
@@ -135,6 +135,11 @@
 
         queryParams: Object,
 
+        previousQueryParams: {
+          type: Object,
+          value: {}
+        },
+
         activitiesUrl: {
           type: String,
           computed: '_computeActivitiesUrl(route)'
@@ -161,11 +166,18 @@
       },
 
       _clusterActivitiesAjax: function (_, queryParams) {
-        if (!Object.keys(queryParams).length) {
+        var thunk = this.$.activities.thunk();
+        var areNewParams = !this._areObjectsEquivalent(this.previousQueryParams, queryParams);
+
+        this.previousQueryParams = queryParams;
+
+        if (!Object.keys(queryParams).length || !areNewParams) {
           return;
         }
 
-        var thunk = this.$.activities.thunk();
+        // Cancel the pending request, if any
+        this.$.activities.abort();
+
         this.dispatch(App.Actions.fetchClusterActivitiesList(thunk))
           .catch(function (err) { // jshint ignore:line
               // TODO: error handling.

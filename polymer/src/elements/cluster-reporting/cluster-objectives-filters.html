@@ -10,20 +10,12 @@
 
 <dom-module id="cluster-objectives-filters">
   <template>
-    <style include="app-grid-style">
+    <style>
       :host {
         display: block;
-        margin-bottom: 25px;
-        background: white;
-
-        --app-grid-columns: 4;
-        --app-grid-gutter: 25px;
-        --app-grid-item-height: auto;
-        --app-grid-expandible-item-columns: 4;
       }
-
-      .incomplete {
-        @apply --app-grid-expandible-item;
+      text-filter {
+        margin-bottom: 15px;
       }
     </style>
 
@@ -36,15 +28,13 @@
         params-object="{{queryParams}}">
     </iron-query-params>
 
-    <filter-list filters="{{filters}}" class="app-grid">
-
+    <filter-list filters="{{filters}}">
       <text-filter
           class="item"
           label="Search Cluster Objective Title"
           name="ref_title"
           value="[[queryParams.ref_title]]">
       </text-filter>
-
     </filter-list>
   </template>
 

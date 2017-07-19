@@ -27,8 +27,7 @@
 
     <iron-pages
       selected={{page}}
-      attr-for-selected="name"
-      fallback-selection="clusters">
+      attr-for-selected="name">
 
         <clusters-response-parameters
           name="clusters"
@@ -54,31 +53,29 @@
       ],
 
       observers: [
-        '_routeChanged(route)',
+        '_routeChanged(routeData)',
       ],
 
       properties: {
         page: {
+          value: 'clusters',
           type: String,
           observer: '_pageChanged',
         },
       },
 
-      _routeChanged: function (route) {
-        if (route.path === '/partners') {
+      _routeChanged: function (routeData) {
+        if (routeData.page === 'partners') {
           this.page = 'partners';
         } else {
           this.page = 'clusters';
         }
+        this.set('route.path', '/' + this.page);
       },
 
       _pageChanged: function (page) {
         if (page) {
-          // TODO: Fix. Why is this resolveUrl returning the /src/pages/ part of the URL?
-          // var resolvedPageUrl = this.resolveUrl(page + '.html');
-          this.set('route.path', '/' + page);
-          var base = 'http://localhost:8080/src/pages/app/cluster-reporting/';
-          var resolvedPageUrl = base + page + '.html';
+          var resolvedPageUrl = this.resolveUrl(page + '.html');
           this.importHref(resolvedPageUrl, null, this._notFound, true);
         }
       },

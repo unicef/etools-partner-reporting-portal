@@ -14,18 +14,19 @@
   <template>
     <style include="app-grid-style">
       :host {
+        padding: 0;
         display: block;
-        margin-bottom: 25px;
-        background: white;
-
         --app-grid-columns: 4;
-        --app-grid-gutter: 25px;
+        --app-grid-gutter: 15px;
         --app-grid-item-height: auto;
         --app-grid-expandible-item-columns: 4;
       }
 
-      .incomplete {
-        @apply --app-grid-expandible-item;
+      /*TODO: Flexbox instead*/
+      .item-large {
+        margin: 0 15px;
+        width: 45%;
+        display: inline-block;
       }
     </style>
 
@@ -39,11 +40,9 @@
     </iron-query-params>
 
     <filter-list filters="{{filters}}">
-
-      <!-- TODO: Make first two filters 50% each. -->
-      <div class="app-grid">
+      <div>
         <text-filter
-            class="item"
+            class="item-large"
             label="Project"
             name="title"
             value="[[queryParams.title]]">
@@ -51,7 +50,7 @@
 
         <!-- TODO: Implement location filter/check if PD location filter is the same. -->
         <dropdown-filter
-            class="item"
+            class="item-large"
             label="Location"
             name="location"
             value="[[value]]"
