@@ -124,7 +124,7 @@ class TestProgressReportAPIView(BaseAPITestCase):
 
     def test_list_api_filter_by_due_status(self):
         self.reports = self.queryset.filter(
-            status__in=[PROGRESS_REPORT_STATUS.due, PROGRESS_REPORT_STATUS.over_due]
+            status__in=[PROGRESS_REPORT_STATUS.due, PROGRESS_REPORT_STATUS.overdue]
         )
 
         url = reverse('progress-reports', kwargs={'location_id': self.location_id})

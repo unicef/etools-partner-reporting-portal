@@ -31,7 +31,12 @@ from unicef.models import (
     CountryProgrammeOutput,
     LowerLevelOutput,
 )
-from core.common import FREQUENCY_LEVEL, PD_STATUS
+from core.common import (
+    FREQUENCY_LEVEL, PD_STATUS,
+    PD_FREQUENCY_LEVEL,
+    REPORTABLE_FREQUENCY_LEVEL,
+    INDICATOR_REPORT_STATUS,
+)
 from core.models import Intervention, Location
 from core.countries import COUNTRIES_ALPHA2_CODE
 
@@ -239,6 +244,11 @@ class ReportableFactory(factory.django.DjangoModelFactory):
     # Commented out so that we can create Disaggregation and DisaggregationValue objects manually
     # disaggregation = factory.RelatedFactory('core.factories.DisaggregationFactory', 'reportable')
 
+    cs_dates = list()
+    frequency = REPORTABLE_FREQUENCY_LEVEL.weekly
+    start_date = fuzzy.FuzzyDate(datetime.date.today())
+    end_date = fuzzy.FuzzyDate(datetime.date.today())
+
     class Meta:
         exclude = ['content_object']
         abstract = True
@@ -288,6 +298,9 @@ class LocationFactory(factory.django.DjangoModelFactory):
 
 
 class ProgressReportFactory(factory.django.DjangoModelFactory):
+    start_date = fuzzy.FuzzyDate(datetime.date.today())
+    end_date = fuzzy.FuzzyDate(datetime.date.today())
+    
     class Meta:
         model = ProgressReport
 
@@ -308,7 +321,7 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     population_focus = factory.Sequence(lambda n: "Population %d" % n)
     response_to_HRP = factory.Sequence(lambda n: "response_to_HRP%d" % n)
     status = fuzzy.FuzzyChoice(PD_STATUS_LIST)
-    frequency = FREQUENCY_LEVEL.weekly
+    frequency = PD_FREQUENCY_LEVEL.weekly
     budget = fuzzy.FuzzyDecimal(low=1000.0, high=100000.0, precision=2)
     unicef_office = factory.Sequence(lambda n: "JCO country programme %d" % n)
     unicef_focal_point = factory.Sequence(lambda n: "Abdallah Yakhola %d" % n)
@@ -319,6 +332,8 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     in_kind_amount = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
 
     cp_output = factory.RelatedFactory('core.factories.CountryProgrammeOutputFactory', 'programme_document')
+
+    cs_dates = list()
 
     class Meta:
         model = ProgrammeDocument
