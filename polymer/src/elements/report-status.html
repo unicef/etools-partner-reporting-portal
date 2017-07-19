@@ -7,6 +7,11 @@
       :host {
         display: inline-block;
       }
+
+      status-badge {
+        position: relative;
+        top: -2px;
+      }
     </style>
 
     <status-badge type="[[type]]"></status-badge>
@@ -42,14 +47,18 @@
         switch (status) {
           case 1:
           case 'Sub':
+          case 'Met':
+          case 'OnT':
             return 'success';
           case 2:
           case 'Ove':
             return 'error';
           case 3:
           case 'Due':
+          case 'NoP':
             return 'neutral';
           case 'Rej':
+          case 'Con':
             return 'warning';
         }
       },
@@ -68,6 +77,14 @@
             return 'Submitted';
           case 'Rej':
             return 'Rejected';
+          case 'Met':
+            return 'Met';
+          case 'OnT':
+            return 'On Track';
+          case 'NoP':
+            return 'No Progress';
+          case 'Con':
+            return 'Constrained';
         }
       },
 

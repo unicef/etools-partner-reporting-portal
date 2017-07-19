@@ -66,7 +66,6 @@ class IndicatorReportSimpleSerializer(serializers.ModelSerializer):
     indicator_name = serializers.SerializerMethodField()
     target = serializers.SerializerMethodField()
     achieved = serializers.JSONField(source="total")
-    report_status = serializers.CharField(source='get_report_status_display')
 
     class Meta:
         model = IndicatorReport
@@ -89,7 +88,6 @@ class IndicatorReportSimpleSerializer(serializers.ModelSerializer):
 
 class IndicatorReportStatusSerializer(serializers.ModelSerializer):
 
-    report_status = serializers.CharField(source='get_report_status_display')
 
     class Meta:
         model = IndicatorReport
@@ -120,10 +118,14 @@ class IndicatorListSerializer(serializers.ModelSerializer):
 
 class IndicatorLLoutputsSerializer(serializers.ModelSerializer):
 
+    __narrative_and_assessment = None
+
     name = serializers.SerializerMethodField()
     llo_id = serializers.SerializerMethodField()
     status = serializers.SerializerMethodField()
     indicator_reports = serializers.SerializerMethodField()
+    overall_status = serializers.SerializerMethodField()
+    narrative_assessment = serializers.SerializerMethodField()
 
     class Meta:
         model = Reportable
@@ -132,6 +134,8 @@ class IndicatorLLoutputsSerializer(serializers.ModelSerializer):
             'name',
             'llo_id',
             'status',
+            'overall_status',
+            'narrative_assessment',
             'indicator_reports',
         )
 
@@ -157,6 +161,37 @@ class IndicatorLLoutputsSerializer(serializers.ModelSerializer):
         children = obj.indicator_reports.all()
         serializer = IndicatorReportSimpleSerializer(children, many=True)
         return serializer.data
+
+    def get_overall_status(self, obj):
+        capture = self.__get_narrative_and_assessment(obj)
+        if capture is not None:
+            return capture['overall_status']
+        return ''
+
+    def get_narrative_assessment(self, obj):
+        capture = self.__get_narrative_and_assessment(obj)
+        if capture is not None:
+            return capture['narrative_assessment'] or ''
+        return ''
+
+    def __get_narrative_and_assessment(self, obj):
+        if self.__narrative_and_assessment is not None:
+            return self.__narrative_and_assessment
+        indicator_report = obj.indicator_reports.first()
+        if indicator_report:
+            self.__narrative_and_assessment = Reportable.get_narrative_and_assessment(
+                indicator_report.progress_report_id)
+        return self.__narrative_and_assessment
+
+
+class OverallNarrativeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = IndicatorReport
+        fields = (
+            'overall_status',
+            'narrative_assessment',
+        )
 
 
 class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
@@ -442,6 +477,7 @@ class PDReportsSerializer(serializers.ModelSerializer):
             'id',
             'reporting_period',
             'progress_report_status',
+            'report_status',
             'submission_date',
             'is_draft',
             'due_date',
@@ -461,3 +497,15 @@ class PDReportsSerializer(serializers.ModelSerializer):
 
     def get_due_date(self, obj):
         return obj.due_date and obj.due_date.strftime(settings.PRINT_DATA_FORMAT)
+
+
+class IndicatorReportUpdateSerializer(serializers.ModelSerializer):
+
+    overall_status = serializers.SerializerMethodField()
+    narrative_assessment = serializers.SerializerMethodField()
+
+    class Meta:
+        model = IndicatorReport
+        fields = (
+            'reporting_period',
+        )

@@ -109,7 +109,7 @@
             items="[[disaggregations.indicator_location_data]]"
             as="location">
           <paper-tab name="location-[[location.location.id]]">
-            <status-badge type="success"></status-badge>
+            <status-badge type="[[_computeLocationStatus(location)]]"></status-badge>
             [[location.location.title]]
           </paper-tab>
         </template>
@@ -147,7 +147,7 @@
               <div>
                 <template
                     is="dom-if"
-                    if="[[_equals(mode, 'edit')]]">
+                    if="[[!_equals(computedMode, 'view')]]">
                   <paper-button
                       class="btn-primary"
                       modal-index="[[index]]"
@@ -168,7 +168,7 @@
 
                 <template
                     is="dom-if"
-                    if="[[_equals(mode, 'edit')]]">
+                    if="[[!_equals(computedMode, 'view')]]">
                   <disaggregation-modal
                       id="modal-[[index]]"
                       reporting-period="[[currentReport.reporting_period]]"
@@ -273,6 +273,16 @@
           type: String,
           statePath: 'programmeDocumentReports.current.mode',
         },
+
+        overrideMode: {
+          type: String,
+          value: '',
+        },
+
+        computedMode: {
+          type: String,
+          computed: '_computeMode(mode, overrideMode)',
+        },
       },
 
       init: function () {
@@ -316,6 +326,10 @@
         return this._clone(data[key]);
       },
 
+      _computeMode: function (mode, overrideMode) {
+        return overrideMode || mode;
+      },
+
       _openModal: function (e) {
         this.$$('#modal-' + e.target.modalIndex).open();
       },
@@ -337,6 +351,10 @@
 
       _computeTableVisibility: function (opened, index) {
         return !!opened['modal-' + index];
+      },
+
+      _computeLocationStatus: function (location) {
+        return location.is_complete ? 'success' : 'error';
       },
 
       attached: function () {

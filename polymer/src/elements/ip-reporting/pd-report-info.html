@@ -1,0 +1,242 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/etools-content-panel/etools-content-panel.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-input-container.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-input-char-counter.html">
+<link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
+
+<link rel="import" href="../../endpoints.html">
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../redux/actions.html">
+<link rel="import" href="../../redux/selectors/reportInfo.html">
+<link rel="import" href="../labelled-item.html">
+<link rel="import" href="../etools-prp-ajax.html">
+
+
+<dom-module id="pd-report-info">
+  <template>
+    <style include="app-grid-style">
+      :host {
+        display: block;
+        margin-bottom: 25px;
+
+        --app-grid-columns: 8;
+        --app-grid-gutter: 25px;
+        --app-grid-item-height: auto;
+        --app-grid-expandible-item-columns: 7;
+      }
+
+      .row {
+        @apply --app-grid-expandible-item;
+      }
+
+      .value {
+        font-size: 16px;
+      }
+    </style>
+
+    <etools-prp-ajax
+        id="update"
+        url="[[updateUrl]]"
+        body="[[localData]]"
+        content-type="application/json"
+        method="put">
+    </etools-prp-ajax>
+
+    <etools-content-panel panel-title="Narrative">
+      <div class="app-grid">
+        <div class="row">
+          <labelled-item label="Partner contribution to date">
+            <template
+                is="dom-if"
+                if="[[_equals(computedMode, 'view')]]"
+                restamp="true">
+              <span class="value">[[_withDefault(data.partner_contribution_to_date)]]</span>
+            </template>
+
+            <template
+                is="dom-if"
+                if="[[!_equals(computedMode, 'view')]]"
+                restamp="true">
+              <paper-input-container
+                  no-label-float>
+                <input
+                    id="partner_contribution_to_date"
+                    on-input="_handleInput"
+                    value="[[data.partner_contribution_to_date]]"
+                    maxlength="256">
+                <paper-input-char-counter></paper-input-char-counter>
+              </paper-input-container>
+            </template>
+          </labelled-item>
+        </div>
+
+        <div class="row">
+          <labelled-item label="Funds received to date">
+            <span class="value">[[_withDefault(data.funds_received_to_date)]]</span>
+          </labelled-item>
+        </div>
+
+        <div class="row">
+          <labelled-item label="Challenges/bottlenecks in the reporting period (latest)">
+            <template
+                is="dom-if"
+                if="[[_equals(computedMode, 'view')]]"
+                restamp="true">
+              <span class="value">[[_withDefault(data.challenges_in_the_reporting_period)]]</span>
+            </template>
+
+            <template
+                is="dom-if"
+                if="[[!_equals(computedMode, 'view')]]"
+                restamp="true">
+              <paper-input-container
+                  no-label-float>
+                <input
+                    id="challenges_in_the_reporting_period"
+                    on-input="_handleInput"
+                    value="[[data.challenges_in_the_reporting_period]]"
+                    maxlength="256">
+                <paper-input-char-counter></paper-input-char-counter>
+              </paper-input-container>
+            </template>
+          </labelled-item>
+        </div>
+
+        <div class="row">
+          <labelled-item label="Proposed way forward (latest)">
+            <template
+                is="dom-if"
+                if="[[_equals(computedMode, 'view')]]"
+                restamp="true">
+              <span class="value">[[_withDefault(data.proposed_way_forward)]]</span>
+            </template>
+
+            <template
+                is="dom-if"
+                if="[[!_equals(computedMode, 'view')]]"
+                restamp="true">
+               <paper-input-container
+                  no-label-float>
+                <input
+                    id="proposed_way_forward"
+                    on-input="_handleInput"
+                    value="[[data.proposed_way_forward]]"
+                    maxlength="256">
+                <paper-input-char-counter></paper-input-char-counter>
+              </paper-input-container>
+            </template>
+          </labelled-item>
+        </div>
+      </div>
+    </etools-content-panel>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'pd-report-info',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        localData: Object,
+
+        data: {
+          type: Object,
+          statePath: App.Selectors.ReportInfo.current,
+        },
+
+        pdId: {
+          type: Number,
+          statePath: 'programmeDocuments.current',
+        },
+
+        reportId: {
+          type: String,
+          statePath: 'programmeDocumentReports.current.id',
+        },
+
+        updateUrl: {
+          type: String,
+          computed: '_computeUpdateUrl(reportId)',
+        },
+
+        overrideMode: {
+          type: String,
+          value: '',
+        },
+
+        mode: {
+          type: String,
+          statePath: 'programmeDocumentReports.current.mode',
+        },
+
+        computedMode: {
+          type: String,
+          computed: '_computeMode(mode, overrideMode)',
+        },
+      },
+
+      observers: [
+        '_updateData(localData.progress_report.*)',
+        '_initLocalData(pdId, data.id)',
+      ],
+
+      _handleInput: function () {
+        var field = Polymer.dom(event).rootTarget;
+        var id = field.id;
+
+        this.set(['localData.progress_report', id], field.value.trim());
+      },
+
+      _updateData: function (change) {
+        if (change.path.split('.').length <= 2) {
+          // Skip the initial assignment
+          return;
+        }
+
+        this.debounce('update-data', function () {
+          var updateThunk = this.$.update.thunk();
+
+          this.$.update.abort();
+
+          this.dispatch(
+            App.Actions.IndicatorData.updateInfo(
+              updateThunk,
+              this.reportId
+            )
+          )
+              .catch(function (err) { // jshint ignore:line
+                // TODO: error handling
+              });
+        }, 300);
+      },
+
+      _computeUpdateUrl: function (reportId) {
+        return App.Endpoints.indicatorData(reportId);
+      },
+
+      _computeMode: function (mode, overrideMode) {
+        return overrideMode || mode;
+      },
+
+      _initLocalData: function (pdId, id) {
+        this.set('localData', {
+          progress_report: {
+            id: id,
+            programme_document_id: pdId,
+          },
+        });
+      },
+
+      detached: function () {
+        if (this.isDebouncerActive('update-data')) {
+          this.cancelDebouncer('update-data');
+        }
+      },
+    });
+  </script>
+</dom-module>

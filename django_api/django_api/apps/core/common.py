@@ -99,3 +99,10 @@ PD_STATUS = Choices(
     ("Imp", "implemented", "Implemented"),
     ('Rej', 'rejected', 'Rejected'),
 )
+
+OVERALL_STATUS = Choices(
+    ("Met", "met", "Met"),
+    ("OnT", "on_track", "On Track"),
+    ("NoP", "no_pogress", "No Progress"),
+    ('Con', 'constrained', 'Constrained'),
+)

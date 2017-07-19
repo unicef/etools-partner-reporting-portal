@@ -10,7 +10,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('indicator', '0015_auto_20170706_2350'),
+        ('indicator', '0017_auto_20170704_1401'),
     ]
 
     operations = [
