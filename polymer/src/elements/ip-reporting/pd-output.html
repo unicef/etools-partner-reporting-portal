@@ -271,7 +271,7 @@
       _toggle: function (e) {
         var node = e.target;
 
-        while (typeof node.toggles === 'undefined') {
+        while (node && typeof node.toggles === 'undefined') {
           node = node.parentNode;
         }
 
