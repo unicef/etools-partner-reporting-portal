@@ -77,7 +77,8 @@
           // TODO: Fix. Why is this resolveUrl returning the /src/pages/ part of the URL?
           // var resolvedPageUrl = this.resolveUrl(page + '.html');
           this.set('route.path', '/' + page);
-          var resolvedPageUrl = 'http://localhost:8080/src/pages/app/cluster-reporting/' + page + '.html';
+          var base = 'http://localhost:8080/src/pages/app/cluster-reporting/';
+          var resolvedPageUrl = base + page + '.html';
           this.importHref(resolvedPageUrl, null, this._notFound, true);
         }
       },

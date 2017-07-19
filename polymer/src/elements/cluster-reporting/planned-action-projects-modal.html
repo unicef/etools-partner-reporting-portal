@@ -150,14 +150,14 @@
               <dropdown-form-input class="flex self-stretch"
                                    label="Status"
                                    id="status"
-                                   selected="[[data.status]]"
+                                   selected="{{data.status}}"
                                    data="[[statuses]]">
               </dropdown-form-input>
 
               <dropdown-form-input class="flex self-stretch"
                                    label="Frequency of reporting"
                                    id="frequency"
-                                   selected="[[data.frequency]]"
+                                   selected="{{data.frequency}}"
                                    data="[[frequencies]]">
               </dropdown-form-input>
           </div>
@@ -281,7 +281,7 @@
         frequencies: {
           type: Array,
           value: [
-            {title:'Weekly', id: 'Wee'},
+            {title: 'Weekly', id: 'Wee'},
             {title: 'Monthly', id: 'Mon'},
             {title: 'Quarterly', id: 'Qua'},
           ],
@@ -319,9 +319,10 @@
         this.updatePending = true;
         var thunk = this.$.createProject.thunk();
         thunk()
-          .then(function (res) {
+          .then(function () {
             self.updatePending = false;
             //TODO: Update the list of partner projects to show the new one.
+            //TODO: Redirect to new details page.
           })
           .catch(function (err) { // jshint ignore:line
             self.updatePending = false;

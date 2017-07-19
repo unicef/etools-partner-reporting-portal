@@ -61,7 +61,7 @@
 
       attached: function() {
         // Without this, using the dropdown component will cause the modal to close.
-        this.addEventListener('iron-overlay-closed', function(e){
+        this.addEventListener('iron-overlay-closed', function(e) {
           e.stopPropagation();
         });
       },

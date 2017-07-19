@@ -5,10 +5,8 @@
 
 <link rel="import" href="../../../elements/cluster-reporting/cluster-activities-filters.html">
 <link rel="import" href="../../../elements/cluster-reporting/cluster-activities-modal.html">
-
 <link rel="import" href="../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../styles/shared-styles.html">
-
 <link rel="import" href="../../../behaviors/data-table.html">
 <link rel="import" href="../../../behaviors/pagination.html">
 <link rel="import" href="../../../behaviors/utils.html">
@@ -123,7 +121,6 @@
         App.Behaviors.UtilsBehavior,
       ],
 
-
       observers: [
         '_clusterActivitiesAjax(activitiesUrl, queryParams)',
       ],
@@ -157,19 +154,9 @@
           type: Number,
           statePath: 'clusterActivities.count',
         },
-
-        //For testing create objective API
-        activityData: {
-          type: Object,
-          value: {
-            title: 'Test title for cluster activity creation',
-            standard: 'test',
-            cluster_objective: 80
-          }
-        }
       },
 
-      _openModal: function (e) {
+      _openModal: function () {
         this.$$('#modal').open();
       },
 
@@ -184,17 +171,6 @@
               // TODO: error handling.
           });
       },
-
-        // Testing that cluster objective creation works
-        // thunk3 = this.$.createActivity.thunk();
-        // thunk3()
-        //   .then(function (res) {
-        //     console.log("res", res)
-        //   })
-        //   .catch(function (err) { // jshint ignore:line
-        //     // TODO: error handling
-        //   });
-
 
       _computeActivitiesUrl: function () {
         return App.Endpoints.responseParametersClusterActivities();
