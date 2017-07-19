@@ -12,7 +12,9 @@ from django.dispatch import receiver
 from model_utils.models import TimeStampedModel
 
 from core.common import (
-    INDICATOR_REPORT_STATUS, FREQUENCY_LEVEL,
+    INDICATOR_REPORT_STATUS,
+    FREQUENCY_LEVEL,
+    REPORTABLE_FREQUENCY_LEVEL,
     PROGRESS_REPORT_STATUS
 )
 
@@ -123,6 +125,22 @@ class Reportable(TimeStampedModel):
     content_object = GenericForeignKey('content_type', 'object_id')
     blueprint = models.ForeignKey(IndicatorBlueprint, null=True, related_name="reportables")
     parent_indicator = models.ForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
+
+    frequency = models.CharField(
+        max_length=3,
+        choices=REPORTABLE_FREQUENCY_LEVEL,
+        default=REPORTABLE_FREQUENCY_LEVEL.monthly,
+        verbose_name='Frequency of reporting'
+    )
+
+    start_date = models.DateField(
+        verbose_name='Start Date',
+    )
+    end_date = models.DateField(
+        verbose_name='Due Date',
+    )
+
+    cs_dates = ArrayField(models.DateField(), default=list)
 
     class Meta:
         ordering = ['id']

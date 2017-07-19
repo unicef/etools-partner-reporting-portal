@@ -5,13 +5,14 @@ import logging
 
 from django.db import models
 from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.postgres.fields import ArrayField
 from django.utils.functional import cached_property
 
 from model_utils.models import TimeStampedModel
 
 from core.common import (
     ADMINISTRATIVE_LEVEL,
-    FREQUENCY_LEVEL,
+    PD_FREQUENCY_LEVEL,
     INDICATOR_REPORT_STATUS,
     PD_LIST_REPORT_STATUS,
     PD_DOCUMENT_TYPE,
@@ -87,8 +88,8 @@ class ProgrammeDocument(TimeStampedModel):
     )
     frequency = models.CharField(
         max_length=3,
-        choices=FREQUENCY_LEVEL,
-        default=FREQUENCY_LEVEL.monthly,
+        choices=PD_FREQUENCY_LEVEL,
+        default=PD_FREQUENCY_LEVEL.monthly,
         verbose_name='Frequency of reporting'
     )
     budget = models.DecimalField(
@@ -120,6 +121,8 @@ class ProgrammeDocument(TimeStampedModel):
         default=0,
         verbose_name='UNICEF Supplies'
     )
+
+    cs_dates = ArrayField(models.DateField(), default=list)
 
     # TODO:
     # cron job will create new report with due period !!!
@@ -243,14 +246,14 @@ class ProgrammeDocument(TimeStampedModel):
 
     @property
     def frequency_delta_days(self):
-        if self.frequency == FREQUENCY_LEVEL.weekly:
+        if self.frequency == PD_FREQUENCY_LEVEL.weekly:
             return 7
-        elif self.frequency == FREQUENCY_LEVEL.monthly:
+        elif self.frequency == PD_FREQUENCY_LEVEL.monthly:
             return 30
-        elif self.frequency == FREQUENCY_LEVEL.quartely:
+        elif self.frequency == PD_FREQUENCY_LEVEL.quartely:
             return 90
         else:
-            raise NotImplemented("Not recognized FREQUENCY_LEVEL.")
+            raise NotImplemented("Not recognized PD_FREQUENCY_LEVEL.")
 
 
 def find_first_programme_document_id():
@@ -272,6 +275,13 @@ class ProgressReport(TimeStampedModel):
     status = models.CharField(max_length=3, choices=PROGRESS_REPORT_STATUS, default=PROGRESS_REPORT_STATUS.due)
     programme_document = models.ForeignKey(ProgrammeDocument, related_name="progress_reports", default=find_first_programme_document_id)
     # attachements ???
+
+    start_date = models.DateField(
+        verbose_name='Start Date',
+    )
+    end_date = models.DateField(
+        verbose_name='End Date',
+    )
 
     class Meta:
         ordering = ['id']
