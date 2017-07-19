@@ -1,7 +1,6 @@
 from datetime import date
 import operator
 import logging
-from django.http import Http404
 from django.db.models import Q
 from django.db import transaction
 from django.shortcuts import get_object_or_404
@@ -210,7 +209,7 @@ class IndicatorDataAPIView(APIView):
 
     def put(self, request, ir_id, *args, **kwargs):
         if 'progress_report' not in request.data:
-            _errors = [{"message": "No 'progress_report' in request data."}]
+            _errors = ["No progress_report found in PUT request data."]
             return Response({"errors": _errors},
                             status=status.HTTP_400_BAD_REQUEST)
 
@@ -258,7 +257,7 @@ class IndicatorDataReportableAPIView(APIView):
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({"errors": "Reportable don't contain indicator."}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"errors": "Reportable doesn't contain indicator."}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class IndicatorReportListAPIView(APIView):
@@ -356,4 +355,4 @@ class IndicatorDataLocationAPIView(ListAPIView):
         if ir_id:
             ir = get_object_or_404(IndicatorReport, id=ir_id)
             return Location.objects.filter(reportable=ir.reportable_id)
-        return Location.objects.none()
+        raise Http404

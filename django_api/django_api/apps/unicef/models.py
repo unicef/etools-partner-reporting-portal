@@ -260,7 +260,7 @@ def find_first_programme_document_id():
         from core.factories import ProgrammeDocumentFactory
         pd = ProgrammeDocumentFactory()
         pd_id = pd.id
-    finally:
+    else:
         return pd_id
 
 
