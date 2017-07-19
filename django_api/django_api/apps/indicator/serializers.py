@@ -14,7 +14,7 @@ from core.helpers import (
     get_cast_dictionary_keys_as_tuple,
     get_cast_dictionary_keys_as_string,
 )
-
+from cluster.models import ClusterObjective, ClusterActivity
 from .models import (
     Reportable, IndicatorBlueprint,
     IndicatorReport, IndicatorLocationData,
@@ -509,3 +509,40 @@ class IndicatorReportUpdateSerializer(serializers.ModelSerializer):
         fields = (
             'reporting_period',
         )
+
+
+class ClusterIndicatorDataSerializer(serializers.ModelSerializer):
+
+    name = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField()
+    indicator_reports = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Reportable
+        fields = (
+            'id',
+            'name',
+            'target',
+            'baseline',
+            'status',
+            'indicator_reports',
+        )
+
+    def get_name(self, obj):
+        if isinstance(obj.content_object, ClusterObjective):
+            return obj.content_object.title
+        elif isinstance(obj.content_object, ClusterActivity):
+            return obj.content_object.title
+        else:
+            return ''
+
+    def get_status(self, obj):
+        # first indicator report associated with this output
+        indicator_report = obj.indicator_reports.first()
+        serializer = IndicatorReportStatusSerializer(indicator_report)
+        return serializer.data
+
+    def get_indicator_reports(self, obj):
+        children = obj.indicator_reports.all()
+        serializer = IndicatorReportSimpleSerializer(children, many=True)
+        return serializer.data
