@@ -167,28 +167,28 @@
       },
 
       observers: [
-        '_routePageChanged(routeData.page, routeData.plan)',
-        '_routePlanChanged(routeData.plan)',
-        '_reduxPlanChanged(_currentPlanID)'
+        '_routeChanged(routeData)',
+        '_reduxPlanChanged(_currentPlanID)',
       ],
 
       // These functions track the plan/page values in the URL.
       // Additional logic is in _planChanged and _pageChanged.
-      _routePlanChanged: function (plan) {
+      _routeChanged: function (routeData) {
+        var plan = routeData.plan;
+        var page = routeData.page;
+
         if (!plan) {
-          this.set('route.path', 'select-plan');
+          this.set('routeData.plan', 'select-plan');
+          this.set('routeData.page', undefined);
           this.plan = 'select-plan';
+          return;
         } else {
           this.plan = String(plan);
         }
-      },
 
-      _routePageChanged: function (page, plan) {
         if (!page) {
-          if (plan) {
-            this.set('routeData.page', 'dashboard');
-            this.page = 'dashboard';
-          }
+          // this.set('routeData.page', 'dashboard');
+          this.page = 'dashboard';
         } else {
           this.page = page;
         }
@@ -196,20 +196,21 @@
 
       //The plan may be changed in Redux (set via select-plan.html).
       _reduxPlanChanged: function(plan) {
+        var page = this.page || 'dashboard';
         if (plan) {
-          this.plan = plan;
+          this.set('route.path', '/' + plan + '/' + page);
         }
       },
 
       _planChanged: function (planID) {
         this.set('queryParams', {});
+
         if (planID === 'select-plan') {
           var htmlPage = 'cluster-reporting/select-plan.html';
           var resolvedPageUrl = this.resolveUrl(htmlPage);
           this.importHref(resolvedPageUrl, null, this._notFound, true);
+
         } else if (planID) {
-          this.plan = planID;
-          this._pageChanged('dashboard');
           if (this.currentPlanID !== planID) {
             this.dispatch(App.Actions.setCurrentResponsePlanID(planID));
           }
@@ -218,7 +219,6 @@
 
       _pageChanged: function (page) {
         var resolvedPageUrl = this.resolveUrl('cluster-reporting/' + page + '.html');
-        this.set('route.path', this.plan + '/' + page);
         this.importHref(resolvedPageUrl, null, this._notFound, true);
       },
 
