@@ -258,6 +258,7 @@ class ProgrammeDocument(TimeStampedModel):
 
 def find_first_programme_document_id():
     try:
+        import pdb; pdb.set_trace()
         pd_id = ProgrammeDocument.objects.first().id
     except AttributeError:
         from core.factories import ProgrammeDocumentFactory
@@ -273,7 +274,7 @@ class ProgressReport(TimeStampedModel):
     challenges_in_the_reporting_period = models.CharField(max_length=256)
     proposed_way_forward = models.CharField(max_length=256)
     status = models.CharField(max_length=3, choices=PROGRESS_REPORT_STATUS, default=PROGRESS_REPORT_STATUS.due)
-    programme_document = models.ForeignKey(ProgrammeDocument, related_name="progress_reports", default=find_first_programme_document_id)
+    programme_document = models.ForeignKey(ProgrammeDocument, related_name="progress_reports", default=-1)
     # attachements ???
 
     start_date = models.DateField(
