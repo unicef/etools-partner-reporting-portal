@@ -20,7 +20,7 @@
 
         auto$="[[auto]]"
 
-        method="[[method]]"
+        method="[[formattedMethod]]"
         content-type="[[contentType]]"
         url="[[url]]"
         body="[[body]]"
@@ -71,6 +71,12 @@
           computed: '_computeHeaders(headers, token)',
         },
 
+        formattedMethod: {
+          type: String,
+          value: 'GET',
+          computed: '_computeFormattedMethod(method)',
+        },
+
         lastRequest: {
           notify: true,
         },
@@ -88,6 +94,12 @@
         },
       },
 
+      listeners: {
+        'ajax.response': '_handleResponse',
+        'ajax.request': '_handleRequest',
+        'ajax.error': '_handleError',
+      },
+
       _computeHeaders: function (headers, token) {
         return Object.assign({}, {
           Authorization: 'Bearer ' + token,
@@ -95,10 +107,8 @@
         }, headers);
       },
 
-      listeners: {
-        'ajax.response': '_handleResponse',
-        'ajax.request': '_handleRequest',
-        'ajax.error': '_handleError',
+      _computeFormattedMethod: function (method) {
+        return (method || '').toUpperCase();
       },
 
       _handleResponse: function (e, request) {

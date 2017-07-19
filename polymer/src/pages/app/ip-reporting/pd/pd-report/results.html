@@ -1,0 +1,23 @@
+<link rel="import" href="../../../../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../../../../elements/ip-reporting/pd-output-list.html">
+<link rel="import" href="../../../../../elements/ip-reporting/report-filters.html">
+
+<dom-module id="page-ip-reporting-report-results">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <report-filters></report-filters>
+    <pd-output-list></pd-output-list>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'page-ip-reporting-report-results',
+    });
+  </script>
+</dom-module>
