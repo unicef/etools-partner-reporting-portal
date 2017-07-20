@@ -86,6 +86,37 @@
         };
       },
 
+      // Gets a list of all response plans for the currently selected location ID.
+      fetchResponsePlans: function (responsePlansThunk) {
+        return function (dispatch) {
+          return responsePlansThunk()
+            .then(function (res) {
+              dispatch(App.Actions.setResponsePlans(res.data));
+            });
+        };
+      },
+
+      setResponsePlans: function (plans) {
+        return {
+          type: App.Constants.SET_RESPONSE_PLANS,
+          plans: plans
+        };
+      },
+
+      setCurrentResponsePlanID: function (newPlanID) {
+        return {
+          type: App.Constants.SET_CURRENT_RESPONSE_PLAN_ID,
+          planID: newPlanID,
+        };
+      },
+
+      setCurrentResponsePlan: function (newPlan) {
+        return {
+          type: App.Constants.SET_CURRENT_RESPONSE_PLAN,
+          plan: newPlan,
+        };
+      },
+
       setApp: function (app) {
         return {
           type: App.Constants.SET_APP,

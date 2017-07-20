@@ -18,14 +18,28 @@
           statePath: 'app.current',
         },
 
+        _$currentPlan: {
+          type: String,
+          statePath: 'responsePlans.currentID',
+        },
+
         _baseUrl: {
           type: String,
           computed: '_$computeBaseUrl(_$currentCountry, _$currentApp)',
+        },
+
+        _baseUrlCluster: {
+          type: String,
+          computed: '_$computeBaseUrlCluster(_$currentCountry, _$currentApp, _$currentPlan)',
         }
       },
 
       _$computeBaseUrl: function (country, app) {
         return '/app/' + country + '/' + app;
+      },
+
+      _$computeBaseUrlCluster: function(country, app, planId) {
+        return '/app/' + country + '/' + app + '/plan/' + planId;
       },
 
       /**
