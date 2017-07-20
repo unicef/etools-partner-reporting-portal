@@ -7,6 +7,7 @@ from .models import PartnerProject
 
 
 class PartnerProjectFilter(filters.FilterSet):
+    partner = CharFilter(method='get_partner')
     title = CharFilter(method='get_title')
     location = CharFilter(method='get_location')
     status = ChoiceFilter(choices=PD_STATUS)
@@ -16,6 +17,9 @@ class PartnerProjectFilter(filters.FilterSet):
     class Meta:
         model = PartnerProject
         fields = ['title', 'location', 'status', 'start_date', 'end_date']
+
+    def get_partner(self, queryset, name, value):
+        return queryset.filter(partner_id=value)
 
     def get_title(self, queryset, name, value):
         return queryset.filter(title__icontains=value)

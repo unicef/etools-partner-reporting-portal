@@ -98,3 +98,8 @@ OVERALL_STATUS = Choices(
     ('Con', 'constrained', 'Constrained'),
 )
 
+PARTNER_PROJECT_STATUS = Choices(
+    ("Ong", "ongoing", "Ongoing"),
+    ("Pla", "planned", "Planned"),
+    ("Com", "completed", "Completed"),
+)

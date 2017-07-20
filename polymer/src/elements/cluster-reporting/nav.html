@@ -1,6 +1,9 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="../../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../../bower_components/paper-menu/paper-submenu.html">
+<link rel="import" href="../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../bower_components/app-route/app-location.html">
 
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/page-nav.html">
@@ -18,46 +21,57 @@
           background: var(--theme-selected-item-background-color);
         };
       }
+
     </style>
 
     <paper-menu
         id="menu"
         selected="{{selected}}"
         attr-for-selected="name"
-        selectable="paper-item"
+        selectable=".selectable"
         key-event-target="null">
 
-      <paper-item name="dashboard">
-        <a href="[[buildUrl(_baseUrlCluster, '/dashboard')]]">
-          <span>Dashboard</span>
-        </a>
-      </paper-item>
+        <paper-item name="dashboard" class="selectable">
+          <a href="[[buildUrl(_baseUrlCluster, '/dashboard')]]">
+            <span>Dashboard</span>
+          </a>
+        </paper-item>
 
-      <paper-item name="response-parameters">
-        <a href="[[buildUrl(_baseUrlCluster, '/response-parameters')]]">
-          <span>Response Parameters</span>
-        </a>
-      </paper-item>
+        <div name="response-parameters" class="selectable">
+          <paper-submenu>
+            <paper-item class="menu-trigger">
+              <a href="[[buildUrl(_baseUrlCluster, 'response-parameters')]]">
+                Response Parameters
+              </a>
+            </paper-item>
+            <paper-menu class="menu-content">
+              <paper-item name='response-parameters'>
+                <a href="[[buildUrl(_baseUrlCluster, 'response-parameters/clusters')]]">Clusters</a>
+              </paper-item>
+              <paper-item name='response-parameters'>
+                <a href="[[buildUrl(_baseUrlCluster, 'response-parameters/partners')]]">Partners</a>
+              </a>
+            </paper-menu>
+          </paper-submenu>
+        </div>
 
-      <paper-item name="planned-action">
-        <a href="[[buildUrl(_baseUrlCluster, '/planned-action')]]">
-          <span>My Planned Action</span>
-        </a>
-      </paper-item>
+        <paper-item name="planned-action" class="selectable">
+          <a href="[[buildUrl(_baseUrlCluster, '/planned-action/')]]">
+            <span>My Planned Action</span>
+          </a>
+        </paper-item>
 
-      <paper-item name="results">
-        <a href="[[buildUrl(_baseUrlCluster, '/results')]]">
-          <span>Results</span>
-        </a>
-      </paper-item>
+        <paper-item name="results" class="selectable">
+          <a href="[[buildUrl(_baseUrlCluster, '/results')]]">
+            <span>Results</span>
+          </a>
+        </paper-item>
 
-      <paper-item name="analysis">
-        <a href="[[buildUrl(_baseUrlCluster, '/analysis')]]">
-          <span>Analysis</span>
-        </a>
-      </paper-item>
-
-    </paper-menu>
+        <paper-item name="analysis" class="selectable">
+          <a href="[[buildUrl(_baseUrlCluster, '/analysis')]]">
+            <span>Analysis</span>
+          </a>
+        </paper-item>
   </template>
 
   <script>

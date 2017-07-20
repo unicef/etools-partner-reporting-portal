@@ -1,7 +1,14 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../../bower_components/app-route/app-location.html">
+<link rel="import" href="../../../../bower_components/iron-pages/iron-pages.html">
 
+<link rel="import" href="../../../behaviors/utils.html">
 <link rel="import" href="../../../elements/page-header.html">
 <link rel="import" href="../../../elements/page-body.html">
+
+<link rel="import" href="clusters.html">
+<link rel="import" href="partners.html">
 
 <dom-module id="page-cluster-reporting-response-parameters">
   <template>
@@ -11,9 +18,28 @@
       }
     </style>
 
-    <page-header title="Response Parameters"></page-header>
+    <app-route
+      route="{{route}}"
+      pattern="/:page"
+      data="{{routeData}}"
+      tail="{{subroute}}">
+    </app-route>
 
-    <page-body></page-body>
+    <iron-pages
+      selected={{page}}
+      attr-for-selected="name">
+
+        <clusters-response-parameters
+          name="clusters"
+          route="{{subroute}}">
+        </clusters-response-parameters>
+
+        <partners-response-parameters
+          name="partners"
+          route="{{subroute}}">
+        </partners-response-parameters>
+
+    </iron-pages>
 
   </template>
 
@@ -23,7 +49,37 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.UtilsBehavior,
       ],
+
+      observers: [
+        '_routeChanged(routeData)',
+      ],
+
+      properties: {
+        page: {
+          value: 'clusters',
+          type: String,
+          observer: '_pageChanged',
+        },
+      },
+
+      _routeChanged: function (routeData) {
+        if (routeData.page === 'partners') {
+          this.page = 'partners';
+        } else {
+          this.page = 'clusters';
+        }
+        this.set('route.path', '/' + this.page);
+      },
+
+      _pageChanged: function (page) {
+        if (page) {
+          var resolvedPageUrl = this.resolveUrl(page + '.html');
+          this.importHref(resolvedPageUrl, null, this._notFound, true);
+        }
+      },
+
     });
   </script>
 </dom-module>

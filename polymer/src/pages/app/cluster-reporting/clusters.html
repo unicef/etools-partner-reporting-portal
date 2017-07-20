@@ -9,8 +9,11 @@
 <link rel="import" href="../../../elements/page-body.html">
 <link rel="import" href="planned-action-projects.html">
 <link rel="import" href="planned-action-activities.html">
+<link rel="import" href="cluster-activities.html">
+<link rel="import" href="cluster-objectives.html">
 
-<dom-module id="page-cluster-reporting-planned-action">
+
+<dom-module id="clusters-response-parameters">
   <template>
     <style include="shared-styles">
       :host {
@@ -36,8 +39,7 @@
     </app-route>
 
     <div class="page-top-content">
-
-      <page-header title="My Planned Action"></page-header>
+      <page-header title="Clusters"></page-header>
 
       <div class="top-content-row">
         <paper-tabs
@@ -46,8 +48,12 @@
           noink
           bottom-item>
 
-          <paper-tab name="projects" link>
-            <span class="tab-content">Projects</span>
+          <paper-tab name="response-plans" link>
+            <span class="tab-content">Response Plans</span>
+          </paper-tab>
+
+          <paper-tab name="objectives" link>
+            <span class="tab-content">Objectives</span>
           </paper-tab>
 
           <paper-tab name="activities" link>
@@ -55,23 +61,28 @@
           </paper-tab>
         </paper-tabs>
       </div>
-
     </div>
 
     <page-body>
       <iron-pages
         id="tabContent"
+        selected=[[tab]]
         attr-for-selected="name"
         fallback-selection="projects"
         on-iron-items-changed="_updateTabSelection">
 
-        <template is="dom-if" if="[[_equals(tab, 'projects')]]" restamp="true">
-          <planned-action-projects name="projects"></planned-action-projects>
-        </template>
+        <div name="response-plans">TODO</div>
 
-        <template is="dom-if" if="[[_equals(tab, 'activities')]]" restamp="true">
-          <planned-action-activities name="activities"></planned-action-activities>
-        </template>
+        <cluster-objectives
+            name="objectives"
+            route="{{subroute}}">
+        </cluster-objectives>
+
+        <cluster-activities
+          name="activities"
+          route="{{subroute}}">
+        </cluster-activities>
+
       </iron-pages>
     </page-body>
 
@@ -79,7 +90,7 @@
 
   <script>
     Polymer({
-      is: 'page-cluster-reporting-planned-action',
+      is: 'clusters-response-parameters',
 
       properties: {
         tab: String
@@ -96,8 +107,8 @@
       // Tracks the tab value in the URL only.
       _routeTabChanged: function (tab) {
         if (!tab) {
-          this.set('routeData.tab', 'projects');
-          this.set('route.path', '/projects/');
+          this.set('routeData.tab', 'response-plans');
+          this.set('route.path', '/response-plans/');
         } else {
           this.tab = tab;
           this.set('route.path', '/' + tab);

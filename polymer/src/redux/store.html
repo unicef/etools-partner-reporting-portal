@@ -14,6 +14,8 @@
 <link rel="import" href="reducers/programmeDocumentReports.html">
 <link rel="import" href="reducers/responsePlans.html">
 <link rel="import" href="reducers/disaggregations.html">
+<link rel="import" href="reducers/partnerProjects.html">
+<link rel="import" href="reducers/clusters.html">
 
 <script src="../../bower_components/redux-thunk/index.js"></script>
 
@@ -35,6 +37,9 @@
       progressReports: App.Reducers.ProgressReports,
       responsePlans: App.Reducers.ResponsePlans,
       disaggregations: App.Reducers.Disaggregations,
+      partnerProjects: App.Reducers.PartnerProjects,
+      clusterActivities: App.Reducers.ClusterActivities,
+      clusterObjectives: App.Reducers.ClusterObjectives,
     });
 
     var store = Redux.createStore(
