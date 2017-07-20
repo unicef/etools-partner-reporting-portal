@@ -1,0 +1,25 @@
+<link rel="import" href="../reselect.html">
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Selectors = App.Selectors || {};
+
+    App.Selectors.Country = {
+      id: Reselect.createSelector(
+        function (state) {
+          return state.countries.all;
+        },
+        function (state) {
+          return state.countries.current;
+        },
+        function (countries, code) {
+          return countries.length ? countries.filter(function (country) {
+            return country.code === code;
+          })[0].id : void 0;
+        }
+      ),
+    };
+  }());
+</script>

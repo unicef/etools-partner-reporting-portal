@@ -7,6 +7,7 @@
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
+<link rel="import" href="../../redux/selectors/country.html">
 <link rel="import" href="../../elements/etools-prp-ajax.html">
 
 <dom-module id="page-cluster-reporting">
@@ -19,7 +20,7 @@
 
     <etools-prp-ajax
         id="responsePlans"
-        url="[[_plansUrl]]">
+        url="[[plansUrl]]">
     </etools-prp-ajax>
 
     <app-location
@@ -72,14 +73,14 @@
           observer: '_pageChanged',
         },
 
-        _countryId: {
+        countryId: {
           type: String,
-          statePath: 'location.id',
+          statePath: App.Selectors.Country.id,
         },
 
-        _plansUrl: {
+        plansUrl: {
           type: String,
-          computed: '_computeResponsePlansUrl(_countryId)',
+          computed: '_computeResponsePlansUrl(countryId)',
           observer: '_fetchResponsePlans',
         },
       },
