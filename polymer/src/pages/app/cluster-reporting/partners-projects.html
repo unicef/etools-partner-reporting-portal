@@ -8,6 +8,7 @@
 
 <link rel="import" href="../../../elements/cluster-reporting/partner-projects-filters.html">
 <link rel="import" href="../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../elements/project-status.html">
 <link rel="import" href="../../../redux/store.html">
 <link rel="import" href="../../../redux/actions.html">
 <link rel="import" href="../../../behaviors/data-table.html">
@@ -99,7 +100,7 @@
               [[project.partner]]
             </div>
             <div class="table-cell table-cell--text">
-              [[project.status]]
+              <project-status status="[[project.status]]"></project-status>
             </div>
             <div class="table-cell table-cell--text">
               [[project.title]]

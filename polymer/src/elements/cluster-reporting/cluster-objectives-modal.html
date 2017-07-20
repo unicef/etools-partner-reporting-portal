@@ -65,11 +65,11 @@
         display: block;
       }
 
-      paper-input.flex:first-child {
+      paper-input.flex {
         margin-right: 10px;
       }
 
-      paper-input.flex:nth-child(2) {
+      dropdown-form-input:nth-child(3) {
         margin-left: 10px;
       }
 
@@ -112,6 +112,7 @@
 
           <div class="row horizontal layout">
             <paper-input
+              class="flex"
               id="reference_number"
               label="CO ref #"
               value="{{data.reference_number}}"
@@ -120,14 +121,14 @@
               auto-validate>
             </paper-input>
 
-            <dropdown-form-input class="flex self-stretch"
+            <dropdown-form-input class="flex"
                                  label="Cluster"
                                  id="cluster"
                                  selected="{{data.cluster}}"
                                  data="[[clusters]]">
             </dropdown-form-input>
 
-            <dropdown-form-input class="flex self-stretch"
+            <dropdown-form-input class="flex"
                                  label="Frequency of reporting"
                                  id="frequency"
                                  selected="{{data.frequency}}"

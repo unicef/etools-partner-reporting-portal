@@ -17,16 +17,6 @@
       :host {
         display: block;
       }
-
-      .page-top-content {
-        box-shadow: 0 1px 2px 1px rgba(0, 0, 0, .1);
-      }
-      .page-top-content page-header {
-        padding-bottom:10px;
-      }
-      .top-content-row {
-        padding-left:25px;
-      }
     </style>
 
     <app-route
@@ -37,28 +27,28 @@
     </app-route>
 
     <div class="page-top-content">
-      <page-header title="Partners"></page-header>
+      <page-header title="Partners">
+        <div class="tabs">
+          <paper-tabs
+            selected="{{routeData.tab}}"
+            attr-for-selected="name"
+            scrollable
+            hide-scroll-buttons>
 
-      <div class="top-content-row">
-        <paper-tabs
-          selected="{{routeData.tab}}"
-          attr-for-selected="name"
-          noink
-          bottom-item>
+            <paper-tab name="contacts">
+              <span class="tab-content">Contacts</span>
+            </paper-tab>
 
-          <paper-tab name="contacts" link>
-            <span class="tab-content">Contacts</span>
-          </paper-tab>
+            <paper-tab name="projects">
+              <span class="tab-content">Projects</span>
+            </paper-tab>
 
-          <paper-tab name="projects" link>
-            <span class="tab-content">Projects</span>
-          </paper-tab>
-
-          <paper-tab name="activities" link>
-            <span class="tab-content">Activities</span>
-          </paper-tab>
-        </paper-tabs>
-      </div>
+            <paper-tab name="activities">
+              <span class="tab-content">Activities</span>
+            </paper-tab>
+          </paper-tabs>
+        </div>
+      </page-header>
     </div>
 
     <page-body>

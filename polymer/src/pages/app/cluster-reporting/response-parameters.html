@@ -28,16 +28,19 @@
     <iron-pages
       selected={{page}}
       attr-for-selected="name">
+        <template is="dom-if" if="[[_equals(page, 'clusters')]]" restamp="true">
+          <clusters-response-parameters
+            name="clusters"
+            route="{{subroute}}">
+          </clusters-response-parameters>
+        </template>
 
-        <clusters-response-parameters
-          name="clusters"
-          route="{{subroute}}">
-        </clusters-response-parameters>
-
-        <partners-response-parameters
-          name="partners"
-          route="{{subroute}}">
-        </partners-response-parameters>
+        <template is="dom-if" if="[[_equals(page, 'partners')]]" restamp="true">
+          <partners-response-parameters
+            name="partners"
+            route="{{subroute}}">
+          </partners-response-parameters>
+      </template>
 
     </iron-pages>
 
@@ -53,31 +56,44 @@
       ],
 
       observers: [
-        '_routeChanged(routeData)',
+        '_routeChanged(routeData.page)',
       ],
 
       properties: {
         page: {
-          value: 'clusters',
           type: String,
           observer: '_pageChanged',
         },
       },
 
-      _routeChanged: function (routeData) {
-        if (routeData.page === 'partners') {
-          this.page = 'partners';
-        } else {
-          this.page = 'clusters';
+      detached: function() {
+       this.set('route.path', '');
+      },
+
+      _routeChanged: function (page) {
+        switch (page) {
+          case 'partners':
+            this.page = 'partners';
+            break;
+
+          case 'clusters':
+            this.page = 'clusters';
+            break;
+
+          default:
+            this.set('route.path', '/clusters');
+            this.page = 'clusters';
+            break;
         }
-        this.set('route.path', '/' + this.page);
       },
 
       _pageChanged: function (page) {
-        if (page) {
-          var resolvedPageUrl = this.resolveUrl(page + '.html');
-          this.importHref(resolvedPageUrl, null, this._notFound, true);
+        var resolvedPageUrl = '';
+        if (!page) {
+          return;
         }
+        resolvedPageUrl = this.resolveUrl(page + '.html');
+        this.importHref(resolvedPageUrl, null, this._notFound, true);
       },
 
     });

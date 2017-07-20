@@ -62,15 +62,11 @@
         padding: 24px;
       }
 
-      div.row {
-        display: block;
-      }
-
-      paper-input.flex:first-child {
+      dropdown-form-input:first-child {
         margin-right: 10px;
       }
 
-      paper-input.flex:nth-child(2) {
+      dropdown-form-input:nth-child(3) {
         margin-left: 10px;
       }
 
@@ -119,15 +115,17 @@
           </paper-input>
 
           <div class="row horizontal layout">
-            <dropdown-form-input class="flex self-stretch"
-                                 label="Cluster"
-                                 id="cluster_objective"
-                                 selected="{{data.cluster_objective}}"
-                                 data="[[clusters]]">
+            <dropdown-form-input
+              class="flex self-stretch"
+               label="Cluster"
+               id="cluster_objective"
+               selected="{{data.cluster_objective}}"
+               data="[[clusters]]">
             </dropdown-form-input>
 
             <!-- TODO: Ask: dropdown in mockup, but text field everywhere else? -->
             <paper-input
+                class="flex"
                 id="reference_number"
                 label="CO ref #"
                 value="{{data.reference_number}}"
@@ -136,11 +134,12 @@
                 auto-validate>
             </paper-input>
 
-            <dropdown-form-input class="flex self-stretch"
-                                 label="Frequency of reporting"
-                                 id="frequency"
-                                 selected="{{data.frequency}}"
-                                 data="[[frequencies]]">
+            <dropdown-form-input
+               class="flex"
+               label="Frequency of reporting"
+               id="frequency"
+               selected="{{data.frequency}}"
+               data="[[frequencies]]">
             </dropdown-form-input>
           </div>
         </iron-form>

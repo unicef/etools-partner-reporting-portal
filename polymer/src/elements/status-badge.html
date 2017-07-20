@@ -34,6 +34,8 @@
       properties: {
         type: String,
 
+        hideIcon: Boolean,
+
         icon: {
           type: String,
           computed: '_computeIcon(type)',
@@ -46,19 +48,22 @@
       },
 
       _computeIcon: function (type) {
-        switch (type) {
-          case 'success':
-            return 'icons:check-circle';
-          case 'error':
-          case 'warning':
-            return 'icons:error';
-          case 'neutral':
-            return 'image:lens';
+        if (!this.hideIcon) {
+          switch (type) {
+            case 'success':
+              return 'icons:check-circle';
+            case 'error':
+            case 'warning':
+              return 'icons:error';
+          }
         }
+        return 'image:lens';
       },
 
       _computeColor: function (type) {
         switch (type) {
+          case 'default':
+            return '#0099ff';
           case 'success':
             return '#009951';
           case 'error':
