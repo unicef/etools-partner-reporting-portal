@@ -5,7 +5,7 @@ from .views import (
     ClusterObjectiveListCreateAPIView,
     ClusterActivityAPIView,
     ClusterActivityListAPIView,
-    ClusterIndicatorDataListAPIView,
+    ClusterIndicatorsListAPIView,
 )
 
 
@@ -24,7 +24,7 @@ urlpatterns = [
     url(r'^(?P<cluster_id>\d+)/cluster-activity-list/$',
         ClusterActivityListAPIView.as_view(),
         name="cluster-activity-list"),
-    url(r'^indicator-data-list/$',
-        ClusterIndicatorDataListAPIView.as_view(),
-        name="indicator-data-list"),
+    url(r'^cluster-indicators-list/$',
+        ClusterIndicatorsListAPIView.as_view(),
+        name="cluster-indicators-list"),
 ]
