@@ -90,3 +90,9 @@ RESPONSE_PLAN_TYPE = Choices(
     ("HRP", "hrp", "HRP"),
     ("FA", "fa", "FA"),
 )
+
+PARTNER_PROJECT_STATUS = Choices(
+    ("Ong", "ongoing", "Ongoing"),
+    ("Pla", "planned", "Planned"),
+    ("Com", "completed", "Completed"),
+)
