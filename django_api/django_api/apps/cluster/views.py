@@ -211,5 +211,6 @@ class ClusterIndicatorsListAPIView(ListCreateAPIView):
     def get_queryset(self):
         queryset = Reportable.objects.filter(
             Q(cluster_objectives__isnull=False) | Q(cluster_activities__isnull=False)
+            | Q(partner_projects__isnull=False) | Q(partner_activities__isnull=False)
         )
         return queryset
