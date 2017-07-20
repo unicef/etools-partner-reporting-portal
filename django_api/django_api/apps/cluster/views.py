@@ -21,7 +21,7 @@ from .serializers import (
     ClusterActivitySerializer,
     ClusterActivityPatchSerializer,
 )
-from .filters import ClusterObjectiveFilter, ClusterActivityFilter
+from .filters import ClusterObjectiveFilter, ClusterActivityFilter, ClusterIndicatorDataFilter
 
 logger = logging.getLogger(__name__)
 
@@ -204,18 +204,12 @@ class ClusterIndicatorDataListAPIView(ListCreateAPIView):
 
     permission_classes = (IsAuthenticated, )
     serializer_class = ClusterIndicatorDataSerializer
+    pagination_class = SmallPagination
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
+    filter_class = ClusterIndicatorDataFilter
 
     def get_queryset(self):
         queryset = Reportable.objects.filter(
             Q(cluster_objectives__isnull=False) | Q(cluster_activities__isnull=False)
         )
         return queryset
-
-    def get(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        serializer = ClusterIndicatorDataSerializer(queryset, many=True)
-
-        return Response(
-            serializer.data,
-            status=statuses.HTTP_200_OK
-        )
