@@ -1,142 +1,69 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/app-route/app-route.html">
 <link rel="import" href="../../../bower_components/app-route/app-location.html">
-<link rel="import" href="../../../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
-<link rel="import" href="../../../bower_components/app-layout/app-drawer/app-drawer.html">
-<link rel="import" href="../../../bower_components/app-layout/app-header/app-header.html">
-<link rel="import" href="../../../bower_components/app-layout/app-toolbar/app-toolbar.html">
 <link rel="import" href="../../../bower_components/iron-pages/iron-pages.html">
 
-<link rel="import" href="../../behaviors/utils.html">
-<link rel="import" href="../../redux/actions.html">
-<link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../endpoints.html">
-<link rel="import" href="../../elements/cluster-reporting/nav.html">
-<link rel="import" href="../../elements/cluster-reporting/app-header.html">
-<link rel="import" href="../../styles/app-theme-cluster.html">
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../redux/actions.html">
+<link rel="import" href="../../elements/etools-prp-ajax.html">
 
 <dom-module id="page-cluster-reporting">
   <template>
-  <style include="app-theme-cluster-styles">
-    :host {
-      display: block;
-    }
-
-    app-drawer {
-      --app-drawer-width: 220px;
-      --app-drawer-content-container: {
-        box-shadow: 1px 0 2px 1px rgba(0, 0, 0, .1);
+    <style>
+      :host {
+        display: block;
       }
-    }
+    </style>
 
-    app-toolbar {
-      background: var(--theme-primary-color);
-    }
+    <etools-prp-ajax
+        id="responsePlans"
+        url="[[_plansUrl]]">
+    </etools-prp-ajax>
 
-    .mode {
-      font-size: 16px;
-      text-transform: uppercase;
-      color: var(--theme-primary-text-color-light);
-      cursor: default;
-      user-select: none;
-    }
-  </style>
+    <app-location
+        query-params="{{queryParams}}">
+    </app-location>
 
-   <app-location query-params="{{queryParams}}"></app-location>
+    <app-route
+        route="{{route}}"
+        pattern="/:page"
+        data="{{routeData}}"
+        tail="{{subroute}}">
+    </app-route>
 
-   <app-route
-       route="{{route}}"
-       pattern="/:plan/:page"
-       data="{{routeData}}"
-       tail="{{subroute}}">
-   </app-route>
-
-  <etools-prp-ajax
-      id="responsePlans"
-      url="[[_plansUrl]]">
-  </etools-prp-ajax>
-
-  <template is="dom-if" if="[[_equals(plan, 'select-plan')]]" restamp="true">
-    <page-select-plan
-      name="select-plan"
-      selectedPlan={{plan}}
-      route="{{subroute}}">
-    </page-select-plan>
-  </template>
-
-  <template is="dom-if" if="[[!_equals(plan, 'select-plan')]]" restamp="true">
-   <app-drawer-layout persistent responsive-width="0px">
-     <app-drawer>
-       <app-header fixed>
-         <app-toolbar>
-           <div class="mode">
-             Cluster
-             <br>
-             Reporting
-           </div>
-         </app-toolbar>
-       </app-header>
-
-       <cluster-reporting-nav
-           selected="{{page}}"
-           role="navigation">
-       </cluster-reporting-nav>
-     </app-drawer>
-
-     <cluster-reporting-app-header></cluster-reporting-app-header>
-
-     <iron-pages
+    <iron-pages
         selected="[[page]]"
         attr-for-selected="name">
-      <template is="dom-if" if="[[_equals(page, 'dashboard')]]" restamp="true">
-        <page-cluster-reporting-dashboard
-            name="dashboard"
+      <template
+          is="dom-if"
+          if="[[_equals(page, 'select-plan')]]"
+          restamp="true">
+        <page-cluster-reporting-select-plan
+            name="select-plan"
             route="{{subroute}}">
-        </page-cluster-reporting-dashboard>
+        </page-cluster-reporting-select-plan>
       </template>
 
-      <template is="dom-if" if="[[_equals(page, 'response-parameters')]]" restamp="true">
-        <page-cluster-reporting-response-parameters
-            name="response-parameters"
+      <template
+          is="dom-if"
+          if="[[_equals(page, 'router')]]">
+        <page-cluster-reporting-router
+            name="router"
             route="{{subroute}}">
-        </page-cluster-reporting-response-parameters>
+        </page-cluster-reporting-router>
       </template>
-
-      <template is="dom-if" if="[[_equals(page, 'planned-action')]]" restamp="true">
-        <page-cluster-reporting-planned-action
-            name="planned-action"
-            route="{{subroute}}">
-        </page-cluster-reporting-planned-action>
-      </template>
-
-      <template is="dom-if" if="[[_equals(page, 'results')]]" restamp="true">
-        <page-cluster-reporting-results
-            name="results"
-            route="{{subroute}}">
-        </page-cluster-reporting-results>
-      </template>
-
-      <template is="dom-if" if="[[_equals(page, 'analysis')]]" restamp="true">
-        <page-cluster-reporting-analysis
-            name="analysis"
-            route="{{subroute}}">
-        </page-cluster-reporting-analysis>
-      </template>
-
     </iron-pages>
-
-   </app-drawer-layout>
-   </template>
-
-
   </template>
 
   <script>
     Polymer({
       is: 'page-cluster-reporting',
+
       behaviors: [
-        App.Behaviors.ReduxBehavior,
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
       ],
 
       properties: {
@@ -145,102 +72,63 @@
           observer: '_pageChanged',
         },
 
-        plan: {
-          type: String,
-          observer: '_planChanged',
-        },
-
         _countryId: {
-          type: Number,
-          statePath: 'countries.currentId',
-        },
-
-        _currentPlanID: {
-          type: Object,
-          statePath: 'responsePlans.currentID',
+          type: String,
+          statePath: 'location.id',
         },
 
         _plansUrl: {
           type: String,
-          computed: '_computeResponsePlansUrl(_countryId)'
-        }
+          computed: '_computeResponsePlansUrl(_countryId)',
+          observer: '_fetchResponsePlans',
+        },
       },
 
       observers: [
-        '_routeChanged(routeData)',
-        '_reduxPlanChanged(_currentPlanID)',
+        '_routePageChanged(routeData.page)',
       ],
 
-      // These functions track the plan/page values in the URL.
-      // Additional logic is in _planChanged and _pageChanged.
-      _routeChanged: function (routeData) {
-        var plan = routeData.plan;
-        var page = routeData.page;
+      _routePageChanged: function (page) {
+        switch (page) {
+          case 'select-plan':
+            this.set('page', page);
+            break;
 
-        if (!plan) {
-          this.set('routeData.plan', 'select-plan');
-          this.set('routeData.page', undefined);
-          this.plan = 'select-plan';
-          return;
-        } else {
-          this.plan = String(plan);
-        }
+          case void 0:
+          case '':
+            this.set('route.path', 'select-plan');
+            this.set('page', 'select-plan');
+            break;
 
-        if (!page) {
-          // this.set('routeData.page', 'dashboard');
-          this.page = 'dashboard';
-        } else {
-          this.page = page;
-        }
-      },
-
-      //The plan may be changed in Redux (set via select-plan.html).
-      _reduxPlanChanged: function(plan) {
-        var page = this.page || 'dashboard';
-        if (plan) {
-          this.set('route.path', '/' + plan + '/' + page);
-        }
-      },
-
-      _planChanged: function (planID) {
-        this.set('queryParams', {});
-
-        if (planID === 'select-plan') {
-          var htmlPage = 'cluster-reporting/select-plan.html';
-          var resolvedPageUrl = this.resolveUrl(htmlPage);
-          this.importHref(resolvedPageUrl, null, this._notFound, true);
-
-        } else if (planID) {
-          if (this.currentPlanID !== planID) {
-            this.dispatch(App.Actions.setCurrentResponsePlanID(planID));
-          }
+          case 'plan':
+            this.set('page', 'router');
+            break;
         }
       },
 
       _pageChanged: function (page) {
         var resolvedPageUrl = this.resolveUrl('cluster-reporting/' + page + '.html');
+
         this.importHref(resolvedPageUrl, null, this._notFound, true);
       },
 
-      _getResponsePlansForCountry: function() {
-        var responsePlansThunk = this.$.responsePlans.thunk();
+      _computeResponsePlansUrl: function (countryId) {
+        return countryId ? App.Endpoints.responsePlans(countryId) : '';
+      },
+
+      _fetchResponsePlans: function (url) {
+        var responsePlansThunk;
+
+        if (!url) {
+          return;
+        }
+
+        responsePlansThunk = this.$.responsePlans.thunk();
 
         this.dispatch(App.Actions.fetchResponsePlans(responsePlansThunk))
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
             });
-      },
-
-      _computeResponsePlansUrl: function(currentCountryId) {
-        return App.Endpoints.responsePlans(String(currentCountryId));
-      },
-
-      attached: function() {
-        this._getResponsePlansForCountry(this.countryId);
-      },
-
-      _notFound: function () {
-        window.location.href = '/not-found';
       },
     });
   </script>

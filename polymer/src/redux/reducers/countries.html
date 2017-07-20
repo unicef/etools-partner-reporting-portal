@@ -10,7 +10,6 @@
     App.Reducers.Countries = Redux.combineReducers({
       all: allCountriesReducer,
       current: currentCountryReducer,
-      currentId: currentCountryIdReducer,
     });
 
     function allCountriesReducer(state, action) {
@@ -24,23 +23,6 @@
 
         case App.Constants.RESET:
           return [];
-
-        default:
-          return state;
-      }
-    }
-
-    function currentCountryIdReducer(state, action) {
-      if (typeof state === 'undefined') {
-        state = null;
-      }
-
-      switch (action.type) {
-        case App.Constants.SET_COUNTRY_ID:
-          return action.countryId;
-
-        case App.Constants.RESET:
-          return null;
 
         default:
           return state;

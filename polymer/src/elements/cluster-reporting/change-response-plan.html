@@ -2,8 +2,6 @@
 
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../behaviors/routing.html">
-<link rel="import" href="../../behaviors/page-nav.html">
-<link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/routing.html">
 
 <dom-module id="change-response-plan">
@@ -27,7 +25,7 @@
     </style>
 
     <span>[[currentPlanTitle]]</span>
-    <a on-tap="_change" href="[[url]]">change</a>
+    <a href="[[changePlanUrl]]">change</a>
   </template>
 
   <script>
@@ -36,13 +34,11 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
-        App.Behaviors.PageNavBehavior,
-        App.Behaviors.UtilsBehavior,
         App.Behaviors.RoutingBehavior,
       ],
 
       properties: {
-        responsePlans: {
+         responsePlans: {
           type: Array,
           statePath: 'responsePlans.all',
         },
@@ -53,41 +49,35 @@
         },
 
         currentPlanTitle: {
-          type: 'String',
+          type: String,
           computed: '_getCurrentPlanTitle(responsePlans, responsePlanID)'
         },
 
-        url: String,
+        changePlanUrl: {
+          type: String,
+          computed: '_computeChangePlanUrl(_baseUrl, responsePlanID)',
+        },
       },
 
-      attached: function() {
-        this.url = this._formatUrl();
-        this._getCurrentPlanTitle();
-      },
+      _getCurrentPlanTitle: function(plans, id) {
+        var i = 0;
+        var plan;
 
-      _getCurrentPlanTitle: function() {
-        var self = this;
-        var title = '';
-        this.responsePlans.forEach(function(plan) {
-          if (String(plan.id) === self.responsePlanID) {
-            title = plan.title;
+        while (i < plans.length) {
+          plan = plans[i];
+          i += 1;
+
+          if (String(plan.id) === id) {
+            break;
           }
-        });
-        return title;
-      },
-
-      _formatUrl: function() {
-        var previous = this.responsePlanID;
-        var url = this.buildUrl(this.baseUrl, 'select-plan');
-        if (previous && previous !== 'undefined') {
-          return url + '?previous=' + previous;
         }
-        return url;
+
+        return (plan || {}).title;
       },
 
-      _change: function() {
-        this.dispatch(App.Actions.setCurrentResponsePlanID('select-plan'));
-      }
+      _computeChangePlanUrl: function (_baseUrl, id) {
+        return this.buildUrl(_baseUrl, '/select-plan/?previous=' + id);
+      },
     });
   </script>
 </dom-module>

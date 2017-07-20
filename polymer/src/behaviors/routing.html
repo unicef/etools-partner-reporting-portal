@@ -38,11 +38,8 @@
         return '/app/' + country + '/' + app;
       },
 
-      _$computeBaseUrlCluster: function(country, app, planID) {
-        if (planID) {
-          return this._baseUrl + '/' + planID;
-        }
-        return this._baseUrl;
+      _$computeBaseUrlCluster: function(country, app, planId) {
+        return '/app/' + country + '/' + app + '/plan/' + planId;
       },
 
       /**
@@ -50,12 +47,10 @@
        * expression within the template.
        */
       buildUrl: function (baseUrl, tail) {
-        if (!baseUrl) {  //required for the cluster nav change link to work
-          baseUrl = this._baseUrl;
-        }
         if (tail.length && tail[0] !== '/') {
           tail = '/' + tail;
         }
+
         return baseUrl + tail;
       },
 
