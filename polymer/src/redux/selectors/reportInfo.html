@@ -1,0 +1,23 @@
+<link rel="import" href="../reselect.html">
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Selectors = App.Selectors || {};
+
+    App.Selectors.ReportInfo = {
+      current: Reselect.createSelector(
+        function (state) {
+          return state.indicatorData.infoByReport;
+        },
+        function (state) {
+          return state.programmeDocumentReports.current.id;
+        },
+        function (info, id) {
+          return info[id];
+        }
+      ),
+    };
+  }());
+</script>

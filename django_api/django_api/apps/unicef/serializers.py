@@ -111,3 +111,7 @@ class ProgressReportSerializer(serializers.ModelSerializer):
 
     def get_is_draft(self, obj):
         return obj.latest_indicator_report.is_draft
+
+
+class ProgressReportUpdateSerializer(ProgressReportSerializer):
+    programme_document = ProgrammeDocumentSerializer(read_only=True)

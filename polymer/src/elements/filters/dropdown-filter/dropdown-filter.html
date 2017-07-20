@@ -71,12 +71,10 @@
       _handleChange: function (e) {
         var newValue = this.$.repeat.itemForElement(e.detail.item).id;
 
-        if (newValue !== this.lastValue) {
-          this.fire('filter-changed', {
-            name: this.name,
-            value: String(newValue),
-          });
-        }
+        this.fire('filter-changed', {
+          name: this.name,
+          value: newValue,
+        });
       },
 
       _computeSelected: function (value) {

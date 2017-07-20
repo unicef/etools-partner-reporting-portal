@@ -9,8 +9,10 @@
   <template>
     <style include="iron-flex">
       :host {
+        --header-gutter: 25px;
+
         display: block;
-        padding: 25px;
+        padding: var(--header-gutter);
         background: white;
         box-shadow: 0 1px 2px 1px rgba(0, 0, 0, .1);
       }
@@ -41,6 +43,10 @@
       .toolbar {
         text-align: right;
       }
+
+      .tabs ::content paper-tabs {
+        margin-bottom: -var(--header-gutter);
+      }
     </style>
 
     <div class="layout horizontal center">
@@ -63,6 +69,10 @@
       <div class="toolbar flex">
         <content select=".toolbar"></content>
       </div>
+    </div>
+
+    <div class="tabs">
+      <content select=".tabs"><content>
     </div>
   </template>
 

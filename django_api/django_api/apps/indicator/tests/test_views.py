@@ -1,6 +1,8 @@
 from ast import literal_eval as make_tuple
+from datetime import date
 
 from django.urls import reverse
+from django.conf import settings
 
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
@@ -18,6 +20,7 @@ from core.helpers import (
     get_cast_dictionary_keys_as_tuple,
 )
 from core.management.commands._privates import generate_fake_data
+from core.common import OVERALL_STATUS, PROGRESS_REPORT_STATUS
 from core.tests.base import BaseAPITestCase
 from unicef.models import (
     LowerLevelOutput,
@@ -100,6 +103,14 @@ class TestIndicatorListAPIView(BaseAPITestCase):
                     lower_level_outputs__id=resp_data['llo_id']).indicator_reports.all().count()
             )
 
+        # PD output filter (reportable id)
+        reportable_id = response.data['outputs'][0]['id']
+        url = url + ("?reportable_id=%d" % reportable_id)
+        response = self.client.get(url, format='json')
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(len(response.data['outputs']), 1)
+        self.assertEquals(response.data['outputs'][0]['id'], reportable_id)
+
     def test_list_api_filter_by_locations(self):
         self.reports = Reportable.objects.filter(
             lower_level_outputs__reportables__isnull=False,
@@ -134,6 +145,65 @@ class TestIndicatorListAPIView(BaseAPITestCase):
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertGreater(len(self.reports), len(response.data['results']))
+
+    def test_enter_indicator(self):
+        ir = IndicatorReport.objects.first()
+        self.assertEquals(ir.progress_report.partner_contribution_to_date, '')
+        self.assertEquals(ir.progress_report.challenges_in_the_reporting_period, '')
+        data = {
+            'progress_report': {
+                'id': ir.progress_report.id,
+                'partner_contribution_to_date': 'update field',
+                'challenges_in_the_reporting_period': 'new challanges',
+                'proposed_way_forward': 'update field',
+                'funds_received_to_date': 'updated funds',
+                'programme_document_id': ir.progress_report.programme_document.id,
+            }
+        }
+
+        url = reverse('indicator-data', kwargs={'ir_id': ir.id})
+        response = self.client.put(url, data=data, format='json')
+        updated_ir = IndicatorReport.objects.get(id=ir.id)
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(response.data['progress_report']['partner_contribution_to_date'], u'update field')
+        self.assertEquals(updated_ir.progress_report.partner_contribution_to_date, u'update field')
+        self.assertEquals(updated_ir.progress_report.challenges_in_the_reporting_period, u'new challanges')
+
+        del data['progress_report']
+        response = self.client.put(url, data=data, format='json')
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_submit_indicator(self):
+        ir = IndicatorReport.objects.first()
+        url = reverse('indicator-data', kwargs={'ir_id': ir.id})
+        response = self.client.post(url, format='json')
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(response.data['submission_date'], date.today().strftime(settings.PRINT_DATA_FORMAT))
+        self.assertEquals(response.data['is_draft'], False)
+        self.assertEquals(response.data['progress_report_status'], PROGRESS_REPORT_STATUS.submitted)
+
+
+class TestIndicatorDataReportableAPIView(BaseAPITestCase):
+
+    def test_overall_narrative(self):
+        ir = IndicatorReport.objects.first()
+        url = reverse('indicator-data-reportable', kwargs={'ir_id': ir.id, 'reportable_id': ir.reportable.id})
+
+        new_overall_status = OVERALL_STATUS.met
+        data = dict(overall_status=new_overall_status)
+        response = self.client.patch(url, data=data, format='json')
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(response.data['overall_status'], new_overall_status)
+
+        updated_ir = IndicatorReport.objects.get(id=ir.id)
+        self.assertEquals(updated_ir.overall_status, new_overall_status)
+
+        new_narrative_assessment = "new narrative_assessment"
+        data = dict(narrative_assessment=new_narrative_assessment)
+        response = self.client.patch(url, data=data, format='json')
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        updated_ir = IndicatorReport.objects.get(id=ir.id)
+        self.assertEquals(updated_ir.narrative_assessment, new_narrative_assessment)
 
 
 class TestIndicatorReportListAPIView(BaseAPITestCase):

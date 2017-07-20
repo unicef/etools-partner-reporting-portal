@@ -10,7 +10,9 @@
 
     App.Reducers.IndicatorData = Redux.combineReducers({
       byReport: indicatorsByReportReducer,
+      infoByReport: infoByReportReducer,
       allIds: reportIdsReducer,
+      loading: loadingReducer,
     });
 
     function indicatorsByReportReducer(state, action) {
@@ -23,7 +25,70 @@
           return (function () {
             var change = {};
 
-            change[action.reportId] = action.data;
+            change[action.reportId] = action.data.outputs;
+
+            return Object.assign({}, state, change);
+          }());
+
+        case App.Constants.AMEND_REPORTABLE:
+          return (function () {
+            var reportableId = Number(action.reportableId);
+            var change = {};
+
+            change[action.reportId] = state[action.reportId]
+                .map(function (reportable) {
+                  if (reportable.id !== reportableId) {
+                    return reportable;
+                  }
+
+                  return Object.assign({}, reportable, action.data);
+                });
+
+            return Object.assign({}, state, change);
+          }());
+
+        case App.Constants.RESET:
+          return {};
+
+        default:
+          return state;
+      }
+    }
+
+    function infoByReportReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = {};
+      }
+
+      switch (action.type) {
+        case App.Constants.SET_INDICATOR_DATA:
+          return (function () {
+            var keys = [
+              'partner_contribution_to_date',
+              'funds_received_to_date',
+              'challenges_in_the_reporting_period',
+              'proposed_way_forward',
+              'id',
+            ];
+
+            var change = {};
+
+            change[action.reportId] = keys.reduce(function (prev, curr) {
+              if (action.data[curr]) {
+                prev[curr] = action.data[curr];
+              }
+
+              return prev;
+            }, {});
+
+            return Object.assign({}, state, change);
+          }());
+
+        case App.Constants.AMEND_INFO:
+          return (function () {
+            var change = {};
+
+            change[action.reportId] = Object.assign({}, state[action.reportId], action.data);
 
             return Object.assign({}, state, change);
           }());
@@ -53,6 +118,23 @@
 
         case App.Constants.RESET:
           return [];
+
+        default:
+          return state;
+      }
+    }
+
+    function loadingReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = false;
+      }
+
+      switch (action.type) {
+        case App.Constants.INDICATOR_DATA_LOADING_START:
+          return true;
+
+        case App.Constants.INDICATOR_DATA_LOADING_STOP:
+          return false;
 
         default:
           return state;

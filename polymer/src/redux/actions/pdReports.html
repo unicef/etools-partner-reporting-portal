@@ -43,6 +43,15 @@
         };
       },
 
+      updateSingle: function (pdId, reportId, data) {
+        return {
+          type: App.Constants.UPDATE_PD_REPORT,
+          pdId: pdId,
+          reportId: reportId,
+          data: data,
+        };
+      },
+
       setCount: function (pdId, count) {
         return {
           type: App.Constants.SET_PD_REPORTS_COUNT,
