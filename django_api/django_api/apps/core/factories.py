@@ -187,7 +187,7 @@ class ClusterFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "cluster_%d" % n)
     user = factory.SubFactory(UserFactory)
 
-    objective = factory.RelatedFactory('core.factories.ClusterObjectiveFactory', 'cluster')
+    intervention = factory.SubFactory(InterventionFactory)
 
     class Meta:
         model = Cluster
@@ -197,6 +197,7 @@ class ClusterObjectiveFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "cluster_objective_%d" % n)
 
     objective = factory.RelatedFactory('core.factories.ClusterActivityFactory', 'cluster_objective')
+    cluster = factory.SubFactory(ClusterFactory)
 
     class Meta:
         model = ClusterObjective
@@ -204,6 +205,7 @@ class ClusterObjectiveFactory(factory.django.DjangoModelFactory):
 
 class ClusterActivityFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "cluster_activity_%d" % n)
+    cluster_objective = factory.SubFactory(ClusterObjectiveFactory)
 
     class Meta:
         model = ClusterActivity
@@ -275,6 +277,42 @@ class RatioReportableToLowerLevelOutputFactory(ReportableFactory):
 
     total = dict(
         [('c', 0), ('d', random.randint(3000, 6000)), ('v', random.randint(0, 3000))])
+
+    class Meta:
+        model = Reportable
+
+
+class RatioReportableToClusterObjectiveFactory(ReportableFactory):
+    content_object = factory.SubFactory(ClusterObjectiveFactory)
+    target = '5000'
+    baseline = '0'
+
+    indicator_report = factory.RelatedFactory('core.factories.RatioIndicatorReportFactory', 'reportable')
+
+    location = factory.RelatedFactory('core.factories.LocationFactory', 'reportable', parent=None)
+
+    blueprint = factory.SubFactory(RatioTypeIndicatorBlueprintFactory)
+
+    total = dict(
+        [('c', 0), ('d', random.randint(3000, 6000)), ('v', random.randint(0, 3000))])
+
+    class Meta:
+        model = Reportable
+
+
+class QuantityReportableToClusterObjectiveFactory(ReportableFactory):
+    content_object = factory.SubFactory(ClusterObjectiveFactory)
+    target = '5000'
+    baseline = '0'
+
+    indicator_report = factory.RelatedFactory('core.factories.QuantityIndicatorReportFactory', 'reportable')
+
+    location = factory.RelatedFactory('core.factories.LocationFactory', 'reportable', parent=None)
+
+    blueprint = factory.SubFactory(QuantityTypeIndicatorBlueprintFactory)
+
+    total = dict(
+        [('c', 0), ('d', 0), ('v', random.randint(0, 3000))])
 
     class Meta:
         model = Reportable
