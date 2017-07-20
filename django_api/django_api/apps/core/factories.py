@@ -37,7 +37,7 @@ from core.common import (
     REPORTABLE_FREQUENCY_LEVEL,
     INDICATOR_REPORT_STATUS,
 )
-from core.models import Intervention, Location
+from core.models import Intervention, Location, ResponsePlan
 from core.countries import COUNTRIES_ALPHA2_CODE
 
 PD_STATUS_LIST = [x[0] for x in PD_STATUS]
