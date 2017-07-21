@@ -215,6 +215,11 @@ def find_missing_frequency_period_dates(start_date, last_date, frequency):
     date_to_compare = last_date if last_date else start_date
     date_list = []
 
+    # Only add 1 day to date_to_compare if it came from last_date
+    # in order to set next date period correctly
+    if last_date:
+        date_to_compare += timedelta(1)
+
     # For now, we only generate missing dates for the past.
     if today > date_to_compare:
         # day_delta as a flag to decrement day_delta_counter for next date
@@ -227,15 +232,16 @@ def find_missing_frequency_period_dates(start_date, last_date, frequency):
             missing_date = today - timedelta(day_delta_counter)
 
             if frequency == PD_FREQUENCY_LEVEL.weekly:
-                # If day_delta_counter has more week date to create
+                # Check if we should proceed to next date
                 if day_delta >= 7:
+                    # If day_delta_counter has more week date to create
                     if day_delta_counter >= 7:
                         day_delta_counter -= 7
 
+                    # We have exhausted day_delta_counter successfully. Exiting
                     else:
                         day_delta_counter = 0
 
-                # We have exhausted day_delta_counter successfully. Exiting
                 else:
                     break
 
@@ -243,42 +249,50 @@ def find_missing_frequency_period_dates(start_date, last_date, frequency):
                 # Get the # of days in target month
                 num_of_days = monthrange(missing_date.year, missing_date.month)
 
-                # If day_delta_counter has more months to create
+                # Check if we should proceed to next date
                 if day_delta >= num_of_days:
+                    # If day_delta_counter has more months to create
                     if day_delta_counter >= num_of_days:
-                        missing_date = today - timedelta(day_delta_counter)
                         day_delta_counter -= num_of_days
 
+                    # We have exhausted day_delta_counter successfully. Exiting
                     else:
                         day_delta_counter = 0
 
-                # We have exhausted day_delta_counter successfully. Exiting
                 else:
                     break
 
             elif frequency == PD_FREQUENCY_LEVEL.quarterly:
-                # If day_delta_counter has more week date to create
-                if day_delta >= 7:
-                    if day_delta_counter >= 7:
-                        day_delta_counter -= 7
+                quarter = get_current_quarter_for_a_month(missing_date.month)
+                end_quarter_date = get_last_date_of_a_quarter(
+                    missing_date.year, quarter=quarter)
 
+                quarter_day_delta = (end_quarter_date - missing_date).days
+
+                # Check if we should proceed to next date
+                if day_delta >= quarter_day_delta:
+                    # If day_delta_counter has more days to create
+                    if day_delta_counter >= quarter_day_delta:
+                        day_delta_counter -= quarter_day_delta
+
+                    # We have exhausted day_delta_counter successfully. Exiting
                     else:
                         day_delta_counter = 0
 
-                # We have exhausted day_delta_counter successfully. Exiting
                 else:
                     break
 
             elif frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
-                # If day_delta_counter has more week date to create
+                # Check if we should proceed to next date
                 if day_delta >= 7:
+                    # If day_delta_counter has more week date to create
                     if day_delta_counter >= 7:
                         day_delta_counter -= 7
 
+                    # We have exhausted day_delta_counter successfully. Exiting
                     else:
                         day_delta_counter = 0
 
-                # We have exhausted day_delta_counter successfully. Exiting
                 else:
                     break
 

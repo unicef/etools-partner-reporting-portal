@@ -67,7 +67,7 @@ class Command(BaseCommand):
             # Get missing date list based on progress report existence
             if latest_progress_report:
                 date_list = find_missing_frequency_period_dates(
-                    pd.start_date, latest_progress_report.start_date, frequency
+                    pd.start_date, latest_progress_report.end_date, frequency
                 )
 
             else:
