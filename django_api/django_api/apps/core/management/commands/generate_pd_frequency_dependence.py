@@ -34,14 +34,47 @@ def get_first_date_of_a_quarter(year, quarter=1):
     assert quarter >= 1
 
     first_month_of_quarter = 3 * quarter - 2
-    last_month_of_quarter = 3 * quarter
 
     date_of_first_day_of_quarter = date(year, first_month_of_quarter, 1)
+
+    return date_of_first_day_of_quarter
+
+
+def get_last_date_of_a_quarter(year, quarter=1):
+    assert quarter >= 1
+
+    last_month_of_quarter = 3 * quarter
+
     date_of_last_day_of_quarter = date(
         year, last_month_of_quarter,
         get_num_of_days_in_a_month(year, last_month_of_quarter))
 
-    return date_of_first_day_of_quarter
+    return date_of_last_day_of_quarter
+
+
+def calculate_end_date_given_start_date(start_date, frequency):
+    if frequency == PD_FREQUENCY_LEVEL.weekly:
+        end_date = start_date + timedelta(7)
+
+    elif frequency == PD_FREQUENCY_LEVEL.monthly:
+        num_of_days = get_num_of_days_in_a_month(
+            start_date.year, start_date.month)
+
+        end_date = date(
+            start_date.year, start_date.month, num_of_days)
+
+    elif frequency == PD_FREQUENCY_LEVEL.quarterly:
+        quarter = get_current_quarter_for_a_month(
+            start_date.month)
+
+        end_date = get_last_date_of_a_quarter(
+            start_date.year, quarter=quarter)
+
+    # TODO: Handling custom_specific_dates later
+    # elif frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
+    #     end_date = pd.start_date + timedelta(7)
+
+    return end_date
 
 
 def find_missing_frequency_period_dates(start_date, last_date, frequency):
@@ -163,66 +196,34 @@ class Command(BaseCommand):
             latest_progress_report = pd.progress_reports.last()
 
             if not latest_progress_report:
-                if frequency == PD_FREQUENCY_LEVEL.weekly:
-                    end_date = pd.start_date + timedelta(7)
+                start_date = pd.start_date
+                end_date = calculate_end_date_given_start_date(
+                    start_date, frequency)
 
-                elif frequency == PD_FREQUENCY_LEVEL.monthly:
-                    num_of_days = get_num_of_days_in_a_month(
-                        pd.start_date.year, pd.start_date.month)
-
-                    end_date = date(
-                        pd.start_date.year, pd.start_date.month, num_of_days)
-
-                elif frequency == PD_FREQUENCY_LEVEL.quarterly:
-                    quarter = get_current_quarter_for_a_month(
-                        pd.start_date.month)
-
-                    end_date = get_first_date_of_a_quarter(
-                        pd.start_date.year, quarter=quarter)
-
-                # TODO: Handling custom_specific_dates later
-                # elif frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
-                #     end_date = pd.start_date + timedelta(7)
-
-                latest_progress_report = ProgressReportFactory(
-                    start_date=pd.start_date,
+                new_progress_report = ProgressReportFactory(
+                    start_date=start_date,
                     end_date=end_date,
                     programme_document=pd,
                 )
 
-            start_date = pd.start_date
-
-            if latest_progress_report:
-                last_date = latest_progress_report.start_date
-
             else:
-                last_date = latest_progress_report.start_date
+                start_date = latest_progress_report.start_date
+                end_date = calculate_end_date_given_start_date(
+                    latest_progress_report.start_date, frequency)
+
+                new_progress_report = ProgressReportFactory(
+                    start_date=start_date,
+                    end_date=end_date,
+                    programme_document=pd,
+                )
 
             date_list = find_missing_frequency_period_dates(
-                start_date, last_date, frequency)
+                pd.start_date, end_date, frequency)
 
             with transaction.atomic():
                 for missing_date in date_list:
-                    if frequency == PD_FREQUENCY_LEVEL.weekly:
-                        end_date = missing_date + timedelta(7)
-
-                    elif frequency == PD_FREQUENCY_LEVEL.monthly:
-                        num_of_days = get_num_of_days_in_a_month(
-                            missing_date.year, missing_date.month)
-
-                        end_date = date(
-                            missing_date.year, missing_date.month, num_of_days)
-
-                    elif frequency == PD_FREQUENCY_LEVEL.quarterly:
-                        quarter = get_current_quarter_for_a_month(
-                            missing_date.month)
-
-                        end_date = get_first_date_of_a_quarter(
-                            missing_date.year, quarter=quarter)
-
-                    # TODO: Handling custom_specific_dates later
-                    # elif frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
-                    #     end_date = missing_date + timedelta(7)
+                    end_date = calculate_end_date_given_start_date(
+                        missing_date, frequency)
 
                     # Create ProgressReport first
                     next_progress_report = ProgressReportFactory(
