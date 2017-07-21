@@ -15,6 +15,7 @@ from core.factories import (
     ProgressReportFactory,
     QuantityIndicatorReportFactory,
     RatioIndicatorReportFactory,
+    IndicatorLocationDataFactory,
 )
 from unicef.models import ProgressReport, ProgrammeDocument
 from indicator.models import IndicatorReport, Reportable, IndicatorBlueprint
@@ -50,6 +51,8 @@ def find_missing_frequency_period_dates(start_date, last_date, frequency):
 
     # For now, we only generate missing dates for the past.
     if today > last_date:
+        # day_delta as a flag to decrement day_delta_counter for next date
+        # day_delta_counter as a date day integer to indicate next date
         day_delta = (today - last_date).days
         day_delta_counter = day_delta
 
@@ -58,6 +61,7 @@ def find_missing_frequency_period_dates(start_date, last_date, frequency):
             missing_date = today - timedelta(day_delta_counter)
 
             if frequency == PD_FREQUENCY_LEVEL.weekly:
+                # If day_delta_counter has more week date to create
                 if day_delta >= 7:
                     if day_delta_counter >= 7:
                         day_delta_counter -= 7
@@ -65,12 +69,15 @@ def find_missing_frequency_period_dates(start_date, last_date, frequency):
                     else:
                         day_delta_counter = 0
 
+                # We have exhausted day_delta_counter successfully. Exiting
                 else:
                     break
 
             elif frequency == PD_FREQUENCY_LEVEL.monthly:
+                # Get the # of days in target month
                 num_of_days = monthrange(missing_date.year, missing_date.month)
 
+                # If day_delta_counter has more months to create
                 if day_delta >= num_of_days:
                     if day_delta_counter >= num_of_days:
                         missing_date = today - timedelta(day_delta_counter)
@@ -79,10 +86,12 @@ def find_missing_frequency_period_dates(start_date, last_date, frequency):
                     else:
                         day_delta_counter = 0
 
+                # We have exhausted day_delta_counter successfully. Exiting
                 else:
                     break
 
             elif frequency == PD_FREQUENCY_LEVEL.quarterly:
+                # If day_delta_counter has more week date to create
                 if day_delta >= 7:
                     if day_delta_counter >= 7:
                         day_delta_counter -= 7
@@ -90,10 +99,12 @@ def find_missing_frequency_period_dates(start_date, last_date, frequency):
                     else:
                         day_delta_counter = 0
 
+                # We have exhausted day_delta_counter successfully. Exiting
                 else:
                     break
 
             elif frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
+                # If day_delta_counter has more week date to create
                 if day_delta >= 7:
                     if day_delta_counter >= 7:
                         day_delta_counter -= 7
@@ -101,9 +112,11 @@ def find_missing_frequency_period_dates(start_date, last_date, frequency):
                     else:
                         day_delta_counter = 0
 
+                # We have exhausted day_delta_counter successfully. Exiting
                 else:
                     break
 
+            # Only add new date if it's later than start date
             if start_date <= missing_date:
                 date_list.append(missing_date)
 
@@ -150,17 +163,17 @@ class Command(BaseCommand):
             latest_progress_report = pd.progress_reports.last()
 
             if not latest_progress_report:
-                if pd.frequency == PD_FREQUENCY_LEVEL.weekly:
+                if frequency == PD_FREQUENCY_LEVEL.weekly:
                     end_date = pd.start_date + timedelta(7)
 
-                elif pd.frequency == PD_FREQUENCY_LEVEL.monthly:
+                elif frequency == PD_FREQUENCY_LEVEL.monthly:
                     num_of_days = get_num_of_days_in_a_month(
                         pd.start_date.year, pd.start_date.month)
 
                     end_date = date(
                         pd.start_date.year, pd.start_date.month, num_of_days)
 
-                elif pd.frequency == PD_FREQUENCY_LEVEL.quarterly:
+                elif frequency == PD_FREQUENCY_LEVEL.quarterly:
                     quarter = get_current_quarter_for_a_month(
                         pd.start_date.month)
 
@@ -168,7 +181,7 @@ class Command(BaseCommand):
                         pd.start_date.year, quarter=quarter)
 
                 # TODO: Handling custom_specific_dates later
-                # elif pd.frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
+                # elif frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
                 #     end_date = pd.start_date + timedelta(7)
 
                 latest_progress_report = ProgressReportFactory(
@@ -180,19 +193,75 @@ class Command(BaseCommand):
             start_date = pd.start_date
 
             if latest_progress_report:
-                last_date = latest_progress_report.end_date
+                last_date = latest_progress_report.start_date
 
             else:
-                last_date = latest_progress_report.end_date
+                last_date = latest_progress_report.start_date
 
-            date_list = find_missing_frequency_period_dates(start_date, last_date, frequency)
+            date_list = find_missing_frequency_period_dates(
+                start_date, last_date, frequency)
 
             with transaction.atomic():
                 for missing_date in date_list:
+                    if frequency == PD_FREQUENCY_LEVEL.weekly:
+                        end_date = missing_date + timedelta(7)
+
+                    elif frequency == PD_FREQUENCY_LEVEL.monthly:
+                        num_of_days = get_num_of_days_in_a_month(
+                            missing_date.year, missing_date.month)
+
+                        end_date = date(
+                            missing_date.year, missing_date.month, num_of_days)
+
+                    elif frequency == PD_FREQUENCY_LEVEL.quarterly:
+                        quarter = get_current_quarter_for_a_month(
+                            missing_date.month)
+
+                        end_date = get_first_date_of_a_quarter(
+                            missing_date.year, quarter=quarter)
+
+                    # TODO: Handling custom_specific_dates later
+                    # elif frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
+                    #     end_date = missing_date + timedelta(7)
+
+                    # Create ProgressReport first
+                    next_progress_report = ProgressReportFactory(
+                        start_date=missing_date,
+                        end_date=end_date,
+                        programme_document=pd,
+                    )
+
                     if reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
-                        indicator_report = QuantityIndicatorReportFactory(reportable=reportable)
+                        indicator_report = QuantityIndicatorReportFactory(
+                            reportable=reportable,
+                            time_period_start=missing_date,
+                            time_period_end=end_date,
+                        )
+
+                        location_data = IndicatorLocationDataFactory(
+                            indicator_report=indicator_report,
+                            location=location,
+                            num_disaggregation=indicator_report.disaggregations.count(),
+                            level_reported=indicator_report.disaggregations.count(),
+                            disaggregation_reported_on=indicator_report.disaggregations.values_list('id', flat=True),
+                            disaggregation={}
+                        )
+
                     else:
-                        indicator_report = RatioIndicatorReportFactory(reportable=reportable)
+                        indicator_report = RatioIndicatorReportFactory(
+                            reportable=reportable,
+                            time_period_start=missing_date,
+                            time_period_end=end_date,
+                        )
+
+                        location_data = IndicatorLocationDataFactory(
+                            indicator_report=indicator_report,
+                            location=location,
+                            num_disaggregation=indicator_report.disaggregations.count(),
+                            level_reported=indicator_report.disaggregations.count(),
+                            disaggregation_reported_on=indicator_report.disaggregations.values_list('id', flat=True),
+                            disaggregation={}
+                        )
 
                     indicator_report.progress_report = progress_report
                     indicator_report.save()
