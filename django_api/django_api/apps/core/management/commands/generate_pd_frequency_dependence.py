@@ -51,37 +51,61 @@ def find_missing_frequency_period_dates(start_date, last_date, frequency):
     # For now, we only generate missing dates for the past.
     if today > last_date:
         day_delta = (today - last_date).days
+        day_delta_counter = day_delta
 
         # Keep adding missing date until we get caught up with day_delta
-        while day_delta >= 0:
-            missing_date = today - timedelta(day_delta)
+        while day_delta_counter > 0:
+            missing_date = today - timedelta(day_delta_counter)
 
             if frequency == PD_FREQUENCY_LEVEL.weekly:
                 if day_delta >= 7:
-                    day_delta -= 7
+                    if day_delta_counter >= 7:
+                        day_delta_counter -= 7
+
+                    else:
+                        day_delta_counter = 0
 
                 else:
-                    day_delta = 0
+                    break
 
             elif frequency == PD_FREQUENCY_LEVEL.monthly:
                 num_of_days = monthrange(missing_date.year, missing_date.month)
 
                 if day_delta >= num_of_days:
-                    missing_date = today - timedelta(day_delta)
-                    day_delta -= num_of_days
+                    if day_delta_counter >= num_of_days:
+                        missing_date = today - timedelta(day_delta_counter)
+                        day_delta_counter -= num_of_days
+
+                    else:
+                        day_delta_counter = 0
 
                 else:
-                    day_delta = 0
+                    break
 
-            elif frequency == PD_FREQUENCY_LEVEL.quarterly and day_delta >= 7:
-                missing_date = today - timedelta(day_delta)
-                day_delta -= 7
+            elif frequency == PD_FREQUENCY_LEVEL.quarterly:
+                if day_delta >= 7:
+                    if day_delta_counter >= 7:
+                        day_delta_counter -= 7
 
-            elif frequency == PD_FREQUENCY_LEVEL.custom_specific_dates and day_delta >= 7:
-                missing_date = today - timedelta(day_delta)
-                day_delta -= 7
+                    else:
+                        day_delta_counter = 0
 
-            date_list.append(missing_date)
+                else:
+                    break
+
+            elif frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
+                if day_delta >= 7:
+                    if day_delta_counter >= 7:
+                        day_delta_counter -= 7
+
+                    else:
+                        day_delta_counter = 0
+
+                else:
+                    break
+
+            if start_date <= missing_date:
+                date_list.append(missing_date)
 
     return date_list
 
@@ -153,8 +177,12 @@ class Command(BaseCommand):
                     programme_document=pd,
                 )
 
+            start_date = pd.start_date
+
             if latest_progress_report:
-                start_date = latest_progress_report.start_date
+                last_date = latest_progress_report.end_date
+
+            else:
                 last_date = latest_progress_report.end_date
 
             date_list = find_missing_frequency_period_dates(start_date, last_date, frequency)
@@ -215,7 +243,8 @@ class Command(BaseCommand):
                 start_date = latest_indicator_report.start_date
                 last_date = latest_indicator_report.end_date
 
-            date_list = find_missing_frequency_period_dates(start_date, last_date, frequency)
+            date_list = find_missing_frequency_period_dates(
+                start_date, last_date, frequency)
 
             with transaction.atomic():
                 for missing_date in date_list:
