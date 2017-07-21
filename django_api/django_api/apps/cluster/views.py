@@ -214,5 +214,5 @@ class ClusterIndicatorsListAPIView(ListCreateAPIView):
         queryset = IndicatorReport.objects.filter(
             Q(reportable__cluster_objectives__isnull=False) | Q(reportable__cluster_activities__isnull=False)
             | Q(reportable__partner_projects__isnull=False) | Q(reportable__partner_activities__isnull=False)
-        )#.filter(reportable__cluster_objectives__cluster__response_plan=response_plan_id)
+        ).filter(reportable__cluster_objectives__cluster__response_plan=response_plan_id)
         return queryset
