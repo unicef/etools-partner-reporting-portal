@@ -24,7 +24,7 @@ urlpatterns = [
     url(r'^(?P<cluster_id>\d+)/cluster-activity-list/$',
         ClusterActivityListAPIView.as_view(),
         name="cluster-activity-list"),
-    url(r'^cluster-indicators-list/$',
+    url(r'^(?P<response_plan_id>\d+)/cluster-indicators-list/$',
         ClusterIndicatorsListAPIView.as_view(),
         name="cluster-indicators-list"),
 ]
