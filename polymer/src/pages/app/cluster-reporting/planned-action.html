@@ -6,9 +6,14 @@
 
 <link rel="import" href="../../../styles/shared-styles.html">
 <link rel="import" href="../../../elements/page-header.html">
-<link rel="import" href="../../../elements/page-body.html">
-<link rel="import" href="planned-action-projects.html">
-<link rel="import" href="planned-action-activities.html">
+<link rel="import" href="planned-action/planned-action-projects-router.html">
+
+
+<!--
+When the user first clicks My Planned Action, this component determines whether
+to display the Planned Action page header and tabs.  It passes the page name to
+planned-action-projects-router.
+-->
 
 <dom-module id="page-cluster-reporting-planned-action">
   <template>
@@ -20,56 +25,38 @@
 
     <app-route
       route="{{route}}"
-      pattern="/:tab"
+      pattern="/:subpage"
       data="{{routeData}}"
       tail="{{subroute}}">
     </app-route>
 
-    <div class="page-top-content">
+    <template is="dom-if" if="[[_displayHeader(subpage)]]" restamp="true">
+      <div class="page-top-content">
+        <page-header title="My Planned Action">
+          <div class="tabs">
+            <paper-tabs
+              selected="{{tab}}"
+              attr-for-selected="name"
+              scrollable
+              hide-scroll-buttons>
 
-      <page-header title="My Planned Action">
-        <div class="tabs">
-          <paper-tabs
-            selected="{{routeData.tab}}"
-            attr-for-selected="name"
-            scrollable
-            hide-scroll-buttons>
+              <paper-tab name="projects">
+                <span class="tab-content">Projects</span>
+              </paper-tab>
 
-            <paper-tab name="projects">
-              <span class="tab-content">Projects</span>
-            </paper-tab>
+              <paper-tab name="activities">
+                <span class="tab-content">Activities</span>
+              </paper-tab>
+            </paper-tabs>
+          </div>
+        </page-header>
+      </div>
+    </template>
 
-            <paper-tab name="activities">
-              <span class="tab-content">Activities</span>
-            </paper-tab>
-          </paper-tabs>
-        </div>
-      </page-header>
-
-    </div>
-
-    <page-body>
-      <iron-pages
-        id="tabContent"
-        attr-for-selected="name"
-        fallback-selection="projects"
-        on-iron-items-changed="_updateTabSelection">
-
-        <template is="dom-if" if="[[_equals(tab, 'projects')]]" restamp="true">
-          <planned-action-projects
-            route="{{subroute}}"
-            name="projects">
-          </planned-action-projects>
-        </template>
-
-        <template is="dom-if" if="[[_equals(tab, 'activities')]]" restamp="true">
-          <planned-action-activities
-            route="{{subroute}}"
-            name="activities">
-          </planned-action-activities>
-        </template>
-      </iron-pages>
-    </page-body>
+    <planned-action-projects-router
+      route="{{subroute}}"
+      page={{subpage}}>
+    </planned-action-projects-router>
 
   </template>
 
@@ -78,6 +65,8 @@
       is: 'page-cluster-reporting-planned-action',
 
       properties: {
+        subpage: String,
+
         tab: String
       },
 
@@ -86,30 +75,47 @@
       ],
 
       observers: [
-        '_routeTabChanged(routeData.tab)',
+        '_routeChanged(routeData.subpage)',
+        '_tabChanged(tab)'
       ],
 
-      _routeTabChanged: function (tab) {
-        switch (tab) {
+      _routeChanged: function (subpage) {
+        switch (subpage) {
           case 'projects':
+            this.subpage = 'projects';
             this.tab = 'projects';
             break;
 
           case 'activities':
+            this.subpage = 'activities';
             this.tab = 'activities';
             break;
 
+          case 'project':
+            this.subpage = 'project';
+            break;
+
+          case 'activity':
+            this.subpage = 'activity';
+            break;
+
           default:
-            this.tab = 'projects';
+            this.subpage = 'projects';
             this.set('route.path', '/projects');
             break;
         }
       },
 
-      _updateTabSelection: function () {
-        this.$.tabContent.select(this.tab);
+      _displayHeader: function(subpage) {
+        if (subpage === 'projects' || subpage === 'activities') {
+          return true;
+        }
+        return false;
       },
 
+      _tabChanged: function (tab) {
+        this.set('route.path', '/' + tab);
+      },
     });
   </script>
 </dom-module>

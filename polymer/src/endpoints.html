@@ -80,6 +80,10 @@
       plannedActions: function() {
         return this._buildUrl('/partner/partner-project-list/');
       },
+
+      plannedActionsProjectOverview: function(projectId) {
+        return this._buildUrl('/partner/partner-project-details/' + projectId + '/');
+      },
     };
   }());
 </script>

@@ -1,0 +1,138 @@
+<link rel="import" href="../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../../../../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../../../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../../../../bower_components/app-route/app-route.html">
+
+<link rel="import" href="../../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../../elements/page-header.html">
+<link rel="import" href="../../../../elements/cluster-reporting/planned-action/project-overview.html">
+<link rel="import" href="../../../../endpoints.html">
+<link rel="import" href="../../../../redux/actions.html">
+<link rel="import" href="../../../../redux/store.html">
+<link rel="import" href="../../../../styles/shared-styles.html">
+<link rel="import" href="../../../../behaviors/utils.html">
+<link rel="import" href="../../../../behaviors/routing.html">
+<link rel="import" href="../../../../elements/page-body.html">
+<link rel="import" href="../../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../../endpoints.html">
+<link rel="import" href="../../../../redux/actions.html">
+<link rel="import" href="../../../../redux/store.html">
+
+<!--
+The overview tab content is retrieved in this component because some info is
+needed for the header name, etc. -->
+
+<dom-module id="planned-action-projects-details">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+      }
+    </style>
+
+    <etools-prp-ajax
+        id="overview"
+        url="[[overviewUrl]]"
+        params="[[queryParams]]">
+    </etools-prp-ajax>
+
+    <app-route
+      route="{{route}}"
+      pattern="/:tab"
+      subroute="{{subroute}}"
+      data="{{routeData}}">
+    </app-route>
+
+    <page-header title="[[ projectData.title ]]" back="TODO (will need to use Build URL)">
+      <div class="tabs">
+        <paper-tabs
+            selected="{{ routeData.tab }}"
+            attr-for-selected="name"
+            scrollable
+            hide-scroll-buttons>
+          <paper-tab name="project-overview">Overview</paper-tab>
+          <paper-tab name="indicators">Indicators</paper-tab>
+          <paper-tab name="activities">Activities</paper-tab>
+        </paper-tabs>
+      </div>
+    </page-header>
+
+    <template is="dom-if" if="[[_equals(tab, 'project-overview')]]" restamp="true">
+      <pa-project-details-overview project-data=[[projectData]]></pa-project-details-overview>
+    </template>
+
+    <template is="dom-if" if="[[_equals(tab, 'indicators')]]" restamp="true">
+      TODO: Indicator content
+    </template>
+
+    <template is="dom-if" if="[[_equals(tab, 'activities')]]" restamp="true">
+      TODO: Activity content
+    </template>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'planned-action-projects-details',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.RoutingBehavior,
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        tab: String,
+
+        routeData: Object,
+
+        projectId: String,
+
+        projectData: {
+          type: Object,
+          value: {}
+        },
+
+        overviewUrl: {
+          type: String,
+          computed: '_computeOverviewUrl(projectId)'
+        }
+      },
+
+      observers: [
+        '_updateUrlTab(routeData.tab)',
+      ],
+
+      _updateTabSelection: function () {
+        this.$.tabContent.select(this.tab);
+      },
+
+      _updateUrlTab: function (tab) {
+        if (!tab) {
+          tab = 'project-overview';
+        }
+        this.set('tab', tab);
+        this.set('route.path', '/' + this.tab);
+      },
+
+      _computeOverviewUrl: function(projectId) {
+        return App.Endpoints.plannedActionsProjectOverview(this.projectId);
+      },
+
+      attached: function () {
+        var thunk = this.$.overview.thunk();
+        var self = this;
+        thunk()
+          .then(function (res) {
+            self.updatePending = false;
+            self.projectData = res.data;
+          })
+          .catch(function (err) { // jshint ignore:line
+            self.updatePending = false;
+            // TODO: error handling
+          });
+      },
+    });
+  </script>
+</dom-module>
