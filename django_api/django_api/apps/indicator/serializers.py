@@ -510,6 +510,7 @@ class IndicatorReportUpdateSerializer(serializers.ModelSerializer):
 
 class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
 
+    indicator_name = serializers.SerializerMethodField()
     reportable = IndicatorListSerializer()
     reporting_period = serializers.SerializerMethodField()
     cluster = serializers.SerializerMethodField()
@@ -520,6 +521,7 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
         model = IndicatorReport
         fields = (
             'id',
+            'indicator_name',
             'title',
             'reportable',
             'reporting_period',
@@ -535,6 +537,9 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
             'project',
             'is_draft',
         )
+
+    def get_indicator_name(self, obj):
+        return obj.reportable.blueprint.title
 
     def get_reporting_period(self, obj):
         return "%s - %s " % (
