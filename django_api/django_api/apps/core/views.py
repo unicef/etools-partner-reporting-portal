@@ -3,11 +3,12 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework import status as statuses
 from .permissions import IsAuthenticated
-from .models import Intervention, Location
+from .models import Intervention, Location, ResponsePlan
 from .serializers import (
     SimpleInterventionSerializer,
     SimpleLocationSerializer,
     ChildrenLocationSerializer,
+    ResponsePlanSerializer,
 )
 
 
@@ -54,3 +55,17 @@ class ChildrenLocationAPIView(ListAPIView):
             serializer.data,
             status=statuses.HTTP_200_OK
         )
+
+
+class ResponsePlanAPIView(ListAPIView):
+    """
+    Endpoint for getting ResponsePlan.
+    ResponsePlan need to have defined of intervention to be displayed on drop down menu.
+    """
+
+    serializer_class = ResponsePlanSerializer
+    permission_classes = (IsAuthenticated, )
+
+    def get_queryset(self):
+        intervention_id = self.kwargs.get('intervention_id')
+        return ResponsePlan.objects.filter(intervention_id=intervention_id)

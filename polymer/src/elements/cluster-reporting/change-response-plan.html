@@ -1,0 +1,83 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../behaviors/routing.html">
+<link rel="import" href="../../behaviors/routing.html">
+
+<dom-module id="change-response-plan">
+  <template>
+    <style>
+      :host {
+        display: block;
+        margin: auto 30px;
+        height: 64px;
+        line-height: 64px;
+
+        color: var(--theme-primary-text-color-medium);
+        font-size: 15px;
+        font-weight: 200;
+      }
+
+      a {
+        color: var(--theme-primary-color);
+        font-size: 13px;
+      }
+    </style>
+
+    <span>[[currentPlanTitle]]</span>
+    <a href="[[changePlanUrl]]">change</a>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'change-response-plan',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.RoutingBehavior,
+      ],
+
+      properties: {
+         responsePlans: {
+          type: Array,
+          statePath: 'responsePlans.all',
+        },
+
+        responsePlanID: {
+          type: String,
+          statePath: 'responsePlans.currentID',
+        },
+
+        currentPlanTitle: {
+          type: String,
+          computed: '_getCurrentPlanTitle(responsePlans, responsePlanID)'
+        },
+
+        changePlanUrl: {
+          type: String,
+          computed: '_computeChangePlanUrl(_baseUrl, responsePlanID)',
+        },
+      },
+
+      _getCurrentPlanTitle: function(plans, id) {
+        var i = 0;
+        var plan;
+
+        while (i < plans.length) {
+          plan = plans[i];
+          i += 1;
+
+          if (String(plan.id) === id) {
+            break;
+          }
+        }
+
+        return (plan || {}).title;
+      },
+
+      _computeChangePlanUrl: function (_baseUrl, id) {
+        return this.buildUrl(_baseUrl, '/select-plan/?previous=' + id);
+      },
+    });
+  </script>
+</dom-module>

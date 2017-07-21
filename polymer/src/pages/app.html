@@ -1,6 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/app-route/app-route.html">
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../bower_components/iron-localstorage/iron-localstorage.html">
 
 <link rel="import" href="../elements/etools-prp-countries.html">
 <link rel="import" href="../elements/etools-prp-ajax.html">
@@ -16,6 +17,10 @@
         display: block;
       }
     </style>
+
+    <iron-localstorage
+        name="defaultApp"
+        value="{{_defaultApp}}"></iron-localstorage>
 
     <etools-prp-countries
         id="countries"
@@ -68,6 +73,8 @@
           type: String,
           observer: '_pageChanged',
         },
+
+        _defaultApp: String,
 
         interventionsUrl: {
           type: String,
@@ -138,20 +145,27 @@
       },
 
       _routeAppChanged: function (app) {
-        var defaultApp = 'ip-reporting'; // FIXME: correct default?
+        this.async(function () {
+          var defaultApp = this._defaultApp || 'ip-reporting'; // FIXME: correct default?
 
-        if (!this.routeData.country_code) {
-          return;
-        }
+          if (!this.routeData.country_code) {
+            return;
+          }
 
-        if (!app) {
-          this._redirectToApp(defaultApp);
-        } else if (!this._app) {
-          this.dispatch(App.Actions.setApp(app));
+          if (!app) {
+            this._redirectToApp(defaultApp);
+          } else if (!this._app) {
+            this.dispatch(App.Actions.setApp(app));
 
-          // Render
-          this.page = app;
-        }
+            // Store selected app
+            this.set('_defaultApp', app);
+
+            // Render
+            this.page = app;
+          } else {
+            this.set('_defaultApp', app);
+          }
+        });
       },
 
       _pageChanged: function (page) {
