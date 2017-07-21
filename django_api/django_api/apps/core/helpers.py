@@ -1,10 +1,13 @@
+import math
+import random
 import sys
 import os
-import random
 from ast import literal_eval
-from contextlib import contextmanager
-from itertools import combinations, product
+from calendar import monthrange
 from collections import OrderedDict
+from contextlib import contextmanager
+from datetime import date, timedelta
+from itertools import combinations, product
 
 
 @contextmanager
@@ -148,3 +151,139 @@ def get_cast_dictionary_keys_as_string(dictionary):
         casted_dictionary.pop(key)
 
     return casted_dictionary
+
+
+def get_num_of_days_in_a_month(year, month):
+    return monthrange(year, month)[1]
+
+
+def get_current_quarter_for_a_month(month):
+    return math.ceil(float(month) / 3)
+
+
+# Modified a bit from https://stackoverflow.com/a/37708216/2363915
+def get_first_date_of_a_quarter(year, quarter=1):
+    assert quarter >= 1
+
+    first_month_of_quarter = 3 * quarter - 2
+
+    date_of_first_day_of_quarter = date(year, first_month_of_quarter, 1)
+
+    return date_of_first_day_of_quarter
+
+
+def get_last_date_of_a_quarter(year, quarter=1):
+    assert quarter >= 1
+
+    last_month_of_quarter = 3 * quarter
+
+    date_of_last_day_of_quarter = date(
+        year, last_month_of_quarter,
+        get_num_of_days_in_a_month(year, last_month_of_quarter))
+
+    return date_of_last_day_of_quarter
+
+
+def calculate_end_date_given_start_date(start_date, frequency):
+    if frequency == PD_FREQUENCY_LEVEL.weekly:
+        end_date = start_date + timedelta(7)
+
+    elif frequency == PD_FREQUENCY_LEVEL.monthly:
+        num_of_days = get_num_of_days_in_a_month(
+            start_date.year, start_date.month)
+
+        end_date = date(
+            start_date.year, start_date.month, num_of_days)
+
+    elif frequency == PD_FREQUENCY_LEVEL.quarterly:
+        quarter = get_current_quarter_for_a_month(
+            start_date.month)
+
+        end_date = get_last_date_of_a_quarter(
+            start_date.year, quarter=quarter)
+
+    # TODO: Handling custom_specific_dates later
+    # elif frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
+    #     end_date = pd.start_date + timedelta(7)
+
+    return end_date
+
+
+def find_missing_frequency_period_dates(start_date, last_date, frequency):
+    # PD_FREQUENCY_LEVEL can be used interchangeably
+    today = date.today()
+    date_to_compare = last_date if last_date else start_date
+    date_list = []
+
+    # For now, we only generate missing dates for the past.
+    if today > date_to_compare:
+        # day_delta as a flag to decrement day_delta_counter for next date
+        # day_delta_counter as a date day integer to indicate next date
+        day_delta = (today - date_to_compare).days
+        day_delta_counter = day_delta
+
+        # Keep adding missing date until we get caught up with day_delta
+        while day_delta_counter > 0:
+            missing_date = today - timedelta(day_delta_counter)
+
+            if frequency == PD_FREQUENCY_LEVEL.weekly:
+                # If day_delta_counter has more week date to create
+                if day_delta >= 7:
+                    if day_delta_counter >= 7:
+                        day_delta_counter -= 7
+
+                    else:
+                        day_delta_counter = 0
+
+                # We have exhausted day_delta_counter successfully. Exiting
+                else:
+                    break
+
+            elif frequency == PD_FREQUENCY_LEVEL.monthly:
+                # Get the # of days in target month
+                num_of_days = monthrange(missing_date.year, missing_date.month)
+
+                # If day_delta_counter has more months to create
+                if day_delta >= num_of_days:
+                    if day_delta_counter >= num_of_days:
+                        missing_date = today - timedelta(day_delta_counter)
+                        day_delta_counter -= num_of_days
+
+                    else:
+                        day_delta_counter = 0
+
+                # We have exhausted day_delta_counter successfully. Exiting
+                else:
+                    break
+
+            elif frequency == PD_FREQUENCY_LEVEL.quarterly:
+                # If day_delta_counter has more week date to create
+                if day_delta >= 7:
+                    if day_delta_counter >= 7:
+                        day_delta_counter -= 7
+
+                    else:
+                        day_delta_counter = 0
+
+                # We have exhausted day_delta_counter successfully. Exiting
+                else:
+                    break
+
+            elif frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
+                # If day_delta_counter has more week date to create
+                if day_delta >= 7:
+                    if day_delta_counter >= 7:
+                        day_delta_counter -= 7
+
+                    else:
+                        day_delta_counter = 0
+
+                # We have exhausted day_delta_counter successfully. Exiting
+                else:
+                    break
+
+            # Only add new date if it's later than start date
+            if start_date <= missing_date:
+                date_list.append(missing_date)
+
+    return date_list
