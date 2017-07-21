@@ -15,7 +15,10 @@ class TestInterventionListAPIView(BaseAPITestCase):
         response = self.client.get(url, format='json')
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(response.data), Intervention.objects.count())
+        self.assertEquals(
+            len(response.data),
+            Intervention.objects.prefetch_related('locations').filter(locations__isnull=False).distinct().count()
+        )
 
 
 class TestLocationListAPIView(BaseAPITestCase):
