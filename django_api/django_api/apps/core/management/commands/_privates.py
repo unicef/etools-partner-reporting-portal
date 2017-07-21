@@ -24,6 +24,7 @@ from unicef.models import (
 )
 from core.models import (
     Intervention,
+    ResponsePlan,
     Location,
 )
 from core.factories import (

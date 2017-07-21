@@ -191,7 +191,8 @@ class ResponsePlanFactory(factory.django.DjangoModelFactory):
     start = fuzzy.FuzzyDate(datetime.date.today())
     end = fuzzy.FuzzyDate(datetime.date.today())
 
-    cluster = factory.RelatedFactory('core.factories.ClusterFactory', 'response_plan')
+    # cluster = factory.RelatedFactory('core.factories.ClusterFactory', 'response_plan')
+    intervention = factory.SubFactory(InterventionFactory)
 
     class Meta:
         model = ResponsePlan
@@ -201,7 +202,7 @@ class ClusterFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "cluster_%d" % n)
     user = factory.SubFactory(UserFactory)
 
-    intervention = factory.SubFactory(InterventionFactory)
+    response_plan = factory.SubFactory(ResponsePlanFactory)
 
     class Meta:
         model = Cluster
