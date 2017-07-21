@@ -21,7 +21,7 @@ from .serializers import (
     ClusterActivitySerializer,
     ClusterActivityPatchSerializer,
 )
-from .filters import ClusterObjectiveFilter, ClusterActivityFilter, ClusterIndicatorDataFilter
+from .filters import ClusterObjectiveFilter, ClusterActivityFilter, ClusterIndicatorsFilter
 
 logger = logging.getLogger(__name__)
 
@@ -206,7 +206,7 @@ class ClusterIndicatorsListAPIView(ListCreateAPIView):
     serializer_class = ClusterIndicatorDataSerializer
     pagination_class = SmallPagination
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
-    filter_class = ClusterIndicatorDataFilter
+    filter_class = ClusterIndicatorsFilter
 
     def get_queryset(self):
         queryset = Reportable.objects.filter(

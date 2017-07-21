@@ -2,6 +2,7 @@ from django.db.models import Q
 import django_filters
 from django_filters.filters import CharFilter
 
+from core.common import INDICATOR_REPORT_STATUS
 from indicator.models import Reportable
 from .models import ClusterObjective, ClusterActivity
 
@@ -31,8 +32,9 @@ class ClusterActivityFilter(django_filters.FilterSet):
         return queryset.filter(title__icontains=value)
 
 
-class ClusterIndicatorDataFilter(django_filters.FilterSet):
+class ClusterIndicatorsFilter(django_filters.FilterSet):
 
+    submitted = CharFilter(method='get_submitted')
     cluster = CharFilter(method='get_cluster')
     partner = CharFilter(method='get_partner')
     indicator = CharFilter(method='get_indicator')
@@ -48,6 +50,12 @@ class ClusterIndicatorDataFilter(django_filters.FilterSet):
             'project',
             'location',
         ]
+
+    def get_submitted(self, queryset, name, value):
+        if value == "1":
+            return queryset.filter(indicator_reports__report_status=INDICATOR_REPORT_STATUS.submitted)
+        else:
+            return queryset.exclude(indicator_reports__report_status=INDICATOR_REPORT_STATUS.submitted)
 
     def get_cluster(self, queryset, name, value):
         return queryset.filter(cluster_objectives__cluster=value)
