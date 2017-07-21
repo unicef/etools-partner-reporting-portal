@@ -3,7 +3,7 @@ import django_filters
 from django_filters.filters import CharFilter
 
 from core.common import INDICATOR_REPORT_STATUS
-from indicator.models import Reportable
+from indicator.models import IndicatorReport
 from .models import ClusterObjective, ClusterActivity
 
 
@@ -42,7 +42,7 @@ class ClusterIndicatorsFilter(django_filters.FilterSet):
     location = CharFilter(method='get_location')
 
     class Meta:
-        model = Reportable
+        model = IndicatorReport
         fields = [
             'cluster',
             'partner',
@@ -53,21 +53,21 @@ class ClusterIndicatorsFilter(django_filters.FilterSet):
 
     def get_submitted(self, queryset, name, value):
         if value == "1":
-            return queryset.filter(indicator_reports__report_status=INDICATOR_REPORT_STATUS.submitted)
+            return queryset.filter(report_status=INDICATOR_REPORT_STATUS.submitted)
         else:
-            return queryset.exclude(indicator_reports__report_status=INDICATOR_REPORT_STATUS.submitted)
+            return queryset.exclude(report_status=INDICATOR_REPORT_STATUS.submitted)
 
     def get_cluster(self, queryset, name, value):
-        return queryset.filter(cluster_objectives__cluster=value)
+        return queryset.filter(reportable__cluster_objectives__cluster=value)
 
     def get_partner(self, queryset, name, value):
-        return queryset.filter(cluster_objectives__cluster__partners=value)
+        return queryset.filter(reportable__partner_project__partners=value)
 
     def get_indicator(self, queryset, name, value):
-        return queryset.filter(indicator_reports=value)
+        return queryset.filter(reportable_id=value)
 
     def get_project(self, queryset, name, value):
-        return queryset.filter(partner_projects=value)
+        return queryset.filter(reportable__partner_projects=value)
 
     def get_location(self, queryset, name, value):
-        return queryset.filter(locations=value)
+        return queryset.filter(reportable__locations=value)

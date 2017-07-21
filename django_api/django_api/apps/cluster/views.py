@@ -12,8 +12,8 @@ import django_filters
 
 from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
-from indicator.serializers import ClusterIndicatorDataSerializer
-from unicef.models import Reportable
+from indicator.serializers import ClusterIndicatorReportSerializer
+from indicator.models import IndicatorReport
 from .models import ClusterObjective, ClusterActivity
 from .serializers import (
     ClusterObjectiveSerializer,
@@ -203,14 +203,16 @@ class ClusterActivityListAPIView(ListCreateAPIView):
 class ClusterIndicatorsListAPIView(ListCreateAPIView):
 
     permission_classes = (IsAuthenticated, )
-    serializer_class = ClusterIndicatorDataSerializer
+    serializer_class = ClusterIndicatorReportSerializer
     pagination_class = SmallPagination
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     filter_class = ClusterIndicatorsFilter
+    lookup_field = lookup_url_kwarg = 'response_plan_id'
 
     def get_queryset(self):
-        queryset = Reportable.objects.filter(
-            Q(cluster_objectives__isnull=False) | Q(cluster_activities__isnull=False)
-            | Q(partner_projects__isnull=False) | Q(partner_activities__isnull=False)
-        )
+        response_plan_id = self.kwargs.get(self.lookup_field)
+        queryset = IndicatorReport.objects.filter(
+            Q(reportable__cluster_objectives__isnull=False) | Q(reportable__cluster_activities__isnull=False)
+            | Q(reportable__partner_projects__isnull=False) | Q(reportable__partner_activities__isnull=False)
+        )#.filter(reportable__cluster_objectives__cluster__response_plan=response_plan_id)
         return queryset

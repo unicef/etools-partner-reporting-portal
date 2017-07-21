@@ -1,9 +1,5 @@
 from ast import literal_eval as make_tuple
-from itertools import combinations
-from collections import OrderedDict
-
 from django.conf import settings
-
 from rest_framework import serializers
 
 from unicef.models import LowerLevelOutput
@@ -14,6 +10,7 @@ from core.helpers import (
     get_cast_dictionary_keys_as_tuple,
     get_cast_dictionary_keys_as_string,
 )
+from partner.models import PartnerProject, PartnerActivity
 from cluster.models import ClusterObjective, ClusterActivity
 from .models import (
     Reportable, IndicatorBlueprint,
@@ -511,38 +508,51 @@ class IndicatorReportUpdateSerializer(serializers.ModelSerializer):
         )
 
 
-class ClusterIndicatorDataSerializer(serializers.ModelSerializer):
+class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
 
-    name = serializers.SerializerMethodField()
-    status = serializers.SerializerMethodField()
-    indicator_reports = serializers.SerializerMethodField()
+    reportable = IndicatorListSerializer()
+    reporting_period = serializers.SerializerMethodField()
+    cluster = serializers.SerializerMethodField()
+    project = serializers.SerializerMethodField()
+    is_draft = serializers.SerializerMethodField()
 
     class Meta:
-        model = Reportable
+        model = IndicatorReport
         fields = (
             'id',
-            'name',
-            'target',
-            'baseline',
-            'status',
-            'indicator_reports',
+            'title',
+            'reportable',
+            'reporting_period',
+            'due_date',
+            'submission_date',
+            'frequency',
+            'total',
+            'remarks',
+            'report_status',
+            'overall_status',
+            'narrative_assessment',
+            'cluster',
+            'project',
+            'is_draft',
         )
 
-    def get_name(self, obj):
-        if isinstance(obj.content_object, ClusterObjective):
-            return obj.content_object.title
-        elif isinstance(obj.content_object, ClusterActivity):
-            return obj.content_object.title
+    def get_reporting_period(self, obj):
+        return "%s - %s " % (
+            obj.time_period_start.strftime(settings.PRINT_DATA_FORMAT),
+            obj.time_period_end.strftime(settings.PRINT_DATA_FORMAT)
+        )
+
+    def get_cluster(self, obj):
+        if isinstance(obj.reportable.content_object, (ClusterObjective, ClusterActivity)):
+            return obj.reportable.content_object.cluster.title
         else:
             return ''
 
-    def get_status(self, obj):
-        # first indicator report associated with this output
-        indicator_report = obj.indicator_reports.first()
-        serializer = IndicatorReportStatusSerializer(indicator_report)
-        return serializer.data
+    def get_project(self, obj):
+        if isinstance(obj.reportable.content_object, (PartnerProject, PartnerActivity)):
+            return obj.reportable.content_object.title
+        else:
+            return ''
 
-    def get_indicator_reports(self, obj):
-        children = obj.indicator_reports.all()
-        serializer = IndicatorReportSimpleSerializer(children, many=True)
-        return serializer.data
+    def get_is_draft(self, obj):
+        return obj.is_draft
