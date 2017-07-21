@@ -1,5 +1,6 @@
 import logging
 
+from django.db.models import Q
 from django.http import Http404
 
 from rest_framework.views import APIView
@@ -11,6 +12,8 @@ import django_filters
 
 from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
+from indicator.serializers import ClusterIndicatorDataSerializer
+from unicef.models import Reportable
 from .models import ClusterObjective, ClusterActivity
 from .serializers import (
     ClusterObjectiveSerializer,
@@ -18,7 +21,7 @@ from .serializers import (
     ClusterActivitySerializer,
     ClusterActivityPatchSerializer,
 )
-from .filters import ClusterObjectiveFilter, ClusterActivityFilter
+from .filters import ClusterObjectiveFilter, ClusterActivityFilter, ClusterIndicatorsFilter
 
 logger = logging.getLogger(__name__)
 
@@ -195,3 +198,19 @@ class ClusterActivityListAPIView(ListCreateAPIView):
 
         serializer.save()
         return Response({'id': serializer.instance.id}, status=statuses.HTTP_201_CREATED)
+
+
+class ClusterIndicatorsListAPIView(ListCreateAPIView):
+
+    permission_classes = (IsAuthenticated, )
+    serializer_class = ClusterIndicatorDataSerializer
+    pagination_class = SmallPagination
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
+    filter_class = ClusterIndicatorsFilter
+
+    def get_queryset(self):
+        queryset = Reportable.objects.filter(
+            Q(cluster_objectives__isnull=False) | Q(cluster_activities__isnull=False)
+            | Q(partner_projects__isnull=False) | Q(partner_activities__isnull=False)
+        )
+        return queryset

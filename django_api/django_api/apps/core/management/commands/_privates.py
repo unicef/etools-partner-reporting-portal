@@ -35,11 +35,16 @@ from core.factories import (
     LocationFactory,
     QuantityReportableToLowerLevelOutputFactory,
     RatioReportableToLowerLevelOutputFactory,
+    QuantityReportableToClusterObjectiveFactory,
+    RatioReportableToClusterObjectiveFactory,
     QuantityIndicatorReportFactory,
     RatioIndicatorReportFactory,
     ProgressReportFactory,
     SectionFactory,
     ProgrammeDocumentFactory,
+    ClusterObjectiveFactory,
+    ClusterActivityFactory,
+    ClusterFactory,
     DisaggregationFactory,
     DisaggregationValueFactory,
 )
@@ -141,10 +146,22 @@ def generate_fake_data(quantity=40):
     print "{} ResponsePlan objects created".format(quantity*3)
 
     # Linking ClusterActivity - PartnerActivity
+    ClusterActivityFactory.create_batch(quantity)
+    print "{} ClusterActivity objects created".format(quantity)
+
     for idx in xrange(quantity):
         cluster_activity = ClusterActivity.objects.all()[idx]
         PartnerFactory(partner_activity__cluster_activity=cluster_activity)
     print "{} ClusterActivity <-> PartnerActivity objects linked".format(quantity)
+
+    ClusterObjectiveFactory.create_batch(quantity)
+    print "{} ClusterObjective objects created".format(quantity)
+
+    RatioReportableToClusterObjectiveFactory.create_batch(quantity/2)
+    print "{} ClusterObjective <-> RatioReportableToClusterObjectiveFactory <-> IndicatorReport objects linked".format(quantity/2)
+
+    QuantityReportableToClusterObjectiveFactory.create_batch(quantity/2)
+    print "{} ClusterObjective <-> QuantityReportableToClusterObjectiveFactory <-> IndicatorReport objects linked".format(quantity/2)
 
     print "Generating IndicatorLocationData for Quantity type"
     generate_indicator_report_location_disaggregation_quantity_data()
