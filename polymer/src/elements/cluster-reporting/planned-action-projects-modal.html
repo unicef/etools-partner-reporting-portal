@@ -10,10 +10,12 @@
 <link rel="import" href="../../../bower_components/iron-form/iron-form.html">
 <link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../bower_components/iron-location/iron-location.html">
 
 <link rel="import" href="../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../elements/etools-prp-date-input.html">
 <link rel="import" href="../../elements/dropdown-form-input.html">
+<link rel="import" href="../../behaviors/routing.html">
 <link rel="import" href="../../styles/buttons.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
@@ -79,6 +81,8 @@
       }
 
     </style>
+
+    <iron-location path="{{path}}"></iron-location>
 
     <etools-prp-ajax
         id="createProject"
@@ -231,9 +235,13 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.RoutingBehavior,
       ],
 
       properties: {
+
+        path: String,
+
         reportingPeriod: String,
 
         opened: {
@@ -276,9 +284,9 @@
           type: Array,
           value: [
             {title: 'All', id: ''},
-            {title: 'Draft', id: 'Dra'},
-            {title: 'Active', id: 'Act'},
-            {title: 'Implemented', id: 'Imp'},
+            {title: 'Ongoing', id: 'Ong'},
+            {title: 'Planned', id: 'Pla'},
+            {title: 'Completed', id: 'Com'},
           ],
         },
 
@@ -317,16 +325,21 @@
         }
       },
 
+      _redirectToDetail(id) {
+        var path = '/planned-action/project/' + String(id);
+        var url = this.buildUrl(this._baseUrlCluster, path);
+        this.set("path", url)
+      },
+
       _save: function () {
         var self = this;
         this._getDropdownIds();
         this.updatePending = true;
         var thunk = this.$.createProject.thunk();
         thunk()
-          .then(function () {
+          .then(function (res) {
             self.updatePending = false;
-            //TODO: Update the list of partner projects to show the new one.
-            //TODO: Redirect to new details page.
+            self._redirectToDetail(res.data.id);
           })
           .catch(function (err) { // jshint ignore:line
             self.updatePending = false;

@@ -6,7 +6,9 @@
 
 <link rel="import" href="../../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../../elements/page-header.html">
-<link rel="import" href="../../../../elements/cluster-reporting/planned-action/project-overview.html">
+<link rel="import" href="../../../../elements/cluster-reporting/planned-action/project/overview.html">
+<link rel="import" href="../../../../elements/project-status.html">
+<link rel="import" href="../../../../elements/page-badge.html">
 <link rel="import" href="../../../../endpoints.html">
 <link rel="import" href="../../../../redux/actions.html">
 <link rel="import" href="../../../../redux/store.html">
@@ -26,10 +28,29 @@ needed for the header name, etc. -->
 <dom-module id="planned-action-projects-details">
   <template>
     <style include="shared-styles">
-      :host {
+    :host {
+      display: block;
+
+      --page-header-above-title: {
+        position: absolute;
         display: block;
-      }
-    </style>
+        left: 0;
+        top: -23px;
+      };
+    }
+
+    .toolbar report-status {
+      margin-right: 1em;
+    }
+
+    .toolbar a {
+      text-decoration: none;
+    }
+
+    .tabs paper-tab {
+      text-transform: uppercase;
+    }
+  </style>
 
     <etools-prp-ajax
         id="overview"
@@ -44,21 +65,32 @@ needed for the header name, etc. -->
       data="{{routeData}}">
     </app-route>
 
-    <page-header title="[[ projectData.title ]]" back="TODO (will need to use Build URL)">
+    <page-header
+        title="[[projectData.title]]"
+        back="[[backLink]]">
+
+      <page-badge
+          class="above-title" name="project">
+      </page-badge>
+
+      <div class="toolbar">
+        <project-status status="[[projectData.status]]"></project-status>
+      </div>
+
       <div class="tabs">
         <paper-tabs
             selected="{{ routeData.tab }}"
             attr-for-selected="name"
             scrollable
             hide-scroll-buttons>
-          <paper-tab name="project-overview">Overview</paper-tab>
+          <paper-tab name="overview">Overview</paper-tab>
           <paper-tab name="indicators">Indicators</paper-tab>
           <paper-tab name="activities">Activities</paper-tab>
         </paper-tabs>
       </div>
     </page-header>
 
-    <template is="dom-if" if="[[_equals(tab, 'project-overview')]]" restamp="true">
+    <template is="dom-if" if="[[_equals(tab, 'overview')]]" restamp="true">
       <pa-project-details-overview project-data=[[projectData]]></pa-project-details-overview>
     </template>
 
@@ -97,12 +129,21 @@ needed for the header name, etc. -->
         overviewUrl: {
           type: String,
           computed: '_computeOverviewUrl(projectId)'
-        }
+        },
+
+        backLink: {
+          type: String,
+          computed: '_computeBackLink(route)',
+        },
       },
 
       observers: [
         '_updateUrlTab(routeData.tab)',
       ],
+
+      _computeBackLink: function () {
+        return 'TODO';
+      },
 
       _updateTabSelection: function () {
         this.$.tabContent.select(this.tab);
@@ -110,7 +151,7 @@ needed for the header name, etc. -->
 
       _updateUrlTab: function (tab) {
         if (!tab) {
-          tab = 'project-overview';
+          tab = 'overview';
         }
         this.set('tab', tab);
         this.set('route.path', '/' + this.tab);
