@@ -7,13 +7,12 @@
 <link rel="import" href="../../../elements/cluster-reporting/cluster-objectives-modal.html">
 <link rel="import" href="../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../styles/shared-styles.html">
-
 <link rel="import" href="../../../behaviors/data-table.html">
 <link rel="import" href="../../../behaviors/pagination.html">
 <link rel="import" href="../../../behaviors/utils.html">
 <link rel="import" href="../../../styles/table-styles.html">
 
-<dom-module id="cluster-objectives">
+<dom-module id="cluster-objectives-list">
     <template>
     <style include="data-table-styles table-styles">
       :host {
@@ -40,6 +39,7 @@
     </iron-query-params>
 
     <etools-prp-ajax
+        pattern="/:id"
         id="objectives"
         url="[[objectivesUrl]]"
         params="[[queryParams]]">
@@ -104,7 +104,7 @@
 
   <script>
     Polymer({
-      is: 'cluster-objectives',
+      is: 'cluster-objectives-list',
 
       behaviors: [
         App.Behaviors.ReduxBehavior,

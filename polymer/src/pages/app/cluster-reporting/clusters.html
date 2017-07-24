@@ -6,11 +6,7 @@
 
 <link rel="import" href="../../../styles/shared-styles.html">
 <link rel="import" href="../../../elements/page-header.html">
-<link rel="import" href="../../../elements/page-body.html">
-<link rel="import" href="planned-action-projects.html">
-<link rel="import" href="planned-action-activities.html">
-<link rel="import" href="cluster-activities.html">
-<link rel="import" href="cluster-objectives.html">
+<link rel="import" href="response-parameters/response-parameters-clusters-router.html">
 
 
 <dom-module id="clusters-response-parameters">
@@ -23,58 +19,42 @@
 
     <app-route
       route="{{route}}"
-      pattern="/:tab"
+      pattern="/:subpage"
       data="{{routeData}}"
       tail="{{subroute}}">
     </app-route>
 
-    <div class="page-top-content">
-      <page-header title="Clusters">
-        <div class="tabs">
-          <paper-tabs
-            selected="{{routeData.tab}}"
-            attr-for-selected="name"
-            scrollable
-            hide-scroll-buttons>
+    <template is="dom-if" if="[[_displayHeader(subpage)]]" restamp="true">
+      <div class="page-top-content">
+        <page-header title="Clusters">
+          <div class="tabs">
+            <paper-tabs
+              selected="{{tab}}"
+              attr-for-selected="name"
+              scrollable
+              hide-scroll-buttons>
 
-            <paper-tab name="response-plans">
-              <span class="tab-content">Response Plans</span>
-            </paper-tab>
+              <paper-tab name="response-plans">
+                <span class="tab-content">Response Plans</span>
+              </paper-tab>
 
-            <paper-tab name="objectives">
-              <span class="tab-content">Objectives</span>
-            </paper-tab>
+              <paper-tab name="objectives">
+                <span class="tab-content">Objectives</span>
+              </paper-tab>
 
-            <paper-tab name="activities">
-              <span class="tab-content">Activities</span>
-            </paper-tab>
-          </paper-tabs>
-        </div>
-      </page-header>
-    </div>
+              <paper-tab name="activities">
+                <span class="tab-content">Activities</span>
+              </paper-tab>
+            </paper-tabs>
+          </div>
+        </page-header>
+      </div>
+    </template>
 
-    <page-body>
-      <iron-pages
-        id="tabContent"
-        selected=[[tab]]
-        attr-for-selected="name"
-        fallback-selection="projects"
-        on-iron-items-changed="_updateTabSelection">
-
-        <div name="response-plans">TODO</div>
-
-        <cluster-objectives
-            name="objectives"
-            route="{{subroute}}">
-        </cluster-objectives>
-
-        <cluster-activities
-          name="activities"
-          route="{{subroute}}">
-        </cluster-activities>
-
-      </iron-pages>
-    </page-body>
+    <response-parameters-clusters-router
+      route="{{subroute}}"
+      page={{subpage}}>
+    </response-parameters-clusters-router>
 
   </template>
 
@@ -83,6 +63,8 @@
       is: 'clusters-response-parameters',
 
       properties: {
+        subpage: String,
+
         tab: String
       },
 
@@ -91,24 +73,56 @@
       ],
 
       observers: [
-        '_routeTabChanged(routeData.tab)',
+        '_routeChanged(routeData.subpage)',
+        '_tabChanged(tab)'
       ],
 
-      // Tracks the tab value in the URL only.
-      _routeTabChanged: function (tab) {
-        if (!tab) {
-          this.set('routeData.tab', 'response-plans');
-          this.set('route.path', '/response-plans/');
-        } else {
-          this.tab = tab;
-          this.set('route.path', '/' + tab);
+      _routeChanged: function (subpage) {
+        switch (subpage) {
+          case 'response-plans':
+            this.subpage = 'response-plans';
+            this.tab = 'response-plans';
+            break;
+
+          case 'objectives':
+            this.subpage = 'objectives';
+            this.tab = 'objectives';
+            break;
+
+          case 'activities':
+            this.subpage = 'activities';
+            this.tab = 'activities';
+            break;
+
+          case 'response-plan':
+            this.subpage = 'response-plan';
+            break;
+
+          case 'objective':
+            this.subpage = 'objective';
+            break;
+
+          case 'activity':
+            this.subpage = 'activity';
+            break;
+
+          default:
+            this.subpage = 'response-plans';
+            this.set('route.path', '/response-plans');
+            break;
         }
       },
 
-      _updateTabSelection: function () {
-        this.$.tabContent.select(this.tab);
+      _displayHeader: function(subpage) {
+        if (subpage[subpage.length - 1] === 's') {
+          return true;
+        }
+        return false;
       },
 
+      _tabChanged: function (tab) {
+        this.set('route.path', '/' + tab);
+      },
     });
   </script>
 </dom-module>
