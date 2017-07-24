@@ -14,8 +14,9 @@ from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
 from indicator.serializers import ClusterIndicatorReportSerializer, ClusterIndicatorReportSimpleSerializer
 from indicator.models import IndicatorReport
-from .models import ClusterObjective, ClusterActivity
+from .models import ClusterObjective, ClusterActivity, Cluster
 from .serializers import (
+    ClusterSimpleSerializer,
     ClusterObjectiveSerializer,
     ClusterObjectivePatchSerializer,
     ClusterActivitySerializer,
@@ -221,3 +222,14 @@ class ClusterIndicatorsListAPIView(ListCreateAPIView):
 class ClusterIndicatorsSimpleListAPIView(ClusterIndicatorsListAPIView):
     serializer_class = ClusterIndicatorReportSimpleSerializer
     pagination_class = filter_class = None
+
+
+class ClusterListAPIView(ListCreateAPIView):
+
+    permission_classes = (IsAuthenticated, )
+    serializer_class = ClusterSimpleSerializer
+    lookup_field = lookup_url_kwarg = 'response_plan_id'
+
+    def get_queryset(self):
+        response_plan_id = self.kwargs.get(self.lookup_field)
+        return Cluster.objects.filter(response_plan_id=response_plan_id)

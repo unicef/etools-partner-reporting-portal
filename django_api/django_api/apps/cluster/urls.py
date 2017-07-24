@@ -1,6 +1,7 @@
 from django.conf.urls import url
 
 from .views import (
+    ClusterListAPIView,
     ClusterObjectiveAPIView,
     ClusterObjectiveListCreateAPIView,
     ClusterActivityAPIView,
@@ -31,4 +32,7 @@ urlpatterns = [
     url(r'^(?P<response_plan_id>\d+)/cluster-indicators-simple-list/$',
         ClusterIndicatorsSimpleListAPIView.as_view(),
         name="cluster-indicators-simple-list"),
+    url(r'^(?P<response_plan_id>\d+)/cluster-simple-list/$',
+        ClusterListAPIView.as_view(),
+        name="cluster-simple-list"),
 ]
