@@ -51,6 +51,7 @@ from core.factories import (
 )
 
 from _generate_disaggregation_fake_data import (
+    generate_indicator_report_location_disaggregation_quantity_data_cluster,
     generate_indicator_report_location_disaggregation_quantity_data,
     generate_indicator_report_location_disaggregation_ratio_data,
 )
@@ -166,6 +167,9 @@ def generate_fake_data(quantity=40):
 
     print "Generating IndicatorLocationData for Quantity type"
     generate_indicator_report_location_disaggregation_quantity_data()
+
+    print "Generating IndicatorLocationData for Quantity type CLUSTER"
+    generate_indicator_report_location_disaggregation_quantity_data_cluster()
 
     print "Generating IndicatorLocationData for Ratio type"
     generate_indicator_report_location_disaggregation_ratio_data()
