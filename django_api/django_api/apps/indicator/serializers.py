@@ -566,3 +566,18 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
 
     def get_can_submit(self, obj):
         return obj.can_submit
+
+
+class ClusterIndicatorReportSimpleSerializer(serializers.ModelSerializer):
+
+    title = serializers.SerializerMethodField()
+
+    class Meta:
+        model = IndicatorReport
+        fields = (
+            'id',
+            'title',
+        )
+
+    def get_title(self, obj):
+        return obj.reportable.blueprint.title

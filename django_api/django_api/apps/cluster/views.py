@@ -12,7 +12,7 @@ import django_filters
 
 from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
-from indicator.serializers import ClusterIndicatorReportSerializer
+from indicator.serializers import ClusterIndicatorReportSerializer, ClusterIndicatorReportSimpleSerializer
 from indicator.models import IndicatorReport
 from .models import ClusterObjective, ClusterActivity
 from .serializers import (
@@ -216,3 +216,8 @@ class ClusterIndicatorsListAPIView(ListCreateAPIView):
             | Q(reportable__partner_projects__isnull=False) | Q(reportable__partner_activities__isnull=False)
         ).filter(reportable__cluster_objectives__cluster__response_plan=response_plan_id)
         return queryset
+
+
+class ClusterIndicatorsSimpleListAPIView(ClusterIndicatorsListAPIView):
+    serializer_class = ClusterIndicatorReportSimpleSerializer
+    pagination_class = filter_class = None
