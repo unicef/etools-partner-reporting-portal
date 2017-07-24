@@ -1,6 +1,7 @@
 from django.conf.urls import url
 
 from .views import (
+    PartnerSimpleListAPIView,
     PartnerDetailsAPIView,
     PartnerProjectListCreateAPIView,
     PartnerProjectSimpleListAPIView,
@@ -13,6 +14,9 @@ urlpatterns = [
     url(r'^^(?P<response_plan_id>\d+)/partner-project-simple-list/$',
         PartnerProjectSimpleListAPIView.as_view(),
         name="partner-project-simple-list"),
+    url(r'^^(?P<response_plan_id>\d+)/partner-simple-list/$',
+        PartnerSimpleListAPIView.as_view(),
+        name="partner-simple-list"),
     url(r'^partner-project-list/$', PartnerProjectListCreateAPIView.as_view(), name="partner-project-list"),
     url(r'^(?P<cluster_id>\d+)/partner-project-list/$',
         PartnerProjectListCreateAPIView.as_view(),

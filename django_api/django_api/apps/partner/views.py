@@ -14,7 +14,7 @@ from .serializer import (
     PartnerProjectSimpleSerializer,
     PartnerProjectPatchSerializer,
 )
-from .models import PartnerProject
+from .models import PartnerProject, Partner
 from .filters import PartnerProjectFilter
 
 
@@ -135,3 +135,13 @@ class PartnerProjectSimpleListAPIView(ListAPIView):
     def get_queryset(self):
         response_plan_id = self.kwargs.get(self.lookup_field)
         return PartnerProject.objects.filter(partner__clusters__response_plan_id=response_plan_id)
+
+
+class PartnerSimpleListAPIView(ListAPIView):
+    serializer_class = PartnerProjectSimpleSerializer
+    permission_classes = (IsAuthenticated, )
+    lookup_field = lookup_url_kwarg = 'response_plan_id'
+
+    def get_queryset(self):
+        response_plan_id = self.kwargs.get(self.lookup_field)
+        return Partner.objects.filter(clusters__response_plan_id=response_plan_id)
