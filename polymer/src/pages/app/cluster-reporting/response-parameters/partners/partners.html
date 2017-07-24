@@ -1,13 +1,13 @@
-<link rel="import" href="../../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../../bower_components/paper-tabs/paper-tab.html">
-<link rel="import" href="../../../../bower_components/paper-tabs/paper-tabs.html">
-<link rel="import" href="../../../../bower_components/app-route/app-route.html">
-<link rel="import" href="../../../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../../../../../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../../../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../../../../bower_components/iron-pages/iron-pages.html">
 
-<link rel="import" href="../../../styles/shared-styles.html">
-<link rel="import" href="../../../behaviors/utils.html">
-<link rel="import" href="../../../behaviors/routing.html">
-<link rel="import" href="response-parameters/response-parameters-partners-router.html">
+<link rel="import" href="../../../../../styles/shared-styles.html">
+<link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="../../../../../behaviors/routing.html">
+<link rel="import" href="router.html">
 
 
 <dom-module id="partners-response-parameters">
@@ -15,6 +15,10 @@
     <style include="shared-styles">
       :host {
         display: block;
+      }
+
+      .tabs paper-tab {
+        text-transform: uppercase;
       }
     </style>
 
@@ -35,7 +39,7 @@
               scrollable
               hide-scroll-buttons>
 
-              <paper-tab name="contacts">
+              <paper-tab name="contacts" disabled="true">
                 <span class="tab-content">Contacts</span>
               </paper-tab>
 
@@ -43,7 +47,7 @@
                 <span class="tab-content">Projects</span>
               </paper-tab>
 
-              <paper-tab name="activities">
+              <paper-tab name="activities" disabled="true">
                 <span class="tab-content">Activities</span>
               </paper-tab>
             </paper-tabs>

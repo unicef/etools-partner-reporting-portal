@@ -1,19 +1,20 @@
-<link rel="import" href="../../../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../../../bower_components/etools-data-table/etools-data-table.html">
-<link rel="import" href="../../../../../bower_components/iron-location/iron-location.html">
-<link rel="import" href="../../../../../bower_components/iron-location/iron-query-params.html">
+<link rel="import" href="../../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../../bower_components/etools-data-table/etools-data-table.html">
+<link rel="import" href="../../../../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../../../../bower_components/iron-location/iron-query-params.html">
 
-<link rel="import" href="../../../../elements/cluster-reporting/cluster-activities-filters.html">
-<link rel="import" href="../../../../elements/cluster-reporting/cluster-activities-modal.html">
-<link rel="import" href="../../../../elements/etools-prp-ajax.html">
-<link rel="import" href="../../../../styles/shared-styles.html">
-<link rel="import" href="../../../../behaviors/data-table.html">
-<link rel="import" href="../../../../behaviors/pagination.html">
-<link rel="import" href="../../../../behaviors/utils.html">
-<link rel="import" href="../../../../behaviors/routing.html">
-<link rel="import" href="../../../../styles/table-styles.html">
+<link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/clusters/objectives/filters.html">
+<link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/clusters/objectives/creation-modal.html">
+<link rel="import" href="../../../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../../../elements/page-body.html">
+<link rel="import" href="../../../../../behaviors/data-table.html">
+<link rel="import" href="../../../../../behaviors/pagination.html">
+<link rel="import" href="../../../../../behaviors/routing.html">
+<link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="../../../../../styles/shared-styles.html">
+<link rel="import" href="../../../../../styles/table-styles.html">
 
-<dom-module id="clusters-activities">
+<dom-module id="clusters-objectives">
     <template>
     <style include="data-table-styles table-styles">
       :host {
@@ -44,27 +45,19 @@
     </iron-query-params>
 
     <etools-prp-ajax
-        id="activities"
-        url="[[activitiesUrl]]"
+        id="objectives"
+        url="[[objectivesUrl]]"
         params="[[queryParams]]">
     </etools-prp-ajax>
 
-    <etools-prp-ajax
-        id="createActivity"
-        url="[[activitiesUrl]]"
-        body="[[activityData]]"
-        content-type="application/json"
-        method="post">
-    </etools-prp-ajax>
-
     <page-body>
-      <cluster-activities-filters class="filters"></cluster-activities-filters>
+      <cluster-objectives-filters class="filters"></cluster-objectives-filters>
 
-      <cluster-activities-modal id="modal"></cluster-activities-modal>
+      <cluster-objectives-modal id="modal"></cluster-objectives-modal>
 
       <div id="action">
         <paper-button id="add" on-tap="_openModal" raised>
-          Add Cluster Activity
+          Add Cluster Objective
         </paper-button>
       </div>
 
@@ -77,27 +70,27 @@
         <etools-data-table-column field="ref">
           <div class="table-column">CO ref. #</div>
         </etools-data-table-column>
-        <etools-data-table-column field="activity">
-          <div class="table-column">Cluster Activity</div>
+        <etools-data-table-column field="title">
+          <div class="table-column">Cluster Objective Title</div>
         </etools-data-table-column>
       </etools-data-table-header>
 
       <template
           id="list"
           is="dom-repeat"
-          items="[[activities]]"
-          as="activity"
+          items="[[objectives]]"
+          as="objective"
           initial-count="[[pageSize]]">
         <etools-data-table-row no-collapse>
           <div slot="row-data">
             <div class="table-cell table-cell--text">
-              [[activity.co_cluster_title]]
+              [[objective.cluster]]
             </div>
             <div class="table-cell table-cell--text">
-              [[activity.co_reference_number]]
+              [[objective.reference_number]]
             </div>
             <div class="table-cell table-cell--text">
-              <a href="[[_detailUrl(activity.id)]]">[[activity.title]]</a>
+              <a href="[[_detailUrl(objective.id)]]">[[objective.title]]</a>
             </div>
           </div>
         </etools-data-table-row>
@@ -118,7 +111,7 @@
 
   <script>
     Polymer({
-      is: 'clusters-activities',
+      is: 'clusters-objectives',
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
@@ -129,7 +122,7 @@
       ],
 
       observers: [
-        '_clusterActivitiesAjax(activitiesUrl, queryParams)',
+        '_clusterObjectivesAjax(objectivesUrl, queryParams)',
       ],
 
       properties: {
@@ -147,24 +140,24 @@
           value: {}
         },
 
-        activitiesUrl: {
+        objectivesUrl: {
           type: String,
-          computed: '_computeActivitiesUrl(route)'
+          computed: '_computeObjectivesUrl(route)'
         },
 
         loading: {
           type: Boolean,
-          statePath: 'clusterActivities.loading'
+          statePath: 'clusterObjectives.loading'
         },
 
-        activities: {
+        objectives: {
           type: Object,
-          statePath: 'clusterActivities.all',
+          statePath: 'clusterObjectives.all',
         },
 
         totalResults: {
           type: Number,
-          statePath: 'clusterActivities.count',
+          statePath: 'clusterObjectives.count',
         },
       },
 
@@ -172,13 +165,13 @@
         this.$$('#modal').open();
       },
 
-      _detailUrl(id) {
-        var path = '/response-parameters/clusters/activity/' + id;
-        return this.buildUrl(this._baseUrlCluster, path)
+      _detailUrl: function (id) {
+        var path = '/response-parameters/clusters/objective/' + id;
+        return this.buildUrl(this._baseUrlCluster, path);
       },
 
-      _clusterActivitiesAjax: function (_, queryParams) {
-        var thunk = this.$.activities.thunk();
+      _clusterObjectivesAjax: function (_, queryParams) {
+        var thunk = this.$.objectives.thunk();
         var areNewParams = !this._areObjectsEquivalent(this.previousQueryParams, queryParams);
 
         this.previousQueryParams = queryParams;
@@ -188,16 +181,16 @@
         }
 
         // Cancel the pending request, if any
-        this.$.activities.abort();
+        this.$.objectives.abort();
 
-        this.dispatch(App.Actions.fetchClusterActivitiesList(thunk))
+        this.dispatch(App.Actions.fetchClusterObjectivesList(thunk))
           .catch(function (err) { // jshint ignore:line
               // TODO: error handling.
           });
       },
 
-      _computeActivitiesUrl: function () {
-        return App.Endpoints.responseParametersClusterActivities();
+      _computeObjectivesUrl: function () {
+        return App.Endpoints.responseParametersClusterObjectives();
       },
     });
   </script>

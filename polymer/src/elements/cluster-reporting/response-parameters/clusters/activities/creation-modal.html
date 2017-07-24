@@ -1,25 +1,25 @@
-<link rel="import" href="../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
-<link rel="import" href="../../../bower_components/paper-dialog/paper-dialog.html">
-<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
-<link rel="import" href="../../../bower_components/paper-styles/typography.html">
-<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
-<link rel="import" href="../../../bower_components/iron-form/iron-form.html">
-<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
-<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../../../../../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../../../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../../../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../../../../bower_components/etools-loading/etools-loading.html">
+<link rel="import" href="../../../../../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../../../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../../../../bower_components/iron-location/iron-location.html">
 
-<link rel="import" href="../../elements/dropdown-form-input.html">
-<link rel="import" href="../../elements/etools-prp-ajax.html">
-<link rel="import" href="../../styles/buttons.html">
-<link rel="import" href="../../redux/store.html">
-<link rel="import" href="../../redux/actions.html">
-<link rel="import" href="../../behaviors/routing.html">
+<link rel="import" href="../../../../../elements/dropdown-form-input.html">
+<link rel="import" href="../../../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../../../styles/buttons.html">
+<link rel="import" href="../../../../../redux/store.html">
+<link rel="import" href="../../../../../redux/actions.html">
+<link rel="import" href="../../../../../behaviors/date.html">
 
-<dom-module id="cluster-objectives-modal">
+<dom-module id="cluster-activities-modal">
   <template>
     <style include="button-styles iron-flex iron-flex-alignment iron-flex-reverse">
       :host {
@@ -63,11 +63,7 @@
         padding: 24px;
       }
 
-      div.row {
-        display: block;
-      }
-
-      paper-input.flex {
+      dropdown-form-input:first-child {
         margin-right: 10px;
       }
 
@@ -80,8 +76,8 @@
     <iron-location path="{{path}}"></iron-location>
 
     <etools-prp-ajax
-        id="createObjective"
-        url="[[objectiveCreationUrl]]"
+        id="createActivity"
+        url="[[activityUrl]]"
         body="[[data]]"
         content-type="application/json"
         method="post">
@@ -92,7 +88,7 @@
         with-backdrop
         opened="[[opened]]">
       <div class="header layout horizontal justified">
-        <h2>Add Cluster Objective</h2>
+        <h2>Add Cluster Activity</h2>
           <paper-icon-button
               class="self-center"
               on-tap="close"
@@ -103,42 +99,51 @@
 
       <paper-dialog-scrollable>
         <iron-form>
-          <div class="row">
-            <paper-input
-              id="title"
-              label="Cluster Objective Title"
-              value="{{data.title}}"
-              type="string"
-              required
-              auto-validate>
-            </paper-input>
-          </div>
+          <paper-input
+            id="title"
+            label="Title"
+            value="{{data.title}}"
+            type="string"
+            required
+            auto-validate>
+          </paper-input>
+
+          <paper-input
+            id="standard"
+            label="Standard"
+            value="{{data.standard}}"
+            type="string"
+            required
+            auto-validate>
+          </paper-input>
 
           <div class="row horizontal layout">
+            <dropdown-form-input
+              class="flex self-stretch"
+               label="Cluster"
+               id="cluster_objective"
+               selected="{{data.cluster_objective}}"
+               data="[[clusters]]">
+            </dropdown-form-input>
+
+            <!-- TODO: Ask: dropdown in mockup, but text field everywhere else? -->
             <paper-input
-              class="flex"
-              id="reference_number"
-              label="CO ref #"
-              value="{{data.reference_number}}"
-              type="string"
-              required
-              auto-validate>
+                class="flex"
+                id="reference_number"
+                label="CO ref #"
+                value="{{data.reference_number}}"
+                type="string"
+                required
+                auto-validate>
             </paper-input>
 
-            <dropdown-form-input class="flex"
-                                 label="Cluster"
-                                 id="cluster"
-                                 selected="{{data.cluster}}"
-                                 data="[[clusters]]">
+            <dropdown-form-input
+               class="flex"
+               label="Frequency of reporting"
+               id="frequency"
+               selected="{{data.frequency}}"
+               data="[[frequencies]]">
             </dropdown-form-input>
-
-            <dropdown-form-input class="flex"
-                                 label="Frequency of reporting"
-                                 id="frequency"
-                                 selected="{{data.frequency}}"
-                                 data="[[frequencies]]">
-            </dropdown-form-input>
-
           </div>
         </iron-form>
 
@@ -154,17 +159,24 @@
         </paper-button>
       </div>
 
+      <etools-loading active="[[updatePending]]"></etools-loading>
+
     </paper-dialog>
   </template>
 
   <script>
     Polymer({
-      is: 'cluster-objectives-modal',
+      is: 'cluster-activities-modal',
 
       behaviors: [
+        App.Behaviors.DateBehavior,
         App.Behaviors.ReduxBehavior,
         App.Behaviors.RoutingBehavior,
       ],
+
+      listeners: {
+        'dialog.iron-overlay-closed': 'close',
+      },
 
       properties: {
 
@@ -182,16 +194,6 @@
         data: {
           type: Object,
           value: {}
-        },
-
-        formatDate: {
-          type: String,
-          value: 'DD MMM YYYY'
-        },
-
-        objectiveCreationUrl: {
-          type: String,
-          value: App.Endpoints.responseParametersClusterObjectives()
         },
 
         // TODO: Remove this and populate cluster dropdown.
@@ -212,15 +214,16 @@
             {title: 'Quarterly', id: 'Qua'},
           ],
         },
-      },
 
-      listeners: {
-        'dialog.iron-overlay-closed': 'close',
+        activityUrl: {
+          type: String,
+          value: App.Endpoints.responseParametersClusterActivities()
+        },
       },
 
       close: function () {
-        this.data = {};
         this.set('opened', false);
+        this.data = {};
       },
 
       open: function () {
@@ -234,21 +237,19 @@
         if (typeof(this.data.frequency) === 'number') {
           this.data.frequency = this.frequencies[this.data.frequency].id;
         }
-        if (typeof(this.data.cluster) === 'number') {
-          this.data.cluster = this.clusters[this.data.cluster].id;
-        }
       },
 
-      _redirectToDetail(id) {
-        var path = '/response-parameters/clusters/objective/' + String(id);
+      _redirectToDetail: function (id) {
+        var path = '/response-parameters/clusters/activity/' + String(id);
         var url = this.buildUrl(this._baseUrlCluster, path);
-        this.set("path", url)
+        this.set('path', url);
       },
 
       _save: function () {
         var self = this;
         this._getDropdownIds();
-        var thunk = this.$.createObjective.thunk();
+        var thunk = this.$.createActivity.thunk();
+        self.updatePending = true;
         thunk()
           .then(function (res) {
             self.updatePending = false;

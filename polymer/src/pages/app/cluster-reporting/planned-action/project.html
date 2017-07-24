@@ -4,26 +4,17 @@
 <link rel="import" href="../../../../../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../../../../../bower_components/app-route/app-route.html">
 
+<link rel="import" href="../../../../behaviors/utils.html">
+<link rel="import" href="../../../../behaviors/routing.html">
+<link rel="import" href="../../../../elements/cluster-reporting/planned-action/projects/overview.html">
 <link rel="import" href="../../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../../elements/page-header.html">
-<link rel="import" href="../../../../elements/cluster-reporting/planned-action/project/overview.html">
 <link rel="import" href="../../../../elements/project-status.html">
 <link rel="import" href="../../../../elements/page-badge.html">
 <link rel="import" href="../../../../endpoints.html">
 <link rel="import" href="../../../../redux/actions.html">
 <link rel="import" href="../../../../redux/store.html">
 <link rel="import" href="../../../../styles/shared-styles.html">
-<link rel="import" href="../../../../behaviors/utils.html">
-<link rel="import" href="../../../../behaviors/routing.html">
-<link rel="import" href="../../../../elements/page-body.html">
-<link rel="import" href="../../../../elements/etools-prp-ajax.html">
-<link rel="import" href="../../../../endpoints.html">
-<link rel="import" href="../../../../redux/actions.html">
-<link rel="import" href="../../../../redux/store.html">
-
-<!--
-The overview tab content is retrieved in this component because some info is
-needed for the header name, etc. -->
 
 <dom-module id="planned-action-projects-details">
   <template>
@@ -53,9 +44,9 @@ needed for the header name, etc. -->
   </style>
 
     <etools-prp-ajax
-        id="overview"
-        url="[[overviewUrl]]"
-        params="[[queryParams]]">
+      id="overview"
+      url="[[overviewUrl]]"
+      params="[[queryParams]]">
     </etools-prp-ajax>
 
     <app-route
@@ -158,7 +149,7 @@ needed for the header name, etc. -->
       },
 
       _computeOverviewUrl: function(projectId) {
-        return App.Endpoints.plannedActionsProjectOverview(this.projectId);
+        return App.Endpoints.plannedActionsProjectOverview(projectId);
       },
 
       attached: function () {

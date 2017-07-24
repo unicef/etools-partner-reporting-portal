@@ -1,28 +1,29 @@
-<link rel="import" href="../../../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../../../bower_components/paper-tabs/paper-tab.html">
-<link rel="import" href="../../../../../bower_components/paper-tabs/paper-tabs.html">
-<link rel="import" href="../../../../../bower_components/iron-pages/iron-pages.html">
-<link rel="import" href="../../../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../../../../../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../../../../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../../../../../bower_components/app-route/app-route.html">
 
-<link rel="import" href="../../../../elements/etools-prp-ajax.html">
-<link rel="import" href="../../../../elements/page-header.html">
-<link rel="import" href="../../../../elements/cluster-reporting/response-parameters/clusters-overview.html">
-<link rel="import" href="../../../../elements/project-status.html">
-<link rel="import" href="../../../../elements/page-badge.html">
-<link rel="import" href="../../../../endpoints.html">
-<link rel="import" href="../../../../redux/actions.html">
-<link rel="import" href="../../../../redux/store.html">
-<link rel="import" href="../../../../styles/shared-styles.html">
-<link rel="import" href="../../../../behaviors/utils.html">
-<link rel="import" href="../../../../behaviors/routing.html">
-<link rel="import" href="../../../../elements/page-body.html">
-<link rel="import" href="../../../../elements/etools-prp-ajax.html">
-<link rel="import" href="../../../../endpoints.html">
-<link rel="import" href="../../../../redux/actions.html">
-<link rel="import" href="../../../../redux/store.html">
+<link rel="import" href="../../../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../../../elements/page-header.html">
+<link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/clusters/activities/
+overview.html">
+<link rel="import" href="../../../../../elements/project-status.html">
+<link rel="import" href="../../../../../elements/page-badge.html">
+<link rel="import" href="../../../../../endpoints.html">
+<link rel="import" href="../../../../../redux/actions.html">
+<link rel="import" href="../../../../../redux/store.html">
+<link rel="import" href="../../../../../styles/shared-styles.html">
+<link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="../../../../../behaviors/routing.html">
+<link rel="import" href="../../../../../elements/page-body.html">
+<link rel="import" href="../../../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../../../endpoints.html">
+<link rel="import" href="../../../../../redux/actions.html">
+<link rel="import" href="../../../../../redux/store.html">
 
 
-<dom-module id="clusters-objective-details">
+<dom-module id="clusters-activity-details">
   <template>
     <style include="shared-styles">
     :host {
@@ -50,8 +51,8 @@
   </style>
 
     <etools-prp-ajax
-        id="objective"
-        url="[[objectiveUrl]]"
+        id="activity"
+        url="[[url]]"
         params="[[queryParams]]">
     </etools-prp-ajax>
 
@@ -67,7 +68,7 @@
         back="[[backLink]]">
 
       <page-badge
-          class="above-title" name="objective">
+          class="above-title" name="activity">
       </page-badge>
 
       <div class="toolbar">
@@ -82,28 +83,28 @@
             hide-scroll-buttons>
           <paper-tab name="overview">Overview</paper-tab>
           <paper-tab name="indicators">Indicators</paper-tab>
-          <paper-tab name="activities">Activities</paper-tab>
+          <paper-tab name="contributing-partners">Contributing Partners</paper-tab>
         </paper-tabs>
       </div>
     </page-header>
 
     <template is="dom-if" if="[[_equals(tab, 'overview')]]" restamp="true">
-      <rp-clusters-details-overview data=[[data]]></rp-clusters-details-overview>
+      <rp-clusters-activity-overview data=[[data]]></rp-clusters-activity-overview>
     </template>
 
     <template is="dom-if" if="[[_equals(tab, 'indicators')]]" restamp="true">
       TODO: Indicator content
     </template>
 
-    <template is="dom-if" if="[[_equals(tab, 'activities')]]" restamp="true">
-      TODO: Activity content
+    <template is="dom-if" if="[[_equals(tab, 'contributing-partners')]]" restamp="true">
+      TODO: Contributing Partners content
     </template>
 
   </template>
 
   <script>
     Polymer({
-      is: 'clusters-objective-details',
+      is: 'clusters-activity-details',
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
@@ -116,16 +117,16 @@
 
         routeData: Object,
 
-        objectiveId: String,
+        activityId: String,
 
         data: {
           type: Object,
           value: {}
         },
 
-        objectiveUrl: {
+        url: {
           type: String,
-          computed: '_computeObjectiveUrl(objectiveId)'
+          computed: '_computeUrl(activityId)'
         },
 
         backLink: {
@@ -154,19 +155,15 @@
         this.set('route.path', '/' + this.tab);
       },
 
-      _computeObjectiveUrl: function(objectiveId) {
-        console.log("ob id?", objectiveId)
-        console.log(App.Endpoints.responseParamtersClustersObjectiveDetail(this.objectiveId))
-        return App.Endpoints.responseParamtersClustersObjectiveDetail(this.objectiveId);
+      _computeUrl: function(activityId) {
+        return App.Endpoints.responseParamtersClustersActivityDetail(activityId);
       },
 
       attached: function () {
-        console.log("ATTACHED")
-        var thunk = this.$.objective.thunk();
+        var thunk = this.$.activity.thunk();
         var self = this;
         thunk()
           .then(function (res) {
-            console.log("res?", res)
             self.updatePending = false;
             self.data = res.data;
           })

@@ -9,8 +9,8 @@
 <link rel="import" href="../../../../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../../../../bower_components/paper-radio-button/paper-radio-button.html">
 
-<link rel="import" href="../../../../elements/cluster-reporting/planned-action-projects-filters.html">
-<link rel="import" href="../../../../elements/cluster-reporting/planned-action-projects-modal.html">
+<link rel="import" href="../../../../elements/cluster-reporting/planned-action/projects/filters.html">
+<link rel="import" href="../../../../elements/cluster-reporting/planned-action/projects/creation-modal.html">
 <link rel="import" href="../../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../../elements/project-status.html">
 <link rel="import" href="../../../../elements/page-body.html">
@@ -61,6 +61,9 @@
         color: var(--theme-primary-color);
       }
 
+      .tabs paper-tab {
+        text-transform: uppercase;
+      }
     </style>
 
     <iron-location
@@ -241,9 +244,9 @@
         '_partnerProjectsAjax(queryParams)',
       ],
 
-      _detailUrl(project) {
+      _detailUrl: function(project) {
         var path = '/planned-action/project/' + project.id;
-        return this.buildUrl(this._baseUrlCluster, path)
+        return this.buildUrl(this._baseUrlCluster, path);
       },
 
       _partnerProjectsAjax: function (queryParams) {
