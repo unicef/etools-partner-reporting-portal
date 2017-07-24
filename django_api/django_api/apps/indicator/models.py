@@ -257,9 +257,9 @@ class IndicatorReport(TimeStampedModel):
     def can_submit(self):
         for data in self.indicator_location_data.all():
             for key, vals in data.disaggregation.iteritems():
-                if self.is_percentage and vals.get('c', 0) == 0:
+                if self.is_percentage and (vals.get('c', None) in [None, '']):
                     return False
-                elif self.is_number and vals.get('v', 0) == 0:
+                elif self.is_number and (vals.get('v', None) in [None, '']):
                     return False
         return True
 
