@@ -115,9 +115,9 @@ class Command(BaseCommand):
                                     location=location,
                                     num_disaggregation=indicator_report.disaggregations.count(),
                                     level_reported=indicator_report.disaggregations.count(),
-                                    disaggregation_reported_on=indicator_report.disaggregations.values_list(
-                                        'id', flat=True),
-                                    disaggregation={}
+                                    disaggregation_reported_on=list(indicator_report.disaggregations.values_list(
+                                        'id', flat=True)),
+                                    disaggregation=dict(),
                                 )
 
                         else:
@@ -136,9 +136,9 @@ class Command(BaseCommand):
                                     location=location,
                                     num_disaggregation=indicator_report.disaggregations.count(),
                                     level_reported=indicator_report.disaggregations.count(),
-                                    disaggregation_reported_on=indicator_report.disaggregations.values_list(
-                                        'id', flat=True),
-                                    disaggregation={}
+                                    disaggregation_reported_on=list(indicator_report.disaggregations.values_list(
+                                        'id', flat=True)),
+                                    disaggregation=dict(),
                                 )
 
                         indicator_report.progress_report = next_progress_report
@@ -158,8 +158,8 @@ class Command(BaseCommand):
             if latest_indicator_report:
                 print "Indicator {} IndicatorReport Found with period of {} - {} ".format(
                     indicator,
-                    latest_indicator_report.start_date,
-                    latest_indicator_report.end_date)
+                    latest_indicator_report.time_period_start,
+                    latest_indicator_report.time_period_end)
 
                 date_list = find_missing_frequency_period_dates(
                     indicator.start_date,
@@ -198,9 +198,9 @@ class Command(BaseCommand):
                                 location=location,
                                 num_disaggregation=indicator_report.disaggregations.count(),
                                 level_reported=indicator_report.disaggregations.count(),
-                                disaggregation_reported_on=indicator_report.disaggregations.values_list(
-                                    'id', flat=True),
-                                disaggregation={}
+                                disaggregation_reported_on=list(indicator_report.disaggregations.values_list(
+                                    'id', flat=True)),
+                                disaggregation=dict(),
                             )
 
                     else:
@@ -221,7 +221,7 @@ class Command(BaseCommand):
                                 location=location,
                                 num_disaggregation=indicator_report.disaggregations.count(),
                                 level_reported=indicator_report.disaggregations.count(),
-                                disaggregation_reported_on=indicator_report.disaggregations.values_list(
-                                    'id', flat=True),
-                                disaggregation={}
+                                disaggregation_reported_on=list(indicator_report.disaggregations.values_list(
+                                    'id', flat=True)),
+                                disaggregation=dict(),
                             )
