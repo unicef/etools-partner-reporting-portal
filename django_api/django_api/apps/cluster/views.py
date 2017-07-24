@@ -233,3 +233,4 @@ class ClusterListAPIView(ListCreateAPIView):
     def get_queryset(self):
         response_plan_id = self.kwargs.get(self.lookup_field)
         return Cluster.objects.filter(response_plan_id=response_plan_id)
+
