@@ -534,7 +534,7 @@ def generate_indicator_report_location_disaggregation_quantity_data():
     # IndicatorReport objects with location data are guaranteed to show up
     # first
     today = datetime.date.today()
-    date = datetime.date(today.year - 1, today.month, today.day)
+    date = datetime.date(today.year, 1, today.day)
 
     not_latest_queryset = IndicatorReport.objects.filter()
 
@@ -671,7 +671,7 @@ def generate_indicator_report_location_disaggregation_ratio_data():
     # IndicatorReport objects with location data are guaranteed to show up
     # first
     today = datetime.date.today()
-    date = datetime.date(today.year - 1, today.month, today.day)
+    date = datetime.date(today.year, 1, today.day)
 
     not_latest_queryset = IndicatorReport.objects.filter()
 

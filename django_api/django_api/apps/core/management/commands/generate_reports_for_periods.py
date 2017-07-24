@@ -146,7 +146,7 @@ class Command(BaseCommand):
             if latest_indicator_report:
                 date_list = find_missing_frequency_period_dates(
                     indicator.start_date,
-                    latest_indicator_report.end_date,
+                    latest_indicator_report.time_period_end,
                     frequency,
                 )
 
