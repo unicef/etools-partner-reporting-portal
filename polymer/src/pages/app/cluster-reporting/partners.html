@@ -5,10 +5,9 @@
 <link rel="import" href="../../../../bower_components/iron-pages/iron-pages.html">
 
 <link rel="import" href="../../../styles/shared-styles.html">
-<link rel="import" href="../../../elements/page-header.html">
-<link rel="import" href="../../../elements/page-body.html">
-<link rel="import" href="partners-projects.html">
-<link rel="import" href="partners-activities.html">
+<link rel="import" href="../../../behaviors/utils.html">
+<link rel="import" href="../../../behaviors/routing.html">
+<link rel="import" href="response-parameters/response-parameters-partners-router.html">
 
 
 <dom-module id="partners-response-parameters">
@@ -21,55 +20,42 @@
 
     <app-route
       route="{{route}}"
-      pattern="/:tab"
+      pattern="/:subpage"
       data="{{routeData}}"
       tail="{{subroute}}">
     </app-route>
 
-    <div class="page-top-content">
-      <page-header title="Partners">
-        <div class="tabs">
-          <paper-tabs
-            selected="{{routeData.tab}}"
-            attr-for-selected="name"
-            scrollable
-            hide-scroll-buttons>
+    <template is="dom-if" if="[[_displayHeader(subpage)]]" restamp="true">
+      <div class="page-top-content">
+        <page-header title="Partners">
+          <div class="tabs">
+            <paper-tabs
+              selected="{{tab}}"
+              attr-for-selected="name"
+              scrollable
+              hide-scroll-buttons>
 
-            <paper-tab name="contacts">
-              <span class="tab-content">Contacts</span>
-            </paper-tab>
+              <paper-tab name="contacts">
+                <span class="tab-content">Contacts</span>
+              </paper-tab>
 
-            <paper-tab name="projects">
-              <span class="tab-content">Projects</span>
-            </paper-tab>
+              <paper-tab name="projects">
+                <span class="tab-content">Projects</span>
+              </paper-tab>
 
-            <paper-tab name="activities">
-              <span class="tab-content">Activities</span>
-            </paper-tab>
-          </paper-tabs>
-        </div>
-      </page-header>
-    </div>
+              <paper-tab name="activities">
+                <span class="tab-content">Activities</span>
+              </paper-tab>
+            </paper-tabs>
+          </div>
+        </page-header>
+      </div>
+    </template>
 
-    <page-body>
-      <iron-pages
-        id="tabContent"
-        selected=[[tab]]
-        attr-for-selected="name"
-        fallback-selection="projects"
-        on-iron-items-changed="_updateTabSelection">
-
-        <div name="contacts">TODO</div>
-
-        <partners-projects
-            name="projects"
-            route="{{subroute}}">
-        </partners-projects>
-
-        <div name="activities">TODO</div>
-
-      </iron-pages>
-    </page-body>
+    <response-parameters-partners-router
+      route="{{subroute}}"
+      page={{subpage}}>
+    </response-parameters-partners-router>
 
   </template>
 
@@ -78,32 +64,66 @@
       is: 'partners-response-parameters',
 
       properties: {
+        subpage: String,
+
         tab: String
       },
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.RoutingBehavior,
       ],
 
       observers: [
-        '_routeTabChanged(routeData.tab)',
+        '_routeChanged(routeData.subpage)',
+        '_tabChanged(tab)'
       ],
 
-      // Tracks the tab value in the URL only.
-      _routeTabChanged: function (tab) {
-        if (!tab) {
-          this.set('routeData.tab', 'contacts');
-          this.set('route.path', '/contacts/');
-        } else {
-          this.tab = tab;
-          this.set('route.path', '/' + tab);
+      _routeChanged: function (subpage) {
+        switch (subpage) {
+          case 'contacts':
+            this.subpage = 'contacts';
+            this.tab = 'contacts';
+            break;
+
+          case 'projects':
+            this.subpage = 'projects';
+            this.tab = 'projects';
+            break;
+
+          case 'project':
+            this.subpage = 'project';
+            break;
+
+          case 'activities':
+            this.subpage = 'activities';
+            this.tab = 'activities';
+            break;
+
+          case 'activity':
+            this.subpage = 'activity';
+            break;
+
+          default:
+            this.subpage = 'projects';
+            this.set('route.path', '/projects');
+            // this.subpage = 'contacts';
+            // this.set('route.path', '/contacts');
+            break;
         }
       },
 
-      _updateTabSelection: function () {
-        this.$.tabContent.select(this.tab);
+      _displayHeader: function(subpage) {
+        if (subpage[subpage.length - 1] === 's') {
+          return true;
+        }
+        return false;
       },
 
+      _tabChanged: function (tab) {
+        this.set('route.path', '/' + tab);
+      },
     });
   </script>
 </dom-module>
