@@ -166,10 +166,8 @@ def generate_fake_data(quantity=40):
     print "{} ClusterObjective <-> QuantityReportableToClusterObjectiveFactory <-> IndicatorReport objects linked".format(quantity/2)
 
     print "Generating IndicatorLocationData for Quantity type"
-    generate_indicator_report_location_disaggregation_quantity_data()
-
-    print "Generating IndicatorLocationData for Quantity type CLUSTER"
-    generate_indicator_report_location_disaggregation_quantity_data_cluster()
+    generate_indicator_report_location_disaggregation_quantity_data(QuantityIndicatorReportFactory)
+    generate_indicator_report_location_disaggregation_quantity_data(QuantityReportableToClusterObjectiveFactory)
 
     print "Generating IndicatorLocationData for Ratio type"
     generate_indicator_report_location_disaggregation_ratio_data()

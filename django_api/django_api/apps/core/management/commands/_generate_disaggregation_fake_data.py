@@ -412,7 +412,7 @@ def generate_disaggregation_and_disaggregation_values(reportable, disaggregation
                 "disaggregation_map does not have key %s to create Disaggregation" % (target))
 
 
-def generate_indicator_report_location_disaggregation_quantity_data():
+def generate_indicator_report_location_disaggregation_quantity_data(handler):
     # Adding extra IndicatorReport to each QuantityReportableToLowerLevelOutput
     locations = Location.objects.all()
 
@@ -422,23 +422,28 @@ def generate_indicator_report_location_disaggregation_quantity_data():
         "gender": ["male", "female", "other"],
     }
 
-    queryset = Reportable.objects.filter(
-        lower_level_outputs__reportables__isnull=False, blueprint__unit=IndicatorBlueprint.NUMBER).order_by('id')
+    if handler.__name__ == 'QuantityReportableToClusterObjectiveFactory':
+        queryset = Reportable.objects.filter(
+            cluster_objectives__reportables__isnull=False, blueprint__unit=IndicatorBlueprint.NUMBER).order_by('id')
+    else:
+        queryset = Reportable.objects.filter(
+            lower_level_outputs__reportables__isnull=False, blueprint__unit=IndicatorBlueprint.NUMBER).order_by('id')
 
     for idx, reportable in enumerate(queryset):
         # -- Extra IndicatorReport and IndicatorLocationData --
 
         # ProgressReport - IndicatorReport from
         # QuantityReportableToLowerLevelOutput
-        indicator_report = QuantityIndicatorReportFactory(reportable=reportable)
-        indicator_report.progress_report = reportable.indicator_reports.first().progress_report
-        indicator_report.save()
+        if handler.__name__ == 'QuantityIndicatorReportFactory':
+            indicator_report = QuantityIndicatorReportFactory(reportable=reportable)
+            indicator_report.progress_report = reportable.indicator_reports.first().progress_report
+            indicator_report.save()
 
         # -- IndicatorLocationData --
 
         # -- 0 num_disaggregation generation for 3 entries --
         if idx % 8 == 0:
-            print "NO Disaggregation (and DisaggregationValue) objects for QuantityReportableToLowerLevelOutput {} created".format(idx)
+            print "NO Disaggregation (and DisaggregationValue) objects for {} {} created".format(handler.__name__, idx)
 
         # -- 1 num_disaggregation generation for 3 entries --
         elif idx % 8 == 1:
@@ -447,7 +452,7 @@ def generate_indicator_report_location_disaggregation_quantity_data():
                 sample_disaggregation_value_map,
                 disaggregation_targets=["height"])
 
-            print "Disaggregation (and DisaggregationValue) objects for QuantityReportableToLowerLevelOutput {} created".format(idx)
+            print "Disaggregation (and DisaggregationValue) objects for {} {} created".format(handler.__name__, idx)
 
         elif idx % 8 == 2:
             generate_disaggregation_and_disaggregation_values(
@@ -455,7 +460,7 @@ def generate_indicator_report_location_disaggregation_quantity_data():
                 sample_disaggregation_value_map,
                 disaggregation_targets=["age"])
 
-            print "Disaggregation (and DisaggregationValue) objects for QuantityReportableToLowerLevelOutput {} created".format(idx)
+            print "Disaggregation (and DisaggregationValue) objects for {} {} created".format(handler.__name__, idx)
 
         elif idx % 8 == 3:
             generate_disaggregation_and_disaggregation_values(
@@ -463,7 +468,7 @@ def generate_indicator_report_location_disaggregation_quantity_data():
                 sample_disaggregation_value_map,
                 disaggregation_targets=["gender"])
 
-            print "Disaggregation (and DisaggregationValue) objects for QuantityReportableToLowerLevelOutput {} created".format(idx)
+            print "Disaggregation (and DisaggregationValue) objects for {} {} created".format(handler.__name__, idx)
 
         # -- 2 num_disaggregation generation for 3 entries --
         elif idx % 8 == 4:
@@ -472,7 +477,7 @@ def generate_indicator_report_location_disaggregation_quantity_data():
                 sample_disaggregation_value_map,
                 disaggregation_targets=["height", "age"])
 
-            print "Disaggregation (and DisaggregationValue) objects for QuantityReportableToLowerLevelOutput {} created".format(idx)
+            print "Disaggregation (and DisaggregationValue) objects for {} {} created".format(handler.__name__, idx)
 
         elif idx % 8 == 5:
             generate_disaggregation_and_disaggregation_values(
@@ -480,7 +485,7 @@ def generate_indicator_report_location_disaggregation_quantity_data():
                 sample_disaggregation_value_map,
                 disaggregation_targets=["height", "gender"])
 
-            print "Disaggregation (and DisaggregationValue) objects for QuantityReportableToLowerLevelOutput {} created".format(idx)
+            print "Disaggregation (and DisaggregationValue) objects for {} {} created".format(handler.__name__, idx)
 
         elif idx % 8 == 6:
             generate_disaggregation_and_disaggregation_values(
@@ -488,7 +493,7 @@ def generate_indicator_report_location_disaggregation_quantity_data():
                 sample_disaggregation_value_map,
                 disaggregation_targets=["gender", "age"])
 
-            print "Disaggregation (and DisaggregationValue) objects for QuantityReportableToLowerLevelOutput {} created".format(idx)
+            print "Disaggregation (and DisaggregationValue) objects for {} {} created".format(handler.__name__, idx)
 
         # -- 3 num_disaggregation generation for 3 entries --
         elif idx % 8 == 7:
@@ -497,7 +502,7 @@ def generate_indicator_report_location_disaggregation_quantity_data():
                 sample_disaggregation_value_map,
                 disaggregation_targets=["age", "gender", "height"])
 
-            print "Disaggregation (and DisaggregationValue) objects for QuantityReportableToLowerLevelOutput {} created".format(idx)
+            print "Disaggregation (and DisaggregationValue) objects for {} {} created".format(handler.__name__, idx)
 
     for idx, reportable in enumerate(queryset):
         # -- 0 num_disaggregation generation for 3 entries --
@@ -529,7 +534,7 @@ def generate_indicator_report_location_disaggregation_quantity_data():
                     reportable.locations.add(
                         Location.objects.get(id=location_id))
 
-        print "IndicatorReport and its Disaggregation data entries for QuantityReportableToLowerLevelOutput {} created".format(idx)
+        print "IndicatorReport and its Disaggregation data entries for {} {} created".format(handler.__name__, idx)
 
     # Making the rest of IndicatorReport objects not latest so that
     # IndicatorReport objects with location data are guaranteed to show up
@@ -537,9 +542,14 @@ def generate_indicator_report_location_disaggregation_quantity_data():
     today = datetime.date.today()
     date = datetime.date(today.year - 1, today.month, today.day)
 
-    not_latest_queryset = IndicatorReport.objects.filter(
-        reportable__lower_level_outputs__reportables__isnull=False
-    )
+    if handler.__name__ == 'QuantityReportableToClusterObjectiveFactory':
+        not_latest_queryset = IndicatorReport.objects.filter(
+            reportable__cluster_objectives__reportables__isnull=False
+        )
+    else:
+        not_latest_queryset = IndicatorReport.objects.filter(
+            reportable__lower_level_outputs__reportables__isnull=False
+        )
 
     not_latest_queryset.filter(indicator_location_data__isnull=True) \
         .update(time_period_start=date)
@@ -678,144 +688,6 @@ def generate_indicator_report_location_disaggregation_ratio_data():
 
     not_latest_queryset = IndicatorReport.objects.filter(
         reportable__lower_level_outputs__reportables__isnull=False
-    )
-
-    not_latest_queryset.filter(indicator_location_data__isnull=True) \
-        .update(time_period_start=date)
-
-    not_latest_queryset.filter(
-        indicator_location_data__disaggregation__isnull=True) \
-        .update(time_period_start=date)
-
-
-
-def generate_indicator_report_location_disaggregation_quantity_data_cluster():
-    # Adding extra IndicatorReport to each QuantityReportableToClusterObjectiveFactory
-    locations = Location.objects.all()
-
-    sample_disaggregation_value_map = {
-        "height": ["tall", "medium", "short", "extrashort"],
-        "age": ["1-2m", "3-4m", "5-6m", '7-10m', '11-13m', '14-16m'],
-        "gender": ["male", "female", "other"],
-    }
-
-    queryset = Reportable.objects.filter(
-        cluster_objectives__reportables__isnull=False, blueprint__unit=IndicatorBlueprint.NUMBER).order_by('id')
-
-    for idx, reportable in enumerate(queryset):
-        # -- Extra IndicatorReport and IndicatorLocationData --
-
-        # ProgressReport - IndicatorReport from
-        # QuantityReportableToClusterObjectiveFactory
-        # indicator_report = QuantityReportableToClusterObjectiveFactory(reportable=reportable)
-        # indicator_report.progress_report = reportable.indicator_reports.first().progress_report
-        # indicator_report.save()
-
-        # -- IndicatorLocationData --
-
-        # -- 0 num_disaggregation generation for 3 entries --
-        if idx % 8 == 0:
-            print "NO Disaggregation (and DisaggregationValue) objects for QuantityReportableToClusterObjectiveFactory {} created".format(idx)
-
-        # -- 1 num_disaggregation generation for 3 entries --
-        elif idx % 8 == 1:
-            generate_disaggregation_and_disaggregation_values(
-                reportable,
-                sample_disaggregation_value_map,
-                disaggregation_targets=["height"])
-
-            print "Disaggregation (and DisaggregationValue) objects for QuantityReportableToClusterObjectiveFactory {} created".format(idx)
-
-        elif idx % 8 == 2:
-            generate_disaggregation_and_disaggregation_values(
-                reportable,
-                sample_disaggregation_value_map,
-                disaggregation_targets=["age"])
-
-            print "Disaggregation (and DisaggregationValue) objects for QuantityReportableToClusterObjectiveFactory {} created".format(idx)
-
-        elif idx % 8 == 3:
-            generate_disaggregation_and_disaggregation_values(
-                reportable,
-                sample_disaggregation_value_map,
-                disaggregation_targets=["gender"])
-
-            print "Disaggregation (and DisaggregationValue) objects for QuantityReportableToClusterObjectiveFactory {} created".format(idx)
-
-        # -- 2 num_disaggregation generation for 3 entries --
-        elif idx % 8 == 4:
-            generate_disaggregation_and_disaggregation_values(
-                reportable,
-                sample_disaggregation_value_map,
-                disaggregation_targets=["height", "age"])
-
-            print "Disaggregation (and DisaggregationValue) objects for QuantityReportableToClusterObjectiveFactory {} created".format(idx)
-
-        elif idx % 8 == 5:
-            generate_disaggregation_and_disaggregation_values(
-                reportable,
-                sample_disaggregation_value_map,
-                disaggregation_targets=["height", "gender"])
-
-            print "Disaggregation (and DisaggregationValue) objects for QuantityReportableToClusterObjectiveFactory {} created".format(idx)
-
-        elif idx % 8 == 6:
-            generate_disaggregation_and_disaggregation_values(
-                reportable,
-                sample_disaggregation_value_map,
-                disaggregation_targets=["gender", "age"])
-
-            print "Disaggregation (and DisaggregationValue) objects for QuantityReportableToClusterObjectiveFactory {} created".format(idx)
-
-        # -- 3 num_disaggregation generation for 3 entries --
-        elif idx % 8 == 7:
-            generate_disaggregation_and_disaggregation_values(
-                reportable,
-                sample_disaggregation_value_map,
-                disaggregation_targets=["age", "gender", "height"])
-
-            print "Disaggregation (and DisaggregationValue) objects for QuantityReportableToClusterObjectiveFactory {} created".format(idx)
-
-    for idx, reportable in enumerate(queryset):
-        # -- 0 num_disaggregation generation for 3 entries --
-        if reportable.disaggregation.count() == 0:
-            generate_0_num_disagg_data(reportable, indicator_type="quantity")
-
-        # -- 1 num_disaggregation generation for 3 entries --
-        elif reportable.disaggregation.count() == 1:
-            generate_1_num_disagg_data(reportable, indicator_type="quantity")
-
-        # -- 2 num_disaggregation generation for 3 entries --
-        elif reportable.disaggregation.count() == 2:
-            generate_2_num_disagg_data(reportable, indicator_type="quantity")
-
-        # -- 3 num_disaggregation generation for 3 entries --
-        elif reportable.disaggregation.count() == 3:
-            generate_3_num_disagg_data(reportable, indicator_type="quantity")
-
-        # 0 num_disaggregation
-        if reportable.disaggregation.count() != 0:
-            if reportable.locations.count() != 0:
-                first_reportable_location_id = reportable.locations.first().id
-
-            else:
-                first_reportable_location_id = None
-
-            for location_id in list(reportable.indicator_reports.values_list('indicator_location_data__location', flat=True)):
-                if not first_reportable_location_id or (first_reportable_location_id and first_reportable_location_id != location_id):
-                    reportable.locations.add(
-                        Location.objects.get(id=location_id))
-
-        print "IndicatorReport and its Disaggregation data entries for QuantityReportableToClusterObjectiveFactory {} created".format(idx)
-
-    # Making the rest of IndicatorReport objects not latest so that
-    # IndicatorReport objects with location data are guaranteed to show up
-    # first
-    today = datetime.date.today()
-    date = datetime.date(today.year - 1, today.month, today.day)
-
-    not_latest_queryset = IndicatorReport.objects.filter(
-        reportable__cluster_objectives__reportables__isnull=False
     )
 
     not_latest_queryset.filter(indicator_location_data__isnull=True) \
