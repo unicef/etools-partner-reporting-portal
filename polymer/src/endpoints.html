@@ -68,6 +68,10 @@
       indicatorLocationDataEntries: function() {
         return this._buildUrl('/indicator/indicator-location-data-entries/');
       },
+
+      clusterIndicatorReports: function (responsePlanId) {
+        return this._buildUrl('/cluster/' + responsePlanId + '/cluster-indicators-list/');
+      },
     };
   }());
 </script>
