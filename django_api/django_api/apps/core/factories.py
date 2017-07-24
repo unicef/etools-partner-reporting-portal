@@ -299,6 +299,60 @@ class RatioReportableToLowerLevelOutputFactory(ReportableFactory):
         model = Reportable
 
 
+class QuantityReportableToPartnerProjectFactory(ReportableFactory):
+    content_object = factory.SubFactory('core.factories.PartnerProjectFactory')
+    target = '5000'
+    baseline = '0'
+
+    indicator_report = factory.RelatedFactory('core.factories.QuantityIndicatorReportFactory', 'reportable')
+
+    location = factory.RelatedFactory('core.factories.LocationFactory', 'reportable', parent=None)
+
+    blueprint = factory.SubFactory(QuantityTypeIndicatorBlueprintFactory)
+
+    total = dict(
+        [('c', 0), ('d', 0), ('v', random.randint(0, 3000))])
+
+    class Meta:
+        model = Reportable
+
+
+class QuantityReportableToClusterObjectiveFactory(ReportableFactory):
+    content_object = factory.SubFactory('core.factories.ClusterObjectiveFactory')
+    target = '5000'
+    baseline = '0'
+
+    indicator_report = factory.RelatedFactory('core.factories.QuantityIndicatorReportFactory', 'reportable')
+
+    location = factory.RelatedFactory('core.factories.LocationFactory', 'reportable', parent=None)
+
+    blueprint = factory.SubFactory(QuantityTypeIndicatorBlueprintFactory)
+
+    total = dict(
+        [('c', 0), ('d', 0), ('v', random.randint(0, 3000))])
+
+    class Meta:
+        model = Reportable
+
+
+class QuantityReportableToPartnerActivityFactory(ReportableFactory):
+    content_object = factory.SubFactory('core.factories.PartnerActivityFactory')
+    target = '5000'
+    baseline = '0'
+
+    indicator_report = factory.RelatedFactory('core.factories.QuantityIndicatorReportFactory', 'reportable')
+
+    location = factory.RelatedFactory('core.factories.LocationFactory', 'reportable', parent=None)
+
+    blueprint = factory.SubFactory(QuantityTypeIndicatorBlueprintFactory)
+
+    total = dict(
+        [('c', 0), ('d', 0), ('v', random.randint(0, 3000))])
+
+    class Meta:
+        model = Reportable
+
+
 class LocationFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "location_%d" % n)
 
@@ -309,7 +363,7 @@ class LocationFactory(factory.django.DjangoModelFactory):
 class ProgressReportFactory(factory.django.DjangoModelFactory):
     start_date = fuzzy.FuzzyDate(datetime.date.today())
     end_date = fuzzy.FuzzyDate(datetime.date.today())
-    
+
     class Meta:
         model = ProgressReport
 

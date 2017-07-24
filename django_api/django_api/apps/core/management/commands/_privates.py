@@ -35,6 +35,9 @@ from core.factories import (
     LocationFactory,
     QuantityReportableToLowerLevelOutputFactory,
     RatioReportableToLowerLevelOutputFactory,
+    QuantityReportableToPartnerProjectFactory,
+    QuantityReportableToClusterObjectiveFactory,
+    QuantityReportableToPartnerActivityFactory,
     QuantityIndicatorReportFactory,
     RatioIndicatorReportFactory,
     ProgressReportFactory,
@@ -145,6 +148,28 @@ def generate_fake_data(quantity=40):
         cluster_activity = ClusterActivity.objects.all()[idx]
         PartnerFactory(partner_activity__cluster_activity=cluster_activity)
     print "{} ClusterActivity <-> PartnerActivity objects linked".format(quantity)
+
+    # Cluster Indicator creations
+    for idx in xrange(quantity):
+        pp = PartnerProject.objects.all()[idx]
+        co = ClusterObjective.objects.all()[idx]
+        pa = PartnerActivity.objects.all()[idx]
+
+        reportable_to_pp = QuantityReportableToPartnerProjectFactory(
+            content_object=pp, indicator_report__progress_report=None
+        )
+
+        reportable_to_co = QuantityReportableToClusterObjectiveFactory(
+            content_object=co, indicator_report__progress_report=None
+        )
+
+        reportable_to_pa = QuantityReportableToPartnerActivityFactory(
+            content_object=pa, indicator_report__progress_report=None
+        )
+
+        # TODO: Add Ratio typed cluster indicators
+
+    print "{} Cluster objects <-> QuantityReportable objects linked".format(quantity)
 
     print "Generating IndicatorLocationData for Quantity type"
     generate_indicator_report_location_disaggregation_quantity_data()
