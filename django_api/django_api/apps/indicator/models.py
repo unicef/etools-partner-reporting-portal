@@ -255,6 +255,12 @@ class IndicatorReport(TimeStampedModel):
 
     @property
     def can_submit(self):
+        if self.submission_date is not None and self.report_status == INDICATOR_REPORT_STATUS.sent_back:
+            pass  # lets go and check throw disaggregation
+        elif self.submission_date and  self.report_status in [
+                INDICATOR_REPORT_STATUS.accepted, INDICATOR_REPORT_STATUS.submitted]:
+            return False
+
         for data in self.indicator_location_data.all():
             for key, vals in data.disaggregation.iteritems():
                 if self.is_percentage and (vals.get('c', None) in [None, '']):
