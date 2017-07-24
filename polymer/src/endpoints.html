@@ -72,6 +72,10 @@
       clusterIndicatorReports: function (responsePlanId) {
         return this._buildUrl('/cluster/' + responsePlanId + '/cluster-indicators-list/');
       },
+
+      clusterIndicatorNames: function (responsePlanId) {
+        return this._buildUrl('/cluster/' + responsePlanId + '/cluster-indicators-simple-list/');
+      },
     };
   }());
 </script>
