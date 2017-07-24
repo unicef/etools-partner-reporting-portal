@@ -516,6 +516,7 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
     cluster = serializers.SerializerMethodField()
     project = serializers.SerializerMethodField()
     is_draft = serializers.SerializerMethodField()
+    can_submit = serializers.SerializerMethodField()
 
     class Meta:
         model = IndicatorReport
@@ -536,6 +537,7 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
             'cluster',
             'project',
             'is_draft',
+            'can_submit',
         )
 
     def get_indicator_name(self, obj):
@@ -561,3 +563,6 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
 
     def get_is_draft(self, obj):
         return obj.is_draft
+
+    def get_can_submit(self, obj):
+        return obj.can_submit

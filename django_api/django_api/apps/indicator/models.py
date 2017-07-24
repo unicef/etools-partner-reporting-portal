@@ -246,6 +246,24 @@ class IndicatorReport(TimeStampedModel):
         return False
 
     @property
+    def is_percentage(self):
+        return self.display_type == self.reportable.blueprint.PERCENTAGE
+
+    @property
+    def is_number(self):
+        return self.display_type == self.reportable.blueprint.NUMBER
+
+    @property
+    def can_submit(self):
+        for data in self.indicator_location_data.all():
+            for key, vals in data.disaggregation.iteritems():
+                if self.is_percentage and vals.get('c', 0) == 0:
+                    return False
+                elif self.is_number and vals.get('v', 0) == 0:
+                    return False
+        return True
+
+    @property
     def progress_report_status(self):
         if self.progress_report:
             return self.progress_report.status
