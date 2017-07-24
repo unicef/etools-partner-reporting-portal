@@ -51,7 +51,6 @@ from core.factories import (
 )
 
 from _generate_disaggregation_fake_data import (
-    generate_indicator_report_location_disaggregation_quantity_data_cluster,
     generate_indicator_report_location_disaggregation_quantity_data,
     generate_indicator_report_location_disaggregation_ratio_data,
 )
@@ -170,7 +169,8 @@ def generate_fake_data(quantity=40):
     generate_indicator_report_location_disaggregation_quantity_data(QuantityReportableToClusterObjectiveFactory)
 
     print "Generating IndicatorLocationData for Ratio type"
-    generate_indicator_report_location_disaggregation_ratio_data()
+    generate_indicator_report_location_disaggregation_ratio_data(RatioIndicatorReportFactory)
+    generate_indicator_report_location_disaggregation_ratio_data(RatioReportableToClusterObjectiveFactory)
 
     admin.partner_id = Partner.objects.first().id
     admin.save()
