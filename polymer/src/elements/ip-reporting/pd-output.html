@@ -16,7 +16,7 @@
 <link rel="import" href="../labelled-item.html">
 <link rel="import" href="../report-status.html">
 <link rel="import" href="../etools-prp-ajax.html">
-<link rel="import" href="indicator-details.html">
+<link rel="import" href="../indicator-details.html">
 
 <dom-module id="pd-output">
   <template>
@@ -65,8 +65,8 @@
       }
 
       .indicator-header {
-        padding: 10px 25px 10px 10px;
-        background: var(--theme-selected-item-background-color);
+        padding: 6px 25px 6px 10px;
+        background: var(--paper-grey-300);
       }
 
       .indicator-header__title h3 {
@@ -86,7 +86,7 @@
       .indicator-header__target dl {
         margin: 0;
         text-align: right;
-        font-size: 12px;
+        font-size: 11px;
       }
 
       .indicator-header__target dt {
@@ -200,6 +200,10 @@
                   <dd class="flex">[[_withDefault(indicator.target)]]</dd>
                 </dl>
                 <dl class="layout horizontal justified">
+                  <dt class="flex-3">Total cumulative progress:</dt>
+                  <dd class="flex">[[_withDefault(indicator.total.v)]]</dd>
+                </dl>
+                <dl class="layout horizontal justified">
                   <dt class="flex-3">Achievement in reporting period:</dt>
                   <dd class="flex">[[_withDefault(indicator.achieved.v)]]</dd>
                 </dl>
@@ -216,6 +220,7 @@
                 reportable-id="[[data.id]]"
                 indicator-name="[[indicator.indicator_name]]"
                 indicator-id="[[indicator.id]]"
+                reporting-period="[[currentReport.reporting_period]]"
                 override-mode="[[computedMode]]">
             </indicator-details>
           </iron-collapse>
@@ -262,6 +267,11 @@
           type: String,
           computed: '_computeReportableUrl(reportId, data)',
         },
+
+        currentReport: {
+          type: Object,
+          statePath: App.Selectors.ProgrammeDocumentReports.current,
+        },
       },
 
       observers: [
@@ -287,10 +297,16 @@
       },
 
       _handleOpenedChanged: function (e, data) {
+        var indicatorDetails;
+
         e.stopPropagation();
 
         if (data.value) {
-          Polymer.dom(e.srcElement).querySelector('indicator-details').init();
+          indicatorDetails = Polymer.dom(e.srcElement).querySelector('indicator-details');
+
+          try {
+            indicatorDetails.init();
+          } catch (err) {}
         }
       },
 
