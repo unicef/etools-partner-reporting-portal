@@ -11,8 +11,8 @@
     <style include='disaggregation-table-styles'></style>
 
     <tr class='horizontal layout headerRow'>
-      <th class='flex'></th>
-      <th class='flex'>Total</th>
+      <th></th>
+      <th>Total</th>
     </tr>
 
     <template is="dom-repeat"
@@ -21,6 +21,7 @@
       <disaggregation-table-row
           data="[[row]]"
           level-reported="[[data.level_reported]]"
+          indicator-type="[[data.display_type]]"
           row-type="middleRow"
           editable="[[editable]]">
       </disaggregation-table-row>
@@ -29,6 +30,7 @@
     <disaggregation-table-row
         data="[[totalRow]]"
         level-reported="[[data.level_reported]]"
+        indicator-type="[[data.display_type]]"
         row-type="totalsRow">
     </disaggregation-table-row>
   </template>
@@ -51,10 +53,9 @@
 
         totalRow: {
           type: Array,
-          computed: '_determineTotalRow(mapping, data)'
+          computed: '_determineTotalRow(data)'
         },
 
-        //Passing columnNames as a param is required to trigger update.
         columns: {
           type: Array,
           computed: '_getColumns(mapping)'
@@ -67,36 +68,31 @@
       },
 
       _getColumns: function(mapping) {
-        return mapping[0].choices;
+        return (mapping[0] || []).choices;
       },
 
-      _determineTotalRow: function (_, data) { // jshint ignore:line
-        var totalRow = {
+      _determineTotalRow: function (data) {
+        return {
           title: 'total',
           total: {
             key: '', // unused
             data: data.disaggregation['()'],
           },
         };
-        return totalRow;
       },
 
-      _determineRows: function(columns, _) { // jshint ignore:line
-        var self = this;
-        var data = [];
+      _determineRows: function(columns, data) {
+        return columns.map(function (z) {
+          var formatted = this._formatDisaggregationIds([z.id]);
 
-        columns.forEach(function(z) {
-          var formatted = self._formatDisaggregationIds([z.id]);
-          var forDisplay = {
+          return {
             title: z.value,
             data: [{
               key: formatted,
-              data: self.data.disaggregation[formatted],
+              data: data.disaggregation[formatted],
             }],
           };
-          data.push(forDisplay);
-        });
-        return data;
+        }, this);
       },
     });
   </script>

@@ -40,12 +40,11 @@ INTERVENTION_STATUS = Choices(
 )
 
 INDICATOR_REPORT_STATUS = Choices(
-    ('Ove', 'overdue', 'Overdue'),  #red
-    ('Sub', 'submitted', 'Submitted'),  #orange
-    ('Acc', 'accepted', 'Accepted'),  #green
-    ('Sen', 'sent_back', 'Sent back to partner'),  #red
-    ('Due', 'due', 'Due'),  #grey
-    ('Not', 'nothing_due', 'Nothing due'),  #no colour
+    ('Due', 'due', 'Due'),  # grey
+    ('Ove', 'overdue', 'Overdue'),  # red
+    ('Sub', 'submitted', 'Submitted'),  # orange
+    ('Sen', 'sent_back', 'Sent back'),  # red
+    ('Acc', 'accepted', 'Accepted'),  # green
 )
 
 ADMINISTRATIVE_LEVEL = Choices(
@@ -58,6 +57,20 @@ FREQUENCY_LEVEL = Choices(
     ('Wee', 'weekly', 'Weekly'),
     ('Mon', 'monthly', 'Monthly'),
     ('Qua', 'quarterly', 'Quarterly'),
+)
+
+PD_FREQUENCY_LEVEL = Choices(
+    ('Wee', 'weekly', 'Weekly'),
+    ('Mon', 'monthly', 'Monthly'),
+    ('Qua', 'quarterly', 'Quarterly'),
+    ('Csd', 'custom_specific_dates', 'Custom specific dates'),
+)
+
+REPORTABLE_FREQUENCY_LEVEL = Choices(
+    ('Wee', 'weekly', 'Weekly'),
+    ('Mon', 'monthly', 'Monthly'),
+    ('Qua', 'quarterly', 'Quarterly'),
+    ('Csd', 'custom_specific_dates', 'Custom specific dates'),
 )
 
 PD_LIST_REPORT_STATUS = Choices(
@@ -74,9 +87,10 @@ PD_DOCUMENT_TYPE = Choices(
 
 PROGRESS_REPORT_STATUS = Choices(
     ('Due', 'due', 'Due'),
-    ('Ove', 'over_due', 'Over due'),
+    ('Ove', 'overdue', 'Overdue'),
     ('Sub', 'submitted', 'Submitted'),
-    ('Rej', 'rejected', 'Rejected'),
+    ('Sen', 'sent_back', 'Sent back'),
+    ('Acc', 'accepted', 'Accepted'),
 )
 
 PD_STATUS = Choices(
@@ -85,3 +99,16 @@ PD_STATUS = Choices(
     ("Imp", "implemented", "Implemented"),
     ('Rej', 'rejected', 'Rejected'),
 )
+
+RESPONSE_PLAN_TYPE = Choices(
+    ("HRP", "hrp", "HRP"),
+    ("FA", "fa", "FA"),
+)
+
+OVERALL_STATUS = Choices(
+    ("Met", "met", "Met"),
+    ("OnT", "on_track", "On Track"),
+    ("NoP", "no_pogress", "No Progress"),
+    ('Con', 'constrained', 'Constrained'),
+)
+

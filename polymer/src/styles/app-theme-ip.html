@@ -1,13 +1,12 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/color.html">
 
-<dom-module id="app-theme">
+<dom-module id="app-theme-ip-styles">
   <template>
     <style>
       :root {
         --theme-primary-color: #0099ff;
         --theme-secondary-color-a: #ccebff;
-        --theme-secondary-color-b: #72c300;
         --theme-secondary-color-c: #233944;
 
         --theme-primary-text-color-dark: #212121;
@@ -37,6 +36,8 @@
         --paper-tab-content-unselected: {
           color: var(--theme-secondary-text-color);
         };
+
+        --paper-radio-button-checked-color: var(--theme-primary-color);
       }
     </style>
   </template>

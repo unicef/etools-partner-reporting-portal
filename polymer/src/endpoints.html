@@ -45,12 +45,24 @@
         return this._buildUrl('/unicef/' + locationId + '/progress-reports');
       },
 
+      responsePlans: function (interventionId) {
+        return this._buildUrl('/core/' + interventionId + '/response-plan/');
+      },
+
       childLocations: function (locationId) {
         return this._buildUrl('/core/' + locationId + '/children-location/');
       },
 
       indicatorData: function (reportId) {
         return this._buildUrl('/indicator/indicator-data/' + reportId + '/');
+      },
+
+      indicatorDataLocation: function (reportId) {
+        return this._buildUrl('/indicator/indicator-data-location/' + reportId + '/');
+      },
+
+      reportable: function (reportId, reportableId) {
+        return this.indicatorData(reportId) + 'reportable/' + reportableId + '/';
       },
 
       indicatorLocationDataEntries: function() {

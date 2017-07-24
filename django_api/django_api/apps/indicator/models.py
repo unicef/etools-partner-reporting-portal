@@ -12,8 +12,11 @@ from django.dispatch import receiver
 from model_utils.models import TimeStampedModel
 
 from core.common import (
-    INDICATOR_REPORT_STATUS, FREQUENCY_LEVEL,
-    PROGRESS_REPORT_STATUS
+    INDICATOR_REPORT_STATUS,
+    FREQUENCY_LEVEL,
+    REPORTABLE_FREQUENCY_LEVEL,
+    PROGRESS_REPORT_STATUS,
+    OVERALL_STATUS,
 )
 
 
@@ -124,6 +127,22 @@ class Reportable(TimeStampedModel):
     blueprint = models.ForeignKey(IndicatorBlueprint, null=True, related_name="reportables")
     parent_indicator = models.ForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
 
+    frequency = models.CharField(
+        max_length=3,
+        choices=REPORTABLE_FREQUENCY_LEVEL,
+        default=REPORTABLE_FREQUENCY_LEVEL.monthly,
+        verbose_name='Frequency of reporting'
+    )
+
+    start_date = models.DateField(
+        verbose_name='Start Date',
+    )
+    end_date = models.DateField(
+        verbose_name='Due Date',
+    )
+
+    cs_dates = ArrayField(models.DateField(), default=list)
+
     class Meta:
         ordering = ['id']
 
@@ -161,9 +180,19 @@ class Reportable(TimeStampedModel):
 
         return percentage
 
+    @classmethod
+    def get_narrative_and_assessment(cls, progress_report_id):
+        progress_report = IndicatorReport.objects.filter(progress_report_id=progress_report_id).first()
+        return {
+            'overall_status': progress_report and progress_report.overall_status,
+            'narrative_assessment': progress_report and progress_report.narrative_assessment,
+        }
+
+    def __str__(self):
+        return "Reportable <pk:%s>" % self.id
+
 
 class IndicatorReport(TimeStampedModel):
-    # TODO: probably we should add overall status & narrative assessemnt
     """
     IndicatorReport module is a result of partner staff activity (what they done in defined frequency scope).
 
@@ -196,8 +225,16 @@ class IndicatorReport(TimeStampedModel):
         max_length=3
     )
 
+
     class Meta:
         ordering = ['id']
+
+    overall_status = models.CharField(
+        choices=OVERALL_STATUS,
+        default=OVERALL_STATUS.on_track,
+        max_length=3
+    )
+    narrative_assessment = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return self.title
@@ -211,7 +248,7 @@ class IndicatorReport(TimeStampedModel):
     @property
     def progress_report_status(self):
         if self.progress_report:
-            return self.progress_report.get_status_display()
+            return self.progress_report.status
         else:
             return PROGRESS_REPORT_STATUS.due
 
@@ -283,21 +320,22 @@ def recalculate_reportable_total(sender, instance, **kwargs):
 
         else:
             for indicator_report in reportable.indicator_reports.all():
-                if indicator_report.total['v'] is None:
-                    indicator_report.total['v'] = 0
-
                 reportable_total['v'] += indicator_report.total['v']
-
-                if indicator_report.total['c'] is None:
-                    indicator_report.total['c'] = 0
-
                 reportable_total['c'] += indicator_report.total['c']
 
         if blueprint.calculation_formula_across_periods == IndicatorBlueprint.AVG:
             ir_count = reportable.indicator_reports.count()
 
-            reportable_total['v'] = reportable_total['v'] / float(ir_count)
-            reportable_total['c'] = reportable_total['c'] / float(ir_count)
+            reportable_total['v'] = reportable_total['v'] / (ir_count * 1.0)
+            reportable_total['c'] = reportable_total['c'] / (ir_count * 1.0)
+
+    # IndicatorReport total calculation
+    elif blueprint.unit == IndicatorBlueprint.PERCENTAGE:
+        for indicator_report in reportable.indicator_reports.all():
+            reportable_total['v'] += indicator_report.total['v']
+            reportable_total['d'] += indicator_report.total['d']
+
+        reportable_total['c'] = reportable_total['v'] / (reportable_total['d'] * 1.0)
 
     reportable.total = reportable_total
     reportable.save()

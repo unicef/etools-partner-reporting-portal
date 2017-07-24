@@ -1,0 +1,108 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
+<link rel="import" href="../polyfills/es6-shim.html">
+<link rel="import" href="../styles/buttons.html">
+
+<dom-module id="confirm-box">
+  <template>
+    <style include="iron-flex iron-flex-reverse iron-flex-alignment button-styles">
+      :host {
+        display: block;
+      }
+
+      .overlay {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        z-index: 10;
+        background: rgba(0, 0, 0, .3);
+      }
+
+      .prompt {
+        box-sizing: border-box;
+        width: calc(100% - 48px);
+        padding: 24px;
+        background: white;
+        box-shadow: 0 1px 2px 1px rgba(0, 0, 0, .1);
+      }
+    </style>
+
+    <template
+        is="dom-if"
+        if="[[active]]">
+      <div class="overlay layout horizontal center-center">
+        <div class="prompt">
+          <p>
+            [[config.body]]
+          </p>
+          <div class="layout horizontal-reverse">
+            <paper-button
+                class="btn-primary"
+                on-tap="_ok">
+              [[config.okLabel]]
+            </paper-button>
+
+            <paper-button
+                on-tap="_cancel">
+              [[config.cancelLabel]]
+            </paper-button>
+          </div>
+        </div>
+      </div>
+    </template>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'confirm-box',
+
+      properties: {
+        active: {
+          type: Boolean,
+          value: false,
+        },
+
+        config: {
+          type: Object,
+          value: {
+            okLabel: 'Continue',
+            cancelLabel: 'Cancel',
+          },
+        },
+      },
+
+      _ok: function () {
+        try {
+          this.config.result.resolve();
+        } catch (err) {}
+
+        this._close();
+      },
+
+      _cancel: function () {
+        try {
+          this.config.result.reject();
+        } catch (err) {}
+
+        this._close();
+      },
+
+      _open: function () {
+        this.set('active', true);
+      },
+
+      _close: function () {
+        this.set('active', false);
+      },
+
+      run: function (config) {
+        this.set('config', Object.assign({}, this.config, config));
+        this._open();
+      },
+    });
+  </script>
+</dom-module>

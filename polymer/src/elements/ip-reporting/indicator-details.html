@@ -10,6 +10,7 @@
 <link rel="import" href="../../../bower_components/paper-button/paper-button.html">
 
 <link rel="import" href="../etools-prp-ajax.html">
+<link rel="import" href="../status-badge.html">
 <link rel="import" href="../disaggregations/disaggregation-table.html">
 <link rel="import" href="../disaggregations/disaggregation-modal.html">
 <link rel="import" href="../../endpoints.html">
@@ -88,20 +89,6 @@
         font-size: 12px;
         color: var(--theme-primary-text-color-medium);
       }
-
-      .location-progress {
-        text-align: right;
-      }
-
-      .location-progress dt,
-      .location-progress dd {
-        display: inline;
-        margin: 0;
-      }
-
-      .location-progress dt {
-        font-weight: bold;
-      }
     </style>
 
     <etools-prp-ajax
@@ -121,7 +108,10 @@
             is="dom-repeat"
             items="[[disaggregations.indicator_location_data]]"
             as="location">
-          <paper-tab name="location-[[location.location.id]]">[[location.location.title]]</paper-tab>
+          <paper-tab name="location-[[location.location.id]]">
+            <status-badge type="[[_computeLocationStatus(location)]]"></status-badge>
+            [[location.location.title]]
+          </paper-tab>
         </template>
       </paper-tabs>
 
@@ -135,15 +125,29 @@
           <div name="location-[[location.location.id]]">
             <div class="tab-header layout horizontal justified">
               <dl>
-                <dt>Location progress:</dt>
-                <dd>[[location.location_progress.v]]</dd>
-                <dt>Previous location progress:</dt>
-                <dd>[[location.previous_location_progress.v]]</dd>
+                <template
+                    is="dom-if"
+                    if="[[_equals(location.display_type, 'number')]]"
+                    restamp="true">
+                  <dt>Location progress:</dt>
+                  <dd>[[location.location_progress.v]]</dd>
+                  <dt>Previous location progress:</dt>
+                  <dd>[[location.previous_location_progress.v]]</dd>
+                </template>
+                <template
+                    is="dom-if"
+                    if="[[_equals(location.display_type, 'percentage')]]"
+                    restamp="true">
+                  <dt>Location progress:</dt>
+                  <dd>[[_toPercentage(location.location_progress.c)]]</dd>
+                  <dt>Previous location progress:</dt>
+                  <dd>[[_toPercentage(location.previous_location_progress.c)]]</dd>
+                </template>
               </dl>
               <div>
                 <template
                     is="dom-if"
-                    if="[[_equals(mode, 'edit')]]">
+                    if="[[!_equals(computedMode, 'view')]]">
                   <paper-button
                       class="btn-primary"
                       modal-index="[[index]]"
@@ -164,10 +168,11 @@
 
                 <template
                     is="dom-if"
-                    if="[[_equals(mode, 'edit')]]">
+                    if="[[!_equals(computedMode, 'view')]]">
                   <disaggregation-modal
                       id="modal-[[index]]"
-                      reporting-period="[[currentReport.reporting_period]]">
+                      reporting-period="[[currentReport.reporting_period]]"
+                      on-opened-changed="_updateModals">
                     <div class="meta">
                       <h3>[[indicatorName]]</h3>
                       <p class="location">
@@ -177,17 +182,18 @@
                       <p class="current-pd">
                         [[currentPD.agreement]] | [[currentPD.title]]
                       </p>
-                      <dl class="location-progress">
-                        <dt>Location progress:</dt>
-                        <dd>[[location.location_progress.v]]</dd>
-                      </dl>
                     </div>
-                    <disaggregation-table
-                        data="[[location]]"
-                        mapping="[[disaggregations.disagg_lookup_map]]"
-                        indicator-id="[[indicatorId]]"
-                        editable="1">
-                    </disaggregation-table>
+                    <template
+                        is="dom-if"
+                        if="[[_computeTableVisibility(opened, index)]]"
+                        restamp="true">
+                      <disaggregation-table
+                          data="[[location]]"
+                          mapping="[[disaggregations.disagg_lookup_map]]"
+                          indicator-id="[[indicatorId]]"
+                          editable="1">
+                      </disaggregation-table>
+                    </template>
                   </disaggregation-modal>
                 </template>
               </div>
@@ -215,6 +221,8 @@
         indicatorName: String,
 
         reportableId: Number,
+
+        opened: Object,
 
         selected: {
           type: Number,
@@ -265,6 +273,16 @@
           type: String,
           statePath: 'programmeDocumentReports.current.mode',
         },
+
+        overrideMode: {
+          type: String,
+          value: '',
+        },
+
+        computedMode: {
+          type: String,
+          computed: '_computeMode(mode, overrideMode)',
+        },
       },
 
       init: function () {
@@ -308,8 +326,39 @@
         return this._clone(data[key]);
       },
 
+      _computeMode: function (mode, overrideMode) {
+        return overrideMode || mode;
+      },
+
       _openModal: function (e) {
         this.$$('#modal-' + e.target.modalIndex).open();
+      },
+
+      _updateModals: function (e, data) {
+        var id = e.target.id;
+        var change;
+
+        if (!id) {
+          return;
+        }
+
+        change = {};
+
+        change[id] = data.value;
+
+        this.set('opened', Object.assign({}, this.opened, change));
+      },
+
+      _computeTableVisibility: function (opened, index) {
+        return !!opened['modal-' + index];
+      },
+
+      _computeLocationStatus: function (location) {
+        return location.is_complete ? 'success' : 'error';
+      },
+
+      attached: function () {
+        this.set('opened', {});
       },
     });
   </script>

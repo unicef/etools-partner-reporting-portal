@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Intervention, Location
+from .models import Intervention, Location, ResponsePlan
 
 
 class SimpleInterventionSerializer(serializers.ModelSerializer):
@@ -56,3 +56,19 @@ class ChildrenLocationSerializer(serializers.ModelSerializer):
 
     def get_id(self, obj):
         return str(obj.id)
+
+
+class ResponsePlanSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ResponsePlan
+        fields = (
+            'id',
+            'title',
+            'plan_type',
+            'start',
+            'end',
+            'intervention',
+            'documents',
+        )
+

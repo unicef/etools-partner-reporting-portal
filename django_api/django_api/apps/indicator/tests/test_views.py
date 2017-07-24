@@ -1,4 +1,9 @@
+from ast import literal_eval as make_tuple
+from datetime import date
+
 from django.urls import reverse
+from django.conf import settings
+
 from rest_framework import status
 
 from core.tests.base import BaseAPITestCase
@@ -8,7 +13,15 @@ from cluster.models import ClusterObjective
 from indicator.models import Reportable, IndicatorReport, IndicatorLocationData, IndicatorBlueprint
 
 from core.helpers import (
+    suppress_stdout,
     get_cast_dictionary_keys_as_tuple,
+)
+from core.common import OVERALL_STATUS, PROGRESS_REPORT_STATUS
+from core.tests.base import BaseAPITestCase
+from unicef.models import (
+    LowerLevelOutput,
+    Section,
+    ProgrammeDocument
 )
 from indicator.serializers import (
     IndicatorLocationDataUpdateSerializer
@@ -84,6 +97,14 @@ class TestIndicatorListAPIView(BaseAPITestCase):
                     lower_level_outputs__id=resp_data['llo_id']).indicator_reports.all().count()
             )
 
+        # PD output filter (reportable id)
+        reportable_id = response.data['outputs'][0]['id']
+        url = url + ("?reportable_id=%d" % reportable_id)
+        response = self.client.get(url, format='json')
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(len(response.data['outputs']), 1)
+        self.assertEquals(response.data['outputs'][0]['id'], reportable_id)
+
     def test_list_api_filter_by_locations(self):
         self.reports = Reportable.objects.filter(
             lower_level_outputs__reportables__isnull=False,
@@ -99,7 +120,7 @@ class TestIndicatorListAPIView(BaseAPITestCase):
         response = self.client.get(url, format='json')
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(response.data['results']), len(self.reports))
+        self.assertGreater(len(self.reports), len(response.data['results']))
 
     def test_list_api_filter_by_pd_ids(self):
         self.reports = Reportable.objects.filter(
@@ -117,7 +138,66 @@ class TestIndicatorListAPIView(BaseAPITestCase):
         response = self.client.get(url, format='json')
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(response.data['results']), len(self.reports))
+        self.assertGreater(len(self.reports), len(response.data['results']))
+
+    def test_enter_indicator(self):
+        ir = IndicatorReport.objects.first()
+        self.assertEquals(ir.progress_report.partner_contribution_to_date, '')
+        self.assertEquals(ir.progress_report.challenges_in_the_reporting_period, '')
+        data = {
+            'progress_report': {
+                'id': ir.progress_report.id,
+                'partner_contribution_to_date': 'update field',
+                'challenges_in_the_reporting_period': 'new challanges',
+                'proposed_way_forward': 'update field',
+                'funds_received_to_date': 'updated funds',
+                'programme_document_id': ir.progress_report.programme_document.id,
+            }
+        }
+
+        url = reverse('indicator-data', kwargs={'ir_id': ir.id})
+        response = self.client.put(url, data=data, format='json')
+        updated_ir = IndicatorReport.objects.get(id=ir.id)
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(response.data['progress_report']['partner_contribution_to_date'], u'update field')
+        self.assertEquals(updated_ir.progress_report.partner_contribution_to_date, u'update field')
+        self.assertEquals(updated_ir.progress_report.challenges_in_the_reporting_period, u'new challanges')
+
+        del data['progress_report']
+        response = self.client.put(url, data=data, format='json')
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_submit_indicator(self):
+        ir = IndicatorReport.objects.first()
+        url = reverse('indicator-data', kwargs={'ir_id': ir.id})
+        response = self.client.post(url, format='json')
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(response.data['submission_date'], date.today().strftime(settings.PRINT_DATA_FORMAT))
+        self.assertEquals(response.data['is_draft'], False)
+        self.assertEquals(response.data['progress_report_status'], PROGRESS_REPORT_STATUS.submitted)
+
+
+class TestIndicatorDataReportableAPIView(BaseAPITestCase):
+
+    def test_overall_narrative(self):
+        ir = IndicatorReport.objects.first()
+        url = reverse('indicator-data-reportable', kwargs={'ir_id': ir.id, 'reportable_id': ir.reportable.id})
+
+        new_overall_status = OVERALL_STATUS.met
+        data = dict(overall_status=new_overall_status)
+        response = self.client.patch(url, data=data, format='json')
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(response.data['overall_status'], new_overall_status)
+
+        updated_ir = IndicatorReport.objects.get(id=ir.id)
+        self.assertEquals(updated_ir.overall_status, new_overall_status)
+
+        new_narrative_assessment = "new narrative_assessment"
+        data = dict(narrative_assessment=new_narrative_assessment)
+        response = self.client.patch(url, data=data, format='json')
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        updated_ir = IndicatorReport.objects.get(id=ir.id)
+        self.assertEquals(updated_ir.narrative_assessment, new_narrative_assessment)
 
 
 class TestIndicatorReportListAPIView(BaseAPITestCase):
@@ -328,6 +408,8 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
         self.data = {
             'cluster_objective_id': self.co.id,
             'means_of_verification': 'IMO/CC calculation',
+            'start_date': date.today(),
+            'end_date': date.today(),
             'locations': [
                 {'id': Location.objects.first().id},
                 {'id': Location.objects.last().id},
@@ -603,24 +685,27 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
             response.data['non_field_errors'][0]
         )
 
-    def test_update_less_disaggregation_entry_count(self):
+    def test_update_not_all_level_reported_disaggregation_entry_count(self):
         indicator_location_data = IndicatorLocationData.objects.filter(
             level_reported=3, num_disaggregation=3).first()
 
         update_data = IndicatorLocationDataUpdateSerializer(
             indicator_location_data).data
 
-        first_key = update_data['disaggregation'].keys()[0]
-        update_data['disaggregation'].pop(first_key)
+        level_reported_key = filter(
+            lambda item: len(make_tuple(item)) ==
+            indicator_location_data.level_reported,
+            update_data['disaggregation'].keys())[0]
+        update_data['disaggregation'].pop(level_reported_key)
 
         url = reverse('indicator-location-data-entries-put-api')
         response = self.client.put(url, update_data, format='json')
 
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn(
-            "Submitted disaggregation data entries does not contain "
-            + "all possible combination pair keys",
-            response.data['non_field_errors'][0]
+        self.assertEquals(
+            "Submitted disaggregation data entries do not contain "
+            + "all level %d combination pair keys" % (indicator_location_data.level_reported),
+            str(response.data['non_field_errors'][0])
         )
 
     def test_update_extra_disaggregation_entry_count(self):
@@ -652,7 +737,7 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
         self.assertIn(
             "Submitted disaggregation data entries contains "
             + "extra combination pair keys",
-            response.data['non_field_errors'][0]
+            str(response.data['non_field_errors'][0])
         )
 
     def test_update_higher_coordinate_space_key_validation(self):

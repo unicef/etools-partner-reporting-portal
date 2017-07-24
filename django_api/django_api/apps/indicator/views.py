@@ -1,7 +1,8 @@
+from datetime import date
 import operator
 import logging
-from django.http import Http404
 from django.db.models import Q
+from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.http import Http404
 
@@ -14,17 +15,20 @@ import django_filters.rest_framework
 
 from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
-from unicef.serializers import ProgressReportSerializer
+from core.models import Location
+from core.common import PROGRESS_REPORT_STATUS, INDICATOR_REPORT_STATUS
+from core.serializers import ShortLocationSerializer
+from unicef.serializers import ProgressReportSerializer, ProgressReportUpdateSerializer
+from unicef.models import ProgressReport
 
 from .disaggregators import (
     QuantityIndicatorDisaggregator,
+    RatioIndicatorDisaggregator,
 )
 from .serializers import (
-    IndicatorListSerializer,
-    IndicatorReportListSerializer,
-    IndicatorLocationDataUpdateSerializer,
-    PDReportsSerializer,
-    IndicatorLLoutputsSerializer,
+    IndicatorListSerializer, IndicatorReportListSerializer, PDReportsSerializer,
+    IndicatorLLoutputsSerializer, IndicatorLocationDataUpdateSerializer,
+    OverallNarrativeSerializer,
     ClusterIndicatorSerializer,
 )
 from .filters import IndicatorFilter, PDReportsFilter
@@ -156,10 +160,24 @@ class IndicatorDataAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def get_queryset(self, id):
-        return Reportable.objects.filter(
+        queryset = Reportable.objects.filter(
             indicator_reports__id=id,
             lower_level_outputs__isnull=False
         )
+        reportable_id = self.request.query_params.get('reportable_id', None)
+        if reportable_id:
+            queryset = queryset.filter(id=reportable_id)
+
+        location = self.request.query_params.get('location', None)
+        if location:
+            queryset = queryset.filter(locations__id=location)
+
+        incomplete = self.request.query_params.get('incomplete', None)
+        if incomplete == "1":
+            queryset = queryset.exclude(
+                indicator_reports__progress_report__status=PROGRESS_REPORT_STATUS.submitted
+            )
+        return queryset
 
     def get_indicator_report(self, id):
         try:
@@ -189,6 +207,58 @@ class IndicatorDataAPIView(APIView):
             response,
             status=status.HTTP_200_OK
         )
+
+    def put(self, request, ir_id, *args, **kwargs):
+        if 'progress_report' not in request.data:
+            _errors = ["No progress_report found in PUT request data."]
+            return Response({"errors": _errors},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        pr = get_object_or_404(ProgressReport, pk=request.data['progress_report'].get('id'))
+        progress_report = ProgressReportUpdateSerializer(
+            instance=pr,
+            data=request.data['progress_report']
+        )
+
+        if progress_report.is_valid():
+            progress_report.save()
+
+        return Response(dict(progress_report=progress_report.data), status=status.HTTP_200_OK)
+
+    @transaction.atomic
+    def post(self, request, ir_id, *args, **kwargs):
+        ir = self.get_indicator_report(ir_id)
+        if ir.submission_date is None or ir.status == INDICATOR_REPORT_STATUS.sent_back:
+            ir.submission_date = date.today()
+            ir.report_status = INDICATOR_REPORT_STATUS.submitted
+            ir.save()
+            ir.progress_report.status = PROGRESS_REPORT_STATUS.submitted
+            ir.progress_report.save()
+            serializer = PDReportsSerializer(instance=ir)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            _errors = [{"message": "Indicator can be submitted only once."}]
+            return Response({"errors": _errors},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+
+class IndicatorDataReportableAPIView(APIView):
+
+    serializer_class = OverallNarrativeSerializer
+    permission_classes = (IsAuthenticated, )
+
+    def patch(self, request, ir_id, reportable_id, *args, **kwargs):
+        reportable = get_object_or_404(Reportable, pk=reportable_id)
+        first_indicator = reportable.indicator_reports.first()
+        if first_indicator:
+            serializer = OverallNarrativeSerializer(data=request.data, instance=first_indicator)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({"errors": "Reportable doesn't contain indicator."}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class IndicatorReportListAPIView(APIView):
@@ -261,6 +331,12 @@ class IndicatorLocationDataUpdateAPIView(APIView):
                 QuantityIndicatorDisaggregator.post_process(
                     indicator_location_data)
 
+            if blueprint.unit == IndicatorBlueprint.PERCENTAGE:
+                RatioIndicatorDisaggregator.post_process(
+                    indicator_location_data)
+
+            serializer.data['disaggregation'] = indicator_location_data.disaggregation
+
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         else:
@@ -310,3 +386,19 @@ class ClusterIndicatorAPIView(APIView):
 
         serializer.save()
         return Response({'id': serializer.instance.id}, status=status.HTTP_200_OK)
+
+
+class IndicatorDataLocationAPIView(ListAPIView):
+    """
+    REST API endpoint to fill location filter on PD reports screen.
+    """
+
+    serializer_class = ShortLocationSerializer
+    permission_classes = (IsAuthenticated, )
+
+    def get_queryset(self, *args, **kwargs):
+        ir_id = self.kwargs.get('ir_id', None)
+        if ir_id:
+            ir = get_object_or_404(IndicatorReport, id=ir_id)
+            return Location.objects.filter(reportable=ir.reportable_id)
+        raise Http404
