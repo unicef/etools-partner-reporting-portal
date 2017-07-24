@@ -6,6 +6,7 @@
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../filter-list.html">
 <link rel="import" href="../filters/cluster-indicator-filter/cluster-indicator-filter.html">
+<link rel="import" href="../filters/cluster-filter/cluster-filter.html">
 
 <dom-module id="cluster-report-filters">
   <template>
@@ -38,6 +39,11 @@
     <filter-list
         filters="{{filters}}"
         class="app-grid">
+      <cluster-filter
+          class="item"
+          value="[[_withDefault(queryParams.cluster, '')]]">
+      </cluster-filter>
+
       <cluster-indicator-filter
           class="item filter-2-col"
           value="[[_withDefault(queryParams.indicator, '')]]">
