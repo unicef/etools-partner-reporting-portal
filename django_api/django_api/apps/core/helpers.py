@@ -9,6 +9,11 @@ from contextlib import contextmanager
 from datetime import date, timedelta
 from itertools import combinations, product
 
+from core.common import (
+    PD_FREQUENCY_LEVEL,
+    REPORTABLE_FREQUENCY_LEVEL,
+)
+
 
 @contextmanager
 def suppress_stdout():

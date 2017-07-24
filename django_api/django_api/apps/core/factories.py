@@ -365,7 +365,7 @@ class LocationFactory(factory.django.DjangoModelFactory):
 
 class ProgressReportFactory(factory.django.DjangoModelFactory):
     start_date = beginning_of_this_year
-    end_date = today
+    end_date = beginning_of_this_year + datetime.timedelta(days=30)
 
     class Meta:
         model = ProgressReport
@@ -425,8 +425,8 @@ class DisaggregationValueFactory(factory.django.DjangoModelFactory):
 class QuantityIndicatorReportFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "quantity_indicator_report_%d" % n)
     time_period_start = beginning_of_this_year
-    time_period_end = today + datetime.timedelta(days=70)
-    due_date = today + datetime.timedelta(days=70)
+    time_period_end = beginning_of_this_year + datetime.timedelta(days=70)
+    due_date = beginning_of_this_year + datetime.timedelta(days=70)
     total = dict(
         [('c', 0), ('d', 0), ('v', random.randint(0, 3000))])
 
@@ -437,8 +437,8 @@ class QuantityIndicatorReportFactory(factory.django.DjangoModelFactory):
 class RatioIndicatorReportFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "ratio_indicator_report_%d" % n)
     time_period_start = beginning_of_this_year
-    time_period_end = today + datetime.timedelta(days=70)
-    due_date = today + datetime.timedelta(days=70)
+    time_period_end = beginning_of_this_year + datetime.timedelta(days=70)
+    due_date = beginning_of_this_year + datetime.timedelta(days=70)
     total = dict(
         [('c', 0), ('d', random.randint(3000, 6000)), ('v', random.randint(0, 3000))])
 
