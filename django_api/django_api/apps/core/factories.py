@@ -95,8 +95,8 @@ class PartnerActivityFactory(factory.django.DjangoModelFactory):
 
 class PartnerProjectFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "partner_project_%d" % n)
-    start_date = fuzzy.FuzzyDate(beginning_of_this_year)
-    end_date = fuzzy.FuzzyDate(datetime.date.today())
+    start_date = beginning_of_this_year
+    end_date = today
 
     description = factory.Sequence(lambda n: "description %d" % n)
     additional_information = factory.Sequence(lambda n: "additional_information %d" % n)
@@ -169,10 +169,10 @@ class InterventionFactory(factory.django.DjangoModelFactory):
     number = fuzzy.FuzzyText(length=64)
     country_code = fuzzy.FuzzyChoice(COUNTRIES_LIST)
     status = 'Dra'
-    start = fuzzy.FuzzyDate(datetime.date.today())
-    end = fuzzy.FuzzyDate(datetime.date.today())
-    signed_by_unicef_date = fuzzy.FuzzyDate(datetime.date.today())
-    signed_by_partner_date = fuzzy.FuzzyDate(datetime.date.today())
+    start = today
+    end = today
+    signed_by_unicef_date = today
+    signed_by_partner_date = today
 
     @factory.post_generation
     def locations(self, create, extracted, **kwargs):
@@ -191,8 +191,8 @@ class InterventionFactory(factory.django.DjangoModelFactory):
 
 class ResponsePlanFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "response plan %d" % n)
-    start = fuzzy.FuzzyDate(datetime.date.today())
-    end = fuzzy.FuzzyDate(datetime.date.today())
+    start = today
+    end = today
 
     cluster = factory.RelatedFactory('core.factories.ClusterFactory', 'response_plan')
 
@@ -258,8 +258,8 @@ class ReportableFactory(factory.django.DjangoModelFactory):
 
     cs_dates = list()
     frequency = REPORTABLE_FREQUENCY_LEVEL.weekly
-    start_date = fuzzy.FuzzyDate(beginning_of_this_year)
-    end_date = fuzzy.FuzzyDate(datetime.date.today())
+    start_date = beginning_of_this_year
+    end_date = today
 
     class Meta:
         exclude = ['content_object']
@@ -364,8 +364,8 @@ class LocationFactory(factory.django.DjangoModelFactory):
 
 
 class ProgressReportFactory(factory.django.DjangoModelFactory):
-    start_date = fuzzy.FuzzyDate(beginning_of_this_year)
-    end_date = fuzzy.FuzzyDate(today)
+    start_date = beginning_of_this_year
+    end_date = today
 
     class Meta:
         model = ProgressReport
@@ -383,7 +383,7 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     agreement = factory.Sequence(lambda n: "JOR/PCA2017%d" % n)
     reference_number = factory.Sequence(lambda n: "reference_number_%d" % n)
     start_date = beginning_of_this_year
-    end_date = datetime.date.today() + datetime.timedelta(days=70)
+    end_date = today + datetime.timedelta(days=70)
     population_focus = factory.Sequence(lambda n: "Population %d" % n)
     response_to_HRP = factory.Sequence(lambda n: "response_to_HRP%d" % n)
     status = fuzzy.FuzzyChoice(PD_STATUS_LIST)
@@ -424,9 +424,9 @@ class DisaggregationValueFactory(factory.django.DjangoModelFactory):
 
 class QuantityIndicatorReportFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "quantity_indicator_report_%d" % n)
-    time_period_start = fuzzy.FuzzyDate(beginning_of_this_year)
-    time_period_end = fuzzy.FuzzyDate(datetime.date.today() + datetime.timedelta(days=70))
-    due_date = fuzzy.FuzzyDate(datetime.date.today() + datetime.timedelta(days=70))
+    time_period_start = beginning_of_this_year
+    time_period_end = today + datetime.timedelta(days=70)
+    due_date = today + datetime.timedelta(days=70)
     total = dict(
         [('c', 0), ('d', 0), ('v', random.randint(0, 3000))])
 
@@ -436,9 +436,9 @@ class QuantityIndicatorReportFactory(factory.django.DjangoModelFactory):
 
 class RatioIndicatorReportFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "ratio_indicator_report_%d" % n)
-    time_period_start = fuzzy.FuzzyDate(beginning_of_this_year)
-    time_period_end = fuzzy.FuzzyDate(datetime.date.today() + datetime.timedelta(days=70))
-    due_date = fuzzy.FuzzyDate(datetime.date.today() + datetime.timedelta(days=70))
+    time_period_start = beginning_of_this_year
+    time_period_end = today + datetime.timedelta(days=70)
+    due_date = today + datetime.timedelta(days=70)
     total = dict(
         [('c', 0), ('d', random.randint(3000, 6000)), ('v', random.randint(0, 3000))])
 
