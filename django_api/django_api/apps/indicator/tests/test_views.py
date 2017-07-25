@@ -9,8 +9,9 @@ from rest_framework import status
 from core.tests.base import BaseAPITestCase
 from core.models import Location
 from unicef.models import LowerLevelOutput, Section, ProgrammeDocument
-from cluster.models import ClusterObjective
+from cluster.models import ClusterObjective, ClusterActivity
 from indicator.models import Reportable, IndicatorReport, IndicatorLocationData, IndicatorBlueprint
+from partner.models import PartnerProject, PartnerActivity
 
 from core.helpers import (
     suppress_stdout,
@@ -33,6 +34,7 @@ from indicator.models import (
     Disaggregation,
     DisaggregationValue,
 )
+
 
 class TestPDReportsAPIView(BaseAPITestCase):
     generate_fake_data_quantity = 5
@@ -406,10 +408,9 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
         self.co = ClusterObjective.objects.first()
         self.url = reverse('cluster-indicator')
         self.data = {
-            'cluster_objective_id': self.co.id,
+            'object_id': self.co.id,
+            'object_type': 'ClusterObjective',
             'means_of_verification': 'IMO/CC calculation',
-            'start_date': date.today(),
-            'end_date': date.today(),
             'locations': [
                 {'id': Location.objects.first().id},
                 {'id': Location.objects.last().id},
@@ -425,7 +426,7 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
             },
         }
 
-    def test_create_indicator_cluster_reporting(self):
+    def test_create_indicator_cluster_objective_reporting(self):
         response = self.client.post(self.url, data=self.data, format='json')
 
         self.assertTrue(status.is_success(response.status_code))
@@ -441,6 +442,52 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
             response.data,
             {"locations": "List of dict location or one dict location expected"}
         )
+
+    def test_create_indicator_cluster_activities_reporting(self):
+        ca = ClusterActivity.objects.first()
+        self.data['object_id'] = ca.id
+        self.data['object_type'] = 'ClusterActivity'
+        response = self.client.post(self.url, data=self.data, format='json')
+
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+        self.assertEquals(Reportable.objects.count(), self.reportable_count+1)
+        self.assertEquals(IndicatorBlueprint.objects.count(), self.blueprint_count+1)
+
+    def test_create_indicator_partner_project_reporting(self):
+        pp = PartnerProject.objects.first()
+        self.data['object_id'] = pp.id
+        self.data['object_type'] = 'PartnerProject'
+        response = self.client.post(self.url, data=self.data, format='json')
+
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+        self.assertEquals(Reportable.objects.count(), self.reportable_count+1)
+        self.assertEquals(IndicatorBlueprint.objects.count(), self.blueprint_count+1)
+
+    def test_create_indicator_partner_activities_reporting(self):
+        pa = PartnerActivity.objects.filter(project__isnull=False).first()
+        self.data['object_id'] = pa.id
+        self.data['object_type'] = 'PartnerActivity'
+        response = self.client.post(self.url, data=self.data, format='json')
+
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+        self.assertEquals(Reportable.objects.count(), self.reportable_count+1)
+        self.assertEquals(IndicatorBlueprint.objects.count(), self.blueprint_count+1)
+
+    def test_create_indicator_fake_object_type_reporting(self):
+        self.data['object_id'] = 1
+        self.data['object_type'] = 'fake'
+        response = self.client.post(self.url, data=self.data, format='json')
+        self.assertFalse(status.is_success(response.status_code))
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEquals(
+            response.data['object_type'],
+            ['Not valid data. Expected value is ClusterObjective, ClusterActivity, PartnerProject, PartnerActivity.']
+        )
+        self.assertEquals(Reportable.objects.count(), self.reportable_count)
+        self.assertEquals(IndicatorBlueprint.objects.count(), self.blueprint_count)
 
     def test_update_indicator_cluster_reporting(self):
         response = self.client.post(self.url, data=self.data, format='json')

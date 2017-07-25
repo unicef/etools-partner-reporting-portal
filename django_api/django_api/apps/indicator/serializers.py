@@ -2,6 +2,7 @@ from ast import literal_eval as make_tuple
 
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
+from django.shortcuts import get_object_or_404
 
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -10,8 +11,10 @@ from unicef.models import LowerLevelOutput
 
 from core.serializers import SimpleLocationSerializer, IdLocationSerializer
 from core.models import Location
-from cluster.models import ClusterObjective
+from cluster.models import ClusterObjective, ClusterActivity
+from partner.models import PartnerProject, PartnerActivity
 
+from core.validators import add_indicator_object_type_validator
 from core.helpers import (
     generate_data_combination_entries,
     get_sorted_ordered_dict_by_keys,
@@ -521,7 +524,7 @@ class IndicatorBlueprintSerializer(serializers.ModelSerializer):
 
 class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
-    cluster_objective_id = serializers.CharField(source='object_id')
+    object_type = serializers.CharField(validators=[add_indicator_object_type_validator])
     blueprint = IndicatorBlueprintSerializer()
     locations = IdLocationSerializer(many=True)
 
@@ -529,11 +532,10 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         model = Reportable
         fields = (
             'id',
-            'start_date',
-            'end_date',
             'means_of_verification',
             'blueprint',
-            'cluster_objective_id',
+            'object_id',
+            'object_type',
             'locations',
         )
 
@@ -552,9 +554,38 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         else:
             raise ValidationError(blueprint.errors)
 
+        if validated_data['object_type'] == 'ClusterObjective':
+            validated_data['content_type'] = ContentType.objects.get_for_model(ClusterObjective)
+            cluster_objective = get_object_or_404(ClusterObjective, pk=validated_data['object_id'])
+            validated_data['start_date'] = cluster_objective.cluster.response_plan.start
+            validated_data['end_date'] = cluster_objective.cluster.response_plan.end
+            validated_data['is_cluster_indicator'] = True
+        elif validated_data['object_type'] == 'ClusterActivity':
+            validated_data['content_type'] = ContentType.objects.get_for_model(ClusterActivity)
+            cluster_activity = get_object_or_404(ClusterActivity, pk=validated_data['object_id'])
+            validated_data['start_date'] = cluster_activity.cluster_objective.cluster.response_plan.start
+            validated_data['end_date'] = cluster_activity.cluster_objective.cluster.response_plan.end
+            validated_data['is_cluster_indicator'] = True
+        elif validated_data['object_type'] == 'PartnerProject':
+            validated_data['content_type'] = ContentType.objects.get_for_model(PartnerProject)
+            partner_project = get_object_or_404(PartnerProject, pk=validated_data['object_id'])
+            validated_data['start_date'] = partner_project.start_date
+            validated_data['end_date'] = partner_project.end_date
+            validated_data['is_cluster_indicator'] = False
+        elif validated_data['object_type'] == 'PartnerActivity':
+            validated_data['content_type'] = ContentType.objects.get_for_model(PartnerActivity)
+            partner_activity = get_object_or_404(PartnerActivity, pk=validated_data['object_id'])
+            validated_data['start_date'] = partner_activity.project.start_date
+            validated_data['end_date'] = partner_activity.project.end_date
+            validated_data['is_cluster_indicator'] = False
+        else:
+            raise ValidationError([
+                "object_type expected (ClusterObjective, ClusterActivity, PartnerProject, PartnerActivity)"
+            ])
+
         validated_data['blueprint'] = blueprint.instance
-        validated_data['content_type'] = ContentType.objects.get_for_model(ClusterObjective)
-        validated_data['is_cluster_indicator'] = True
+
+        del validated_data['object_type']
         del validated_data['locations']
 
         self.instance = Reportable.objects.create(**validated_data)
