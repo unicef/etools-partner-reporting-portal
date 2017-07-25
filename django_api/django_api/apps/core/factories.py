@@ -261,7 +261,7 @@ class ReportableFactory(factory.django.DjangoModelFactory):
     cs_dates = list()
     frequency = fuzzy.FuzzyChoice(REPORTABLE_FREQUENCY_LEVEL_CHOICE_LIST)
     start_date = beginning_of_this_year
-    end_date = today
+    end_date = today + datetime.timedelta(days=70)
 
     class Meta:
         exclude = ['content_object']
@@ -427,8 +427,8 @@ class DisaggregationValueFactory(factory.django.DjangoModelFactory):
 class QuantityIndicatorReportFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "quantity_indicator_report_%d" % n)
     time_period_start = beginning_of_this_year
-    time_period_end = beginning_of_this_year + datetime.timedelta(days=70)
-    due_date = beginning_of_this_year + datetime.timedelta(days=70)
+    time_period_end = beginning_of_this_year + datetime.timedelta(days=30)
+    due_date = beginning_of_this_year + datetime.timedelta(days=30)
     total = dict(
         [('c', 0), ('d', 0), ('v', random.randint(0, 3000))])
 
@@ -439,8 +439,8 @@ class QuantityIndicatorReportFactory(factory.django.DjangoModelFactory):
 class RatioIndicatorReportFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "ratio_indicator_report_%d" % n)
     time_period_start = beginning_of_this_year
-    time_period_end = beginning_of_this_year + datetime.timedelta(days=70)
-    due_date = beginning_of_this_year + datetime.timedelta(days=70)
+    time_period_end = beginning_of_this_year + datetime.timedelta(days=30)
+    due_date = beginning_of_this_year + datetime.timedelta(days=30)
     total = dict(
         [('c', 0), ('d', random.randint(3000, 6000)), ('v', random.randint(0, 3000))])
 

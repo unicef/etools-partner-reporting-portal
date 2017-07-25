@@ -209,10 +209,6 @@ def calculate_end_date_given_start_date(start_date, frequency):
         end_date = get_last_date_of_a_quarter(
             start_date.year, quarter=quarter)
 
-    # TODO: Handling custom_specific_dates later
-    # elif frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
-    #     end_date = pd.start_date + timedelta(7)
-
     return end_date
 
 
@@ -242,10 +238,10 @@ def find_missing_frequency_period_dates(start_date, last_date, frequency):
 
             if frequency == PD_FREQUENCY_LEVEL.weekly:
                 # Check if we should proceed to next date
-                if day_delta >= 7:
+                if day_delta >= 8:
                     # If day_delta_counter has more week date to create
-                    if day_delta_counter >= 7:
-                        day_delta_counter -= 7
+                    if day_delta_counter >= 8:
+                        day_delta_counter -= 8
 
                     # We have exhausted day_delta_counter successfully. Exiting
                     else:

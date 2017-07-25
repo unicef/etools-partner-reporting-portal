@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.db import transaction
 from django.core.management.base import BaseCommand
 
