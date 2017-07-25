@@ -428,11 +428,18 @@ def generate_indicator_report_location_disaggregation_quantity_data():
     for idx, reportable in enumerate(queryset):
         # -- Extra IndicatorReport and IndicatorLocationData --
 
-        # ProgressReport - IndicatorReport from
-        # QuantityReportable object
-        indicator_report = QuantityIndicatorReportFactory(reportable=reportable)
-        indicator_report.progress_report = reportable.indicator_reports.first().progress_report
-        indicator_report.save()
+        cluster_indicator_types = [
+            'partnerproject',
+            'partneractivity',
+            'clusterobjective'
+        ]
+
+        if reportable.content_type.model in cluster_indicator_types:
+            # ProgressReport - IndicatorReport from
+            # QuantityReportable object
+            indicator_report = QuantityIndicatorReportFactory(reportable=reportable)
+            indicator_report.progress_report = reportable.indicator_reports.first().progress_report
+            indicator_report.save()
 
         # -- IndicatorLocationData --
 
@@ -565,11 +572,18 @@ def generate_indicator_report_location_disaggregation_ratio_data():
     for idx, reportable in enumerate(queryset):
         # -- Extra IndicatorReport and IndicatorLocationData --
 
-        # ProgressReport - IndicatorReport from
-        # QuantityReportable object
-        indicator_report = RatioIndicatorReportFactory(reportable=reportable)
-        indicator_report.progress_report = reportable.indicator_reports.first().progress_report
-        indicator_report.save()
+        cluster_indicator_types = [
+            'partnerproject',
+            'partneractivity',
+            'clusterobjective'
+        ]
+
+        if reportable.content_type.model in cluster_indicator_types:
+            # ProgressReport - IndicatorReport from
+            # RatioReportable object
+            indicator_report = RatioIndicatorReportFactory(reportable=reportable)
+            indicator_report.progress_report = reportable.indicator_reports.first().progress_report
+            indicator_report.save()
 
         # -- IndicatorLocationData --
 
