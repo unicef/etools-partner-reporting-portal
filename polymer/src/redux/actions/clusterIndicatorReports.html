@@ -59,6 +59,14 @@
           return submitThunk();
         };
       },
+
+      updateSingle: function (reportId, data) {
+        return {
+          type: App.Constants.UPDATE_CLUSTER_INDICATOR_REPORT,
+          reportId: reportId,
+          data: data,
+        };
+      },
     };
   }());
 </script>

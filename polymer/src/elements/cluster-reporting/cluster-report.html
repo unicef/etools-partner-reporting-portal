@@ -302,6 +302,10 @@
         },
       },
 
+      listeners: {
+        'report-complete': '_onReportComplete',
+      },
+
       _computeIcon: function (opened) {
         return opened ? 'less' : 'more';
       },
@@ -372,6 +376,19 @@
 
       _revert: function () {
         this.set('busy', false);
+      },
+
+      _onReportComplete: function (e, data) {
+        e.stopPropagation();
+
+        this.dispatch(
+          App.Actions.ClusterIndicatorReports.updateSingle(
+            data.indicatorId,
+            {
+              can_submit: true,
+            }
+          )
+        );
       },
 
       detached: function () {

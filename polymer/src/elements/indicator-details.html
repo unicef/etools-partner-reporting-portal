@@ -301,6 +301,10 @@
         },
       },
 
+      listeners: {
+        'location-updated': '_onLocationUpdated',
+      },
+
       init: function () {
         var self = this;
         var disaggregationsThunk;
@@ -375,6 +379,24 @@
 
       _computeHasPD: function (currentPD) {
         return !!Object.keys(currentPD).length;
+      },
+
+      _onLocationUpdated: function (e) {
+        e.stopPropagation();
+
+        var allComplete = this.disaggregations.indicator_location_data
+            .every(function (location) {
+              return location.is_complete;
+            });
+
+        if (!allComplete) {
+          return;
+        }
+
+        this.fire('report-complete', {
+          indicatorId: this.indicatorId,
+          reportableId: this.reportableId,
+        });
       },
 
       attached: function () {

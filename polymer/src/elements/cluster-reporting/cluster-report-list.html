@@ -6,6 +6,7 @@
 
 <link rel="import" href="../../constants.html">
 <link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../redux/selectors/clusterIndicatorReports.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/pagination.html">
 <link rel="import" href="../../behaviors/data-table.html">
@@ -95,7 +96,7 @@
 
         data: {
           type: Array,
-          statePath: 'clusterIndicatorReports.all',
+          statePath: App.Selectors.ClusterIndicatorReports.all,
         },
 
         totalResults: {
