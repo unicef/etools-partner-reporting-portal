@@ -12,6 +12,8 @@ class PartnerProjectFilter(filters.FilterSet):
     status = ChoiceFilter(choices=PD_STATUS)
     start_date = DateFilter(method='get_start_date')
     end_date = DateFilter(method='get_end_date')
+    cluster_id = DateFilter(method='get_cluster_id')
+
 
     class Meta:
         model = PartnerProject
@@ -28,3 +30,6 @@ class PartnerProjectFilter(filters.FilterSet):
 
     def get_end_date(self, queryset, name, value):
         return queryset.filter(end_date__lte=value)
+
+    def get_cluster_id(self, queryset, name, value):
+        return queryset.filter(clusters__in=[value])
