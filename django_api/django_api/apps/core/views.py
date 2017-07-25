@@ -32,13 +32,15 @@ class SimpleLocationListAPIView(ListAPIView):
 
     def get_queryset(self):
         response_plan_id = self.kwargs.get(self.lookup_field)
-        return Location.objects.filter(
-            Q(reportable__cluster_activities__clusters__response_plan_id=response_plan_id),
-            # Q(reportable__cluster_objectives__clusters__response_plan=response_plan_id),
-            # Q(reportable__partner_projects__clusters__response_plan=response_plan_id),
-            # Q(reportable__partner_activities__cluster__response_plan=response_plan_id),
-        )
-
+        result = ResponsePlan.objects.filter(id=response_plan_id).values_list(
+            'clusters__cluster_objectives__reportables__locations',
+            'clusters__cluster_objectives__cluster_activities__reportables__locations',
+            'clusters__partner_projects__reportables__locations',
+            'clusters__partner_projects__partner_activities__reportables__locations',
+        ).distinct()
+        pks = []
+        [pks.extend(filter(lambda x: x is not None, part)) for part in result]
+        return Location.objects.filter(pk__in=pks)
 
 
 class ChildrenLocationAPIView(ListAPIView):
