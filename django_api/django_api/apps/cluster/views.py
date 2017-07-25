@@ -4,15 +4,16 @@ from django.http import Http404
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import ListCreateAPIView, ListAPIView
 from rest_framework import status as statuses, serializers
 
 import django_filters
 
 from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
-from .models import ClusterObjective, ClusterActivity
+from .models import ClusterObjective, ClusterActivity, Cluster
 from .serializers import (
+    ClusterSimpleSerializer,
     ClusterObjectiveSerializer,
     ClusterObjectivePatchSerializer,
     ClusterActivitySerializer,
@@ -21,6 +22,20 @@ from .serializers import (
 from .filters import ClusterObjectiveFilter, ClusterActivityFilter
 
 logger = logging.getLogger(__name__)
+
+
+class ClusterListAPIView(ListAPIView):
+
+    serializer_class = ClusterSimpleSerializer
+    permission_classes = (IsAuthenticated, )
+    lookup_field = lookup_url_kwarg = 'rp_id'
+
+    def get_queryset(self, *args, **kwargs):
+        queryset = Cluster.objects
+        response_plan_id = self.kwargs.get(self.lookup_field)
+        if response_plan_id:
+            return queryset.filter(response_plan_id=response_plan_id)
+        return queryset.all()
 
 
 class ClusterObjectiveAPIView(APIView):

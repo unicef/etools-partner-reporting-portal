@@ -1,0 +1,265 @@
+<link rel="import" href="../../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../../../../../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../../../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../../../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../../../../bower_components/etools-loading/etools-loading.html">
+<link rel="import" href="../../../../../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../../../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../../../../bower_components/iron-location/iron-location.html">
+
+<link rel="import" href="../../../../../elements/dropdown-form-input.html">
+<link rel="import" href="../../../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../../../styles/buttons.html">
+<link rel="import" href="../../../../../redux/store.html">
+<link rel="import" href="../../../../../redux/actions.html">
+<link rel="import" href="../../../../../behaviors/date.html">
+
+<dom-module id="cluster-activities-modal">
+  <template>
+    <style include="button-styles iron-flex iron-flex-alignment iron-flex-reverse">
+      :host {
+        display: block;
+
+        --paper-dialog: {
+          min-width: 500px;
+
+          & > * {
+            margin: 0;
+          }
+        };
+      }
+
+      .header {
+        height: 48px;
+        padding: 0 24px;
+        margin: 0;
+        color: white;
+        background: var(--theme-primary-color);
+      }
+
+      paper-button.btn-primary {
+        background-color: var(--theme-primary-color);
+        color: white;
+      }
+
+      .header h2 {
+        @apply(--paper-font-title);
+
+        margin: 0;
+        line-height: 48px;
+      }
+
+      .header paper-icon-button {
+        margin: 0 -13px 0 20px;
+        color: white;
+      }
+
+      .buttons {
+        padding: 24px;
+      }
+
+      dropdown-form-input:first-child {
+        margin-right: 10px;
+      }
+
+      dropdown-form-input:nth-child(3) {
+        margin-left: 10px;
+      }
+
+    </style>
+
+    <iron-location path="{{path}}"></iron-location>
+
+    <etools-prp-ajax
+        id="createActivity"
+        url="[[activityUrl]]"
+        body="[[data]]"
+        content-type="application/json"
+        method="post">
+    </etools-prp-ajax>
+
+    <paper-dialog
+        id="dialog"
+        with-backdrop
+        opened="[[opened]]">
+      <div class="header layout horizontal justified">
+        <h2>Add Cluster Activity</h2>
+          <paper-icon-button
+              class="self-center"
+              on-tap="close"
+              icon="icons:close">
+          </paper-icon-button>
+        </div>
+      </div>
+
+      <paper-dialog-scrollable>
+        <iron-form>
+          <paper-input
+            id="title"
+            label="Title"
+            value="{{data.title}}"
+            type="string"
+            required
+            auto-validate>
+          </paper-input>
+
+          <paper-input
+            id="standard"
+            label="Standard"
+            value="{{data.standard}}"
+            type="string"
+            required
+            auto-validate>
+          </paper-input>
+
+          <div class="row horizontal layout">
+            <dropdown-form-input
+              class="flex self-stretch"
+               label="Cluster"
+               id="cluster_objective"
+               selected="{{data.cluster_objective}}"
+               data="[[clusters]]">
+            </dropdown-form-input>
+
+            <!-- TODO: Ask: dropdown in mockup, but text field everywhere else? -->
+            <paper-input
+                class="flex"
+                id="reference_number"
+                label="CO ref #"
+                value="{{data.reference_number}}"
+                type="string"
+                required
+                auto-validate>
+            </paper-input>
+
+            <dropdown-form-input
+               class="flex"
+               label="Frequency of reporting"
+               id="frequency"
+               selected="{{data.frequency}}"
+               data="[[frequencies]]">
+            </dropdown-form-input>
+          </div>
+        </iron-form>
+
+      </paper-dialog-scrollable>
+
+      <div class="buttons layout horizontal-reverse">
+        <paper-button class="btn-primary" on-tap="_save" raised>
+          Save
+        </paper-button>
+
+        <paper-button  on-tap="close">
+          Cancel
+        </paper-button>
+      </div>
+
+      <etools-loading active="[[updatePending]]"></etools-loading>
+
+    </paper-dialog>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'cluster-activities-modal',
+
+      behaviors: [
+        App.Behaviors.DateBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.RoutingBehavior,
+      ],
+
+      listeners: {
+        'dialog.iron-overlay-closed': 'close',
+      },
+
+      properties: {
+
+        opened: {
+          type: Boolean,
+          value: false,
+        },
+
+        updatePending: {
+          type: Boolean,
+          value: false,
+        },
+
+        // TODO: locations and clusters.
+        data: {
+          type: Object,
+          value: {}
+        },
+
+        // TODO: Remove this and populate cluster dropdown.
+        clusters: {
+          type: Array,
+          value: [
+            {title: 'Cluster A', id: 10},
+            {title: 'Cluster B', id: 15},
+            {title: 'Cluster C', id: 20},
+          ],
+        },
+
+        frequencies: {
+          type: Array,
+          value: [
+            {title: 'Weekly', id: 'Wee'},
+            {title: 'Monthly', id: 'Mon'},
+            {title: 'Quarterly', id: 'Qua'},
+          ],
+        },
+
+        activityUrl: {
+          type: String,
+          value: App.Endpoints.responseParametersClusterActivities()
+        },
+      },
+
+      close: function () {
+        this.set('opened', false);
+        this.data = {};
+      },
+
+      open: function () {
+        this.set('opened', true);
+      },
+
+      // Dropdowns provide the index of the selected item.
+      // This function is temporary. TODO:
+      // Need to refactor so dropdown-form-input will return value, not index.
+      _getDropdownIds: function() {
+        if (typeof(this.data.frequency) === 'number') {
+          this.data.frequency = this.frequencies[this.data.frequency].id;
+        }
+      },
+
+      _redirectToDetail: function (id) {
+        var path = '/response-parameters/clusters/activity/' + String(id);
+        var url = this.buildUrl(this._baseUrlCluster, path);
+        this.set('path', url);
+      },
+
+      _save: function () {
+        var self = this;
+        this._getDropdownIds();
+        var thunk = this.$.createActivity.thunk();
+        self.updatePending = true;
+        thunk()
+          .then(function (res) {
+            self.updatePending = false;
+            self._redirectToDetail(res.data.id);
+          })
+          .catch(function (err) { // jshint ignore:line
+            self.updatePending = false;
+            // TODO: error handling
+          });
+      },
+    });
+  </script>
+</dom-module>

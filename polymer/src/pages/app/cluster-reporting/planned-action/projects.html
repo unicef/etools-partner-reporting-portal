@@ -1,0 +1,56 @@
+<link rel="import" href="../../../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../../../elements/cluster-reporting/planned-action/projects/filters.html">
+<link rel="import" href="../../../../elements/cluster-reporting/planned-action/projects/creation-modal.html">
+<link rel="import" href="../../../../elements/cluster-reporting/project-list-table.html">
+<link rel="import" href="../../../../styles/shared-styles.html">
+
+
+<dom-module id="planned-action-projects-list">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+      }
+      div#action {
+        margin-bottom: 25px;
+        @apply(--layout-horizontal);
+        @apply(--layout-end-justified)
+      }
+
+      paper-button {
+        background-color: var(--theme-primary-color);
+        color: white;
+      }
+    </style>
+
+    <page-body>
+
+      <planned-action-projects-filters class="filters"></planned-action-projects-filters>
+
+      <div id="action">
+        <paper-button id="add" on-tap="_openModal" raised>
+          Add Project
+        </paper-button>
+      </div>
+
+      <planned-action-projects-modal id="modal"></planned-action-projects-modal>
+
+      <project-list-table
+        page="planned-action">
+      </project-list-table>
+
+    </page-body>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'planned-action-projects-list',
+
+      _openModal: function () {
+        this.$$('#modal').open();
+      },
+
+    });
+  </script>
+</dom-module>

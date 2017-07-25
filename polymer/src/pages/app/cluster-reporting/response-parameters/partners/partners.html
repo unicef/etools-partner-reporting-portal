@@ -1,21 +1,16 @@
-<link rel="import" href="../../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../../bower_components/paper-tabs/paper-tab.html">
-<link rel="import" href="../../../../bower_components/paper-tabs/paper-tabs.html">
-<link rel="import" href="../../../../bower_components/app-route/app-route.html">
-<link rel="import" href="../../../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../../../../../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../../../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../../../../bower_components/iron-pages/iron-pages.html">
 
-<link rel="import" href="../../../styles/shared-styles.html">
-<link rel="import" href="../../../elements/page-header.html">
-<link rel="import" href="planned-action/router.html">
+<link rel="import" href="../../../../../styles/shared-styles.html">
+<link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="../../../../../behaviors/routing.html">
+<link rel="import" href="router.html">
 
 
-<!--
-When the user first clicks My Planned Action, this component determines whether
-to display the Planned Action page header and tabs.  It passes the page name to
-planned-action-projects-router.
--->
-
-<dom-module id="page-cluster-reporting-planned-action">
+<dom-module id="partners-response-parameters">
   <template>
     <style include="shared-styles">
       :host {
@@ -36,13 +31,17 @@ planned-action-projects-router.
 
     <template is="dom-if" if="[[_displayHeader(subpage)]]" restamp="true">
       <div class="page-top-content">
-        <page-header title="My Planned Action">
+        <page-header title="Partners">
           <div class="tabs">
             <paper-tabs
               selected="{{tab}}"
               attr-for-selected="name"
               scrollable
               hide-scroll-buttons>
+
+              <paper-tab name="contacts">
+                <span class="tab-content">Contacts</span>
+              </paper-tab>
 
               <paper-tab name="projects">
                 <span class="tab-content">Projects</span>
@@ -57,16 +56,16 @@ planned-action-projects-router.
       </div>
     </template>
 
-    <planned-action-projects-router
+    <response-parameters-partners-router
       route="{{subroute}}"
       page={{subpage}}>
-    </planned-action-projects-router>
+    </response-parameters-partners-router>
 
   </template>
 
   <script>
     Polymer({
-      is: 'page-cluster-reporting-planned-action',
+      is: 'partners-response-parameters',
 
       properties: {
         subpage: String,
@@ -76,6 +75,8 @@ planned-action-projects-router.
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.RoutingBehavior,
       ],
 
       observers: [
@@ -85,18 +86,23 @@ planned-action-projects-router.
 
       _routeChanged: function (subpage) {
         switch (subpage) {
+          case 'contacts':
+            this.subpage = 'contacts';
+            this.tab = 'contacts';
+            break;
+
           case 'projects':
             this.subpage = 'projects';
             this.tab = 'projects';
             break;
 
+          case 'project':
+            this.subpage = 'project';
+            break;
+
           case 'activities':
             this.subpage = 'activities';
             this.tab = 'activities';
-            break;
-
-          case 'project':
-            this.subpage = 'project';
             break;
 
           case 'activity':
@@ -106,12 +112,14 @@ planned-action-projects-router.
           default:
             this.subpage = 'projects';
             this.set('route.path', '/projects');
+            // this.subpage = 'contacts';
+            // this.set('route.path', '/contacts');
             break;
         }
       },
 
       _displayHeader: function(subpage) {
-        if (subpage === 'projects' || subpage === 'activities') {
+        if (subpage[subpage.length - 1] === 's') {
           return true;
         }
         return false;

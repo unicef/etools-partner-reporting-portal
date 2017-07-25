@@ -1,21 +1,16 @@
-<link rel="import" href="../../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../../bower_components/paper-tabs/paper-tab.html">
-<link rel="import" href="../../../../bower_components/paper-tabs/paper-tabs.html">
-<link rel="import" href="../../../../bower_components/app-route/app-route.html">
-<link rel="import" href="../../../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../../../../../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../../../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../../../../bower_components/iron-pages/iron-pages.html">
 
-<link rel="import" href="../../../styles/shared-styles.html">
-<link rel="import" href="../../../elements/page-header.html">
-<link rel="import" href="planned-action/router.html">
+<link rel="import" href="../../../../../styles/shared-styles.html">
+<link rel="import" href="../../../../../elements/page-header.html">
+<link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="router.html">
 
 
-<!--
-When the user first clicks My Planned Action, this component determines whether
-to display the Planned Action page header and tabs.  It passes the page name to
-planned-action-projects-router.
--->
-
-<dom-module id="page-cluster-reporting-planned-action">
+<dom-module id="clusters-response-parameters">
   <template>
     <style include="shared-styles">
       :host {
@@ -36,7 +31,7 @@ planned-action-projects-router.
 
     <template is="dom-if" if="[[_displayHeader(subpage)]]" restamp="true">
       <div class="page-top-content">
-        <page-header title="My Planned Action">
+        <page-header title="Clusters">
           <div class="tabs">
             <paper-tabs
               selected="{{tab}}"
@@ -44,8 +39,12 @@ planned-action-projects-router.
               scrollable
               hide-scroll-buttons>
 
-              <paper-tab name="projects">
-                <span class="tab-content">Projects</span>
+              <paper-tab name="response-plans">
+                <span class="tab-content">Response Plans</span>
+              </paper-tab>
+
+              <paper-tab name="objectives">
+                <span class="tab-content">Objectives</span>
               </paper-tab>
 
               <paper-tab name="activities">
@@ -57,16 +56,16 @@ planned-action-projects-router.
       </div>
     </template>
 
-    <planned-action-projects-router
+    <response-parameters-clusters-router
       route="{{subroute}}"
       page={{subpage}}>
-    </planned-action-projects-router>
+    </response-parameters-clusters-router>
 
   </template>
 
   <script>
     Polymer({
-      is: 'page-cluster-reporting-planned-action',
+      is: 'clusters-response-parameters',
 
       properties: {
         subpage: String,
@@ -85,9 +84,14 @@ planned-action-projects-router.
 
       _routeChanged: function (subpage) {
         switch (subpage) {
-          case 'projects':
-            this.subpage = 'projects';
-            this.tab = 'projects';
+          case 'response-plans':
+            this.subpage = 'response-plans';
+            this.tab = 'response-plans';
+            break;
+
+          case 'objectives':
+            this.subpage = 'objectives';
+            this.tab = 'objectives';
             break;
 
           case 'activities':
@@ -95,8 +99,12 @@ planned-action-projects-router.
             this.tab = 'activities';
             break;
 
-          case 'project':
-            this.subpage = 'project';
+          case 'response-plan':
+            this.subpage = 'response-plan';
+            break;
+
+          case 'objective':
+            this.subpage = 'objective';
             break;
 
           case 'activity':
@@ -104,14 +112,14 @@ planned-action-projects-router.
             break;
 
           default:
-            this.subpage = 'projects';
-            this.set('route.path', '/projects');
+            this.subpage = 'response-plans';
+            this.set('route.path', '/response-plans');
             break;
         }
       },
 
       _displayHeader: function(subpage) {
-        if (subpage === 'projects' || subpage === 'activities') {
+        if (subpage[subpage.length - 1] === 's') {
           return true;
         }
         return false;

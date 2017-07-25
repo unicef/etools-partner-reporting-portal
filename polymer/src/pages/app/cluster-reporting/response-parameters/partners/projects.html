@@ -1,0 +1,32 @@
+<link rel="import" href="../../../../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/partners/projects/filters.html">
+<link rel="import" href="../../../../../elements/cluster-reporting/planned-action/projects/creation-modal.html">
+<link rel="import" href="../../../../../elements/cluster-reporting/project-list-table.html">
+<link rel="import" href="../../../../../styles/shared-styles.html">
+
+<dom-module id="rp-partners-projects">
+    <template>
+      <style include="shared-styles">
+        :host {
+          display: block;
+        }
+      </style>
+
+    <page-body>
+
+      <partner-projects-filters class="filters"></partner-projects-filters>
+
+      <project-list-table
+        page="response-parameters">
+      </project-list-table>
+
+    <page-body>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'rp-partners-projects',
+    });
+  </script>
+</dom-module>

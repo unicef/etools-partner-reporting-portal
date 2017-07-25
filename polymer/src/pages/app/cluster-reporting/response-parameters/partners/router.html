@@ -1,0 +1,103 @@
+<link rel="import" href="../../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../../../../bower_components/iron-location/iron-query-params.html">
+<link rel="import" href="../../../../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../../../../bower_components/iron-pages/iron-pages.html">
+
+<link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="projects.html">
+
+<dom-module id="response-parameters-partners-router">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <iron-location></iron-location>
+
+    <app-route
+      route="{{route}}"
+      pattern="/:id"
+      data="{{routeData}}"
+      tail="{{subroute}}">
+    </app-route>
+
+    <iron-pages
+        selected="[[page]]"
+        attr-for-selected="name">
+
+      <template is="dom-if" if="[[_equals(page, 'contacts')]]" restamp="true">
+        TODO: Contacts
+      </template>
+
+      <template is="dom-if" if="[[_equals(page, 'projects')]]" restamp="true">
+        <rp-partners-projects
+          name="projects"
+          route="{{subroute}}">
+        </rp-partners-projects>
+      </template>
+
+      <template is="dom-if" if="[[_equals(page, 'project')]]" restamp="true">
+        <rp-partners-project-detail
+          name="project"
+          project-id="{{id}}"
+          route="{{subroute}}">
+        </rp-partners-project-detail>
+      </template>
+
+      <template is="dom-if" if="[[_equals(page, 'activities')]]" restamp="true">
+        TODO: Activities
+      </template>
+
+      <template is="dom-if" if="[[_equals(page, 'activity')]]" restamp="true">
+        TODO: Activity
+      </template>
+    </iron-pages>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'response-parameters-partners-router',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+      ],
+
+      observers: [
+        '_routeChanged(routeData.id)',
+      ],
+
+      properties: {
+        page: {
+          type: String,
+          observer: '_pageChanged',
+        },
+
+        id: String,
+      },
+
+      _routeChanged: function (id) {
+        this.id = id;
+      },
+
+      _pageChanged: function (page) {
+        var resolvedPageUrl;
+
+        if (!page) {
+          return;
+        }
+
+        // TODO: Remove when other pages are ready.
+        if (page === 'activities' || page === 'contacts') {
+          return;
+        }
+
+        resolvedPageUrl = this.resolveUrl(page + '.html');
+        this.importHref(resolvedPageUrl, null, this._notFound, true);
+      }
+
+    });
+  </script>
+</dom-module>
