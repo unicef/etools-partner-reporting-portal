@@ -136,6 +136,7 @@ class IndicatorLLoutputsSerializer(serializers.ModelSerializer):
             'narrative_assessment',
             'indicator_reports',
             'display_type',
+            'total',
         )
 
     def get_name(self, obj):
