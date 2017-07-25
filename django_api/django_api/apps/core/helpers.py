@@ -190,6 +190,8 @@ def get_last_date_of_a_quarter(year, quarter=1):
 
 
 def calculate_end_date_given_start_date(start_date, frequency):
+    end_date = None
+
     if frequency == PD_FREQUENCY_LEVEL.weekly:
         end_date = start_date + timedelta(7)
 
@@ -234,6 +236,8 @@ def find_missing_frequency_period_dates(start_date, last_date, frequency):
 
         # Keep adding missing date until we get caught up with day_delta
         while day_delta_counter > 0:
+            can_add = True
+
             missing_date = today - timedelta(day_delta_counter)
 
             if frequency == PD_FREQUENCY_LEVEL.weekly:
@@ -274,8 +278,18 @@ def find_missing_frequency_period_dates(start_date, last_date, frequency):
 
                 quarter_day_delta = (end_quarter_date - missing_date).days
 
+                # See if we got more days to go but we are at the last day of the quarter
+                if quarter_day_delta == 0:
+                    # If current missing date is in same month as today's month, then we know we have exhausted day_delta_counter successfully. Exiting
+                    if missing_date.month == today.month:
+                        day_delta_counter = 0
+
+                    else:
+                        day_delta_counter -= 1
+                        can_add = False
+
                 # Check if we should proceed to next date
-                if day_delta >= quarter_day_delta:
+                elif day_delta >= quarter_day_delta:
                     # If day_delta_counter has more days to create
                     if day_delta_counter >= quarter_day_delta:
                         day_delta_counter -= quarter_day_delta
@@ -287,22 +301,8 @@ def find_missing_frequency_period_dates(start_date, last_date, frequency):
                 else:
                     break
 
-            elif frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
-                # Check if we should proceed to next date
-                if day_delta >= 7:
-                    # If day_delta_counter has more week date to create
-                    if day_delta_counter >= 7:
-                        day_delta_counter -= 7
-
-                    # We have exhausted day_delta_counter successfully. Exiting
-                    else:
-                        day_delta_counter = 0
-
-                else:
-                    break
-
             # Only add new date if it's later than start date
-            if start_date <= missing_date:
+            if start_date <= missing_date and can_add:
                 date_list.append(missing_date)
 
     return date_list

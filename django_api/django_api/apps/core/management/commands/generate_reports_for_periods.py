@@ -65,23 +65,29 @@ class Command(BaseCommand):
             frequency = pd.frequency
             latest_progress_report = pd.progress_reports.last()
 
-            # Get missing date list based on progress report existence
-            if latest_progress_report:
-                print "PD {} ProgressReport Found with period of {} - {} ".format(
-                    pd,
-                    latest_progress_report.start_date,
-                    latest_progress_report.end_date)
-
-                date_list = find_missing_frequency_period_dates(
-                    pd.start_date, latest_progress_report.end_date, frequency
-                )
+            if frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
+                print "PD {} frequency is custom specific dates".format(
+                    pd)
+                date_list = pd.cs_dates
 
             else:
-                print "PD {} ProgressReport NOT Found".format(
-                    pd)
+                # Get missing date list based on progress report existence
+                if latest_progress_report:
+                    print "PD {} ProgressReport Found with period of {} - {} ".format(
+                        pd,
+                        latest_progress_report.start_date,
+                        latest_progress_report.end_date)
 
-                date_list = find_missing_frequency_period_dates(
-                    pd.start_date, None, frequency)
+                    date_list = find_missing_frequency_period_dates(
+                        pd.start_date, latest_progress_report.end_date, frequency
+                    )
+
+                else:
+                    print "PD {} ProgressReport NOT Found".format(
+                        pd)
+
+                    date_list = find_missing_frequency_period_dates(
+                        pd.start_date, None, frequency)
 
             print "Missing dates: {}".format(date_list)
 
@@ -154,24 +160,31 @@ class Command(BaseCommand):
             frequency = indicator.frequency
             latest_indicator_report = indicator.indicator_reports.last()
 
-            # Get missing date list based on progress report existence
-            if latest_indicator_report:
-                print "Indicator {} IndicatorReport Found with period of {} - {} ".format(
-                    indicator,
-                    latest_indicator_report.time_period_start,
-                    latest_indicator_report.time_period_end)
-
-                date_list = find_missing_frequency_period_dates(
-                    indicator.start_date,
-                    latest_indicator_report.time_period_end,
-                    frequency,
-                )
+            if frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
+                print "Indicator {} frequency is custom specific dates".format(
+                    pd)
+                date_list = pd.cs_dates
 
             else:
-                print "Indicator {} IndicatorReport Not Found".format(
-                    indicator)
-                date_list = find_missing_frequency_period_dates(
-                    indicator.start_date, None, frequency)
+                # Get missing date list based on progress report existence
+                if latest_indicator_report:
+                    print "Indicator {} IndicatorReport Found with period of {} - {} ".format(
+                        indicator,
+                        latest_indicator_report.time_period_start,
+                        latest_indicator_report.time_period_end)
+
+                    date_list = find_missing_frequency_period_dates(
+                        indicator.start_date,
+                        latest_indicator_report.time_period_end,
+                        frequency,
+                    )
+
+                else:
+                    print "Indicator {} IndicatorReport Not Found".format(
+                        indicator)
+
+                    date_list = find_missing_frequency_period_dates(
+                        indicator.start_date, None, frequency)
 
             print "Missing dates: {}".format(date_list)
 
