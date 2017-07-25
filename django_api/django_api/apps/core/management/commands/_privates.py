@@ -36,8 +36,10 @@ from core.factories import (
     LocationFactory,
     QuantityReportableToLowerLevelOutputFactory,
     RatioReportableToLowerLevelOutputFactory,
-    QuantityReportableToClusterObjectiveFactory,
     RatioReportableToClusterObjectiveFactory,
+    QuantityReportableToPartnerProjectFactory,
+    QuantityReportableToClusterObjectiveFactory,
+    QuantityReportableToPartnerActivityFactory,
     QuantityIndicatorReportFactory,
     RatioIndicatorReportFactory,
     ProgressReportFactory,
@@ -155,22 +157,33 @@ def generate_fake_data(quantity=40):
         PartnerFactory(partner_activity__cluster_activity=cluster_activity)
     print "{} ClusterActivity <-> PartnerActivity objects linked".format(quantity)
 
-    ClusterObjectiveFactory.create_batch(quantity)
-    print "{} ClusterObjective objects created".format(quantity)
+    # Cluster Indicator creations
+    for idx in xrange(quantity):
+        pp = PartnerProject.objects.all()[idx]
+        co = ClusterObjective.objects.all()[idx]
+        pa = PartnerActivity.objects.all()[idx]
 
-    RatioReportableToClusterObjectiveFactory.create_batch(quantity/2)
-    print "{} ClusterObjective <-> RatioReportableToClusterObjectiveFactory <-> IndicatorReport objects linked".format(quantity/2)
+        reportable_to_pp = QuantityReportableToPartnerProjectFactory(
+            content_object=pp, indicator_report__progress_report=None
+        )
 
-    QuantityReportableToClusterObjectiveFactory.create_batch(quantity/2)
-    print "{} ClusterObjective <-> QuantityReportableToClusterObjectiveFactory <-> IndicatorReport objects linked".format(quantity/2)
+        reportable_to_co = QuantityReportableToClusterObjectiveFactory(
+            content_object=co, indicator_report__progress_report=None
+        )
+
+        reportable_to_pa = QuantityReportableToPartnerActivityFactory(
+            content_object=pa, indicator_report__progress_report=None
+        )
+
+        # TODO: Add Ratio typed cluster indicators
+
+    print "{} Cluster objects <-> QuantityReportable objects linked".format(quantity)
 
     print "Generating IndicatorLocationData for Quantity type"
-    generate_indicator_report_location_disaggregation_quantity_data(QuantityIndicatorReportFactory)
-    generate_indicator_report_location_disaggregation_quantity_data(QuantityReportableToClusterObjectiveFactory)
+    generate_indicator_report_location_disaggregation_quantity_data()
 
     print "Generating IndicatorLocationData for Ratio type"
-    generate_indicator_report_location_disaggregation_ratio_data(RatioIndicatorReportFactory)
-    generate_indicator_report_location_disaggregation_ratio_data(RatioReportableToClusterObjectiveFactory)
+    generate_indicator_report_location_disaggregation_ratio_data()
 
     admin.partner_id = Partner.objects.first().id
     admin.save()

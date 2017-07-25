@@ -205,7 +205,7 @@ class IndicatorReport(TimeStampedModel):
     title = models.CharField(max_length=255)
     reportable = models.ForeignKey(Reportable, related_name="indicator_reports")
     progress_report = models.ForeignKey('unicef.ProgressReport', related_name="indicator_reports", null=True)
-    time_period_start = models.DateField(auto_now=True)  # first day of defined frequency mode
+    time_period_start = models.DateField()  # first day of defined frequency mode
     time_period_end = models.DateField()  # last day of defined frequency mode
     due_date = models.DateField()  # can be few days/weeks out of the "end date"
     submission_date = models.DateField(null=True, blank=True, verbose_name="Date of submission")

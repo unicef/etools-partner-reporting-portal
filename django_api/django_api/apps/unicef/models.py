@@ -250,7 +250,7 @@ class ProgrammeDocument(TimeStampedModel):
             return 7
         elif self.frequency == PD_FREQUENCY_LEVEL.monthly:
             return 30
-        elif self.frequency == PD_FREQUENCY_LEVEL.quartely:
+        elif self.frequency == PD_FREQUENCY_LEVEL.quarterly:
             return 90
         else:
             raise NotImplemented("Not recognized PD_FREQUENCY_LEVEL.")
