@@ -1,0 +1,53 @@
+<link rel="import" href="../../constants.html">
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Actions = App.Actions || {};
+
+    App.Actions.PartnerProjects = {
+
+      fetchPartnerProjectsList: function (thunk) {
+        return function (dispatch) {
+          dispatch(App.Actions.PartnerProjects.partnerProjectsLoadingStart());
+          return thunk()
+            .catch(function () {
+              dispatch(App.Actions.PartnerProjects.partnerProjectsLoadingStart());
+            })
+            .then(function (res) {
+              dispatch(App.Actions.PartnerProjects.setPartnerProjectsList(res.data));
+              dispatch(App.Actions.PartnerProjects.setPartnerProjectsCount(res.data));
+              dispatch(App.Actions.PartnerProjects.partnerProjectsLoadingStop());
+            });
+        };
+      },
+
+      setPartnerProjectsList: function (data) {
+        return {
+          type: App.Constants.SET_PARTNER_PROJECTS_LIST,
+          data: data,
+        };
+      },
+
+      partnerProjectsLoadingStart: function () {
+        return {
+          type: App.Constants.PARTNER_PROJECTS_LOADING_START,
+        };
+      },
+
+      partnerProjectsLoadingStop: function () {
+        return {
+          type: App.Constants.PARTNER_PROJECTS_LOADING_STOP,
+        };
+      },
+
+      setPartnerProjectsCount: function (data) {
+        return {
+          type: App.Constants.SET_PARTNER_PROJECTS_COUNT,
+          count: data.count
+        };
+      },
+    };
+  }());
+</script>

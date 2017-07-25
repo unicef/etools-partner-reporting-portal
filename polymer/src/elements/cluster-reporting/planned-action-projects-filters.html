@@ -1,0 +1,120 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../bower_components/iron-location/iron-query-params.html">
+
+<link rel="import" href="../filter-list.html">
+<link rel="import" href="../filters/text-filter/text-filter.html">
+<link rel="import" href="../filters/dropdown-filter/dropdown-filter.html">
+<link rel="import" href="../filters/checkbox-filter/checkbox-filter.html">
+<link rel="import" href="../filters/date-filter/date-filter.html">
+<link rel="import" href="../../behaviors/utils.html">
+
+<dom-module id="planned-action-projects-filters">
+  <template>
+    <style include="app-grid-style">
+      :host {
+        padding: 0;
+        display: block;
+        --app-grid-columns: 4;
+        --app-grid-gutter: 15px;
+        --app-grid-item-height: auto;
+        --app-grid-expandible-item-columns: 4;
+      }
+
+      /*TODO: Flexbox instead*/
+      .item-large {
+        margin: 0 15px;
+        width: 45%;
+        display: inline-block;
+      }
+    </style>
+
+    <iron-location
+        query="{{query}}">
+    </iron-location>
+
+    <iron-query-params
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
+    </iron-query-params>
+
+    <filter-list filters="{{filters}}">
+      <div>
+        <text-filter
+            class="item-large"
+            label="Project"
+            name="title"
+            value="[[queryParams.title]]">
+        </text-filter>
+
+        <!-- TODO: Implement location filter/check if PD location filter is the same. -->
+        <dropdown-filter
+            class="item-large"
+            label="Location"
+            name="location"
+            value="[[value]]"
+            data="[[locations]]">
+        </dropdown-filter>
+      </div>
+
+      <div class="app-grid">
+        <dropdown-filter
+            class="item"
+            label="Status"
+            name="status"
+            value="[[_withDefault(queryParams.status, '')]]"
+            data="[[statuses]]">
+        </dropdown-filter>
+
+        <date-filter
+          format="YYYY-MM-DD"
+          class="item"
+          label="Start date"
+          name="start_date"
+          value="[[_withDefault(queryParams.start_date, '')]]">
+        </date-filter>
+
+        <date-filter
+          format="YYYY-MM-DD"
+          class="item"
+          label="End date"
+          name="end_date"
+          value="[[_withDefault(queryParams.end_date, '')]]">
+        </date-filter>
+      </div>
+
+    </filter-list>
+  </template>
+
+  <script>
+    Polymer({
+      id: 'planned-action-projects-filters',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+      ],
+
+      properties: {
+
+        queryParams: Object,
+
+        locations: [
+          {title: 'All', id: ''}
+        ],
+
+        statuses: {
+          type: Array,
+          value: [
+            {title: 'All', id: ''},
+            {title: 'Draft', id: 'Dra'},
+            {title: 'Active', id: 'Act'},
+            {title: 'Implemented', id: 'Imp'},
+          ],
+        },
+
+      },
+
+    });
+  </script>
+</dom-module>

@@ -1,7 +1,14 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../../bower_components/app-route/app-location.html">
+<link rel="import" href="../../../../bower_components/iron-pages/iron-pages.html">
 
+<link rel="import" href="../../../behaviors/utils.html">
 <link rel="import" href="../../../elements/page-header.html">
 <link rel="import" href="../../../elements/page-body.html">
+
+<link rel="import" href="clusters.html">
+<link rel="import" href="partners.html">
 
 <dom-module id="page-cluster-reporting-response-parameters">
   <template>
@@ -11,9 +18,31 @@
       }
     </style>
 
-    <page-header title="Response Parameters"></page-header>
+    <app-route
+      route="{{route}}"
+      pattern="/:page"
+      data="{{routeData}}"
+      tail="{{subroute}}">
+    </app-route>
 
-    <page-body></page-body>
+    <iron-pages
+      selected={{page}}
+      attr-for-selected="name">
+        <template is="dom-if" if="[[_equals(page, 'clusters')]]" restamp="true">
+          <clusters-response-parameters
+            name="clusters"
+            route="{{subroute}}">
+          </clusters-response-parameters>
+        </template>
+
+        <template is="dom-if" if="[[_equals(page, 'partners')]]" restamp="true">
+          <partners-response-parameters
+            name="partners"
+            route="{{subroute}}">
+          </partners-response-parameters>
+      </template>
+
+    </iron-pages>
 
   </template>
 
@@ -23,7 +52,50 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.UtilsBehavior,
       ],
+
+      observers: [
+        '_routeChanged(routeData.page)',
+      ],
+
+      properties: {
+        page: {
+          type: String,
+          observer: '_pageChanged',
+        },
+      },
+
+      detached: function() {
+       this.set('route.path', '');
+      },
+
+      _routeChanged: function (page) {
+        switch (page) {
+          case 'partners':
+            this.page = 'partners';
+            break;
+
+          case 'clusters':
+            this.page = 'clusters';
+            break;
+
+          default:
+            this.set('route.path', '/clusters');
+            this.page = 'clusters';
+            break;
+        }
+      },
+
+      _pageChanged: function (page) {
+        var resolvedPageUrl = '';
+        if (!page) {
+          return;
+        }
+        resolvedPageUrl = this.resolveUrl(page + '.html');
+        this.importHref(resolvedPageUrl, null, this._notFound, true);
+      },
+
     });
   </script>
 </dom-module>
