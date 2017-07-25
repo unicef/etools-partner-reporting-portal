@@ -29,7 +29,7 @@
         attr-for-selected="name">
 
       <template is="dom-if" if="[[_equals(page, 'contacts')]]" restamp="true">
-        Contacts
+        TODO: Contacts
       </template>
 
       <template is="dom-if" if="[[_equals(page, 'projects')]]" restamp="true">
@@ -41,9 +41,9 @@
 
       <template is="dom-if" if="[[_equals(page, 'project')]]" restamp="true">
         <rp-partners-project-detail
-            name="project"
-            project-id="{{id}}"
-            route="{{subroute}}">
+          name="project"
+          project-id="{{id}}"
+          route="{{subroute}}">
         </rp-partners-project-detail>
       </template>
 
@@ -86,6 +86,11 @@
         var resolvedPageUrl;
 
         if (!page) {
+          return;
+        }
+
+        // TODO: Remove when other pages are ready.
+        if (page === 'activities' || page === 'contacts') {
           return;
         }
 
