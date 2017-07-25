@@ -71,6 +71,7 @@ class IndicatorReportSimpleSerializer(serializers.ModelSerializer):
             'indicator_name',
             'target',
             'achieved',
+            'total',
             'report_status',
         )
 
