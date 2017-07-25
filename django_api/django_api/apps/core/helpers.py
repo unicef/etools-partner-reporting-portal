@@ -163,7 +163,7 @@ def get_num_of_days_in_a_month(year, month):
 
 
 def get_current_quarter_for_a_month(month):
-    return math.ceil(float(month) / 3)
+    return int(math.ceil(float(month) / 3))
 
 
 # Modified a bit from https://stackoverflow.com/a/37708216/2363915

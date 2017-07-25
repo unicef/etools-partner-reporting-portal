@@ -48,6 +48,8 @@ QUANTITY_CALC_CHOICES_LIST = [x[0] for x in IndicatorBlueprint.QUANTITY_CALC_CHO
 QUANTITY_DISPLAY_TYPE_CHOICES_LIST = [x[0] for x in IndicatorBlueprint.QUANTITY_DISPLAY_TYPE_CHOICES]
 RATIO_CALC_CHOICES_LIST = [x[0] for x in IndicatorBlueprint.RATIO_CALC_CHOICES]
 RATIO_DISPLAY_TYPE_CHOICES_LIST = [x[0] for x in IndicatorBlueprint.RATIO_DISPLAY_TYPE_CHOICES]
+PD_FREQUENCY_LEVEL_CHOICE_LIST = [x[0] for x in PD_FREQUENCY_LEVEL]
+REPORTABLE_FREQUENCY_LEVEL_CHOICE_LIST = [x[0] for x in REPORTABLE_FREQUENCY_LEVEL]
 
 today = datetime.date.today()
 beginning_of_this_year = datetime.date(today.year, 1, 1)
@@ -257,7 +259,7 @@ class ReportableFactory(factory.django.DjangoModelFactory):
     # disaggregation = factory.RelatedFactory('core.factories.DisaggregationFactory', 'reportable')
 
     cs_dates = list()
-    frequency = REPORTABLE_FREQUENCY_LEVEL.weekly
+    frequency = fuzzy.FuzzyChoice(REPORTABLE_FREQUENCY_LEVEL_CHOICE_LIST)
     start_date = beginning_of_this_year
     end_date = today
 
@@ -387,7 +389,7 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     population_focus = factory.Sequence(lambda n: "Population %d" % n)
     response_to_HRP = factory.Sequence(lambda n: "response_to_HRP%d" % n)
     status = fuzzy.FuzzyChoice(PD_STATUS_LIST)
-    frequency = PD_FREQUENCY_LEVEL.weekly
+    frequency = fuzzy.FuzzyChoice(PD_FREQUENCY_LEVEL_CHOICE_LIST)
     budget = fuzzy.FuzzyDecimal(low=1000.0, high=100000.0, precision=2)
     unicef_office = factory.Sequence(lambda n: "JCO country programme %d" % n)
     unicef_focal_point = factory.Sequence(lambda n: "Abdallah Yakhola %d" % n)
