@@ -123,6 +123,7 @@ class IndicatorLLoutputsSerializer(serializers.ModelSerializer):
     indicator_reports = serializers.SerializerMethodField()
     overall_status = serializers.SerializerMethodField()
     narrative_assessment = serializers.SerializerMethodField()
+    display_type = serializers.SerializerMethodField()
 
     class Meta:
         model = Reportable
@@ -134,6 +135,7 @@ class IndicatorLLoutputsSerializer(serializers.ModelSerializer):
             'overall_status',
             'narrative_assessment',
             'indicator_reports',
+            'display_type',
         )
 
     def get_name(self, obj):
@@ -179,6 +181,9 @@ class IndicatorLLoutputsSerializer(serializers.ModelSerializer):
             self.__narrative_and_assessment = Reportable.get_narrative_and_assessment(
                 indicator_report.progress_report_id)
         return self.__narrative_and_assessment
+
+    def get_display_type(self, obj):
+        return obj.blueprint.display_type
 
 
 class OverallNarrativeSerializer(serializers.ModelSerializer):
