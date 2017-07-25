@@ -17,6 +17,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='progressreport',
             name='programme_document',
-            field=models.ForeignKey(default=unicef.models.find_first_programme_document_id, on_delete=django.db.models.deletion.CASCADE, related_name='progress_reports', to='unicef.ProgrammeDocument'),
+            field=models.ForeignKey(default=-1, on_delete=django.db.models.deletion.CASCADE, related_name='progress_reports', to='unicef.ProgrammeDocument'),
         ),
     ]
