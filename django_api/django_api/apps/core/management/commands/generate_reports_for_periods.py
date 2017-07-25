@@ -70,7 +70,12 @@ class Command(BaseCommand):
             if frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
                 print "PD {} frequency is custom specific dates".format(
                     pd)
-                date_list = pd.cs_dates
+
+                if not latest_progress_report:
+                    date_list = pd.cs_dates
+
+                else:
+                    date_list = filter(lambda item: item > latest_progress_report.start_date, date_list)
 
             else:
                 # Get missing date list based on progress report existence
@@ -164,8 +169,13 @@ class Command(BaseCommand):
 
             if frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
                 print "Indicator {} frequency is custom specific dates".format(
-                    pd)
-                date_list = pd.cs_dates
+                    indicator)
+
+                if not latest_indicator_report:
+                    date_list = indicator.cs_dates
+
+                else:
+                    date_list = filter(lambda item: item > latest_indicator_report.time_period_start, date_list)
 
             else:
                 # Get missing date list based on progress report existence
