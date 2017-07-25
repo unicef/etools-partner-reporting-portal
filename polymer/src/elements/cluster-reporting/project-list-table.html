@@ -75,90 +75,92 @@
       tail="{{subroute}}">
     </app-route>
 
-    <etools-data-table-header
-        label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
-      <etools-data-table-column field="cluster">
-        <div class="table-column">Cluster</div>
-      </etools-data-table-column>
-      <template is="dom-if" if="[[_equals(page, 'response-parameters')]]">
-        <etools-data-table-column field="status">
-          <div class="table-column">Partner</div>
+    <etools-content-panel panel-title="">
+      <etools-data-table-header
+          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
+        <etools-data-table-column field="cluster">
+          <div class="table-column">Cluster</div>
         </etools-data-table-column>
-      </template>
-      <etools-data-table-column field="status">
-        <div class="table-column">Status</div>
-      </etools-data-table-column>
-      <etools-data-table-column field="project">
-        <div class="table-column">Project</div>
-      </etools-data-table-column>
-      <etools-data-table-column field="Location">
-        <div class="table-column">Location</div>
-      </etools-data-table-column>
-    </etools-data-table-header>
+        <template is="dom-if" if="[[_equals(page, 'response-parameters')]]">
+          <etools-data-table-column field="status">
+            <div class="table-column">Partner</div>
+          </etools-data-table-column>
+        </template>
+        <etools-data-table-column field="status">
+          <div class="table-column">Status</div>
+        </etools-data-table-column>
+        <etools-data-table-column field="project">
+          <div class="table-column">Project</div>
+        </etools-data-table-column>
+        <etools-data-table-column field="Location">
+          <div class="table-column">Location</div>
+        </etools-data-table-column>
+      </etools-data-table-header>
 
-    <template
-        id="list"
-        is="dom-repeat"
-        items="[[projects]]"
-        as="project"
-        initial-count="[[pageSize]]">
-      <etools-prp-data-table-row details-opened="[[detailsOpened]]">
-        <div slot="row-data">
-          <div class="table-cell table-cell--text">
-            <!-- TODO: loop through list -->
-          </div>
-          <template is="dom-if" if="[[_equals(page, 'response-parameters')]]">
-            <div class="table-cell table-cell--text">
-              [[project.partner]]
-            </div>
-          </template>
-          <div class="table-cell table-cell--text">
-            <project-status status="[[project.status]]"></project-status>
-          </div>
-          <div class="table-cell table-cell--text">
-            <a href="[[_detailUrl(project)]]">[[project.title]]</a>
-          </div>
-          <div class="table-cell table-cell--text">
-            <!-- TODO: loop through list -->
-          </div>
-        </div>
-        <div slot="row-data-details">
+      <template
+          id="list"
+          is="dom-repeat"
+          items="[[projects]]"
+          as="project"
+          initial-count="[[pageSize]]">
+        <etools-prp-data-table-row details-opened="[[detailsOpened]]">
           <div slot="row-data">
             <div class="table-cell table-cell--text">
-              <span class="label">Start Date</span>
-              [[project.start_date]]
-              <span class="label">Total Budget</span>
-              [[project.total_budget]]
+              <!-- TODO: loop through list -->
+            </div>
+            <template is="dom-if" if="[[_equals(page, 'response-parameters')]]">
+              <div class="table-cell table-cell--text">
+                [[project.partner]]
+              </div>
+            </template>
+            <div class="table-cell table-cell--text">
+              <project-status status="[[project.status]]"></project-status>
             </div>
             <div class="table-cell table-cell--text">
-              <span class="label">End Date</span>
-              [[project.end_date]]
-              <span class="label">Funding Source</span>
-              [[project.funding_source]]
+              <a href="[[_detailUrl(project)]]">[[project.title]]</a>
             </div>
             <div class="table-cell table-cell--text">
-              <span class="label">Part of a Joint Response Plan</span>
-              <!-- [[TODO: get this]] -->
-            </div>
-            <div class="table-cell table-cell--text">
-              <span class="label">Frequency of Reporting</span>
-              <!-- [[TODO: get this]] -->
+              <!-- TODO: loop through list -->
             </div>
           </div>
-        </div>
-      </etools-prp-data-table-row>
-    </template>
+          <div slot="row-data-details">
+            <div slot="row-data">
+              <div class="table-cell table-cell--text">
+                <span class="label">Start Date</span>
+                [[project.start_date]]
+                <span class="label">Total Budget</span>
+                [[project.total_budget]]
+              </div>
+              <div class="table-cell table-cell--text">
+                <span class="label">End Date</span>
+                [[project.end_date]]
+                <span class="label">Funding Source</span>
+                [[project.funding_source]]
+              </div>
+              <div class="table-cell table-cell--text">
+                <span class="label">Part of a Joint Response Plan</span>
+                <!-- [[TODO: get this]] -->
+              </div>
+              <div class="table-cell table-cell--text">
+                <span class="label">Frequency of Reporting</span>
+                [[project.frequency]]
+              </div>
+            </div>
+          </div>
+        </etools-prp-data-table-row>
+      </template>
 
-    <etools-data-table-footer
-        page-size="[[pageSize]]"
-        page-number="[[pageNumber]]"
-        total-results="[[totalResults]]"
-        visible-range="{{visibleRange}}"
-        on-page-size-changed="_pageSizeChanged"
-        on-page-number-changed="_pageNumberChanged">
-    </etools-data-table-footer>
+      <etools-data-table-footer
+          page-size="[[pageSize]]"
+          page-number="[[pageNumber]]"
+          total-results="[[totalResults]]"
+          visible-range="{{visibleRange}}"
+          on-page-size-changed="_pageSizeChanged"
+          on-page-number-changed="_pageNumberChanged">
+      </etools-data-table-footer>
 
-    <etools-loading active="[[loading]]"></etools-loading>
+      <etools-loading active="[[loading]]"></etools-loading>
+    </etools-content-panel>
   </template>
 
     <script>
@@ -174,12 +176,6 @@
         ],
 
         properties: {
-
-          mode: {
-            type: String,
-            value: ''
-          },
-
           pageSize: Number,
 
           pageNumber: Number,
