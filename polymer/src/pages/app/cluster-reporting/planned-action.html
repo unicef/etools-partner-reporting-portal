@@ -3,9 +3,12 @@
 <link rel="import" href="../../../../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../../../../bower_components/app-route/app-route.html">
 <link rel="import" href="../../../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
 <link rel="import" href="../../../styles/shared-styles.html">
 <link rel="import" href="../../../elements/page-header.html">
+<link rel="import" href="../../../elements/filters/cluster-filter/filter-list-by-cluster.html">
+<link rel="import" href="../../../elements/filters/cluster-filter/cluster-filter.html">
 <link rel="import" href="planned-action/router.html">
 
 
@@ -17,13 +20,17 @@ planned-action-projects-router.
 
 <dom-module id="page-cluster-reporting-planned-action">
   <template>
-    <style include="shared-styles">
+    <style include="shared-styles iron-flex iron-flex-alignment">
       :host {
         display: block;
       }
 
       .tabs paper-tab {
         text-transform: uppercase;
+      }
+
+      .toolbar div {
+        max-width: 200px;
       }
     </style>
 
@@ -37,6 +44,12 @@ planned-action-projects-router.
     <template is="dom-if" if="[[_displayHeader(subpage)]]" restamp="true">
       <div class="page-top-content">
         <page-header title="My Planned Action">
+          <div class="toolbar horizontal end-justified layout">
+            <filter-list-by-cluster filters="{{filters}}">
+              <cluster-filter>
+              </cluster-filter>
+            </filter-list-by-cluster>
+          </div>
           <div class="tabs">
             <paper-tabs
               selected="{{tab}}"
