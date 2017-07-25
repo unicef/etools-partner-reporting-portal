@@ -2,6 +2,7 @@ from ast import literal_eval as make_tuple
 
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
+from django.db import transaction
 from django.shortcuts import get_object_or_404
 
 from rest_framework import serializers
@@ -524,6 +525,7 @@ class IndicatorBlueprintSerializer(serializers.ModelSerializer):
 
 class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
+    disaggregation = serializers.JSONField()
     object_type = serializers.CharField(validators=[add_indicator_object_type_validator])
     blueprint = IndicatorBlueprintSerializer()
     locations = IdLocationSerializer(many=True)
@@ -537,6 +539,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             'object_id',
             'object_type',
             'locations',
+            'disaggregation',
         )
 
     def check_location(self, locations):
@@ -544,6 +547,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 False in [loc.get('id', False) for loc in locations]:
             raise ValidationError({"locations": "List of dict location or one dict location expected"})
 
+    @transaction.atomic
     def create(self, validated_data):
 
         self.check_location(self.initial_data.get('locations'))
@@ -553,6 +557,8 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             blueprint.save()
         else:
             raise ValidationError(blueprint.errors)
+
+        validated_data['blueprint'] = blueprint.instance
 
         if validated_data['object_type'] == 'ClusterObjective':
             validated_data['content_type'] = ContentType.objects.get_for_model(ClusterObjective)
@@ -579,19 +585,30 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             validated_data['end_date'] = partner_activity.project.end_date
             validated_data['is_cluster_indicator'] = False
         else:
-            raise ValidationError([
-                "object_type expected (ClusterObjective, ClusterActivity, PartnerProject, PartnerActivity)"
-            ])
-
-        validated_data['blueprint'] = blueprint.instance
+            raise NotImplemented()
 
         del validated_data['object_type']
         del validated_data['locations']
+        disaggregations = validated_data['disaggregation']
+        del validated_data['disaggregation']
 
         self.instance = Reportable.objects.create(**validated_data)
 
         for location in self.initial_data.get('locations'):
             self.instance.locations.add(Location.objects.get(id=location.get('id')))
+
+        for disaggregation in disaggregations:
+            disaggregation_instance = Disaggregation.objects.create(
+                name=disaggregation['name'],
+                reportable=self.instance,
+                active=True,
+            )
+            for value in disaggregation['values']:
+                DisaggregationValue.objects.create(
+                    disaggregation=disaggregation_instance,
+                    value=value,
+                    active=True
+                )
 
         return self.instance
 

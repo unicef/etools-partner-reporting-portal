@@ -424,6 +424,10 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
                 'display_type': IndicatorBlueprint.NUMBER,
                 'disaggregatable': True,
             },
+            'disaggregation': [
+                {'name': 'Age', 'values': ['0-5m', '5-12m', '1-3y', '4-7y']},
+                {'name': 'Gender', 'values': ['Male', 'Female', 'Other']}
+            ]
         }
 
     def test_create_indicator_cluster_objective_reporting(self):
@@ -433,6 +437,14 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
         self.assertEquals(Reportable.objects.count(), self.reportable_count+1)
         self.assertEquals(IndicatorBlueprint.objects.count(), self.blueprint_count+1)
+
+        rep_dis = Disaggregation.objects.filter(reportable=response.data['reportable_id'])
+        self.assertTrue(rep_dis.first().name in ['Gender', 'Age'])
+        self.assertTrue(rep_dis.last().name in ['Gender', 'Age'])
+        first_dis_vals = DisaggregationValue.objects.filter(disaggregation=rep_dis.first())
+        last_dis_vals = DisaggregationValue.objects.filter(disaggregation=rep_dis.last())
+        self.assertTrue(first_dis_vals.first().value in self.data['disaggregation'][0]['values'])
+        self.assertTrue(last_dis_vals.first().value in self.data['disaggregation'][1]['values'])
 
         self.data['locations'].append(dict(failkey=1))
         response = self.client.post(self.url, data=self.data, format='json')
