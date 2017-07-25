@@ -8,6 +8,7 @@
 <link rel="import" href="../filters/cluster-indicator-filter/cluster-indicator-filter.html">
 <link rel="import" href="../filters/cluster-project-filter/cluster-project-filter.html">
 <link rel="import" href="../filters/cluster-partner-filter/cluster-partner-filter.html">
+<link rel="import" href="../filters/cluster-location-filter/cluster-location-filter.html">
 <link rel="import" href="../filters/cluster-filter/cluster-filter.html">
 
 <dom-module id="cluster-report-filters">
@@ -60,6 +61,11 @@
           class="item filter-2-col"
           value="[[_withDefault(queryParams.project, '')]]">
       </cluster-project-filter>
+
+      <cluster-location-filter
+          class="item filter-2-col"
+          value="[[_withDefault(queryParams.location, '')]]">
+      </cluster-location-filter>
     </filter-list>
   </template>
 

@@ -306,23 +306,41 @@
       },
 
       _submit: function () {
+        this.set('busy', true);
+
+        this._confirmIntent()
+            .then(this._commit.bind(this))
+            .catch(this._revert.bind(this));
+      },
+
+      _confirmIntent: function () {
+        var deferred = this._deferred();
+
+        this.fire('report-submit-confirm', deferred);
+
+        return deferred.promise;
+      },
+
+      _commit: function () {
         var submitThunk = this.$.submit.thunk();
         var self = this;
-
-        this.set('busy', true);
 
         this.dispatch(
           App.Actions.ClusterIndicatorReports.submit(submitThunk)
         )
             .then(function () {
-              self.fire('report-submitted', self.data.id);
               self.set('busy', false);
+              self.fire('report-submitted', self.data.id);
             })
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
 
               self.set('busy', false);
             });
+      },
+
+      _revert: function () {
+        this.set('busy', false);
       },
 
       detached: function () {

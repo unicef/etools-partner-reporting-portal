@@ -4,10 +4,12 @@
 <link rel="import" href="../../../bower_components/iron-location/iron-location.html">
 <link rel="import" href="../../../bower_components/iron-location/iron-query-params.html">
 
+<link rel="import" href="../../constants.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/pagination.html">
 <link rel="import" href="../../behaviors/data-table.html">
+<link rel="import" href="../confirm-box.html">
 <link rel="import" href="cluster-report-proxy.html">
 
 <dom-module id="cluster-report-list">
@@ -68,6 +70,8 @@
         on-page-size-changed="_pageSizeChanged"
         on-page-number-changed="_pageNumberChanged">
     </etools-data-table-footer>
+
+    <confirm-box id="confirm"></confirm-box>
   </template>
 
   <script>
@@ -98,6 +102,24 @@
           type: Number,
           statePath: 'clusterIndicatorReports.count',
         },
+      },
+
+      listeners: {
+        'report-submit-confirm': '_confirm',
+      },
+
+      _confirm: function (e, result) {
+        e.stopPropagation();
+
+        this.$.confirm.run({
+          body:
+              'The IMO will be informed of this submission and you will ' +
+              'not be able to make any changes on this report unless it ' +
+              'is sent back to you. Are you sure you’d like to Submit this report?',
+          result: result,
+          maxWidth: '500px',
+          mode: App.Constants.CONFIRM_MODAL,
+        });
       },
     });
   </script>
