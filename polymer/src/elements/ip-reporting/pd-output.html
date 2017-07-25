@@ -201,11 +201,33 @@
                 </dl>
                 <dl class="layout horizontal justified">
                   <dt class="flex-3">Total cumulative progress:</dt>
-                  <dd class="flex">[[_withDefault(indicator.total.v)]]</dd>
+                  <template
+                      is="dom-if"
+                      if="[[_equals(indicatorType, 'number')]]"
+                      restamp="true">
+                    <dd class="flex">[[_withDefault(indicator.total.v)]]</dd>
+                  </template>
+                  <template
+                      is="dom-if"
+                      if="[[_equals(indicatorType, 'percentage')]]"
+                      restamp="true">
+                    <dd class="flex">[[_toPercentage(indicator.total.c)]]</dd>
+                  </template>
                 </dl>
                 <dl class="layout horizontal justified">
                   <dt class="flex-3">Achievement in reporting period:</dt>
-                  <dd class="flex">[[_withDefault(indicator.achieved.v)]]</dd>
+                  <template
+                      is="dom-if"
+                      if="[[_equals(indicatorType, 'number')]]"
+                      restamp="true">
+                    <dd class="flex">[[_withDefault(indicator.achieved.v)]]</dd>
+                  </template>
+                  <template
+                      is="dom-if"
+                      if="[[_equals(indicatorType, 'percentage')]]"
+                      restamp="true">
+                    <dd class="flex">[[_toPercentage(indicator.achieved.c)]]</dd>
+                  </template>
                 </dl>
               </div>
             </div>
@@ -271,6 +293,11 @@
         currentReport: {
           type: Object,
           statePath: App.Selectors.ProgrammeDocumentReports.current,
+        },
+
+        indicatorType: {
+          type: String,
+          computed: '_computeIndicatorType(data)',
         },
       },
 
@@ -356,6 +383,10 @@
 
       _computeMode: function (mode, overrideMode) {
         return overrideMode || mode;
+      },
+
+      _computeIndicatorType: function (data) {
+        return data.display_type;
       },
 
       attached: function () {

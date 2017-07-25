@@ -214,11 +214,33 @@
               </dl>
               <dl class="layout horizontal justified">
                 <dt class="flex-3">Total cumulative progress:</dt>
-                <dd class="flex">[[_withDefault(data.total.v)]]</dd>
+                <template
+                    is="dom-if"
+                    if="[[_equals(indicatorType, 'number')]]"
+                    restamp="true">
+                  <dd class="flex">[[_withDefault(data.total.v)]]</dd>
+                </template>
+                <template
+                    is="dom-if"
+                    if="[[_equals(indicatorType, 'percentage')]]"
+                    restamp="true">
+                  <dd class="flex">[[_toPercentage(data.total.c)]]</dd>
+                </template>
               </dl>
               <dl class="layout horizontal justified">
                 <dt class="flex-3">Achievement in reporting period:</dt>
-                <dd class="flex">[[_withDefault(data.reportable.achieved.v)]]</dd>
+                <template
+                    is="dom-if"
+                    if="[[_equals(indicatorType, 'number')]]"
+                    restamp="true">
+                  <dd class="flex">[[_withDefault(data.reportable.achieved.v)]]</dd>
+                </template>
+                <template
+                    is="dom-if"
+                    if="[[_equals(indicatorType, 'percentage')]]"
+                    restamp="true">
+                  <dd class="flex">[[_toPercentage(data.reportable.achieved.c)]]</dd>
+                </template>
               </dl>
             </div>
           </div>
@@ -273,6 +295,11 @@
           type: String,
           computed: '_computeSubmitUrl(data)',
         },
+
+        indicatorType: {
+          type: String,
+          computed: '_computeIndicatorType(data)',
+        },
       },
 
       _computeIcon: function (opened) {
@@ -285,6 +312,10 @@
 
       _computeSubmitUrl: function (data) {
         return App.Endpoints.indicatorData(data.id);
+      },
+
+      _computeIndicatorType: function (data) {
+        return data.reportable.blueprint.display_type;
       },
 
       _toggle: function () {
