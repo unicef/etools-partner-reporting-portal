@@ -252,7 +252,7 @@ def find_missing_frequency_period_dates(start_date, last_date, frequency):
 
             elif frequency == PD_FREQUENCY_LEVEL.monthly:
                 # Get the # of days in target month
-                num_of_days = monthrange(missing_date.year, missing_date.month)
+                num_of_days = get_num_of_days_in_a_month(missing_date.year, missing_date.month)
 
                 # Check if we should proceed to next date
                 if day_delta >= num_of_days:

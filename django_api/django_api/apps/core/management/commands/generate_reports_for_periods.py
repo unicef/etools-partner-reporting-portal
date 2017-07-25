@@ -66,6 +66,7 @@ class Command(BaseCommand):
             reportable_queryset = pd.reportable_queryset
             frequency = pd.frequency
             latest_progress_report = pd.progress_reports.last()
+            date_list = []
 
             if frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
                 print "PD {} frequency is custom specific dates".format(
@@ -166,6 +167,7 @@ class Command(BaseCommand):
 
             frequency = indicator.frequency
             latest_indicator_report = indicator.indicator_reports.last()
+            date_list = []
 
             if frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
                 print "Indicator {} frequency is custom specific dates".format(
