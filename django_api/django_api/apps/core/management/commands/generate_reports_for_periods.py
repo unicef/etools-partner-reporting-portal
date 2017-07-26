@@ -131,7 +131,9 @@ class Command(BaseCommand):
                                     level_reported=indicator_report.disaggregations.count(),
                                     disaggregation_reported_on=list(indicator_report.disaggregations.values_list(
                                         'id', flat=True)),
-                                    disaggregation=dict(),
+                                    disaggregation={
+                                        '()': {'c': 0, 'd': 0, 'v': 0}
+                                    },
                                 )
 
                         else:
@@ -152,7 +154,9 @@ class Command(BaseCommand):
                                     level_reported=indicator_report.disaggregations.count(),
                                     disaggregation_reported_on=list(indicator_report.disaggregations.values_list(
                                         'id', flat=True)),
-                                    disaggregation=dict(),
+                                    disaggregation={
+                                        '()': {'c': 0, 'd': 0, 'v': 0}
+                                    },
                                 )
 
                         indicator_report.progress_report = next_progress_report
@@ -227,7 +231,9 @@ class Command(BaseCommand):
                                 level_reported=indicator_report.disaggregations.count(),
                                 disaggregation_reported_on=list(indicator_report.disaggregations.values_list(
                                     'id', flat=True)),
-                                disaggregation=dict(),
+                                disaggregation={
+                                    '()': {'c': 0, 'd': 0, 'v': 0}
+                                },
                             )
 
                     else:
@@ -250,5 +256,7 @@ class Command(BaseCommand):
                                 level_reported=indicator_report.disaggregations.count(),
                                 disaggregation_reported_on=list(indicator_report.disaggregations.values_list(
                                     'id', flat=True)),
-                                disaggregation=dict(),
+                                disaggregation={
+                                    '()': {'c': 0, 'd': 0, 'v': 0}
+                                },
                             )
