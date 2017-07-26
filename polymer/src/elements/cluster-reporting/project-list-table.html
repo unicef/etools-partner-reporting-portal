@@ -213,6 +213,11 @@
             type: Boolean,
             value: false
           },
+
+          openedDetails: {
+            type: Array,
+            value: []
+          }
         },
 
         _openModal: function () {
@@ -222,6 +227,11 @@
         observers: [
           '_projectsAjax(queryParams)',
         ],
+
+        listeners: {
+          'page-number-changed': '_pageNumberModified',
+          'details-opened-changed': '_detailsChange'
+        },
 
         _detailUrl: function(project) {
           var path = '/response-parameters/partners/project/' + project.id;
@@ -250,6 +260,10 @@
                 // TODO: error handling.
             });
         },
+
+        detached: function () {
+          this.openedDetails.length = 0;
+        }
 
       });
     </script>
