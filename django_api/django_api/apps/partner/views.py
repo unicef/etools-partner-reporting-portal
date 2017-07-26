@@ -42,14 +42,9 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
     pagination_class = SmallPagination
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     filter_class = PartnerProjectFilter
-    lookup_field = lookup_url_kwarg = 'cluster_id'
 
     def get_queryset(self, *args, **kwargs):
-        queryset = PartnerProject.objects.select_related('partner').prefetch_related('clusters', 'locations')
-        cluster_id = self.kwargs.get(self.lookup_field)
-        if cluster_id:
-            return queryset.filter(clusters__in=[cluster_id])
-        return queryset.all()
+        return PartnerProject.objects.select_related('partner').prefetch_related('clusters', 'locations').all()
 
     def add_many_to_many_relations(self, instance):
         """
