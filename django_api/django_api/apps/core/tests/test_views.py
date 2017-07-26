@@ -8,8 +8,6 @@ from .base import BaseAPITestCase
 
 class TestInterventionListAPIView(BaseAPITestCase):
 
-    generate_fake_data_quantity = 40
-
     def test_list_api(self):
         url = reverse('simple-intervention')
         response = self.client.get(url, format='json')
@@ -22,8 +20,6 @@ class TestInterventionListAPIView(BaseAPITestCase):
 
 
 class TestLocationListAPIView(BaseAPITestCase):
-
-    generate_fake_data_quantity = 40
 
     def test_list_api(self):
         response_plan_id = ResponsePlan.objects.first().id

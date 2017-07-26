@@ -316,14 +316,6 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
                 + "its IndicatorReport's Reportable disaggregation counts"
             )
 
-        # disaggregation_reported_on element-wise assertion
-        for disagg_id in data['disaggregation_reported_on']:
-            if disagg_id not in disaggregation_id_list:
-                raise serializers.ValidationError(
-                    "disaggregation_reported_on list must have "
-                    + "all its elements mapped to disaggregation ids"
-                )
-
         # IndicatorReport membership validation
         if not self.instance.id in data['indicator_report'] \
                 .indicator_location_data.values_list('id', flat=True):
@@ -331,6 +323,14 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
                 "IndicatorLocationData does not belong to "
                 + "this {}".format(data['indicator_report'])
             )
+
+        # disaggregation_reported_on element-wise assertion
+        for disagg_id in data['disaggregation_reported_on']:
+            if disagg_id not in disaggregation_id_list:
+                raise serializers.ValidationError(
+                    "disaggregation_reported_on list must have "
+                    + "all its elements mapped to disaggregation ids"
+                )
 
         # Filter disaggregation option IDs
         # from given disaggregation_reported_on Disaggregation IDs

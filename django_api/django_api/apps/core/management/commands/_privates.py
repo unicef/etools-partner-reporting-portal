@@ -87,7 +87,7 @@ def clean_up_data():
 
 
 def generate_fake_data(quantity=40):
-    if quantity < 40:
+    if not settings.IS_TEST and quantity < 40:
         quantity = 40
 
     admin, created = User.objects.get_or_create(username='admin', defaults={
