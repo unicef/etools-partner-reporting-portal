@@ -6,7 +6,7 @@ from .permissions import IsAuthenticated
 from .models import Intervention, Location, ResponsePlan
 from .serializers import (
     SimpleInterventionSerializer,
-    SimpleLocationSerializer,
+    ShortLocationSerializer,
     ChildrenLocationSerializer,
     ResponsePlanSerializer,
 )
@@ -26,8 +26,21 @@ class SimpleLocationListAPIView(ListAPIView):
     """
     Endpoint for getting all Location objects.
     """
-    queryset = Location.objects.all()
-    serializer_class = SimpleLocationSerializer
+    permission_classes = (IsAuthenticated, )
+    serializer_class = ShortLocationSerializer
+    lookup_field = lookup_url_kwarg = 'response_plan_id'
+
+    def get_queryset(self):
+        response_plan_id = self.kwargs.get(self.lookup_field)
+        result = ResponsePlan.objects.filter(id=response_plan_id).values_list(
+            'clusters__cluster_objectives__reportables__locations',
+            'clusters__cluster_objectives__cluster_activities__reportables__locations',
+            'clusters__partner_projects__reportables__locations',
+            'clusters__partner_projects__partner_activities__reportables__locations',
+        ).distinct()
+        pks = []
+        [pks.extend(filter(lambda x: x is not None, part)) for part in result]
+        return Location.objects.filter(pk__in=pks)
 
 
 class ChildrenLocationAPIView(ListAPIView):

@@ -14,8 +14,29 @@ from indicator.disaggregators import (
 )
 
 
+class TestQuantityIndicatorDisaggregator5(BaseAPITestCase):
+    generate_fake_data_quantity = 5
+
+    def test_post_process_location_sum_calc(self):
+        unit_type = IndicatorBlueprint.NUMBER
+        calc_type = IndicatorBlueprint.SUM
+
+        indicator = Reportable.objects.filter(
+            blueprint__unit=unit_type,
+            blueprint__calculation_formula_across_locations=calc_type,
+        ).first()
+
+        indicator_report = indicator.indicator_reports.first()
+        loc_total = 0
+
+        for loc_data in indicator_report.indicator_location_data.all():
+            QuantityIndicatorDisaggregator.post_process(loc_data)
+            loc_total += loc_data.disaggregation['()']['c']
+
+        self.assertEquals(indicator_report.total['c'], loc_total)
+
+
 class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
-    generate_fake_data_quantity = 40
 
     def test_post_process_location_sum_calc(self):
         unit_type = IndicatorBlueprint.NUMBER
@@ -140,7 +161,7 @@ class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
 
 
 class TestRatioIndicatorDisaggregator(BaseAPITestCase):
-    generate_fake_data_quantity = 40
+    generate_fake_data_quantity = 25
 
     def test_post_process_location_ratio_calc(self):
         unit_type = IndicatorBlueprint.PERCENTAGE

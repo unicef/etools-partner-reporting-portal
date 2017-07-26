@@ -1,6 +1,6 @@
 from django.http import Http404
 from rest_framework.views import APIView
-from rest_framework.generics import RetrieveAPIView, ListCreateAPIView
+from rest_framework.generics import RetrieveAPIView, ListCreateAPIView, ListAPIView
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -11,9 +11,10 @@ from core.permissions import IsAuthenticated
 from .serializer import (
     PartnerDetailsSerializer,
     PartnerProjectSerializer,
+    PartnerProjectSimpleSerializer,
     PartnerProjectPatchSerializer,
 )
-from .models import PartnerProject
+from .models import PartnerProject, Partner
 from .filters import PartnerProjectFilter
 
 
@@ -119,3 +120,23 @@ class PartnerProjectAPIView(APIView):
         instance = self.get_instance(request, pk)
         instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class PartnerProjectSimpleListAPIView(ListAPIView):
+    serializer_class = PartnerProjectSimpleSerializer
+    permission_classes = (IsAuthenticated, )
+    lookup_field = lookup_url_kwarg = 'response_plan_id'
+
+    def get_queryset(self):
+        response_plan_id = self.kwargs.get(self.lookup_field)
+        return PartnerProject.objects.filter(partner__clusters__response_plan_id=response_plan_id)
+
+
+class PartnerSimpleListAPIView(ListAPIView):
+    serializer_class = PartnerProjectSimpleSerializer
+    permission_classes = (IsAuthenticated, )
+    lookup_field = lookup_url_kwarg = 'response_plan_id'
+
+    def get_queryset(self):
+        response_plan_id = self.kwargs.get(self.lookup_field)
+        return Partner.objects.filter(clusters__response_plan_id=response_plan_id)

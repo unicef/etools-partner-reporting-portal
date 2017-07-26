@@ -68,6 +68,30 @@
       indicatorLocationDataEntries: function() {
         return this._buildUrl('/indicator/indicator-location-data-entries/');
       },
+
+      clusterIndicatorReports: function (responsePlanId) {
+        return this._buildUrl('/cluster/' + responsePlanId + '/cluster-indicators-list/');
+      },
+
+      clusterIndicatorNames: function (responsePlanId) {
+        return this._buildUrl('/cluster/' + responsePlanId + '/cluster-indicators-simple-list/');
+      },
+
+      clusterNames: function (responsePlanId) {
+        return this._buildUrl('/cluster/' + responsePlanId + '/cluster-simple-list/');
+      },
+
+      clusterProjectNames: function (responsePlanId) {
+        return this._buildUrl('/partner/' + responsePlanId + '/partner-project-simple-list/');
+      },
+
+      clusterPartnerNames: function (responsePlanId) {
+        return this._buildUrl('/partner/' + responsePlanId + '/partner-simple-list/');
+      },
+
+      clusterLocationNames: function (responsePlanId) {
+        return this._buildUrl('/core/' + responsePlanId + '/simple-location/');
+      },
     };
   }());
 </script>
