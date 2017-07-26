@@ -12,7 +12,7 @@ class PartnerProjectFilter(filters.FilterSet):
     status = ChoiceFilter(choices=PD_STATUS)
     start_date = DateFilter(method='get_start_date')
     end_date = DateFilter(method='get_end_date')
-    cluster_id = DateFilter(method='get_cluster_id')
+    cluster_id = CharFilter(method='get_cluster_id')
 
 
     class Meta:
