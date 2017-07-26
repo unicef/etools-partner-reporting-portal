@@ -81,6 +81,7 @@ def clean_up_data():
         Location.objects.all().delete()
         Disaggregation.objects.all().delete()
         DisaggregationValue.objects.all().delete()
+        ResponsePlan.objects.all().delete()
 
         print "All ORM objects deleted"
 
@@ -138,23 +139,46 @@ def generate_fake_data(quantity=40):
 
     print "{} ProgrammeDocument <-> QuantityReportableToLowerLevelOutput <-> IndicatorReport objects linked".format(quantity)
 
-    # Intervention creates Cluster and Locations
-    InterventionFactory.create_batch(
-        quantity, locations=Location.objects.all())
-    print "{} Intervention objects created".format(quantity)
-
-    for intervention in Intervention.objects.all():
-        for idx in xrange(3):
-            ResponsePlanFactory(intervention=intervention)
-    print "{} ResponsePlan objects created".format(quantity*3)
-
-    # Linking ClusterActivity - PartnerActivity
+    # Creating ClusterActivity objects
+    # Which creates ClusterObjective, its Cluster,
+    # ResponsePlan and Intervention
     ClusterActivityFactory.create_batch(quantity)
     print "{} ClusterActivity objects created".format(quantity)
+    print "{} ClusterObjective objects created".format(quantity)
+    print "{} Cluster objects created".format(quantity)
+    print "{} ResponsePlan objects created".format(quantity)
+    print "{} Intervention objects created".format(quantity)
 
+    # Intervention <-> Locations
+    for intervention in Intervention.objects.all():
+        intervention.locations.add(*list(Location.objects.all()))
+    print "{} Intervention objects linked to Locations".format(quantity)
+
+    # Extra ResponsePlan creation
+    # Intervention <-> ResponsePlan <-> Cluster
+    for idx in xrange(quantity):
+        intervention = Intervention.objects.all()[idx]
+
+        for _ in xrange(3):
+            response_plan = ResponsePlanFactory(intervention=intervention)
+
+            cluster = ClusterFactory()
+            cluster.response_plan = response_plan
+            cluster.save()
+
+    print "{} Extra ResponsePlan & Cluster objects created".format(quantity*3)
+
+    # ClusterActivity <-> PartnerActivity link
     for idx in xrange(quantity):
         cluster_activity = ClusterActivity.objects.all()[idx]
-        PartnerFactory(partner_activity__cluster_activity=cluster_activity)
+        partner = PartnerFactory(partner_activity__cluster_activity=cluster_activity)
+
+    for idx in xrange(quantity):
+        cluster = Cluster.objects.all()[idx]
+        pp = PartnerProject.objects.all()[idx]
+
+        pp.clusters.add(cluster)
+
     print "{} ClusterActivity <-> PartnerActivity objects linked".format(quantity)
 
     # Cluster Indicator creations

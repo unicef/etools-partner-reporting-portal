@@ -196,7 +196,7 @@ class ResponsePlanFactory(factory.django.DjangoModelFactory):
     start = today
     end = today
 
-    # cluster = factory.RelatedFactory('core.factories.ClusterFactory', 'response_plan')
+    cluster = factory.RelatedFactory('core.factories.ClusterFactory', 'response_plan')
     intervention = factory.SubFactory(InterventionFactory)
 
     class Meta:
