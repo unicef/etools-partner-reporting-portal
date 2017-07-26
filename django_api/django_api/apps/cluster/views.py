@@ -90,14 +90,9 @@ class ClusterObjectiveListCreateAPIView(ListCreateAPIView):
     pagination_class = SmallPagination
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     filter_class = ClusterObjectiveFilter
-    lookup_field = lookup_url_kwarg = 'cluster_id'
 
     def get_queryset(self, *args, **kwargs):
-        queryset = ClusterObjective.objects.select_related('cluster')
-        cluster_id = self.kwargs.get(self.lookup_field)
-        if cluster_id:
-            return queryset.filter(cluster_id=cluster_id)
-        return queryset.all()
+        return ClusterObjective.objects.select_related('cluster').all()
 
     def post(self, request, *args, **kwargs):
         """
@@ -174,14 +169,9 @@ class ClusterActivityListAPIView(ListCreateAPIView):
     pagination_class = SmallPagination
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     filter_class = ClusterActivityFilter
-    lookup_field = lookup_url_kwarg = 'cluster_id'
 
     def get_queryset(self, *args, **kwargs):
-        queryset = ClusterActivity.objects.select_related('cluster_objective__cluster')
-        cluster_id = self.kwargs.get(self.lookup_field)
-        if cluster_id:
-            return queryset.filter(cluster_objective__cluster_id=cluster_id)
-        return queryset.all()
+        return ClusterActivity.objects.select_related('cluster_objective__cluster').all()
 
     def post(self, request, *args, **kwargs):
         """
