@@ -25,6 +25,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
+IS_TEST = False
 IS_DEV = False
 IS_STAGING = False
 IS_PROD = False
