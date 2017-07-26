@@ -9,6 +9,7 @@
 <link rel="import" href="../../../filters/dropdown-filter/dropdown-filter.html">
 <link rel="import" href="../../../filters/checkbox-filter/checkbox-filter.html">
 <link rel="import" href="../../../filters/date-filter/date-filter.html">
+<link rel="import" href="../../../filters/status-filter/project-status-filter.html">
 
 <dom-module id="planned-action-projects-filters">
   <template>
@@ -53,19 +54,15 @@
             class="item-large"
             label="Location"
             name="location"
-            value="[[value]]"
+            value="[[queryParams.location]]"
             data="[[locations]]">
         </dropdown-filter>
       </div>
 
       <div class="app-grid">
-        <dropdown-filter
-            class="item"
-            label="Status"
-            name="status"
-            value="[[_withDefault(queryParams.status, '')]]"
-            data="[[statuses]]">
-        </dropdown-filter>
+        <project-status-filter
+          value="[[_withDefault(queryParams.status, '')]]">
+        </project-status-filter>
 
         <date-filter
           format="YYYY-MM-DD"
@@ -96,23 +93,16 @@
       ],
 
       properties: {
-
         queryParams: Object,
+
+        filters: {
+          type: Object,
+          notify: true,
+        },
 
         locations: [
           {title: 'All', id: ''}
         ],
-
-        statuses: {
-          type: Array,
-          value: [
-            {title: 'All', id: ''},
-            {title: 'Ongoing', id: 'Ong'},
-            {title: 'Planned', id: 'Pla'},
-            {title: 'Completed', id: 'Com'},
-          ],
-        },
-
       },
 
     });

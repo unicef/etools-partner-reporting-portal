@@ -1,0 +1,42 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../dropdown-filter/dropdown-filter.html">
+
+<dom-module id="project-status-filter">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <dropdown-filter
+      class="item"
+      label="Status"
+      name="status"
+      value="[[value]]]"
+      data="[[data]]">
+    </dropdown-filter>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'project-status-filter',
+
+      properties: {
+        data: {
+          type: Array,
+          value: [
+            {title: 'All', id: ''},
+            {title: 'Ongoing', id: 'Ong'},
+            {title: 'Planned', id: 'Pla'},
+            {title: 'Completed', id: 'Com'},
+          ],
+        },
+
+        value: String,
+      },
+    });
+  </script>
+</dom-module>

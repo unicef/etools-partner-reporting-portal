@@ -3,6 +3,8 @@
 <link rel="import" href="../../../../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../../../../bower_components/app-route/app-route.html">
 <link rel="import" href="../../../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../../bower_components/iron-location/iron-query-params.html">
 
 <link rel="import" href="../../../styles/shared-styles.html">
 <link rel="import" href="../../../elements/page-header.html">
@@ -27,6 +29,15 @@ planned-action-projects-router.
       }
     </style>
 
+    <iron-location
+        query="{{query}}">
+    </iron-location>
+
+    <iron-query-params
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
+    </iron-query-params>
+
     <app-route
       route="{{route}}"
       pattern="/:subpage"
@@ -41,6 +52,7 @@ planned-action-projects-router.
             <paper-tabs
               selected="{{tab}}"
               attr-for-selected="name"
+              on-iron-activate="_resetPage"
               scrollable
               hide-scroll-buttons>
 
@@ -69,6 +81,8 @@ planned-action-projects-router.
       is: 'page-cluster-reporting-planned-action',
 
       properties: {
+        queryParams: Object,
+
         subpage: String,
 
         tab: String
@@ -119,6 +133,10 @@ planned-action-projects-router.
 
       _tabChanged: function (tab) {
         this.set('route.path', '/' + tab);
+      },
+
+      _resetPage: function () {
+        this.set('queryParams.page', 1);
       },
     });
   </script>
