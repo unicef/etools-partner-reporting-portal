@@ -14,8 +14,8 @@ from indicator.disaggregators import (
 )
 
 
-class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
-    generate_fake_data_quantity = 40
+class TestQuantityIndicatorDisaggregator5(BaseAPITestCase):
+    generate_fake_data_quantity = 5
 
     def test_post_process_location_sum_calc(self):
         unit_type = IndicatorBlueprint.NUMBER
@@ -140,7 +140,7 @@ class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
 
 
 class TestRatioIndicatorDisaggregator(BaseAPITestCase):
-    generate_fake_data_quantity = 40
+    generate_fake_data_quantity = 25
 
     def test_post_process_location_ratio_calc(self):
         unit_type = IndicatorBlueprint.PERCENTAGE

@@ -41,7 +41,6 @@ from indicator.models import (
 
 
 class TestPDReportsAPIView(BaseAPITestCase):
-    generate_fake_data_quantity = 5
 
     def test_list_api(self):
         pd = ProgrammeDocument.objects.first()
@@ -75,7 +74,6 @@ class TestPDReportsAPIView(BaseAPITestCase):
 
 
 class TestIndicatorListAPIView(BaseAPITestCase):
-    generate_fake_data_quantity = 5
 
     def test_list_api(self):
         ir_id = IndicatorReport.objects.first().id
@@ -110,41 +108,6 @@ class TestIndicatorListAPIView(BaseAPITestCase):
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(len(response.data['outputs']), 1)
         self.assertEquals(response.data['outputs'][0]['id'], reportable_id)
-
-    def test_list_api_filter_by_locations(self):
-        self.reports = Reportable.objects.filter(
-            lower_level_outputs__reportables__isnull=False,
-            locations__isnull=False
-        ).distinct()
-
-        location_ids = map(lambda item: str(
-            item), self.reports.values_list('locations__id', flat=True))
-        location_id_list_string = ','.join(location_ids)
-
-        url = reverse('indicator-list-create-api')
-        url += '?locations=' + location_id_list_string
-        response = self.client.get(url, format='json')
-
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertGreater(len(self.reports), len(response.data['results']))
-
-    def test_list_api_filter_by_pd_ids(self):
-        self.reports = Reportable.objects.filter(
-            lower_level_outputs__reportables__isnull=False)
-
-        pd_ids = map(
-            lambda item: str(item),
-            self.reports.values_list(
-                'lower_level_outputs__indicator__programme_document__id', flat=True)
-        )
-        pd_id_list_string = ','.join(pd_ids)
-
-        url = reverse('indicator-list-create-api')
-        url += '?pds=' + pd_id_list_string
-        response = self.client.get(url, format='json')
-
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertGreater(len(self.reports), len(response.data['results']))
 
     def test_enter_indicator(self):
         ir = IndicatorReport.objects.first()
@@ -183,6 +146,45 @@ class TestIndicatorListAPIView(BaseAPITestCase):
         self.assertEquals(response.data['progress_report_status'], PROGRESS_REPORT_STATUS.submitted)
 
 
+class TestIndicatorListAPIView30(BaseAPITestCase):
+    generate_fake_data_quantity = 30
+
+    def test_list_api_filter_by_locations(self):
+        self.reports = Reportable.objects.filter(
+            lower_level_outputs__reportables__isnull=False,
+            locations__isnull=False
+        ).distinct()
+
+        location_ids = map(lambda item: str(
+            item), self.reports.values_list('locations__id', flat=True))
+        location_id_list_string = ','.join(location_ids)
+
+        url = reverse('indicator-list-create-api')
+        url += '?locations=' + location_id_list_string
+        response = self.client.get(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertGreater(len(self.reports), len(response.data['results']))
+
+    def test_list_api_filter_by_pd_ids(self):
+        self.reports = Reportable.objects.filter(
+            lower_level_outputs__reportables__isnull=False)
+
+        pd_ids = map(
+            lambda item: str(item),
+            self.reports.values_list(
+                'lower_level_outputs__indicator__programme_document__id', flat=True)
+        )
+        pd_id_list_string = ','.join(pd_ids)
+
+        url = reverse('indicator-list-create-api')
+        url += '?pds=' + pd_id_list_string
+        response = self.client.get(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertGreater(len(self.reports), len(response.data['results']))
+
+
 class TestIndicatorDataReportableAPIView(BaseAPITestCase):
 
     def test_overall_narrative(self):
@@ -207,7 +209,6 @@ class TestIndicatorDataReportableAPIView(BaseAPITestCase):
 
 
 class TestIndicatorReportListAPIView(BaseAPITestCase):
-    generate_fake_data_quantity = 5
 
     def test_list_api_with_reportable_id(self):
         indicator_report = IndicatorReport.objects.last()

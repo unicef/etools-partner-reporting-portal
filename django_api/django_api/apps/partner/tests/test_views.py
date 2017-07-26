@@ -40,7 +40,7 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
         get list by given cluster id unit test for PartnerProjectListCreateAPIView
         """
         cluster_id = Cluster.objects.first().id
-        url = reverse('partner-project-list', kwargs={"cluster_id": cluster_id})
+        url = reverse('partner-project-list') + "?cluster_id=" + str(cluster_id)
         response = self.client.get(url, format='json')
 
         self.assertTrue(status.is_success(response.status_code))

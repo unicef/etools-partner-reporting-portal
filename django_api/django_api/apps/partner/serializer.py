@@ -111,3 +111,13 @@ class PartnerProjectPatchSerializer(serializers.ModelSerializer):
             'partner',
             # 'reportables',
         )
+
+
+class PartnerProjectSimpleSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PartnerProject
+        fields = (
+            'id',
+            'title',
+        )

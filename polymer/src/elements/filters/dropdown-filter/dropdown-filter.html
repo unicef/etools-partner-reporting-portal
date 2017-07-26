@@ -73,13 +73,13 @@
 
         this.fire('filter-changed', {
           name: this.name,
-          value: newValue,
+          value: String(newValue),
         });
       },
 
       _computeSelected: function (value) {
         return this.data.findIndex(function (item) {
-          return item.id === value;
+          return String(item.id) === value;
         });
       },
     });

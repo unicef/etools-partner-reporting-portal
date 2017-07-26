@@ -6,6 +6,8 @@ from .views import (
     ClusterObjectiveListCreateAPIView,
     ClusterActivityAPIView,
     ClusterActivityListAPIView,
+    ClusterIndicatorsListAPIView,
+    ClusterIndicatorsSimpleListAPIView,
 )
 
 
@@ -16,13 +18,18 @@ urlpatterns = [
     url(r'^cluster-objective-list/$',
         ClusterObjectiveListCreateAPIView.as_view(),
         name="cluster-objective-list"),
-    url(r'^(?P<cluster_id>\d+)/cluster-objective-list/$',
-        ClusterObjectiveListCreateAPIView.as_view(),
-        name="cluster-objective-list"),
-
     url(r'^cluster-activity/(?P<pk>\d+)/$', ClusterActivityAPIView.as_view(), name="cluster-activity"),
     url(r'^cluster-activity-list/$', ClusterActivityListAPIView.as_view(), name="cluster-activity-list"),
     url(r'^(?P<cluster_id>\d+)/cluster-activity-list/$',
         ClusterActivityListAPIView.as_view(),
         name="cluster-activity-list"),
+    url(r'^(?P<response_plan_id>\d+)/cluster-indicators-list/$',
+        ClusterIndicatorsListAPIView.as_view(),
+        name="cluster-indicators-list"),
+    url(r'^(?P<response_plan_id>\d+)/cluster-indicators-simple-list/$',
+        ClusterIndicatorsSimpleListAPIView.as_view(),
+        name="cluster-indicators-simple-list"),
+    url(r'^(?P<response_plan_id>\d+)/cluster-simple-list/$',
+        ClusterListAPIView.as_view(),
+        name="cluster-simple-list"),
 ]

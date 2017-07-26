@@ -16,9 +16,9 @@ from indicator.models import IndicatorReport
 from unicef.models import LowerLevelOutput, Section, ProgrammeDocument, ProgressReport
 
 
-class TestProgrammeDocumentAPIView(BaseAPITestCase):
+class TestProgrammeDocumentAPIView25(BaseAPITestCase):
 
-    generate_fake_data_quantity = 5
+    generate_fake_data_quantity = 25
 
     def test_list_api(self):
         intervention = Intervention.objects.filter(locations__isnull=False).first()
@@ -70,6 +70,9 @@ class TestProgrammeDocumentAPIView(BaseAPITestCase):
         for result in response.data['results']:
             self.assertEquals(result['title'], document['title'])
 
+
+class TestProgrammeDocumentAPIView(BaseAPITestCase):
+
     def test_detail_api(self):
         pd = ProgrammeDocument.objects.first()
         # location_id is redundantly!
@@ -82,8 +85,6 @@ class TestProgrammeDocumentAPIView(BaseAPITestCase):
 
 
 class TestProgressReportAPIView(BaseAPITestCase):
-
-    generate_fake_data_quantity = 5
 
     def setUp(self):
         super(TestProgressReportAPIView, self).setUp()

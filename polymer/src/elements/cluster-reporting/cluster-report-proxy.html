@@ -1,0 +1,60 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="cluster-report.html">
+
+<dom-module id="cluster-report-proxy">
+  <template>
+    <style>
+      :host {
+        display: block;
+        margin: 0 -24px;
+      }
+    </style>
+
+    <template
+        is="dom-if"
+        if="[[active]]"
+        restamp="true">
+      <cluster-report
+          data="[[data]]"
+          mode="[[mode]]">
+      </cluster-report>
+    </template>
+  </template>
+
+  <script>
+    Polymer({
+      id: 'cluster-report-proxy',
+
+      properties: {
+        data: Object,
+
+        currentId: Number,
+
+        mode: String,
+
+        active: {
+          type: Boolean,
+          value: false,
+        },
+      },
+
+      observers: [
+        '_render(data.id)',
+      ],
+
+      _render: function (id) {
+        if (typeof id === 'undefined') {
+          return;
+        }
+
+        // Force re-render:
+        this.set('active', false);
+
+        this.async(function () {
+          this.set('active', true);
+        });
+      },
+    });
+  </script>
+</dom-module>
