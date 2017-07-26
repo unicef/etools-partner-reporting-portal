@@ -1,5 +1,6 @@
 import logging
 
+from django.db.models import Q
 from django.http import Http404
 
 from rest_framework.views import APIView
@@ -11,14 +12,17 @@ import django_filters
 
 from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
-from .models import ClusterObjective, ClusterActivity
+from indicator.serializers import ClusterIndicatorReportSerializer, ClusterIndicatorReportSimpleSerializer
+from indicator.models import IndicatorReport
+from .models import ClusterObjective, ClusterActivity, Cluster
 from .serializers import (
+    ClusterSimpleSerializer,
     ClusterObjectiveSerializer,
     ClusterObjectivePatchSerializer,
     ClusterActivitySerializer,
     ClusterActivityPatchSerializer,
 )
-from .filters import ClusterObjectiveFilter, ClusterActivityFilter
+from .filters import ClusterObjectiveFilter, ClusterActivityFilter, ClusterIndicatorsFilter
 
 logger = logging.getLogger(__name__)
 
@@ -90,14 +94,9 @@ class ClusterObjectiveListCreateAPIView(ListCreateAPIView):
     pagination_class = SmallPagination
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     filter_class = ClusterObjectiveFilter
-    lookup_field = lookup_url_kwarg = 'cluster_id'
 
     def get_queryset(self, *args, **kwargs):
-        queryset = ClusterObjective.objects.select_related('cluster')
-        cluster_id = self.kwargs.get(self.lookup_field)
-        if cluster_id:
-            return queryset.filter(cluster_id=cluster_id)
-        return queryset.all()
+        return ClusterObjective.objects.select_related('cluster').all()
 
     def post(self, request, *args, **kwargs):
         """
@@ -174,14 +173,9 @@ class ClusterActivityListAPIView(ListCreateAPIView):
     pagination_class = SmallPagination
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     filter_class = ClusterActivityFilter
-    lookup_field = lookup_url_kwarg = 'cluster_id'
 
     def get_queryset(self, *args, **kwargs):
-        queryset = ClusterActivity.objects.select_related('cluster_objective__cluster')
-        cluster_id = self.kwargs.get(self.lookup_field)
-        if cluster_id:
-            return queryset.filter(cluster_objective__cluster_id=cluster_id)
-        return queryset.all()
+        return ClusterActivity.objects.select_related('cluster_objective__cluster').all()
 
     def post(self, request, *args, **kwargs):
         """
@@ -195,3 +189,44 @@ class ClusterActivityListAPIView(ListCreateAPIView):
 
         serializer.save()
         return Response({'id': serializer.instance.id}, status=statuses.HTTP_201_CREATED)
+
+
+class ClusterIndicatorsListAPIView(ListCreateAPIView):
+
+    permission_classes = (IsAuthenticated, )
+    serializer_class = ClusterIndicatorReportSerializer
+    pagination_class = SmallPagination
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
+    filter_class = ClusterIndicatorsFilter
+    lookup_field = lookup_url_kwarg = 'response_plan_id'
+
+    def get_queryset(self):
+        response_plan_id = self.kwargs.get(self.lookup_field)
+        queryset = IndicatorReport.objects.filter(
+            Q(reportable__cluster_objectives__isnull=False)
+            | Q(reportable__cluster_activities__isnull=False)
+            | Q(reportable__partner_projects__isnull=False)
+            | Q(reportable__partner_activities__isnull=False)
+        ).filter(
+            Q(reportable__cluster_objectives__cluster__response_plan=response_plan_id)
+            | Q(reportable__cluster_activities__cluster_objective__cluster__response_plan=response_plan_id)
+            | Q(reportable__partner_projects__clusters__response_plan=response_plan_id)
+            | Q(reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)
+            )
+        return queryset
+
+
+class ClusterIndicatorsSimpleListAPIView(ClusterIndicatorsListAPIView):
+    serializer_class = ClusterIndicatorReportSimpleSerializer
+    pagination_class = filter_class = None
+
+
+class ClusterListAPIView(ListCreateAPIView):
+
+    permission_classes = (IsAuthenticated, )
+    serializer_class = ClusterSimpleSerializer
+    lookup_field = lookup_url_kwarg = 'response_plan_id'
+
+    def get_queryset(self):
+        response_plan_id = self.kwargs.get(self.lookup_field)
+        return Cluster.objects.filter(response_plan_id=response_plan_id)

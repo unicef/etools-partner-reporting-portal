@@ -232,8 +232,9 @@ class IndicatorDataAPIView(APIView):
             ir.submission_date = date.today()
             ir.report_status = INDICATOR_REPORT_STATUS.submitted
             ir.save()
-            ir.progress_report.status = PROGRESS_REPORT_STATUS.submitted
-            ir.progress_report.save()
+            if ir.progress_report is not None:
+                ir.progress_report.status = PROGRESS_REPORT_STATUS.submitted
+                ir.progress_report.save()
             serializer = PDReportsSerializer(instance=ir)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:

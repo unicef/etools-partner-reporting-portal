@@ -22,7 +22,8 @@ from core.helpers import (
     get_cast_dictionary_keys_as_tuple,
     get_cast_dictionary_keys_as_string,
 )
-
+from partner.models import PartnerProject, PartnerActivity
+from cluster.models import ClusterObjective, ClusterActivity
 from .models import (
     Reportable, IndicatorBlueprint,
     IndicatorReport, IndicatorLocationData,
@@ -82,6 +83,7 @@ class IndicatorReportSimpleSerializer(serializers.ModelSerializer):
             'indicator_name',
             'target',
             'achieved',
+            'total',
             'report_status',
         )
 
@@ -134,6 +136,7 @@ class IndicatorLLoutputsSerializer(serializers.ModelSerializer):
     indicator_reports = serializers.SerializerMethodField()
     overall_status = serializers.SerializerMethodField()
     narrative_assessment = serializers.SerializerMethodField()
+    display_type = serializers.SerializerMethodField()
 
     class Meta:
         model = Reportable
@@ -145,6 +148,8 @@ class IndicatorLLoutputsSerializer(serializers.ModelSerializer):
             'overall_status',
             'narrative_assessment',
             'indicator_reports',
+            'display_type',
+            'total',
         )
 
     def get_name(self, obj):
@@ -190,6 +195,9 @@ class IndicatorLLoutputsSerializer(serializers.ModelSerializer):
             self.__narrative_and_assessment = Reportable.get_narrative_and_assessment(
                 indicator_report.progress_report_id)
         return self.__narrative_and_assessment
+
+    def get_display_type(self, obj):
+        return obj.blueprint.display_type
 
 
 class OverallNarrativeSerializer(serializers.ModelSerializer):
@@ -320,14 +328,6 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
                 + "its IndicatorReport's Reportable disaggregation counts"
             )
 
-        # disaggregation_reported_on element-wise assertion
-        for disagg_id in data['disaggregation_reported_on']:
-            if disagg_id not in disaggregation_id_list:
-                raise serializers.ValidationError(
-                    "disaggregation_reported_on list must have "
-                    + "all its elements mapped to disaggregation ids"
-                )
-
         # IndicatorReport membership validation
         if not self.instance.id in data['indicator_report'] \
                 .indicator_location_data.values_list('id', flat=True):
@@ -335,6 +335,14 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
                 "IndicatorLocationData does not belong to "
                 + "this {}".format(data['indicator_report'])
             )
+
+        # disaggregation_reported_on element-wise assertion
+        for disagg_id in data['disaggregation_reported_on']:
+            if disagg_id not in disaggregation_id_list:
+                raise serializers.ValidationError(
+                    "disaggregation_reported_on list must have "
+                    + "all its elements mapped to disaggregation ids"
+                )
 
         # Filter disaggregation option IDs
         # from given disaggregation_reported_on Disaggregation IDs
@@ -658,3 +666,79 @@ class IndicatorReportUpdateSerializer(serializers.ModelSerializer):
         fields = (
             'reporting_period',
         )
+
+
+class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
+
+    indicator_name = serializers.SerializerMethodField()
+    reportable = IndicatorListSerializer()
+    reporting_period = serializers.SerializerMethodField()
+    cluster = serializers.SerializerMethodField()
+    project = serializers.SerializerMethodField()
+    is_draft = serializers.SerializerMethodField()
+    can_submit = serializers.SerializerMethodField()
+
+    class Meta:
+        model = IndicatorReport
+        fields = (
+            'id',
+            'indicator_name',
+            'title',
+            'reportable',
+            'reporting_period',
+            'due_date',
+            'submission_date',
+            'frequency',
+            'total',
+            'remarks',
+            'report_status',
+            'overall_status',
+            'narrative_assessment',
+            'cluster',
+            'project',
+            'is_draft',
+            'can_submit',
+        )
+
+    def get_indicator_name(self, obj):
+        return obj.reportable.blueprint.title
+
+    def get_reporting_period(self, obj):
+        return "%s - %s " % (
+            obj.time_period_start.strftime(settings.PRINT_DATA_FORMAT),
+            obj.time_period_end.strftime(settings.PRINT_DATA_FORMAT)
+        )
+
+    def get_cluster(self, obj):
+        if isinstance(obj.reportable.content_object, (ClusterObjective, ClusterActivity)):
+            return obj.reportable.content_object.cluster.title
+        else:
+            return ''
+
+    def get_project(self, obj):
+        if isinstance(obj.reportable.content_object, (PartnerProject, PartnerActivity)):
+            return obj.reportable.content_object.title
+        else:
+            return ''
+
+    def get_is_draft(self, obj):
+        return obj.is_draft
+
+    def get_can_submit(self, obj):
+        return obj.can_submit
+
+
+class ClusterIndicatorReportSimpleSerializer(serializers.ModelSerializer):
+
+    title = serializers.SerializerMethodField()
+
+    class Meta:
+        model = IndicatorReport
+        fields = (
+            'id',
+            'title',
+        )
+
+    def get_title(self, obj):
+        return obj.reportable.blueprint.title
+

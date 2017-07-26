@@ -223,6 +223,7 @@
       },
 
       save: function () {
+        var self = this;
         var updateThunk;
         var valid;
 
@@ -252,7 +253,12 @@
             this.indicatorId,
             this.formattedData.location.id
           )
-        );
+        )
+            .then(function (value) {
+              self.fire('location-updated');
+
+              return value;
+            });
       },
 
       _triggerModalRefit: function (e) {
