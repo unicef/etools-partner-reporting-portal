@@ -122,7 +122,7 @@
               class="flex self-stretch"
                label="Cluster"
                id="cluster_objective"
-               selected="{{data.cluster_objective}}"
+               value="{{data.cluster_objective}}"
                data="[[clusters]]">
             </dropdown-form-input>
 
@@ -141,7 +141,7 @@
                class="flex"
                label="Frequency of reporting"
                id="frequency"
-               selected="{{data.frequency}}"
+               value="{{data.frequency}}"
                data="[[frequencies]]">
             </dropdown-form-input>
           </div>
@@ -230,15 +230,6 @@
         this.set('opened', true);
       },
 
-      // Dropdowns provide the index of the selected item.
-      // This function is temporary. TODO:
-      // Need to refactor so dropdown-form-input will return value, not index.
-      _getDropdownIds: function() {
-        if (typeof(this.data.frequency) === 'number') {
-          this.data.frequency = this.frequencies[this.data.frequency].id;
-        }
-      },
-
       _redirectToDetail: function (id) {
         var path = '/response-parameters/clusters/activity/' + String(id);
         var url = this.buildUrl(this._baseUrlCluster, path);
@@ -247,7 +238,6 @@
 
       _save: function () {
         var self = this;
-        this._getDropdownIds();
         var thunk = this.$.createActivity.thunk();
         self.updatePending = true;
         thunk()

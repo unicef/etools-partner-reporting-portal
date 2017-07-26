@@ -125,18 +125,20 @@
               auto-validate>
             </paper-input>
 
-            <dropdown-form-input class="flex"
-                                 label="Cluster"
-                                 id="cluster"
-                                 selected="{{data.cluster}}"
-                                 data="[[clusters]]">
+            <dropdown-form-input
+              class="flex"
+               label="Cluster"
+               id="cluster"
+               value="{{data.cluster}}"
+               data="[[clusters]]">
             </dropdown-form-input>
 
-            <dropdown-form-input class="flex"
-                                 label="Frequency of reporting"
-                                 id="frequency"
-                                 selected="{{data.frequency}}"
-                                 data="[[frequencies]]">
+            <dropdown-form-input
+               class="flex"
+               label="Frequency of reporting"
+               id="frequency"
+               value="{{data.frequency}}"
+               data="[[frequencies]]">
             </dropdown-form-input>
 
           </div>
@@ -227,18 +229,6 @@
         this.set('opened', true);
       },
 
-      // Dropdowns provide the index of the selected item.
-      // This function is temporary. TODO:
-      // Need to refactor so dropdown-form-input will return value, not index.
-      _getDropdownIds: function() {
-        if (typeof(this.data.frequency) === 'number') {
-          this.data.frequency = this.frequencies[this.data.frequency].id;
-        }
-        if (typeof(this.data.cluster) === 'number') {
-          this.data.cluster = this.clusters[this.data.cluster].id;
-        }
-      },
-
       _redirectToDetail: function (id) {
         var path = '/response-parameters/clusters/objective/' + String(id);
         var url = this.buildUrl(this._baseUrlCluster, path);
@@ -247,7 +237,6 @@
 
       _save: function () {
         var self = this;
-        this._getDropdownIds();
         var thunk = this.$.createObjective.thunk();
         thunk()
           .then(function (res) {
