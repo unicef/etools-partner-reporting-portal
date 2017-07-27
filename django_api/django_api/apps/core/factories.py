@@ -54,6 +54,12 @@ REPORTABLE_FREQUENCY_LEVEL_CHOICE_LIST = [x[0] for x in REPORTABLE_FREQUENCY_LEV
 today = datetime.date.today()
 beginning_of_this_year = datetime.date(today.year, 1, 1)
 
+cs_date_1 = datetime.date(today.year, 1, 1)
+
+cs_date_2 = datetime.date(today.year, 3, 24)
+
+cs_date_3 = datetime.date(today.year, 5, 15)
+
 
 # https://stackoverflow.com/a/41154232/2363915
 class JSONFactory(factory.DictFactory):
@@ -261,7 +267,7 @@ class ReportableFactory(factory.django.DjangoModelFactory):
     # Commented out so that we can create Disaggregation and DisaggregationValue objects manually
     # disaggregation = factory.RelatedFactory('core.factories.DisaggregationFactory', 'reportable')
 
-    cs_dates = list()
+    cs_dates = [cs_date_1, cs_date_2, cs_date_3]
     frequency = fuzzy.FuzzyChoice(REPORTABLE_FREQUENCY_LEVEL_CHOICE_LIST)
     start_date = beginning_of_this_year
     end_date = today + datetime.timedelta(days=70)
@@ -420,7 +426,7 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
 
     cp_output = factory.RelatedFactory('core.factories.CountryProgrammeOutputFactory', 'programme_document')
 
-    cs_dates = list()
+    cs_dates = [cs_date_1, cs_date_2, cs_date_3]
 
     class Meta:
         model = ProgrammeDocument
