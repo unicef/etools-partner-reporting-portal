@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from core.common import FREQUENCY_LEVEL
+from partner.models import PartnerProject
 from .models import ClusterObjective, ClusterActivity, Cluster
 
 

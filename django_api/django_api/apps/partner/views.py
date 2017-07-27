@@ -13,9 +13,10 @@ from .serializer import (
     PartnerProjectSerializer,
     PartnerProjectSimpleSerializer,
     PartnerProjectPatchSerializer,
+    ClusterActivityPartnersSerializer,
 )
 from .models import PartnerProject, Partner
-from .filters import PartnerProjectFilter
+from .filters import PartnerProjectFilter, ClusterActivityPartnersFilter
 
 
 class PartnerDetailsAPIView(RetrieveAPIView):
@@ -140,3 +141,18 @@ class PartnerSimpleListAPIView(ListAPIView):
     def get_queryset(self):
         response_plan_id = self.kwargs.get(self.lookup_field)
         return Partner.objects.filter(clusters__response_plan_id=response_plan_id)
+
+
+class ClusterActivityPartnersAPIView(ListAPIView):
+
+    serializer_class = ClusterActivityPartnersSerializer
+    permission_classes = (IsAuthenticated, )
+    pagination_class = SmallPagination
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
+    filter_class = ClusterActivityPartnersFilter
+    lookup_field = lookup_url_kwarg = 'pk'
+
+    def get_queryset(self, *args, **kwargs):
+        cluster_activity_id = self.kwargs.get(self.lookup_field)
+        #return PartnerProject.objects.select_related('partner').prefetch_related('clusters', 'locations').all()
+        return Partner.objects.filter(partner_activities__cluster_activity_id=cluster_activity_id)

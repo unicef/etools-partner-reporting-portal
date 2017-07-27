@@ -5,7 +5,7 @@ from django.http import Http404
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import ListCreateAPIView, ListAPIView
 from rest_framework import status as statuses, serializers
 
 import django_filters
@@ -22,7 +22,11 @@ from .serializers import (
     ClusterActivitySerializer,
     ClusterActivityPatchSerializer,
 )
-from .filters import ClusterObjectiveFilter, ClusterActivityFilter, ClusterIndicatorsFilter
+from .filters import (
+    ClusterObjectiveFilter,
+    ClusterActivityFilter,
+    ClusterIndicatorsFilter,
+)
 
 logger = logging.getLogger(__name__)
 

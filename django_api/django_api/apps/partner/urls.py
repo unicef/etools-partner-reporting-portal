@@ -6,6 +6,7 @@ from .views import (
     PartnerProjectListCreateAPIView,
     PartnerProjectSimpleListAPIView,
     PartnerProjectAPIView,
+    ClusterActivityPartnersAPIView,
 )
 
 
@@ -19,5 +20,7 @@ urlpatterns = [
         name="partner-simple-list"),
     url(r'^partner-project-list/$', PartnerProjectListCreateAPIView.as_view(), name="partner-project-list"),
     url(r'^partner-project-details/(?P<pk>\d+)/$', PartnerProjectAPIView.as_view(), name="partner-project-details"),
-
+    url(r'^cluster-activity/(?P<pk>\d+)/partners/$',
+        ClusterActivityPartnersAPIView.as_view(),
+        name="cluster-activity-partners"),
 ]
