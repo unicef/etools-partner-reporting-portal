@@ -1,6 +1,7 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
 
 <link rel="import" href="../dropdown-filter/dropdown-filter.html">
+<link rel="import" href="../../../behaviors/utils.html">
 
 <dom-module id="project-status-filter">
   <template>
@@ -14,7 +15,7 @@
       class="item"
       label="Status"
       name="status"
-      value="[[value]]]"
+      value="[[_withDefault(value, '')]]"
       data="[[data]]">
     </dropdown-filter>
 
@@ -23,6 +24,10 @@
   <script>
     Polymer({
       is: 'project-status-filter',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+      ],
 
       properties: {
         data: {
