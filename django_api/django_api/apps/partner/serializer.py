@@ -65,7 +65,6 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
             'clusters',
             'locations',
             'partner',
-            # 'reportables',
         )
 
     def get_id(self, obj):
@@ -104,7 +103,6 @@ class PartnerProjectPatchSerializer(serializers.ModelSerializer):
             'clusters',
             'locations',
             'partner',
-            # 'reportables',
         )
 
 
@@ -121,6 +119,7 @@ class PartnerProjectSimpleSerializer(serializers.ModelSerializer):
 class ClusterActivityPartnersSerializer(serializers.ModelSerializer):
 
     partner_projects = PartnerProjectSimpleSerializer(many=True)
+    links = serializers.SerializerMethodField()
 
     class Meta:
         model = Partner
@@ -131,10 +130,14 @@ class ClusterActivityPartnersSerializer(serializers.ModelSerializer):
             'email',
             'phone_number',
             'partner_projects',
-            'clusters',
             'street_address',
             'city',
             'postal_code',
             'country',
-            # 'links',
+            'links',
         )
+
+    def get_links(self, obj):
+        return [
+            pp.additional_information for pp in obj.partner_projects.all()
+        ]

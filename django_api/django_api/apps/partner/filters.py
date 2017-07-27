@@ -38,7 +38,11 @@ class PartnerProjectFilter(filters.FilterSet):
 
 class ClusterActivityPartnersFilter(django_filters.FilterSet):
 
+    partner = CharFilter(method='get_partner')
+
     class Meta:
         model = Partner
-        fields = [
-        ]
+        fields = ['partner', ]
+
+    def get_partner(self, queryset, name, value):
+        return queryset.filter(id=value)
