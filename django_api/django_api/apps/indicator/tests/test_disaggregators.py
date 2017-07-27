@@ -35,27 +35,6 @@ class TestQuantityIndicatorDisaggregator5(BaseAPITestCase):
 
         self.assertEquals(indicator_report.total['c'], loc_total)
 
-
-class TestQuantityIndicatorDisaggregator(BaseAPITestCase):
-
-    def test_post_process_location_sum_calc(self):
-        unit_type = IndicatorBlueprint.NUMBER
-        calc_type = IndicatorBlueprint.SUM
-
-        indicator = Reportable.objects.filter(
-            blueprint__unit=unit_type,
-            blueprint__calculation_formula_across_locations=calc_type,
-        ).first()
-
-        indicator_report = indicator.indicator_reports.first()
-        loc_total = 0
-
-        for loc_data in indicator_report.indicator_location_data.all():
-            QuantityIndicatorDisaggregator.post_process(loc_data)
-            loc_total += loc_data.disaggregation['()']['c']
-
-        self.assertEquals(indicator_report.total['c'], loc_total)
-
     def test_post_process_location_max_calc(self):
         unit_type = IndicatorBlueprint.NUMBER
         calc_type = IndicatorBlueprint.MAX
