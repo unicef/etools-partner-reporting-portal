@@ -12,7 +12,8 @@
 <link rel="import" href="../../../../../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../../../../../bower_components/iron-location/iron-location.html">
 
-<link rel="import" href="../../../../../elements/dropdown-form-input.html">
+<link rel="import" href="../../../../../elements/form-fields/dropdown-form-input.html">
+<link rel="import" href="../../../../../elements/form-fields/cluster-dropdown-input.html">
 <link rel="import" href="../../../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../../../styles/buttons.html">
 <link rel="import" href="../../../../../redux/store.html">
@@ -123,13 +124,12 @@
               required>
             </paper-input>
 
-            <dropdown-form-input
-              class="flex"
-               label="Cluster"
-               id="cluster"
-               value="{{data.cluster}}"
-               data="[[clusters]]">
-            </dropdown-form-input>
+            <cluster-dropdown-input
+              class="flex self-stretch"
+              label="Cluster"
+              id="cluster"
+              value="{{data.cluster}}">
+            </cluster-dropdown-input>
 
             <dropdown-form-input
                class="flex"
@@ -192,16 +192,6 @@
         objectiveCreationUrl: {
           type: String,
           value: App.Endpoints.responseParametersClusterObjectives()
-        },
-
-        // TODO: Remove this and populate cluster dropdown.
-        clusters: {
-          type: Array,
-          value: [
-            {title: 'Cluster A', id: 10},
-            {title: 'Cluster B', id: 15},
-            {title: 'Cluster C', id: 20},
-          ],
         },
 
         frequencies: {
