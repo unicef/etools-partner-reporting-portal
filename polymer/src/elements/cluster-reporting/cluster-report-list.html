@@ -106,10 +106,11 @@
       },
 
       listeners: {
-        'report-submit-confirm': '_confirm',
+        'report-submit-confirm': '_onConfirm',
+        'report-submitted': '_onReportSubmitted',
       },
 
-      _confirm: function (e, result) {
+      _onConfirm: function (e, result) {
         e.stopPropagation();
 
         this.$.confirm.run({
@@ -121,6 +122,19 @@
           maxWidth: '500px',
           mode: App.Constants.CONFIRM_MODAL,
         });
+      },
+
+      _onReportSubmitted: function (e) {
+        var tail = this.totalResults % this.pageSize;
+        var last = Math.ceil(this.totalResults / this.pageSize);
+
+        if (tail === 1 && last !== 1 && this.pageNumber === last) {
+          e.stopPropagation();
+
+          this.set('queryParams.page', this.pageNumber - 1);
+        } else {
+          // Let the parent component handle the event
+        }
       },
     });
   </script>

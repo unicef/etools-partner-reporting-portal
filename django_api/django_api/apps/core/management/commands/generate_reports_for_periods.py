@@ -73,10 +73,12 @@ class Command(BaseCommand):
                     pd)
 
                 if not latest_progress_report:
-                    date_list = pd.cs_dates
+                    date_list = [pd.start_date]
+                    date_list.extend(pd.cs_dates)
 
                 else:
-                    date_list = filter(lambda item: item > latest_progress_report.start_date, date_list)
+                    date_list = [latest_progress_report.end_date + timedelta(days=1)]
+                    date_list.extend(filter(lambda item: item > latest_progress_report.end_date, pd.cs_dates))
 
             else:
                 # Get missing date list based on progress report existence
@@ -100,9 +102,20 @@ class Command(BaseCommand):
             print "Missing dates: {}".format(date_list)
 
             with transaction.atomic():
-                for missing_date in date_list:
-                    end_date = calculate_end_date_given_start_date(
-                        missing_date, frequency)
+                last_element_idx = len(date_list) - 1
+
+                for idx, missing_date in enumerate(date_list):
+                    if frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
+                        if idx != last_element_idx:
+                            end_date = calculate_end_date_given_start_date(
+                                missing_date, frequency, cs_dates=date_list)
+
+                        else:
+                            break
+
+                    else:
+                        end_date = calculate_end_date_given_start_date(
+                            missing_date, frequency)
 
                     # Create ProgressReport first
                     print "Creating PD {} ProgressReport object for {} - {}".format(pd, missing_date, end_date)
@@ -131,7 +144,9 @@ class Command(BaseCommand):
                                     level_reported=indicator_report.disaggregations.count(),
                                     disaggregation_reported_on=list(indicator_report.disaggregations.values_list(
                                         'id', flat=True)),
-                                    disaggregation=dict(),
+                                    disaggregation={
+                                        '()': {'c': 0, 'd': 0, 'v': 0}
+                                    },
                                 )
 
                         else:
@@ -152,7 +167,9 @@ class Command(BaseCommand):
                                     level_reported=indicator_report.disaggregations.count(),
                                     disaggregation_reported_on=list(indicator_report.disaggregations.values_list(
                                         'id', flat=True)),
-                                    disaggregation=dict(),
+                                    disaggregation={
+                                        '()': {'c': 0, 'd': 0, 'v': 0}
+                                    },
                                 )
 
                         indicator_report.progress_report = next_progress_report
@@ -174,10 +191,12 @@ class Command(BaseCommand):
                     indicator)
 
                 if not latest_indicator_report:
-                    date_list = indicator.cs_dates
+                    date_list = [indicator.start_date]
+                    date_list.extend(indicator.cs_dates)
 
                 else:
-                    date_list = filter(lambda item: item > latest_indicator_report.time_period_start, date_list)
+                    date_list = [latest_indicator_report.time_period_end + timedelta(days=1)]
+                    date_list.extend(filter(lambda item: item > latest_indicator_report.time_period_end, indicator.cs_dates))
 
             else:
                 # Get missing date list based on progress report existence
@@ -203,9 +222,20 @@ class Command(BaseCommand):
             print "Missing dates: {}".format(date_list)
 
             with transaction.atomic():
-                for missing_date in date_list:
-                    end_date = calculate_end_date_given_start_date(
-                        missing_date, frequency)
+                last_element_idx = len(date_list) - 1
+
+                for idx, missing_date in enumerate(date_list):
+                    if frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
+                        if idx != last_element_idx:
+                            end_date = calculate_end_date_given_start_date(
+                                missing_date, frequency, cs_dates=date_list)
+
+                        else:
+                            break
+
+                    else:
+                        end_date = calculate_end_date_given_start_date(
+                            missing_date, frequency)
 
                     if indicator.blueprint.unit == IndicatorBlueprint.NUMBER:
                         print "Creating Indicator {} Quantity IndicatorReport object for {} - {}".format(indicator, missing_date, end_date)
@@ -227,7 +257,9 @@ class Command(BaseCommand):
                                 level_reported=indicator_report.disaggregations.count(),
                                 disaggregation_reported_on=list(indicator_report.disaggregations.values_list(
                                     'id', flat=True)),
-                                disaggregation=dict(),
+                                disaggregation={
+                                    '()': {'c': 0, 'd': 0, 'v': 0}
+                                },
                             )
 
                     else:
@@ -250,5 +282,7 @@ class Command(BaseCommand):
                                 level_reported=indicator_report.disaggregations.count(),
                                 disaggregation_reported_on=list(indicator_report.disaggregations.values_list(
                                     'id', flat=True)),
-                                disaggregation=dict(),
+                                disaggregation={
+                                    '()': {'c': 0, 'd': 0, 'v': 0}
+                                },
                             )

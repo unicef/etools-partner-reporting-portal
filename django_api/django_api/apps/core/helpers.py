@@ -189,7 +189,7 @@ def get_last_date_of_a_quarter(year, quarter=1):
     return date_of_last_day_of_quarter
 
 
-def calculate_end_date_given_start_date(start_date, frequency):
+def calculate_end_date_given_start_date(start_date, frequency, cs_dates=None):
     end_date = None
 
     if frequency == PD_FREQUENCY_LEVEL.weekly:
@@ -208,6 +208,19 @@ def calculate_end_date_given_start_date(start_date, frequency):
 
         end_date = get_last_date_of_a_quarter(
             start_date.year, quarter=quarter)
+
+    elif frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
+        last_element_idx = len(cs_dates) - 1
+
+        for idx, cs_date in enumerate(cs_dates):
+            if cs_date > start_date:
+                if idx != last_element_idx:
+                    end_date = cs_date - timedelta(days=1)
+
+                else:
+                    end_date = cs_date
+
+                break
 
     return end_date
 
