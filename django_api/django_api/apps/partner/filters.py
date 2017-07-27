@@ -4,7 +4,7 @@ from django_filters.filters import ChoiceFilter, CharFilter, DateFilter
 
 from core.common import PD_STATUS
 
-from .models import PartnerProject, Partner
+from .models import PartnerProject, Partner, PartnerActivity
 
 
 class PartnerProjectFilter(filters.FilterSet):
@@ -46,3 +46,19 @@ class ClusterActivityPartnersFilter(django_filters.FilterSet):
 
     def get_partner(self, queryset, name, value):
         return queryset.filter(id=value)
+
+
+class PartnerActivityFilter(django_filters.FilterSet):
+
+    partner = CharFilter(method='get_partner')
+    project = CharFilter(method='get_project')
+
+    class Meta:
+        model = PartnerActivity
+        fields = ['partner', 'project']
+
+    def get_partner(self, queryset, name, value):
+        return queryset.filter(partner=value)
+
+    def get_project(self, queryset, name, value):
+        return queryset.filter(project=value)

@@ -6,6 +6,7 @@ from core.common import PD_STATUS
 from .models import (
     Partner,
     PartnerProject,
+    PartnerActivity,
 )
 
 
@@ -141,3 +142,19 @@ class ClusterActivityPartnersSerializer(serializers.ModelSerializer):
         return [
             pp.additional_information for pp in obj.partner_projects.all()
         ]
+
+
+class PartnerActivitySerializer(serializers.ModelSerializer):
+
+    cluster = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField()
+
+    class Meta:
+        model = PartnerActivity
+        fields = ('id', 'cluster', 'status', 'project', 'cluster_activity')
+
+    def get_cluster(self, obj):
+        return obj.cluster_activity.cluster_objective.cluster.title
+
+    def get_status(self, obj):
+        return obj.project and obj.project.status
