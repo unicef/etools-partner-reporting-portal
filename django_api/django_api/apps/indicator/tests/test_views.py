@@ -399,7 +399,7 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
 
 class TestClusterIndicatorAPIView(BaseAPITestCase):
 
-    generate_fake_data_quantity = 2
+    generate_fake_data_quantity = 3
 
     def setUp(self):
         super(TestClusterIndicatorAPIView, self).setUp()
