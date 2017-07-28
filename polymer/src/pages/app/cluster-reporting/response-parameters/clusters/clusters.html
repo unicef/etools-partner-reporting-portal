@@ -8,6 +8,7 @@
 
 <link rel="import" href="../../../../../styles/shared-styles.html">
 <link rel="import" href="../../../../../elements/page-header.html">
+<link rel="import" href="../../../../../behaviors/routing.html">
 <link rel="import" href="../../../../../behaviors/utils.html">
 <link rel="import" href="router.html">
 
@@ -84,16 +85,18 @@
 
         subpage: String,
 
-        tab: String
+        tab: String,
       },
 
       behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.RoutingBehavior,
         App.Behaviors.UtilsBehavior,
       ],
 
       observers: [
         '_routeChanged(routeData.subpage)',
-        '_tabChanged(tab)'
+        '_tabChanged(tab)',
       ],
 
       _routeChanged: function (subpage) {

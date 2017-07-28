@@ -62,12 +62,6 @@
         params-object="{{queryParams}}">
     </iron-query-params>
 
-    <etools-prp-ajax
-        id="plannedActionsProjects"
-        url="[[plannedActionsProjectsUrl]]"
-        params="[[queryParams]]">
-    </etools-prp-ajax>
-
     <app-route
       route="{{route}}"
       pattern="/:id"
@@ -176,24 +170,6 @@
         ],
 
         properties: {
-          pageSize: Number,
-
-          pageNumber: Number,
-
-          query: String,
-
-          queryParams: Object,
-
-          previousQueryParams: {
-            type: Object,
-            value: {}
-          },
-
-          plannedActionsProjectsUrl: {
-            type: String,
-            value: App.Endpoints.plannedActions()
-          },
-
           projects: {
             type: Object,
             statePath: 'partnerProjects.all',
@@ -224,10 +200,6 @@
           this.$$('#modal').open();
         },
 
-        observers: [
-          '_projectsAjax(queryParams)',
-        ],
-
         listeners: {
           'page-number-changed': '_pageNumberModified',
           'details-opened-changed': '_detailsChange'
@@ -239,26 +211,6 @@
             path = '/planned-action/project/' + project.id;
           }
           return this.buildUrl(this._baseUrlCluster, path);
-        },
-
-        // FIXME: query params are sometimes the same but different types (strings v. numbers)
-        _projectsAjax: function (queryParams) {
-          var thunk = this.$.plannedActionsProjects.thunk();
-
-          var areNewParams = !this._areObjectsEquivalent(this.previousQueryParams, queryParams);
-          this.previousQueryParams = queryParams;
-
-          if (!Object.keys(queryParams).length || !areNewParams) {
-            return;
-          }
-
-          // Cancel the pending request, if any
-          this.$.plannedActionsProjects.abort();
-
-          this.dispatch(App.Actions.PartnerProjects.fetchPartnerProjectsList(thunk))
-            .catch(function (err) { // jshint ignore:line
-                // TODO: error handling.
-            });
         },
 
         detached: function () {
