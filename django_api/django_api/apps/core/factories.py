@@ -96,7 +96,6 @@ class PartnerFactory(factory.django.DjangoModelFactory):
 
 class PartnerActivityFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "partner_activity_%d" % n)
-    project = factory.SubFactory('core.factories.PartnerProjectFactory')
 
     class Meta:
         model = PartnerActivity

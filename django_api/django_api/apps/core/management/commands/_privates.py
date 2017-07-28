@@ -186,6 +186,8 @@ def generate_fake_data(quantity=40):
         pp = PartnerProject.objects.all()[idx]
         co = ClusterObjective.objects.all()[idx]
         pa = PartnerActivity.objects.all()[idx]
+        pa.project = pp
+        pa.save()
 
         reportable_to_pp = QuantityReportableToPartnerProjectFactory(
             content_object=pp, indicator_report__progress_report=None
