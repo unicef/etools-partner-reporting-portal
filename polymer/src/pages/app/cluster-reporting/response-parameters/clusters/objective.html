@@ -3,6 +3,7 @@
 <link rel="import" href="../../../../../../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../../../../../../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../../../../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../../../../bower_components/iron-location/iron-location.html">
 
 <link rel="import" href="../../../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../../../elements/page-header.html">
@@ -44,10 +45,14 @@
     }
   </style>
 
+    <iron-location
+        query="{{query}}">
+    </iron-location>
+
     <etools-prp-ajax
-        id="objective"
-        url="[[objectiveUrl]]"
-        params="[[queryParams]]">
+      id="objective"
+      url="[[objectiveUrl]]"
+      params="[[queryParams]]">
     </etools-prp-ajax>
 
     <app-route
@@ -58,6 +63,7 @@
     </app-route>
 
     <page-header
+        is-cluster
         title="[[data.title]]"
         back="[[backLink]]">
 
@@ -125,17 +131,13 @@
 
         backLink: {
           type: String,
-          computed: '_computeBackLink(route)',
+          computed: '_computeBackLink(query)',
         },
       },
 
       observers: [
         '_updateUrlTab(routeData.tab)',
       ],
-
-      _computeBackLink: function () {
-        return 'TODO';
-      },
 
       _updateTabSelection: function () {
         this.$.tabContent.select(this.tab);
@@ -151,6 +153,10 @@
 
       _computeObjectiveUrl: function(objectiveId) {
         return App.Endpoints.responseParamtersClustersObjectiveDetail(objectiveId);
+      },
+
+      _computeBackLink: function(query) {
+        return '/response-parameters/clusters/objectives' + '?' + query;
       },
 
       attached: function () {

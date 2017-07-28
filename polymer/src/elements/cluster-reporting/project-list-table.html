@@ -170,6 +170,7 @@
         ],
 
         properties: {
+
           projects: {
             type: Object,
             statePath: 'partnerProjects.all',
@@ -210,7 +211,8 @@
           if (this.page === 'planned-action') {
             path = '/planned-action/project/' + project.id;
           }
-          return this.buildUrl(this._baseUrlCluster, path);
+          //Query string is passed to construct the back button.
+          return this.buildUrl(this._baseUrlCluster, path) + '?' + this.query;
         },
 
         detached: function () {

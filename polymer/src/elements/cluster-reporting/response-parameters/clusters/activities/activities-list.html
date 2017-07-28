@@ -124,7 +124,7 @@
 
       _detailUrl: function(id) {
         var path = '/response-parameters/clusters/activity/' + id;
-        return this.buildUrl(this._baseUrlCluster, path);
+        return this.buildUrl(this._baseUrlCluster, path) + '?' + this.query;
       },
 
     });

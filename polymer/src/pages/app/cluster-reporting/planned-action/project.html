@@ -3,6 +3,8 @@
 <link rel="import" href="../../../../../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../../../../../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../../../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../../../bower_components/iron-location/iron-query-params.html">
+<link rel="import" href="../../../../../bower_components/iron-location/iron-location.html">
 
 <link rel="import" href="../../../../behaviors/utils.html">
 <link rel="import" href="../../../../behaviors/routing.html">
@@ -43,6 +45,15 @@
     }
   </style>
 
+    <iron-location
+        query="{{query}}">
+    </iron-location>
+
+    <iron-query-params
+      params-string="{{query}}"
+      params-object="{{queryParams}}">
+    </iron-query-params>
+
     <etools-prp-ajax
       id="overview"
       url="[[overviewUrl]]"
@@ -57,6 +68,7 @@
     </app-route>
 
     <page-header
+        is-cluster
         title="[[projectData.title]]"
         back="[[backLink]]">
 
@@ -101,8 +113,8 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
-        App.Behaviors.RoutingBehavior,
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.RoutingBehavior,
       ],
 
       properties: {
@@ -111,6 +123,8 @@
         routeData: Object,
 
         projectId: String,
+
+        query: String,
 
         projectData: {
           type: Object,
@@ -124,7 +138,7 @@
 
         backLink: {
           type: String,
-          computed: '_computeBackLink(route)',
+          computed: '_computeBackLink(query)',
         },
       },
 
@@ -133,7 +147,7 @@
       ],
 
       _computeBackLink: function () {
-        return 'TODO';
+        return '/planned-action/projects' + '?' + this.query;
       },
 
       _updateTabSelection: function () {
