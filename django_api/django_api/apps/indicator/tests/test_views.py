@@ -17,7 +17,7 @@ from core.helpers import (
     suppress_stdout,
     get_cast_dictionary_keys_as_tuple,
 )
-from core.common import OVERALL_STATUS, PROGRESS_REPORT_STATUS
+from core.common import OVERALL_STATUS, PROGRESS_REPORT_STATUS, REPORTABLE_FREQUENCY_LEVEL
 from core.tests.base import BaseAPITestCase
 from unicef.models import (
     LowerLevelOutput,
@@ -412,6 +412,7 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
             'object_id': self.co.id,
             'object_type': 'ClusterObjective',
             'means_of_verification': 'IMO/CC calculation',
+            'frequency': REPORTABLE_FREQUENCY_LEVEL.weekly,
             'locations': [
                 {'id': Location.objects.first().id},
                 {'id': Location.objects.last().id},
@@ -438,6 +439,9 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
         self.assertEquals(Reportable.objects.count(), self.reportable_count+1)
         self.assertEquals(IndicatorBlueprint.objects.count(), self.blueprint_count+1)
+
+        reportable = Reportable.objects.get(id=response.data['reportable_id'])
+        self.assertEquals(reportable.frequency, REPORTABLE_FREQUENCY_LEVEL.weekly)
 
         rep_dis = Disaggregation.objects.filter(reportable=response.data['reportable_id'])
         self.assertTrue(rep_dis.first().name in ['Gender', 'Age'])

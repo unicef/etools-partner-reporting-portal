@@ -548,6 +548,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             'object_type',
             'locations',
             'disaggregation',
+            'frequency',
         )
 
     def check_location(self, locations):
