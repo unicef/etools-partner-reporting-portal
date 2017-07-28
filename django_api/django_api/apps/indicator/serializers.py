@@ -10,6 +10,7 @@ from rest_framework.exceptions import ValidationError
 
 from unicef.models import LowerLevelOutput
 
+from core.common import REPORTABLE_FREQUENCY_LEVEL
 from core.serializers import SimpleLocationSerializer, IdLocationSerializer
 from core.models import Location
 from cluster.models import ClusterObjective, ClusterActivity
@@ -549,6 +550,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             'locations',
             'disaggregation',
             'frequency',
+            'cs_dates',
         )
 
     def check_location(self, locations):

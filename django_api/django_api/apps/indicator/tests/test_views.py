@@ -1,5 +1,5 @@
 from ast import literal_eval as make_tuple
-from datetime import date
+from datetime import date, timedelta
 
 from django.urls import reverse
 from django.conf import settings
@@ -294,16 +294,28 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
             {"locations": "List of dict location or one dict location expected"}
         )
 
-    def test_create_indicator_cluster_activities_reporting(self):
+    def test_create_csdates_indicator_cluster_activities_reporting(self):
+        cs_dates = [
+            date.today().strftime(settings.INPUT_DATA_FORMAT),
+            (date.today() + timedelta(days=3)).strftime(settings.INPUT_DATA_FORMAT),
+            (date.today() + timedelta(days=6)).strftime(settings.INPUT_DATA_FORMAT),
+            (date.today() + timedelta(days=9)).strftime(settings.INPUT_DATA_FORMAT),
+        ]
         ca = ClusterActivity.objects.first()
         self.data['object_id'] = ca.id
         self.data['object_type'] = 'ClusterActivity'
+        self.data['cs_dates'] = cs_dates
+        self.data['frequency'] = REPORTABLE_FREQUENCY_LEVEL.custom_specific_dates
         response = self.client.post(self.url, data=self.data, format='json')
 
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
         self.assertEquals(Reportable.objects.count(), self.reportable_count+1)
         self.assertEquals(IndicatorBlueprint.objects.count(), self.blueprint_count+1)
+
+        reportable = Reportable.objects.get(id=response.data['reportable_id'])
+        self.assertEquals(reportable.frequency, REPORTABLE_FREQUENCY_LEVEL.custom_specific_dates)
+        self.assertEquals(len(reportable.cs_dates), len(cs_dates))
 
     def test_create_indicator_partner_project_reporting(self):
         pp = PartnerProject.objects.first()
