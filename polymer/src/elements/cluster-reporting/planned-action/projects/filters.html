@@ -48,12 +48,12 @@
           value="[[queryParams.title]]">
         </text-filter>
 
-        <cluster-location-filter
+        <!-- FIXME: Bug #209 -->
+        <!-- <cluster-location-filter
           class="item filter-2-col"
           value="[[_withDefault(queryParams.location, '')]]">
-        </cluster-location-filter>
+        </cluster-location-filter> -->
 
-        <!-- FIXME: Making the URL query string go crazy. -->
         <!-- <project-status-filter
           value="[[_withDefault(queryParams.status, '')]]">
         </project-status-filter> -->

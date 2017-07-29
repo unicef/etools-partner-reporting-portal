@@ -104,9 +104,9 @@
         },
       },
 
-      _computeBackUrl: function (back, baseUrl, isCluster) {
+      _computeBackUrl: function (tail, baseUrl, isCluster) {
         if (isCluster) {
-          return this.buildUrl(this._baseUrlCluster, back);
+          return this.buildUrl(this._baseUrlCluster, tail);
         }
         return tail ? this.buildUrl(baseUrl, tail) : '';
       },
