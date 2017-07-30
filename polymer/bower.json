@@ -50,8 +50,7 @@
     "app-layout": "PolymerElements/app-layout#^1.0.1"
   },
   "devDependencies": {
-    "web-component-tester": "^4.0.0",
-    "etools-datepicker": "^1.0.11"
+    "web-component-tester": "^4.0.0"
   },
   "resolutions": {
     "paper-styles": "^1.2.0",

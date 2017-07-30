@@ -2,6 +2,7 @@
 
 <link rel="import" href="../../../elements/page-header.html">
 <link rel="import" href="../../../elements/page-body.html">
+<link rel="import" href="../../../elements/cluster-reporting/indicator-modal.html">
 
 <dom-module id="page-cluster-reporting-analysis">
   <template>
@@ -13,17 +14,19 @@
 
     <page-header title="Analysis"></page-header>
 
-    <page-body></page-body>
-
+    <page-body>
+      <indicator-modal id="modal"></indicator-modal>
+      <button on-tap="_test">TEST</button>
+    </page-body>
   </template>
 
   <script>
     Polymer({
       is: 'page-cluster-reporting-analysis',
 
-      behaviors: [
-        App.Behaviors.ReduxBehavior,
-      ],
+      _test: function () {
+        this.$.modal.open();
+      },
     });
   </script>
 </dom-module>
