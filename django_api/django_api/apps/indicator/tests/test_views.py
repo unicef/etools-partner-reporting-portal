@@ -1,5 +1,5 @@
 from ast import literal_eval as make_tuple
-from datetime import date
+from datetime import date, timedelta
 
 from django.urls import reverse
 from django.conf import settings
@@ -231,172 +231,6 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
             self.assertEquals(len(response.data), 2)
 
 
-# TODO: Re-enable this test case at #35 branch
-# class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
-#     generate_fake_data_quantity = 5
-#
-#     def test_put_api(self):
-#         indicator_location_data = IndicatorLocationData.objects.last()
-#         data = [{
-#             "id": 1047,
-#             "location": {
-#               "id": 257,
-#               "title": "location_2",
-#               "latitude": None,
-#               "longitude": None,
-#               "p_code": None
-#             },
-#             "disaggregation": {
-#               "(1773,)": {
-#                 "c": None,
-#                 "d": None,
-#                 "v": 58
-#               },
-#               "()": {
-#                 "c": None,
-#                 "d": None,
-#                 "v": 169
-#               },
-#               "(1776,)": {
-#                 "c": None,
-#                 "d": None,
-#                 "v": 93
-#               },
-#               "(1775,)": {
-#                 "c": None,
-#                 "d": None,
-#                 "v": 127
-#               },
-#               "(1774,)": {
-#                 "c": None,
-#                 "d": None,
-#                 "v": 150
-#               }
-#             },
-#             "num_disaggregation": 3,
-#             "level_reported": 1,
-#             "disaggregation_reported_on": [
-#               509
-#             ]
-#           },
-#           {
-#             "id": 1048,
-#             "location": {
-#               "id": 257,
-#               "title": "location_2",
-#               "latitude": None,
-#               "longitude": None,
-#               "p_code": None
-#             },
-#             "disaggregation": {
-#               "(1778,)": {
-#                 "c": None,
-#                 "d": None,
-#                 "v": 135
-#               },
-#               "(1781,)": {
-#                 "c": None,
-#                 "d": None,
-#                 "v": 141
-#               },
-#               "(1779,)": {
-#                 "c": None,
-#                 "d": None,
-#                 "v": 72
-#               },
-#               "(1780,)": {
-#                 "c": None,
-#                 "d": None,
-#                 "v": 190
-#               },
-#               "()": {
-#                 "c": None,
-#                 "d": None,
-#                 "v": 191
-#               },
-#               "(1782,)": {
-#                 "c": None,
-#                 "d": None,
-#                 "v": 167
-#               },
-#               "(1777,)": {
-#                 "c": None,
-#                 "d": None,
-#                 "v": 106
-#               }
-#             },
-#             "num_disaggregation": 3,
-#             "level_reported": 1,
-#             "disaggregation_reported_on": [
-#               510
-#             ]
-#           },
-#           {
-#             "id": 1049,
-#             "location": {
-#               "id": 257,
-#               "title": "location_2",
-#               "latitude": None,
-#               "longitude": None,
-#               "p_code": None
-#             },
-#             "disaggregation": {
-#               "(1785,)": {
-#                 "c": None,
-#                 "d": None,
-#                 "v": 195
-#               },
-#               "(1784,)": {
-#                 "c": None,
-#                 "d": None,
-#                 "v": 132
-#               },
-#               "()": {
-#                 "c": None,
-#                 "d": None,
-#                 "v": 103
-#               },
-#               "(1783,)": {
-#                 "c": None,
-#                 "d": None,
-#                 "v": 63
-#               }
-#             },
-#             "num_disaggregation": 3,
-#             "level_reported": 1,
-#             "disaggregation_reported_on": [
-#               511
-#             ]
-#           },
-#           {
-#             "id": 1050,
-#             "location": {
-#               "id": 258,
-#               "title": "location_3",
-#               "latitude": None,
-#               "longitude": None,
-#               "p_code": None
-#             },
-#             "disaggregation": {
-#               "()": {
-#                 "c": None,
-#                 "d": None,
-#                 "v": 50
-#               }
-#             },
-#             "num_disaggregation": 3,
-#             "level_reported": 0,
-#             "disaggregation_reported_on": []
-#           }
-#         ]
-#
-#         url = reverse('indicator-location-data-entries-put-api')
-#         response = self.client.put(url, data, format='json')
-#
-#         self.assertEquals(response.status_code, status.HTTP_200_OK)
-#         self.assertEquals(response.data, data)
-
-
 class TestClusterIndicatorAPIView(BaseAPITestCase):
 
     generate_fake_data_quantity = 3
@@ -460,16 +294,28 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
             {"locations": "List of dict location or one dict location expected"}
         )
 
-    def test_create_indicator_cluster_activities_reporting(self):
+    def test_create_csdates_indicator_cluster_activities_reporting(self):
+        cs_dates = [
+            date.today().strftime(settings.INPUT_DATA_FORMAT),
+            (date.today() + timedelta(days=3)).strftime(settings.INPUT_DATA_FORMAT),
+            (date.today() + timedelta(days=6)).strftime(settings.INPUT_DATA_FORMAT),
+            (date.today() + timedelta(days=9)).strftime(settings.INPUT_DATA_FORMAT),
+        ]
         ca = ClusterActivity.objects.first()
         self.data['object_id'] = ca.id
         self.data['object_type'] = 'ClusterActivity'
+        self.data['cs_dates'] = cs_dates
+        self.data['frequency'] = REPORTABLE_FREQUENCY_LEVEL.custom_specific_dates
         response = self.client.post(self.url, data=self.data, format='json')
 
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
         self.assertEquals(Reportable.objects.count(), self.reportable_count+1)
         self.assertEquals(IndicatorBlueprint.objects.count(), self.blueprint_count+1)
+
+        reportable = Reportable.objects.get(id=response.data['reportable_id'])
+        self.assertEquals(reportable.frequency, REPORTABLE_FREQUENCY_LEVEL.custom_specific_dates)
+        self.assertEquals(len(reportable.cs_dates), len(cs_dates))
 
     def test_create_indicator_partner_project_reporting(self):
         pp = PartnerProject.objects.first()
