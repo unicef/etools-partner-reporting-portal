@@ -103,13 +103,14 @@
       </div>
 
       <paper-dialog-scrollable>
-        <iron-form>
+        <iron-form id="create">
           <div class="row">
             <paper-input
               id="title"
               label="Cluster Objective Title"
               value="{{data.title}}"
               type="string"
+              error-message="A title is required."
               required>
             </paper-input>
           </div>
@@ -121,7 +122,7 @@
               label="CO ref #"
               value="{{data.reference_number}}"
               type="string"
-              required>
+              error-message="A reference number is required.">
             </paper-input>
 
             <cluster-dropdown-input
@@ -141,11 +142,10 @@
 
           </div>
         </iron-form>
-
       </paper-dialog-scrollable>
 
       <div class="buttons layout horizontal-reverse">
-        <paper-button class="btn-primary" on-tap="_save" raised>
+        <paper-button class="btn-primary" on-click="validate" raised>
           Save
         </paper-button>
 
@@ -222,6 +222,31 @@
         var path = '/response-parameters/clusters/objective/' + String(id);
         var url = this.buildUrl(this._baseUrlCluster, path);
         this.set('path', url);
+      },
+
+      validate: function() {
+        var valid = true;
+        if (!this.data.title) {
+          valid = false;
+          this.$.title.invalid = true;
+        }
+        if (!this.data.reference_number) {
+          valid = false;
+          this.$.reference_number.invalid = true;
+        }
+        if (!this.data.cluster) {
+          valid = false;
+          this.$.cluster.invalid = true;
+        }
+        if (!this.data.frequency) {
+          valid = false;
+          this.$.frequency.invalid = true;
+        }
+
+        if (valid) {
+          this._save();
+        }
+        return valid;
       },
 
       _save: function () {
