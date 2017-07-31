@@ -150,7 +150,12 @@ planned-action-projects-router.
       },
 
       _resetPage: function () {
-        this.set('queryParams', {});
+        var queryParams = {};
+        // Cluster filtering should persist across tabs.
+        if (this.queryParams.cluster_id) {
+          queryParams.cluster_id = this.queryParams.cluster_id;
+        }
+        this.set('queryParams', queryParams);
       },
     });
   </script>
