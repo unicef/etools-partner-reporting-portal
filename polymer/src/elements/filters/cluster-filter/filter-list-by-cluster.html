@@ -36,11 +36,6 @@
       properties: {
         queryParams: Object,
 
-        filters: {
-          type: Array,
-          value: [],
-        },
-
         clusterId: {
           type: Number,
           statePath: 'clusters.filterByClusterId'
@@ -54,8 +49,6 @@
 
       listeners: {
         'filter-changed': '_onFilterChanged',
-        'register-filter': '_registerFilter',
-        'deregister-filter': '_deregisterFilter',
       },
 
       _onFilterChanged: function (e, change) {
@@ -72,24 +65,6 @@
         this.set('queryParams', newParams);
 
         this._resetPageNumber();
-      },
-
-      _registerFilter: function (e, name) {
-        e.stopPropagation();
-
-        this.push('filters', name);
-      },
-
-      _deregisterFilter: function (e, name) {
-        e.stopPropagation();
-
-        var index = this.filters.indexOf(name);
-
-        if (index === -1) {
-          return;
-        }
-
-        this.splice('filters', index, 1);
       },
 
       _resetPageNumber: function () {
