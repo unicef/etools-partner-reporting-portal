@@ -13,7 +13,7 @@
           dispatch(App.Actions.PartnerProjects.partnerProjectsLoadingStart());
           return thunk()
             .catch(function () {
-              dispatch(App.Actions.PartnerProjects.partnerProjectsLoadingStart());
+              dispatch(App.Actions.PartnerProjects.partnerProjectsLoadingStop());
             })
             .then(function (res) {
               dispatch(App.Actions.PartnerProjects.setPartnerProjectsList(res.data));

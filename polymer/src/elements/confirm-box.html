@@ -2,6 +2,7 @@
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
+<link rel="import" href="../constants.html">
 <link rel="import" href="../polyfills/es6-shim.html">
 <link rel="import" href="../styles/buttons.html">
 
@@ -13,7 +14,6 @@
       }
 
       .overlay {
-        position: absolute;
         left: 0;
         right: 0;
         top: 0;
@@ -34,8 +34,12 @@
     <template
         is="dom-if"
         if="[[active]]">
-      <div class="overlay layout horizontal center-center">
-        <div class="prompt">
+      <div
+          class="overlay layout horizontal center-center"
+          style="position: [[position]];">
+        <div
+            class="prompt"
+            style="max-width: [[config.maxWidth]];">
           <p>
             [[config.body]]
           </p>
@@ -66,13 +70,30 @@
           value: false,
         },
 
+        position: {
+          type: String,
+          computed: '_computePosition(config)',
+        },
+
         config: {
           type: Object,
           value: {
             okLabel: 'Continue',
             cancelLabel: 'Cancel',
+            maxWidth: '100%',
+            mode: App.Constants.CONFIRM_INLINE,
           },
         },
+      },
+
+      _computePosition: function (config) {
+        switch (config.mode) {
+          case App.Constants.CONFIRM_INLINE:
+            return 'absolute';
+
+          case App.Constants.CONFIRM_MODAL:
+            return 'fixed';
+        }
       },
 
       _ok: function () {

@@ -22,7 +22,7 @@
     <etools-prp-ajax
         id="programmeDocuments"
         url="[[programmeDocumentsUrl]]"
-        params="[[computedQueryParams]]">
+        params="[[queryParams]]">
     </etools-prp-ajax>
 
     <iron-location
@@ -91,15 +91,10 @@
           type: Object,
           statePath: App.Selectors.ProgrammeDocuments.current,
         },
-
-        computedQueryParams: {
-          type: Object,
-          value: {},
-        },
       },
 
       observers: [
-        '_handleInputChange(programmeDocumentsUrl, computedQueryParams)',
+        '_handleInputChange(programmeDocumentsUrl, queryParams)',
         '_routePdIdChanged(routeData.pd_id)',
         '_routePathChanged(route.path)',
         '_computeQueryParams(queryParams, subroute.path)',

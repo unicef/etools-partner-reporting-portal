@@ -22,26 +22,36 @@ from .base import BaseAPITestCase
 
 class TestInterventionListAPIView(BaseAPITestCase):
 
-    generate_fake_data_quantity = 40
-
     def test_list_api(self):
         url = reverse('simple-intervention')
         response = self.client.get(url, format='json')
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(response.data), Intervention.objects.count())
+        self.assertEquals(
+            len(response.data),
+            Intervention.objects.prefetch_related('locations').filter(locations__isnull=False).distinct().count()
+        )
 
 
 class TestLocationListAPIView(BaseAPITestCase):
 
-    generate_fake_data_quantity = 40
-
     def test_list_api(self):
-        url = reverse('simple-location')
+        response_plan_id = ResponsePlan.objects.first().id
+        url = reverse('simple-location', kwargs={'response_plan_id': response_plan_id})
         response = self.client.get(url, format='json')
 
+        result = ResponsePlan.objects.filter(id=response_plan_id).values_list(
+            'clusters__cluster_objectives__reportables__locations',
+            'clusters__cluster_objectives__cluster_activities__reportables__locations',
+            'clusters__partner_projects__reportables__locations',
+            'clusters__partner_projects__partner_activities__reportables__locations',
+        ).distinct()
+        pks = []
+        [pks.extend(filter(lambda x: x is not None, part)) for part in result]
+        expected = Location.objects.filter(pk__in=pks).count()
+
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(response.data), Location.objects.count())
+        self.assertEquals(len(response.data), expected)
 
 
 class TestResponsePlanAPIView(BaseAPITestCase):

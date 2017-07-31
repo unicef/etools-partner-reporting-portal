@@ -95,11 +95,19 @@
 
         backUrl: {
           type: String,
-          computed: '_computeBackUrl(back, _baseUrl)',
+          computed: '_computeBackUrl(back, _baseUrl, isCluster)'
+        },
+
+        isCluster: {
+          type: Boolean,
+          default: false
         },
       },
 
-      _computeBackUrl: function (tail, baseUrl) {
+      _computeBackUrl: function (tail, baseUrl, isCluster) {
+        if (isCluster) {
+          return this.buildUrl(this._baseUrlCluster, tail);
+        }
         return tail ? this.buildUrl(baseUrl, tail) : '';
       },
     });

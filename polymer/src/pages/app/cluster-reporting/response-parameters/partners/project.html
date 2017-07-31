@@ -3,6 +3,7 @@
 <link rel="import" href="../../../../../../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../../../../../../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../../../../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../../../../bower_components/iron-location/iron-location.html">
 
 <link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/partners/projects/overview.html">
 <link rel="import" href="../../../../../elements/page-body.html">
@@ -26,9 +27,13 @@
       }
     </style>
 
+    <iron-location
+      query="{{query}}">
+    </iron-location>
+
     <etools-prp-ajax
-        id="project"
-        url="[[overviewUrl]]">
+      id="project"
+      url="[[overviewUrl]]">
     </etools-prp-ajax>
 
     <app-route
@@ -39,6 +44,7 @@
     </app-route>
 
     <page-header
+        is-cluster
         title="[[projectData.title]]"
         back="[[backLink]]">
 
@@ -101,12 +107,12 @@
 
         backLink: {
           type: String,
-          computed: '_computeBackLink(route)',
+          computed: '_computeBackLink(query)',
         },
       },
 
-      _computeBackLink: function () {
-        return 'TODO';
+      _computeBackLink: function(query) {
+        return '/response-parameters/partners/projects' + '?' + query;
       },
 
       _computeOverviewUrl: function(projectId) {

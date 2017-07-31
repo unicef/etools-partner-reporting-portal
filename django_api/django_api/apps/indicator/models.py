@@ -205,7 +205,7 @@ class IndicatorReport(TimeStampedModel):
     title = models.CharField(max_length=255)
     reportable = models.ForeignKey(Reportable, related_name="indicator_reports")
     progress_report = models.ForeignKey('unicef.ProgressReport', related_name="indicator_reports", null=True)
-    time_period_start = models.DateField(auto_now=True)  # first day of defined frequency mode
+    time_period_start = models.DateField()  # first day of defined frequency mode
     time_period_end = models.DateField()  # last day of defined frequency mode
     due_date = models.DateField()  # can be few days/weeks out of the "end date"
     submission_date = models.DateField(null=True, blank=True, verbose_name="Date of submission")
@@ -244,6 +244,30 @@ class IndicatorReport(TimeStampedModel):
         if self.submission_date is None and IndicatorLocationData.objects.filter(indicator_report=self).exists():
             return True
         return False
+
+    @property
+    def is_percentage(self):
+        return self.display_type == self.reportable.blueprint.PERCENTAGE
+
+    @property
+    def is_number(self):
+        return self.display_type == self.reportable.blueprint.NUMBER
+
+    @property
+    def can_submit(self):
+        if self.submission_date is not None and self.report_status == INDICATOR_REPORT_STATUS.sent_back:
+            pass  # lets go and check throw disaggregation
+        elif self.submission_date and  self.report_status in [
+                INDICATOR_REPORT_STATUS.accepted, INDICATOR_REPORT_STATUS.submitted]:
+            return False
+
+        for data in self.indicator_location_data.all():
+            for key, vals in data.disaggregation.iteritems():
+                if self.is_percentage and (vals.get('c', None) in [None, '']):
+                    return False
+                elif self.is_number and (vals.get('v', None) in [None, '']):
+                    return False
+        return True
 
     @property
     def progress_report_status(self):

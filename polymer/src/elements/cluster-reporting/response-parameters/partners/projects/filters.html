@@ -9,6 +9,8 @@
 <link rel="import" href="../../../../filters/dropdown-filter/dropdown-filter.html">
 <link rel="import" href="../../../../filters/checkbox-filter/checkbox-filter.html">
 <link rel="import" href="../../../../filters/date-filter/date-filter.html">
+<link rel="import" href="../../../../filters/status-filter/project-status-filter.html">
+<link rel="import" href="../../../../filters/cluster-location-filter/cluster-location-filter.html">
 
 <dom-module id="partner-projects-filters">
   <template>
@@ -18,15 +20,11 @@
         margin-bottom: 25px;
         background: white;
 
-        --app-grid-columns: 4;
+        --app-grid-columns: 3;
         --app-grid-gutter: 25px;
         --app-grid-item-height: auto;
-        --app-grid-expandible-item-columns: 4;
       }
 
-      .incomplete {
-        @apply --app-grid-expandible-item;
-      }
     </style>
 
     <iron-location
@@ -40,40 +38,30 @@
 
     <filter-list filters="{{filters}}">
       <div class="app-grid">
-
         <text-filter
-            class="item"
-            label="Partner"
-            name="partner"
-            value="[[queryParams.partner]]">
+          class="item"
+          label="Partner"
+          name="partner"
+          value="[[queryParams.partner]]">
         </text-filter>
 
         <text-filter
-            class="item"
-            label="Project"
-            name="title"
-            value="[[queryParams.title]]">
+          class="item"
+          label="Project"
+          name="title"
+          value="[[queryParams.title]]">
         </text-filter>
 
-        <dropdown-filter
-            class="item"
-            label="Status"
-            name="status"
-            value="[[_withDefault(queryParams.status, '')]]"
-            data="[[statuses]]">
-        </dropdown-filter>
+        <!-- FIXME: Bug #209 -->
+        <!-- <project-status-filter
+          value="[[_withDefault(queryParams.status, '')]]">
+        </project-status-filter>
 
-        <!-- TODO: Implement location filter -->
-        <dropdown-filter
-            class="item"
-            label="Location"
-            name="location"
-            value="[[value]]"
-            data="[[locations]]">
-        </dropdown-filter>
+        <cluster-location-filter
+          class="item"
+          value="[[_withDefault(queryParams.location, '')]]">
+        </cluster-location-filter> -->
       </div>
-
-
     </filter-list>
   </template>
 
@@ -86,22 +74,14 @@
       ],
 
       properties: {
-
-        queryParams: Object,
+        filters: {
+          type: Object,
+          notify: true,
+        },
 
         locations: [
           {title: 'All', id: ''}
         ],
-
-        statuses: {
-          type: Array,
-          value: [
-            {title: 'All', id: ''},
-            {title: 'Ongoing', id: 'Ong'},
-            {title: 'Planned', id: 'Pla'},
-            {title: 'Completed', id: 'Com'},
-          ],
-        },
 
       },
 

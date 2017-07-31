@@ -14,7 +14,7 @@
 
 <link rel="import" href="../../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../../elements/etools-prp-date-input.html">
-<link rel="import" href="../../../../elements/dropdown-form-input.html">
+<link rel="import" href="../../../../elements/form-fields/dropdown-form-input.html">
 <link rel="import" href="../../../../behaviors/routing.html">
 <link rel="import" href="../../../../redux/store.html">
 <link rel="import" href="../../../../redux/actions.html">
@@ -124,7 +124,7 @@
                  class="flex self-stretch"
                  label="Cluster"
                  id="cluster"
-                 selected="{{data.cluster}}"
+                 value="{{data.cluster}}"
                  disabled="true"
                  data="[[clusters]]">
               </dropdown-form-input>
@@ -134,7 +134,7 @@
                  label="Location"
                  id="location"
                  disabled="true"
-                 selected="{{data.location}}"
+                 value="{{data.location}}"
                  data="[[locations]]">
               </dropdown-form-input>
           </div>
@@ -163,7 +163,7 @@
                  class="flex self-stretch"
                  label="Status"
                  id="status"
-                 selected="{{data.status}}"
+                 value="{{data.status}}"
                  data="[[statuses]]">
               </dropdown-form-input>
 
@@ -171,7 +171,7 @@
                  class="flex self-stretch"
                  label="Frequency of reporting"
                  id="frequency"
-                 selected="{{data.frequency}}"
+                 value="{{data.frequency}}"
                  data="[[frequencies]]">
               </dropdown-form-input>
           </div>
@@ -312,23 +312,11 @@
 
       close: function () {
         this.set('opened', false);
-        this.data = {locations: [], clusters: []};
       },
 
       open: function () {
+        this.data = {locations: [], clusters: []};
         this.set('opened', true);
-      },
-
-      // Dropdowns provide the index of the selected item.
-      // This function is temporary. TODO:
-      // Need to refactor so dropdown-form-input will return value, not index.
-      _getDropdownIds: function() {
-        if (typeof(this.data.frequency) === 'number') {
-          this.data.frequency = this.frequencies[this.data.frequency].id;
-        }
-        if (typeof(this.data.status) === 'number') {
-          this.data.status = this.statuses[this.data.status].id;
-        }
       },
 
       _redirectToDetail: function(id) {
@@ -339,7 +327,6 @@
 
       _save: function () {
         var self = this;
-        this._getDropdownIds();
         this.updatePending = true;
         var thunk = this.$.createProject.thunk();
         thunk()

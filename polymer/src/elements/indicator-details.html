@@ -1,26 +1,26 @@
-<link rel="import" href="../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
-<link rel="import" href="../../../bower_components/paper-tabs/paper-tab.html">
-<link rel="import" href="../../../bower_components/paper-tabs/paper-tabs.html">
-<link rel="import" href="../../../bower_components/iron-pages/iron-pages.html">
-<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
-<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
-<link rel="import" href="../../../bower_components/iron-icons/maps-icons.html">
-<link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
-<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/etools-loading/etools-loading.html">
+<link rel="import" href="../../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
 
-<link rel="import" href="../etools-prp-ajax.html">
-<link rel="import" href="../status-badge.html">
-<link rel="import" href="../disaggregations/disaggregation-table.html">
-<link rel="import" href="../disaggregations/disaggregation-modal.html">
-<link rel="import" href="../../endpoints.html">
-<link rel="import" href="../../behaviors/utils.html">
-<link rel="import" href="../../redux/store.html">
-<link rel="import" href="../../redux/actions.html">
-<link rel="import" href="../../redux/selectors/programmeDocumentReports.html">
-<link rel="import" href="../../redux/selectors/programmeDocuments.html">
-<link rel="import" href="../../polyfills/es6-shim.html">
-<link rel="import" href="../../styles/buttons.html">
+<link rel="import" href="etools-prp-ajax.html">
+<link rel="import" href="status-badge.html">
+<link rel="import" href="disaggregations/disaggregation-table.html">
+<link rel="import" href="disaggregations/disaggregation-modal.html">
+<link rel="import" href="../endpoints.html">
+<link rel="import" href="../behaviors/utils.html">
+<link rel="import" href="../redux/store.html">
+<link rel="import" href="../redux/actions.html">
+<link rel="import" href="../redux/selectors/programmeDocumentReports.html">
+<link rel="import" href="../redux/selectors/programmeDocuments.html">
+<link rel="import" href="../polyfills/es6-shim.html">
+<link rel="import" href="../styles/buttons.html">
 
 <dom-module id="indicator-details">
   <template>
@@ -44,6 +44,10 @@
         padding: 10px 25px;
         border-bottom: 1px solid var(--paper-grey-300);
         background: var(--paper-grey-100);
+      }
+
+      .tab-header paper-button {
+        margin: 0;
       }
 
       .tab-header dl {
@@ -85,9 +89,13 @@
       }
 
       .current-pd {
-        margin: 0 0 1em;
+        margin: 0;
         font-size: 12px;
         color: var(--theme-primary-text-color-medium);
+      }
+
+      disaggregation-modal disaggregation-table {
+        margin-top: 1em;
       }
     </style>
 
@@ -171,7 +179,7 @@
                     if="[[!_equals(computedMode, 'view')]]">
                   <disaggregation-modal
                       id="modal-[[index]]"
-                      reporting-period="[[currentReport.reporting_period]]"
+                      reporting-period="[[reportingPeriod]]"
                       on-opened-changed="_updateModals">
                     <div class="meta">
                       <h3>[[indicatorName]]</h3>
@@ -179,9 +187,14 @@
                         <iron-icon icon="maps:place"></iron-icon>
                         [[location.location.title]]
                       </p>
-                      <p class="current-pd">
-                        [[currentPD.agreement]] | [[currentPD.title]]
-                      </p>
+                      <template
+                          is="dom-if"
+                          if="[[hasPD]]"
+                          restamp="true">
+                        <p class="current-pd">
+                          [[currentPD.agreement]] | [[currentPD.title]]
+                        </p>
+                      </template>
                     </div>
                     <template
                         is="dom-if"
@@ -222,6 +235,8 @@
 
         reportableId: Number,
 
+        reportingPeriod: String,
+
         opened: Object,
 
         selected: {
@@ -244,6 +259,11 @@
           statePath: App.Selectors.ProgrammeDocuments.current,
         },
 
+        hasPD: {
+          type: Boolean,
+          computed: '_computeHasPD(currentPD)',
+        },
+
         disaggregationsUrl: {
           type: String,
           computed: '_computeDisaggregationsUrl(reportableId)',
@@ -264,13 +284,9 @@
           computed: '_computeDisaggregations(data, indicatorId)',
         },
 
-        currentReport: {
-          type: Object,
-          statePath: App.Selectors.ProgrammeDocumentReports.current,
-        },
-
         mode: {
           type: String,
+          value: '',
           statePath: 'programmeDocumentReports.current.mode',
         },
 
@@ -283,6 +299,10 @@
           type: String,
           computed: '_computeMode(mode, overrideMode)',
         },
+      },
+
+      listeners: {
+        'location-updated': '_onLocationUpdated',
       },
 
       init: function () {
@@ -355,6 +375,28 @@
 
       _computeLocationStatus: function (location) {
         return location.is_complete ? 'success' : 'error';
+      },
+
+      _computeHasPD: function (currentPD) {
+        return !!Object.keys(currentPD).length;
+      },
+
+      _onLocationUpdated: function (e) {
+        e.stopPropagation();
+
+        var allComplete = this.disaggregations.indicator_location_data
+            .every(function (location) {
+              return location.is_complete;
+            });
+
+        if (!allComplete) {
+          return;
+        }
+
+        this.fire('report-complete', {
+          indicatorId: this.indicatorId,
+          reportableId: this.reportableId,
+        });
       },
 
       attached: function () {
