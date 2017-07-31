@@ -9,7 +9,6 @@
 <link rel="import" href="../../../styles/shared-styles.html">
 <link rel="import" href="../../../elements/page-header.html">
 <link rel="import" href="../../../elements/filters/cluster-filter/filter-list-by-cluster.html">
-<link rel="import" href="../../../elements/filters/cluster-filter/cluster-filter.html">
 <link rel="import" href="planned-action/router.html">
 
 
@@ -24,6 +23,10 @@ planned-action-projects-router.
     <style include="shared-styles iron-flex iron-flex-alignment">
       :host {
         display: block;
+      }
+
+      page-header {
+        padding-top: 0;
       }
 
       .tabs paper-tab {
@@ -55,9 +58,8 @@ planned-action-projects-router.
       <div class="page-top-content">
         <page-header title="My Planned Action">
           <div class="toolbar horizontal end-justified layout">
-            <filter-list-by-cluster filters="{{filters}}">
-              <cluster-filter>
-              </cluster-filter>
+            <filter-list-by-cluster
+              filters="{{filters}}">
             </filter-list-by-cluster>
           </div>
           <div class="tabs">
