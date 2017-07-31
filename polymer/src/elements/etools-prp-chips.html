@@ -29,8 +29,10 @@
       }
 
       .chip__actions iron-icon {
-        width: 20px;
-        height: 20px;
+        width: 18px;
+        height: 18px;
+        position: relative;
+        top: -2px;
         color: var(--paper-deep-orange-a700);
         cursor: pointer;
       }
@@ -116,6 +118,10 @@
         value.splice(toRemove, 1);
 
         this.set('value', value);
+      },
+
+      detached: function () {
+        this.set('value', []);
       },
     });
   </script>
