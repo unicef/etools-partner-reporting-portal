@@ -19,3 +19,5 @@ factory_boy==2.8.1
 
 # WSGI
 uwsgi==2.0.15
+
+openpyxl==2.4.8
