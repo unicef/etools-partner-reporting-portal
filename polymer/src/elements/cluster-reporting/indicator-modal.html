@@ -14,10 +14,14 @@
 <link rel="import" href="../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-multi-selection-menu.html">
 
 <link rel="import" href="chip-date-of-report.html">
 <link rel="import" href="../labelled-item.html">
 <link rel="import" href="../etools-prp-chips.html">
+<link rel="import" href="../etools-prp-ajax.html">
+<link rel="import" href="../../endpoints.html">
+<link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/modal.html">
 <link rel="import" href="../../styles/buttons.html">
@@ -58,6 +62,11 @@
         width: 100%;
       }
     </style>
+
+    <etools-prp-ajax
+        id="locations"
+        url="[[locationsUrl]]">
+    </etools-prp-ajax>
 
     <paper-dialog
         id="dialog"
@@ -199,12 +208,25 @@
                       value="{{data.cs_dates}}"
                       class="validate"
                       label="Date of report"
+                      on-selected-chips-updated="_validate"
                       required>
                     <chip-date-of-report></chip-date-of-report>
                   </etools-prp-chips>
                 </div>
               </template>
             </div>
+          </div>
+
+          <div class="row">
+            <etools-multi-selection-menu
+                class="validate"
+                label="Location"
+                options="[[locations]]"
+                selected-values="{{selectedLocations}}"
+                on-selected-values-changed="_validate"
+                trigger-value-change-event
+                required>
+            </etools-multi-selection-menu>
           </div>
         </template>
       </paper-dialog-scrollable>
@@ -233,17 +255,26 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
         App.Behaviors.ModalBehavior,
       ],
 
       properties: {
-        data: {
-          type: Object,
-        },
+        data: Object,
 
         type: String,
 
         displayType: String,
+
+        locationId: {
+          type: String,
+          statePath: 'location.id',
+        },
+
+        locationsUrl: {
+          type: String,
+          computed: '_computeLocationsUrl(locationId)',
+        },
 
         computedType: {
           type: String,
@@ -254,6 +285,16 @@
         updatePending: {
           type: Boolean,
           value: false,
+        },
+
+        locations: {
+          type: Array,
+          value: [],
+        },
+
+        selectedLocations: {
+          type: Array,
+          value: [],
         },
 
         frequencies: {
@@ -282,6 +323,7 @@
       observers: [
         '_setDefaults(opened)',
         '_setCSD(csd.*)',
+        '_setLocations(selectedLocations.splices)',
       ],
 
       _computeType: function (type, displayType) {
@@ -308,6 +350,22 @@
         this.set('data.frequency', freq.id);
       },
 
+      _setLocations: function () {
+        var selected = this.selectedLocations ?
+            this.locations
+                .filter(function (location) {
+                  return this.selectedLocations.indexOf(location.value) !== -1;
+                }, this)
+                .map(function (location) {
+                  return {
+                    id: location.id,
+                  };
+                }) :
+            [];
+
+        this.set('data.locations', selected);
+      },
+
       _onRadioGroupChanged: function (e) {
         this._updateValue(e.target);
       },
@@ -321,6 +379,8 @@
           return;
         }
 
+        this.set('selectedLocations', []);
+
         this.set('data', {
           cs_dates: [],
           locations: [],
@@ -329,6 +389,8 @@
         });
 
         this._forEach('paper-radio-group', this._updateValue);
+
+        this._fetchLocations();
       },
 
       _validate: function (e) {
@@ -337,6 +399,27 @@
 
       _showCSD: function (frequency) {
         return frequency && this._equals(frequency, 'Csd');
+      },
+
+      _computeLocationsUrl: function (locationId) {
+        return App.Endpoints.childLocations(locationId);
+      },
+
+      _fetchLocations: function () {
+        var self = this;
+
+        this.$.locations.thunk()()
+            .then(function (res) {
+              self.set('locations', res.data.map(self._formatLocation));
+            });
+      },
+
+      _formatLocation: function (data) {
+        return {
+          id: data.id,
+          value: data.title,
+          label: data.title,
+        };
       },
 
       _save: function () {

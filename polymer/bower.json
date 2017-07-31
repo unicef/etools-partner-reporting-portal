@@ -48,7 +48,8 @@
     "paper-radio-group": "PolymerElements/paper-radio-group#^2.0.0",
     "paper-radio-button": "PolymerElements/paper-radio-button#^2.0.0",
     "app-layout": "PolymerElements/app-layout#^1.0.1",
-    "paper-date-picker": "^0.1.5"
+    "paper-date-picker": "^0.1.5",
+    "etools-searchable-multiselection-menu": "^2.2.0"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0"
