@@ -16,6 +16,7 @@
 <link rel="import" href="../../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-multi-selection-menu.html">
 
+<link rel="import" href="disaggregations-widget.html">
 <link rel="import" href="chip-date-of-report.html">
 <link rel="import" href="../labelled-item.html">
 <link rel="import" href="../etools-prp-chips.html">
@@ -227,6 +228,15 @@
                 trigger-value-change-event
                 required>
             </etools-multi-selection-menu>
+          </div>
+
+          <div class="row">
+            <disaggregations-widget
+                class="validate"
+                value="{{data.disaggregation}}"
+                on-disaggregations-updated="_validate"
+                required>
+            </disaggregations-widget>
           </div>
         </template>
       </paper-dialog-scrollable>
