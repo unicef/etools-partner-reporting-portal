@@ -9,6 +9,8 @@
 <link rel="import" href="../../../../behaviors/utils.html">
 <link rel="import" href="../../../../behaviors/routing.html">
 <link rel="import" href="../../../../elements/cluster-reporting/planned-action/projects/overview.html">
+<link rel="import" href="../../../../elements/cluster-reporting/planned-action/projects/indicators.html">
+<link rel="import" href="../../../../elements/cluster-reporting/planned-action/projects/activities.html">
 <link rel="import" href="../../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../../elements/page-header.html">
 <link rel="import" href="../../../../elements/project-status.html">
@@ -98,11 +100,11 @@
     </template>
 
     <template is="dom-if" if="[[_equals(tab, 'indicators')]]" restamp="true">
-      TODO: Indicator content
+      <pa-project-details-indicators></pa-project-details-indicators>
     </template>
 
     <template is="dom-if" if="[[_equals(tab, 'activities')]]" restamp="true">
-      TODO: Activity content
+      <pa-project-details-activities></pa-project-details-activities>
     </template>
 
   </template>

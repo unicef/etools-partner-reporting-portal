@@ -6,6 +6,8 @@
 <link rel="import" href="../../../../../../bower_components/iron-location/iron-location.html">
 
 <link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/partners/projects/overview.html">
+<link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/partners/projects/indicators.html">
+<link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/partners/projects/activities.html">
 <link rel="import" href="../../../../../elements/page-body.html">
 <link rel="import" href="../../../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../../../elements/page-body.html">
@@ -69,11 +71,17 @@
       </div>
     </page-header>
 
-    <page-body>
-      <template is="dom-if" if="[[_equals(tab, 'overview')]]" restamp="true">
-        <rp-partner-project-details-overview project-data=[[projectData]]></rp-partner-project-details-overview>
-      </template>
-    </page-body>
+    <template is="dom-if" if="[[_equals(tab, 'overview')]]" restamp="true">
+      <rp-partner-project-details-overview project-data=[[projectData]]></rp-partner-project-details-overview>
+    </template>
+
+    <template is="dom-if" if="[[_equals(tab, 'indicators')]]" restamp="true">
+      <rp-partner-project-details-indicators></rp-partner-project-details-indicators>
+    </template>
+
+    <template is="dom-if" if="[[_equals(tab, 'activities')]]" restamp="true">
+      <rp-partner-project-details-activities></rp-partner-project-details-activities>
+    </template>
   </template>
 
   <script>
