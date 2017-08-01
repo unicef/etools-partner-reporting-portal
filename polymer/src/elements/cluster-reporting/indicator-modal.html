@@ -16,6 +16,7 @@
 <link rel="import" href="../../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-multi-selection-menu.html">
 
+<link rel="import" href="../../polyfills/es6-shim.html">
 <link rel="import" href="disaggregations-widget.html">
 <link rel="import" href="chip-date-of-report.html">
 <link rel="import" href="../labelled-item.html">
@@ -69,6 +70,13 @@
         url="[[locationsUrl]]">
     </etools-prp-ajax>
 
+    <etools-prp-ajax
+        id="indicators"
+        url="[[indicatorsUrl]]"
+        method="post"
+        content-type="application/json">
+    </etools-prp-ajax>
+
     <paper-dialog
         id="dialog"
         with-backdrop
@@ -88,7 +96,7 @@
           <labelled-item label="Type">
             <paper-radio-group
                 data-path="type"
-                on-paper-radio-group-changed="_onRadioGroupChanged"
+                on-paper-radio-group-changed="_onValueChanged"
                 selected="number">
               <paper-radio-button name="number">Quantity (#)</paper-radio-button>
               <paper-radio-button name="percentage_ratio">Percent/Ratio</paper-radio-button>
@@ -104,7 +112,7 @@
               <labelled-item label="Calculation method across locations">
                 <paper-radio-group
                     data-path="data.blueprint.calculation_formula_across_locations"
-                    on-paper-radio-group-changed="_onRadioGroupChanged"
+                    on-paper-radio-group-changed="_onValueChanged"
                     selected="sum">
                   <paper-radio-button name="sum">sum</paper-radio-button>
                   <paper-radio-button name="max">max</paper-radio-button>
@@ -116,7 +124,7 @@
               <labelled-item label="Calculation method across reporting periods">
                 <paper-radio-group
                     data-path="data.blueprint.calculation_formula_across_periods"
-                    on-paper-radio-group-changed="_onRadioGroupChanged"
+                    on-paper-radio-group-changed="_onValueChanged"
                     selected="sum">
                   <paper-radio-button name="sum">sum</paper-radio-button>
                   <paper-radio-button name="max">max</paper-radio-button>
@@ -133,7 +141,7 @@
           <labelled-item label="Display type">
             <paper-radio-group
                 data-path="displayType"
-                on-paper-radio-group-changed="_onRadioGroupChanged"
+                on-paper-radio-group-changed="_onValueChanged"
                 selected="percentage">
               <paper-radio-button name="percentage">Percentage</paper-radio-button>
               <paper-radio-button name="ratio">Ratio</paper-radio-button>
@@ -272,6 +280,10 @@
 
         type: String,
 
+        objectId: Number,
+
+        objectType: String,
+
         displayType: String,
 
         locationId: {
@@ -282,6 +294,11 @@
         locationsUrl: {
           type: String,
           computed: '_computeLocationsUrl(locationId)',
+        },
+
+        indicatorsUrl: {
+          type: String,
+          value: App.Endpoints.clusterIndicators(),
         },
 
         computedType: {
@@ -330,7 +347,6 @@
 
       observers: [
         '_setDefaults(opened)',
-        '_setCSD(csd.*)',
         '_setLocations(selectedLocations.splices)',
       ],
 
@@ -374,7 +390,7 @@
         this.set('data.locations', selected);
       },
 
-      _onRadioGroupChanged: function (e) {
+      _onValueChanged: function (e) {
         this._updateValue(e.target);
       },
 
@@ -430,11 +446,30 @@
         };
       },
 
+      _processData: function (rawData) {
+        var data = this._clone(rawData);
+
+        if (['percentage', 'ratio'].indexOf(data.blueprint.display_type) !== -1) {
+          delete data.blueprint.calculation_formula_across_locations;
+          delete data.blueprint.calculation_formula_across_periods;
+        }
+
+        if (data.frequency !== 'Csd') {
+          delete data.cs_dates;
+        }
+
+        return Object.assign(data, {
+          object_id: this.objectId,
+          object_type: this.objectType,
+        });
+      },
+
       _save: function () {
         var fields = [].slice.call(
           Polymer.dom(this.root).querySelectorAll('.validate')
         );
 
+        var self = this;
         var valid;
 
         fields.forEach(function (field) {
@@ -451,7 +486,19 @@
 
         this.set('updatePending', true);
 
-        console.log(this._debug(this.data)); // FIXME
+        this.$.indicators.body = this._processData(this.data);
+
+        this.$.indicators.thunk()()
+            .then(function (res) {
+              self.fire('indicator-added', res.data);
+              self.set('updatePending', false);
+              self.close();
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+
+              self.set('updatePending', false);
+            });
       },
     });
   </script>
