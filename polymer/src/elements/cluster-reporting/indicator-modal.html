@@ -233,9 +233,7 @@
           <div class="row">
             <disaggregations-widget
                 class="validate"
-                value="{{data.disaggregation}}"
-                on-disaggregations-updated="_validate"
-                required>
+                value="{{data.disaggregation}}">
             </disaggregations-widget>
           </div>
         </template>
@@ -433,7 +431,10 @@
       },
 
       _save: function () {
-        var fields = [].slice.call(Polymer.dom(this.root).querySelectorAll('.validate'));
+        var fields = [].slice.call(
+          Polymer.dom(this.root).querySelectorAll('.validate')
+        );
+
         var valid;
 
         fields.forEach(function (field) {
@@ -450,7 +451,7 @@
 
         this.set('updatePending', true);
 
-        console.log(this._debug(this.data));
+        console.log(this._debug(this.data)); // FIXME
       },
     });
   </script>

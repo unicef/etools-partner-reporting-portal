@@ -3,7 +3,12 @@
 <link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
 
+<link rel="import" href="../../polyfills/es6-shim.html">
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../etools-prp-chips.html">
+<link rel="import" href="chip-disagg-value.html">
 <link rel="import" href="../../styles/buttons.html">
 
 <dom-module id="disaggregations-widget">
@@ -45,7 +50,7 @@
 
       .col-name,
       .col-values {
-        padding: 10px 0 10px 24px;
+        padding-left: 24px;
       }
     </style>
 
@@ -57,17 +62,35 @@
       <div class="row layout horizontal">
         <div class="flex-none layout vertical center-center col-actions">
           <paper-icon-button
-              class="remove-btn"
               index="[[index]]"
+              class="remove-btn"
               on-tap="_remove"
               icon="icons:cancel">
           </paper-icon-button>
         </div>
         <div class="flex col-name">
-          Name
+          <paper-input
+              class="validate"
+              index="[[index]]"
+              name="name"
+              label="Disaggregate by"
+              value="[[_getField(index, 'name', value.length)]]"
+              on-input="_onInput"
+              always-float-label
+              required>
+          </paper-input>
         </div>
         <div class="flex col-values">
-          Values
+          <etools-prp-chips
+              class="validate"
+              index="[[index]]"
+              name="values"
+              label="Disaggregation groups"
+              value="[[_getField(index, 'values', value.length)]]"
+              on-selected-chips-updated="_onInput"
+              required>
+            <chip-disagg-value></chip-disagg-value>
+          </etools-prp-chips>
         </div>
       </div>
     </template>
@@ -84,6 +107,10 @@
     Polymer({
       id: 'disaggregations-widget',
 
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+      ],
+
       properties: {
         threshold: {
           type: Number,
@@ -99,17 +126,12 @@
         invalid: {
           type: Boolean,
           notify: true,
-          computed: '_computeInvalid(required, value)',
-        },
-
-        required: {
-          type: Boolean,
-          value: false,
+          value: true
         },
 
         _canAddMore: {
           type: Boolean,
-          computed: '_computeCanAddMore(threshold, value)',
+          value: true,
         },
 
         _invalid: {
@@ -123,52 +145,79 @@
         },
       },
 
-      _computeInvalid: function (required, value) {
-        if (!required) {
-          return false;
+      observers: [
+        '_setValidity(value.splices)',
+        '_setCanAddMore(value.splices)',
+      ],
+
+      _setValidity: function () {
+        var invalid;
+
+        if (!this.value.length) {
+          invalid = true;
+        } else {
+          invalid = this.value.some(function (disagg) {
+            return !disagg.name.length || !disagg.values.length;
+          });
         }
 
-        if (!value.length) {
-          return true;
-        }
-
-        return value.some(function (disagg) {
-          return !disagg.name.length || !disagg.values.length;
-        });
+        this.set('invalid', invalid);
       },
 
       _computeHeadingClassName: function (invalid) {
         return invalid ? 'error' : '';
       },
 
-      _computeCanAddMore: function (threshold, value) {
-        return value.length < threshold;
+      _setCanAddMore: function () {
+        this.set('_canAddMore', this.value.length < this.threshold);
       },
 
       _add: function () {
-        var value = this.value.slice();
-
-        value.push({
-          name: 'FIXME',
-          values: ['FIXME'],
+        this.push('value', {
+          name: '',
+          values: [],
         });
-
-        this.set('value', value);
-        this.fire('disaggregations-updated');
       },
 
       _remove: function (e) {
-        var value = this.value.slice();
         var toRemove = +e.target.index;
 
-        value.splice(toRemove, 1);
+        this.splice('value', toRemove, 1);
+      },
 
-        this.set('value', value);
-        this.fire('disaggregations-updated');
+      _onInput: function (e) {
+        var el = e.target;
+        var newValue = el.value;
+
+        this.async(function () {
+          var index = +el.index;
+          var field = el.name;
+          var change = {};
+
+          change[field] = typeof newValue === 'string' ?
+              newValue.trim() : newValue;
+
+          this.set(
+            ['value', index],
+            Object.assign({}, this.value[index], change)
+          );
+
+          el.validate();
+
+          this._setValidity();
+        });
+      },
+
+      _getField: function (index, name) {
+        return (this.value[index] || {})[name];
       },
 
       validate: function () {
         this.set('_invalid', this.invalid);
+
+        this._forEach('.validate', function (element) {
+          element.validate();
+        });
       },
     });
   </script>
