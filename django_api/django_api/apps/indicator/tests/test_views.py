@@ -1,5 +1,7 @@
 from ast import literal_eval as make_tuple
 from datetime import date, timedelta
+import random
+import string
 
 from django.urls import reverse
 from django.conf import settings
@@ -292,6 +294,21 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
         self.assertEquals(
             response.data,
             {"locations": "List of dict location or one dict location expected"}
+        )
+
+    def test_create_indicator_disaggregation_max_length_reporting(self):
+        max_length = DisaggregationValue._meta.get_field('value').max_length
+        over_max_val = "".join(random.sample(string.ascii_uppercase, max_length+1))
+        self.data['disaggregation'][1]['values'][0] = over_max_val
+        response = self.client.post(self.url, data=self.data, format='json')
+
+        self.assertFalse(status.is_success(response.status_code))
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEquals(Reportable.objects.count(), self.reportable_count)
+        self.assertEquals(IndicatorBlueprint.objects.count(), self.blueprint_count)
+        self.assertEquals(
+            response.data,
+            {"disaggregation": "Disaggregation Value expected max %s chars" % max_length}
         )
 
     def test_create_csdates_indicator_cluster_activities_reporting(self):

@@ -558,10 +558,21 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 False in [loc.get('id', False) for loc in locations]:
             raise ValidationError({"locations": "List of dict location or one dict location expected"})
 
+    def check_disaggregation(self, disaggregation):
+        if not isinstance(disaggregation, list):
+            raise ValidationError({"disaggregation": "List of dict disaggregation expected"})
+        max_length = DisaggregationValue._meta.get_field('value').max_length
+        for dis in disaggregation:
+            for val in dis['values']:
+                if len(val) > max_length:
+                    msg = "Disaggregation Value expected max %s chars" % max_length
+                    raise ValidationError({"disaggregation": msg})
+
     @transaction.atomic
     def create(self, validated_data):
 
         self.check_location(self.initial_data.get('locations'))
+        self.check_disaggregation(self.initial_data.get('disaggregation'))
 
         blueprint = IndicatorBlueprintSerializer(data=validated_data['blueprint'])
         if blueprint.is_valid():
