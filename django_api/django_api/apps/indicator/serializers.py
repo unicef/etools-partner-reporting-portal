@@ -553,6 +553,9 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             'cs_dates',
         )
 
+    def get_object_type(self, obj):
+        return obj.content_type
+
     def check_location(self, locations):
         if not isinstance(locations, (list, dict)) or\
                 False in [loc.get('id', False) for loc in locations]:
@@ -644,12 +647,6 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             'means_of_verification', instance.means_of_verification)
         instance.blueprint.title = \
             validated_data.get('blueprint', {}).get('title', instance.blueprint.title)
-        instance.blueprint.unit = \
-            validated_data.get('blueprint', {}).get('unit', instance.blueprint.unit)
-        instance.blueprint.description = \
-            validated_data.get('blueprint', {}).get('description', instance.blueprint.description)
-        instance.blueprint.disaggregatable = \
-            validated_data.get('blueprint', {}).get('disaggregatable', instance.blueprint.disaggregatable)
 
         _errors = []
         if validated_data.get('blueprint', {}).get('calculation_formula_across_periods'):
@@ -671,6 +668,26 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+
+class ClusterIndicatorDataSerializer(serializers.ModelSerializer):
+
+    disaggregation = DisaggregationListSerializer(many=True)
+    blueprint = IndicatorBlueprintSerializer()
+    locations = IdLocationSerializer(many=True)
+
+    class Meta:
+        model = Reportable
+        fields = (
+            'id',
+            'means_of_verification',
+            'blueprint',
+            'locations',
+            'disaggregation',
+            'frequency',
+            'cs_dates',
+        )
+
 
 class IndicatorReportUpdateSerializer(serializers.ModelSerializer):
 

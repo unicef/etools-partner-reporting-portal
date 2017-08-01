@@ -30,6 +30,7 @@ from .serializers import (
     IndicatorLLoutputsSerializer, IndicatorLocationDataUpdateSerializer,
     OverallNarrativeSerializer,
     ClusterIndicatorSerializer,
+    ClusterIndicatorDataSerializer,
 )
 from .filters import IndicatorFilter, PDReportsFilter
 from .models import (
@@ -367,10 +368,7 @@ class ClusterIndicatorAPIView(APIView):
 
         serializer.save()
         return Response(
-            {
-                'reportable_id': serializer.instance.id,
-                'blueprint_id': serializer.instance.blueprint.id
-            },
+            ClusterIndicatorDataSerializer(instance=serializer.instance).data,
             status=status.HTTP_201_CREATED
         )
 

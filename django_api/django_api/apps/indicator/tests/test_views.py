@@ -273,10 +273,10 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
         self.assertEquals(Reportable.objects.count(), self.reportable_count+1)
         self.assertEquals(IndicatorBlueprint.objects.count(), self.blueprint_count+1)
 
-        reportable = Reportable.objects.get(id=response.data['reportable_id'])
+        reportable = Reportable.objects.get(id=response.data['id'])
         self.assertEquals(reportable.frequency, REPORTABLE_FREQUENCY_LEVEL.weekly)
 
-        rep_dis = Disaggregation.objects.filter(reportable=response.data['reportable_id'])
+        rep_dis = Disaggregation.objects.filter(reportable=response.data['id'])
         self.assertTrue(rep_dis.first().name in ['Gender', 'Age'])
         self.assertTrue(rep_dis.last().name in ['Gender', 'Age'])
         first_dis_vals = DisaggregationValue.objects.filter(disaggregation=rep_dis.first())
@@ -304,7 +304,7 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
         self.assertEquals(Reportable.objects.count(), self.reportable_count+1)
         self.assertEquals(IndicatorBlueprint.objects.count(), self.blueprint_count+1)
 
-        reportable = Reportable.objects.get(id=response.data['reportable_id'])
+        reportable = Reportable.objects.get(id=response.data['id'])
         self.assertEquals(reportable.blueprint.display_type, IndicatorBlueprint.PERCENTAGE)
 
     def test_create_indicator_disaggregation_max_length_reporting(self):
@@ -341,7 +341,7 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
         self.assertEquals(Reportable.objects.count(), self.reportable_count+1)
         self.assertEquals(IndicatorBlueprint.objects.count(), self.blueprint_count+1)
 
-        reportable = Reportable.objects.get(id=response.data['reportable_id'])
+        reportable = Reportable.objects.get(id=response.data['id'])
         self.assertEquals(reportable.frequency, REPORTABLE_FREQUENCY_LEVEL.custom_specific_dates)
         self.assertEquals(len(reportable.cs_dates), len(cs_dates))
 
@@ -384,7 +384,7 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
         response = self.client.post(self.url, data=self.data, format='json')
         self.assertTrue(status.is_success(response.status_code))
 
-        self.data.update({"id": response.data.get("reportable_id")})
+        self.data.update({"id": response.data.get("id")})
         new_means_of_verification = 'IMO/CC calculation - updated'
         self.data['means_of_verification'] = new_means_of_verification
         new_title = 'of temporary classrooms - updated'
