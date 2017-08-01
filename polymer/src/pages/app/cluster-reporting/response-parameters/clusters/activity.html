@@ -9,6 +9,10 @@
 <link rel="import" href="../../../../../elements/page-header.html">
 <link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/clusters/activities/
 overview.html">
+<link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/clusters/activities/
+indicators.html">
+<link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/clusters/activities/
+contributing-partners.html">
 <link rel="import" href="../../../../../elements/project-status.html">
 <link rel="import" href="../../../../../elements/page-badge.html">
 <link rel="import" href="../../../../../endpoints.html">
@@ -99,11 +103,11 @@ overview.html">
     </template>
 
     <template is="dom-if" if="[[_equals(tab, 'indicators')]]" restamp="true">
-      TODO: Indicator content
+      <rp-clusters-activity-indicators></rp-clusters-activity-indicators>
     </template>
 
     <template is="dom-if" if="[[_equals(tab, 'contributing-partners')]]" restamp="true">
-      TODO: Contributing Partners content
+      <rp-clusters-activity-contributing-partners></rp-clusters-activity-contributing-partners>
     </template>
 
   </template>

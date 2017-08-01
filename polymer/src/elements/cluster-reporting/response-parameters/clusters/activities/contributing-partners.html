@@ -1,0 +1,33 @@
+<link rel="import" href="../../../../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../../../../elements/page-body.html">
+<link rel="import" href="../../../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../../../elements/page-body.html">
+<link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="../../../../../endpoints.html">
+<link rel="import" href="../../../../../redux/actions.html">
+<link rel="import" href="../../../../../redux/store.html">
+
+<dom-module id="rp-clusters-activity-contributing-partners">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <page-body>
+      Contributing Partners
+    </page-body>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'rp-clusters-activity-contributing-partners',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+      ],
+
+    });
+  </script>
+</dom-module>
