@@ -574,6 +574,8 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         self.check_location(self.initial_data.get('locations'))
         self.check_disaggregation(self.initial_data.get('disaggregation'))
 
+        validated_data['blueprint']['unit'] = validated_data['blueprint']['display_type']
+        validated_data['blueprint']['disaggregatable'] = True
         blueprint = IndicatorBlueprintSerializer(data=validated_data['blueprint'])
         if blueprint.is_valid():
             blueprint.save()

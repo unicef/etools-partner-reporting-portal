@@ -255,12 +255,9 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
             ],
             'blueprint': {
                 'title': 'of temporary classrooms',
-                'unit': IndicatorBlueprint.NUMBER,
-                'description': 'Average measure for the month',
                 'calculation_formula_across_periods': IndicatorBlueprint.MAX,
                 'calculation_formula_across_locations': IndicatorBlueprint.AVG,
                 'display_type': IndicatorBlueprint.NUMBER,
-                'disaggregatable': True,
             },
             'disaggregation': [
                 {'name': 'Age', 'values': ['0-5m', '5-12m', '1-3y', '4-7y']},
@@ -295,6 +292,20 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
             response.data,
             {"locations": "List of dict location or one dict location expected"}
         )
+
+    def test_create_percentage_indicator_reporting(self):
+        self.data['blueprint'].pop('calculation_formula_across_periods')
+        self.data['blueprint'].pop('calculation_formula_across_locations')
+        self.data['blueprint']['display_type'] = IndicatorBlueprint.PERCENTAGE
+        response = self.client.post(self.url, data=self.data, format='json')
+
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+        self.assertEquals(Reportable.objects.count(), self.reportable_count+1)
+        self.assertEquals(IndicatorBlueprint.objects.count(), self.blueprint_count+1)
+
+        reportable = Reportable.objects.get(id=response.data['reportable_id'])
+        self.assertEquals(reportable.blueprint.display_type, IndicatorBlueprint.PERCENTAGE)
 
     def test_create_indicator_disaggregation_max_length_reporting(self):
         max_length = DisaggregationValue._meta.get_field('value').max_length
