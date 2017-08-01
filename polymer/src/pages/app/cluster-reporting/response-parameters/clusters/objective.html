@@ -99,7 +99,9 @@
     </template>
 
     <template is="dom-if" if="[[_equals(tab, 'activities')]]" restamp="true">
-      <rp-clusters-details-activities></rp-clusters-details-activities>
+      <rp-clusters-details-activities
+        objective-id="{{objectiveId}}">
+      </rp-clusters-details-activities>
     </template>
   </template>
 
