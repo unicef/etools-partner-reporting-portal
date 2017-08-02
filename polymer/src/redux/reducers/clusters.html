@@ -129,6 +129,9 @@
         case App.Constants.SET_FILTER_BY_CLUSTER_ID:
           return action.id;
 
+        case App.Constants.RESET:
+          return '';
+
         default:
           return state;
       }
