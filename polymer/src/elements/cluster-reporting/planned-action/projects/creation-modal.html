@@ -12,9 +12,9 @@
 <link rel="import" href="../../../../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
 <link rel="import" href="../../../../../bower_components/paper-dialog/paper-dialog.html">
 
-<link rel="import" href="../../../../elements/etools-prp-ajax.html">
-<link rel="import" href="../../../../elements/etools-prp-date-input.html">
-<link rel="import" href="../../../../elements/form-fields/dropdown-form-input.html">
+<link rel="import" href="../../../etools-prp-ajax.html">
+<link rel="import" href="../../../etools-prp-date-input.html">
+<link rel="import" href="../../../form-fields/dropdown-form-input.html">
 <link rel="import" href="../../../../behaviors/routing.html">
 <link rel="import" href="../../../../redux/store.html">
 <link rel="import" href="../../../../redux/actions.html">
@@ -43,11 +43,6 @@
         background: var(--theme-primary-color);
       }
 
-      paper-button.btn-primary {
-        background-color: var(--theme-primary-color);
-        color: white;
-      }
-
       .header h2 {
         @apply(--paper-font-title);
 
@@ -62,10 +57,6 @@
 
       .buttons {
         padding: 24px;
-      }
-
-      div.row {
-        display: block;
       }
 
       paper-input.flex:first-child,
@@ -264,11 +255,6 @@
         data: {
           type: Object,
           value: {locations: [], clusters: []}
-        },
-
-        formatDate: {
-          type: String,
-          value: 'DD MMM YYYY'
         },
 
         projectCreationUrl: {
