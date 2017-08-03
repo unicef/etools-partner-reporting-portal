@@ -8,6 +8,7 @@
 
 <link rel="import" href="../../../../../styles/shared-styles.html">
 <link rel="import" href="../../../../../elements/page-header.html">
+<link rel="import" href="../../../../../elements/filters/cluster-filter/filter-list-by-cluster.html">
 <link rel="import" href="../../../../../behaviors/routing.html">
 <link rel="import" href="../../../../../behaviors/utils.html">
 <link rel="import" href="router.html">
@@ -15,9 +16,13 @@
 
 <dom-module id="clusters-response-parameters">
   <template>
-    <style include="shared-styles">
+    <style include="shared-styles iron-flex iron-flex-alignment">
       :host {
         display: block;
+      }
+
+      page-header {
+        padding-top: 0;
       }
 
       .tabs paper-tab {
@@ -44,6 +49,9 @@
     <template is="dom-if" if="[[_displayHeader(subpage)]]" restamp="true">
       <div class="page-top-content">
         <page-header title="Clusters">
+          <div class="toolbar horizontal end-justified layout">
+            <filter-list-by-cluster></filter-list-by-cluster>
+          </div>
           <div class="tabs">
             <paper-tabs
               selected="{{tab}}"
@@ -145,7 +153,12 @@
       },
 
       _resetPage: function () {
-        this.set('queryParams', {});
+        var queryParams = {};
+        // Cluster filtering should persist across tabs.
+        if (this.queryParams.cluster_id) {
+          queryParams.cluster_id = this.queryParams.cluster_id;
+        }
+        this.set('queryParams', queryParams);
       },
     });
   </script>
