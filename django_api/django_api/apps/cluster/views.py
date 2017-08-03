@@ -21,6 +21,8 @@ from .serializers import (
     ClusterObjectivePatchSerializer,
     ClusterActivitySerializer,
     ClusterActivityPatchSerializer,
+    ClusterDashboardSerializer,
+    ClusterPartnerDashboardSerializer,
 )
 from .filters import ClusterObjectiveFilter, ClusterActivityFilter, ClusterIndicatorsFilter
 
@@ -250,7 +252,9 @@ class ClusterDashboardAPIView(APIView):
 
     def get(self, request, response_plan_id, cluster_id, *args, **kwargs):
         cluster = self.get_instance(request, response_plan_id, cluster_id)
-        return Response({}, status=statuses.HTTP_200_OK)
+
+        serializer = ClusterDashboardSerializer(instance=cluster)
+        return Response(serializer.data, status=statuses.HTTP_200_OK)
 
 
 class ClusterPartnerDashboardAPIView(ListCreateAPIView):
@@ -272,4 +276,8 @@ class ClusterPartnerDashboardAPIView(ListCreateAPIView):
 
     def get(self, request, response_plan_id, cluster_id, *args, **kwargs):
         cluster = self.get_instance(request, response_plan_id, cluster_id)
-        return Response({}, status=statuses.HTTP_200_OK)
+        partner = request.user.partner
+
+        serializer = ClusterPartnerDashboardSerializer(
+            instance=cluster, context={'partner': partner})
+        return Response(serializer.data, status=statuses.HTTP_200_OK)
