@@ -29,6 +29,10 @@
       a {
         color: var(--theme-primary-color);
       }
+
+      .wrapper {
+        position: relative;
+      }
     </style>
 
     <iron-location query="{{query}}"></iron-location>
@@ -38,51 +42,53 @@
         params-object="{{queryParams}}">
     </iron-query-params>
 
-    <etools-data-table-header
-        no-collapse
-        label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
-      <etools-data-table-column field="cluster">
-        <div class="table-column">Cluster</div>
-      </etools-data-table-column>
-      <etools-data-table-column field="ref">
-        <div class="table-column">CO ref. #</div>
-      </etools-data-table-column>
-      <etools-data-table-column field="title">
-        <div class="table-column">Cluster Objective Title</div>
-      </etools-data-table-column>
-    </etools-data-table-header>
+    <div class="wrapper">
+      <etools-data-table-header
+          no-collapse
+          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
+        <etools-data-table-column field="cluster">
+          <div class="table-column">Cluster</div>
+        </etools-data-table-column>
+        <etools-data-table-column field="ref">
+          <div class="table-column">CO ref. #</div>
+        </etools-data-table-column>
+        <etools-data-table-column field="title">
+          <div class="table-column">Cluster Objective Title</div>
+        </etools-data-table-column>
+      </etools-data-table-header>
 
-    <template
-        id="list"
-        is="dom-repeat"
-        items="[[objectives]]"
-        as="objective"
-        initial-count="[[pageSize]]">
-      <etools-data-table-row no-collapse>
-        <div slot="row-data">
-          <div class="table-cell table-cell--text">
-            [[objective.cluster_title]]
+      <template
+          id="list"
+          is="dom-repeat"
+          items="[[objectives]]"
+          as="objective"
+          initial-count="[[pageSize]]">
+        <etools-data-table-row no-collapse>
+          <div slot="row-data">
+            <div class="table-cell table-cell--text">
+              [[objective.cluster_title]]
+            </div>
+            <div class="table-cell table-cell--text">
+              [[objective.reference_number]]
+            </div>
+            <div class="table-cell table-cell--text">
+              <a href="[[_detailUrl(objective.id)]]">[[objective.title]]</a>
+            </div>
           </div>
-          <div class="table-cell table-cell--text">
-            [[objective.reference_number]]
-          </div>
-          <div class="table-cell table-cell--text">
-            <a href="[[_detailUrl(objective.id)]]">[[objective.title]]</a>
-          </div>
-        </div>
-      </etools-data-table-row>
-    </template>
+        </etools-data-table-row>
+      </template>
 
-    <etools-data-table-footer
-        page-size="[[pageSize]]"
-        page-number="[[pageNumber]]"
-        total-results="[[totalResults]]"
-        visible-range="{{visibleRange}}"
-        on-page-size-changed="_pageSizeChanged"
-        on-page-number-changed="_pageNumberChanged">
-    </etools-data-table-footer>
+      <etools-data-table-footer
+          page-size="[[pageSize]]"
+          page-number="[[pageNumber]]"
+          total-results="[[totalResults]]"
+          visible-range="{{visibleRange}}"
+          on-page-size-changed="_pageSizeChanged"
+          on-page-number-changed="_pageNumberChanged">
+      </etools-data-table-footer>
 
-    <etools-loading active="[[loading]]"></etools-loading>
+      <etools-loading active="[[loading]]"></etools-loading>
+    </div>
   </template>
 
   <script>

@@ -91,6 +91,18 @@
           return true;
         }
         return false;
+      },
+
+      _commaSeparatedListValues: function (items) {
+        return items.join(', ');
+      },
+
+      _commaSeparatedDictValue: function (items, key) {
+        var newList = items.map(function(item) {
+          return item[key];
+        });
+
+        return newList.join(', ');
       }
     };
   }());
