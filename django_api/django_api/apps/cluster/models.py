@@ -1,11 +1,16 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.db.models import Q
+from django.utils.functional import cached_property
 from django.contrib.contenttypes.fields import GenericRelation
 
 from model_utils.models import TimeStampedModel
 
-from core.common import FREQUENCY_LEVEL
+from core.common import FREQUENCY_LEVEL, INDICATOR_REPORT_STATUS
+
+from indicator.models import Reportable, IndicatorReport
+from partner.models import PartnerActivity
 
 
 class Cluster(TimeStampedModel):
@@ -25,6 +30,70 @@ class Cluster(TimeStampedModel):
 
     def __str__(self):
         return "<pk: %s> %s" % (self.id, self.title)
+
+    def num_of_partners(self):
+        return self.partners.count()
+
+    def num_of_met_indicators(self):
+        fully_achieved_indicators = filter(lambda x: int(x.progress_percentage) == 100, self.reportable_queryset)
+
+        return len(fully_achieved_indicators)
+
+    def num_of_constrained_indicators(self):
+        return len(self.constrained_indicators)
+
+    def num_of_non_cluster_activities(self):
+        return self.partner_activities.count()
+
+    @cached_property
+    def partner_activities(self):
+        partner_activities = PartnerActivity.objects.filter(
+            cluster_activity__in=self.cluster_activities
+        )
+
+        return partner_activities
+
+    @cached_property
+    def cluster_activities(self):
+        cluster_activities = ClusterActivity.objects.filter(
+            cluster_objective__cluster=self,
+        )
+
+        return cluster_activities
+
+    @cached_property
+    def reportable_queryset(self):
+        cluster_reportables = Reportable.objects.filter(
+            Q(cluster_objectives__cluster=self)
+            | Q(cluster_activities__cluster_objective__cluster=self)
+        )
+
+        return cluster_reportables
+
+    @cached_property
+    def indicator_report_queryset(self):
+        indicator_reports = IndicatorReport.objects.filter(
+            reportable__in=self.reportable_queryset,
+        )
+
+        return indicator_reports
+
+    @cached_property
+    def new_indicator_reports(self):
+        return self.indicator_report_queryset.filter(
+            report_status=INDICATOR_REPORT_STATUS.due
+        )
+
+    @cached_property
+    def overdue_indicator_reports(self):
+        return self.indicator_report_queryset.filter(
+            report_status=INDICATOR_REPORT_STATUS.overdue
+        )
+
+    @cached_property
+    def constrained_indicators(self):
+        return filter(lambda x: int(x.progress_percentage) != 100, self.reportable_queryset)
+
 
 
 class ClusterObjective(TimeStampedModel):

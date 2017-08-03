@@ -1,5 +1,12 @@
 from rest_framework import serializers
+
 from core.common import FREQUENCY_LEVEL
+
+from indicator.serializers import (
+    ClusterIndicatorReportSerializer,
+    IndicatorListSerializer,
+)
+
 from .models import ClusterObjective, ClusterActivity, Cluster
 
 
@@ -111,25 +118,28 @@ class ClusterDashboardSerializer(serializers.ModelSerializer):
     constrained_indicators = serializers.SerializerMethodField()
 
     def get_num_of_partners(self, obj):
-        return {}
+        return obj.num_of_partners()
 
     def get_num_of_met_indicators(self, obj):
-        return {}
+        return obj.num_of_met_indicators()
 
     def get_num_of_constrained_indicators(self, obj):
-        return {}
+        return obj.num_of_constrained_indicators()
 
     def get_num_of_non_cluster_activities(self, obj):
-        return {}
+        return obj.num_of_non_cluster_activities()
 
     def get_new_indicator_reports(self, obj):
-        return {}
+        return ClusterIndicatorReportSerializer(
+            obj.new_indicator_reports, many=True).data
 
     def get_overdue_indicator_reports(self, obj):
-        return {}
+        return ClusterIndicatorReportSerializer(
+            obj.overdue_indicator_reports, many=True).data
 
     def get_constrained_indicators(self, obj):
-        return {}
+        return IndicatorListSerializer(
+            obj.constrained_indicators, many=True).data
 
     class Meta:
         model = Cluster
