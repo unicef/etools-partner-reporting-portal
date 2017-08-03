@@ -1,16 +1,16 @@
 <link rel="import" href="../../../../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../../../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
-<link rel="import" href="../../../../../../bower_components/paper-dialog/paper-dialog.html">
-<link rel="import" href="../../../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
-<link rel="import" href="../../../../../../bower_components/paper-styles/typography.html">
-<link rel="import" href="../../../../../../bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="../../../../../../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../../../../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../../../../bower_components/app-layout/app-grid/app-grid-style.html">
 <link rel="import" href="../../../../../../bower_components/etools-loading/etools-loading.html">
+<link rel="import" href="../../../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../../../../../bower_components/iron-form/iron-form.html">
 <link rel="import" href="../../../../../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../../../../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../../../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../../../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../../../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../../../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../../../../../../bower_components/paper-dialog/paper-dialog.html">
 
 <link rel="import" href="../../../../form-fields/dropdown-form-input.html">
 <link rel="import" href="../../../../form-fields/cluster-dropdown-input.html">
@@ -22,17 +22,26 @@
 
 <dom-module id="cluster-activities-modal">
   <template>
-    <style include="button-styles iron-flex iron-flex-alignment iron-flex-reverse">
+    <style include="app-grid-style button-styles iron-flex iron-flex-alignment iron-flex-reverse">
       :host {
         display: block;
 
+        --app-grid-columns: 3;
+        --app-grid-gutter: 15px;
+        --app-grid-item-height: auto;
+        --app-grid-expandible-item-columns: 3;
+
         --paper-dialog: {
-          min-width: 500px;
+          width: 700px;
 
           & > * {
             margin: 0;
           }
         };
+      }
+
+      .full-width {
+        @apply --app-grid-expandible-item;
       }
 
       .header {
@@ -58,15 +67,6 @@
       .buttons {
         padding: 24px;
       }
-
-      dropdown-form-input:first-child {
-        margin-right: 10px;
-      }
-
-      dropdown-form-input:nth-child(3) {
-        margin-left: 10px;
-      }
-
     </style>
 
     <iron-location path="{{path}}"></iron-location>
@@ -94,8 +94,9 @@
       </div>
 
       <paper-dialog-scrollable>
-        <iron-form>
+        <iron-form class="app-grid">
           <paper-input
+            class="item full-width"
             id="title"
             label="Title"
             value="{{data.title}}"
@@ -104,6 +105,7 @@
           </paper-input>
 
           <paper-input
+            class="item full-width"
             id="standard"
             label="Standard"
             value="{{data.standard}}"
@@ -111,33 +113,32 @@
             required>
           </paper-input>
 
-          <div class="row horizontal layout">
-            <!-- TODO: Check cluster ID vs. cluster_objective ID here.
-            API and mockups conflict. -->
-            <cluster-dropdown-input
-              class="flex self-stretch"
-              label="Cluster"
-              id="cluster"
-              value="{{data.cluster_objective}}">
-            </cluster-dropdown-input>
+          <!-- TODO: Check cluster ID vs. cluster_objective ID here.
+          API and mockups conflict. -->
+          <cluster-dropdown-input
+            class="item"
+            label="Cluster"
+            id="cluster"
+            value="{{data.cluster_objective}}">
+          </cluster-dropdown-input>
 
-            <paper-input
-                class="flex"
-                id="reference_number"
-                label="CO ref #"
-                value="{{data.reference_number}}"
-                type="string"
-                required>
-            </paper-input>
+          <paper-input
+            class="item"
+            id="reference_number"
+            label="CO ref #"
+            value="{{data.reference_number}}"
+            type="string"
+            required>
+          </paper-input>
 
-            <dropdown-form-input
-               class="flex"
-               label="Frequency of reporting"
-               id="frequency"
-               value="{{data.frequency}}"
-               data="[[frequencies]]">
-            </dropdown-form-input>
-          </div>
+          <dropdown-form-input
+             class="item"
+             label="Frequency of reporting"
+             id="frequency"
+             value="{{data.frequency}}"
+             data="[[frequencies]]">
+          </dropdown-form-input>
+
         </iron-form>
 
       </paper-dialog-scrollable>
@@ -166,10 +167,6 @@
         App.Behaviors.ReduxBehavior,
         App.Behaviors.RoutingBehavior,
       ],
-
-      listeners: {
-        'dialog.iron-overlay-closed': 'close',
-      },
 
       properties: {
 
