@@ -230,3 +230,46 @@ class ClusterListAPIView(ListCreateAPIView):
     def get_queryset(self):
         response_plan_id = self.kwargs.get(self.lookup_field)
         return Cluster.objects.filter(response_plan_id=response_plan_id)
+
+
+class ClusterDashboardAPIView(APIView):
+    """
+    ClusterDashboardAPIView provides a high-level IMO-reserved dashboard info
+    for the specified cluster in a country's response plan
+    """
+    permission_classes = (IsAuthenticated, )
+
+    def get_instance(self, request, response_plan_id=None, cluster_id=None):
+        try:
+            instance = Cluster.objects.get(
+                id=cluster_id, response_plan_id=response_plan_id)
+        except Cluster.DoesNotExist:
+            # TODO: log exception
+            raise Http404
+        return instance
+
+    def get(self, request, response_plan_id, cluster_id, *args, **kwargs):
+        cluster = self.get_instance(request, response_plan_id, cluster_id)
+        return Response({}, status=statuses.HTTP_200_OK)
+
+
+class ClusterPartnerDashboardAPIView(ListCreateAPIView):
+    """
+    ClusterPartnerDashboardAPIView provides
+    a high-level partner-reserved dashboard info
+    for the specified cluster in a country's response plan
+    """
+    permission_classes = (IsAuthenticated, )
+
+    def get_instance(self, request, response_plan_id=None, cluster_id=None):
+        try:
+            instance = Cluster.objects.get(
+                id=cluster_id, response_plan_id=response_plan_id)
+        except Cluster.DoesNotExist:
+            # TODO: log exception
+            raise Http404
+        return instance
+
+    def get(self, request, response_plan_id, cluster_id, *args, **kwargs):
+        cluster = self.get_instance(request, response_plan_id, cluster_id)
+        return Response({}, status=statuses.HTTP_200_OK)
