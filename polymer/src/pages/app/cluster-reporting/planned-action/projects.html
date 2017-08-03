@@ -9,10 +9,11 @@
 <link rel="import" href="../../../../elements/cluster-reporting/project-list-table.html">
 <link rel="import" href="../../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../../styles/shared-styles.html">
+<link rel="import" href="../../../../styles/buttons.html">
 
 <dom-module id="planned-action-projects-list">
   <template>
-    <style include="shared-styles">
+    <style include="shared-styles button-styles">
       :host {
         display: block;
       }
@@ -20,11 +21,6 @@
         margin-bottom: 25px;
         @apply(--layout-horizontal);
         @apply(--layout-end-justified)
-      }
-
-      paper-button {
-        background-color: var(--theme-primary-color);
-        color: white;
       }
     </style>
 
@@ -45,7 +41,7 @@
       <planned-action-projects-filters class="filters"></planned-action-projects-filters>
 
       <div id="action">
-        <paper-button id="add" on-tap="_openModal" raised>
+        <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
           Add Project
         </paper-button>
       </div>

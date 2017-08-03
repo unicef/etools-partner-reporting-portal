@@ -131,10 +131,8 @@
       },
 
       _displayHeader: function(subpage) {
-        if (subpage[subpage.length - 1] === 's') {
-          return true;
-        }
-        return false;
+        var requiresHeader = ['projects', 'contacts', 'activities'];
+        return this._displayClusterHeader(subpage, requiresHeader);
       },
 
       _tabChanged: function (tab) {

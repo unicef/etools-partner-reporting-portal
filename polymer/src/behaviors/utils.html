@@ -85,6 +85,13 @@
         return value == null /* undefinded & null */ ? // jshint ignore:line
             value : Math.floor(value * 100) + '%';
       },
+
+      _displayClusterHeader: function (subpage, needsHeaderList) {
+        if (needsHeaderList.indexOf(subpage) >= 0) {
+          return true;
+        }
+        return false;
+      }
     };
   }());
 </script>

@@ -9,13 +9,14 @@
 <link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/clusters/objectives/objectives-list.html">
 <link rel="import" href="../../../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../../../elements/page-body.html">
+<link rel="import" href="../../../../../styles/buttons.html">
 <link rel="import" href="../../../../../styles/shared-styles.html">
 <link rel="import" href="../../../../../styles/table-styles.html">
 
 
 <dom-module id="clusters-objectives">
     <template>
-    <style include="data-table-styles table-styles">
+    <style include="data-table-styles table-styles button-styles">
       :host {
         display: block;
       }
@@ -24,11 +25,6 @@
         margin-bottom: 25px;
         @apply(--layout-horizontal);
         @apply(--layout-end-justified)
-      }
-
-      paper-button {
-        background-color: var(--theme-primary-color);
-        color: white;
       }
 
       a {
@@ -55,7 +51,7 @@
       <cluster-objectives-modal id="modal"></cluster-objectives-modal>
 
       <div id="action">
-        <paper-button id="add" on-tap="_openModal" raised>
+        <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
           Add Cluster Objective
         </paper-button>
       </div>
@@ -83,7 +79,7 @@
 
         objectivesUrl: {
           type: String,
-          computed: '_computeObjectivesUrl(route)'
+          value: App.Endpoints.responseParametersClusterObjectives()
         },
       },
 
@@ -104,10 +100,6 @@
           .catch(function (err) { // jshint ignore:line
               // TODO: error handling.
           });
-      },
-
-      _computeObjectivesUrl: function () {
-        return App.Endpoints.responseParametersClusterObjectives();
       },
     });
   </script>

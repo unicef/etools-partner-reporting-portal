@@ -125,10 +125,8 @@ planned-action-projects-router.
       },
 
       _displayHeader: function(subpage) {
-        if (subpage === 'projects' || subpage === 'activities') {
-          return true;
-        }
-        return false;
+        var requiresHeader = ['projects', 'activities'];
+        return this._displayClusterHeader(subpage, requiresHeader);
       },
 
       _tabChanged: function (tab) {

@@ -12,10 +12,11 @@
 <link rel="import" href="../../../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../../../styles/table-styles.html">
 <link rel="import" href="../../../../../styles/shared-styles.html">
+<link rel="import" href="../../../../../styles/buttons.html">
 
 <dom-module id="clusters-activities">
     <template>
-    <style include="data-table-styles table-styles">
+    <style include="data-table-styles table-styles button-styles">
       :host {
         display: block;
       }
@@ -24,11 +25,6 @@
         margin-bottom: 25px;
         @apply(--layout-horizontal);
         @apply(--layout-end-justified)
-      }
-
-      paper-button {
-        background-color: var(--theme-primary-color);
-        color: white;
       }
 
       a {
@@ -55,7 +51,7 @@
       <cluster-activities-modal id="modal"></cluster-activities-modal>
 
       <div id="action">
-        <paper-button id="add" on-tap="_openModal" raised>
+        <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
           Add Cluster Activity
         </paper-button>
       </div>
@@ -84,7 +80,7 @@
 
         activitiesUrl: {
           type: String,
-          computed: '_computeActivitiesUrl(route)'
+          value: App.Endpoints.responseParametersClusterActivities()
         },
 
         loading: {
@@ -116,10 +112,6 @@
           .catch(function (err) { // jshint ignore:line
               // TODO: error handling.
           });
-      },
-
-      _computeActivitiesUrl: function () {
-        return App.Endpoints.responseParametersClusterActivities();
       },
     });
   </script>
