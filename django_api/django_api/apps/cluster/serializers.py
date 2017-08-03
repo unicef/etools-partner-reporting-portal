@@ -99,3 +99,94 @@ class ClusterActivityPatchSerializer(serializers.ModelSerializer):
             'frequency',
             'cluster_objective',
         )
+
+
+class ClusterDashboardSerializer(serializers.ModelSerializer):
+    num_of_partners = serializers.SerializerMethodField()
+    num_of_met_indicators = serializers.SerializerMethodField()
+    num_of_constrained_indicators = serializers.SerializerMethodField()
+    num_of_non_cluster_activities = serializers.SerializerMethodField()
+    new_indicator_reports = serializers.SerializerMethodField()
+    overdue_indicator_reports = serializers.SerializerMethodField()
+    constrained_indicators = serializers.SerializerMethodField()
+
+    def get_num_of_partners(self, obj):
+        return {}
+
+    def get_num_of_met_indicators(self, obj):
+        return {}
+
+    def get_num_of_constrained_indicators(self, obj):
+        return {}
+
+    def get_num_of_non_cluster_activities(self, obj):
+        return {}
+
+    def get_new_indicator_reports(self, obj):
+        return {}
+
+    def get_overdue_indicator_reports(self, obj):
+        return {}
+
+    def get_constrained_indicators(self, obj):
+        return {}
+
+    class Meta:
+        model = Cluster
+        fields = (
+            'num_of_partners',
+            'num_of_met_indicators',
+            'num_of_constrained_indicators',
+            'num_of_non_cluster_activities',
+            'new_indicator_reports',
+            'overdue_indicator_reports',
+            'constrained_indicators',
+        )
+
+
+class ClusterPartnerDashboardSerializer(serializers.ModelSerializer):
+    num_of_due_overdue_indicator_reports = serializers.SerializerMethodField()
+    num_of_indicator_targets_met = serializers.SerializerMethodField()
+    num_of_projects_in_my_organization = serializers.SerializerMethodField()
+    num_of_constrained_indicators = serializers.SerializerMethodField()
+    num_of_non_cluster_activities = serializers.SerializerMethodField()
+    overdue_indicator_reports = serializers.SerializerMethodField()
+    my_project_activities = serializers.SerializerMethodField()
+    constrained_indicators = serializers.SerializerMethodField()
+
+    def get_num_of_due_overdue_indicator_reports(self, obj):
+        return {}
+
+    def get_num_of_indicator_targets_met(self, obj):
+        return {}
+
+    def get_num_of_projects_in_my_organization(self, obj):
+        return {}
+
+    def get_num_of_constrained_indicators(self, obj):
+        return {}
+
+    def get_num_of_non_cluster_activities(self, obj):
+        return {}
+
+    def get_overdue_indicator_reports(self, obj):
+        return {}
+
+    def get_my_project_activities(self, obj):
+        return {}
+
+    def get_constrained_indicators(self, obj):
+        return {}
+
+    class Meta:
+        model = Cluster
+        fields = (
+            'num_of_due_overdue_indicator_reports',
+            'num_of_indicator_targets_met',
+            'num_of_projects_in_my_organization',
+            'num_of_constrained_indicators',
+            'num_of_non_cluster_activities',
+            'overdue_indicator_reports',
+            'my_project_activities',
+            'constrained_indicators',
+        )
