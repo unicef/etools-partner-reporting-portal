@@ -1,6 +1,7 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="../../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../../bower_components/iron-icons/av-icons.html">
 
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/page-nav.html">
@@ -29,31 +30,31 @@
 
       <paper-item name="dashboard">
         <a href="[[buildUrl(_baseUrlCluster, '/dashboard')]]">
-          <span>Dashboard</span>
+          <span><iron-icon icon="view-quilt" role="presentation"></iron-icon>Dashboard</span>
         </a>
       </paper-item>
 
       <paper-item name="response-parameters">
         <a href="[[buildUrl(_baseUrlCluster, '/response-parameters')]]">
-          <span>Response Parameters</span>
+          <span><iron-icon icon="compare-arrows" role="presentation"></iron-icon>Response Parameters</span>
         </a>
       </paper-item>
 
       <paper-item name="planned-action">
         <a href="[[buildUrl(_baseUrlCluster, '/planned-action')]]">
-          <span>My Planned Action</span>
+          <span><iron-icon icon="av:playlist-add" role="presentation"></iron-icon>My Planned Action</span>
         </a>
       </paper-item>
 
       <paper-item name="results">
         <a href="[[buildUrl(_baseUrlCluster, '/results')]]">
-          <span>Results</span>
+          <span><iron-icon icon="trending-up" role="presentation"></iron-icon>Results</span>
         </a>
       </paper-item>
 
       <paper-item name="analysis">
         <a href="[[buildUrl(_baseUrlCluster, '/analysis')]]">
-          <span>Analysis</span>
+          <span><iron-icon icon="av:equalizer" role="presentation"></iron-icon>Analysis</span>
         </a>
       </paper-item>
 
