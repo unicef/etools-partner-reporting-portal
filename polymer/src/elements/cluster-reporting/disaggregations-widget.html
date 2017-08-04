@@ -151,15 +151,9 @@
       ],
 
       _setValidity: function () {
-        var invalid;
-
-        if (!this.value.length) {
-          invalid = true;
-        } else {
-          invalid = this.value.some(function (disagg) {
-            return !disagg.name.length || !disagg.values.length;
-          });
-        }
+        var invalid = this.value.length && this.value.some(function (disagg) {
+          return !disagg.name.length || !disagg.values.length;
+        });
 
         this.set('invalid', invalid);
       },
