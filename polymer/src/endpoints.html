@@ -92,6 +92,10 @@
       clusterLocationNames: function (responsePlanId) {
         return this._buildUrl('/core/' + responsePlanId + '/simple-location/');
       },
+
+      clusterIndicators: function () {
+        return this._buildUrl('/indicator/cluster-indicator/');
+      },
     };
   }());
 </script>
