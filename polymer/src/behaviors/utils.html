@@ -86,21 +86,24 @@
             value : Math.floor(value * 100) + '%';
       },
 
-      _areObjectsEquivalent: function (a, b) {
-        var aProps = Object.getOwnPropertyNames(a);
-        var bProps = Object.getOwnPropertyNames(b);
-
-        if (aProps.length !== bProps.length) {
-          return false;
+      _displayClusterHeader: function (subpage, needsHeaderList) {
+        if (needsHeaderList.indexOf(subpage) >= 0) {
+          return true;
         }
-
-        for (var i = 0; i < aProps.length; i++) {
-          var propName = aProps[i];
-          if (a[propName] !== b[propName]) {
-              return false;
-          }
-        }
+        return false;
       },
+
+      _commaSeparatedListValues: function (items) {
+        return items.join(', ');
+      },
+
+      _commaSeparatedDictValue: function (items, key) {
+        var newList = items.map(function(item) {
+          return item[key];
+        });
+
+        return newList.join(', ');
+      }
     };
   }());
 </script>

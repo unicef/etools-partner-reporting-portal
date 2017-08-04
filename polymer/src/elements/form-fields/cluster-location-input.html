@@ -5,7 +5,7 @@
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../redux/store.html">
 
-<dom-module id="cluster-dropdown-input">
+<dom-module id="cluster-location-input">
   <template>
     <style>
       :host {
@@ -14,33 +14,33 @@
     </style>
 
     <etools-prp-ajax
-        id="clusterNames"
-        url="[[clusterNamesUrl]]">
+        id="locationNames"
+        url="[[locationNamesUrl]]">
     </etools-prp-ajax>
 
     <template is="dom-if" if="[[!loading]]">
       <dropdown-form-input
-        label="Cluster"
-        name="cluster"
+        label="Location"
+        name="location"
         value="{{value}}"
         data="[[data]]">
-      </dropdown-forn-input>
+      </dropdown-form-input>
     </template>
   </template>
 
   <script>
     Polymer({
-      is: 'cluster-dropdown-input',
+      is: 'cluster-location-input',
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
       ],
 
       properties: {
-        clusterNamesUrl: {
+        locationNamesUrl: {
           type: String,
-          computed: '_computeClusterNamesUrl(responsePlanID)',
-          observer: '_fetchClusterNames',
+          computed: '_computeLocationNamesUrl(responsePlanID)',
+          observer: '_fetchLocationNames',
         },
 
         responsePlanID: {
@@ -65,20 +65,20 @@
         }
       },
 
-      _computeClusterNamesUrl: function (responsePlanID) {
-        return App.Endpoints.clusterNames(responsePlanID);
+      _computeLocationNamesUrl: function (responsePlanID) {
+        return App.Endpoints.clusterLocationNames(responsePlanID);
       },
 
       _computeLoading: function (data) {
         return !data.length;
       },
 
-      _fetchClusterNames: function () {
+      _fetchLocationNames: function () {
         var self = this;
 
-        this.$.clusterNames.abort();
+        this.$.locationNames.abort();
 
-        this.$.clusterNames.thunk()()
+        this.$.locationNames.thunk()()
             .then(function (res) {
               self.set('data', [{
                 id: '',
@@ -91,7 +91,7 @@
       },
 
       detached: function () {
-        this.$.clusterNames.abort();
+        this.$.locationNames.abort();
       },
     });
   </script>

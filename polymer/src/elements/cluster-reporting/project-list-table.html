@@ -1,27 +1,28 @@
-<link rel="import" href="../../../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../../../bower_components/app-route/app-route.html">
-<link rel="import" href="../../../../../bower_components/etools-data-table/etools-data-table.html">
-<link rel="import" href="../../../../../bower_components/etools-loading/etools-loading.html">
-<link rel="import" href="../../../../../bower_components/iron-icon/iron-icon.html">
-<link rel="import" href="../../../../../bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="../../../../../bower_components/iron-location/iron-location.html">
-<link rel="import" href="../../../../../bower_components/iron-location/iron-query-params.html">
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../bower_components/etools-data-table/etools-data-table.html">
+<link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
+<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../bower_components/iron-location/iron-query-params.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout.html">
 
 <link rel="import" href="../../behaviors/data-table.html">
 <link rel="import" href="../../behaviors/pagination.html">
 <link rel="import" href="../../behaviors/routing.html">
 <link rel="import" href="../../behaviors/utils.html">
-<link rel="import" href="../../elements/etools-prp-ajax.html">
-<link rel="import" href="../../elements/project-status.html">
-<link rel="import" href="../../elements/page-body.html">
-<link rel="import" href="../../elements/etools-prp-data-table-row.html">
+<link rel="import" href="../etools-prp-ajax.html">
+<link rel="import" href="../project-status.html">
+<link rel="import" href="../page-body.html">
+<link rel="import" href="../etools-prp-data-table-row.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
 <link rel="import" href="../../styles/table-styles.html">
 
 <dom-module id="project-list-table">
   <template>
-    <style include="data-table-styles table-styles">
+    <style include="data-table-styles table-styles iron-flex">
       :host {
         display: block;
       }
@@ -46,6 +47,9 @@
         color: var(--theme-primary-color);
       }
 
+      .wrapper {
+        position: relative;
+      }
     </style>
 
     <iron-location
@@ -57,91 +61,93 @@
       params-object="{{queryParams}}">
     </iron-query-params>
 
-    <etools-content-panel no-header>
-      <etools-data-table-header
-          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
-        <etools-data-table-column field="cluster">
-          <div class="table-column">Cluster</div>
-        </etools-data-table-column>
-        <template is="dom-if" if="[[_equals(page, 'response-parameters')]]">
-          <etools-data-table-column field="status">
-            <div class="table-column">Partner</div>
+    <div class="wrapper">
+      <etools-content-panel no-header>
+        <etools-data-table-header
+            label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
+          <etools-data-table-column field="cluster">
+            <div class="table-column">Cluster</div>
           </etools-data-table-column>
-        </template>
-        <etools-data-table-column field="status">
-          <div class="table-column">Status</div>
-        </etools-data-table-column>
-        <etools-data-table-column field="project">
-          <div class="table-column">Project</div>
-        </etools-data-table-column>
-        <etools-data-table-column field="Location">
-          <div class="table-column">Location</div>
-        </etools-data-table-column>
-      </etools-data-table-header>
+          <template is="dom-if" if="[[_equals(page, 'response-parameters')]]">
+            <etools-data-table-column field="status">
+              <div class="table-column">Partner</div>
+            </etools-data-table-column>
+          </template>
+          <etools-data-table-column field="status">
+            <div class="table-column">Status</div>
+          </etools-data-table-column>
+          <etools-data-table-column field="project">
+            <div class="table-column">Project</div>
+          </etools-data-table-column>
+          <etools-data-table-column field="Location">
+            <div class="table-column">Location</div>
+          </etools-data-table-column>
+        </etools-data-table-header>
 
-      <template
-          id="list"
-          is="dom-repeat"
-          items="[[projects]]"
-          as="project"
-          initial-count="[[pageSize]]">
-        <etools-prp-data-table-row details-opened="[[detailsOpened]]">
-          <div slot="row-data">
-            <div class="table-cell table-cell--text">
-              <!-- TODO: loop through list -->
-            </div>
-            <template is="dom-if" if="[[_equals(page, 'response-parameters')]]">
-              <div class="table-cell table-cell--text">
-                [[project.partner]]
-              </div>
-            </template>
-            <div class="table-cell table-cell--text">
-              <project-status status="[[project.status]]"></project-status>
-            </div>
-            <div class="table-cell table-cell--text">
-              <a href="[[_detailUrl(project)]]">[[project.title]]</a>
-            </div>
-            <div class="table-cell table-cell--text">
-              <!-- TODO: loop through list -->
-            </div>
-          </div>
-          <div slot="row-data-details">
+        <template
+            id="list"
+            is="dom-repeat"
+            items="[[projects]]"
+            as="project"
+            initial-count="[[pageSize]]">
+          <etools-prp-data-table-row details-opened="[[detailsOpened]]">
             <div slot="row-data">
               <div class="table-cell table-cell--text">
-                <span class="label">Start Date</span>
-                [[project.start_date]]
-                <span class="label">Total Budget</span>
-                [[project.total_budget]]
+                [[_commaSeparatedDictValue(project.clusters, 'title')]]
+              </div>
+              <template is="dom-if" if="[[_equals(page, 'response-parameters')]]">
+                <div class="table-cell table-cell--text">
+                  [[project.partner]]
+                </div>
+              </template>
+              <div class="table-cell table-cell--text">
+                <project-status status="[[project.status]]"></project-status>
               </div>
               <div class="table-cell table-cell--text">
-                <span class="label">End Date</span>
-                [[project.end_date]]
-                <span class="label">Funding Source</span>
-                [[project.funding_source]]
+                <a href="[[_detailUrl(project)]]">[[project.title]]</a>
               </div>
               <div class="table-cell table-cell--text">
-                <span class="label">Part of a Joint Response Plan</span>
-                [[project.part_response_plan]]
-              </div>
-              <div class="table-cell table-cell--text">
-                <span class="label">Frequency of Reporting</span>
-                [[project.frequency]]
+                [[_commaSeparatedListValues(project.locations)]]
               </div>
             </div>
-          </div>
-        </etools-prp-data-table-row>
-      </template>
+            <div slot="row-data-details">
+              <div slot="row-data">
+                <div class="table-cell table-cell--text">
+                  <span class="label">Start Date</span>
+                  [[project.start_date]]
+                  <span class="label">Total Budget</span>
+                  [[project.total_budget]]
+                </div>
+                <div class="table-cell table-cell--text">
+                  <span class="label">End Date</span>
+                  [[project.end_date]]
+                  <span class="label">Funding Source</span>
+                  [[project.funding_source]]
+                </div>
+                <div class="table-cell table-cell--text">
+                  <span class="label">Part of a Joint Response Plan</span>
+                  [[project.part_response_plan]]
+                </div>
+                <div class="table-cell table-cell--text">
+                  <span class="label">Frequency of Reporting</span>
+                  [[project.frequency]]
+                </div>
+              </div>
+            </div>
+          </etools-prp-data-table-row>
+        </template>
 
-      <etools-data-table-footer
-          page-size="[[pageSize]]"
-          page-number="[[pageNumber]]"
-          total-results="[[totalResults]]"
-          visible-range="{{visibleRange}}"
-          on-page-size-changed="_pageSizeChanged"
-          on-page-number-changed="_pageNumberChanged">
-      </etools-data-table-footer>
+        <etools-data-table-footer
+            page-size="[[pageSize]]"
+            page-number="[[pageNumber]]"
+            total-results="[[totalResults]]"
+            visible-range="{{visibleRange}}"
+            on-page-size-changed="_pageSizeChanged"
+            on-page-number-changed="_pageNumberChanged">
+        </etools-data-table-footer>
 
-      <etools-loading active="[[loading]]"></etools-loading>
+        <etools-loading active="[[loading]]"></etools-loading>
+      </div>
     </etools-content-panel>
   </template>
 

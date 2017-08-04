@@ -54,13 +54,6 @@
         disabled: String,
       },
 
-      attached: function() {
-        // Without this, using the dropdown component will cause the modal to close.
-        this.addEventListener('iron-overlay-closed', function(e) {
-          e.stopPropagation();
-        });
-      },
-
       _getValue: function (e) {
         var newValue = this.$.repeat.itemForElement(e.detail.item).id;
         this.value = newValue;

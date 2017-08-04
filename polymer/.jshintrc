@@ -26,6 +26,7 @@
     "WCT": true,
     "sinon": true,
     "fixture": true,
-    "assert": true
+    "assert": true,
+    "moment": true
   }
 }
