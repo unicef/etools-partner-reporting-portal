@@ -92,7 +92,7 @@
       responseParamtersClustersActivityDetail: function(activityId) {
         return this._buildUrl('/cluster/cluster-activity/' + activityId + '/');
       },
-      
+
       clusterIndicatorReports: function (responsePlanId) {
         return this._buildUrl('/cluster/' + responsePlanId + '/cluster-indicators-list/');
       },
@@ -119,6 +119,10 @@
 
       clusterIndicators: function () {
         return this._buildUrl('/indicator/cluster-indicator/');
+      },
+
+      partnersByClusterActivityId: function (clusterActivityId) {
+        return this._buildUrl('/partner/cluster-activity/' + clusterActivityId + '/partners');
       },
     };
   }());

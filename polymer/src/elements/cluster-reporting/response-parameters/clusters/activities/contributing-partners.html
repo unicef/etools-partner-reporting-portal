@@ -8,6 +8,8 @@
 <link rel="import" href="../../../../../redux/actions.html">
 <link rel="import" href="../../../../../redux/store.html">
 
+<link rel="import" href="contributing-partners-list.html">
+
 <dom-module id="rp-clusters-activity-contributing-partners">
   <template>
     <style>
@@ -15,8 +17,17 @@
         display: block;
       }
     </style>
+
+    <etools-prp-ajax
+      id="partners"
+      url="[[partnersUrl]]"
+      params="[[queryParams]]">
+    </etools-prp-ajax>
+
     <page-body>
-      Contributing Partners
+      <contributing-partners-list
+        activity-id=[[activityId]]>
+      </contributing-partners-list>
     </page-body>
   </template>
 
@@ -24,10 +35,41 @@
     Polymer({
       is: 'rp-clusters-activity-contributing-partners',
 
+      properties: {
+        activityId: Number,
+
+        partnersUrl: {
+          type: String,
+          computed: '_computePartnersUrl(activityId)'
+        },
+      },
+
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
       ],
 
+      attached: function() {
+        this._partnersByClusterActivityIdAjax();
+      },
+
+      _computePartnersUrl: function(activityId) {
+        return App.Endpoints.partnersByClusterActivityId(activityId);
+      },
+
+      _partnersByClusterActivityIdAjax: function () {
+        var thunk = this.$.partners.thunk();
+
+        this.$.partners.abort();
+
+        this.dispatch(App.Actions.clusterActivities.partners.fetch(thunk, this.activityId))
+          .catch(function (err) { // jshint ignore:line
+              // TODO: error handling.
+          });
+      },
+
     });
+
+
   </script>
 </dom-module>

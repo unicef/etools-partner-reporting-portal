@@ -106,7 +106,9 @@ contributing-partners.html">
     </template>
 
     <template is="dom-if" if="[[_equals(tab, 'contributing-partners')]]" restamp="true">
-      <rp-clusters-activity-contributing-partners></rp-clusters-activity-contributing-partners>
+      <rp-clusters-activity-contributing-partners
+        activity-id=[[activityId]]>
+      </rp-clusters-activity-contributing-partners>
     </template>
 
   </template>
@@ -171,6 +173,7 @@ contributing-partners.html">
       attached: function () {
         var thunk = this.$.activity.thunk();
         var self = this;
+
         thunk()
           .then(function (res) {
             self.updatePending = false;
