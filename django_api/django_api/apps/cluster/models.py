@@ -31,17 +31,21 @@ class Cluster(TimeStampedModel):
     def __str__(self):
         return "<pk: %s> %s" % (self.id, self.title)
 
+    @property
     def num_of_partners(self):
         return self.partners.count()
 
+    @property
     def num_of_met_indicators(self):
         fully_achieved_indicators = filter(lambda x: int(x.progress_percentage) == 100, self.reportable_queryset)
 
         return len(fully_achieved_indicators)
 
+    @property
     def num_of_constrained_indicators(self):
         return len(self.constrained_indicators)
 
+    @property
     def num_of_non_cluster_activities(self):
         return self.partner_activities.count()
 
@@ -94,6 +98,41 @@ class Cluster(TimeStampedModel):
     def constrained_indicators(self):
         return filter(lambda x: int(x.progress_percentage) != 100, self.reportable_queryset)
 
+    def num_of_due_overdue_indicator_reports_partner(self, partner=None):
+        overdue = self.overdue_indicator_reports.filter(
+            reportable__partner_activities__partner=partner)
+
+        due = self.new_indicator_reports.filter(
+            reportable__partner_activities__partner=partner)
+
+        return overdue.count() + due.count()
+
+    def num_of_indicator_targets_met_partner(self, partner=None):
+        return len(filter(lambda x: int(x.progress_percentage) == 100, self.reportable_queryset.filter(
+            partner_activities__partner=partner
+        )))
+
+    def num_of_projects_in_my_organization_partner(self, partner=None):
+        return partner.partner_projects.filter(clusters=self).count()
+
+    def num_of_constrained_indicators_partner(self, partner=None):
+        return len(self.constrained_indicators_partner(partner))
+
+    def num_of_non_cluster_activities_partner(self, partner=None):
+        return self.num_of_non_cluster_activities
+
+    def overdue_indicator_reports_partner(self, partner=None):
+        return self.overdue_indicator_reports.filter(
+            reportable__partner_activities__partner=partner)
+
+    def my_project_activities_partner(self, partner=None):
+        return partner.partner_activities.filter(
+            cluster_activity__cluster_objective__cluster=self)
+
+    def constrained_indicators_partner(self, partner=None):
+        return filter(lambda x: int(x.progress_percentage) != 100, self.reportable_queryset.filter(
+            partner_activities__partner=partner
+        ))
 
 
 class ClusterObjective(TimeStampedModel):

@@ -118,16 +118,16 @@ class ClusterDashboardSerializer(serializers.ModelSerializer):
     constrained_indicators = serializers.SerializerMethodField()
 
     def get_num_of_partners(self, obj):
-        return obj.num_of_partners()
+        return obj.num_of_partners
 
     def get_num_of_met_indicators(self, obj):
-        return obj.num_of_met_indicators()
+        return obj.num_of_met_indicators
 
     def get_num_of_constrained_indicators(self, obj):
-        return obj.num_of_constrained_indicators()
+        return obj.num_of_constrained_indicators
 
     def get_num_of_non_cluster_activities(self, obj):
-        return obj.num_of_non_cluster_activities()
+        return obj.num_of_non_cluster_activities
 
     def get_new_indicator_reports(self, obj):
         return ClusterIndicatorReportSerializer(
@@ -165,28 +165,41 @@ class ClusterPartnerDashboardSerializer(serializers.ModelSerializer):
     constrained_indicators = serializers.SerializerMethodField()
 
     def get_num_of_due_overdue_indicator_reports(self, obj):
-        return {}
+        return obj.num_of_due_overdue_indicator_reports_partner(
+            self.context['partner'])
 
     def get_num_of_indicator_targets_met(self, obj):
-        return {}
+        return obj.num_of_indicator_targets_met_partner(
+            self.context['partner'])
 
     def get_num_of_projects_in_my_organization(self, obj):
-        return {}
+        return obj.num_of_projects_in_my_organization_partner(
+            self.context['partner'])
 
     def get_num_of_constrained_indicators(self, obj):
-        return {}
+        return obj.num_of_constrained_indicators_partner(
+            self.context['partner'])
 
     def get_num_of_non_cluster_activities(self, obj):
-        return {}
+        return obj.num_of_non_cluster_activities_partner(
+            self.context['partner'])
 
     def get_overdue_indicator_reports(self, obj):
-        return {}
+        return ClusterIndicatorReportSerializer(
+            obj.overdue_indicator_reports_partner(
+                self.context['partner']), many=True).data
 
     def get_my_project_activities(self, obj):
-        return {}
+        from partner.serializers import PartnerActivitySimpleSerializer
+
+        return PartnerActivitySimpleSerializer(
+            obj.my_project_activities_partner(
+                self.context['partner']), many=True).data
 
     def get_constrained_indicators(self, obj):
-        return {}
+        return IndicatorListSerializer(
+            obj.constrained_indicators_partner(
+                self.context['partner']), many=True).data
 
     class Meta:
         model = Cluster

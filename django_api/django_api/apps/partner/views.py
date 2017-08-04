@@ -8,7 +8,7 @@ import django_filters
 
 from core.paginations import SmallPagination
 from core.permissions import IsAuthenticated
-from .serializer import (
+from .serializers import (
     PartnerDetailsSerializer,
     PartnerProjectSerializer,
     PartnerProjectSimpleSerializer,

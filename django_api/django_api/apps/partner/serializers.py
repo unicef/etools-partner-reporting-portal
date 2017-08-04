@@ -3,9 +3,11 @@ from rest_framework import serializers
 from cluster.serializers import ClusterSimpleSerializer
 from core.serializers import ShortLocationSerializer
 from core.common import PD_STATUS
+
 from .models import (
     Partner,
     PartnerProject,
+    PartnerActivity
 )
 
 
@@ -115,4 +117,15 @@ class PartnerProjectSimpleSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'title',
+        )
+
+
+class PartnerActivitySimpleSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PartnerActivity
+        fields = (
+            'title',
+            'project',
+            'partner',
         )

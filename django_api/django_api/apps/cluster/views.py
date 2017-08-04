@@ -257,7 +257,7 @@ class ClusterDashboardAPIView(APIView):
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
 
-class ClusterPartnerDashboardAPIView(ListCreateAPIView):
+class ClusterPartnerDashboardAPIView(APIView):
     """
     ClusterPartnerDashboardAPIView provides
     a high-level partner-reserved dashboard info
