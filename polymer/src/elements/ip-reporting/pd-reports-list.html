@@ -164,7 +164,8 @@
 
         if (report.is_draft) {
           suffix = 'draft';
-        } else if (report.report_status === 'Sub') {
+        } else if (report.report_status === 'Sub' ||
+                   report.report_status === 'Rej') {
           suffix = 'view';
         } else {
           suffix = 'edit';
@@ -176,10 +177,11 @@
         );
       },
 
-      _getLinkText: function(report) {
+      _getLinkText: function (report) {
         if (report.is_draft) {
           return 'Go To Draft';
-        } else if (report.report_status === 'Sub') {
+        } else if (report.report_status === 'Sub' ||
+                   report.report_status === 'Rej') {
           return 'View Report';
         } else {
           return 'Enter Data';
