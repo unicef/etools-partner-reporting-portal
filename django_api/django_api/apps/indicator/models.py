@@ -416,7 +416,7 @@ class DisaggregationValue(TimeStampedModel):
         indicator.Disaggregation (ForeignKey): "disaggregation"
     """
     disaggregation = models.ForeignKey(Disaggregation, related_name="disaggregation_value")
-    value = models.CharField(max_length=255, null=True, blank=True)
+    value = models.CharField(max_length=15, null=True, blank=True)
     active = models.BooleanField(default=False)
 
     def __str__(self):

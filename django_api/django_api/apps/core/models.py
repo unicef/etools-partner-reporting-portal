@@ -125,7 +125,7 @@ class Location(TimeStampedModel):
         core.Location (ForeignKey): "self"
     """
     title = models.CharField(max_length=255)
-    reportable = models.ForeignKey('indicator.Reportable', related_name="locations")
+    reportable = models.ForeignKey('indicator.Reportable', null=True, blank=True, related_name="locations")
 
     latitude = models.DecimalField(
         null=True,
