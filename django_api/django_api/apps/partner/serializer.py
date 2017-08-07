@@ -121,3 +121,37 @@ class PartnerProjectSimpleSerializer(serializers.ModelSerializer):
             'id',
             'title',
         )
+
+
+class PartnerActivitySerializer(serializers.ModelSerializer):
+
+    cluster = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField()
+
+    class Meta:
+        model = PartnerActivity
+        fields = ('id', 'cluster', 'status', 'project', 'cluster_activity')
+
+    def get_cluster(self, obj):
+        return obj.cluster_activity.cluster_objective.cluster.title
+
+    def get_status(self, obj):
+        return obj.project and obj.project.status
+
+
+class PartnerActivityFromClusterActivitySerializer(serializers.Serializer):
+    cluster = serializers.PositiveIntegerField()
+    cluster_activity = serializers.PositiveIntegerField()
+    project = serializers.PositiveIntegerField()
+    partner = serializers.PositiveIntegerField()
+
+
+class PartnerActivityFromCustomActivitySerializer(serializers.Serializer):
+    title = serializers.CharField(max=255)
+    cluster = serializers.PositiveIntegerField()
+    cluster_objective = serializers.PositiveIntegerField()
+    project = serializers.PositiveIntegerField()
+    partner = serializers.PositiveIntegerField()
+    location = serializers.ListField(
+        child=serializers.PositiveIntegerField()
+    )
