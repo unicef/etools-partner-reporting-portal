@@ -92,7 +92,7 @@ class IndicatorBlueprint(TimeStampedModel):
         super(IndicatorBlueprint, self).save(*args, **kwargs)
 
     class Meta:
-        ordering = ['id']
+        ordering = ['-id']
 
 
 class Reportable(TimeStampedModel):
@@ -144,7 +144,7 @@ class Reportable(TimeStampedModel):
     cs_dates = ArrayField(models.DateField(), default=list)
 
     class Meta:
-        ordering = ['id']
+        ordering = ['-id']
 
     def __str__(self):
         return "Reportable <pk:%s>" % self.id
@@ -227,7 +227,7 @@ class IndicatorReport(TimeStampedModel):
 
 
     class Meta:
-        ordering = ['id']
+        ordering = ['-id']
 
     overall_status = models.CharField(
         choices=OVERALL_STATUS,

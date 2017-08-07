@@ -178,7 +178,7 @@ class PartnerProject(TimeStampedModel):
     reportables = GenericRelation('indicator.Reportable', related_query_name='partner_projects')
 
     class Meta:
-        ordering = ['id']
+        ordering = ['-id']
 
 
 class PartnerActivity(TimeStampedModel):
@@ -199,4 +199,4 @@ class PartnerActivity(TimeStampedModel):
     reportables = GenericRelation('indicator.Reportable', related_query_name='partner_activities')
 
     class Meta:
-        ordering = ['id']
+        ordering = ['-id']
