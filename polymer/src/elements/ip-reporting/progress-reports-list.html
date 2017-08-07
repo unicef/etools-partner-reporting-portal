@@ -12,6 +12,7 @@
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/data-table.html">
 <link rel="import" href="../../behaviors/pagination.html">
+<link rel="import" href="../../behaviors/routing.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../styles/table-styles.html">
 
@@ -76,7 +77,7 @@
         <etools-data-table-row no-collapse>
           <div slot="row-data">
             <div class="table-cell table-cell--text">
-              <a href="../pd/[[ report.programme_document.id ]]">
+              <a href="[[_getPDLink(report)]]">
                 [[_withDefault(report.programme_document.reference_number, '-')]]
               </a>
             </div>
@@ -101,7 +102,7 @@
               </template>
             </div>
             <div class="table-cell table-cell--text cell-reports">
-                <a href="TODO">[[_linkText(report)]]</a>
+                <a href="[[_getReportLink(report)]]">[[_getReportLinkText(report)]]</a>
             </div>
           </div>
         </etools-data-table-row>
@@ -126,6 +127,7 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.RoutingBehavior,
         App.Behaviors.DataTableBehavior,
         App.Behaviors.PaginationBehavior,
         App.Behaviors.UtilsBehavior,
@@ -152,15 +154,40 @@
         return is_draft;
       },
 
-      _linkText: function(report) {
+      _getPDLink: function (report) {
+        return this.buildUrl(
+          this._baseUrl,
+          '/pd/' + report.programme_document.id + '/view/details'
+        );
+      },
+
+      _getReportLinkText: function (report) {
         if (report.is_draft) {
           return 'Go To Draft';
-        } else if (report.progress_report_status === 'Sub' ||
-                   report.progress_report_status === 'Rej') {
+        } else if (report.status === 'Sub' ||
+                   report.status === 'Rej') {
           return 'View Report';
         } else {
           return 'Enter Data';
         }
+      },
+
+      _getReportLink: function (report) {
+        var suffix;
+
+        if (report.is_draft) {
+          suffix = 'draft';
+        } else if (report.status === 'Sub' ||
+                   report.status === 'Rej') {
+          suffix = 'view';
+        } else {
+          suffix = 'edit';
+        }
+
+        return this.buildUrl(
+          this._baseUrl,
+          '/pd/' + report.programme_document.id + '/report/' + report.id + '/' + suffix
+        );
       },
     });
   </script>

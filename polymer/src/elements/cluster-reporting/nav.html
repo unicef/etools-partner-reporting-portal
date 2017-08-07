@@ -1,6 +1,11 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="../../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../../bower_components/paper-menu/paper-submenu.html">
+<link rel="import" href="../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/iron-icons/av-icons.html">
 
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/page-nav.html">
@@ -8,6 +13,8 @@
 <link rel="import" href="../../redux/store.html">
 
 <link rel="import" href="../../styles/page-nav.html">
+
+<app-route route="{{route}}"></app-route>
 
 <dom-module id="cluster-reporting-nav">
   <template>
@@ -18,46 +25,57 @@
           background: var(--theme-selected-item-background-color);
         };
       }
+
     </style>
 
     <paper-menu
         id="menu"
         selected="{{selected}}"
         attr-for-selected="name"
-        selectable="paper-item"
+        selectable=".selectable"
         key-event-target="null">
 
-      <paper-item name="dashboard">
-        <a href="[[buildUrl(_baseUrlCluster, '/dashboard')]]">
-          <span>Dashboard</span>
-        </a>
-      </paper-item>
+        <paper-item name="dashboard" class="selectable">
+          <a href="[[buildUrl(_baseUrlCluster, '/dashboard')]]">
+            <span><iron-icon icon="view-quilt" role="presentation"></iron-icon>Dashboard</span>
+          </a>
+        </paper-item>
 
-      <paper-item name="response-parameters">
-        <a href="[[buildUrl(_baseUrlCluster, '/response-parameters')]]">
-          <span>Response Parameters</span>
-        </a>
-      </paper-item>
+        <div name="response-parameters" class="selectable">
+          <paper-submenu>
+            <paper-item class="menu-trigger">
+              <a href="[[buildUrl(_baseUrlCluster, 'response-parameters')]]">
+              <span><iron-icon icon="compare-arrows" role="presentation"></iron-icon>Response Parameters</span>
+              </a>
+            </paper-item>
+            <paper-menu class="menu-content">
+              <paper-item name="response-parameters" id="clustersSubmenu" class$="[[clustersSelected]]">
+                <a href="[[buildUrl(_baseUrlCluster, 'response-parameters/clusters')]]">Clusters</a>
+              </paper-item>
+              <paper-item name="response-parameters" id="partnersSubmenu" class$="[[partnersSelected]]">
+                <a href="[[buildUrl(_baseUrlCluster, 'response-parameters/partners')]]">Partners</a>
+              </a>
+            </paper-menu>
+          </paper-submenu>
+        </div>
 
-      <paper-item name="planned-action">
-        <a href="[[buildUrl(_baseUrlCluster, '/planned-action')]]">
-          <span>My Planned Action</span>
-        </a>
-      </paper-item>
+        <paper-item name="planned-action" class="selectable">
+          <a href="[[buildUrl(_baseUrlCluster, '/planned-action/')]]">
+            <span><iron-icon icon="av:playlist-add" role="presentation"></iron-icon>My Planned Action</span>
+          </a>
+        </paper-item>
 
-      <paper-item name="results">
-        <a href="[[buildUrl(_baseUrlCluster, '/results')]]">
-          <span>Results</span>
-        </a>
-      </paper-item>
+        <paper-item name="results" class="selectable">
+          <a href="[[buildUrl(_baseUrlCluster, '/results')]]">
+            <span><iron-icon icon="trending-up" role="presentation"></iron-icon>Results</span>
+          </a>
+        </paper-item>
 
-      <paper-item name="analysis">
-        <a href="[[buildUrl(_baseUrlCluster, '/analysis')]]">
-          <span>Analysis</span>
-        </a>
-      </paper-item>
-
-    </paper-menu>
+        <paper-item name="analysis" class="selectable">
+          <a href="[[buildUrl(_baseUrlCluster, '/analysis')]]">
+            <span><iron-icon icon="av:equalizer" role="presentation"></iron-icon>Analysis</span>
+          </a>
+        </paper-item>
   </template>
 
   <script>
@@ -70,6 +88,27 @@
         App.Behaviors.ReduxBehavior,
         App.Behaviors.RoutingBehavior,
       ],
+
+      properties: {
+        clustersSelected: String,
+        partnersSelected: String
+
+      },
+
+      observers: [
+        '_routeChanged(route)',
+      ],
+
+      //Shows the submenu item selected upon initial load.
+      _routeChanged: function() {
+        if (this.route.path.indexOf('partners') >= 0) {
+          this.partnersSelected = 'iron-selected';
+          this.clustersSelected = '';
+        } else {
+          this.clustersSelected = 'iron-selected';
+          this.partnersSelected = '';
+        }
+      },
     });
   </script>
 </dom-module>
