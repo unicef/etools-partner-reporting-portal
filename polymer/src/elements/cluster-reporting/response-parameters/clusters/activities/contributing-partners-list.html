@@ -163,15 +163,14 @@
             computed: '_computeCurrentPartners(activityId, allPartners)'
           },
 
-          //
-          // loading: {
-          //   type: Boolean,
-          //   statePath: 'partnerProjects.loading'
-          // },
-          //
+          loading: {
+            type: Boolean,
+            statePath: 'clusterActivities.partnersLoading'
+          },
+
           totalResults: {
             type: Number,
-            statePath: 'partnerProjects.count',
+            statePath: 'clusterActivities.partnersCount',
           },
 
           detailsOpened: {

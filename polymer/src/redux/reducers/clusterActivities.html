@@ -13,6 +13,8 @@
       count: clusterActivitiesCountReducer,
       loading: loadingClusterActivitiesReducer,
       partners: partnersByClusterActivityIdReducer,
+      partnersCount: partnersByClusterActivityIdCountReducer,
+      partnersLoading: partnersByClusterActivityIdLoadingReducer
     });
 
     function clusterActivitiesListReducer(state, action) {
@@ -79,6 +81,37 @@
 
         case App.Constants.RESET:
           return {};
+
+        default:
+          return state;
+      }
+    }
+
+    function partnersByClusterActivityIdCountReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = 0;
+      }
+
+      switch (action.type) {
+        case App.Constants.SET_PARTNERS_BY_CLUSTER_ACTIVITY_ID_COUNT:
+          return action.count;
+
+        default:
+          return state;
+      }
+    }
+
+    function partnersByClusterActivityIdLoadingReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = false;
+      }
+
+      switch (action.type) {
+        case App.Constants.PARTNERS_BY_CLUSTER_ACTIVITY_ID_LOADING_START:
+          return true;
+
+        case App.Constants.PARTNERS_BY_CLUSTER_ACTIVITY_ID_LOADING_STOP:
+          return false;
 
         default:
           return state;
