@@ -1,0 +1,133 @@
+<link rel="import" href="../../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../../bower_components/etools-data-table/etools-data-table.html">
+<link rel="import" href="../../../../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../../../../bower_components/iron-location/iron-query-params.html">
+<link rel="import" href="../../../../../../bower_components/iron-flex-layout/iron-flex-layout.html">
+
+<link rel="import" href="../../../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../../../elements/page-body.html">
+<link rel="import" href="../../../../../behaviors/data-table.html">
+<link rel="import" href="../../../../../behaviors/pagination.html">
+<link rel="import" href="../../../../../behaviors/routing.html">
+<link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="../../../../../styles/shared-styles.html">
+<link rel="import" href="../../../../../styles/table-styles.html">
+
+<dom-module id="clusters-objectives-list">
+    <template>
+    <style include="data-table-styles table-styles iron-flex">
+      :host {
+        display: block;
+      }
+
+      div#action {
+        margin-bottom: 25px;
+        @apply(--layout-horizontal);
+        @apply(--layout-end-justified)
+      }
+
+      a {
+        color: var(--theme-primary-color);
+      }
+
+      .wrapper {
+        position: relative;
+      }
+    </style>
+
+    <iron-location query="{{query}}"></iron-location>
+
+    <iron-query-params
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
+    </iron-query-params>
+
+    <div class="wrapper">
+      <etools-data-table-header
+          no-collapse
+          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
+        <etools-data-table-column field="cluster">
+          <div class="table-column">Cluster</div>
+        </etools-data-table-column>
+        <etools-data-table-column field="ref">
+          <div class="table-column">CO ref. #</div>
+        </etools-data-table-column>
+        <etools-data-table-column field="title">
+          <div class="table-column">Cluster Objective Title</div>
+        </etools-data-table-column>
+      </etools-data-table-header>
+
+      <template
+          id="list"
+          is="dom-repeat"
+          items="[[objectives]]"
+          as="objective"
+          initial-count="[[pageSize]]">
+        <etools-data-table-row no-collapse>
+          <div slot="row-data">
+            <div class="table-cell table-cell--text">
+              [[objective.cluster_title]]
+            </div>
+            <div class="table-cell table-cell--text">
+              [[objective.reference_number]]
+            </div>
+            <div class="table-cell table-cell--text">
+              <a href="[[_detailUrl(objective.id)]]">[[objective.title]]</a>
+            </div>
+          </div>
+        </etools-data-table-row>
+      </template>
+
+      <etools-data-table-footer
+          page-size="[[pageSize]]"
+          page-number="[[pageNumber]]"
+          total-results="[[totalResults]]"
+          visible-range="{{visibleRange}}"
+          on-page-size-changed="_pageSizeChanged"
+          on-page-number-changed="_pageNumberChanged">
+      </etools-data-table-footer>
+
+      <etools-loading active="[[loading]]"></etools-loading>
+    </div>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'clusters-objectives-list',
+
+      behaviors: [
+        App.Behaviors.PaginationBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.RoutingBehavior,
+        App.Behaviors.DataTableBehavior,
+        App.Behaviors.UtilsBehavior,
+      ],
+
+      properties: {
+        loading: {
+          type: Boolean,
+          statePath: 'clusterObjectives.loading'
+        },
+
+        objectives: {
+          type: Object,
+          statePath: 'clusterObjectives.all',
+        },
+
+        totalResults: {
+          type: Number,
+          statePath: 'clusterObjectives.count',
+        },
+      },
+
+      _openModal: function () {
+        this.$$('#modal').open();
+      },
+
+      _detailUrl: function (id) {
+        var path = '/response-parameters/clusters/objective/' + id;
+        return this.buildUrl(this._baseUrlCluster, path) + '?' + this.query;
+      },
+    });
+  </script>
+</dom-module>

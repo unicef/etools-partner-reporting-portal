@@ -1,0 +1,29 @@
+<link rel="import" href="../../../../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../../../../elements/page-body.html">
+<link rel="import" href="../../../project-details.html">
+
+<dom-module id="rp-partner-project-details-overview">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <page-body>
+      <project-details-display project-data=[[projectData]]></project-details-display>
+    </page-body>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'rp-partner-project-details-overview',
+
+      properties: {
+        projectData: Object,
+      },
+
+    });
+  </script>
+</dom-module>
