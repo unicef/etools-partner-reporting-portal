@@ -1,0 +1,189 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../../../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../../../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
+<link rel="import" href="../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-multi-selection-menu.html">
+
+<link rel="import" href="../etools-prp-ajax.html">
+<link rel="import" href="../../endpoints.html">
+<link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/modal.html">
+<link rel="import" href="../../styles/buttons.html">
+<link rel="import" href="../../styles/modal.html">
+
+<dom-module id="activity-modal">
+  <template>
+    <style include="button-styles modal-styles app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
+      :host {
+        display: block;
+
+        --app-grid-columns: 2;
+        --app-grid-gutter: 24px;
+        --app-grid-item-height: auto;
+        --app-grid-expandible-item-columns: 2;
+
+        --paper-dialog: {
+          width: 600px;
+
+          & > * {
+            margin: 0;
+          }
+        };
+      }
+
+      .item-wide {
+        @apply --app-grid-expandible-item;
+      }
+
+      paper-radio-group {
+        display: block;
+        margin-top: 16px;
+      }
+
+      paper-radio-group > .fields {
+        padding: calc(var(--app-grid-gutter) / 2) 0;
+      }
+
+      paper-radio-group > .fields[empty] {
+        padding: 0;
+      }
+
+      paper-radio-group .app-grid {
+        margin: -var(--app-grid-gutter);
+      }
+
+      paper-radio-button {
+        margin-left: -12px;
+      }
+
+      paper-dropdown-menu {
+        width: 100%;
+      }
+    </style>
+
+    <etools-prp-ajax
+        id="activity"
+        url="[[activityUrl]]"
+        method="post"
+        content-type="application/json">
+    </etools-prp-ajax>
+
+    <paper-dialog
+        id="dialog"
+        with-backdrop
+        opened="{{opened}}">
+      <div class="header layout horizontal justified">
+        <h2>Add activity</h2>
+
+        <paper-icon-button
+            class="self-center"
+            on-tap="close"
+            icon="icons:close">
+        </paper-icon-button>
+      </div>
+
+      <paper-dialog-scrollable>
+        <paper-radio-group
+            id="mode"
+            selected="{{mode}}">
+          <paper-radio-button name="cluster">Add from Cluster Activities</paper-radio-button>
+
+          <div
+              class="fields"
+              empty$="[[!_equals(mode, 'cluster')]]">
+            <template
+                is="dom-if"
+                if="[[_equals(mode, 'cluster')]]"
+                restamp="true">
+              <div class="app-grid">
+                <div class="item">Cluster dropdown</div>
+              </div>
+              <div class="app-grid">
+                <div class="item item-wide">
+                  Activity dropdown
+                </div>
+              </div>
+              <div class="app-grid">
+                <div class="item item-wide">
+                  Partner project dropdown
+                </div>
+              </div>
+            </template>
+          </div>
+
+          <paper-radio-button name="custom">Add Custom Activity</paper-radio-button>
+
+          <div
+              class="fields"
+              empty$="[[!_equals(mode, 'custom')]]">
+            <template
+                is="dom-if"
+                if="[[_equals(mode, 'custom')]]"
+                restamp="true">
+              <div class="app-grid">
+                <div class="item">Cluster dropdown</div>
+              </div>
+            </template>
+          </div>
+        </paper-radio-group>
+      </paper-dialog-scrollable>
+
+      <div class="buttons layout horizontal-reverse">
+        <paper-button
+            on-tap="_save"
+            class="btn-primary"
+            raised>
+          Add activity
+        </paper-button>
+
+        <paper-button
+            on-tap="close">
+          Cancel
+        </paper-button>
+      </div>
+
+      <etools-loading active="[[updatePending]]"></etools-loading>
+    </paper-dialog>
+  </template>
+
+  <script>
+    Polymer({
+      id: 'activity-modal',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.ModalBehavior,
+      ],
+
+      properties: {
+        updatePending: {
+          type: Boolean,
+          value: false,
+        },
+
+        mode: {
+          type: String,
+          value: 'cluster',
+        },
+      },
+
+      listeners: {
+        'mode.selected-changed': 'adjustPosition',
+      },
+    });
+  </script>
+</dom-module>
