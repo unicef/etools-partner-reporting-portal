@@ -198,5 +198,11 @@ class PartnerActivity(TimeStampedModel):
     cluster_activity = models.ForeignKey('cluster.ClusterActivity', related_name="partner_activities", null=True)
     reportables = GenericRelation('indicator.Reportable', related_query_name='partner_activities')
 
+    start_date = models.DateField()
+    end_date = models.DateField()
+
+    # PartnerActivity shares the status flags with PartnerProject
+    status = models.CharField(max_length=3, choices=PARTNER_PROJECT_STATUS, default=PARTNER_PROJECT_STATUS.ongoing)
+
     class Meta:
         ordering = ['-id']
