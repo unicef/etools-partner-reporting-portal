@@ -5,7 +5,7 @@
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/etools-datepicker/etools-datepicker-button.html">
 
-<link rel="import" href="../redux/store.html">
+<link rel="import" href="etools-prp-theme.html">
 <link rel="import" href="../behaviors/date.html">
 <link rel="import" href="../styles/shared-styles.html">
 
@@ -17,6 +17,10 @@
         display: block;
       }
     </style>
+
+    <etools-prp-theme
+        primary-color="{{primaryColor}}">
+    </etools-prp-theme>
 
     <paper-input id="dateInput"
                  label="[[label]]"
@@ -52,7 +56,6 @@
         is: 'etools-prp-date-input',
         behaviors: [
           App.Behaviors.DateBehavior,
-          App.Behaviors.ReduxBehavior,
         ],
         properties: {
           label: String,
@@ -104,9 +107,8 @@
             type: String,
             value: 'YYYY-MM-DD'
           },
-          currentApp: {
+          primaryColor: {
             type: String,
-            statePath: 'app.current',
             observer: '_updateTheme',
           },
         },
@@ -121,23 +123,12 @@
         validate: function() {
           return this.$.dateInput.validate();
         },
-        _updateTheme: function (app) {
+        _updateTheme: function (color) {
           this.async(function () {
             var datePicker = this.$.datePickerButton.datePicker;
-            var themeColor;
 
-            switch (app) {
-              case 'cluster-reporting':
-                themeColor = '#009d55';
-                break;
-
-              case 'ip-reporting':
-                themeColor = '#0099ff';
-                break;
-            }
-
-            datePicker.customStyle['--etools-datepicker-heading-bg-color'] = themeColor;
-            datePicker.customStyle['--etools-datepicker-btns-text-color'] = themeColor;
+            datePicker.customStyle['--etools-datepicker-heading-bg-color'] = color;
+            datePicker.customStyle['--etools-datepicker-btns-text-color'] = color;
             datePicker.updateStyles();
           });
         },
