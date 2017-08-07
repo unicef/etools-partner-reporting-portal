@@ -1,24 +1,61 @@
 <link rel="import" href="../../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../../bower_components/iron-flex-layout/iron-flex-layout.html">
 
-<link rel="import" href="../../../../../elements/page-body.html">
-<link rel="import" href="../../../project-details.html">
+<link rel="import" href="../../../../etools-prp-ajax.html">
+<link rel="import" href="../../../../page-body.html">
+<link rel="import" href="../../../indicator-modal.html">
+<link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="../../../../../endpoints.html">
+<link rel="import" href="../../../../../styles/table-styles.html">
+<link rel="import" href="../../../../../styles/buttons.html">
 
 <dom-module id="rp-partner-project-details-indicators">
   <template>
-    <style>
+    <style include="button-styles iron-flex data-table-styles table-styles">
       :host {
         display: block;
+      }
+
+      div#action {
+        margin: 25px 0;
+        @apply(--layout-horizontal);
+        @apply(--layout-end-justified)
       }
     </style>
 
     <page-body>
-      Indicators
+      <div id="action">
+        <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
+          Add Indicator
+        </paper-button>
+      </div>
+      <indicator-modal
+        id="indicatorModal"
+        object-id="1"
+        object-type="PartnerProject">
+      </indicator-modal>
     </page-body>
   </template>
 
   <script>
     Polymer({
       is: 'rp-partner-project-details-indicators',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+      ],
+
+      listeners: {
+        'indicatorModal.indicator-added': '_onSuccess',
+      },
+
+      _openModal: function () {
+        this.$.indicatorModal.open();
+      },
+
+      _onSuccess: function (e, data) {
+        console.log('Added indicator', data);
+      },
     });
   </script>
 </dom-module>
