@@ -17,6 +17,7 @@
 <link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-multi-selection-menu.html">
 
 <link rel="import" href="../etools-prp-ajax.html">
+<link rel="import" href="../etools-prp-date-input.html">
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../behaviors/utils.html">
@@ -110,15 +111,28 @@
                 restamp="true">
               <div class="app-grid">
                 <div class="item">Cluster dropdown</div>
-              </div>
-              <div class="app-grid">
                 <div class="item item-wide">
                   Activity dropdown
                 </div>
-              </div>
-              <div class="app-grid">
                 <div class="item item-wide">
                   Partner project dropdown
+                </div>
+                <div class="item">
+                   <etools-prp-date-input
+                      label="Start date"
+                      value="{{data.cluster.start_date}}"
+                      required
+                      no-init>
+                   </etools-prp-date-input>
+                  </etools-date-input>
+                </div>
+                <div class="item">
+                  <etools-prp-date-input
+                      label="End date"
+                      value="{{data.cluster.end_date}}"
+                      required
+                      no-init>
+                  </etools-prp-date-input>
                 </div>
               </div>
             </template>
@@ -170,6 +184,8 @@
       ],
 
       properties: {
+        data: Object,
+
         updatePending: {
           type: Boolean,
           value: false,
@@ -179,10 +195,22 @@
           type: String,
           value: 'cluster',
         },
+
+        opened: {
+          type: Boolean,
+          observer: '_setDefaults',
+        },
       },
 
       listeners: {
         'mode.selected-changed': 'adjustPosition',
+      },
+
+      _setDefaults: function () {
+        this.set('data', {
+          cluster: {},
+          custom: {},
+        });
       },
     });
   </script>
