@@ -12,6 +12,7 @@ from .views import (
 
 
 urlpatterns = [
+    url(r'^cluster-list/(?P<rp_id>\d+)/$', ClusterListAPIView.as_view(), name="cluster-list"),
     url(r'^cluster-objective/$', ClusterObjectiveAPIView.as_view(), name="cluster-objective"),
     url(r'^cluster-objective/(?P<pk>\d+)/$', ClusterObjectiveAPIView.as_view(), name="cluster-objective"),
     url(r'^cluster-objective-list/$',
