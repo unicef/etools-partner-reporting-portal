@@ -100,7 +100,9 @@
         <paper-radio-group
             id="mode"
             selected="{{mode}}">
-          <paper-radio-button name="cluster">Add from Cluster Activities</paper-radio-button>
+          <paper-radio-button name="cluster">
+            <strong>Add from Cluster Activities</strong>
+          </paper-radio-button>
 
           <div
               class="fields"
@@ -119,8 +121,11 @@
                 </div>
                 <div class="item">
                    <etools-prp-date-input
+                      class="validate"
                       label="Start date"
                       value="{{data.cluster.start_date}}"
+                      error-message=""
+                      auto-validate
                       required
                       no-init>
                    </etools-prp-date-input>
@@ -128,17 +133,25 @@
                 </div>
                 <div class="item">
                   <etools-prp-date-input
+                      class="validate"
                       label="End date"
                       value="{{data.cluster.end_date}}"
+                      error-message=""
+                      auto-validate
                       required
                       no-init>
                   </etools-prp-date-input>
+                </div>
+                <div class="item">
+                  Status dropdown
                 </div>
               </div>
             </template>
           </div>
 
-          <paper-radio-button name="custom">Add Custom Activity</paper-radio-button>
+          <paper-radio-button name="custom">
+            <strong>Add Custom Activity</strong>
+          </paper-radio-button>
 
           <div
               class="fields"
@@ -148,7 +161,22 @@
                 if="[[_equals(mode, 'custom')]]"
                 restamp="true">
               <div class="app-grid">
-                <div class="item">Cluster dropdown</div>
+                <div class="item">
+                  Cluster dropdown
+                </div>
+                <div class="item">
+                  CO ref. # dropdown
+                </div>
+                <div class="item item-wide">
+                  <paper-input
+                      class="validate"
+                      label="Title"
+                      value="{{data.custom.title}}"
+                      on-input="_validate"
+                      always-float-label
+                      required>
+                  </paper-input>
+                </div>
               </div>
             </template>
           </div>
@@ -212,6 +240,32 @@
           cluster: {},
           custom: {},
         });
+      },
+
+      _validate: function (e) {
+        e.target.validate();
+      },
+
+      _save: function () {
+        var fields = [].slice.call(
+          Polymer.dom(this.root).querySelectorAll('.validate')
+        );
+
+        var valid;
+
+        fields.forEach(function (field) {
+          field.validate();
+        });
+
+        valid = fields.every(function (field) {
+          return !field.invalid;
+        });
+
+        if (!valid) {
+          return;
+        }
+
+        console.log(this.data[this.mode]);
       },
     });
   </script>

@@ -31,7 +31,6 @@
                  disabled$="[[disabled]]"
                  readonly$="[[readonly]]"
                  required$="[[required]]"
-                 invalid$="[[invalid]]"
                  auto-validate$="[[autoValidate]]"
                  error-message="[[errorMessage]]">
       <!-- <iron-icon prefix icon="date-range" hidden$="[[!readonly]]"></iron-icon> -->
@@ -87,7 +86,6 @@
           required: {
             type: Boolean,
             value: false,
-            reflectToAttribute: true
           },
           autoValidate: {
             type: Boolean,
@@ -96,8 +94,8 @@
           },
           invalid: {
             type: Boolean,
-            value: false,
-            reflectToAttribute: true
+            value: true,
+            computed: '_computeInvalid(required, value)',
           },
           errorMessage: {
             type: String,
@@ -120,6 +118,11 @@
         _disabledDatepicker: function(readonly, disabled) {
           return readonly || disabled;
         },
+
+        _computeInvalid: function (required, value) {
+          return this.required && !value;
+        },
+
         validate: function() {
           return this.$.dateInput.validate();
         },
