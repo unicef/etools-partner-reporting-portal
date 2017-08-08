@@ -82,6 +82,16 @@
         content-type="application/json">
     </etools-prp-ajax>
 
+    <etools-prp-ajax
+        id="clusters"
+        url="[[clustersUrl]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
+        id="locations"
+        url="[[locationsUrl]]">
+    </etools-prp-ajax>
+
     <paper-dialog
         id="dialog"
         with-backdrop
@@ -112,7 +122,26 @@
                 if="[[_equals(mode, 'cluster')]]"
                 restamp="true">
               <div class="app-grid">
-                <div class="item">Cluster dropdown</div>
+                <div class="item">
+                  <paper-dropdown-menu
+                      class="validate"
+                      label="Cluster"
+                      on-value-changed="_validate"
+                      always-float-label
+                      required>
+                    <paper-listbox
+                        selected="{{data.cluster.cluster}}"
+                        attr-for-selected="value"
+                        slot="dropdown-content"
+                        class="dropdown-content">
+                      <template
+                          is="dom-repeat"
+                          items="[[clusters]]">
+                        <paper-item value="[[item.id]]">[[item.title]]</paper-item>
+                      </template>
+                    </paper-listbox>
+                  </paper-dropdown-menu>
+                </div>
                 <div class="item item-wide">
                   Activity dropdown
                 </div>
@@ -143,7 +172,24 @@
                   </etools-prp-date-input>
                 </div>
                 <div class="item">
-                  Status dropdown
+                  <paper-dropdown-menu
+                      class="validate"
+                      label="Status"
+                      on-value-changed="_validate"
+                      always-float-label
+                      required>
+                    <paper-listbox
+                        selected="{{data.cluster.status}}"
+                        attr-for-selected="value"
+                        slot="dropdown-content"
+                        class="dropdown-content">
+                      <template
+                          is="dom-repeat"
+                          items="[[statuses]]">
+                        <paper-item value="[[item.id]]">[[item.title]]</paper-item>
+                      </template>
+                    </paper-listbox>
+                  </paper-dropdown-menu>
                 </div>
               </div>
             </template>
@@ -162,7 +208,24 @@
                 restamp="true">
               <div class="app-grid">
                 <div class="item">
-                  Cluster dropdown
+                  <paper-dropdown-menu
+                      class="validate"
+                      label="Cluster"
+                      on-value-changed="_validate"
+                      always-float-label
+                      required>
+                    <paper-listbox
+                        selected="{{data.custom.cluster}}"
+                        attr-for-selected="value"
+                        slot="dropdown-content"
+                        class="dropdown-content">
+                      <template
+                          is="dom-repeat"
+                          items="[[clusters]]">
+                        <paper-item value="[[item.id]]">[[item.title]]</paper-item>
+                      </template>
+                    </paper-listbox>
+                  </paper-dropdown-menu>
                 </div>
                 <div class="item">
                   CO ref. # dropdown
@@ -176,6 +239,65 @@
                       always-float-label
                       required>
                   </paper-input>
+                </div>
+                <div class="item item-wide">
+                  Partner project dropdown
+                </div>
+                 <div class="item">
+                   <etools-prp-date-input
+                      class="validate"
+                      label="Start date"
+                      value="{{data.custom.start_date}}"
+                      error-message=""
+                      auto-validate
+                      required
+                      no-init>
+                   </etools-prp-date-input>
+                  </etools-date-input>
+                </div>
+                <div class="item">
+                  <etools-prp-date-input
+                      class="validate"
+                      label="End date"
+                      value="{{data.custom.end_date}}"
+                      error-message=""
+                      auto-validate
+                      required
+                      no-init>
+                  </etools-prp-date-input>
+                </div>
+                <div class="item">
+                  <paper-dropdown-menu
+                      class="validate"
+                      label="Status"
+                      on-value-changed="_validate"
+                      always-float-label
+                      required>
+                    <paper-listbox
+                        selected="{{data.custom.status}}"
+                        attr-for-selected="value"
+                        slot="dropdown-content"
+                        class="dropdown-content">
+                      <template
+                          is="dom-repeat"
+                          items="[[statuses]]">
+                        <paper-item value="[[item.id]]">[[item.title]]</paper-item>
+                      </template>
+                    </paper-listbox>
+                  </paper-dropdown-menu>
+                </div>
+                <div class="item">
+                  <etools-multi-selection-menu
+                      class="validate"
+                      label="Location"
+                      options="[[locations]]"
+                      selected-values="{{selectedLocations}}"
+                      on-selected-values-changed="_validate"
+                      option-value="id"
+                      option-label="title"
+                      trigger-value-change-event
+                      required>
+                  </etools-multi-selection-menu>
                 </div>
               </div>
             </template>
@@ -214,6 +336,8 @@
       properties: {
         data: Object,
 
+        selectedLocations: Array,
+
         updatePending: {
           type: Boolean,
           value: false,
@@ -229,21 +353,121 @@
           type: Boolean,
           observer: '_setDefaults',
         },
+
+        responsePlanId: {
+          type: String,
+          statePath: 'responsePlans.currentID',
+        },
+
+        activityUrl: {
+          type: String,
+          computed: '_computeActivityUrl(responsePlanId, mode)',
+        },
+
+        clustersUrl: {
+          type: String,
+          computed: '_computeClustersUrl(responsePlanId)',
+          observer: '_fetchClusters',
+        },
+
+        clusters: {
+          type: Array,
+          value: [],
+        },
+
+        statuses: {
+          type: Array,
+          value: [
+            {title: 'Ongoing', id: 'Ong'},
+            {title: 'Planned', id: 'Pla'},
+            {title: 'Completed', id: 'Com'},
+          ],
+        },
+
+        locationId: {
+          type: String,
+          statePath: 'location.id',
+        },
+
+        locationsUrl: {
+          type: String,
+          computed: '_computeLocationsUrl(locationId)',
+          observer: '_fetchLocations',
+        },
+
+        locations: {
+          type: Array,
+          value: [],
+        }
       },
 
       listeners: {
         'mode.selected-changed': 'adjustPosition',
       },
 
+      observers: [
+        '_setLocations(selectedLocations.splices)',
+      ],
+
       _setDefaults: function () {
         this.set('data', {
           cluster: {},
           custom: {},
         });
+
+        this.set('selectedLocations', []);
       },
 
       _validate: function (e) {
         e.target.validate();
+      },
+
+      _computeActivityUrl: function (responsePlanId, mode) {
+        return App.Endpoints.partnerActivity(responsePlanId, mode);
+      },
+
+      _computeClustersUrl: function (responsePlanId) {
+        return App.Endpoints.clusterNames(responsePlanId);
+      },
+
+      _fetchClusters: function () {
+        var self = this;
+
+        this.$.clusters.abort();
+
+        this.$.clusters.thunk()()
+            .then(function (res) {
+              self.set('clusters', res.data);
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
+      },
+
+      _computeLocationsUrl: function (locationId) {
+        return App.Endpoints.childLocations(locationId);
+      },
+
+      _fetchLocations: function () {
+        var self = this;
+
+        this.$.locations.thunk()()
+            .then(function (res) {
+              self.set('locations', res.data);
+            });
+      },
+
+      _setLocations: function () {
+        if (!this.locations || !this.selectedLocations) {
+          return;
+        }
+
+        this.set(
+          'data.custom.locations',
+          this.locations.filter(function (location) {
+            return this.selectedLocations.indexOf(location.id) !== -1;
+          }, this)
+        );
       },
 
       _save: function () {
@@ -251,6 +475,7 @@
           Polymer.dom(this.root).querySelectorAll('.validate')
         );
 
+        var self = this;
         var valid;
 
         fields.forEach(function (field) {
@@ -265,7 +490,21 @@
           return;
         }
 
-        console.log(this.data[this.mode]);
+        this.set('updatePending', true);
+
+        this.$.activity.body = this.data[this.mode];
+
+        this.$.activity.thunk()()
+            .then(function (res) {
+              self.fire('activity-added', res.data);
+              self.set('updatePending', false);
+              self.close();
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+
+              self.set('updatePending', false);
+            });
       },
     });
   </script>

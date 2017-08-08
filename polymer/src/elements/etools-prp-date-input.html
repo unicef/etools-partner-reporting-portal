@@ -95,6 +95,7 @@
           invalid: {
             type: Boolean,
             value: true,
+            notify: true,
             computed: '_computeInvalid(required, value)',
           },
           errorMessage: {
@@ -126,14 +127,21 @@
         validate: function() {
           return this.$.dateInput.validate();
         },
-        _updateTheme: function (color) {
-          this.async(function () {
-            var datePicker = this.$.datePickerButton.datePicker;
 
-            datePicker.customStyle['--etools-datepicker-heading-bg-color'] = color;
-            datePicker.customStyle['--etools-datepicker-btns-text-color'] = color;
-            datePicker.updateStyles();
-          });
+        _updateTheme: function (color) {
+          (function updateTheme (self) {
+            self.async(function () {
+              var datePicker = this.$.datePickerButton.datePicker;
+
+              if (!datePicker) {
+                return updateTheme(self);
+              }
+
+              datePicker.customStyle['--etools-datepicker-heading-bg-color'] = color;
+              datePicker.customStyle['--etools-datepicker-btns-text-color'] = color;
+              datePicker.updateStyles();
+            }, 100);
+          }(this));
         },
       });
     })();
