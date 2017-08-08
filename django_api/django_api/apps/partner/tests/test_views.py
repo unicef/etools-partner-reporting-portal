@@ -1,11 +1,24 @@
 import datetime
+
 from django.urls import reverse
 from django.conf import settings
+
 from rest_framework import status
+
 from core.tests.base import BaseAPITestCase
 from core.models import Location
-from cluster.models import Cluster
-from partner.models import Partner, PartnerProject
+from core.factories import ClusterObjectiveFactory
+from cluster.models import (
+    Cluster,
+    ClusterActivity,
+    ClusterObjective,
+)
+
+from partner.models import (
+    Partner,
+    PartnerProject,
+    PartnerActivity,
+)
 
 
 class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
@@ -150,3 +163,73 @@ class TestPartnerProjectAPIView(BaseAPITestCase):
 
         self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEquals(PartnerProject.objects.all().count(), base_count)
+
+
+class TestPartnerActivityAPIView(BaseAPITestCase):
+
+    def setUp(self):
+        super(TestPartnerActivityAPIView, self).setUp()
+
+        self.cluster = Cluster.objects.filter(
+            partner_projects__isnull=False,
+            partner_projects__partner__isnull=False).distinct().first()
+
+        self.cluster_objective = ClusterObjectiveFactory(cluster=self.cluster)
+
+        self.partner_project = self.cluster.partner_projects.first()
+
+        self.data = {
+            "cluster": self.cluster.id,
+            "partner": self.partner_project.partner.id,
+            "project": self.partner_project.id,
+            "start_date": "2017-01-01",
+            "end_date": "2017-05-31",
+            "status": "Ong"
+        }
+
+    def test_create_activity_from_cluster_activity(self):
+        base_count = PartnerActivity.objects.all().count()
+
+        self.cluster_activity = self.cluster.cluster_objectives.first().cluster_activities.first()
+
+        self.data['cluster_activity'] = self.cluster_activity.id
+
+        # test for creating object
+        url = reverse(
+            'partner-activity-create',
+            kwargs={
+                'response_plan_id': self.cluster.response_plan_id,
+                'create_mode': 'cluster',
+            }
+        )
+
+        response = self.client.post(url, data=self.data, format='json')
+
+        self.assertTrue(status.is_success(response.status_code))
+        created_obj = PartnerActivity.objects.get(id=response.data['id'])
+        self.assertEquals(created_obj.title, self.cluster_activity.title)
+        self.assertEquals(PartnerActivity.objects.all().count(),  base_count + 1)
+
+    def test_create_activity_from_custom_activity(self):
+        base_count = PartnerActivity.objects.all().count()
+        last = PartnerActivity.objects.last()
+
+        self.data['cluster_objective'] = self.cluster.cluster_objectives.first().id
+
+        self.data['title'] = 'TEST'
+
+        # test for creating object
+        url = reverse(
+            'partner-activity-create',
+            kwargs={
+                'response_plan_id': self.cluster.response_plan_id,
+                'create_mode': 'custom',
+            }
+        )
+
+        response = self.client.post(url, data=self.data, format='json')
+
+        self.assertTrue(status.is_success(response.status_code))
+        created_obj = PartnerActivity.objects.get(id=response.data['id'])
+        self.assertEquals(created_obj.title, self.data['title'])
+        self.assertEquals(PartnerActivity.objects.all().count(),  base_count + 1)
