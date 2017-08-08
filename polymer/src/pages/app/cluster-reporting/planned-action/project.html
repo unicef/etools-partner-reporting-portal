@@ -99,7 +99,9 @@
     </template>
 
     <template is="dom-if" if="[[_equals(tab, 'indicators')]]" restamp="true">
-      <pa-project-details-indicators></pa-project-details-indicators>
+      <pa-project-details-indicators
+        project-id="[[projectId]]">
+      </pa-project-details-indicators>
     </template>
 
     <template is="dom-if" if="[[_equals(tab, 'activities')]]" restamp="true">
