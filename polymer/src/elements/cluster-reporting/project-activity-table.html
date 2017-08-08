@@ -27,6 +27,10 @@
         display: block;
       }
 
+      iron-icon {
+        color: var(--paper-grey-600);
+      }
+
       a {
         color: var(--theme-primary-color);
       }
@@ -81,7 +85,12 @@
                 <!-- TODO: Add project activity title when available. -->
               </div>
               <div class="table-cell table-cell--text">
-                [[item.cluster_activity]]
+                <template is="dom-if" if="[[item.cluster_activity]]">
+                  <iron-icon icon="icons:check" aria-label="checkmark"></iron-icon>
+                </template>
+                <template is="dom-if" if="[[!item.cluster_activity]]">
+                  <span role="presentation"> - </span>
+                </template>
               </div>
             </div>
           </etools-prp-data-table-row>
@@ -163,15 +172,6 @@
         listeners: {
           'page-number-changed': '_pageNumberModified',
           'details-opened-changed': '_detailsChange'
-        },
-
-        _detailUrl: function(projectId) {
-          var path = '/response-parameters/partners/project/' + projectId;
-          if (this.page === 'planned-action') {
-            path = '/planned-action/project/' + projectId;
-          }
-
-          return this.buildUrl(this._baseUrlCluster, path);
         },
 
         _computeCurrentActivitiesCount: function(projectId, activitiesCountDict) {
