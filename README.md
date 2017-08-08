@@ -1,13 +1,13 @@
 # etools-partner-reporting-portal
 
 ## Container build status
-* Polymer: [![Codefresh Polymer build status]( https://g.codefresh.io/api/badges/build?repoOwner=unicef&repoName=etools-partner-reporting-portal&branch=develop&pipelineName=polymer&accountName=UNICEF&type=cf-2)]( https://g.codefresh.io/repositories/unicef/etools-partner-reporting-portal/builds?filter=trigger:build;branch:develop;service:58d57dc1d28e8f0100907a76~polymer)
+* Polymer: [![Codefresh build status]( https://g.codefresh.io/api/badges/build?repoOwner=unicef&repoName=etools-partner-reporting-portal&branch=develop&pipelineName=polymer&accountName=unicef&type=cf-1)]( https://g.codefresh.io/repositories/unicef/etools-partner-reporting-portal/builds?filter=trigger:build;branch:develop;service:58d57dc1d28e8f0100907a76~polymer)
 
-* PostGIS: [![Codefresh PostGIS build status]( https://g.codefresh.io/api/badges/build?repoOwner=unicef&repoName=etools-partner-reporting-portal&branch=develop&pipelineName=db&accountName=UNICEF&type=cf-2)]( https://g.codefresh.io/repositories/unicef/etools-partner-reporting-portal/builds?filter=trigger:build;branch:develop;service:58d57dc1d28e8f0100907a76~db)
+* PostGIS: [![Codefresh build status]( https://g.codefresh.io/api/badges/build?repoOwner=unicef&repoName=etools-partner-reporting-portal&branch=develop&pipelineName=db&accountName=unicef&type=cf-1)]( https://g.codefresh.io/repositories/unicef/etools-partner-reporting-portal/builds?filter=trigger:build;branch:develop;service:58d57dc1d28e8f0100907a75~db)
 
-* Django API: [![Codefresh Django build status]( https://g.codefresh.io/api/badges/build?repoOwner=unicef&repoName=etools-partner-reporting-portal&branch=develop&pipelineName=django_api&accountName=UNICEF&type=cf-2)]( https://g.codefresh.io/repositories/unicef/etools-partner-reporting-portal/builds?filter=trigger:build;branch:develop;service:58d57dc1d28e8f0100907a76~django_api)
+* Django API: [![Codefresh build status]( https://g.codefresh.io/api/badges/build?repoOwner=unicef&repoName=etools-partner-reporting-portal&branch=develop&pipelineName=django_api&accountName=unicef&type=cf-1)]( https://g.codefresh.io/repositories/unicef/etools-partner-reporting-portal/builds?filter=trigger:build;branch:develop;service:58d57dc1d28e8f0100907a74~django_api)
 
-* Nginx proxy: [![Codefresh Nginx build status]( https://g.codefresh.io/api/badges/build?repoOwner=unicef&repoName=etools-partner-reporting-portal&branch=develop&pipelineName=proxy&accountName=UNICEF&type=cf-2)]( https://g.codefresh.io/repositories/unicef/etools-partner-reporting-portal/builds?filter=trigger:build;branch:develop;service:58d57dc1d28e8f0100907a76~proxy)
+* Nginx proxy: [![Codefresh build status]( https://g.codefresh.io/api/badges/build?repoOwner=unicef&repoName=etools-partner-reporting-portal&branch=develop&pipelineName=proxy&accountName=unicef&type=cf-1)]( https://g.codefresh.io/repositories/unicef/etools-partner-reporting-portal/builds?filter=trigger:build;branch:develop;service:58d57dc1fa94a00100a3096c~proxy)
 
 ## Setup
 1. Install Docker for your OS
