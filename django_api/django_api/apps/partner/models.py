@@ -196,6 +196,7 @@ class PartnerActivity(TimeStampedModel):
     project = models.ForeignKey(PartnerProject, null=True, related_name="partner_activities")
     partner = models.ForeignKey(Partner, related_name="partner_activities")
     cluster_activity = models.ForeignKey('cluster.ClusterActivity', related_name="partner_activities", null=True)
+    cluster_objective = models.ForeignKey('cluster.ClusterObjective', related_name="partner_activities", null=True)
     reportables = GenericRelation('indicator.Reportable', related_query_name='partner_activities')
 
     start_date = models.DateField()
