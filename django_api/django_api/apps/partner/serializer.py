@@ -157,21 +157,21 @@ class PartnerActivityBaseCreateSerializer(serializers.Serializer):
 
     def validate(self, data):
         try:
-            cluster = Cluster.objects.get(id=data['cluster'])
+            data['cluster'] = Cluster.objects.get(id=data['cluster'])
         except Cluster.DoesNotExist as e:
             raise serializers.ValidationError(
                 'Cluster ID {} does not exist.'.format(data['cluster']))
 
         try:
-            partner = Partner.objects.get(id=data['partner'])
+            data['partner'] = Partner.objects.get(id=data['partner'])
         except Partner.DoesNotExist as e:
             raise serializers.ValidationError(
                 'Partner ID {} does not exist.'.format(data['partner']))
 
         try:
-            project = PartnerProject.objects.get(id=data['project'])
+            data['project'] = PartnerProject.objects.get(id=data['project'])
 
-            if project.partner.id != self.initial_data['partner']:
+            if data['project'].partner.id != self.initial_data['partner']:
                 raise serializers.ValidationError(
                     'PartnerProject does not belong to Partner {}.'.format(self.initial_data['partner']))
         except PartnerProject.DoesNotExist as e:
@@ -191,9 +191,9 @@ class PartnerActivityFromClusterActivitySerializer(PartnerActivityBaseCreateSeri
         data = super(PartnerActivityFromClusterActivitySerializer, self).validate(data)
 
         try:
-            cluster_activity = ClusterActivity.objects.get(id=data['cluster_activity'])
+            data['cluster_activity'] = ClusterActivity.objects.get(id=data['cluster_activity'])
 
-            if cluster_activity.cluster_objective.cluster.id != self.initial_data['cluster']:
+            if data['cluster_activity'].cluster_objective.cluster.id != self.initial_data['cluster']:
                 raise serializers.ValidationError(
                     'ClusterActivity does not belong to Cluster {}.'.format(self.initial_data['cluster']))
         except ClusterActivity.DoesNotExist as e:
@@ -211,9 +211,9 @@ class PartnerActivityFromCustomActivitySerializer(PartnerActivityBaseCreateSeria
         data = super(PartnerActivityFromCustomActivitySerializer, self).validate(data)
 
         try:
-            cluster_objective = ClusterObjective.objects.get(id=data['cluster_objective'])
+            data['cluster_objective'] = ClusterObjective.objects.get(id=data['cluster_objective'])
 
-            if cluster_objective.cluster.id != self.initial_data['cluster']:
+            if data['cluster_objective'].cluster.id != self.initial_data['cluster']:
                 raise serializers.ValidationError(
                     'ClusterObjective does not belong to Cluster {}.'.format(self.initial_data['cluster']))
         except ClusterObjective.DoesNotExist as e:

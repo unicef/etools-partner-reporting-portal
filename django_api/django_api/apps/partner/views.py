@@ -165,7 +165,7 @@ class PartnerActivityAPIView(APIView):
 
             try:
                 pa = PartnerActivity.objects.create(
-                    title=serializer.validated_data['title'],
+                    title=serializer.validated_data['cluster_activity'].title,
                     project=serializer.validated_data['project'],
                     partner=serializer.validated_data['partner'],
                     cluster_activity=serializer.validated_data['cluster_activity'],
