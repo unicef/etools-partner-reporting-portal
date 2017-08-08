@@ -163,14 +163,19 @@
             computed: '_computeCurrentPartners(activityId, allPartners)'
           },
 
-          loading: {
-            type: Boolean,
-            statePath: 'clusterActivities.partnersLoading'
+          allPartnersCount: {
+            type: Number,
+            statePath: 'clusterActivities.partnersCount',
           },
 
           totalResults: {
             type: Number,
-            statePath: 'clusterActivities.partnersCount',
+            computed: '_computeCurrentPartnersCount(activityId, allPartnersCount)'
+          },
+
+          loading: {
+            type: Boolean,
+            statePath: 'clusterActivities.partnersLoading'
           },
 
           detailsOpened: {
@@ -195,6 +200,10 @@
 
         _computeCurrentPartners: function(activityId, allPartners) {
           return allPartners[activityId];
+        },
+
+        _computeCurrentPartnersCount: function(activityId, allPartnersCount) {
+          return allPartnersCount[activityId];
         },
 
         detached: function () {

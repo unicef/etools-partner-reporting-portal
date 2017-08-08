@@ -124,6 +124,10 @@
       partnersByClusterActivityId: function (clusterActivityId) {
         return this._buildUrl('/partner/cluster-activity/' + clusterActivityId + '/partners');
       },
+
+      partnerActivityList: function () {
+        return this._buildUrl('/partner/partner-activity-list/');
+      },
     };
   }());
 </script>

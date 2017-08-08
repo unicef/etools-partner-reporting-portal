@@ -95,7 +95,7 @@
     </page-header>
 
     <template is="dom-if" if="[[_equals(tab, 'overview')]]" restamp="true">
-      <pa-project-details-overview project-data=[[projectData]]></pa-project-details-overview>
+      <pa-project-details-overview project-data="[[projectData]]"></pa-project-details-overview>
     </template>
 
     <template is="dom-if" if="[[_equals(tab, 'indicators')]]" restamp="true">
@@ -103,7 +103,9 @@
     </template>
 
     <template is="dom-if" if="[[_equals(tab, 'activities')]]" restamp="true">
-      <pa-project-details-activities></pa-project-details-activities>
+      <pa-project-details-activities
+        project-id="[[projectId]]">
+      </pa-project-details-activities>
     </template>
 
   </template>
