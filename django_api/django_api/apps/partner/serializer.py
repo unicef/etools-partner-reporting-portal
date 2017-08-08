@@ -155,38 +155,29 @@ class PartnerActivityBaseCreateSerializer(serializers.Serializer):
     end_date = serializers.DateField()
     status = serializers.ChoiceField(choices=PARTNER_PROJECT_STATUS)
 
-    def validate_cluster(self, value):
+    def validate(self, data):
         try:
-            cluster = Cluster.objects.get(id=value)
+            cluster = Cluster.objects.get(id=data['cluster'])
         except Cluster.DoesNotExist as e:
             raise serializers.ValidationError(
-                'Cluster ID {} does not exist.'.format(value))
-        else:
-            return cluster
+                'Cluster ID {} does not exist.'.format(data['cluster']))
 
-    def validate_partner(self, value):
         try:
-            partner = Partner.objects.get(id=value)
+            partner = Partner.objects.get(id=data['partner'])
         except Partner.DoesNotExist as e:
             raise serializers.ValidationError(
-                'Partner ID {} does not exist.'.format(value))
-        else:
-            return partner
+                'Partner ID {} does not exist.'.format(data['partner']))
 
-    def validate_project(self, value):
         try:
-            project = PartnerProject.objects.get(id=value)
+            project = PartnerProject.objects.get(id=data['project'])
 
-            if project.partner.id != self.data['partner']:
+            if project.partner.id != self.initial_data['partner']:
                 raise serializers.ValidationError(
-                    'PartnerProject does not belong to Partner {}.'.format(self.data['partner']))
+                    'PartnerProject does not belong to Partner {}.'.format(self.initial_data['partner']))
         except PartnerProject.DoesNotExist as e:
             raise serializers.ValidationError(
-                'PartnerProject ID {} does not exist.'.format(value))
-        else:
-            return project
+                'PartnerProject ID {} does not exist.'.format(data['project']))
 
-    def validate(self, data):
         if data['start_date'] > data['end_date']:
             raise serializers.ValidationError("start_date should come before end_date")
 
@@ -196,33 +187,37 @@ class PartnerActivityBaseCreateSerializer(serializers.Serializer):
 class PartnerActivityFromClusterActivitySerializer(PartnerActivityBaseCreateSerializer):
     cluster_activity = serializers.IntegerField()
 
-    def validate_cluster_activity(self, value):
-        try:
-            cluster_activity = ClusterActivity.objects.get(id=value)
+    def validate(self, data):
+        data = super(PartnerActivityFromClusterActivitySerializer, self).validate(data)
 
-            if cluster_activity.cluster.id != self.data['cluster']:
+        try:
+            cluster_activity = ClusterActivity.objects.get(id=data['cluster_activity'])
+
+            if cluster_activity.cluster_objective.cluster.id != self.initial_data['cluster']:
                 raise serializers.ValidationError(
-                    'ClusterActivity does not belong to Cluster {}.'.format(self.data['cluster']))
+                    'ClusterActivity does not belong to Cluster {}.'.format(self.initial_data['cluster']))
         except ClusterActivity.DoesNotExist as e:
             raise serializers.ValidationError(
-                'ClusterActivity ID {} does not exist.'.format(value))
-        else:
-            return cluster_activity
+                'ClusterActivity ID {} does not exist.'.format(data['cluster_activity']))
+
+        return data
 
 
 class PartnerActivityFromCustomActivitySerializer(PartnerActivityBaseCreateSerializer):
     cluster_objective = serializers.IntegerField()
     title = serializers.CharField(max_length=255)
 
-    def validate_cluster_objective(self, value):
-        try:
-            cluster_objective = ClusterObjective.objects.get(id=value)
+    def validate(self, data):
+        data = super(PartnerActivityFromCustomActivitySerializer, self).validate(data)
 
-            if cluster_objective.cluster.id != self.data['cluster']:
+        try:
+            cluster_objective = ClusterObjective.objects.get(id=data['cluster_objective'])
+
+            if cluster_objective.cluster.id != self.initial_data['cluster']:
                 raise serializers.ValidationError(
-                    'ClusterObjective does not belong to Cluster {}.'.format(self.data['cluster']))
+                    'ClusterObjective does not belong to Cluster {}.'.format(self.initial_data['cluster']))
         except ClusterObjective.DoesNotExist as e:
             raise serializers.ValidationError(
-                'ClusterObjective ID {} does not exist.'.format(value))
-        else:
-            return cluster_objective
+                'ClusterObjective ID {} does not exist.'.format(data['cluster_objective']))
+
+        return data
