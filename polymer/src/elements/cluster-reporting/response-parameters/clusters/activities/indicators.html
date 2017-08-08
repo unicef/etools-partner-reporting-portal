@@ -31,7 +31,7 @@
       </div>
       <indicator-modal
         id="indicatorModal"
-        object-id="1"
+        object-id="[[activityId]]"
         object-type="ClusterActivity">
       </indicator-modal>
     </page-body>
@@ -45,6 +45,10 @@
       behaviors: [
         App.Behaviors.UtilsBehavior,
       ],
+
+      properties: {
+        activityId: Number,
+      },
 
       listeners: {
         'indicatorModal.indicator-added': '_onSuccess',

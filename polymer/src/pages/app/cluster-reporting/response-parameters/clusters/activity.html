@@ -102,7 +102,9 @@ contributing-partners.html">
     </template>
 
     <template is="dom-if" if="[[_equals(tab, 'indicators')]]" restamp="true">
-      <rp-clusters-activity-indicators></rp-clusters-activity-indicators>
+      <rp-clusters-activity-indicators
+        activity-id=[[activityId]]>
+      </rp-clusters-activity-indicators>
     </template>
 
     <template is="dom-if" if="[[_equals(tab, 'contributing-partners')]]" restamp="true">

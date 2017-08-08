@@ -9,8 +9,6 @@
 <link rel="import" href="../../../../styles/table-styles.html">
 <link rel="import" href="../../../../styles/buttons.html">
 
-
-
 <dom-module id="pa-project-details-indicators">
   <template>
     <style include="button-styles iron-flex data-table-styles table-styles">
@@ -33,8 +31,8 @@
       </div>
       <indicator-modal
         id="indicatorModal"
-        object-id="1"
-        object-type="ClusterObjective">
+        object-id="[[projectId]]"
+        object-type="PartnerProject">
       </indicator-modal>
     </page-body>
   </template>
@@ -42,6 +40,10 @@
   <script>
     Polymer({
       is: 'pa-project-details-indicators',
+
+      properties: {
+        projectId: String,
+      },
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
