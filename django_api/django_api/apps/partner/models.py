@@ -1,7 +1,9 @@
 from __future__ import unicode_literals
 
-from django.db import models
 from django.contrib.contenttypes.fields import GenericRelation
+from django.db import models
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 
 from model_utils.models import TimeStampedModel
 
@@ -207,3 +209,9 @@ class PartnerActivity(TimeStampedModel):
 
     class Meta:
         ordering = ['-id']
+
+
+@receiver(pre_save, sender=PartnerActivity, dispatch_uid="check_pa_double_fks")
+def check_pa_double_fks(sender, instance, **kwargs):
+    if instance.cluster_activity and instance.cluster_objective:
+        raise Exception("PartnerActivity cannot belong to both ClusterActivity and ClusterObjective")
