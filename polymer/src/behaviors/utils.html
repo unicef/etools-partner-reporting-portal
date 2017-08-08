@@ -106,7 +106,7 @@
       },
 
       _formatAddress: function (street, city, zip) {
-        if (!street & !city & !zip) {
+        if (!(street || city || zip)) {
           return undefined;
         } else if (!street) {
           return city + ' ' + zip;

@@ -13,7 +13,7 @@
           dispatch(App.Actions.clusterActivities.clusterActivitiesLoadingStart());
           return thunk()
             .catch(function () {
-              dispatch(App.Actions.clusterActivities.clusterActivitiesLoadingStart());
+              dispatch(App.Actions.clusterActivities.clusterActivitiesLoadingStop());
             })
             .then(function (res) {
               dispatch(App.Actions.clusterActivities.setClusterActivitiesList(res.data));
@@ -48,49 +48,52 @@
           count: data.count
         };
       },
-    }
+    };
 
     App.Actions.clusterActivities.partners = {
-        fetch: function (thunk, clusterId) {
-          return function (dispatch) {
-            dispatch(App.Actions.clusterActivities.partners.setLoadingStart());
-            return thunk()
-              .then(function (res) {
-                dispatch(App.Actions.clusterActivities.partners.set(clusterId, res.data.results));
-                dispatch(App.Actions.clusterActivities.partners.setCount(clusterId, res.data.count));
-                dispatch(App.Actions.clusterActivities.partners.setLoadingStop());
-              });
-          };
-        },
+      fetch: function (thunk, clusterId) {
+        return function (dispatch) {
+          dispatch(App.Actions.clusterActivities.partners.setLoadingStart());
+          return thunk()
+            .then(function (res) {
+              dispatch(App.Actions.clusterActivities.partners.set(
+                clusterId, res.data.results
+              ));
+              dispatch(App.Actions.clusterActivities.partners.setCount(
+                clusterId, res.data.count
+              ));
+              dispatch(App.Actions.clusterActivities.partners.setLoadingStop());
+            });
+        };
+      },
 
-        set: function (clusterActivityId, data) {
-          return {
-            type: App.Constants.SET_PARTNERS_BY_CLUSTER_ACTIVITY_ID,
-            clusterActivityId: clusterActivityId,
-            data: data,
-          };
-        },
+      set: function (clusterActivityId, data) {
+        return {
+          type: App.Constants.SET_PARTNERS_BY_CLUSTER_ACTIVITY_ID,
+          clusterActivityId: clusterActivityId,
+          data: data,
+        };
+      },
 
-        setCount: function (clusterActivityId, count) {
-          return {
-            type: App.Constants.SET_PARTNERS_BY_CLUSTER_ACTIVITY_ID_COUNT,
-            clusterActivityId: clusterActivityId,
-            count: count,
-          };
-        },
+      setCount: function (clusterActivityId, count) {
+        return {
+          type: App.Constants.SET_PARTNERS_BY_CLUSTER_ACTIVITY_ID_COUNT,
+          clusterActivityId: clusterActivityId,
+          count: count,
+        };
+      },
 
-        setLoadingStop: function () {
-          return {
-            type: App.Constants.PARTNERS_BY_CLUSTER_ACTIVITY_ID_LOADING_STOP,
-          };
-        },
+      setLoadingStop: function () {
+        return {
+          type: App.Constants.PARTNERS_BY_CLUSTER_ACTIVITY_ID_LOADING_STOP,
+        };
+      },
 
-        setLoadingStart: function () {
-          return {
-            type: App.Constants.PARTNERS_BY_CLUSTER_ACTIVITY_ID_LOADING_START,
-          };
-        },
-
-    }
+      setLoadingStart: function () {
+        return {
+          type: App.Constants.PARTNERS_BY_CLUSTER_ACTIVITY_ID_LOADING_START,
+        };
+      },
+    };
   }());
 </script>

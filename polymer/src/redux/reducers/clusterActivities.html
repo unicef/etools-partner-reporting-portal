@@ -94,7 +94,12 @@
 
       switch (action.type) {
         case App.Constants.SET_PARTNERS_BY_CLUSTER_ACTIVITY_ID_COUNT:
-          return action.count;
+          return (function () {
+            var change = {};
+
+            change[action.clusterActivityId] = action.count;
+            return Object.assign({}, state, change);
+          }());
 
         default:
           return state;
