@@ -13,8 +13,8 @@
         return this._buildUrl('/core/simple-intervention/');
       },
 
-      indicators: function () {
-        return this._buildUrl('/indicator/');
+      indicators: function (content_object) {
+        return this._buildUrl('/indicator/' + content_object);
       },
 
       indicatorReports: function (indicatorId) {

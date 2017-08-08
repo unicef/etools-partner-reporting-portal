@@ -113,6 +113,10 @@ class IndicatorListSerializer(serializers.ModelSerializer):
     ref_num = serializers.CharField()
     achieved = serializers.JSONField()
     progress_percentage = serializers.FloatField()
+    content_type_name = serializers.SerializerMethodField()
+
+    def get_content_type_name(self, obj):
+        return obj.content_type.name
 
     class Meta:
         model = Reportable
@@ -124,6 +128,8 @@ class IndicatorListSerializer(serializers.ModelSerializer):
             'ref_num',
             'achieved',
             'progress_percentage',
+            'content_type_name',
+            'object_id'
         )
 
 
@@ -774,4 +780,3 @@ class ClusterIndicatorReportSimpleSerializer(serializers.ModelSerializer):
 
     def get_title(self, obj):
         return obj.reportable.blueprint.title
-
