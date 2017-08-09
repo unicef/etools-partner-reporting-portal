@@ -66,7 +66,7 @@
 
         this.$.activities.abort();
 
-        this.dispatch(App.Actions.clusterActivities.fetchClusterActivitiesList(thunk))
+        this.dispatch(App.Actions.ClusterActivities.fetchClusterActivitiesList(thunk))
           .catch(function (err) { // jshint ignore:line
               // TODO: error handling.
           });
