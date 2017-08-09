@@ -1,7 +1,14 @@
 from django.conf import settings
 
-from account.models import User
-from cluster.models import Cluster, ClusterObjective, ClusterActivity
+from account.models import (
+    User,
+    UserProfile,
+)
+from cluster.models import (
+    Cluster,
+    ClusterObjective,
+    ClusterActivity,
+)
 from partner.models import (
     Partner,
     PartnerProject,
@@ -16,9 +23,9 @@ from indicator.models import (
     DisaggregationValue,
 )
 from unicef.models import (
-    ProgressReport,
     Section,
     ProgrammeDocument,
+    ProgressReport,
     CountryProgrammeOutput,
     LowerLevelOutput,
 )
@@ -28,12 +35,6 @@ from core.models import (
     Location,
 )
 from core.factories import (
-    UserFactory,
-    PartnerFactory,
-    IndicatorLocationDataFactory,
-    InterventionFactory,
-    ResponsePlanFactory,
-    LocationFactory,
     QuantityReportableToLowerLevelOutputFactory,
     RatioReportableToLowerLevelOutputFactory,
     RatioReportableToClusterObjectiveFactory,
@@ -42,14 +43,27 @@ from core.factories import (
     QuantityReportableToPartnerActivityFactory,
     QuantityIndicatorReportFactory,
     RatioIndicatorReportFactory,
-    ProgressReportFactory,
-    SectionFactory,
-    ProgrammeDocumentFactory,
+    QuantityTypeIndicatorBlueprintFactory,
+    RatioTypeIndicatorBlueprintFactory,
+    UserFactory,
+    UserProfileFactory,
+    ClusterFactory,
     ClusterObjectiveFactory,
     ClusterActivityFactory,
-    ClusterFactory,
+    PartnerFactory,
+    PartnerProjectFactory,
+    PartnerActivityFactory,
+    IndicatorLocationDataFactory,
     DisaggregationFactory,
     DisaggregationValueFactory,
+    SectionFactory,
+    ProgrammeDocumentFactory,
+    ProgressReportFactory,
+    CountryProgrammeOutputFactory,
+    LowerLevelOutputFactory,
+    InterventionFactory,
+    ResponsePlanFactory,
+    LocationFactory,
 )
 
 from _generate_disaggregation_fake_data import (
@@ -63,6 +77,7 @@ def clean_up_data():
         print "Deleting all ORM objects"
 
         User.objects.all().delete()
+        UserProfile.objects.all().delete()
         Cluster.objects.all().delete()
         ClusterObjective.objects.all().delete()
         ClusterActivity.objects.all().delete()
@@ -73,15 +88,16 @@ def clean_up_data():
         Reportable.objects.all().delete()
         IndicatorReport.objects.all().delete()
         IndicatorLocationData.objects.all().delete()
-        ProgressReport.objects.all().delete()
+        Disaggregation.objects.all().delete()
+        DisaggregationValue.objects.all().delete()
+        Section.objects.all().delete()
         ProgrammeDocument.objects.all().delete()
+        ProgressReport.objects.all().delete()
         CountryProgrammeOutput.objects.all().delete()
         LowerLevelOutput.objects.all().delete()
         Intervention.objects.all().delete()
-        Location.objects.all().delete()
-        Disaggregation.objects.all().delete()
-        DisaggregationValue.objects.all().delete()
         ResponsePlan.objects.all().delete()
+        Location.objects.all().delete()
 
         print "All ORM objects deleted"
 
@@ -98,12 +114,7 @@ def generate_fake_data(quantity=40):
     })
     admin.set_password('Passw0rd!')
     admin.save()
-    print "Superuser created:{}/{}".format(admin.username, 'Passw0rd!')
-
-    UserFactory.create_batch(quantity)
-    print "{} User objects created".format(quantity)
-
-    print "{} Partner objects created".format(quantity)
+    print "Superuser created: {}/{}".format(admin.username, 'Passw0rd!')
 
     SectionFactory.create_batch(quantity)
     print "{} Section objects created".format(quantity)
@@ -115,7 +126,8 @@ def generate_fake_data(quantity=40):
     # ProgressReport - ProgrammeDocument
     # created LowerLevelOutput - QuantityReportableToLowerLevelOutput
     # Section - ProgrammeDocument via QuantityReportableToLowerLevelOutput
-    # ProgressReport - IndicatorReport from QuantityReportableToLowerLevelOutput
+    # ProgressReport - IndicatorReport from
+    # QuantityReportableToLowerLevelOutput
     for idx in xrange(quantity):
         pd = ProgrammeDocument.objects.all()[idx]
         progress_report = ProgressReportFactory(programme_document=pd)
@@ -148,6 +160,7 @@ def generate_fake_data(quantity=40):
     print "{} Cluster objects created".format(quantity)
     print "{} ResponsePlan objects created".format(quantity)
     print "{} Intervention objects created".format(quantity)
+    print "{} User objects created".format(quantity)
 
     # Intervention <-> Locations
     for intervention in Intervention.objects.all():
@@ -166,20 +179,41 @@ def generate_fake_data(quantity=40):
             cluster.response_plan = response_plan
             cluster.save()
 
-    print "{} Extra ResponsePlan & Cluster objects created".format(quantity*3)
+    print "{} Extra ResponsePlan & Cluster objects created".format(quantity * 3)
 
-    # ClusterActivity <-> PartnerActivity link
-    for idx in xrange(quantity):
-        cluster_activity = ClusterActivity.objects.all()[idx]
-        partner = PartnerFactory(partner_activity__cluster_activity=cluster_activity)
+    for cluster in Cluster.objects.all():
+        for _ in xrange(3):
+            objective = ClusterObjectiveFactory(cluster=cluster)
+            activity = ClusterActivityFactory(cluster_objective=objective)
 
-    for idx in xrange(quantity):
-        cluster = Cluster.objects.all()[idx]
-        pp = PartnerProject.objects.all()[idx]
+    print "{} Extra Cluster objective and activity objects created".format(quantity * 3)
 
-        pp.clusters.add(cluster)
+    # Creating PartnerActivity from ClusterActivity
+    for cluster in Cluster.objects.all():
+        partner = PartnerFactory(partner_activity=None, partner_project=None)
 
-    print "{} ClusterActivity <-> PartnerActivity objects linked".format(quantity)
+        for objective in cluster.cluster_objectives.all():
+            project = PartnerProjectFactory(partner=partner)
+            project.clusters.add(cluster)
+
+            for activity in objective.cluster_activities.all():
+                partner_activity = PartnerActivityFactory(
+                    project=project,
+                    partner=project.partner,
+                    cluster_activity=activity)
+
+    print "{} Partner & PartnerProject & PartnerActivity from ClusterActivity objects created".format(quantity * 3)
+
+    # Creating PartnerActivity from Custom activity
+    for partner in Partner.objects.all():
+        for _ in xrange(3):
+            project = PartnerProjectFactory(partner=partner)
+            partner_activity = PartnerActivityFactory(
+                project=project,
+                partner=project.partner,
+            )
+
+    print "{} Partner & PartnerProject & PartnerActivity from Custom activity objects created".format(quantity * 3)
 
     # Cluster Indicator creations
     for idx in xrange(quantity):
