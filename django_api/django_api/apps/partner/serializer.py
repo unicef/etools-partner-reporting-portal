@@ -156,13 +156,17 @@ class PartnerActivitySerializer(serializers.ModelSerializer):
 
     cluster = serializers.SerializerMethodField()
     status = serializers.SerializerMethodField()
+    project = PartnerProjectSimpleSerializer()
 
     class Meta:
         model = PartnerActivity
         fields = ('id', 'cluster', 'status', 'project', 'cluster_activity')
 
     def get_cluster(self, obj):
-        return obj.cluster_activity.cluster_objective.cluster.title
+        if obj.cluster_activity:
+            return obj.cluster_activity.cluster_objective.cluster.title
+        else:
+            return None
 
     def get_status(self, obj):
         return obj.project and obj.project.status
