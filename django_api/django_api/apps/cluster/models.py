@@ -72,7 +72,7 @@ class Cluster(TimeStampedModel):
     @cached_property
     def reportable_queryset(self):
         cluster_reportables = Reportable.objects.filter(
-            Q(partner_activity__partner__clusters=self)
+            Q(partner_activities__partner__clusters=self)
         ).distinct()
 
         return cluster_reportables
@@ -132,13 +132,13 @@ class Cluster(TimeStampedModel):
         return overdue.count() + due.count()
 
     def num_of_indicator_targets_met_partner(self, partner=None):
-        return self.met_indicator_reports_partner.count()
+        return self.met_indicator_reports_partner(partner).count()
 
     def num_of_projects_in_my_organization_partner(self, partner=None):
         return partner.partner_projects.filter(clusters=self).count()
 
     def num_of_constrained_indicator_reports_partner(self, partner=None):
-        return self.constrained_indicator_reports_partner.count()
+        return self.constrained_indicator_reports_partner(partner).count()
 
     def num_of_non_cluster_activities_partner(self, partner=None):
         return self.partner_activities.filter(
