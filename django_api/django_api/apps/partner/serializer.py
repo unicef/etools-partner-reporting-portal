@@ -127,6 +127,7 @@ class ClusterActivityPartnersSerializer(serializers.ModelSerializer):
 
     partner_projects = PartnerProjectSimpleSerializer(many=True)
     links = serializers.SerializerMethodField()
+    clusters = ClusterSimpleSerializer(many=True, read_only=True)
 
     class Meta:
         model = Partner
@@ -142,6 +143,7 @@ class ClusterActivityPartnersSerializer(serializers.ModelSerializer):
             'postal_code',
             'country',
             'links',
+            'clusters',
         )
 
     def get_links(self, obj):
