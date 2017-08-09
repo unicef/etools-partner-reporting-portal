@@ -175,7 +175,7 @@ class Reportable(TimeStampedModel):
             # pass
         percentage = 0.0
 
-        if self.achieved:
+        if self.achieved and self.baseline is not None and self.target is not None:
             percentage = (self.achieved['c'] - float(self.baseline)) / (float(self.target) - float(self.baseline))
 
         return percentage
