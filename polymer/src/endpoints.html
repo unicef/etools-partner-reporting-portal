@@ -77,6 +77,10 @@
         return this._buildUrl('/cluster/cluster-activity-list/');
       },
 
+      clusterActivities: function (clusterId) {
+        return this._buildUrl('/cluster/' + clusterId + '/cluster-activity-list/');
+      },
+
       plannedActions: function() {
         return this._buildUrl('/partner/partner-project-list/');
       },

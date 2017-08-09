@@ -14,7 +14,7 @@
 <link rel="import" href="../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../../bower_components/paper-item/paper-item.html">
-<link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-multi-selection-menu.html">
+<link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html">
 
 <link rel="import" href="../etools-prp-ajax.html">
 <link rel="import" href="../etools-prp-date-input.html">
@@ -88,8 +88,25 @@
     </etools-prp-ajax>
 
     <etools-prp-ajax
-        id="locations"
-        url="[[locationsUrl]]">
+        id="activities"
+        url="[[activitiesUrl]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
+        id="partners"
+        url="[[partnersUrl]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
+        id="projects"
+        params="[[projectsParams]]"
+        url="[[projectsUrl]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
+        id="objectives"
+        params="[[objectivesParams]]"
+        url="[[objectivesUrl]]">
     </etools-prp-ajax>
 
     <paper-dialog
@@ -142,11 +159,53 @@
                     </paper-listbox>
                   </paper-dropdown-menu>
                 </div>
-                <div class="item item-wide">
-                  Activity dropdown
+                <div class="item">
+                  <etools-single-selection-menu
+                      class="validate"
+                      label="Activity"
+                      options="[[activities]]"
+                      option-value="id"
+                      option-label="title"
+                      selected="{{data.cluster.cluster_activity}}"
+                      on-iron-activate="_validate"
+                      disabled="[[fetchingActivities]]"
+                      trigger-value-change-event
+                      required>
+                  </etools-single-selection-menu>
                 </div>
-                <div class="item item-wide">
-                  Partner project dropdown
+                <div class="item">
+                  <paper-dropdown-menu
+                      class="validate"
+                      label="Partner"
+                      on-value-changed="_validate"
+                      always-float-label
+                      required>
+                    <paper-listbox
+                        selected="{{data.cluster.partner}}"
+                        attr-for-selected="value"
+                        slot="dropdown-content"
+                        class="dropdown-content">
+                      <template
+                          is="dom-repeat"
+                          items="[[partners]]">
+                        <paper-item value="[[item.id]]">[[item.title]]</paper-item>
+                      </template>
+                    </paper-listbox>
+                  </paper-dropdown-menu>
+                </div>
+                <div class="item">
+                   <etools-single-selection-menu
+                      class="validate"
+                      label="Project"
+                      options="[[projects]]"
+                      option-value="id"
+                      option-label="title"
+                      selected="{{data.cluster.project}}"
+                      on-iron-activate="_validate"
+                      disabled="[[fetchingProjects]]"
+                      trigger-value-change-event
+                      required>
+                  </etools-single-selection-menu>
                 </div>
                 <div class="item">
                    <etools-prp-date-input
@@ -228,7 +287,18 @@
                   </paper-dropdown-menu>
                 </div>
                 <div class="item">
-                  CO ref. # dropdown
+                  <etools-single-selection-menu
+                      class="validate"
+                      label="CO ref. #"
+                      options="[[objectives]]"
+                      option-value="id"
+                      option-label="title"
+                      selected="{{data.custom.cluster_objective}}"
+                      on-iron-activate="_validate"
+                      disabled="[[fetchingObjectives]]"
+                      trigger-value-change-event
+                      required>
+                  </etools-single-selection-menu>
                 </div>
                 <div class="item item-wide">
                   <paper-input
@@ -240,8 +310,39 @@
                       required>
                   </paper-input>
                 </div>
-                <div class="item item-wide">
-                  Partner project dropdown
+                <div class="item">
+                  <paper-dropdown-menu
+                      class="validate"
+                      label="Partner"
+                      on-value-changed="_validate"
+                      always-float-label
+                      required>
+                    <paper-listbox
+                        selected="{{data.custom.partner}}"
+                        attr-for-selected="value"
+                        slot="dropdown-content"
+                        class="dropdown-content">
+                      <template
+                          is="dom-repeat"
+                          items="[[partners]]">
+                        <paper-item value="[[item.id]]">[[item.title]]</paper-item>
+                      </template>
+                    </paper-listbox>
+                  </paper-dropdown-menu>
+                </div>
+                <div class="item">
+                  <etools-single-selection-menu
+                      class="validate"
+                      label="Project"
+                      options="[[projects]]"
+                      option-value="id"
+                      option-label="title"
+                      selected="{{data.custom.project}}"
+                      on-iron-activate="_validate"
+                      disabled="[[fetchingProjects]]"
+                      trigger-value-change-event
+                      required>
+                  </etools-single-selection-menu>
                 </div>
                  <div class="item">
                    <etools-prp-date-input
@@ -286,19 +387,6 @@
                     </paper-listbox>
                   </paper-dropdown-menu>
                 </div>
-                <div class="item">
-                  <etools-multi-selection-menu
-                      class="validate"
-                      label="Location"
-                      options="[[locations]]"
-                      selected-values="{{selectedLocations}}"
-                      on-selected-values-changed="_validate"
-                      option-value="id"
-                      option-label="title"
-                      trigger-value-change-event
-                      required>
-                  </etools-multi-selection-menu>
-                </div>
               </div>
             </template>
           </div>
@@ -336,9 +424,24 @@
       properties: {
         data: Object,
 
-        selectedLocations: Array,
+        activitiesUrl: String,
 
         updatePending: {
+          type: Boolean,
+          value: false,
+        },
+
+        fetchingActivities: {
+          type: Boolean,
+          value: false,
+        },
+
+        fetchingProjects: {
+          type: Boolean,
+          value: false,
+        },
+
+        fetchingObjectives: {
           type: Boolean,
           value: false,
         },
@@ -375,6 +478,12 @@
           value: [],
         },
 
+        partnersUrl: {
+          type: String,
+          computed: '_computePartnersUrl(responsePlanId)',
+          observer: '_fetchPartners',
+        },
+
         statuses: {
           type: Array,
           value: [
@@ -389,16 +498,40 @@
           statePath: 'location.id',
         },
 
-        locationsUrl: {
-          type: String,
-          computed: '_computeLocationsUrl(locationId)',
-          observer: '_fetchLocations',
-        },
-
-        locations: {
+        activities: {
           type: Array,
           value: [],
-        }
+        },
+
+        projects: {
+          type: Array,
+          value: [],
+        },
+
+        projectsParams: {
+          type: Object,
+          value: {},
+        },
+
+        projectsUrl: {
+          type: String,
+          value: App.Endpoints.plannedActions(),
+        },
+
+        objectives: {
+          type: Array,
+          value: [],
+        },
+
+        objectivesParams: {
+          type: Object,
+          value: {},
+        },
+
+        objectivesUrl: {
+          type: String,
+          value: App.Endpoints.responseParametersClusterObjectives(),
+        },
       },
 
       listeners: {
@@ -406,7 +539,10 @@
       },
 
       observers: [
-        '_setLocations(selectedLocations.splices)',
+        '_fetchActivities(data.cluster.cluster)',
+        '_fetchProjects(data.cluster.partner)',
+        '_fetchProjects(data.custom.partner)',
+        '_fetchObjectives(data.custom.cluster)',
       ],
 
       _setDefaults: function () {
@@ -415,7 +551,7 @@
           custom: {},
         });
 
-        this.set('selectedLocations', []);
+        this.set('activities', []);
       },
 
       _validate: function (e) {
@@ -444,30 +580,98 @@
             });
       },
 
-      _computeLocationsUrl: function (locationId) {
-        return App.Endpoints.childLocations(locationId);
-      },
-
-      _fetchLocations: function () {
+      _fetchActivities: function (clusterId) {
         var self = this;
 
-        this.$.locations.thunk()()
-            .then(function (res) {
-              self.set('locations', res.data);
-            });
-      },
-
-      _setLocations: function () {
-        if (!this.locations || !this.selectedLocations) {
+        if (typeof clusterId === 'undefined') {
           return;
         }
 
-        this.set(
-          'data.custom.locations',
-          this.locations.filter(function (location) {
-            return this.selectedLocations.indexOf(location.id) !== -1;
-          }, this)
-        );
+        this.set('fetchingActivities', true);
+        this.set('activities', []);
+        this.set('data.cluster.cluster_activity', undefined);
+        this.set('activitiesUrl', App.Endpoints.clusterActivities(clusterId));
+
+        this.$.activities.abort();
+
+        this.$.activities.thunk()()
+            .then(function (res) {
+              self.set('activities', res.data.results);
+              self.set('fetchingActivities', false);
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+              self.set('fetchingActivities', false);
+            });
+      },
+
+      _computePartnersUrl: function (responsePlanId) {
+        return App.Endpoints.clusterPartnerNames(responsePlanId);
+      },
+
+      _fetchPartners: function () {
+        var self = this;
+
+        this.$.partners.abort();
+
+        this.$.partners.thunk()()
+            .then(function (res) {
+              self.set('partners', res.data);
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
+      },
+
+      _fetchProjects: function (partnerId) {
+        var self = this;
+
+        if (typeof partnerId === 'undefined') {
+          return;
+        }
+
+        this.set('projectsParams.partner', partnerId);
+        this.set('fetchingProjects', true);
+        this.set('projects', []);
+        this.set('data.cluster.project', undefined);
+        this.set('data.custom.project', undefined);
+
+        this.$.projects.abort();
+
+        this.$.projects.thunk()()
+            .then(function (res) {
+              self.set('projects', res.data.results);
+              self.set('fetchingProjects', false);
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+              self.set('fetchingProjects', false);
+            });
+      },
+
+      _fetchObjectives: function (clusterId) {
+        var self = this;
+
+        if (typeof clusterId === 'undefined') {
+          return;
+        }
+
+        this.set('objectivesParams.cluster_id', clusterId);
+        this.set('fetchingObjectives', true);
+        this.set('objectives', []);
+        this.set('data.custom.cluster_objective', undefined);
+
+        this.$.objectives.abort();
+
+        this.$.objectives.thunk()()
+            .then(function (res) {
+              self.set('objectives', res.data.results);
+              self.set('fetchingObjectives', false);
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+              self.set('fetchingObjectives', false);
+            });
       },
 
       _save: function () {
