@@ -1,0 +1,112 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../bower_components/etools-content-panel/etools-content-panel.html">
+<link rel="import" href="../../../bower_components/etools-data-table/etools-data-table.html">
+<link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
+
+<link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../behaviors/data-table.html">
+<link rel="import" href="../../behaviors/pagination.html">
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../ip-reporting/list-view-single-indicator.html">
+<link rel="import" href="../../styles/table-styles.html">
+
+<dom-module id="tab-detail-indicators-list">
+  <template>
+    <style include="iron-flex iron-flex-factors data-table-styles table-styles">
+    </style>
+
+    <iron-location
+        query="{{query}}">
+    </iron-location>
+
+    <iron-query-params
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
+    </iron-query-params>
+
+    <etools-content-panel panel-title="List of Indicators">
+      <etools-loading active="[[loading]]"></etools-loading>
+      <etools-data-table-header
+        id="listHeader"
+        label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
+
+        <etools-data-table-column class="flex-2" field="number">
+          PD/SSFA ToR ref.#
+        </etools-data-table-column>
+
+        <etools-data-table-column class="flex-6" field="indicator">
+          Indicator
+        </etools-data-table-column>
+
+        <etools-data-table-column  class="flex-4" field="progress">
+          Current progress
+        </etools-data-table-column>
+
+      </etools-data-table-header>
+
+      <template id="list"
+                is="dom-repeat"
+                items="[[data]]"
+                initial-count="[[pageSize]]"
+                as="indicator">
+        <list-view-single-indicator indicator="{{indicator}}"></list-view-single-indicator>
+      </template>
+
+      <etools-data-table-footer
+          page-size="[[pageSize]]"
+          page-number="[[pageNumber]]"
+          total-results="[[totalResults]]"
+          visible-range="{{visibleRange}}"
+          on-page-size-changed="_pageSizeChanged"
+          on-page-number-changed="_pageNumberChanged">
+      </etools-data-table-footer>
+
+    </etools-content-panel>
+  </template>
+  <script>
+    Polymer({
+      is: 'tab-detail-indicators-list',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.DataTableBehavior,
+        App.Behaviors.PaginationBehavior,
+        App.Behaviors.UtilsBehavior,
+      ],
+
+      properties: {
+        data: Array,
+
+        // loading: {
+        //   type: Boolean,
+        //   statePath: 'indicators.loading'
+        // },
+
+        queryParams: Object,
+
+        query: String,
+
+        pageSize: Number,
+
+        pageNumber: Number,
+
+        totalResults: Number,
+
+        openedDetails: {
+          type: Array,
+          value: []
+        }
+      },
+
+      listeners: {
+        'page-number-changed': '_pageNumberModified',
+        'details-opened-changed': '_detailsChange'
+      },
+
+      detached: function () {
+        this.openedDetails.length = 0;
+      }
+    });
+  </script>
+</dom-module>

@@ -1,0 +1,59 @@
+<link rel="import" href="../../constants.html">
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Actions = App.Actions || {};
+
+    App.Actions.ClusterObjectives = {
+      // TODO: Move from activities.html into this file.
+    }
+
+    App.Actions.ClusterObjectives.indicators = {
+      fetch: function (thunk, clusterObjectiveId) {
+        return function (dispatch) {
+          dispatch(App.Actions.ClusterObjectives.indicators.setLoadingStart());
+          return thunk()
+            .then(function (res) {
+              dispatch(App.Actions.ClusterObjectives.indicators.setIndicators(
+                clusterObjectiveId, res.data.results
+              ));
+              dispatch(App.Actions.ClusterObjectives.indicators.setCount(
+                clusterObjectiveId, res.data.count
+              ));
+              dispatch(App.Actions.ClusterObjectives.indicators.setLoadingStop());
+            });
+        };
+      },
+
+      setIndicators: function (clusterObjectiveId, data) {
+        return {
+          type: App.Constants.SET_INDICATORS_BY_CLUSTER_OBJECTIVE_ID,
+          clusterObjectiveId: clusterObjectiveId,
+          data: data,
+        };
+      },
+
+      setCount: function (clusterObjectiveId, count) {
+        return {
+          type: App.Constants.SET_INDICATORS_BY_CLUSTER_OBJECTIVE_ID_COUNT,
+          clusterObjectiveId: clusterObjectiveId,
+          count: count,
+        };
+      },
+
+      setLoadingStop: function () {
+        return {
+          type: App.Constants.INDICATORS_BY_CLUSTER_OBJECTIVE_ID_LOADING_STOP,
+        };
+      },
+
+      setLoadingStart: function () {
+        return {
+          type: App.Constants.INDICATORS_BY_CLUSTER_OBJECTIVE_ID_LOADING_START,
+        };
+      },
+    };
+  }());
+</script>
