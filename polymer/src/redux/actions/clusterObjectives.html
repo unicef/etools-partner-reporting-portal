@@ -7,7 +7,46 @@
     App.Actions = App.Actions || {};
 
     App.Actions.ClusterObjectives = {
-      // TODO: Move from activities.html into this file.
+      fetchClusterObjectivesList: function (thunk) {
+        return function (dispatch) {
+          dispatch(App.Actions.ClusterObjectives.clusterObjectivesLoadingStart());
+          return thunk()
+            .catch(function () {
+              dispatch(App.Actions.ClusterObjectives.clusterObjectivesLoadingStart());
+            })
+            .then(function (res) {
+              dispatch(App.Actions.ClusterObjectives.setClusterObjectivesList(res.data));
+              dispatch(App.Actions.ClusterObjectives.setClusterObjectivesCount(res.data));
+              dispatch(App.Actions.ClusterObjectives.clusterObjectivesLoadingStop());
+            });
+        };
+      },
+
+      setClusterObjectivesList: function (data) {
+        return {
+          type: App.Constants.SET_CLUSTER_OBJECTIVES_LIST,
+          data: data,
+        };
+      },
+
+      clusterObjectivesLoadingStart: function () {
+        return {
+          type: App.Constants.CLUSTER_OBJECTIVES_LOADING_START,
+        };
+      },
+
+      clusterObjectivesLoadingStop: function () {
+        return {
+          type: App.Constants.CLUSTER_OBJECTIVES_LOADING_STOP,
+        };
+      },
+
+      setClusterObjectivesCount: function (data) {
+        return {
+          type: App.Constants.SET_CLUSTER_OBJECTIVES_COUNT,
+          count: data.count
+        };
+      },
     }
 
     App.Actions.ClusterObjectives.indicators = {

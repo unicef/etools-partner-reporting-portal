@@ -97,7 +97,7 @@
 
         this.$.objectives.abort();
 
-        this.dispatch(App.Actions.fetchClusterObjectivesList(thunk))
+        this.dispatch(App.Actions.ClusterObjectives.fetchClusterObjectivesList(thunk))
           .catch(function (err) { // jshint ignore:line
               // TODO: error handling.
           });

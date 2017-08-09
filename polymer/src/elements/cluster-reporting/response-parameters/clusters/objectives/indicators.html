@@ -51,10 +51,10 @@
         object-type="ClusterObjective">
       </indicator-modal>
 
-      <tab-detail-indicators-list
-        total-results="[[totalResults]]"
-        data="[[data]]">
-      </tab-detail-indicators-list>
+      <list-view-indicators
+          data="[[data]]"
+          total-results="[[totalResults]]">
+      </list-view-indicators>
     </page-body>
   </template>
 
@@ -110,8 +110,8 @@
         this.$.indicatorModal.open();
       },
 
-      _onSuccess: function (e, data) {
-        console.log('Added indicator', data);
+      _onSuccess: function () {
+        this._clusterObjectiveIndicatorsAjax();
       },
 
       _computeStatePath: function(activityId) {
