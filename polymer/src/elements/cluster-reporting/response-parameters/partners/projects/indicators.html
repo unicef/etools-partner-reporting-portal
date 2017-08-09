@@ -35,7 +35,8 @@
 
     <etools-prp-ajax
         id="indicators"
-        url="[[url]]">
+        url="[[url]]"
+        params="[[queryParams]]">
     </etools-prp-ajax>
 
     <page-body>
@@ -84,7 +85,7 @@
 
         url: {
           type: String,
-          computed: '_computeUrl(projectId)'
+          computed: '_computeUrl(projectId, queryParams)'
         },
 
         allIndicators: {
@@ -112,10 +113,6 @@
 
       _onSuccess: function () {
         this._indicatorsAjax();
-      },
-
-      _computeStatePath: function(projectId) {
-        return 'clusterActivities.partnersByClusterActivityId.' + projectId;
       },
 
       _computeCurrentIndicators: function(projectId, allIndicators) {

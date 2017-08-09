@@ -35,7 +35,8 @@
 
     <etools-prp-ajax
         id="indicators"
-        url="[[url]]">
+        url="[[url]]"
+        params="[[queryParams]]">
     </etools-prp-ajax>
 
     <page-body>
@@ -84,7 +85,7 @@
 
         url: {
           type: String,
-          computed: '_computeUrl(objectiveId)'
+          computed: '_computeUrl(objectiveId, queryParams)'
         },
 
         allIndicators: {
@@ -114,10 +115,6 @@
         this._clusterObjectiveIndicatorsAjax();
       },
 
-      _computeStatePath: function(activityId) {
-        return 'clusterActivities.partnersByClusterActivityId.' + activityId;
-      },
-
       _computeCurrentIndicators: function(objectiveId, allIndicators) {
         return allIndicators[objectiveId];
       },
@@ -129,7 +126,6 @@
       _computeUrl: function () {
         //Make sure the queryParams are updated before the thunk is created:
         this.set('queryParams.object_id', this.objectiveId);
-
         return App.Endpoints.indicators('co');
       },
 
