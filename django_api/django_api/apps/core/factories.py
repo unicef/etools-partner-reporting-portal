@@ -178,8 +178,8 @@ class InterventionFactory(factory.django.DjangoModelFactory):
     number = fuzzy.FuzzyText(length=64)
     country_code = fuzzy.FuzzyChoice(COUNTRIES_LIST)
     status = 'Dra'
-    start = today
-    end = today
+    start = beginning_of_this_year
+    end = beginning_of_this_year + datetime.timedelta(days=364)
     signed_by_unicef_date = today
     signed_by_partner_date = today
 
@@ -200,11 +200,10 @@ class InterventionFactory(factory.django.DjangoModelFactory):
 
 class ResponsePlanFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "response plan %d" % n)
-    start = today
-    end = today
+    start = beginning_of_this_year
+    end = beginning_of_this_year + datetime.timedelta(days=364)
 
     cluster = factory.RelatedFactory('core.factories.ClusterFactory', 'response_plan')
-    intervention = factory.SubFactory(InterventionFactory)
 
     class Meta:
         model = ResponsePlan
