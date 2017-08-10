@@ -17,6 +17,9 @@ steps:
         composition_candidates:
             test:
                 image: ${{build_django}}
+                depends_on:
+                    - proxy
+                    - django_api
                 command: sleep 45 && python /code/manage.py test --settings=django_api.settings.test --parallel
         composition_variables:
             - POSTGRES_DB=$POSTGRES_DB
