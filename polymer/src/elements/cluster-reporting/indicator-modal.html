@@ -226,15 +226,15 @@
             </div>
           </div>
 
+          <!-- TODO: Re-add 'required' and on-selected-values-changed="_validate"
+          when the location list is populated so submission isn't prevented -->
           <div class="row">
             <etools-multi-selection-menu
                 class="validate"
                 label="Location"
                 options="[[locations]]"
                 selected-values="{{selectedLocations}}"
-                on-selected-values-changed="_validate"
-                trigger-value-change-event
-                required>
+                trigger-value-change-event>
             </etools-multi-selection-menu>
           </div>
 
