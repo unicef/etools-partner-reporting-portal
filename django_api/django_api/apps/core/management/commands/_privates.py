@@ -3,8 +3,15 @@ import datetime
 
 from django.conf import settings
 
-from account.models import User
-from cluster.models import Cluster, ClusterObjective, ClusterActivity
+from account.models import (
+    User,
+    UserProfile,
+)
+from cluster.models import (
+    Cluster,
+    ClusterObjective,
+    ClusterActivity,
+)
 from partner.models import (
     Partner,
     PartnerProject,
@@ -19,9 +26,9 @@ from indicator.models import (
     DisaggregationValue,
 )
 from unicef.models import (
-    ProgressReport,
     Section,
     ProgrammeDocument,
+    ProgressReport,
     CountryProgrammeOutput,
     LowerLevelOutput,
 )
@@ -31,12 +38,6 @@ from core.models import (
     Location,
 )
 from core.factories import (
-    UserFactory,
-    PartnerFactory,
-    IndicatorLocationDataFactory,
-    InterventionFactory,
-    ResponsePlanFactory,
-    LocationFactory,
     QuantityReportableToLowerLevelOutputFactory,
     RatioReportableToLowerLevelOutputFactory,
     RatioReportableToClusterObjectiveFactory,
@@ -45,14 +46,27 @@ from core.factories import (
     QuantityReportableToPartnerActivityFactory,
     QuantityIndicatorReportFactory,
     RatioIndicatorReportFactory,
-    ProgressReportFactory,
-    SectionFactory,
-    ProgrammeDocumentFactory,
+    QuantityTypeIndicatorBlueprintFactory,
+    RatioTypeIndicatorBlueprintFactory,
+    UserFactory,
+    UserProfileFactory,
+    ClusterFactory,
     ClusterObjectiveFactory,
     ClusterActivityFactory,
-    ClusterFactory,
+    PartnerFactory,
+    PartnerProjectFactory,
+    PartnerActivityFactory,
+    IndicatorLocationDataFactory,
     DisaggregationFactory,
     DisaggregationValueFactory,
+    SectionFactory,
+    ProgrammeDocumentFactory,
+    ProgressReportFactory,
+    CountryProgrammeOutputFactory,
+    LowerLevelOutputFactory,
+    InterventionFactory,
+    ResponsePlanFactory,
+    LocationFactory,
 )
 
 from _generate_disaggregation_fake_data import (
@@ -66,6 +80,7 @@ def clean_up_data():
         print "Deleting all ORM objects"
 
         User.objects.all().delete()
+        UserProfile.objects.all().delete()
         Cluster.objects.all().delete()
         ClusterObjective.objects.all().delete()
         ClusterActivity.objects.all().delete()
@@ -76,15 +91,16 @@ def clean_up_data():
         Reportable.objects.all().delete()
         IndicatorReport.objects.all().delete()
         IndicatorLocationData.objects.all().delete()
-        ProgressReport.objects.all().delete()
+        Disaggregation.objects.all().delete()
+        DisaggregationValue.objects.all().delete()
+        Section.objects.all().delete()
         ProgrammeDocument.objects.all().delete()
+        ProgressReport.objects.all().delete()
         CountryProgrammeOutput.objects.all().delete()
         LowerLevelOutput.objects.all().delete()
         Intervention.objects.all().delete()
-        Location.objects.all().delete()
-        Disaggregation.objects.all().delete()
-        DisaggregationValue.objects.all().delete()
         ResponsePlan.objects.all().delete()
+        Location.objects.all().delete()
 
         print "All ORM objects deleted"
 
@@ -125,36 +141,35 @@ def generate_fake_data(quantity=40):
         print "{} ResponsePlan objects created for {}".format(3, intervention)
 
     for response_plan in ResponsePlan.objects.all():
-        for idx in xrange(3, 0, -1):
-            user = UserFactory(
-                first_name="WASH",
-                last_name="IMO")
+        user = UserFactory(
+            first_name="WASH",
+            last_name="IMO")
 
-            ClusterFactory(
-                response_plan=response_plan,
-                title="WASH",
-                user=user
-            )
+        ClusterFactory(
+            response_plan=response_plan,
+            title="WASH",
+            user=user
+        )
 
-            user = UserFactory(
-                first_name="Nutrition",
-                last_name="IMO")
+        user = UserFactory(
+            first_name="Nutrition",
+            last_name="IMO")
 
-            ClusterFactory(
-                response_plan=response_plan,
-                title="Nutrition",
-                user=user
-            )
+        ClusterFactory(
+            response_plan=response_plan,
+            title="Nutrition",
+            user=user
+        )
 
-            user = UserFactory(
-                first_name="Education",
-                last_name="IMO")
+        user = UserFactory(
+            first_name="Education",
+            last_name="IMO")
 
-            ClusterFactory(
-                response_plan=response_plan,
-                title="Education",
-                user=user
-            )
+        ClusterFactory(
+            response_plan=response_plan,
+            title="Education",
+            user=user
+        )
 
         print "{} Cluster & Cluster user objects created for {}".format(3, response_plan.title)
 
