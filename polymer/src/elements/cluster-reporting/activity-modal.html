@@ -89,6 +89,7 @@
 
     <etools-prp-ajax
         id="activities"
+        params="[[activitiesParams]]"
         url="[[activitiesUrl]]">
     </etools-prp-ajax>
 
@@ -467,6 +468,13 @@
           computed: '_computeActivityUrl(responsePlanId, mode)',
         },
 
+        activitiesParams: {
+          type: Object,
+          value: {
+            page_size: 99999,
+          },
+        },
+
         clustersUrl: {
           type: String,
           computed: '_computeClustersUrl(responsePlanId)',
@@ -510,7 +518,9 @@
 
         projectsParams: {
           type: Object,
-          value: {},
+          value: {
+            page_size: 99999,
+          },
         },
 
         projectsUrl: {
@@ -525,7 +535,9 @@
 
         objectivesParams: {
           type: Object,
-          value: {},
+          value: {
+            page_size: 99999,
+          },
         },
 
         objectivesUrl: {
