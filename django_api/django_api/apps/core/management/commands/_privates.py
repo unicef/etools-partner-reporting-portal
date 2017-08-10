@@ -146,9 +146,22 @@ def generate_fake_data(quantity=40):
                 user=user
             )
 
-        print "{} Cluster objects created for {}".format(3, response_plan.title)
+        print "{} Cluster & Cluster user objects created for {}".format(3, response_plan.title)
 
-        print "{} Cluster user objects created".format(3)
+    for cluster in Cluster.objects.all():
+        for idx in xrange(3, 0, -1):
+            user = UserFactory(
+                first_name="{} Cluster".format(cluster.title),
+                last_name="Partner")
+
+            partner = PartnerFactory(
+                title="{} - {} Cluster Partner".format(cluster.response_plan.title, cluster.title),
+                partner_activity=None,
+                partner_project=None,
+                user=user,
+            )
+
+        print "{} Partner objects & Partner user objects created for {}".format(3, cluster)
 
     # admin, created = User.objects.get_or_create(username='admin', defaults={
     #     'email': 'admin@unicef.org',
@@ -168,36 +181,36 @@ def generate_fake_data(quantity=40):
     # SectionFactory.create_batch(quantity)
     # print "{} Section objects created".format(quantity)
     #
-    # ProgrammeDocumentFactory.create_batch(quantity)
-    # print "{} ProgrammeDocument objects created".format(quantity)
-    #
-    # # Linking the followings:
-    # # ProgressReport - ProgrammeDocument
-    # # created LowerLevelOutput - QuantityReportableToLowerLevelOutput
-    # # Section - ProgrammeDocument via QuantityReportableToLowerLevelOutput
-    # # ProgressReport - IndicatorReport from QuantityReportableToLowerLevelOutput
-    # for idx in xrange(quantity):
-    #     pd = ProgrammeDocument.objects.all()[idx]
-    #     progress_report = ProgressReportFactory(programme_document=pd)
-    #     llo = LowerLevelOutput.objects.all()[idx]
-    #
-    #     if idx < 20:
-    #         reportable = QuantityReportableToLowerLevelOutputFactory(
-    #             content_object=llo, indicator_report__progress_report=None)
-    #
-    #     else:
-    #         reportable = RatioReportableToLowerLevelOutputFactory(
-    #             content_object=llo, indicator_report__progress_report=None)
-    #
-    #     reportable.content_object \
-    #         .indicator.programme_document.sections.add(
-    #             Section.objects.all()[idx])
-    #
-    #     indicator_report = reportable.indicator_reports.first()
-    #     indicator_report.progress_report = progress_report
-    #     indicator_report.save()
-    #
-    # print "{} ProgrammeDocument <-> QuantityReportableToLowerLevelOutput <-> IndicatorReport objects linked".format(quantity)
+    ProgrammeDocumentFactory.create_batch(quantity)
+    print "{} ProgrammeDocument objects created".format(quantity)
+
+    # Linking the followings:
+    # ProgressReport - ProgrammeDocument
+    # created LowerLevelOutput - QuantityReportableToLowerLevelOutput
+    # Section - ProgrammeDocument via QuantityReportableToLowerLevelOutput
+    # ProgressReport - IndicatorReport from QuantityReportableToLowerLevelOutput
+    for idx in xrange(quantity):
+        pd = ProgrammeDocument.objects.all()[idx]
+        progress_report = ProgressReportFactory(programme_document=pd)
+        llo = LowerLevelOutput.objects.all()[idx]
+
+        if idx < 20:
+            reportable = QuantityReportableToLowerLevelOutputFactory(
+                content_object=llo, indicator_report__progress_report=None)
+
+        else:
+            reportable = RatioReportableToLowerLevelOutputFactory(
+                content_object=llo, indicator_report__progress_report=None)
+
+        reportable.content_object \
+            .indicator.programme_document.sections.add(
+                Section.objects.all()[idx])
+
+        indicator_report = reportable.indicator_reports.first()
+        indicator_report.progress_report = progress_report
+        indicator_report.save()
+
+    print "{} ProgrammeDocument <-> QuantityReportableToLowerLevelOutput <-> IndicatorReport objects linked".format(quantity)
     #
     # # Creating ClusterActivity objects
     # # Which creates ClusterObjective, its Cluster,
@@ -209,10 +222,10 @@ def generate_fake_data(quantity=40):
     # print "{} ResponsePlan objects created".format(quantity)
     # print "{} Intervention objects created".format(quantity)
     #
-    # # Intervention <-> Locations
-    # for intervention in Intervention.objects.all():
-    #     intervention.locations.add(*list(Location.objects.all()))
-    # print "{} Intervention objects linked to Locations".format(quantity)
+    # Intervention <-> Locations
+    for intervention in Intervention.objects.all():
+        intervention.locations.add(*list(Location.objects.all()))
+    print "{} Intervention objects linked to Locations".format(quantity)
     #
     # # Extra ResponsePlan creation
     # # Intervention <-> ResponsePlan <-> Cluster
@@ -241,33 +254,33 @@ def generate_fake_data(quantity=40):
     #
     # print "{} ClusterActivity <-> PartnerActivity objects linked".format(quantity)
     #
-    # # Cluster Indicator creations
-    # for idx in xrange(quantity):
-    #     pp = PartnerProject.objects.all()[idx]
-    #     co = ClusterObjective.objects.all()[idx]
-    #     pa = PartnerActivity.objects.all()[idx]
-    #
-    #     reportable_to_pp = QuantityReportableToPartnerProjectFactory(
-    #         content_object=pp, indicator_report__progress_report=None
-    #     )
-    #
-    #     reportable_to_co = QuantityReportableToClusterObjectiveFactory(
-    #         content_object=co, indicator_report__progress_report=None
-    #     )
-    #
-    #     reportable_to_pa = QuantityReportableToPartnerActivityFactory(
-    #         content_object=pa, indicator_report__progress_report=None
-    #     )
-    #
-    #     # TODO: Add Ratio typed cluster indicators
-    #
-    # print "{} Cluster objects <-> QuantityReportable objects linked".format(quantity)
-    #
-    # print "Generating IndicatorLocationData for Quantity type"
-    # generate_indicator_report_location_disaggregation_quantity_data()
-    #
-    # print "Generating IndicatorLocationData for Ratio type"
-    # generate_indicator_report_location_disaggregation_ratio_data()
+    # Cluster Indicator creations
+    for idx in xrange(quantity):
+        pp = PartnerProject.objects.all()[idx]
+        co = ClusterObjective.objects.all()[idx]
+        pa = PartnerActivity.objects.all()[idx]
+
+        reportable_to_pp = QuantityReportableToPartnerProjectFactory(
+            content_object=pp, indicator_report__progress_report=None
+        )
+
+        reportable_to_co = QuantityReportableToClusterObjectiveFactory(
+            content_object=co, indicator_report__progress_report=None
+        )
+
+        reportable_to_pa = QuantityReportableToPartnerActivityFactory(
+            content_object=pa, indicator_report__progress_report=None
+        )
+
+        # TODO: Add Ratio typed cluster indicators
+
+    print "{} Cluster objects <-> QuantityReportable objects linked".format(quantity)
+
+    print "Generating IndicatorLocationData for Quantity type"
+    generate_indicator_report_location_disaggregation_quantity_data()
+
+    print "Generating IndicatorLocationData for Ratio type"
+    generate_indicator_report_location_disaggregation_ratio_data()
     #
     # admin.partner_id = Partner.objects.first().id
     # admin.save()
