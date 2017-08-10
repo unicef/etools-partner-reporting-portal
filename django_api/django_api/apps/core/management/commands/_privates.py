@@ -98,6 +98,19 @@ def generate_fake_data(quantity=40):
 
     today = datetime.date.today()
 
+    admin, created = User.objects.get_or_create(username='admin', defaults={
+        'email': 'admin@unicef.org',
+        'is_superuser': True,
+        'is_staff': True,
+        'organization': 'Tivix'
+    })
+    admin.set_password('Passw0rd!')
+    admin.save()
+    print "Superuser created:{}/{}".format(admin.username, 'Passw0rd!')
+
+    SectionFactory.create_batch(quantity)
+    print "{} Section objects created".format(quantity)
+
     InterventionFactory.create_batch(quantity)
     print "{} Intervention objects created".format(quantity)
 
@@ -110,9 +123,6 @@ def generate_fake_data(quantity=40):
             )
 
         print "{} ResponsePlan objects created for {}".format(3, intervention)
-
-    SectionFactory.create_batch(quantity)
-    print "{} Section objects created".format(quantity)
 
     for response_plan in ResponsePlan.objects.all():
         for idx in xrange(3, 0, -1):
@@ -161,26 +171,69 @@ def generate_fake_data(quantity=40):
                 user=user,
             )
 
+            partner.clusters.add(cluster)
+
         print "{} Partner objects & Partner user objects created for {}".format(3, cluster)
 
-    # admin, created = User.objects.get_or_create(username='admin', defaults={
-    #     'email': 'admin@unicef.org',
-    #     'is_superuser': True,
-    #     'is_staff': True,
-    #     'organization': 'Tivix'
-    # })
-    # admin.set_password('Passw0rd!')
-    # admin.save()
-    # print "Superuser created:{}/{}".format(admin.username, 'Passw0rd!')
-    #
-    # UserFactory.create_batch(quantity)
-    # print "{} User objects created".format(quantity)
-    #
-    # print "{} Partner objects created".format(quantity)
-    #
-    # SectionFactory.create_batch(quantity)
-    # print "{} Section objects created".format(quantity)
-    #
+    for cluster in Cluster.objects.all():
+        for idx in xrange(3, 0, -1):
+            ClusterObjectiveFactory(
+                title="{} - {} Cluster Objective".format(cluster.response_plan.title, cluster.title),
+                cluster=cluster,
+            )
+
+        print "{} Cluster Objective objects created for {}".format(3, cluster)
+
+    for cluster_objective in ClusterObjective.objects.all():
+        for idx in xrange(3, 0, -1):
+            ClusterActivityFactory(
+                title="{} - {} Cluster Activity".format(cluster_objective.cluster.response_plan.title, cluster_objective.title),
+                cluster_objective=cluster_objective,
+            )
+
+        print "{} Cluster Activity objects created for {}".format(3, cluster_objective.title)
+
+    for partner in Partner.objects.all():
+        for idx in xrange(3, 0, -1):
+            first_cluster = partner.clusters.first()
+            pp = PartnerProjectFactory(
+                partner=partner,
+                title="{} - {} Partner Project".format(first_cluster.response_plan.title, partner.title)
+            )
+
+            pp.clusters.add(first_cluster)
+
+        print "{} PartnerProject objects created for {} under {} Cluster".format(3, partner, first_cluster.title)
+
+    # ClusterActivity <-> PartnerActivity link
+    for cluster_activity in ClusterActivity.objects.all():
+        partner = cluster_activity.cluster_objective.cluster.partners.first()
+
+        for project in partner.partner_projects.all():
+            for idx in xrange(3, 0, -1):
+                pa = PartnerActivityFactory(
+                    partner=project.partner,
+                    project=project,
+                    cluster_activity=cluster_activity,
+                    title="{} - {} Partner Activity From {} Cluster Activity".format(project.partner.title, project.title, cluster_activity.title)
+                )
+
+            print "{} PartnerActivity objects created for {} under {} Cluster Activity".format(3, partner, cluster_activity.title)
+
+    print "ClusterActivity <-> PartnerActivity objects linked"
+
+    for partner in Partner.objects.all():
+        for project in partner.partner_projects.all():
+            for idx in xrange(3, 0, -1):
+                pa = PartnerActivityFactory(
+                    partner=project.partner,
+                    project=project,
+                    cluster_activity=None,
+                    title="{} - {} Partner Activity From Custom Activity".format(project.partner.title, project.title)
+                )
+
+            print "{} PartnerActivity objects created for {}".format(3, partner)
+
     ProgrammeDocumentFactory.create_batch(quantity)
     print "{} ProgrammeDocument objects created".format(quantity)
 
@@ -210,50 +263,13 @@ def generate_fake_data(quantity=40):
         indicator_report.progress_report = progress_report
         indicator_report.save()
 
-    print "{} ProgrammeDocument <-> QuantityReportableToLowerLevelOutput <-> IndicatorReport objects linked".format(quantity)
-    #
-    # # Creating ClusterActivity objects
-    # # Which creates ClusterObjective, its Cluster,
-    # # ResponsePlan and Intervention
-    # ClusterActivityFactory.create_batch(quantity)
-    # print "{} ClusterActivity objects created".format(quantity)
-    # print "{} ClusterObjective objects created".format(quantity)
-    # print "{} Cluster objects created".format(quantity)
-    # print "{} ResponsePlan objects created".format(quantity)
-    # print "{} Intervention objects created".format(quantity)
-    #
+    print "ProgrammeDocument <-> QuantityReportableToLowerLevelOutput <-> IndicatorReport objects linked".format(quantity)
+
     # Intervention <-> Locations
     for intervention in Intervention.objects.all():
         intervention.locations.add(*list(Location.objects.all()))
-    print "{} Intervention objects linked to Locations".format(quantity)
-    #
-    # # Extra ResponsePlan creation
-    # # Intervention <-> ResponsePlan <-> Cluster
-    # for idx in xrange(quantity):
-    #     intervention = Intervention.objects.all()[idx]
-    #
-    #     for _ in xrange(3):
-    #         response_plan = ResponsePlanFactory(intervention=intervention)
-    #
-    #         cluster = ClusterFactory()
-    #         cluster.response_plan = response_plan
-    #         cluster.save()
-    #
-    # print "{} Extra ResponsePlan & Cluster objects created".format(quantity*3)
-    #
-    # # ClusterActivity <-> PartnerActivity link
-    # for idx in xrange(quantity):
-    #     cluster_activity = ClusterActivity.objects.all()[idx]
-    #     partner = PartnerFactory(partner_activity__cluster_activity=cluster_activity)
-    #
-    # for idx in xrange(quantity):
-    #     cluster = Cluster.objects.all()[idx]
-    #     pp = PartnerProject.objects.all()[idx]
-    #
-    #     pp.clusters.add(cluster)
-    #
-    # print "{} ClusterActivity <-> PartnerActivity objects linked".format(quantity)
-    #
+    print "Intervention objects linked to Locations".format(quantity)
+
     # Cluster Indicator creations
     for idx in xrange(quantity):
         pp = PartnerProject.objects.all()[idx]
@@ -263,6 +279,7 @@ def generate_fake_data(quantity=40):
         reportable_to_pp = QuantityReportableToPartnerProjectFactory(
             content_object=pp, indicator_report__progress_report=None
         )
+        pp.locations.add(*list(reportable_to_pp.locations.all()))
 
         reportable_to_co = QuantityReportableToClusterObjectiveFactory(
             content_object=co, indicator_report__progress_report=None
@@ -274,13 +291,13 @@ def generate_fake_data(quantity=40):
 
         # TODO: Add Ratio typed cluster indicators
 
-    print "{} Cluster objects <-> QuantityReportable objects linked".format(quantity)
+    print "Cluster objects <-> QuantityReportable objects linked".format(quantity)
 
     print "Generating IndicatorLocationData for Quantity type"
     generate_indicator_report_location_disaggregation_quantity_data()
 
     print "Generating IndicatorLocationData for Ratio type"
     generate_indicator_report_location_disaggregation_ratio_data()
-    #
-    # admin.partner_id = Partner.objects.first().id
-    # admin.save()
+
+    admin.partner_id = Partner.objects.first().id
+    admin.save()
