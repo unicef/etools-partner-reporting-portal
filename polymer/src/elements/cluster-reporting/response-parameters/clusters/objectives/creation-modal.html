@@ -73,7 +73,7 @@
 
     <etools-prp-ajax
         id="createObjective"
-        url="[[objectiveCreationUrl]]"
+        url="[[url]]"
         body="[[data]]"
         content-type="application/json"
         method="post">
@@ -153,6 +153,10 @@
       ],
 
       properties: {
+        responsePlanID: {
+          type: String,
+          statePath: 'responsePlans.currentID',
+        },
 
         opened: {
           type: Boolean,
@@ -169,9 +173,9 @@
           value: 'DD MMM YYYY'
         },
 
-        objectiveCreationUrl: {
+        url: {
           type: String,
-          value: App.Endpoints.responseParametersClusterObjectives()
+          computed: '_computeUrl(responsePlanID)'
         },
 
         frequencies: {
@@ -182,6 +186,10 @@
             {title: 'Quarterly', id: 'Qua'},
           ],
         },
+      },
+
+      _computeUrl: function(responsePlanID) {
+        return App.Endpoints.responseParametersClusterObjectives(responsePlanID);
       },
 
       close: function () {
