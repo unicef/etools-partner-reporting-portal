@@ -68,6 +68,7 @@ from core.factories import (
     ResponsePlanFactory,
     LocationFactory,
 )
+from core.common import INDICATOR_REPORT_STATUS
 
 from _generate_disaggregation_fake_data import (
     generate_indicator_report_location_disaggregation_quantity_data,
@@ -314,6 +315,10 @@ def generate_fake_data(quantity=40):
 
     print "Generating IndicatorLocationData for Ratio type"
     generate_indicator_report_location_disaggregation_ratio_data()
+
+    IndicatorReport.objects.filter(
+        report_status=INDICATOR_REPORT_STATUS.submitted
+    ).update(submission_date=today)
 
     admin.partner_id = Partner.objects.first().id
     admin.save()
