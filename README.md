@@ -15,6 +15,8 @@
 3. Run `fab up` !
 4. Go to http://127.0.0.1:8080/ to see the frontend / polymer running. The Django app is running under http://127.0.0.1:8080/api/
 5. Run `fab fixtures` - load fake data like account, core, partner and other modules!
+6. TEMP: Go to http://127.0.0.1:8080/api/admin/ login with admin/Passw0rd! and can now go to http://127.0.0.1:8080/app/ to see the frontend interface. Replace 'ip-reporting' or 'cluster-reporting' in the URL's to switch between the two interfaces.
+
 
 ## Development
 Here are some docker tips:
