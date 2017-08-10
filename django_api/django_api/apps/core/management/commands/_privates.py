@@ -122,11 +122,7 @@ def generate_fake_data(quantity=40):
     })
     admin.set_password('Passw0rd!')
     admin.save()
-<<<<<<< HEAD
-    print "Superuser created: {}/{}".format(admin.username, 'Passw0rd!')
-=======
     print "Superuser created:{}/{}".format(admin.username, 'Passw0rd!')
->>>>>>> refactor-fake-data-overhaul
 
     SectionFactory.create_batch(quantity)
     print "{} Section objects created".format(quantity)
@@ -283,79 +279,12 @@ def generate_fake_data(quantity=40):
         indicator_report.progress_report = progress_report
         indicator_report.save()
 
-<<<<<<< HEAD
-    print "{} ProgrammeDocument <-> QuantityReportableToLowerLevelOutput <-> IndicatorReport objects linked".format(quantity)
-
-    # Creating ClusterActivity objects
-    # Which creates ClusterObjective, its Cluster,
-    # ResponsePlan and Intervention
-    ClusterActivityFactory.create_batch(quantity)
-    print "{} ClusterActivity objects created".format(quantity)
-    print "{} ClusterObjective objects created".format(quantity)
-    print "{} Cluster objects created".format(quantity)
-    print "{} ResponsePlan objects created".format(quantity)
-    print "{} Intervention objects created".format(quantity)
-    print "{} User objects created".format(quantity)
-=======
     print "ProgrammeDocument <-> QuantityReportableToLowerLevelOutput <-> IndicatorReport objects linked".format(quantity)
->>>>>>> refactor-fake-data-overhaul
 
     # Intervention <-> Locations
     for intervention in Intervention.objects.all():
         intervention.locations.add(*list(Location.objects.all()))
-<<<<<<< HEAD
-    print "{} Intervention objects linked to Locations".format(quantity)
-
-    # Extra ResponsePlan creation
-    # Intervention <-> ResponsePlan <-> Cluster
-    for idx in xrange(quantity):
-        intervention = Intervention.objects.all()[idx]
-
-        for _ in xrange(3):
-            response_plan = ResponsePlanFactory(intervention=intervention)
-
-            cluster = ClusterFactory()
-            cluster.response_plan = response_plan
-            cluster.save()
-
-    print "{} Extra ResponsePlan & Cluster objects created".format(quantity * 3)
-
-    for cluster in Cluster.objects.all():
-        for _ in xrange(3):
-            objective = ClusterObjectiveFactory(cluster=cluster)
-            activity = ClusterActivityFactory(cluster_objective=objective)
-
-    print "{} Extra Cluster objective and activity objects created".format(quantity * 3)
-
-    # Creating PartnerActivity from ClusterActivity
-    for cluster in Cluster.objects.all():
-        partner = PartnerFactory(partner_activity=None, partner_project=None)
-
-        for objective in cluster.cluster_objectives.all():
-            project = PartnerProjectFactory(partner=partner)
-            project.clusters.add(cluster)
-
-            for activity in objective.cluster_activities.all():
-                partner_activity = PartnerActivityFactory(
-                    project=project,
-                    partner=project.partner,
-                    cluster_activity=activity)
-
-    print "{} Partner & PartnerProject & PartnerActivity from ClusterActivity objects created".format(quantity * 3)
-
-    # Creating PartnerActivity from Custom activity
-    for partner in Partner.objects.all():
-        for _ in xrange(3):
-            project = PartnerProjectFactory(partner=partner)
-            partner_activity = PartnerActivityFactory(
-                project=project,
-                partner=project.partner,
-            )
-
-    print "{} Partner & PartnerProject & PartnerActivity from Custom activity objects created".format(quantity * 3)
-=======
     print "Intervention objects linked to Locations".format(quantity)
->>>>>>> refactor-fake-data-overhaul
 
     # Cluster Indicator creations
     for idx in xrange(quantity):
