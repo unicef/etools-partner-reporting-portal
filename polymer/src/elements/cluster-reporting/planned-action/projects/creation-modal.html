@@ -75,7 +75,7 @@
 
     <etools-prp-ajax
         id="createProject"
-        url="[[projectCreationUrl]]"
+        url="[[url]]"
         body="[[data]]"
         content-type="application/json"
         method="post">
@@ -220,6 +220,10 @@
       ],
 
       properties: {
+        responsePlanID: {
+          type: String,
+          statePath: 'responsePlans.currentID',
+        },
 
         path: String,
 
@@ -240,9 +244,9 @@
           value: {}
         },
 
-        projectCreationUrl: {
+        url: {
           type: String,
-          value: App.Endpoints.plannedActions()
+          computed: '_computeUrl(responsePlanID)'
         },
 
         statuses: {
@@ -262,6 +266,10 @@
             {title: 'Quarterly', id: 'Qua'},
           ],
         },
+      },
+
+      _computeUrl: function(responsePlanID) {
+        return App.Endpoints.plannedActions(responsePlanID);
       },
 
       close: function () {
