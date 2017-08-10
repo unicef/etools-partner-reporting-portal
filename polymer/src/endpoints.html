@@ -69,16 +69,16 @@
         return this._buildUrl('/indicator/indicator-location-data-entries/');
       },
 
-      responseParametersClusterObjectives: function() {
-        return this._buildUrl('/cluster/cluster-objective-list/');
+      responseParametersClusterObjectives: function(responsePlanId) {
+        return this._buildUrl('/cluster/' + responsePlanId + '/cluster-objective-list/');
       },
 
-      responseParametersClusterActivities: function() {
-        return this._buildUrl('/cluster/cluster-activity-list/');
+      responseParametersClusterActivities: function(responsePlanId) {
+        return this._buildUrl('/cluster/' + responsePlanId +'/cluster-activity-list/');
       },
 
-      plannedActions: function() {
-        return this._buildUrl('/partner/partner-project-list/');
+      plannedActions: function(responsePlanId) {
+        return this._buildUrl('/partner/' + responsePlanId + '/partner-project-list/');
       },
 
       plannedActionsProjectOverview: function(projectId) {

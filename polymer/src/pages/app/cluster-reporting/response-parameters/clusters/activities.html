@@ -71,7 +71,7 @@
       ],
 
       observers: [
-        '_clusterActivitiesAjax(queryParams)',
+        '_clusterActivitiesAjax(queryParams, activitiesUrl)',
       ],
 
       properties: {
@@ -80,7 +80,12 @@
 
         activitiesUrl: {
           type: String,
-          value: App.Endpoints.responseParametersClusterActivities()
+          computed: '_computeUrl(responsePlanID)',
+        },
+
+        responsePlanID: {
+          type: String,
+          statePath: 'responsePlans.currentID',
         },
 
         loading: {
@@ -97,6 +102,10 @@
           type: Number,
           statePath: 'clusterActivities.count',
         },
+      },
+
+      _computeUrl: function(responsePlanID) {
+        return App.Endpoints.responseParametersClusterActivities(responsePlanID);
       },
 
       _openModal: function () {
