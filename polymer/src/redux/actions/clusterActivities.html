@@ -52,16 +52,16 @@
     App.Actions.ClusterActivities.partners = {
       fetch: function (thunk, clusterId) {
         return function (dispatch) {
-          dispatch(App.Actions.clusterActivities.partners.setLoadingStart());
+          dispatch(App.Actions.ClusterActivities.partners.setLoadingStart());
           return thunk()
             .then(function (res) {
-              dispatch(App.Actions.clusterActivities.partners.set(
+              dispatch(App.Actions.ClusterActivities.partners.set(
                 clusterId, res.data.results
               ));
-              dispatch(App.Actions.clusterActivities.partners.setCount(
+              dispatch(App.Actions.ClusterActivities.partners.setCount(
                 clusterId, res.data.count
               ));
-              dispatch(App.Actions.clusterActivities.partners.setLoadingStop());
+              dispatch(App.Actions.ClusterActivities.partners.setLoadingStop());
             });
         };
       },
