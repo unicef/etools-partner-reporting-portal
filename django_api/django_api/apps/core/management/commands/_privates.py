@@ -230,7 +230,7 @@ def generate_fake_data(quantity=40):
                     partner=project.partner,
                     project=project,
                     cluster_activity=cluster_activity,
-                    title="{} - {} Partner Activity From {} Cluster Activity".format(project.partner.title, project.title, cluster_activity.title)
+                    title="{} Partner Activity".format(project.title)
                 )
 
             print "{} PartnerActivity objects created for {} under {} Cluster Activity".format(3, partner, cluster_activity.title)
@@ -244,7 +244,7 @@ def generate_fake_data(quantity=40):
                     partner=project.partner,
                     project=project,
                     cluster_activity=None,
-                    title="{} - {} Partner Activity From Custom Activity".format(project.partner.title, project.title)
+                    title="{} Partner Activity".format(project.title)
                 )
 
             print "{} PartnerActivity objects created for {}".format(3, partner)
