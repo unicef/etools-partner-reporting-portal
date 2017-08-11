@@ -1,5 +1,4 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../bower_components/iron-icons/maps-icons.html">
 <link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../../bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="../../../bower_components/paper-tabs/paper-tabs.html">
@@ -28,9 +27,6 @@
         };
       }
 
-      iron-icon {
-        color: var(--accent-color);
-      }
       h3 {
         width: 100%;
         float: left;
@@ -192,7 +188,7 @@
             timeframe = 'previous';
           }
 
-          report.indicator_location_data.forEach(function(locationReport, index) {
+          report.indicator_location_data.forEach(function(locationReport) {
             if (locations[locationReport.location.id]) {
               var toUpdate = locations[locationReport.location.id];
               toUpdate[timeframe] = locationReport;
@@ -213,7 +209,6 @@
           locationList.push(locations[i]);
         });
 
-        console.log("locationList", locationList)
         return locationList;
       },
 
