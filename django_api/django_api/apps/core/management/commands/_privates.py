@@ -360,7 +360,3 @@ def generate_fake_data(seed_quantity=40):
 
     admin.partner = Partner.objects.first()
     admin.save()
-
-    print "Admin belong to Cluster ID {} under {} Response plan\n".format(
-        admin.partner.clusters.first().id,
-        admin.partner.clusters.first().response_plan.title)
