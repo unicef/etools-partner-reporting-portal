@@ -84,7 +84,7 @@ class Cluster(TimeStampedModel):
 
         for r in reportables:
             latest = r.indicator_reports.latest('id')
-            id_list.append(latest)
+            id_list.append(latest.id)
 
         return IndicatorReport.objects.filter(id__in=id_list)
 

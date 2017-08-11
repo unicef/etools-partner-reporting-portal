@@ -52,6 +52,7 @@ RATIO_DISPLAY_TYPE_CHOICES_LIST = [x[0] for x in IndicatorBlueprint.RATIO_DISPLA
 PD_FREQUENCY_LEVEL_CHOICE_LIST = [x[0] for x in PD_FREQUENCY_LEVEL]
 REPORTABLE_FREQUENCY_LEVEL_CHOICE_LIST = [x[0] for x in REPORTABLE_FREQUENCY_LEVEL]
 OVERALL_STATUS_LIST = [x[0] for x in OVERALL_STATUS]
+REPORT_STATUS_LIST = [x[0] for x in INDICATOR_REPORT_STATUS]
 
 today = datetime.date.today()
 beginning_of_this_year = datetime.date(today.year, 1, 1)
@@ -477,6 +478,8 @@ class QuantityIndicatorReportFactory(factory.django.DjangoModelFactory):
     total = dict(
         [('c', 0), ('d', 0), ('v', random.randint(0, 3000))])
     overall_status = fuzzy.FuzzyChoice(OVERALL_STATUS_LIST)
+    report_status = fuzzy.FuzzyChoice(REPORT_STATUS_LIST)
+    submission_date = beginning_of_this_year + datetime.timedelta(days=10)
 
     class Meta:
         model = IndicatorReport
@@ -490,6 +493,8 @@ class RatioIndicatorReportFactory(factory.django.DjangoModelFactory):
     total = dict(
         [('c', 0), ('d', random.randint(3000, 6000)), ('v', random.randint(0, 3000))])
     overall_status = fuzzy.FuzzyChoice(OVERALL_STATUS_LIST)
+    report_status = fuzzy.FuzzyChoice(REPORT_STATUS_LIST)
+    submission_date = beginning_of_this_year + datetime.timedelta(days=10)
 
     class Meta:
         model = IndicatorReport
