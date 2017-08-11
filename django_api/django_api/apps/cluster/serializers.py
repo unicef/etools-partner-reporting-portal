@@ -4,7 +4,7 @@ from core.common import FREQUENCY_LEVEL
 
 from indicator.serializers import (
     ClusterIndicatorReportSerializer,
-    IndicatorListSerializer,
+    IndicatorReportListSerializer,
 )
 
 from .models import ClusterObjective, ClusterActivity, Cluster
@@ -138,7 +138,7 @@ class ClusterDashboardSerializer(serializers.ModelSerializer):
             obj.overdue_indicator_reports, many=True).data
 
     def get_constrained_indicator_reports(self, obj):
-        return IndicatorListSerializer(
+        return IndicatorReportListSerializer(
             obj.constrained_indicator_reports, many=True).data
 
     class Meta:
@@ -197,7 +197,7 @@ class ClusterPartnerDashboardSerializer(serializers.ModelSerializer):
                 self.context['partner']), many=True).data
 
     def get_constrained_indicator_reports(self, obj):
-        return IndicatorListSerializer(
+        return IndicatorReportListSerializer(
             obj.constrained_indicator_reports_partner(
                 self.context['partner']), many=True).data
 

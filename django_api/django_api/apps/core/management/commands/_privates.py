@@ -125,6 +125,8 @@ def generate_fake_data(seed_quantity=40):
     admin.set_password('Passw0rd!')
     admin.save()
 
+    print "Superuser created: {}/{}\n".format(admin.username, 'Passw0rd!')
+
     SectionFactory.create_batch(seed_quantity)
     print "{} Section objects created".format(seed_quantity / 4)
 
@@ -356,6 +358,9 @@ def generate_fake_data(seed_quantity=40):
         report_status=INDICATOR_REPORT_STATUS.submitted
     ).update(submission_date=today)
 
-    admin.partner_id = Partner.objects.first().id
+    admin.partner = Partner.objects.first()
     admin.save()
-    print "Superuser created:{}/{}\n".format(admin.username, 'Passw0rd!')
+
+    print "Admin belong to Cluster ID {} under {} Response plan\n".format(
+        admin.partner.clusters.first().id,
+        admin.partner.clusters.first().response_plan.title)
