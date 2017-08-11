@@ -367,6 +367,24 @@ class QuantityReportableToClusterObjectiveFactory(ReportableFactory):
         model = Reportable
 
 
+class QuantityReportableToClusterActivityFactory(ReportableFactory):
+    content_object = factory.SubFactory('core.factories.ClusterActivityFactory')
+    target = '5000'
+    baseline = '0'
+
+    indicator_report = factory.RelatedFactory('core.factories.QuantityIndicatorReportFactory', 'reportable')
+
+    location = factory.RelatedFactory('core.factories.LocationFactory', 'reportable', parent=None)
+
+    blueprint = factory.SubFactory(QuantityTypeIndicatorBlueprintFactory)
+
+    total = dict(
+        [('c', 0), ('d', 0), ('v', random.randint(0, 3000))])
+
+    class Meta:
+        model = Reportable
+
+
 class QuantityReportableToPartnerActivityFactory(ReportableFactory):
     content_object = factory.SubFactory('core.factories.PartnerActivityFactory')
     target = '5000'

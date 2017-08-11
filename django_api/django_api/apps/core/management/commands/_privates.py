@@ -44,6 +44,7 @@ from core.factories import (
     QuantityReportableToPartnerProjectFactory,
     QuantityReportableToClusterObjectiveFactory,
     QuantityReportableToPartnerActivityFactory,
+    QuantityReportableToClusterActivityFactory,
     QuantityIndicatorReportFactory,
     RatioIndicatorReportFactory,
     QuantityTypeIndicatorBlueprintFactory,
@@ -128,8 +129,8 @@ def generate_fake_data(quantity=40):
     SectionFactory.create_batch(quantity)
     print "{} Section objects created".format(quantity)
 
-    InterventionFactory.create_batch(quantity)
-    print "{} Intervention objects created".format(quantity)
+    InterventionFactory.create_batch(quantity / 4)
+    print "{} Intervention objects created".format(quantity / 4)
 
     for intervention in Intervention.objects.all():
         for idx in xrange(3, 0, -1):
@@ -192,25 +193,37 @@ def generate_fake_data(quantity=40):
         print "{} Partner objects & Partner user objects created for {}".format(3, cluster)
 
     for cluster in Cluster.objects.all():
-        for idx in xrange(3, 0, -1):
-            ClusterObjectiveFactory(
+        for idx in xrange(2, 0, -1):
+            co = ClusterObjectiveFactory(
                 title="{} - {} Cluster Objective".format(cluster.response_plan.title, cluster.title),
                 cluster=cluster,
             )
 
-        print "{} Cluster Objective objects created for {}".format(3, cluster)
+            reportable_to_co = QuantityReportableToClusterObjectiveFactory(
+                content_object=co, indicator_report__progress_report=None
+            )
+
+            print "Cluster Objective QuantityReportable objects created"
+
+        print "{} Cluster Objective objects created for {}".format(2, cluster)
 
     for cluster_objective in ClusterObjective.objects.all():
-        for idx in xrange(3, 0, -1):
-            ClusterActivityFactory(
+        for idx in xrange(2, 0, -1):
+            ca = ClusterActivityFactory(
                 title="{} - {} Cluster Activity".format(cluster_objective.cluster.response_plan.title, cluster_objective.title),
                 cluster_objective=cluster_objective,
             )
 
-        print "{} Cluster Activity objects created for {}".format(3, cluster_objective.title)
+            reportable_to_ca = QuantityReportableToClusterActivityFactory(
+                content_object=ca, indicator_report__progress_report=None
+            )
+
+            print "Cluster Activity QuantityReportable objects created"
+
+        print "{} Cluster Activity objects created for {}".format(2, cluster_objective.title)
 
     for partner in Partner.objects.all():
-        for idx in xrange(3, 0, -1):
+        for idx in xrange(2, 0, -1):
             first_cluster = partner.clusters.first()
             pp = PartnerProjectFactory(
                 partner=partner,
@@ -219,14 +232,14 @@ def generate_fake_data(quantity=40):
 
             pp.clusters.add(first_cluster)
 
-        print "{} PartnerProject objects created for {} under {} Cluster".format(3, partner, first_cluster.title)
+        print "{} PartnerProject objects created for {} under {} Cluster".format(2, partner, first_cluster.title)
 
     # ClusterActivity <-> PartnerActivity link
     for cluster_activity in ClusterActivity.objects.all():
         partner = cluster_activity.cluster_objective.cluster.partners.first()
 
         for project in partner.partner_projects.all():
-            for idx in xrange(3, 0, -1):
+            for idx in xrange(2, 0, -1):
                 pa = PartnerActivityFactory(
                     partner=project.partner,
                     project=project,
@@ -234,21 +247,43 @@ def generate_fake_data(quantity=40):
                     title="{} Partner Activity".format(project.title)
                 )
 
-            print "{} PartnerActivity objects created for {} under {} Cluster Activity".format(3, partner, cluster_activity.title)
+                reportable_to_pa = QuantityReportableToPartnerActivityFactory(
+                    content_object=pa, indicator_report__progress_report=None
+                )
+
+                reportable_to_pa.parent_indicator = cluster_activity.reportables.first()
+
+                reportable_to_pa.save()
+
+                print "Partner Activity QuantityReportable objects created"
+
+            print "{} PartnerActivity objects created for {} under {} Cluster Activity".format(2, partner, cluster_activity.title)
 
     print "ClusterActivity <-> PartnerActivity objects linked"
 
-    for partner in Partner.objects.all():
-        for project in partner.partner_projects.all():
-            for idx in xrange(3, 0, -1):
-                pa = PartnerActivityFactory(
-                    partner=project.partner,
-                    project=project,
-                    cluster_activity=None,
-                    title="{} Partner Activity".format(project.title)
-                )
+    for project in PartnerProject.objects.all():
+        reportable_to_pp = QuantityReportableToPartnerProjectFactory(
+            content_object=project, indicator_report__progress_report=None
+        )
+        project.locations.add(*list(reportable_to_pp.locations.all()))
 
-            print "{} PartnerActivity objects created for {}".format(3, partner)
+        print "Partner Project QuantityReportable objects created"
+
+        for idx in xrange(3, 0, -1):
+            pa = PartnerActivityFactory(
+                partner=project.partner,
+                project=project,
+                cluster_activity=None,
+                title="{} Partner Activity".format(project.title)
+            )
+
+            reportable_to_pa = QuantityReportableToPartnerActivityFactory(
+                content_object=pa, indicator_report__progress_report=None
+            )
+
+            print "Partner Activity QuantityReportable objects created"
+
+        print "{} PartnerActivity objects created for {}".format(3, project.partner)
 
     ProgrammeDocumentFactory.create_batch(quantity)
     print "{} ProgrammeDocument objects created".format(quantity)
@@ -259,10 +294,9 @@ def generate_fake_data(quantity=40):
     # Section - ProgrammeDocument via QuantityReportableToLowerLevelOutput
     # ProgressReport - IndicatorReport from
     # QuantityReportableToLowerLevelOutput
-    for idx in xrange(quantity):
-        pd = ProgrammeDocument.objects.all()[idx]
-        progress_report = ProgressReportFactory(programme_document=pd)
-        llo = LowerLevelOutput.objects.all()[idx]
+    for idx, llo in enumerate(LowerLevelOutput.objects.all()):
+        progress_report = ProgressReportFactory(
+            programme_document=llo.indicator.programme_document)
 
         if idx < 20:
             reportable = QuantityReportableToLowerLevelOutputFactory(
@@ -286,29 +320,6 @@ def generate_fake_data(quantity=40):
     for intervention in Intervention.objects.all():
         intervention.locations.add(*list(Location.objects.all()))
     print "Intervention objects linked to Locations".format(quantity)
-
-    # Cluster Indicator creations
-    for idx in xrange(quantity):
-        pp = PartnerProject.objects.all()[idx]
-        co = ClusterObjective.objects.all()[idx]
-        pa = PartnerActivity.objects.all()[idx]
-
-        reportable_to_pp = QuantityReportableToPartnerProjectFactory(
-            content_object=pp, indicator_report__progress_report=None
-        )
-        pp.locations.add(*list(reportable_to_pp.locations.all()))
-
-        reportable_to_co = QuantityReportableToClusterObjectiveFactory(
-            content_object=co, indicator_report__progress_report=None
-        )
-
-        reportable_to_pa = QuantityReportableToPartnerActivityFactory(
-            content_object=pa, indicator_report__progress_report=None
-        )
-
-        # TODO: Add Ratio typed cluster indicators
-
-    print "Cluster objects <-> QuantityReportable objects linked".format(quantity)
 
     print "Generating IndicatorLocationData for Quantity type"
     generate_indicator_report_location_disaggregation_quantity_data()
