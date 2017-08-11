@@ -1,0 +1,43 @@
+version: '1.0'
+
+steps:
+
+    build_django:
+        type: build
+        image_name: unicef/etools-prp-django-api
+        dockerfile: Dockerfile
+        working_directory: ${{main_clone}}/django_api
+        tag: ${{CF_BRANCH}}
+        build_arguments:
+            - env=$ENV
+            
+    # composition_step:
+    #     type: composition
+    #     composition: 'unicef-prp'
+    #     composition_candidates:
+    #         test:
+    #             image: ${{build_django}}
+    #             depends_on:
+    #                 - proxy
+    #                 - django_api
+    #             command: bash -c "/usr/local/bin/waitforit -host=django_api -port=8000 && python /code/manage.py test --settings=django_api.settings.test --parallel"
+    #     composition_variables:
+    #         - POSTGRES_DB=$POSTGRES_DB
+    #         - POSTGRES_USER=$POSTGRES_USER
+    #         - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+    #         - POSTGRES_HOST=$POSTGRES_HOST
+    #         - SECRET_KEY=$SECRET_KEY
+    #         - ENV=$ENV
+    #         - DJANGO_ALLOWED_HOST="*"
+
+    push_to_hub:
+        type: push
+        title: Pushing django image to docker hub
+        candidate: ${{build_django}}
+        tags: 
+            - ${{CF_BRANCH}}
+            - latest
+        when:
+            branch:
+                only: 
+                    - develop
