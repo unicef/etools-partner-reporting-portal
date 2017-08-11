@@ -118,6 +118,8 @@ class ClusterObjectiveListCreateAPIView(ListCreateAPIView):
     #     return ClusterObjective.objects.select_related('cluster').all()
 
     def get_queryset(self, *args, **kwargs):
+        response_plan_id = self.kwargs.get('response_plan_id')
+
         return ClusterObjective.objects.select_related('cluster').filter(
             cluster__response_plan_id=response_plan_id)
 
