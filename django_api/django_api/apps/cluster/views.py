@@ -117,16 +117,9 @@ class ClusterObjectiveListCreateAPIView(ListCreateAPIView):
     # def get_queryset(self, *args, **kwargs):
     #     return ClusterObjective.objects.select_related('cluster').all()
 
-
     def get_queryset(self, *args, **kwargs):
-        # FIXME: use better query.
-        queryset = Cluster.objects
-        response_plan_id = self.kwargs.get('response_plan_id')
-        clusters = queryset.filter(response_plan_id=response_plan_id)
-
-        cluster_ids = [cluster.id for cluster in clusters]
-
-        return ClusterObjective.objects.select_related('cluster').filter(cluster_id__in=cluster_ids)
+        return ClusterObjective.objects.select_related('cluster').filter(
+            cluster__response_plan_id=response_plan_id)
 
     def post(self, request, *args, **kwargs):
         """
@@ -205,15 +198,9 @@ class ClusterActivityListAPIView(ListCreateAPIView):
     filter_class = ClusterActivityFilter
 
     def get_queryset(self, *args, **kwargs):
-        # FIXME: Temporary fix. Use much better query.
-        queryset = Cluster.objects
         response_plan_id = self.kwargs.get('response_plan_id')
-        clusters = queryset.filter(response_plan_id=response_plan_id)
 
-        cluster_ids = [cluster.id for cluster in clusters]
-        objective_ids = ClusterObjective.objects.select_related('cluster').filter(cluster_id__in=cluster_ids)
-
-        return ClusterActivity.objects.select_related('cluster_objective__cluster').filter(cluster_objective__in=objective_ids)
+        return ClusterActivity.objects.select_related('cluster_objective__cluster').filter(cluster_objective__cluster__response_plan_id=response_plan_id)
 
     def post(self, request, *args, **kwargs):
         """
