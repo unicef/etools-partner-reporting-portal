@@ -107,12 +107,12 @@ def clean_up_data():
         print "All ORM objects deleted"
 
 
-def generate_fake_data(quantity=40):
-    if not settings.IS_TEST and quantity < 40:
-        quantity = 40
+def generate_fake_data(seed_quantity=40):
+    if not settings.IS_TEST and seed_quantity < 40:
+        seed_quantity = 40
 
-    if quantity >= 253:
-        quantity = 250
+    if seed_quantity >= 253:
+        seed_quantity = 250
 
     today = datetime.date.today()
 
@@ -124,16 +124,15 @@ def generate_fake_data(quantity=40):
     })
     admin.set_password('Passw0rd!')
     admin.save()
-    print "Superuser created:{}/{}".format(admin.username, 'Passw0rd!')
 
-    SectionFactory.create_batch(quantity)
-    print "{} Section objects created".format(quantity)
+    SectionFactory.create_batch(seed_quantity)
+    print "{} Section objects created".format(seed_quantity / 4)
 
-    InterventionFactory.create_batch(quantity / 4)
-    print "{} Intervention objects created".format(quantity / 4)
+    InterventionFactory.create_batch(seed_quantity / 8)
+    print "{} Intervention objects created".format(seed_quantity / 8)
 
     for intervention in Intervention.objects.all():
-        for idx in xrange(3, 0, -1):
+        for idx in xrange(0, 3):
             year = today.year - idx
             ResponsePlanFactory(
                 intervention=intervention,
@@ -147,52 +146,12 @@ def generate_fake_data(quantity=40):
             first_name="WASH",
             last_name="IMO")
 
-        ClusterFactory(
+        cluster = ClusterFactory(
             response_plan=response_plan,
             title="WASH",
             user=user
         )
 
-        user = UserFactory(
-            first_name="Nutrition",
-            last_name="IMO")
-
-        ClusterFactory(
-            response_plan=response_plan,
-            title="Nutrition",
-            user=user
-        )
-
-        user = UserFactory(
-            first_name="Education",
-            last_name="IMO")
-
-        ClusterFactory(
-            response_plan=response_plan,
-            title="Education",
-            user=user
-        )
-
-        print "{} Cluster & Cluster user objects created for {}".format(3, response_plan.title)
-
-    for cluster in Cluster.objects.all():
-        for idx in xrange(3, 0, -1):
-            user = UserFactory(
-                first_name="{} Cluster".format(cluster.title),
-                last_name="Partner")
-
-            partner = PartnerFactory(
-                title="{} - {} Cluster Partner".format(cluster.response_plan.title, cluster.title),
-                partner_activity=None,
-                partner_project=None,
-                user=user,
-            )
-
-            partner.clusters.add(cluster)
-
-        print "{} Partner objects & Partner user objects created for {}".format(3, cluster)
-
-    for cluster in Cluster.objects.all():
         for idx in xrange(2, 0, -1):
             co = ClusterObjectiveFactory(
                 title="{} - {} Cluster Objective".format(cluster.response_plan.title, cluster.title),
@@ -203,22 +162,98 @@ def generate_fake_data(quantity=40):
                 content_object=co, indicator_report__progress_report=None
             )
 
-            print "Cluster Objective QuantityReportable objects created"
+        user = UserFactory(
+            first_name="{} Cluster".format(cluster.title),
+            last_name="Partner")
 
-        print "{} Cluster Objective objects created for {}".format(2, cluster)
+        partner = PartnerFactory(
+            title="{} - {} Cluster Partner".format(cluster.response_plan.title, cluster.title),
+            partner_activity=None,
+            partner_project=None,
+            user=user,
+        )
+        partner.clusters.add(cluster)
+
+        user = UserFactory(
+            first_name="Nutrition",
+            last_name="IMO")
+
+        cluster = ClusterFactory(
+            response_plan=response_plan,
+            title="Nutrition",
+            user=user
+        )
+
+        for idx in xrange(2, 0, -1):
+            co = ClusterObjectiveFactory(
+                title="{} - {} Cluster Objective".format(cluster.response_plan.title, cluster.title),
+                cluster=cluster,
+            )
+
+            reportable_to_co = QuantityReportableToClusterObjectiveFactory(
+                content_object=co, indicator_report__progress_report=None
+            )
+
+        user = UserFactory(
+            first_name="{} Cluster".format(cluster.title),
+            last_name="Partner")
+
+        partner = PartnerFactory(
+            title="{} - {} Cluster Partner".format(cluster.response_plan.title, cluster.title),
+            partner_activity=None,
+            partner_project=None,
+            user=user,
+        )
+        partner.clusters.add(cluster)
+
+        user = UserFactory(
+            first_name="Education",
+            last_name="IMO")
+
+        cluster = ClusterFactory(
+            response_plan=response_plan,
+            title="Education",
+            user=user
+        )
+
+        for idx in xrange(2, 0, -1):
+            co = ClusterObjectiveFactory(
+                title="{} - {} Cluster Objective".format(cluster.response_plan.title, cluster.title),
+                cluster=cluster,
+            )
+
+            reportable_to_co = QuantityReportableToClusterObjectiveFactory(
+                content_object=co, indicator_report__progress_report=None
+            )
+
+        user = UserFactory(
+            first_name="{} Cluster".format(cluster.title),
+            last_name="Partner")
+
+        partner = PartnerFactory(
+            title="{} - {} Cluster Partner".format(cluster.response_plan.title, cluster.title),
+            partner_activity=None,
+            partner_project=None,
+            user=user,
+        )
+        partner.clusters.add(cluster)
+
+        print "{} Cluster & Cluster user objects created for {}".format(3, response_plan.title)
+
+        print "{} Partner objects & Partner user objects created for {}".format(3, cluster)
+
+        print "{} Cluster Objective objects created for {}".format(2 * 3, cluster)
 
     for cluster_objective in ClusterObjective.objects.all():
         for idx in xrange(2, 0, -1):
             ca = ClusterActivityFactory(
-                title="{} - {} Cluster Activity".format(cluster_objective.cluster.response_plan.title, cluster_objective.title),
+                title="{} Cluster Activity".format(cluster_objective.title),
                 cluster_objective=cluster_objective,
             )
 
             reportable_to_ca = QuantityReportableToClusterActivityFactory(
                 content_object=ca, indicator_report__progress_report=None
             )
-
-            print "Cluster Activity QuantityReportable objects created"
 
         print "{} Cluster Activity objects created for {}".format(2, cluster_objective.title)
 
@@ -227,10 +262,15 @@ def generate_fake_data(quantity=40):
             first_cluster = partner.clusters.first()
             pp = PartnerProjectFactory(
                 partner=partner,
-                title="{} - {} Partner Project".format(first_cluster.response_plan.title, partner.title)
+                title="{} Partner Project".format(partner.title)
             )
 
             pp.clusters.add(first_cluster)
+
+            reportable_to_pp = QuantityReportableToPartnerProjectFactory(
+                content_object=pp, indicator_report__progress_report=None
+            )
+            pp.locations.add(*list(reportable_to_pp.locations.all()))
 
         print "{} PartnerProject objects created for {} under {} Cluster".format(2, partner, first_cluster.title)
 
@@ -244,7 +284,7 @@ def generate_fake_data(quantity=40):
                     partner=project.partner,
                     project=project,
                     cluster_activity=cluster_activity,
-                    title="{} Partner Activity".format(project.title)
+                    title="{} Partner Activity from CA".format(project.title)
                 )
 
                 reportable_to_pa = QuantityReportableToPartnerActivityFactory(
@@ -255,38 +295,23 @@ def generate_fake_data(quantity=40):
 
                 reportable_to_pa.save()
 
-                print "Partner Activity QuantityReportable objects created"
+                pa = PartnerActivityFactory(
+                    partner=project.partner,
+                    project=project,
+                    cluster_activity=None,
+                    title="{} Partner Activity".format(project.title)
+                )
 
-            print "{} PartnerActivity objects created for {} under {} Cluster Activity".format(2, partner, cluster_activity.title)
+                reportable_to_pa = QuantityReportableToPartnerActivityFactory(
+                    content_object=pa, indicator_report__progress_report=None
+                )
+
+            print "{} PartnerActivity objects created for {} under {} Cluster Activity and Custom Activity".format(4, partner, cluster_activity.title)
 
     print "ClusterActivity <-> PartnerActivity objects linked"
 
-    for project in PartnerProject.objects.all():
-        reportable_to_pp = QuantityReportableToPartnerProjectFactory(
-            content_object=project, indicator_report__progress_report=None
-        )
-        project.locations.add(*list(reportable_to_pp.locations.all()))
-
-        print "Partner Project QuantityReportable objects created"
-
-        for idx in xrange(3, 0, -1):
-            pa = PartnerActivityFactory(
-                partner=project.partner,
-                project=project,
-                cluster_activity=None,
-                title="{} Partner Activity".format(project.title)
-            )
-
-            reportable_to_pa = QuantityReportableToPartnerActivityFactory(
-                content_object=pa, indicator_report__progress_report=None
-            )
-
-            print "Partner Activity QuantityReportable objects created"
-
-        print "{} PartnerActivity objects created for {}".format(3, project.partner)
-
-    ProgrammeDocumentFactory.create_batch(quantity)
-    print "{} ProgrammeDocument objects created".format(quantity)
+    ProgrammeDocumentFactory.create_batch(seed_quantity)
+    print "{} ProgrammeDocument objects created".format(seed_quantity)
 
     # Linking the followings:
     # ProgressReport - ProgrammeDocument
@@ -314,12 +339,12 @@ def generate_fake_data(quantity=40):
         indicator_report.progress_report = progress_report
         indicator_report.save()
 
-    print "ProgrammeDocument <-> QuantityReportableToLowerLevelOutput <-> IndicatorReport objects linked".format(quantity)
+    print "ProgrammeDocument <-> QuantityReportableToLowerLevelOutput <-> IndicatorReport objects linked".format(seed_quantity)
 
     # Intervention <-> Locations
     for intervention in Intervention.objects.all():
         intervention.locations.add(*list(Location.objects.all()))
-    print "Intervention objects linked to Locations".format(quantity)
+    print "Intervention objects linked to Locations".format(seed_quantity)
 
     print "Generating IndicatorLocationData for Quantity type"
     generate_indicator_report_location_disaggregation_quantity_data()
@@ -333,3 +358,4 @@ def generate_fake_data(quantity=40):
 
     admin.partner_id = Partner.objects.first().id
     admin.save()
+    print "Superuser created:{}/{}\n".format(admin.username, 'Passw0rd!')
