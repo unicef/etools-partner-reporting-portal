@@ -16,14 +16,15 @@
 <link rel="import" href="../../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html">
 
-<link rel="import" href="../etools-prp-ajax.html">
-<link rel="import" href="../etools-prp-date-input.html">
+<link rel="import" href="../../polyfills/es6-shim.html">
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/modal.html">
 <link rel="import" href="../../styles/buttons.html">
 <link rel="import" href="../../styles/modal.html">
+<link rel="import" href="../etools-prp-ajax.html">
+<link rel="import" href="../etools-prp-date-input.html">
 
 <dom-module id="activity-modal">
   <template>
@@ -394,13 +395,12 @@
 
         mode: {
           type: String,
-          value: 'cluster',
           observer: '_setDefaults',
         },
 
         opened: {
           type: Boolean,
-          observer: '_setDefaults',
+          observer: '_onOpenedChanged',
         },
 
         responsePlanId: {
@@ -486,7 +486,6 @@
 
         partner: {
           type: Object,
-          value: {},
           statePath: 'partner.current',
         },
 
@@ -514,6 +513,17 @@
         });
 
         this.set('activities', []);
+        this.set('objectives', []);
+      },
+
+      _onOpenedChanged: function (opened) {
+        if (opened) {
+          this.set('mode', '');
+
+          this.async(function () {
+            this.set('mode', 'cluster');
+          });
+        }
       },
 
       _validate: function (e) {
@@ -641,7 +651,9 @@
 
         this.set('updatePending', true);
 
-        this.$.activity.body = this.data[this.mode];
+        this.$.activity.body = Object.assign({
+          partner: this.partner.id,
+        }, this.data[this.mode]);
 
         this.$.activity.thunk()()
             .then(function (res) {
