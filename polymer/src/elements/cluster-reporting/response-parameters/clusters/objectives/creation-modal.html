@@ -11,14 +11,15 @@
 <link rel="import" href="../../../../../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../../../../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
 <link rel="import" href="../../../../../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../../../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 
-<link rel="import" href="../../../../form-fields/dropdown-form-input.html">
-<link rel="import" href="../../../../form-fields/cluster-dropdown-input.html">
+<link rel="import" href="../../../../form-fields/cluster-dropdown-content.html">
 <link rel="import" href="../../../../etools-prp-ajax.html">
 <link rel="import" href="../../../../../styles/buttons.html">
 <link rel="import" href="../../../../../redux/store.html">
 <link rel="import" href="../../../../../redux/actions.html">
 <link rel="import" href="../../../../../behaviors/routing.html">
+<link rel="import" href="../../../../../behaviors/utils.html">
 
 <dom-module id="cluster-objectives-modal">
   <template>
@@ -71,6 +72,8 @@
 
     <iron-location path="{{path}}"></iron-location>
 
+    <cluster-dropdown-content clusters="{{clusters}}"></cluster-dropdown-content>
+
     <etools-prp-ajax
         id="createObjective"
         url="[[objectiveCreationUrl]]"
@@ -96,7 +99,7 @@
       <paper-dialog-scrollable>
         <iron-form class="app-grid">
             <paper-input
-              class="item full-width"
+              class="item validate full-width"
               id="title"
               label="Cluster Objective Title"
               value="{{data.title}}"
@@ -105,7 +108,7 @@
             </paper-input>
 
             <paper-input
-              class="item"
+              class="item validate"
               id="reference_number"
               label="CO ref #"
               value="{{data.reference_number}}"
@@ -113,20 +116,45 @@
               required>
             </paper-input>
 
-            <cluster-dropdown-input
-              class="item"
-              label="Cluster"
-              id="cluster"
-              value="{{data.cluster}}">
-            </cluster-dropdown-input>
+            <paper-dropdown-menu
+                class="item validate"
+                label="Cluster"
+                id="cluster"
+                on-value-changed="_validate"
+                on-selected-item-changed="_setCluster"
+                always-float-label
+                required>
+                <paper-listbox
+                    slot="dropdown-content"
+                    class="dropdown-content">
+                  <template
+                      id="clusters"
+                      is="dom-repeat"
+                      items="[[clusters]]">
+                    <paper-item>[[item.title]]</paper-item>
+                  </template>
+                </paper-listbox>
+            </paper-dropdown-menu>
 
-            <dropdown-form-input
-               class="item"
-               label="Frequency of reporting"
-               id="frequency"
-               value="{{data.frequency}}"
-               data="[[frequencies]]">
-            </dropdown-form-input>
+            <paper-dropdown-menu
+                class="validate"
+                label="Frequency of reporting"
+                on-value-changed="_validate"
+                on-selected-item-changed="_setFrequency"
+                always-float-label
+                required>
+              <paper-listbox
+                  slot="dropdown-content"
+                  class="dropdown-content">
+                <template
+                    id="frequencies"
+                    is="dom-repeat"
+                    items="[[frequencies]]">
+                  <paper-item>[[item.title]]</paper-item>
+                </template>
+              </paper-listbox>
+            </paper-dropdown-menu>
+
         </iron-form>
       </paper-dialog-scrollable>
 
@@ -150,6 +178,7 @@
       behaviors: [
         App.Behaviors.ReduxBehavior,
         App.Behaviors.RoutingBehavior,
+        App.Behaviors.UtilsBehavior
       ],
 
       properties: {
@@ -182,6 +211,11 @@
             {title: 'Quarterly', id: 'Qua'},
           ],
         },
+
+        clusters: {
+          type: Array,
+          value: []
+        }
       },
 
       close: function () {
@@ -200,7 +234,33 @@
         this.set('path', url);
       },
 
+      _setFrequency: function (e, data) {
+        var freq = this.$$('#frequencies').itemForElement(data.value);
+        if (!freq) {
+          return;
+        }
+
+        this.set('data.frequency', freq.id);
+      },
+
+      _setCluster: function (e, data) {
+        var cluster = this.$$('#clusters').itemForElement(data.value);
+
+        if (!cluster) {
+          return;
+        }
+        this.set('data.cluster', cluster.id);
+      },
+
+      _validate: function (e) {
+        e.target.validate();
+      },
+
       _save: function () {
+        if (!this._fieldsAreValid()) {
+          return;
+        }
+
         var self = this;
         var thunk = this.$.createObjective.thunk();
         thunk()
