@@ -98,8 +98,21 @@
           type: Number,
           statePath: 'indicators.count'
         },
+
+        openedDetails: {
+          type: Array,
+          value: []
+        }
       },
 
+      listeners: {
+        'page-number-changed': '_pageNumberModified',
+        'details-opened-changed': '_detailsChange'
+      },
+
+      detached: function () {
+        this.openedDetails.length = 0;
+      }
     });
   </script>
 </dom-module>

@@ -5,7 +5,7 @@ from rest_framework import status
 from core.tests.base import BaseAPITestCase
 from core.models import Location
 from cluster.models import Cluster
-from partner.models import PartnerProject
+from partner.models import Partner, PartnerProject
 
 
 class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
@@ -40,7 +40,7 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
         get list by given cluster id unit test for PartnerProjectListCreateAPIView
         """
         cluster_id = Cluster.objects.first().id
-        url = reverse('partner-project-list', kwargs={"cluster_id": cluster_id})
+        url = reverse('partner-project-list') + "?cluster_id=" + str(cluster_id)
         response = self.client.get(url, format='json')
 
         self.assertTrue(status.is_success(response.status_code))
@@ -79,6 +79,14 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
         self.assertEquals(response.data['results'][0]['id'], pp.id)
         self.assertEquals(response.data['results'][0]['title'], pp.title)
         self.assertEquals(response.data['results'][0]['locations'][0]['id'], location.id)
+
+        partner = Partner.objects.last()
+        url = reverse('partner-project-list')
+        url += "?partner=%d" % partner.id
+        response = self.client.get(url, format='json')
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(response.data['count'], 1)
+        self.assertEquals(response.data['results'][0]['partner'], str(partner.id))
 
 
 class TestPartnerProjectAPIView(BaseAPITestCase):

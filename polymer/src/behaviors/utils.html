@@ -1,4 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/promise-polyfill/promise-polyfill-lite.html">
 
 <script>
   (function () {
@@ -32,6 +33,10 @@
         return JSON.stringify(val, null, 2);
       },
 
+      _log: function (val) {
+        console.log(val);
+      },
+
       _toNumber: function (val) {
         return Number(val);
       },
@@ -45,7 +50,60 @@
       _notFound: function () {
         window.location.href = '/not-found';
       },
-    };
 
+      _clone: function _clone(val) {
+        var typeStr = Object.prototype.toString.call(val);
+
+        switch (typeStr) {
+          case '[object Array]':
+            return val.map(_clone);
+
+          case '[object Object]':
+            return Object.keys(val).reduce(function (prev, curr) {
+              prev[curr] = _clone(val[curr]);
+
+              return prev;
+            }, {});
+
+          default:
+            return val;
+        }
+      },
+
+      _deferred: function () {
+        var defer = {};
+
+        defer.promise = new Promise(function (resolve, reject) {
+          defer.resolve = resolve;
+          defer.reject = reject;
+        });
+
+        return defer;
+      },
+
+      _toPercentage: function (value) {
+        return value == null /* undefinded & null */ ? // jshint ignore:line
+            value : Math.floor(value * 100) + '%';
+      },
+
+      _displayClusterHeader: function (subpage, needsHeaderList) {
+        if (needsHeaderList.indexOf(subpage) >= 0) {
+          return true;
+        }
+        return false;
+      },
+
+      _commaSeparatedListValues: function (items) {
+        return items.join(', ');
+      },
+
+      _commaSeparatedDictValue: function (items, key) {
+        var newList = items.map(function(item) {
+          return item[key];
+        });
+
+        return newList.join(', ');
+      }
+    };
   }());
 </script>

@@ -26,16 +26,6 @@
       :host {
         display: block;
       }
-      .page-top-content {
-        box-shadow: 0 1px 2px 1px rgba(0, 0, 0, .1);
-      }
-      .page-top-content page-header {
-        padding-bottom:10px;
-      }
-      .top-content-row {
-        padding-left:25px;
-      }
-
     </style>
 
     <app-route
@@ -44,31 +34,18 @@
       data="{{routeData}}">
     </app-route>
 
-    <div class="page-top-content">
-
-      <page-header title="[[ pd.title ]]" back="pd"></page-header>
-
-      <div class="top-content-row">
-
+    <page-header title="[[ pd.title ]]" back="pd">
+      <div class="tabs">
         <paper-tabs
-          selected="{{ routeData.dashTab }}"
-          attr-for-selected="name"
-          noink
-          bottom-item>
-
-          <paper-tab name="details" link>
-            <span class="tab-content">Details</span>
-          </paper-tab>
-
-          <paper-tab name="reports" link>
-            <span class="tab-content">Reports</span>
-          </paper-tab>
-
+            selected="{{ routeData.dashTab }}"
+            attr-for-selected="name"
+            scrollable
+            hide-scroll-buttons>
+          <paper-tab name="details">Details</paper-tab>
+          <paper-tab name="reports">Reports</paper-tab>
         </paper-tabs>
-
       </div>
-
-    </div>
+    </page-header>
 
     <iron-pages
       id="tabContent"

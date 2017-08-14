@@ -1,0 +1,149 @@
+<link rel="import" href="../../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../../../../../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../../../../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../../../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../../../../bower_components/iron-location/iron-location.html">
+
+<link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/partners/projects/overview.html">
+<link rel="import" href="../../../../../elements/page-body.html">
+<link rel="import" href="../../../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../../../elements/page-body.html">
+<link rel="import" href="../../../../../elements/page-header.html">
+<link rel="import" href="../../../../../elements/page-badge.html">
+<link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="../../../../../endpoints.html">
+<link rel="import" href="../../../../../redux/actions.html">
+<link rel="import" href="../../../../../redux/store.html">
+
+<dom-module id="rp-partners-project-detail">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      .tabs paper-tab {
+        text-transform: uppercase;
+      }
+    </style>
+
+    <iron-location
+      query="{{query}}">
+    </iron-location>
+
+    <etools-prp-ajax
+      id="project"
+      url="[[overviewUrl]]">
+    </etools-prp-ajax>
+
+    <app-route
+      route="{{route}}"
+      pattern="/:tab"
+      subroute="{{subroute}}"
+      data="{{routeData}}">
+    </app-route>
+
+    <page-header
+        title="[[projectData.title]]"
+        back="[[backLink]]">
+
+      <page-badge
+          class="above-title" name="project">
+      </page-badge>
+
+      <div class="toolbar">
+        <project-status status="[[data.status]]"></project-status>
+      </div>
+
+      <div class="tabs">
+        <paper-tabs
+            selected="{{routeData.tab}}"
+            attr-for-selected="name"
+            scrollable
+            hide-scroll-buttons>
+          <paper-tab name="overview">Overview</paper-tab>
+          <paper-tab name="indicators">Indicators</paper-tab>
+          <paper-tab name="activities">Activities</paper-tab>
+        </paper-tabs>
+      </div>
+    </page-header>
+
+    <page-body>
+      <template is="dom-if" if="[[_equals(tab, 'overview')]]" restamp="true">
+        <rp-partner-project-details-overview project-data=[[projectData]]></rp-partner-project-details-overview>
+      </template>
+    </page-body>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'rp-partners-project-detail',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+      ],
+
+      observers: [
+        '_updateUrlTab(routeData.tab)',
+      ],
+
+      properties: {
+        tab: String,
+
+        routeData: Object,
+
+        projectId: String,
+
+        projectData: {
+          type: Object,
+          value: {}
+        },
+
+        overviewUrl: {
+          type: String,
+          computed: '_computeOverviewUrl(projectId)'
+        },
+
+        backLink: {
+          type: String,
+          computed: '_computeBackLink(query)',
+        },
+      },
+
+      _computeBackLink: function(query) {
+        return '/response-parameters/partners/projects' + '?' + query;
+      },
+
+      _computeOverviewUrl: function(projectId) {
+        return App.Endpoints.plannedActionsProjectOverview(projectId);
+      },
+
+      _updateTabSelection: function () {
+        this.$.tabContent.select(this.tab);
+      },
+
+      _updateUrlTab: function (tab) {
+        if (!tab) {
+          tab = 'overview';
+        }
+        this.set('tab', tab);
+        this.set('route.path', '/' + this.tab);
+      },
+
+      attached: function () {
+        var thunk = this.$.project.thunk();
+        var self = this;
+        thunk()
+          .then(function (res) {
+            self.updatePending = false;
+            self.projectData = res.data;
+          })
+          .catch(function (err) { // jshint ignore:line
+            self.updatePending = false;
+            // TODO: error handling
+          });
+      },
+
+    });
+  </script>
+</dom-module>

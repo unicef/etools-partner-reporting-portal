@@ -8,13 +8,15 @@
 <link rel="import" href="reducers/partner.html">
 <link rel="import" href="reducers/indicators.html">
 <link rel="import" href="reducers/programmeDocuments.html">
-<<<<<<< HEAD
 <link rel="import" href="reducers/indicatorData.html">
-=======
 <link rel="import" href="reducers/progressReports.html">
->>>>>>> develop
 <link rel="import" href="reducers/programmeDocumentDetails.html">
 <link rel="import" href="reducers/programmeDocumentReports.html">
+<link rel="import" href="reducers/responsePlans.html">
+<link rel="import" href="reducers/disaggregations.html">
+<link rel="import" href="reducers/partnerProjects.html">
+<link rel="import" href="reducers/clusters.html">
+<link rel="import" href="reducers/clusterIndicatorReports.html">
 
 <script src="../../bower_components/redux-thunk/index.js"></script>
 
@@ -34,6 +36,13 @@
       programmeDocumentDetails: App.Reducers.ProgrammeDocumentDetails,
       programmeDocumentReports: App.Reducers.ProgrammeDocumentReports,
       progressReports: App.Reducers.ProgressReports,
+      responsePlans: App.Reducers.ResponsePlans,
+      disaggregations: App.Reducers.Disaggregations,
+      partnerProjects: App.Reducers.PartnerProjects,
+      clusters: App.Reducers.Clusters,
+      clusterActivities: App.Reducers.ClusterActivities,
+      clusterObjectives: App.Reducers.ClusterObjectives,
+      clusterIndicatorReports: App.Reducers.ClusterIndicatorReports,
     });
 
     var store = Redux.createStore(

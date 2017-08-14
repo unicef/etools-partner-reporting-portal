@@ -8,6 +8,9 @@
 <link rel="import" href="actions/indicatorData.html">
 <link rel="import" href="actions/indicators.html">
 <link rel="import" href="actions/progressReports.html">
+<link rel="import" href="actions/disaggregations.html">
+<link rel="import" href="actions/partnerProjects.html">
+<link rel="import" href="actions/clusterIndicatorReports.html">
 
 <script>
   (function () {
@@ -85,6 +88,37 @@
         };
       },
 
+      // Gets a list of all response plans for the currently selected location ID.
+      fetchResponsePlans: function (responsePlansThunk) {
+        return function (dispatch) {
+          return responsePlansThunk()
+            .then(function (res) {
+              dispatch(App.Actions.setResponsePlans(res.data));
+            });
+        };
+      },
+
+      setResponsePlans: function (plans) {
+        return {
+          type: App.Constants.SET_RESPONSE_PLANS,
+          plans: plans
+        };
+      },
+
+      setCurrentResponsePlanID: function (newPlanID) {
+        return {
+          type: App.Constants.SET_CURRENT_RESPONSE_PLAN_ID,
+          planID: newPlanID,
+        };
+      },
+
+      setCurrentResponsePlan: function (newPlan) {
+        return {
+          type: App.Constants.SET_CURRENT_RESPONSE_PLAN,
+          plan: newPlan,
+        };
+      },
+
       setApp: function (app) {
         return {
           type: App.Constants.SET_APP,
@@ -144,6 +178,95 @@
         return {
           type: App.Constants.SET_PROGRAMME_DOCUMENT_DETAILS,
           pdDetailsData: pdDetailsData,
+        };
+      },
+
+      fetchClusterObjectivesList: function (thunk) {
+        return function (dispatch) {
+          dispatch(App.Actions.clusterObjectivesLoadingStart());
+          return thunk()
+            .catch(function () {
+              dispatch(App.Actions.clusterObjectivesLoadingStart());
+            })
+            .then(function (res) {
+              dispatch(App.Actions.setClusterObjectivesList(res.data));
+              dispatch(App.Actions.setClusterObjectivesCount(res.data));
+              dispatch(App.Actions.clusterObjectivesLoadingStop());
+            });
+        };
+      },
+
+      setClusterObjectivesList: function (data) {
+        return {
+          type: App.Constants.SET_CLUSTER_OBJECTIVES_LIST,
+          data: data,
+        };
+      },
+
+      clusterObjectivesLoadingStart: function () {
+        return {
+          type: App.Constants.CLUSTER_OBJECTIVES_LOADING_START,
+        };
+      },
+
+      clusterObjectivesLoadingStop: function () {
+        return {
+          type: App.Constants.CLUSTER_OBJECTIVES_LOADING_STOP,
+        };
+      },
+
+      setClusterObjectivesCount: function (data) {
+        return {
+          type: App.Constants.SET_CLUSTER_OBJECTIVES_COUNT,
+          count: data.count
+        };
+      },
+
+      fetchClusterActivitiesList: function (thunk) {
+        return function (dispatch) {
+          dispatch(App.Actions.clusterActivitiesLoadingStart());
+          return thunk()
+            .catch(function () {
+              dispatch(App.Actions.clusterActivitiesLoadingStart());
+            })
+            .then(function (res) {
+              dispatch(App.Actions.setClusterActivitiesList(res.data));
+              dispatch(App.Actions.setClusterActivitiesCount(res.data));
+              dispatch(App.Actions.clusterActivitiesLoadingStop());
+            });
+        };
+      },
+
+      setClusterActivitiesList: function (data) {
+        return {
+          type: App.Constants.SET_CLUSTER_ACTIVITIES_LIST,
+          data: data,
+        };
+      },
+
+      clusterActivitiesLoadingStart: function () {
+        return {
+          type: App.Constants.CLUSTER_ACTIVITIES_LOADING_START,
+        };
+      },
+
+      clusterActivitiesLoadingStop: function () {
+        return {
+          type: App.Constants.CLUSTER_ACTIVITIES_LOADING_STOP,
+        };
+      },
+
+      setClusterActivitiesCount: function (data) {
+        return {
+          type: App.Constants.SET_CLUSTER_ACTIVITIES_COUNT,
+          count: data.count
+        };
+      },
+
+      setFilterByClusterId: function (id) {
+        return {
+          type: App.Constants.SET_FILTER_BY_CLUSTER_ID,
+          id: id
         };
       },
 

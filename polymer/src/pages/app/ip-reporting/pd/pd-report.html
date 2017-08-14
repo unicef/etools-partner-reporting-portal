@@ -1,21 +1,24 @@
 <link rel="import" href="../../../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../../../bower_components/app-route/app-route.html">
-<link rel="import" href="../../../../../bower_components/paper-menu-button/paper-menu-button.html">
-<link rel="import" href="../../../../../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../../../../../bower_components/paper-menu/paper-menu.html">
-<link rel="import" href="../../../../../bower_components/paper-item/paper-item.html">
-<link rel="import" href="../../../../../bower_components/paper-item/paper-icon-item.html">
-<link rel="import" href="../../../../../bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="../../../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../../../bower_components/iron-location/iron-query-params.html">
+<link rel="import" href="../../../../../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../../../../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../../../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../../../../bower_components/paper-button/paper-button.html">
 
+<link rel="import" href="../../../../styles/buttons.html">
+<link rel="import" href="../../../../pages/app/ip-reporting/pd/pd-report/results.html">
+<link rel="import" href="../../../../pages/app/ip-reporting/pd/pd-report/info.html">
+<link rel="import" href="../../../../pages/app/ip-reporting/pd/pd-report/submit.html">
 <link rel="import" href="../../../../elements/page-header.html">
 <link rel="import" href="../../../../elements/page-body.html">
-<link rel="import" href="../../../../elements/ip-reporting/pd-output-list.html">
 <link rel="import" href="../../../../elements/reporting-period.html">
 <link rel="import" href="../../../../elements/report-status.html">
 <link rel="import" href="../../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../../endpoints.html">
 <link rel="import" href="../../../../behaviors/utils.html">
+<link rel="import" href="../../../../behaviors/routing.html">
 <link rel="import" href="../../../../redux/store.html">
 <link rel="import" href="../../../../redux/actions.html">
 <link rel="import" href="../../../../redux/selectors/programmeDocuments.html">
@@ -23,7 +26,7 @@
 
 <dom-module id="page-ip-reporting-pd-report">
   <template>
-    <style>
+    <style include="button-styles">
       :host {
         display: block;
 
@@ -32,15 +35,18 @@
           left: 0;
           top: -23px;
         };
+      }
 
-        --paper-item-icon: {
-          width: auto;
-          margin-right: 5px;
-        };
+      .toolbar report-status {
+        margin-right: 1em;
+      }
 
-        --paper-item: {
-          white-space: nowrap;
-        };
+      .toolbar a {
+        text-decoration: none;
+      }
+
+      .tabs paper-tab {
+        text-transform: uppercase;
       }
     </style>
 
@@ -50,9 +56,19 @@
         data="{{routeData}}">
     </app-route>
 
+    <iron-location
+        query="{{query}}">
+    </iron-location>
+
+    <iron-query-params
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
+    </iron-query-params>
+
     <etools-prp-ajax
         id="indicatorData"
-        url="[[indicatorDataUrl]]">
+        url="[[indicatorDataUrl]]"
+        params="[[queryParams]]">
     </etools-prp-ajax>
 
     <etools-prp-ajax
@@ -69,30 +85,71 @@
       </reporting-period>
 
       <div class="toolbar">
-        <template
-            is="dom-if"
-            if="[[_equals(mode, 'edit')]]">
-          <report-status status="[[currentReport.progress_report_status]]"></report-status>
-        </template>
+        <report-status status="[[currentReport.report_status]]"></report-status>
 
-        <paper-menu-button dynamic-align>
-          <paper-icon-button
-              icon="icons:more-vert"
-              class="dropdown-trigger">
-          </paper-icon-button>
-          <paper-menu class="dropdown-content">
-            <paper-item>PD details</paper-item>
-            <paper-icon-item>
-              <iron-icon icon="icons:file-upload" item-icon></iron-icon>
-              <span class="flex">Export</span>
-            </paper-icon-item>
-          </paper-menu>
-        </paper-menu-button>
+        <a href="[[pdUrl]]" tabindex="-1">
+          <paper-button
+              class="btn-primary"
+              raised>
+            Show PD/SSFA ToR Details
+          </paper-button>
+        </a>
+      </div>
+
+      <div class="tabs">
+        <paper-tabs
+            selected="{{selectedTab}}"
+            attr-for-selected="name"
+            scrollable
+            hide-scroll-buttons>
+          <paper-tab name="results">Reporting on results</paper-tab>
+          <paper-tab name="info">Other info</paper-tab>
+
+          <template
+              is="dom-if"
+              if="[[!_equals(mode, 'view')]]"
+              restamp="true">
+            <paper-tab name="submit">Review and submit</paper-tab>
+          </template>
+        </paper-tabs>
       </div>
     </page-header>
 
     <page-body>
-      <pd-output-list></pd-output-list>
+      <iron-pages
+          attr-for-selected="name"
+          selected="{{selectedTab}}">
+        <template
+            is="dom-if"
+            if="[[_equals(selectedTab, 'results')]]"
+            restamp="true">
+          <page-ip-reporting-report-results
+              name="results">
+          </page-ip-reporting-report-results>
+        </template>
+
+        <template
+            is="dom-if"
+            if="[[_equals(selectedTab, 'info')]]"
+            restamp="true">
+          <page-ip-reporting-report-info
+              name="info">
+          </page-ip-reporting-report-info>
+        </template>
+
+        <template
+            is="dom-if"
+            if="[[!_equals(mode, 'view')]]"
+            restamp="true">
+          <template
+              is="dom-if"
+              if="[[_equals(selectedTab, 'submit')]]"
+              restamp="true">
+            <page-ip-reporting-report-submit
+                name="submit">
+            </page-ip-reporting-report-submit>
+          </template>
+        </template>
     </page-body>
   </template>
 
@@ -103,19 +160,22 @@
       behaviors: [
         App.Behaviors.ReduxBehavior,
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.RoutingBehavior,
       ],
 
       properties: {
         routeData: Object,
 
+        queryParams: Object,
+
         mode: {
           type: String,
-          computed: '_computeMode(routeData)',
+          statePath: 'programmeDocumentReports.current.mode',
         },
 
         reportId: {
           type: String,
-          statePath: 'programmeDocumentReports.current',
+          statePath: 'programmeDocumentReports.current.id',
         },
 
         indicatorDataUrl: {
@@ -126,6 +186,11 @@
         reportUrl: {
           type: String,
           computed: '_computeReportUrl(pdId, reportId)',
+        },
+
+        pdUrl: {
+          type: String,
+          computed: '_computePdUrl(_baseUrl, pdId)',
         },
 
         pdId: {
@@ -153,24 +218,17 @@
           type: String,
           computed: '_computeBackLink(pdId)',
         },
+
+        selectedTab: {
+          type: String,
+          value: 'results',
+        },
       },
 
       observers: [
-        '_onReportIdChanged(routeData.report_id)',
-        '_handleInputChange(indicatorDataUrl)',
+        '_onReportChanged(routeData.report_id, routeData.mode)',
+        '_handleInputChange(indicatorDataUrl, queryParams)',
       ],
-
-      _computeMode: function (routeData) {
-        switch (routeData.mode) {
-          case 'view':
-          case 'draft':
-          case 'edit':
-            return routeData.mode;
-
-          default:
-            return 'view';
-        }
-      },
 
       _computeBackLink: function (pdId) {
         return 'pd/' + pdId + '/view/reports';
@@ -180,8 +238,8 @@
         return pd.reference_number;
       },
 
-      _onReportIdChanged: function (reportId) {
-        this.dispatch(App.Actions.PDReports.setCurrent(reportId));
+      _onReportChanged: function (reportId, mode) {
+        this.dispatch(App.Actions.PDReports.setCurrent(reportId, mode));
       },
 
       _computeHeadingText: function (pd, mode) {
@@ -212,10 +270,14 @@
         return App.Endpoints.programmeDocumentReport(pdId, reportId);
       },
 
-      _handleInputChange: function (url) {
+      _computePdUrl: function (_baseUrl, pdId) {
+        return this.buildUrl(_baseUrl, '/pd/' + pdId + '/view/details');
+      },
+
+      _handleInputChange: function (url, queryParams) {
         var indicatorDataThunk;
 
-        if (!url) {
+        if (!url || !Object.keys(queryParams).length) {
           return;
         }
 

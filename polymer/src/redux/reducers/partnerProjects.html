@@ -1,0 +1,64 @@
+<link rel="import" href="../redux.html">
+<link rel="import" href="../../constants.html">
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Reducers = App.Reducers || {};
+
+    App.Reducers.PartnerProjects = Redux.combineReducers({
+      all: partnerProjectsListReducer,
+      count: partnerProjectsCountReducer,
+      loading: loadingPartnerProjectsReducer,
+    });
+
+    function partnerProjectsListReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = [];
+      }
+
+      switch (action.type) {
+        case App.Constants.SET_PARTNER_PROJECTS_LIST:
+          return action.data.results;
+
+        case App.Constants.RESET:
+          return [];
+
+        default:
+          return state;
+      }
+    }
+
+    function partnerProjectsCountReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = 0;
+      }
+
+      switch (action.type) {
+        case App.Constants.SET_PARTNER_PROJECTS_COUNT:
+          return action.count;
+
+        default:
+          return state;
+      }
+    }
+
+    function loadingPartnerProjectsReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = false;
+      }
+
+      switch (action.type) {
+        case App.Constants.PARTNER_PROJECTS_LOADING_START:
+          return true;
+
+        case App.Constants.PARTNER_PROJECTS_LOADING_STOP:
+          return false;
+
+        default:
+          return state;
+      }
+    }
+  }());
+</script>

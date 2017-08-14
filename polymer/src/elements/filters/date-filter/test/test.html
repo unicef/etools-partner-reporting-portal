@@ -8,19 +8,6 @@
   <script src="../../../../../bower_components/web-component-tester/browser.js"></script>
   <script src="../../../../../bower_components/moment/moment.js"></script>
 
-
-  <script>
-    /* global moment */
-    var App = {}; // jshint ignore:line
-    var testDateString = '01 Jan 2017'
-    var testDate = moment(testDateString);
-    var _createDatePickerDialog = function(datepicker) {
-      datepicker.datePicker = document.createElement('etools-datepicker');
-
-      Polymer.dom(document.querySelector('body')).appendChild(datepicker.datePicker);
-    }
-
-  </script>
   <link rel="import" href="../date-filter.html">
 </head>
 <body>
@@ -35,6 +22,16 @@
   </test-fixture>
 
   <script>
+    /* global moment */
+    var App = {}; // jshint ignore:line
+    var testDateString = '01 Jan 2017';
+    var testDate = moment(testDateString);
+    var _createDatePickerDialog = function(datepicker) {
+      datepicker.datePicker = document.createElement('etools-datepicker');
+
+      Polymer.dom(document.querySelector('body')).appendChild(datepicker.datePicker);
+    };
+
     suite('<date-filter>', function () {
       var el;
       var field;
@@ -46,7 +43,7 @@
             .querySelector('paper-input').root).querySelector('input');
         datepicker = Polymer.dom(el.root)
             .querySelector('etools-datepicker-button');
-        _createDatePickerDialog(datepicker)
+        _createDatePickerDialog(datepicker);
 
       });
 
@@ -95,10 +92,9 @@
         }));
       });
 
-
       test('opens datepicker on down event', function () {
-        field.addEventListener('down', function (e) {
-          assert(true, datepicker.open)
+        field.addEventListener('down', function () {
+          assert(true, datepicker.open);
         });
 
         field.dispatchEvent(new Event('down', {

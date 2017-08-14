@@ -39,6 +39,18 @@
             return Object.assign({}, state, change);
           }());
 
+        case App.Constants.UPDATE_PD_REPORT:
+          return (function () {
+            var change = {};
+
+            change[action.pdId] = (state[action.pdId] || []).map(function (report) {
+              return report.id === action.reportId ?
+                  Object.assign({}, report, action.data) : report;
+            });
+
+            return Object.assign({}, state, change);
+          }());
+
         case App.Constants.RESET:
           return {};
 
@@ -92,15 +104,18 @@
 
     function currentPDReportReducer(state, action) {
       if (typeof state === 'undefined') {
-        state = '';
+        state = {};
       }
 
       switch (action.type) {
         case App.Constants.SET_CURRENT_PD_REPORT:
-          return action.reportId;
+          return {
+            id: action.reportId,
+            mode: action.mode,
+          };
 
         case App.Constants.RESET:
-          return '';
+          return {};
 
         default:
           return state;

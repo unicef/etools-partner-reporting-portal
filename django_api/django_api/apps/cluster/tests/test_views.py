@@ -132,7 +132,7 @@ class TestClusterObjectiveAPIView(BaseAPITestCase):
         self.assertEquals(response.data['count'], 1)
 
         # test for defined cluster
-        url = reverse('cluster-objective-list', kwargs={'cluster_id': last.cluster_id})
+        url = reverse('cluster-objective-list') + "?cluster_id=" + str(last.cluster_id)
         response = self.client.get(url, format='json')
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(response.data['count'], 1)
