@@ -8,6 +8,7 @@
 <link rel="import" href="../../../redux/actions.html">
 <link rel="import" href="../../../behaviors/utils.html">
 <link rel="import" href="../../../redux/store.html">
+<link rel="import" href="../../../redux/selectors/programmeDocuments.html">
 <link rel="import" href="../../../endpoints.html">
 
 <dom-module id="page-ip-reporting-pd">
@@ -69,6 +70,8 @@
       ],
 
       properties: {
+        queryParams: Object,
+
         page: {
           type: String,
           observer: '_pageChanged',
@@ -84,13 +87,17 @@
           statePath: 'location.id',
         },
 
-        queryParams: Object,
+        currentPD: {
+          type: Object,
+          statePath: App.Selectors.ProgrammeDocuments.current,
+        },
       },
 
       observers: [
         '_handleInputChange(programmeDocumentsUrl, queryParams)',
         '_routePdIdChanged(routeData.pd_id)',
         '_routePathChanged(route.path)',
+        '_computeQueryParams(queryParams, subroute.path)',
       ],
 
       _routePdIdChanged: function (pd_id) {
@@ -127,10 +134,22 @@
         return locationId ? App.Endpoints.programmeDocuments(locationId) : '';
       },
 
+      _computeQueryParams: function (queryParams, tail) {
+        return tail ? {} : queryParams;
+      },
+
       _handleInputChange: function (programmeDocumentsUrl) {
         var pdThunk;
 
         if (!programmeDocumentsUrl) {
+          return;
+        }
+
+        if (
+          this.subroute.path &&
+          (this.currentPD && typeof this.currentPD.id !== 'undefined')
+        ) {
+          // Don't refetch on child routes, unless navigated to directly.
           return;
         }
 

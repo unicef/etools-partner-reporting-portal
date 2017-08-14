@@ -7,7 +7,7 @@ from core.common import PROGRESS_REPORT_STATUS
 from core.tests.base import BaseAPITestCase
 from core.models import Intervention, Location
 from core.factories import (
-    ReportableToLowerLevelOutputFactory,
+    QuantityReportableToLowerLevelOutputFactory,
     ProgrammeDocumentFactory,
     ProgressReportFactory,
     IndicatorLocationDataFactory,
@@ -16,9 +16,9 @@ from indicator.models import IndicatorReport
 from unicef.models import LowerLevelOutput, Section, ProgrammeDocument, ProgressReport
 
 
-class TestProgrammeDocumentAPIView(BaseAPITestCase):
+class TestProgrammeDocumentAPIView25(BaseAPITestCase):
 
-    generate_fake_data_quantity = 5
+    generate_fake_data_quantity = 25
 
     def test_list_api(self):
         intervention = Intervention.objects.filter(locations__isnull=False).first()
@@ -70,6 +70,9 @@ class TestProgrammeDocumentAPIView(BaseAPITestCase):
         for result in response.data['results']:
             self.assertEquals(result['title'], document['title'])
 
+
+class TestProgrammeDocumentAPIView(BaseAPITestCase):
+
     def test_detail_api(self):
         pd = ProgrammeDocument.objects.first()
         # location_id is redundantly!
@@ -82,8 +85,6 @@ class TestProgrammeDocumentAPIView(BaseAPITestCase):
 
 
 class TestProgressReportAPIView(BaseAPITestCase):
-
-    generate_fake_data_quantity = 5
 
     def setUp(self):
         super(TestProgressReportAPIView, self).setUp()
@@ -124,7 +125,7 @@ class TestProgressReportAPIView(BaseAPITestCase):
 
     def test_list_api_filter_by_due_status(self):
         self.reports = self.queryset.filter(
-            status__in=[PROGRESS_REPORT_STATUS.due, PROGRESS_REPORT_STATUS.over_due]
+            status__in=[PROGRESS_REPORT_STATUS.due, PROGRESS_REPORT_STATUS.overdue]
         )
 
         url = reverse('progress-reports', kwargs={'location_id': self.location_id})

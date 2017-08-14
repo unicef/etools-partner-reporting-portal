@@ -1,0 +1,186 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../../../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../../../../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../../../../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../../../../bower_components/app-layout/app-toolbar/app-toolbar.html">
+
+<link rel="import" href="../../../styles/app-theme-cluster.html">
+<link rel="import" href="../../../redux/store.html">
+<link rel="import" href="../../../redux/actions.html">
+<link rel="import" href="../../../behaviors/utils.html">
+<link rel="import" href="../../../elements/cluster-reporting/nav.html">
+<link rel="import" href="../../../elements/cluster-reporting/app-header.html">
+
+<dom-module id="page-cluster-reporting-router">
+  <template>
+    <style include="app-theme-cluster-styles">
+      :host {
+        display: block;
+      }
+
+      app-drawer {
+        --app-drawer-width: 220px;
+        --app-drawer-content-container: {
+          box-shadow: 1px 0 2px 1px rgba(0, 0, 0, .1);
+        }
+      }
+
+      app-toolbar {
+        background: var(--theme-primary-color);
+      }
+
+      .mode {
+        font-size: 16px;
+        text-transform: uppercase;
+        color: var(--theme-primary-text-color-light);
+        cursor: default;
+        user-select: none;
+      }
+    </style>
+
+    <app-route
+       route="{{route}}"
+       pattern="/:plan/:page"
+       data="{{routeData}}"
+       tail="{{subroute}}">
+    </app-route>
+
+    <app-drawer-layout
+        responsive-width="0px"
+        persistent>
+      <app-drawer>
+        <app-header fixed>
+          <app-toolbar>
+            <div class="mode">
+              Cluster
+              <br>
+              Reporting
+            </div>
+          </app-toolbar>
+        </app-header>
+
+        <cluster-reporting-nav
+            route="{{subroute}}"
+            selected="{{page}}"
+            role="navigation">
+        </cluster-reporting-nav>
+      </app-drawer>
+
+      <cluster-reporting-app-header></cluster-reporting-app-header>
+
+      <iron-pages
+          selected="[[page]]"
+          attr-for-selected="name">
+        <template
+            is="dom-if"
+            if="[[_equals(page, 'dashboard')]]"
+            restamp="true">
+          <page-cluster-reporting-dashboard
+              name="dashboard"
+              route="{{subroute}}">
+          </page-cluster-reporting-dashboard>
+        </template>
+
+        <template
+            is="dom-if"
+            if="[[_equals(page, 'response-parameters')]]"
+            restamp="true">
+          <page-cluster-reporting-response-parameters
+              name="response-parameters"
+              route="{{subroute}}">
+          </page-cluster-reporting-response-parameters>
+        </template>
+
+        <template
+            is="dom-if"
+            if="[[_equals(page, 'planned-action')]]"
+            restamp="true">
+          <page-cluster-reporting-planned-action
+              name="planned-action"
+              route="{{subroute}}">
+          </page-cluster-reporting-planned-action>
+        </template>
+
+        <template
+            is="dom-if"
+            if="[[_equals(page, 'results')]]"
+            restamp="true">
+          <page-cluster-reporting-results
+              name="results"
+              route="{{subroute}}">
+          </page-cluster-reporting-results>
+        </template>
+
+        <template
+            is="dom-if"
+            if="[[_equals(page, 'analysis')]]"
+            restamp="true">
+          <page-cluster-reporting-analysis
+              name="analysis"
+              route="{{subroute}}">
+          </page-cluster-reporting-analysis>
+        </template>
+      </iron-pages>
+    </app-drawer-layout>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'page-cluster-reporting-router',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        plan: {
+          type: String,
+          observer: '_planChanged',
+        },
+
+        page: {
+          type: String,
+          observer: '_pageChanged',
+        },
+      },
+
+      observers: [
+        '_routePageChanged(routeData.page)',
+        '_routePlanChanged(routeData.plan)',
+      ],
+
+      _pageChanged: function (page) {
+        var resolvedPageUrl = this.resolveUrl(page + '.html');
+
+        this.importHref(resolvedPageUrl, null, this._notFound, true);
+      },
+
+      _planChanged: function (plan) {
+        this.dispatch(App.Actions.setCurrentResponsePlanID(plan));
+      },
+
+      _routePlanChanged: function (plan) {
+        this.set('plan', plan);
+      },
+
+      _routePageChanged: function (page) {
+        var newPage = page || 'dashboard';
+
+        this.set('page', newPage);
+
+        if (newPage !== page) {
+          this.async(function () {
+            this.set(
+              'route.path',
+              '/' + this.routeData.plan + '/' + newPage
+            );
+          });
+        }
+
+      },
+    });
+  </script>
+</dom-module>

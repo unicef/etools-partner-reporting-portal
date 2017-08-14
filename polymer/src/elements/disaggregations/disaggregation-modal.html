@@ -1,0 +1,134 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
+
+<link rel="import" href="../../behaviors/modal.html">
+<link rel="import" href="../../styles/buttons.html">
+<link rel="import" href="../../styles/modal.html">
+<link rel="import" href="../confirm-box.html">
+
+<dom-module id="disaggregation-modal">
+  <template>
+    <style include="button-styles modal-styles iron-flex iron-flex-alignment iron-flex-reverse">
+      :host {
+        display: block;
+
+        --paper-dialog: {
+          width: 700px;
+
+          & > * {
+            margin: 0;
+          }
+        };
+      }
+
+      ::content disaggregation-table {
+        margin-bottom: 1em;
+      }
+    </style>
+
+    <paper-dialog
+        id="dialog"
+        with-backdrop
+        opened="{{opened}}">
+      <div class="header layout horizontal justified">
+        <h2>Enter data</h2>
+
+        <div class="layout horizontal">
+          <p>Reporting period: [[reportingPeriod]]</p>
+
+          <paper-icon-button
+              class="self-center"
+              on-tap="close"
+              icon="icons:close">
+          </paper-icon-button>
+        </div>
+      </div>
+
+      <paper-dialog-scrollable>
+        <content select=".meta"></content>
+        <content
+            select="disaggregation-table"
+            class="table">
+        </content>
+      </paper-dialog-scrollable>
+
+      <div class="buttons layout horizontal-reverse">
+        <paper-button
+            class="btn-primary"
+            on-tap="_save"
+            raised>
+          Save
+        </paper-button>
+
+        <paper-button
+            on-tap="close">
+          Cancel
+        </paper-button>
+      </div>
+
+      <confirm-box id="confirm"></confirm-box>
+
+      <etools-loading active="[[updatePending]]"></etools-loading>
+    </paper-dialog>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'disaggregation-modal',
+
+      behaviors: [
+        App.Behaviors.ModalBehavior,
+      ],
+
+      properties: {
+        reportingPeriod: String,
+
+        updatePending: {
+          type: Boolean,
+          value: false,
+        },
+      },
+
+      listeners: {
+        'dialog.iron-overlay-closed': 'close',
+        'disaggregation-modal-refit': 'adjustPosition',
+        'disaggregation-modal-confirm': '_confirm',
+      },
+
+      _save: function () {
+        var table = this.getContentChildNodes('.table')[0];
+        var self = this;
+
+        this.set('updatePending', true);
+
+        table.save()
+            .then(function () {
+              self.set('updatePending', false);
+              self.close();
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+
+              self.set('updatePending', false);
+            });
+      },
+
+      _confirm: function (e, result) {
+        e.stopPropagation();
+
+        this.$.confirm.run({
+          body: 'Changing disaggregation will cause your previous data to be lost. ' +
+              'Do you want to continue?',
+          result: result,
+        });
+      },
+
+    });
+  </script>
+</dom-module>

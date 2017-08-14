@@ -113,14 +113,5 @@ class ProgressReportSerializer(serializers.ModelSerializer):
         return obj.latest_indicator_report.is_draft
 
 
-class ProgressReportPUTSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = ProgressReport
-        fields = (
-            'id',
-            'partner_contribution_to_date',
-            'funds_received_to_date',
-            'challenges_in_the_reporting_period',
-            'proposed_way_forward',
-        )
+class ProgressReportUpdateSerializer(ProgressReportSerializer):
+    programme_document = ProgrammeDocumentSerializer(read_only=True)

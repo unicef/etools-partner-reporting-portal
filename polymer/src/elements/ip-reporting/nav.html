@@ -1,6 +1,9 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="../../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/iron-icons/social-icons.html">
 
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/page-nav.html">
@@ -22,25 +25,25 @@
 
       <paper-item name="overview">
         <a href="[[buildUrl(_baseUrl, '/overview')]]">
-          <span>Overview</span>
+          <span><iron-icon icon="social:public" role="presentation"></iron-icon> Overview</span>
         </a>
       </paper-item>
 
       <paper-item name="pd">
         <a href="[[buildUrl(_baseUrl, '/pd')]]">
-          <span>Programme Documents</span>
+          <span><iron-icon icon="description" role="presentation"></iron-icon>Programme Documents</span>
         </a>
       </paper-item>
 
       <paper-item name="progress-reports">
         <a href="[[buildUrl(_baseUrl, '/progress-reports')]]">
-          <span>Progress Reports</span>
+          <span><iron-icon icon="assignment" role="presentation"></iron-icon>Progress Reports</span>
         </a>
       </paper-item>
 
       <paper-item name="indicators">
         <a href="[[buildUrl(_baseUrl, '/indicators')]]">
-          <span>Indicators</span>
+          <span><iron-icon icon="trending-up" role="presentation"></iron-icon>Indicators</span>
         </a>
       </paper-item>
 

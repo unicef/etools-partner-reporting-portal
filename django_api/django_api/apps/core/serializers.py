@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Intervention, Location
+from .models import Intervention, Location, ResponsePlan
 
 
 class SimpleInterventionSerializer(serializers.ModelSerializer):
@@ -37,6 +37,13 @@ class ShortLocationSerializer(serializers.ModelSerializer):
         return str(obj.id)
 
 
+class IdLocationSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Location
+        fields = ('id', )
+
+
 class ChildrenLocationSerializer(serializers.ModelSerializer):
     """
     Endpoint for drop down meny on PD list filterset - location.
@@ -49,3 +56,19 @@ class ChildrenLocationSerializer(serializers.ModelSerializer):
 
     def get_id(self, obj):
         return str(obj.id)
+
+
+class ResponsePlanSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ResponsePlan
+        fields = (
+            'id',
+            'title',
+            'plan_type',
+            'start',
+            'end',
+            'intervention',
+            'documents',
+        )
+

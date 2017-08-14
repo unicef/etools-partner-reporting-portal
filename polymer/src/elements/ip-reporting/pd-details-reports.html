@@ -66,23 +66,30 @@
       },
 
       _handleInputChange: function (url) {
-        var pdReportsThunk;
+        this.debounce('fetch-data', function () {
+          var pdReportsThunk;
 
-        if (!url) {
-          return;
-        }
+          if (!url) {
+            return;
+          }
 
-        pdReportsThunk = this.$.pdReports.thunk();
+          pdReportsThunk = this.$.pdReports.thunk();
 
-        // Cancel the pending request, if any
-        this.$.pdReports.abort();
+          // Cancel the pending request, if any
+          this.$.pdReports.abort();
 
-        this.dispatch(App.Actions.PDReports.fetch(pdReportsThunk, this.pdId))
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-            });
+          this.dispatch(App.Actions.PDReports.fetch(pdReportsThunk, this.pdId))
+              .catch(function (err) { // jshint ignore:line
+                // TODO: error handling
+              });
+        }, 300);
       },
 
+      detached: function () {
+        if (this.isDebouncerActive('fetch-data')) {
+          this.cancelDebouncer('fetch-data');
+        }
+      },
     });
   </script>
 </dom-module>

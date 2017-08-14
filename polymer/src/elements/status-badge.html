@@ -11,10 +11,10 @@
         display: inline-block;
         vertical-align: top;
 
-        --iron-icon-height: 16px;
-        --iron-icon-width: 16px;
+        --iron-icon-height: var(--status-badge-size, 16px);
+        --iron-icon-width: var(--status-badge-size, 16px);
 
-        margin-right:4px;
+        margin-right: 4px;
       }
       :host iron-icon {
         line-height: 1;
@@ -34,6 +34,8 @@
       properties: {
         type: String,
 
+        hideIcon: Boolean,
+
         icon: {
           type: String,
           computed: '_computeIcon(type)',
@@ -46,19 +48,22 @@
       },
 
       _computeIcon: function (type) {
-        switch (type) {
-          case 'success':
-            return 'icons:check-circle';
-          case 'error':
-          case 'warning':
-            return 'icons:error';
-          case 'neutral':
-            return 'image:lens';
+        if (!this.hideIcon) {
+          switch (type) {
+            case 'success':
+              return 'icons:check-circle';
+            case 'error':
+            case 'warning':
+              return 'icons:error';
+          }
         }
+        return 'image:lens';
       },
 
       _computeColor: function (type) {
         switch (type) {
+          case 'default':
+            return '#0099ff';
           case 'success':
             return '#009951';
           case 'error':

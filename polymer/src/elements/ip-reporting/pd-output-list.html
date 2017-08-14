@@ -1,20 +1,49 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
 
 <link rel="import" href="../../elements/ip-reporting/pd-output.html">
+<link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/selectors/indicatorData.html">
 
 <dom-module id="pd-output-list">
   <template>
-    <style>
+    <style include="iron-flex iron-flex-alignment">
       :host {
         display: block;
+      }
+
+      .loader {
+        margin: 2em 0;
+      }
+
+      pd-output {
+        margin-bottom: 25px;
       }
     </style>
 
     <template
-        is="dom-repeat"
-        items="[[data]]">
-      <pd-output data="[[item]]"></pd-output>
+        is="dom-if"
+        if="[[loading]]"
+        restamp="true">
+      <div class="loader layout horizontal center-center">
+        <div>
+          <etools-loading no-overlay active></etools-loading>
+        </div>
+      </div>
+    </template>
+
+    <template
+        is="dom-if"
+        if="[[!loading]]">
+      <template
+          is="dom-repeat"
+          items="[[data]]">
+        <pd-output
+            data="[[item]]"
+            override-mode="[[overrideMode]]">
+        </pd-output>
+      </template>
     </template>
   </template>
 
@@ -27,6 +56,13 @@
       ],
 
       properties: {
+        overrideMode: String,
+
+        loading: {
+          type: Boolean,
+          statePath: 'indicatorData.loading',
+        },
+
         data: {
           type: Array,
           statePath: App.Selectors.IndicatorData.all,
