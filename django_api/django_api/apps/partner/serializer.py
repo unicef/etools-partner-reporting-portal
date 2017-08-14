@@ -67,10 +67,7 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
             'clusters',
             'locations',
             'partner',
-<<<<<<< HEAD
-=======
             'part_response_plan',
->>>>>>> develop
         )
 
     def get_id(self, obj):
