@@ -16,14 +16,15 @@
 <link rel="import" href="../../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html">
 
-<link rel="import" href="../etools-prp-ajax.html">
-<link rel="import" href="../etools-prp-date-input.html">
+<link rel="import" href="../../polyfills/es6-shim.html">
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/modal.html">
 <link rel="import" href="../../styles/buttons.html">
 <link rel="import" href="../../styles/modal.html">
+<link rel="import" href="../etools-prp-ajax.html">
+<link rel="import" href="../etools-prp-date-input.html">
 
 <dom-module id="activity-modal">
   <template>
@@ -51,7 +52,7 @@
 
       paper-radio-group {
         display: block;
-        margin-top: 16px;
+        padding-top: 16px;
       }
 
       paper-radio-group > .fields {
@@ -76,6 +77,11 @@
     </style>
 
     <etools-prp-ajax
+        id="partner"
+        url="[[partnerUrl]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
         id="activity"
         url="[[activityUrl]]"
         method="post"
@@ -91,11 +97,6 @@
         id="activities"
         params="[[activitiesParams]]"
         url="[[activitiesUrl]]">
-    </etools-prp-ajax>
-
-    <etools-prp-ajax
-        id="partners"
-        url="[[partnersUrl]]">
     </etools-prp-ajax>
 
     <etools-prp-ajax
@@ -169,32 +170,12 @@
                       option-label="title"
                       selected="{{data.cluster.cluster_activity}}"
                       on-iron-activate="_validate"
-                      disabled="[[fetchingActivities]]"
+                      disabled="[[_equals(activities.length, 0)]]"
                       trigger-value-change-event
                       required>
                   </etools-single-selection-menu>
                 </div>
-                <div class="item">
-                  <paper-dropdown-menu
-                      class="validate"
-                      label="Partner"
-                      on-value-changed="_validate"
-                      always-float-label
-                      required>
-                    <paper-listbox
-                        selected="{{data.cluster.partner}}"
-                        attr-for-selected="value"
-                        slot="dropdown-content"
-                        class="dropdown-content">
-                      <template
-                          is="dom-repeat"
-                          items="[[partners]]">
-                        <paper-item value="[[item.id]]">[[item.title]]</paper-item>
-                      </template>
-                    </paper-listbox>
-                  </paper-dropdown-menu>
-                </div>
-                <div class="item">
+                <div class="item item-wide">
                    <etools-single-selection-menu
                       class="validate"
                       label="Project"
@@ -203,7 +184,7 @@
                       option-label="title"
                       selected="{{data.cluster.project}}"
                       on-iron-activate="_validate"
-                      disabled="[[fetchingProjects]]"
+                      disabled="[[_equals(projects.length, 0)]]"
                       trigger-value-change-event
                       required>
                   </etools-single-selection-menu>
@@ -296,7 +277,7 @@
                       option-label="title"
                       selected="{{data.custom.cluster_objective}}"
                       on-iron-activate="_validate"
-                      disabled="[[fetchingObjectives]]"
+                      disabled="[[_equals(objectives.length, 0)]]"
                       trigger-value-change-event
                       required>
                   </etools-single-selection-menu>
@@ -311,27 +292,7 @@
                       required>
                   </paper-input>
                 </div>
-                <div class="item">
-                  <paper-dropdown-menu
-                      class="validate"
-                      label="Partner"
-                      on-value-changed="_validate"
-                      always-float-label
-                      required>
-                    <paper-listbox
-                        selected="{{data.custom.partner}}"
-                        attr-for-selected="value"
-                        slot="dropdown-content"
-                        class="dropdown-content">
-                      <template
-                          is="dom-repeat"
-                          items="[[partners]]">
-                        <paper-item value="[[item.id]]">[[item.title]]</paper-item>
-                      </template>
-                    </paper-listbox>
-                  </paper-dropdown-menu>
-                </div>
-                <div class="item">
+                <div class="item item-wide">
                   <etools-single-selection-menu
                       class="validate"
                       label="Project"
@@ -340,7 +301,7 @@
                       option-label="title"
                       selected="{{data.custom.project}}"
                       on-iron-activate="_validate"
-                      disabled="[[fetchingProjects]]"
+                      disabled="[[_equals(projects.length, 0)]]"
                       trigger-value-change-event
                       required>
                   </etools-single-selection-menu>
@@ -432,30 +393,14 @@
           value: false,
         },
 
-        fetchingActivities: {
-          type: Boolean,
-          value: false,
-        },
-
-        fetchingProjects: {
-          type: Boolean,
-          value: false,
-        },
-
-        fetchingObjectives: {
-          type: Boolean,
-          value: false,
-        },
-
         mode: {
           type: String,
-          value: 'cluster',
           observer: '_setDefaults',
         },
 
         opened: {
           type: Boolean,
-          observer: '_setDefaults',
+          observer: '_onOpenedChanged',
         },
 
         responsePlanId: {
@@ -484,12 +429,6 @@
         clusters: {
           type: Array,
           value: [],
-        },
-
-        partnersUrl: {
-          type: String,
-          computed: '_computePartnersUrl(responsePlanId)',
-          observer: '_fetchPartners',
         },
 
         statuses: {
@@ -544,6 +483,16 @@
           type: String,
           value: App.Endpoints.responseParametersClusterObjectives(),
         },
+
+        partner: {
+          type: Object,
+          statePath: 'partner.current',
+        },
+
+        partnerUrl: {
+          type: String,
+          value: App.Endpoints.partnerDetails(),
+        },
       },
 
       listeners: {
@@ -551,9 +500,9 @@
       },
 
       observers: [
+        '_fetchPartner(partner.id)',
+        '_fetchProjects(partner.id)',
         '_fetchActivities(data.cluster.cluster)',
-        '_fetchProjects(data.cluster.partner)',
-        '_fetchProjects(data.custom.partner)',
         '_fetchObjectives(data.custom.cluster)',
       ],
 
@@ -564,6 +513,17 @@
         });
 
         this.set('activities', []);
+        this.set('objectives', []);
+      },
+
+      _onOpenedChanged: function (opened) {
+        if (opened) {
+          this.set('mode', '');
+
+          this.async(function () {
+            this.set('mode', 'cluster');
+          });
+        }
       },
 
       _validate: function (e) {
@@ -599,7 +559,6 @@
           return;
         }
 
-        this.set('fetchingActivities', true);
         this.set('activities', []);
         this.set('data.cluster.cluster_activity', undefined);
         this.set('activitiesUrl', App.Endpoints.clusterActivities(clusterId));
@@ -609,26 +568,6 @@
         this.$.activities.thunk()()
             .then(function (res) {
               self.set('activities', res.data.results);
-              self.set('fetchingActivities', false);
-            })
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-              self.set('fetchingActivities', false);
-            });
-      },
-
-      _computePartnersUrl: function (responsePlanId) {
-        return App.Endpoints.clusterPartnerNames(responsePlanId);
-      },
-
-      _fetchPartners: function () {
-        var self = this;
-
-        this.$.partners.abort();
-
-        this.$.partners.thunk()()
-            .then(function (res) {
-              self.set('partners', res.data);
             })
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
@@ -642,22 +581,12 @@
           return;
         }
 
-        this.set('projectsParams.partner', partnerId);
-        this.set('fetchingProjects', true);
-        this.set('projects', []);
-        this.set('data.cluster.project', undefined);
-        this.set('data.custom.project', undefined);
-
-        this.$.projects.abort();
-
         this.$.projects.thunk()()
             .then(function (res) {
               self.set('projects', res.data.results);
-              self.set('fetchingProjects', false);
             })
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
-              self.set('fetchingProjects', false);
             });
       },
 
@@ -669,7 +598,6 @@
         }
 
         this.set('objectivesParams.cluster_id', clusterId);
-        this.set('fetchingObjectives', true);
         this.set('objectives', []);
         this.set('data.custom.cluster_objective', undefined);
 
@@ -678,12 +606,27 @@
         this.$.objectives.thunk()()
             .then(function (res) {
               self.set('objectives', res.data.results);
-              self.set('fetchingObjectives', false);
             })
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
-              self.set('fetchingObjectives', false);
             });
+      },
+
+      _fetchPartner: function (partnerId) {
+        this.debounce('fetch-partner', function () {
+          var partnerThunk;
+
+          if (typeof partnerId !== 'undefined') {
+            return;
+          }
+
+          partnerThunk = this.$.partner.thunk();
+
+          this.dispatch(App.Actions.fetchPartner(partnerThunk))
+              .catch(function (err) { // jshint ignore:line
+                // TODO: error handling
+              });
+        }, 100);
       },
 
       _save: function () {
@@ -708,7 +651,9 @@
 
         this.set('updatePending', true);
 
-        this.$.activity.body = this.data[this.mode];
+        this.$.activity.body = Object.assign({
+          partner: this.partner.id,
+        }, this.data[this.mode]);
 
         this.$.activity.thunk()()
             .then(function (res) {
@@ -721,6 +666,12 @@
 
               self.set('updatePending', false);
             });
+      },
+
+      detached: function () {
+        if (this.isDebouncerActive('fetch-partner')) {
+          this.cancelDebouncer('fetch-partner');
+        }
       },
     });
   </script>
