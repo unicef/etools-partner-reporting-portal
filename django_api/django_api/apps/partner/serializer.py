@@ -6,6 +6,7 @@ from core.common import PD_STATUS
 from .models import (
     Partner,
     PartnerProject,
+    PartnerActivity,
 )
 
 
@@ -109,7 +110,6 @@ class PartnerProjectPatchSerializer(serializers.ModelSerializer):
             'clusters',
             'locations',
             'partner',
-            # 'reportables',
         )
 
 
@@ -121,3 +121,52 @@ class PartnerProjectSimpleSerializer(serializers.ModelSerializer):
             'id',
             'title',
         )
+
+
+class ClusterActivityPartnersSerializer(serializers.ModelSerializer):
+
+    partner_projects = PartnerProjectSimpleSerializer(many=True)
+    links = serializers.SerializerMethodField()
+    clusters = ClusterSimpleSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Partner
+        fields = (
+            'id',
+            'title',
+            # 'focial point',
+            'email',
+            'phone_number',
+            'partner_projects',
+            'street_address',
+            'city',
+            'postal_code',
+            'country',
+            'links',
+            'clusters',
+        )
+
+    def get_links(self, obj):
+        return [
+            pp.additional_information for pp in obj.partner_projects.all()
+        ]
+
+
+class PartnerActivitySerializer(serializers.ModelSerializer):
+
+    cluster = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField()
+    project = PartnerProjectSimpleSerializer()
+
+    class Meta:
+        model = PartnerActivity
+        fields = ('id', 'cluster', 'status', 'project', 'cluster_activity')
+
+    def get_cluster(self, obj):
+        if obj.cluster_activity:
+            return obj.cluster_activity.cluster_objective.cluster.title
+        else:
+            return None
+
+    def get_status(self, obj):
+        return obj.project and obj.project.status

@@ -28,16 +28,20 @@ class ClusterActivityFilter(django_filters.FilterSet):
 
     title = CharFilter(method='get_title')
     cluster_id = CharFilter(method='get_cluster_id')
+    cluster_objective_id = CharFilter(method='get_cluster_objective_id')
 
     class Meta:
         model = ClusterActivity
-        fields = ['title', 'cluster_id']
+        fields = ['title', 'cluster_id', 'cluster_objective_id']
 
     def get_title(self, queryset, name, value):
         return queryset.filter(title__icontains=value)
 
     def get_cluster_id(self, queryset, name, value):
         return queryset.filter(cluster_objective__cluster_id=value)
+
+    def get_cluster_objective_id(self, queryset, name, value):
+        return queryset.filter(cluster_objective=value)
 
 
 class ClusterIndicatorsFilter(django_filters.FilterSet):

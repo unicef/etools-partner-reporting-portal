@@ -1,3 +1,4 @@
+<link rel="import" href="../../polyfills/es6-shim.html">
 <link rel="import" href="../redux.html">
 <link rel="import" href="../../constants.html">
 
@@ -7,22 +8,22 @@
 
     App.Reducers = App.Reducers || {};
 
-    App.Reducers.PartnerProjects = Redux.combineReducers({
-      all: partnerProjectsListReducer,
-      count: partnerProjectsCountReducer,
-      loading: loadingPartnerProjectsReducer,
-      activities: activitiesByPartnerProjectIdReducer,
-      activitiesCount: activitiesByPartnerProjectIdCountReducer,
-      activitiesLoading: activitiesByPartnerProjectIdLoadingReducer
+    App.Reducers.ClusterActivities = Redux.combineReducers({
+      all: clusterActivitiesListReducer,
+      count: clusterActivitiesCountReducer,
+      loading: loadingClusterActivitiesReducer,
+      partners: partnersByClusterActivityIdReducer,
+      partnersCount: partnersByClusterActivityIdCountReducer,
+      partnersLoading: partnersByClusterActivityIdLoadingReducer
     });
 
-    function partnerProjectsListReducer(state, action) {
+    function clusterActivitiesListReducer(state, action) {
       if (typeof state === 'undefined') {
         state = [];
       }
 
       switch (action.type) {
-        case App.Constants.SET_PARTNER_PROJECTS_LIST:
+        case App.Constants.SET_CLUSTER_ACTIVITIES_LIST:
           return action.data.results;
 
         case App.Constants.RESET:
@@ -33,13 +34,13 @@
       }
     }
 
-    function partnerProjectsCountReducer(state, action) {
+    function clusterActivitiesCountReducer(state, action) {
       if (typeof state === 'undefined') {
         state = 0;
       }
 
       switch (action.type) {
-        case App.Constants.SET_PARTNER_PROJECTS_COUNT:
+        case App.Constants.SET_CLUSTER_ACTIVITIES_COUNT:
           return action.count;
 
         default:
@@ -47,16 +48,16 @@
       }
     }
 
-    function loadingPartnerProjectsReducer(state, action) {
+    function loadingClusterActivitiesReducer(state, action) {
       if (typeof state === 'undefined') {
         state = false;
       }
 
       switch (action.type) {
-        case App.Constants.PARTNER_PROJECTS_LOADING_START:
+        case App.Constants.CLUSTER_ACTIVITIES_LOADING_START:
           return true;
 
-        case App.Constants.PARTNER_PROJECTS_LOADING_STOP:
+        case App.Constants.CLUSTER_ACTIVITIES_LOADING_STOP:
           return false;
 
         default:
@@ -64,19 +65,17 @@
       }
     }
 
-    // Activities
-
-    function activitiesByPartnerProjectIdReducer(state, action) {
+    function partnersByClusterActivityIdReducer(state, action) {
       if (typeof state === 'undefined') {
         state = {};
       }
 
       switch (action.type) {
-        case App.Constants.SET_ACTIVITIES_BY_PARTNER_PROJECT_ID:
+        case App.Constants.SET_PARTNERS_BY_CLUSTER_ACTIVITY_ID:
           return (function () {
             var change = {};
 
-            change[action.partnerProjectId] = action.data;
+            change[action.clusterActivityId] = action.data;
             return Object.assign({}, state, change);
           }());
 
@@ -88,16 +87,17 @@
       }
     }
 
-    function activitiesByPartnerProjectIdCountReducer(state, action) {
+    function partnersByClusterActivityIdCountReducer(state, action) {
       if (typeof state === 'undefined') {
         state = 0;
       }
 
       switch (action.type) {
-        case App.Constants.SET_ACTIVITIES_BY_PARTNER_PROJECT_ID_COUNT:
+        case App.Constants.SET_PARTNERS_BY_CLUSTER_ACTIVITY_ID_COUNT:
           return (function () {
             var change = {};
-            change[action.partnerProjectId] = action.count;
+
+            change[action.clusterActivityId] = action.count;
             return Object.assign({}, state, change);
           }());
 
@@ -106,16 +106,16 @@
       }
     }
 
-    function activitiesByPartnerProjectIdLoadingReducer(state, action) {
+    function partnersByClusterActivityIdLoadingReducer(state, action) {
       if (typeof state === 'undefined') {
         state = false;
       }
 
       switch (action.type) {
-        case App.Constants.ACTIVITIES_BY_PARTNER_PROJECT_ID_LOADING_START:
+        case App.Constants.PARTNERS_BY_CLUSTER_ACTIVITY_ID_LOADING_START:
           return true;
 
-        case App.Constants.ACTIVITIES_BY_PARTNER_PROJECT_ID_LOADING_STOP:
+        case App.Constants.PARTNERS_BY_CLUSTER_ACTIVITY_ID_LOADING_STOP:
           return false;
 
         default:

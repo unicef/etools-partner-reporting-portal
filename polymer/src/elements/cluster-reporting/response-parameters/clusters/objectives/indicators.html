@@ -1,0 +1,44 @@
+<link rel="import" href="../../../../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../../../../elements/page-body.html">
+<link rel="import" href="../../../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../../../elements/page-body.html">
+<link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="../../../../../endpoints.html">
+<link rel="import" href="../../../../../redux/actions.html">
+<link rel="import" href="../../../../../redux/store.html">
+<link rel="import" href="../../../../labelled-item.html">
+
+<dom-module id="rp-clusters-details-indicators">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <etools-prp-ajax
+        id="overview"
+        url="[[overviewUrl]]">
+    </etools-prp-ajax>
+
+    <page-body>
+      Indicators
+    </page-body>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'rp-clusters-details-indicators',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+      ],
+
+      properties: {
+        data: Object,
+      },
+
+    });
+  </script>
+</dom-module>
