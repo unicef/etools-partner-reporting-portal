@@ -1,9 +1,22 @@
 from ast import literal_eval as make_tuple
+
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
+from django.db import transaction
+from django.shortcuts import get_object_or_404
+
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from unicef.models import LowerLevelOutput
-from core.serializers import SimpleLocationSerializer
+
+from core.common import REPORTABLE_FREQUENCY_LEVEL
+from core.serializers import SimpleLocationSerializer, IdLocationSerializer
+from core.models import Location
+from cluster.models import ClusterObjective, ClusterActivity
+from partner.models import PartnerProject, PartnerActivity
+
+from core.validators import add_indicator_object_type_validator
 from core.helpers import (
     generate_data_combination_entries,
     get_sorted_ordered_dict_by_keys,
@@ -503,6 +516,179 @@ class PDReportsSerializer(serializers.ModelSerializer):
         return obj.due_date and obj.due_date.strftime(settings.PRINT_DATA_FORMAT)
 
 
+class IndicatorBlueprintSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = IndicatorBlueprint
+        fields = (
+            'id',
+            'title',
+            'unit',
+            'description',
+            'disaggregatable',
+            'calculation_formula_across_periods',
+            'calculation_formula_across_locations',
+            'display_type',
+        )
+
+
+class ClusterIndicatorSerializer(serializers.ModelSerializer):
+
+    disaggregation = serializers.JSONField()
+    object_type = serializers.CharField(validators=[add_indicator_object_type_validator])
+    blueprint = IndicatorBlueprintSerializer()
+    locations = IdLocationSerializer(many=True)
+
+    class Meta:
+        model = Reportable
+        fields = (
+            'id',
+            'means_of_verification',
+            'blueprint',
+            'object_id',
+            'object_type',
+            'locations',
+            'disaggregation',
+            'frequency',
+            'cs_dates',
+        )
+
+    def get_object_type(self, obj):
+        return obj.content_type
+
+    def check_location(self, locations):
+        if not isinstance(locations, (list, dict)) or\
+                False in [loc.get('id', False) for loc in locations]:
+            raise ValidationError({"locations": "List of dict location or one dict location expected"})
+
+    def check_disaggregation(self, disaggregation):
+        if not isinstance(disaggregation, list):
+            raise ValidationError({"disaggregation": "List of dict disaggregation expected"})
+        max_length = DisaggregationValue._meta.get_field('value').max_length
+        for dis in disaggregation:
+            for val in dis['values']:
+                if len(val) > max_length:
+                    msg = "Disaggregation Value expected max %s chars" % max_length
+                    raise ValidationError({"disaggregation": msg})
+
+    @transaction.atomic
+    def create(self, validated_data):
+
+        self.check_location(self.initial_data.get('locations'))
+        self.check_disaggregation(self.initial_data.get('disaggregation'))
+
+        validated_data['blueprint']['unit'] = validated_data['blueprint']['display_type']
+        validated_data['blueprint']['disaggregatable'] = True
+        blueprint = IndicatorBlueprintSerializer(data=validated_data['blueprint'])
+        if blueprint.is_valid():
+            blueprint.save()
+        else:
+            raise ValidationError(blueprint.errors)
+
+        validated_data['blueprint'] = blueprint.instance
+
+        if validated_data['object_type'] == 'ClusterObjective':
+            validated_data['content_type'] = ContentType.objects.get_for_model(ClusterObjective)
+            cluster_objective = get_object_or_404(ClusterObjective, pk=validated_data['object_id'])
+            validated_data['start_date'] = cluster_objective.cluster.response_plan.start
+            validated_data['end_date'] = cluster_objective.cluster.response_plan.end
+            validated_data['is_cluster_indicator'] = True
+        elif validated_data['object_type'] == 'ClusterActivity':
+            validated_data['content_type'] = ContentType.objects.get_for_model(ClusterActivity)
+            cluster_activity = get_object_or_404(ClusterActivity, pk=validated_data['object_id'])
+            validated_data['start_date'] = cluster_activity.cluster_objective.cluster.response_plan.start
+            validated_data['end_date'] = cluster_activity.cluster_objective.cluster.response_plan.end
+            validated_data['is_cluster_indicator'] = True
+        elif validated_data['object_type'] == 'PartnerProject':
+            validated_data['content_type'] = ContentType.objects.get_for_model(PartnerProject)
+            partner_project = get_object_or_404(PartnerProject, pk=validated_data['object_id'])
+            validated_data['start_date'] = partner_project.start_date
+            validated_data['end_date'] = partner_project.end_date
+            validated_data['is_cluster_indicator'] = False
+        elif validated_data['object_type'] == 'PartnerActivity':
+            validated_data['content_type'] = ContentType.objects.get_for_model(PartnerActivity)
+            partner_activity = get_object_or_404(PartnerActivity, pk=validated_data['object_id'])
+            validated_data['start_date'] = partner_activity.project.start_date
+            validated_data['end_date'] = partner_activity.project.end_date
+            validated_data['is_cluster_indicator'] = False
+        else:
+            raise NotImplemented()
+
+        del validated_data['object_type']
+        del validated_data['locations']
+        disaggregations = validated_data['disaggregation']
+        del validated_data['disaggregation']
+
+        self.instance = Reportable.objects.create(**validated_data)
+
+        for location in self.initial_data.get('locations'):
+            self.instance.locations.add(Location.objects.get(id=location.get('id')))
+
+        for disaggregation in disaggregations:
+            disaggregation_instance = Disaggregation.objects.create(
+                name=disaggregation['name'],
+                reportable=self.instance,
+                active=True,
+            )
+            for value in disaggregation['values']:
+                DisaggregationValue.objects.create(
+                    disaggregation=disaggregation_instance,
+                    value=value,
+                    active=True
+                )
+
+        return self.instance
+
+    def update(self, instance, validated_data):
+        # cluster_objective_id should not be changed in this endpoint !
+        self.check_location(self.initial_data.get('locations'))
+
+        instance.means_of_verification = validated_data.get(
+            'means_of_verification', instance.means_of_verification)
+        instance.blueprint.title = \
+            validated_data.get('blueprint', {}).get('title', instance.blueprint.title)
+
+        _errors = []
+        if validated_data.get('blueprint', {}).get('calculation_formula_across_periods'):
+            _errors.append("Modify or change the `calculation_formula_across_periods` is not allowed.")
+        if validated_data.get('blueprint', {}).get('calculation_formula_across_locations'):
+            _errors.append("Modify or change the `calculation_formula_across_locations` is not allowed.")
+        if validated_data.get('blueprint', {}).get('display_type'):
+            _errors.append("Modify or change the `display_type` is not allowed.")
+        if _errors:
+            raise ValidationError({"errors": _errors})
+
+        exclude_ids = [loc['id'] for loc in self.initial_data.get('locations')]
+        Location.objects.filter(reportable_id=instance.id).exclude(id__in=exclude_ids).update(reportable=None)
+
+        for location in self.initial_data.get('locations'):
+            instance.locations.add(Location.objects.get(id=location.get('id')))
+
+        instance.blueprint.save()
+        instance.save()
+
+        return instance
+
+
+class ClusterIndicatorDataSerializer(serializers.ModelSerializer):
+
+    disaggregation = DisaggregationListSerializer(many=True)
+    blueprint = IndicatorBlueprintSerializer()
+    locations = IdLocationSerializer(many=True)
+
+    class Meta:
+        model = Reportable
+        fields = (
+            'id',
+            'means_of_verification',
+            'blueprint',
+            'locations',
+            'disaggregation',
+            'frequency',
+            'cs_dates',
+        )
+
+
 class IndicatorReportUpdateSerializer(serializers.ModelSerializer):
 
     overall_status = serializers.SerializerMethodField()
@@ -588,3 +774,4 @@ class ClusterIndicatorReportSimpleSerializer(serializers.ModelSerializer):
 
     def get_title(self, obj):
         return obj.reportable.blueprint.title
+

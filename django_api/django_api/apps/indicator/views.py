@@ -26,16 +26,18 @@ from .disaggregators import (
     RatioIndicatorDisaggregator,
 )
 from .serializers import (
-    IndicatorListSerializer, IndicatorReportListSerializer, PDReportsSerializer, SimpleIndicatorLocationDataListSerializer,
+    IndicatorListSerializer, IndicatorReportListSerializer, PDReportsSerializer,
     IndicatorLLoutputsSerializer, IndicatorLocationDataUpdateSerializer,
-    IndicatorReportUpdateSerializer,
     OverallNarrativeSerializer,
+    ClusterIndicatorSerializer,
+    ClusterIndicatorDataSerializer,
 )
 from .filters import IndicatorFilter, PDReportsFilter
 from .models import (
-    IndicatorReport, Reportable, Disaggregation,
-    DisaggregationValue, IndicatorLocationData,
-    IndicatorBlueprint
+    IndicatorBlueprint,
+    IndicatorReport,
+    Reportable,
+    IndicatorLocationData,
 )
 
 logger = logging.getLogger(__name__)
@@ -341,6 +343,48 @@ class IndicatorLocationDataUpdateAPIView(APIView):
 
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ClusterIndicatorAPIView(APIView):
+    """
+    Add and Update Indicator on cluster reporting screen.
+    """
+
+    serializer_class = ClusterIndicatorSerializer
+    permission_classes = (IsAuthenticated, )
+
+    def get_serializer(self, data, instance=None, many=False, read_only=False):
+        return self.serializer_class(
+            data=data,
+            instance=instance,
+            many=many,
+            read_only=read_only,
+        )
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer.save()
+        return Response(
+            ClusterIndicatorDataSerializer(instance=serializer.instance).data,
+            status=status.HTTP_201_CREATED
+        )
+
+    def get_object(self):
+        return get_object_or_404(Reportable, pk=self.request.data.get("id"))
+
+    def put(self, request, *args, **kwargs):
+        serializer = self.get_serializer(
+            instance=self.get_object(),
+            data=request.data
+        )
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer.save()
+        return Response({'id': serializer.instance.id}, status=status.HTTP_200_OK)
 
 
 class IndicatorDataLocationAPIView(ListAPIView):

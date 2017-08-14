@@ -1,0 +1,227 @@
+<link rel="import" href="../../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../../../../../../bower_components/etools-loading/etools-loading.html">
+<link rel="import" href="../../../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../../../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../../../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../../../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../../../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../../../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../../../../../../bower_components/paper-dialog/paper-dialog.html">
+
+<link rel="import" href="../../../../form-fields/dropdown-form-input.html">
+<link rel="import" href="../../../../form-fields/cluster-dropdown-input.html">
+<link rel="import" href="../../../../etools-prp-ajax.html">
+<link rel="import" href="../../../../../styles/buttons.html">
+<link rel="import" href="../../../../../redux/store.html">
+<link rel="import" href="../../../../../redux/actions.html">
+<link rel="import" href="../../../../../behaviors/date.html">
+
+<dom-module id="cluster-activities-modal">
+  <template>
+    <style include="app-grid-style button-styles iron-flex iron-flex-alignment iron-flex-reverse">
+      :host {
+        display: block;
+
+        --app-grid-columns: 3;
+        --app-grid-gutter: 15px;
+        --app-grid-item-height: auto;
+        --app-grid-expandible-item-columns: 3;
+
+        --paper-dialog: {
+          width: 700px;
+
+          & > * {
+            margin: 0;
+          }
+        };
+      }
+
+      .full-width {
+        @apply --app-grid-expandible-item;
+      }
+
+      .header {
+        height: 48px;
+        padding: 0 24px;
+        margin: 0;
+        color: white;
+        background: var(--theme-primary-color);
+      }
+
+      .header h2 {
+        @apply(--paper-font-title);
+
+        margin: 0;
+        line-height: 48px;
+      }
+
+      .header paper-icon-button {
+        margin: 0 -13px 0 20px;
+        color: white;
+      }
+
+      .buttons {
+        padding: 24px;
+      }
+    </style>
+
+    <iron-location path="{{path}}"></iron-location>
+
+    <etools-prp-ajax
+        id="createActivity"
+        url="[[activityUrl]]"
+        body="[[data]]"
+        content-type="application/json"
+        method="post">
+    </etools-prp-ajax>
+
+    <paper-dialog
+        id="dialog"
+        with-backdrop
+        opened="[[opened]]">
+      <div class="header layout horizontal justified">
+        <h2>Add Cluster Activity</h2>
+          <paper-icon-button
+              class="self-center"
+              on-tap="close"
+              icon="icons:close">
+          </paper-icon-button>
+        </div>
+      </div>
+
+      <paper-dialog-scrollable>
+        <iron-form class="app-grid">
+          <paper-input
+            class="item full-width"
+            id="title"
+            label="Title"
+            value="{{data.title}}"
+            type="string"
+            required>
+          </paper-input>
+
+          <paper-input
+            class="item full-width"
+            id="standard"
+            label="Standard"
+            value="{{data.standard}}"
+            type="string"
+            required>
+          </paper-input>
+
+          <cluster-dropdown-input
+            class="item"
+            label="Cluster"
+            id="cluster"
+            value="{{data.cluster_objective}}">
+          </cluster-dropdown-input>
+
+          <paper-input
+            class="item"
+            id="reference_number"
+            label="CO ref #"
+            value="{{data.reference_number}}"
+            type="string"
+            required>
+          </paper-input>
+
+          <dropdown-form-input
+             class="item"
+             label="Frequency of reporting"
+             id="frequency"
+             value="{{data.frequency}}"
+             data="[[frequencies]]">
+          </dropdown-form-input>
+
+        </iron-form>
+
+      </paper-dialog-scrollable>
+
+      <div class="buttons layout horizontal-reverse">
+        <paper-button class="btn-primary" on-tap="_save" raised>
+          Save
+        </paper-button>
+
+        <paper-button  on-tap="close">
+          Cancel
+        </paper-button>
+      </div>
+
+      <etools-loading active="[[updatePending]]"></etools-loading>
+
+    </paper-dialog>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'cluster-activities-modal',
+
+      behaviors: [
+        App.Behaviors.DateBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.RoutingBehavior,
+      ],
+
+      properties: {
+
+        opened: {
+          type: Boolean,
+          value: false,
+        },
+
+        updatePending: {
+          type: Boolean,
+          value: false,
+        },
+
+        frequencies: {
+          type: Array,
+          value: [
+            {title: 'Weekly', id: 'Wee'},
+            {title: 'Monthly', id: 'Mon'},
+            {title: 'Quarterly', id: 'Qua'},
+          ],
+        },
+
+        activityUrl: {
+          type: String,
+          value: App.Endpoints.responseParametersClusterActivities()
+        },
+      },
+
+      close: function () {
+        this.set('opened', false);
+      },
+
+      open: function () {
+        this.data = {};
+        this.set('opened', true);
+      },
+
+      _redirectToDetail: function (id) {
+        var path = '/response-parameters/clusters/activity/' + String(id);
+        var url = this.buildUrl(this._baseUrlCluster, path);
+        this.set('path', url);
+      },
+
+      _save: function () {
+        var self = this;
+        var thunk = this.$.createActivity.thunk();
+        self.updatePending = true;
+        thunk()
+          .then(function (res) {
+            self.updatePending = false;
+            self._redirectToDetail(res.data.id);
+          })
+          .catch(function (err) { // jshint ignore:line
+            self.updatePending = false;
+            // TODO: error handling
+          });
+      },
+    });
+  </script>
+</dom-module>

@@ -1,0 +1,133 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+
+<link rel="import" href="labelled-item.html">
+<link rel="import" href="../styles/shared-styles.html">
+
+<dom-module id="etools-prp-chips">
+  <template>
+    <style include="iron-flex shared-styles">
+      :host {
+        display: block;
+        padding: 8px 0;
+      }
+
+      .chips {
+        font-size: 16px;
+        line-height: 24px;
+      }
+
+      .chip {
+        max-width: 100%;
+        margin-right: .75em;
+      }
+
+      .chip__content {
+        @apply --truncate;
+      }
+
+      .chip__actions iron-icon {
+        width: 18px;
+        height: 18px;
+        margin-left: 2px;
+        position: relative;
+        top: -2px;
+        color: var(--paper-deep-orange-a700);
+        cursor: pointer;
+      }
+    </style>
+
+    <labelled-item label="[[label]]" invalid="[[_invalid]]">
+      <div class="chips layout horizontal wrap">
+        <template
+            is="dom-repeat"
+            items="[[value]]"
+            as="chip">
+          <div class="chip layout horizontal">
+            <div class="chip__content">[[chip]]</div>
+            <div class="chip__actions">
+              <iron-icon
+                  index="[[index]]"
+                  on-tap="_onChipRemove"
+                  icon="icons:clear">
+              </iron-icon>
+            </div>
+          </div>
+        </template>
+
+        <content></content>
+      </div>
+    </labelled-item>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'etools-prp-chips',
+
+      properties: {
+        label: String,
+
+        name: String,
+
+        value: {
+          type: Array,
+          value: [],
+          notify: true,
+        },
+
+        required: {
+          type: Boolean,
+          value: false,
+        },
+
+        invalid: {
+          type: Boolean,
+          notify: true,
+          computed: '_computeInvalid(required, value)',
+        },
+
+        _invalid: {
+          type: Boolean,
+          value: false,
+        },
+      },
+
+      listeners: {
+        'chip-add': '_onChipAdd',
+      },
+
+      validate: function () {
+        this.set('_invalid', this.invalid);
+      },
+
+      _computeInvalid: function (required, value) {
+        return this.required && !value.length;
+      },
+
+      _onChipAdd: function (e, chip) {
+        e.stopPropagation();
+
+        if (this.value.indexOf(chip) === -1) {
+          this.set('value', this.value.concat(chip));
+          this.fire('selected-chips-updated');
+        }
+      },
+
+      _onChipRemove: function (e) {
+        var value = this.value.slice();
+        var toRemove = +e.target.index;
+
+        value.splice(toRemove, 1);
+
+        this.set('value', value);
+        this.fire('selected-chips-updated');
+      },
+
+      detached: function () {
+        this.set('value', []);
+      },
+    });
+  </script>
+</dom-module>

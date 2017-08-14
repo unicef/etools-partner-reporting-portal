@@ -9,7 +9,7 @@ from core.common import (
     PARTNER_TYPE,
     SHARED_PARTNER_TYPE,
     CSO_TYPES,
-    PD_STATUS as PARTNER_PROJECT_STATUS,
+    PARTNER_PROJECT_STATUS,
 )
 
 from core.countries import COUNTRIES_ALPHA2_CODE_DICT, COUNTRIES_ALPHA2_CODE
@@ -168,7 +168,7 @@ class PartnerProject(TimeStampedModel):
     additional_information = models.CharField(max_length=255, verbose_name="Additional information (e.g. links)")
     start_date = models.DateField()
     end_date = models.DateField()
-    status = models.CharField(max_length=3, choices=PARTNER_PROJECT_STATUS, default=PARTNER_PROJECT_STATUS.draft)
+    status = models.CharField(max_length=3, choices=PARTNER_PROJECT_STATUS, default=PARTNER_PROJECT_STATUS.ongoing)
     total_budget = models.DecimalField(null=True, decimal_places=2, help_text='Total Budget', max_digits=12)
     funding_source = models.CharField(max_length=255)
 
@@ -178,7 +178,7 @@ class PartnerProject(TimeStampedModel):
     reportables = GenericRelation('indicator.Reportable', related_query_name='partner_projects')
 
     class Meta:
-        ordering = ['id']
+        ordering = ['-id']
 
 
 class PartnerActivity(TimeStampedModel):
@@ -199,4 +199,4 @@ class PartnerActivity(TimeStampedModel):
     reportables = GenericRelation('indicator.Reportable', related_query_name='partner_activities')
 
     class Meta:
-        ordering = ['id']
+        ordering = ['-id']

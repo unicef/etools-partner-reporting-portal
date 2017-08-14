@@ -29,9 +29,9 @@
       properties: {
         data: Object,
 
-        currentId: Number,
-
         mode: String,
+
+        currentId: Number,
 
         active: {
           type: Boolean,
@@ -43,10 +43,22 @@
         '_render(data.id)',
       ],
 
+      _computeCurrentId: function (data) {
+        return data.id;
+      },
+
       _render: function (id) {
         if (typeof id === 'undefined') {
           return;
         }
+
+        if (this.currentId === id) {
+          return;
+        }
+
+        this.async(function () {
+          this.set('currentId', id);
+        });
 
         // Force re-render:
         this.set('active', false);

@@ -136,7 +136,7 @@ class ProgrammeDocument(TimeStampedModel):
     __budget = None
 
     class Meta:
-        ordering = ['id']
+        ordering = ['-id']
 
     def __str__(self):
         return self.title
@@ -285,7 +285,7 @@ class ProgressReport(TimeStampedModel):
     )
 
     class Meta:
-        ordering = ['id']
+        ordering = ['-id']
 
     @cached_property
     def latest_indicator_report(self):
