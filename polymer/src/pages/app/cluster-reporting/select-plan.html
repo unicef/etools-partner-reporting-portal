@@ -144,7 +144,7 @@
                   <paper-radio-button
                     checked="[[_determineIfChecked(selected, plan.id)]]"
                     name="[[plan.id]]"
-                    on-tap="_selectRadioButton">
+                    on-tap="_handleRadioButtonChange">
                   </paper-radio-button>
                 </div>
                 <div class="table-cell" flex-2>
@@ -161,7 +161,7 @@
                 </div>
               </div>
 
-              <div slot="row-data-details">
+              <div slot="row-data-details" class="row-details-expanded-wrapper">
                 <template is="dom-if" if="[[!plan.documents.length]]">
                   There are no documents for this response plan.
                 </template>
@@ -234,11 +234,22 @@
         return false;
       },
 
-      // Note: paper-radio-group requires the radio buttons to be directly nested,
-      // so it will not work for this component.
-      _selectRadioButton: function(e) {
-        if (e.target.checked) {
-          this.selected = e.target.name;
+      /*
+      Note:
+      paper-radio-group requires the radio buttons to be directly nested.
+      It will not work for this component.
+      on-tap and change events target different elements in Chrome than in Safari and FF.
+      */
+
+      //Gets correct target element when using Chrome.
+      _handleRadioButtonChange: function(e) {
+        var target = e.target;
+        if (e.target.id === 'onRadio' || e.target.id === 'offRadio') {
+          target = e.target.parentNode.parentNode;
+        }
+
+        if (target.checked) {
+          this.selected = target.name;
         } else {
           this.selected = null;
         }
