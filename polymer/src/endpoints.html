@@ -127,6 +127,13 @@
 
       partnerActivity: function (responsePlanId, mode) {
         return this._buildUrl('/partner/' + responsePlanId + '/create-partner-activity/' + mode);
+
+      partnersByClusterActivityId: function (clusterActivityId) {
+        return this._buildUrl('/partner/cluster-activity/' + clusterActivityId + '/partners');
+      },
+
+      partnerActivityList: function () {
+        return this._buildUrl('/partner/partner-activity-list/');
       },
     };
   }());

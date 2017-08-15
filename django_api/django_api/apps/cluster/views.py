@@ -22,7 +22,11 @@ from .serializers import (
     ClusterActivitySerializer,
     ClusterActivityPatchSerializer,
 )
-from .filters import ClusterObjectiveFilter, ClusterActivityFilter, ClusterIndicatorsFilter
+from .filters import (
+    ClusterObjectiveFilter,
+    ClusterActivityFilter,
+    ClusterIndicatorsFilter,
+)
 
 logger = logging.getLogger(__name__)
 
