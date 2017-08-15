@@ -112,11 +112,11 @@
 
      _validate: function (validate) {
        if (validate) {
-         var valid = !this._fieldsAreValid();
+         this._fieldsAreValid();
        }
 
       //  Reset this value in the parent.
-       this.needsValidation = '';
+      this.needsValidation = '';
      }
    });
  </script>

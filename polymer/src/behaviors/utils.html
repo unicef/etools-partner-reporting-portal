@@ -114,9 +114,8 @@
           return street + ',' + city + ' ' + zip;
         }
       },
-      
+
       _fieldsAreValid: function() {
-        var self = this;
         var valid;
         var fields = [].slice.call(
           Polymer.dom(this.root).querySelectorAll('.validate')
