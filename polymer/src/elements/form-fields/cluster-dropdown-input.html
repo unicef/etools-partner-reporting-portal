@@ -80,10 +80,7 @@
 
         this.$.clusterNames.thunk()()
             .then(function (res) {
-              self.set('data', [{
-                id: '',
-                title: 'All',
-              }].concat(res.data));
+              self.set('data', res.data);
             })
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
