@@ -13,10 +13,10 @@
 <link rel="import" href="../../../../../bower_components/paper-dialog/paper-dialog.html">
 
 <link rel="import" href="../../../etools-prp-ajax.html">
-<link rel="import" href="../../../etools-prp-date-input.html">
+<link rel="import" href="../../../date-input.html">
 <link rel="import" href="../../../form-fields/dropdown-form-input.html">
 <link rel="import" href="../../../form-fields/cluster-dropdown-content.html">
-<link rel="import" href="../../../form-fields/cluster-location-input.html">
+<link rel="import" href="../../../form-fields/cluster-location-content.html">
 <link rel="import" href="../../../../behaviors/routing.html">
 <link rel="import" href="../../../../behaviors/utils.html">
 <link rel="import" href="../../../../redux/store.html">
@@ -75,6 +75,7 @@
     <iron-location path="{{path}}"></iron-location>
 
     <cluster-dropdown-content clusters="{{clusters}}"></cluster-dropdown-content>
+    <cluster-location-content locations="{{locations}}"></cluster-location-content>
 
     <etools-prp-ajax
         id="createProject"
@@ -130,30 +131,41 @@
               </paper-listbox>
           </paper-dropdown-menu>
 
-          <cluster-location-input
-             class="item"
-             label="Location"
-             id="location"
-             value="{{data.location}}">
-          </cluster-location-input>
+          <paper-dropdown-menu
+              class="item validate"
+              label="Location"
+              id="location"
+              on-value-changed="_validate"
+              on-selected-item-changed="_setLocation"
+              always-float-label
+              required>
+              <paper-listbox
+                  slot="dropdown-content"
+                  class="dropdown-content">
+                <template
+                    id="locations"
+                    is="dom-repeat"
+                    items="[[locations]]">
+                  <paper-item>[[item.title]]</paper-item>
+                </template>
+              </paper-listbox>
+          </paper-dropdown-menu>
 
-          <div class="item">
-            <etools-prp-date-input
-               id="startDateField"
-               label="Start Date"
-               value="{{data.start_date}}"
-               no-init>
-            </etools-prp-date-input>
-          </div>
+          <date-input
+            required
+            needs-validation="{{validateStart}}"
+            class="item"
+            label="Start Date"
+            value="{{data.start_date}}">
+          </date-input>
 
-          <div class="item">
-            <etools-prp-date-input
-               id="endDateField"
-               label="End Date"
-               value="{{data.end_date}}"
-               no-init>
-            </etools-prp-date-input>
-          </div>
+          <date-input
+            required
+            needs-validation="{{validateEnd}}"
+            class="item"
+            label="End Date"
+            value="{{data.end_date}}">
+          </date-input>
 
           <dropdown-form-input
              class="item"
@@ -181,16 +193,17 @@
           </paper-input>
 
           <paper-input
-            class="item"
+            class="item validate"
             id="funding_source"
             label="Funding Source"
             value="{{data.funding_source}}"
             type="string"
+            required
             auto-validate>
           </paper-input>
 
           <paper-input
-            class="item full-width"
+            class="item validate full-width"
             id="description"
             label="Description"
             value="{{data.description}}"
@@ -200,7 +213,7 @@
           </paper-input>
 
           <paper-input
-            class="item full-width"
+            class="item validate full-width"
             id="additional_information"
             label="Additional information (e.g. links)"
             value="{{data.additional_information}}"
@@ -237,7 +250,6 @@
       ],
 
       properties: {
-
         path: String,
 
         reportingPeriod: String,
@@ -255,6 +267,16 @@
         data: {
           type: Object,
           value: {}
+        },
+
+        validateStart: {
+          type: String,
+          value: ''
+        },
+
+        validateEnd: {
+          type: String,
+          value: ''
         },
 
         projectCreationUrl: {
@@ -312,6 +334,15 @@
         this.set('data.cluster', cluster.id);
       },
 
+      _setLocation: function (e, data) {
+        var location = this.$$('#locations').itemForElement(data.value);
+
+        if (!location) {
+          return;
+        }
+        this.set('data.location', location);
+      },
+
       _redirectToDetail: function(id) {
         var path = '/planned-action/project/' + String(id);
         var url = this.buildUrl(this._baseUrlCluster, path);
@@ -319,6 +350,13 @@
       },
 
       _save: function () {
+        this.validateStart= 'true';
+        this.validateEnd= 'true';
+
+        if (!this._fieldsAreValid()) {
+          return;
+        }
+
         // Temporary. Issue #223 will add chips for locations and clusters.
         // Better fake data is also required (request made already).
         this.data.locations = [];
