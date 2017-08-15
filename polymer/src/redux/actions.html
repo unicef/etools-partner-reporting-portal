@@ -11,6 +11,7 @@
 <link rel="import" href="actions/disaggregations.html">
 <link rel="import" href="actions/partnerProjects.html">
 <link rel="import" href="actions/clusterIndicatorReports.html">
+<link rel="import" href="actions/clusterActivities.html">
 
 <script>
   (function () {
@@ -218,47 +219,6 @@
       setClusterObjectivesCount: function (data) {
         return {
           type: App.Constants.SET_CLUSTER_OBJECTIVES_COUNT,
-          count: data.count
-        };
-      },
-
-      fetchClusterActivitiesList: function (thunk) {
-        return function (dispatch) {
-          dispatch(App.Actions.clusterActivitiesLoadingStart());
-          return thunk()
-            .catch(function () {
-              dispatch(App.Actions.clusterActivitiesLoadingStart());
-            })
-            .then(function (res) {
-              dispatch(App.Actions.setClusterActivitiesList(res.data));
-              dispatch(App.Actions.setClusterActivitiesCount(res.data));
-              dispatch(App.Actions.clusterActivitiesLoadingStop());
-            });
-        };
-      },
-
-      setClusterActivitiesList: function (data) {
-        return {
-          type: App.Constants.SET_CLUSTER_ACTIVITIES_LIST,
-          data: data,
-        };
-      },
-
-      clusterActivitiesLoadingStart: function () {
-        return {
-          type: App.Constants.CLUSTER_ACTIVITIES_LOADING_START,
-        };
-      },
-
-      clusterActivitiesLoadingStop: function () {
-        return {
-          type: App.Constants.CLUSTER_ACTIVITIES_LOADING_STOP,
-        };
-      },
-
-      setClusterActivitiesCount: function (data) {
-        return {
-          type: App.Constants.SET_CLUSTER_ACTIVITIES_COUNT,
           count: data.count
         };
       },

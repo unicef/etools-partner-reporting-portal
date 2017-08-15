@@ -1,4 +1,4 @@
-### This PR addresses (ticket title)
+### This PR resolves #ISSUE_NUMBER.
 
 ##### Feature list
 * _Describe the list of features from Django_
