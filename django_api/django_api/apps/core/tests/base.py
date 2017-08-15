@@ -19,7 +19,7 @@ class BaseAPITestCase(APITestCase):
         # generating data
         if self.with_generate_fake_data:
             with suppress_stdout():
-                generate_fake_data(quantity=self.generate_fake_data_quantity)
+                generate_fake_data(self.generate_fake_data_quantity)
 
         # creating a session (login already created user in generate_fake_data)
         if self.with_session_login:
