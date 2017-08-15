@@ -75,7 +75,7 @@
 
     <etools-prp-ajax
         id="createProject"
-        url="[[projectCreationUrl]]"
+        url="[[url]]"
         body="[[data]]"
         content-type="application/json"
         method="post">
@@ -109,9 +109,9 @@
 
           <cluster-dropdown-input
             class="item"
-            label="Cluster"
-            id="cluster"
-            value="{{data.cluster}}">
+            label="Clusters"
+            id="clusters"
+            value="{{data.clusters}}">
           </cluster-dropdown-input>
 
           <cluster-location-input
@@ -220,6 +220,10 @@
       ],
 
       properties: {
+        responsePlanID: {
+          type: String,
+          statePath: 'responsePlans.currentID',
+        },
 
         path: String,
 
@@ -240,9 +244,9 @@
           value: {}
         },
 
-        projectCreationUrl: {
+        url: {
           type: String,
-          value: App.Endpoints.plannedActions()
+          computed: '_computeUrl(responsePlanID)'
         },
 
         statuses: {
@@ -264,6 +268,10 @@
         },
       },
 
+      _computeUrl: function(responsePlanID) {
+        return App.Endpoints.plannedActions(responsePlanID);
+      },
+
       close: function () {
         this.set('opened', false);
       },
@@ -280,10 +288,15 @@
       },
 
       _save: function () {
-        // Temporary. Issue #223 will add chips for locations and clusters.
-        // Better fake data is also required (request made already).
+        // Temporary workaround. Issue #223 will add chips for locations and clusters.
         this.data.locations = [];
-        this.data.clusters = [];
+        var clusterSelection = this.data.clusters;
+        if (typeof(clusterSelection) === 'number') {
+          this.data.clusters = [{id: clusterSelection}];
+        } else {
+          clusterSelection = this.data.clusters[0].id;
+          this.data.clusters = [{id: clusterSelection}];
+        }
 
         var self = this;
         this.updatePending = true;

@@ -46,7 +46,9 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
     filter_class = PartnerProjectFilter
 
     def get_queryset(self, *args, **kwargs):
-        return PartnerProject.objects.select_related('partner').prefetch_related('clusters', 'locations').all()
+        response_plan_id = self.kwargs.get('response_plan_id')
+
+        return PartnerProject.objects.select_related('partner').prefetch_related('clusters', 'locations').filter(clusters__response_plan_id=response_plan_id)
 
     def add_many_to_many_relations(self, instance):
         """

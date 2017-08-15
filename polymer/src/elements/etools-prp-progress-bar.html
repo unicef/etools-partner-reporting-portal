@@ -7,11 +7,8 @@
 <dom-module id="etools-prp-progress-bar">
   <template>
     <style include="progress-bar"></style>
-    <!-- TODO: percentage is going to be returned from the backend -->
-    <!-- TODO: Change color to green if it's a cluster item (not in this sprint). -->
-    <paper-progress value="[[percentage]]"
-                    class="blue">
-    </paper-progress>
+    <!-- TODO: In IP, change color to green if it's a cluster item. -->
+    <paper-progress value="[[percentage]]"></paper-progress>
     <span>[[percentage]]%</span>
   </template>
 

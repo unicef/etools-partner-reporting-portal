@@ -6,19 +6,18 @@
 
     App.Actions = App.Actions || {};
 
-    App.Actions.clusterActivities = {
-
+    App.Actions.ClusterActivities = {
       fetchClusterActivitiesList: function (thunk) {
         return function (dispatch) {
-          dispatch(App.Actions.clusterActivities.clusterActivitiesLoadingStart());
+          dispatch(App.Actions.ClusterActivities.clusterActivitiesLoadingStart());
           return thunk()
             .catch(function () {
-              dispatch(App.Actions.clusterActivities.clusterActivitiesLoadingStop());
+              dispatch(App.Actions.ClusterActivities.clusterActivitiesLoadingStop());
             })
             .then(function (res) {
-              dispatch(App.Actions.clusterActivities.setClusterActivitiesList(res.data));
-              dispatch(App.Actions.clusterActivities.setClusterActivitiesCount(res.data));
-              dispatch(App.Actions.clusterActivities.clusterActivitiesLoadingStop());
+              dispatch(App.Actions.ClusterActivities.setClusterActivitiesList(res.data));
+              dispatch(App.Actions.ClusterActivities.setClusterActivitiesCount(res.data));
+              dispatch(App.Actions.ClusterActivities.clusterActivitiesLoadingStop());
             });
         };
       },
@@ -50,19 +49,19 @@
       },
     };
 
-    App.Actions.clusterActivities.partners = {
+    App.Actions.ClusterActivities.partners = {
       fetch: function (thunk, clusterId) {
         return function (dispatch) {
-          dispatch(App.Actions.clusterActivities.partners.setLoadingStart());
+          dispatch(App.Actions.ClusterActivities.partners.setLoadingStart());
           return thunk()
             .then(function (res) {
-              dispatch(App.Actions.clusterActivities.partners.set(
+              dispatch(App.Actions.ClusterActivities.partners.set(
                 clusterId, res.data.results
               ));
-              dispatch(App.Actions.clusterActivities.partners.setCount(
+              dispatch(App.Actions.ClusterActivities.partners.setCount(
                 clusterId, res.data.count
               ));
-              dispatch(App.Actions.clusterActivities.partners.setLoadingStop());
+              dispatch(App.Actions.ClusterActivities.partners.setLoadingStop());
             });
         };
       },
@@ -92,6 +91,52 @@
       setLoadingStart: function () {
         return {
           type: App.Constants.PARTNERS_BY_CLUSTER_ACTIVITY_ID_LOADING_START,
+        };
+      },
+    };
+
+    App.Actions.ClusterActivities.indicators = {
+      fetch: function (thunk, clusterActivityId) {
+        return function (dispatch) {
+          dispatch(App.Actions.ClusterActivities.indicators.setLoadingStart());
+          return thunk()
+            .then(function (res) {
+              dispatch(App.Actions.ClusterActivities.indicators.setIndicators(
+                clusterActivityId, res.data.results
+              ));
+              dispatch(App.Actions.ClusterActivities.indicators.setCount(
+                clusterActivityId, res.data.count
+              ));
+              dispatch(App.Actions.ClusterActivities.indicators.setLoadingStop());
+            });
+        };
+      },
+
+      setIndicators: function (clusterActivityId, data) {
+        return {
+          type: App.Constants.SET_INDICATORS_BY_CLUSTER_ACTIVITY_ID,
+          clusterActivityId: clusterActivityId,
+          data: data,
+        };
+      },
+
+      setCount: function (clusterActivityId, count) {
+        return {
+          type: App.Constants.SET_INDICATORS_BY_CLUSTER_ACTIVITY_ID_COUNT,
+          clusterActivityId: clusterActivityId,
+          count: count,
+        };
+      },
+
+      setLoadingStop: function () {
+        return {
+          type: App.Constants.INDICATORS_BY_CLUSTER_ACTIVITY_ID_LOADING_STOP,
+        };
+      },
+
+      setLoadingStart: function () {
+        return {
+          type: App.Constants.INDICATORS_BY_CLUSTER_ACTIVITY_ID_LOADING_START,
         };
       },
     };

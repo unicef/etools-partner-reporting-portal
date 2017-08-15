@@ -14,7 +14,10 @@
       loading: loadingClusterActivitiesReducer,
       partners: partnersByClusterActivityIdReducer,
       partnersCount: partnersByClusterActivityIdCountReducer,
-      partnersLoading: partnersByClusterActivityIdLoadingReducer
+      partnersLoading: partnersByClusterActivityIdLoadingReducer,
+      indicators: indicatorsByClusterActivityIdReducer,
+      indicatorsCount: indicatorsByClusterActivityIdCountReducer,
+      indicatorsLoading: indicatorsByClusterActivityIdLoadingReducer
     });
 
     function clusterActivitiesListReducer(state, action) {
@@ -116,6 +119,64 @@
           return true;
 
         case App.Constants.PARTNERS_BY_CLUSTER_ACTIVITY_ID_LOADING_STOP:
+          return false;
+
+        default:
+          return state;
+      }
+    }
+
+    function indicatorsByClusterActivityIdReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = {};
+      }
+
+      switch (action.type) {
+        case App.Constants.SET_INDICATORS_BY_CLUSTER_ACTIVITY_ID:
+          return (function () {
+            var change = {};
+
+            change[action.clusterActivityId] = action.data;
+            return Object.assign({}, state, change);
+          }());
+
+        case App.Constants.RESET:
+          return {};
+
+        default:
+          return state;
+      }
+    }
+
+    function indicatorsByClusterActivityIdCountReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = 0;
+      }
+
+      switch (action.type) {
+        case App.Constants.SET_INDICATORS_BY_CLUSTER_ACTIVITY_ID_COUNT:
+          return (function () {
+            var change = {};
+
+            change[action.clusterActivityId] = action.count;
+            return Object.assign({}, state, change);
+          }());
+
+        default:
+          return state;
+      }
+    }
+
+    function indicatorsByClusterActivityIdLoadingReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = false;
+      }
+
+      switch (action.type) {
+        case App.Constants.INDICATORS_BY_CLUSTER_ACTIVITY_ID_LOADING_START:
+          return true;
+
+        case App.Constants.INDICATORS_BY_CLUSTER_ACTIVITY_ID_LOADING_STOP:
           return false;
 
         default:

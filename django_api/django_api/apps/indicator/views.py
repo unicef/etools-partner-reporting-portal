@@ -16,7 +16,15 @@ import django_filters.rest_framework
 from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
 from core.models import Location
-from core.common import PROGRESS_REPORT_STATUS, INDICATOR_REPORT_STATUS
+from core.common import (
+    PROGRESS_REPORT_STATUS,
+    INDICATOR_REPORT_STATUS,
+    REPORTABLE_LLO_CONTENT_OBJECT,
+    REPORTABLE_CO_CONTENT_OBJECT,
+    REPORTABLE_CA_CONTENT_OBJECT,
+    REPORTABLE_PP_CONTENT_OBJECT,
+    REPORTABLE_PA_CONTENT_OBJECT,
+)
 from core.serializers import ShortLocationSerializer
 from unicef.serializers import ProgressReportSerializer, ProgressReportUpdateSerializer
 from unicef.models import ProgressReport
@@ -111,24 +119,43 @@ class IndicatorListCreateAPIView(ListCreateAPIView):
     - blueprint__title (string as Indicator title)
 
     Filtering list Example:
-     - /api/indicator/?blueprint__title=indicator_blueprint_0
-     - /api/indicator/&locations=20,21,24&blueprint__title=indicator_blueprint_17
-     - /api/indicator?pds=37,63,65
+     - /api/indicator/<content_object>/?blueprint__title=indicator_blueprint_0
+     - /api/indicator/<content_object>/?locations=20,21,24&blueprint__title=indicator_blueprint_17
+     - /api/indicator/<content_object>/?pds=37,63,65
+     - /api/indicator/<content_object>/?content_object=co,object_id=34    [for cluster objective indicators]
+     - /api/indicator/<content_object>/                                   [will throw exception]
     """
     serializer_class = IndicatorListSerializer
     pagination_class = SmallPagination
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
     filter_class = IndicatorFilter
+    lookup_url_kwarg = 'content_object'
 
     def get_queryset(self):
-        queryset = Reportable.objects.filter(indicator_reports__isnull=False, lower_level_outputs__isnull=False)
+        content_object = self.kwargs.get(self.lookup_url_kwarg)
+        if content_object == REPORTABLE_LLO_CONTENT_OBJECT:
+            queryset = Reportable.objects.filter(lower_level_outputs__isnull=False)
+        elif content_object == REPORTABLE_CO_CONTENT_OBJECT:
+            queryset = Reportable.objects.filter(cluster_objectives__isnull=False)
+        elif content_object == REPORTABLE_CA_CONTENT_OBJECT:
+            queryset = Reportable.objects.filter(cluster_activities__isnull=False)
+        elif content_object == REPORTABLE_PP_CONTENT_OBJECT:
+            queryset = Reportable.objects.filter(partner_projects__isnull=False)
+        elif content_object == REPORTABLE_PA_CONTENT_OBJECT:
+            queryset = Reportable.objects.filter(partner_activities__isnull=False)
+        else:
+            raise Http404
+
+
+        object_id = self.request.query_params.get('object_id', None)
+        if content_object is not None and object_id is not None:
+            queryset = queryset.filter(object_id=object_id)
 
         q_list = []
 
         locations = self.request.query_params.get('locations', None)
         pds = self.request.query_params.get('pds', None)
 
-        # TODO: Create Cluster List API endpoint when we start working on Cluster Reporting
         clusters = self.request.query_params.get('clusters', None)
         pd_statuses = self.request.query_params.get('pd_statuses', None)
 
