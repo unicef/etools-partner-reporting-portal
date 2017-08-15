@@ -1,6 +1,8 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../bower_components/iron-icons/maps-icons.html">
 <link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../../bower_components/iron-pages/iron-pages.html">
 
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../etools-prp-ajax.html">
@@ -18,10 +20,13 @@
         width: 100%;
         /*Required so the loading message isn't cut off:*/
         min-height: 250px;
+
+        --paper-tabs: {
+          padding-left: 13px;
+          border-bottom: 1px solid var(--paper-grey-300);
+        };
       }
-      iron-icon {
-        color: var(--accent-color);
-      }
+
       h3 {
         width: 100%;
         float: left;
@@ -42,60 +47,74 @@
       <div>
     </template>
 
-    <template is="dom-repeat"
-              items="[[locations]]"
-              as="location">
+    <paper-tabs
+        selected="{{selected}}"
+        fallback-selection="location-[[locations.0.current.id]]"
+        attr-for-selected="name"
+        scrollable
+        hide-scroll-buttons>
+      <template
+          is="dom-repeat"
+          items="[[locations]]"
+          as="location">
+        <paper-tab name="location-[[location.current.id]]">
+          [[location.name]]
+        </paper-tab>
+      </template>
+    </paper-tabs>
 
-      <h3>
-        <iron-icon icon="maps:place"></iron-icon>
-        [[location.name]]
-      </h3>
+    <iron-pages
+        attr-for-selected="name"
+        selected="{{selected}}">
 
-      <div class="container">
-        <template is="dom-if" if="[[location.current]]">
-          <div class="item">
-            <h4>
-              <span>
-                <strong>Progress in current reporting period: </strong>
-                [[location.reportInfo.time_period_start]] -
-                [[location.reportInfo.time_period_end]]
-              </span>
-              <span class="total">
-                <strong>Total: </strong>[[location.reportInfo.total.v]]
-              </span>
-            </h4>
-            <p>Level reported: [[location.current.level_reported]]</p>
-            <!-- TODO: check - wrong use of total? -->
-            <disaggregation-table
-              data=[[location.current]]
-              mapping=[[location.reportInfo.disagg_lookup_map]]>
-            </disaggregation-table>
+      <template
+          is="dom-repeat"
+          items="[[locations]]"
+          as="location">
+        <div name="location-[[location.current.id]]">
+          <div class="container">
+            <template is="dom-if" if="[[location.current]]">
+              <div class="item">
+                <h4>
+                  <span>
+                    <strong>Progress in current reporting period: </strong>
+                    [[location.reportInfo.time_period_start]] -
+                    [[location.reportInfo.time_period_end]]
+                  </span>
+                  <span class="total">
+                    <strong>Total: </strong>[[location.reportInfo.total.v]]
+                  </span>
+                </h4>
+                <!-- TODO: check - wrong use of total? -->
+                <disaggregation-table
+                  data=[[location.current]]
+                  mapping=[[location.reportInfo.disagg_lookup_map]]>
+                </disaggregation-table>
+              </div>
+            </template>
+
+            <template is="dom-if" if="[[location.previous]]">
+              <div class="item">
+                <h4>
+                  <span>
+                    <strong>Progress in previous reporting period: </strong>
+                    [[location.reportInfo.time_period_start]] -
+                    [[location.reportInfo.time_period_end]]
+                  </span>
+                  <span class="total">
+                    <strong>Total: </strong>[[location.reportInfo.total.v]]
+                  </span>
+                </h4>
+                <disaggregation-table
+                  data=[[location.previous]]
+                  mapping=[[location.reportInfo.disagg_lookup_map]]>
+                </disaggregation-table>
+              </div>
+            </template>
           </div>
-        </template>
-
-        <template is="dom-if" if="[[location.previous]]">
-          <div class="item">
-            <h4>
-              <span>
-                <strong>Progress in previous reporting period: </strong>
-                [[location.reportInfo.time_period_start]] -
-                [[location.reportInfo.time_period_end]]
-              </span>
-              <span class="total">
-                <strong>Total: </strong>[[location.reportInfo.total.v]]
-              </span>
-            </h4>
-            <p>Level reported: [[location.previous.level_reported]]</p>
-            <disaggregation-table
-              data=[[location.previous]]
-              mapping=[[location.reportInfo.disagg_lookup_map]]>
-            </disaggregation-table>
-          </div>
-        </template>
-      </div>
-
-    </template>
-
+        </div>
+      </template>
+    </iron-pages>
   </template>
 
   <script>
@@ -111,6 +130,11 @@
         indicatorDetailUrl: {
           type: String,
           computed: '_computeIndicatorReportsUrl(indicatorId)',
+        },
+
+        selected: {
+          type: Number,
+          value: 0,
         },
 
         isOpen: {
@@ -157,6 +181,7 @@
         if (!data) {
           return [];
         }
+
         data.forEach(function(report, index) {
           var timeframe = 'current';
           if (index === 1) {
