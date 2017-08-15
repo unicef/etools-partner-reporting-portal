@@ -13,7 +13,10 @@
       loading: loadingPartnerProjectsReducer,
       activities: activitiesByPartnerProjectIdReducer,
       activitiesCount: activitiesByPartnerProjectIdCountReducer,
-      activitiesLoading: activitiesByPartnerProjectIdLoadingReducer
+      activitiesLoading: activitiesByPartnerProjectIdLoadingReducer,
+      indicators: indicatorsReducer,
+      indicatorsCount: indicatorsCountReducer,
+      indicatorsLoading: indicatorsLoadingReducer
     });
 
     function partnerProjectsListReducer(state, action) {
@@ -116,6 +119,64 @@
           return true;
 
         case App.Constants.ACTIVITIES_BY_PARTNER_PROJECT_ID_LOADING_STOP:
+          return false;
+
+        default:
+          return state;
+      }
+    }
+
+    function indicatorsReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = {};
+      }
+
+      switch (action.type) {
+        case App.Constants.SET_INDICATORS_BY_PARTNER_PROJECT_ID:
+          return (function () {
+            var change = {};
+
+            change[action.partnerProjectId] = action.data;
+            return Object.assign({}, state, change);
+          }());
+
+        case App.Constants.RESET:
+          return {};
+
+        default:
+          return state;
+      }
+    }
+
+    function indicatorsCountReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = 0;
+      }
+
+      switch (action.type) {
+        case App.Constants.SET_INDICATORS_BY_PARTNER_PROJECT_ID_COUNT:
+          return (function () {
+            var change = {};
+
+            change[action.partnerProjectId] = action.count;
+            return Object.assign({}, state, change);
+          }());
+
+        default:
+          return state;
+      }
+    }
+
+    function indicatorsLoadingReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = false;
+      }
+
+      switch (action.type) {
+        case App.Constants.INDICATORS_BY_PARTNER_PROJECT_ID_LOADING_START:
+          return true;
+
+        case App.Constants.INDICATORS_BY_PARTNER_PROJECT_ID_LOADING_STOP:
           return false;
 
         default:

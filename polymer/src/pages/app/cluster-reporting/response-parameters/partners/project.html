@@ -75,7 +75,9 @@
     </template>
 
     <template is="dom-if" if="[[_equals(tab, 'indicators')]]" restamp="true">
-      <rp-partner-project-details-indicators></rp-partner-project-details-indicators>
+      <rp-partner-project-details-indicators
+        project-id="[[projectId]]">
+      </rp-partner-project-details-indicators>
     </template>
 
     <template is="dom-if" if="[[_equals(tab, 'activities')]]" restamp="true">

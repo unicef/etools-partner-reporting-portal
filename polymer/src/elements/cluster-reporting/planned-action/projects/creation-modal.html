@@ -79,7 +79,7 @@
 
     <etools-prp-ajax
         id="createProject"
-        url="[[projectCreationUrl]]"
+        url="[[url]]"
         body="[[data]]"
         content-type="application/json"
         method="post">
@@ -250,6 +250,11 @@
       ],
 
       properties: {
+        responsePlanID: {
+          type: String,
+          statePath: 'responsePlans.currentID',
+        },
+
         path: String,
 
         reportingPeriod: String,
@@ -279,9 +284,9 @@
           value: ''
         },
 
-        projectCreationUrl: {
+        url: {
           type: String,
-          value: App.Endpoints.plannedActions()
+          computed: '_computeUrl(responsePlanID)'
         },
 
         statuses: {
@@ -301,6 +306,10 @@
             {title: 'Quarterly', id: 'Qua'},
           ],
         },
+      },
+
+      _computeUrl: function(responsePlanID) {
+        return App.Endpoints.plannedActions(responsePlanID);
       },
 
       close: function () {
@@ -331,7 +340,7 @@
         if (!cluster) {
           return;
         }
-        this.set('data.cluster', cluster.id);
+        this.set('data.clusters', cluster.id);
       },
 
       _setLocation: function (e, data) {
@@ -340,7 +349,7 @@
         if (!location) {
           return;
         }
-        this.set('data.location', location);
+        this.set('data.locations', location);
       },
 
       _redirectToDetail: function(id) {
@@ -360,7 +369,13 @@
         // Temporary. Issue #223 will add chips for locations and clusters.
         // Better fake data is also required (request made already).
         this.data.locations = [];
-        this.data.clusters = [];
+        var clusterSelection = this.data.clusters;
+        if (typeof(clusterSelection) === 'number') {
+          this.data.clusters = [{id: clusterSelection}];
+        } else {
+          clusterSelection = this.data.clusters[0].id;
+          this.data.clusters = [{id: clusterSelection}];
+        }
 
         var self = this;
         this.updatePending = true;
