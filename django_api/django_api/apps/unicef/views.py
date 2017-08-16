@@ -1,12 +1,14 @@
 import logging
 from django.http import Http404
 from django.db.models import Q
+from django.http import HttpResponse
 
 from rest_framework.generics import RetrieveAPIView, ListAPIView
 from rest_framework.response import Response
 from rest_framework import status as statuses
 
 import django_filters.rest_framework
+from easy_pdf.rendering import render_to_pdf
 
 from core.paginations import SmallPagination
 from core.permissions import IsAuthenticated
@@ -15,7 +17,7 @@ from core.models import Location
 from .serializers import (
     ProgrammeDocumentSerializer,
     ProgrammeDocumentDetailSerializer,
-    ProgressReportSerializer,
+    ProgressReportSerializer
 )
 
 from .models import ProgrammeDocument, ProgressReport
@@ -131,3 +133,14 @@ class ProgressReportAPIView(ListAPIView):
             serializer.data,
             status=statuses.HTTP_200_OK
         )
+
+class ProgressReportPDFView(RetrieveAPIView):
+    """
+        Endpoint for getting PDF of Progress Report Annex C.
+    """
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        # Render to pdf
+        data = render_to_pdf("report_annex_c_pdf.html", {})
+        return HttpResponse(data, content_type='application/pdf')

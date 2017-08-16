@@ -4,6 +4,7 @@ from .views import (
     ProgrammeDocumentAPIView,
     ProgrammeDocumentDetailsAPIView,
     ProgressReportAPIView,
+    ProgressReportPDFView
 )
 
 
@@ -17,4 +18,7 @@ urlpatterns = [
     url(r'^(?P<location_id>\d+)/progress-reports/$',
         ProgressReportAPIView.as_view(),
         name="progress-reports"),
+    url(r'^(?P<location_id>\d+)/progress-reports/(?P<pk>\d+)/annex-C-export-PDF/$',
+        ProgressReportPDFView.as_view(),
+            name="progress-reports-pdf"),
 ]
