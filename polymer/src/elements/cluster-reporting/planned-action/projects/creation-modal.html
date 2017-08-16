@@ -108,7 +108,7 @@
             value="{{data.title}}"
             type="string"
             required
-            auto-validate>
+            on-input="_validate">
           </paper-input>
 
           <paper-dropdown-menu
@@ -116,17 +116,18 @@
               label="Cluster"
               id="cluster"
               on-value-changed="_validate"
-              on-selected-item-changed="_setCluster"
               always-float-label
               required>
               <paper-listbox
+                  selected="{{data.clusters}}"
+                  attr-for-selected="value"
                   slot="dropdown-content"
                   class="dropdown-content">
                 <template
                     id="clusters"
                     is="dom-repeat"
                     items="[[clusters]]">
-                  <paper-item>[[item.title]]</paper-item>
+                  <paper-item value="[[item.id]]">[[item.title]]</paper-item>
                 </template>
               </paper-listbox>
           </paper-dropdown-menu>
@@ -136,17 +137,18 @@
               label="Location"
               id="location"
               on-value-changed="_validate"
-              on-selected-item-changed="_setLocation"
               always-float-label
               required>
               <paper-listbox
+                  selected="{{data.locations}}"
+                  attr-for-selected="value"
                   slot="dropdown-content"
                   class="dropdown-content">
                 <template
                     id="locations"
                     is="dom-repeat"
                     items="[[locations]]">
-                  <paper-item>[[item.title]]</paper-item>
+                  <paper-item value="[[item.id]]">[[item.title]]</paper-item>
                 </template>
               </paper-listbox>
           </paper-dropdown-menu>
@@ -175,13 +177,23 @@
              data="[[statuses]]">
           </dropdown-form-input>
 
-          <dropdown-form-input
-             class="item"
-             label="Frequency of reporting"
-             id="frequency"
-             value="{{data.frequency}}"
-             data="[[frequencies]]">
-          </dropdown-form-input>
+          <paper-dropdown-menu
+              class="item validate"
+              label="Frequency of reporting"
+              always-float-label>
+            <paper-listbox
+                selected="{{data.frequency}}"
+                attr-for-selected="value"
+                slot="dropdown-content"
+                class="dropdown-content">
+              <template
+                  id="frequencies"
+                  is="dom-repeat"
+                  items="[[frequencies]]">
+                <paper-item value="[[item.id]]">[[item.title]]</paper-item>
+              </template>
+            </paper-listbox>
+          </paper-dropdown-menu>
 
           <paper-input
             class="item"
@@ -189,7 +201,7 @@
             label="Total Budget"
             value="{{data.total_budget}}"
             type="number"
-            auto-validate>
+            on-input="_validate">
           </paper-input>
 
           <paper-input
@@ -199,7 +211,7 @@
             value="{{data.funding_source}}"
             type="string"
             required
-            auto-validate>
+            on-input="_validate">
           </paper-input>
 
           <paper-input
@@ -209,7 +221,7 @@
             value="{{data.description}}"
             type="string"
             required
-            auto-validate>
+            on-input="_validate">
           </paper-input>
 
           <paper-input
@@ -219,7 +231,7 @@
             value="{{data.additional_information}}"
             type="string"
             required
-            auto-validate>
+            on-input="_validate">
           </paper-input>
         </iron-form>
 
@@ -323,33 +335,6 @@
 
       _validate: function (e) {
         e.target.validate();
-      },
-
-      _setFrequency: function (e, data) {
-        var freq = this.$$('#frequencies').itemForElement(data.value);
-        if (!freq) {
-          return;
-        }
-
-        this.set('data.frequency', freq.id);
-      },
-
-      _setCluster: function (e, data) {
-        var cluster = this.$$('#clusters').itemForElement(data.value);
-
-        if (!cluster) {
-          return;
-        }
-        this.set('data.clusters', cluster.id);
-      },
-
-      _setLocation: function (e, data) {
-        var location = this.$$('#locations').itemForElement(data.value);
-
-        if (!location) {
-          return;
-        }
-        this.set('data.locations', location);
       },
 
       _redirectToDetail: function(id) {

@@ -104,6 +104,7 @@
               label="Cluster Objective Title"
               value="{{data.title}}"
               type="string"
+              on-input="_validate"
               required>
             </paper-input>
 
@@ -113,6 +114,7 @@
               label="CO ref #"
               value="{{data.reference_number}}"
               type="string"
+              on-input="_validate"
               required>
             </paper-input>
 
@@ -121,17 +123,18 @@
                 label="Cluster"
                 id="cluster"
                 on-value-changed="_validate"
-                on-selected-item-changed="_setCluster"
                 always-float-label
                 required>
                 <paper-listbox
+                    selected="{{data.clusters}}"
+                    attr-for-selected="value"
                     slot="dropdown-content"
                     class="dropdown-content">
                   <template
                       id="clusters"
                       is="dom-repeat"
                       items="[[clusters]]">
-                    <paper-item>[[item.title]]</paper-item>
+                    <paper-item value="[[item.id]]">[[item.title]]</paper-item>
                   </template>
                 </paper-listbox>
             </paper-dropdown-menu>
@@ -140,17 +143,18 @@
                 class="validate"
                 label="Frequency of reporting"
                 on-value-changed="_validate"
-                on-selected-item-changed="_setFrequency"
                 always-float-label
                 required>
               <paper-listbox
+                  selected="{{data.frequency}}"
+                  attr-for-selected="value"
                   slot="dropdown-content"
                   class="dropdown-content">
                 <template
                     id="frequencies"
                     is="dom-repeat"
                     items="[[frequencies]]">
-                  <paper-item>[[item.title]]</paper-item>
+                  <paper-item value="[[item.id]]">[[item.title]]</paper-item>
                 </template>
               </paper-listbox>
             </paper-dropdown-menu>
@@ -240,24 +244,6 @@
         var path = '/response-parameters/clusters/objective/' + String(id);
         var url = this.buildUrl(this._baseUrlCluster, path);
         this.set('path', url);
-      },
-
-      _setFrequency: function (e, data) {
-        var freq = this.$$('#frequencies').itemForElement(data.value);
-        if (!freq) {
-          return;
-        }
-
-        this.set('data.frequency', freq.id);
-      },
-
-      _setCluster: function (e, data) {
-        var cluster = this.$$('#clusters').itemForElement(data.value);
-
-        if (!cluster) {
-          return;
-        }
-        this.set('data.cluster', cluster.id);
       },
 
       _validate: function (e) {

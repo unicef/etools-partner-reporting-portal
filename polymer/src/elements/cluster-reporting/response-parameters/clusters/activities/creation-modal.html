@@ -104,6 +104,7 @@
             label="Title"
             value="{{data.title}}"
             type="string"
+            on-input="_validate"
             required>
           </paper-input>
 
@@ -113,6 +114,7 @@
             label="Standard"
             value="{{data.standard}}"
             type="string"
+            on-input="_validate"
             required>
           </paper-input>
 
@@ -121,17 +123,18 @@
               label="Cluster"
               id="cluster"
               on-value-changed="_validate"
-              on-selected-item-changed="_setCluster"
               always-float-label
               required>
               <paper-listbox
+                  selected="{{data.cluster}}"
+                  attr-for-selected="value"
                   slot="dropdown-content"
                   class="dropdown-content">
                 <template
                     id="clusters"
                     is="dom-repeat"
                     items="[[clusters]]">
-                  <paper-item>[[item.title]]</paper-item>
+                  <paper-item value="[[item.id]]">[[item.title]]</paper-item>
                 </template>
               </paper-listbox>
           </paper-dropdown-menu>
@@ -142,6 +145,7 @@
             label="CO ref #"
             value="{{data.reference_number}}"
             type="string"
+            on-input="_validate"
             required>
           </paper-input>
 
@@ -149,17 +153,18 @@
               class="item validate"
               label="Frequency of reporting"
               on-value-changed="_validate"
-              on-selected-item-changed="_setFrequency"
               always-float-label
               required>
             <paper-listbox
+                selected="{{data.frequency}}"
+                attr-for-selected="value"
                 slot="dropdown-content"
                 class="dropdown-content">
               <template
                   id="frequencies"
                   is="dom-repeat"
                   items="[[frequencies]]">
-                <paper-item>[[item.title]]</paper-item>
+                <paper-item value="[[item.id]]">[[item.title]]</paper-item>
               </template>
             </paper-listbox>
           </paper-dropdown-menu>
@@ -244,24 +249,6 @@
 
       _validate: function (e) {
         e.target.validate();
-      },
-
-      _setFrequency: function (e, data) {
-        var freq = this.$$('#frequencies').itemForElement(data.value);
-        if (!freq) {
-          return;
-        }
-
-        this.set('data.frequency', freq.id);
-      },
-
-      _setCluster: function (e, data) {
-        var cluster = this.$$('#clusters').itemForElement(data.value);
-
-        if (!cluster) {
-          return;
-        }
-        this.set('data.cluster', cluster.id);
       },
 
       _redirectToDetail: function (id) {
