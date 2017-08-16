@@ -45,15 +45,17 @@
       <etools-data-table-header
           no-collapse
           label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
-        <etools-data-table-column field="cluster">
-          <div class="table-column">Cluster</div>
-        </etools-data-table-column>
-        <etools-data-table-column field="ref">
-          <div class="table-column">CO ref. #</div>
-        </etools-data-table-column>
-        <etools-data-table-column field="activity">
-          <div class="table-column">Cluster Activity</div>
-        </etools-data-table-column>
+        <template is="dom-if" if="[[!isMinimalList]]" restamp="true">
+          <etools-data-table-column field="cluster">
+            <div class="table-column">Cluster</div>
+          </etools-data-table-column>
+          <etools-data-table-column field="ref">
+            <div class="table-column">CO ref. #</div>
+          </etools-data-table-column>
+          <etools-data-table-column field="activity">
+            <div class="table-column">Cluster Activity</div>
+          </etools-data-table-column>
+        </template>
       </etools-data-table-header>
 
       <template
@@ -64,12 +66,14 @@
           initial-count="[[pageSize]]">
         <etools-data-table-row no-collapse>
           <div slot="row-data">
-            <div class="table-cell table-cell--text">
-              [[activity.co_cluster_title]]
-            </div>
-            <div class="table-cell table-cell--text">
-              [[activity.co_reference_number]]
-            </div>
+            <template is="dom-if" if="[[!isMinimalList]]" restamp="true">
+              <div class="table-cell table-cell--text">
+                [[activity.co_cluster_title]]
+              </div>
+              <div class="table-cell table-cell--text">
+                [[activity.co_reference_number]]
+              </div>
+            </template>
             <div class="table-cell table-cell--text">
               <a href="[[_detailUrl(activity.id)]]">[[activity.title]]</a>
             </div>
@@ -117,6 +121,11 @@
           type: Number,
           statePath: 'clusterActivities.count',
         },
+
+        isMinimalList: {
+          type: Boolean,
+          value: false
+        }
       },
 
       _openModal: function () {

@@ -117,7 +117,6 @@ class PartnerProjectPatchSerializer(serializers.ModelSerializer):
             'clusters',
             'locations',
             'partner',
-            # 'reportables',
         )
 
 
@@ -131,20 +130,33 @@ class PartnerProjectSimpleSerializer(serializers.ModelSerializer):
         )
 
 
-class PartnerActivitySerializer(serializers.ModelSerializer):
+class ClusterActivityPartnersSerializer(serializers.ModelSerializer):
 
-    cluster = serializers.SerializerMethodField()
-    status = serializers.SerializerMethodField()
+    partner_projects = PartnerProjectSimpleSerializer(many=True)
+    links = serializers.SerializerMethodField()
+    clusters = ClusterSimpleSerializer(many=True, read_only=True)
 
     class Meta:
-        model = PartnerActivity
-        fields = ('id', 'cluster', 'status', 'project', 'cluster_activity')
+        model = Partner
+        fields = (
+            'id',
+            'title',
+            # 'focial point',
+            'email',
+            'phone_number',
+            'partner_projects',
+            'street_address',
+            'city',
+            'postal_code',
+            'country',
+            'links',
+            'clusters',
+        )
 
-    def get_cluster(self, obj):
-        return obj.cluster_activity.cluster_objective.cluster.title
-
-    def get_status(self, obj):
-        return obj.project and obj.project.status
+    def get_links(self, obj):
+        return [
+            pp.additional_information for pp in obj.partner_projects.all()
+        ]
 
 
 class PartnerActivityBaseCreateSerializer(serializers.Serializer):
@@ -221,3 +233,23 @@ class PartnerActivityFromCustomActivitySerializer(PartnerActivityBaseCreateSeria
                 'ClusterObjective ID {} does not exist.'.format(data['cluster_objective']))
 
         return data
+
+
+class PartnerActivitySerializer(serializers.ModelSerializer):
+
+    cluster = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField()
+    project = PartnerProjectSimpleSerializer()
+
+    class Meta:
+        model = PartnerActivity
+        fields = ('id', 'cluster', 'status', 'project', 'cluster_activity')
+
+    def get_cluster(self, obj):
+        if obj.cluster_activity:
+            return obj.cluster_activity.cluster_objective.cluster.title
+        else:
+            return None
+
+    def get_status(self, obj):
+        return obj.project and obj.project.status

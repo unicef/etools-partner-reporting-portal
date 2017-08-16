@@ -37,6 +37,7 @@ from core.common import (
     REPORTABLE_FREQUENCY_LEVEL,
     INDICATOR_REPORT_STATUS,
     PARTNER_PROJECT_STATUS,
+    OVERALL_STATUS,
 )
 from core.models import Intervention, Location, ResponsePlan
 from core.countries import COUNTRIES_ALPHA2_CODE
@@ -51,6 +52,8 @@ RATIO_CALC_CHOICES_LIST = [x[0] for x in IndicatorBlueprint.RATIO_CALC_CHOICES]
 RATIO_DISPLAY_TYPE_CHOICES_LIST = [x[0] for x in IndicatorBlueprint.RATIO_DISPLAY_TYPE_CHOICES]
 PD_FREQUENCY_LEVEL_CHOICE_LIST = [x[0] for x in PD_FREQUENCY_LEVEL]
 REPORTABLE_FREQUENCY_LEVEL_CHOICE_LIST = [x[0] for x in REPORTABLE_FREQUENCY_LEVEL]
+OVERALL_STATUS_LIST = [x[0] for x in OVERALL_STATUS]
+REPORT_STATUS_LIST = [x[0] for x in INDICATOR_REPORT_STATUS]
 
 today = datetime.date.today()
 beginning_of_this_year = datetime.date(today.year, 1, 1)
@@ -183,8 +186,8 @@ class InterventionFactory(factory.django.DjangoModelFactory):
     number = fuzzy.FuzzyText(length=64)
     country_code = fuzzy.FuzzyChoice(COUNTRIES_LIST)
     status = 'Dra'
-    start = today
-    end = today
+    start = beginning_of_this_year
+    end = beginning_of_this_year + datetime.timedelta(days=364)
     signed_by_unicef_date = today
     signed_by_partner_date = today
 
@@ -205,11 +208,10 @@ class InterventionFactory(factory.django.DjangoModelFactory):
 
 class ResponsePlanFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "response plan %d" % n)
-    start = today
-    end = today
+    start = beginning_of_this_year
+    end = beginning_of_this_year + datetime.timedelta(days=364)
 
     cluster = factory.RelatedFactory('core.factories.ClusterFactory', 'response_plan')
-    intervention = factory.SubFactory(InterventionFactory)
 
     class Meta:
         model = ResponsePlan
@@ -371,6 +373,24 @@ class QuantityReportableToClusterObjectiveFactory(ReportableFactory):
         model = Reportable
 
 
+class QuantityReportableToClusterActivityFactory(ReportableFactory):
+    content_object = factory.SubFactory('core.factories.ClusterActivityFactory')
+    target = '5000'
+    baseline = '0'
+
+    indicator_report = factory.RelatedFactory('core.factories.QuantityIndicatorReportFactory', 'reportable')
+
+    location = factory.RelatedFactory('core.factories.LocationFactory', 'reportable', parent=None)
+
+    blueprint = factory.SubFactory(QuantityTypeIndicatorBlueprintFactory)
+
+    total = dict(
+        [('c', 0), ('d', 0), ('v', random.randint(0, 3000))])
+
+    class Meta:
+        model = Reportable
+
+
 class QuantityReportableToPartnerActivityFactory(ReportableFactory):
     content_object = factory.SubFactory('core.factories.PartnerActivityFactory')
     target = '5000'
@@ -462,6 +482,9 @@ class QuantityIndicatorReportFactory(factory.django.DjangoModelFactory):
     due_date = beginning_of_this_year + datetime.timedelta(days=30)
     total = dict(
         [('c', 0), ('d', 0), ('v', random.randint(0, 3000))])
+    overall_status = fuzzy.FuzzyChoice(OVERALL_STATUS_LIST)
+    report_status = fuzzy.FuzzyChoice(REPORT_STATUS_LIST)
+    submission_date = beginning_of_this_year + datetime.timedelta(days=10)
 
     class Meta:
         model = IndicatorReport
@@ -474,6 +497,9 @@ class RatioIndicatorReportFactory(factory.django.DjangoModelFactory):
     due_date = beginning_of_this_year + datetime.timedelta(days=30)
     total = dict(
         [('c', 0), ('d', random.randint(3000, 6000)), ('v', random.randint(0, 3000))])
+    overall_status = fuzzy.FuzzyChoice(OVERALL_STATUS_LIST)
+    report_status = fuzzy.FuzzyChoice(REPORT_STATUS_LIST)
+    submission_date = beginning_of_this_year + datetime.timedelta(days=10)
 
     class Meta:
         model = IndicatorReport
