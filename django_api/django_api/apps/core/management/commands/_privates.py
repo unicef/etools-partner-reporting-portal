@@ -242,6 +242,17 @@ def generate_light_fake_data(seed_quantity=5):
         indicator_report.progress_report = progress_report
         indicator_report.save()
 
+        reportable = RatioReportableToLowerLevelOutputFactory(
+            content_object=llo, indicator_report__progress_report=None)
+
+        reportable.content_object \
+            .indicator.programme_document.sections.add(
+                Section.objects.all()[idx])
+
+        indicator_report = reportable.indicator_reports.first()
+        indicator_report.progress_report = progress_report
+        indicator_report.save()
+
     # Intervention <-> Locations
     for intervention in Intervention.objects.all():
         intervention.locations.add(*list(Location.objects.all()))
