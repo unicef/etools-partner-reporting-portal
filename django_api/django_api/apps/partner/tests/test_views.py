@@ -58,7 +58,6 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
         response = self.client.post(url, data=self.data, format='json')
 
         self.assertTrue(status.is_success(response.status_code))
-        self.assertEquals(response.data['id'], (last.id+1))
         created_obj = PartnerProject.objects.get(id=response.data['id'])
         self.assertEquals(created_obj.title, self.data['title'])
         self.assertEquals(PartnerProject.objects.all().count(),  base_count + 1)
