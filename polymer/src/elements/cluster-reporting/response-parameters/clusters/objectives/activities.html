@@ -51,13 +51,18 @@
       ],
 
       properties: {
+        responsePlanID: {
+          type: String,
+          statePath: 'responsePlans.currentID',
+        },
+
         queryParams: Object,
 
         objectiveId: String,
 
         activitiesUrl: {
           type: String,
-          computed: '_computeActivitiesUrl(queryParams, objectiveId)'
+          computed: '_computeActivitiesUrl(queryParams, objectiveId, responsePlanID)'
         },
       },
 
@@ -66,7 +71,7 @@
 
         this.$.activities.abort();
 
-        this.dispatch(App.Actions.clusterActivities.fetchClusterActivitiesList(thunk))
+        this.dispatch(App.Actions.ClusterActivities.fetchClusterActivitiesList(thunk))
           .catch(function (err) { // jshint ignore:line
               // TODO: error handling.
           });
@@ -76,7 +81,7 @@
         //Make sure the queryParams are updated before the thunk is created:
         this.set('queryParams.cluster_objective_id', this.objectiveId);
 
-        return App.Endpoints.responseParametersClusterActivities();
+        return App.Endpoints.responseParametersClusterActivities(this.responsePlanID);
       },
     });
   </script>
