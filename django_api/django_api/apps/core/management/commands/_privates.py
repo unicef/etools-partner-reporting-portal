@@ -123,21 +123,14 @@ def generate_light_fake_data(seed_quantity=5):
     admin.set_password('Passw0rd!')
     admin.save()
 
-    print "Superuser created: {}/{}\n".format(admin.username, 'Passw0rd!')
-
     SectionFactory.create_batch(seed_quantity)
-    print "{} Section objects created".format(seed_quantity)
-
     InterventionFactory.create_batch(seed_quantity)
-    print "{} Intervention objects created".format(seed_quantity)
 
     for intervention in Intervention.objects.all():
         ResponsePlanFactory(
             intervention=intervention,
             title="{} {} Humanitarian Response Plan".format(intervention.country_name, today.year)
         )
-
-        print "ResponsePlan object created for {}".format(intervention)
 
     for response_plan in ResponsePlan.objects.all():
         user = UserFactory(
@@ -171,12 +164,6 @@ def generate_light_fake_data(seed_quantity=5):
         )
         partner.clusters.add(cluster)
 
-        print "Cluster & Cluster user objects created for {}".format(response_plan.title)
-
-        print "Partner objects & Partner user objects created for {}".format(cluster)
-
-        print "Cluster Objective objects created for {}".format(cluster)
-
     for cluster_objective in ClusterObjective.objects.all():
         ca = ClusterActivityFactory(
             title="{} Cluster Activity".format(cluster_objective.title),
@@ -186,8 +173,6 @@ def generate_light_fake_data(seed_quantity=5):
         reportable_to_ca = QuantityReportableToClusterActivityFactory(
             content_object=ca, indicator_report__progress_report=None
         )
-
-        print "Cluster Activity objects created for {}".format(cluster_objective.title)
 
     for partner in Partner.objects.all():
         first_cluster = partner.clusters.first()
@@ -202,8 +187,6 @@ def generate_light_fake_data(seed_quantity=5):
             content_object=pp, indicator_report__progress_report=None
         )
         pp.locations.add(*list(reportable_to_pp.locations.all()))
-
-        print "PartnerProject objects created for {} under {} Cluster".format(partner, first_cluster.title)
 
     # ClusterActivity <-> PartnerActivity link
     for cluster_activity in ClusterActivity.objects.all():
@@ -236,12 +219,7 @@ def generate_light_fake_data(seed_quantity=5):
                 content_object=pa, indicator_report__progress_report=None
             )
 
-            print "PartnerActivity objects created for {} under {} Cluster Activity and Custom Activity".format(partner, cluster_activity.title)
-
-    print "ClusterActivity <-> PartnerActivity objects linked"
-
     ProgrammeDocumentFactory.create_batch(seed_quantity)
-    print "{} ProgrammeDocument objects created".format(seed_quantity)
 
     # Linking the followings:
     # ProgressReport - ProgrammeDocument
@@ -264,17 +242,11 @@ def generate_light_fake_data(seed_quantity=5):
         indicator_report.progress_report = progress_report
         indicator_report.save()
 
-    print "ProgrammeDocument <-> QuantityReportableToLowerLevelOutput <-> IndicatorReport objects linked".format(seed_quantity)
-
     # Intervention <-> Locations
     for intervention in Intervention.objects.all():
         intervention.locations.add(*list(Location.objects.all()))
-    print "Intervention objects linked to Locations".format(seed_quantity)
-
-    print "Generating IndicatorLocationData for Quantity type"
     generate_indicator_report_location_disaggregation_quantity_data()
 
-    print "Generating IndicatorLocationData for Ratio type"
     generate_indicator_report_location_disaggregation_ratio_data()
 
     IndicatorReport.objects.filter(
