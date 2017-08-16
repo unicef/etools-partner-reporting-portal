@@ -1,7 +1,199 @@
 {% extends "easy_pdf/base.html" %}
 
+{% block extra_style %}
+    <style type="text/css">
+        body {
+            font-family: "Arial", "sans-serif";
+            font-size: 10px;
+        }
+        h1 {
+            font-family: "Arial", "sans-serif";
+            font-size: 11px;
+            font-weight: bold;
+        }
+        table, tr {
+            border: 1px solid black;
+        }
+        td, th {
+            padding-top: 4px;
+            padding-bottom: 1px;
+            padding-left: 3px;
+        }
+        th {
+            background-color: #d9d9d9;
+            font-weight: normal;
+            text-align: left;
+        }
+        th.section {
+            background-color: #002060;
+            font-weight: bold;
+            color: #ffffff;
+            text-align: left;
+        }
+        td.signature {
+            font-size: 12px;
+            font-weight: bold;
+        }
+    </style>
+{% endblock %}
+
 {% block content %}
-    <div id="content">
-        <h1>Hi there!</h1>
-    </div>
+        <h1>PART 2: programme progress/final report – to be completed by CSO as part of reporting with FACE</h1>
+        <table>
+            <tr>
+                <th colspan="3" class="section">Section 1. Programme & CSO overview</th>
+            </tr>
+            <tr>
+                <th rowspan="3" width="40%">
+                    1.1 Programme reference
+                </th>
+                <th width="40%">
+                    UNICEF Office
+                </th>
+                <td>
+                    6
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    Progr. Title
+                </th>
+                <td>
+                    5
+                </td>
+            </tr>
+            <tr>
+                <th>PD/SSFA Ref. #</th>
+                <td>30</td>
+            </tr>
+            <tr>
+                <th rowspan="9">
+                    1.2 Organization information
+                </th>
+                <th>Organization / Acronym</th>
+                <td>1a / 1b</td>
+            </tr>
+            <tr>
+                <th>Name of CSO Authorized Official</th>
+                <td>3</td>
+            </tr>
+            <tr>
+                <th>Title of Authorized Official</th>
+                <td>2c</td>
+            </tr>
+            <tr>
+                <th>Email of Authorized Official</th>
+                <td>2e</td>
+            </tr>
+            <tr>
+                <th>Phone of Authorized Official</th>
+                <td>2d</td>
+            </tr>
+            <tr>
+                <th>Name of Programme Focal Point</th>
+                <td>7</td>
+            </tr>
+            <tr>
+                <th>Title</th>
+                <td>2c</td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td>2e</td>
+            </tr>
+            <tr>
+                <th>Telephone</th>
+                <td>2d</td>
+            </tr>
+            <tr>
+                <th rowspan="3">
+                    1.3 Programme information
+                </th>
+                <th>Progr. Duration</th>
+                <td>From 8a to 8b</td>
+            </tr>
+            <tr>
+                <th>Start date</th>
+                <td>8a</td>
+            </tr>
+            <tr>
+                <th>Reporting period</th>
+                <td>21</td>
+            </tr>
+            <tr>
+                <th rowspan="3">1.4 Budget information</th>
+                <th>Programme budget</th>
+                <td>9</td>
+            </tr>
+            <tr>
+                <th>UNICEF contribution</th>
+                <td>10</td>
+            </tr>
+            <tr>
+                <th>Funds received to date</th>
+                <td>23a 23b to date</td>
+            </tr>
+            <tr>
+                <th>1.5 Partner Contribution made to date</th>
+                <td colspan="2">22</td>
+            </tr>
+            <tr>
+                <th>1.6 Signature of CSO Authorized Official</th>
+                <td class="signature">Submitted by Name</td>
+                <td>Date: 20</td>
+            </tr>
+        </table>
+
+        <!--TEMPORARY-->
+        <br /><br /><br /><br /><br /><br /><br /><br />
+        <br /><br /><br /><br /><br /><br /><br /><br />
+        <br /><br /><br /><br /><br /><br />
+
+        <table>
+            <tr>
+                <th class="section">2. Reporting on results achieved</th>
+            </tr>
+            <tr>
+                <td>The table below provides an overview of results achieved during the reporting period and cumulatively since the onset of the programme.</td>
+            </tr>
+        </table>
+        <br /><br />
+        <table>
+            <tr>
+                <th>Programme Outputs*</th>
+                <th>Performance indicator*</th>
+                <th>Targets*</th>
+                <th>Achievement in reporting period**</th>
+                <th>Cumulative progress to date**</th>
+                <th>Overall Status</th>
+                <th>Narrative assessment/ summary of progress**</th>
+            </tr>
+
+            <!--This is probably loop -->
+            <tr>
+                <th width="200px">12</th>
+                <th>15</th>
+                <th>16</th>
+                <td>18</td>
+                <td>17</td>
+                <td class="status">13</td>
+                <td width="350px">17</td>
+            </tr>
+            <!--End of loop-->
+
+            <tr>
+                <th>Challenges / bottlenecks faced in the reporting period</th>
+                <td colspan="6">24</td>
+            </tr>
+            <tr>
+                <th>Proposed way forward</th>
+                <td colspan="6">25</td>
+            </tr>
+        </table>
+        <br />
+        <p>
+            * Information directly extracted from Section 2.2 of the signed Programme document.<br />
+            ** Information to be updated upon submission of the report.
+        </p>
+
 {% endblock %}
