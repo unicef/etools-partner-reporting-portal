@@ -10,7 +10,6 @@ from rest_framework import status
 
 from core.tests.base import BaseAPITestCase
 from core.models import Location
-from unicef.models import LowerLevelOutput, Section, ProgrammeDocument
 from cluster.models import ClusterObjective, ClusterActivity
 from indicator.models import Reportable, IndicatorReport, IndicatorLocationData, IndicatorBlueprint
 from partner.models import PartnerProject, PartnerActivity
@@ -24,11 +23,13 @@ from core.tests.base import BaseAPITestCase
 from unicef.models import (
     LowerLevelOutput,
     Section,
-    ProgrammeDocument
+    ProgrammeDocument,
+    ProgressReport,
 )
 from indicator.serializers import (
     IndicatorLocationDataUpdateSerializer
 )
+from indicator.views import ProgressReportAPIView
 from indicator.models import (
     Reportable,
     IndicatorReport,
@@ -231,6 +232,44 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
 
             self.assertEquals(response.status_code, status.HTTP_200_OK)
             self.assertEquals(len(response.data), 2)
+
+
+class TestProgressReportAPIView(BaseAPITestCase):
+
+    def test_narrative_update(self):
+        pr = ProgressReport.objects.first()
+        url = reverse('progress-report')
+        data = {
+            'id': pr.id,
+            'partner_contribution_to_date': "updated field",
+            'funds_received_to_date': "updated field",
+            'challenges_in_the_reporting_period': "updated field",
+            'proposed_way_forward': "updated field",
+        }
+        response = self.client.put(url, data=data, format='json')
+
+        updated_pr = ProgressReport.objects.first()
+        self.assertEquals(updated_pr.id, pr.id)
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(response.data['partner_contribution_to_date'], updated_pr.partner_contribution_to_date)
+        self.assertEquals(response.data['partner_contribution_to_date'], "updated field")
+
+        updated_pr.status = PROGRESS_REPORT_STATUS.submitted
+        updated_pr.save()
+
+        response = self.client.put(url, data=data, format='json')
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEquals(response.data['status'],
+                          [ProgressReportAPIView.PUT_TO_SUBMITTED_ERROR_MSG])
+
+        data.pop('funds_received_to_date')
+        response = self.client.put(url, data=data, format='json')
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        data.pop('id')
+        response = self.client.put(url, data=data, format='json')
+        self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
 class TestClusterIndicatorAPIView(BaseAPITestCase):
