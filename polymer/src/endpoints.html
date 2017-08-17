@@ -77,6 +77,10 @@
         return this._buildUrl('/cluster/' + responsePlanId + '/cluster-activity-list/');
       },
 
+      clusterActivities: function (clusterId) {
+        return this._buildUrl('/cluster/' + clusterId + '/cluster-activity-list/');
+      },
+
       plannedActions: function(responsePlanId) {
         return this._buildUrl('/partner/' + responsePlanId + '/partner-project-list/');
       },
@@ -119,6 +123,10 @@
 
       clusterIndicators: function () {
         return this._buildUrl('/indicator/cluster-indicator/');
+      },
+
+      partnerActivity: function (responsePlanId, mode) {
+        return this._buildUrl('/partner/' + responsePlanId + '/create-partner-activity/' + mode);
       },
 
       partnersByClusterActivityId: function (clusterActivityId) {

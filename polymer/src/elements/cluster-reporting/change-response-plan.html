@@ -1,21 +1,29 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/paper-tooltip/paper-tooltip.html">
 
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../behaviors/routing.html">
 <link rel="import" href="../../behaviors/routing.html">
+<link rel="import" href="../../styles/shared-styles.html">
 
 <dom-module id="change-response-plan">
   <template>
-    <style>
+    <style include="shared-styles">
       :host {
         display: block;
-        margin: auto 30px;
-        height: 64px;
-        line-height: 64px;
-
-        color: var(--theme-primary-text-color-medium);
+        margin: 0 30px;
         font-size: 15px;
         font-weight: 200;
+        color: var(--theme-primary-text-color-medium);
+      }
+
+      span {
+        @apply(--truncate);
+
+        display: inline-block;
+        vertical-align: middle;
+        max-width: 150px;
+        cursor: default;
       }
 
       a {
@@ -24,7 +32,10 @@
       }
     </style>
 
-    <span>[[currentPlanTitle]]</span>
+    <span>
+      [[currentPlanTitle]]
+      <paper-tooltip>[[currentPlanTitle]]</paper-tooltip>
+    </span>
     <a href="[[changePlanUrl]]">change</a>
   </template>
 
