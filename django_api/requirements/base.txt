@@ -22,3 +22,4 @@ uwsgi==2.0.15
 
 # GIS
 carto==1.0.1
+git+https://github.com/jamescw/django-paintstore.git
