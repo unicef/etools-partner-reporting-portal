@@ -72,7 +72,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='location',
             name='gateway',
-            field=models.ForeignKey(default='Gateway 1', on_delete=django.db.models.deletion.CASCADE, to='core.GatewayType', verbose_name='Location Type'),
+            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='core.GatewayType', verbose_name='Location Type'),
             preserve_default=False,
         ),
     ]

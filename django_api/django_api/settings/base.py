@@ -121,7 +121,7 @@ WSGI_APPLICATION = 'django_api.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': '%s' % os.getenv('POSTGRES_DB'),
         'USER': '%s' % os.getenv('POSTGRES_USER'),
         'PASSWORD': '%s' % os.getenv('POSTGRES_PASSWORD'),
