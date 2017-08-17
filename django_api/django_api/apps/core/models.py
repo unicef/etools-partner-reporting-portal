@@ -226,14 +226,15 @@ class Location(TimeStampedModel):
         )
 
 
-@receiver(post_delete, sender=Location)
-@receiver(post_save, sender=Location)
-def invalidate_locations_etag(sender, instance, **kwargs):
-    """
-    Invalidate the locations etag in the cache on every change.
-    """
-    schema_name = connection.schema_name
-    cache.delete("{}-locations-etag".format(schema_name))
+# @receiver(post_delete, sender=Location)
+# @receiver(post_save, sender=Location)
+# def invalidate_locations_etag(sender, instance, **kwargs):
+#     """
+#     Invalidate the locations etag in the cache on every change.
+#     """
+#     import pdb; pdb.set_trace()
+#     schema_name = connection.schema_name
+#     cache.delete("{}-locations-etag".format(schema_name))
 
 
 class CartoDBTable(MPTTModel):
