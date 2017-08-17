@@ -19,3 +19,6 @@ factory_boy==2.8.1
 
 # WSGI
 uwsgi==2.0.15
+
+# GIS
+carto==1.0.1
