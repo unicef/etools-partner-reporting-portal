@@ -67,6 +67,7 @@
 
       observers: [
         '_projectsAjax(queryParams, url)',
+        '_fetchCurrentPartner(partnerDetailsUrl)'
       ],
 
       behaviors: [
@@ -90,7 +91,7 @@
 
         url: {
           type: String,
-          computed: '_computeUrl(queryParams, responsePlanID, partnerID)'
+          computed: '_computeUrl(responsePlanID, queryParams, partnerID)'
         },
 
         partnerDetailsUrl: {
@@ -99,7 +100,7 @@
         },
       },
 
-      attached: function () {
+      _fetchCurrentPartner: function () {
         var partnerThunk = this.$.partnerDetails.thunk();
 
         this.dispatch(App.Actions.fetchPartner(partnerThunk))
@@ -108,9 +109,9 @@
             });
       },
 
-      _computeUrl: function () {
-        var base = App.Endpoints.plannedActions(this.responsePlanID);
-        return base + '?partner=' + this.partnerID;
+      _computeUrl: function (responsePlanID, queryParams, partnerID) {
+        queryParams.partner = partnerID;
+        return App.Endpoints.plannedActions(responsePlanID);
       },
 
       _projectsAjax: function (queryParams) {
