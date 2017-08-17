@@ -28,7 +28,7 @@
 
     <etools-prp-ajax
         id="plannedActionsProjects"
-        url="[[plannedActionsProjectsUrl]]"
+        url="[[url]]"
         params="[[queryParams]]">
     </etools-prp-ajax>
 
@@ -46,7 +46,7 @@
       is: 'rp-partners-projects',
 
       observers: [
-        '_projectsAjax(queryParams)',
+        '_projectsAjax(queryParams, url)',
       ],
 
       behaviors: [
@@ -58,10 +58,19 @@
       properties: {
         queryParams: Object,
 
-        plannedActionsProjectsUrl: {
+        responsePlanID: {
           type: String,
-          value: App.Endpoints.plannedActions()
+          statePath: 'responsePlans.currentID',
         },
+
+        url: {
+          type: String,
+          computed: '_computeUrl(responsePlanID)'
+        },
+      },
+
+      _computeUrl: function(responsePlanID) {
+        return App.Endpoints.plannedActions(responsePlanID);
       },
 
       _projectsAjax: function (queryParams) {

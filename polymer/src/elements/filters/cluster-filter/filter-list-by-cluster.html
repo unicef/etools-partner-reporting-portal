@@ -56,6 +56,8 @@
         var clusterId = this.queryParams.cluster_id || this.clusterId;
         if (change.value) {
           clusterId = change.value;
+        } else {
+          clusterId = '';
         }
 
         e.stopPropagation();

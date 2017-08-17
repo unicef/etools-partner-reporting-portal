@@ -1,15 +1,15 @@
-<link rel="import" href="../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
-<link rel="import" href="../../../bower_components/etools-content-panel/etools-content-panel.html">
-<link rel="import" href="../../../bower_components/etools-data-table/etools-data-table.html">
-<link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/etools-content-panel/etools-content-panel.html">
+<link rel="import" href="../../bower_components/etools-data-table/etools-data-table.html">
+<link rel="import" href="../../bower_components/etools-loading/etools-loading.html">
 
-<link rel="import" href="../../redux/store.html">
-<link rel="import" href="../../behaviors/data-table.html">
-<link rel="import" href="../../behaviors/pagination.html">
-<link rel="import" href="../../behaviors/utils.html">
-<link rel="import" href="../ip-reporting/list-view-single-indicator.html">
-<link rel="import" href="../../styles/table-styles.html">
+<link rel="import" href="../redux/store.html">
+<link rel="import" href="../behaviors/data-table.html">
+<link rel="import" href="../behaviors/pagination.html">
+<link rel="import" href="../behaviors/utils.html">
+<link rel="import" href="list-view-single-indicator.html">
+<link rel="import" href="../styles/table-styles.html">
 
 <dom-module id="list-view-indicators">
   <template>
@@ -50,7 +50,9 @@
                 items="[[data]]"
                 initial-count="[[pageSize]]"
                 as="indicator">
-        <list-view-single-indicator indicator="{{indicator}}"></list-view-single-indicator>
+        <list-view-single-indicator
+          indicator="{{indicator}}">
+        </list-view-single-indicator>
       </template>
 
       <etools-data-table-footer
@@ -63,6 +65,7 @@
       </etools-data-table-footer>
 
     </etools-content-panel>
+
   </template>
   <script>
     Polymer({
@@ -76,15 +79,12 @@
       ],
 
       properties: {
-        data: {
-          type: Object,
-          statePath: 'indicators.all',
-        },
 
-        loading: {
-          type: Boolean,
-          statePath: 'indicators.loading'
-        },
+        data: Array,
+
+        loading: Boolean,
+
+        totalResults: Number,
 
         queryParams: Object,
 
@@ -93,11 +93,6 @@
         pageSize: Number,
 
         pageNumber: Number,
-
-        totalResults: {
-          type: Number,
-          statePath: 'indicators.count'
-        },
 
         openedDetails: {
           type: Array,

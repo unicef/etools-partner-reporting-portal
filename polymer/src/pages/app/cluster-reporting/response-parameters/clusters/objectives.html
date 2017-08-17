@@ -72,20 +72,29 @@
       ],
 
       observers: [
-        '_clusterObjectivesAjax(queryParams)',
+        '_clusterObjectivesAjax(queryParams, objectivesUrl)',
       ],
 
       properties: {
         queryParams: Object,
 
+        responsePlanID: {
+          type: String,
+          statePath: 'responsePlans.currentID',
+        },
+
         objectivesUrl: {
           type: String,
-          value: App.Endpoints.responseParametersClusterObjectives()
+          computed: '_computeUrl(responsePlanID)'
         },
       },
 
       _openModal: function () {
         this.$$('#modal').open();
+      },
+
+      _computeUrl: function(responsePlanID) {
+        return App.Endpoints.responseParametersClusterObjectives(responsePlanID);
       },
 
       _clusterObjectivesAjax: function (queryParams) {
@@ -97,7 +106,7 @@
 
         this.$.objectives.abort();
 
-        this.dispatch(App.Actions.fetchClusterObjectivesList(thunk))
+        this.dispatch(App.Actions.ClusterObjectives.fetchClusterObjectivesList(thunk))
           .catch(function (err) { // jshint ignore:line
               // TODO: error handling.
           });
