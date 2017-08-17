@@ -22,14 +22,6 @@ steps:
                     - django_api
                     - db
                 command: bash -c "sleep 20 && /usr/local/bin/waitforit -host=db -port=5432 && python /code/manage.py test --settings=django_api.settings.test --parallel --failfast"
-        composition_variables:
-            - POSTGRES_DB=$POSTGRES_DB
-            - POSTGRES_USER=$POSTGRES_USER
-            - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
-            - POSTGRES_HOST=$POSTGRES_HOST
-            - SECRET_KEY=$SECRET_KEY
-            - ENV="test"
-            - DJANGO_ALLOWED_HOST="*"
 
     push_to_hub:
         type: push
