@@ -256,7 +256,7 @@ class IndicatorDataAPIView(APIView):
     @transaction.atomic
     def post(self, request, ir_id, *args, **kwargs):
         ir = self.get_indicator_report(ir_id)
-        if ir.submission_date is None or ir.status == INDICATOR_REPORT_STATUS.sent_back:
+        if ir.submission_date is None or ir.report_status == INDICATOR_REPORT_STATUS.sent_back:
             ir.submission_date = date.today()
             ir.report_status = INDICATOR_REPORT_STATUS.submitted
             ir.save()
