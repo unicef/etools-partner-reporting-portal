@@ -100,7 +100,7 @@ class TestPartnerProjectAPIView(BaseAPITestCase):
 
     def test_get_non_existent_instance(self):
         last = PartnerProject.objects.last()
-        url = reverse('partner-project-details', kwargs={"pk": last.id+1})
+        url = reverse('partner-project-details', kwargs={"pk": 9999999})
         response = self.client.get(url, format='json')
 
         self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -125,8 +125,8 @@ class TestPartnerProjectAPIView(BaseAPITestCase):
         """
         last = PartnerProject.objects.last()
 
-        data = dict(id=last.id+1, title='new updated title')
-        url = reverse('partner-project-details', kwargs={"pk": last.id+1})
+        data = dict(id=9999999, title='new updated title')
+        url = reverse('partner-project-details', kwargs={"pk": 9999999})
         response = self.client.patch(url, data=data, format='json')
 
         self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -144,7 +144,7 @@ class TestPartnerProjectAPIView(BaseAPITestCase):
     def test_delete_non_existent_partner_project(self):
         base_count = PartnerProject.objects.all().count()
         last = PartnerProject.objects.last()
-        url = reverse('partner-project-details', kwargs={"pk": last.id+1})
+        url = reverse('partner-project-details', kwargs={"pk": 9999999})
         response = self.client.delete(url, data={"id": last.pk+1}, format='json')
 
         self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
