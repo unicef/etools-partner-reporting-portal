@@ -167,7 +167,6 @@ class ProgressReportPDFView(RetrieveAPIView):
 
         data = dict()
 
-
         data['unicef_office'] = report.programme_document.unicef_office
         data['title'] = report.programme_document.title
         data['reference_number'] = report.programme_document.reference_number
