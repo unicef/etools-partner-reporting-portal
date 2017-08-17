@@ -2,6 +2,7 @@ import logging
 from django.http import Http404
 from django.db.models import Q
 from django.http import HttpResponse
+from django.conf import settings
 
 from rest_framework.generics import RetrieveAPIView, ListAPIView
 from rest_framework.response import Response
@@ -24,6 +25,7 @@ from .models import ProgrammeDocument, ProgressReport
 from .filters import ProgrammeDocumentFilter, ProgressReportFilter
 
 logger = logging.getLogger(__name__)
+
 
 
 class ProgrammeDocumentAPIView(ListAPIView):
@@ -94,6 +96,7 @@ class ProgrammeDocumentDetailsAPIView(RetrieveAPIView):
             raise Http404
 
 
+
 class ProgressReportAPIView(ListAPIView):
     """
     Endpoint for getting list of all PD Progress Reports
@@ -140,7 +143,42 @@ class ProgressReportPDFView(RetrieveAPIView):
     """
     permission_classes = (IsAuthenticated,)
 
-    def get(self, request, *args, **kwargs):
+    def prepare_reportable(self, indicator_reports):
+        result = list()
+        temp = None
+        d = list()
+        for r in indicator_reports:
+            if not temp:
+                temp = r.reportable.id
+            elif temp != r.reportable.id:
+                result.append(d)
+                temp = None
+                d = list()
+            d.append(r)
+        if d:
+            result.append(d)
+        return result
+
+    def get(self, request, pk, *args, **kwargs):
         # Render to pdf
-        data = render_to_pdf("report_annex_c_pdf.html", {})
-        return HttpResponse(data, content_type='application/pdf')
+        report = ProgressReport.objects.get(id=pk)
+
+        data = dict()
+
+        data['unicef_office'] = report.programme_document.unicef_office
+        data['title'] = report.programme_document.title
+        data['reference_number'] = report.programme_document.reference_number
+        data['start_date'] = report.programme_document.start_date.strftime(settings.PRINT_DATA_FORMAT)
+        data['end_date'] = report.programme_document.end_date.strftime(settings.PRINT_DATA_FORMAT)
+        data['cso_contribution'] = report.programme_document.cso_contribution
+        data['budget'] = report.programme_document.budget
+        data['funds_received_to_date'] = report.funds_received_to_date
+        data['challenges_in_the_reporting_period'] = report.challenges_in_the_reporting_period
+        data['proposed_way_forward'] = report.proposed_way_forward
+        data['partner_contribution_to_date'] = report.partner_contribution_to_date
+        data['submission_date'] = report.get_submission_date()
+        data['reporting_period'] = report.get_reporting_period()
+        data['outputs'] = self.prepare_reportable(report.indicator_reports.all().order_by('reportable'))
+
+        pdf = render_to_pdf("report_annex_c_pdf.html", data)
+        return HttpResponse(pdf, content_type='application/pdf')
