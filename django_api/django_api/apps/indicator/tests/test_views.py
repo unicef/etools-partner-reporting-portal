@@ -10,17 +10,15 @@ from rest_framework import status
 
 from core.tests.base import BaseAPITestCase
 from core.models import Location
-from unicef.models import LowerLevelOutput, Section, ProgrammeDocument
-from cluster.models import ClusterObjective, ClusterActivity
-from indicator.models import Reportable, IndicatorReport, IndicatorLocationData, IndicatorBlueprint
-from partner.models import PartnerProject, PartnerActivity
-
 from core.helpers import (
     suppress_stdout,
     get_cast_dictionary_keys_as_tuple,
 )
-from core.common import OVERALL_STATUS, PROGRESS_REPORT_STATUS, REPORTABLE_FREQUENCY_LEVEL
+from core.common import OVERALL_STATUS, PROGRESS_REPORT_STATUS, REPORTABLE_FREQUENCY_LEVEL, INDICATOR_REPORT_STATUS
+from core.factories import ProgressReportFactory
 from core.tests.base import BaseAPITestCase
+from cluster.models import ClusterObjective, ClusterActivity
+from partner.models import PartnerProject, PartnerActivity
 from unicef.models import (
     LowerLevelOutput,
     Section,
@@ -35,6 +33,7 @@ from indicator.models import (
     IndicatorLocationData,
     Disaggregation,
     DisaggregationValue,
+    IndicatorBlueprint,
 )
 
 
@@ -71,10 +70,18 @@ class TestPDReportsAPIView(BaseAPITestCase):
         self.assertEquals(response.data['id'], str(report_id))
 
 
-class TestIndicatorListAPIView(BaseAPITestCase):
+class TestIndicatorDataAPIView(BaseAPITestCase):
+    generate_fake_data_quantity = 30
 
     def test_list_api(self):
-        ir_id = IndicatorReport.objects.first().id
+        ir = IndicatorReport.objects.filter(reportable__lower_level_outputs__isnull=False).first()
+
+        if not ir.progress_report:
+            ir.progress_report = ProgressReportFactory(
+                programme_document=ir.reportable.content_object.indicator.programme_document)
+            ir.save()
+
+        ir_id = ir.id
         url = reverse('indicator-data', kwargs={'ir_id': ir_id})
         response = self.client.get(url, format='json')
 
@@ -108,7 +115,13 @@ class TestIndicatorListAPIView(BaseAPITestCase):
         self.assertEquals(response.data['outputs'][0]['id'], reportable_id)
 
     def test_enter_indicator(self):
-        ir = IndicatorReport.objects.first()
+        ir = IndicatorReport.objects.filter(reportable__lower_level_outputs__isnull=False).first()
+
+        if not ir.progress_report:
+            ir.progress_report = ProgressReportFactory(
+                programme_document=ir.reportable.content_object.indicator.programme_document)
+            ir.save()
+
         self.assertEquals(ir.progress_report.partner_contribution_to_date, '')
         self.assertEquals(ir.progress_report.challenges_in_the_reporting_period, '')
         data = {
@@ -135,7 +148,15 @@ class TestIndicatorListAPIView(BaseAPITestCase):
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_submit_indicator(self):
-        ir = IndicatorReport.objects.first()
+        ir = IndicatorReport.objects.filter(
+            reportable__lower_level_outputs__isnull=False,
+            report_status=INDICATOR_REPORT_STATUS.sent_back).first()
+
+        if not ir.progress_report:
+            ir.progress_report = ProgressReportFactory(
+                programme_document=ir.reportable.content_object.indicator.programme_document)
+            ir.save()
+
         url = reverse('indicator-data', kwargs={'ir_id': ir.id})
         response = self.client.post(url, format='json')
         self.assertEquals(response.status_code, status.HTTP_200_OK)
@@ -157,7 +178,7 @@ class TestIndicatorListAPIView30(BaseAPITestCase):
             item), self.reports.values_list('locations__id', flat=True))
         location_id_list_string = ','.join(location_ids)
 
-        url = reverse('indicator-list-create-api')
+        url = reverse('indicator-list-create-api', kwargs={'content_object': 'llo'})
         url += '?locations=' + location_id_list_string
         response = self.client.get(url, format='json')
 
@@ -175,7 +196,7 @@ class TestIndicatorListAPIView30(BaseAPITestCase):
         )
         pd_id_list_string = ','.join(pd_ids)
 
-        url = reverse('indicator-list-create-api')
+        url = reverse('indicator-list-create-api', kwargs={'content_object': 'llo'})
         url += '?pds=' + pd_id_list_string
         response = self.client.get(url, format='json')
 

@@ -20,8 +20,11 @@
 
     <template is="dom-if" if="[[!loading]]">
       <dropdown-form-input
+        id="field"
         label="Cluster"
         name="cluster"
+        disabled="[[disabled]]"
+        required="[[required]]"
         value="{{value}}"
         data="[[data]]">
       </dropdown-forn-input>
@@ -52,6 +55,18 @@
           type: Boolean,
           value: true,
           computed: '_computeLoading(data)',
+        },
+
+        required: {
+          type: Boolean,
+          value: false,
+        },
+
+        invalid: {
+          type: Boolean,
+          value: true,
+          notify: true,
+          computed: '_computeInvalid(required, value)',
         },
 
         data: {
@@ -85,6 +100,14 @@
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
             });
+      },
+
+      _computeInvalid: function (required, value) {
+        return this.required && !value;
+      },
+
+      validate: function() {
+        return this.$$('#field').validate();
       },
 
       detached: function () {

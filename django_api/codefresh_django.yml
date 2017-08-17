@@ -10,34 +10,27 @@ steps:
         tag: ${{CF_BRANCH}}
         build_arguments:
             - env=$ENV
-            
-    # composition_step:
-    #     type: composition
-    #     composition: 'unicef-prp'
-    #     composition_candidates:
-    #         test:
-    #             image: ${{build_django}}
-    #             depends_on:
-    #                 - proxy
-    #                 - django_api
-    #             command: bash -c "/usr/local/bin/waitforit -host=django_api -port=8000 && python /code/manage.py test --settings=django_api.settings.test --parallel"
-    #     composition_variables:
-    #         - POSTGRES_DB=$POSTGRES_DB
-    #         - POSTGRES_USER=$POSTGRES_USER
-    #         - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
-    #         - POSTGRES_HOST=$POSTGRES_HOST
-    #         - SECRET_KEY=$SECRET_KEY
-    #         - ENV=$ENV
-    #         - DJANGO_ALLOWED_HOST="*"
+
+    composition_step:
+        type: composition
+        composition: 'unicef-prp'
+        composition_candidates:
+            test:
+                image: ${{build_django}}
+                depends_on:
+                    - proxy
+                    - django_api
+                    - db
+                command: bash -c "sleep 20 && /usr/local/bin/waitforit -host=db -port=5432 && python /code/manage.py test --settings=django_api.settings.test --parallel --failfast"
 
     push_to_hub:
         type: push
         title: Pushing django image to docker hub
         candidate: ${{build_django}}
-        tags: 
+        tags:
             - ${{CF_BRANCH}}
             - latest
         when:
             branch:
-                only: 
+                only:
                     - develop
