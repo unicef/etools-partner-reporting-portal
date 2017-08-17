@@ -2,9 +2,12 @@ import datetime
 from django.urls import reverse
 from django.conf import settings
 from rest_framework import status
+
 from core.tests.base import BaseAPITestCase
 from core.models import Location
+from core.factories import PartnerProjectFactory, PartnerFactory
 from cluster.models import Cluster
+
 from partner.models import Partner, PartnerProject
 
 
@@ -12,13 +15,32 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
 
     def setUp(self):
         super(TestPartnerProjectListCreateAPIView, self).setUp()
+
+        self.cluster = Cluster.objects.first()
+
+        self.partner = PartnerFactory(
+            title="{} - {} Cluster Partner".format(self.cluster.response_plan.title, self.cluster.title),
+            partner_activity=None,
+            partner_project=None,
+            user=None,
+        )
+
+        self.partner.clusters.add(self.cluster)
+
+        self.pp = PartnerProjectFactory(
+            partner=self.cluster.partners.first(),
+            title="{} Partner Project".format(self.cluster.partners.first().title)
+        )
+
+        self.pp.clusters.add(self.cluster)
+
         self.data = {
-            'clusters': [{"id": Cluster.objects.first().id}],
+            'clusters': [{"id": self.cluster.id}],
             'locations': [{"id": Location.objects.first().id}, {"id": Location.objects.last().id}],
             'title': 'partner project title',
             'start_date': datetime.date.today().strftime(settings.INPUT_DATA_FORMAT),
             'end_date': datetime.date.today().strftime(settings.INPUT_DATA_FORMAT),
-            'status': 'Dra',
+            'status': 'Ong',
             'description': "description",
             'additional_information': "additional_information",
             'total_budget': 100000,
@@ -29,18 +51,18 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
         """
         get list unit test for PartnerProjectListCreateAPIView
         """
-        url = reverse('partner-project-list')
+        url = reverse('partner-project-list', kwargs={'response_plan_id': self.cluster.response_plan_id})
         response = self.client.get(url, format='json')
 
         self.assertTrue(status.is_success(response.status_code))
-        self.assertEquals(response.data['count'], PartnerProject.objects.all().count())
+        self.assertEquals(response.data['count'], PartnerProject.objects.filter(clusters__response_plan_id=self.cluster.response_plan_id).count())
 
     def test_list_partner_project_by_cluster(self):
         """
         get list by given cluster id unit test for PartnerProjectListCreateAPIView
         """
-        cluster_id = Cluster.objects.first().id
-        url = reverse('partner-project-list') + "?cluster_id=" + str(cluster_id)
+        cluster_id = self.cluster.id
+        url = reverse('partner-project-list', kwargs={'response_plan_id': self.cluster.response_plan_id}) + "?cluster_id=" + str(cluster_id)
         response = self.client.get(url, format='json')
 
         self.assertTrue(status.is_success(response.status_code))
@@ -54,7 +76,7 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
         last = PartnerProject.objects.last()
 
         # test for creating object
-        url = reverse('partner-project-list')
+        url = reverse('partner-project-list', kwargs={'response_plan_id': self.cluster.response_plan_id})
         response = self.client.post(url, data=self.data, format='json')
 
         self.assertTrue(status.is_success(response.status_code))
@@ -66,10 +88,10 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
         """
         get list unit test for PartnerProjectListCreateAPIView
         """
-        pp = PartnerProject.objects.first()
+        pp = self.cluster.partner_projects.first()
         location = Location.objects.first()
         pp.locations.add(location)
-        url = reverse('partner-project-list')
+        url = reverse('partner-project-list', kwargs={'response_plan_id': self.cluster.response_plan_id})
         url += "?location=%d" % location.id
         response = self.client.get(url, format='json')
 
@@ -79,8 +101,8 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
         self.assertEquals(response.data['results'][0]['title'], pp.title)
         self.assertEquals(response.data['results'][0]['locations'][0]['id'], str(location.id))
 
-        partner = Partner.objects.last()
-        url = reverse('partner-project-list')
+        partner = self.cluster.partners.first()
+        url = reverse('partner-project-list', kwargs={'response_plan_id': self.cluster.response_plan_id})
         url += "?partner=%d" % partner.id
         response = self.client.get(url, format='json')
         self.assertTrue(status.is_success(response.status_code))
