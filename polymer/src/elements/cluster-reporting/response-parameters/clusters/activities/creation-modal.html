@@ -149,36 +149,6 @@
                 </paper-listbox>
             </paper-dropdown-menu>
 
-            <paper-input
-              class="item validate"
-              id="reference_number"
-              label="CO ref #"
-              value="{{data.reference_number}}"
-              type="string"
-              on-input="_validate"
-              required>
-            </paper-input>
-
-            <paper-dropdown-menu
-                class="item validate"
-                label="Frequency of reporting"
-                on-value-changed="_validate"
-                always-float-label
-                required>
-              <paper-listbox
-                  selected="{{data.frequency}}"
-                  attr-for-selected="value"
-                  slot="dropdown-content"
-                  class="dropdown-content">
-                <template
-                    id="frequencies"
-                    is="dom-repeat"
-                    items="[[frequencies]]">
-                  <paper-item value="[[item.id]]">[[item.title]]</paper-item>
-                </template>
-              </paper-listbox>
-            </paper-dropdown-menu>
-
             <paper-dropdown-menu
                 class="item validate"
                 label="CO ref #"
@@ -196,7 +166,7 @@
                       id="objectives"
                       is="dom-repeat"
                       items="[[objectives]]">
-                    <paper-item value="[[item.id]]">[[item.title]]</paper-item>
+                    <paper-item value="[[item.id]]">[[item.reference_number]]</paper-item>
                   </template>
                 </paper-listbox>
             </paper-dropdown-menu>
@@ -323,8 +293,7 @@
       },
 
       _computeObjectivesUrl: function(responsePlanID, clusterID) {
-        var idString = clusterID.toString();
-        this.objectivesParams = {cluster_id: idString};
+        this.objectivesParams = {cluster_id: clusterID};
         return App.Endpoints.responseParametersClusterObjectives(responsePlanID);
       },
 
