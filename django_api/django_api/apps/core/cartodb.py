@@ -1,5 +1,6 @@
 import logging
 
+from django.conf import settings
 from django.db import IntegrityError
 
 from carto.auth import APIKeyAuthClient
