@@ -464,7 +464,7 @@
 
         projectsUrl: {
           type: String,
-          value: App.Endpoints.plannedActions(),
+          computed: '_computeProjectsUrl(responsePlanId)',
         },
 
         objectives: {
@@ -481,7 +481,7 @@
 
         objectivesUrl: {
           type: String,
-          value: App.Endpoints.responseParametersClusterObjectives(),
+          computed: '_computeObjectivesUrl(responsePlanId)',
         },
 
         partner: {
@@ -538,6 +538,14 @@
         return App.Endpoints.clusterNames(responsePlanId);
       },
 
+      _computeProjectsUrl: function (responsePlanId) {
+        return App.Endpoints.plannedActions(responsePlanId);
+      },
+
+      _computeObjectivesUrl: function (responsePlanId) {
+        return App.Endpoints.responseParametersClusterObjectives(responsePlanId);
+      },
+
       _fetchClusters: function () {
         var self = this;
 
@@ -580,6 +588,8 @@
         if (typeof partnerId === 'undefined') {
           return;
         }
+
+        this.set('projectsParams.partner', partnerId);
 
         this.$.projects.thunk()()
             .then(function (res) {

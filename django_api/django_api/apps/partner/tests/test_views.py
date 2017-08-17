@@ -7,7 +7,7 @@ from rest_framework import status
 
 from core.tests.base import BaseAPITestCase
 from core.models import Location
-from core.factories import PartnerProjectFactory, PartnerFactoryi, ClusterObjectiveFactory
+from core.factories import PartnerProjectFactory, PartnerFactory, ClusterObjectiveFactory
 
 from cluster.models import (
     Cluster,
