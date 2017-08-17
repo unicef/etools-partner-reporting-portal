@@ -15,6 +15,8 @@ from .serializer import (
     PartnerProjectPatchSerializer,
     ClusterActivityPartnersSerializer,
     PartnerActivitySerializer,
+    PartnerActivityFromClusterActivitySerializer,
+    PartnerActivityFromCustomActivitySerializer,
 )
 from .models import PartnerProject, PartnerActivity, Partner
 from .filters import PartnerProjectFilter, ClusterActivityPartnersFilter, PartnerActivityFilter
@@ -144,6 +146,66 @@ class PartnerSimpleListAPIView(ListAPIView):
     def get_queryset(self):
         response_plan_id = self.kwargs.get(self.lookup_field)
         return Partner.objects.filter(clusters__response_plan_id=response_plan_id)
+
+
+class PartnerActivityAPIView(APIView):
+    """
+    PartnerActivityAPIView CRUD endpoint
+    """
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request, create_mode, *args, **kwargs):
+        """
+        Create on PartnerActivity model
+        :return: serialized PartnerActivity object
+        """
+        if create_mode == 'cluster':
+            serializer = PartnerActivityFromClusterActivitySerializer(
+                data=self.request.data)
+
+            if not serializer.is_valid():
+                return Response(
+                    serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                pa = PartnerActivity.objects.create(
+                    title=serializer.validated_data['cluster_activity'].title,
+                    project=serializer.validated_data['project'],
+                    partner=serializer.validated_data['partner'],
+                    cluster_activity=serializer.validated_data['cluster_activity'],
+                    start_date=serializer.validated_data['start_date'],
+                    end_date=serializer.validated_data['end_date'],
+                    status=serializer.validated_data['status'],
+                )
+            except Exception as e:
+                return Response(
+                    {'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
+
+        elif create_mode == 'custom':
+            serializer = PartnerActivityFromCustomActivitySerializer(
+                data=self.request.data)
+
+            if not serializer.is_valid():
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                pa = PartnerActivity.objects.create(
+                    title=serializer.validated_data['title'],
+                    project=serializer.validated_data['project'],
+                    partner=serializer.validated_data['partner'],
+                    cluster_objective=serializer.validated_data['cluster_objective'],
+                    start_date=serializer.validated_data['start_date'],
+                    end_date=serializer.validated_data['end_date'],
+                    status=serializer.validated_data['status'],
+                )
+            except Exception as e:
+                return Response(
+                    {'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
+
+        else:
+            return Response({'error': "Wrong create mode flag"}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'id': pa.id}, status=status.HTTP_201_CREATED)
 
 
 class ClusterActivityPartnersAPIView(ListAPIView):

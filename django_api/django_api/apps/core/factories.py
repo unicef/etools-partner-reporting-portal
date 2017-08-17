@@ -36,6 +36,7 @@ from core.common import (
     PD_FREQUENCY_LEVEL,
     REPORTABLE_FREQUENCY_LEVEL,
     INDICATOR_REPORT_STATUS,
+    PARTNER_PROJECT_STATUS,
     OVERALL_STATUS,
 )
 from core.models import Intervention, Location, ResponsePlan
@@ -100,6 +101,10 @@ class PartnerFactory(factory.django.DjangoModelFactory):
 class PartnerActivityFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "partner_activity_%d" % n)
     project = factory.SubFactory('core.factories.PartnerProjectFactory')
+
+    start_date = beginning_of_this_year
+    end_date = beginning_of_this_year + datetime.timedelta(days=30)
+    status = fuzzy.FuzzyChoice(PARTNER_PROJECT_STATUS.ongoing)
 
     class Meta:
         model = PartnerActivity
@@ -225,7 +230,7 @@ class ClusterFactory(factory.django.DjangoModelFactory):
 class ClusterObjectiveFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "cluster_objective_%d" % n)
 
-    objective = factory.RelatedFactory('core.factories.ClusterActivityFactory', 'cluster_objective')
+    activity = factory.RelatedFactory('core.factories.ClusterActivityFactory', 'cluster_objective')
     cluster = factory.SubFactory(ClusterFactory)
 
     class Meta:

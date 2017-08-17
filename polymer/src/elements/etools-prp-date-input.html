@@ -5,7 +5,9 @@
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/etools-datepicker/etools-datepicker-button.html">
 
+<link rel="import" href="etools-prp-theme.html">
 <link rel="import" href="../behaviors/date.html">
+<link rel="import" href="../styles/shared-styles.html">
 
 <dom-module id="etools-prp-date-input">
 
@@ -16,6 +18,10 @@
       }
     </style>
 
+    <etools-prp-theme
+        primary-color="{{primaryColor}}">
+    </etools-prp-theme>
+
     <paper-input id="dateInput"
                  label="[[label]]"
                  value="[[prettyDate(value)]]"
@@ -25,7 +31,6 @@
                  disabled$="[[disabled]]"
                  readonly$="[[readonly]]"
                  required$="[[required]]"
-                 invalid$="[[invalid]]"
                  auto-validate$="[[autoValidate]]"
                  error-message="[[errorMessage]]">
       <!-- <iron-icon prefix icon="date-range" hidden$="[[!readonly]]"></iron-icon> -->
@@ -49,7 +54,7 @@
       Polymer({
         is: 'etools-prp-date-input',
         behaviors: [
-          App.Behaviors.DateBehavior
+          App.Behaviors.DateBehavior,
         ],
         properties: {
           label: String,
@@ -81,7 +86,6 @@
           required: {
             type: Boolean,
             value: false,
-            reflectToAttribute: true
           },
           autoValidate: {
             type: Boolean,
@@ -90,8 +94,9 @@
           },
           invalid: {
             type: Boolean,
-            value: false,
-            reflectToAttribute: true
+            value: true,
+            notify: true,
+            computed: '_computeInvalid(required, value)',
           },
           errorMessage: {
             type: String,
@@ -100,7 +105,11 @@
           format: {
             type: String,
             value: 'YYYY-MM-DD'
-          }
+          },
+          primaryColor: {
+            type: String,
+            observer: '_updateTheme',
+          },
         },
         _readonlyStateChange: function(newValue, oldValue) {
           if (newValue !== oldValue) {
@@ -110,9 +119,30 @@
         _disabledDatepicker: function(readonly, disabled) {
           return readonly || disabled;
         },
+
+        _computeInvalid: function (required, value) {
+          return this.required && !value;
+        },
+
         validate: function() {
           return this.$.dateInput.validate();
-        }
+        },
+
+        _updateTheme: function (color) {
+          (function updateTheme (self) {
+            self.async(function () {
+              var datePicker = this.$.datePickerButton.datePicker;
+
+              if (!datePicker) {
+                return updateTheme(self);
+              }
+
+              datePicker.customStyle['--etools-datepicker-heading-bg-color'] = color;
+              datePicker.customStyle['--etools-datepicker-btns-text-color'] = color;
+              datePicker.updateStyles();
+            }, 100);
+          }(this));
+        },
       });
     })();
   </script>
