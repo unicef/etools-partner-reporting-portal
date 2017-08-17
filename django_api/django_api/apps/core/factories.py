@@ -39,7 +39,7 @@ from core.common import (
     PARTNER_PROJECT_STATUS,
     OVERALL_STATUS,
 )
-from core.models import Intervention, Location, ResponsePlan
+from core.models import Intervention, Location, ResponsePlan, GatewayType
 from core.countries import COUNTRIES_ALPHA2_CODE
 
 PD_STATUS_LIST = [x[0] for x in PD_STATUS]
@@ -411,6 +411,7 @@ class QuantityReportableToPartnerActivityFactory(ReportableFactory):
 
 class LocationFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "location_%d" % n)
+    gateway = factory.SubFactory('core.factories.GatewayTypeFactory')
 
     class Meta:
         model = Location
@@ -529,3 +530,10 @@ class IndicatorLocationDataFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = IndicatorLocationData
+
+
+class GatewayTypeFactory(factory.django.DjangoModelFactory):
+    name = factory.Sequence(lambda n: "gateway_type_%d" % n)
+
+    class Meta:
+        model = GatewayType
