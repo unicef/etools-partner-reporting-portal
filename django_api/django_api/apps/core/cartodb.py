@@ -2,7 +2,9 @@ import logging
 
 from django.db import IntegrityError
 
-from cartodb.auth import APIKeyAuthClient
+from carto.auth import APIKeyAuthClient
+from carto.sql import SQLClient
+from carto.exceptions import CartoException
 
 from core.models import Location
 
@@ -12,6 +14,8 @@ logger = logging.getLogger('core.cartodb')
 def get_carto_client():
     USR_BASE_URL = "https://{user}.carto.com/".format(user=settings.CARTODB_USERNAME)
     auth_client = APIKeyAuthClient(api_key=settings.CARTODB_APIKEY, base_url=USR_BASE_URL)
+
+    return auth_client
 
 
 def create_location(pcode, carto_table, parent, parent_instance,
@@ -87,8 +91,8 @@ def create_location(pcode, carto_table, parent, parent_instance,
 
 
 def update_sites_from_cartodb(carto_table):
-
-    client = CartoDBAPIKey(carto_table.api_key, carto_table.domain)
+    client = get_carto_client()
+    sql = SQLClient(client)
 
     sites_created = sites_updated = sites_not_added = 0
     try:
@@ -106,9 +110,9 @@ def update_sites_from_cartodb(carto_table):
                 carto_table.pcode_col,
                 carto_table.table_name)
 
-        sites = client.sql(qry)
-    except CartoDBException as e:
-        logging.exception("CartoDB exception occured", exc_info=True)
+        sites = sql.send(qry)
+    except CartoException as e:
+        logging.exception("Carto exception occured", exc_info=True)
     else:
 
         for row in sites['rows']:
