@@ -73,7 +73,7 @@
                 <th width="40%">
                     UNICEF Office
                 </th>
-                <td>
+                <td colspan="2">
                     {{ unicef_office }}
                 </td>
             </tr>
@@ -81,89 +81,90 @@
                 <th>
                     Progr. Title
                 </th>
-                <td>
+                <td colspan="2">
                     {{ title }}
                 </td>
             </tr>
             <tr>
                 <th>PD/SSFA Ref. #</th>
-                <td>{{ reference_number }}</td>
+                <td colspan="2">{{ reference_number }}</td>
             </tr>
             <tr>
                 <th rowspan="9">
                     1.2 Organization information
                 </th>
                 <th>Organization / Acronym</th>
-                <td>Tirana Legal Aid Society / TLAS</td>
+                <td colspan="2">Tirana Legal Aid Society / TLAS</td>
             </tr>
             <tr>
                 <th>Name of CSO Authorized Official</th>
-                <td>Raimonda Bozo</td>
+                <td colspan="2">Raimonda Bozo</td>
             </tr>
             <tr>
                 <th>Title of Authorized Official</th>
-                <td>Executive Director</td>
+                <td colspan="2">Executive Director</td>
             </tr>
             <tr>
                 <th>Email of Authorized Official</th>
-                <td>bozo@tlas.com</td>
+                <td colspan="2">bozo@tlas.com</td>
             </tr>
             <tr>
                 <th>Phone of Authorized Official</th>
-                <td>001-123-987762</td>
+                <td colspan="2">001-123-987762</td>
             </tr>
             <tr>
                 <th>Name of Programme Focal Point</th>
-                <td>Borana Resulaj</td>
+                <td colspan="2">Borana Resulaj</td>
             </tr>
             <tr>
                 <th>Title</th>
-                <td>Finance Manager</td>
+                <td colspan="2">Finance Manager</td>
             </tr>
             <tr>
                 <th>Email</th>
-                <td>resulak@tlas.com</td>
+                <td colspan="2">resulak@tlas.com</td>
             </tr>
             <tr>
                 <th>Telephone</th>
-                <td>001-1223-977231</td>
+                <td colspan="2">001-1223-977231</td>
             </tr>
             <tr>
                 <th rowspan="3">
                     1.3 Programme information
                 </th>
                 <th>Progr. Duration</th>
-                <td>From {{ start_date }} to {{ end_date }}</td>
+                <td colspan="2">From {{ start_date }} to {{ end_date }}</td>
             </tr>
             <tr>
                 <th>Start date</th>
-                <td>{{ start_date }}</td>
+                <td colspan="2">{{ start_date }}</td>
             </tr>
             <tr>
                 <th>Reporting period</th>
-                <td>{{ reporting_period }}</td>
+                <td colspan="2">{{ reporting_period }}</td>
             </tr>
             <tr>
                 <th rowspan="3">1.4 Budget information</th>
                 <th>Programme budget</th>
-                <td>{{ cso_contribution }}</td>
+                <td colspan="2">{{ cso_contribution }}</td>
             </tr>
             <tr>
                 <th>UNICEF contribution</th>
-                <td>{{ budget }}</td>
+                <td colspan="2">{{ budget }}</td>
             </tr>
             <tr>
                 <th>Funds received to date</th>
-                <td>{{ funds_received_to_date }} to date</td>
+                <td>{{ budget }}</td>
+                <td>100% to date</td>
             </tr>
             <tr>
                 <th>1.5 Partner Contribution made to date</th>
-                <td colspan="2">{{ partner_contribution_to_date }}</td>
+                <td colspan="3">{{ partner_contribution_to_date }}</td>
             </tr>
             <tr>
                 <th>1.6 Signature of CSO Authorized Official</th>
-                <td class="signature">Submitted by Name:</td>
-                <td>Date: {{ submission_date }}</td>
+                <td class="signature">Raimonda Bozo</td>
+                <td colspan="2">Date: {{ submission_date|default:"---" }}</td>
             </tr>
         </table>
 
