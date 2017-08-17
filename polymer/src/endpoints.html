@@ -136,6 +136,11 @@
       partnerActivityList: function () {
         return this._buildUrl('/partner/partner-activity-list/');
       },
+
+      reportExport: function (locationId, reportId) {
+        return this._buildUrl('/unicef/' + locationId + '/progress-reports/' +
+            reportId + '/annex-C-export-PDF/');
+      },
     };
   }());
 </script>

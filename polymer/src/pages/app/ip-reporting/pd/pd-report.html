@@ -16,6 +16,7 @@
 <link rel="import" href="../../../../elements/reporting-period.html">
 <link rel="import" href="../../../../elements/report-status.html">
 <link rel="import" href="../../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../../elements/ip-reporting/pd-report-export-button.html">
 <link rel="import" href="../../../../endpoints.html">
 <link rel="import" href="../../../../behaviors/utils.html">
 <link rel="import" href="../../../../behaviors/routing.html">
@@ -38,7 +39,7 @@
       }
 
       .toolbar report-status {
-        margin-right: 1em;
+        margin-right: .5em;
       }
 
       .toolbar a {
@@ -86,6 +87,13 @@
 
       <div class="toolbar">
         <report-status status="[[currentReport.report_status]]"></report-status>
+
+        <template
+            is="dom-if"
+            if="[[_equals(mode, 'view')]]"
+            restamp="true">
+          <pd-report-export-button></pd-report-export-button>
+        </template>
 
         <a href="[[pdUrl]]" tabindex="-1">
           <paper-button
