@@ -13,7 +13,7 @@
 <link rel="import" href="../../../../../bower_components/paper-dialog/paper-dialog.html">
 
 <link rel="import" href="../../../etools-prp-ajax.html">
-<link rel="import" href="../../../date-input.html">
+<link rel="import" href="../../../etools-prp-date-input.html">
 <link rel="import" href="../../../form-fields/dropdown-form-input.html">
 <link rel="import" href="../../../form-fields/cluster-dropdown-content.html">
 <link rel="import" href="../../../form-fields/cluster-location-content.html">
@@ -153,41 +153,62 @@
               </paper-listbox>
           </paper-dropdown-menu>
 
-          <date-input
-            required
-            needs-validation="{{validateStart}}"
-            class="item"
-            label="Start Date"
-            value="{{data.start_date}}">
-          </date-input>
+          <div class="item">
+             <etools-prp-date-input
+                class="validate"
+                label="Start date"
+                value="{{data.start_date}}"
+                error-message=""
+                auto-validate
+                required
+                no-init>
+             </etools-prp-date-input>
+            </etools-date-input>
+          </div>
 
-          <date-input
-            required
-            needs-validation="{{validateEnd}}"
-            class="item"
-            label="End Date"
-            value="{{data.end_date}}">
-          </date-input>
+          <div class="item">
+            <etools-prp-date-input
+                class="validate"
+                label="End date"
+                value="{{data.end_date}}"
+                error-message=""
+                auto-validate
+                required
+                no-init>
+            </etools-prp-date-input>
+          </div>
 
-          <dropdown-form-input
-             class="item"
-             label="Status"
-             id="status"
-             value="{{data.status}}"
-             data="[[statuses]]">
-          </dropdown-form-input>
+          <paper-dropdown-menu
+              class="item validate"
+              label="Status"
+              on-value-changed="_validate"
+              always-float-label
+              required>
+            <paper-listbox
+                selected="{{data.status}}"
+                attr-for-selected="value"
+                slot="dropdown-content"
+                class="dropdown-content">
+              <template
+                is="dom-repeat"
+                items="[[statuses]]">
+                <paper-item value="[[item.id]]">[[item.title]]</paper-item>
+              </template>
+            </paper-listbox>
+          </paper-dropdown-menu>
 
           <paper-dropdown-menu
               class="item validate"
               label="Frequency of reporting"
-              always-float-label>
+              on-value-changed="_validate"
+              always-float-label
+              required>
             <paper-listbox
                 selected="{{data.frequency}}"
                 attr-for-selected="value"
                 slot="dropdown-content"
                 class="dropdown-content">
               <template
-                  id="frequencies"
                   is="dom-repeat"
                   items="[[frequencies]]">
                 <paper-item value="[[item.id]]">[[item.title]]</paper-item>
@@ -196,11 +217,12 @@
           </paper-dropdown-menu>
 
           <paper-input
-            class="item"
+            class="item validate"
             id="total_budget"
             label="Total Budget"
             value="{{data.total_budget}}"
             type="number"
+            required
             on-input="_validate">
           </paper-input>
 
@@ -286,16 +308,6 @@
           value: {}
         },
 
-        validateStart: {
-          type: String,
-          value: ''
-        },
-
-        validateEnd: {
-          type: String,
-          value: ''
-        },
-
         url: {
           type: String,
           computed: '_computeUrl(responsePlanID)'
@@ -344,9 +356,6 @@
       },
 
       _save: function () {
-        this.validateStart = 'true';
-        this.validateEnd = 'true';
-
         if (!this._fieldsAreValid()) {
           return;
         }
