@@ -2,7 +2,12 @@
 
 {% block extra_style %}
     <style type="text/css">
-        body {
+        @page {
+            size: a4 landscape;
+            margin: 1cm;
+        }
+
+        #pdf {
             font-family: "Arial", "sans-serif";
             font-size: 10px;
         }
@@ -11,7 +16,7 @@
             font-size: 11px;
             font-weight: bold;
         }
-        table, tr {
+        table, td, th {
             border: 1px solid black;
         }
         td, th {
@@ -34,11 +39,29 @@
             font-size: 12px;
             font-weight: bold;
         }
+
+        td.Met {
+            background-color: #FFFFFF;
+        }
+
+        td.OnT {
+            background-color: #92D050;
+        }
+
+        td.NoP {
+            background-color: #E93F33;
+        }
+
+        td.Con {
+            background-color: #B2A1C7;
+        }
+
     </style>
 {% endblock %}
 
 {% block content %}
-        <h1>PART 2: programme progress/final report – to be completed by CSO as part of reporting with FACE</h1>
+    <div id="pdf">
+        <h1>PART 2: programme progress/final report - to be completed by CSO as part of reporting with FACE</h1>
         <table>
             <tr>
                 <th colspan="3" class="section">Section 1. Programme & CSO overview</th>
@@ -71,39 +94,39 @@
                     1.2 Organization information
                 </th>
                 <th>Organization / Acronym</th>
-                <td>1a / 1b</td>
+                <td>Tirana Legal Aid Society / TLAS</td>
             </tr>
             <tr>
                 <th>Name of CSO Authorized Official</th>
-                <td>3</td>
+                <td>Raimonda Bozo</td>
             </tr>
             <tr>
                 <th>Title of Authorized Official</th>
-                <td>2c</td>
+                <td>Executive Director</td>
             </tr>
             <tr>
                 <th>Email of Authorized Official</th>
-                <td>2e</td>
+                <td>bozo@tlas.com</td>
             </tr>
             <tr>
                 <th>Phone of Authorized Official</th>
-                <td>2d</td>
+                <td>001-123-987762</td>
             </tr>
             <tr>
                 <th>Name of Programme Focal Point</th>
-                <td>7</td>
+                <td>Borana Resulaj</td>
             </tr>
             <tr>
                 <th>Title</th>
-                <td>2c</td>
+                <td>Finance Manager</td>
             </tr>
             <tr>
                 <th>Email</th>
-                <td>2e</td>
+                <td>resulak@tlas.com</td>
             </tr>
             <tr>
                 <th>Telephone</th>
-                <td>2d</td>
+                <td>001-1223-977231</td>
             </tr>
             <tr>
                 <th rowspan="3">
@@ -145,9 +168,9 @@
         </table>
 
         <!--TEMPORARY-->
-        <br /><br /><br /><br /><br /><br /><br /><br />
-        <br /><br /><br /><br /><br /><br /><br /><br />
-        <br /><br /><br /><br /><br /><br />
+        <div>
+            <pdf:nextpage />
+        </div>
 
         <table>
             <tr>
@@ -179,7 +202,7 @@
                             <th>{{ indicator.reportable.target }}</th>
                             <td width="100px">{{ indicator.total.c|floatformat:"2" }}</td>
                             <td width="100px">{{ indicator.total.c|floatformat:"2" }}</td>
-                            <td class="status" rowspan="{{ output|length }}">{{ indicator.get_overall_status_display }}</td>
+                            <td class="{{ indicator.overall_status }}" rowspan="{{ output|length }}">{{ indicator.get_overall_status_display }}</td>
                             <td rowspan="{{ output|length }}">{{ indicator.narrative_assessment|default:"---" }}</td>
                         </tr>
                     {% else %}
@@ -208,5 +231,5 @@
             * Information directly extracted from Section 2.2 of the signed Programme document.<br />
             ** Information to be updated upon submission of the report.
         </p>
-
+    </div>
 {% endblock %}

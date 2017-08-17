@@ -15,6 +15,8 @@ from core.paginations import SmallPagination
 from core.permissions import IsAuthenticated
 from core.models import Location
 
+
+
 from .serializers import (
     ProgrammeDocumentSerializer,
     ProgrammeDocumentDetailSerializer,
@@ -165,6 +167,7 @@ class ProgressReportPDFView(RetrieveAPIView):
 
         data = dict()
 
+
         data['unicef_office'] = report.programme_document.unicef_office
         data['title'] = report.programme_document.title
         data['reference_number'] = report.programme_document.reference_number
@@ -178,6 +181,7 @@ class ProgressReportPDFView(RetrieveAPIView):
         data['partner_contribution_to_date'] = report.partner_contribution_to_date
         data['submission_date'] = report.get_submission_date()
         data['reporting_period'] = report.get_reporting_period()
+
         data['outputs'] = self.prepare_reportable(report.indicator_reports.all().order_by('reportable'))
 
         pdf = render_to_pdf("report_annex_c_pdf.html", data)
