@@ -5,7 +5,7 @@
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../redux/store.html">
 
-<dom-module id="cluster-location-input">
+<dom-module id="cluster-location-content">
   <template>
     <style>
       :host {
@@ -18,19 +18,11 @@
         url="[[locationNamesUrl]]">
     </etools-prp-ajax>
 
-    <template is="dom-if" if="[[!loading]]">
-      <dropdown-form-input
-        label="Location"
-        name="location"
-        value="{{value}}"
-        data="[[data]]">
-      </dropdown-form-input>
-    </template>
   </template>
 
   <script>
     Polymer({
-      is: 'cluster-location-input',
+      is: 'cluster-location-content',
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
@@ -48,29 +40,15 @@
           statePath: 'responsePlans.currentID',
         },
 
-        loading: {
-          type: Boolean,
-          value: true,
-          computed: '_computeLoading(data)',
-        },
-
-        data: {
+        locations: {
           type: Array,
           value: [],
-        },
-
-        value: {
-          type: Number,
           notify: true
-        }
+        },
       },
 
       _computeLocationNamesUrl: function (responsePlanID) {
         return App.Endpoints.clusterLocationNames(responsePlanID);
-      },
-
-      _computeLoading: function (data) {
-        return !data.length;
       },
 
       _fetchLocationNames: function () {
@@ -80,10 +58,7 @@
 
         this.$.locationNames.thunk()()
             .then(function (res) {
-              self.set('data', [{
-                id: '',
-                title: 'All',
-              }].concat(res.data));
+              self.set('locations', res.data);
             })
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
