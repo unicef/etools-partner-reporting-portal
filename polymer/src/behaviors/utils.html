@@ -114,6 +114,23 @@
           return street + ',' + city + ' ' + zip;
         }
       },
+
+      _fieldsAreValid: function() {
+        var valid;
+        var fields = [].slice.call(
+          Polymer.dom(this.root).querySelectorAll('.validate')
+        );
+
+        fields.forEach(function (field) {
+          field.validate();
+        });
+
+        valid = fields.every(function (field) {
+          return !field.invalid;
+        });
+
+        return valid;
+      }
     };
   }());
 </script>
