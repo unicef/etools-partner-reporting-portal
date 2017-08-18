@@ -107,9 +107,9 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
 
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(response.data['count'], 1)
-        self.assertEquals(response.data['results'][0]['id'], str(pp.id))
+        self.assertEquals(response.data['results'][0]['id'], pp.id)
         self.assertEquals(response.data['results'][0]['title'], pp.title)
-        self.assertEquals(response.data['results'][0]['locations'][0]['id'], str(location.id))
+        self.assertEquals(response.data['results'][0]['locations'][0]['id'], location.id)
 
         partner = self.cluster.partners.first()
         url = reverse('partner-project-list', kwargs={'response_plan_id': self.cluster.response_plan_id})
@@ -127,7 +127,7 @@ class TestPartnerProjectAPIView(BaseAPITestCase):
         url = reverse('partner-project-details', kwargs={"pk": first.id})
         response = self.client.get(url, format='json')
         self.assertTrue(status.is_success(response.status_code))
-        self.assertEquals(response.data['id'], str(first.id))
+        self.assertEquals(response.data['id'], first.id)
         self.assertEquals(response.data['title'], first.title)
 
     def test_get_non_existent_instance(self):

@@ -489,7 +489,6 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
 
 class PDReportsSerializer(serializers.ModelSerializer):
 
-    id = serializers.SerializerMethodField()
     reporting_period = serializers.SerializerMethodField()
     submission_date = serializers.SerializerMethodField()
     due_date = serializers.SerializerMethodField()
@@ -505,9 +504,6 @@ class PDReportsSerializer(serializers.ModelSerializer):
             'is_draft',
             'due_date',
         )
-
-    def get_id(self, obj):
-        return str(obj.id)
 
     def get_reporting_period(self, obj):
         return "%s - %s " % (

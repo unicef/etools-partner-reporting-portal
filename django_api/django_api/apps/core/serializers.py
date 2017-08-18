@@ -26,15 +26,11 @@ class SimpleLocationSerializer(serializers.ModelSerializer):
 
 class ShortLocationSerializer(serializers.ModelSerializer):
 
-    id = serializers.SerializerMethodField()
     title = serializers.CharField(read_only=True)
 
     class Meta:
         model = Location
         fields = ('id', 'title')
-
-    def get_id(self, obj):
-        return str(obj.id)
 
 
 class IdLocationSerializer(serializers.ModelSerializer):
@@ -48,14 +44,10 @@ class ChildrenLocationSerializer(serializers.ModelSerializer):
     """
     Endpoint for drop down meny on PD list filterset - location.
     """
-    id = serializers.SerializerMethodField()
 
     class Meta:
         model = Intervention
         fields = ('id', 'title')
-
-    def get_id(self, obj):
-        return str(obj.id)
 
 
 class ResponsePlanSerializer(serializers.ModelSerializer):
@@ -71,4 +63,3 @@ class ResponsePlanSerializer(serializers.ModelSerializer):
             'intervention',
             'documents',
         )
-

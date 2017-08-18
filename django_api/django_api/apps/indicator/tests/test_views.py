@@ -67,7 +67,7 @@ class TestPDReportsAPIView(BaseAPITestCase):
                       kwargs={'pd_id': pd.pk, 'report_id': report_id})
         response = self.client.get(url, format='json')
         self.assertTrue(status.is_success(response.status_code))
-        self.assertEquals(response.data['id'], str(report_id))
+        self.assertEquals(response.data['id'], report_id)
 
 
 class TestIndicatorDataAPIView(BaseAPITestCase):

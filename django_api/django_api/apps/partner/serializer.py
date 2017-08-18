@@ -53,7 +53,6 @@ class PartnerDetailsSerializer(serializers.ModelSerializer):
 
 class PartnerProjectSerializer(serializers.ModelSerializer):
 
-    id = serializers.SerializerMethodField()
     clusters = ClusterSimpleSerializer(many=True, read_only=True)
     locations = ShortLocationSerializer(many=True, read_only=True)
     partner = serializers.SerializerMethodField()
@@ -76,9 +75,6 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
             'partner',
             'part_response_plan',
         )
-
-    def get_id(self, obj):
-        return str(obj.id)
 
     def get_partner(self, obj):
         return obj.partner and str(obj.partner_id)
