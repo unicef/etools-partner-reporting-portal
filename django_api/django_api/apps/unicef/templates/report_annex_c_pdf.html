@@ -1,4 +1,5 @@
 {% extends "easy_pdf/base.html" %}
+{% load pdf_extras %}
 
 {% block extra_style %}
     <style type="text/css">
@@ -201,8 +202,8 @@
                             <th rowspan="{{ output|length }}">{{ indicator.reportable.blueprint.title }}</th>
                             <th>{{ indicator.title }}</th>
                             <th>{{ indicator.reportable.target }}</th>
-                            <td width="100px">{{ indicator.total.c|floatformat:"2" }}</td>
-                            <td width="100px">{{ indicator.total.c|floatformat:"2" }}</td>
+                            <td width="100px">{% if indicator.is_number %}{{ indicator.total.v|floatformat:"0" }}{% else %}{{ indicator.total.c|percentage }}{% endif %}</td>
+                            <td width="100px">{% if indicator.is_number %}{{ indicator.total.v|floatformat:"0" }}{% else %}{{ indicator.total.c|percentage }}{% endif %}</td>
                             <td class="{{ indicator.overall_status }}" rowspan="{{ output|length }}">{{ indicator.get_overall_status_display }}</td>
                             <td rowspan="{{ output|length }}">{{ indicator.narrative_assessment|default:"---" }}</td>
                         </tr>
@@ -210,8 +211,8 @@
                         <tr>
                             <th>{{ indicator.title }}</th>
                             <th>{{ indicator.reportable.target }}</th>
-                            <td>{{ indicator.total.c|floatformat:"2" }}</td>
-                            <td>{{ indicator.total.c|floatformat:"2" }}</td>
+                            <td>{% if indicator.is_number %}{{ indicator.total.v|floatformat:"0" }}{% else %}{{ indicator.total.c|percentage }}{% endif %}</td>
+                            <td>{% if indicator.is_number %}{{ indicator.total.v|floatformat:"0" }}{% else %}{{ indicator.total.c|percentage }}{% endif %}</td>
                         </tr>
                     {% endif %}
                 {% endfor %}
