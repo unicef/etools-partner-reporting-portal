@@ -67,7 +67,6 @@
 
       observers: [
         '_projectsAjax(queryParams, url)',
-        '_fetchCurrentPartner(partnerDetailsUrl)'
       ],
 
       behaviors: [
@@ -97,6 +96,7 @@
         partnerDetailsUrl: {
           type: String,
           value: App.Endpoints.partnerDetails(),
+          observer: '_fetchCurrentPartner',
         },
       },
 
@@ -109,12 +109,13 @@
             });
       },
 
-      _computeUrl: function (responsePlanID, queryParams, partnerID) {
-        queryParams.partner = partnerID;
+      _computeUrl: function (responsePlanID) {
         return App.Endpoints.plannedActions(responsePlanID);
       },
 
       _projectsAjax: function (queryParams) {
+        queryParams.partner = this.partnerID;
+
         var thunk = this.$.plannedActionsProjects.thunk();
 
         if (!Object.keys(queryParams).length) {
