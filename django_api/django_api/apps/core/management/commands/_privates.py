@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# encoding: utf-8
+
 from __future__ import unicode_literals
 import datetime
 
@@ -105,6 +109,163 @@ def clean_up_data():
         Location.objects.all().delete()
 
         print "All ORM objects deleted"
+
+
+def generate_light_fake_data(seed_quantity=5):
+    today = datetime.date.today()
+
+    admin, created = User.objects.get_or_create(username='admin', defaults={
+        'email': 'admin@unicef.org',
+        'is_superuser': True,
+        'is_staff': True,
+        'organization': 'Tivix'
+    })
+    admin.set_password('Passw0rd!')
+    admin.save()
+
+    SectionFactory.create_batch(seed_quantity)
+    InterventionFactory.create_batch(seed_quantity)
+
+    for intervention in Intervention.objects.all():
+        ResponsePlanFactory(
+            intervention=intervention,
+            title="{} {} Humanitarian Response Plan".format(intervention.country_name, today.year)
+        )
+
+    for response_plan in ResponsePlan.objects.all():
+        user = UserFactory(
+            first_name="WASH",
+            last_name="IMO")
+
+        cluster = ClusterFactory(
+            response_plan=response_plan,
+            title="WASH",
+            user=user
+        )
+
+        co = ClusterObjectiveFactory(
+            title="{} - {} Cluster Objective".format(cluster.response_plan.title, cluster.title),
+            cluster=cluster,
+        )
+
+        reportable_to_co = QuantityReportableToClusterObjectiveFactory(
+            content_object=co, indicator_report__progress_report=None
+        )
+
+        user = UserFactory(
+            first_name="{} Cluster".format(cluster.title),
+            last_name="Partner")
+
+        partner = PartnerFactory(
+            title="{} - {} Cluster Partner".format(cluster.response_plan.title, cluster.title),
+            partner_activity=None,
+            partner_project=None,
+            user=user,
+        )
+        partner.clusters.add(cluster)
+
+    for cluster_objective in ClusterObjective.objects.all():
+        ca = ClusterActivityFactory(
+            title="{} Cluster Activity".format(cluster_objective.title),
+            cluster_objective=cluster_objective,
+        )
+
+        reportable_to_ca = QuantityReportableToClusterActivityFactory(
+            content_object=ca, indicator_report__progress_report=None
+        )
+
+    for partner in Partner.objects.all():
+        first_cluster = partner.clusters.first()
+        pp = PartnerProjectFactory(
+            partner=partner,
+            title="{} Partner Project".format(partner.title)
+        )
+
+        pp.clusters.add(first_cluster)
+
+        reportable_to_pp = QuantityReportableToPartnerProjectFactory(
+            content_object=pp, indicator_report__progress_report=None
+        )
+        pp.locations.add(*list(reportable_to_pp.locations.all()))
+
+    # ClusterActivity <-> PartnerActivity link
+    for cluster_activity in ClusterActivity.objects.all():
+        partner = cluster_activity.cluster_objective.cluster.partners.first()
+
+        for project in partner.partner_projects.all():
+            pa = PartnerActivityFactory(
+                partner=project.partner,
+                project=project,
+                cluster_activity=cluster_activity,
+                title="{} Partner Activity from CA".format(project.title)
+            )
+
+            reportable_to_pa = QuantityReportableToPartnerActivityFactory(
+                content_object=pa, indicator_report__progress_report=None
+            )
+
+            reportable_to_pa.parent_indicator = cluster_activity.reportables.first()
+
+            reportable_to_pa.save()
+
+            pa = PartnerActivityFactory(
+                partner=project.partner,
+                project=project,
+                cluster_activity=None,
+                title="{} Partner Activity".format(project.title)
+            )
+
+            reportable_to_pa = QuantityReportableToPartnerActivityFactory(
+                content_object=pa, indicator_report__progress_report=None
+            )
+
+    ProgrammeDocumentFactory.create_batch(seed_quantity)
+
+    # Linking the followings:
+    # ProgressReport - ProgrammeDocument
+    # created LowerLevelOutput - QuantityReportableToLowerLevelOutput
+    # Section - ProgrammeDocument via QuantityReportableToLowerLevelOutput
+    # ProgressReport - IndicatorReport from
+    # QuantityReportableToLowerLevelOutput
+    for idx, llo in enumerate(LowerLevelOutput.objects.all()):
+        progress_report = ProgressReportFactory(
+            programme_document=llo.indicator.programme_document)
+
+        reportable = QuantityReportableToLowerLevelOutputFactory(
+            content_object=llo, indicator_report__progress_report=None)
+
+        reportable.content_object \
+            .indicator.programme_document.sections.add(
+                Section.objects.all()[idx])
+
+        indicator_report = reportable.indicator_reports.first()
+        indicator_report.progress_report = progress_report
+        indicator_report.save()
+
+        reportable = RatioReportableToLowerLevelOutputFactory(
+            content_object=llo, indicator_report__progress_report=None)
+
+        reportable.content_object \
+            .indicator.programme_document.sections.add(
+                Section.objects.all()[idx])
+
+        indicator_report = reportable.indicator_reports.first()
+        indicator_report.progress_report = progress_report
+        indicator_report.save()
+
+    # Intervention <-> Locations
+    for intervention in Intervention.objects.all():
+        intervention.locations.add(*list(Location.objects.all()))
+    generate_indicator_report_location_disaggregation_quantity_data()
+
+    generate_indicator_report_location_disaggregation_ratio_data()
+
+    IndicatorReport.objects.filter(
+        report_status=INDICATOR_REPORT_STATUS.submitted
+    ).update(submission_date=today)
+
+    admin.partner = Partner.objects.first()
+    admin.save()
 
 
 def generate_fake_data(seed_quantity=40):

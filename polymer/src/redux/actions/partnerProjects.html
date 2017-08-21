@@ -49,5 +49,97 @@
         };
       },
     };
+
+    App.Actions.PartnerProjects.activities = {
+      fetch: function (thunk, partnerProjectId) {
+        return function (dispatch) {
+          dispatch(App.Actions.PartnerProjects.activities.setLoadingStart());
+          return thunk()
+            .then(function (res) {
+              dispatch(App.Actions.PartnerProjects.activities.set(
+                partnerProjectId, res.data.results
+              ));
+              dispatch(App.Actions.PartnerProjects.activities.setCount(
+                partnerProjectId, res.data.count
+              ));
+              dispatch(App.Actions.PartnerProjects.activities.setLoadingStop());
+            });
+        };
+      },
+
+      set: function (partnerProjectId, data) {
+        return {
+          type: App.Constants.SET_ACTIVITIES_BY_PARTNER_PROJECT_ID,
+          partnerProjectId: partnerProjectId,
+          data: data,
+        };
+      },
+
+      setCount: function (partnerProjectId, count) {
+        return {
+          type: App.Constants.SET_ACTIVITIES_BY_PARTNER_PROJECT_ID_COUNT,
+          partnerProjectId: partnerProjectId,
+          count: count,
+        };
+      },
+
+      setLoadingStop: function () {
+        return {
+          type: App.Constants.ACTIVITIES_BY_PARTNER_PROJECT_ID_LOADING_STOP,
+        };
+      },
+
+      setLoadingStart: function () {
+        return {
+          type: App.Constants.ACTIVITIES_BY_PARTNER_PROJECT_ID_LOADING_START,
+        };
+      },
+    };
+
+    App.Actions.PartnerProjects.indicators = {
+      fetch: function (thunk, partnerProjectId) {
+        return function (dispatch) {
+          dispatch(App.Actions.PartnerProjects.indicators.setLoadingStart());
+          return thunk()
+            .then(function (res) {
+              dispatch(App.Actions.PartnerProjects.indicators.setIndicators(
+                partnerProjectId, res.data.results
+              ));
+              dispatch(App.Actions.PartnerProjects.indicators.setCount(
+                partnerProjectId, res.data.count
+              ));
+              dispatch(App.Actions.PartnerProjects.indicators.setLoadingStop());
+            });
+        };
+      },
+
+      setIndicators: function (partnerProjectId, data) {
+        return {
+          type: App.Constants.SET_INDICATORS_BY_PARTNER_PROJECT_ID,
+          partnerProjectId: partnerProjectId,
+          data: data,
+        };
+      },
+
+      setCount: function (partnerProjectId, count) {
+        return {
+          type: App.Constants.SET_INDICATORS_BY_PARTNER_PROJECT_ID_COUNT,
+          partnerProjectId: partnerProjectId,
+          count: count,
+        };
+      },
+
+      setLoadingStop: function () {
+        return {
+          type: App.Constants.INDICATORS_BY_PARTNER_PROJECT_ID_LOADING_STOP,
+        };
+      },
+
+      setLoadingStart: function () {
+        return {
+          type: App.Constants.INDICATORS_BY_PARTNER_PROJECT_ID_LOADING_START,
+        };
+      },
+    };
   }());
 </script>

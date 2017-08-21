@@ -103,6 +103,33 @@
         });
 
         return newList.join(', ');
+      },
+
+      _formatAddress: function (street, city, zip) {
+        if (!(street || city || zip)) {
+          return undefined;
+        } else if (!street) {
+          return city + ' ' + zip;
+        } else {
+          return street + ',' + city + ' ' + zip;
+        }
+      },
+
+      _fieldsAreValid: function() {
+        var valid;
+        var fields = [].slice.call(
+          Polymer.dom(this.root).querySelectorAll('.validate')
+        );
+
+        fields.forEach(function (field) {
+          field.validate();
+        });
+
+        valid = fields.every(function (field) {
+          return !field.invalid;
+        });
+
+        return valid;
       }
     };
   }());

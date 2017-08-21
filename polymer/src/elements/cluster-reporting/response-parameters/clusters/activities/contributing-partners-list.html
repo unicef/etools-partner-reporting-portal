@@ -1,0 +1,210 @@
+<link rel="import" href="../../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../../../../bower_components/etools-data-table/etools-data-table.html">
+<link rel="import" href="../../../../../../bower_components/etools-loading/etools-loading.html">
+<link rel="import" href="../../../../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../../../../bower_components/iron-location/iron-query-params.html">
+<link rel="import" href="../../../../../../bower_components/iron-flex-layout/iron-flex-layout.html">
+
+<link rel="import" href="../../../../../behaviors/data-table.html">
+<link rel="import" href="../../../../../behaviors/pagination.html">
+<link rel="import" href="../../../../../behaviors/routing.html">
+<link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="../../../../etools-prp-ajax.html">
+<link rel="import" href="../../../../project-status.html">
+<link rel="import" href="../../../../page-body.html">
+<link rel="import" href="../../../../etools-prp-data-table-row.html">
+<link rel="import" href="../../../../../redux/store.html">
+<link rel="import" href="../../../../../redux/actions.html">
+<link rel="import" href="../../../../../styles/table-styles.html">
+
+<dom-module id="contributing-partners-list">
+  <template>
+    <style include="data-table-styles table-styles iron-flex">
+      :host {
+        display: block;
+      }
+
+      div[slot='row-data-details'] .table-cell--text {
+        font-size: 12px;
+      }
+
+      .label {
+        display: block;
+        padding-top: 10px;
+        color: var(--paper-grey-600);
+      }
+
+      div#action {
+        margin-bottom: 25px;
+        @apply(--layout-horizontal);
+        @apply(--layout-end-justified)
+      }
+
+      a {
+        color: var(--theme-primary-color);
+      }
+
+      .wrapper {
+        position: relative;
+      }
+    </style>
+
+    <iron-location
+      query="{{query}}">
+    </iron-location>
+
+    <iron-query-params
+      params-string="{{query}}"
+      params-object="{{queryParams}}">
+    </iron-query-params>
+
+    <div class="wrapper">
+      <etools-content-panel no-header>
+        <etools-data-table-header
+            label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
+          <etools-data-table-column field="cluster">
+            <div class="table-column">Partner</div>
+          </etools-data-table-column>
+          <etools-data-table-column field="cluster">
+            <div class="table-column">Focal Point</div>
+          </etools-data-table-column>
+          <etools-data-table-column field="status">
+            <div class="table-column">E-mail</div>
+          </etools-data-table-column>
+          <etools-data-table-column field="project">
+            <div class="table-column">Phone Number</div>
+          </etools-data-table-column>
+        </etools-data-table-header>
+
+        <template
+            id="list"
+            is="dom-repeat"
+            items="[[data]]"
+            initial-count="[[pageSize]]">
+          <etools-prp-data-table-row details-opened="[[detailsOpened]]">
+            <div slot="row-data">
+              <div class="table-cell table-cell--text">
+                [[item.title]]
+              </div>
+              <div class="table-cell table-cell--text">
+                <!-- TODO: get 'focal point' -->
+                [[_withDefault(item.focal_point)]]
+              </div>
+              <div class="table-cell table-cell--text">
+                [[_withDefault(item.email)]]
+              </div>
+              <div class="table-cell table-cell--text">
+                [[_withDefault(item.phone_number)]]
+              </div>
+
+            </div>
+            <div slot="row-data-details">
+              <div slot="row-data">
+                <div class="table-cell table-cell--text">
+                  <span class="label">Partner Projects(s)</span>
+                  [[_commaSeparatedDictValue(item.partner_projects, 'title')]]
+                </div>
+                <div class="table-cell table-cell--text">
+                  <span class="label">Cluster</span>
+                  [[item.cluster]]
+                </div>
+                <div class="table-cell table-cell--text">
+                  <span class="label">Address</span>
+                  [[_formatAddress(item.street_address, item.city, item.postal_code)]]
+                </div>
+                <div class="table-cell table-cell--text">
+                  <span class="label">Links</span>
+                  [[_commaSeparatedListValues(item.links)]]
+                </div>
+              </div>
+            </div>
+          </etools-prp-data-table-row>
+        </template>
+
+        <etools-data-table-footer
+            page-size="[[pageSize]]"
+            page-number="[[pageNumber]]"
+            total-results="[[totalResults]]"
+            visible-range="{{visibleRange}}"
+            on-page-size-changed="_pageSizeChanged"
+            on-page-number-changed="_pageNumberChanged">
+        </etools-data-table-footer>
+
+        <etools-loading active="[[loading]]"></etools-loading>
+      </div>
+    </etools-content-panel>
+  </template>
+
+    <script>
+      Polymer({
+        is: 'contributing-partners-list',
+
+        behaviors: [
+          App.Behaviors.PaginationBehavior,
+          App.Behaviors.ReduxBehavior,
+          App.Behaviors.RoutingBehavior,
+          App.Behaviors.DataTableBehavior,
+          App.Behaviors.UtilsBehavior,
+        ],
+
+        properties: {
+          activityId: Number,
+
+          allPartners: {
+            type: Object,
+            statePath: 'clusterActivities.partners'
+          },
+
+          data: {
+            type: Array,
+            computed: '_computeCurrentPartners(activityId, allPartners)'
+          },
+
+          allPartnersCount: {
+            type: Number,
+            statePath: 'clusterActivities.partnersCount',
+          },
+
+          totalResults: {
+            type: Number,
+            computed: '_computeCurrentPartnersCount(activityId, allPartnersCount)'
+          },
+
+          loading: {
+            type: Boolean,
+            statePath: 'clusterActivities.partnersLoading'
+          },
+
+          detailsOpened: {
+            type: Boolean,
+            value: false
+          },
+
+          openedDetails: {
+            type: Array,
+            value: []
+          }
+        },
+
+        listeners: {
+          'page-number-changed': '_pageNumberModified',
+          'details-opened-changed': '_detailsChange'
+        },
+
+        _computeCurrentPartners: function(activityId, allPartners) {
+          return allPartners[activityId];
+        },
+
+        _computeCurrentPartnersCount: function(activityId, allPartnersCount) {
+          return allPartnersCount[activityId];
+        },
+
+        detached: function () {
+          this.openedDetails.length = 0;
+        }
+      });
+    </script>
+  </dom-module>

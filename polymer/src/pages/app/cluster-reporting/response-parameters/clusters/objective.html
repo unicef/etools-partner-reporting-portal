@@ -8,6 +8,8 @@
 <link rel="import" href="../../../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../../../elements/page-header.html">
 <link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/clusters/objectives/overview.html">
+<link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/clusters/objectives/indicators.html">
+<link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/clusters/objectives/activities.html">
 <link rel="import" href="../../../../../elements/project-status.html">
 <link rel="import" href="../../../../../elements/page-body.html">
 <link rel="import" href="../../../../../elements/page-badge.html">
@@ -92,13 +94,16 @@
     </template>
 
     <template is="dom-if" if="[[_equals(tab, 'indicators')]]" restamp="true">
-      TODO: Indicator content
+      <rp-clusters-details-indicators
+        objective-id="{{objectiveId}}">
+      </rp-clusters-details-indicators>
     </template>
 
     <template is="dom-if" if="[[_equals(tab, 'activities')]]" restamp="true">
-      TODO: Activity content
+      <rp-clusters-details-activities
+        objective-id="{{objectiveId}}">
+      </rp-clusters-details-activities>
     </template>
-
   </template>
 
   <script>

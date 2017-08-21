@@ -11,14 +11,15 @@
 <link rel="import" href="../../../../../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../../../../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
 <link rel="import" href="../../../../../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../../../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 
-<link rel="import" href="../../../../form-fields/dropdown-form-input.html">
-<link rel="import" href="../../../../form-fields/cluster-dropdown-input.html">
+<link rel="import" href="../../../../form-fields/cluster-dropdown-content.html">
 <link rel="import" href="../../../../etools-prp-ajax.html">
 <link rel="import" href="../../../../../styles/buttons.html">
 <link rel="import" href="../../../../../redux/store.html">
 <link rel="import" href="../../../../../redux/actions.html">
 <link rel="import" href="../../../../../behaviors/routing.html">
+<link rel="import" href="../../../../../behaviors/utils.html">
 
 <dom-module id="cluster-objectives-modal">
   <template>
@@ -71,9 +72,11 @@
 
     <iron-location path="{{path}}"></iron-location>
 
+    <cluster-dropdown-content clusters="{{clusters}}"></cluster-dropdown-content>
+
     <etools-prp-ajax
         id="createObjective"
-        url="[[objectiveCreationUrl]]"
+        url="[[url]]"
         body="[[data]]"
         content-type="application/json"
         method="post">
@@ -94,40 +97,74 @@
       </div>
 
       <paper-dialog-scrollable>
-        <iron-form class="app-grid">
-            <paper-input
-              class="item full-width"
-              id="title"
-              label="Cluster Objective Title"
-              value="{{data.title}}"
-              type="string"
-              required>
-            </paper-input>
+        <template
+            is="dom-if"
+            if="[[refresh]]"
+            restamp="true">
+          <iron-form class="app-grid">
+              <paper-input
+                class="item validate full-width"
+                id="title"
+                label="Cluster Objective Title"
+                value="{{data.title}}"
+                type="string"
+                on-input="_validate"
+                required>
+              </paper-input>
 
-            <paper-input
-              class="item"
-              id="reference_number"
-              label="CO ref #"
-              value="{{data.reference_number}}"
-              type="string"
-              required>
-            </paper-input>
+              <paper-input
+                class="item validate"
+                id="reference_number"
+                label="CO ref #"
+                value="{{data.reference_number}}"
+                type="string"
+                on-input="_validate"
+                required>
+              </paper-input>
 
-            <cluster-dropdown-input
-              class="item"
-              label="Cluster"
-              id="cluster"
-              value="{{data.cluster}}">
-            </cluster-dropdown-input>
+              <paper-dropdown-menu
+                  class="item validate"
+                  label="Cluster"
+                  id="cluster"
+                  on-value-changed="_validate"
+                  always-float-label
+                  required>
+                  <paper-listbox
+                      selected="{{data.cluster}}"
+                      attr-for-selected="value"
+                      slot="dropdown-content"
+                      class="dropdown-content">
+                    <template
+                        id="clusters"
+                        is="dom-repeat"
+                        items="[[clusters]]">
+                      <paper-item value="[[item.id]]">[[item.title]]</paper-item>
+                    </template>
+                  </paper-listbox>
+              </paper-dropdown-menu>
 
-            <dropdown-form-input
-               class="item"
-               label="Frequency of reporting"
-               id="frequency"
-               value="{{data.frequency}}"
-               data="[[frequencies]]">
-            </dropdown-form-input>
-        </iron-form>
+              <paper-dropdown-menu
+                  class="validate"
+                  label="Frequency of reporting"
+                  on-value-changed="_validate"
+                  always-float-label
+                  required>
+                <paper-listbox
+                    selected="{{data.frequency}}"
+                    attr-for-selected="value"
+                    slot="dropdown-content"
+                    class="dropdown-content">
+                  <template
+                      id="frequencies"
+                      is="dom-repeat"
+                      items="[[frequencies]]">
+                    <paper-item value="[[item.id]]">[[item.title]]</paper-item>
+                  </template>
+                </paper-listbox>
+              </paper-dropdown-menu>
+
+          </iron-form>
+        </template>
       </paper-dialog-scrollable>
 
       <div class="buttons layout horizontal-reverse">
@@ -150,9 +187,14 @@
       behaviors: [
         App.Behaviors.ReduxBehavior,
         App.Behaviors.RoutingBehavior,
+        App.Behaviors.UtilsBehavior
       ],
 
       properties: {
+        responsePlanID: {
+          type: String,
+          statePath: 'responsePlans.currentID',
+        },
 
         opened: {
           type: Boolean,
@@ -169,9 +211,9 @@
           value: 'DD MMM YYYY'
         },
 
-        objectiveCreationUrl: {
+        url: {
           type: String,
-          value: App.Endpoints.responseParametersClusterObjectives()
+          computed: '_computeUrl(responsePlanID)'
         },
 
         frequencies: {
@@ -182,16 +224,31 @@
             {title: 'Quarterly', id: 'Qua'},
           ],
         },
+
+        clusters: {
+          type: Array,
+          value: []
+        },
+
+        refresh: {
+          type: Boolean,
+          value: false
+        },
+      },
+
+      _computeUrl: function(responsePlanID) {
+        return App.Endpoints.responseParametersClusterObjectives(responsePlanID);
       },
 
       close: function () {
-        this.data = {};
         this.set('opened', false);
+        this.set('refresh', false);
       },
 
       open: function () {
         this.data = {};
         this.set('opened', true);
+        this.set('refresh', true);
       },
 
       _redirectToDetail: function (id) {
@@ -200,7 +257,15 @@
         this.set('path', url);
       },
 
+      _validate: function (e) {
+        e.target.validate();
+      },
+
       _save: function () {
+        if (!this._fieldsAreValid()) {
+          return;
+        }
+
         var self = this;
         var thunk = this.$.createObjective.thunk();
         thunk()

@@ -71,7 +71,7 @@
       ],
 
       observers: [
-        '_clusterActivitiesAjax(queryParams)',
+        '_clusterActivitiesAjax(queryParams, activitiesUrl)',
       ],
 
       properties: {
@@ -80,7 +80,12 @@
 
         activitiesUrl: {
           type: String,
-          value: App.Endpoints.responseParametersClusterActivities()
+          computed: '_computeUrl(responsePlanID)',
+        },
+
+        responsePlanID: {
+          type: String,
+          statePath: 'responsePlans.currentID',
         },
 
         loading: {
@@ -99,6 +104,10 @@
         },
       },
 
+      _computeUrl: function(responsePlanID) {
+        return App.Endpoints.responseParametersClusterActivities(responsePlanID);
+      },
+
       _openModal: function () {
         this.$$('#modal').open();
       },
@@ -108,7 +117,7 @@
 
         this.$.activities.abort();
 
-        this.dispatch(App.Actions.fetchClusterActivitiesList(thunk))
+        this.dispatch(App.Actions.ClusterActivities.fetchClusterActivitiesList(thunk))
           .catch(function (err) { // jshint ignore:line
               // TODO: error handling.
           });

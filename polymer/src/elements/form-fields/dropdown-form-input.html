@@ -18,9 +18,11 @@
     </style>
 
     <paper-dropdown-menu
-        id="[[id]]"
+        id="field"
         label="[[label]]"
         disabled="[[disabled]]"
+        required="[[required]]"
+        invalid="{{invalid}}"
         always-float-label>
       <paper-listbox
           slot="dropdown-content"
@@ -52,6 +54,10 @@
         },
 
         disabled: String,
+      },
+
+      validate: function () {
+        return this.$.field.validate();
       },
 
       _getValue: function (e) {

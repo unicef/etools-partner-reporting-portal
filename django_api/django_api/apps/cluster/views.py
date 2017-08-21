@@ -24,7 +24,11 @@ from .serializers import (
     ClusterDashboardSerializer,
     ClusterPartnerDashboardSerializer,
 )
-from .filters import ClusterObjectiveFilter, ClusterActivityFilter, ClusterIndicatorsFilter
+from .filters import (
+    ClusterObjectiveFilter,
+    ClusterActivityFilter,
+    ClusterIndicatorsFilter,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -111,8 +115,15 @@ class ClusterObjectiveListCreateAPIView(ListCreateAPIView):
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     filter_class = ClusterObjectiveFilter
 
+    #
+    # def get_queryset(self, *args, **kwargs):
+    #     return ClusterObjective.objects.select_related('cluster').all()
+
     def get_queryset(self, *args, **kwargs):
-        return ClusterObjective.objects.select_related('cluster').all()
+        response_plan_id = self.kwargs.get('response_plan_id')
+
+        return ClusterObjective.objects.select_related('cluster').filter(
+            cluster__response_plan_id=response_plan_id)
 
     def post(self, request, *args, **kwargs):
         """
@@ -191,7 +202,9 @@ class ClusterActivityListAPIView(ListCreateAPIView):
     filter_class = ClusterActivityFilter
 
     def get_queryset(self, *args, **kwargs):
-        return ClusterActivity.objects.select_related('cluster_objective__cluster').all()
+        response_plan_id = self.kwargs.get('response_plan_id')
+
+        return ClusterActivity.objects.select_related('cluster_objective__cluster').filter(cluster_objective__cluster__response_plan_id=response_plan_id)
 
     def post(self, request, *args, **kwargs):
         """
