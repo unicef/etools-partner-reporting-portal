@@ -5,7 +5,7 @@
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../redux/store.html">
 
-<dom-module id="cluster-dropdown-input">
+<dom-module id="cluster-dropdown-content">
   <template>
     <style>
       :host {
@@ -18,22 +18,11 @@
         url="[[clusterNamesUrl]]">
     </etools-prp-ajax>
 
-    <template is="dom-if" if="[[!loading]]">
-      <dropdown-form-input
-        id="field"
-        label="Cluster"
-        name="cluster"
-        disabled="[[disabled]]"
-        required="[[required]]"
-        value="{{value}}"
-        data="[[data]]">
-      </dropdown-forn-input>
-    </template>
   </template>
 
   <script>
     Polymer({
-      is: 'cluster-dropdown-input',
+      is: 'cluster-dropdown-content',
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
@@ -51,41 +40,15 @@
           statePath: 'responsePlans.currentID',
         },
 
-        loading: {
-          type: Boolean,
-          value: true,
-          computed: '_computeLoading(data)',
-        },
-
-        required: {
-          type: Boolean,
-          value: false,
-        },
-
-        invalid: {
-          type: Boolean,
-          value: true,
-          notify: true,
-          computed: '_computeInvalid(required, value)',
-        },
-
-        data: {
+        clusters: {
           type: Array,
           value: [],
-        },
-
-        value: {
-          type: Number,
           notify: true
-        }
+        },
       },
 
       _computeClusterNamesUrl: function (responsePlanID) {
         return App.Endpoints.clusterNames(responsePlanID);
-      },
-
-      _computeLoading: function (data) {
-        return !data.length;
       },
 
       _fetchClusterNames: function () {
@@ -95,19 +58,12 @@
 
         this.$.clusterNames.thunk()()
             .then(function (res) {
-              self.set('data', res.data);
+              self.set('clusters', res.data);
             })
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
             });
-      },
 
-      _computeInvalid: function (required, value) {
-        return this.required && !value;
-      },
-
-      validate: function() {
-        return this.$$('#field').validate();
       },
 
       detached: function () {
