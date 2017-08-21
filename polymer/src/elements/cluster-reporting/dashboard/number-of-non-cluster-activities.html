@@ -1,0 +1,52 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../../bower_components/etools-loading/etools-loading.html">
+
+<link rel="import" href="../../../behaviors/utils.html">
+<link rel="import" href="../../../styles/widgets.html">
+
+<dom-module id="number-of-non-cluster-activities">
+  <template>
+    <style include="widget-styles iron-flex iron-flex-alignment">
+      :host {
+        display: block;
+      }
+    </style>
+
+    <paper-card class="widget-container">
+      <div class="card-content layout horizontal justified">
+        <div class="self-center">
+          <h3 class="widget-heading">Number of non-Cluster Activities</h3>
+        </div>
+        <div>
+          <div class="widget-figure">[[_withDefault(numberOfActivities, '-')]]</div>
+        </div>
+
+        <etools-loading active="[[loading]]"></etools-loading>
+      </div>
+    </paper-card>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'number-of-non-cluster-activities',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+      ],
+
+      properties: {
+        numberOfActivities: {
+          type: Number,
+          value: null,
+        },
+
+        loading: {
+          type: Boolean,
+          value: false,
+        },
+      },
+    });
+  </script>
+</dom-module>

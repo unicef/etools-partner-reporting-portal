@@ -1,0 +1,163 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../../../bower_components/google-chart/google-chart.html">
+<link rel="import" href="../../../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
+<link rel="import" href="../../../polyfills/es6-shim.html">
+<link rel="import" href="../../../styles/widgets.html">
+
+<dom-module id="indicators-by-status">
+  <template>
+    <style include="app-grid-style widget-styles iron-flex iron-flex-alignment">
+      :host {
+        display: block;
+
+        --app-grid-columns: 3;
+        --app-grid-gutter: 16px;
+        --app-grid-item-height: auto;
+        --app-grid-expandible-item-columns: 2;
+      }
+
+      google-chart {
+        width: 100%;
+        height: 100%;
+      }
+
+      .app-grid {
+        margin: -var(--app-grid-gutter);
+      }
+
+      .item-wide {
+        @apply(--app-grid-expandible-item);
+      }
+
+      .legend {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+        font-size: 12px;
+        line-height: 1;
+      }
+
+      .legend-row {
+        padding-bottom: .5em;
+        border-bottom: 1px solid var(--paper-grey-200);
+      }
+
+      .legend-row:not(:last-child) {
+        margin-bottom: .75em;
+      }
+
+      .color {
+        display: inline-block;
+        vertical-align: middle;
+        width: .5em;
+        height: 1.25em;
+        margin-right: .25em;
+        position: relative;
+        top: -1px;
+      }
+    </style>
+
+    <paper-card class="widget-container">
+      <div class="card-content">
+        <h3 class="widget-heading">Indicators by Progress Status</h3>
+
+        <div class="app-grid">
+          <div class="item">
+            <google-chart
+                type="pie"
+                options="[[chartOptions]]"
+                cols="[[chartCols]]"
+                rows="[[chartRows]]">
+            </google-chart>
+          </div>
+          <div class="item item-wide">
+            <ul class="legend">
+              <template
+                  is="dom-repeat"
+                  items="[[chartRows]]">
+                <li class="legend-row layout horizontal justified">
+                  <span>
+                    <span
+                        class="color"
+                        style="background: [[_getColor(colors, index)]];">
+                    </span>
+                    [[item.0]]
+                  </span>
+                  <span>[[item.1]]</span>
+                </li>
+              </template>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </paper-card>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'indicators-by-status',
+
+      properties: {
+        chartOptions: {
+          type: Object,
+          computed: '_computeChartOptions(colors)',
+        },
+
+        chartCols: {
+          type: Array,
+          value: [
+            {label: 'Status', type: 'string'},
+            {label: 'Count', type: 'number'},
+          ],
+        },
+
+        colors: {
+          type: Array,
+          value: [
+            '#029a53',
+            '#2bb0f2',
+            '#d8d8d8',
+            '#fecc02',
+            '#273d48',
+          ],
+        },
+
+        chartRows: {
+          type: Array,
+          value: [
+            ['Met', 30],
+            ['On Track', 10],
+            ['No Progress', 10],
+            ['Constrained', 50],
+            ['No Status', 10],
+          ],
+        },
+      },
+
+      _computeChartOptions: function (colors) {
+        return Object.assign({
+          chartArea: {
+            left: 0,
+            top: 0,
+            width: '90%',
+            height: '90%',
+          },
+          enableInteractivity: false,
+          legend: 'none',
+          pieSliceText: 'none',
+        }, {
+          slices: colors.map(function (color) {
+            return { color: color };
+          }),
+        });
+      },
+
+      _getColor: function (colors, index) {
+        return colors[index];
+      },
+    });
+  </script>
+</dom-module>

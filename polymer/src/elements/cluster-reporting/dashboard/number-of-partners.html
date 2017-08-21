@@ -1,0 +1,54 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../../../bower_components/etools-loading/etools-loading.html">
+
+<link rel="import" href="../../../behaviors/utils.html">
+<link rel="import" href="../../../styles/widgets.html">
+
+<dom-module id="number-of-partners">
+  <template>
+    <style include="widget-styles">
+      :host {
+        display: block;
+      }
+    </style>
+
+    <paper-card class="widget-container">
+      <div class="card-content">
+        <div>
+          <h3 class="widget-heading">Number of Contributing Partners</h3>
+        </div>
+
+        <div class="widget-figure">[[_withDefault(numberOfPartners, '-')]]</div>
+
+        <div class="widget-actions">
+            <a href="#">See all partners</a>
+        </div>
+
+        <etools-loading active="[[loading]]"></etools-loading>
+      </div>
+    </paper-card>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'number-of-partners',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+      ],
+
+      properties: {
+        numberOfPartners: {
+          type: Number,
+          value: null,
+        },
+
+        loading: {
+          type: Boolean,
+          value: false,
+        },
+      },
+    });
+  </script>
+</dom-module>

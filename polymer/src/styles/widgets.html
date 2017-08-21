@@ -1,0 +1,47 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+
+<dom-module id="widget-styles">
+  <template>
+    <style>
+      .widget-container {
+        width: 100%;
+      }
+
+      .widget-heading {
+        margin: 0 0 1.5em;
+
+        @apply(--paper-font-body1);
+      }
+
+      .widget-heading:only-child {
+        margin: 0;
+      }
+
+      .widget-figure {
+        @apply(--paper-font-display1);
+
+        margin: .25em 0;
+        text-align: right;
+      }
+
+      .widget-figure:only-child {
+        margin: 0;
+      }
+
+      .widget-actions {
+        text-align: right;
+      }
+
+      etools-content-panel > .widget-actions {
+        padding: 16px;
+      }
+
+      .widget-actions a {
+        text-transform: uppercase;
+        text-decoration: none;
+        color: var(--theme-primary-color);
+      }
+    </style>
+  </template>
+</dom-module>

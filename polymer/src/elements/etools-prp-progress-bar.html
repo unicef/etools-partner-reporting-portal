@@ -6,10 +6,14 @@
 
 <dom-module id="etools-prp-progress-bar">
   <template>
-    <style include="progress-bar"></style>
-    <!-- TODO: In IP, change color to green if it's a cluster item. -->
+    <style include="progress-bar">
+      .percentage {
+        vertical-align: middle;
+        line-height: 15px;
+      }
+    </style>
     <paper-progress value="[[percentage]]"></paper-progress>
-    <span>[[percentage]]%</span>
+    <span class="percentage">[[percentage]]%</span>
   </template>
 
   <script>
@@ -18,7 +22,6 @@
         is: 'etools-prp-progress-bar',
 
         properties: {
-
           number: {
             type: Number,
             value: 0
