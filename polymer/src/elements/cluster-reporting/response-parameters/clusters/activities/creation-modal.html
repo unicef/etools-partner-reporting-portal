@@ -292,8 +292,7 @@
         return App.Endpoints.responseParametersClusterObjectives(responsePlanID);
       },
 
-      _computeObjectivesUrl: function(responsePlanID, clusterID) {
-        this.objectivesParams = {cluster_id: clusterID};
+      _computeObjectivesUrl: function(responsePlanID) {
         return App.Endpoints.responseParametersClusterObjectives(responsePlanID);
       },
 
@@ -308,6 +307,8 @@
       getObjectivesByClusterID: function() {
         var self = this;
         var thunk = this.$.objectivesByClusterID.thunk();
+
+        this.objectivesParams = {cluster_id: this.data.cluster};
 
         thunk()
           .then(function (res) {
