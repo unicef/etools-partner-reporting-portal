@@ -4,6 +4,8 @@ from rest_framework import status
 
 from core.tests.base import BaseAPITestCase
 from core.common import FREQUENCY_LEVEL
+from core.factories import UserFactory
+
 from cluster.models import ClusterObjective, Cluster, ClusterActivity
 
 
@@ -324,6 +326,13 @@ class TestClusterPartnerDashboardAPIView(BaseAPITestCase):
         first_cluster = Cluster.objects.filter(partners__isnull=False).first()
         partner = first_cluster.partners.first()
         user = partner.users.first()
+
+        if not user:
+            user = UserFactory(
+                first_name="Test",
+                last_name="1")
+            user.partner = partner
+
         user.set_password('Passw0rd!')
         user.save()
 
