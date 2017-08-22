@@ -294,3 +294,54 @@ class TestClusterActivityAPIView(BaseAPITestCase):
 
         response = self.client.delete(url, data={"id": last.pk}, format='json')
         self.assertEquals(status.HTTP_404_NOT_FOUND, response.status_code)
+
+
+class TestClusterDashboardAPIView(BaseAPITestCase):
+
+    def test_get_partner_dashboard(self):
+        first_cluster = Cluster.objects.first()
+
+        url = reverse('cluster-dashboard', kwargs={
+            'response_plan_id': first_cluster.response_plan_id,
+            'cluster_id': first_cluster.id,
+        })
+
+        response = self.client.get(url, format='json')
+
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(response.data['num_of_partners'], first_cluster.num_of_partners)
+        self.assertEquals(response.data['num_of_met_indicator_reports'], first_cluster.num_of_met_indicator_reports)
+        self.assertEquals(response.data['num_of_constrained_indicator_reports'], first_cluster.num_of_constrained_indicator_reports)
+        self.assertEquals(response.data['num_of_non_cluster_activities'], first_cluster.num_of_non_cluster_activities)
+        self.assertEquals(response.data['new_indicator_reports'], first_cluster.new_indicator_reports)
+        self.assertEquals(len(response.data['overdue_indicator_reports']), first_cluster.overdue_indicator_reports.count())
+        self.assertEquals(len(response.data['constrained_indicator_reports']), first_cluster.constrained_indicator_reports.count())
+
+
+class TestClusterPartnerDashboardAPIView(BaseAPITestCase):
+
+    def test_get_partner_dashboard(self):
+        first_cluster = Cluster.objects.filter(partners__isnull=False).first()
+        partner = first_cluster.partners.first()
+        user = partner.users.first()
+        user.set_password('Passw0rd!')
+        user.save()
+
+        self.client.login(username=user.username, password='Passw0rd!')
+
+        url = reverse('cluster-partner-dashboard', kwargs={
+            'response_plan_id': first_cluster.response_plan_id,
+            'cluster_id': first_cluster.id,
+        })
+
+        response = self.client.get(url, format='json')
+
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(response.data['num_of_due_overdue_indicator_reports'], first_cluster.num_of_due_overdue_indicator_reports_partner(partner))
+        self.assertEquals(response.data['num_of_indicator_targets_met'], first_cluster.num_of_indicator_targets_met_partner(partner))
+        self.assertEquals(response.data['num_of_projects_in_my_organization'], first_cluster.num_of_projects_in_my_organization_partner(partner))
+        self.assertEquals(response.data['num_of_constrained_indicator_reports'], first_cluster.num_of_constrained_indicator_reports_partner(partner))
+        self.assertEquals(response.data['num_of_non_cluster_activities'], first_cluster.num_of_non_cluster_activities_partner(partner))
+        self.assertEquals(len(response.data['overdue_indicator_reports']), first_cluster.overdue_indicator_reports_partner(partner).count())
+        self.assertEquals(len(response.data['my_project_activities']), first_cluster.my_project_activities_partner(partner).count())
+        self.assertEquals(len(response.data['constrained_indicator_reports']), first_cluster.constrained_indicator_reports_partner(partner).count())
