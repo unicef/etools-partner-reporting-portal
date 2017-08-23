@@ -1,8 +1,10 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
+<link rel="import" href="../styles/shared-styles.html">
+
 <dom-module id="labelled-item">
   <template>
-    <style>
+    <style include="shared-styles">
       :host {
         display: block;
         position: relative;
@@ -15,6 +17,8 @@
       .labelled-item__label {
         font-size: 12px;
         color: #737373;
+
+        @apply(--truncate);
       }
 
       .labelled-item__content {
@@ -43,6 +47,8 @@
       is: 'labelled-item',
 
       properties: {
+        label: String,
+
         invalid: {
           type: Boolean,
           value: false,

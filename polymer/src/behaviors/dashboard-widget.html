@@ -1,0 +1,40 @@
+<link rel="import" href="../polyfills/es6-shim.html">
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Behaviors = App.Behaviors || {};
+
+    App.Behaviors.DashboardWidgetBehavior = {
+      properties: {
+        detailsOpened: {
+          type: Array,
+          value: [],
+        },
+      },
+
+      _collapseAll: function () {
+        this.detailsOpened.slice().forEach(function (row) {
+          row.detailsOpened = false;
+        });
+      },
+
+      _handleOpenedChanged: function (e, data) {
+        var row = e.srcElement;
+        var openedIndex = this.detailsOpened.indexOf(row);
+
+        if (!data.value) {
+          if (openedIndex !== -1) {
+            this.splice('detailsOpened', openedIndex, 1);
+          }
+
+          return;
+        }
+
+        this.push('detailsOpened', row);
+      },
+    };
+
+  }());
+</script>

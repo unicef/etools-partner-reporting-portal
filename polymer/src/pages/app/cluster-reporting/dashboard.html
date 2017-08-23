@@ -6,15 +6,17 @@
 <link rel="import" href="../../../endpoints.html">
 <link rel="import" href="../../../redux/store.html">
 <link rel="import" href="../../../redux/actions.html">
+<link rel="import" href="../../../behaviors/utils.html">
 <link rel="import" href="../../../elements/page-header.html">
 <link rel="import" href="../../../elements/page-body.html">
+<link rel="import" href="../../../elements/filters/cluster-filter/filter-list-by-cluster.html">
 <link rel="import" href="../../../elements/cluster-reporting/dashboard/indicators-by-status.html">
 <link rel="import" href="../../../elements/cluster-reporting/dashboard/number-of-partners.html">
 <link rel="import" href="../../../elements/cluster-reporting/dashboard/number-of-due-reports.html">
 <link rel="import" href="../../../elements/cluster-reporting/dashboard/number-of-non-cluster-activities.html">
 <link rel="import" href="../../../elements/cluster-reporting/dashboard/reports-list.html">
 <link rel="import" href="../../../elements/cluster-reporting/dashboard/constrained-reports-list.html">
-<link rel="import" href="../../../elements/filters/cluster-filter/filter-list-by-cluster.html">
+<link rel="import" href="../../../elements/cluster-reporting/dashboard/activities-list.html">
 
 <dom-module id="page-cluster-reporting-dashboard">
   <template>
@@ -111,6 +113,10 @@
       <div class="row">
         <constrained-reports-list></constrained-reports-list>
       </div>
+
+      <div class="row">
+        <activities-list></activities-list>
+      </div>
     </page-body>
 
   </template>
@@ -120,6 +126,7 @@
       is: 'page-cluster-reporting-dashboard',
 
       behaviors: [
+        App.Behaviors.UtilsBehavior,
         App.Behaviors.ReduxBehavior,
       ],
 

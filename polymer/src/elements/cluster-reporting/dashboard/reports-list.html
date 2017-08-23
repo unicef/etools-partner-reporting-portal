@@ -5,13 +5,14 @@
 
 <link rel="import" href="../../../redux/store.html">
 <link rel="import" href="../../../behaviors/routing.html">
+<link rel="import" href="../../../behaviors/dashboard-widget.html">
 <link rel="import" href="../../indicator-details.html">
 <link rel="import" href="../../../styles/table-styles.html">
-<link rel="import" href="../../../styles/widgets.html">
+<link rel="import" href="../../../styles/dashboard-widget.html">
 
 <dom-module id="reports-list">
   <template>
-    <style include="data-table-styles table-styles widget-styles">
+    <style include="data-table-styles table-styles dashboard-widget-styles">
       :host {
         display: block;
 
@@ -47,7 +48,7 @@
           items="[[data]]">
         <etools-data-table-row
             index="[[index]]"
-            on-opened-changed="_handleOpenedChanged"
+            on-opened-changed="_onOpenedChanged"
             no-animation>
           <div slot="row-data">
             <div class="table-cell table-cell--text">
@@ -91,17 +92,13 @@
       behaviors: [
         App.Behaviors.ReduxBehavior,
         App.Behaviors.RoutingBehavior,
+        App.Behaviors.DashboardWidgetBehavior,
       ],
 
       properties: {
         label: String,
 
         collection: String,
-
-        detailsOpened: {
-          type: Array,
-          value: [],
-        },
 
         data: {
           type: Array,
@@ -126,32 +123,14 @@
         return this.buildUrl(baseUrl, '/results');
       },
 
-      _handleOpenedChanged: function (e, data) {
-        var row = e.srcElement;
-        var openedIndex = this.detailsOpened.indexOf(row);
-        var index;
-
-        if (!data.value) {
-          if (openedIndex !== -1) {
-            this.splice('detailsOpened', openedIndex, 1);
-          }
-
-          return;
-        }
-
-        index = row.index;
-
-        this.push('detailsOpened', row);
+      _onOpenedChanged: function (e, data) {
+        var index = e.srcElement.index;
 
         try {
           Polymer.dom(this.root).querySelector('#indicator-details-' + index).init();
         } catch (err) {}
-      },
 
-      _collapseAll: function () {
-        this.detailsOpened.slice().forEach(function (row) {
-          row.detailsOpened = false;
-        });
+        this._handleOpenedChanged(e, data);
       },
 
       detached: function () {
