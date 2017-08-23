@@ -40,6 +40,7 @@ from core.models import (
     Intervention,
     ResponsePlan,
     Location,
+    GatewayType,
 )
 from core.factories import (
     QuantityReportableToLowerLevelOutputFactory,
@@ -107,6 +108,7 @@ def clean_up_data():
         Intervention.objects.all().delete()
         ResponsePlan.objects.all().delete()
         Location.objects.all().delete()
+        GatewayType.objects.all().delete()
 
         print "All ORM objects deleted"
 
