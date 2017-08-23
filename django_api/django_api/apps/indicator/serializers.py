@@ -479,11 +479,35 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
             'time_period_start',
             'time_period_end',
             'display_type',
+            'submission_date',
             'total',
             'remarks',
             'report_status',
             'disagg_lookup_map',
             'disagg_choice_lookup_map',
+        )
+
+
+class ClusterIndicatorReportListSerializer(IndicatorReportListSerializer):
+    cluster = serializers.SerializerMethodField()
+    partner = serializers.SerializerMethodField()
+
+    def get_cluster(self, obj):
+        cluster = obj.reportable.content_object.partner.clusters.first()
+
+        if cluster:
+            return cluster.title
+
+        else:
+            return ''
+
+    def get_partner(self, obj):
+        return obj.reportable.content_object.partner.title
+
+    class Meta(IndicatorReportListSerializer.Meta):
+        fields = IndicatorReportListSerializer.Meta.fields + (
+            'cluster',
+            'partner',
         )
 
 
@@ -714,6 +738,7 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
     reporting_period = serializers.SerializerMethodField()
     cluster = serializers.SerializerMethodField()
     project = serializers.SerializerMethodField()
+    partner = serializers.SerializerMethodField()
     is_draft = serializers.SerializerMethodField()
     can_submit = serializers.SerializerMethodField()
 
@@ -735,6 +760,7 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
             'narrative_assessment',
             'cluster',
             'project',
+            'partner',
             'is_draft',
             'can_submit',
         )
@@ -757,6 +783,12 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
     def get_project(self, obj):
         if isinstance(obj.reportable.content_object, (PartnerProject, PartnerActivity)):
             return obj.reportable.content_object.title
+        else:
+            return ''
+
+    def get_partner(self, obj):
+        if isinstance(obj.reportable.content_object, (PartnerProject, PartnerActivity)):
+            return obj.reportable.content_object.partner.title
         else:
             return ''
 
