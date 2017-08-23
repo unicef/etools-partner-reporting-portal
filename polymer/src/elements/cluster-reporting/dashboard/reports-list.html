@@ -1,0 +1,163 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/etools-content-panel/etools-content-panel.html">
+<link rel="import" href="../../../../bower_components/etools-data-table/etools-data-table.html">
+<link rel="import" href="../../../../bower_components/etools-loading/etools-loading.html">
+
+<link rel="import" href="../../../redux/store.html">
+<link rel="import" href="../../../behaviors/routing.html">
+<link rel="import" href="../../indicator-details.html">
+<link rel="import" href="../../../styles/table-styles.html">
+<link rel="import" href="../../../styles/widgets.html">
+
+<dom-module id="reports-list">
+  <template>
+    <style include="data-table-styles table-styles widget-styles">
+      :host {
+        display: block;
+
+        --ecp-content: {
+          padding: 0;
+        };
+      }
+
+      etools-data-table-row /deep/ #collapse-wrapper {
+        padding: 0;
+        background: #fff;
+      }
+    </style>
+
+    <etools-content-panel panel-title="[[label]]">
+      <etools-data-table-header no-title>
+        <etools-data-table-column field="cluster">
+          <div class="table-column">Cluster</div>
+        </etools-data-table-column>
+        <etools-data-table-column field="indicator_name" flex-2>
+          <div class="table-column flex-2">Indicator</div>
+        </etools-data-table-column>
+        <etools-data-table-column field="partner">
+          <div class="table-column">Partner</div>
+        </etools-data-table-column>
+        <etools-data-table-column field="due_date">
+          <div class="table-column">Due date</div>
+        </etools-data-table-column>
+      </etools-data-table-header>
+
+      <template
+          is="dom-repeat"
+          items="[[data]]">
+        <etools-data-table-row
+            index="[[index]]"
+            on-opened-changed="_handleOpenedChanged"
+            no-animation>
+          <div slot="row-data">
+            <div class="table-cell table-cell--text">
+              [[item.cluster]]
+            </div>
+            <div class="table-cell table-cell--text" flex-2>
+              [[item.indicator_name]]
+            </div>
+            <div class="table-cell table-cell--text">
+              [[item.partner]]
+            </div>
+            <div class="table-cell table-cell--text">
+              [[item.due_date]]
+            </div>
+          </div>
+          <div slot="row-data-details">
+            <indicator-details
+                id$="indicator-details-[[index]]"
+                reportable-id="[[item.reportable.id]]"
+                indicator-name="[[item.indicator_name]]"
+                indicator-id="[[item.id]]"
+                reporting-period="[[item.reporting_period]]"
+                override-mode="edit">
+            </indicator-details>
+          </div>
+        </etools-data-table-row>
+      </template>
+
+      <div class="widget-actions">
+        <a href="[[reportsUrl]]">See more</a>
+      </div>
+
+      <etools-loading active="[[loading]]"></etools-loading>
+    </etools-content-panel>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'reports-list',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.RoutingBehavior,
+      ],
+
+      properties: {
+        label: String,
+
+        collection: String,
+
+        detailsOpened: {
+          type: Array,
+          value: [],
+        },
+
+        data: {
+          type: Array,
+          statePath: function (state) {
+            return state.clusterDashboardData.data[this.collection];
+          },
+          observer: '_collapseAll',
+        },
+
+        reportsUrl: {
+          type: String,
+          computed: '_computeReportsUrl(_baseUrlCluster)',
+        },
+
+        loading: {
+          type: Boolean,
+          statePath: 'clusterDashboardData.loading',
+        },
+      },
+
+      _computeReportsUrl: function (baseUrl) {
+        return this.buildUrl(baseUrl, '/results');
+      },
+
+      _handleOpenedChanged: function (e, data) {
+        var row = e.srcElement;
+        var openedIndex = this.detailsOpened.indexOf(row);
+        var index;
+
+        if (!data.value) {
+          if (openedIndex !== -1) {
+            this.splice('detailsOpened', openedIndex, 1);
+          }
+
+          return;
+        }
+
+        index = row.index;
+
+        this.push('detailsOpened', row);
+
+        try {
+          Polymer.dom(this.root).querySelector('#indicator-details-' + index).init();
+        } catch (err) {}
+      },
+
+      _collapseAll: function () {
+        this.detailsOpened.slice().forEach(function (row) {
+          row.detailsOpened = false;
+        });
+      },
+
+      detached: function () {
+        this._collapseAll();
+        this.set('detailsOpened.length', 0);
+      },
+    });
+  </script>
+</dom-module>

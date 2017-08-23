@@ -136,6 +136,18 @@
       partnerActivityList: function () {
         return this._buildUrl('/partner/partner-activity-list/');
       },
+
+      clusterDashboard: function (responsePlanId, clusterId, mode) {
+        return this._buildUrl(
+          '/cluster/' +
+          responsePlanId +
+          '/' +
+          clusterId +
+          '/' +
+          mode +
+          '-dashboard/'
+        );
+      },
     };
   }());
 </script>

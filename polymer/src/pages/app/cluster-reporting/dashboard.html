@@ -1,14 +1,18 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../../bower_components/iron-location/iron-query-params.html">
 
+<link rel="import" href="../../../endpoints.html">
+<link rel="import" href="../../../redux/store.html">
+<link rel="import" href="../../../redux/actions.html">
 <link rel="import" href="../../../elements/page-header.html">
 <link rel="import" href="../../../elements/page-body.html">
 <link rel="import" href="../../../elements/cluster-reporting/dashboard/indicators-by-status.html">
 <link rel="import" href="../../../elements/cluster-reporting/dashboard/number-of-partners.html">
 <link rel="import" href="../../../elements/cluster-reporting/dashboard/number-of-due-reports.html">
 <link rel="import" href="../../../elements/cluster-reporting/dashboard/number-of-non-cluster-activities.html">
-<link rel="import" href="../../../elements/cluster-reporting/dashboard/overdue-reports-list.html">
-<link rel="import" href="../../../elements/cluster-reporting/dashboard/upcoming-reports-list.html">
+<link rel="import" href="../../../elements/cluster-reporting/dashboard/reports-list.html">
 <link rel="import" href="../../../elements/cluster-reporting/dashboard/constrained-reports-list.html">
 <link rel="import" href="../../../elements/filters/cluster-filter/filter-list-by-cluster.html">
 
@@ -47,6 +51,21 @@
       }
     </style>
 
+    <iron-location
+        query="{{query}}">
+    </iron-location>
+
+    <iron-query-params
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
+    </iron-query-params>
+
+    <etools-prp-ajax
+        id="data"
+        url="[[dataUrl]]"
+        params="[[queryParams]]">
+    </etools-prp-ajax>
+
     <page-header title="Dashboard">
       <div class="toolbar">
         <filter-list-by-cluster></filter-list-by-cluster>
@@ -76,11 +95,17 @@
       </div>
 
       <div class="row">
-        <overdue-reports-list></overdue-reports-list>
+        <reports-list
+            label="List of overdue indicator reports"
+            collection="overdue_indicator_reports">
+        </reports-list>
       </div>
 
       <div class="row">
-        <upcoming-reports-list></upcoming-reports-list>
+        <reports-list
+            label="List of upcoming indicator reports in last 15 days"
+            collection="TODO">
+        </reports-list>
       </div>
 
       <div class="row">
@@ -93,6 +118,58 @@
   <script>
     Polymer({
       is: 'page-cluster-reporting-dashboard',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        responsePlanId: {
+          type: String,
+          value: '6', // FIXME
+          // statePath: 'responsePlans.currentID',
+        },
+
+        clusterId: {
+          type: Number,
+          value: 33, // FIXME
+          // statePath: 'clusters.filterByClusterId'
+        },
+
+        mode: {
+          type: String,
+          value: 'partner', // FIXME
+        },
+
+        dataUrl: {
+          type: String,
+          computed: '_computeDataUrl(responsePlanId, clusterId, mode)',
+        },
+      },
+
+      observers: [
+        '_handleInputChange(dataUrl, queryParams)',
+      ],
+
+      _computeDataUrl: function (responsePlanId, clusterId, mode) {
+        return App.Endpoints.clusterDashboard(responsePlanId, clusterId, mode);
+      },
+
+      _handleInputChange: function () {
+        this.debounce('fetch-data', function () {
+          var dataThunk = this.$.data.thunk();
+
+          this.$.data.abort();
+
+          this.dispatch(App.Actions.ClusterDashboardData.fetch(dataThunk));
+        }, 100);
+      },
+
+      detached: function () {
+        if (this.isDebouncerActive('fetch-data')) {
+          this.cancelDebouncer('fetch-data');
+        }
+      },
     });
   </script>
 </dom-module>

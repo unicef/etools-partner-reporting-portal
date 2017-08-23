@@ -2,7 +2,9 @@
 <link rel="import" href="../../../../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../../../../bower_components/etools-loading/etools-loading.html">
 
+<link rel="import" href="../../../redux/store.html">
 <link rel="import" href="../../../behaviors/utils.html">
+<link rel="import" href="../../../behaviors/routing.html">
 <link rel="import" href="../../../styles/widgets.html">
 
 <dom-module id="number-of-partners">
@@ -22,7 +24,7 @@
         <div class="widget-figure">[[_withDefault(numberOfPartners, '-')]]</div>
 
         <div class="widget-actions">
-            <a href="#">See all partners</a>
+            <a href="[[partnersUrl]]">See all partners</a>
         </div>
 
         <etools-loading active="[[loading]]"></etools-loading>
@@ -36,6 +38,8 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.RoutingBehavior,
       ],
 
       properties: {
@@ -44,10 +48,19 @@
           value: null,
         },
 
+        partnersUrl: {
+          type: String,
+          computed: '_computePartnersUrl(_baseUrlCluster)',
+        },
+
         loading: {
           type: Boolean,
           value: false,
         },
+      },
+
+      _computePartnersUrl: function (baseUrl) {
+        return this.buildUrl(baseUrl, '/response-parameters/partners');
       },
     });
   </script>

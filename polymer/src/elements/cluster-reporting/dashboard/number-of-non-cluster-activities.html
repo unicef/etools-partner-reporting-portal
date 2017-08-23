@@ -3,6 +3,7 @@
 <link rel="import" href="../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../../../bower_components/etools-loading/etools-loading.html">
 
+<link rel="import" href="../../../redux/store.html">
 <link rel="import" href="../../../behaviors/utils.html">
 <link rel="import" href="../../../styles/widgets.html">
 
@@ -34,17 +35,19 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
       ],
 
       properties: {
         numberOfActivities: {
           type: Number,
           value: null,
+          statePath: 'clusterDashboardData.data.num_of_non_cluster_activities',
         },
 
         loading: {
           type: Boolean,
-          value: false,
+          statePath: 'clusterDashboardData.loading',
         },
       },
     });

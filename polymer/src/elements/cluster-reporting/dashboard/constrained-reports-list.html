@@ -20,7 +20,9 @@
     </style>
 
     <etools-content-panel panel-title="List of constrained indicators">
-      <etools-data-table-header no-title>
+      <etools-data-table-header
+          no-title
+          no-collapse>
         <etools-data-table-column field="cluster">
           <div class="table-column">Cluster</div>
         </etools-data-table-column>
@@ -41,7 +43,7 @@
       <template
           is="dom-repeat"
           items="[[data]]">
-        <etools-data-table-row>
+        <etools-data-table-row no-collapse>
           <div slot="row-data">
             <div class="table-cell table-cell--text">
               [[item.cluster]]

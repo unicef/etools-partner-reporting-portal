@@ -6,9 +6,9 @@
 <link rel="import" href="../../../styles/table-styles.html">
 <link rel="import" href="../../../styles/widgets.html">
 
-<dom-module id="upcoming-reports-list">
+<dom-module id="overdue-reports-list-imo">
   <template>
-      <style include="data-table-styles table-styles widget-styles">
+    <style include="data-table-styles table-styles widget-styles">
       :host {
         display: block;
 
@@ -18,7 +18,7 @@
       }
     </style>
 
-    <etools-content-panel panel-title="List of upcoming indicator reports in last 15 days">
+    <etools-content-panel panel-title="List of overdue indicator reports from last 2 months">
       <etools-data-table-header no-title>
         <etools-data-table-column field="cluster">
           <div class="table-column">Cluster</div>
@@ -63,7 +63,7 @@
 
   <script>
     Polymer({
-      is: 'upcoming-reports-list',
+      is: 'overdue-reports-list-imo',
 
       properties: {
         data: {
