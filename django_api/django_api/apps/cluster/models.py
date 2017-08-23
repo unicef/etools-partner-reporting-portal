@@ -168,8 +168,20 @@ class Cluster(TimeStampedModel):
 
         return overdue.count() + due.count()
 
-    def num_of_indicator_targets_met_partner(self, partner=None):
+    def num_of_met_indicator_reports_partner(self, partner=None):
         return self.met_indicator_reports_partner(partner).count()
+
+    def num_of_constrained_indicator_reports_partner(self, partner=None):
+        return self.constrained_indicator_reports_partner(partner).count()
+
+    def num_of_on_track_indicator_reports_partner(self, partner=None):
+        return self.on_track_indicator_reports_partner(partner).count()
+
+    def num_of_no_progress_indicator_reports_partner(self, partner=None):
+        return self.no_progress_indicator_reports_partner(partner).count()
+
+    def num_of_no_status_indicator_reports_partner(self, partner=None):
+        return self.no_status_indicator_reports_partner(partner).count()
 
     def num_of_projects_in_my_organization_partner(self, partner=None):
         return partner.partner_projects.filter(clusters=self).count()
@@ -190,13 +202,28 @@ class Cluster(TimeStampedModel):
         return partner.partner_activities.filter(
             partner__clusters=self)
 
+    def met_indicator_reports_partner(self, partner=None):
+        return self.met_indicator_reports.filter(
+            reportable__partner_activities__partner=partner
+        )
+
     def constrained_indicator_reports_partner(self, partner=None):
         return self.constrained_indicator_reports.filter(
             reportable__partner_activities__partner=partner
         )
 
-    def met_indicator_reports_partner(self, partner=None):
-        return self.met_indicator_reports.filter(
+    def on_track_indicator_reports_partner(self, partner=None):
+        return self.on_track_indicator_reports.filter(
+            reportable__partner_activities__partner=partner
+        )
+
+    def no_progress_indicator_reports_partner(self, partner=None):
+        return self.no_progress_indicator_reports.filter(
+            reportable__partner_activities__partner=partner
+        )
+
+    def no_status_indicator_reports_partner(self, partner=None):
+        return self.no_status_indicator_reports.filter(
             reportable__partner_activities__partner=partner
         )
 

@@ -719,6 +719,23 @@ class ClusterIndicatorDataSerializer(serializers.ModelSerializer):
         )
 
 
+class ClusterIndicatorForPartnerActivitySerializer(serializers.ModelSerializer):
+    blueprint = IndicatorBlueprintSerializer()
+    locations = SimpleLocationSerializer(many=True)
+
+    class Meta:
+        model = Reportable
+        fields = (
+            'id',
+            'blueprint',
+            'locations',
+            'frequency',
+            'cs_dates',
+            'start_date',
+            'end_date',
+        )
+
+
 class IndicatorReportUpdateSerializer(serializers.ModelSerializer):
 
     overall_status = serializers.SerializerMethodField()
