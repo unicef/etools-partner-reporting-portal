@@ -17,6 +17,7 @@
 <link rel="import" href="../../../elements/cluster-reporting/dashboard/number-of-due-reports.html">
 <link rel="import" href="../../../elements/cluster-reporting/dashboard/number-of-non-cluster-activities.html">
 <link rel="import" href="../../../elements/cluster-reporting/dashboard/reports-list.html">
+<link rel="import" href="../../../elements/cluster-reporting/dashboard/overdue-reports-list-imo.html">
 <link rel="import" href="../../../elements/cluster-reporting/dashboard/constrained-reports-list.html">
 <link rel="import" href="../../../elements/cluster-reporting/dashboard/activities-list.html">
 
@@ -115,10 +116,22 @@
       </div>
 
       <div class="row">
-        <reports-list
-            label="List of overdue indicator reports"
-            collection="overdue_indicator_reports">
-        </reports-list>
+        <template
+            is="dom-if"
+            if="[[_equals(mode, 'cluster')]]"
+            restamp="true">
+          <reports-list
+              label="List of overdue indicator reports"
+              collection="overdue_indicator_reports">
+          </reports-list>
+        </template>
+
+        <template
+            is="dom-if"
+            if="[[_equals(mode, 'partner')]]"
+            restamp="true">
+            <overdue-reports-list-imo></overdue-reports-list-imo>
+        </template>
       </div>
 
       <template

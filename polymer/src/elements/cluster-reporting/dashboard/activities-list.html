@@ -24,6 +24,10 @@
           padding: 0;
         };
       }
+
+      .cell-is-cluster {
+        text-align: center;
+      }
     </style>
 
     <etools-content-panel panel-title="List of My Project Activities">
@@ -38,7 +42,7 @@
           <div class="table-column">Activity</div>
         </etools-data-table-column>
         <etools-data-table-column field="is_cluster">
-          <div class="table-column">Cluster Activity</div>
+          <div class="table-column cell-is-cluster">Cluster Activity</div>
         </etools-data-table-column>
         <etools-data-table-column field="location">
           <div class="table-column">Location</div>
@@ -61,7 +65,7 @@
             <div class="table-cell table-cell--text" flex-2>
               [[item.title]]
             </div>
-            <div class="table-cell">
+            <div class="table-cell cell-is-cluster">
               <template
                   is="dom-if"
                   if="[[item.is_cluster]]">
@@ -91,7 +95,7 @@
             </div>
             <div class="table-cell flex-2 table-cell--text">
               <labelled-item label="Project">
-                [[item.project]]
+                [[item.project.title]]
               </labelled-item>
             </div>
             <div class="table-cell flex">&nbsp;</div>
