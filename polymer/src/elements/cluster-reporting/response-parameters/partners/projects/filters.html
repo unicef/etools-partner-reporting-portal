@@ -11,6 +11,7 @@
 <link rel="import" href="../../../../filters/date-filter/date-filter.html">
 <link rel="import" href="../../../../filters/status-filter/project-status-filter.html">
 <link rel="import" href="../../../../filters/cluster-location-filter/cluster-location-filter.html">
+<link rel="import" href="../../../../filters/cluster-partner-filter/cluster-partner-filter.html">
 
 <dom-module id="partner-projects-filters">
   <template>
@@ -38,12 +39,11 @@
 
     <filter-list filters="{{filters}}">
       <div class="app-grid">
-        <text-filter
-          class="item"
-          label="Partner"
-          name="partner"
-          value="[[queryParams.partner]]">
-        </text-filter>
+
+        <cluster-partner-filter
+            class="item"
+            value="[[_withDefault(queryParams.partner, '')]]">
+        </cluster-partner-filter>
 
         <text-filter
           class="item"

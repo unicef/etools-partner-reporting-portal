@@ -11,6 +11,7 @@
 <link rel="import" href="../../../../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../../../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
 <link rel="import" href="../../../../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../../../../bower_components/etools-searchable-multiselection-menu/etools-multi-selection-menu.html">
 
 <link rel="import" href="../../../etools-prp-ajax.html">
 <link rel="import" href="../../../etools-prp-date-input.html">
@@ -115,47 +116,29 @@
               on-input="_validate">
             </paper-input>
 
-            <paper-dropdown-menu
-                class="item validate"
-                label="Cluster"
-                id="cluster"
-                on-value-changed="_validate"
-                always-float-label
-                required>
-                <paper-listbox
-                    selected="{{data.clusters}}"
-                    attr-for-selected="value"
-                    slot="dropdown-content"
-                    class="dropdown-content">
-                  <template
-                      id="clusters"
-                      is="dom-repeat"
-                      items="[[clusters]]">
-                    <paper-item value="[[item.id]]">[[item.title]]</paper-item>
-                  </template>
-                </paper-listbox>
-            </paper-dropdown-menu>
+            <div class="row">
+              <etools-multi-selection-menu
+                  class="validate"
+                  label="Locations"
+                  options="[[formattedLocations]]"
+                  selected-values="{{selectedLocations}}"
+                  on-selected-values-changed="_validate"
+                  trigger-value-change-event
+                  required>
+              </etools-multi-selection-menu>
+            </div>
 
-            <paper-dropdown-menu
-                class="item validate"
-                label="Location"
-                id="location"
-                on-value-changed="_validate"
-                always-float-label
-                required>
-                <paper-listbox
-                    selected="{{data.locations}}"
-                    attr-for-selected="value"
-                    slot="dropdown-content"
-                    class="dropdown-content">
-                  <template
-                      id="locations"
-                      is="dom-repeat"
-                      items="[[locations]]">
-                    <paper-item value="[[item.id]]">[[item.title]]</paper-item>
-                  </template>
-                </paper-listbox>
-            </paper-dropdown-menu>
+            <div class="row">
+              <etools-multi-selection-menu
+                  class="validate"
+                  label="Clusters"
+                  options="[[formattedClusters]]"
+                  selected-values="{{selectedClusters}}"
+                  on-selected-values-changed="_validate"
+                  trigger-value-change-event
+                  required>
+              </etools-multi-selection-menu>
+            </div>
 
             <div class="item">
                <etools-prp-date-input
@@ -322,6 +305,26 @@
           computed: '_computeUrl(responsePlanID)'
         },
 
+        locations: {
+          format: Array,
+          value: []
+        },
+
+        clusters: {
+          format: Array,
+          value: []
+        },
+
+        formattedLocations: {
+          type: Array,
+          computed: '_formatForMultiselect(locations)'
+        },
+
+        formattedClusters: {
+          type: Array,
+          computed: '_formatForMultiselect(clusters)'
+        },
+
         statuses: {
           type: Array,
           value: [
@@ -339,6 +342,10 @@
             {title: 'Quarterly', id: 'Qua'},
           ],
         },
+
+        selectedLocations: Array,
+
+        selectedClusters: Array,
       },
 
       _computeUrl: function(responsePlanID) {
@@ -352,6 +359,8 @@
 
       open: function () {
         this.data = {};
+        this.selectedClusters = [];
+        this.selectedLocations = [];
         this.set('opened', true);
         this.set('refresh', true);
       },
@@ -366,23 +375,31 @@
         this.set('path', url);
       },
 
+      _formatForMultiselect: function(list) {
+        return list.map(function(item) {
+          return {
+            id:item.id,
+            value:item.id,
+            label:item.title,
+          };
+        });
+      },
+
       _save: function () {
+        var self = this;
+
         if (!this._fieldsAreValid()) {
           return;
         }
 
-        // Temporary. Issue #223 will add chips for locations and clusters.
-        // Better fake data is also required (request made already).
-        this.data.locations = [];
-        var clusterSelection = this.data.clusters;
-        if (typeof(clusterSelection) === 'number') {
-          this.data.clusters = [{id: clusterSelection}];
-        } else {
-          clusterSelection = this.data.clusters[0].id;
-          this.data.clusters = [{id: clusterSelection}];
-        }
+        this.data.locations = this.selectedLocations.map(function(item) {
+          return {id: Number(item)}
+        });
 
-        var self = this;
+        this.data.clusters = this.selectedClusters.map(function(item) {
+          return {id: Number(item)}
+        });
+
         this.updatePending = true;
         var thunk = this.$.createProject.thunk();
         thunk()
