@@ -7,6 +7,7 @@
 <link rel="import" href="../../../redux/store.html">
 <link rel="import" href="../../../redux/actions.html">
 <link rel="import" href="../../../behaviors/utils.html">
+<link rel="import" href="../../../elements/etools-prp-auth.html">
 <link rel="import" href="../../../elements/page-header.html">
 <link rel="import" href="../../../elements/page-body.html">
 <link rel="import" href="../../../elements/filters/cluster-filter/filter-list-by-cluster.html">
@@ -53,6 +54,10 @@
         @apply(--app-grid-expandible-item);
       }
     </style>
+
+    <etools-prp-auth
+        account-type="{{accountType}}">
+    </etools-prp-auth>
 
     <iron-location
         query="{{query}}">
@@ -164,11 +169,6 @@
           type: Number,
           value: 33, // FIXME
           // statePath: 'clusters.filterByClusterId'
-        },
-
-        accountType: {
-          type: String,
-          statePath: 'auth.accountType',
         },
 
         mode: {
