@@ -46,6 +46,13 @@
         numberOfPartners: {
           type: Number,
           value: null,
+          statePath: 'clusterDashboardData.data.num_of_partners',
+        },
+
+        numberOfReports: {
+          type: Number,
+          value: null,
+          statePath: 'clusterDashboardData.data.num_of_due_overdue_indicator_reports',
         },
 
         partnersUrl: {
@@ -55,7 +62,7 @@
 
         loading: {
           type: Boolean,
-          value: false,
+          statePath: 'clusterDashboardData.loading',
         },
       },
 
