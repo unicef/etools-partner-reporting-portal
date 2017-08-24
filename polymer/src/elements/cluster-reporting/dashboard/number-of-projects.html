@@ -2,7 +2,9 @@
 <link rel="import" href="../../../../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../../../../bower_components/etools-loading/etools-loading.html">
 
+<link rel="import" href="../../../redux/store.html">
 <link rel="import" href="../../../behaviors/utils.html">
+<link rel="import" href="../../../behaviors/routing.html">
 <link rel="import" href="../../../styles/dashboard-widget.html">
 
 <dom-module id="number-of-projects">
@@ -22,7 +24,7 @@
         <div class="widget-figure">[[_withDefault(numberOfProjects, '-')]]</div>
 
         <div class="widget-actions">
-            <a href="#">See all projects</a>
+            <a href="[[projectsUrl]]">See all projects</a>
         </div>
 
         <etools-loading active="[[loading]]"></etools-loading>
@@ -36,19 +38,32 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.RoutingBehavior,
       ],
 
       properties: {
         numberOfProjects: {
           type: Number,
           value: null,
+          statePath: 'clusterDashboardData.data.num_of_projects_in_my_organization',
+        },
+
+        projectsUrl: {
+          type: String,
+          computed: '_computePartnersUrl(_baseUrlCluster)',
         },
 
         loading: {
           type: Boolean,
-          value: false,
+          statePath: 'clusterDashboardData.loading',
         },
+      },
+
+      _computePartnersUrl: function (baseUrl) {
+        return this.buildUrl(baseUrl, '/planned-action/projects');
       },
     });
   </script>
 </dom-module>
+

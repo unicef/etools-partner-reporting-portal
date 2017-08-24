@@ -12,6 +12,7 @@
 <link rel="import" href="../../../elements/filters/cluster-filter/filter-list-by-cluster.html">
 <link rel="import" href="../../../elements/cluster-reporting/dashboard/indicators-by-status.html">
 <link rel="import" href="../../../elements/cluster-reporting/dashboard/number-of-partners.html">
+<link rel="import" href="../../../elements/cluster-reporting/dashboard/number-of-projects.html">
 <link rel="import" href="../../../elements/cluster-reporting/dashboard/number-of-due-reports.html">
 <link rel="import" href="../../../elements/cluster-reporting/dashboard/number-of-non-cluster-activities.html">
 <link rel="import" href="../../../elements/cluster-reporting/dashboard/reports-list.html">
@@ -83,7 +84,19 @@
           <div class="item">
             <div class="app-grid">
               <div class="item">
-                <number-of-partners></number-of-partners>
+                <template
+                    is="dom-if"
+                    if="[[_equals(mode, 'cluster')]]"
+                    restamp="true">
+                  <number-of-partners></number-of-partners>
+                </template>
+
+                <template
+                    is="dom-if"
+                    if="[[_equals(mode, 'partner')]]"
+                    restamp="true">
+                  <number-of-projects></number-of-projects>
+                </template>
               </div>
               <div class="item">
                 <number-of-due-reports></number-of-due-reports>
@@ -103,20 +116,30 @@
         </reports-list>
       </div>
 
-      <div class="row">
-        <reports-list
-            label="List of upcoming indicator reports in last 15 days"
-            collection="TODO">
-        </reports-list>
-      </div>
+      <template
+          is="dom-if"
+          if="[[_equals(mode, 'cluster')]]"
+          restamp="true">
+        <div class="row">
+          <reports-list
+              label="List of upcoming indicator reports in last 15 days"
+              collection="new_indicator_reports">
+          </reports-list>
+        </div>
+      </template>
 
       <div class="row">
         <constrained-reports-list></constrained-reports-list>
       </div>
 
-      <div class="row">
-        <activities-list></activities-list>
-      </div>
+      <template
+          is="dom-if"
+          if="[[_equals(mode, 'partner')]]"
+          restamp="true">
+        <div class="row">
+          <activities-list></activities-list>
+        </div>
+      </template>
     </page-body>
 
   </template>
@@ -143,10 +166,14 @@
           // statePath: 'clusters.filterByClusterId'
         },
 
+        accountType: {
+          type: String,
+          statePath: 'auth.accountType',
+        },
+
         mode: {
           type: String,
-          // value: 'partner'
-          value: 'cluster', // FIXME
+          computed: '_computeMode(accountType)',
         },
 
         dataUrl: {
@@ -158,6 +185,16 @@
       observers: [
         '_handleInputChange(dataUrl, queryParams)',
       ],
+
+      _computeMode: function (accountType) {
+        switch (accountType) {
+          case App.Constants.ACCOUNT_TYPE_PARTNER:
+            return 'cluster';
+
+          case App.Constants.ACCOUNT_TYPE_IMO:
+            return 'partner';
+        }
+      },
 
       _computeDataUrl: function (responsePlanId, clusterId, mode) {
         return App.Endpoints.clusterDashboard(responsePlanId, clusterId, mode);

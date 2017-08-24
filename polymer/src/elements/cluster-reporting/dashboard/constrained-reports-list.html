@@ -3,6 +3,8 @@
 <link rel="import" href="../../../../bower_components/etools-data-table/etools-data-table.html">
 <link rel="import" href="../../../../bower_components/etools-loading/etools-loading.html">
 
+<link rel="import" href="../../../redux/store.html">
+<link rel="import" href="../../../behaviors/routing.html">
 <link rel="import" href="../../../elements/etools-prp-progress-bar.html">
 <link rel="import" href="../../../styles/table-styles.html">
 <link rel="import" href="../../../styles/dashboard-widget.html">
@@ -17,6 +19,11 @@
           padding: 0;
         };
       }
+
+      a {
+        text-decoration: none;
+        color: var(--theme-primary-color);
+      }
     </style>
 
     <etools-content-panel panel-title="List of constrained indicators">
@@ -26,7 +33,7 @@
         <etools-data-table-column field="cluster">
           <div class="table-column">Cluster</div>
         </etools-data-table-column>
-        <etools-data-table-column field="indicator" flex-2>
+        <etools-data-table-column field="title" flex-2>
           <div class="table-column flex-2">Indicator</div>
         </etools-data-table-column>
         <etools-data-table-column field="partner">
@@ -49,7 +56,7 @@
               [[item.cluster]]
             </div>
             <div class="table-cell table-cell--text" flex-2>
-              [[item.indicator]]
+              <a href="[[_getReportUrl(_baseUrlCluster, item.id)]]">[[item.title]]</a>
             </div>
             <div class="table-cell table-cell--text">
               [[item.partner]]
@@ -67,8 +74,10 @@
       </template>
 
       <div class="widget-actions">
-        <a href="#">See more</a>
+        <a href="[[reportsUrl]]">See more</a>
       </div>
+
+      <etools-loading active="[[loading]]"></etools-loading>
     </etools-content-panel>
   </template>
 
@@ -76,52 +85,34 @@
     Polymer({
       is: 'constrained-reports-list',
 
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.RoutingBehavior,
+      ],
+
       properties: {
         data: {
           type: Array,
-          value: [
-            {
-              cluster: 'Education',
-              indicator: '# of children having access to new borehole (leg pump)',
-              partner: 'Action Aid',
-              last_reported: '14 Jul 2017',
-              progress_percentage: 0.1,
-            },
-            {
-              cluster: 'Education',
-              indicator: '# of children having access to new borehole (leg pump)',
-              partner: 'Action Aid',
-              last_reported: '14 Jul 2017',
-              progress_percentage: 0.34,
-            },
-            {
-              cluster: 'Education',
-              indicator: '# of children having access to new borehole (leg pump)',
-              partner: 'Action Aid',
-              last_reported: '14 Jul 2017',
-              progress_percentage: 1,
-            },
-            {
-              cluster: 'Education',
-              indicator: '# of children having access to new borehole (leg pump)',
-              partner: 'Action Aid',
-              last_reported: '14 Jul 2017',
-              progress_percentage: 0.1,
-            },
-            {
-              cluster: 'Education',
-              indicator: '# of children having access to new borehole (leg pump)',
-              partner: 'Action Aid',
-              last_reported: '14 Jul 2017',
-              progress_percentage: 0.5,
-            },
-          ],
+          statePath: 'clusterDashboardData.data.constrained_indicator_reports',
+        },
+
+        reportsUrl: {
+          type: String,
+          computed: '_computeReportsUrl(_baseUrlCluster)',
         },
 
         loading: {
           type: Boolean,
-          value: false,
+          statePath: 'clusterDashboardData.loading',
         },
+      },
+
+      _computeReportsUrl: function (baseUrl) {
+        return this.buildUrl(baseUrl, '/results/submitted');
+      },
+
+      _getReportUrl: function (baseUrl, id) {
+        return this.buildUrl(baseUrl, '/results/submitted?indicator=' + id);
       },
     });
   </script>
