@@ -9,7 +9,6 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('indicator', '0021_auto_20170807_2147'),
-        ('indicator', '0021_auto_20170816_2331'),
     ]
 
     operations = [

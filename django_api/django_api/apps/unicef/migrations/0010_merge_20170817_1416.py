@@ -8,7 +8,6 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('unicef', '0009_auto_20170816_2331'),
         ('unicef', '0009_auto_20170807_2147'),
     ]
 

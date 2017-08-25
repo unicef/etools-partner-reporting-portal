@@ -9,7 +9,6 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('cluster', '0006_auto_20170807_2147'),
-        ('cluster', '0006_auto_20170816_2331'),
     ]
 
     operations = [
