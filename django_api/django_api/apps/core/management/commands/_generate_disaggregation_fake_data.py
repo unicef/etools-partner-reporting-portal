@@ -13,6 +13,7 @@ from indicator.disaggregators import (
 )
 from core.models import (
     Location,
+    CartoDBTable,
 )
 from core.helpers import (
     generate_data_combination_entries,
@@ -33,7 +34,14 @@ def generate_0_num_disagg_data(reportable, indicator_type="quantity"):
     # IndicatorReport from QuantityReportable object -
     # IndicatorLocationData
     if reportable.locations.count() == 0:
-        LocationFactory(reportable=reportable)
+        table = CartoDBTable.objects.first()
+
+        LocationFactory(
+            reportable=reportable,
+            gateway=table.gateway,
+            carto_db_table=table,
+            intervention=table.intervention,
+        )
 
     location = reportable.locations.first()
     disagg_idx = 0
