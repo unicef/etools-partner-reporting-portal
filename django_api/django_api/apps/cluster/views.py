@@ -1,11 +1,12 @@
 import logging
 
 from django.db.models import Q
-from django.http import Http404
+from django.http import Http404, HttpResponse
+from django.conf import settings
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.generics import ListCreateAPIView, ListAPIView
+from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveAPIView
 from rest_framework import status as statuses, serializers
 
 import django_filters
@@ -14,6 +15,7 @@ from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
 from indicator.serializers import ClusterIndicatorReportSerializer, ClusterIndicatorReportSimpleSerializer
 from indicator.models import IndicatorReport
+from cluster.export import XLSXWriter
 from .models import ClusterObjective, ClusterActivity, Cluster
 from .serializers import (
     ClusterSimpleSerializer,
@@ -308,3 +310,41 @@ class ClusterPartnerDashboardAPIView(APIView):
         serializer = ClusterPartnerDashboardSerializer(
             instance=cluster, context={'partner': partner})
         return Response(serializer.data, status=statuses.HTTP_200_OK)
+
+
+class ClusterIndicatorsListExcelView(RetrieveAPIView):
+    """
+        Used for generating excel file from filtered indicators
+    """
+    permission_classes = (IsAuthenticated,)
+
+
+    def get(self, request, response_plan_id, *args, **kwargs):
+        # Render to excel
+
+        indicators = IndicatorReport.objects.filter(
+            Q(reportable__cluster_objectives__isnull=False)
+            | Q(reportable__cluster_activities__isnull=False)
+            | Q(reportable__partner_projects__isnull=False)
+            | Q(reportable__partner_activities__isnull=False)
+        ).filter(
+            Q(reportable__cluster_objectives__cluster__response_plan=response_plan_id)
+            | Q(reportable__cluster_activities__cluster_objective__cluster__response_plan=response_plan_id)
+            | Q(reportable__partner_projects__clusters__response_plan=response_plan_id)
+            | Q(
+                reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)
+        )
+
+        writer = XLSXWriter(indicators)
+
+        import os.path
+        import mimetypes
+
+        mimetypes.init()
+        file_path = writer.export_data()
+        file_name = os.path.basename(file_path)
+        file_content = open(file_path, 'rb').read()
+        response = HttpResponse(file_content, content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        response['Content-Disposition'] = 'attachment; filename=' + file_name
+        return response
+
