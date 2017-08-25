@@ -130,6 +130,17 @@ class PartnerProjectSimpleSerializer(serializers.ModelSerializer):
         )
 
 
+class PartnerActivitySimpleSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PartnerActivity
+        fields = (
+            'title',
+            'project',
+            'partner',
+        )
+
+
 class ClusterActivityPartnersSerializer(serializers.ModelSerializer):
 
     partner_projects = PartnerProjectSimpleSerializer(many=True)
