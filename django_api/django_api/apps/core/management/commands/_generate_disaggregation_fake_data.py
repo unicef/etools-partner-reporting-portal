@@ -38,7 +38,7 @@ def generate_0_num_disagg_data(reportable, indicator_type="quantity"):
 
         LocationFactory(
             reportable=reportable,
-            gateway=table.gateway,
+            gateway=table.location_type,
             carto_db_table=table,
             intervention=table.intervention,
         )
