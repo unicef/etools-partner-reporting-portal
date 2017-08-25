@@ -529,6 +529,7 @@ class IndicatorLocationDataFactory(factory.django.DjangoModelFactory):
 
 class GatewayTypeFactory(factory.django.DjangoModelFactory):
     name = factory.Sequence(lambda n: "gateway_type_%d" % n)
+    admin_level = fuzzy.FuzzyInteger(1, 10, 1)
 
     class Meta:
         model = GatewayType

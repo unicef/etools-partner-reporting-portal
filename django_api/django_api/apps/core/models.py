@@ -141,6 +141,7 @@ class GatewayType(models.Model):
     """
 
     name = models.CharField(max_length=64L, unique=True)
+    admin_level = models.PositiveSmallIntegerField()
 
     intervention = models.ForeignKey(Intervention, related_name="gateway_types")
 
