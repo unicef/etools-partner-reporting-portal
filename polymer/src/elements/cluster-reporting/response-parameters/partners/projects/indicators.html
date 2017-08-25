@@ -1,0 +1,145 @@
+<link rel="import" href="../../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../../../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../../../../bower_components/iron-location/iron-query-params.html">
+
+<link rel="import" href="../../../../etools-prp-ajax.html">
+<link rel="import" href="../../../../page-body.html">
+<link rel="import" href="../../../indicator-modal.html">
+<link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="../../../../../endpoints.html">
+<link rel="import" href="../../../../../styles/table-styles.html">
+<link rel="import" href="../../../../../styles/buttons.html">
+<link rel="import" href="../../../../list-view-indicators.html">
+
+<dom-module id="rp-partner-project-details-indicators">
+  <template>
+    <style include="button-styles iron-flex data-table-styles table-styles">
+      :host {
+        display: block;
+      }
+
+      div#action {
+        margin: 25px 0;
+        @apply(--layout-horizontal);
+        @apply(--layout-end-justified)
+      }
+    </style>
+
+    <iron-location query="{{query}}"></iron-location>
+
+    <iron-query-params
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
+    </iron-query-params>
+
+    <etools-prp-ajax
+        id="indicators"
+        url="[[url]]"
+        params="[[queryParams]]">
+    </etools-prp-ajax>
+
+    <page-body>
+      <div id="action">
+        <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
+          Add Indicator
+        </paper-button>
+      </div>
+
+      <indicator-modal
+        id="indicatorModal"
+        object-id="[[projectId]]"
+        object-type="PartnerProject">
+      </indicator-modal>
+
+      <list-view-indicators
+          data="[[data]]"
+          total-results="[[totalResults]]">
+      </list-view-indicators>
+    </page-body>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'rp-partner-project-details-indicators',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.UtilsBehavior,
+      ],
+
+      properties: {
+        queryParams: Object,
+
+        projectId: Number,
+
+        data: {
+          type: Array,
+          computed: '_computeCurrentIndicators(projectId, allIndicators)'
+        },
+
+        totalResults: {
+          type: Number,
+          computed: '_computeCurrentIndicatorsCount(projectId, allIndicatorsCount)'
+        },
+
+        url: {
+          type: String,
+          computed: '_computeUrl(projectId, queryParams)'
+        },
+
+        allIndicators: {
+          type: Object,
+          statePath: 'partnerProjects.indicators',
+        },
+
+        allIndicatorsCount: {
+          type: Number,
+          statePath: 'partnerProjects.indicatorsCount',
+        },
+      },
+
+      listeners: {
+        'indicatorModal.indicator-added': '_onSuccess',
+      },
+
+      observers: [
+        '_indicatorsAjax(queryParams, projectId)',
+      ],
+
+      _openModal: function () {
+        this.$.indicatorModal.open();
+      },
+
+      _onSuccess: function () {
+        this._indicatorsAjax();
+      },
+
+      _computeCurrentIndicators: function(projectId, allIndicators) {
+        return allIndicators[projectId];
+      },
+
+      _computeCurrentIndicatorsCount: function(projectId, allIndicatorsCount) {
+        return allIndicatorsCount[projectId];
+      },
+
+      _computeUrl: function () {
+        //Make sure the queryParams are updated before the thunk is created:
+        this.set('queryParams.object_id', this.projectId);
+
+        return App.Endpoints.indicators('pp');
+      },
+
+      _indicatorsAjax: function () {
+        var thunk = this.$.indicators.thunk();
+
+        this.$.indicators.abort();
+
+        this.dispatch(App.Actions.PartnerProjects.indicators.fetch(thunk, this.projectId))
+          .catch(function (err) { // jshint ignore:line
+              // TODO: error handling.
+          });
+      },
+    });
+  </script>
+</dom-module>

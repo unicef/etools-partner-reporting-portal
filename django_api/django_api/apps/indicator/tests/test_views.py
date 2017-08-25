@@ -1,33 +1,29 @@
 from ast import literal_eval as make_tuple
-from datetime import date
+from datetime import date, timedelta
+import random
+import string
 
 from django.urls import reverse
 from django.conf import settings
 
 from rest_framework import status
-from rest_framework.test import APITestCase, APIClient
 
-from account.models import User
-from core.factories import (
-    ProgrammeDocumentFactory,
-    QuantityReportableToLowerLevelOutputFactory,
-    ProgressReportFactory,
-    IndicatorLocationDataFactory,
-    SectionFactory
-)
+from core.tests.base import BaseAPITestCase
+from core.models import Location
 from core.helpers import (
     suppress_stdout,
     get_cast_dictionary_keys_as_tuple,
 )
-from core.management.commands._privates import generate_fake_data
-from core.common import OVERALL_STATUS, PROGRESS_REPORT_STATUS
+from core.common import OVERALL_STATUS, PROGRESS_REPORT_STATUS, REPORTABLE_FREQUENCY_LEVEL, INDICATOR_REPORT_STATUS
+from core.factories import ProgressReportFactory
 from core.tests.base import BaseAPITestCase
+from cluster.models import ClusterObjective, ClusterActivity
+from partner.models import PartnerProject, PartnerActivity
 from unicef.models import (
     LowerLevelOutput,
     Section,
     ProgrammeDocument
 )
-
 from indicator.serializers import (
     IndicatorLocationDataUpdateSerializer
 )
@@ -37,6 +33,7 @@ from indicator.models import (
     IndicatorLocationData,
     Disaggregation,
     DisaggregationValue,
+    IndicatorBlueprint,
 )
 
 
@@ -73,10 +70,18 @@ class TestPDReportsAPIView(BaseAPITestCase):
         self.assertEquals(response.data['id'], str(report_id))
 
 
-class TestIndicatorListAPIView(BaseAPITestCase):
+class TestIndicatorDataAPIView(BaseAPITestCase):
+    generate_fake_data_quantity = 30
 
     def test_list_api(self):
-        ir_id = IndicatorReport.objects.first().id
+        ir = IndicatorReport.objects.filter(reportable__lower_level_outputs__isnull=False).first()
+
+        if not ir.progress_report:
+            ir.progress_report = ProgressReportFactory(
+                programme_document=ir.reportable.content_object.indicator.programme_document)
+            ir.save()
+
+        ir_id = ir.id
         url = reverse('indicator-data', kwargs={'ir_id': ir_id})
         response = self.client.get(url, format='json')
 
@@ -110,7 +115,13 @@ class TestIndicatorListAPIView(BaseAPITestCase):
         self.assertEquals(response.data['outputs'][0]['id'], reportable_id)
 
     def test_enter_indicator(self):
-        ir = IndicatorReport.objects.first()
+        ir = IndicatorReport.objects.filter(reportable__lower_level_outputs__isnull=False).first()
+
+        if not ir.progress_report:
+            ir.progress_report = ProgressReportFactory(
+                programme_document=ir.reportable.content_object.indicator.programme_document)
+            ir.save()
+
         self.assertEquals(ir.progress_report.partner_contribution_to_date, '')
         self.assertEquals(ir.progress_report.challenges_in_the_reporting_period, '')
         data = {
@@ -137,7 +148,15 @@ class TestIndicatorListAPIView(BaseAPITestCase):
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_submit_indicator(self):
-        ir = IndicatorReport.objects.first()
+        ir = IndicatorReport.objects.filter(
+            reportable__lower_level_outputs__isnull=False,
+            report_status=INDICATOR_REPORT_STATUS.sent_back).first()
+
+        if not ir.progress_report:
+            ir.progress_report = ProgressReportFactory(
+                programme_document=ir.reportable.content_object.indicator.programme_document)
+            ir.save()
+
         url = reverse('indicator-data', kwargs={'ir_id': ir.id})
         response = self.client.post(url, format='json')
         self.assertEquals(response.status_code, status.HTTP_200_OK)
@@ -159,7 +178,7 @@ class TestIndicatorListAPIView30(BaseAPITestCase):
             item), self.reports.values_list('locations__id', flat=True))
         location_id_list_string = ','.join(location_ids)
 
-        url = reverse('indicator-list-create-api')
+        url = reverse('indicator-list-create-api', kwargs={'content_object': 'llo'})
         url += '?locations=' + location_id_list_string
         response = self.client.get(url, format='json')
 
@@ -177,7 +196,7 @@ class TestIndicatorListAPIView30(BaseAPITestCase):
         )
         pd_id_list_string = ','.join(pd_ids)
 
-        url = reverse('indicator-list-create-api')
+        url = reverse('indicator-list-create-api', kwargs={'content_object': 'llo'})
         url += '?pds=' + pd_id_list_string
         response = self.client.get(url, format='json')
 
@@ -233,6 +252,191 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
 
             self.assertEquals(response.status_code, status.HTTP_200_OK)
             self.assertEquals(len(response.data), 2)
+
+
+class TestClusterIndicatorAPIView(BaseAPITestCase):
+
+    generate_fake_data_quantity = 3
+
+    def setUp(self):
+        super(TestClusterIndicatorAPIView, self).setUp()
+        self.reportable_count = Reportable.objects.count()
+        self.blueprint_count = IndicatorBlueprint.objects.count()
+
+        self.co = ClusterObjective.objects.first()
+        self.url = reverse('cluster-indicator')
+        self.data = {
+            'object_id': self.co.id,
+            'object_type': 'ClusterObjective',
+            'means_of_verification': 'IMO/CC calculation',
+            'frequency': REPORTABLE_FREQUENCY_LEVEL.weekly,
+            'locations': [
+                {'id': Location.objects.first().id},
+                {'id': Location.objects.last().id},
+            ],
+            'blueprint': {
+                'title': 'of temporary classrooms',
+                'calculation_formula_across_periods': IndicatorBlueprint.MAX,
+                'calculation_formula_across_locations': IndicatorBlueprint.AVG,
+                'display_type': IndicatorBlueprint.NUMBER,
+            },
+            'disaggregation': [
+                {'name': 'Age', 'values': ['0-5m', '5-12m', '1-3y', '4-7y']},
+                {'name': 'Gender', 'values': ['Male', 'Female', 'Other']}
+            ]
+        }
+
+    def test_create_indicator_cluster_objective_reporting(self):
+        response = self.client.post(self.url, data=self.data, format='json')
+
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+        self.assertEquals(Reportable.objects.count(), self.reportable_count+1)
+        self.assertEquals(IndicatorBlueprint.objects.count(), self.blueprint_count+1)
+
+        reportable = Reportable.objects.get(id=response.data['id'])
+        self.assertEquals(reportable.frequency, REPORTABLE_FREQUENCY_LEVEL.weekly)
+
+        rep_dis = Disaggregation.objects.filter(reportable=response.data['id'])
+        self.assertTrue(rep_dis.first().name in ['Gender', 'Age'])
+        self.assertTrue(rep_dis.last().name in ['Gender', 'Age'])
+        first_dis_vals = DisaggregationValue.objects.filter(disaggregation=rep_dis.first())
+        last_dis_vals = DisaggregationValue.objects.filter(disaggregation=rep_dis.last())
+        self.assertTrue(first_dis_vals.first().value in self.data['disaggregation'][0]['values'])
+        self.assertTrue(last_dis_vals.first().value in self.data['disaggregation'][1]['values'])
+
+        self.data['locations'].append(dict(failkey=1))
+        response = self.client.post(self.url, data=self.data, format='json')
+        self.assertFalse(status.is_success(response.status_code))
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEquals(
+            response.data,
+            {"locations": "List of dict location or one dict location expected"}
+        )
+
+    def test_create_percentage_indicator_reporting(self):
+        self.data['blueprint'].pop('calculation_formula_across_periods')
+        self.data['blueprint'].pop('calculation_formula_across_locations')
+        self.data['blueprint']['display_type'] = IndicatorBlueprint.PERCENTAGE
+        response = self.client.post(self.url, data=self.data, format='json')
+
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+        self.assertEquals(Reportable.objects.count(), self.reportable_count+1)
+        self.assertEquals(IndicatorBlueprint.objects.count(), self.blueprint_count+1)
+
+        reportable = Reportable.objects.get(id=response.data['id'])
+        self.assertEquals(reportable.blueprint.display_type, IndicatorBlueprint.PERCENTAGE)
+
+    def test_create_indicator_disaggregation_max_length_reporting(self):
+        max_length = DisaggregationValue._meta.get_field('value').max_length
+        over_max_val = "".join(random.sample(string.ascii_uppercase, max_length+1))
+        self.data['disaggregation'][1]['values'][0] = over_max_val
+        response = self.client.post(self.url, data=self.data, format='json')
+
+        self.assertFalse(status.is_success(response.status_code))
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEquals(Reportable.objects.count(), self.reportable_count)
+        self.assertEquals(IndicatorBlueprint.objects.count(), self.blueprint_count)
+        self.assertEquals(
+            response.data,
+            {"disaggregation": "Disaggregation Value expected max %s chars" % max_length}
+        )
+
+    def test_create_csdates_indicator_cluster_activities_reporting(self):
+        cs_dates = [
+            date.today().strftime(settings.INPUT_DATA_FORMAT),
+            (date.today() + timedelta(days=3)).strftime(settings.INPUT_DATA_FORMAT),
+            (date.today() + timedelta(days=6)).strftime(settings.INPUT_DATA_FORMAT),
+            (date.today() + timedelta(days=9)).strftime(settings.INPUT_DATA_FORMAT),
+        ]
+        ca = ClusterActivity.objects.first()
+        self.data['object_id'] = ca.id
+        self.data['object_type'] = 'ClusterActivity'
+        self.data['cs_dates'] = cs_dates
+        self.data['frequency'] = REPORTABLE_FREQUENCY_LEVEL.custom_specific_dates
+        response = self.client.post(self.url, data=self.data, format='json')
+
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+        self.assertEquals(Reportable.objects.count(), self.reportable_count+1)
+        self.assertEquals(IndicatorBlueprint.objects.count(), self.blueprint_count+1)
+
+        reportable = Reportable.objects.get(id=response.data['id'])
+        self.assertEquals(reportable.frequency, REPORTABLE_FREQUENCY_LEVEL.custom_specific_dates)
+        self.assertEquals(len(reportable.cs_dates), len(cs_dates))
+
+    def test_create_indicator_partner_project_reporting(self):
+        pp = PartnerProject.objects.first()
+        self.data['object_id'] = pp.id
+        self.data['object_type'] = 'PartnerProject'
+        response = self.client.post(self.url, data=self.data, format='json')
+
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+        self.assertEquals(Reportable.objects.count(), self.reportable_count+1)
+        self.assertEquals(IndicatorBlueprint.objects.count(), self.blueprint_count+1)
+
+    def test_create_indicator_partner_activities_reporting(self):
+        pa = PartnerActivity.objects.filter(project__isnull=False).first()
+        self.data['object_id'] = pa.id
+        self.data['object_type'] = 'PartnerActivity'
+        response = self.client.post(self.url, data=self.data, format='json')
+
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+        self.assertEquals(Reportable.objects.count(), self.reportable_count+1)
+        self.assertEquals(IndicatorBlueprint.objects.count(), self.blueprint_count+1)
+
+    def test_create_indicator_fake_object_type_reporting(self):
+        self.data['object_id'] = 1
+        self.data['object_type'] = 'fake'
+        response = self.client.post(self.url, data=self.data, format='json')
+        self.assertFalse(status.is_success(response.status_code))
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEquals(
+            response.data['object_type'],
+            ['Not valid data. Expected value is ClusterObjective, ClusterActivity, PartnerProject, PartnerActivity.']
+        )
+        self.assertEquals(Reportable.objects.count(), self.reportable_count)
+        self.assertEquals(IndicatorBlueprint.objects.count(), self.blueprint_count)
+
+    def test_update_indicator_cluster_reporting(self):
+        response = self.client.post(self.url, data=self.data, format='json')
+        self.assertTrue(status.is_success(response.status_code))
+
+        self.data.update({"id": response.data.get("id")})
+        new_means_of_verification = 'IMO/CC calculation - updated'
+        self.data['means_of_verification'] = new_means_of_verification
+        new_title = 'of temporary classrooms - updated'
+        self.data['blueprint']['title'] = new_title
+        self.data['blueprint']['calculation_formula_across_locations'] = IndicatorBlueprint.MAX
+        self.data['locations'] = [{'id': Location.objects.first().id}]
+        response = self.client.put(self.url, data=self.data, format='json')
+
+        self.assertFalse(status.is_success(response.status_code))
+        expected_errors = set([
+            'Modify or change the `calculation_formula_across_periods` is not allowed.',
+            'Modify or change the `calculation_formula_across_locations` is not allowed.',
+            'Modify or change the `display_type` is not allowed.'
+        ])
+        self.assertTrue(expected_errors.issubset(response.data['errors']))
+
+        del self.data['blueprint']['calculation_formula_across_periods']
+        del self.data['blueprint']['calculation_formula_across_locations']
+        del self.data['blueprint']['display_type']
+        self.data['locations'] = [{'id': Location.objects.first().id}]
+        response = self.client.put(self.url, data=self.data, format='json')
+
+        reportable = Reportable.objects.get(id=response.data['id'])
+        self.assertEquals(reportable.means_of_verification, new_means_of_verification)
+        self.assertEquals(reportable.blueprint.title, new_title)
+        self.assertEquals(reportable.blueprint.calculation_formula_across_locations, IndicatorBlueprint.AVG)
+        self.assertEquals(reportable.locations.count(), 1)
+        self.assertEquals(
+            reportable.locations.first().id,
+            Location.objects.first().id
+        )
 
 
 class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):

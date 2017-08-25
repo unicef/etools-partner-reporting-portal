@@ -3,6 +3,12 @@ from __future__ import unicode_literals
 from model_utils import Choices
 
 
+REPORTABLE_LLO_CONTENT_OBJECT = 'llo'
+REPORTABLE_CO_CONTENT_OBJECT = 'co'
+REPORTABLE_CA_CONTENT_OBJECT = 'ca'
+REPORTABLE_PP_CONTENT_OBJECT = 'pp'
+REPORTABLE_PA_CONTENT_OBJECT = 'pa'
+
 CSO_TYPES = Choices(
     ('Int', 'International', 'International'),
     ('Nat', 'National', 'National'),
@@ -112,3 +118,8 @@ OVERALL_STATUS = Choices(
     ('Con', 'constrained', 'Constrained'),
 )
 
+PARTNER_PROJECT_STATUS = Choices(
+    ("Ong", "ongoing", "Ongoing"),
+    ("Pla", "planned", "Planned"),
+    ("Com", "completed", "Completed"),
+)

@@ -5,7 +5,7 @@ from django.http import Http404
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import ListCreateAPIView, ListAPIView
 from rest_framework import status as statuses, serializers
 
 import django_filters
@@ -21,10 +21,30 @@ from .serializers import (
     ClusterObjectivePatchSerializer,
     ClusterActivitySerializer,
     ClusterActivityPatchSerializer,
+    ClusterDashboardSerializer,
+    ClusterPartnerDashboardSerializer,
 )
-from .filters import ClusterObjectiveFilter, ClusterActivityFilter, ClusterIndicatorsFilter
+from .filters import (
+    ClusterObjectiveFilter,
+    ClusterActivityFilter,
+    ClusterIndicatorsFilter,
+)
 
 logger = logging.getLogger(__name__)
+
+
+class ClusterListAPIView(ListAPIView):
+
+    serializer_class = ClusterSimpleSerializer
+    permission_classes = (IsAuthenticated, )
+    lookup_field = lookup_url_kwarg = 'rp_id'
+
+    def get_queryset(self, *args, **kwargs):
+        queryset = Cluster.objects
+        response_plan_id = self.kwargs.get(self.lookup_field)
+        if response_plan_id:
+            return queryset.filter(response_plan_id=response_plan_id)
+        return queryset.all()
 
 
 class ClusterObjectiveAPIView(APIView):
@@ -95,8 +115,15 @@ class ClusterObjectiveListCreateAPIView(ListCreateAPIView):
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     filter_class = ClusterObjectiveFilter
 
+    #
+    # def get_queryset(self, *args, **kwargs):
+    #     return ClusterObjective.objects.select_related('cluster').all()
+
     def get_queryset(self, *args, **kwargs):
-        return ClusterObjective.objects.select_related('cluster').all()
+        response_plan_id = self.kwargs.get('response_plan_id')
+
+        return ClusterObjective.objects.select_related('cluster').filter(
+            cluster__response_plan_id=response_plan_id)
 
     def post(self, request, *args, **kwargs):
         """
@@ -175,7 +202,9 @@ class ClusterActivityListAPIView(ListCreateAPIView):
     filter_class = ClusterActivityFilter
 
     def get_queryset(self, *args, **kwargs):
-        return ClusterActivity.objects.select_related('cluster_objective__cluster').all()
+        response_plan_id = self.kwargs.get('response_plan_id')
+
+        return ClusterActivity.objects.select_related('cluster_objective__cluster').filter(cluster_objective__cluster__response_plan_id=response_plan_id)
 
     def post(self, request, *args, **kwargs):
         """
@@ -230,3 +259,52 @@ class ClusterListAPIView(ListCreateAPIView):
     def get_queryset(self):
         response_plan_id = self.kwargs.get(self.lookup_field)
         return Cluster.objects.filter(response_plan_id=response_plan_id)
+
+
+class ClusterDashboardAPIView(APIView):
+    """
+    ClusterDashboardAPIView provides a high-level IMO-reserved dashboard info
+    for the specified cluster in a country's response plan
+    """
+    permission_classes = (IsAuthenticated, )
+
+    def get_instance(self, request, response_plan_id=None, cluster_id=None):
+        try:
+            instance = Cluster.objects.get(
+                id=cluster_id, response_plan_id=response_plan_id)
+        except Cluster.DoesNotExist:
+            # TODO: log exception
+            raise Http404
+        return instance
+
+    def get(self, request, response_plan_id, cluster_id, *args, **kwargs):
+        cluster = self.get_instance(request, response_plan_id, cluster_id)
+
+        serializer = ClusterDashboardSerializer(instance=cluster)
+        return Response(serializer.data, status=statuses.HTTP_200_OK)
+
+
+class ClusterPartnerDashboardAPIView(APIView):
+    """
+    ClusterPartnerDashboardAPIView provides
+    a high-level partner-reserved dashboard info
+    for the specified cluster in a country's response plan
+    """
+    permission_classes = (IsAuthenticated, )
+
+    def get_instance(self, request, response_plan_id=None, cluster_id=None):
+        try:
+            instance = Cluster.objects.get(
+                id=cluster_id, response_plan_id=response_plan_id)
+        except Cluster.DoesNotExist:
+            # TODO: log exception
+            raise Http404
+        return instance
+
+    def get(self, request, response_plan_id, cluster_id, *args, **kwargs):
+        cluster = self.get_instance(request, response_plan_id, cluster_id)
+        partner = request.user.partner
+
+        serializer = ClusterPartnerDashboardSerializer(
+            instance=cluster, context={'partner': partner})
+        return Response(serializer.data, status=statuses.HTTP_200_OK)

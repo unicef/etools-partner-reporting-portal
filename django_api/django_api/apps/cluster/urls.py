@@ -8,18 +8,20 @@ from .views import (
     ClusterActivityListAPIView,
     ClusterIndicatorsListAPIView,
     ClusterIndicatorsSimpleListAPIView,
+    ClusterDashboardAPIView,
+    ClusterPartnerDashboardAPIView,
 )
 
 
 urlpatterns = [
+    url(r'^cluster-list/(?P<rp_id>\d+)/$', ClusterListAPIView.as_view(), name="cluster-list"),
     url(r'^cluster-objective/$', ClusterObjectiveAPIView.as_view(), name="cluster-objective"),
     url(r'^cluster-objective/(?P<pk>\d+)/$', ClusterObjectiveAPIView.as_view(), name="cluster-objective"),
-    url(r'^cluster-objective-list/$',
+    url(r'^(?P<response_plan_id>\d+)/cluster-objective-list/$',
         ClusterObjectiveListCreateAPIView.as_view(),
         name="cluster-objective-list"),
     url(r'^cluster-activity/(?P<pk>\d+)/$', ClusterActivityAPIView.as_view(), name="cluster-activity"),
-    url(r'^cluster-activity-list/$', ClusterActivityListAPIView.as_view(), name="cluster-activity-list"),
-    url(r'^(?P<cluster_id>\d+)/cluster-activity-list/$',
+    url(r'^(?P<response_plan_id>\d+)/cluster-activity-list/$',
         ClusterActivityListAPIView.as_view(),
         name="cluster-activity-list"),
     url(r'^(?P<response_plan_id>\d+)/cluster-indicators-list/$',
@@ -31,4 +33,12 @@ urlpatterns = [
     url(r'^(?P<response_plan_id>\d+)/cluster-simple-list/$',
         ClusterListAPIView.as_view(),
         name="cluster-simple-list"),
+
+    url(r'^(?P<response_plan_id>\d+)/(?P<cluster_id>\d+)/cluster-dashboard/$',
+        ClusterDashboardAPIView.as_view(),
+        name="cluster-dashboard"),
+
+    url(r'^(?P<response_plan_id>\d+)/(?P<cluster_id>\d+)/partner-dashboard/$',
+        ClusterPartnerDashboardAPIView.as_view(),
+        name="cluster-partner-dashboard"),
 ]

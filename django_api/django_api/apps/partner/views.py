@@ -8,14 +8,18 @@ import django_filters
 
 from core.paginations import SmallPagination
 from core.permissions import IsAuthenticated
-from .serializer import (
+from .serializers import (
     PartnerDetailsSerializer,
     PartnerProjectSerializer,
     PartnerProjectSimpleSerializer,
     PartnerProjectPatchSerializer,
+    ClusterActivityPartnersSerializer,
+    PartnerActivitySerializer,
+    PartnerActivityFromClusterActivitySerializer,
+    PartnerActivityFromCustomActivitySerializer,
 )
-from .models import PartnerProject, Partner
-from .filters import PartnerProjectFilter
+from .models import PartnerProject, PartnerActivity, Partner
+from .filters import PartnerProjectFilter, ClusterActivityPartnersFilter, PartnerActivityFilter
 
 
 class PartnerDetailsAPIView(RetrieveAPIView):
@@ -44,7 +48,9 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
     filter_class = PartnerProjectFilter
 
     def get_queryset(self, *args, **kwargs):
-        return PartnerProject.objects.select_related('partner').prefetch_related('clusters', 'locations').all()
+        response_plan_id = self.kwargs.get('response_plan_id')
+
+        return PartnerProject.objects.select_related('partner').prefetch_related('clusters', 'locations').filter(clusters__response_plan_id=response_plan_id)
 
     def add_many_to_many_relations(self, instance):
         """
@@ -140,3 +146,89 @@ class PartnerSimpleListAPIView(ListAPIView):
     def get_queryset(self):
         response_plan_id = self.kwargs.get(self.lookup_field)
         return Partner.objects.filter(clusters__response_plan_id=response_plan_id)
+
+
+class PartnerActivityAPIView(APIView):
+    """
+    PartnerActivityAPIView CRUD endpoint
+    """
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request, create_mode, *args, **kwargs):
+        """
+        Create on PartnerActivity model
+        :return: serialized PartnerActivity object
+        """
+        if create_mode == 'cluster':
+            serializer = PartnerActivityFromClusterActivitySerializer(
+                data=self.request.data)
+
+            if not serializer.is_valid():
+                return Response(
+                    serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                pa = PartnerActivity.objects.create(
+                    title=serializer.validated_data['cluster_activity'].title,
+                    project=serializer.validated_data['project'],
+                    partner=serializer.validated_data['partner'],
+                    cluster_activity=serializer.validated_data['cluster_activity'],
+                    start_date=serializer.validated_data['start_date'],
+                    end_date=serializer.validated_data['end_date'],
+                    status=serializer.validated_data['status'],
+                )
+            except Exception as e:
+                return Response(
+                    {'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
+
+        elif create_mode == 'custom':
+            serializer = PartnerActivityFromCustomActivitySerializer(
+                data=self.request.data)
+
+            if not serializer.is_valid():
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                pa = PartnerActivity.objects.create(
+                    title=serializer.validated_data['title'],
+                    project=serializer.validated_data['project'],
+                    partner=serializer.validated_data['partner'],
+                    cluster_objective=serializer.validated_data['cluster_objective'],
+                    start_date=serializer.validated_data['start_date'],
+                    end_date=serializer.validated_data['end_date'],
+                    status=serializer.validated_data['status'],
+                )
+            except Exception as e:
+                return Response(
+                    {'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
+
+        else:
+            return Response({'error': "Wrong create mode flag"}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'id': pa.id}, status=status.HTTP_201_CREATED)
+
+
+class ClusterActivityPartnersAPIView(ListAPIView):
+
+    serializer_class = ClusterActivityPartnersSerializer
+    permission_classes = (IsAuthenticated, )
+    pagination_class = SmallPagination
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
+    filter_class = ClusterActivityPartnersFilter
+    lookup_field = lookup_url_kwarg = 'pk'
+
+    def get_queryset(self, *args, **kwargs):
+        cluster_activity_id = self.kwargs.get(self.lookup_field)
+        return Partner.objects.filter(partner_activities__cluster_activity_id=cluster_activity_id)
+
+
+class PartnerActivityListCreateAPIView(ListCreateAPIView):
+
+    serializer_class = PartnerActivitySerializer
+    permission_classes = (IsAuthenticated, )
+    pagination_class = SmallPagination
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
+    filter_class = PartnerActivityFilter
+
+    def get_queryset(self, *args, **kwargs):
+        return PartnerActivity.objects.all()

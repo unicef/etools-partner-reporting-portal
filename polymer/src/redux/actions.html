@@ -9,7 +9,10 @@
 <link rel="import" href="actions/indicators.html">
 <link rel="import" href="actions/progressReports.html">
 <link rel="import" href="actions/disaggregations.html">
+<link rel="import" href="actions/partnerProjects.html">
 <link rel="import" href="actions/clusterIndicatorReports.html">
+<link rel="import" href="actions/clusterActivities.html">
+<link rel="import" href="actions/clusterObjectives.html">
 
 <script>
   (function () {
@@ -177,6 +180,13 @@
         return {
           type: App.Constants.SET_PROGRAMME_DOCUMENT_DETAILS,
           pdDetailsData: pdDetailsData,
+        };
+      },
+
+      setFilterByClusterId: function (id) {
+        return {
+          type: App.Constants.SET_FILTER_BY_CLUSTER_ID,
+          id: id
         };
       },
 

@@ -1,0 +1,95 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../dropdown-filter/dropdown-filter.html">
+<link rel="import" href="../../etools-prp-ajax.html">
+<link rel="import" href="../../../endpoints.html">
+<link rel="import" href="../../../redux/store.html">
+
+<dom-module id="partner-filter">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <etools-prp-ajax
+        id="partnerNames"
+        url="[[partnerNamesUrl]]">
+    </etools-prp-ajax>
+
+    <template is="dom-if" if="[[!loading]]">
+      <dropdown-filter
+        label="Partner"
+        name="partner"
+        value="[[value]]"
+        data="[[data]]">
+      </dropdown-filter>
+    </template>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'partner-filter',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        partnerNamesUrl: {
+          type: String,
+          computed: '_computeUrl(responsePlanID)',
+          observer: '_fetchPartnerNames',
+        },
+
+        responsePlanID: {
+          type: String,
+          statePath: 'responsePlans.currentID',
+        },
+
+        loading: {
+          type: Boolean,
+          value: true,
+          computed: '_computeLoading(data)',
+        },
+
+        data: {
+          type: Array,
+          value: [],
+        },
+
+        value: String,
+      },
+
+      _computeUrl: function (responsePlanID) {
+        return App.Endpoints.clusterPartnerNames(responsePlanID);
+      },
+
+      _computeLoading: function (data) {
+        return !data.length;
+      },
+
+      _fetchPartnerNames: function () {
+        var self = this;
+
+        this.$.partnerNames.abort();
+
+        this.$.partnerNames.thunk()()
+            .then(function (res) {
+              self.set('data', [{
+                id: '',
+                title: 'All',
+              }].concat(res.data));
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
+      },
+
+      detached: function () {
+        this.$.partnerNames.abort();
+      },
+    });
+  </script>
+</dom-module>

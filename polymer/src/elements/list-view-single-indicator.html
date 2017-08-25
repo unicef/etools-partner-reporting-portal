@@ -1,15 +1,18 @@
-<link rel="import" href="../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
-<link rel="import" href="../ip-reporting/ip-reporting-indicator-details.html">
-<link rel="import" href="../etools-prp-data-table-row.html">
-<link rel="import" href="../etools-prp-progress-bar.html">
-<link rel="import" href="../../styles/table-styles.html">
+<link rel="import" href="ip-reporting/ip-reporting-indicator-details.html">
+<link rel="import" href="etools-prp-data-table-row.html">
+<link rel="import" href="etools-prp-progress-bar.html">
+<link rel="import" href="../styles/table-styles.html">
 
 <dom-module id="list-view-single-indicator">
   <template>
 
     <style include="iron-flex iron-flex-factors data-table-styles table-styles">
+      :host {
+        display: block;
+      }
     </style>
 
     <etools-prp-data-table-row details-opened="{{detailsOpened}}">

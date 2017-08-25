@@ -1,0 +1,161 @@
+<link rel="import" href="../../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../../../../../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../../../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../../../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../../../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../../../../bower_components/iron-location/iron-query-params.html">
+
+<link rel="import" href="../../../../../styles/shared-styles.html">
+<link rel="import" href="../../../../../elements/page-header.html">
+<link rel="import" href="../../../../../elements/filters/cluster-filter/filter-list-by-cluster.html">
+<link rel="import" href="../../../../../behaviors/routing.html">
+<link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="router.html">
+
+
+<dom-module id="clusters-response-parameters">
+  <template>
+    <style include="shared-styles iron-flex iron-flex-alignment">
+      :host {
+        display: block;
+      }
+
+      page-header {
+        padding-top: 0;
+      }
+
+      .tabs paper-tab {
+        text-transform: uppercase;
+      }
+    </style>
+
+    <iron-location
+        query="{{query}}">
+    </iron-location>
+
+    <iron-query-params
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
+    </iron-query-params>
+
+    <app-route
+      route="{{route}}"
+      pattern="/:subpage"
+      data="{{routeData}}"
+      tail="{{subroute}}">
+    </app-route>
+
+    <template is="dom-if" if="[[_displayHeader(subpage)]]" restamp="true">
+      <div class="page-top-content">
+        <page-header title="Clusters">
+          <div class="toolbar horizontal end-justified layout">
+            <filter-list-by-cluster></filter-list-by-cluster>
+          </div>
+          <div class="tabs">
+            <paper-tabs
+              selected="{{tab}}"
+              attr-for-selected="name"
+              on-iron-activate="_resetPage"
+              scrollable
+              hide-scroll-buttons>
+
+              <paper-tab name="objectives">
+                <span class="tab-content">Objectives</span>
+              </paper-tab>
+
+              <paper-tab name="activities">
+                <span class="tab-content">Activities</span>
+              </paper-tab>
+            </paper-tabs>
+          </div>
+        </page-header>
+      </div>
+    </template>
+
+    <response-parameters-clusters-router
+      route="{{subroute}}"
+      page={{subpage}}>
+    </response-parameters-clusters-router>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'clusters-response-parameters',
+
+      properties: {
+        queryParams: Object,
+
+        subpage: String,
+
+        tab: String,
+      },
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.RoutingBehavior,
+        App.Behaviors.UtilsBehavior,
+      ],
+
+      observers: [
+        '_routeChanged(routeData.subpage)',
+        '_tabChanged(tab)',
+      ],
+
+      _routeChanged: function (subpage) {
+        switch (subpage) {
+          case 'response-plans':
+            this.subpage = 'response-plans';
+            this.tab = 'response-plans';
+            break;
+
+          case 'objectives':
+            this.subpage = 'objectives';
+            this.tab = 'objectives';
+            break;
+
+          case 'activities':
+            this.subpage = 'activities';
+            this.tab = 'activities';
+            break;
+
+          case 'response-plan':
+            this.subpage = 'response-plan';
+            break;
+
+          case 'objective':
+            this.subpage = 'objective';
+            break;
+
+          case 'activity':
+            this.subpage = 'activity';
+            break;
+
+          default:
+            this.subpage = 'objectives';
+            this.set('route.path', '/objectives');
+            break;
+        }
+      },
+
+      _displayHeader: function(subpage) {
+        var requiresHeader = ['objectives', 'activities', 'response-plans'];
+        return this._displayClusterHeader(subpage, requiresHeader);
+      },
+
+      _tabChanged: function (tab) {
+        this.set('route.path', '/' + tab);
+      },
+
+      _resetPage: function () {
+        var queryParams = {};
+        // Cluster filtering should persist across tabs.
+        if (this.queryParams.cluster_id) {
+          queryParams.cluster_id = this.queryParams.cluster_id;
+        }
+        this.set('queryParams', queryParams);
+      },
+    });
+  </script>
+</dom-module>

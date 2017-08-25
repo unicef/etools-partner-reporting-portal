@@ -13,8 +13,8 @@
         return this._buildUrl('/core/simple-intervention/');
       },
 
-      indicators: function () {
-        return this._buildUrl('/indicator/');
+      indicators: function (content_object) {
+        return this._buildUrl('/indicator/' + content_object);
       },
 
       indicatorReports: function (indicatorId) {
@@ -69,6 +69,34 @@
         return this._buildUrl('/indicator/indicator-location-data-entries/');
       },
 
+      responseParametersClusterObjectives: function(responsePlanId) {
+        return this._buildUrl('/cluster/' + responsePlanId + '/cluster-objective-list/');
+      },
+
+      responseParametersClusterActivities: function(responsePlanId) {
+        return this._buildUrl('/cluster/' + responsePlanId + '/cluster-activity-list/');
+      },
+
+      clusterActivities: function (clusterId) {
+        return this._buildUrl('/cluster/' + clusterId + '/cluster-activity-list/');
+      },
+
+      plannedActions: function(responsePlanId) {
+        return this._buildUrl('/partner/' + responsePlanId + '/partner-project-list/');
+      },
+
+      plannedActionsProjectOverview: function(projectId) {
+        return this._buildUrl('/partner/partner-project-details/' + projectId + '/');
+      },
+
+      responseParamtersClustersObjectiveDetail: function(objectiveId) {
+        return this._buildUrl('/cluster/cluster-objective/' + objectiveId + '/');
+      },
+
+      responseParamtersClustersActivityDetail: function(activityId) {
+        return this._buildUrl('/cluster/cluster-activity/' + activityId + '/');
+      },
+
       clusterIndicatorReports: function (responsePlanId) {
         return this._buildUrl('/cluster/' + responsePlanId + '/cluster-indicators-list/');
       },
@@ -91,6 +119,22 @@
 
       clusterLocationNames: function (responsePlanId) {
         return this._buildUrl('/core/' + responsePlanId + '/simple-location/');
+      },
+
+      clusterIndicators: function () {
+        return this._buildUrl('/indicator/cluster-indicator/');
+      },
+
+      partnerActivity: function (responsePlanId, mode) {
+        return this._buildUrl('/partner/' + responsePlanId + '/create-partner-activity/' + mode);
+      },
+
+      partnersByClusterActivityId: function (clusterActivityId) {
+        return this._buildUrl('/partner/cluster-activity/' + clusterActivityId + '/partners');
+      },
+
+      partnerActivityList: function () {
+        return this._buildUrl('/partner/partner-activity-list/');
       },
     };
   }());
