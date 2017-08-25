@@ -158,9 +158,13 @@ def generate_light_fake_data(seed_quantity=5):
             cluster=cluster,
         )
 
+        table = response_plan.intervention.carto_db_tables.first()
+
         reportable_to_co = QuantityReportableToClusterObjectiveFactory(
             content_object=co, indicator_report__progress_report=None,
-            location__gateway=response_plan.intervention.gateway_types.first(),
+            location__carto_db_table=table,
+            location__gateway=table.location_type,
+            location__intervention=table.intervention,
         )
 
         user = UserFactory(
@@ -183,7 +187,9 @@ def generate_light_fake_data(seed_quantity=5):
 
         reportable_to_ca = QuantityReportableToClusterActivityFactory(
             content_object=ca, indicator_report__progress_report=None,
-            location__gateway=response_plan.intervention.gateway_types.first(),
+            location__carto_db_table=table,
+            location__gateway=table.location_type,
+            location__intervention=table.intervention,
         )
 
     for partner in Partner.objects.all():
@@ -197,7 +203,9 @@ def generate_light_fake_data(seed_quantity=5):
 
         reportable_to_pp = QuantityReportableToPartnerProjectFactory(
             content_object=pp, indicator_report__progress_report=None,
-            location__gateway=response_plan.intervention.gateway_types.first(),
+            location__carto_db_table=table,
+            location__gateway=table.location_type,
+            location__intervention=table.intervention,
         )
         pp.locations.add(*list(reportable_to_pp.locations.all()))
 
@@ -215,7 +223,9 @@ def generate_light_fake_data(seed_quantity=5):
 
             reportable_to_pa = QuantityReportableToPartnerActivityFactory(
                 content_object=pa, indicator_report__progress_report=None,
-                location__gateway=response_plan.intervention.gateway_types.first(),
+                location__carto_db_table=table,
+                location__gateway=table.location_type,
+                location__intervention=table.intervention,
             )
 
             reportable_to_pa.parent_indicator = cluster_activity.reportables.first()
@@ -231,7 +241,9 @@ def generate_light_fake_data(seed_quantity=5):
 
             reportable_to_pa = QuantityReportableToPartnerActivityFactory(
                 content_object=pa, indicator_report__progress_report=None,
-                location__gateway=response_plan.intervention.gateway_types.first(),
+                location__carto_db_table=table,
+                location__gateway=table.location_type,
+                location__intervention=table.intervention,
             )
 
     ProgrammeDocumentFactory.create_batch(seed_quantity)
@@ -246,9 +258,13 @@ def generate_light_fake_data(seed_quantity=5):
         progress_report = ProgressReportFactory(
             programme_document=llo.indicator.programme_document)
 
+        table = CartoDBTable.objects.first()
+
         reportable = QuantityReportableToLowerLevelOutputFactory(
             content_object=llo, indicator_report__progress_report=None,
-            location__gateway=GatewayType.objects.last()
+            location__gateway=table.location_type,
+            location__carto_db_table=table,
+            location__intervention=table.intervention,
         )
 
         reportable.content_object \
@@ -261,7 +277,9 @@ def generate_light_fake_data(seed_quantity=5):
 
         reportable = RatioReportableToLowerLevelOutputFactory(
             content_object=llo, indicator_report__progress_report=None,
-            location__gateway=GatewayType.objects.last()
+            location__gateway=table.location_type,
+            location__carto_db_table=table,
+            location__intervention=table.intervention,
         )
 
         reportable.content_object \
@@ -328,6 +346,8 @@ def generate_fake_data(seed_quantity=40):
         print "{} ResponsePlan objects created for {}".format(3, intervention)
 
     for response_plan in ResponsePlan.objects.all():
+        table = response_plan.intervention.carto_db_tables.first()
+
         user = UserFactory(
             first_name="WASH",
             last_name="IMO")
@@ -346,7 +366,9 @@ def generate_fake_data(seed_quantity=40):
 
             reportable_to_co = QuantityReportableToClusterObjectiveFactory(
                 content_object=co, indicator_report__progress_report=None,
-                location__gateway=response_plan.intervention.gateway_types.first(),
+                location__carto_db_table=table,
+                location__gateway=table.location_type,
+                location__intervention=table.intervention,
             )
 
         user = UserFactory(
@@ -379,7 +401,9 @@ def generate_fake_data(seed_quantity=40):
 
             reportable_to_co = QuantityReportableToClusterObjectiveFactory(
                 content_object=co, indicator_report__progress_report=None,
-                location__gateway=response_plan.intervention.gateway_types.first(),
+                location__carto_db_table=table,
+                location__gateway=table.location_type,
+                location__intervention=table.intervention,
             )
 
         user = UserFactory(
@@ -412,7 +436,9 @@ def generate_fake_data(seed_quantity=40):
 
             reportable_to_co = QuantityReportableToClusterObjectiveFactory(
                 content_object=co, indicator_report__progress_report=None,
-                location__gateway=response_plan.intervention.gateway_types.first(),
+                location__carto_db_table=table,
+                location__gateway=table.location_type,
+                location__intervention=table.intervention,
             )
 
         user = UserFactory(
@@ -433,6 +459,8 @@ def generate_fake_data(seed_quantity=40):
 
         print "{} Cluster Objective objects created for {}".format(2 * 3, cluster)
 
+    table = CartoDBTable.objects.first()
+
     for cluster_objective in ClusterObjective.objects.all():
         for idx in xrange(2, 0, -1):
             ca = ClusterActivityFactory(
@@ -442,7 +470,9 @@ def generate_fake_data(seed_quantity=40):
 
             reportable_to_ca = QuantityReportableToClusterActivityFactory(
                 content_object=ca, indicator_report__progress_report=None,
-                location__gateway=GatewayType.objects.first(),
+                location__gateway=table.location_type,
+                location__carto_db_table=table,
+                location__intervention=table.intervention,
             )
 
         print "{} Cluster Activity objects created for {}".format(2, cluster_objective.title)
@@ -459,7 +489,9 @@ def generate_fake_data(seed_quantity=40):
 
             reportable_to_pp = QuantityReportableToPartnerProjectFactory(
                 content_object=pp, indicator_report__progress_report=None,
-                location__gateway=GatewayType.objects.first(),
+                location__gateway=table.location_type,
+                location__carto_db_table=table,
+                location__intervention=table.intervention,
             )
             pp.locations.add(*list(reportable_to_pp.locations.all()))
 
@@ -480,7 +512,9 @@ def generate_fake_data(seed_quantity=40):
 
                 reportable_to_pa = QuantityReportableToPartnerActivityFactory(
                     content_object=pa, indicator_report__progress_report=None,
-                    location__gateway=GatewayType.objects.first(),
+                    location__gateway=table.location_type,
+                    location__carto_db_table=table,
+                    location__intervention=table.intervention,
                 )
 
                 reportable_to_pa.parent_indicator = cluster_activity.reportables.first()
@@ -496,7 +530,9 @@ def generate_fake_data(seed_quantity=40):
 
                 reportable_to_pa = QuantityReportableToPartnerActivityFactory(
                     content_object=pa, indicator_report__progress_report=None,
-                    location__gateway=GatewayType.objects.first(),
+                    location__gateway=table.location_type,
+                    location__carto_db_table=table,
+                    location__intervention=table.intervention,
                 )
 
             print "{} PartnerActivity objects created for {} under {} Cluster Activity and Custom Activity".format(4, partner, cluster_activity.title)
@@ -519,13 +555,17 @@ def generate_fake_data(seed_quantity=40):
         if idx < 20:
             reportable = QuantityReportableToLowerLevelOutputFactory(
                 content_object=llo, indicator_report__progress_report=None,
-                location__gateway=GatewayType.objects.first(),
+                location__gateway=table.location_type,
+                location__carto_db_table=table,
+                location__intervention=table.intervention,
             )
 
         else:
             reportable = RatioReportableToLowerLevelOutputFactory(
                 content_object=llo, indicator_report__progress_report=None,
-                location__gateway=GatewayType.objects.first(),
+                location__gateway=table.location_type,
+                location__carto_db_table=table,
+                location__intervention=table.intervention,
             )
 
         reportable.content_object \
