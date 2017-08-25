@@ -101,6 +101,10 @@
         return this._buildUrl('/cluster/' + responsePlanId + '/cluster-indicators-list/');
       },
 
+      clusterIndicatorReportsExport: function (responsePlanId) {
+        return this.clusterIndicatorReports(responsePlanId) + 'export/';
+      },
+
       clusterIndicatorNames: function (responsePlanId) {
         return this._buildUrl('/cluster/' + responsePlanId + '/cluster-indicators-simple-list/');
       },

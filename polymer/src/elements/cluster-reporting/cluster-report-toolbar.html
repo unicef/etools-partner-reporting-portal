@@ -1,0 +1,77 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
+<link rel="import" href="../../endpoints.html">
+<link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../styles/buttons.html">
+
+<dom-module id="cluster-report-toolbar">
+  <template>
+    <style include="iron-flex iron-flex-reverse button-styles">
+      :host {
+        display: block;
+        margin: 1em 0;
+      }
+
+      a {
+        text-decoration: none;
+        color: var(--theme-primary-color);
+      }
+    </style>
+
+    <iron-location
+      query="{{query}}">
+    </iron-location>
+
+    <div class="layout horizontal-reverse">
+      <!-- <paper-button class="btn-primary">
+        <iron-icon icon="icons:file-upload"></iron-icon>
+        Import
+      </paper-button> -->
+
+      <a
+          href="[[exportUrl]]"
+          tabindex="-1"
+          target="_blank">
+        <paper-button class="btn-primary">
+          <iron-icon icon="icons:file-download"></iron-icon>
+          Export
+        </paper-button>
+      </a>
+    </div>
+  </template>
+
+    <script>
+      Polymer({
+        is: 'cluster-report-toolbar',
+
+        behaviors: [
+          App.Behaviors.ReduxBehavior,
+        ],
+
+        properties: {
+          responsePlanId: {
+            type: String,
+            statePath: 'responsePlans.currentID',
+          },
+
+          exportUrl: {
+            type: String,
+            computed: '_computeExportUrl(responsePlanId, query)',
+          },
+        },
+
+        _computeExportUrl: function (responsePlanId, query) {
+          return [
+            App.Endpoints.clusterIndicatorReportsExport(responsePlanId),
+            '?',
+            query,
+          ].join('');
+        },
+      });
+    </script>
+  </dom-module>
