@@ -492,6 +492,7 @@ class ClusterIndicatorReportListSerializer(IndicatorReportListSerializer):
     cluster = serializers.SerializerMethodField()
     partner = serializers.SerializerMethodField()
     progress_percentage = serializers.SerializerMethodField()
+    indicator_id = serializers.SerializerMethodField()
 
     def get_cluster(self, obj):
         cluster = obj.reportable.content_object.partner.clusters.first()
@@ -508,11 +509,15 @@ class ClusterIndicatorReportListSerializer(IndicatorReportListSerializer):
     def get_progress_percentage(self, obj):
         return obj.reportable.progress_percentage
 
+    def get_indicator_id(self, obj):
+        return obj.reportable.id
+
     class Meta(IndicatorReportListSerializer.Meta):
         fields = IndicatorReportListSerializer.Meta.fields + (
             'cluster',
             'partner',
             'progress_percentage',
+            'indicator_id',
         )
 
 
