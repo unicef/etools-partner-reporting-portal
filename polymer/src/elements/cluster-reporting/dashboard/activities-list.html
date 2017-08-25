@@ -28,6 +28,10 @@
       .cell-is-cluster {
         text-align: center;
       }
+
+      .value {
+        font-size: 12px;
+      }
     </style>
 
     <etools-content-panel panel-title="List of My Project Activities">
@@ -85,23 +89,23 @@
           <div slot="row-data-details">
             <div class="table-cell flex table-cell--text">
               <labelled-item label="Start Date">
-                [[item.start_date]]
+                <span class="value">[[item.start_date]]</span>
               </labelled-item>
             </div>
             <div class="table-cell flex table-cell--text">
               <labelled-item label="End Date">
-                [[item.end_date]]
+                <span class="value">[[item.end_date]]</span>
               </labelled-item>
             </div>
             <div class="table-cell flex-2 table-cell--text">
               <labelled-item label="Project">
-                [[item.project.title]]
+                <span class="value">[[item.project.title]]</span>
               </labelled-item>
             </div>
             <div class="table-cell flex">&nbsp;</div>
             <div class="table-cell table-cell--text flex">
               <labelled-item label="Frequency of reporting">
-                [[item.frequency_of_reporting]]
+                <span class="value">[[item.frequency_of_reporting]]</span>
               </labelled-item>
             </div>
           </div>
@@ -123,10 +127,14 @@
       behaviors: [
         App.Behaviors.ReduxBehavior,
         App.Behaviors.RoutingBehavior,
-        App.Behaviors.DashboardWidgetBehavior,
       ],
 
       properties: {
+        detailsOpened: {
+          type: Array,
+          value: [],
+        },
+
         data: {
           type: Array,
           statePath: 'clusterDashboardData.data.my_project_activities',
@@ -143,8 +151,34 @@
         },
       },
 
+      _collapseAll: function () {
+        this.detailsOpened.slice().forEach(function (row) {
+          row.detailsOpened = false;
+        });
+      },
+
+      _handleOpenedChanged: function (e, data) {
+        var row = e.srcElement;
+        var openedIndex = this.detailsOpened.indexOf(row);
+
+        if (!data.value) {
+          if (openedIndex !== -1) {
+            this.splice('detailsOpened', openedIndex, 1);
+          }
+
+          return;
+        }
+
+        this.push('detailsOpened', row);
+      },
+
       _computeActivitiesUrl: function (baseUrl) {
         return this.buildUrl(baseUrl, '/planned-action/activities');
+      },
+
+      detached: function () {
+        this._collapseAll();
+        this.set('detailsOpened.length', 0);
       },
     });
   </script>

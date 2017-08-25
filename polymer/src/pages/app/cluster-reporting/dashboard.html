@@ -17,7 +17,6 @@
 <link rel="import" href="../../../elements/cluster-reporting/dashboard/number-of-due-reports.html">
 <link rel="import" href="../../../elements/cluster-reporting/dashboard/number-of-non-cluster-activities.html">
 <link rel="import" href="../../../elements/cluster-reporting/dashboard/reports-list.html">
-<link rel="import" href="../../../elements/cluster-reporting/dashboard/overdue-reports-list-imo.html">
 <link rel="import" href="../../../elements/cluster-reporting/dashboard/constrained-reports-list.html">
 <link rel="import" href="../../../elements/cluster-reporting/dashboard/activities-list.html">
 
@@ -130,7 +129,10 @@
             is="dom-if"
             if="[[_equals(mode, 'partner')]]"
             restamp="true">
-            <overdue-reports-list-imo></overdue-reports-list-imo>
+          <reports-list
+              label="List of overdue indicator reports from last 2 months"
+              collection="overdue_indicator_reports">
+          </reports-list>
         </template>
       </div>
 
@@ -196,16 +198,20 @@
       },
 
       observers: [
-        '_handleInputChange(dataUrl, queryParams)',
+        '_fetchData(dataUrl, queryParams)',
       ],
+
+      listeners: {
+        'report-submitted': '_fetchData',
+      },
 
       _computeMode: function (accountType) {
         switch (accountType) {
           case App.Constants.ACCOUNT_TYPE_PARTNER:
-            return 'cluster';
+            return 'partner';
 
           case App.Constants.ACCOUNT_TYPE_IMO:
-            return 'partner';
+            return 'cluster';
         }
       },
 
@@ -213,7 +219,7 @@
         return App.Endpoints.clusterDashboard(responsePlanId, clusterId, mode);
       },
 
-      _handleInputChange: function () {
+      _fetchData: function () {
         this.debounce('fetch-data', function () {
           var dataThunk = this.$.data.thunk();
 

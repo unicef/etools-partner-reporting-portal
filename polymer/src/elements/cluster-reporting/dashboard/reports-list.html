@@ -1,85 +1,46 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../../bower_components/etools-content-panel/etools-content-panel.html">
-<link rel="import" href="../../../../bower_components/etools-data-table/etools-data-table.html">
 <link rel="import" href="../../../../bower_components/etools-loading/etools-loading.html">
 
+<link rel="import" href="../../../constants.html">
 <link rel="import" href="../../../redux/store.html">
-<link rel="import" href="../../../behaviors/routing.html">
-<link rel="import" href="../../../behaviors/dashboard-widget.html">
-<link rel="import" href="../../indicator-details.html">
-<link rel="import" href="../../../styles/table-styles.html">
+<link rel="import" href="../../confirm-box.html">
+<link rel="import" href="../../cluster-reporting/cluster-report.html">
 <link rel="import" href="../../../styles/dashboard-widget.html">
 
 <dom-module id="reports-list">
   <template>
-    <style include="data-table-styles table-styles dashboard-widget-styles">
+    <style include="dashboard-widget-styles">
       :host {
         display: block;
 
         --ecp-content: {
+          min-height: 110px;
           padding: 0;
         };
       }
 
-      etools-data-table-row /deep/ #collapse-wrapper {
-        padding: 0;
-        background: #fff;
+      cluster-report:not(:last-of-type) {
+        margin-bottom: 2px;
       }
     </style>
 
+    <confirm-box id="confirm"></confirm-box>
+
     <etools-content-panel panel-title="[[label]]">
-      <etools-data-table-header no-title>
-        <etools-data-table-column field="cluster">
-          <div class="table-column">Cluster</div>
-        </etools-data-table-column>
-        <etools-data-table-column field="indicator_name" flex-2>
-          <div class="table-column flex-2">Indicator</div>
-        </etools-data-table-column>
-        <etools-data-table-column field="partner">
-          <div class="table-column">Partner</div>
-        </etools-data-table-column>
-        <etools-data-table-column field="due_date">
-          <div class="table-column">Due date</div>
-        </etools-data-table-column>
-      </etools-data-table-header>
-
       <template
-          is="dom-repeat"
-          items="[[data]]">
-        <etools-data-table-row
-            index="[[index]]"
-            on-opened-changed="_onOpenedChanged"
-            no-animation>
-          <div slot="row-data">
-            <div class="table-cell table-cell--text">
-              [[item.cluster]]
-            </div>
-            <div class="table-cell table-cell--text" flex-2>
-              [[item.indicator_name]]
-            </div>
-            <div class="table-cell table-cell--text">
-              [[item.partner]]
-            </div>
-            <div class="table-cell table-cell--text">
-              [[item.due_date]]
-            </div>
-          </div>
-          <div slot="row-data-details">
-            <indicator-details
-                id$="indicator-details-[[index]]"
-                reportable-id="[[item.reportable.id]]"
-                indicator-name="[[item.indicator_name]]"
-                indicator-id="[[item.id]]"
-                reporting-period="[[item.reporting_period]]"
-                override-mode="edit">
-            </indicator-details>
-          </div>
-        </etools-data-table-row>
+          is="dom-if"
+          if="[[active]]"
+          restamp="true">
+        <template
+            is="dom-repeat"
+            items="[[data]]">
+          <cluster-report
+              data="[[item]]"
+              mode="edit">
+          </cluster-report>
+        </template>
       </template>
-
-      <div class="widget-actions">
-        <a href="[[reportsUrl]]">See more</a>
-      </div>
 
       <etools-loading active="[[loading]]"></etools-loading>
     </etools-content-panel>
@@ -91,8 +52,6 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
-        App.Behaviors.RoutingBehavior,
-        App.Behaviors.DashboardWidgetBehavior,
       ],
 
       properties: {
@@ -100,17 +59,17 @@
 
         collection: String,
 
+        active: {
+          type: Boolean,
+          value: false,
+        },
+
         data: {
           type: Array,
           statePath: function (state) {
             return state.clusterDashboardData.data[this.collection];
           },
-          observer: '_collapseAll',
-        },
-
-        reportsUrl: {
-          type: String,
-          computed: '_computeReportsUrl(_baseUrlCluster)',
+          observer: '_refresh',
         },
 
         loading: {
@@ -119,23 +78,31 @@
         },
       },
 
-      _computeReportsUrl: function (baseUrl) {
-        return this.buildUrl(baseUrl, '/results');
+      listeners: {
+        'report-submit-confirm': '_onConfirm',
       },
 
-      _onOpenedChanged: function (e, data) {
-        var index = e.srcElement.index;
+      _refresh: function () {
+        // Force re-render:
+        this.set('active', false);
 
-        try {
-          Polymer.dom(this.root).querySelector('#indicator-details-' + index).init();
-        } catch (err) {}
-
-        this._handleOpenedChanged(e, data);
+        this.async(function () {
+          this.set('active', true);
+        });
       },
 
-      detached: function () {
-        this._collapseAll();
-        this.set('detailsOpened.length', 0);
+      _onConfirm: function (e, result) {
+        e.stopPropagation();
+
+        this.$.confirm.run({
+          body:
+              'The IMO will be informed of this submission and you will ' +
+              'not be able to make any changes on this report unless it ' +
+              'is sent back to you. Are you sure you’d like to Submit this report?',
+          result: result,
+          maxWidth: '500px',
+          mode: App.Constants.CONFIRM_MODAL,
+        });
       },
     });
   </script>

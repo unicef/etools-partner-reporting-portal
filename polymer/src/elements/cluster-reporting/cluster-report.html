@@ -17,7 +17,7 @@
 
 <dom-module id="cluster-report">
   <template>
-    <style include="iron-flex iron-flex-factors shared-styles button-styles">
+    <style include="iron-flex iron-flex-alignment iron-flex-factors shared-styles button-styles">
       :host {
         display: block;
       }
@@ -57,10 +57,12 @@
       }
 
       .report__meta dl {
-        @apply --truncate;
-
         margin: 0;
         font-size: 11px;
+      }
+
+      .report__meta dl:not(:first-of-type) {
+        margin-top: .5em;
       }
 
       .report__meta dt,
@@ -113,7 +115,8 @@
       }
 
       .iron-collapse-opened {
-        border: 1px solid var(--paper-grey-300);
+        @apply(--cluster-report-content);
+
         background: white;
       }
 
