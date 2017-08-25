@@ -14,7 +14,7 @@ from django.db import (
     IntegrityError,
     connection
 )
-from django.db.models.signals import post_delete, post_save
+from django.db.models.signals import pre_delete, post_save
 from django.dispatch.dispatcher import receiver
 
 from model_utils.models import TimeStampedModel
@@ -89,8 +89,6 @@ class Intervention(TimeStampedModel):
     signed_by_unicef_date = models.DateField(null=True, blank=True)
     signed_by_partner_date = models.DateField(null=True, blank=True)
 
-    locations = models.ManyToManyField('core.Location')
-
     class Meta:
         ordering = ['number']
 
@@ -143,12 +141,15 @@ class GatewayType(models.Model):
     """
 
     name = models.CharField(max_length=64L, unique=True)
+    admin_level = models.PositiveSmallIntegerField()
+
+    intervention = models.ForeignKey(Intervention, related_name="gateway_types")
 
     class Meta:
         ordering = ['name']
         verbose_name = 'Location Type'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -175,6 +176,8 @@ class Location(TimeStampedModel):
     reportable = models.ForeignKey('indicator.Reportable', null=True, blank=True, related_name="locations")
 
     gateway = models.ForeignKey(GatewayType, verbose_name='Location Type')
+    carto_db_table = models.ForeignKey('core.CartoDBTable', related_name="locations")
+    intervention = models.ForeignKey(Intervention, related_name="locations")
 
     latitude = models.DecimalField(
         null=True,
@@ -226,34 +229,21 @@ class Location(TimeStampedModel):
         )
 
 
-# @receiver(post_delete, sender=Location)
-# @receiver(post_save, sender=Location)
-# def invalidate_locations_etag(sender, instance, **kwargs):
-#     """
-#     Invalidate the locations etag in the cache on every change.
-#     """
-#     import pdb; pdb.set_trace()
-#     schema_name = connection.schema_name
-#     cache.delete("{}-locations-etag".format(schema_name))
-
-
 class CartoDBTable(MPTTModel):
     """
-    Represents a table in CartoDB, it is used to import lacations
+    Represents a table in CartoDB, it is used to import locations
     related models:
         core.GatewayType: 'gateway'
+        core.Intervention: 'intervention'
     """
 
     domain = models.CharField(max_length=254)
     api_key = models.CharField(max_length=254)
     table_name = models.CharField(max_length=254)
-    display_name = models.CharField(max_length=254, null=True, blank=True)
     location_type = models.ForeignKey(GatewayType)
-    name_col = models.CharField(max_length=254, default='name')
-    pcode_col = models.CharField(max_length=254, default='pcode')
-    parent_code_col = models.CharField(max_length=254, null=True, blank=True)
     parent = TreeForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
-    color = ColorPickerField(null=True, blank=True, default=get_random_color)
 
-    def __unicode__(self):
+    intervention = models.ForeignKey(Intervention, related_name="carto_db_tables")
+
+    def __str__(self):
         return self.table_name
