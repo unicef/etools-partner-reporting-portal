@@ -53,13 +53,13 @@
               </labelled-item>
             </li>
             <li class="item">
-              <labelled-item label="Cluster">
-                <span class="value">[[_withDefault(projectData.cluster)]]</span>
+              <labelled-item label="Clusters">
+                <span class="value">[[_commaSeparatedDictValues(projectData.clusters, 'title')]]</span>
               </labelled-item>
             </li>
             <li class="item">
-              <labelled-item label="Location">
-                <span class="value">[[_withDefault(projectData.location)]]</span>
+              <labelled-item label="Locations">
+                <span class="value">[[_commaSeparatedDictValues(projectData.locations, 'title')]]</span>
               </labelled-item>
             </li>
 

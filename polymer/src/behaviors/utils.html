@@ -97,7 +97,7 @@
         return items.join(', ');
       },
 
-      _commaSeparatedDictValue: function (items, key) {
+      _commaSeparatedDictValues: function (items, key) {
         var newList = items.map(function(item) {
           return item[key];
         });
@@ -114,6 +114,23 @@
           return street + ',' + city + ' ' + zip;
         }
       },
+
+      _fieldsAreValid: function() {
+        var valid;
+        var fields = [].slice.call(
+          Polymer.dom(this.root).querySelectorAll('.validate')
+        );
+
+        fields.forEach(function (field) {
+          field.validate();
+        });
+
+        valid = fields.every(function (field) {
+          return !field.invalid;
+        });
+
+        return valid;
+      }
     };
   }());
 </script>

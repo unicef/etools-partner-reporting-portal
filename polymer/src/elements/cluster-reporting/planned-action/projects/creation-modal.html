@@ -11,13 +11,15 @@
 <link rel="import" href="../../../../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../../../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
 <link rel="import" href="../../../../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../../../../bower_components/etools-searchable-multiselection-menu/etools-multi-selection-menu.html">
 
 <link rel="import" href="../../../etools-prp-ajax.html">
 <link rel="import" href="../../../etools-prp-date-input.html">
 <link rel="import" href="../../../form-fields/dropdown-form-input.html">
-<link rel="import" href="../../../form-fields/cluster-dropdown-input.html">
-<link rel="import" href="../../../form-fields/cluster-location-input.html">
+<link rel="import" href="../../../form-fields/cluster-dropdown-content.html">
+<link rel="import" href="../../../form-fields/cluster-location-content.html">
 <link rel="import" href="../../../../behaviors/routing.html">
+<link rel="import" href="../../../../behaviors/utils.html">
 <link rel="import" href="../../../../redux/store.html">
 <link rel="import" href="../../../../redux/actions.html">
 <link rel="import" href="../../../../styles/buttons.html">
@@ -73,6 +75,9 @@
 
     <iron-location path="{{path}}"></iron-location>
 
+    <cluster-dropdown-content clusters="{{clusters}}"></cluster-dropdown-content>
+    <cluster-location-content locations="{{locations}}"></cluster-location-content>
+
     <etools-prp-ajax
         id="createProject"
         url="[[url]]"
@@ -96,106 +101,149 @@
       </div>
 
       <paper-dialog-scrollable>
-        <iron-form class="app-grid">
-          <paper-input
-            class="item full-width"
-            id="title"
-            label="Title"
-            value="{{data.title}}"
-            type="string"
-            required
-            auto-validate>
-          </paper-input>
+        <template
+            is="dom-if"
+            if="[[refresh]]"
+            restamp="true">
+          <iron-form class="app-grid">
+            <paper-input
+              class="item validate full-width"
+              id="title"
+              label="Title"
+              value="{{data.title}}"
+              type="string"
+              required
+              on-input="_validate">
+            </paper-input>
 
-          <cluster-dropdown-input
-            class="item"
-            label="Clusters"
-            id="clusters"
-            value="{{data.clusters}}">
-          </cluster-dropdown-input>
+            <div class="row">
+              <etools-multi-selection-menu
+                  class="validate"
+                  label="Locations"
+                  options="[[formattedLocations]]"
+                  selected-values="{{selectedLocations}}"
+                  on-selected-values-changed="_validate"
+                  trigger-value-change-event
+                  required>
+              </etools-multi-selection-menu>
+            </div>
 
-          <cluster-location-input
-             class="item"
-             label="Location"
-             id="location"
-             value="{{data.location}}">
-          </cluster-location-input>
+            <div class="row">
+              <etools-multi-selection-menu
+                  class="validate"
+                  label="Clusters"
+                  options="[[formattedClusters]]"
+                  selected-values="{{selectedClusters}}"
+                  on-selected-values-changed="_validate"
+                  trigger-value-change-event
+                  required>
+              </etools-multi-selection-menu>
+            </div>
 
-          <div class="item">
-            <etools-prp-date-input
-               id="startDateField"
-               label="Start Date"
-               value="{{data.start_date}}"
-               required
-               no-init>
-            </etools-prp-date-input>
-          </div>
+            <div class="item">
+               <etools-prp-date-input
+                  class="validate"
+                  label="Start date"
+                  value="{{data.start_date}}"
+                  error-message=""
+                  auto-validate
+                  required
+                  no-init>
+               </etools-prp-date-input>
+              </etools-date-input>
+            </div>
 
-          <div class="item">
-            <etools-prp-date-input
-               id="endDateField"
-               label="End Date"
-               value="{{data.end_date}}"
-               required
-               no-init>
-            </etools-prp-date-input>
-          </div>
+            <div class="item">
+              <etools-prp-date-input
+                  class="validate"
+                  label="End date"
+                  value="{{data.end_date}}"
+                  error-message=""
+                  auto-validate
+                  required
+                  no-init>
+              </etools-prp-date-input>
+            </div>
 
-          <dropdown-form-input
-             class="item"
-             label="Status"
-             id="status"
-             value="{{data.status}}"
-             data="[[statuses]]">
-          </dropdown-form-input>
+            <paper-dropdown-menu
+                class="item validate"
+                label="Status"
+                on-value-changed="_validate"
+                always-float-label
+                required>
+              <paper-listbox
+                  selected="{{data.status}}"
+                  attr-for-selected="value"
+                  slot="dropdown-content"
+                  class="dropdown-content">
+                <template
+                  is="dom-repeat"
+                  items="[[statuses]]">
+                  <paper-item value="[[item.id]]">[[item.title]]</paper-item>
+                </template>
+              </paper-listbox>
+            </paper-dropdown-menu>
 
-          <dropdown-form-input
-             class="item"
-             label="Frequency of reporting"
-             id="frequency"
-             value="{{data.frequency}}"
-             data="[[frequencies]]">
-          </dropdown-form-input>
+            <paper-dropdown-menu
+                class="item validate"
+                label="Frequency of reporting"
+                on-value-changed="_validate"
+                always-float-label
+                required>
+              <paper-listbox
+                  selected="{{data.frequency}}"
+                  attr-for-selected="value"
+                  slot="dropdown-content"
+                  class="dropdown-content">
+                <template
+                    is="dom-repeat"
+                    items="[[frequencies]]">
+                  <paper-item value="[[item.id]]">[[item.title]]</paper-item>
+                </template>
+              </paper-listbox>
+            </paper-dropdown-menu>
 
-          <paper-input
-            class="item"
-            id="total_budget"
-            label="Total Budget"
-            value="{{data.total_budget}}"
-            type="number"
-            auto-validate>
-          </paper-input>
+            <paper-input
+              class="item validate"
+              id="total_budget"
+              label="Total Budget"
+              value="{{data.total_budget}}"
+              type="number"
+              required
+              on-input="_validate">
+            </paper-input>
 
-          <paper-input
-            class="item"
-            id="funding_source"
-            label="Funding Source"
-            value="{{data.funding_source}}"
-            type="string"
-            auto-validate>
-          </paper-input>
+            <paper-input
+              class="item validate"
+              id="funding_source"
+              label="Funding Source"
+              value="{{data.funding_source}}"
+              type="string"
+              required
+              on-input="_validate">
+            </paper-input>
 
-          <paper-input
-            class="item full-width"
-            id="description"
-            label="Description"
-            value="{{data.description}}"
-            type="string"
-            required
-            auto-validate>
-          </paper-input>
+            <paper-input
+              class="item validate full-width"
+              id="description"
+              label="Description"
+              value="{{data.description}}"
+              type="string"
+              required
+              on-input="_validate">
+            </paper-input>
 
-          <paper-input
-            class="item full-width"
-            id="additional_information"
-            label="Additional information (e.g. links)"
-            value="{{data.additional_information}}"
-            type="string"
-            required
-            auto-validate>
-          </paper-input>
-        </iron-form>
-
+            <paper-input
+              class="item validate full-width"
+              id="additional_information"
+              label="Additional information (e.g. links)"
+              value="{{data.additional_information}}"
+              type="string"
+              required
+              on-input="_validate">
+            </paper-input>
+          </iron-form>
+        </template>
       </paper-dialog-scrollable>
 
       <div class="buttons layout horizontal-reverse">
@@ -219,6 +267,7 @@
       behaviors: [
         App.Behaviors.ReduxBehavior,
         App.Behaviors.RoutingBehavior,
+        App.Behaviors.UtilsBehavior,
       ],
 
       properties: {
@@ -246,9 +295,34 @@
           value: {}
         },
 
+        refresh: {
+          type: Boolean,
+          value: false
+        },
+
         url: {
           type: String,
           computed: '_computeUrl(responsePlanID)'
+        },
+
+        locations: {
+          format: Array,
+          value: []
+        },
+
+        clusters: {
+          format: Array,
+          value: []
+        },
+
+        formattedLocations: {
+          type: Array,
+          computed: '_formatForMultiselect(locations)'
+        },
+
+        formattedClusters: {
+          type: Array,
+          computed: '_formatForMultiselect(clusters)'
         },
 
         statuses: {
@@ -268,6 +342,10 @@
             {title: 'Quarterly', id: 'Qua'},
           ],
         },
+
+        selectedLocations: Array,
+
+        selectedClusters: Array,
       },
 
       _computeUrl: function(responsePlanID) {
@@ -276,11 +354,19 @@
 
       close: function () {
         this.set('opened', false);
+        this.set('refresh', false);
       },
 
       open: function () {
         this.data = {};
+        this.selectedClusters = [];
+        this.selectedLocations = [];
         this.set('opened', true);
+        this.set('refresh', true);
+      },
+
+      _validate: function (e) {
+        e.target.validate();
       },
 
       _redirectToDetail: function(id) {
@@ -289,18 +375,31 @@
         this.set('path', url);
       },
 
+      _formatForMultiselect: function(list) {
+        return list.map(function(item) {
+          return {
+            id:item.id,
+            value:item.id,
+            label:item.title,
+          };
+        });
+      },
+
       _save: function () {
-        // Temporary workaround. Issue #223 will add chips for locations and clusters.
-        this.data.locations = [];
-        var clusterSelection = this.data.clusters;
-        if (typeof(clusterSelection) === 'number') {
-          this.data.clusters = [{id: clusterSelection}];
-        } else {
-          clusterSelection = this.data.clusters[0].id;
-          this.data.clusters = [{id: clusterSelection}];
+        var self = this;
+
+        if (!this._fieldsAreValid()) {
+          return;
         }
 
-        var self = this;
+        this.data.locations = this.selectedLocations.map(function(item) {
+          return {id: Number(item)}
+        });
+
+        this.data.clusters = this.selectedClusters.map(function(item) {
+          return {id: Number(item)}
+        });
+
         this.updatePending = true;
         var thunk = this.$.createProject.thunk();
         thunk()
