@@ -7,11 +7,10 @@
 <link rel="import" href="../../../behaviors/routing.html">
 <link rel="import" href="../../../elements/etools-prp-progress-bar.html">
 <link rel="import" href="../../../styles/table-styles.html">
-<link rel="import" href="../../../styles/dashboard-widget.html">
 
 <dom-module id="constrained-reports-list">
   <template>
-      <style include="data-table-styles table-styles dashboard-widget-styles">
+      <style include="data-table-styles table-styles">
       :host {
         display: block;
 
@@ -23,6 +22,12 @@
       a {
         text-decoration: none;
         color: var(--theme-primary-color);
+      }
+
+      footer {
+        padding: 16px;
+        text-align: right;
+        text-transform: uppercase;
       }
     </style>
 
@@ -73,9 +78,9 @@
         </etools-data-table-row>
       </template>
 
-      <div class="widget-actions">
+      <footer>
         <a href="[[reportsUrl]]">See more</a>
-      </div>
+      </footer>
 
       <etools-loading active="[[loading]]"></etools-loading>
     </etools-content-panel>

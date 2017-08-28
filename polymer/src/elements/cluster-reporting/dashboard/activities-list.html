@@ -12,11 +12,10 @@
 <link rel="import" href="../../etools-prp-progress-bar.html">
 <link rel="import" href="../../labelled-item.html">
 <link rel="import" href="../../../styles/table-styles.html">
-<link rel="import" href="../../../styles/dashboard-widget.html">
 
 <dom-module id="activities-list">
   <template>
-      <style include="data-table-styles table-styles dashboard-widget-styles iron-flex-factors">
+      <style include="data-table-styles table-styles iron-flex-factors">
       :host {
         display: block;
 
@@ -31,6 +30,17 @@
 
       .value {
         font-size: 12px;
+      }
+
+      a {
+        text-decoration: none;
+        color: var(--theme-primary-color);
+      }
+
+      footer {
+        padding: 16px;
+        text-align: right;
+        text-transform: uppercase;
       }
     </style>
 
@@ -112,9 +122,9 @@
         </etools-data-table-row>
       </template>
 
-      <div class="widget-actions">
+      <footer>
         <a href="[[activitiesUrl]]">See more</a>
-      </div>
+      </footer>
 
       <etools-loading active="[[loading]]"></etools-loading>
     </etools-content-panel>

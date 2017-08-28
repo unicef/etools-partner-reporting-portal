@@ -21,9 +21,8 @@
         --app-grid-expandible-item-columns: 2;
       }
 
-      .card-content {
-        box-sizing: border-box;
-        min-height: 228px;
+      .widget-heading {
+        margin-bottom: 1.5em;
       }
 
       google-chart {
@@ -68,40 +67,38 @@
     </style>
 
     <paper-card class="widget-container">
-      <div class="card-content">
-        <h3 class="widget-heading">Indicators by Progress Status</h3>
+      <h3 class="widget-heading">Indicators by Progress Status</h3>
 
-        <div class="app-grid">
-          <div class="item">
-            <google-chart
-                type="pie"
-                options="[[chartOptions]]"
-                cols="[[chartCols]]"
-                rows="[[chartRows]]">
-            </google-chart>
-          </div>
-          <div class="item item-wide">
-            <ul class="legend">
-              <template
-                  is="dom-repeat"
-                  items="[[chartRows]]">
-                <li class="legend-row layout horizontal justified">
-                  <span>
-                    <span
-                        class="color"
-                        style="background: [[_getColor(colors, index)]];">
-                    </span>
-                    [[item.0]]
-                  </span>
-                  <span>[[item.1]]</span>
-                </li>
-              </template>
-            </ul>
-          </div>
+      <div class="app-grid">
+        <div class="item">
+          <google-chart
+              type="pie"
+              options="[[chartOptions]]"
+              cols="[[chartCols]]"
+              rows="[[chartRows]]">
+          </google-chart>
         </div>
-
-        <etools-loading active="[[loading]]"></etools-loading>
+        <div class="item item-wide">
+          <ul class="legend">
+            <template
+                is="dom-repeat"
+                items="[[chartRows]]">
+              <li class="legend-row layout horizontal justified">
+                <span>
+                  <span
+                      class="color"
+                      style="background: [[_getColor(colors, index)]];">
+                  </span>
+                  [[item.0]]
+                </span>
+                <span>[[item.1]]</span>
+              </li>
+            </template>
+          </ul>
+        </div>
       </div>
+
+      <etools-loading active="[[loading]]"></etools-loading>
     </paper-card>
   </template>
 

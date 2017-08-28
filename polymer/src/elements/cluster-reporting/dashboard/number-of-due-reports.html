@@ -1,6 +1,7 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../../../../bower_components/etools-loading/etools-loading.html">
+<link rel="import" href="../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
 <link rel="import" href="../../../redux/store.html">
 <link rel="import" href="../../../behaviors/utils.html">
@@ -9,26 +10,22 @@
 
 <dom-module id="number-of-due-reports">
   <template>
-    <style include="dashboard-widget-styles">
+    <style include="dashboard-widget-styles iron-flex">
       :host {
         display: block;
       }
     </style>
 
-    <paper-card class="widget-container">
-      <div class="card-content">
-        <div>
-          <h3 class="widget-heading">Number of Due / Overdue Reports</h3>
-        </div>
+    <paper-card class="widget-container layout vertical">
+      <h3 class="widget-heading flex">Number of Due / Overdue Reports</h3>
 
-        <div class="widget-figure">[[_withDefault(numberOfReports, '-')]]</div>
+      <div class="widget-figure flex">[[_withDefault(numberOfReports, '-')]]</div>
 
-        <div class="widget-actions">
-          <a href="[[reportsUrl]]">See all reports</a>
-        </div>
-
-        <etools-loading active="[[loading]]"></etools-loading>
+      <div class="widget-actions">
+        <a href="[[reportsUrl]]">See all reports</a>
       </div>
+
+      <etools-loading active="[[loading]]"></etools-loading>
     </paper-card>
   </template>
 
