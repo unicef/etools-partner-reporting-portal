@@ -9,13 +9,14 @@
 <link rel="import" href="../../../redux/store.html">
 <link rel="import" href="../../../behaviors/routing.html">
 <link rel="import" href="../../report-status.html">
+<link rel="import" href="../../frequency-of-reporting.html">
 <link rel="import" href="../../etools-prp-progress-bar.html">
 <link rel="import" href="../../labelled-item.html">
 <link rel="import" href="../../../styles/table-styles.html">
 
 <dom-module id="activities-list">
   <template>
-      <style include="data-table-styles table-styles iron-flex-factors">
+      <style include="iron-flex iron-flex-factors data-table-styles table-styles">
       :host {
         display: block;
 
@@ -28,9 +29,18 @@
         text-align: center;
       }
 
+      .reportables {
+        width: 100%;
+      }
+
+      .reportable:not(:last-child) {
+        margin-bottom: 1em;
+      }
+
       .value {
         font-size: 12px;
       }
+
 
       a {
         text-decoration: none;
@@ -65,58 +75,71 @@
 
       <template
           is="dom-repeat"
-          items="[[data]]">
+          items="[[data]]"
+          as="activity">
         <etools-data-table-row
             on-opened-changed="_handleOpenedChanged"
             no-animation>
           <div slot="row-data">
             <div class="table-cell table-cell--text">
-              [[item.cluster]]
+              [[activity.cluster]]
             </div>
             <div class="table-cell table-cell--text">
-              <report-status status="[[item.status]]"></report-status>
+              <report-status status="[[activity.status]]"></report-status>
             </div>
             <div class="table-cell table-cell--text" flex-2>
-              [[item.title]]
+              [[activity.title]]
             </div>
             <div class="table-cell cell-is-cluster">
               <template
                   is="dom-if"
-                  if="[[item.is_cluster]]">
+                  if="[[activity.is_cluster]]">
                 <iron-icon icon="check"></iron-icon>
               </template>
               <template
                   is="dom-if"
-                  if="[[!item.is_cluster]]">
+                  if="[[!activity.is_cluster]]">
                 -
               </template>
             </div>
             <div class="table-cell">
-              [[item.location]]
+              [[activity.location]]
             </div>
           </div>
 
           <div slot="row-data-details">
-            <div class="table-cell flex table-cell--text">
-              <labelled-item label="Start Date">
-                <span class="value">[[item.start_date]]</span>
-              </labelled-item>
-            </div>
-            <div class="table-cell flex table-cell--text">
-              <labelled-item label="End Date">
-                <span class="value">[[item.end_date]]</span>
-              </labelled-item>
-            </div>
-            <div class="table-cell flex-2 table-cell--text">
-              <labelled-item label="Project">
-                <span class="value">[[item.project.title]]</span>
-              </labelled-item>
-            </div>
-            <div class="table-cell flex">&nbsp;</div>
-            <div class="table-cell table-cell--text flex">
-              <labelled-item label="Frequency of reporting">
-                <span class="value">[[item.frequency_of_reporting]]</span>
-              </labelled-item>
+            <div class="reportables layout vertical">
+              <template
+                  is="dom-repeat"
+                  items="[[activity.reportables]]"
+                  as="reportable">
+                <div class="reportable layout horizontal">
+                  <div class="table-cell table-cell--text">
+                    <labelled-item label="Start Date">
+                      <span class="value">[[reportable.start_date]]</span>
+                    </labelled-item>
+                  </div>
+                  <div class="table-cell table-cell--text">
+                    <labelled-item label="End Date">
+                      <span class="value">[[reportable.end_date]]</span>
+                    </labelled-item>
+                  </div>
+                  <div class="table-cell table-cell--text" flex-2>
+                    <labelled-item label="Project">
+                      <span class="value">[[activity.project.title]]</span>
+                    </labelled-item>
+                  </div>
+                  <div class="table-cell">&nbsp;</div>
+                  <div class="table-cell table-cell--text">
+                    <labelled-item label="Frequency of reporting">
+                      <span class="value">
+                        <frequency-of-reporting
+                            type="[[reportable.frequency]]">
+                        </frequency-of-reporting>
+                    </labelled-item>
+                  </div>
+                </div>
+              </template>
             </div>
           </div>
         </etools-data-table-row>
@@ -148,6 +171,7 @@
         data: {
           type: Array,
           statePath: 'clusterDashboardData.data.my_project_activities',
+          observer: '_collapseAll',
         },
 
         activitiesUrl: {
