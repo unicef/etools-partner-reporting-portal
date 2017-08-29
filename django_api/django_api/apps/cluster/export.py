@@ -27,6 +27,9 @@ class XLSXWriter:
         disaggregation_types = Disaggregation.objects.all().distinct('name')
         disaggregation_types_length = len(disaggregation_types)
 
+        # TODO: remove! Mapping current fake data to unique Disaggregation ID
+        disaggregation_types_map = dict()
+
         # disaggregation_values_list is list that holds unique Disaggregation values per Disaggregation type
         disaggregation_values_list = list()
         disaggregation_values_length = 0
@@ -49,6 +52,7 @@ class XLSXWriter:
         # Generate headers for disaggregation
         for dt in range(disaggregation_types_length):
             self.sheet.cell(row=1, column=28 + dt).value = disaggregation_types[dt].name
+            disaggregation_types_map[disaggregation_types[dt].name] = 28 + dt
 
         # Generate headers for disaggregation values
         for dv in range(len(disaggregation_values)):
@@ -56,7 +60,7 @@ class XLSXWriter:
             values = " + ".join([disaggregation_value.value for disaggregation_value in disaggregation_values[dv]])
             self.sheet.cell(row=1, column=28 + disaggregation_types_length + dv).value = values
             self.sheet.cell(row=2, column=28 + disaggregation_types_length + dv).value = ids
-            disaggregation_values_dict[ids] = 28 + disaggregation_types_length + dv
+            disaggregation_values_dict[values] = 28 + disaggregation_types_length + dv
             if dv == len(disaggregation_values) - 1:
                 self.sheet.cell(row=1, column=28 + disaggregation_types_length + dv).value = "Total"
                 disaggregation_values_dict[""] = 28 + disaggregation_types_length + dv
@@ -127,10 +131,17 @@ class XLSXWriter:
                 self.sheet.cell(row=start_row_id, column=26 + MOVE_COLUMN).value = indicator.id
                 self.sheet.cell(row=start_row_id, column=27 + MOVE_COLUMN).value = location_data.id
 
+                #TODO: Update below when we have unique disaggregation data
+                # Disaggregation type
+                for dt in Disaggregation.objects.filter(id__in=location_data.disaggregation_reported_on):
+                    self.sheet.cell(row=start_row_id, column=disaggregation_types_map[dt.name]).value = "X"
                 # Iterate over disaggregation
                 for k, v in location_data.disaggregation.items():
-                    if k in disaggregation_values_dict:
-                        self.sheet.cell(row=start_row_id, column=disaggregation_values_dict[k]).value = v
+                    if eval(k):
+                        dvs = DisaggregationValue.objects.filter(id__in=eval(k))
+                        name = " + ".join([dv.value for dv in dvs])
+                        if name in disaggregation_values_dict:
+                            self.sheet.cell(row=start_row_id, column=disaggregation_values_dict[name]).value = v['c']
 
                 start_row_id += 1
 
