@@ -332,6 +332,36 @@ class IndicatorReportListAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class IndicatorReportUpdateAPIView(APIView):
+    """
+        REST API endpoint to update IndicatorReport fields: overall_status, narrative_assessment
+
+        kwargs:
+        - reportable_id: Reportable pk
+        - ir_id: Indicator Report pk
+
+        PATCH parameter:
+        - overall_status
+        - narrative_assessment
+        """
+
+    serializer_class = OverallNarrativeSerializer
+    permission_classes = (IsAuthenticated, )
+
+    def patch(self, request, ir_id, reportable_id, *args, **kwargs):
+        reportable = get_object_or_404(Reportable, pk=reportable_id)
+        first_indicator = reportable.indicator_reports.first()
+        if first_indicator:
+            serializer = OverallNarrativeSerializer(data=request.data, instance=first_indicator)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({"errors": "Reportable doesn't contain indicator."}, status=status.HTTP_400_BAD_REQUEST)
+
+
 class IndicatorLocationDataUpdateAPIView(APIView):
     """
     REST API endpoint to update one IndicatorLocationData, including disaggregation data.
