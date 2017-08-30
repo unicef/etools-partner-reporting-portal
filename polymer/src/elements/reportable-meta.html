@@ -46,6 +46,12 @@
           <paper-radio-button name="OnT">On Track</paper-radio-button>
           <paper-radio-button name="NoP">No Progress</paper-radio-button>
           <paper-radio-button name="Con">Constrained</paper-radio-button>
+          <template
+              is="dom-if"
+              if="[[allowNoStatus]]"
+              restamp="true">
+            <paper-radio-button name="TODO">No status</paper-radio-button>
+          </template>
         </paper-radio-group>
       </template>
 
@@ -96,6 +102,12 @@
         data: Object,
 
         localData: Object,
+
+        allowNoStatus: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true,
+        },
       },
 
       _handleInput: function () {

@@ -9,6 +9,7 @@
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
+<link rel="import" href="../reportable-meta.html">
 <link rel="import" href="../report-status.html">
 <link rel="import" href="../etools-prp-ajax.html">
 <link rel="import" href="../indicator-details.html">
@@ -125,6 +126,10 @@
         text-transform: uppercase;
         color: white;
         background: var(--paper-grey-500);
+      }
+
+      reportable-meta {
+        padding: 25px;
       }
     </style>
 
@@ -253,6 +258,12 @@
             opened="{{opened}}"
             on-opened-changed="_handleOpenedChanged"
             no-animation>
+          <reportable-meta
+              data="data"
+              mode="[[mode]]"
+              allow-no-status>
+          </reportable-meta>
+
           <indicator-details
             reportable-id="[[data.reportable.id]]"
             indicator-name="[[data.indicator_name]]"
@@ -304,6 +315,7 @@
 
       listeners: {
         'report-complete': '_onReportComplete',
+        'reportable-meta-changed': '_updateMeta',
       },
 
       _computeIcon: function (opened) {
@@ -389,6 +401,12 @@
             }
           )
         );
+      },
+
+      _updateMeta: function (e, data) {
+        e.stopPropagation();
+
+        console.log(data); // FIXME
       },
 
       detached: function () {

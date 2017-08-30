@@ -31,7 +31,7 @@
         };
       }
 
-      .header {
+      reportable-meta {
         padding: 25px;
       }
 
@@ -80,6 +80,10 @@
       .indicator-header__target dd {
         margin: 0;
         font-weight: bold;
+      }
+
+      indicator-details {
+        padding-top: 15px;
       }
     </style>
 
@@ -249,7 +253,7 @@
       },
 
       listeners: {
-        'reportable-meta-changed': '_updateData',
+        'reportable-meta-changed': '_updateMeta',
       },
 
       _toggle: function (e) {
@@ -288,7 +292,7 @@
         }
       },
 
-      _updateData: function (e, data) {
+      _updateMeta: function (e, data) {
         var updateThunk;
 
         e.stopPropagation();
