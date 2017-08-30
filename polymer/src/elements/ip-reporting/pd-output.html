@@ -323,10 +323,6 @@
         return data.display_type;
       },
 
-      attached: function () {
-        this.set('reportableMeta', {});
-      },
-
       detached: function () {
         this._forEach('[id^="collapse-"]', function (section) {
           section.opened = false;
