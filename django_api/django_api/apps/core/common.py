@@ -116,6 +116,7 @@ OVERALL_STATUS = Choices(
     ("OnT", "on_track", "On Track"),
     ("NoP", "no_pogress", "No Progress"),
     ('Con', 'constrained', 'Constrained'),
+    ('NoS', 'no_status', 'No Status'),
 )
 
 PARTNER_PROJECT_STATUS = Choices(

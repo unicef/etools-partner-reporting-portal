@@ -231,7 +231,7 @@ class IndicatorReport(TimeStampedModel):
 
     overall_status = models.CharField(
         choices=OVERALL_STATUS,
-        default=OVERALL_STATUS.on_track,
+        default=OVERALL_STATUS.no_status,
         max_length=3
     )
     narrative_assessment = models.CharField(max_length=255, null=True, blank=True)
