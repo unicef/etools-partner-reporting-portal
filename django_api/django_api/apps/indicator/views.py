@@ -24,6 +24,7 @@ from core.common import (
     REPORTABLE_CA_CONTENT_OBJECT,
     REPORTABLE_PP_CONTENT_OBJECT,
     REPORTABLE_PA_CONTENT_OBJECT,
+    OVERALL_STATUS,
 )
 from core.serializers import ShortLocationSerializer
 from unicef.serializers import ProgressReportSerializer, ProgressReportUpdateSerializer
@@ -256,6 +257,23 @@ class IndicatorDataAPIView(APIView):
     @transaction.atomic
     def post(self, request, ir_id, *args, **kwargs):
         ir = self.get_indicator_report(ir_id)
+
+        # Check if all indicator data is fulfilled for IR status different then Met or No Progress
+        if ir.overall_status not in (OVERALL_STATUS.met, OVERALL_STATUS.no_progress):
+            for data in ir.indicator_location_data.all():
+                for key, vals in data.disaggregation.iteritems():
+                    if ir.is_percentage and (vals.get('c', None) in [None, '']):
+                        _errors = [{
+                            "message": "You have not completed all required indicators for this progress report. Unless your Output status is Met or has No Progress, all indicator data needs to be completed."}]
+                        return Response({"errors": _errors},
+                                        status=status.HTTP_400_BAD_REQUEST)
+                    elif ir.is_number and (vals.get('v', None) in [None, '']):
+                        _errors = [{
+                            "message": "You have not completed all required indicators for this progress report. Unless your Output status is Met or has No Progress, all indicator data needs to be completed."}]
+                        return Response({"errors": _errors},
+                                        status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if indicator was already submitted or SENT BACK
         if ir.submission_date is None or ir.report_status == INDICATOR_REPORT_STATUS.sent_back:
             ir.submission_date = date.today()
             ir.report_status = INDICATOR_REPORT_STATUS.submitted
@@ -266,7 +284,7 @@ class IndicatorDataAPIView(APIView):
             serializer = PDReportsSerializer(instance=ir)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            _errors = [{"message": "Indicator can be submitted only once."}]
+            _errors = [{"message": "Indicator was already submitted. Your IMO will need to send it back for you to edit your submission."}]
             return Response({"errors": _errors},
                             status=status.HTTP_400_BAD_REQUEST)
 
