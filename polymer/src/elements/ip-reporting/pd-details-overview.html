@@ -87,12 +87,12 @@
           </li>
           <li class="item">
             <labelled-item label="UNICEF Focal Point(s)">
-              <span class="field-value">[[_withDefault(pd.unicef_focal_point)]]</span>
+              <span class="field-value">[[_formatFocalPoint(pd.unicef_focal_point)]]</span>
             </labelled-item>
           </li>
           <li class="item">
             <labelled-item label="Partner Focal Point(s)">
-              <span class="field-value">[[_withDefault(pd.partner_focal_point)]]</span>
+              <span class="field-value">[[_formatFocalPoint(pd.partner_focal_point)]]</span>
             </labelled-item>
           </li>
         </ul>
@@ -147,6 +147,10 @@
 
       _computeLoaded: function (pd) {
         return !!pd.id;
+      },
+
+      _formatFocalPoint: function (items) {
+        return this._withDefault(this._commaSeparatedDictValues(items, 'name'));
       },
     });
   </script>
