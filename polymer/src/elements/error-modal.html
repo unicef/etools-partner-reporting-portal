@@ -10,6 +10,11 @@
       :host {
         --paper-dialog: {
           width: 500px;
+          padding: 24px;
+
+          & > * {
+            margin: 0;
+          }
         }
       }
     </style>
@@ -17,13 +22,22 @@
     <paper-dialog
         with-backdrop
         opened="{{opened}}">
-      <p>This is a hardcoded error message. FIXME!</p>
-      <div class="layout horizontal-reverse">
-        <paper-button
-            class="btn-primary"
-            dialog-dismiss>
-          Close
-        </paper-button>
+      <div>
+        <ul>
+          <template
+              is="dom-repeat"
+              items="[[errors]]"
+              as="error">
+            <li>[[error.message]]</li>
+          </template>
+        </ul>
+        <div class="layout horizontal-reverse">
+          <paper-button
+              class="btn-primary"
+              dialog-dismiss>
+            Close
+          </paper-button>
+        </div>
       </div>
     </paper-dialog>
   </template>

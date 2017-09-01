@@ -111,8 +111,10 @@
               self.set('busy', false);
               self.set('path', newPath);
             })
-            .catch(function (err) {
-              return self.$.error.open(err);
+            .catch(function (res) {
+              var errors = res.data.errors;
+
+              return self.$.error.open(errors);
             })
             .then(function () {
               self.set('busy', false);
