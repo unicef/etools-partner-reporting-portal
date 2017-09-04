@@ -8,7 +8,8 @@
 <link rel="import" href="../../../bower_components/iron-location/iron-location.html">
 <link rel="import" href="../../../bower_components/iron-location/iron-query-params.html">
 
-<link rel="import" href="../../elements/report-status.html">
+<link rel="import" href="../report-status.html">
+<link rel="import" href="../etools-prp-number.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/data-table.html">
 <link rel="import" href="../../behaviors/pagination.html">
@@ -98,13 +99,13 @@
               [[_withDefault(pd.end_date)]]
             </div>
             <div class="table-cell table-cell--text">
-              [[_withDefault(pd.cso_contribution)]]
+              <etools-prp-number value="[[pd.cso_contribution]]"></etools-prp-number>
             </div>
             <div class="table-cell table-cell--text">
-              [[_withDefault(pd.total_unicef_cash)]]
+              <etools-prp-number value="[[pd.total_unicef_cash]]"></etools-prp-number>
             </div>
             <div class="table-cell table-cell--text">
-              [[_withDefault(pd.total_unicef_supplies)]]
+              <etools-prp-number value="[[pd.total_unicef_supplies]]"></etools-prp-number>
             </div>
             <div class="table-cell table-cell--text">
               [[_withDefault(pd.calculated_budget)]]

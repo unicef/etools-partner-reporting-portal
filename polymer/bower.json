@@ -50,7 +50,8 @@
     "app-layout": "PolymerElements/app-layout#^1.0.1",
     "paper-date-picker": "^0.1.5",
     "etools-searchable-multiselection-menu": "^2.2.0",
-    "google-chart": "GoogleWebComponents/google-chart#^1.1.2"
+    "google-chart": "GoogleWebComponents/google-chart#^1.1.2",
+    "numeral-js": "saeidzebardast/numeral-js#^0.1.3"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0"

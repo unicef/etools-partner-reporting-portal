@@ -6,6 +6,7 @@
 
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../etools-prp-ajax.html">
+<link rel="import" href="../etools-prp-number.html">
 <link rel="import" href="../../elements/disaggregations/disaggregation-table.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../endpoints.html">
@@ -82,7 +83,19 @@
                     [[location.reportInfo.time_period_end]]
                   </span>
                   <span class="total">
-                    <strong>Total: </strong>[[location.reportInfo.total.v]]
+                    <strong>Total:</strong>
+                    <template
+                        is="dom-if"
+                        if="[[_equals(location.current.display_type, 'number')]]"
+                        restamp="true">
+                      <etools-prp-number value="[[location.reportInfo.total.v]]"></etools-prp-number>
+                    </template>
+                    <template
+                        is="dom-if"
+                        if="[[_equals(location.current.display_type, 'percentage')]]"
+                        restamp="true">
+                      [[_toPercentage(location.reportInfo.total.c)]]
+                    </template>
                   </span>
                 </h4>
                 <!-- TODO: check - wrong use of total? -->
@@ -102,7 +115,19 @@
                     [[location.reportInfo.time_period_end]]
                   </span>
                   <span class="total">
-                    <strong>Total: </strong>[[location.reportInfo.total.v]]
+                    <strong>Total: </strong>
+                    <template
+                        is="dom-if"
+                        if="[[_equals(location.previous.display_type, 'number')]]"
+                        restamp="true">
+                      <etools-prp-number value="[[location.reportInfo.total.v]]"></etools-prp-number>
+                    </template>
+                    <template
+                        is="dom-if"
+                        if="[[_equals(location.previous.display_type, 'percentage')]]"
+                        restamp="true">
+                      [[_toPercentage(location.reportInfo.total.c)]]
+                    </template>
                   </span>
                 </h4>
                 <disaggregation-table
