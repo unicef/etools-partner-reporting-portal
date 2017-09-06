@@ -77,7 +77,7 @@ class ClusterIndicatorsFilter(django_filters.FilterSet):
         return queryset.filter(reportable__cluster_objectives__cluster=value)
 
     def get_partner(self, queryset, name, value):
-        return queryset.filter(reportable__partner_project__partners=value)
+        return queryset.filter(reportable__partner_projects__partner=value)
 
     def get_indicator(self, queryset, name, value):
         return queryset.filter(reportable_id=value)
