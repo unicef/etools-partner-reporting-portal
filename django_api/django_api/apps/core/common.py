@@ -108,7 +108,7 @@ RESPONSE_PLAN_TYPE = Choices(
 OVERALL_STATUS = Choices(
     ("Met", "met", "Met"),
     ("OnT", "on_track", "On Track"),
-    ("NoP", "no_pogress", "No Progress"),
+    ("NoP", "no_progress", "No Progress"),
     ('Con', 'constrained', 'Constrained'),
 )
 
