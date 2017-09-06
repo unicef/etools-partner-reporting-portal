@@ -19,6 +19,7 @@
 <link rel="import" href="reducers/clusterIndicatorReports.html">
 <link rel="import" href="reducers/clusterActivities.html">
 <link rel="import" href="reducers/clusterObjectives.html">
+<link rel="import" href="reducers/clusterDashboardData.html">
 
 <script src="../../bower_components/redux-thunk/index.js"></script>
 
@@ -45,6 +46,7 @@
       clusterActivities: App.Reducers.ClusterActivities,
       clusterObjectives: App.Reducers.ClusterObjectives,
       clusterIndicatorReports: App.Reducers.ClusterIndicatorReports,
+      clusterDashboardData: App.Reducers.ClusterDashboardData,
     });
 
     var store = Redux.createStore(

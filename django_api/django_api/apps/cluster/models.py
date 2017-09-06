@@ -49,6 +49,18 @@ class Cluster(TimeStampedModel):
         return self.constrained_indicator_reports.count()
 
     @property
+    def num_of_on_track_indicator_reports(self):
+        return self.on_track_indicator_reports.count()
+
+    @property
+    def num_of_no_progress_indicator_reports(self):
+        return self.no_progress_indicator_reports.count()
+
+    @property
+    def num_of_no_status_indicator_reports(self):
+        return self.no_status_indicator_reports.count()
+
+    @property
     def num_of_non_cluster_activities(self):
         return self.partner_activities.filter(
             cluster_activity__isnull=True).count()
@@ -122,6 +134,31 @@ class Cluster(TimeStampedModel):
             overall_status=OVERALL_STATUS.constrained
         )
 
+    @cached_property
+    def on_track_indicator_reports(self):
+        return self.submitted_indicator_reports.filter(
+            overall_status=OVERALL_STATUS.on_track,
+        )
+
+    @cached_property
+    def no_progress_indicator_reports(self):
+        return self.submitted_indicator_reports.filter(
+            overall_status=OVERALL_STATUS.no_progress,
+        )
+
+    @cached_property
+    def no_status_indicator_reports(self):
+        return self.submitted_indicator_reports.filter(
+            overall_status=OVERALL_STATUS.no_status,
+        )
+
+    @cached_property
+    def num_of_due_overdue_indicator_reports(self):
+        overdue = self.overdue_indicator_reports
+        due = self.due_indicator_reports
+
+        return overdue.count() + due.count()
+
     def num_of_due_overdue_indicator_reports_partner(self, partner=None):
         overdue = self.overdue_indicator_reports.filter(
             reportable__partner_activities__partner=partner)
@@ -131,8 +168,20 @@ class Cluster(TimeStampedModel):
 
         return overdue.count() + due.count()
 
-    def num_of_indicator_targets_met_partner(self, partner=None):
+    def num_of_met_indicator_reports_partner(self, partner=None):
         return self.met_indicator_reports_partner(partner).count()
+
+    def num_of_constrained_indicator_reports_partner(self, partner=None):
+        return self.constrained_indicator_reports_partner(partner).count()
+
+    def num_of_on_track_indicator_reports_partner(self, partner=None):
+        return self.on_track_indicator_reports_partner(partner).count()
+
+    def num_of_no_progress_indicator_reports_partner(self, partner=None):
+        return self.no_progress_indicator_reports_partner(partner).count()
+
+    def num_of_no_status_indicator_reports_partner(self, partner=None):
+        return self.no_status_indicator_reports_partner(partner).count()
 
     def num_of_projects_in_my_organization_partner(self, partner=None):
         return partner.partner_projects.filter(clusters=self).count()
@@ -153,13 +202,28 @@ class Cluster(TimeStampedModel):
         return partner.partner_activities.filter(
             partner__clusters=self)
 
+    def met_indicator_reports_partner(self, partner=None):
+        return self.met_indicator_reports.filter(
+            reportable__partner_activities__partner=partner
+        )
+
     def constrained_indicator_reports_partner(self, partner=None):
         return self.constrained_indicator_reports.filter(
             reportable__partner_activities__partner=partner
         )
 
-    def met_indicator_reports_partner(self, partner=None):
-        return self.met_indicator_reports.filter(
+    def on_track_indicator_reports_partner(self, partner=None):
+        return self.on_track_indicator_reports.filter(
+            reportable__partner_activities__partner=partner
+        )
+
+    def no_progress_indicator_reports_partner(self, partner=None):
+        return self.no_progress_indicator_reports.filter(
+            reportable__partner_activities__partner=partner
+        )
+
+    def no_status_indicator_reports_partner(self, partner=None):
+        return self.no_status_indicator_reports.filter(
             reportable__partner_activities__partner=partner
         )
 

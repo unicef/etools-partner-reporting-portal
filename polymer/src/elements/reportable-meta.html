@@ -1,0 +1,153 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input-container.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input-char-counter.html">
+
+<link rel="import" href="../behaviors/utils.html">
+<link rel="import" href="report-status.html">
+<link rel="import" href="labelled-item.html">
+
+<dom-module id="reportable-meta">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      labelled-item {
+        font-size: 16px;
+      }
+
+      labelled-item:not(:last-child) {
+        margin-bottom: 25px;
+      }
+
+      paper-radio-group {
+        margin-left: -12px;
+      }
+
+      status-badge {
+        position: relative;
+        top: -2px;
+      }
+    </style>
+
+    <labelled-item label="Overall status">
+      <template
+          is="dom-if"
+          if="[[!_equals(mode, 'view')]]"
+          restamp="true">
+        <paper-radio-group
+            id="overall_status"
+            selected="[[data.overall_status]]"
+            on-selected-changed="_handleInput">
+          <paper-radio-button name="Met">Met</paper-radio-button>
+          <paper-radio-button name="OnT">On Track</paper-radio-button>
+          <paper-radio-button name="NoP">No Progress</paper-radio-button>
+          <paper-radio-button name="Con">Constrained</paper-radio-button>
+          <template
+              is="dom-if"
+              if="[[allowNoStatus]]"
+              restamp="true">
+            <paper-radio-button name="NoS">No Status</paper-radio-button>
+          </template>
+        </paper-radio-group>
+      </template>
+
+      <template
+          is="dom-if"
+          if="[[_equals(mode, 'view')]]"
+          restamp="true">
+          <report-status status="[[data.overall_status]]"></report-status>
+      </template>
+    </labelled-item>
+
+    <labelled-item label="Narrative assessment">
+      <template
+          is="dom-if"
+          if="[[!_equals(mode, 'view')]]"
+          restamp="true">
+        <paper-input-container
+            no-label-float>
+          <input
+              id="narrative_assessment"
+              on-input="_handleInput"
+              value="[[data.narrative_assessment]]"
+              maxlength="256">
+          <paper-input-char-counter></paper-input-char-counter>
+        </paper-input-container>
+      </template>
+
+      <template
+          is="dom-if"
+          if="[[_equals(mode, 'view')]]"
+          restamp="true">
+        [[data.narrative_assessment]]
+      </template>
+    </labelled-item>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'reportable-meta',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+      ],
+
+      properties: {
+        mode: String,
+
+        data: Object,
+
+        localData: Object,
+
+        allowNoStatus: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true,
+        },
+      },
+
+      _handleInput: function () {
+        var field = Polymer.dom(event).rootTarget;
+        var id = field.id;
+
+        switch (id) {
+          case 'overall_status':
+            this.set(['localData', id], field.selected);
+            break;
+
+          case 'narrative_assessment':
+            this.set(['localData', id], field.value.trim());
+            break;
+        }
+      },
+
+      observers: [
+        '_localDataChanged(localData.*)'
+      ],
+
+      _localDataChanged: function (change) {
+        if (change.path.split('.').length < 2) {
+          return;
+        }
+
+        this.debounce('local-data-changed', function () {
+          this.fire('reportable-meta-changed', this.localData);
+        }, 400);
+      },
+
+      attached: function () {
+        this.set('localData', {});
+      },
+
+      detached: function () {
+        if (this.isDebouncerActive('local-data-changed')) {
+          this.cancelDebouncer('local-data-changed');
+        }
+      },
+    });
+  </script>
+</dom-module>

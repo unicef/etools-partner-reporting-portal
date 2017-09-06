@@ -1,0 +1,125 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/etools-content-panel/etools-content-panel.html">
+<link rel="import" href="../../../../bower_components/etools-data-table/etools-data-table.html">
+<link rel="import" href="../../../../bower_components/etools-loading/etools-loading.html">
+
+<link rel="import" href="../../../redux/store.html">
+<link rel="import" href="../../../behaviors/routing.html">
+<link rel="import" href="../../../elements/etools-prp-progress-bar.html">
+<link rel="import" href="../../../styles/table-styles.html">
+
+<dom-module id="constrained-reports-list">
+  <template>
+      <style include="data-table-styles table-styles">
+      :host {
+        display: block;
+
+        --ecp-content: {
+          padding: 0;
+        };
+      }
+
+      a {
+        text-decoration: none;
+        color: var(--theme-primary-color);
+      }
+
+      footer {
+        padding: 16px;
+        text-align: right;
+        text-transform: uppercase;
+      }
+    </style>
+
+    <etools-content-panel panel-title="List of constrained indicators">
+      <etools-data-table-header
+          no-title
+          no-collapse>
+        <etools-data-table-column field="cluster">
+          <div class="table-column">Cluster</div>
+        </etools-data-table-column>
+        <etools-data-table-column field="title" flex-2>
+          <div class="table-column flex-2">Indicator</div>
+        </etools-data-table-column>
+        <etools-data-table-column field="partner">
+          <div class="table-column">Partner</div>
+        </etools-data-table-column>
+        <etools-data-table-column field="last_reported">
+          <div class="table-column">Last reported</div>
+        </etools-data-table-column>
+        <etools-data-table-column field="progress_percentage" flex-2>
+          <div class="table-column">Current progress</div>
+        </etools-data-table-column>
+      </etools-data-table-header>
+
+      <template
+          is="dom-repeat"
+          items="[[data]]">
+        <etools-data-table-row no-collapse>
+          <div slot="row-data">
+            <div class="table-cell table-cell--text">
+              [[item.cluster]]
+            </div>
+            <div class="table-cell table-cell--text" flex-2>
+              <a href="[[_getReportUrl(_baseUrlCluster, item.indicator_id)]]">[[item.title]]</a>
+            </div>
+            <div class="table-cell table-cell--text">
+              [[item.partner]]
+            </div>
+            <div class="table-cell table-cell--text">
+              [[item.submission_date]]
+            </div>
+            <div class="table-cell" flex-2>
+              <etools-prp-progress-bar
+                  number="[[item.progress_percentage]]">
+              </etools-prp-progress-bar>
+            </div>
+          </div>
+        </etools-data-table-row>
+      </template>
+
+      <footer>
+        <a href="[[reportsUrl]]">See more</a>
+      </footer>
+
+      <etools-loading active="[[loading]]"></etools-loading>
+    </etools-content-panel>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'constrained-reports-list',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.RoutingBehavior,
+      ],
+
+      properties: {
+        data: {
+          type: Array,
+          statePath: 'clusterDashboardData.data.constrained_indicator_reports',
+        },
+
+        reportsUrl: {
+          type: String,
+          computed: '_computeReportsUrl(_baseUrlCluster)',
+        },
+
+        loading: {
+          type: Boolean,
+          statePath: 'clusterDashboardData.loading',
+        },
+      },
+
+      _computeReportsUrl: function (baseUrl) {
+        return this.buildUrl(baseUrl, '/results/submitted');
+      },
+
+      _getReportUrl: function (baseUrl, id) {
+        return this.buildUrl(baseUrl, '/results/submitted?indicator=' + id);
+      },
+    });
+  </script>
+</dom-module>
+
