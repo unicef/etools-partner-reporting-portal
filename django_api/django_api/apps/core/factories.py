@@ -26,6 +26,7 @@ from indicator.models import (
 )
 from unicef.models import (
     Section,
+    Person,
     ProgressReport,
     ProgrammeDocument,
     CountryProgrammeOutput,
@@ -431,6 +432,16 @@ class SectionFactory(factory.django.DjangoModelFactory):
         model = Section
 
 
+class PersonFactory(factory.django.DjangoModelFactory):
+    name = factory.Sequence(lambda n: "Person_%d" % n)
+    title = factory.Sequence(lambda n: "Title_%d" % n)
+    phone_number = factory.Sequence(lambda n: "+12 442-113-1%d" % n)
+    email = factory.Sequence(lambda n: "person_%d@uniceftest.org" % n)
+
+    class Meta:
+        model = Person
+
+
 class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "programme_document_%d" % n)
     agreement = factory.Sequence(lambda n: "JOR/PCA2017%d" % n)
@@ -438,17 +449,15 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     start_date = beginning_of_this_year
     end_date = today + datetime.timedelta(days=70)
     population_focus = factory.Sequence(lambda n: "Population %d" % n)
-    response_to_HRP = factory.Sequence(lambda n: "response_to_HRP%d" % n)
     status = fuzzy.FuzzyChoice(PD_STATUS_LIST)
     frequency = fuzzy.FuzzyChoice(PD_FREQUENCY_LEVEL_CHOICE_LIST)
     budget = fuzzy.FuzzyDecimal(low=1000.0, high=100000.0, precision=2)
     unicef_office = factory.Sequence(lambda n: "JCO country programme %d" % n)
-    unicef_focal_point = factory.Sequence(lambda n: "Abdallah Yakhola %d" % n)
-    partner_focal_point = factory.Sequence(lambda n: "Hanin Odeh %d" % n)
-
     cso_contribution = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
     total_unicef_cash = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
     in_kind_amount = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
+    org_name = factory.Sequence(lambda n: "Organization Name %d" % n)
+    org_acronym = factory.Sequence(lambda n: "ORG%d" % n)
 
     cp_output = factory.RelatedFactory('core.factories.CountryProgrammeOutputFactory', 'programme_document')
 

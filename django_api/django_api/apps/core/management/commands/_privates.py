@@ -5,6 +5,8 @@
 from __future__ import unicode_literals
 import datetime
 
+import random
+
 from django.conf import settings
 
 from account.models import (
@@ -35,6 +37,7 @@ from unicef.models import (
     ProgressReport,
     CountryProgrammeOutput,
     LowerLevelOutput,
+    Person,
 )
 from core.models import (
     Intervention,
@@ -72,6 +75,7 @@ from core.factories import (
     InterventionFactory,
     ResponsePlanFactory,
     LocationFactory,
+    PersonFactory,
 )
 from core.common import INDICATOR_REPORT_STATUS
 
@@ -107,7 +111,7 @@ def clean_up_data():
         Intervention.objects.all().delete()
         ResponsePlan.objects.all().delete()
         Location.objects.all().delete()
-
+        Person.objects.all().delete()
         print "All ORM objects deleted"
 
 
@@ -219,6 +223,7 @@ def generate_light_fake_data(seed_quantity=5):
                 content_object=pa, indicator_report__progress_report=None
             )
 
+    PersonFactory.create_batch(seed_quantity)
     ProgrammeDocumentFactory.create_batch(seed_quantity)
 
     # Linking the followings:
@@ -248,6 +253,18 @@ def generate_light_fake_data(seed_quantity=5):
         reportable.content_object \
             .indicator.programme_document.sections.add(
                 Section.objects.all()[idx])
+
+        reportable.content_object \
+            .indicator.programme_document.unicef_focal_point.add(
+            Person.objects.order_by('?').first())
+
+        reportable.content_object \
+            .indicator.programme_document.partner_focal_point.add(
+            Person.objects.order_by('?').first())
+
+        reportable.content_object \
+            .indicator.programme_document.unicef_officers.add(
+            Person.objects.order_by('?').first())
 
         indicator_report = reportable.indicator_reports.first()
         indicator_report.progress_report = progress_report
@@ -497,6 +514,17 @@ def generate_fake_data(seed_quantity=40):
         reportable.content_object \
             .indicator.programme_document.sections.add(
                 Section.objects.all()[idx])
+        reportable.content_object \
+            .indicator.programme_document.unicef_focal_point.add(
+            Person.objects.order_by('?').first())
+
+        reportable.content_object \
+            .indicator.programme_document.partner_focal_point.add(
+            Person.objects.order_by('?').first())
+
+        reportable.content_object \
+            .indicator.programme_document.unicef_officers.add(
+            Person.objects.order_by('?').first())
 
         indicator_report = reportable.indicator_reports.first()
         indicator_report.progress_report = progress_report
