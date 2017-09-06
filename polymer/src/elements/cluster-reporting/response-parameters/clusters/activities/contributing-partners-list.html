@@ -6,49 +6,79 @@
 <link rel="import" href="../../../../../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../../../../../bower_components/iron-location/iron-location.html">
 <link rel="import" href="../../../../../../bower_components/iron-location/iron-query-params.html">
-<link rel="import" href="../../../../../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../../../../../bower_components/app-layout/app-grid/app-grid-style.html">
 
+<link rel="import" href="../../../../../polyfills/es6-shim.html">
 <link rel="import" href="../../../../../behaviors/data-table.html">
 <link rel="import" href="../../../../../behaviors/pagination.html">
 <link rel="import" href="../../../../../behaviors/routing.html">
 <link rel="import" href="../../../../../behaviors/utils.html">
 <link rel="import" href="../../../../etools-prp-ajax.html">
+<link rel="import" href="../../../../labelled-item.html">
 <link rel="import" href="../../../../project-status.html">
 <link rel="import" href="../../../../page-body.html">
-<link rel="import" href="../../../../etools-prp-data-table-row.html">
 <link rel="import" href="../../../../../redux/store.html">
 <link rel="import" href="../../../../../redux/actions.html">
 <link rel="import" href="../../../../../styles/table-styles.html">
+<link rel="import" href="../../../../../styles/shared-styles.html">
 
 <dom-module id="contributing-partners-list">
   <template>
-    <style include="data-table-styles table-styles iron-flex">
+    <style include="shared-styles data-table-styles table-styles app-grid-style">
       :host {
         display: block;
+
+        --app-grid-columns: 5;
+        --app-grid-gutter: 15px;
+        --app-grid-item-height: auto;
+        --app-grid-expandible-item-columns: 5;
+        --links-width: calc((100% / 5 * 3) - 30px);
+
+        --ecp-content: {
+          padding: 0;
+        };
       }
 
-      div[slot='row-data-details'] .table-cell--text {
-        font-size: 12px;
+      .app-grid {
+        margin: -var(--app-grid-gutter);
       }
 
-      .label {
-        display: block;
-        padding-top: 10px;
-        color: var(--paper-grey-600);
+      .full-width {
+        @apply --app-grid-expandible-item;
       }
 
-      div#action {
-        margin-bottom: 25px;
-        @apply(--layout-horizontal);
-        @apply(--layout-end-justified)
+      .links {
+        flex-basis: var(--links-width);
+        max-width: var(--links-width);
       }
 
       a {
+        text-decoration: none;
         color: var(--theme-primary-color);
       }
 
       .wrapper {
         position: relative;
+      }
+
+      .cell-activity {
+        text-align: right;
+      }
+
+      .cell-activity a {
+        text-transform: uppercase;
+      }
+
+      .row-data {
+        width: 100%;
+      }
+
+      .value {
+        font-size: 12px;
+      }
+
+      .truncate {
+        @apply(--truncate);
       }
     </style>
 
@@ -77,6 +107,9 @@
           <etools-data-table-column field="project">
             <div class="table-column">Phone Number</div>
           </etools-data-table-column>
+          <etools-data-table-column field="">
+            <div class="table-column">&nbsp;</div>
+          </etools-data-table-column>
         </etools-data-table-header>
 
         <template
@@ -84,7 +117,7 @@
             is="dom-repeat"
             items="[[data]]"
             initial-count="[[pageSize]]">
-          <etools-prp-data-table-row details-opened="[[detailsOpened]]">
+          <etools-data-table-row details-opened="[[detailsOpened]]">
             <div slot="row-data">
               <div class="table-cell table-cell--text">
                 [[item.title]]
@@ -99,29 +132,53 @@
               <div class="table-cell table-cell--text">
                 [[_withDefault(item.phone_number)]]
               </div>
-
+              <div class="table-cell table-cell--text cell-activity">
+                <a href="[[_getActivityUrl(_baseUrlCluster, activityId, item.partner_activities)]]">See activity</a>
+              </div>
             </div>
             <div slot="row-data-details">
-              <div slot="row-data">
-                <div class="table-cell table-cell--text">
-                  <span class="label">Partner Projects(s)</span>
-                  [[_commaSeparatedDictValues(item.partner_projects, 'title')]]
-                </div>
-                <div class="table-cell table-cell--text">
-                  <span class="label">Cluster</span>
-                  [[item.cluster]]
-                </div>
-                <div class="table-cell table-cell--text">
-                  <span class="label">Address</span>
-                  [[_formatAddress(item.street_address, item.city, item.postal_code)]]
-                </div>
-                <div class="table-cell table-cell--text">
-                  <span class="label">Links</span>
-                  [[_commaSeparatedListValues(item.links)]]
+              <div class="row-data">
+                <div class="app-grid">
+                  <div class="item full-width">
+                    <labelled-item label="Partner Projects(s)">
+                      <div class="value">
+                        <template
+                            is="dom-repeat"
+                            items="[[item.partner_projects]]"
+                            as="project"><template is="dom-if" if="[[!_equals(index, 0)]]" restamp="true">,</template>
+                          <a href="[[_getProjectUrl(_baseUrlCluster, project.id)]]">[[project.title]]</a></template>
+                      </div>
+                    </labelled-item>
+                  </div>
+                  <div class="item">
+                    <labelled-item label="Cluster">
+                      <div class="value truncate">
+                        [[item.cluster]]
+                      </div>
+                    </labelled-item>
+                  </div>
+                  <div class="item">
+                    <labelled-item label="Address">
+                      <div class="value truncate">
+                        [[_formatAddress(item.street_address, item.city, item.postal_code)]]
+                      </div>
+                    </labelled-item>
+                  </div>
+                  <div class="item links">
+                    <labelled-item label="Links">
+                      <div class="value">
+                        <template
+                            is="dom-repeat"
+                            items="[[item.links]]"
+                            as="link"><template is="dom-if" if="[[!_equals(index, 0)]]" restamp="true">,</template>
+                          <a href="[[link]]" target="_blank">[[link]]</a></template>
+                      </labelled-item>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </etools-prp-data-table-row>
+          </etools-data-table-row>
         </template>
 
         <etools-data-table-footer
@@ -200,6 +257,24 @@
 
         _computeCurrentPartnersCount: function(activityId, allPartnersCount) {
           return allPartnersCount[activityId];
+        },
+
+        _getActivityUrl: function (_baseUrlCluster, activityId, partner_activities) {
+          var id = (partner_activities.filter(function (activity) {
+            return Number(activity.cluster_activity) === Number(activityId);
+          })[0] || {}).id;
+
+          return this.buildUrl(
+            _baseUrlCluster,
+            '/response-parameters/clusters/activity/' + id + '/overview'
+          );
+        },
+
+        _getProjectUrl: function (_baseUrlCluster, projectId) {
+          return this.buildUrl(
+            _baseUrlCluster,
+            '/response-parameters/partners/project/' + projectId + '/overview'
+          );
         },
 
         detached: function () {
