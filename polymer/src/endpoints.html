@@ -17,8 +17,8 @@
         return this._buildUrl('/indicator/' + content_object);
       },
 
-      indicatorReports: function (indicatorId) {
-        return this._buildUrl('/indicator/' + indicatorId + '/indicator-reports/');
+      indicatorReports: function (reportableId) {
+        return this._buildUrl('/indicator/' + reportableId + '/indicator-reports/');
       },
 
       partnerDetails: function () {
@@ -139,8 +139,21 @@
 
       reportExport: function (locationId, reportId) {
         return this._buildUrl('/unicef/' + locationId + '/progress-reports/' +
-            reportId + '/annex-C-export-PDF/');
+          reportId + '/annex-C-export-PDF/');
       },
+
+      clusterDashboard: function (responsePlanId, clusterId, mode) {
+        return this._buildUrl(
+          '/cluster/' +
+          responsePlanId +
+          '/' +
+          clusterId +
+          '/' +
+          mode +
+          '-dashboard/'
+        );
+
+      }
     };
   }());
 </script>

@@ -12,13 +12,13 @@ from django.utils.functional import cached_property
 from model_utils.models import TimeStampedModel
 
 from core.common import (
-    ADMINISTRATIVE_LEVEL,
     PD_FREQUENCY_LEVEL,
     INDICATOR_REPORT_STATUS,
     PD_LIST_REPORT_STATUS,
     PD_DOCUMENT_TYPE,
     PROGRESS_REPORT_STATUS,
     PD_STATUS,
+    CURRENCIES,
 )
 from indicator.models import Reportable  # IndicatorReport
 
@@ -35,6 +35,16 @@ class Section(models.Model):
         return self.name
 
 
+class Person(models.Model):
+    name = models.CharField(max_length=128, verbose_name='Name')
+    title = models.CharField(max_length=255, verbose_name='Title')
+    phone_number = models.CharField(max_length=64, verbose_name='Phone Number')
+    email = models.CharField(max_length=255, verbose_name='Phone Number')
+
+    def __unicode__(self):
+        return self.name
+
+
 class ProgrammeDocument(TimeStampedModel):
     """
     ProgrammeDocument model describe agreement between UNICEF & Partner to realize document and
@@ -42,6 +52,9 @@ class ProgrammeDocument(TimeStampedModel):
 
     related models:
         unicef.Section (ManyToManyField): "sections"
+        Person  (ManyToManyField): "officer_programme_documents"
+        Person  (ManyToManyField): "unicef_focal_programme_documents"
+        Person  (ManyToManyField): "officer_programme_documents"
     """
     agreement = models.CharField(max_length=255, verbose_name='Agreement')
     document_type = models.CharField(
@@ -50,11 +63,17 @@ class ProgrammeDocument(TimeStampedModel):
         default=PD_DOCUMENT_TYPE.PD,
         verbose_name='Document Type'
     )
+
     reference_number = models.CharField(max_length=255, verbose_name='Reference Number')
     title = models.CharField(max_length=255, verbose_name='PD/SSFA ToR Title')
     unicef_office = models.CharField(max_length=255, verbose_name='UNICEF Office(s)')
-    unicef_focal_point = models.CharField(max_length=255, verbose_name='UNICEF Focal Point(s)')
-    partner_focal_point = models.CharField(max_length=255, verbose_name='Partner Focal Point(s)')
+
+    unicef_officers =  models.ManyToManyField(Person, verbose_name='UNICEF Officer(s)', related_name="officer_programme_documents")
+    unicef_focal_point = models.ManyToManyField(Person, verbose_name='UNICEF Focal Point(s)', related_name="unicef_focal_programme_documents")
+    partner_focal_point = models.ManyToManyField(Person, verbose_name='Partner Focal Point(s)', related_name="partner_focal_programme_documents")
+
+    org_name = models.CharField(max_length=255, verbose_name='Organization name', blank=True)
+    org_acronym = models.CharField(max_length=16, verbose_name='Organization acronym', blank=True)
 
     start_date = models.DateField(
         verbose_name='Start Programme Date',
@@ -65,11 +84,6 @@ class ProgrammeDocument(TimeStampedModel):
     population_focus = models.CharField(
         max_length=256,
         verbose_name='Population Focus')
-    response_to_HRP = models.CharField(
-        max_length=256,
-        blank=True,
-        null=True,
-        verbose_name='In response to an HRP')
     status = models.CharField(
         choices=PD_STATUS,
         default=PD_STATUS.draft,
@@ -81,24 +95,25 @@ class ProgrammeDocument(TimeStampedModel):
         default=True,
         verbose_name='Contributing to Cluster'
     )
-    administrative_level = models.CharField(
-        max_length=3,
-        choices=ADMINISTRATIVE_LEVEL,
-        default=ADMINISTRATIVE_LEVEL.country,
-        verbose_name='Locations - administrative level'
-    )
     frequency = models.CharField(
         max_length=3,
         choices=PD_FREQUENCY_LEVEL,
         default=PD_FREQUENCY_LEVEL.monthly,
         verbose_name='Frequency of reporting'
     )
+
     budget = models.DecimalField(
         decimal_places=2,
         max_digits=12,
         blank=True,
         null=True,
         help_text='Total Budget'
+    )
+    budget_currency = models.CharField(
+        choices=CURRENCIES,
+        default=CURRENCIES.usd,
+        max_length=16,
+        verbose_name='Budget Currency'
     )
 
     # intervention budged model from etool !!!
@@ -108,6 +123,13 @@ class ProgrammeDocument(TimeStampedModel):
         default=0,
         verbose_name='CSO Contribution'
     )
+    cso_contribution_currency = models.CharField(
+        choices=CURRENCIES,
+        default=CURRENCIES.usd,
+        max_length=16,
+        verbose_name='CSO Contribution Currency'
+    )
+
     # intervention budged model from etool !!!
     total_unicef_cash = models.DecimalField(
         decimal_places=2,
@@ -115,12 +137,25 @@ class ProgrammeDocument(TimeStampedModel):
         default=0,
         verbose_name='UNICEF cash'
     )
+    total_unicef_cash_currency = models.CharField(
+        choices=CURRENCIES,
+        default=CURRENCIES.usd,
+        max_length=16,
+        verbose_name='UNICEF cash Currency'
+    )
+
     # intervention budged model from etool !!!
     in_kind_amount = models.DecimalField(
         max_digits=12,
         decimal_places=2,
         default=0,
         verbose_name='UNICEF Supplies'
+    )
+    in_kind_amount_currency = models.CharField(
+        choices=CURRENCIES,
+        default=CURRENCIES.usd,
+        max_length=16,
+        verbose_name='UNICEF Supplies Currency'
     )
 
     cs_dates = ArrayField(models.DateField(), default=list)

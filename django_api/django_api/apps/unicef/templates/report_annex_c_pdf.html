@@ -95,39 +95,39 @@
                     1.2 Organization information
                 </th>
                 <th>Organization / Acronym</th>
-                <td colspan="2">Tirana Legal Aid Society / TLAS</td>
+                <td colspan="2">{{ organization }} / {{ organization_acronym }}</td>
             </tr>
             <tr>
                 <th>Name of CSO Authorized Official</th>
-                <td colspan="2">Raimonda Bozo</td>
+                <td colspan="2">{{ authorized_officer.name }}</td>
             </tr>
             <tr>
                 <th>Title of Authorized Official</th>
-                <td colspan="2">Executive Director</td>
+                <td colspan="2">{{ authorized_officer.title }}</td>
             </tr>
             <tr>
                 <th>Email of Authorized Official</th>
-                <td colspan="2">bozo@tlas.com</td>
+                <td colspan="2">{{ authorized_officer.email }}</td>
             </tr>
             <tr>
                 <th>Phone of Authorized Official</th>
-                <td colspan="2">001-123-987762</td>
+                <td colspan="2">{{ authorized_officer.phone_number }}</td>
             </tr>
             <tr>
                 <th>Name of Programme Focal Point</th>
-                <td colspan="2">Borana Resulaj</td>
+                <td colspan="2">{{ focal_point.name }}</td>
             </tr>
             <tr>
                 <th>Title</th>
-                <td colspan="2">Finance Manager</td>
+                <td colspan="2">{{ focal_point.title }}</td>
             </tr>
             <tr>
                 <th>Email</th>
-                <td colspan="2">resulak@tlas.com</td>
+                <td colspan="2">{{ focal_point.email }}</td>
             </tr>
             <tr>
                 <th>Telephone</th>
-                <td colspan="2">001-1223-977231</td>
+                <td colspan="2">{{ focal_point.phone_number }}1</td>
             </tr>
             <tr>
                 <th rowspan="3">
@@ -164,7 +164,7 @@
             </tr>
             <tr>
                 <th>1.6 Signature of CSO Authorized Official</th>
-                <td class="signature">Raimonda Bozo</td>
+                <td class="signature">{{ authorized_officer.name }}</td>
                 <td colspan="2">Date: {{ submission_date|default:"---" }}</td>
             </tr>
         </table>

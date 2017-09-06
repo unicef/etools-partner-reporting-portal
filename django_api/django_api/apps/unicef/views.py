@@ -181,7 +181,14 @@ class ProgressReportPDFView(RetrieveAPIView):
         data['submission_date'] = report.get_submission_date()
         data['reporting_period'] = report.get_reporting_period()
 
+        data['organization'] = report.programme_document.org_name
+        data['organization_acronym'] = report.programme_document.org_acronym
+
+        data['authorized_officer'] = report.programme_document.unicef_officers.first()
+        data['focal_point'] = report.programme_document.unicef_focal_point.first()
+
         data['outputs'] = self.prepare_reportable(report.indicator_reports.all().order_by('reportable'))
 
         pdf = render_to_pdf("report_annex_c_pdf.html", data)
         return HttpResponse(pdf, content_type='application/pdf')
+    
