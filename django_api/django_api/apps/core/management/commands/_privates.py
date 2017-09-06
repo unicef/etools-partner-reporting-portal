@@ -490,6 +490,7 @@ def generate_fake_data(seed_quantity=40):
 
     print "ClusterActivity <-> PartnerActivity objects linked"
 
+    PersonFactory.create_batch(seed_quantity)
     ProgrammeDocumentFactory.create_batch(seed_quantity)
     print "{} ProgrammeDocument objects created".format(seed_quantity)
 
