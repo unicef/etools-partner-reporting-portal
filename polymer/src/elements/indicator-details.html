@@ -10,6 +10,7 @@
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 
 <link rel="import" href="etools-prp-ajax.html">
+<link rel="import" href="etools-prp-number.html">
 <link rel="import" href="status-badge.html">
 <link rel="import" href="disaggregations/disaggregation-table.html">
 <link rel="import" href="disaggregations/disaggregation-modal.html">
@@ -145,9 +146,13 @@
                     if="[[_equals(location.display_type, 'number')]]"
                     restamp="true">
                   <dt>Location progress:</dt>
-                  <dd>[[location.location_progress.v]]</dd>
+                  <dd>
+                    <etools-prp-number value="[[location.location_progress.v]]"></etools-prp-number>
+                  </dd>
                   <dt>Previous location progress:</dt>
-                  <dd>[[location.previous_location_progress.v]]</dd>
+                  <dd>
+                    <etools-prp-number value="[[location.previous_location_progress.v]]"></etools-prp-number>
+                  </dd>
                 </template>
                 <template
                     is="dom-if"

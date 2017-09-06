@@ -1,0 +1,86 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/promise-polyfill/promise-polyfill-lite.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
+<link rel="import" href="../styles/buttons.html">
+
+<dom-module id="error-modal">
+  <template>
+    <style include="iron-flex iron-flex-reverse iron-flex-alignment button-styles">
+      :host {
+        --paper-dialog: {
+          width: 500px;
+          padding: 24px;
+
+          & > * {
+            margin: 0;
+          }
+        }
+      }
+    </style>
+
+    <paper-dialog
+        with-backdrop
+        opened="{{opened}}">
+      <div>
+        <ul>
+          <template
+              is="dom-repeat"
+              items="[[errors]]"
+              as="error">
+            <li>[[error.message]]</li>
+          </template>
+        </ul>
+        <div class="layout horizontal-reverse">
+          <paper-button
+              class="btn-primary"
+              dialog-dismiss>
+            Close
+          </paper-button>
+        </div>
+      </div>
+    </paper-dialog>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'error-modal',
+
+      properties: {
+        errors: {
+          type: Array,
+          value: [],
+        },
+
+        opened: {
+          type: Boolean,
+          value: false,
+        },
+
+        _result: Object,
+      },
+
+      open: function (errors) {
+        var self = this;
+
+        this.set('errors', errors);
+        this.set('opened', true);
+
+        this.set('_result', new Promise(function (resolve) {
+          self.addEventListener('opened-changed', function onOpenedChanged() {
+            self.removeEventListener('opened-changed', onOpenedChanged);
+
+            resolve();
+          });
+        }));
+
+        return this._result;
+      },
+
+      close: function () {
+        this.set('errors', []);
+        this.set('opened', false);
+      },
+    });
+  </script>
+</dom-module>

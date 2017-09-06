@@ -11,6 +11,8 @@
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
 <link rel="import" href="../reportable-meta.html">
+<link rel="import" href="../labelled-item.html">
+<link rel="import" href="../etools-prp-number.html">
 <link rel="import" href="../report-status.html">
 <link rel="import" href="../etools-prp-ajax.html">
 <link rel="import" href="../indicator-details.html">
@@ -142,7 +144,9 @@
               <div class="indicator-header__target flex-none layout vertical center-justified">
                 <dl class="layout horizontal justified">
                   <dt class="flex-3">Target:</dt>
-                  <dd class="flex">[[_withDefault(indicator.target)]]</dd>
+                  <dd class="flex">
+                    <etools-prp-number value="[[indicator.target]]"></etools-prp-number>
+                  </dd>
                 </dl>
                 <dl class="layout horizontal justified">
                   <dt class="flex-3">Total cumulative progress:</dt>
@@ -150,7 +154,9 @@
                       is="dom-if"
                       if="[[_equals(indicatorType, 'number')]]"
                       restamp="true">
-                    <dd class="flex">[[_withDefault(indicator.total.v)]]</dd>
+                    <dd class="flex">
+                      <etools-prp-number value="[[indicator.total.v]]"></etools-prp-number>
+                    </dd>
                   </template>
                   <template
                       is="dom-if"

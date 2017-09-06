@@ -53,12 +53,6 @@ INDICATOR_REPORT_STATUS = Choices(
     ('Acc', 'accepted', 'Accepted'),  # green
 )
 
-ADMINISTRATIVE_LEVEL = Choices(
-    ('Cou', 'country', 'Country level'),
-    ('Reg', 'region', 'Region level'),
-    ('Cit', 'city', 'City level'),
-)
-
 FREQUENCY_LEVEL = Choices(
     ('Wee', 'weekly', 'Weekly'),
     ('Mon', 'monthly', 'Monthly'),
@@ -114,7 +108,7 @@ RESPONSE_PLAN_TYPE = Choices(
 OVERALL_STATUS = Choices(
     ("Met", "met", "Met"),
     ("OnT", "on_track", "On Track"),
-    ("NoP", "no_pogress", "No Progress"),
+    ("NoP", "no_progress", "No Progress"),
     ('Con', 'constrained', 'Constrained'),
     ('NoS', 'no_status', 'No Status'),
 )
@@ -123,4 +117,9 @@ PARTNER_PROJECT_STATUS = Choices(
     ("Ong", "ongoing", "Ongoing"),
     ("Pla", "planned", "Planned"),
     ("Com", "completed", "Completed"),
+)
+
+CURRENCIES = Choices(
+    ("USD", "usd", "$"),
+    ("EUR", "euro", "E"),
 )
