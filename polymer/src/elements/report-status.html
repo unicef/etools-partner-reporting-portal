@@ -50,6 +50,7 @@
           case 'Sub':
           case 'Met':
           case 'OnT':
+          case 'Com':
             return 'success';
           case 2:
           case 'Ove':
@@ -57,9 +58,11 @@
           case 3:
           case 'Due':
           case 'NoP':
+          case 'Ong':
             return 'neutral';
           case 'Rej':
           case 'Con':
+          case 'Pla':
             return 'warning';
           case 'NoS':
             return 'no-status';
@@ -88,6 +91,12 @@
             return 'No Progress';
           case 'Con':
             return 'Constrained';
+          case 'Ong':
+            return 'Ongoing';
+          case 'Pla':
+            return 'Planned';
+          case 'Com':
+            return 'Completed';
           case 'NoS':
             return 'No Status';
         }

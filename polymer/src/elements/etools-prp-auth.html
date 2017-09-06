@@ -26,6 +26,18 @@
           type: String,
           statePath: 'auth.token',
         },
+
+        _accountType: {
+          type: String,
+          statePath: 'auth.accountType',
+        },
+
+        accountType: {
+          type: String,
+          notify: true,
+          computed: '_computeAccountType(_accountType)',
+        },
+
         authenticated: {
           type: Boolean,
           notify: true,
@@ -40,6 +52,10 @@
         if (savedToken && !this.token) {
           this.dispatch(App.Actions.setToken(savedToken));
         }
+      },
+
+      _computeAccountType: function (_accountType) {
+        return _accountType;
       },
 
       _computeAuthenticated: function (token) {

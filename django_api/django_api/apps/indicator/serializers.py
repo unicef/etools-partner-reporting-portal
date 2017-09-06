@@ -479,6 +479,7 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
             'time_period_start',
             'time_period_end',
             'display_type',
+            'submission_date',
             'total',
             'remarks',
             'report_status',
@@ -486,6 +487,39 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
             'disagg_choice_lookup_map',
             'overall_status',
             'narrative_assessment'
+        )
+
+
+class ClusterIndicatorReportListSerializer(IndicatorReportListSerializer):
+    cluster = serializers.SerializerMethodField()
+    partner = serializers.SerializerMethodField()
+    progress_percentage = serializers.SerializerMethodField()
+    indicator_id = serializers.SerializerMethodField()
+
+    def get_cluster(self, obj):
+        cluster = obj.reportable.content_object.partner.clusters.first()
+
+        if cluster:
+            return cluster.title
+
+        else:
+            return ''
+
+    def get_partner(self, obj):
+        return obj.reportable.content_object.partner.title
+
+    def get_progress_percentage(self, obj):
+        return obj.reportable.progress_percentage
+
+    def get_indicator_id(self, obj):
+        return obj.reportable.id
+
+    class Meta(IndicatorReportListSerializer.Meta):
+        fields = IndicatorReportListSerializer.Meta.fields + (
+            'cluster',
+            'partner',
+            'progress_percentage',
+            'indicator_id',
         )
 
 
@@ -697,6 +731,23 @@ class ClusterIndicatorDataSerializer(serializers.ModelSerializer):
         )
 
 
+class ClusterIndicatorForPartnerActivitySerializer(serializers.ModelSerializer):
+    blueprint = IndicatorBlueprintSerializer()
+    locations = SimpleLocationSerializer(many=True)
+
+    class Meta:
+        model = Reportable
+        fields = (
+            'id',
+            'blueprint',
+            'locations',
+            'frequency',
+            'cs_dates',
+            'start_date',
+            'end_date',
+        )
+
+
 class IndicatorReportUpdateSerializer(serializers.ModelSerializer):
 
     overall_status = serializers.SerializerMethodField()
@@ -716,6 +767,7 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
     reporting_period = serializers.SerializerMethodField()
     cluster = serializers.SerializerMethodField()
     project = serializers.SerializerMethodField()
+    partner = serializers.SerializerMethodField()
     is_draft = serializers.SerializerMethodField()
     can_submit = serializers.SerializerMethodField()
 
@@ -737,6 +789,7 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
             'narrative_assessment',
             'cluster',
             'project',
+            'partner',
             'is_draft',
             'can_submit',
         )
@@ -759,6 +812,12 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
     def get_project(self, obj):
         if isinstance(obj.reportable.content_object, (PartnerProject, PartnerActivity)):
             return obj.reportable.content_object.title
+        else:
+            return ''
+
+    def get_partner(self, obj):
+        if isinstance(obj.reportable.content_object, (PartnerProject, PartnerActivity)):
+            return obj.reportable.content_object.partner.title
         else:
             return ''
 
