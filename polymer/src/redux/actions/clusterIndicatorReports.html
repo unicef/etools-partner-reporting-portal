@@ -60,6 +60,18 @@
         };
       },
 
+      update: function (updateThunk, reportId) {
+        return function (dispatch) {
+          return updateThunk()
+              .then(function (res) {
+                dispatch(App.Actions.ClusterIndicatorReports.updateSingle(
+                  reportId,
+                  res.data
+                ));
+              });
+        };
+      },
+
       updateSingle: function (reportId, data) {
         return {
           type: App.Constants.UPDATE_CLUSTER_INDICATOR_REPORT,

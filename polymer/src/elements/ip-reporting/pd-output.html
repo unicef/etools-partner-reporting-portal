@@ -4,17 +4,15 @@
 <link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../../bower_components/etools-content-panel/etools-content-panel.html">
 <link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
-<link rel="import" href="../../../bower_components/paper-radio-group/paper-radio-group.html">
-<link rel="import" href="../../../bower_components/paper-radio-button/paper-radio-button.html">
-<link rel="import" href="../../../bower_components/paper-input/paper-input-container.html">
-<link rel="import" href="../../../bower_components/paper-input/paper-input-char-counter.html">
 
-
+<link rel="import" href="../../polyfills/es6-shim.html">
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
+<link rel="import" href="../reportable-meta.html">
 <link rel="import" href="../labelled-item.html">
+<link rel="import" href="../etools-prp-number.html">
 <link rel="import" href="../report-status.html">
 <link rel="import" href="../etools-prp-ajax.html">
 <link rel="import" href="../indicator-details.html">
@@ -35,21 +33,8 @@
         };
       }
 
-      .header {
+      reportable-meta {
         padding: 25px;
-      }
-
-      .header labelled-item {
-        font-size: 16px;
-      }
-
-      .header status-badge {
-        position: relative;
-        top: -2px;
-      }
-
-      .header labelled-item:not(:last-child) {
-        margin-bottom: 25px;
       }
 
       .indicator:not(:last-child) {
@@ -99,68 +84,29 @@
         font-weight: bold;
       }
 
-      paper-radio-group {
-        margin-left: -12px;
+      indicator-details {
+        padding-top: 15px;
       }
     </style>
 
     <etools-prp-ajax
         id="update"
         url="[[reportableUrl]]"
-        body="[[reportableData]]"
+        body="[[reportableMeta]]"
         content-type="application/json"
         method="patch">
     </etools-prp-ajax>
 
     <etools-content-panel panel-title="[[data.name]]">
       <div class="header">
-        <labelled-item label="Overall status">
-          <template
-              is="dom-if"
-              if="[[!_equals(computedMode, 'view')]]"
-              restamp="true">
-            <paper-radio-group
-                id="overall_status"
-                selected="[[data.overall_status]]"
-                on-selected-changed="_handleInput">
-              <paper-radio-button name="Met">Met</paper-radio-button>
-              <paper-radio-button name="OnT">On Track</paper-radio-button>
-              <paper-radio-button name="NoP">No Progress</paper-radio-button>
-              <paper-radio-button name="Con">Constrained</paper-radio-button>
-            </paper-radio-group>
-          </template>
-
-          <template
-              is="dom-if"
-              if="[[_equals(computedMode, 'view')]]"
-              restamp="true">
-              <report-status status="[[data.overall_status]]"></report-status>
-          </template>
-        </labelled-item>
-
-        <labelled-item label="Narrative assessment">
-          <template
-              is="dom-if"
-              if="[[!_equals(computedMode, 'view')]]"
-              restamp="true">
-            <paper-input-container
-                no-label-float>
-              <input
-                  id="narrative_assessment"
-                  on-input="_handleInput"
-                  value="[[data.narrative_assessment]]"
-                  maxlength="256">
-              <paper-input-char-counter></paper-input-char-counter>
-            </paper-input-container>
-          </template>
-
-          <template
-              is="dom-if"
-              if="[[_equals(computedMode, 'view')]]"
-              restamp="true">
-            [[data.narrative_assessment]]
-          </template>
-        </labelled-item>
+        <template
+            is="dom-if"
+            if="[[showMeta]]">
+          <reportable-meta
+              data="[[data]]"
+              mode="[[computedMode]]">
+          </reportable-meta>
+        </template>
       </div>
 
       <template
@@ -198,7 +144,9 @@
               <div class="indicator-header__target flex-none layout vertical center-justified">
                 <dl class="layout horizontal justified">
                   <dt class="flex-3">Target:</dt>
-                  <dd class="flex">[[_withDefault(indicator.target)]]</dd>
+                  <dd class="flex">
+                    <etools-prp-number value="[[indicator.target]]"></etools-prp-number>
+                  </dd>
                 </dl>
                 <dl class="layout horizontal justified">
                   <dt class="flex-3">Total cumulative progress:</dt>
@@ -206,7 +154,9 @@
                       is="dom-if"
                       if="[[_equals(indicatorType, 'number')]]"
                       restamp="true">
-                    <dd class="flex">[[_withDefault(indicator.total.v)]]</dd>
+                    <dd class="flex">
+                      <etools-prp-number value="[[indicator.total.v]]"></etools-prp-number>
+                    </dd>
                   </template>
                   <template
                       is="dom-if"
@@ -264,7 +214,7 @@
       properties: {
         data: Object,
 
-        reportableData: Object,
+        reportableMeta: Object,
 
         overrideMode: {
           type: String,
@@ -300,11 +250,17 @@
           type: String,
           computed: '_computeIndicatorType(data)',
         },
+
+        showMeta: {
+          type: Boolean,
+          value: false,
+          computed: '_computeShowMeta(reportId, data)',
+        },
       },
 
-      observers: [
-        '_updateData(reportableData.*, reportId, data.id)',
-      ],
+      listeners: {
+        'reportable-meta-changed': '_updateMeta',
+      },
 
       _toggle: function (e) {
         var node = e.target;
@@ -324,6 +280,10 @@
         return App.Endpoints.reportable(reportId, data.id);
       },
 
+      _computeShowMeta: function () {
+        return true;
+      },
+
       _handleOpenedChanged: function (e, data) {
         var indicatorDetails;
 
@@ -338,33 +298,12 @@
         }
       },
 
-      _handleInput: function () {
-        var field = Polymer.dom(event).rootTarget;
-        var id = field.id;
-        var DELAY = 300;
-
-        switch (id) {
-          case 'overall_status':
-            this.debounce('status-change', function () {
-              this.set(['reportableData', id], field.selected);
-            }, DELAY);
-            break;
-
-          case 'narrative_assessment':
-            this.debounce('assessment-change', function () {
-              this.set(['reportableData', id], field.value.trim());
-            }, DELAY);
-            break;
-        }
-      },
-
-      _updateData: function (change, reportId, reportableId) {
+      _updateMeta: function (e, data) {
         var updateThunk;
 
-        if (change.path.split('.').length === 1) {
-          // Skip the initial assignment
-          return;
-        }
+        e.stopPropagation();
+
+        this.set('reportableMeta', data);
 
         updateThunk = this.$.update.thunk();
 
@@ -373,8 +312,8 @@
         this.dispatch(
           App.Actions.IndicatorData.updateReportable(
             updateThunk,
-            reportId,
-            reportableId
+            this.reportId,
+            this.data.id
           )
         )
             .catch(function (err) { // jshint ignore:line
@@ -390,22 +329,10 @@
         return data.display_type;
       },
 
-      attached: function () {
-        this.set('reportableData', {});
-      },
-
       detached: function () {
         this._forEach('[id^="collapse-"]', function (section) {
           section.opened = false;
         });
-
-        if (this.isDebouncerActive('status-change')) {
-          this.cancelDebouncer('status-change');
-        }
-
-        if (this.isDebouncerActive('assessment-change')) {
-          this.cancelDebouncer('assessment-change');
-        }
       },
     });
   </script>
