@@ -98,7 +98,7 @@
       },
 
       _commaSeparatedDictValues: function (items, key) {
-        var newList = items.map(function(item) {
+        var newList = (items || []).map(function(item) {
           return item[key];
         });
 

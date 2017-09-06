@@ -485,6 +485,8 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
             'report_status',
             'disagg_lookup_map',
             'disagg_choice_lookup_map',
+            'overall_status',
+            'narrative_assessment'
         )
 
 

@@ -53,12 +53,6 @@ INDICATOR_REPORT_STATUS = Choices(
     ('Acc', 'accepted', 'Accepted'),  # green
 )
 
-ADMINISTRATIVE_LEVEL = Choices(
-    ('Cou', 'country', 'Country level'),
-    ('Reg', 'region', 'Region level'),
-    ('Cit', 'city', 'City level'),
-)
-
 FREQUENCY_LEVEL = Choices(
     ('Wee', 'weekly', 'Weekly'),
     ('Mon', 'monthly', 'Monthly'),
@@ -123,4 +117,9 @@ PARTNER_PROJECT_STATUS = Choices(
     ("Ong", "ongoing", "Ongoing"),
     ("Pla", "planned", "Planned"),
     ("Com", "completed", "Completed"),
+)
+
+CURRENCIES = Choices(
+    ("USD", "usd", "$"),
+    ("EUR", "euro", "E"),
 )
