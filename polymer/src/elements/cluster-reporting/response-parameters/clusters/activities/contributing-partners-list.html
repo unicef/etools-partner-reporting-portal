@@ -8,6 +8,7 @@
 <link rel="import" href="../../../../../../bower_components/iron-location/iron-query-params.html">
 <link rel="import" href="../../../../../../bower_components/app-layout/app-grid/app-grid-style.html">
 
+<link rel="import" href="../../../../../polyfills/es6-shim.html">
 <link rel="import" href="../../../../../behaviors/data-table.html">
 <link rel="import" href="../../../../../behaviors/pagination.html">
 <link rel="import" href="../../../../../behaviors/routing.html">
@@ -132,7 +133,7 @@
                 [[_withDefault(item.phone_number)]]
               </div>
               <div class="table-cell table-cell--text cell-activity">
-                <a href="[[overviewUrl]]">See activity</a>
+                <a href="[[_getActivityUrl(_baseUrlCluster, activityId, item.partner_activities)]]">See activity</a>
               </div>
             </div>
             <div slot="row-data-details">
@@ -229,11 +230,6 @@
             computed: '_computeCurrentPartnersCount(activityId, allPartnersCount)'
           },
 
-          overviewUrl: {
-            type: String,
-            computed: '_computeOverviewUrl(_baseUrlCluster, activityId)',
-          },
-
           loading: {
             type: Boolean,
             statePath: 'clusterActivities.partnersLoading'
@@ -263,10 +259,14 @@
           return allPartnersCount[activityId];
         },
 
-        _computeOverviewUrl: function (_baseUrlCluster, activityId) {
+        _getActivityUrl: function (_baseUrlCluster, activityId, partner_activities) {
+          var id = (partner_activities.filter(function (activity) {
+            return Number(activity.cluster_activity) === Number(activityId);
+          })[0] || {}).id;
+
           return this.buildUrl(
             _baseUrlCluster,
-            '/response-parameters/clusters/activity/' + activityId + '/overview'
+            '/response-parameters/clusters/activity/' + id + '/overview'
           );
         },
 
