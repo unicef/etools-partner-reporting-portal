@@ -4,20 +4,24 @@
 <link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../bower_components/promise-polyfill/promise-polyfill-lite.html">
 
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
+<link rel="import" href="../reportable-meta.html">
+<link rel="import" href="../error-modal.html">
 <link rel="import" href="../report-status.html">
 <link rel="import" href="../etools-prp-ajax.html">
+<link rel="import" href="../etools-prp-number.html">
 <link rel="import" href="../indicator-details.html">
 <link rel="import" href="../../styles/shared-styles.html">
 <link rel="import" href="../../styles/buttons.html">
 
 <dom-module id="cluster-report">
   <template>
-    <style include="iron-flex iron-flex-factors shared-styles button-styles">
+    <style include="iron-flex iron-flex-alignment iron-flex-factors shared-styles button-styles">
       :host {
         display: block;
       }
@@ -57,10 +61,12 @@
       }
 
       .report__meta dl {
-        @apply --truncate;
-
         margin: 0;
         font-size: 11px;
+      }
+
+      .report__meta dl:not(:first-of-type) {
+        margin-top: .5em;
       }
 
       .report__meta dt,
@@ -113,7 +119,8 @@
       }
 
       .iron-collapse-opened {
-        border: 1px solid var(--paper-grey-300);
+        @apply(--cluster-report-content);
+
         background: white;
       }
 
@@ -126,12 +133,24 @@
         color: white;
         background: var(--paper-grey-500);
       }
+
+      reportable-meta {
+        padding: 25px;
+      }
     </style>
 
     <etools-prp-ajax
         id="submit"
-        url="[[submitUrl]]"
+        url="[[reportUrl]]"
         method="post">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
+        id="update"
+        url="[[reportUrl]]"
+        body="[[reportMeta]]"
+        method="patch"
+        content-type="application/json">
     </etools-prp-ajax>
 
     <div class="report">
@@ -210,7 +229,9 @@
             <div class="reportable__target flex-none layout vertical center-justified">
               <dl class="layout horizontal justified">
                 <dt class="flex-3">Target:</dt>
-                <dd class="flex">[[_withDefault(data.reportable.target)]]</dd>
+                <dd class="flex">
+                  <etools-prp-number value="[[data.reportable.target]]"></etools-prp-number>
+                </dd>
               </dl>
               <dl class="layout horizontal justified">
                 <dt class="flex-3">Total cumulative progress:</dt>
@@ -218,7 +239,9 @@
                     is="dom-if"
                     if="[[_equals(indicatorType, 'number')]]"
                     restamp="true">
-                  <dd class="flex">[[_withDefault(data.total.v)]]</dd>
+                  <dd class="flex">
+                    <etools-prp-number value="[[data.total.v]]"></etools-prp-number>
+                  </dd>
                 </template>
                 <template
                     is="dom-if"
@@ -233,7 +256,9 @@
                     is="dom-if"
                     if="[[_equals(indicatorType, 'number')]]"
                     restamp="true">
-                  <dd class="flex">[[_withDefault(data.reportable.achieved.v)]]</dd>
+                  <dd class="flex">
+                    <etools-prp-number value="[[data.reportable.achieved.v]]"></etools-prp-number>
+                  </dd>
                 </template>
                 <template
                     is="dom-if"
@@ -253,6 +278,12 @@
             opened="{{opened}}"
             on-opened-changed="_handleOpenedChanged"
             no-animation>
+          <reportable-meta
+              data="[[data]]"
+              mode="[[mode]]"
+              allow-no-status>
+          </reportable-meta>
+
           <indicator-details
             reportable-id="[[data.reportable.id]]"
             indicator-name="[[data.indicator_name]]"
@@ -263,6 +294,8 @@
         </iron-collapse>
       </div>
     </div>
+
+    <error-modal id="error"></error-modal>
   </template>
 
   <script>
@@ -276,6 +309,8 @@
 
       properties: {
         data: Object,
+
+        reportMeta: Object,
 
         opened: Boolean,
 
@@ -291,9 +326,9 @@
           computed: '_computeCanSubmit(data, busy)',
         },
 
-        submitUrl: {
+        reportUrl: {
           type: String,
-          computed: '_computeSubmitUrl(data)',
+          computed: '_computeReportUrl(data)',
         },
 
         indicatorType: {
@@ -304,6 +339,7 @@
 
       listeners: {
         'report-complete': '_onReportComplete',
+        'reportable-meta-changed': '_updateMeta',
       },
 
       _computeIcon: function (opened) {
@@ -314,7 +350,7 @@
         return data.can_submit && !busy;
       },
 
-      _computeSubmitUrl: function (data) {
+      _computeReportUrl: function (data) {
         return App.Endpoints.indicatorData(data.id);
       },
 
@@ -360,17 +396,19 @@
         var submitThunk = this.$.submit.thunk();
         var self = this;
 
-        this.dispatch(
+        return this.dispatch(
           App.Actions.ClusterIndicatorReports.submit(submitThunk)
         )
             .then(function () {
               self.set('busy', false);
               self.fire('report-submitted', self.data.id);
             })
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
+            .catch(function (res) {
+              var errors = res.data.errors;
 
-              self.set('busy', false);
+              return self.$.error.open(errors).then(function () {
+                return Promise.reject(); // Revert
+              });
             });
       },
 
@@ -391,8 +429,32 @@
         );
       },
 
+      _updateMeta: function (e, data) {
+        var updateThunk;
+
+        e.stopPropagation();
+
+        this.set('reportMeta', data);
+
+        updateThunk = this.$.update.thunk();
+
+        this.$.update.abort();
+
+        this.dispatch(
+          App.Actions.ClusterIndicatorReports.update(
+            updateThunk,
+            this.data.id
+          )
+        )
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
+      },
+
       detached: function () {
         this.$.submit.abort();
+        this.$.update.abort();
+        this.$.error.close();
       },
     });
   </script>
