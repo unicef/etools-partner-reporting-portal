@@ -288,6 +288,18 @@ class IndicatorDataAPIView(APIView):
             return Response({"errors": _errors},
                             status=status.HTTP_400_BAD_REQUEST)
 
+    def patch(self, request, ir_id, *args, **kwargs):
+        indicator = self.get_indicator_report(ir_id)
+        if indicator:
+            serializer = OverallNarrativeSerializer(data=request.data, instance=indicator)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({"errors": "Indicator Report not found."}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class IndicatorDataReportableAPIView(APIView):
 

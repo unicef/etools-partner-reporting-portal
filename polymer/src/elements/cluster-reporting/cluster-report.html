@@ -10,6 +10,7 @@
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
+<link rel="import" href="../reportable-meta.html">
 <link rel="import" href="../error-modal.html">
 <link rel="import" href="../report-status.html">
 <link rel="import" href="../etools-prp-ajax.html">
@@ -129,12 +130,24 @@
         color: white;
         background: var(--paper-grey-500);
       }
+
+      reportable-meta {
+        padding: 25px;
+      }
     </style>
 
     <etools-prp-ajax
         id="submit"
-        url="[[submitUrl]]"
+        url="[[reportUrl]]"
         method="post">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
+        id="update"
+        url="[[reportUrl]]"
+        body="[[reportMeta]]"
+        method="patch"
+        content-type="application/json">
     </etools-prp-ajax>
 
     <div class="report">
@@ -262,6 +275,12 @@
             opened="{{opened}}"
             on-opened-changed="_handleOpenedChanged"
             no-animation>
+          <reportable-meta
+              data="[[data]]"
+              mode="[[mode]]"
+              allow-no-status>
+          </reportable-meta>
+
           <indicator-details
             reportable-id="[[data.reportable.id]]"
             indicator-name="[[data.indicator_name]]"
@@ -288,6 +307,8 @@
       properties: {
         data: Object,
 
+        reportMeta: Object,
+
         opened: Boolean,
 
         mode: String,
@@ -302,9 +323,9 @@
           computed: '_computeCanSubmit(data, busy)',
         },
 
-        submitUrl: {
+        reportUrl: {
           type: String,
-          computed: '_computeSubmitUrl(data)',
+          computed: '_computeReportUrl(data)',
         },
 
         indicatorType: {
@@ -315,6 +336,7 @@
 
       listeners: {
         'report-complete': '_onReportComplete',
+        'reportable-meta-changed': '_updateMeta',
       },
 
       _computeIcon: function (opened) {
@@ -325,7 +347,7 @@
         return data.can_submit && !busy;
       },
 
-      _computeSubmitUrl: function (data) {
+      _computeReportUrl: function (data) {
         return App.Endpoints.indicatorData(data.id);
       },
 
@@ -404,8 +426,31 @@
         );
       },
 
+      _updateMeta: function (e, data) {
+        var updateThunk;
+
+        e.stopPropagation();
+
+        this.set('reportMeta', data);
+
+        updateThunk = this.$.update.thunk();
+
+        this.$.update.abort();
+
+        this.dispatch(
+          App.Actions.ClusterIndicatorReports.update(
+            updateThunk,
+            this.data.id
+          )
+        )
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
+      },
+
       detached: function () {
         this.$.submit.abort();
+        this.$.update.abort();
         this.$.error.close();
       },
     });

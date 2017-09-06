@@ -41,6 +41,11 @@
         };
       }
 
+      .locations-heading {
+        margin: 0 25px;
+        font-size: 12px;
+      }
+
       .tab-header {
         padding: 10px 25px;
         border-bottom: 1px solid var(--paper-grey-300);
@@ -107,6 +112,8 @@
     </etools-prp-ajax>
 
     <template is="dom-if" if="[[!loading]]">
+      <h3 class="locations-heading">Data for locations</h3>
+
       <paper-tabs
           selected="{{selected}}"
           fallback-selection="location-[[disaggregations.indicator_location_data.0.location.id]]"
