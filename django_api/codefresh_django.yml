@@ -4,7 +4,7 @@ steps:
 
     build_django:
         type: build
-        image_name: unicef/etools-prp-django-api
+        image_name: unicef/etools-prp
         dockerfile: Dockerfile
         working_directory: ${{main_clone}}/django_api
         tag: ${{CF_BRANCH}}
