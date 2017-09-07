@@ -46,19 +46,21 @@
         App.Behaviors.UtilsBehavior,
       ],
 
-      observers: [
-        '_clusterActivitiesAjax(queryParams)',
-      ],
-
       properties: {
         responsePlanID: {
           type: String,
           statePath: 'responsePlans.currentID',
         },
 
-        queryParams: Object,
+        queryParams: {
+          type: Object,
+          observer: '_clusterActivitiesAjax',
+        },
 
-        objectiveId: String,
+        objectiveId: {
+          type: String,
+          observer: '_updateParams',
+        },
 
         activitiesUrl: {
           type: String,
@@ -66,8 +68,20 @@
         },
       },
 
-      _clusterActivitiesAjax: function () {
-        var thunk = this.$.activities.thunk();
+      _updateParams: function (objectiveId) {
+        this.async(function () {
+          this.set('queryParams.cluster_objective_id', objectiveId);
+        });
+      },
+
+      _clusterActivitiesAjax: function (queryParams) {
+        var thunk;
+
+        if (typeof queryParams.cluster_objective_id === 'undefined') {
+          return;
+        }
+
+        thunk = this.$.activities.thunk();
 
         this.$.activities.abort();
 
@@ -78,9 +92,6 @@
       },
 
       _computeActivitiesUrl: function () {
-        //Make sure the queryParams are updated before the thunk is created:
-        this.set('queryParams.cluster_objective_id', this.objectiveId);
-
         return App.Endpoints.responseParametersClusterActivities(this.responsePlanID);
       },
     });

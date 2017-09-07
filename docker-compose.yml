@@ -17,7 +17,7 @@ services:
   django_api:
     image: unicef/etools-prp-django-api
     env_file:
-      - django_api/.env
+      - .env
     build:
       context: ./django_api
       dockerfile: ./Dockerfile
@@ -32,6 +32,8 @@ services:
 
   db:
     image: unicef/etools-prp-db
+    env_file:
+      - .env
     build:
       context: ./db
       dockerfile: ./Dockerfile

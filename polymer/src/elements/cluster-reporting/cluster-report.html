@@ -230,7 +230,18 @@
               <dl class="layout horizontal justified">
                 <dt class="flex-3">Target:</dt>
                 <dd class="flex">
-                  <etools-prp-number value="[[data.reportable.target]]"></etools-prp-number>
+                  <template
+                      is="dom-if"
+                      if="[[_equals(indicatorType, 'number')]]"
+                      restamp="true">
+                    <etools-prp-number value="[[data.reportable.target]]"></etools-prp-number>
+                  </template>
+                  <template
+                      is="dom-if"
+                      if="[[_equals(indicatorType, 'percentage')]]"
+                      restamp="true">
+                    [[_toPercentage(data.reportable.target)]]
+                  </template>
                 </dd>
               </dl>
               <dl class="layout horizontal justified">

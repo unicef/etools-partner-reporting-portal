@@ -141,6 +141,7 @@ class PartnerActivitySimpleSerializer(serializers.ModelSerializer):
             'title',
             'project',
             'partner',
+            'cluster_activity'
         )
 
 
