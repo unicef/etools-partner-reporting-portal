@@ -45,6 +45,10 @@
         padding-left: 1em;
       }
 
+      .report__meta a {
+        text-decoration: none;
+      }
+
       .report__meta paper-button {
         margin: 0;
       }
@@ -174,8 +178,20 @@
             <div class="column flex">
               <report-status status="[[data.overall_status]]"></report-status>
               <dl>
-                <dt>Due date:</dt>
-                <dd>[[data.due_date]]</dd>
+                <template
+                    is="dom-if"
+                    if="[[!_equals(mode, 'view')]]"
+                    restamp="true">
+                  <dt>Due date:</dt>
+                  <dd>[[data.due_date]]</dd>
+                </template>
+                <template
+                    is="dom-if"
+                    if="[[_equals(mode, 'view')]]"
+                    restamp="true">
+                  <dt>Submission date:</dt>
+                  <dd>[[data.submission_date]]</dd>
+                </template>
               </dl>
               <dl>
                 <dt>Reporting period:</dt>
@@ -188,8 +204,8 @@
                 <dd>[[_withDefault(data.project)]]</dd>
               </dl>
               <dl>
-                <dt>Cluster:</dt>
-                <dd>[[_withDefault(data.cluster)]]</dd>
+                <dt>Activity:</dt>
+                <dd>[[_withDefault(data.partner_activity)]]</dd>
               </dl>
             </div>
             <template
@@ -200,11 +216,11 @@
                 <span class="draft-badge">Draft</span>
               </div>
             </template>
-            <template
-                is="dom-if"
-                if="[[!_equals(mode, 'view')]]"
-                restamp="true">
-              <div class="column layout horizontal center-center flex-none">
+            <div class="column layout horizontal center-center flex-none">
+              <template
+                  is="dom-if"
+                  if="[[!_equals(mode, 'view')]]"
+                  restamp="true">
                 <paper-button
                     class="btn-primary"
                     disabled="[[!canSubmit]]"
@@ -212,18 +228,37 @@
                     raised>
                   Submit
                 </paper-button>
-              </div>
-            </template>
+              </template>
+              <template
+                  is="dom-if"
+                  if="[[_equals(mode, 'view')]]"
+                  restamp="true">
+                <a
+                    href="#"
+                    target="_blank"
+                    tabindex="-1">
+                  <paper-button class="btn-primary">
+                    <iron-icon icon="icons:file-download"></iron-icon>
+                    Export
+                  </paper-button>
+                </a>
+              </template>
+            </div>
           </div>
           <div class="reportable layout horizontal">
             <div class="reportable__title flex-3 layout vertical center-justified">
               <div class="layout horizontal">
-                <div class="status-badge layout vertical center-justified">
-                  <report-status
-                      status="[[data.report_status]]"
-                      no-label>
-                  </report-status>
-                </div>
+                <template
+                    is="dom-if"
+                    if="[[!_equals(mode, 'view')]]"
+                    restamp="true">
+                  <div class="status-badge layout vertical center-justified">
+                    <report-status
+                        status="[[data.report_status]]"
+                        no-label>
+                    </report-status>
+                  </div>
+                </template>
                 <h3>[[data.indicator_name]]</h3>
               </div>
             </div>
