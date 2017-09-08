@@ -5,6 +5,8 @@
 <link rel="import" href="../../../../bower_components/app-layout/app-drawer/app-drawer.html">
 <link rel="import" href="../../../../bower_components/app-layout/app-header/app-header.html">
 <link rel="import" href="../../../../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../../../../bower_components/etools-loading/etools-loading.html">
+<link rel="import" href="../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
 <link rel="import" href="../../../styles/app-theme-cluster.html">
 <link rel="import" href="../../../redux/store.html">
@@ -15,7 +17,7 @@
 
 <dom-module id="page-cluster-reporting-router">
   <template>
-    <style include="app-theme-cluster-styles">
+    <style include="app-theme-cluster-styles iron-flex">
       :host {
         display: block;
       }
@@ -37,6 +39,10 @@
         color: var(--theme-primary-text-color-light);
         cursor: default;
         user-select: none;
+      }
+
+      .loading {
+        margin: 10em 0;
       }
     </style>
 
@@ -70,9 +76,19 @@
 
       <cluster-reporting-app-header></cluster-reporting-app-header>
 
+      <template
+          is="dom-if"
+          if="[[loading]]"
+          restamp="true">
+        <div class="loading layout horizontal center-center">
+          <etools-loading no-overlay></etools-loading>
+        </div>
+      </template>
+
       <iron-pages
           selected="[[page]]"
-          attr-for-selected="name">
+          attr-for-selected="name"
+          hidden$="[[!loading]]">
         <template
             is="dom-if"
             if="[[_equals(page, 'dashboard')]]"
@@ -136,6 +152,11 @@
       ],
 
       properties: {
+        loading: {
+          type: Boolean,
+          value: false,
+        },
+
         plan: {
           type: String,
           observer: '_planChanged',
@@ -155,7 +176,16 @@
       _pageChanged: function (page) {
         var resolvedPageUrl = this.resolveUrl(page + '.html');
 
-        this.importHref(resolvedPageUrl, null, this._notFound, true);
+        this.set('loading', true);
+
+        this.importHref(
+          resolvedPageUrl,
+          function () {
+            this.set('loading', false);
+          },
+          this._notFound,
+          true
+        );
       },
 
       _planChanged: function (plan) {
