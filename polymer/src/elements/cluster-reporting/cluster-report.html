@@ -8,6 +8,7 @@
 
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/notifications.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
 <link rel="import" href="../reportable-meta.html">
@@ -315,6 +316,7 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.NotificationsBehavior,
         App.Behaviors.ReduxBehavior,
       ],
 
@@ -441,6 +443,7 @@
       },
 
       _updateMeta: function (e, data) {
+        var self = this;
         var updateThunk;
 
         e.stopPropagation();
@@ -457,6 +460,9 @@
             this.data.id
           )
         )
+            .then(function () {
+              self._notifyChangesSaved();
+            })
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
             });
