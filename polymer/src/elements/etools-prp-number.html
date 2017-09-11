@@ -1,0 +1,39 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/numeral-js/numeral-js.html">
+
+<link rel="import" href="../constants.html">
+
+<dom-module id="etools-prp-number">
+  <template>
+    <numeral-js number="[[value]]" format="[[_finalFormat]]" print></numeral-js>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'etools-prp-number',
+
+      properties: {
+        value: Number,
+
+        overrideFormat: {
+          type: String,
+          value: '',
+        },
+
+        _defaultFormat: {
+          type: String,
+          value: App.Constants.FORMAT_NUMBER_DEFAULT,
+        },
+
+        _finalFormat: {
+          type: String,
+          computed: '_computeFinalFormat(_defaultFormat, overrideFormat)',
+        },
+      },
+
+      _computeFinalFormat: function (_defaultFormat, overrideFormat) {
+        return overrideFormat || _defaultFormat;
+      },
+    });
+  </script>
+</dom-module>

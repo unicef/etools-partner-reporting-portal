@@ -9,6 +9,7 @@
 
     App.Reducers.Auth = Redux.combineReducers({
       token: tokenReducer,
+      accountType: accountTypeReducer,
     });
 
     function tokenReducer(state, action) {
@@ -21,6 +22,27 @@
           return action.token;
 
         case App.Constants.RESET_TOKEN:
+          return '';
+
+        default:
+          return state;
+      }
+    }
+
+    function accountTypeReducer(state, action) {
+      if (typeof state === 'undefined') {
+        // state = '';
+
+        // FIXME:
+        state = App.Constants.ACCOUNT_TYPE_PARTNER;
+        // state = App.Constants.ACCOUNT_TYPE_IMO;
+      }
+
+      switch (action.type) {
+        case App.Constants.SET_ACCOUNT_TYPE:
+          return action.accountType;
+
+        case App.Constants.RESET:
           return '';
 
         default:
