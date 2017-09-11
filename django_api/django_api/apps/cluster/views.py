@@ -314,17 +314,19 @@ class ClusterPartnerDashboardAPIView(APIView):
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
 
-class ClusterIndicatorsListExcelView(RetrieveAPIView):
+class ClusterIndicatorsListExcelView(ListAPIView):
     """
         Used for generating excel file from filtered indicators
     """
     permission_classes = (IsAuthenticated,)
+    serializer_class = ClusterIndicatorReportSerializer
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
+    filter_class = ClusterIndicatorsFilter
+    lookup_field = lookup_url_kwarg = 'response_plan_id'
 
-
-    def get(self, request, response_plan_id, *args, **kwargs):
-        # Render to excel
-
-        indicators = IndicatorReport.objects.filter(
+    def get_queryset(self):
+        response_plan_id = self.kwargs.get(self.lookup_field)
+        queryset = IndicatorReport.objects.filter(
             Q(reportable__cluster_objectives__isnull=False)
             | Q(reportable__cluster_activities__isnull=False)
             | Q(reportable__partner_projects__isnull=False)
@@ -336,6 +338,12 @@ class ClusterIndicatorsListExcelView(RetrieveAPIView):
             | Q(
                 reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)
         )
+        return queryset
+
+
+    def list(self, request, response_plan_id, *args, **kwargs):
+        # Render to excel
+        indicators = self.filter_queryset(self.get_queryset())
 
         writer = XLSXWriter(indicators)
 
