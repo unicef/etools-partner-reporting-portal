@@ -10,7 +10,8 @@ from .views import (
     ClusterIndicatorsSimpleListAPIView,
     ClusterDashboardAPIView,
     ClusterPartnerDashboardAPIView,
-    ClusterIndicatorsListExcelView
+    ClusterIndicatorsListExcelView,
+    ClusterIndicatorsLocationListAPIView
 )
 
 
@@ -46,4 +47,8 @@ urlpatterns = [
     url(r'^(?P<response_plan_id>\d+)/cluster-indicators-list/export/$',
         ClusterIndicatorsListExcelView.as_view(),
         name="cluster-indicators-list-excel"),
+
+    url(r'^(?P<response_plan_id>\d+)/cluster-indicators-locations/$',
+        ClusterIndicatorsLocationListAPIView.as_view(),
+        name="cluster-indicators-locations"),
 ]

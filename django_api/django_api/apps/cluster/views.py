@@ -13,6 +13,8 @@ import django_filters
 
 from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
+from core.serializers import ShortLocationSerializer
+from core.models import Location
 from indicator.serializers import ClusterIndicatorReportSerializer, ClusterIndicatorReportSimpleSerializer
 from indicator.models import IndicatorReport
 from cluster.export import XLSXWriter
@@ -347,4 +349,29 @@ class ClusterIndicatorsListExcelView(RetrieveAPIView):
         response = HttpResponse(file_content, content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
         response['Content-Disposition'] = 'attachment; filename=' + file_name
         return response
+
+
+class ClusterIndicatorsLocationListAPIView(ListAPIView):
+    """
+    Endpoint for getting all Indicator Locations objects for given plan
+    """
+    permission_classes = (IsAuthenticated, )
+    serializer_class = ShortLocationSerializer
+    lookup_field = lookup_url_kwarg = 'response_plan_id'
+
+    def get_queryset(self):
+        response_plan_id = self.kwargs.get(self.lookup_field)
+        result = IndicatorReport.objects.filter(
+            Q(reportable__cluster_objectives__isnull=False)
+            | Q(reportable__cluster_activities__isnull=False)
+            | Q(reportable__partner_projects__isnull=False)
+            | Q(reportable__partner_activities__isnull=False)
+        ).filter(
+            Q(reportable__cluster_objectives__cluster__response_plan=response_plan_id)
+            | Q(reportable__cluster_activities__cluster_objective__cluster__response_plan=response_plan_id)
+            | Q(reportable__partner_projects__clusters__response_plan=response_plan_id)
+            | Q(
+                reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)
+        ).values_list('reportable__indicator_reports__indicator_location_data__location', flat=True).distinct()
+        return Location.objects.filter(pk__in=result)
 
