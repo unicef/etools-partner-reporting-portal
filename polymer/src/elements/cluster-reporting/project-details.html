@@ -5,6 +5,7 @@
 <link rel="import" href="../page-body.html">
 <link rel="import" href="../ip-reporting/partner-details.html">
 <link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../etools-prp-number.html">
 <link rel="import" href="../labelled-item.html">
 
 <dom-module id="project-details-display">
@@ -53,13 +54,13 @@
               </labelled-item>
             </li>
             <li class="item">
-              <labelled-item label="Cluster">
-                <span class="value">[[_withDefault(projectData.cluster)]]</span>
+              <labelled-item label="Clusters">
+                <span class="value">[[_commaSeparatedDictValues(projectData.clusters, 'title')]]</span>
               </labelled-item>
             </li>
             <li class="item">
-              <labelled-item label="Location">
-                <span class="value">[[_withDefault(projectData.location)]]</span>
+              <labelled-item label="Locations">
+                <span class="value">[[_commaSeparatedDictValues(projectData.locations, 'title')]]</span>
               </labelled-item>
             </li>
 
@@ -75,7 +76,9 @@
             </li>
             <li class="item">
               <labelled-item label="Total Budget">
-                <span class="value">[[projectData.total_budget]]</span>
+                <span class="value">
+                  <etools-prp-number value="[[projectData.total_budget]]"></etools-prp-number>
+                </span>
               </labelled-item>
             </li>
             <li class="item">

@@ -87,12 +87,12 @@
           </li>
           <li class="item">
             <labelled-item label="UNICEF Focal Point(s)">
-              <span class="field-value">[[_withDefault(pd.unicef_focal_point)]]</span>
+              <span class="field-value">[[_formatFocalPoint(pd.unicef_focal_point)]]</span>
             </labelled-item>
           </li>
           <li class="item">
             <labelled-item label="Partner Focal Point(s)">
-              <span class="field-value">[[_withDefault(pd.partner_focal_point)]]</span>
+              <span class="field-value">[[_formatFocalPoint(pd.partner_focal_point)]]</span>
             </labelled-item>
           </li>
         </ul>
@@ -101,11 +101,6 @@
       <etools-content-panel panel-title="PD or SSFA Details">
         <etools-loading active="[[!loaded]]"></etools-loading>
         <ul class="app-grid">
-          <li class="item">
-            <labelled-item label="In response to an HRP">
-              <span class="field-value">[[_withDefault(pd.response_to_HRP)]]</span>
-            </labelled-item>
-          </li>
           <li class="item">
             <labelled-item label="Start date">
               <span class="field-value">[[_withDefault(pd.start_date)]]</span>
@@ -121,7 +116,6 @@
               <span class="field-value">[[_withDefault(pd.population_focus)]]</span>
             </labelled-item>
           </li>
-
         </ul>
       </etools-content-panel>
     </page-body>
@@ -152,6 +146,10 @@
 
       _computeLoaded: function (pd) {
         return !!pd.id;
+      },
+
+      _formatFocalPoint: function (items) {
+        return this._withDefault(this._commaSeparatedDictValues(items, 'name'));
       },
     });
   </script>
