@@ -143,6 +143,8 @@ class Reportable(TimeStampedModel):
 
     cs_dates = ArrayField(models.DateField(), default=list)
 
+    location_admin_refs = ArrayField(JSONField(), default=list)
+
     class Meta:
         ordering = ['-id']
 
@@ -231,7 +233,7 @@ class IndicatorReport(TimeStampedModel):
 
     overall_status = models.CharField(
         choices=OVERALL_STATUS,
-        default=OVERALL_STATUS.on_track,
+        default=OVERALL_STATUS.no_status,
         max_length=3
     )
     narrative_assessment = models.CharField(max_length=255, null=True, blank=True)

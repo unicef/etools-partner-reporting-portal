@@ -1,6 +1,7 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 
 <link rel="import" href="disaggregation-field.html">
+<link rel="import" href="../etools-prp-number.html">
 <link rel="import" href="../../styles/disaggregation-table-styles.html">
 
 <dom-module id="disaggregation-table-cell">
@@ -24,7 +25,9 @@
     <template
         is="dom-if"
         if="[[!editableBool]]">
-      <span class="cellValue">[[data.v]]</span>
+      <span class="cellValue">
+        <etools-prp-number value="[[data.v]]"></etools-prp-number>
+      </span>
     </template>
   </template>
 

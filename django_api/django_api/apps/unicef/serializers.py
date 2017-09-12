@@ -1,7 +1,13 @@
 from django.conf import settings
 from rest_framework import serializers
 
-from .models import ProgrammeDocument, Section, ProgressReport
+from .models import ProgrammeDocument, Section, ProgressReport, Person
+
+
+class PersonSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Person
+        fields = ('name', 'title', 'email', 'phone_number')
 
 
 class ProgrammeDocumentSerializer(serializers.ModelSerializer):
@@ -9,6 +15,9 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
     id = serializers.SerializerMethodField()
     status = serializers.CharField(source='get_status_display')
     total_unicef_supplies = serializers.SerializerMethodField()
+    unicef_officers = PersonSerializer(read_only=True, many=True)
+    unicef_focal_point = PersonSerializer(read_only=True, many=True)
+    partner_focal_point = PersonSerializer(read_only=True, many=True)
 
     class Meta:
         model = ProgrammeDocument
@@ -18,17 +27,17 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
             'reference_number',
             'title',
             'unicef_office',
-            'unicef_focal_point',
-            'partner_focal_point',
             'start_date',
             'end_date',
             'population_focus',
-            'response_to_HRP',
             'status',
             'calculated_budget',
             'cso_contribution',
             'total_unicef_cash',
             'total_unicef_supplies',
+            'partner_focal_point',
+            'unicef_focal_point',
+            'unicef_officers'
         )
 
     def get_id(self, obj):
@@ -52,6 +61,9 @@ class ProgrammeDocumentDetailSerializer(serializers.ModelSerializer):
     frequency = serializers.CharField(source='get_frequency_display')
     # sections = serializers.SerializerMethodField()
     sections = SectionSerializer(read_only=True, many=True)
+    unicef_officers = PersonSerializer(read_only=True, many=True)
+    unicef_focal_point = PersonSerializer(read_only=True, many=True)
+    partner_focal_point = PersonSerializer(read_only=True, many=True)
 
     class Meta:
         model = ProgrammeDocument
@@ -62,9 +74,8 @@ class ProgrammeDocumentDetailSerializer(serializers.ModelSerializer):
             'reference_number',
             'title',
             'unicef_office',
-            'unicef_focal_point',
-            'partner_focal_point',
-            'response_to_HRP',
+            # 'unicef_focal_point',
+            # 'partner_focal_point',
             'start_date',
             'end_date',
             'population_focus',

@@ -1,10 +1,25 @@
 from __future__ import unicode_literals
+import random
+import logging
 from decimal import Decimal
 
-from django.core.validators import MinValueValidator, MaxValueValidator
-from django.db import models
+from django.core.cache import cache
+from django.contrib.gis.db import models
+from django.contrib.contenttypes.models import ContentType
+from django.core.validators import (
+    MinValueValidator,
+    MaxValueValidator
+)
+from django.db import (
+    IntegrityError,
+    connection
+)
+from django.db.models.signals import pre_delete, post_save
+from django.dispatch.dispatcher import receiver
 
 from model_utils.models import TimeStampedModel
+from mptt.models import MPTTModel, TreeForeignKey
+from paintstore.fields import ColorPickerField
 
 from .common import (
     INTERVENTION_TYPES,
@@ -12,6 +27,13 @@ from .common import (
     RESPONSE_PLAN_TYPE,
 )
 from .countries import COUNTRIES_ALPHA2_CODE_DICT, COUNTRIES_ALPHA2_CODE
+
+logger = logging.getLogger('locations.models')
+
+
+def get_random_color():
+    r = lambda: random.randint(0,255)
+    return '#%02X%02X%02X' % (r(), r(), r())
 
 
 class Intervention(TimeStampedModel):
@@ -67,8 +89,6 @@ class Intervention(TimeStampedModel):
     signed_by_unicef_date = models.DateField(null=True, blank=True)
     signed_by_partner_date = models.DateField(null=True, blank=True)
 
-    locations = models.ManyToManyField('core.Location')
-
     class Meta:
         ordering = ['number']
 
@@ -115,17 +135,49 @@ class ResponsePlan(TimeStampedModel):
         return []  # TODO probably create file field
 
 
+class GatewayType(models.Model):
+    """
+    Represents an Admin Type in location-related models.
+    """
+
+    name = models.CharField(max_length=64L, unique=True)
+    admin_level = models.PositiveSmallIntegerField()
+
+    intervention = models.ForeignKey(Intervention, related_name="gateway_types")
+
+    class Meta:
+        ordering = ['name']
+        verbose_name = 'Location Type'
+
+    def __str__(self):
+        return self.name
+
+
+class LocationManager(models.GeoManager):
+
+    def get_queryset(self):
+        return super(LocationManager, self).get_queryset().select_related('gateway')
+
+
 class Location(TimeStampedModel):
     """
     Location model define place where agents are working.
     The background of the location can be: Country > Region > City > District/Point.
 
+    Either a point or geospatial object.
+    pcode should be unique.
+
     related models:
         indicator.Reportable (ForeignKey): "reportable"
         core.Location (ForeignKey): "self"
+        core.GatewayType: "gateway"
     """
     title = models.CharField(max_length=255)
     reportable = models.ForeignKey('indicator.Reportable', null=True, blank=True, related_name="locations")
+
+    gateway = models.ForeignKey(GatewayType, verbose_name='Location Type')
+    carto_db_table = models.ForeignKey('core.CartoDBTable', related_name="locations")
+    intervention = models.ForeignKey(Intervention, related_name="locations")
 
     latitude = models.DecimalField(
         null=True,
@@ -144,9 +196,10 @@ class Location(TimeStampedModel):
     p_code = models.CharField(max_length=32, blank=True, null=True)
 
     parent = models.ForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
-    # uncomment when dj will be >= 1.11
-    # geom = models.MultiPolygonField(null=True, blank=True)
-    # point = models.PointField(null=True, blank=True)
+
+    geom = models.MultiPolygonField(null=True, blank=True)
+    point = models.PointField(null=True, blank=True)
+    objects = LocationManager()
 
     class Meta:
         unique_together = ('title', 'p_code')
@@ -154,7 +207,14 @@ class Location(TimeStampedModel):
 
     def __str__(self):
         if self.p_code:
-            return "%s {PCode: %s}" % (self.title, self.p_code)
+            return '{} ({} {})'.format(
+                self.name,
+                self.gateway.name,
+                "{}: {}".format(
+                    'CERD' if self.gateway.name == 'School' else 'PCode',
+                    self.p_code if self.p_code else ''
+                    ))
+
         return self.title
 
     @property
@@ -167,3 +227,23 @@ class Location(TimeStampedModel):
             self.point.y,
             self.point.x
         )
+
+
+class CartoDBTable(MPTTModel):
+    """
+    Represents a table in CartoDB, it is used to import locations
+    related models:
+        core.GatewayType: 'gateway'
+        core.Intervention: 'intervention'
+    """
+
+    domain = models.CharField(max_length=254)
+    api_key = models.CharField(max_length=254)
+    table_name = models.CharField(max_length=254)
+    location_type = models.ForeignKey(GatewayType)
+    parent = TreeForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
+
+    intervention = models.ForeignKey(Intervention, related_name="carto_db_tables")
+
+    def __str__(self):
+        return self.table_name

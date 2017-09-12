@@ -93,7 +93,7 @@
           <etools-prp-data-table-row details-opened="[[detailsOpened]]">
             <div slot="row-data">
               <div class="table-cell table-cell--text">
-                [[_commaSeparatedDictValue(project.clusters, 'title')]]
+                [[_commaSeparatedDictValues(project.clusters, 'title')]]
               </div>
               <template is="dom-if" if="[[_equals(page, 'response-parameters')]]">
                 <div class="table-cell table-cell--text">
@@ -107,7 +107,7 @@
                 <a href="[[_detailUrl(project)]]">[[project.title]]</a>
               </div>
               <div class="table-cell table-cell--text">
-                [[_commaSeparatedListValues(project.locations)]]
+                [[_commaSeparatedDictValues(project.locations, 'title')]]
               </div>
             </div>
             <div slot="row-data-details" class="row-details-expanded-wrapper">
