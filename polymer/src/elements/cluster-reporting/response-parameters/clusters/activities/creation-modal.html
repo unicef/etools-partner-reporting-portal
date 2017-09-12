@@ -220,6 +220,10 @@
         App.Behaviors.UtilsBehavior,
       ],
 
+      observers: [
+        '_getObjectivesByClusterID(data.cluster)'
+      ],
+
       properties: {
         responsePlanID: {
           type: String,
@@ -297,27 +301,28 @@
       },
 
       _isObjectivesDisabled: function(clusterID) {
-        if (clusterID) {
-          this.getObjectivesByClusterID();
-        } else {
-          return true;
-        }
+        return !clusterID;
       },
 
-      getObjectivesByClusterID: function() {
+      _getObjectivesByClusterID: function(clusterID) {
         var self = this;
-        var thunk = this.$.objectivesByClusterID.thunk();
+        if (clusterID) {
+          var thunk = this.$.objectivesByClusterID.thunk();
 
-        this.objectivesParams = {cluster_id: this.data.cluster};
+          this.objectivesParams = {cluster_id: this.data.cluster};
 
-        thunk()
-          .then(function (res) {
-            self.set('objectives', res.data.results);
-          })
-          .catch(function (err) { // jshint ignore:line
-            self.updatePending = false;
-            // TODO: error handling
-          });
+          thunk()
+            .then(function (res) {
+              self.set('objectives', res.data.results);
+            })
+            .catch(function (err) { // jshint ignore:line
+              self.updatePending = false;
+              // TODO: error handling
+            });
+        } else {
+          self.set('objectives', []);
+        }
+
       },
 
       close: function () {
