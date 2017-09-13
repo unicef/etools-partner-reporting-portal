@@ -207,8 +207,3 @@ LOGGING = {
             'propagate': True},
     }
 }
-
-
-# CartoDB settings
-CARTODB_USERNAME = os.getenv('CARTODB_USERNAME')
-CARTODB_APIKEY = os.getenv('CARTODB_APIKEY')

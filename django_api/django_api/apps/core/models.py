@@ -250,7 +250,6 @@ class CartoDBTable(MPTTModel):
 
     domain = models.CharField(max_length=254)
     api_key = models.CharField(max_length=254)
-    username = models.CharField(max_length=254)
     table_name = models.CharField(max_length=254)
     location_type = models.ForeignKey(GatewayType)
     parent = TreeForeignKey(
