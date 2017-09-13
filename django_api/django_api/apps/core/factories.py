@@ -547,6 +547,7 @@ class GatewayTypeFactory(factory.django.DjangoModelFactory):
 class CartoDBTableFactory(factory.django.DjangoModelFactory):
     domain = factory.Sequence(lambda n: "domain_%d" % n)
     api_key = factory.Sequence(lambda n: "api_key_%d" % n)
+    username = factory.Sequence(lambda n: "username_%d" % n)
     table_name = factory.Sequence(lambda n: "table_name_%d" % n)
 
     class Meta:
