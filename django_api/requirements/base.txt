@@ -26,3 +26,4 @@ git+https://github.com/jamescw/django-paintstore.git
 
 # Celery
 django-celery==3.2.1
+redis==2.10.6
