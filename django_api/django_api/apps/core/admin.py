@@ -22,7 +22,6 @@ class CartoDBTableAdmin(admin.ModelAdmin):
     list_display = (
         'domain',
         'api_key',
-        'username',
         'table_name',
         'location_type',
         'parent_table_name',

@@ -69,6 +69,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'django_filters',
+    'djcelery',
 
     'account',
     'cluster',
@@ -207,3 +208,33 @@ LOGGING = {
             'propagate': True},
     }
 }
+
+import djcelery
+djcelery.setup_loader()
+BROKER_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
+BROKER_VISIBILITY_VAR = os.environ.get('CELERY_VISIBILITY_TIMEOUT', 1800)
+BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': int(BROKER_VISIBILITY_VAR)}  # 5 hours
+
+CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
+CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
+
+# Sensible settings for celery
+CELERY_ALWAYS_EAGER = False
+CELERY_ACKS_LATE = True
+CELERY_TASK_PUBLISH_RETRY = True
+CELERY_DISABLE_RATE_LIMITS = False
+
+# By default we will ignore result
+# If you want to see results and try out tasks interactively, change it to False
+# Or change this setting on tasks level
+CELERY_IGNORE_RESULT = True
+CELERY_SEND_TASK_ERROR_EMAILS = False
+CELERY_TASK_RESULT_EXPIRES = 600
+
+# Don't use pickle as serializer, json is much safer
+# CELERY_TASK_SERIALIZER = "json"
+# CELERY_ACCEPT_CONTENT = ['application/json']
+
+# CELERYD_HIJACK_ROOT_LOGGER = False
+CELERYD_PREFETCH_MULTIPLIER = 1
+# CELERYD_MAX_TASKS_PER_CHILD = 1000
