@@ -15,7 +15,7 @@ services:
       - polymer
 
   django_api:
-    image: unicef/etools-prp-django-api
+    image: unicef/etools-prp
     env_file:
       - .env
     build:

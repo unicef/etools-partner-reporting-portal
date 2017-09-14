@@ -40,7 +40,13 @@ from core.common import (
     PARTNER_PROJECT_STATUS,
     OVERALL_STATUS,
 )
-from core.models import Intervention, Location, ResponsePlan
+from core.models import (
+    Intervention,
+    Location,
+    ResponsePlan,
+    GatewayType,
+    CartoDBTable,
+)
 from core.countries import COUNTRIES_ALPHA2_CODE
 
 PD_STATUS_LIST = [x[0] for x in PD_STATUS]
@@ -136,8 +142,8 @@ class PartnerProjectFactory(factory.django.DjangoModelFactory):
             return
 
         if extracted:
-            for cluster in extracted:
-                self.locations.add(cluster)
+            for location in extracted:
+                self.locations.add(location)
 
     class Meta:
         model = PartnerProject
@@ -191,17 +197,6 @@ class InterventionFactory(factory.django.DjangoModelFactory):
     end = beginning_of_this_year + datetime.timedelta(days=364)
     signed_by_unicef_date = today
     signed_by_partner_date = today
-
-    @factory.post_generation
-    def locations(self, create, extracted, **kwargs):
-        if not create:
-            # Simple build, do nothing.
-            return
-
-        if extracted:
-            # A list of groups were passed in, use them
-            for location in extracted.order_by('?')[:2]:
-                self.locations.add(location)
 
     class Meta:
         model = Intervention
@@ -412,6 +407,7 @@ class QuantityReportableToPartnerActivityFactory(ReportableFactory):
 
 class LocationFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "location_%d" % n)
+    gateway = factory.SubFactory('core.factories.GatewayTypeFactory')
 
     class Meta:
         model = Location
@@ -538,3 +534,20 @@ class IndicatorLocationDataFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = IndicatorLocationData
+
+
+class GatewayTypeFactory(factory.django.DjangoModelFactory):
+    name = factory.Sequence(lambda n: "gateway_type_%d" % n)
+    admin_level = fuzzy.FuzzyInteger(1, 10, 1)
+
+    class Meta:
+        model = GatewayType
+
+
+class CartoDBTableFactory(factory.django.DjangoModelFactory):
+    domain = factory.Sequence(lambda n: "domain_%d" % n)
+    api_key = factory.Sequence(lambda n: "api_key_%d" % n)
+    table_name = factory.Sequence(lambda n: "table_name_%d" % n)
+
+    class Meta:
+        model = CartoDBTable
