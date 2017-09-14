@@ -70,6 +70,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'djcelery',
+    'leaflet',
+    'suit',
 
     'account',
     'cluster',
@@ -238,3 +240,10 @@ CELERY_TASK_RESULT_EXPIRES = 600
 # CELERYD_HIJACK_ROOT_LOGGER = False
 CELERYD_PREFETCH_MULTIPLIER = 1
 # CELERYD_MAX_TASKS_PER_CHILD = 1000
+
+LEAFLET_CONFIG = {
+    'TILES':  'http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+    'ATTRIBUTION_PREFIX': 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012',
+    'MIN_ZOOM': 3,
+    'MAX_ZOOM': 18,
+}

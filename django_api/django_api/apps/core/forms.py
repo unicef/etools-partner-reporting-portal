@@ -1,6 +1,9 @@
 import logging
+
 from django import forms
 from django.core.exceptions import ValidationError
+
+from suit.widgets import AutosizedTextarea
 
 from carto.sql import SQLClient
 from carto.exceptions import CartoException
@@ -10,6 +13,19 @@ from core.models import GatewayType, CartoDBTable
 
 
 logger = logging.getLogger('locations.models')
+
+
+class AutoSizeTextForm(forms.ModelForm):
+    """
+    Adds large text boxes to name and description fields
+    """
+    class Meta:
+        widgets = {
+            'name':
+                AutosizedTextarea(attrs={'class': 'input-xlarge'}),
+            'description':
+                AutosizedTextarea(attrs={'class': 'input-xlarge'}),
+        }
 
 
 class CartoDBTableForm(forms.ModelForm):
@@ -22,10 +38,9 @@ class CartoDBTableForm(forms.ModelForm):
 
         domain = self.cleaned_data['domain']
         api_key = self.cleaned_data['api_key']
-        username = self.cleaned_data['username']
         table_name = self.cleaned_data['table_name']
 
-        client = get_carto_client(api_key, domain, username)
+        client = get_carto_client(api_key, domain)
         sql = SQLClient(client)
 
         try:

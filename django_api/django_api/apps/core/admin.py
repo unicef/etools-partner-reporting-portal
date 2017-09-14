@@ -1,6 +1,12 @@
-from django.contrib import admin
+from django.contrib.gis import admin
 
-from core.forms import GatewayTypeModelForm, CartoDBTableForm
+from leaflet.admin import LeafletGeoAdmin
+
+from core.forms import (
+    GatewayTypeModelForm,
+    CartoDBTableForm,
+    AutoSizeTextForm
+)
 from core.cartodb import update_sites_from_cartodb
 from core.models import (
     Intervention,
@@ -9,6 +15,44 @@ from core.models import (
     GatewayType,
     CartoDBTable,
 )
+
+
+class LocationAdmin(LeafletGeoAdmin, admin.ModelAdmin):
+    save_as = True
+    form = AutoSizeTextForm
+    fields = [
+        'title',
+        'gateway',
+        'p_code',
+        'geom',
+        'point',
+    ]
+    list_display = (
+        'title',
+        'gateway',
+        'p_code',
+    )
+    list_filter = (
+        'gateway',
+        'parent',
+    )
+    search_fields = ('title', 'p_code',)
+
+    def get_form(self, request, obj=None, **kwargs):
+        self.readonly_fields = [] if request.user.is_superuser else ['p_code', 'geom', 'point', 'gateway']
+
+        return super(LocationAdmin, self).get_form(request, obj, **kwargs)
+
+    # def get_fields(self, request, obj=None):
+    #
+    #     fields = super(LocationAdmin, self).get_fields(request, obj)
+    #     if obj:
+    #         if obj.point:
+    #             fields.append('point')
+    #         if obj.geom:
+    #             fields.append('geom')
+    #
+    #     return fields
 
 
 class GatewayTypeAdmin(admin.ModelAdmin):
@@ -38,7 +82,7 @@ class CartoDBTableAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Intervention)
-admin.site.register(Location)
+admin.site.register(Location, LocationAdmin)
 admin.site.register(ResponsePlan)
 admin.site.register(GatewayType)
 admin.site.register(CartoDBTable, CartoDBTableAdmin)

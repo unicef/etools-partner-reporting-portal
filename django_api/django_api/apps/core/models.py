@@ -218,7 +218,7 @@ class Location(TimeStampedModel):
     def __str__(self):
         if self.p_code:
             return '{} ({} {})'.format(
-                self.name,
+                self.title,
                 self.gateway.name,
                 "{}: {}".format(
                     'CERD' if self.gateway.name == 'School' else 'PCode',

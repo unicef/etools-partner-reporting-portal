@@ -46,7 +46,9 @@ def create_location(pcode,
         create_args = {
             'p_code': pcode,
             'gateway': carto_table.location_type,
-            'name': site_name
+            'title': site_name,
+            'carto_db_table': carto_table,
+            'intervention': carto_table.intervention,
         }
 
         if parent_instance:
@@ -63,22 +65,22 @@ def create_location(pcode,
         sites_created += 1
 
         try:
-            location = Location.objects.create(**create_args)
+            loc = Location.objects.create(**create_args)
 
         except IntegrityError as e:
-            logger.info('Not Added: {}', e)
-
-        logger.info('{}: {} ({})'.format(
-            'Added',
-            location.name,
-            carto_table.location_type.name
-        ))
+            logger.info('Not Added: {}'.format(str(e)))
+        else:
+            logger.info('{}: {} ({})'.format(
+                'Added',
+                loc.title,
+                carto_table.location_type.name
+            ))
 
         return True, sites_not_added, sites_created, sites_updated
 
     else:
         # names can be updated for existing locations with the same code
-        location.name = site_name
+        location.title = site_name
 
         if not row['the_geom']:
             return False, sites_not_added, sites_created, sites_updated
@@ -101,7 +103,7 @@ def create_location(pcode,
 
         logger.info('{}: {} ({})'.format(
             'Updated',
-            location.name,
+            location.title,
             carto_table.location_type.name
         ))
 
@@ -119,8 +121,7 @@ def update_sites_from_cartodb(carto_table):
     """
     client = get_carto_client(
         carto_table.api_key,
-        carto_table.domain,
-        carto_table.username)
+        carto_table.domain)
 
     sql = SQLClient(client)
 
@@ -162,14 +163,14 @@ def update_sites_from_cartodb(carto_table):
             if carto_table.parent:
                 try:
                     parent_instance = Location.objects.get(
-                        p_code=carto_table.parent.pcode)
+                        carto_db_table=carto_table.parent)
 
                 except Exception as exp:
                     msg = ""
 
-                    if exp is parent_instance.MultipleObjectsReturned:
+                    if exp is Location.MultipleObjectsReturned:
                         msg = "{} locations found for parent code: {}".format(
-                            'Multiple' if exp is parent_instance.MultipleObjectsReturned else 'No',
+                            'Multiple' if exp is Location.MultipleObjectsReturned else 'No',
                             parent_instance.pcode
                         )
 
