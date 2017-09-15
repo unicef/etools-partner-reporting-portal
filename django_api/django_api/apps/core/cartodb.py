@@ -163,7 +163,7 @@ def update_sites_from_cartodb(carto_table):
             if carto_table.parent:
                 try:
                     parent_instance = Location.objects.get(
-                        carto_db_table=carto_table.parent)
+                        p_code=row['parent_pcode'])
 
                 except Exception as exp:
                     msg = ""
