@@ -40,7 +40,7 @@ from unicef.models import (
     Person,
 )
 from core.models import (
-    Intervention,
+    Workspace,
     ResponsePlan,
     Location,
     GatewayType,
@@ -74,7 +74,7 @@ from core.factories import (
     ProgressReportFactory,
     CountryProgrammeOutputFactory,
     LowerLevelOutputFactory,
-    InterventionFactory,
+    WorkspaceFactory,
     ResponsePlanFactory,
     LocationFactory,
     PersonFactory,
@@ -112,7 +112,7 @@ def clean_up_data():
         ProgressReport.objects.all().delete()
         CountryProgrammeOutput.objects.all().delete()
         LowerLevelOutput.objects.all().delete()
-        Intervention.objects.all().delete()
+        Workspace.objects.all().delete()
         ResponsePlan.objects.all().delete()
         Location.objects.all().delete()
         GatewayType.objects.all().delete()
@@ -134,9 +134,9 @@ def generate_light_fake_data(seed_quantity=5):
     admin.save()
 
     SectionFactory.create_batch(seed_quantity)
-    InterventionFactory.create_batch(seed_quantity)
+    WorkspaceFactory.create_batch(seed_quantity)
 
-    for intervention in Intervention.objects.all():
+    for intervention in Workspace.objects.all():
         ResponsePlanFactory(
             intervention=intervention,
             title="{} {} Humanitarian Response Plan".format(intervention.country_name, today.year)
@@ -307,8 +307,8 @@ def generate_light_fake_data(seed_quantity=5):
         indicator_report.progress_report = progress_report
         indicator_report.save()
 
-    # Intervention <-> Locations
-    for intervention in Intervention.objects.all():
+    # Workspace <-> Locations
+    for intervention in Workspace.objects.all():
         intervention.locations.add(*list(Location.objects.all()))
     generate_indicator_report_location_disaggregation_quantity_data()
 
@@ -345,10 +345,10 @@ def generate_fake_data(seed_quantity=40):
     SectionFactory.create_batch(seed_quantity)
     print "{} Section objects created".format(seed_quantity / 4)
 
-    InterventionFactory.create_batch(seed_quantity / 8)
-    print "{} Intervention objects created".format(seed_quantity / 8)
+    WorkspaceFactory.create_batch(seed_quantity / 8)
+    print "{} Workspace objects created".format(seed_quantity / 8)
 
-    for intervention in Intervention.objects.all():
+    for intervention in Workspace.objects.all():
         for idx in xrange(0, 3):
             year = today.year - idx
             ResponsePlanFactory(
@@ -607,10 +607,10 @@ def generate_fake_data(seed_quantity=40):
 
     print "ProgrammeDocument <-> QuantityReportableToLowerLevelOutput <-> IndicatorReport objects linked".format(seed_quantity)
 
-    # Intervention <-> Locations
-    for intervention in Intervention.objects.all():
+    # Workspace <-> Locations
+    for intervention in Workspace.objects.all():
         intervention.locations.add(*list(Location.objects.all()))
-    print "Intervention objects linked to Locations".format(seed_quantity)
+    print "Workspace objects linked to Locations".format(seed_quantity)
 
     print "Generating IndicatorLocationData for Quantity type"
     generate_indicator_report_location_disaggregation_quantity_data()

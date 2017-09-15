@@ -5,7 +5,7 @@ from django.urls import reverse
 from rest_framework import status
 from core.common import PROGRESS_REPORT_STATUS
 from core.tests.base import BaseAPITestCase
-from core.models import Intervention, Location
+from core.models import Workspace, Location
 from core.factories import (
     QuantityReportableToLowerLevelOutputFactory,
     ProgrammeDocumentFactory,
@@ -21,7 +21,7 @@ class TestProgrammeDocumentAPIView25(BaseAPITestCase):
     generate_fake_data_quantity = 25
 
     def test_list_api(self):
-        intervention = Intervention.objects.filter(locations__isnull=False).first()
+        intervention = Workspace.objects.filter(locations__isnull=False).first()
 
         location_id = intervention.locations.first().id
 
@@ -32,7 +32,7 @@ class TestProgrammeDocumentAPIView25(BaseAPITestCase):
         self.assertEquals(len(response.data['results']), 1)
 
     def test_list_filter_api(self):
-        intervention = Intervention.objects.filter(locations__isnull=False).first()
+        intervention = Workspace.objects.filter(locations__isnull=False).first()
         url = reverse('programme-document', kwargs={'location_id': intervention.locations.first().id})
         response = self.client.get(
             url+"?ref_title=&status=&location=",
@@ -88,7 +88,7 @@ class TestProgressReportAPIView(BaseAPITestCase):
 
     def setUp(self):
         super(TestProgressReportAPIView, self).setUp()
-        self.location_id = Intervention.objects.filter(locations__isnull=False).first().locations.first().id
+        self.location_id = Workspace.objects.filter(locations__isnull=False).first().locations.first().id
         self.queryset = self.get_queryset()
 
     def get_queryset(self):

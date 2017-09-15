@@ -41,7 +41,7 @@ from core.common import (
     OVERALL_STATUS,
 )
 from core.models import (
-    Intervention,
+    Workspace,
     Location,
     ResponsePlan,
     GatewayType,
@@ -187,7 +187,7 @@ class UserFactory(factory.django.DjangoModelFactory):
         model = User
 
 
-class InterventionFactory(factory.django.DjangoModelFactory):
+class WorkspaceFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "intervention_%d" % n)
     document_type = 'PD'
     number = fuzzy.FuzzyText(length=64)
@@ -199,7 +199,7 @@ class InterventionFactory(factory.django.DjangoModelFactory):
     signed_by_partner_date = today
 
     class Meta:
-        model = Intervention
+        model = Workspace
 
 
 class ResponsePlanFactory(factory.django.DjangoModelFactory):
@@ -453,7 +453,6 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     total_unicef_cash = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
     in_kind_amount = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
     org_name = factory.Sequence(lambda n: "Organization Name %d" % n)
-    org_acronym = factory.Sequence(lambda n: "ORG%d" % n)
 
     cp_output = factory.RelatedFactory('core.factories.CountryProgrammeOutputFactory', 'programme_document')
 

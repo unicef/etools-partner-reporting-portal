@@ -71,8 +71,7 @@ class ProgrammeDocument(TimeStampedModel):
     unicef_focal_point = models.ManyToManyField(Person, verbose_name='UNICEF Focal Point(s)', related_name="unicef_focal_programme_documents")
     partner_focal_point = models.ManyToManyField(Person, verbose_name='Partner Focal Point(s)', related_name="partner_focal_programme_documents")
 
-    org_name = models.CharField(max_length=255, verbose_name='Organization name', blank=True)
-    org_acronym = models.CharField(max_length=16, verbose_name='Organization acronym', blank=True)
+    partner = models.ForeignKey('partner.Partner')
 
     start_date = models.DateField(
         verbose_name='Start Programme Date',
@@ -308,16 +307,24 @@ class ProgressReport(TimeStampedModel):
     funds_received_to_date = models.CharField(max_length=256)
     challenges_in_the_reporting_period = models.CharField(max_length=256)
     proposed_way_forward = models.CharField(max_length=256)
-    status = models.CharField(max_length=3, choices=PROGRESS_REPORT_STATUS, default=PROGRESS_REPORT_STATUS.due)
-    programme_document = models.ForeignKey(ProgrammeDocument, related_name="progress_reports", default=-1)
+    status = models.CharField(max_length=3, choices=PROGRESS_REPORT_STATUS,
+                              default=PROGRESS_REPORT_STATUS.due)
+    programme_document = models.ForeignKey(ProgrammeDocument,
+                                           related_name="progress_reports",
+                                           default=-1)
     # attachements ???
 
-    start_date = models.DateField(
-        verbose_name='Start Date',
-    )
-    end_date = models.DateField(
-        verbose_name='End Date',
-    )
+    start_date = models.DateField(verbose_name='Start Date')
+    end_date = models.DateField(verbose_name='End Date')
+    due_date = models.DateField(verbose_name='Due Date')
+    submission_date = models.DateField(verbose_name='Submission Date',
+                                       blank=True, null=True)
+    submitted_by = models.ForeignKey('account.User',
+                                     blank=True, null=True)
+
+    sent_back_date = models.DateField(verbose_name='Sent Back Date',
+                                      blank=True, null=True)
+    sent_back_feedback = models.TextField(blank=True, null=True)
 
     class Meta:
         ordering = ['-id']
@@ -353,7 +360,7 @@ class LowerLevelOutput(TimeStampedModel):
         indicator.Reportable (GenericRelation): "reportables"
     """
     title = models.CharField(max_length=255)
-    indicator = models.ForeignKey(CountryProgrammeOutput, related_name="ll_outputs")
+    cp_output = models.ForeignKey(CountryProgrammeOutput, related_name="ll_outputs")
     reportables = GenericRelation('indicator.Reportable', related_query_name='lower_level_outputs')
 
     class Meta:

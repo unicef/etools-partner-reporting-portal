@@ -12,6 +12,7 @@ from core.common import (
     FREQUENCY_LEVEL,
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
+    CLUSTER_TYPES,
 )
 
 from indicator.models import Reportable, IndicatorReport
@@ -25,13 +26,17 @@ class Cluster(TimeStampedModel):
     Partners will belong to Education, that are working on this background.
 
     related models:
-        core.Intervention (ForeignKey): "intervention"
+        core.Workspace (ForeignKey): "intervention"
         account.User (ForeignKey): "user"
     """
-    title = models.CharField(max_length=255)
-    # intervention = models.ForeignKey('core.Intervention', related_name="clusters")
+    type = models.CharField(max_length=32, choices=CLUSTER_TYPES)
     response_plan = models.ForeignKey('core.ResponsePlan', null=True, related_name="clusters")
     user = models.ForeignKey('account.User', related_name="clusters")
+
+    class Meta:
+        """One response plan can only have a cluster of one type."""
+
+        unique_together = ('type', 'response_plan')
 
     def __str__(self):
         return "<pk: %s> %s" % (self.id, self.title)
@@ -246,7 +251,8 @@ class ClusterObjective(TimeStampedModel):
         default=FREQUENCY_LEVEL.monthly,
         verbose_name='Frequency of reporting'
     )
-    reportables = GenericRelation('indicator.Reportable', related_query_name='cluster_objectives')
+    reportables = GenericRelation('indicator.Reportable',
+                                  related_query_name='cluster_objectives')
 
     class Meta:
         ordering = ['-id']
