@@ -156,7 +156,7 @@ class Reportable(TimeStampedModel):
         from unicef.models import LowerLevelOutput
 
         if isinstance(self.content_object, LowerLevelOutput):
-            return self.content_object.indicator.programme_document.reference_number
+            return self.content_object.cp_output.programme_document.reference_number
         else:
             return ''
 
