@@ -79,7 +79,8 @@ class Workspace(TimeStampedModel):
         max_length=8
     )
     countries = models.ManyToManyField(Country, related_name='workspaces')
-    locations = models.ManyToManyField(Location, related_name='workspaces')
+    locations = models.ManyToManyField('core.Location',
+                                       related_name='workspaces')
 
     class Meta:
         ordering = ['title']
@@ -119,7 +120,7 @@ class ResponsePlan(TimeStampedModel):
         return []  # TODO probably create file field
 
 
-class GatewayType(models.Model):
+class GatewayType(TimeStampedModel):
     """
     Represents an Admin Type in location-related models.
     """
