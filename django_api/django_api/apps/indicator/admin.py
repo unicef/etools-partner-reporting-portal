@@ -5,9 +5,13 @@ from .models import (
     Reportable,
     IndicatorReport,
     IndicatorLocationData,
+    Disaggregation,
+    DisaggregationValue,
 )
 
 admin.site.register(IndicatorBlueprint)
 admin.site.register(Reportable)
 admin.site.register(IndicatorReport)
 admin.site.register(IndicatorLocationData)
+admin.site.register(Disaggregation)
+admin.site.register(DisaggregationValue)
