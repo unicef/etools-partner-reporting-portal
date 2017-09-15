@@ -117,6 +117,15 @@ class PartnerActivityFactory(factory.django.DjangoModelFactory):
     end_date = beginning_of_this_year + datetime.timedelta(days=30)
     status = fuzzy.FuzzyChoice(PARTNER_PROJECT_STATUS.ongoing)
 
+    @factory.post_generation
+    def locations(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            for location in extracted:
+                self.locations.add(location)
+
     class Meta:
         model = PartnerActivity
 
@@ -234,6 +243,15 @@ class ClusterObjectiveFactory(factory.django.DjangoModelFactory):
     activity = factory.RelatedFactory('core.factories.ClusterActivityFactory', 'cluster_objective')
     cluster = factory.SubFactory(ClusterFactory)
 
+    @factory.post_generation
+    def locations(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            for location in extracted:
+                self.locations.add(location)
+
     class Meta:
         model = ClusterObjective
 
@@ -241,6 +259,15 @@ class ClusterObjectiveFactory(factory.django.DjangoModelFactory):
 class ClusterActivityFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "cluster_activity_%d" % n)
     cluster_objective = factory.SubFactory(ClusterObjectiveFactory)
+
+    @factory.post_generation
+    def locations(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            for location in extracted:
+                self.locations.add(location)
 
     class Meta:
         model = ClusterActivity

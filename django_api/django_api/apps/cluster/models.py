@@ -245,6 +245,7 @@ class ClusterObjective(TimeStampedModel):
     title = models.CharField(max_length=255, verbose_name='Cluster Objective Title')
     reference_number = models.CharField(max_length=255, verbose_name='Reference Number')
     cluster = models.ForeignKey(Cluster, related_name="cluster_objectives")
+    locations = models.ManyToManyField('core.Location', related_name="cluster_objectives")
     frequency = models.CharField(
         max_length=3,
         choices=FREQUENCY_LEVEL,
@@ -278,6 +279,7 @@ class ClusterActivity(TimeStampedModel):
         verbose_name='Frequency of reporting'
     )
     cluster_objective = models.ForeignKey(ClusterObjective, related_name="cluster_activities")
+    locations = models.ManyToManyField('core.Location', related_name="cluster_activities")
     reportables = GenericRelation('indicator.Reportable', related_query_name='cluster_activities')
 
     class Meta:

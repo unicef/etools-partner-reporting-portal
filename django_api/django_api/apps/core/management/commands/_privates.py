@@ -197,6 +197,8 @@ def generate_fake_data(workspace_quantity=10):
                 location__gateway=table.location_type,
             )
 
+            co.locations.add(*list(reportable_to_co.locations.all()))
+
         user = UserFactory(
             first_name="{} Cluster".format(cluster.type[:20]),
             last_name="Partner")
@@ -231,6 +233,8 @@ def generate_fake_data(workspace_quantity=10):
                 location__gateway=table.location_type,
             )
 
+            co.locations.add(*list(reportable_to_co.locations.all()))
+
         user = UserFactory(
             first_name="{} Cluster".format(cluster.type),
             last_name="Partner")
@@ -264,6 +268,7 @@ def generate_fake_data(workspace_quantity=10):
                 location__carto_db_table=table,
                 location__gateway=table.location_type,
             )
+            co.locations.add(*list(reportable_to_co.locations.all()))
 
         user = UserFactory(
             first_name="{} Cluster".format(cluster.type),
@@ -297,6 +302,7 @@ def generate_fake_data(workspace_quantity=10):
                 location__gateway=table.location_type,
                 location__carto_db_table=table,
             )
+            ca.locations.add(*list(reportable_to_ca.locations.all()))
 
         print "{} Cluster Activity objects created for {}".format(2, cluster_objective.title)
 
@@ -337,10 +343,10 @@ def generate_fake_data(workspace_quantity=10):
                     location__gateway=table.location_type,
                     location__carto_db_table=table,
                 )
-
                 reportable_to_pa.parent_indicator = cluster_activity.reportables.first()
-
                 reportable_to_pa.save()
+
+                pa.locations.add(*list(reportable_to_pa.locations.all()))
 
                 pa = PartnerActivityFactory(
                     partner=project.partner,
@@ -354,6 +360,7 @@ def generate_fake_data(workspace_quantity=10):
                     location__gateway=table.location_type,
                     location__carto_db_table=table,
                 )
+                pa.locations.add(*list(reportable_to_pa.locations.all()))
 
             print "{} PartnerActivity objects created for {} under {} Cluster Activity and Custom Activity".format(4, partner, cluster_activity.title)
 
