@@ -99,7 +99,7 @@ class TestProgressReportAPIView(BaseAPITestCase):
             Q(parent__parent__parent_id=self.location_id) |
             Q(parent__parent__parent__parent_id=self.location_id)
         ).values_list(
-             'reportable__lower_level_outputs__indicator__programme_document__id',
+             'reportable__lower_level_outputs__cp_output__programme_document__id',
              flat=True
         )
         return ProgressReport.objects.filter(programme_document_id__in=pd_ids)

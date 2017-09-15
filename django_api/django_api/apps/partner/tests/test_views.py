@@ -29,7 +29,7 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
         self.cluster = Cluster.objects.first()
 
         self.partner = PartnerFactory(
-            title="{} - {} Cluster Partner".format(self.cluster.response_plan.title, self.cluster.title),
+            title="{} - {} Cluster Partner".format(self.cluster.response_plan.title, self.cluster.type),
             partner_activity=None,
             partner_project=None,
             user=None,

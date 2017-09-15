@@ -178,7 +178,7 @@ class ProgrammeDocument(TimeStampedModel):
     @cached_property
     def reportable_queryset(self):
         return Reportable.objects.filter(
-            lower_level_outputs__indicator__programme_document=self)
+            lower_level_outputs__cp_output__programme_document=self)
 
     @property
     def reports_exists(self):

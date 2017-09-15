@@ -9,7 +9,7 @@ class SimpleWorkspaceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Workspace
-        fields = ('id', 'title', 'country_name', 'country_code', 'location_id')
+        fields = ('id', 'title', 'workspace_code', 'location_id')
 
     def get_location_id(self, obj):
         # for example: Ukrain, Luhansk, Sorokyne .. we want to have only Ukrain (no parent - always one)
@@ -68,7 +68,6 @@ class ResponsePlanSerializer(serializers.ModelSerializer):
             'plan_type',
             'start',
             'end',
-            'intervention',
+            'workspace',
             'documents',
         )
-

@@ -81,4 +81,4 @@ class ResponsePlanAPIView(ListAPIView):
 
     def get_queryset(self):
         intervention_id = self.kwargs.get('intervention_id')
-        return ResponsePlan.objects.filter(intervention_id=intervention_id)
+        return ResponsePlan.objects.filter(workspace_id=intervention_id)

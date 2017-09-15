@@ -37,7 +37,7 @@ class ProgrammeDocumentFilter(django_filters.FilterSet):
             Q(parent__parent__parent_id=value) |
             Q(parent__parent__parent__parent_id=value)
         ).values_list(
-             'reportable__lower_level_outputs__indicator__programme_document__id',
+             'reportable__lower_level_outputs__cp_output__programme_document__id',
              flat=True
         )
         return queryset.filter(pk__in=pd_ids)

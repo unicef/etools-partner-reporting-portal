@@ -36,7 +36,7 @@
 
     <app-route
         route="{{route}}"
-        pattern="/:country_code/:app"
+        pattern="/:workspace_code/:app"
         data="{{routeData}}"
         tail="{{subroute}}">
     </app-route>
@@ -100,7 +100,7 @@
       },
 
       observers: [
-        '_routeCountryChanged(routeData.country_code)',
+        '_routeCountryChanged(routeData.workspace_code)',
         '_routeAppChanged(routeData.app)',
         '_handleCountryChange(currentCountry, countries)',
       ],
@@ -113,11 +113,11 @@
         var code = country.code;
 
         this.set('route.path', '/' + code + '/');
-        this.set('routeData.country_code', code);
+        this.set('routeData.workspace_code', code);
       },
 
       _redirectToApp: function (app) {
-        this.set('route.path', '/' + this.routeData.country_code + '/' + app);
+        this.set('route.path', '/' + this.routeData.workspace_code + '/' + app);
       },
 
       _handleCountriesAsync: function (e, change) {
@@ -134,10 +134,10 @@
         } catch (err) {}
       },
 
-      _routeCountryChanged: function (country_code) {
+      _routeCountryChanged: function (workspace_code) {
         var country;
 
-        if (!country_code) {
+        if (!workspace_code) {
           this.dispatch(App.Actions.reset()); // Switch country === wipe all the data
 
           if (this.countries.length) {
@@ -151,7 +151,7 @@
             this.listen(this.$.countries, 'all-changed', '_handleCountriesAsync');
           }
         } else if (!this._countryCode) {
-          this.dispatch(App.Actions.setCountry(country_code));
+          this.dispatch(App.Actions.setCountry(workspace_code));
         }
       },
 
@@ -159,7 +159,7 @@
         this.async(function () {
           var defaultApp = this._defaultApp || 'ip-reporting'; // FIXME: correct default?
 
-          if (!this.routeData.country_code) {
+          if (!this.routeData.workspace_code) {
             return;
           }
 
