@@ -39,8 +39,10 @@ from core.common import (
     INDICATOR_REPORT_STATUS,
     PARTNER_PROJECT_STATUS,
     OVERALL_STATUS,
+    CLUSTER_TYPES,
 )
 from core.models import (
+    Country,
     Workspace,
     Location,
     ResponsePlan,
@@ -51,6 +53,7 @@ from core.countries import COUNTRIES_ALPHA2_CODE
 
 PD_STATUS_LIST = [x[0] for x in PD_STATUS]
 COUNTRIES_LIST = [x[0] for x in COUNTRIES_ALPHA2_CODE]
+COUNTRY_NAMES_LIST = [x[1] for x in COUNTRIES_ALPHA2_CODE]
 CALC_CHOICES_LIST = [x[0] for x in IndicatorBlueprint.CALC_CHOICES]
 DISPLAY_TYPE_CHOICES_LIST = [x[0] for x in IndicatorBlueprint.DISPLAY_TYPE_CHOICES]
 QUANTITY_CALC_CHOICES_LIST = [x[0] for x in IndicatorBlueprint.QUANTITY_CALC_CHOICES]
@@ -61,6 +64,7 @@ PD_FREQUENCY_LEVEL_CHOICE_LIST = [x[0] for x in PD_FREQUENCY_LEVEL]
 REPORTABLE_FREQUENCY_LEVEL_CHOICE_LIST = [x[0] for x in REPORTABLE_FREQUENCY_LEVEL]
 OVERALL_STATUS_LIST = [x[0] for x in OVERALL_STATUS]
 REPORT_STATUS_LIST = [x[0] for x in INDICATOR_REPORT_STATUS]
+CLUSTER_TYPES_LIST = [x[0] for x in CLUSTER_TYPES]
 
 today = datetime.date.today()
 beginning_of_this_year = datetime.date(today.year, 1, 1)
@@ -187,16 +191,16 @@ class UserFactory(factory.django.DjangoModelFactory):
         model = User
 
 
+class CountryFactory(factory.django.DjangoModelFactory):
+    name = fuzzy.FuzzyChoice(COUNTRY_NAMES_LIST)
+
+    class Meta:
+        model = Country
+
+
 class WorkspaceFactory(factory.django.DjangoModelFactory):
-    title = factory.Sequence(lambda n: "intervention_%d" % n)
-    document_type = 'PD'
-    number = fuzzy.FuzzyText(length=64)
-    country_code = fuzzy.FuzzyChoice(COUNTRIES_LIST)
-    status = 'Dra'
-    start = beginning_of_this_year
-    end = beginning_of_this_year + datetime.timedelta(days=364)
-    signed_by_unicef_date = today
-    signed_by_partner_date = today
+    title = factory.Sequence(lambda n: "workspace_%d" % n)
+    workspace_code = fuzzy.FuzzyChoice(COUNTRIES_LIST)
 
     class Meta:
         model = Workspace
@@ -208,13 +212,14 @@ class ResponsePlanFactory(factory.django.DjangoModelFactory):
     end = beginning_of_this_year + datetime.timedelta(days=364)
 
     cluster = factory.RelatedFactory('core.factories.ClusterFactory', 'response_plan')
+    workspace = factory.SubFactory('core.factories.WorkspaceFactory')
 
     class Meta:
         model = ResponsePlan
 
 
 class ClusterFactory(factory.django.DjangoModelFactory):
-    title = factory.Sequence(lambda n: "cluster_%d" % n)
+    type = fuzzy.FuzzyChoice(CLUSTER_TYPES_LIST)
     user = factory.SubFactory(UserFactory)
 
     response_plan = factory.SubFactory(ResponsePlanFactory)
@@ -416,6 +421,7 @@ class LocationFactory(factory.django.DjangoModelFactory):
 class ProgressReportFactory(factory.django.DjangoModelFactory):
     start_date = beginning_of_this_year
     end_date = beginning_of_this_year + datetime.timedelta(days=30)
+    due_date = beginning_of_this_year + datetime.timedelta(days=45)
 
     class Meta:
         model = ProgressReport
@@ -452,7 +458,7 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     cso_contribution = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
     total_unicef_cash = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
     in_kind_amount = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
-    org_name = factory.Sequence(lambda n: "Organization Name %d" % n)
+    partner = factory.SubFactory('core.factories.PartnerFactory')
 
     cp_output = factory.RelatedFactory('core.factories.CountryProgrammeOutputFactory', 'programme_document')
 
@@ -511,7 +517,7 @@ class RatioIndicatorReportFactory(factory.django.DjangoModelFactory):
 
 class CountryProgrammeOutputFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "country_programme_%d" % n)
-    lower_level_output = factory.RelatedFactory('core.factories.LowerLevelOutputFactory', 'indicator')
+    lower_level_output = factory.RelatedFactory('core.factories.LowerLevelOutputFactory', 'cp_output')
 
     class Meta:
         model = CountryProgrammeOutput
