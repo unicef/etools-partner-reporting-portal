@@ -109,7 +109,7 @@ class PDReportsDetailAPIView(RetrieveAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class IndicatorListCreateAPIView(ListCreateAPIView):
+class IndicatorListAPIView(ListAPIView):
     """
     REST API endpoint to get a list of Indicator objects and to create a new Indicator object.
 
