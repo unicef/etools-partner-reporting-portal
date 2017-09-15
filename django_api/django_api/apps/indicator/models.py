@@ -138,7 +138,7 @@ class Reportable(TimeStampedModel):
         verbose_name='Start Date',
     )
     end_date = models.DateField(
-        verbose_name='Due Date',
+        verbose_name='End Date',
     )
 
     cs_dates = ArrayField(models.DateField(), default=list)
