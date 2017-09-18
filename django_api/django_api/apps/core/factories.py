@@ -486,6 +486,7 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     total_unicef_cash = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
     in_kind_amount = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
     partner = factory.SubFactory('core.factories.PartnerFactory')
+    workspace = factory.SubFactory('core.factories.WorkspaceFactory')
 
     cp_output = factory.RelatedFactory('core.factories.CountryProgrammeOutputFactory', 'programme_document')
     workspace = factory.Iterator(Workspace.objects.all())

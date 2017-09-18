@@ -46,21 +46,6 @@ class Country(TimeStampedModel):
         null=True, blank=True
     )
     long_name = models.CharField(max_length=255, null=True, blank=True)
-    business_area_code = models.CharField(
-        max_length=10,
-        null=True, blank=True
-    )
-    latitude = models.DecimalField(
-        null=True, blank=True,
-        max_digits=8, decimal_places=5,
-        validators=[MinValueValidator(Decimal(-90)), MaxValueValidator(Decimal(90))]
-    )
-    longitude = models.DecimalField(
-        null=True, blank=True,
-        max_digits=8, decimal_places=5,
-        validators=[MinValueValidator(Decimal(-180)), MaxValueValidator(Decimal(180))]
-    )
-    initial_zoom = models.IntegerField(default=8)
 
     def __unicode__(self):
         return self.name
@@ -81,6 +66,21 @@ class Workspace(TimeStampedModel):
     countries = models.ManyToManyField(Country, related_name='workspaces')
     locations = models.ManyToManyField('core.Location',
                                        related_name='workspaces')
+    business_area_code = models.CharField(
+        max_length=10,
+        null=True, blank=True
+    )
+    latitude = models.DecimalField(
+        null=True, blank=True,
+        max_digits=8, decimal_places=5,
+        validators=[MinValueValidator(Decimal(-90)), MaxValueValidator(Decimal(90))]
+    )
+    longitude = models.DecimalField(
+        null=True, blank=True,
+        max_digits=8, decimal_places=5,
+        validators=[MinValueValidator(Decimal(-180)), MaxValueValidator(Decimal(180))]
+    )
+    initial_zoom = models.IntegerField(default=8)
 
     class Meta:
         ordering = ['title']

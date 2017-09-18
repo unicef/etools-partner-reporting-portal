@@ -54,6 +54,7 @@ class ProgrammeDocument(TimeStampedModel):
         Person  (ManyToManyField): "officer_programme_documents"
         Person  (ManyToManyField): "unicef_focal_programme_documents"
         Person  (ManyToManyField): "officer_programme_documents"
+        Workspace (ForeignKey): "workspace_programme_documents"
     """
     agreement = models.CharField(max_length=255, verbose_name='Agreement')
     document_type = models.CharField(
@@ -64,12 +65,22 @@ class ProgrammeDocument(TimeStampedModel):
     )
 
     reference_number = models.CharField(max_length=255, verbose_name='Reference Number')
-    title = models.CharField(max_length=255, verbose_name='PD/SSFA ToR Title')
-    unicef_office = models.CharField(max_length=255, verbose_name='UNICEF Office(s)')
+    title = models.CharField(max_length=255,
+                             verbose_name='PD/SSFA ToR Title')
+    unicef_office = models.CharField(max_length=255,
+                                     verbose_name='UNICEF Office(s)')
 
-    unicef_officers =  models.ManyToManyField(Person, verbose_name='UNICEF Officer(s)', related_name="officer_programme_documents")
-    unicef_focal_point = models.ManyToManyField(Person, verbose_name='UNICEF Focal Point(s)', related_name="unicef_focal_programme_documents")
-    partner_focal_point = models.ManyToManyField(Person, verbose_name='Partner Focal Point(s)', related_name="partner_focal_programme_documents")
+    unicef_officers =  models.ManyToManyField(Person,
+                                              verbose_name='UNICEF Officer(s)',
+                                              related_name="officer_programme_documents")
+    unicef_focal_point = models.ManyToManyField(Person,
+                                                verbose_name='UNICEF Focal Point(s)',
+                                                related_name="unicef_focal_programme_documents")
+    partner_focal_point = models.ManyToManyField(Person,
+                                                 verbose_name='Partner Focal Point(s)',
+                                                 related_name="partner_focal_programme_documents")
+    workspace = models.ForeignKey('core.Workspace',
+                                  related_name="partner_focal_programme_documents")
 
     partner = models.ForeignKey('partner.Partner')
     workspace = models.ForeignKey('core.Workspace')

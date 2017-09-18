@@ -368,8 +368,12 @@ def generate_fake_data(workspace_quantity=10):
 
     PersonFactory.create_batch(workspace_quantity)
     for partner in Partner.objects.all():
-        ProgrammeDocumentFactory.create_batch(workspace_quantity, partner=partner)
-    print "{} ProgrammeDocument objects created".format(workspace_quantity)
+        for workspace in Workspace.objects.all():
+            ProgrammeDocumentFactory.create_batch(workspace_quantity * 5,
+                                                  partner=partner,
+                                                  workspace=workspace)
+    print "{} ProgrammeDocument objects created".format(
+        workspace_quantity * Partner.objects.count())
 
     # Linking the followings:
     # ProgressReport - ProgrammeDocument
