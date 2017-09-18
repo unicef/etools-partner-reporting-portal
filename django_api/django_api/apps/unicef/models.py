@@ -83,7 +83,6 @@ class ProgrammeDocument(TimeStampedModel):
                                   related_name="partner_focal_programme_documents")
 
     partner = models.ForeignKey('partner.Partner')
-    workspace = models.ForeignKey('core.Workspace')
 
     start_date = models.DateField(
         verbose_name='Start Programme Date',
