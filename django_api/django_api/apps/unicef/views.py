@@ -96,7 +96,6 @@ class ProgressReportAPIView(ListAPIView):
     """
     Endpoint for getting list of all PD Progress Reports
     """
-    # queryset = ProgressReport.objects.all()
     serializer_class = ProgressReportSerializer
     pagination_class = SmallPagination
     permission_classes = (IsAuthenticated, )
@@ -104,21 +103,11 @@ class ProgressReportAPIView(ListAPIView):
     filter_class = ProgressReportFilter
 
     def get_queryset(self):
-        pd_ids = Location.objects.filter(
-            Q(id=self.location_id) |
-            Q(parent_id=self.location_id) |
-            Q(parent__parent_id=self.location_id) |
-            Q(parent__parent__parent_id=self.location_id) |
-            Q(parent__parent__parent__parent_id=self.location_id)
-        ).values_list(
-             'reportable__lower_level_outputs__cp_output__programme_document__id',
-             flat=True
-        )
-        return ProgressReport.objects.filter(programme_document_id__in=pd_ids)
+        # Limit reports to partner only
+        return ProgressReport.objects.filter(programme_document__partner=self.request.user.partner)
 
-    def list(self, request, location_id, *args, **kwargs):
-        self.location_id = location_id
-        queryset = self.get_queryset()
+    def list(self, request, workspace_id, *args, **kwargs):
+        queryset = self.get_queryset().filter(programme_document__workspace=workspace_id)
         filtered = ProgressReportFilter(request.GET, queryset=queryset)
 
         page = self.paginate_queryset(filtered.qs)

@@ -68,6 +68,8 @@ class ProgressReportFilter(django_filters.FilterSet):
                           input_formats=[settings.PRINT_DATA_FORMAT])
     due = TypedChoiceFilter(name='due', choices=BOOLEAN_CHOICES, coerce=strtobool,
                             method='get_due_overdue_status', label='Show only due or overdue')
+    location = CharFilter(name='location', method='get_location',
+                              label='Location')
 
     class Meta:
         model = ProgressReport
@@ -89,10 +91,7 @@ class ProgressReportFilter(django_filters.FilterSet):
         )
 
     def get_due_date(self, queryset, name, value):
-        ir_ids = IndicatorReport.objects \
-            .filter(progress_report_id__in=queryset.values_list('id', flat=True)) \
-            .filter(due_date=value) \
-            .values_list('progress_report_id') \
-            .distinct()
+        return queryset.filter(due_date=value)
 
-        return queryset.filter(id__in=ir_ids)
+    def get_location(self, queryset, name, value):
+        return queryset.filter(indicator_reports__indicator_location_data__location=value)

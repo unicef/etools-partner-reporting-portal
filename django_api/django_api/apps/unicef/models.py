@@ -72,6 +72,7 @@ class ProgrammeDocument(TimeStampedModel):
     partner_focal_point = models.ManyToManyField(Person, verbose_name='Partner Focal Point(s)', related_name="partner_focal_programme_documents")
 
     partner = models.ForeignKey('partner.Partner')
+    workspace = models.ForeignKey('core.Workspace')
 
     start_date = models.DateField(
         verbose_name='Start Programme Date',
