@@ -10,7 +10,7 @@ class BaseAPITestCase(APITestCase):
     Base class for all api test case with generated fake data.
     """
 
-    generate_fake_data_quantity = 3
+    generate_fake_data_quantity = 1
     client_class = APIClient
     with_session_login = True
     with_generate_fake_data = True
