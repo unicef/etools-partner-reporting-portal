@@ -28,9 +28,9 @@ def create_location(pcode,
                     parent_instance,
                     site_name,
                     row,
-                    sites_not_added,
-                    sites_created,
-                    sites_updated):
+                    num_not_added,
+                    num_created,
+                    num_updated):
     try:
         location = Location.objects.get(p_code=pcode)
 
@@ -38,8 +38,8 @@ def create_location(pcode,
         logger.warning("Multiple locations found for: {}, {} ({})".format(
             carto_table.location_type, site_name, pcode
         ))
-        sites_not_added += 1
-        return False, sites_not_added, sites_created, sites_updated
+        num_not_added += 1
+        return False, num_not_added, num_created, num_updated
 
     except Location.DoesNotExist:
         # try to create the location
@@ -48,21 +48,20 @@ def create_location(pcode,
             'gateway': carto_table.location_type,
             'title': site_name,
             'carto_db_table': carto_table,
-            'intervention': carto_table.intervention,
         }
 
         if parent_instance:
             create_args['parent'] = parent_instance
 
         if not row['the_geom']:
-            return False, sites_not_added, sites_created, sites_updated
+            return False, num_not_added, num_created, num_updated
 
         if 'Point' in row['the_geom']:
             create_args['point'] = row['the_geom']
         else:
             create_args['geom'] = row['the_geom']
 
-        sites_created += 1
+        num_created += 1
 
         try:
             loc = Location.objects.create(**create_args)
@@ -76,14 +75,14 @@ def create_location(pcode,
                 carto_table.location_type.name
             ))
 
-        return True, sites_not_added, sites_created, sites_updated
+        return True, num_not_added, num_created, num_updated
 
     else:
         # names can be updated for existing locations with the same code
         location.title = site_name
 
         if not row['the_geom']:
-            return False, sites_not_added, sites_created, sites_updated
+            return False, num_not_added, num_created, num_updated
 
         if 'Point' in row['the_geom']:
             location.point = row['the_geom']
@@ -97,9 +96,9 @@ def create_location(pcode,
         except IntegrityError as e:
             logger.exception(
                 'Error whilst saving location: {}'.format(site_name))
-            return False, sites_not_added, sites_created, sites_updated
+            return False, num_not_added, num_created, num_updated
 
-        sites_updated += 1
+        num_updated += 1
 
         logger.info('{}: {} ({})'.format(
             'Updated',
@@ -107,7 +106,7 @@ def create_location(pcode,
             carto_table.location_type.name
         ))
 
-        return True, sites_not_added, sites_created, sites_updated
+        return True, num_not_added, num_created, num_updated
 
 
 @app.task
@@ -125,7 +124,7 @@ def update_sites_from_cartodb(carto_table):
 
     sql = SQLClient(client)
 
-    sites_created = sites_updated = sites_not_added = 0
+    num_created = num_updated = num_not_added = 0
 
     try:
         # query for cartodb
@@ -152,7 +151,7 @@ def update_sites_from_cartodb(carto_table):
             if not site_name or site_name.isspace():
                 logger.warning(
                     "No name for location with PCode: {}".format(pcode))
-                sites_not_added += 1
+                num_not_added += 1
                 continue
 
             site_name = site_name.encode('UTF-8')
@@ -166,37 +165,34 @@ def update_sites_from_cartodb(carto_table):
                         p_code=row['parent_pcode'])
 
                 except Exception as exp:
-                    msg = ""
+                    msg = "{} locations found for parent code: {}"
 
                     if exp is Location.MultipleObjectsReturned:
-                        msg = "{} locations found for parent code: {}".format(
-                            'Multiple' if exp is Location.MultipleObjectsReturned else 'No',
-                            parent_instance.pcode
-                        )
+                        msg = msg.format('Multiple', parent_instance.pcode)
 
                     else:
-                        msg = exp.message
+                        msg = msg.format('No', parent_instance.pcode)
 
                     logger.warning(msg)
-                    sites_not_added += 1
+                    num_not_added += 1
                     continue
 
             # create the actual location or retrieve existing based on type and
             # code
-            succ, sites_not_added, sites_created, sites_updated = create_location(
+            succ, num_not_added, num_created, num_updated = create_location(
                 pcode,
                 carto_table,
                 parent_instance,
                 site_name,
                 row,
-                sites_not_added,
-                sites_created,
-                sites_updated
+                num_not_added,
+                num_created,
+                num_updated
             )
 
-    return "Table name {}: {} sites created, {} sites updated, {} sites skipped".format(
+    return "Table name {}: {} created, {} updated, {} skipped".format(
         carto_table.table_name,
-        sites_created,
-        sites_updated,
-        sites_not_added
+        num_created,
+        num_updated,
+        num_not_added
     )
