@@ -152,6 +152,10 @@
           '-dashboard/'
         );
       },
+
+      clusterIndicatorLocations: function (responsePlanId) {
+        return this._buildUrl('/cluster/' + responsePlanId + '/cluster-indicators-locations/');
+      },
     };
   }());
 </script>
