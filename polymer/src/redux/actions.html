@@ -68,7 +68,7 @@
                         id: workspace.id,
                         code: workspace.workspace_code,
                         name: workspace.title,
-                        location: workspace.location_id,
+                        location: workspace.id, // TODO: quick fix for now, since we want to get data by workspace id not country_id
                       };
                     });
 

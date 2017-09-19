@@ -115,6 +115,9 @@ class ResponsePlan(TimeStampedModel):
     )
     workspace = models.ForeignKey('core.Workspace', related_name="response_plans")
 
+    def __unicode__(self):
+        return self.title
+
     @property
     def documents(self):
         return []  # TODO probably create file field

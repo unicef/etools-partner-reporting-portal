@@ -17,7 +17,8 @@ class SimpleWorkspaceAPIView(ListAPIView):
     Endpoint for getting Workspace.
     Workspace need to have defined location to be displayed on drop down menu.
     """
-    queryset = Workspace.objects.prefetch_related('locations').filter(locations__isnull=False).distinct()
+    queryset = Workspace.objects.prefetch_related('locations').filter(
+        locations__isnull=False).distinct()
     serializer_class = SimpleWorkspaceSerializer
     permission_classes = (IsAuthenticated, )
 
