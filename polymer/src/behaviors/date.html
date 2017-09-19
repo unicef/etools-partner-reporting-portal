@@ -23,7 +23,7 @@
           format = 'D MMM YYYY';
         }
         if (typeof dateString === 'string' && dateString !== '') {
-          var date = new Date(dateString);
+          var date = this.getUTCDate(dateString);
           if (date.toString() !== 'Invalid Date') {
             // using moment.utc() ensures that the date will not be changed
             // no matter timezone the user has set
@@ -69,8 +69,8 @@
         }
         if (typeof firstDateString === 'string' && firstDateString !== '' &&
             typeof secondDateString === 'string' && secondDateString !== '') {
-          var firstDate = new Date(firstDateString);
-          var secondDate = new Date(secondDateString);
+          var firstDate = this.getUTCDate(firstDateString);
+          var secondDate = this.getUTCDate(secondDateString);
           if (firstDate.toString() !== 'Invalid Date' && secondDate.toString() !== 'Invalid Date') {
             var mFirstDate = moment.utc(firstDate);
             var mSecondDate = moment.utc(secondDate);
@@ -81,8 +81,8 @@
       },
       getMaxDateStr: function(d1Str, d2Str) {
         // TODO: optimize this
-        var d1 = new Date(d1Str);
-        var d2 = new Date(d2Str);
+        var d1 = this.getUTCDate(d1Str);
+        var d2 = this.getUTCDate(d2Str);
         if (d1.toString() === 'Invalid Date' && d2.toString() !== 'Invalid Date') {
           return d2Str;
         } else if (d1.toString() !== 'Invalid Date' && d2.toString() === 'Invalid Date') {
@@ -98,7 +98,11 @@
         }
       },
       isFutureDate: function(dateStr) {
-        return moment.utc().isBefore(moment.utc(new Date(dateStr)));
+        return moment.utc().isBefore(moment.utc(this.getUTCDate(dateStr)));
+      },
+
+      getUTCDate: function(dateStr) {
+        return new Date(dateStr + ' UTC');
       }
     };
 
