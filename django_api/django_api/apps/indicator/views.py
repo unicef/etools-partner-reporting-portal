@@ -109,7 +109,7 @@ class PDReportsDetailAPIView(RetrieveAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class IndicatorListCreateAPIView(ListCreateAPIView):
+class IndicatorListAPIView(ListAPIView):
     """
     REST API endpoint to get a list of Indicator objects and to create a new Indicator object.
 
@@ -166,7 +166,7 @@ class IndicatorListCreateAPIView(ListCreateAPIView):
 
         if pds:
             pd_list = map(lambda item: int(item), filter(lambda item: item != '' and item.isdigit(), pds.split(',')))
-            q_list.append(Q(lower_level_outputs__indicator__programme_document__id__in=pd_list))
+            q_list.append(Q(lower_level_outputs__cp_output__programme_document__id__in=pd_list))
 
         if clusters:
             cluster_list = map(lambda item: int(item), filter(lambda item: item != '' and item.isdigit(), clusters.split(',')))
@@ -174,7 +174,7 @@ class IndicatorListCreateAPIView(ListCreateAPIView):
 
         if pd_statuses:
             pd_status_list = map(lambda item: item, filter(lambda item: item != '' and item.isdigit(), pd_statuses.split(',')))
-            q_list.append(Q(lower_level_outputs__indicator__programme_document__status__in=pd_status_list))
+            q_list.append(Q(lower_level_outputs__cp_output__programme_document__status__in=pd_status_list))
 
         if q_list:
             queryset = queryset.filter(reduce(operator.or_, q_list))

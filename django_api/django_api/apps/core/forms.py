@@ -14,5 +14,5 @@ class GatewayTypeModelForm(forms.ModelForm):
         fields = (
             'name',
             'admin_level',
-            'intervention',
+            'workspace',
         )

@@ -14,6 +14,11 @@ from easy_pdf.rendering import render_to_pdf
 from core.paginations import SmallPagination
 from core.permissions import IsAuthenticated
 from core.models import Location
+from core.serializers import ShortLocationSerializer
+
+from indicator.models import Reportable
+from indicator.serializers import IndicatorListSerializer
+from indicator.filters import IndicatorFilter
 
 
 
@@ -41,21 +46,10 @@ class ProgrammeDocumentAPIView(ListAPIView):
     filter_class = ProgrammeDocumentFilter
 
     def get_queryset(self):
-        pd_ids = Location.objects.filter(
-            Q(id=self.location_id) |
-            Q(parent_id=self.location_id) |
-            Q(parent__parent_id=self.location_id) |
-            Q(parent__parent__parent_id=self.location_id) |
-            Q(parent__parent__parent__parent_id=self.location_id)
-        ).values_list(
-             'reportable__lower_level_outputs__indicator__programme_document__id',
-             flat=True
-        )
-        return ProgrammeDocument.objects.filter(pk__in=pd_ids)
+        return ProgrammeDocument.objects.filter(partner=self.request.user.partner)
 
-    def list(self, request, location_id, *args, **kwargs):
-        self.location_id = location_id
-        queryset = self.get_queryset()
+    def list(self, request, workspace_id, *args, **kwargs):
+        queryset = self.get_queryset().filter(workspace=workspace_id)
         filtered = ProgrammeDocumentFilter(request.GET, queryset=queryset)
 
         page = self.paginate_queryset(filtered.qs)
@@ -75,19 +69,19 @@ class ProgrammeDocumentDetailsAPIView(RetrieveAPIView):
     serializer_class = ProgrammeDocumentDetailSerializer
     permission_classes = (IsAuthenticated, )
 
-    def get(self, request, pk, *args, **kwargs):
+    def get(self, request, workspace_id, pk, *args, **kwargs):
         """
         Get Programme Document Details by given pk.
         """
+        self.workspace_id = workspace_id
         serializer = self.get_serializer(
             self.get_object(pk)
         )
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
     def get_object(self, pk):
-        # TODO: permission to object should be checked and raise 403 if fail!!!
         try:
-            return ProgrammeDocument.objects.get(pk=pk)
+            return ProgrammeDocument.objects.get(partner=self.request.user.partner, workspace=self.workspace_id, pk=pk)
         except ProgrammeDocument.DoesNotExist as exp:
             logger.exception({
                 "endpoint": "ProgrammeDocumentDetailsAPIView",
@@ -97,13 +91,55 @@ class ProgrammeDocumentDetailsAPIView(RetrieveAPIView):
             })
             raise Http404
 
+class ProgrammeDocumentLocationsAPIView(ListAPIView):
 
+    queryset = Location.objects.all()
+    serializer_class = ShortLocationSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def list(self, request, workspace_id, *args, **kwargs):
+        pd = ProgrammeDocument.objects.filter(partner=self.request.user.partner, workspace=workspace_id)
+        queryset = self.get_queryset().filter(reportable__indicator_reports__progress_report__programme_document__in=pd)
+        filtered = ProgressReportFilter(request.GET, queryset=queryset)
+
+        page = self.paginate_queryset(filtered.qs)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(filtered.qs, many=True)
+        return Response(
+            serializer.data,
+            status=statuses.HTTP_200_OK
+        )
+
+class ProgrammeDocumentIndicatorsAPIView(ListAPIView):
+
+    queryset = Reportable.objects.all()
+    serializer_class = IndicatorListSerializer
+    pagination_class = SmallPagination
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
+
+    def list(self, request, workspace_id, *args, **kwargs):
+        pd = ProgrammeDocument.objects.filter(partner=self.request.user.partner, workspace=workspace_id)
+        queryset = self.get_queryset().filter(indicator_reports__progress_report__programme_document__in=pd)
+        filtered = IndicatorFilter(request.GET, queryset=queryset)
+
+        page = self.paginate_queryset(filtered.qs)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(filtered.qs, many=True)
+        return Response(
+            serializer.data,
+            status=statuses.HTTP_200_OK
+        )
 
 class ProgressReportAPIView(ListAPIView):
     """
     Endpoint for getting list of all PD Progress Reports
     """
-    # queryset = ProgressReport.objects.all()
     serializer_class = ProgressReportSerializer
     pagination_class = SmallPagination
     permission_classes = (IsAuthenticated, )
@@ -111,21 +147,11 @@ class ProgressReportAPIView(ListAPIView):
     filter_class = ProgressReportFilter
 
     def get_queryset(self):
-        pd_ids = Location.objects.filter(
-            Q(id=self.location_id) |
-            Q(parent_id=self.location_id) |
-            Q(parent__parent_id=self.location_id) |
-            Q(parent__parent__parent_id=self.location_id) |
-            Q(parent__parent__parent__parent_id=self.location_id)
-        ).values_list(
-             'reportable__lower_level_outputs__indicator__programme_document__id',
-             flat=True
-        )
-        return ProgressReport.objects.filter(programme_document_id__in=pd_ids)
+        # Limit reports to partner only
+        return ProgressReport.objects.filter(programme_document__partner=self.request.user.partner)
 
-    def list(self, request, location_id, *args, **kwargs):
-        self.location_id = location_id
-        queryset = self.get_queryset()
+    def list(self, request, workspace_id, *args, **kwargs):
+        queryset = self.get_queryset().filter(programme_document__workspace=workspace_id)
         filtered = ProgressReportFilter(request.GET, queryset=queryset)
 
         page = self.paginate_queryset(filtered.qs)

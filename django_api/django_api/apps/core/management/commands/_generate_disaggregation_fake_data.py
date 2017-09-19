@@ -40,7 +40,6 @@ def generate_0_num_disagg_data(reportable, indicator_type="quantity"):
             reportable=reportable,
             gateway=table.location_type,
             carto_db_table=table,
-            intervention=table.intervention,
         )
 
     location = reportable.locations.first()

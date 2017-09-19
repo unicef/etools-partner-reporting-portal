@@ -122,11 +122,6 @@ class Partner(TimeStampedModel):
         blank=True,
         null=True
     )
-    alternate_title = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True
-    )
     rating = models.CharField(
         max_length=50,
         null=True,
@@ -200,7 +195,7 @@ class PartnerActivity(TimeStampedModel):
     cluster_activity = models.ForeignKey('cluster.ClusterActivity', related_name="partner_activities", null=True)
     cluster_objective = models.ForeignKey('cluster.ClusterObjective', related_name="partner_activities", null=True)
     reportables = GenericRelation('indicator.Reportable', related_query_name='partner_activities')
-
+    locations = models.ManyToManyField('core.Location', related_name="partner_activities")
     start_date = models.DateField()
     end_date = models.DateField()
 
