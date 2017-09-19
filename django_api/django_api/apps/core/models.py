@@ -3,14 +3,23 @@ import random
 import logging
 from decimal import Decimal
 
+from django.core.cache import cache
 from django.contrib.gis.db import models
+from django.contrib.contenttypes.models import ContentType
 from django.core.validators import (
     MinValueValidator,
     MaxValueValidator
 )
+from django.db import (
+    IntegrityError,
+    connection
+)
+from django.db.models.signals import pre_delete, post_save
+from django.dispatch.dispatcher import receiver
 
 from model_utils.models import TimeStampedModel
 from mptt.models import MPTTModel, TreeForeignKey
+from paintstore.fields import ColorPickerField
 
 from .common import (
     INTERVENTION_TYPES,
@@ -23,17 +32,14 @@ logger = logging.getLogger('locations.models')
 
 
 def get_random_color():
-    def r():
-        random.randint(0, 255)
-
+    r = lambda: random.randint(0,255)
     return '#%02X%02X%02X' % (r(), r(), r())
 
 
 class Intervention(TimeStampedModel):
     """
     Intervention (response/emergency) model.
-    It's used for drop down menu in right top corner
-    (where location are in country level (without parents)).
+    It's used for drop down menu in right top corner (where location are in country level (without parents)).
 
     related models:
         core.Location (ManyToManyField): "locations"
@@ -95,12 +101,7 @@ class Intervention(TimeStampedModel):
 
     @property
     def address(self):
-        return ", ".join(
-            self.street_address,
-            self.city,
-            self.postal_code,
-            self.country_name
-        )
+        return ", ".join(self.street_address, self.city, self.postal_code, self.country_name)
 
 
 class ResponsePlan(TimeStampedModel):
@@ -127,8 +128,7 @@ class ResponsePlan(TimeStampedModel):
         blank=True,
         verbose_name='End date'
     )
-    intervention = models.ForeignKey(
-        'core.Intervention', related_name="response_plans")
+    intervention = models.ForeignKey('core.Intervention', related_name="response_plans")
 
     @property
     def documents(self):
@@ -143,8 +143,7 @@ class GatewayType(models.Model):
     name = models.CharField(max_length=64L, unique=True)
     admin_level = models.PositiveSmallIntegerField()
 
-    intervention = models.ForeignKey(
-        Intervention, related_name="gateway_types")
+    intervention = models.ForeignKey(Intervention, related_name="gateway_types")
 
     class Meta:
         ordering = ['name']
@@ -163,8 +162,7 @@ class LocationManager(models.GeoManager):
 class Location(TimeStampedModel):
     """
     Location model define place where agents are working.
-    The background of the location can be:
-    Country > Region > City > District/Point.
+    The background of the location can be: Country > Region > City > District/Point.
 
     Either a point or geospatial object.
     pcode should be unique.
@@ -175,15 +173,10 @@ class Location(TimeStampedModel):
         core.GatewayType: "gateway"
     """
     title = models.CharField(max_length=255)
-    reportable = models.ForeignKey(
-        'indicator.Reportable',
-        null=True,
-        blank=True,
-        related_name="locations")
+    reportable = models.ForeignKey('indicator.Reportable', null=True, blank=True, related_name="locations")
 
     gateway = models.ForeignKey(GatewayType, verbose_name='Location Type')
-    carto_db_table = models.ForeignKey(
-        'core.CartoDBTable', related_name="locations")
+    carto_db_table = models.ForeignKey('core.CartoDBTable', related_name="locations")
     intervention = models.ForeignKey(Intervention, related_name="locations")
 
     latitude = models.DecimalField(
@@ -191,21 +184,18 @@ class Location(TimeStampedModel):
         blank=True,
         max_digits=8,
         decimal_places=5,
-        validators=[MinValueValidator(
-            Decimal(-90)), MaxValueValidator(Decimal(90))]
+        validators=[MinValueValidator(Decimal(-90)), MaxValueValidator(Decimal(90))]
     )
     longitude = models.DecimalField(
         null=True,
         blank=True,
         max_digits=8,
         decimal_places=5,
-        validators=[MinValueValidator(
-            Decimal(-180)), MaxValueValidator(Decimal(180))]
+        validators=[MinValueValidator(Decimal(-180)), MaxValueValidator(Decimal(180))]
     )
     p_code = models.CharField(max_length=32, blank=True, null=True)
 
-    parent = models.ForeignKey(
-        'self', null=True, blank=True, related_name='children', db_index=True)
+    parent = models.ForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
 
     geom = models.MultiPolygonField(null=True, blank=True)
     point = models.PointField(null=True, blank=True)
@@ -218,19 +208,18 @@ class Location(TimeStampedModel):
     def __str__(self):
         if self.p_code:
             return '{} ({} {})'.format(
-                self.title,
+                self.name,
                 self.gateway.name,
                 "{}: {}".format(
                     'CERD' if self.gateway.name == 'School' else 'PCode',
                     self.p_code if self.p_code else ''
-                ))
+                    ))
 
         return self.title
 
     @property
     def geo_point(self):
-        return self.point if self.point else \
-            self.geom.point_on_surface if self.geom else ""
+        return self.point if self.point else self.geom.point_on_surface if self.geom else ""
 
     @property
     def point_lat_long(self):
@@ -252,15 +241,9 @@ class CartoDBTable(MPTTModel):
     api_key = models.CharField(max_length=254)
     table_name = models.CharField(max_length=254)
     location_type = models.ForeignKey(GatewayType)
-    parent = TreeForeignKey(
-        'self',
-        null=True,
-        blank=True,
-        related_name='children',
-        db_index=True)
+    parent = TreeForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
 
-    intervention = models.ForeignKey(
-        Intervention, related_name="carto_db_tables")
+    intervention = models.ForeignKey(Intervention, related_name="carto_db_tables")
 
     def __str__(self):
         return self.table_name
