@@ -45,8 +45,8 @@
         return this._buildUrl('/unicef/' + locationId + '/progress-reports');
       },
 
-      responsePlans: function (interventionId) {
-        return this._buildUrl('/core/' + interventionId + '/response-plan/');
+      responsePlans: function (workspaceId) {
+        return this._buildUrl('/core/' + workspaceId + '/response-plan/');
       },
 
       childLocations: function (locationId) {
@@ -102,7 +102,11 @@
       },
 
       clusterIndicatorNames: function (responsePlanId) {
-        return this._buildUrl('/cluster/' + responsePlanId + '/cluster-indicator-reports-simple-list/');
+        return this._buildUrl(
+          '/cluster/' +
+          responsePlanId +
+          '/cluster-indicator-reports-simple-list/'
+        );
       },
 
       clusterNames: function (responsePlanId) {

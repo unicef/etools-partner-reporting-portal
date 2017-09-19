@@ -7,7 +7,7 @@
 <link rel="import" href="../redux/actions.html">
 <link rel="import" href="../behaviors/routing.html">
 
-<dom-module id="country-dropdown">
+<dom-module id="workspace-dropdown">
   <template>
     <style>
       :host {
@@ -57,10 +57,10 @@
       }
     </style>
 
-    <paper-dropdown-menu label="[[country.name]]" noink no-label-float>
+    <paper-dropdown-menu label="[[workspace.name]]" noink no-label-float>
       <paper-listbox
           class="dropdown-content"
-          on-iron-select="_countrySelected"
+          on-iron-select="_workspaceSelected"
           selected="[[selected]]">
         <template id="repeat" is="dom-repeat" items="[[data]]">
           <paper-item>[[item.name]]</paper-item>
@@ -71,7 +71,7 @@
 
   <script>
     Polymer({
-      is: 'country-dropdown',
+      is: 'workspace-dropdown',
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
@@ -79,15 +79,15 @@
       ],
 
       properties: {
-        country: {
+        workspace: {
           type: Object,
-          computed: '_computeCountry(data, current)',
+          computed: '_computeWorkspace(data, current)',
         },
 
         selected: {
           type: Number,
           value: 0,
-          computed: '_computeSelected(data, country)',
+          computed: '_computeSelected(data, workspace)',
         },
 
         current: String,
@@ -95,26 +95,26 @@
         data: Array,
       },
 
-      _countrySelected: function(e) {
+      _workspaceSelected: function(e) {
         var newCode = this.$.repeat.itemForElement(e.detail.item).code;
 
         if (newCode === this.current) {
           return;
         }
 
-        this.dispatch(App.Actions.setCountry(newCode));
+        this.dispatch(App.Actions.setWorkspace(newCode));
 
         window.location.href = this.buildUrl(this._baseUrl, '/');
       },
 
-      _computeCountry: function (data, code) {
-        return data.filter(function (country) {
-          return country.code === code;
+      _computeWorkspace: function (data, code) {
+        return data.filter(function (workspace) {
+          return workspace.code === code;
         })[0];
       },
 
-      _computeSelected: function (data, country) {
-        return data.indexOf(country);
+      _computeSelected: function (data, workspace) {
+        return data.indexOf(workspace);
       },
     });
   </script>

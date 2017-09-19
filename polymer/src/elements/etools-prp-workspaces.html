@@ -1,12 +1,12 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../redux/store.html">
 
-<dom-module id="etools-prp-countries">
+<dom-module id="etools-prp-workspaces">
   <template></template>
 
   <script>
     Polymer({
-      is: 'etools-prp-countries',
+      is: 'etools-prp-workspaces',
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
@@ -15,12 +15,12 @@
       properties: {
         _current: {
           type: String,
-          statePath: 'countries.current',
+          statePath: 'workspaces.current',
         },
 
         _all: {
           type: Array,
-          statePath: 'countries.all',
+          statePath: 'workspaces.all',
         },
 
         // State-linked properties can't notify

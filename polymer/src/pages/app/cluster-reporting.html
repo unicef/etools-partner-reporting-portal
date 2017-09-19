@@ -7,7 +7,7 @@
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
-<link rel="import" href="../../redux/selectors/country.html">
+<link rel="import" href="../../redux/selectors/workspace.html">
 <link rel="import" href="../../elements/etools-prp-ajax.html">
 
 <dom-module id="page-cluster-reporting">
@@ -73,14 +73,14 @@
           observer: '_pageChanged',
         },
 
-        countryId: {
+        workspaceId: {
           type: String,
-          statePath: App.Selectors.Country.id,
+          statePath: App.Selectors.Workspace.id,
         },
 
         plansUrl: {
           type: String,
-          computed: '_computeResponsePlansUrl(countryId)',
+          computed: '_computeResponsePlansUrl(workspaceId)',
           observer: '_fetchResponsePlans',
         },
       },
@@ -113,8 +113,8 @@
         this.importHref(resolvedPageUrl, null, this._notFound, true);
       },
 
-      _computeResponsePlansUrl: function (countryId) {
-        return countryId ? App.Endpoints.responsePlans(countryId) : '';
+      _computeResponsePlansUrl: function (workspaceId) {
+        return workspaceId ? App.Endpoints.responsePlans(workspaceId) : '';
       },
 
       _fetchResponsePlans: function (url) {
