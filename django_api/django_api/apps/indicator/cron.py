@@ -31,17 +31,17 @@ class IndicatorReportOverDueCronJob(CronJobBase):
                 report.save()
                 updates.append(['Due', report])
 
-        # reports = ProgressReport.objects.filter(submission_date__isnull=True)
-        # # Iterate and set proper status
-        # for report in reports:
-        #     due_date = report.end_date + timedelta(days=self.OVERDUE_DAYS)
-        #     if due_date < datetime.now().date() and report.report_status != PROGRESS_REPORT_STATUS.overdue:
-        #         report.report_status = PROGRESS_REPORT_STATUS.overdue
-        #         report.save()
-        #         updates.append(['Overdue', report])
-        #     elif due_date > datetime.now().date() > report.start_date and report.report_status != PROGRESS_REPORT_STATUS.due:
-        #         report.report_status = PROGRESS_REPORT_STATUS.due
-        #         report.save()
-        #         updates.append(['Due', report])
+        reports = ProgressReport.objects.filter(submission_date__isnull=True)
+        # Iterate and set proper status
+        for report in reports:
+            due_date = report.due_date or report.end_date + timedelta(days=self.OVERDUE_DAYS)
+            if due_date < datetime.now().date() and report.status != PROGRESS_REPORT_STATUS.overdue:
+                report.status = PROGRESS_REPORT_STATUS.overdue
+                report.save()
+                updates.append(['Overdue', report])
+            elif due_date > datetime.now().date() > report.start_date and report.status != PROGRESS_REPORT_STATUS.due:
+                report.status = PROGRESS_REPORT_STATUS.due
+                report.save()
+                updates.append(['Due', report])
 
         return "Updated %s Reports: %s" % (len(updates), ", ".join(["(%s for ID %d)" % (status, report.id) for status, report in updates]) ) if updates else "---"
