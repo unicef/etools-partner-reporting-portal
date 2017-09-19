@@ -500,7 +500,7 @@ class ClusterIndicatorReportListSerializer(IndicatorReportListSerializer):
         cluster = obj.reportable.content_object.partner.clusters.first()
 
         if cluster:
-            return cluster.title
+            return cluster.type
 
         else:
             return ''
@@ -805,7 +805,7 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
 
     def get_cluster(self, obj):
         if isinstance(obj.reportable.content_object, (ClusterObjective, ClusterActivity)):
-            return obj.reportable.content_object.cluster.title
+            return obj.reportable.content_object.cluster.type
         else:
             return ''
 

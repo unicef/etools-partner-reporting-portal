@@ -178,7 +178,7 @@ class TestIndicatorListAPIView30(BaseAPITestCase):
             item), self.reports.values_list('locations__id', flat=True))
         location_id_list_string = ','.join(location_ids)
 
-        url = reverse('indicator-list-create-api', kwargs={'content_object': 'llo'})
+        url = reverse('indicator-list-api', kwargs={'content_object': 'llo'})
         url += '?locations=' + location_id_list_string
         response = self.client.get(url, format='json')
 
@@ -192,11 +192,11 @@ class TestIndicatorListAPIView30(BaseAPITestCase):
         pd_ids = map(
             lambda item: str(item),
             self.reports.values_list(
-                'lower_level_outputs__indicator__programme_document__id', flat=True)
+                'lower_level_outputs__cp_output__programme_document__id', flat=True)
         )
         pd_id_list_string = ','.join(pd_ids)
 
-        url = reverse('indicator-list-create-api', kwargs={'content_object': 'llo'})
+        url = reverse('indicator-list-api', kwargs={'content_object': 'llo'})
         url += '?pds=' + pd_id_list_string
         response = self.client.get(url, format='json')
 

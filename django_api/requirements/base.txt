@@ -1,12 +1,12 @@
 # Django packages
-Django==1.11.2
+Django==1.11.5
 
 # REST framework
-djangorestframework==3.6.3
+djangorestframework==3.6.4
 django-filter==1.0.4
 
 # Other Python packages
-psycopg2==2.7.1
+psycopg2==2.7.3.1
 django-model-utils==2.6.1  # latest 3.0.0 but need to check changes
 django-mptt==0.8.6
 python-json-logger==0.1.7

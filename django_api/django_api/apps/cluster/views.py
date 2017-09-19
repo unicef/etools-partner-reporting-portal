@@ -220,7 +220,7 @@ class ClusterActivityListAPIView(ListCreateAPIView):
         return Response({'id': serializer.instance.id}, status=statuses.HTTP_201_CREATED)
 
 
-class ClusterIndicatorsListAPIView(ListCreateAPIView):
+class IndicatorReportsListAPIView(ListCreateAPIView):
 
     permission_classes = (IsAuthenticated, )
     serializer_class = ClusterIndicatorReportSerializer
@@ -245,7 +245,7 @@ class ClusterIndicatorsListAPIView(ListCreateAPIView):
         return queryset
 
 
-class ClusterIndicatorsSimpleListAPIView(ClusterIndicatorsListAPIView):
+class IndicatorReportsSimpleListAPIView(IndicatorReportsListAPIView):
     serializer_class = ClusterIndicatorReportSimpleSerializer
     pagination_class = filter_class = None
 

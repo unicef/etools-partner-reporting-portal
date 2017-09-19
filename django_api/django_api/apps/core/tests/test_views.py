@@ -11,16 +11,16 @@ from core.factories import (
     ProgressReportFactory,
     IndicatorLocationDataFactory,
     SectionFactory,
-    InterventionFactory,
+    WorkspaceFactory,
     ResponsePlanFactory,
 )
 
-from core.models import Location, Intervention, ResponsePlan
-from core.models import Location, Intervention
+from core.models import Location, Workspace, ResponsePlan
+from core.models import Location, Workspace
 from .base import BaseAPITestCase
 
 
-class TestInterventionListAPIView(BaseAPITestCase):
+class TestWorkspaceListAPIView(BaseAPITestCase):
 
     def test_list_api(self):
         url = reverse('simple-intervention')
@@ -29,7 +29,7 @@ class TestInterventionListAPIView(BaseAPITestCase):
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(
             len(response.data),
-            Intervention.objects.prefetch_related('locations').filter(locations__isnull=False).distinct().count()
+            Workspace.objects.prefetch_related('locations').filter(locations__isnull=False).distinct().count()
         )
 
 
@@ -57,7 +57,7 @@ class TestLocationListAPIView(BaseAPITestCase):
 class TestResponsePlanAPIView(BaseAPITestCase):
 
     def test_response_plan(self):
-        intervention = Intervention.objects.first()
+        intervention = Workspace.objects.first()
         response_plan_count = ResponsePlan.objects.filter(intervention=intervention.id).count()
         url = reverse("response-plan", kwargs={'intervention_id': intervention.id})
         response = self.client.get(url, format='json')

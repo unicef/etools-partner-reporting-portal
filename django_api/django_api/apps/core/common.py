@@ -9,6 +9,20 @@ REPORTABLE_CA_CONTENT_OBJECT = 'ca'
 REPORTABLE_PP_CONTENT_OBJECT = 'pp'
 REPORTABLE_PA_CONTENT_OBJECT = 'pa'
 
+CLUSTER_TYPES = Choices(
+    ('cccm', 'CCCM'),
+    ('early_recovery', 'Early Recovery'),
+    ('education', 'Education'),
+    ('emergency_telecommunications', 'Emergency Telecommunications'),
+    ('food_security', 'Food Security'),
+    ('health', 'Health'),
+    ('logistics', 'Logistics'),
+    ('nutrition', 'Nutrition'),
+    ('protection', 'Protection'),
+    ('shelter', 'Shelter'),
+    ('wash', 'WASH'),
+)
+
 CSO_TYPES = Choices(
     ('Int', 'International', 'International'),
     ('Nat', 'National', 'National'),
