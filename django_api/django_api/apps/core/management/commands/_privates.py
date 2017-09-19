@@ -205,7 +205,8 @@ def generate_fake_data(workspace_quantity=10):
             last_name="Partner")
 
         partner = PartnerFactory(
-            title="{} - {} Cluster Partner".format(cluster.response_plan.title, cluster.type),
+            title="{} - {} Cluster Partner".format(
+                cluster.response_plan.title, cluster.type),
             partner_activity=None,
             partner_project=None,
             user=user,
