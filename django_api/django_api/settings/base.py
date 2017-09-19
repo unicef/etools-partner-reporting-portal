@@ -69,6 +69,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'django_filters',
+    'django_cron',
 
     'account',
     'cluster',
@@ -212,3 +213,10 @@ LOGGING = {
 # CartoDB settings
 CARTODB_USERNAME = os.getenv('CARTODB_USERNAME')
 CARTODB_APIKEY = os.getenv('CARTODB_APIKEY')
+
+
+# Cronjobs
+
+CRON_CLASSES = [
+    "indicator.cron.IndicatorReportOverDueCronJob",
+]
