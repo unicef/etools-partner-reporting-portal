@@ -12,6 +12,7 @@ from core.common import (
     FREQUENCY_LEVEL,
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
+    CLUSTER_TYPES,
 )
 
 from indicator.models import Reportable, IndicatorReport
@@ -25,16 +26,20 @@ class Cluster(TimeStampedModel):
     Partners will belong to Education, that are working on this background.
 
     related models:
-        core.Intervention (ForeignKey): "intervention"
+        core.Workspace (ForeignKey): "intervention"
         account.User (ForeignKey): "user"
     """
-    title = models.CharField(max_length=255)
-    # intervention = models.ForeignKey('core.Intervention', related_name="clusters")
+    type = models.CharField(max_length=32, choices=CLUSTER_TYPES)
     response_plan = models.ForeignKey('core.ResponsePlan', null=True, related_name="clusters")
     user = models.ForeignKey('account.User', related_name="clusters")
 
+    class Meta:
+        """One response plan can only have a cluster of one type."""
+
+        unique_together = ('type', 'response_plan')
+
     def __str__(self):
-        return "<pk: %s> %s" % (self.id, self.title)
+        return "<pk: %s> %s" % (self.id, self.type)
 
     @property
     def num_of_partners(self):
@@ -240,13 +245,15 @@ class ClusterObjective(TimeStampedModel):
     title = models.CharField(max_length=255, verbose_name='Cluster Objective Title')
     reference_number = models.CharField(max_length=255, verbose_name='Reference Number')
     cluster = models.ForeignKey(Cluster, related_name="cluster_objectives")
+    locations = models.ManyToManyField('core.Location', related_name="cluster_objectives")
     frequency = models.CharField(
         max_length=3,
         choices=FREQUENCY_LEVEL,
         default=FREQUENCY_LEVEL.monthly,
         verbose_name='Frequency of reporting'
     )
-    reportables = GenericRelation('indicator.Reportable', related_query_name='cluster_objectives')
+    reportables = GenericRelation('indicator.Reportable',
+                                  related_query_name='cluster_objectives')
 
     class Meta:
         ordering = ['-id']
@@ -272,6 +279,7 @@ class ClusterActivity(TimeStampedModel):
         verbose_name='Frequency of reporting'
     )
     cluster_objective = models.ForeignKey(ClusterObjective, related_name="cluster_activities")
+    locations = models.ManyToManyField('core.Location', related_name="cluster_activities")
     reportables = GenericRelation('indicator.Reportable', related_query_name='cluster_activities')
 
     class Meta:

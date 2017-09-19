@@ -40,7 +40,7 @@ class ClusterObjectiveSerializer(serializers.ModelSerializer):
         )
 
     def get_cluster_title(self, obj):
-        return obj.cluster.title
+        return obj.cluster.get_type_display()
 
 
 class ClusterObjectivePatchSerializer(ClusterObjectiveSerializer):
@@ -81,7 +81,7 @@ class ClusterActivitySerializer(serializers.ModelSerializer):
         )
 
     def get_co_cluster_title(self, obj):
-        return obj.cluster_objective.cluster.title
+        return obj.cluster_objective.cluster.get_type_display()
 
     def get_co_title(self, obj):
         return obj.cluster_objective.title

@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+
 import random
 import logging
 from decimal import Decimal
@@ -13,11 +14,8 @@ from model_utils.models import TimeStampedModel
 from mptt.models import MPTTModel, TreeForeignKey
 
 from .common import (
-    INTERVENTION_TYPES,
-    INTERVENTION_STATUS,
     RESPONSE_PLAN_TYPE,
 )
-from .countries import COUNTRIES_ALPHA2_CODE_DICT, COUNTRIES_ALPHA2_CODE
 
 logger = logging.getLogger('locations.models')
 
@@ -29,83 +27,64 @@ def get_random_color():
     return '#%02X%02X%02X' % (r(), r(), r())
 
 
-class Intervention(TimeStampedModel):
+class Country(TimeStampedModel):
     """
-    Intervention (response/emergency) model.
-    It's used for drop down menu in right top corner
-    (where location are in country level (without parents)).
+    Represents a country which has many offices and sections.
+    Taken from https://github.com/unicef/etools/blob/master/EquiTrack/users/models.py
+    on Sep. 14, 2017.
+    """
+    name = models.CharField(max_length=100)
+    country_short_code = models.CharField(
+        max_length=10,
+        null=True, blank=True
+    )
+    long_name = models.CharField(max_length=255, null=True, blank=True)
 
-    related models:
-        core.Location (ManyToManyField): "locations"
+    def __unicode__(self):
+        return self.name
+
+
+class Workspace(TimeStampedModel):
     """
-    document_type = models.CharField(
-        choices=INTERVENTION_TYPES,
-        max_length=255,
-        blank=True,
-        null=True,
-        verbose_name=u'Document type'
-    )
-    number = models.CharField(
-        max_length=64,
-        blank=True,
-        null=True,
-        verbose_name=u'Reference Number',
-        unique=True,
-    )
+    Workspace (previously called Workspace, also synonym was
+    emergency/country) model.
+
+    It's used for drop down menu in right top corner in the UI. Many times
+    workspace is associated with only one country.
+    """
     title = models.CharField(max_length=255)
-    country_code = models.CharField(
-        max_length=2,
-        choices=COUNTRIES_ALPHA2_CODE,
-        null=True,
-        blank=True
+    workspace_code = models.CharField(
+        max_length=8
     )
-    status = models.CharField(
-        max_length=3,
-        blank=True,
-        choices=INTERVENTION_STATUS,
-        default=INTERVENTION_STATUS.draft,
-        help_text="""
-            Draft = In discussion with partner, Active = Currently ongoing,
-            Implemented = completed, Terminated = cancelled or not approved
-        """
+    countries = models.ManyToManyField(Country, related_name='workspaces')
+    locations = models.ManyToManyField('core.Location',
+                                       related_name='workspaces')
+    business_area_code = models.CharField(
+        max_length=10,
+        null=True, blank=True
     )
-    start = models.DateField(
-        null=True,
-        blank=True,
-        help_text='The date the Intervention will start'
+    latitude = models.DecimalField(
+        null=True, blank=True,
+        max_digits=8, decimal_places=5,
+        validators=[MinValueValidator(Decimal(-90)), MaxValueValidator(Decimal(90))]
     )
-    end = models.DateField(
-        null=True,
-        blank=True,
-        help_text='The date the Intervention will end'
+    longitude = models.DecimalField(
+        null=True, blank=True,
+        max_digits=8, decimal_places=5,
+        validators=[MinValueValidator(Decimal(-180)), MaxValueValidator(Decimal(180))]
     )
-
-    signed_by_unicef_date = models.DateField(null=True, blank=True)
-    signed_by_partner_date = models.DateField(null=True, blank=True)
+    initial_zoom = models.IntegerField(default=8)
 
     class Meta:
-        ordering = ['number']
+        ordering = ['title']
 
     def __str__(self):
-        return self.number
-
-    @property
-    def country_name(self):
-        return COUNTRIES_ALPHA2_CODE_DICT[self.country_code]
-
-    @property
-    def address(self):
-        return ", ".join(
-            self.street_address,
-            self.city,
-            self.postal_code,
-            self.country_name
-        )
+        return self.title
 
 
 class ResponsePlan(TimeStampedModel):
     """
-    ResponsePlan model present response of intervention.
+    ResponsePlan model present response of workspace (intervention).
 
     related models:
         ....
@@ -127,15 +106,14 @@ class ResponsePlan(TimeStampedModel):
         blank=True,
         verbose_name='End date'
     )
-    intervention = models.ForeignKey(
-        'core.Intervention', related_name="response_plans")
+    workspace = models.ForeignKey('core.Workspace', related_name="response_plans")
 
     @property
     def documents(self):
         return []  # TODO probably create file field
 
 
-class GatewayType(models.Model):
+class GatewayType(TimeStampedModel):
     """
     Represents an Admin Type in location-related models.
     """
@@ -143,8 +121,7 @@ class GatewayType(models.Model):
     name = models.CharField(max_length=64L, unique=True)
     admin_level = models.PositiveSmallIntegerField()
 
-    intervention = models.ForeignKey(
-        Intervention, related_name="gateway_types")
+    workspace = models.ForeignKey(Workspace, related_name="gateway_types")
 
     class Meta:
         ordering = ['name']
@@ -182,9 +159,7 @@ class Location(TimeStampedModel):
         related_name="locations")
 
     gateway = models.ForeignKey(GatewayType, verbose_name='Location Type')
-    carto_db_table = models.ForeignKey(
-        'core.CartoDBTable', related_name="locations")
-    intervention = models.ForeignKey(Intervention, related_name="locations")
+    carto_db_table = models.ForeignKey('core.CartoDBTable', related_name="locations")
 
     latitude = models.DecimalField(
         null=True,
@@ -245,22 +220,17 @@ class CartoDBTable(MPTTModel):
     Represents a table in CartoDB, it is used to import locations
     related models:
         core.GatewayType: 'gateway'
-        core.Intervention: 'intervention'
+        core.Country: 'country'
     """
 
     domain = models.CharField(max_length=254)
     api_key = models.CharField(max_length=254)
     table_name = models.CharField(max_length=254)
     location_type = models.ForeignKey(GatewayType)
-    parent = TreeForeignKey(
-        'self',
-        null=True,
-        blank=True,
-        related_name='children',
-        db_index=True)
+    parent = TreeForeignKey('self', null=True, blank=True,
+                            related_name='children', db_index=True)
 
-    intervention = models.ForeignKey(
-        Intervention, related_name="carto_db_tables")
+    country = models.ForeignKey(Country, related_name="carto_db_tables")
 
     def __str__(self):
         return self.table_name

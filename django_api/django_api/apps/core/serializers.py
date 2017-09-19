@@ -1,15 +1,15 @@
 from rest_framework import serializers
 
-from .models import Intervention, Location, ResponsePlan
+from .models import Workspace, Location, ResponsePlan
 
 
-class SimpleInterventionSerializer(serializers.ModelSerializer):
+class SimpleWorkspaceSerializer(serializers.ModelSerializer):
 
     location_id = serializers.SerializerMethodField()
 
     class Meta:
-        model = Intervention
-        fields = ('id', 'title', 'country_name', 'country_code', 'location_id')
+        model = Workspace
+        fields = ('id', 'title', 'workspace_code', 'location_id')
 
     def get_location_id(self, obj):
         # for example: Ukrain, Luhansk, Sorokyne .. we want to have only Ukrain (no parent - always one)
@@ -51,7 +51,7 @@ class ChildrenLocationSerializer(serializers.ModelSerializer):
     id = serializers.SerializerMethodField()
 
     class Meta:
-        model = Intervention
+        model = Workspace
         fields = ('id', 'title')
 
     def get_id(self, obj):
@@ -68,7 +68,6 @@ class ResponsePlanSerializer(serializers.ModelSerializer):
             'plan_type',
             'start',
             'end',
-            'intervention',
+            'workspace',
             'documents',
         )
-

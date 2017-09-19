@@ -63,12 +63,12 @@
           return interventionsThunk()
               .then(function (res) {
                 var countries = (res.data || [])
-                    .map(function (intervention) {
+                    .map(function (workspace) {
                       return {
-                        id: intervention.id,
-                        code: intervention.country_code,
-                        name: intervention.country_name,
-                        location: intervention.location_id,
+                        id: workspace.id,
+                        code: workspace.workspace_code,
+                        name: workspace.title,
+                        location: workspace.location_id,
                       };
                     });
 

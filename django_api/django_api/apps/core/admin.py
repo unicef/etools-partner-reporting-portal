@@ -8,8 +8,8 @@ from core.forms import (
     AutoSizeTextForm
 )
 from core.cartodb import update_sites_from_cartodb
-from core.models import (
-    Intervention,
+from .models import (
+    Workspace,
     Location,
     ResponsePlan,
     GatewayType,
@@ -39,7 +39,8 @@ class LocationAdmin(LeafletGeoAdmin, admin.ModelAdmin):
     search_fields = ('title', 'p_code',)
 
     def get_form(self, request, obj=None, **kwargs):
-        self.readonly_fields = [] if request.user.is_superuser else ['p_code', 'geom', 'point', 'gateway']
+        self.readonly_fields = [] if request.user.is_superuser else [
+            'p_code', 'geom', 'point', 'gateway']
 
         return super(LocationAdmin, self).get_form(request, obj, **kwargs)
 
@@ -61,6 +62,7 @@ class GatewayTypeAdmin(admin.ModelAdmin):
 
 
 class CartoDBTableAdmin(admin.ModelAdmin):
+
     form = CartoDBTableForm
     save_as = True
     list_display = (
@@ -81,7 +83,7 @@ class CartoDBTableAdmin(admin.ModelAdmin):
             update_sites_from_cartodb.delay(table)
 
 
-admin.site.register(Intervention)
+admin.site.register(Workspace)
 admin.site.register(Location, LocationAdmin)
 admin.site.register(ResponsePlan)
 admin.site.register(GatewayType)

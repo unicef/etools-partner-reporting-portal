@@ -3,22 +3,22 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework import status as statuses
 from .permissions import IsAuthenticated
-from .models import Intervention, Location, ResponsePlan
+from .models import Workspace, Location, ResponsePlan
 from .serializers import (
-    SimpleInterventionSerializer,
+    SimpleWorkspaceSerializer,
     ShortLocationSerializer,
     ChildrenLocationSerializer,
     ResponsePlanSerializer,
 )
 
 
-class SimpleInterventionAPIView(ListAPIView):
+class SimpleWorkspaceAPIView(ListAPIView):
     """
-    Endpoint for getting Intervention.
-    Intervention need to have defined location to be displayed on drop down menu.
+    Endpoint for getting Workspace.
+    Workspace need to have defined location to be displayed on drop down menu.
     """
-    queryset = Intervention.objects.prefetch_related('locations').filter(locations__isnull=False).distinct()
-    serializer_class = SimpleInterventionSerializer
+    queryset = Workspace.objects.prefetch_related('locations').filter(locations__isnull=False).distinct()
+    serializer_class = SimpleWorkspaceSerializer
     permission_classes = (IsAuthenticated, )
 
 
@@ -81,4 +81,4 @@ class ResponsePlanAPIView(ListAPIView):
 
     def get_queryset(self):
         intervention_id = self.kwargs.get('intervention_id')
-        return ResponsePlan.objects.filter(intervention_id=intervention_id)
+        return ResponsePlan.objects.filter(workspace_id=intervention_id)

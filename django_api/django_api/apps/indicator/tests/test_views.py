@@ -192,7 +192,7 @@ class TestIndicatorListAPIView30(BaseAPITestCase):
         pd_ids = map(
             lambda item: str(item),
             self.reports.values_list(
-                'lower_level_outputs__indicator__programme_document__id', flat=True)
+                'lower_level_outputs__cp_output__programme_document__id', flat=True)
         )
         pd_id_list_string = ','.join(pd_ids)
 
