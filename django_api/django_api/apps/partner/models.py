@@ -122,11 +122,6 @@ class Partner(TimeStampedModel):
         blank=True,
         null=True
     )
-    alternate_title = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True
-    )
     rating = models.CharField(
         max_length=50,
         null=True,

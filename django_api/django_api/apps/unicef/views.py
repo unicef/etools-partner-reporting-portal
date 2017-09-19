@@ -11,6 +11,7 @@ import django_filters.rest_framework
 from core.paginations import SmallPagination
 from core.permissions import IsAuthenticated
 from core.models import Location
+from core.serializers import ShortLocationSerializer
 
 from .serializers import (
     ProgrammeDocumentSerializer,
@@ -79,6 +80,29 @@ class ProgrammeDocumentDetailsAPIView(RetrieveAPIView):
                 "exception": exp,
             })
             raise Http404
+
+
+class ProgrammeDocumentLocationsAPIView(ListAPIView):
+
+    queryset = Location.objects.all()
+    serializer_class = ShortLocationSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def list(self, request, workspace_id, *args, **kwargs):
+        pd = ProgrammeDocument.objects.filter(partner=self.request.user.partner, workspace=workspace_id)
+        queryset = self.get_queryset().filter(reportable__indicator_reports__progress_report__programme_document__in=pd)
+        filtered = ProgressReportFilter(request.GET, queryset=queryset)
+
+        page = self.paginate_queryset(filtered.qs)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(filtered.qs, many=True)
+        return Response(
+            serializer.data,
+            status=statuses.HTTP_200_OK
+        )
 
 
 class ProgressReportAPIView(ListAPIView):
