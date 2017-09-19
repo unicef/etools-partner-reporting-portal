@@ -804,8 +804,10 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
         )
 
     def get_cluster(self, obj):
-        if isinstance(obj.reportable.content_object, (ClusterObjective, ClusterActivity)):
+        if isinstance(obj.reportable.content_object, (ClusterObjective,)):
             return obj.reportable.content_object.cluster.title
+        elif isinstance(obj.reportable.content_object, (ClusterActivity,)):
+            return obj.reportable.content_object.cluster_objective.cluster.title
         else:
             return ''
 
