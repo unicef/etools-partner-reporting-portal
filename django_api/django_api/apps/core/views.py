@@ -5,21 +5,21 @@ from rest_framework import status as statuses
 from .permissions import IsAuthenticated
 from .models import Workspace, Location, ResponsePlan
 from .serializers import (
-    SimpleWorkspaceSerializer,
+    WorkspaceSerializer,
     ShortLocationSerializer,
     ChildrenLocationSerializer,
     ResponsePlanSerializer,
 )
 
 
-class SimpleWorkspaceAPIView(ListAPIView):
+class WorkspaceAPIView(ListAPIView):
     """
     Endpoint for getting Workspace.
     Workspace need to have defined location to be displayed on drop down menu.
     """
     queryset = Workspace.objects.prefetch_related('locations').filter(
         locations__isnull=False).distinct()
-    serializer_class = SimpleWorkspaceSerializer
+    serializer_class = WorkspaceSerializer
     permission_classes = (IsAuthenticated, )
 
 

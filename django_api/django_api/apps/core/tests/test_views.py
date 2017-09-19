@@ -23,7 +23,7 @@ from .base import BaseAPITestCase
 class TestWorkspaceListAPIView(BaseAPITestCase):
 
     def test_list_api(self):
-        url = reverse('simple-intervention')
+        url = reverse('workspace')
         response = self.client.get(url, format='json')
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
