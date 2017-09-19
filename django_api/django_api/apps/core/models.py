@@ -9,6 +9,7 @@ from django.core.validators import (
     MinValueValidator,
     MaxValueValidator
 )
+from django.utils.encoding import python_2_unicode_compatible
 
 from model_utils.models import TimeStampedModel
 from mptt.models import MPTTModel, TreeForeignKey
@@ -137,6 +138,7 @@ class LocationManager(models.GeoManager):
         return super(LocationManager, self).get_queryset().select_related('gateway')
 
 
+@python_2_unicode_compatible
 class Location(TimeStampedModel):
     """
     Location model define place where agents are working.
