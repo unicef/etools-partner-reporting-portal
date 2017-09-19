@@ -40,12 +40,6 @@ services:
 #    volumes:
 #      - './postgres_data:/var/lib/postgresql/data'
 
-  redis:
-    image: unicef/etools-prp-redis
-    build:
-      context: ./redis
-      dockerfile: ./Dockerfile
-
   polymer:
     image: unicef/etools-prp-polymer
     build:
