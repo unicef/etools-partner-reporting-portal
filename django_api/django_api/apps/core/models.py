@@ -158,7 +158,6 @@ class Location(TimeStampedModel):
         core.GatewayType: "gateway"
     """
     title = models.CharField(max_length=255)
-    reportable = models.ForeignKey('indicator.Reportable', null=True, blank=True, related_name="locations")
 
     gateway = models.ForeignKey(GatewayType, verbose_name='Location Type')
     carto_db_table = models.ForeignKey('core.CartoDBTable', related_name="locations")
