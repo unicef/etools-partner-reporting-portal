@@ -1,0 +1,18 @@
+<link rel="import" href="../polyfills/es6-shim.html">
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Behaviors = App.Behaviors || {};
+
+    App.Behaviors.NotificationsBehavior = {
+      _notifyChangesSaved: function (options) {
+        this.fire('notify', Object.assign({
+          type: 'changes-saved',
+        }, options));
+      },
+    };
+
+  }());
+</script>

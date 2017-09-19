@@ -2,16 +2,14 @@
 <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
-<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
 
-<link rel="import" href="../styles/country-flags.html">
 <link rel="import" href="../redux/store.html">
 <link rel="import" href="../redux/actions.html">
 <link rel="import" href="../behaviors/routing.html">
 
 <dom-module id="country-dropdown">
   <template>
-    <style include="country-flag-styles">
+    <style>
       :host {
         display: block;
         position: relative;
@@ -57,17 +55,6 @@
         white-space: nowrap;
         cursor: pointer;
       }
-
-      iron-icon {
-        bottom: 2px;
-        min-width: 24px;
-        min-height: 20px;
-        margin-right: 8px;
-      }
-
-      paper-item iron-icon {
-        margin-right: 16px;
-      }
     </style>
 
     <paper-dropdown-menu label="[[country.name]]" noink no-label-float>
@@ -76,10 +63,7 @@
           on-iron-select="_countrySelected"
           selected="[[selected]]">
         <template id="repeat" is="dom-repeat" items="[[data]]">
-          <paper-item>
-            <iron-icon class$="[[_computeClass(item)]]" item-icon></iron-icon>
-            [[item.name]]
-          </paper-item>
+          <paper-item>[[item.name]]</paper-item>
         </template>
       </paper-listbox>
     </paper-dropdown-menu>
@@ -121,10 +105,6 @@
         this.dispatch(App.Actions.setCountry(newCode));
 
         window.location.href = this.buildUrl(this._baseUrl, '/');
-      },
-
-      _computeClass: function (country) {
-        return 'flag-icon flag-icon-' + country.code.toLowerCase();
       },
 
       _computeCountry: function (data, code) {

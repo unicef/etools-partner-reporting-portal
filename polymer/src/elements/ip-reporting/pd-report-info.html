@@ -6,6 +6,7 @@
 
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/notifications.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
 <link rel="import" href="../../redux/selectors/reportInfo.html">
@@ -138,6 +139,7 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.NotificationsBehavior,
         App.Behaviors.ReduxBehavior,
       ],
 
@@ -193,6 +195,8 @@
       },
 
       _updateData: function (change) {
+        var self = this;
+
         if (change.path.split('.').length <= 2) {
           // Skip the initial assignment
           return;
@@ -209,6 +213,9 @@
               this.reportId
             )
           )
+              .then(function () {
+                self._notifyChangesSaved();
+              })
               .catch(function (err) { // jshint ignore:line
                 // TODO: error handling
               });

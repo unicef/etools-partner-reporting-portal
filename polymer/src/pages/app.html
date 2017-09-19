@@ -2,6 +2,7 @@
 <link rel="import" href="../../bower_components/app-route/app-route.html">
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../../bower_components/iron-localstorage/iron-localstorage.html">
+<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 
 <link rel="import" href="../elements/etools-prp-countries.html">
 <link rel="import" href="../elements/etools-prp-ajax.html">
@@ -57,6 +58,12 @@
         </page-cluster-reporting>
       </template>
     </iron-pages>
+
+    <paper-toast
+        id="changes-saved"
+        text="Changes saved"
+        duration="1500">
+    </paper-toast>
   </template>
 
   <script>
@@ -97,6 +104,10 @@
         '_routeAppChanged(routeData.app)',
         '_handleCountryChange(currentCountry, countries)',
       ],
+
+      listeners: {
+        'notify': '_notify',
+      },
 
       _redirectToCountry: function (country) {
         var code = country.code;
@@ -190,6 +201,14 @@
         })[0];
 
         this.dispatch(App.Actions.Location.set(currentCountryData.location));
+      },
+
+      _notify: function (e, options) {
+        e.stopPropagation();
+
+        try {
+          this.$[options.type].open();
+        } catch (err) {}
       },
 
       attached: function () {

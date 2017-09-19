@@ -143,6 +143,8 @@ class Reportable(TimeStampedModel):
 
     cs_dates = ArrayField(models.DateField(), default=list)
 
+    location_admin_refs = ArrayField(JSONField(), default=list)
+
     class Meta:
         ordering = ['-id']
 

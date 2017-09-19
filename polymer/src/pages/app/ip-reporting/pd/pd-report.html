@@ -17,9 +17,9 @@
 <link rel="import" href="../../../../elements/report-status.html">
 <link rel="import" href="../../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../../elements/ip-reporting/pd-report-export-button.html">
+<link rel="import" href="../../../../elements/ip-reporting/pd-modal.html">
 <link rel="import" href="../../../../endpoints.html">
 <link rel="import" href="../../../../behaviors/utils.html">
-<link rel="import" href="../../../../behaviors/routing.html">
 <link rel="import" href="../../../../redux/store.html">
 <link rel="import" href="../../../../redux/actions.html">
 <link rel="import" href="../../../../redux/selectors/programmeDocuments.html">
@@ -87,21 +87,18 @@
 
       <div class="toolbar">
         <report-status status="[[currentReport.report_status]]"></report-status>
-
         <template
             is="dom-if"
             if="[[_equals(mode, 'view')]]"
             restamp="true">
           <pd-report-export-button></pd-report-export-button>
         </template>
-
-        <a href="[[pdUrl]]" tabindex="-1">
-          <paper-button
-              class="btn-primary"
-              raised>
-            Show PD/SSFA ToR Details
-          </paper-button>
-        </a>
+        <paper-button
+            class="btn-primary"
+            on-tap="_showPdDetails"
+            raised>
+          Show PD/SSFA ToR Details
+        </paper-button>
       </div>
 
       <div class="tabs">
@@ -159,6 +156,8 @@
           </template>
         </template>
     </page-body>
+
+    <pd-modal id="pdDetails"></pd-modal>
   </template>
 
   <script>
@@ -168,7 +167,6 @@
       behaviors: [
         App.Behaviors.ReduxBehavior,
         App.Behaviors.UtilsBehavior,
-        App.Behaviors.RoutingBehavior,
       ],
 
       properties: {
@@ -194,11 +192,6 @@
         reportUrl: {
           type: String,
           computed: '_computeReportUrl(pdId, reportId)',
-        },
-
-        pdUrl: {
-          type: String,
-          computed: '_computePdUrl(_baseUrl, pdId)',
         },
 
         pdId: {
@@ -278,10 +271,6 @@
         return App.Endpoints.programmeDocumentReport(pdId, reportId);
       },
 
-      _computePdUrl: function (_baseUrl, pdId) {
-        return this.buildUrl(_baseUrl, '/pd/' + pdId + '/view/details');
-      },
-
       _handleInputChange: function (url, queryParams) {
         var indicatorDataThunk;
 
@@ -313,6 +302,10 @@
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
             });
+      },
+
+      _showPdDetails: function () {
+        this.$.pdDetails.open();
       },
     });
   </script>
