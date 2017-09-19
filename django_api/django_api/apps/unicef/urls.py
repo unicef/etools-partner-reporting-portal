@@ -5,7 +5,7 @@ from .views import (
     ProgrammeDocumentDetailsAPIView,
     ProgrammeDocumentLocationsAPIView,
     ProgressReportAPIView,
-    ProgressReportPDFView
+    ProgressReportPDFView,
     ProgrammeDocumentIndicatorsAPIView,
 )
 
