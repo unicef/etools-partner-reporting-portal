@@ -17,6 +17,10 @@
         return this._buildUrl('/indicator/' + content_object);
       },
 
+      allIndicators: function (workspaceId) {
+        return this._buildUrl('/unicef/' + workspaceId + '/programme-document/indicators/');
+      },
+
       indicatorReports: function (reportableId) {
         return this._buildUrl('/indicator/' + reportableId + '/indicator-reports/');
       },
