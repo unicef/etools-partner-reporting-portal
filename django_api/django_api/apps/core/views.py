@@ -81,5 +81,5 @@ class ResponsePlanAPIView(ListAPIView):
     permission_classes = (IsAuthenticated, )
 
     def get_queryset(self):
-        intervention_id = self.kwargs.get('intervention_id')
-        return ResponsePlan.objects.filter(workspace_id=intervention_id)
+        workspace_id = self.kwargs.get('workspace_id')
+        return ResponsePlan.objects.filter(workspace_id=workspace_id)

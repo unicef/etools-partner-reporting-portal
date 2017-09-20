@@ -57,13 +57,15 @@ class TestLocationListAPIView(BaseAPITestCase):
 class TestResponsePlanAPIView(BaseAPITestCase):
 
     def test_response_plan(self):
-        intervention = Workspace.objects.first()
-        response_plan_count = ResponsePlan.objects.filter(intervention=intervention.id).count()
-        url = reverse("response-plan", kwargs={'intervention_id': intervention.id})
+        workspace = Workspace.objects.first()
+        response_plan_count = ResponsePlan.objects.filter(
+            workspace=workspace).count()
+        url = reverse("response-plan", kwargs={'workspace_id': workspace.id})
         response = self.client.get(url, format='json')
 
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(len(response.data), response_plan_count)
         self.assertTrue(response.data[0].get('id') in
-                        ResponsePlan.objects.filter(intervention=intervention.id).values_list('id', flat=True))
-        self.assertEquals(response.data[0].get('intervention'), intervention.id)
+                        ResponsePlan.objects.filter(
+                            workspace=workspace).values_list('id', flat=True))
+        self.assertEquals(response.data[0].get('workspace'), workspace.id)
