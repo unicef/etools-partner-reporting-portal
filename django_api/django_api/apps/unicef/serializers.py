@@ -2,7 +2,7 @@ from django.conf import settings
 from rest_framework import serializers
 
 from .models import ProgrammeDocument, Section, ProgressReport, Person
-
+from indicator.serializers import PDReportsSerializer
 
 class PersonSerializer(serializers.ModelSerializer):
     class Meta:
@@ -92,6 +92,7 @@ class ProgressReportSerializer(serializers.ModelSerializer):
     submission_date = serializers.SerializerMethodField()
     due_date = serializers.SerializerMethodField()
     is_draft = serializers.SerializerMethodField()
+    indicator_reports = PDReportsSerializer(read_only=True, many=True)
 
     class Meta:
         model = ProgressReport
@@ -107,6 +108,7 @@ class ProgressReportSerializer(serializers.ModelSerializer):
             'submission_date',
             'due_date',
             'is_draft',
+            'indicator_reports'
         )
 
     def get_reporting_period(self, obj):
