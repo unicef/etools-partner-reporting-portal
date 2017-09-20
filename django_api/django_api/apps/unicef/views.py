@@ -161,6 +161,37 @@ class ProgressReportAPIView(ListAPIView):
             status=statuses.HTTP_200_OK
         )
 
+
+class ProgressReportDetailsAPIView(RetrieveAPIView):
+    """
+    Endpoint for getting Progress Report
+    """
+    serializer_class = ProgressReportSerializer
+    permission_classes = (IsAuthenticated, )
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
+
+    def get(self, request, workspace_id, pk, *args, **kwargs):
+        """
+        Get Progress Report Details by given pk.
+        """
+        self.workspace_id = workspace_id
+        serializer = self.get_serializer(
+            self.get_object(pk)
+        )
+        return Response(serializer.data, status=statuses.HTTP_200_OK)
+
+    def get_object(self, pk):
+        try:
+            return ProgressReport.objects.get(programme_document__partner=self.request.user.partner, programme_document__workspace=self.workspace_id, pk=pk)
+        except ProgressReport.DoesNotExist as exp:
+            logger.exception({
+                "endpoint": "ProgressReportDetailsAPIView",
+                "request.data": self.request.data,
+                "pk": pk,
+                "exception": exp,
+            })
+            raise Http404
+
 class ProgressReportIndicatorsAPIView(ListAPIView):
     serializer_class = PDReportsSerializer
     pagination_class = SmallPagination
