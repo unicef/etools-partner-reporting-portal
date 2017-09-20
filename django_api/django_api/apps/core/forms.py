@@ -81,5 +81,5 @@ class GatewayTypeModelForm(forms.ModelForm):
         fields = (
             'name',
             'admin_level',
-            'workspace',
+            'country',
         )

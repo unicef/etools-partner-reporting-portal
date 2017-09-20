@@ -122,7 +122,7 @@ class GatewayType(TimeStampedModel):
     name = models.CharField(max_length=64L, unique=True)
     admin_level = models.PositiveSmallIntegerField()
 
-    workspace = models.ForeignKey(Workspace, related_name="gateway_types")
+    country = models.ForeignKey(Country, related_name="gateway_types")
 
     class Meta:
         ordering = ['name']

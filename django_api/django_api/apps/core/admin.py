@@ -58,7 +58,7 @@ class LocationAdmin(LeafletGeoAdmin, admin.ModelAdmin):
 
 class GatewayTypeAdmin(admin.ModelAdmin):
     form = GatewayTypeModelForm
-    fields = ('name', 'admin_level', 'intervention')
+    fields = ('name', 'admin_level', 'country')
 
 
 class CartoDBTableAdmin(admin.ModelAdmin):
