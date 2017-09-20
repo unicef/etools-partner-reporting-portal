@@ -208,8 +208,7 @@ class ProgressReportPDFView(RetrieveAPIView):
         data['submission_date'] = report.get_submission_date()
         data['reporting_period'] = report.get_reporting_period()
 
-        data['organization'] = report.programme_document.org_name
-        data['organization_acronym'] = report.programme_document.org_acronym
+        data['partner'] = report.programme_document.partner
 
         data['authorized_officer'] = report.programme_document.unicef_officers.first()
         data['focal_point'] = report.programme_document.unicef_focal_point.first()
