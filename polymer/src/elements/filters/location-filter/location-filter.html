@@ -14,8 +14,8 @@
     </style>
 
     <etools-prp-ajax
-        id="childLocations"
-        url="[[childLocationsUrl]]">
+        id="locations"
+        url="[[locationsUrl]]">
     </etools-prp-ajax>
 
     <template is="dom-if" if="[[!loading]]">
@@ -37,10 +37,10 @@
       ],
 
       properties: {
-        childLocationsUrl: {
+        locationsUrl: {
           type: String,
-          computed: '_computeChildLocationsUrl(locationId)',
-          observer: '_fetchChildLocations',
+          computed: '_computeLocationsUrl(locationId)',
+          observer: '_fetchLocations',
         },
 
         locationId: {
@@ -62,24 +62,24 @@
         value: String,
       },
 
-      _computeChildLocationsUrl: function (locationId) {
-        return locationId ? App.Endpoints.childLocations(locationId) : '';
+      _computeLocationsUrl: function (locationId) {
+        return locationId ? App.Endpoints.locations(locationId) : '';
       },
 
       _computeLoading: function (data) {
         return !data.length;
       },
 
-      _fetchChildLocations: function (url) {
+      _fetchLocations: function (url) {
         var self = this;
 
         if (!url) {
           return;
         }
 
-        this.$.childLocations.abort();
+        this.$.locations.abort();
 
-        this.$.childLocations.thunk()()
+        this.$.locations.thunk()()
             .then(function (res) {
               self.set('data', [{
                 id: '',
@@ -92,7 +92,7 @@
       },
 
       detached: function () {
-        this.$.childLocations.abort();
+        this.$.locations.abort();
       },
     });
   </script>

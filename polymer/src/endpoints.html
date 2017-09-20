@@ -49,6 +49,10 @@
         return this._buildUrl('/core/workspace/' + workspaceId + '/response-plan/');
       },
 
+      locations: function (workspaceId) {
+        return this._buildUrl('/unicef/' + workspaceId + '/programme-document/locations/');
+      },
+
       childLocations: function (locationId) {
         return this._buildUrl('/core/' + locationId + '/children-location/');
       },
