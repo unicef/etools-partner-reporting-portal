@@ -16,9 +16,9 @@ from core.permissions import IsAuthenticated
 from core.models import Location
 from core.serializers import ShortLocationSerializer
 
-from indicator.models import Reportable
-from indicator.serializers import IndicatorListSerializer
-from indicator.filters import IndicatorFilter
+from indicator.models import Reportable, IndicatorReport
+from indicator.serializers import IndicatorListSerializer, PDReportsSerializer
+from indicator.filters import IndicatorFilter, PDReportsFilter
 
 
 
@@ -165,6 +165,7 @@ class ProgressReportAPIView(ListAPIView):
             status=statuses.HTTP_200_OK
         )
 
+
 class ProgressReportPDFView(RetrieveAPIView):
     """
         Endpoint for getting PDF of Progress Report Annex C.
@@ -217,4 +218,61 @@ class ProgressReportPDFView(RetrieveAPIView):
 
         pdf = render_to_pdf("report_annex_c_pdf.html", data)
         return HttpResponse(pdf, content_type='application/pdf')
-    
+
+
+class ProgressReportDetailsAPIView(RetrieveAPIView):
+    """
+    Endpoint for getting Progress Report
+    """
+    serializer_class = ProgressReportSerializer
+    permission_classes = (IsAuthenticated, )
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
+
+    def get(self, request, workspace_id, pk, *args, **kwargs):
+        """
+        Get Progress Report Details by given pk.
+        """
+        self.workspace_id = workspace_id
+        serializer = self.get_serializer(
+            self.get_object(pk)
+        )
+        return Response(serializer.data, status=statuses.HTTP_200_OK)
+
+    def get_object(self, pk):
+        try:
+            return ProgressReport.objects.get(programme_document__partner=self.request.user.partner, programme_document__workspace=self.workspace_id, pk=pk)
+        except ProgressReport.DoesNotExist as exp:
+            logger.exception({
+                "endpoint": "ProgressReportDetailsAPIView",
+                "request.data": self.request.data,
+                "pk": pk,
+                "exception": exp,
+            })
+            raise Http404
+
+class ProgressReportIndicatorsAPIView(ListAPIView):
+    serializer_class = PDReportsSerializer
+    pagination_class = SmallPagination
+    permission_classes = (IsAuthenticated,)
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
+    filter_class = PDReportsFilter
+
+    def get_queryset(self):
+        # Limit reports to partner only
+        return IndicatorReport.objects.filter(progress_report__programme_document__partner=self.request.user.partner)
+
+    def list(self, request, workspace_id, progress_report_id, *args, **kwargs):
+        """
+        Get Programme Document Details by given pk.
+        """
+        queryset = self.get_queryset().filter(progress_report__id=progress_report_id, progress_report__programme_document__workspace=workspace_id)
+        filtered = PDReportsFilter(request.GET, queryset=queryset)
+
+        page = self.paginate_queryset(filtered.qs)
+
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(filtered.qs, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

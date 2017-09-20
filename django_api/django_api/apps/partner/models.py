@@ -205,6 +205,9 @@ class PartnerActivity(TimeStampedModel):
     class Meta:
         ordering = ['-id']
 
+    def __str__(self):
+        return self.title
+
 
 @receiver(pre_save, sender=PartnerActivity, dispatch_uid="check_pa_double_fks")
 def check_pa_double_fks(sender, instance, **kwargs):

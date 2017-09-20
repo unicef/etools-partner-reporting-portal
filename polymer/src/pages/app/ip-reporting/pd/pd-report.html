@@ -22,7 +22,6 @@
 <link rel="import" href="../../../../behaviors/utils.html">
 <link rel="import" href="../../../../redux/store.html">
 <link rel="import" href="../../../../redux/actions.html">
-<link rel="import" href="../../../../redux/selectors/programmeDocuments.html">
 <link rel="import" href="../../../../redux/selectors/programmeDocumentReports.html">
 
 <dom-module id="page-ip-reporting-pd-report">
@@ -184,6 +183,11 @@
           statePath: 'programmeDocumentReports.current.id',
         },
 
+        locationId: {
+          type: String,
+          statePath: 'location.id',
+        },
+
         indicatorDataUrl: {
           type: String,
           computed: '_computeIndicatorDataUrl(reportId)',
@@ -191,7 +195,7 @@
 
         reportUrl: {
           type: String,
-          computed: '_computeReportUrl(pdId, reportId)',
+          computed: '_computeReportUrl(locationId, reportId)',
         },
 
         pdId: {
@@ -199,20 +203,14 @@
           statePath: 'programmeDocuments.current',
         },
 
-        currentPD: {
-          type: Object,
-          statePath: App.Selectors.ProgrammeDocuments.current,
-        },
-
         currentReport: {
           type: Object,
           statePath: App.Selectors.ProgrammeDocumentReports.current,
-          observer: '_fetchReportDataIfNeeded',
         },
 
         headingText: {
           type: String,
-          computed: '_computeHeadingText(currentPD, mode)',
+          computed: '_computeHeadingText(currentReport, mode)',
         },
 
         backLink: {
@@ -229,21 +227,19 @@
       observers: [
         '_onReportChanged(routeData.report_id, routeData.mode)',
         '_handleInputChange(indicatorDataUrl, queryParams)',
+        '_fetchReport(reportUrl, pdId)',
       ],
 
       _computeBackLink: function (pdId) {
         return 'pd/' + pdId + '/view/reports';
       },
 
-      _computeCurrentPDRefNo: function (pd) {
-        return pd.reference_number;
-      },
-
       _onReportChanged: function (reportId, mode) {
         this.dispatch(App.Actions.PDReports.setCurrent(reportId, mode));
       },
 
-      _computeHeadingText: function (pd, mode) {
+      _computeHeadingText: function (report, mode) {
+        var pd = report.programme_document || {};
         var prefix;
 
         switch (mode) {
@@ -260,15 +256,17 @@
             break;
         }
 
-        return prefix + ' ' + pd.reference_number;
+        return prefix + ' ' + this._withDefault(pd.reference_number);
       },
 
       _computeIndicatorDataUrl: function (reportId) {
         return reportId ? App.Endpoints.indicatorData(reportId) : '';
       },
 
-      _computeReportUrl: function (pdId, reportId) {
-        return App.Endpoints.programmeDocumentReport(pdId, reportId);
+      _computeReportUrl: function (locationId, reportId) {
+        return locationId ?
+            App.Endpoints.programmeDocumentReport(locationId, reportId) :
+            '';
       },
 
       _handleInputChange: function (url, queryParams) {
@@ -291,8 +289,8 @@
             });
       },
 
-      _fetchReportDataIfNeeded: function (report) {
-        if (report.id) {
+      _fetchReport: function (reportUrl, pdId) {
+        if (!reportUrl || typeof pdId === 'undefined') {
           return;
         }
 

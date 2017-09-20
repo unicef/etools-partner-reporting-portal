@@ -2,6 +2,7 @@
 <link rel="import" href="../../../bower_components/iron-location/iron-location.html">
 <link rel="import" href="../../../bower_components/iron-location/iron-query-params.html">
 
+<link rel="import" href="../../polyfills/es6-shim.html">
 <link rel="import" href="../../elements/ip-reporting/pd-report-filters.html">
 <link rel="import" href="../../elements/ip-reporting/pd-reports-list.html">
 <link rel="import" href="../../redux/store.html">
@@ -27,7 +28,7 @@
     <etools-prp-ajax
         id="pdReports"
         url="[[pdReportsUrl]]"
-        params="[[queryParams]]">
+        params="[[pdReportsParams]]">
     </etools-prp-ajax>
 
     <page-body>
@@ -51,18 +52,34 @@
           statePath: 'programmeDocuments.current',
         },
 
+        locationId: {
+          type: String,
+          statePath: 'location.id',
+        },
+
         pdReportsUrl: {
           type: String,
-          computed: '_computePDReportsUrl(pdId)',
+          computed: '_computePDReportsUrl(locationId)',
+        },
+
+        pdReportsParams: {
+          type: Object,
+          computed: '_computePDReportsParams(pdId, queryParams)',
         },
       },
 
       observers: [
-        '_handleInputChange(pdReportsUrl, queryParams)',
+        '_handleInputChange(pdReportsUrl, pdReportsParams)',
       ],
 
-      _computePDReportsUrl: function (pdId) {
-        return pdId ? App.Endpoints.programmeDocumentReports(pdId) : '';
+      _computePDReportsUrl: function (locationId) {
+        return locationId ? App.Endpoints.programmeDocumentReports(locationId) : '';
+      },
+
+      _computePDReportsParams: function (pdId, queryParams) {
+        return Object.assign({}, queryParams, {
+          programme_document: pdId,
+        });
       },
 
       _handleInputChange: function (url) {

@@ -7,19 +7,19 @@
 
     App.Reducers = App.Reducers || {};
 
-    App.Reducers.Countries = Redux.combineReducers({
-      all: allCountriesReducer,
-      current: currentCountryReducer,
+    App.Reducers.Workspaces = Redux.combineReducers({
+      all: allWorkspacesReducer,
+      current: currentWorkspaceReducer,
     });
 
-    function allCountriesReducer(state, action) {
+    function allWorkspacesReducer(state, action) {
       if (typeof state === 'undefined') {
         state = [];
       }
 
       switch (action.type) {
-        case App.Constants.SET_COUNTRIES:
-          return action.countries.slice();
+        case App.Constants.SET_WORKSPACES:
+          return action.workspaces.slice();
 
         case App.Constants.RESET:
           return [];
@@ -29,14 +29,14 @@
       }
     }
 
-    function currentCountryReducer(state, action) {
+    function currentWorkspaceReducer(state, action) {
       if (typeof state === 'undefined') {
         state = '';
       }
 
       switch (action.type) {
-        case App.Constants.SET_COUNTRY:
-          return action.country;
+        case App.Constants.SET_WORKSPACE:
+          return action.workspace;
 
         case App.Constants.RESET:
           return '';

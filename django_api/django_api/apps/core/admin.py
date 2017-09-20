@@ -27,8 +27,14 @@ class CountryAdmin(admin.ModelAdmin):
     search_fields = ('name', 'country_short_code')
 
 
+class LocationAdmin(admin.ModelAdmin):
+    list_display = ('title', 'parent', 'gateway', 'p_code')
+    search_fields = ('carto_db_table', 'gateway')
+    search_fields = ('title', 'p_code',)
+
+
 admin.site.register(Workspace, WorkspaceAdmin)
-admin.site.register(Location)
+admin.site.register(Location, LocationAdmin)
 admin.site.register(ResponsePlan)
 admin.site.register(GatewayType)
 admin.site.register(CartoDBTable)
