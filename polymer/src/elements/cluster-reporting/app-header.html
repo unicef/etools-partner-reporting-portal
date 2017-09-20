@@ -5,8 +5,8 @@
 <link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout.html">
 
 <link rel="import" href="../etools-logo.html">
-<link rel="import" href="../country-dropdown.html">
-<link rel="import" href="../etools-prp-countries.html">
+<link rel="import" href="../workspace-dropdown.html">
+<link rel="import" href="../etools-prp-workspaces.html">
 <link rel="import" href="change-response-plan.html">
 
 <dom-module id="cluster-reporting-app-header">
@@ -26,7 +26,7 @@
         @apply(--layout-justified);
       }
 
-      country-dropdown {
+      workspace-dropdown {
         @apply(--layout-self-center);
       }
 
@@ -41,10 +41,10 @@
 
     </style>
 
-    <etools-prp-countries
-        all="{{countries}}"
-        current="{{country}}">
-    </etools-prp-countries>
+    <etools-prp-workspaces
+        all="{{workspaces}}"
+        current="{{workspace}}">
+    </etools-prp-workspaces>
 
     <app-header-layout>
       <app-header fixed>
@@ -53,10 +53,10 @@
           <etools-logo size="120" text-color="#fff"></etools-logo>
           <div class="right-wrapper">
 
-            <country-dropdown
-                data="[[countries]]"
-                current="[[country]]">
-            </country-dropdown>
+            <workspace-dropdown
+                data="[[workspaces]]"
+                current="[[workspace]]">
+            </workspace-dropdown>
 
             <change-response-plan></change-response-plan>
 

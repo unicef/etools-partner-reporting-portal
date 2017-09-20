@@ -122,11 +122,6 @@ class Partner(TimeStampedModel):
         blank=True,
         null=True
     )
-    alternate_title = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True
-    )
     rating = models.CharField(
         max_length=50,
         null=True,
@@ -209,6 +204,9 @@ class PartnerActivity(TimeStampedModel):
 
     class Meta:
         ordering = ['-id']
+
+    def __str__(self):
+        return self.title
 
 
 @receiver(pre_save, sender=PartnerActivity, dispatch_uid="check_pa_double_fks")

@@ -10,11 +10,15 @@
       },
 
       interventions: function () {
-        return this._buildUrl('/core/simple-intervention/');
+        return this._buildUrl('/core/workspace/');
       },
 
       indicators: function (content_object) {
         return this._buildUrl('/indicator/' + content_object);
+      },
+
+      allIndicators: function (workspaceId) {
+        return this._buildUrl('/unicef/' + workspaceId + '/programme-document/indicators/');
       },
 
       indicatorReports: function (reportableId) {
@@ -33,20 +37,24 @@
         return this._buildUrl('/unicef/' + locationId + '/programme-document/details/' + pdId);
       },
 
-      programmeDocumentReports: function (pdId) {
-        return this._buildUrl('/indicator/programme-document/details/' + pdId + '/reports/');
+      programmeDocumentReports: function (workspaceId) {
+        return this._buildUrl('/unicef/' + workspaceId + '/progress-reports/');
       },
 
-      programmeDocumentReport: function (pdId, reportId) {
-        return this.programmeDocumentReports(pdId) + reportId + '/';
+      programmeDocumentReport: function (workspaceId, reportId) {
+        return this.programmeDocumentReports(workspaceId) + reportId + '/';
       },
 
       progressReports: function(locationId) {
         return this._buildUrl('/unicef/' + locationId + '/progress-reports');
       },
 
-      responsePlans: function (interventionId) {
-        return this._buildUrl('/core/' + interventionId + '/response-plan/');
+      responsePlans: function (workspaceId) {
+        return this._buildUrl('/core/workspace/' + workspaceId + '/response-plan/');
+      },
+
+      locations: function (workspaceId) {
+        return this._buildUrl('/unicef/' + workspaceId + '/programme-document/locations/');
       },
 
       childLocations: function (locationId) {
@@ -98,7 +106,7 @@
       },
 
       clusterIndicatorReports: function (responsePlanId) {
-        return this._buildUrl('/cluster/' + responsePlanId + '/cluster-indicators-list/');
+        return this._buildUrl('/cluster/' + responsePlanId + '/cluster-indicator-reports-list/');
       },
 
       clusterIndicatorReportsExport: function (responsePlanId) {
@@ -106,7 +114,11 @@
       },
 
       clusterIndicatorNames: function (responsePlanId) {
-        return this._buildUrl('/cluster/' + responsePlanId + '/cluster-indicators-simple-list/');
+        return this._buildUrl(
+          '/cluster/' +
+          responsePlanId +
+          '/cluster-indicator-reports-simple-list/'
+        );
       },
 
       clusterNames: function (responsePlanId) {
@@ -122,7 +134,7 @@
       },
 
       clusterLocationNames: function (responsePlanId) {
-        return this._buildUrl('/core/' + responsePlanId + '/simple-location/');
+        return this._buildUrl('/core/' + responsePlanId + '/location/');
       },
 
       clusterIndicators: function () {

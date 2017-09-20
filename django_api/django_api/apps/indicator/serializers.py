@@ -12,7 +12,7 @@ from unicef.models import LowerLevelOutput
 from partner.models import PartnerProject, PartnerActivity
 from cluster.models import ClusterObjective, ClusterActivity
 
-from core.serializers import SimpleLocationSerializer, IdLocationSerializer
+from core.serializers import LocationSerializer, IdLocationSerializer
 from core.models import Location
 from core.validators import add_indicator_object_type_validator
 from core.helpers import (
@@ -215,7 +215,7 @@ class OverallNarrativeSerializer(serializers.ModelSerializer):
 
 class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
 
-    location = SimpleLocationSerializer(read_only=True)
+    location = LocationSerializer(read_only=True)
     disaggregation = serializers.SerializerMethodField()
     location_progress = serializers.SerializerMethodField()
     previous_location_progress = serializers.SerializerMethodField()
@@ -752,7 +752,7 @@ class ClusterIndicatorDataSerializer(serializers.ModelSerializer):
 
 class ClusterIndicatorForPartnerActivitySerializer(serializers.ModelSerializer):
     blueprint = IndicatorBlueprintSerializer()
-    locations = SimpleLocationSerializer(many=True)
+    locations = LocationSerializer(many=True)
 
     class Meta:
         model = Reportable

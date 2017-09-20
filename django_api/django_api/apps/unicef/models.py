@@ -70,7 +70,7 @@ class ProgrammeDocument(TimeStampedModel):
     unicef_office = models.CharField(max_length=255,
                                      verbose_name='UNICEF Office(s)')
 
-    unicef_officers =  models.ManyToManyField(Person,
+    unicef_officers = models.ManyToManyField(Person,
                                               verbose_name='UNICEF Officer(s)',
                                               related_name="officer_programme_documents")
     unicef_focal_point = models.ManyToManyField(Person,

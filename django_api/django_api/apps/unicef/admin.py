@@ -9,8 +9,22 @@ from .models import (
     Person,
 )
 
-admin.site.register(ProgressReport)
-admin.site.register(ProgrammeDocument)
+
+class ProgrammeDocumentAdmin(admin.ModelAdmin):
+    list_display = ('title', 'reference_number', 'agreement', 'partner',
+                    'status', 'workspace')
+    list_filter = ('workspace', 'status', 'partner')
+    search_fields = ('title', 'reference_number', 'agreement')
+
+
+class ProgressReportAdmin(admin.ModelAdmin):
+    list_display = ('programme_document', 'status', 'submitted_by',
+                    'start_date', 'end_date', 'due_date', 'submission_date')
+    list_filter = ('status', 'programme_document__status', 'programme_document')
+
+
+admin.site.register(ProgrammeDocument, ProgrammeDocumentAdmin)
+admin.site.register(ProgressReport, ProgressReportAdmin)
 admin.site.register(CountryProgrammeOutput)
 admin.site.register(LowerLevelOutput)
 admin.site.register(Section)

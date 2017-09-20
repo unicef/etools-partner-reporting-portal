@@ -69,9 +69,13 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'django_filters',
+<<<<<<< HEAD
     'djcelery',
     'leaflet',
     'suit',
+=======
+    'django_cron',
+>>>>>>> api-url-changes-#291
 
     'account',
     'cluster',
@@ -211,6 +215,7 @@ LOGGING = {
     }
 }
 
+<<<<<<< HEAD
 import djcelery
 djcelery.setup_loader()
 BROKER_URL = 'redis://redis:6379/0'
@@ -247,3 +252,16 @@ LEAFLET_CONFIG = {
     'MIN_ZOOM': 3,
     'MAX_ZOOM': 18,
 }
+=======
+
+# CartoDB settings
+CARTODB_USERNAME = os.getenv('CARTODB_USERNAME')
+CARTODB_APIKEY = os.getenv('CARTODB_APIKEY')
+
+
+# Cronjobs
+
+CRON_CLASSES = [
+    "indicator.cron.IndicatorReportOverDueCronJob",
+]
+>>>>>>> api-url-changes-#291

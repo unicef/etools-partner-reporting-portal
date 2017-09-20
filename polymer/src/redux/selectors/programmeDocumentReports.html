@@ -43,7 +43,7 @@
         },
         function (byPD, pdId, reportId) {
           return (byPD[pdId] || []).filter(function (report) {
-            return report.id === reportId;
+            return Number(report.id) === Number(reportId);
           })[0] || {};
         }
       ),
