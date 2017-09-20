@@ -37,7 +37,7 @@ class TestLocationListAPIView(BaseAPITestCase):
 
     def test_list_api(self):
         response_plan_id = ResponsePlan.objects.first().id
-        url = reverse('simple-location', kwargs={'response_plan_id': response_plan_id})
+        url = reverse('location', kwargs={'response_plan_id': response_plan_id})
         response = self.client.get(url, format='json')
 
         result = ResponsePlan.objects.filter(id=response_plan_id).values_list(

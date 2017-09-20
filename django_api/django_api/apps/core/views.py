@@ -23,7 +23,7 @@ class WorkspaceAPIView(ListAPIView):
     permission_classes = (IsAuthenticated, )
 
 
-class SimpleLocationListAPIView(ListAPIView):
+class LocationListAPIView(ListAPIView):
     """
     Endpoint for getting all Location objects.
     """

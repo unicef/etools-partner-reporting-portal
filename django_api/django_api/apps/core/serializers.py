@@ -24,7 +24,7 @@ class WorkspaceSerializer(serializers.ModelSerializer):
         return loc and str(loc.id)
 
 
-class SimpleLocationSerializer(serializers.ModelSerializer):
+class LocationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Location
