@@ -258,8 +258,13 @@ class ClusterObjective(TimeStampedModel):
     class Meta:
         ordering = ['-id']
 
+    @property
+    def response_plan(self):
+        return self.cluster.response_plan
+
     def __str__(self):
         return "<pk: %s> %s" % (self.id, self.title)
+
 
 
 class ClusterActivity(TimeStampedModel):
@@ -284,6 +289,14 @@ class ClusterActivity(TimeStampedModel):
 
     class Meta:
         ordering = ['-id']
+
+    @property
+    def cluster(self):
+        return self.cluster_objective.cluster
+
+    @property
+    def response_plan(self):
+        return self.cluster.response_plan
 
     def __str__(self):
         return "<pk: %s> %s" % (self.id, self.title)

@@ -20,6 +20,46 @@ from core.common import (
 )
 
 
+class Disaggregation(TimeStampedModel):
+    """
+    Disaggregation module. For example: <Gender, Age>
+
+    related models:
+        core.ResponsePlan (ForeignKey): "response_plan"
+    """
+    name = models.CharField(max_length=255, verbose_name="Disaggregation by")
+    response_plan = models.ForeignKey('core.ResponsePlan',
+                                      related_name="disaggregations",
+                                      blank=True, null=True)    # IP reporting ones won't have this fk.
+    active = models.BooleanField(default=True)
+
+    class Meta:
+        unique_together = ('name', 'response_plan')
+
+    def __str__(self):
+        return "Disaggregation <pk:%s> %s" % (self.id, self.name)
+
+
+class DisaggregationValue(TimeStampedModel):
+    """
+    Disaggregation Value module. For example: Gender <Male, Female, Other>
+
+    related models:
+        indicator.Disaggregation (ForeignKey): "disaggregation"
+    """
+    disaggregation = models.ForeignKey(Disaggregation,
+                                       related_name="disaggregation_value")
+    value = models.CharField(max_length=15)
+
+    # TODO: we won't allow these to be edited out anymore, so 'active' might
+    # not as relevant anymore.
+    # See https://github.com/unicef/etools-partner-reporting-portal/issues/244
+    active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return "Disaggregation Value <pk:%s> %s" % (self.id, self.value)
+
+
 class IndicatorBlueprint(TimeStampedModel):
     """
     IndicatorBlueprint module is a pattern for indicator
@@ -151,6 +191,7 @@ class Reportable(TimeStampedModel):
     cs_dates = ArrayField(models.DateField(), default=list)
 
     location_admin_refs = ArrayField(JSONField(), default=list)
+    disaggregations = models.ManyToManyField(Disaggregation, blank=True)
 
     class Meta:
         ordering = ['-id']
@@ -292,7 +333,7 @@ class IndicatorReport(TimeStampedModel):
 
     @cached_property
     def disaggregations(self):
-        return self.reportable.disaggregation.all()
+        return self.reportable.disaggregations.all()
 
     @cached_property
     def display_type(self):
@@ -397,36 +438,3 @@ class IndicatorLocationData(TimeStampedModel):
 
     def __str__(self):
         return "{} Location Data for {}".format(self.location, self.indicator_report)
-
-
-class Disaggregation(TimeStampedModel):
-    """
-    Disaggregation module. For example: <Gender, Age>
-
-    related models:
-        indicator.Reportable (ForeignKey): "reportable"
-    """
-    name = models.CharField(max_length=255, verbose_name="Disaggregation by", null=True, blank=True)
-    reportable = models.ForeignKey(Reportable, related_name="disaggregation")
-    active = models.BooleanField(default=False)
-
-    class Meta:
-        unique_together = ('name', 'reportable')
-
-    def __str__(self):
-        return "Disaggregation <pk:%s>" % self.id
-
-
-class DisaggregationValue(TimeStampedModel):
-    """
-    Disaggregation Value module. For example: Gender <Male, Female, Other>
-
-    related models:
-        indicator.Disaggregation (ForeignKey): "disaggregation"
-    """
-    disaggregation = models.ForeignKey(Disaggregation, related_name="disaggregation_value")
-    value = models.CharField(max_length=15, null=True, blank=True)
-    active = models.BooleanField(default=False)
-
-    def __str__(self):
-        return "Disaggregation Value <pk:%s>" % self.id
