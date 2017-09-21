@@ -45,6 +45,10 @@
         return this.programmeDocumentReports(workspaceId) + reportId + '/';
       },
 
+      programmeDocumentReportSubmit: function (workspaceId, reportId) {
+        return this.programmeDocumentReport(workspaceId, reportId) + 'submit/';
+      },
+
       progressReports: function(locationId) {
         return this._buildUrl('/unicef/' + locationId + '/progress-reports');
       },

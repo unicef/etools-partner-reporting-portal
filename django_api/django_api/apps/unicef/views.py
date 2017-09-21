@@ -326,7 +326,7 @@ class ProgressReportSubmitAPIView(APIView):
 
             # Check if indicator was already submitted or SENT BACK
             if ir.submission_date is None or ir.report_status == INDICATOR_REPORT_STATUS.sent_back:
-                ir.submission_date = date.today()
+                ir.submission_date = datetime.now().date()
                 ir.report_status = INDICATOR_REPORT_STATUS.submitted
                 ir.save()
 
