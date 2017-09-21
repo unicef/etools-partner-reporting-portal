@@ -1,36 +1,30 @@
 from __future__ import unicode_literals
+
 import random
 import logging
 from decimal import Decimal
 
-from django.core.cache import cache
 from django.contrib.gis.db import models
-from django.contrib.contenttypes.models import ContentType
 from django.core.validators import (
     MinValueValidator,
     MaxValueValidator
 )
-from django.db import (
-    IntegrityError,
-    connection
-)
-from django.db.models.signals import pre_delete, post_save
-from django.dispatch.dispatcher import receiver
+from django.utils.encoding import python_2_unicode_compatible
 
 from model_utils.models import TimeStampedModel
 from mptt.models import MPTTModel, TreeForeignKey
-from paintstore.fields import ColorPickerField
 
 from .common import (
     RESPONSE_PLAN_TYPE,
 )
-from .countries import COUNTRIES_ALPHA2_CODE_DICT, COUNTRIES_ALPHA2_CODE
 
 logger = logging.getLogger('locations.models')
 
 
 def get_random_color():
-    r = lambda: random.randint(0,255)
+    def r():
+        random.randint(0, 255)
+
     return '#%02X%02X%02X' % (r(), r(), r())
 
 
@@ -131,7 +125,7 @@ class GatewayType(TimeStampedModel):
     name = models.CharField(max_length=64L, unique=True)
     admin_level = models.PositiveSmallIntegerField()
 
-    workspace = models.ForeignKey(Workspace, related_name="gateway_types")
+    country = models.ForeignKey(Country, related_name="gateway_types")
 
     class Meta:
         ordering = ['name']
@@ -147,10 +141,12 @@ class LocationManager(models.GeoManager):
         return super(LocationManager, self).get_queryset().select_related('gateway')
 
 
+@python_2_unicode_compatible
 class Location(TimeStampedModel):
     """
     Location model define place where agents are working.
-    The background of the location can be: Country > Region > City > District/Point.
+    The background of the location can be:
+    Country > Region > City > District/Point.
 
     Either a point or geospatial object.
     pcode should be unique.
@@ -161,7 +157,11 @@ class Location(TimeStampedModel):
         core.GatewayType: "gateway"
     """
     title = models.CharField(max_length=255)
-    reportable = models.ForeignKey('indicator.Reportable', null=True, blank=True, related_name="locations")
+    reportable = models.ForeignKey(
+        'indicator.Reportable',
+        null=True,
+        blank=True,
+        related_name="locations")
 
     gateway = models.ForeignKey(GatewayType, verbose_name='Location Type')
     carto_db_table = models.ForeignKey('core.CartoDBTable', related_name="locations")
@@ -171,18 +171,21 @@ class Location(TimeStampedModel):
         blank=True,
         max_digits=8,
         decimal_places=5,
-        validators=[MinValueValidator(Decimal(-90)), MaxValueValidator(Decimal(90))]
+        validators=[MinValueValidator(
+            Decimal(-90)), MaxValueValidator(Decimal(90))]
     )
     longitude = models.DecimalField(
         null=True,
         blank=True,
         max_digits=8,
         decimal_places=5,
-        validators=[MinValueValidator(Decimal(-180)), MaxValueValidator(Decimal(180))]
+        validators=[MinValueValidator(
+            Decimal(-180)), MaxValueValidator(Decimal(180))]
     )
     p_code = models.CharField(max_length=32, blank=True, null=True)
 
-    parent = models.ForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
+    parent = models.ForeignKey(
+        'self', null=True, blank=True, related_name='children', db_index=True)
 
     geom = models.MultiPolygonField(null=True, blank=True)
     point = models.PointField(null=True, blank=True)
@@ -195,18 +198,19 @@ class Location(TimeStampedModel):
     def __str__(self):
         if self.p_code:
             return '{} ({} {})'.format(
-                self.name,
+                self.title,
                 self.gateway.name,
                 "{}: {}".format(
                     'CERD' if self.gateway.name == 'School' else 'PCode',
                     self.p_code if self.p_code else ''
-                    ))
+                ))
 
         return self.title
 
     @property
     def geo_point(self):
-        return self.point if self.point else self.geom.point_on_surface if self.geom else ""
+        return self.point if self.point else \
+            self.geom.point_on_surface if self.geom else ""
 
     @property
     def point_lat_long(self):

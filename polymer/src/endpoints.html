@@ -113,6 +113,10 @@
         return this._buildUrl('/cluster/' + responsePlanId + '/cluster-indicator-reports-list/');
       },
 
+      clusterIndicatorReportsExport: function (responsePlanId) {
+        return this.clusterIndicatorReports(responsePlanId) + 'export/';
+      },
+
       clusterIndicatorNames: function (responsePlanId) {
         return this._buildUrl(
           '/cluster/' +
@@ -168,8 +172,12 @@
           mode +
           '-dashboard/'
         );
+      },
 
+      clusterIndicatorLocations: function (responsePlanId) {
+        return this._buildUrl('/cluster/' + responsePlanId + '/cluster-indicators-locations/');
       }
+
     };
   }());
 </script>
