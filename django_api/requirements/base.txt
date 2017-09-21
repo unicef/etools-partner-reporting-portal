@@ -11,6 +11,8 @@ django-model-utils==2.6.1  # latest 3.0.0 but need to check changes
 django-mptt==0.8.6
 python-json-logger==0.1.7
 django-suit==0.2.21
+django-easy-pdf==0.1.1
+xhtml2pdf==0.1b3
 
 # Testing
 astroid==1.5.2

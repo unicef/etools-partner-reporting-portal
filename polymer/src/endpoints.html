@@ -45,6 +45,10 @@
         return this.programmeDocumentReports(workspaceId) + reportId + '/';
       },
 
+      programmeDocumentReportSubmit: function (workspaceId, reportId) {
+        return this.programmeDocumentReport(workspaceId, reportId) + 'submit/';
+      },
+
       progressReports: function(locationId) {
         return this._buildUrl('/unicef/' + locationId + '/progress-reports');
       },
@@ -153,6 +157,11 @@
         return this._buildUrl('/partner/partner-activity-list/');
       },
 
+      reportExport: function (locationId, reportId) {
+        return this._buildUrl('/unicef/' + locationId + '/progress-reports/' +
+          reportId + '/annex-C-export-PDF/');
+      },
+
       clusterDashboard: function (responsePlanId, clusterId, mode) {
         return this._buildUrl(
           '/cluster/' +
@@ -167,7 +176,8 @@
 
       clusterIndicatorLocations: function (responsePlanId) {
         return this._buildUrl('/cluster/' + responsePlanId + '/cluster-indicators-locations/');
-      },
+      }
+
     };
   }());
 </script>
