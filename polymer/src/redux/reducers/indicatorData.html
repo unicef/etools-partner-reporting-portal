@@ -25,7 +25,7 @@
           return (function () {
             var change = {};
 
-            change[action.reportId] = action.data.outputs;
+            change[action.reportId] = action.data;
 
             return Object.assign({}, state, change);
           }());
@@ -61,27 +61,31 @@
       }
 
       switch (action.type) {
-        case App.Constants.SET_INDICATOR_DATA:
+        // case App.Constants.SET_INDICATOR_DATA:
+        case App.Constants.SET_CURRENT_PD_REPORT:
+          // return (function () {
+          //   var keys = [
+          //     'partner_contribution_to_date',
+          //     'challenges_in_the_reporting_period',
+          //     'proposed_way_forward',
+          //     'id',
+          //   ];
+
+          //   var change = {};
+
+          //   change[action.reportId] = keys.reduce(function (prev, curr) {
+          //     if (action.data[curr]) {
+          //       prev[curr] = action.data[curr];
+          //     }
+
+          //     return prev;
+          //   }, {});
+
+          //   return Object.assign({}, state, change);
+          // }());
           return (function () {
-            var keys = [
-              'partner_contribution_to_date',
-              'funds_received_to_date',
-              'challenges_in_the_reporting_period',
-              'proposed_way_forward',
-              'id',
-            ];
-
-            var change = {};
-
-            change[action.reportId] = keys.reduce(function (prev, curr) {
-              if (action.data[curr]) {
-                prev[curr] = action.data[curr];
-              }
-
-              return prev;
-            }, {});
-
-            return Object.assign({}, state, change);
+            console.log('TODO:', action);
+            return state;
           }());
 
         case App.Constants.AMEND_INFO:

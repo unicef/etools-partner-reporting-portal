@@ -6,8 +6,8 @@
 <link rel="import" href="../../../../../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../../../../../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../../../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../../../bower_components/promise-polyfill/promise-polyfill-lite.html">
 
-<link rel="import" href="../../../../styles/buttons.html">
 <link rel="import" href="../../../../pages/app/ip-reporting/pd/pd-report/results.html">
 <link rel="import" href="../../../../pages/app/ip-reporting/pd/pd-report/info.html">
 <link rel="import" href="../../../../pages/app/ip-reporting/pd/pd-report/submit.html">
@@ -23,6 +23,7 @@
 <link rel="import" href="../../../../redux/store.html">
 <link rel="import" href="../../../../redux/actions.html">
 <link rel="import" href="../../../../redux/selectors/programmeDocumentReports.html">
+<link rel="import" href="../../../../styles/buttons.html">
 
 <dom-module id="page-ip-reporting-pd-report">
   <template>
@@ -64,12 +65,6 @@
         params-string="{{query}}"
         params-object="{{queryParams}}">
     </iron-query-params>
-
-    <etools-prp-ajax
-        id="indicatorData"
-        url="[[indicatorDataUrl]]"
-        params="[[queryParams]]">
-    </etools-prp-ajax>
 
     <etools-prp-ajax
         id="report"
@@ -188,11 +183,6 @@
           statePath: 'location.id',
         },
 
-        indicatorDataUrl: {
-          type: String,
-          computed: '_computeIndicatorDataUrl(reportId)',
-        },
-
         reportUrl: {
           type: String,
           computed: '_computeReportUrl(locationId, reportId)',
@@ -226,7 +216,7 @@
 
       observers: [
         '_onReportChanged(routeData.report_id, routeData.mode)',
-        '_handleInputChange(indicatorDataUrl, queryParams)',
+        '_handleInputChange(currentReport, queryParams)',
         '_fetchReport(reportUrl, pdId)',
       ],
 
@@ -259,33 +249,60 @@
         return prefix + ' ' + this._withDefault(pd.reference_number);
       },
 
-      _computeIndicatorDataUrl: function (reportId) {
-        return reportId ? App.Endpoints.indicatorData(reportId) : '';
-      },
-
       _computeReportUrl: function (locationId, reportId) {
         return locationId ?
             App.Endpoints.programmeDocumentReport(locationId, reportId) :
             '';
       },
 
-      _handleInputChange: function (url, queryParams) {
-        var indicatorDataThunk;
-
-        if (!url || !Object.keys(queryParams).length) {
+      _handleInputChange: function (currentReport, queryParams) {
+        if (
+          !Object.keys(currentReport).length ||
+          !Object.keys(queryParams).length
+        ) {
           return;
         }
 
-        indicatorDataThunk = this.$.indicatorData.thunk();
+        this.debounce('fetch-indicator-data', function () {
+          var promises = currentReport.indicator_reports
+              .map(this._makeIndicatorReportPromise.bind(this, queryParams));
 
-        // Cancel the pending request, if any
-        this.$.indicatorData.abort();
+          var self = this;
 
-        this.dispatch(
-          App.Actions.IndicatorData.fetch(indicatorDataThunk, this.reportId)
-        )
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
+          self.dispatch(App.Actions.IndicatorData.loadingStart());
+
+          Promise.all(promises)
+              .then(function (results) {
+                return results.filter(Boolean); // Remove failed
+              })
+              .then(function (results) {
+                return results.reduce(function (acc, curr) {
+                  return acc.concat(curr.outputs); // Assumes output uniqueness
+                }, []);
+              })
+              .then(function (outputs) {
+                self.dispatch(App.Actions.IndicatorData.loadingStop());
+                self.dispatch(App.Actions.IndicatorData.set(self.reportId, outputs));
+              });
+        }, 100);
+      },
+
+      _makeIndicatorReportPromise: function (queryParams, indicatorReport) {
+        var ajax = document.createElement('etools-prp-ajax');
+        var reportId = indicatorReport.id;
+        var thunk;
+
+        ajax.params = queryParams;
+        ajax.url = App.Endpoints.indicatorData(reportId);
+
+        thunk = ajax.thunk();
+
+        return thunk()
+            .then(function (res) {
+              return res.data;
+            })
+            .catch(function () {
+              return null; // Propagate failed
             });
       },
 
@@ -304,6 +321,12 @@
 
       _showPdDetails: function () {
         this.$.pdDetails.open();
+      },
+
+      detached: function () {
+        if (this.isDebouncerActive('fetch-indicator-data')) {
+          this.cancelDebouncer('fetch-indicator-data');
+        }
       },
     });
   </script>
