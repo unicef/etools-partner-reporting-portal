@@ -82,6 +82,12 @@
         method="post">
     </etools-prp-ajax>
 
+    <etools-prp-ajax
+        id="objectivesByClusterID"
+        url="[[objectivesUrl]]"
+        params="[[objectivesParams]]">
+    </etools-prp-ajax>
+
     <paper-dialog
         id="dialog"
         with-backdrop
@@ -143,15 +149,27 @@
                 </paper-listbox>
             </paper-dropdown-menu>
 
-            <paper-input
-              class="item validate"
-              id="reference_number"
-              label="CO ref #"
-              value="{{data.reference_number}}"
-              type="string"
-              on-input="_validate"
-              required>
-            </paper-input>
+            <paper-dropdown-menu
+                class="item validate"
+                label="CO ref #"
+                id="objective"
+                on-value-changed="_validate"
+                disabled="[[isObjectivesDisabled]]"
+                always-float-label
+                required>
+                <paper-listbox
+                    selected="{{data.reference_number}}"
+                    attr-for-selected="value"
+                    slot="dropdown-content"
+                    class="dropdown-content">
+                  <template
+                      id="objectives"
+                      is="dom-repeat"
+                      items="[[objectives]]">
+                    <paper-item value="[[item.id]]">[[item.reference_number]]</paper-item>
+                  </template>
+                </paper-listbox>
+            </paper-dropdown-menu>
 
             <paper-dropdown-menu
                 class="item validate"
@@ -202,6 +220,10 @@
         App.Behaviors.UtilsBehavior,
       ],
 
+      observers: [
+        '_getObjectivesByClusterID(data.cluster)'
+      ],
+
       properties: {
         responsePlanID: {
           type: String,
@@ -232,19 +254,75 @@
           computed: '_computeUrl(responsePlanID)'
         },
 
+        data: {
+          type: Object,
+          value: {}
+        },
+
         clusters: {
           type: Array,
           value: []
         },
 
+        objectives: {
+          type: Array,
+          value: []
+        },
+
+        objectivesUrl: {
+          type: String,
+          value: '',
+          computed: '_computeObjectivesUrl(responsePlanID, data.cluster)'
+        },
+
+        isObjectivesDisabled: {
+          type: Boolean,
+          value: true,
+          computed: '_isObjectivesDisabled(data.cluster)'
+        },
+
+        objectivesParams: {
+          type: Object,
+          value: {cluster_id: ''}
+        },
+
         refresh: {
           type: Boolean,
           value: false
-        },
+        }
       },
 
       _computeUrl: function(responsePlanID) {
         return App.Endpoints.responseParametersClusterObjectives(responsePlanID);
+      },
+
+      _computeObjectivesUrl: function(responsePlanID) {
+        return App.Endpoints.responseParametersClusterObjectives(responsePlanID);
+      },
+
+      _isObjectivesDisabled: function(clusterID) {
+        return !clusterID;
+      },
+
+      _getObjectivesByClusterID: function(clusterID) {
+        var self = this;
+        if (clusterID) {
+          var thunk = this.$.objectivesByClusterID.thunk();
+
+          this.objectivesParams = {cluster_id: this.data.cluster};
+
+          thunk()
+            .then(function (res) {
+              self.set('objectives', res.data.results);
+            })
+            .catch(function (err) { // jshint ignore:line
+              self.updatePending = false;
+              // TODO: error handling
+            });
+        } else {
+          self.set('objectives', []);
+        }
+
       },
 
       close: function () {

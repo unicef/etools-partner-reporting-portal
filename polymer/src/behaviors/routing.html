@@ -8,9 +8,9 @@
 
     App.Behaviors[BEHAVIOR_NAME] = {
       properties: {
-        _$currentCountry: {
+        _$currentWorkspace: {
           type: String,
-          statePath: 'countries.current',
+          statePath: 'workspaces.current',
         },
 
         _$currentApp: {
@@ -25,21 +25,21 @@
 
         _baseUrl: {
           type: String,
-          computed: '_$computeBaseUrl(_$currentCountry, _$currentApp)',
+          computed: '_$computeBaseUrl(_$currentWorkspace, _$currentApp)',
         },
 
         _baseUrlCluster: {
           type: String,
-          computed: '_$computeBaseUrlCluster(_$currentCountry, _$currentApp, _$currentPlan)',
+          computed: '_$computeBaseUrlCluster(_$currentWorkspace, _$currentApp, _$currentPlan)',
         }
       },
 
-      _$computeBaseUrl: function (country, app) {
-        return '/app/' + country + '/' + app;
+      _$computeBaseUrl: function (workspace, app) {
+        return '/app/' + workspace + '/' + app;
       },
 
-      _$computeBaseUrlCluster: function(country, app, planId) {
-        return '/app/' + country + '/' + app + '/plan/' + planId;
+      _$computeBaseUrlCluster: function(workspace, app, planId) {
+        return '/app/' + workspace + '/' + app + '/plan/' + planId;
       },
 
       /**

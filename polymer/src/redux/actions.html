@@ -57,37 +57,36 @@
         };
       },
 
-      // Countries
-      fetchCountries: function (interventionsThunk) {
+      // Workspaces
+      fetchWorkspaces: function (interventionsThunk) {
         return function (dispatch) {
           return interventionsThunk()
               .then(function (res) {
-                var countries = (res.data || [])
-                    .map(function (intervention) {
+                var workspaces = (res.data || [])
+                    .map(function (workspace) {
                       return {
-                        id: intervention.id,
-                        code: intervention.country_code,
-                        name: intervention.country_name,
-                        location: intervention.location_id,
+                        id: workspace.id,
+                        code: workspace.workspace_code,
+                        name: workspace.title,
                       };
                     });
 
-                dispatch(App.Actions.setCountries(countries));
+                dispatch(App.Actions.setWorkspaces(workspaces));
               });
         };
       },
 
-      setCountry: function (newCountry) {
+      setWorkspace: function (newWorkspace) {
         return {
-          type: App.Constants.SET_COUNTRY,
-          country: newCountry,
+          type: App.Constants.SET_WORKSPACE,
+          workspace: newWorkspace,
         };
       },
 
-      setCountries: function (countries) {
+      setWorkspaces: function (workspaces) {
         return {
-          type: App.Constants.SET_COUNTRIES,
-          countries: countries,
+          type: App.Constants.SET_WORKSPACES,
+          workspaces: workspaces,
         };
       },
 

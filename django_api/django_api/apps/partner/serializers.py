@@ -60,6 +60,7 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
     locations = ShortLocationSerializer(many=True, read_only=True)
     partner = serializers.SerializerMethodField()
     part_response_plan = serializers.SerializerMethodField()
+    frequency = serializers.SerializerMethodField()
 
     class Meta:
         model = PartnerProject
@@ -77,10 +78,14 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
             'locations',
             'partner',
             'part_response_plan',
+            'frequency'
         )
 
     def get_id(self, obj):
         return str(obj.id)
+
+    def get_frequency(self, obj):
+        return obj.reportables.first().get_frequency_display()
 
     def get_partner(self, obj):
         return obj.partner and str(obj.partner_id)
@@ -269,7 +274,7 @@ class PartnerActivitySerializer(serializers.ModelSerializer):
 
     def get_cluster(self, obj):
         if obj.cluster_activity:
-            return obj.cluster_activity.cluster_objective.cluster.title
+            return obj.cluster_activity.cluster_objective.cluster.type
         else:
             return None
 

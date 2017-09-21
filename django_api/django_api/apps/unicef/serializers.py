@@ -2,7 +2,7 @@ from django.conf import settings
 from rest_framework import serializers
 
 from .models import ProgrammeDocument, Section, ProgressReport, Person
-
+from indicator.serializers import PDReportsSerializer
 
 class PersonSerializer(serializers.ModelSerializer):
     class Meta:
@@ -74,8 +74,9 @@ class ProgrammeDocumentDetailSerializer(serializers.ModelSerializer):
             'reference_number',
             'title',
             'unicef_office',
-            # 'unicef_focal_point',
-            # 'partner_focal_point',
+            'unicef_officers',
+            'unicef_focal_point',
+            'partner_focal_point',
             'start_date',
             'end_date',
             'population_focus',
@@ -88,9 +89,8 @@ class ProgrammeDocumentDetailSerializer(serializers.ModelSerializer):
 class ProgressReportSerializer(serializers.ModelSerializer):
     programme_document = ProgrammeDocumentSerializer()
     reporting_period = serializers.SerializerMethodField()
-    submission_date = serializers.SerializerMethodField()
-    due_date = serializers.SerializerMethodField()
     is_draft = serializers.SerializerMethodField()
+    indicator_reports = PDReportsSerializer(read_only=True, many=True)
 
     class Meta:
         model = ProgressReport
@@ -106,19 +106,14 @@ class ProgressReportSerializer(serializers.ModelSerializer):
             'submission_date',
             'due_date',
             'is_draft',
+            'indicator_reports'
         )
 
     def get_reporting_period(self, obj):
         return "%s - %s " % (
-            obj.latest_indicator_report.time_period_start.strftime(settings.PRINT_DATA_FORMAT),
-            obj.latest_indicator_report.time_period_end.strftime(settings.PRINT_DATA_FORMAT)
+            obj.start_date.strftime(settings.PRINT_DATA_FORMAT),
+            obj.end_date.strftime(settings.PRINT_DATA_FORMAT)
         )
-
-    def get_submission_date(self, obj):
-        return obj.latest_indicator_report.submission_date and obj.latest_indicator_report.submission_date.strftime(settings.PRINT_DATA_FORMAT)
-
-    def get_due_date(self, obj):
-        return obj.latest_indicator_report.due_date and obj.latest_indicator_report.due_date.strftime(settings.PRINT_DATA_FORMAT)
 
     def get_is_draft(self, obj):
         return obj.latest_indicator_report.is_draft
