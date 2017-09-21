@@ -9,15 +9,14 @@ steps:
         working_directory: ${{main_clone}}/redis
         tag: ${{CF_BRANCH}}
 
-    push_to_hub:
-        type: push
-        title: Pushing redis image to docker hub
-        candidate: ${{build_redis}}
-        registry: tivix-dockerhub
-        tags:
-            - ${{CF_BRANCH}}
-            - latest
-        when:
-            branch:
-                only:
-                    - develop
+    # push_to_hub:
+    #     type: push
+    #     title: Pushing redis image to docker hub
+    #     candidate: ${{build_redis}}
+    #     tags:
+    #         - ${{CF_BRANCH}}
+    #         - latest
+    #     when:
+    #         branch:
+    #             only:
+    #                 - develop
