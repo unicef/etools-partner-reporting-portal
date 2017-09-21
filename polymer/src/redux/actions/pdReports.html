@@ -27,6 +27,19 @@
         };
       },
 
+      update: function (updateThunk, pdId, reportId) {
+        return function (dispatch) {
+          return updateThunk()
+              .then(function (res) {
+                dispatch(App.Actions.PDReports.updateSingle(
+                  pdId,
+                  reportId,
+                  res.data.progress_report
+                ));
+              });
+        };
+      },
+
       set: function (pdId, data) {
         return {
           type: App.Constants.SET_PD_REPORTS,

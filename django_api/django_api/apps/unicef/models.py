@@ -4,6 +4,7 @@ from datetime import date
 import logging
 
 from django.db import models
+from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.postgres.fields import ArrayField
 from django.utils.functional import cached_property
@@ -70,7 +71,7 @@ class ProgrammeDocument(TimeStampedModel):
     unicef_office = models.CharField(max_length=255,
                                      verbose_name='UNICEF Office(s)')
 
-    unicef_officers =  models.ManyToManyField(Person,
+    unicef_officers = models.ManyToManyField(Person,
                                               verbose_name='UNICEF Officer(s)',
                                               related_name="officer_programme_documents")
     unicef_focal_point = models.ManyToManyField(Person,
@@ -343,6 +344,15 @@ class ProgressReport(TimeStampedModel):
     @cached_property
     def latest_indicator_report(self):
         return self.indicator_reports.all().order_by('-created').first()
+
+    def get_reporting_period(self):
+        return "%s - %s " % (
+            self.start_date.strftime(settings.PRINT_DATA_FORMAT),
+            self.end_date.strftime(settings.PRINT_DATA_FORMAT)
+        )
+
+    def get_submission_date(self):
+        return self.submission_date.strftime(settings.PRINT_DATA_FORMAT)
 
 
 class CountryProgrammeOutput(TimeStampedModel):

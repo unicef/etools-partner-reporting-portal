@@ -6,17 +6,17 @@
 
     App.Selectors = App.Selectors || {};
 
-    App.Selectors.Country = {
+    App.Selectors.Workspace = {
       id: Reselect.createSelector(
         function (state) {
-          return state.countries.all;
+          return state.workspaces.all;
         },
         function (state) {
-          return state.countries.current;
+          return state.workspaces.current;
         },
-        function (countries, code) {
-          return countries.length ? countries.filter(function (country) {
-            return country.code === code;
+        function (workspaces, code) {
+          return workspaces.length ? workspaces.filter(function (workspace) {
+            return workspace.code === code;
           })[0].id : void 0;
         }
       ),

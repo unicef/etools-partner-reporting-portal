@@ -75,6 +75,11 @@
           statePath: 'programmeDocuments.current',
         },
 
+        locationId: {
+          type: String,
+          statePath: 'location.id',
+        },
+
         reportId: {
           type: String,
           statePath: 'programmeDocumentReports.current.id',
@@ -82,12 +87,12 @@
 
         submitUrl: {
           type: String,
-          computed: '_computeSubmitUrl(reportId)',
+          computed: '_computeSubmitUrl(locationId, reportId)',
         },
       },
 
-      _computeSubmitUrl: function (reportId) {
-        return App.Endpoints.indicatorData(reportId);
+      _computeSubmitUrl: function (locationId, reportId) {
+        return App.Endpoints.programmeDocumentReportSubmit(locationId, reportId);
       },
 
       _submit: function () {

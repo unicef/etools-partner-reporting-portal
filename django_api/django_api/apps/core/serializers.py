@@ -1,15 +1,22 @@
 from rest_framework import serializers
 
-from .models import Workspace, Location, ResponsePlan
+from .models import Workspace, Location, ResponsePlan, Country
 
 
-class SimpleWorkspaceSerializer(serializers.ModelSerializer):
+class CountrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Country
+        fields = ('name', 'country_short_code', 'long_name')
+
+
+class WorkspaceSerializer(serializers.ModelSerializer):
 
     location_id = serializers.SerializerMethodField()
+    countries = CountrySerializer(many=True)
 
     class Meta:
         model = Workspace
-        fields = ('id', 'title', 'workspace_code', 'location_id')
+        fields = ('id', 'title', 'workspace_code', 'location_id', 'countries')
 
     def get_location_id(self, obj):
         # for example: Ukrain, Luhansk, Sorokyne .. we want to have only Ukrain (no parent - always one)
@@ -17,7 +24,7 @@ class SimpleWorkspaceSerializer(serializers.ModelSerializer):
         return loc and str(loc.id)
 
 
-class SimpleLocationSerializer(serializers.ModelSerializer):
+class LocationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Location
