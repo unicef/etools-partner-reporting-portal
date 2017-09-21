@@ -44,7 +44,7 @@
             var change = {};
 
             change[action.pdId] = (state[action.pdId] || []).map(function (report) {
-              return report.id === action.reportId ?
+              return Number(report.id) === Number(action.reportId) ?
                   Object.assign({}, report, action.data) : report;
             });
 
