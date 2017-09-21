@@ -13,6 +13,7 @@ steps:
         type: push
         title: Pushing redis image to docker hub
         candidate: ${{build_redis}}
+        registry: tivix-dockerhub
         tags:
             - ${{CF_BRANCH}}
             - latest
