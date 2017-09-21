@@ -202,8 +202,9 @@
           this.$.update.abort();
 
           this.dispatch(
-            App.Actions.IndicatorData.updateInfo(
+            App.Actions.PDReports.update(
               updateThunk,
+              this.pdId,
               this.reportId
             )
           )
