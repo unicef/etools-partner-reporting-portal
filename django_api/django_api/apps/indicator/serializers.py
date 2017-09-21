@@ -787,6 +787,7 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
     cluster = serializers.SerializerMethodField()
     project = serializers.SerializerMethodField()
     partner = serializers.SerializerMethodField()
+    partner_activity = serializers.SerializerMethodField()
     is_draft = serializers.SerializerMethodField()
     can_submit = serializers.SerializerMethodField()
 
@@ -809,6 +810,7 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
             'cluster',
             'project',
             'partner',
+            'partner_activity',
             'is_draft',
             'can_submit',
         )
@@ -823,20 +825,60 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
         )
 
     def get_cluster(self, obj):
-        if isinstance(obj.reportable.content_object, (ClusterObjective, ClusterActivity)):
-            return obj.reportable.content_object.cluster.type
+        if isinstance(obj.reportable.content_object, (ClusterObjective, )):
+            return obj.reportable.content_object.cluster.title
+        elif isinstance(obj.reportable.content_object, (ClusterActivity, )):
+            return obj.reportable.content_object.cluster_objective.cluster.title
         else:
-            return ''
+            ''
 
     def get_project(self, obj):
-        if isinstance(obj.reportable.content_object, (PartnerProject, PartnerActivity)):
+        if isinstance(obj.reportable.content_object, (PartnerProject, )):
             return obj.reportable.content_object.title
+        elif isinstance(obj.reportable.content_object, (PartnerActivity, )):
+            return obj.reportable.content_object.partner.title
+        elif isinstance(obj.reportable.content_object, (ClusterObjective, )):
+            if obj.reportable.content_object.partner_activities.first():
+                return obj.reportable.content_object.partner_activities.first().partner.title
+            elif obj.reportable.content_object.cluster:
+                return obj.reportable.content_object.cluster.partner_projects.first().title
+            else:
+                return ''
+        elif isinstance(obj.reportable.content_object, (ClusterActivity, )):
+            if obj.reportable.content_object.partner_activities.first():
+                return obj.reportable.content_object.partner_activities.first().partner.title
+            elif obj.reportable.content_object.cluster_objective.cluster:
+                return obj.reportable.content_object.cluster_objective.cluster.partner_projects.first().title
+            else:
+                return ''
         else:
             return ''
 
     def get_partner(self, obj):
         if isinstance(obj.reportable.content_object, (PartnerProject, PartnerActivity)):
             return obj.reportable.content_object.partner.title
+        else:
+            return ''
+
+    def get_partner_activity(self, obj):
+        if isinstance(obj.reportable.content_object, (PartnerProject, )):
+            return obj.reportable.content_object.partner_activities.first().title
+        elif isinstance(obj.reportable.content_object, (PartnerActivity, )):
+            return obj.reportable.content_object.title
+        elif isinstance(obj.reportable.content_object, (ClusterObjective, )):
+            if obj.reportable.content_object.partner_activities.first():
+                return obj.reportable.content_object.partner_activities.first().title
+            elif obj.reportable.content_object.cluster:
+                return obj.reportable.content_object.cluster.partner_projects.first().partner_activities.first().title
+            else:
+                return ''
+        elif isinstance(obj.reportable.content_object, (ClusterActivity, )):
+            if obj.reportable.content_object.partner_activities.first():
+                return obj.reportable.content_object.partner_activities.first().title
+            elif obj.reportable.content_object.cluster_objective.cluster:
+                return obj.reportable.content_object.cluster_objective.cluster.partner_projects.first().partner_activities.first().title
+            else:
+                return ''
         else:
             return ''
 
