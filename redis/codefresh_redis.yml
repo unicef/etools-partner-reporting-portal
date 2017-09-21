@@ -2,7 +2,7 @@ version: '1.0'
 
 steps:
 
-    build_db:
+    build_redis:
         type: build
         image_name: unicef/etools-prp-redis
         dockerfile: Dockerfile
@@ -12,7 +12,8 @@ steps:
     push_to_hub:
         type: push
         title: Pushing redis image to docker hub
-        candidate: ${{build_db}}
+        candidate: ${{build_redis}}
+        registry: tivix-dockerhub
         tags:
             - ${{CF_BRANCH}}
             - latest
