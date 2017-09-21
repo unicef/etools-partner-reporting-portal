@@ -347,12 +347,12 @@ class ProgressReport(TimeStampedModel):
 
     def get_reporting_period(self):
         return "%s - %s " % (
-            self.latest_indicator_report.time_period_start.strftime(settings.PRINT_DATA_FORMAT),
-            self.latest_indicator_report.time_period_end.strftime(settings.PRINT_DATA_FORMAT)
+            self.start_date.strftime(settings.PRINT_DATA_FORMAT),
+            self.end_date.strftime(settings.PRINT_DATA_FORMAT)
         )
 
     def get_submission_date(self):
-        return self.latest_indicator_report.submission_date and self.latest_indicator_report.submission_date.strftime(settings.PRINT_DATA_FORMAT)
+        return self.submission_date.strftime(settings.PRINT_DATA_FORMAT)
 
 
 class CountryProgrammeOutput(TimeStampedModel):

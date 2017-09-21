@@ -1,15 +1,26 @@
 import logging
+
+from datetime import datetime
+
 from django.http import Http404
 from django.db.models import Q
 from django.http import HttpResponse
 from django.conf import settings
+from django.db import transaction
 
 from rest_framework.generics import RetrieveAPIView, ListAPIView
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status as statuses
 
 import django_filters.rest_framework
 from easy_pdf.rendering import render_to_pdf
+
+from core.common import (
+    PROGRESS_REPORT_STATUS,
+    INDICATOR_REPORT_STATUS,
+    OVERALL_STATUS,
+)
 
 from core.paginations import SmallPagination
 from core.permissions import IsAuthenticated
@@ -274,4 +285,60 @@ class ProgressReportIndicatorsAPIView(ListAPIView):
             return self.get_paginated_response(serializer.data)
 
         serializer = self.get_serializer(filtered.qs, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=statuses.HTTP_200_OK)
+
+
+class ProgressReportSubmitAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get_object(self, pk):
+        try:
+            return ProgressReport.objects.get(programme_document__partner=self.request.user.partner, programme_document__workspace=self.workspace_id, pk=pk)
+        except ProgressReport.DoesNotExist as exp:
+            logger.exception({
+                "endpoint": "ProgressReportDetailsAPIView",
+                "request.data": self.request.data,
+                "pk": pk,
+                "exception": exp,
+            })
+            raise Http404
+
+    @transaction.atomic
+    def post(self, request, workspace_id, pk, *args, **kwargs):
+        self.workspace_id = workspace_id
+        progress_report = self.get_object(pk)
+
+        for ir in progress_report.indicator_reports.all():
+            # Check if all indicator data is fulfilled for IR status different then Met or No Progress
+            if ir.overall_status not in (OVERALL_STATUS.met, OVERALL_STATUS.no_progress):
+                for data in ir.indicator_location_data.all():
+                    for key, vals in data.disaggregation.iteritems():
+                        if ir.is_percentage and (vals.get('c', None) in [None, '']):
+                            _errors = [{
+                                "message": "You have not completed all required indicators for this progress report. Unless your Output status is Met or has No Progress, all indicator data needs to be completed."}]
+                            return Response({"errors": _errors},
+                                            status=statuses.HTTP_400_BAD_REQUEST)
+                        elif ir.is_number and (vals.get('v', None) in [None, '']):
+                            _errors = [{
+                                "message": "You have not completed all required indicators for this progress report. Unless your Output status is Met or has No Progress, all indicator data needs to be completed."}]
+                            return Response({"errors": _errors},
+                                            status=statuses.HTTP_400_BAD_REQUEST)
+
+            # Check if indicator was already submitted or SENT BACK
+            if ir.submission_date is None or ir.report_status == INDICATOR_REPORT_STATUS.sent_back:
+                ir.submission_date = date.today()
+                ir.report_status = INDICATOR_REPORT_STATUS.submitted
+                ir.save()
+
+        if progress_report.submission_date is None or progress_report.status == PROGRESS_REPORT_STATUS.sent_back:
+            progress_report.status = PROGRESS_REPORT_STATUS.submitted
+            progress_report.submission_date = datetime.now().date()
+            progress_report.submitted_by = self.request.user
+            progress_report.save()
+            serializer = ProgressReportSerializer(instance=progress_report)
+            return Response(serializer.data, status=statuses.HTTP_200_OK)
+        else:
+            _errors = [{
+                           "message": "Progress report was already submitted. Your IMO will need to send it back for you to edit your submission."}]
+            return Response({"errors": _errors},
+                            status=statuses.HTTP_400_BAD_REQUEST)
