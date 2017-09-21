@@ -89,8 +89,6 @@ class ProgrammeDocumentDetailSerializer(serializers.ModelSerializer):
 class ProgressReportSerializer(serializers.ModelSerializer):
     programme_document = ProgrammeDocumentSerializer()
     reporting_period = serializers.SerializerMethodField()
-    submission_date = serializers.SerializerMethodField()
-    due_date = serializers.SerializerMethodField()
     is_draft = serializers.SerializerMethodField()
     indicator_reports = PDReportsSerializer(read_only=True, many=True)
 
@@ -113,15 +111,9 @@ class ProgressReportSerializer(serializers.ModelSerializer):
 
     def get_reporting_period(self, obj):
         return "%s - %s " % (
-            obj.latest_indicator_report.time_period_start.strftime(settings.PRINT_DATA_FORMAT),
-            obj.latest_indicator_report.time_period_end.strftime(settings.PRINT_DATA_FORMAT)
+            obj.start_date.strftime(settings.PRINT_DATA_FORMAT),
+            obj.end_date.strftime(settings.PRINT_DATA_FORMAT)
         )
-
-    def get_submission_date(self, obj):
-        return obj.latest_indicator_report.submission_date and obj.latest_indicator_report.submission_date.strftime(settings.PRINT_DATA_FORMAT)
-
-    def get_due_date(self, obj):
-        return obj.latest_indicator_report.due_date and obj.latest_indicator_report.due_date.strftime(settings.PRINT_DATA_FORMAT)
 
     def get_is_draft(self, obj):
         return obj.latest_indicator_report.is_draft

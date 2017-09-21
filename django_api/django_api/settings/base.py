@@ -69,6 +69,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'django_filters',
+    'easy_pdf',
     'django_cron',
 
     'account',
