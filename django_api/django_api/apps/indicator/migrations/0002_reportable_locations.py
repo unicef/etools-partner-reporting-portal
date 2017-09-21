@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0003_remove_location_reportable'),
+        ('core', '0004_remove_location_reportable'),
         ('indicator', '0001_initial'),
     ]
 
