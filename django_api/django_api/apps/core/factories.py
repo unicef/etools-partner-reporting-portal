@@ -202,7 +202,6 @@ class UserFactory(factory.django.DjangoModelFactory):
 
 class CountryFactory(factory.django.DjangoModelFactory):
     name = fuzzy.FuzzyChoice(COUNTRY_NAMES_LIST)
-
     class Meta:
         model = Country
 
@@ -308,6 +307,15 @@ class ReportableFactory(factory.django.DjangoModelFactory):
     start_date = beginning_of_this_year
     end_date = today + datetime.timedelta(days=70)
 
+    @factory.post_generation
+    def locations(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            for location in extracted:
+                self.locations.add(location)
+
     class Meta:
         exclude = ['content_object']
         abstract = True
@@ -319,8 +327,6 @@ class QuantityReportableToLowerLevelOutputFactory(ReportableFactory):
     baseline = '0'
 
     indicator_report = factory.RelatedFactory('core.factories.QuantityIndicatorReportFactory', 'reportable')
-
-    location = factory.RelatedFactory('core.factories.LocationFactory', 'reportable', parent=None)
 
     blueprint = factory.SubFactory(QuantityTypeIndicatorBlueprintFactory)
 
@@ -338,8 +344,6 @@ class RatioReportableToLowerLevelOutputFactory(ReportableFactory):
 
     indicator_report = factory.RelatedFactory('core.factories.RatioIndicatorReportFactory', 'reportable')
 
-    location = factory.RelatedFactory('core.factories.LocationFactory', 'reportable', parent=None)
-
     blueprint = factory.SubFactory(RatioTypeIndicatorBlueprintFactory)
 
     total = dict(
@@ -356,8 +360,6 @@ class RatioReportableToClusterObjectiveFactory(ReportableFactory):
 
     indicator_report = factory.RelatedFactory('core.factories.RatioIndicatorReportFactory', 'reportable')
 
-    location = factory.RelatedFactory('core.factories.LocationFactory', 'reportable', parent=None)
-
     blueprint = factory.SubFactory(RatioTypeIndicatorBlueprintFactory)
 
     total = dict(
@@ -370,8 +372,6 @@ class QuantityReportableToPartnerProjectFactory(ReportableFactory):
     baseline = '0'
 
     indicator_report = factory.RelatedFactory('core.factories.QuantityIndicatorReportFactory', 'reportable')
-
-    location = factory.RelatedFactory('core.factories.LocationFactory', 'reportable', parent=None)
 
     blueprint = factory.SubFactory(QuantityTypeIndicatorBlueprintFactory)
 
@@ -390,8 +390,6 @@ class QuantityReportableToClusterObjectiveFactory(ReportableFactory):
 
     indicator_report = factory.RelatedFactory('core.factories.QuantityIndicatorReportFactory', 'reportable')
 
-    location = factory.RelatedFactory('core.factories.LocationFactory', 'reportable', parent=None)
-
     blueprint = factory.SubFactory(QuantityTypeIndicatorBlueprintFactory)
 
     total = dict(
@@ -408,8 +406,6 @@ class QuantityReportableToClusterActivityFactory(ReportableFactory):
 
     indicator_report = factory.RelatedFactory('core.factories.QuantityIndicatorReportFactory', 'reportable')
 
-    location = factory.RelatedFactory('core.factories.LocationFactory', 'reportable', parent=None)
-
     blueprint = factory.SubFactory(QuantityTypeIndicatorBlueprintFactory)
 
     total = dict(
@@ -425,8 +421,6 @@ class QuantityReportableToPartnerActivityFactory(ReportableFactory):
     baseline = '0'
 
     indicator_report = factory.RelatedFactory('core.factories.QuantityIndicatorReportFactory', 'reportable')
-
-    location = factory.RelatedFactory('core.factories.LocationFactory', 'reportable', parent=None)
 
     blueprint = factory.SubFactory(QuantityTypeIndicatorBlueprintFactory)
 
