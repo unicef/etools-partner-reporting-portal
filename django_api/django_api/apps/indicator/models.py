@@ -72,11 +72,15 @@ class IndicatorBlueprint(TimeStampedModel):
     subdomain = models.CharField(max_length=255, null=True, blank=True)
     disaggregatable = models.BooleanField(default=False)
 
-    calculation_formula_across_periods = models.CharField(max_length=10, choices=CALC_CHOICES, default=SUM)
+    calculation_formula_across_periods = models.CharField(
+        max_length=10, choices=CALC_CHOICES, default=SUM)
 
-    calculation_formula_across_locations = models.CharField(max_length=10, choices=CALC_CHOICES, default=SUM)
+    calculation_formula_across_locations = models.CharField(
+        max_length=10, choices=CALC_CHOICES, default=SUM)
 
-    display_type = models.CharField(max_length=10, choices=DISPLAY_TYPE_CHOICES, default=NUMBER)
+    display_type = models.CharField(max_length=10,
+                                    choices=DISPLAY_TYPE_CHOICES,
+                                    default=NUMBER)
 
     # TODO: add:
     # siblings (similar inidcators to this indicator)
@@ -90,6 +94,9 @@ class IndicatorBlueprint(TimeStampedModel):
         if self.code == '':
             self.code = None
         super(IndicatorBlueprint, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.title
 
     class Meta:
         ordering = ['-id']
@@ -138,7 +145,7 @@ class Reportable(TimeStampedModel):
         verbose_name='Start Date',
     )
     end_date = models.DateField(
-        verbose_name='Due Date',
+        verbose_name='End Date',
     )
 
     cs_dates = ArrayField(models.DateField(), default=list)
@@ -156,7 +163,7 @@ class Reportable(TimeStampedModel):
         from unicef.models import LowerLevelOutput
 
         if isinstance(self.content_object, LowerLevelOutput):
-            return self.content_object.indicator.programme_document.reference_number
+            return self.content_object.cp_output.programme_document.reference_number
         else:
             return ''
 
@@ -191,7 +198,7 @@ class Reportable(TimeStampedModel):
         }
 
     def __str__(self):
-        return "Reportable <pk:%s>" % self.id
+        return "Reportable <pk:%s> on %s" % (self.id, self.content_object)
 
 
 class IndicatorReport(TimeStampedModel):

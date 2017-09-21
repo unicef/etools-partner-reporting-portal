@@ -274,7 +274,7 @@ class PartnerActivitySerializer(serializers.ModelSerializer):
 
     def get_cluster(self, obj):
         if obj.cluster_activity:
-            return obj.cluster_activity.cluster_objective.cluster.title
+            return obj.cluster_activity.cluster_objective.cluster.type
         else:
             return None
 

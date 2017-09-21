@@ -84,7 +84,7 @@
         <etools-data-table-row no-collapse>
           <div slot="row-data">
             <div class="table-cell table-cell--text">
-              <report-status status="[[report.report_status]]"></report-status>
+              <report-status status="[[report.status]]"></report-status>
             </div>
             <div class="table-cell table-cell--text">
               [[_withDefault(report.due_date, '-')]]
@@ -164,8 +164,8 @@
 
         if (report.is_draft) {
           suffix = 'draft';
-        } else if (report.report_status === 'Sub' ||
-                   report.report_status === 'Rej') {
+        } else if (report.status === 'Sub' ||
+                   report.status === 'Rej') {
           suffix = 'view';
         } else {
           suffix = 'edit';
@@ -180,8 +180,8 @@
       _getLinkText: function (report) {
         if (report.is_draft) {
           return 'Go To Draft';
-        } else if (report.report_status === 'Sub' ||
-                   report.report_status === 'Rej') {
+        } else if (report.status === 'Sub' ||
+                   report.status === 'Rej') {
           return 'View Report';
         } else {
           return 'Enter Data';
