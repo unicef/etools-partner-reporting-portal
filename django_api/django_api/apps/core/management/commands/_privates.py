@@ -167,7 +167,7 @@ def generate_fake_data(workspace_quantity=10):
                 end = beginning_of_this_year + datetime.timedelta(days=30)
             )
 
-        gateway = GatewayTypeFactory(workspace=workspace)
+        gateway = GatewayTypeFactory(country=country)
         CartoDBTableFactory(location_type=gateway, country=country)
 
         print "{} ResponsePlan objects created for {}".format(3, workspace)
@@ -187,7 +187,8 @@ def generate_fake_data(workspace_quantity=10):
 
         for idx in xrange(2, 0, -1):
             co = ClusterObjectiveFactory(
-                title="{} - {} Cluster Objective".format(cluster.response_plan.title, cluster.type),
+                title="{} - {} - {} CO".format(
+                    idx, cluster.response_plan.title, cluster.type),
                 cluster=cluster,
             )
 
@@ -204,7 +205,8 @@ def generate_fake_data(workspace_quantity=10):
             last_name="Partner")
 
         partner = PartnerFactory(
-            title="{} - {} Cluster Partner".format(cluster.response_plan.title, cluster.type),
+            title="{} - {} Cluster Partner".format(
+                cluster.response_plan.title, cluster.type),
             partner_activity=None,
             partner_project=None,
             user=user,

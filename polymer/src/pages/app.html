@@ -4,7 +4,7 @@
 <link rel="import" href="../../bower_components/iron-localstorage/iron-localstorage.html">
 <link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 
-<link rel="import" href="../elements/etools-prp-countries.html">
+<link rel="import" href="../elements/etools-prp-workspaces.html">
 <link rel="import" href="../elements/etools-prp-ajax.html">
 <link rel="import" href="../behaviors/utils.html">
 <link rel="import" href="../redux/actions.html">
@@ -23,11 +23,11 @@
         name="defaultApp"
         value="{{_defaultApp}}"></iron-localstorage>
 
-    <etools-prp-countries
-        id="countries"
-        all="{{countries}}"
-        current="{{currentCountry}}">
-    </etools-prp-countries>
+    <etools-prp-workspaces
+        id="workspaces"
+        all="{{workspaces}}"
+        current="{{currentWorkspace}}">
+    </etools-prp-workspaces>
 
     <etools-prp-ajax
         id="interventions"
@@ -88,9 +88,9 @@
           value: App.Endpoints.interventions(),
         },
 
-        _countryCode: {
+        _workspaceCode: {
           type: String,
-          statePath: 'countries.current',
+          statePath: 'workspaces.current',
         },
 
         _app: {
@@ -100,17 +100,17 @@
       },
 
       observers: [
-        '_routeCountryChanged(routeData.workspace_code)',
+        '_routeWorkspaceChanged(routeData.workspace_code)',
         '_routeAppChanged(routeData.app)',
-        '_handleCountryChange(currentCountry, countries)',
+        '_handleWorkspaceChange(currentWorkspace, workspaces)',
       ],
 
       listeners: {
         'notify': '_notify',
       },
 
-      _redirectToCountry: function (country) {
-        var code = country.code;
+      _redirectToWorkspace: function (workspace) {
+        var code = workspace.code;
 
         this.set('route.path', '/' + code + '/');
         this.set('routeData.workspace_code', code);
@@ -120,38 +120,38 @@
         this.set('route.path', '/' + this.routeData.workspace_code + '/' + app);
       },
 
-      _handleCountriesAsync: function (e, change) {
-        var country;
+      _handleWorkspacesAsync: function (e, change) {
+        var workspace;
 
         try {
           if (change.value.length) {
-            this.unlisten(this.$.countries, 'all-changed', '_handleCountriesAsync');
+            this.unlisten(this.$.workspaces, 'all-changed', '_handleWorkspacesAsync');
 
-            country = change.value[0];
+            workspace = change.value[0];
 
-            this._redirectToCountry(country);
+            this._redirectToWorkspace(workspace);
           }
         } catch (err) {}
       },
 
-      _routeCountryChanged: function (workspace_code) {
-        var country;
+      _routeWorkspaceChanged: function (workspace_code) {
+        var workspace;
 
         if (!workspace_code) {
-          this.dispatch(App.Actions.reset()); // Switch country === wipe all the data
+          this.dispatch(App.Actions.reset()); // Switch workspace === wipe all the data
 
-          if (this.countries.length) {
+          if (this.workspaces.length) {
 
             // Default to first
-            country = this.countries[0];
+            workspace = this.workspaces[0];
 
-            this._redirectToCountry(country);
+            this._redirectToWorkspace(workspace);
           } else {
-            // Wait until countries are available, then pick one & redirect
-            this.listen(this.$.countries, 'all-changed', '_handleCountriesAsync');
+            // Wait until workspaces are available, then pick one & redirect
+            this.listen(this.$.workspaces, 'all-changed', '_handleWorkspacesAsync');
           }
-        } else if (!this._countryCode) {
-          this.dispatch(App.Actions.setCountry(workspace_code));
+        } else if (!this._workspaceCode) {
+          this.dispatch(App.Actions.setWorkspace(workspace_code));
         }
       },
 
@@ -189,18 +189,18 @@
         window.location.href = '/not-found';
       },
 
-      _handleCountryChange: function (currentCountry, countries) {
-        var currentCountryData;
+      _handleWorkspaceChange: function (currentWorkspace, workspaces) {
+        var currentWorkspaceData;
 
-        if (!currentCountry || !countries.length) {
+        if (!currentWorkspace || !workspaces.length) {
           return;
         }
 
-        currentCountryData = countries.filter(function (country) {
-          return country.code === currentCountry;
+        currentWorkspaceData = workspaces.filter(function (workspace) {
+          return workspace.code === currentWorkspace;
         })[0];
 
-        this.dispatch(App.Actions.Location.set(currentCountryData.location));
+        this.dispatch(App.Actions.Location.set(currentWorkspaceData.id));
       },
 
       _notify: function (e, options) {
@@ -214,7 +214,7 @@
       attached: function () {
         var interventionsThunk = this.$.interventions.thunk();
 
-        this.dispatch(App.Actions.fetchCountries(interventionsThunk))
+        this.dispatch(App.Actions.fetchWorkspaces(interventionsThunk))
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
             });

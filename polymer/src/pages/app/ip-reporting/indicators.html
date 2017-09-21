@@ -70,9 +70,14 @@
           statePath: 'indicators.count'
         },
 
+        locationId: {
+          type: String,
+          statePath: 'location.id',
+        },
+
         indicatorsUrl: {
           type: String,
-          value: App.Endpoints.indicators('llo'),
+          computed: '_computeIndicatorsUrl(locationId)',
         },
 
         query: String,
@@ -83,6 +88,10 @@
       observers: [
         '_indicatorsAjax(indicatorsUrl, queryParams)',
       ],
+
+      _computeIndicatorsUrl: function (locationId) {
+        return App.Endpoints.allIndicators(locationId);
+      },
 
       _indicatorsAjax: function (_, queryParams) {
         if (!Object.keys(queryParams).length) {

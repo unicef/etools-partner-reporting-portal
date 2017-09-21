@@ -489,6 +489,7 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     workspace = factory.SubFactory('core.factories.WorkspaceFactory')
 
     cp_output = factory.RelatedFactory('core.factories.CountryProgrammeOutputFactory', 'programme_document')
+    workspace = factory.Iterator(Workspace.objects.all())
 
     cs_dates = [cs_date_1, cs_date_2, cs_date_3]
 

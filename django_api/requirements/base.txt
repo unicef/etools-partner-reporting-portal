@@ -1,15 +1,18 @@
 # Django packages
-Django==1.11.2
+Django==1.11.5
 
 # REST framework
-djangorestframework==3.6.3
+djangorestframework==3.6.4
 django-filter==1.0.4
 
 # Other Python packages
-psycopg2==2.7.1
+psycopg2==2.7.3.1
 django-model-utils==2.6.1  # latest 3.0.0 but need to check changes
 django-mptt==0.8.6
 python-json-logger==0.1.7
+django-suit==0.2.21
+django-easy-pdf==0.1.1
+xhtml2pdf==0.1b3
 
 # Testing
 astroid==1.5.2
@@ -20,6 +23,16 @@ factory_boy==2.8.1
 # WSGI
 uwsgi==2.0.15
 
+openpyxl==2.4.8
+
 # GIS
-carto==1.0.1
+carto==1.1.0
 git+https://github.com/jamescw/django-paintstore.git
+django-leaflet==0.19.0
+
+# Celery
+django-celery==3.2.1
+redis==2.10.6
+
+# Cron
+django-cron==0.5.0

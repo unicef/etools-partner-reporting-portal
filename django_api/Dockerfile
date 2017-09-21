@@ -63,6 +63,7 @@ ADD . /code/
 VOLUME /code
 
 RUN mkdir -p /data/django_api/logs
+RUN mkdir -p /data/uploads
 RUN touch /data/django_api/logs/django.log
 
 VOLUME /data
