@@ -456,5 +456,5 @@ class IndicatorDataLocationAPIView(ListAPIView):
         ir_id = self.kwargs.get('ir_id', None)
         if ir_id:
             ir = get_object_or_404(IndicatorReport, id=ir_id)
-            return Location.objects.filter(reportable=ir.reportable_id)
+            return Location.objects.filter(reportables=ir.reportable_id)
         raise Http404
