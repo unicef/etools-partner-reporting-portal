@@ -14,13 +14,32 @@ BOOLEAN_CHOICES = (('0', 'False'), ('1', 'True'),)
 
 class  ProgrammeDocumentIndicatorFilter(django_filters.FilterSet):
 
-
+    pd_statuses = ChoiceFilter(choices=PD_STATUS, method='get_status')
+    pds = CharFilter(method='get_programme_document')
+    location = CharFilter(method='get_locations')
+    blueprint__title = CharFilter(method='get_blueprint_title')
+    incomplete = CharFilter(method='get_incomplete')
 
     class Meta:
         model = Reportable
         fields = (
-            'id', 'lower_level_outputs__cp_output__programme_document__status', 'locations', 'blueprint__title'
+            'id', 'blueprint__title'
         )
+
+    def get_status(self, queryset, name, value):
+        return queryset.filter(lower_level_outputs__cp_output__programme_document__status=value)
+
+    def get_programme_document(self, queryset, name, value):
+        return queryset.filter(lower_level_outputs__cp_output__programme_document_id=value)
+
+    def get_locations(self, queryset, name, value):
+        return queryset.filter(locations=value)
+
+    def get_blueprint_title(self, queryset, name, value):
+        return queryset.filter(blueprint__title__contains=value)
+
+    def get_incomplete(self, queryset, name, value):
+        return queryset.filter(lower_level_outputs__cp_output__programme_document__progress_reports__indicator_reports__submission_date__isnull=True) if value == "1" else queryset
 
 
 
