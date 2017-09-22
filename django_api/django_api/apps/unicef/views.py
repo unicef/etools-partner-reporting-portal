@@ -110,7 +110,7 @@ class ProgrammeDocumentLocationsAPIView(ListAPIView):
 
     def list(self, request, workspace_id, *args, **kwargs):
         pd = ProgrammeDocument.objects.filter(partner=self.request.user.partner, workspace=workspace_id)
-        queryset = self.get_queryset().filter(reportable__indicator_reports__progress_report__programme_document__in=pd)
+        queryset = self.get_queryset().filter(reportables__indicator_reports__progress_report__programme_document__in=pd)
         filtered = ProgressReportFilter(request.GET, queryset=queryset)
 
         page = self.paginate_queryset(filtered.qs)

@@ -36,11 +36,11 @@ def generate_0_num_disagg_data(reportable, indicator_type="quantity"):
     if reportable.locations.count() == 0:
         table = CartoDBTable.objects.first()
 
-        LocationFactory(
-            reportable=reportable,
+        l = LocationFactory(
             gateway=table.location_type,
             carto_db_table=table,
         )
+        reportable.locations.add(l)
 
     location = reportable.locations.first()
     disagg_idx = 0
