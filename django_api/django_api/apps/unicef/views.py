@@ -29,7 +29,7 @@ from core.serializers import ShortLocationSerializer
 
 from indicator.models import Reportable, IndicatorReport
 from indicator.serializers import IndicatorListSerializer, PDReportsSerializer
-from indicator.filters import IndicatorFilter, PDReportsFilter
+from indicator.filters import PDReportsFilter
 
 
 
@@ -40,7 +40,7 @@ from .serializers import (
 )
 
 from .models import ProgrammeDocument, ProgressReport
-from .filters import ProgrammeDocumentFilter, ProgressReportFilter
+from .filters import ProgrammeDocumentFilter, ProgressReportFilter, ProgrammeDocumentIndicatorFilter
 
 logger = logging.getLogger(__name__)
 
@@ -134,7 +134,7 @@ class ProgrammeDocumentIndicatorsAPIView(ListAPIView):
     def list(self, request, workspace_id, *args, **kwargs):
         pd = ProgrammeDocument.objects.filter(partner=self.request.user.partner, workspace=workspace_id)
         queryset = self.get_queryset().filter(indicator_reports__progress_report__programme_document__in=pd)
-        filtered = IndicatorFilter(request.GET, queryset=queryset)
+        filtered = ProgrammeDocumentIndicatorFilter(request.GET, queryset=queryset)
 
         page = self.paginate_queryset(filtered.qs)
         if page is not None:
@@ -286,6 +286,42 @@ class ProgressReportIndicatorsAPIView(ListAPIView):
 
         serializer = self.get_serializer(filtered.qs, many=True)
         return Response(serializer.data, status=statuses.HTTP_200_OK)
+
+
+class ProgressReportLocationsAPIView(ListAPIView):
+    queryset = Location.objects.all()
+    serializer_class = ShortLocationSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_object(self, pk):
+        try:
+            return ProgressReport.objects.get(programme_document__partner=self.request.user.partner, programme_document__workspace=self.workspace_id, pk=pk)
+        except ProgressReport.DoesNotExist as exp:
+            logger.exception({
+                "endpoint": "ProgressReportDetailsAPIView",
+                "request.data": self.request.data,
+                "pk": pk,
+                "exception": exp,
+            })
+            raise Http404
+
+    def list(self, request, workspace_id, progress_report_id, *args, **kwargs):
+        self.workspace_id = workspace_id
+        pr = self.get_object(progress_report_id)
+        queryset = self.get_queryset().filter(
+            reportables__indicator_reports__progress_report__programme_document__progress_reports=pr).distinct()
+        filtered = ProgressReportFilter(request.GET, queryset=queryset)
+
+        page = self.paginate_queryset(filtered.qs)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(filtered.qs, many=True)
+        return Response(
+            serializer.data,
+            status=statuses.HTTP_200_OK
+        )
 
 
 class ProgressReportSubmitAPIView(APIView):

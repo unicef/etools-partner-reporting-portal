@@ -6,9 +6,22 @@ from distutils.util import strtobool
 from django_filters.filters import ChoiceFilter, CharFilter, DateFilter, TypedChoiceFilter
 
 from core.common import PD_LIST_REPORT_STATUS, PD_STATUS, PROGRESS_REPORT_STATUS
+from indicator.models import Reportable
 from .models import ProgrammeDocument, ProgressReport
 
 BOOLEAN_CHOICES = (('0', 'False'), ('1', 'True'),)
+
+
+class  ProgrammeDocumentIndicatorFilter(django_filters.FilterSet):
+
+
+
+    class Meta:
+        model = Reportable
+        fields = (
+            'id', 'lower_level_outputs__cp_output__programme_document__status', 'locations', 'blueprint__title'
+        )
+
 
 
 class ProgrammeDocumentFilter(django_filters.FilterSet):

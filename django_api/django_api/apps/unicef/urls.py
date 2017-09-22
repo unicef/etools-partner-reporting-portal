@@ -9,7 +9,8 @@ from .views import (
     ProgressReportAPIView,
     ProgressReportIndicatorsAPIView,
     ProgressReportDetailsAPIView,
-    ProgressReportSubmitAPIView
+    ProgressReportSubmitAPIView,
+    ProgressReportLocationsAPIView,
 )
 
 
@@ -41,4 +42,7 @@ urlpatterns = [
     url(r'^(?P<workspace_id>\d+)/progress-reports/(?P<progress_report_id>\d+)/indicator-reports/$',
         ProgressReportIndicatorsAPIView.as_view(),
         name="progress-reports-indicators"),
+    url(r'^(?P<workspace_id>\d+)/progress-reports/(?P<progress_report_id>\d+)/locations/$',
+        ProgressReportLocationsAPIView.as_view(),
+        name="progress-reports-locations"),
 ]
