@@ -256,10 +256,7 @@
       },
 
       _handleInputChange: function (currentReport, queryParams) {
-        if (
-          !Object.keys(currentReport).length ||
-          !Object.keys(queryParams).length
-        ) {
+        if (!Object.keys(currentReport).length) {
           return;
         }
 
@@ -284,7 +281,7 @@
                 self.dispatch(App.Actions.IndicatorData.loadingStop());
                 self.dispatch(App.Actions.IndicatorData.set(self.reportId, outputs));
               });
-        }, 100);
+        }, 300);
       },
 
       _makeIndicatorReportPromise: function (queryParams, indicatorReport) {
