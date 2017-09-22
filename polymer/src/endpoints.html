@@ -69,8 +69,14 @@
         return this._buildUrl('/indicator/indicator-data/' + reportId + '/');
       },
 
-      indicatorDataLocation: function (reportId) {
-        return this._buildUrl('/indicator/indicator-data-location/' + reportId + '/');
+      indicatorDataLocation: function (workspaceId, reportId) {
+        return this._buildUrl(
+          '/unicef/' +
+          workspaceId +
+          '/progress-reports/' +
+          reportId +
+          '/locations/'
+        );
       },
 
       reportable: function (reportId, reportableId) {

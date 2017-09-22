@@ -44,6 +44,11 @@
           value: [],
         },
 
+        locationId: {
+          type: String,
+          statePath: 'location.id',
+        },
+
         reportId: {
           type: String,
           statePath: 'programmeDocumentReports.current.id',
@@ -51,7 +56,7 @@
 
         locationsUrl: {
           type: String,
-          computed: '_computeLocationsUrl(reportId)',
+          computed: '_computeLocationsUrl(locationId, reportId)',
           observer: '_fetchLocations',
         },
 
@@ -63,8 +68,8 @@
 
       },
 
-      _computeLocationsUrl: function (reportId) {
-        return App.Endpoints.indicatorDataLocation(reportId);
+      _computeLocationsUrl: function (locationId, reportId) {
+        return App.Endpoints.indicatorDataLocation(locationId, reportId);
       },
 
       _computeLoading: function (options) {
