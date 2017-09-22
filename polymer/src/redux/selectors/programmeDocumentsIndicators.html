@@ -1,0 +1,29 @@
+<link rel="import" href="../reselect.html">
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Selectors = App.Selectors || {};
+
+    App.Selectors.ProgrammeDocuments = {
+      all: Reselect.createSelector(pdId, data('byPd'), byPd),
+      count: Reselect.createSelector(pdId, data('count'), byPd),
+      loading: Reselect.createSelector(pdId, data('loading'), byPd),
+    };
+
+    function pdId(state) {
+      return state.programmeDocuments.current;
+    }
+
+    function byPd(pdId, data) {
+      return data[pdId];
+    }
+
+    function data(key) {
+      return function (state) {
+        return state.programmeDocumentsIndicators[key];
+      };
+    }
+  }());
+</script>
