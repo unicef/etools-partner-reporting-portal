@@ -127,7 +127,8 @@ class PDReportsDetailAPIView(RetrieveAPIView):
 
 class IndicatorListAPIView(ListAPIView):
     """
-    REST API endpoint to get a list of Indicator objects and to create a new Indicator object.
+    REST API endpoint to get a list of Indicator objects and to create a new
+    Indicator object.
 
     List filtering keywords:
     - locations (A comma-separated location id list)
@@ -185,8 +186,15 @@ class IndicatorListAPIView(ListAPIView):
             q_list.append(Q(lower_level_outputs__cp_output__programme_document__id__in=pd_list))
 
         if clusters:
-            cluster_list = map(lambda item: int(item), filter(lambda item: item != '' and item.isdigit(), clusters.split(',')))
-            q_list.append(Q(cluster_activities__cluster__id__in=cluster_list))
+            cluster_list = map(lambda item: int(item), filter(
+                lambda item: item != '' and item.isdigit(), clusters.split(
+                    ',')))
+            q_list.append(Q(cluster_objectives__cluster__id__in=cluster_list))
+            q_list.append(Q(
+                cluster_activities__cluster_objective__cluster__id__in=cluster_list))
+            q_list.append(Q(partner_projects__clusters__id__in=cluster_list))
+            q_list.append(Q(
+                partner_activities__project__clusters__id__in=cluster_list))
 
         if pd_statuses:
             pd_status_list = map(lambda item: item, filter(lambda item: item != '' and item.isdigit(), pd_statuses.split(',')))

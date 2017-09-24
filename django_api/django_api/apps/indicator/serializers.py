@@ -119,9 +119,14 @@ class IndicatorListSerializer(serializers.ModelSerializer):
     achieved = serializers.JSONField()
     progress_percentage = serializers.FloatField()
     content_type_name = serializers.SerializerMethodField()
+    content_object_title = serializers.SerializerMethodField()
+    disaggregations = DisaggregationListSerializer(many=True, read_only=True)
 
     def get_content_type_name(self, obj):
         return obj.content_type.name
+
+    def get_content_object_title(self, obj):
+        return obj.content_object.title
 
     class Meta:
         model = Reportable
@@ -134,7 +139,9 @@ class IndicatorListSerializer(serializers.ModelSerializer):
             'achieved',
             'progress_percentage',
             'content_type_name',
-            'object_id'
+            'content_object_title',
+            'object_id',
+            'disaggregations'
         )
 
 
