@@ -334,8 +334,8 @@ class ProgressReport(TimeStampedModel):
     submitted_by = models.ForeignKey('account.User',
                                      blank=True, null=True)
 
-    sent_back_date = models.DateField(verbose_name='Sent Back Date',
-                                      blank=True, null=True)
+    review_date = models.DateField(verbose_name='Review Date',
+                                   blank=True, null=True)
     sent_back_feedback = models.TextField(blank=True, null=True)
 
     class Meta:
@@ -352,7 +352,8 @@ class ProgressReport(TimeStampedModel):
         )
 
     def get_submission_date(self):
-        return self.submission_date.strftime(settings.PRINT_DATA_FORMAT)
+        return self.submission_date.strftime(
+            settings.PRINT_DATA_FORMAT)
 
 
 class CountryProgrammeOutput(TimeStampedModel):
