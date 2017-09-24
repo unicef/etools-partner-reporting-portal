@@ -5,7 +5,7 @@
 <link rel="import" href="../../../endpoints.html">
 <link rel="import" href="../../../redux/store.html">
 
-<dom-module id="report-location-filter">
+<dom-module id="indicator-location-filter">
   <template>
     <style>
       :host {
@@ -14,8 +14,8 @@
     </style>
 
     <etools-prp-ajax
-        id="locations"
-        url="[[locationsUrl]]">
+        id="locationNames"
+        url="[[locationNamesUrl]]">
     </etools-prp-ajax>
 
     <template is="dom-if" if="[[!loading]]">
@@ -23,67 +23,61 @@
           label="Location"
           name="location"
           value="[[value]]"
-          data="[[options]]">
+          data="[[data]]">
       </dropdown-filter>
     </template>
   </template>
 
   <script>
     Polymer({
-      is: 'report-location-filter',
+      is: 'indicator-location-filter',
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
       ],
 
       properties: {
-        value: String,
-
-        options: {
-          type: Array,
-          value: [],
+        locationNamesUrl: {
+          type: String,
+          computed: '_computeLocationNamesUrl(responsePlanID)',
+          observer: '_fetchLocationNames',
         },
 
-        locationId: {
+        responsePlanID: {
           type: String,
-          statePath: 'location.id',
-        },
-
-        reportId: {
-          type: String,
-          statePath: 'programmeDocumentReports.current.id',
-        },
-
-        locationsUrl: {
-          type: String,
-          computed: '_computeLocationsUrl(locationId, reportId)',
-          observer: '_fetchLocations',
+          statePath: 'responsePlans.currentID',
         },
 
         loading: {
           type: Boolean,
           value: true,
-          computed: '_computeLoading(options)',
+          computed: '_computeLoading(data)',
         },
 
+        data: {
+          type: Array,
+          value: [],
+        },
+
+        value: String,
       },
 
-      _computeLocationsUrl: function (locationId, reportId) {
-        return App.Endpoints.indicatorDataLocation(locationId, reportId);
+      _computeLocationNamesUrl: function (responsePlanID) {
+        return App.Endpoints.clusterIndicatorLocations(responsePlanID);
       },
 
-      _computeLoading: function (options) {
-        return !options.length;
+      _computeLoading: function (data) {
+        return !data.length;
       },
 
-      _fetchLocations: function () {
+      _fetchLocationNames: function () {
         var self = this;
 
-        this.$.locations.abort();
+        this.$.locationNames.abort();
 
-        this.$.locations.thunk()()
+        this.$.locationNames.thunk()()
             .then(function (res) {
-              self.set('options', [{
+              self.set('data', [{
                 id: '',
                 title: 'All',
               }].concat(res.data));
@@ -94,7 +88,7 @@
       },
 
       detached: function () {
-        this.$.locations.abort();
+        this.$.locationNames.abort();
       },
     });
   </script>

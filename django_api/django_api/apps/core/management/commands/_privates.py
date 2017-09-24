@@ -163,16 +163,24 @@ def generate_fake_data(workspace_quantity=10):
             ResponsePlan.objects.create(
                 workspace=workspace,
                 title="{} {} Humanitarian Response Plan".format(workspace.title, year),
-                start = beginning_of_this_year,
-                end = beginning_of_this_year + datetime.timedelta(days=30)
+                start=beginning_of_this_year,
+                end=beginning_of_this_year + datetime.timedelta(days=30)
             )
 
-        gateway = GatewayTypeFactory(workspace=workspace)
-        CartoDBTableFactory(location_type=gateway, country=country)
+        gateway = GatewayTypeFactory(country=country)
+        carto_db_table = CartoDBTableFactory(
+            location_type=gateway, country=country)
+
+        LocationFactory.create_batch(
+            8,
+            gateway=gateway,
+            carto_db_table=carto_db_table)
 
         print "{} ResponsePlan objects created for {}".format(3, workspace)
 
     for response_plan in ResponsePlan.objects.all():
+        country = response_plan.workspace.countries.first()
+        locations = list(Location.objects.filter(gateway__country=country))
         table = response_plan.workspace.countries.first().carto_db_tables.first()
 
         user = UserFactory(
@@ -188,25 +196,24 @@ def generate_fake_data(workspace_quantity=10):
         for idx in xrange(2, 0, -1):
             co = ClusterObjectiveFactory(
                 title="{} - {} - {} CO".format(
-                    idx, cluster.response_plan.title, cluster.type),
+                    idx, cluster.response_plan.title, cluster.type.upper()),
                 cluster=cluster,
             )
 
             reportable_to_co = QuantityReportableToClusterObjectiveFactory(
                 content_object=co, indicator_report__progress_report=None,
-                location__carto_db_table=table,
-                location__gateway=table.location_type,
+                locations=locations,
             )
 
-            co.locations.add(*list(reportable_to_co.locations.all()))
+            co.locations.add(*locations)
 
         user = UserFactory(
-            first_name="{} Cluster".format(cluster.type[:20]),
+            first_name="{} Cluster".format(cluster.type.upper()[:20]),
             last_name="Partner")
 
         partner = PartnerFactory(
             title="{} - {} Cluster Partner".format(
-                cluster.response_plan.title, cluster.type),
+                cluster.response_plan.title, cluster.type.upper()),
             partner_activity=None,
             partner_project=None,
             user=user,
@@ -225,24 +232,23 @@ def generate_fake_data(workspace_quantity=10):
 
         for idx in xrange(2, 0, -1):
             co = ClusterObjectiveFactory(
-                title="{} - {} Cluster Objective".format(cluster.response_plan.title, cluster.type),
+                title="{} - {} Cluster Objective".format(cluster.response_plan.title, cluster.type.upper()),
                 cluster=cluster,
             )
 
             reportable_to_co = QuantityReportableToClusterObjectiveFactory(
                 content_object=co, indicator_report__progress_report=None,
-                location__carto_db_table=table,
-                location__gateway=table.location_type,
+                locations=locations,
             )
 
-            co.locations.add(*list(reportable_to_co.locations.all()))
+            co.locations.add(*locations)
 
         user = UserFactory(
-            first_name="{} Cluster".format(cluster.type),
+            first_name="{} Cluster".format(cluster.type.upper()),
             last_name="Partner")
 
         partner = PartnerFactory(
-            title="{} - {} Cluster Partner".format(cluster.response_plan.title, cluster.type),
+            title="{} - {} Cluster Partner".format(cluster.response_plan.title, cluster.type.upper()),
             partner_activity=None,
             partner_project=None,
             user=user,
@@ -261,23 +267,22 @@ def generate_fake_data(workspace_quantity=10):
 
         for idx in xrange(2, 0, -1):
             co = ClusterObjectiveFactory(
-                title="{} - {} Cluster Objective".format(cluster.response_plan.title, cluster.type),
+                title="{} - {} Cluster Objective".format(cluster.response_plan.title, cluster.type.upper()),
                 cluster=cluster,
             )
 
             reportable_to_co = QuantityReportableToClusterObjectiveFactory(
                 content_object=co, indicator_report__progress_report=None,
-                location__carto_db_table=table,
-                location__gateway=table.location_type,
+                locations=locations,
             )
-            co.locations.add(*list(reportable_to_co.locations.all()))
+            co.locations.add(*locations)
 
         user = UserFactory(
-            first_name="{} Cluster".format(cluster.type),
+            first_name="{} Cluster".format(cluster.type.upper()),
             last_name="Partner")
 
         partner = PartnerFactory(
-            title="{} - {} Cluster Partner".format(cluster.response_plan.title, cluster.type),
+            title="{} - {} Cluster Partner".format(cluster.response_plan.title, cluster.type.upper()),
             partner_activity=None,
             partner_project=None,
             user=user,
@@ -291,6 +296,7 @@ def generate_fake_data(workspace_quantity=10):
         print "{} Cluster Objective objects created for {}".format(2 * 3, cluster)
 
     table = CartoDBTable.objects.first()
+    locations = list(Location.objects.filter(carto_db_table=table, carto_db_table__country=carto_db_table.country))
 
     for cluster_objective in ClusterObjective.objects.all():
         for idx in xrange(2, 0, -1):
@@ -301,10 +307,9 @@ def generate_fake_data(workspace_quantity=10):
 
             reportable_to_ca = QuantityReportableToClusterActivityFactory(
                 content_object=ca, indicator_report__progress_report=None,
-                location__gateway=table.location_type,
-                location__carto_db_table=table,
+                locations=locations,
             )
-            ca.locations.add(*list(reportable_to_ca.locations.all()))
+            ca.locations.add(*locations)
 
         print "{} Cluster Activity objects created for {}".format(2, cluster_objective.title)
 
@@ -320,12 +325,11 @@ def generate_fake_data(workspace_quantity=10):
 
             reportable_to_pp = QuantityReportableToPartnerProjectFactory(
                 content_object=pp, indicator_report__progress_report=None,
-                location__gateway=table.location_type,
-                location__carto_db_table=table,
+                locations=locations,
             )
-            pp.locations.add(*list(reportable_to_pp.locations.all()))
+            pp.locations.add(*locations)
 
-        print "{} PartnerProject objects created for {} under {} Cluster".format(2, partner, first_cluster.type)
+        print "{} PartnerProject objects created for {} under {} Cluster".format(2, partner, first_cluster.type.upper())
 
     # ClusterActivity <-> PartnerActivity link
     for cluster_activity in ClusterActivity.objects.all():
@@ -342,13 +346,12 @@ def generate_fake_data(workspace_quantity=10):
 
                 reportable_to_pa = QuantityReportableToPartnerActivityFactory(
                     content_object=pa, indicator_report__progress_report=None,
-                    location__gateway=table.location_type,
-                    location__carto_db_table=table,
+                    locations=locations,
                 )
                 reportable_to_pa.parent_indicator = cluster_activity.reportables.first()
                 reportable_to_pa.save()
 
-                pa.locations.add(*list(reportable_to_pa.locations.all()))
+                pa.locations.add(*locations)
 
                 pa = PartnerActivityFactory(
                     partner=project.partner,
@@ -359,10 +362,9 @@ def generate_fake_data(workspace_quantity=10):
 
                 reportable_to_pa = QuantityReportableToPartnerActivityFactory(
                     content_object=pa, indicator_report__progress_report=None,
-                    location__gateway=table.location_type,
-                    location__carto_db_table=table,
+                    locations=locations,
                 )
-                pa.locations.add(*list(reportable_to_pa.locations.all()))
+                pa.locations.add(*locations)
 
             print "{} PartnerActivity objects created for {} under {} Cluster Activity and Custom Activity".format(4, partner, cluster_activity.title)
 
@@ -384,21 +386,21 @@ def generate_fake_data(workspace_quantity=10):
     # ProgressReport - IndicatorReport from
     # QuantityReportableToLowerLevelOutput
     for idx, llo in enumerate(LowerLevelOutput.objects.all()):
+        country = llo.cp_output.programme_document.workspace.countries.first()
+        locations = list(Location.objects.filter(gateway__country=country))
         progress_report = ProgressReportFactory(
             programme_document=llo.cp_output.programme_document)
 
         if idx < 20:
             reportable = QuantityReportableToLowerLevelOutputFactory(
                 content_object=llo, indicator_report__progress_report=None,
-                location__gateway=table.location_type,
-                location__carto_db_table=table,
+                locations=locations,
             )
 
         else:
             reportable = RatioReportableToLowerLevelOutputFactory(
                 content_object=llo, indicator_report__progress_report=None,
-                location__gateway=table.location_type,
-                location__carto_db_table=table,
+                locations=locations,
             )
 
         reportable.content_object \

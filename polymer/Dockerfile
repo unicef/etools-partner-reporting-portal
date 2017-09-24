@@ -21,7 +21,6 @@ RUN cp -a /tmp/node_modules /code/node_modules
 RUN cp -a /tmp/bower_components /code/bower_components
 
 WORKDIR /code
-VOLUME /code
 
 EXPOSE 8080
 CMD ["gulp", "node", "express.js"]

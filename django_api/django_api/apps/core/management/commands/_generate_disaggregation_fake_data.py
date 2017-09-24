@@ -38,11 +38,11 @@ def generate_0_num_disagg_data(reportable, indicator_type="quantity"):
     if reportable.locations.count() == 0:
         table = CartoDBTable.objects.first()
 
-        LocationFactory(
-            reportable=reportable,
+        l = LocationFactory(
             gateway=table.location_type,
             carto_db_table=table,
         )
+        reportable.locations.add(l)
 
     location = reportable.locations.first()
     disagg_idx = 0
@@ -261,7 +261,7 @@ def generate_3_num_disagg_data(reportable, indicator_type="quantity"):
         disagg_idx = 0
 
         # 3 num_disaggregation & 0 level_reported
-        location = locations[disagg_idx]
+        location = locations[disagg_idx % 5]
 
         if indicator_type == "quantity":
             disaggregation = {
@@ -303,7 +303,7 @@ def generate_3_num_disagg_data(reportable, indicator_type="quantity"):
             indicator_report_from_reportable.disaggregations.values_list('id', flat=True)), 1))
 
         for pair in disaggregation_comb_1_pairs:
-            location = locations[disagg_idx]
+            location = locations[disagg_idx % 5]
 
             location_data = IndicatorLocationDataFactory(
                 indicator_report=indicator_report_from_reportable,
@@ -330,7 +330,7 @@ def generate_3_num_disagg_data(reportable, indicator_type="quantity"):
             indicator_report_from_reportable.disaggregations.values_list('id', flat=True)), 2))
 
         for pair in disaggregation_comb_2_pairs:
-            location = locations[disagg_idx]
+            location = locations[disagg_idx % 5]
 
             location_data = IndicatorLocationDataFactory(
                 indicator_report=indicator_report_from_reportable,
@@ -352,7 +352,7 @@ def generate_3_num_disagg_data(reportable, indicator_type="quantity"):
 
             disagg_idx += 1
 
-        location = locations[disagg_idx]
+        location = locations[disagg_idx % 5]
 
         # 3 num_disaggregation & 3 level_reported
         location_data = IndicatorLocationDataFactory(
@@ -380,7 +380,7 @@ def generate_3_num_disagg_data(reportable, indicator_type="quantity"):
         # Extra IndicatorLocationData for last IndicatorReport for 3
         # num_disaggregation with unique location
         if idx == reportable.indicator_reports.count() - 1:
-            location = locations[disagg_idx]
+            location = locations[disagg_idx % 5]
 
             location_data = IndicatorLocationDataFactory(
                 indicator_report=indicator_report_from_reportable,

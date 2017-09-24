@@ -9,13 +9,11 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from unicef.models import LowerLevelOutput
+from partner.models import PartnerProject, PartnerActivity
+from cluster.models import ClusterObjective, ClusterActivity
 
-from core.common import REPORTABLE_FREQUENCY_LEVEL
 from core.serializers import LocationSerializer, IdLocationSerializer
 from core.models import Location
-from cluster.models import ClusterObjective, ClusterActivity
-from partner.models import PartnerProject, PartnerActivity
-
 from core.validators import add_indicator_object_type_validator
 from core.helpers import (
     generate_data_combination_entries,
@@ -23,8 +21,7 @@ from core.helpers import (
     get_cast_dictionary_keys_as_tuple,
     get_cast_dictionary_keys_as_string,
 )
-from partner.models import PartnerProject, PartnerActivity
-from cluster.models import ClusterObjective, ClusterActivity
+
 from .models import (
     Reportable, IndicatorBlueprint,
     IndicatorReport, IndicatorLocationData,
@@ -98,7 +95,6 @@ class IndicatorReportSimpleSerializer(serializers.ModelSerializer):
 
 
 class IndicatorReportStatusSerializer(serializers.ModelSerializer):
-
 
     class Meta:
         model = IndicatorReport
@@ -336,7 +332,7 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
             )
 
         # IndicatorReport membership validation
-        if not self.instance.id in data['indicator_report'] \
+        if self.instance.id not in data['indicator_report'] \
                 .indicator_location_data.values_list('id', flat=True):
             raise serializers.ValidationError(
                 "IndicatorLocationData does not belong to "
@@ -390,7 +386,7 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
             try:
                 parsed_tuple = make_tuple(key)
 
-            except Exception as e:
+            except Exception:
                 raise serializers.ValidationError(
                     "%s key is not in tuple format" % (key)
                 )
@@ -577,7 +573,8 @@ class IndicatorBlueprintSerializer(serializers.ModelSerializer):
 class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
     disaggregation = serializers.JSONField()
-    object_type = serializers.CharField(validators=[add_indicator_object_type_validator])
+    object_type = serializers.CharField(
+        validators=[add_indicator_object_type_validator])
     blueprint = IndicatorBlueprintSerializer()
     locations = IdLocationSerializer(many=True)
 
@@ -601,11 +598,13 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
     def check_location(self, locations):
         if not isinstance(locations, (list, dict)) or\
                 False in [loc.get('id', False) for loc in locations]:
-            raise ValidationError({"locations": "List of dict location or one dict location expected"})
+            raise ValidationError(
+                {"locations": "List of dict location or one dict location expected"})
 
     def check_disaggregation(self, disaggregation):
         if not isinstance(disaggregation, list):
-            raise ValidationError({"disaggregation": "List of dict disaggregation expected"})
+            raise ValidationError(
+                {"disaggregation": "List of dict disaggregation expected"})
         max_length = DisaggregationValue._meta.get_field('value').max_length
         for dis in disaggregation:
             for val in dis['values']:
@@ -619,9 +618,11 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         self.check_location(self.initial_data.get('locations'))
         self.check_disaggregation(self.initial_data.get('disaggregation'))
 
-        validated_data['blueprint']['unit'] = validated_data['blueprint']['display_type']
+        validated_data['blueprint']['unit'] = validated_data[
+            'blueprint']['display_type']
         validated_data['blueprint']['disaggregatable'] = True
-        blueprint = IndicatorBlueprintSerializer(data=validated_data['blueprint'])
+        blueprint = IndicatorBlueprintSerializer(
+            data=validated_data['blueprint'])
         if blueprint.is_valid():
             blueprint.save()
         else:
@@ -630,26 +631,38 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         validated_data['blueprint'] = blueprint.instance
 
         if validated_data['object_type'] == 'ClusterObjective':
-            validated_data['content_type'] = ContentType.objects.get_for_model(ClusterObjective)
-            cluster_objective = get_object_or_404(ClusterObjective, pk=validated_data['object_id'])
-            validated_data['start_date'] = cluster_objective.cluster.response_plan.start
-            validated_data['end_date'] = cluster_objective.cluster.response_plan.end
+            validated_data['content_type'] = ContentType.objects.get_for_model(
+                ClusterObjective)
+            cluster_objective = get_object_or_404(
+                ClusterObjective, pk=validated_data['object_id'])
+            validated_data[
+                'start_date'] = cluster_objective.cluster.response_plan.start
+            validated_data[
+                'end_date'] = cluster_objective.cluster.response_plan.end
             validated_data['is_cluster_indicator'] = True
         elif validated_data['object_type'] == 'ClusterActivity':
-            validated_data['content_type'] = ContentType.objects.get_for_model(ClusterActivity)
-            cluster_activity = get_object_or_404(ClusterActivity, pk=validated_data['object_id'])
-            validated_data['start_date'] = cluster_activity.cluster_objective.cluster.response_plan.start
-            validated_data['end_date'] = cluster_activity.cluster_objective.cluster.response_plan.end
+            validated_data['content_type'] = ContentType.objects.get_for_model(
+                ClusterActivity)
+            cluster_activity = get_object_or_404(
+                ClusterActivity, pk=validated_data['object_id'])
+            validated_data[
+                'start_date'] = cluster_activity.cluster_objective.cluster.response_plan.start
+            validated_data[
+                'end_date'] = cluster_activity.cluster_objective.cluster.response_plan.end
             validated_data['is_cluster_indicator'] = True
         elif validated_data['object_type'] == 'PartnerProject':
-            validated_data['content_type'] = ContentType.objects.get_for_model(PartnerProject)
-            partner_project = get_object_or_404(PartnerProject, pk=validated_data['object_id'])
+            validated_data['content_type'] = ContentType.objects.get_for_model(
+                PartnerProject)
+            partner_project = get_object_or_404(
+                PartnerProject, pk=validated_data['object_id'])
             validated_data['start_date'] = partner_project.start_date
             validated_data['end_date'] = partner_project.end_date
             validated_data['is_cluster_indicator'] = False
         elif validated_data['object_type'] == 'PartnerActivity':
-            validated_data['content_type'] = ContentType.objects.get_for_model(PartnerActivity)
-            partner_activity = get_object_or_404(PartnerActivity, pk=validated_data['object_id'])
+            validated_data['content_type'] = ContentType.objects.get_for_model(
+                PartnerActivity)
+            partner_activity = get_object_or_404(
+                PartnerActivity, pk=validated_data['object_id'])
             validated_data['start_date'] = partner_activity.project.start_date
             validated_data['end_date'] = partner_activity.project.end_date
             validated_data['is_cluster_indicator'] = False
@@ -664,7 +677,8 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         self.instance = Reportable.objects.create(**validated_data)
 
         for location in self.initial_data.get('locations'):
-            self.instance.locations.add(Location.objects.get(id=location.get('id')))
+            self.instance.locations.add(
+                Location.objects.get(id=location.get('id')))
 
         for disaggregation in disaggregations:
             disaggregation_instance = Disaggregation.objects.create(
@@ -688,20 +702,25 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         instance.means_of_verification = validated_data.get(
             'means_of_verification', instance.means_of_verification)
         instance.blueprint.title = \
-            validated_data.get('blueprint', {}).get('title', instance.blueprint.title)
+            validated_data.get('blueprint', {}).get(
+                'title', instance.blueprint.title)
 
         _errors = []
         if validated_data.get('blueprint', {}).get('calculation_formula_across_periods'):
-            _errors.append("Modify or change the `calculation_formula_across_periods` is not allowed.")
+            _errors.append(
+                "Modify or change the `calculation_formula_across_periods` is not allowed.")
         if validated_data.get('blueprint', {}).get('calculation_formula_across_locations'):
-            _errors.append("Modify or change the `calculation_formula_across_locations` is not allowed.")
+            _errors.append(
+                "Modify or change the `calculation_formula_across_locations` is not allowed.")
         if validated_data.get('blueprint', {}).get('display_type'):
-            _errors.append("Modify or change the `display_type` is not allowed.")
+            _errors.append(
+                "Modify or change the `display_type` is not allowed.")
         if _errors:
             raise ValidationError({"errors": _errors})
 
         exclude_ids = [loc['id'] for loc in self.initial_data.get('locations')]
-        Location.objects.filter(reportable_id=instance.id).exclude(id__in=exclude_ids).update(reportable=None)
+        Location.objects.filter(reportable_id=instance.id).exclude(
+            id__in=exclude_ids).update(reportable=None)
 
         for location in self.initial_data.get('locations'):
             instance.locations.add(Location.objects.get(id=location.get('id')))
@@ -768,6 +787,7 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
     cluster = serializers.SerializerMethodField()
     project = serializers.SerializerMethodField()
     partner = serializers.SerializerMethodField()
+    partner_activity = serializers.SerializerMethodField()
     is_draft = serializers.SerializerMethodField()
     can_submit = serializers.SerializerMethodField()
 
@@ -790,6 +810,7 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
             'cluster',
             'project',
             'partner',
+            'partner_activity',
             'is_draft',
             'can_submit',
         )
@@ -804,20 +825,60 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
         )
 
     def get_cluster(self, obj):
-        if isinstance(obj.reportable.content_object, (ClusterObjective, ClusterActivity)):
-            return obj.reportable.content_object.cluster.type
+        if isinstance(obj.reportable.content_object, (ClusterObjective, )):
+            return obj.reportable.content_object.cluster.title
+        elif isinstance(obj.reportable.content_object, (ClusterActivity, )):
+            return obj.reportable.content_object.cluster_objective.cluster.title
         else:
-            return ''
+            ''
 
     def get_project(self, obj):
-        if isinstance(obj.reportable.content_object, (PartnerProject, PartnerActivity)):
+        if isinstance(obj.reportable.content_object, (PartnerProject, )):
             return obj.reportable.content_object.title
+        elif isinstance(obj.reportable.content_object, (PartnerActivity, )):
+            return obj.reportable.content_object.partner.title
+        elif isinstance(obj.reportable.content_object, (ClusterObjective, )):
+            if obj.reportable.content_object.partner_activities.first():
+                return obj.reportable.content_object.partner_activities.first().partner.title
+            elif obj.reportable.content_object.cluster:
+                return obj.reportable.content_object.cluster.partner_projects.first().title
+            else:
+                return ''
+        elif isinstance(obj.reportable.content_object, (ClusterActivity, )):
+            if obj.reportable.content_object.partner_activities.first():
+                return obj.reportable.content_object.partner_activities.first().partner.title
+            elif obj.reportable.content_object.cluster_objective.cluster:
+                return obj.reportable.content_object.cluster_objective.cluster.partner_projects.first().title
+            else:
+                return ''
         else:
             return ''
 
     def get_partner(self, obj):
         if isinstance(obj.reportable.content_object, (PartnerProject, PartnerActivity)):
             return obj.reportable.content_object.partner.title
+        else:
+            return ''
+
+    def get_partner_activity(self, obj):
+        if isinstance(obj.reportable.content_object, (PartnerProject, )):
+            return obj.reportable.content_object.partner_activities.first().title
+        elif isinstance(obj.reportable.content_object, (PartnerActivity, )):
+            return obj.reportable.content_object.title
+        elif isinstance(obj.reportable.content_object, (ClusterObjective, )):
+            if obj.reportable.content_object.partner_activities.first():
+                return obj.reportable.content_object.partner_activities.first().title
+            elif obj.reportable.content_object.cluster:
+                return obj.reportable.content_object.cluster.partner_projects.first().partner_activities.first().title
+            else:
+                return ''
+        elif isinstance(obj.reportable.content_object, (ClusterActivity, )):
+            if obj.reportable.content_object.partner_activities.first():
+                return obj.reportable.content_object.partner_activities.first().title
+            elif obj.reportable.content_object.cluster_objective.cluster:
+                return obj.reportable.content_object.cluster_objective.cluster.partner_projects.first().partner_activities.first().title
+            else:
+                return ''
         else:
             return ''
 

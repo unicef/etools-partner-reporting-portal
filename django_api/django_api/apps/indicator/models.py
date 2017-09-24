@@ -173,6 +173,8 @@ class Reportable(TimeStampedModel):
     content_object = GenericForeignKey('content_type', 'object_id')
     blueprint = models.ForeignKey(IndicatorBlueprint, null=True, related_name="reportables")
     parent_indicator = models.ForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
+    locations = models.ManyToManyField(
+        'core.Location', related_name="reportables")
 
     frequency = models.CharField(
         max_length=3,
