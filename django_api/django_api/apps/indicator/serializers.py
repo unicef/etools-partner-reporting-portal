@@ -45,7 +45,6 @@ class DisaggregationListSerializer(serializers.ModelSerializer):
         many=True, source='disaggregation_values')
 
     def create(self, validated_data):
-        print validated_data
         disaggregation_values = validated_data.pop('disaggregation_values')
         instance = Disaggregation.objects.create(**validated_data)
         for choice in disaggregation_values:

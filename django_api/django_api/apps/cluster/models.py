@@ -30,7 +30,8 @@ class Cluster(TimeStampedModel):
         account.User (ForeignKey): "user"
     """
     type = models.CharField(max_length=32, choices=CLUSTER_TYPES)
-    response_plan = models.ForeignKey('core.ResponsePlan', null=True, related_name="clusters")
+    response_plan = models.ForeignKey('core.ResponsePlan', null=True,
+                                      related_name="clusters")
     user = models.ForeignKey('account.User', related_name="clusters")
 
     class Meta:
