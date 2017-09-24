@@ -162,11 +162,14 @@ class PartnerProject(TimeStampedModel):
     """
     title = models.CharField(max_length=255)
     description = models.CharField(max_length=255)
-    additional_information = models.CharField(max_length=255, verbose_name="Additional information (e.g. links)")
+    additional_information = models.CharField(max_length=255,
+                                              verbose_name="Additional information (e.g. links)")
     start_date = models.DateField()
     end_date = models.DateField()
-    status = models.CharField(max_length=3, choices=PARTNER_PROJECT_STATUS, default=PARTNER_PROJECT_STATUS.ongoing)
-    total_budget = models.DecimalField(null=True, decimal_places=2, help_text='Total Budget', max_digits=12)
+    status = models.CharField(max_length=3, choices=PARTNER_PROJECT_STATUS,
+                              default=PARTNER_PROJECT_STATUS.ongoing)
+    total_budget = models.DecimalField(null=True, decimal_places=2,
+                                       help_text='Total Budget', max_digits=12)
     funding_source = models.CharField(max_length=255)
 
     clusters = models.ManyToManyField('cluster.Cluster', related_name="partner_projects")
