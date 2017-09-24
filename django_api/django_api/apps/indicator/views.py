@@ -40,6 +40,7 @@ from .serializers import (
     OverallNarrativeSerializer,
     ClusterIndicatorSerializer,
     ClusterIndicatorDataSerializer,
+    DisaggregationListSerializer
 )
 from .filters import IndicatorFilter, PDReportsFilter
 from .models import (
@@ -47,9 +48,24 @@ from .models import (
     IndicatorReport,
     Reportable,
     IndicatorLocationData,
+    Disaggregation
 )
 
 logger = logging.getLogger(__name__)
+
+
+class DisaggregationListCreateAPIView(ListCreateAPIView):
+    """
+    Endpoint to view and create new disaggregations
+    """
+    serializer_class = DisaggregationListSerializer
+    permission_classes = (IsAuthenticated, )
+    pagination_class = SmallPagination
+
+    def get_queryset(self, *args, **kwargs):
+        response_plan_id = self.kwargs.get('response_plan_id')
+        return Disaggregation.objects.filter(
+            response_plan__id=response_plan_id)
 
 
 class PDReportsAPIView(ListAPIView):

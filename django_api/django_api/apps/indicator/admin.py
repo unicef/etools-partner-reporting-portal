@@ -50,6 +50,7 @@ class DisaggregationAdmin(admin.ModelAdmin):
 
 class DisaggregationValueAdmin(admin.ModelAdmin):
     list_display = ('disaggregation', 'value')
+    list_filter = ('disaggregation',)
     search_fields = ('value',)
 
 

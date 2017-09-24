@@ -29,20 +29,6 @@ from .models import (
 )
 
 
-class IndicatorBlueprintSimpleSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = IndicatorBlueprint
-        fields = (
-            'id',
-            'title',
-            'unit',
-            'display_type',
-            'calculation_formula_across_periods',
-            'calculation_formula_across_locations',
-        )
-
-
 class DisaggregationValueListSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -56,7 +42,16 @@ class DisaggregationValueListSerializer(serializers.ModelSerializer):
 
 class DisaggregationListSerializer(serializers.ModelSerializer):
     choices = DisaggregationValueListSerializer(
-        many=True, read_only=True, source='disaggregation_value')
+        many=True, source='disaggregation_values')
+
+    def create(self, validated_data):
+        print validated_data
+        disaggregation_values = validated_data.pop('disaggregation_values')
+        instance = Disaggregation.objects.create(**validated_data)
+        for choice in disaggregation_values:
+            DisaggregationValue.objects.create(disaggregation=instance,
+                                               value=choice['value'])
+        return instance
 
     class Meta:
         model = Disaggregation
@@ -64,7 +59,22 @@ class DisaggregationListSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'active',
+            'response_plan',
             'choices',
+        )
+
+
+class IndicatorBlueprintSimpleSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = IndicatorBlueprint
+        fields = (
+            'id',
+            'title',
+            'unit',
+            'display_type',
+            'calculation_formula_across_periods',
+            'calculation_formula_across_locations',
         )
 
 

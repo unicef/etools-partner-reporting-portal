@@ -10,6 +10,7 @@ from .views import (
     ClusterIndicatorAPIView,
     IndicatorDataReportableAPIView,
     IndicatorDataLocationAPIView,
+    DisaggregationListCreateAPIView
 )
 
 
@@ -30,4 +31,7 @@ urlpatterns = [
     url(r'^indicator-reports/$', IndicatorReportListAPIView.as_view(), name='indicator-report-direct-list-api'),
     url(r'^(?P<reportable_id>\d+)/indicator-reports/$', IndicatorReportListAPIView.as_view(), name='indicator-report-list-api'),
     url(r'^cluster-indicator/$', ClusterIndicatorAPIView.as_view(), name='cluster-indicator'),
+    url(r'^response-plan/(?P<response_plan_id>\d+)/disaggregations/$',
+        DisaggregationListCreateAPIView.as_view(),
+        name="cluster-disaggregations"),
 ]

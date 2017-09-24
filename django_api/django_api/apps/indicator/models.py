@@ -48,7 +48,7 @@ class DisaggregationValue(TimeStampedModel):
         indicator.Disaggregation (ForeignKey): "disaggregation"
     """
     disaggregation = models.ForeignKey(Disaggregation,
-                                       related_name="disaggregation_value")
+                                       related_name="disaggregation_values")
     value = models.CharField(max_length=15)
 
     # TODO: we won't allow these to be edited out anymore, so 'active' might
@@ -359,10 +359,10 @@ class IndicatorReport(TimeStampedModel):
 
         for disaggregation in disaggregations:
             if not id_only:
-                disaggregation_value = disaggregation.disaggregation_value.order_by('id').values_list('id', 'value')
+                disaggregation_value = disaggregation.disaggregation_values.order_by('id').values_list('id', 'value')
 
             else:
-                disaggregation_value = disaggregation.disaggregation_value.order_by('id').values_list('id', flat=True)
+                disaggregation_value = disaggregation.disaggregation_values.order_by('id').values_list('id', flat=True)
 
             output_list.append(list(disaggregation_value))
 
