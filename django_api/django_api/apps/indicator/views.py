@@ -208,6 +208,16 @@ class IndicatorListAPIView(ListAPIView):
         return queryset
 
 
+class ReportableDetailAPIView(RetrieveAPIView):
+    """
+    Get details about a single Reportable, its blueprint, its disaggregations
+    etc.
+    """
+    serializer_class = IndicatorListSerializer
+    queryset = Reportable.objects.all()
+    permission_classes = (IsAuthenticated, )
+
+
 class IndicatorDataAPIView(APIView):
 
     permission_classes = (IsAuthenticated, )
