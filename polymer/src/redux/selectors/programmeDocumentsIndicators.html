@@ -6,10 +6,9 @@
 
     App.Selectors = App.Selectors || {};
 
-    App.Selectors.ProgrammeDocuments = {
-      all: Reselect.createSelector(pdId, data('byPd'), byPd),
-      count: Reselect.createSelector(pdId, data('count'), byPd),
-      loading: Reselect.createSelector(pdId, data('loading'), byPd),
+    App.Selectors.ProgrammeDocumentIndicators = {
+      all: Reselect.createSelector(pdId, pick('byPd'), byPd),
+      loading: Reselect.createSelector(pdId, pick('loading'), byPd),
     };
 
     function pdId(state) {
@@ -20,7 +19,7 @@
       return data[pdId];
     }
 
-    function data(key) {
+    function pick(key) {
       return function (state) {
         return state.programmeDocumentsIndicators[key];
       };

@@ -10,7 +10,6 @@
 
     App.Reducers.ProgrammeDocumentsIndicators = Redux.combineReducers({
       byPd: byPdReducer,
-      count: countByPdReducer,
       loading: loadingByPdReducer,
     });
 
@@ -31,29 +30,6 @@
 
         case App.Constants.UPDATE_PD_INDICATOR:
           return state; // TODO
-
-        case App.Constants.RESET:
-          return {};
-
-        default:
-          return state;
-      }
-    }
-
-    function countByPdReducer(state, action) {
-      if (typeof state === 'undefined') {
-        state = {};
-      }
-
-      switch (action.type) {
-        case App.Constants.SET_PD_INDICATORS_COUNT:
-          return (function () {
-            var change = {};
-
-            change[action.pdId] = action.count;
-
-            return Object.assign({}, state, change);
-          }());
 
         case App.Constants.RESET:
           return {};

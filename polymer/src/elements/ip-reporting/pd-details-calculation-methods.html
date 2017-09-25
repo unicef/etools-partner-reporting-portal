@@ -3,6 +3,7 @@
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
+<link rel="import" href="../../redux/selectors/programmeDocumentsIndicators.html">
 <link rel="import" href="../../elements/page-body.html">
 <link rel="import" href="../../elements/etools-prp-ajax.html">
 
@@ -43,6 +44,21 @@
           statePath: 'programmeDocuments.current',
         },
 
+        loading: {
+          type: Boolean,
+          statePath: App.Selectors.ProgrammeDocumentIndicators.loading,
+        },
+
+        data: {
+          typ: Array,
+          statePath: App.Selectors.ProgrammeDocumentIndicators.all,
+        },
+
+        formattedData: {
+          type: Array,
+          computed: '_computeFormattedData(data)',
+        },
+
         indicatorsUrl: {
           type: String,
           computed: '_computeIndicatorsUrl(locationId)',
@@ -66,7 +82,14 @@
         return {
           pds: pdId,
           orderBy: 'TODO',
+          page_size: 99999, // Magic number :(
         };
+      },
+
+      _computeFormattedData: function (data) {
+        // TODO: add (PD) labels
+
+        return data;
       },
 
       _fetchData: function (url, _, pdId) {

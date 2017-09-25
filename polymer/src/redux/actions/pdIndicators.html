@@ -18,7 +18,6 @@
                 var indicatorData = res.data;
 
                 dispatch(App.Actions.PDIndicators.set(pdId, indicatorData.results));
-                dispatch(App.Actions.PDIndicators.setCount(pdId, indicatorData.count));
                 dispatch(App.Actions.PDIndicators.loadingStop(pdId));
               })
               .catch(function (err) {
@@ -34,14 +33,6 @@
           type: App.Constants.SET_PD_INDICATORS,
           pdId: pdId,
           indicators: indicators,
-        };
-      },
-
-      setCount: function (pdId, count) {
-        return {
-          type: App.Constants.SET_PD_INDICATORS_COUNT,
-          pdId: pdId,
-          count: count,
         };
       },
 
