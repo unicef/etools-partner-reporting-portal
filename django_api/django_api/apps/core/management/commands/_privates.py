@@ -189,8 +189,7 @@ def generate_fake_data(workspace_quantity=10):
 
         cluster = ClusterFactory(
             response_plan=response_plan,
-            type="wash",
-            user=user
+            type="wash"
         )
 
         for idx in xrange(2, 0, -1):
@@ -227,7 +226,6 @@ def generate_fake_data(workspace_quantity=10):
         cluster = ClusterFactory(
             response_plan=response_plan,
             type="nutrition",
-            user=user
         )
 
         for idx in xrange(2, 0, -1):
@@ -262,7 +260,6 @@ def generate_fake_data(workspace_quantity=10):
         cluster = ClusterFactory(
             response_plan=response_plan,
             type="education",
-            user=user
         )
 
         for idx in xrange(2, 0, -1):

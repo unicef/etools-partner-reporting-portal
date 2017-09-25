@@ -228,7 +228,6 @@ class ResponsePlanFactory(factory.django.DjangoModelFactory):
 
 class ClusterFactory(factory.django.DjangoModelFactory):
     type = fuzzy.FuzzyChoice(CLUSTER_TYPES_LIST)
-    user = factory.SubFactory(UserFactory)
 
     response_plan = factory.SubFactory(ResponsePlanFactory)
 

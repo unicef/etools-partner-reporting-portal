@@ -48,8 +48,9 @@ class Person(TimeStampedExternalSyncModelMixin):
 
 class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
     """
-    ProgrammeDocument model describe agreement between UNICEF & Partner to realize document and
-    reports are feedback for this assignment.
+    ProgrammeDocument model describe agreement between UNICEF & Partner to
+    realize document and reports are feedback for this assignment. The data
+    in this model will come from eTools/PMP via a regular sync.
 
     related models:
         unicef.Section (ManyToManyField): "sections"
@@ -250,7 +251,8 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
         if due_report:
             self.__due_date = due_report.time_period_start
         else:
-            due_report = self.reportable_queryset.order_by('indicator_reports__time_period_start') \
+            due_report = self.reportable_queryset.order_by(
+                'indicator_reports__time_period_start') \
                 .last() \
                 .indicator_reports.last()
             self.__due_date = due_report and due_report.time_period_start
@@ -288,7 +290,8 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
             })
             percentage = 0
 
-        self.__budget = "{total} ({consumed}%)".format(total=total, consumed=consumed)
+        self.__budget = "{total} ({consumed}%)".format(total=total,
+                                                       consumed=consumed)
         return self.__budget
 
     @property
@@ -365,7 +368,8 @@ class CountryProgrammeOutput(TimeStampedExternalSyncModelMixin):
         unicef.ProgrammeDocument (ForeignKey): "programme_document"
     """
     title = models.CharField(max_length=255)
-    programme_document = models.ForeignKey(ProgrammeDocument, related_name="cp_outputs")
+    programme_document = models.ForeignKey(ProgrammeDocument,
+                                           related_name="cp_outputs")
 
     class Meta:
         ordering = ['id']
@@ -383,8 +387,10 @@ class LowerLevelOutput(TimeStampedExternalSyncModelMixin):
         indicator.Reportable (GenericRelation): "reportables"
     """
     title = models.CharField(max_length=255)
-    cp_output = models.ForeignKey(CountryProgrammeOutput, related_name="ll_outputs")
-    reportables = GenericRelation('indicator.Reportable', related_query_name='lower_level_outputs')
+    cp_output = models.ForeignKey(CountryProgrammeOutput,
+                                  related_name="ll_outputs")
+    reportables = GenericRelation('indicator.Reportable',
+                                  related_query_name='lower_level_outputs')
 
     class Meta:
         ordering = ['id']
