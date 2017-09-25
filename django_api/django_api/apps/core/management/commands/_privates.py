@@ -424,11 +424,6 @@ def generate_fake_data(workspace_quantity=10):
 
     print "ProgrammeDocument <-> QuantityReportableToLowerLevelOutput <-> IndicatorReport objects linked".format(workspace_quantity)
 
-    # Workspace <-> Locations
-    for workspace in Workspace.objects.all():
-        workspace.locations.add(*list(Location.objects.all()))
-    print "Workspace objects linked to Locations".format(workspace_quantity)
-
     print "Generating IndicatorLocationData for Quantity type"
     generate_indicator_report_location_disaggregation_quantity_data()
 

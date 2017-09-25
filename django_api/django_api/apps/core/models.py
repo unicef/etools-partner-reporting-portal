@@ -72,8 +72,6 @@ class Workspace(TimeStampedExternalSyncModelMixin):
         max_length=8
     )
     countries = models.ManyToManyField(Country, related_name='workspaces')
-    locations = models.ManyToManyField('core.Location',
-                                       related_name='workspaces')
     business_area_code = models.CharField(
         max_length=10,
         null=True, blank=True
