@@ -1,0 +1,294 @@
+<link rel="import" href="../../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../../../../bower_components/paper-input/paper-input.html">
+
+<link rel="import" href="../../../../../polyfills/es6-shim.html">
+<link rel="import" href="../../../../etools-prp-ajax.html">
+<link rel="import" href="../../../../../styles/buttons.html">
+<link rel="import" href="../../../../../redux/store.html">
+<link rel="import" href="../../../../../redux/actions.html">
+<link rel="import" href="../../../../../behaviors/routing.html">
+<link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="../../../../etools-prp-chips.html">
+<link rel="import" href="../../../chip-disagg-value.html">
+
+<dom-module id="cluster-disaggregations-modal">
+  <template>
+    <style include="button-styles iron-flex iron-flex-alignment">
+      :host {
+        display: block;
+      }
+
+      h2 {
+        padding: 5px 10px;
+        margin: 0 0 1em;
+        font-size: 14px;
+        background-color: var(--paper-grey-200);
+      }
+
+      .error,
+      .remove-btn {
+        color: var(--paper-deep-orange-a700);
+      }
+
+      .row {
+        margin-bottom: 1em;
+      }
+
+      .remove-btn {
+        width: 34px;
+        height: 34px;
+      }
+
+      .add-disaggregation-btn {
+        margin: 0;
+      }
+
+      .col-actions {
+        width: 40px;
+        border-right: 1px solid var(--paper-grey-400);
+      }
+
+      .col-name,
+      .col-values {
+        padding-left: 24px;
+      }
+    </style>
+    
+    <iron-location path="{{path}}"></iron-location>
+     <etools-prp-ajax
+        id="createDisaggregation"
+        url="[[url]]"
+        body="[[data]]"
+        content-type="application/json"
+        method="post">
+    </etools-prp-ajax>
+
+<!--     <h2 class$="[[_headingClassName]]">Disaggregations ([[value.length]])</h2> -->
+    
+    <paper-dialog
+        id="dialog"
+        with-backdrop
+        opened="[[opened]]">
+      <div class="header layout horizontal justified">
+        <h2>Add Disaggregation</h2>
+          <paper-icon-button
+              class="self-center"
+              on-tap="close"
+              icon="icons:close">
+          </paper-icon-button>
+        </div>
+      </div>
+      <paper-dialog-scrollable>
+    <template
+        is="dom-repeat"
+        items="[[value]]">
+      <div class="row layout horizontal">
+        <div class="flex-none layout vertical center-center col-actions">
+          <paper-icon-button
+              index="[[index]]"
+              class="remove-btn"
+              on-tap="_remove"
+              icon="icons:cancel">
+          </paper-icon-button>
+        </div>
+        <div class="flex col-name">
+          <paper-input
+              class="validate"
+              index="[[index]]"
+              name="name"
+              label="Disaggregation"
+              value="[[_getField(index, 'name', value.length)]]"
+              on-input="_onInput"
+              always-float-label
+              required>
+          </paper-input>
+        </div>
+        <div class="flex col-values">
+          <etools-prp-chips
+              class="validate"
+              index="[[index]]"
+              name="values"
+              label="Disaggregation group"
+              value="[[_getField(index, 'values', value.length)]]"
+              on-selected-chips-updated="_onInput"
+              required>
+            <chip-disagg-value></chip-disagg-value>
+          </etools-prp-chips>
+        </div>
+      </div>
+    </template>
+    </paper-dialog-scrollable>
+    <div class="buttons layout horizontal-reverse">
+    <paper-button class="btn-primary" on-tap="_save" raised>
+          Save
+        </paper-button>
+
+        <paper-button  on-tap="close">
+          Cancel
+        </paper-button>
+      </div>
+    </paper-dialog>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'cluster-disaggregations-modal',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.RoutingBehavior,
+        App.Behaviors.UtilsBehavior
+      ],
+
+      properties: {
+        responsePlanID: {
+          type: String,
+          statePath: 'responsePlans.currentID',
+        },
+        opened: {
+          type: Boolean,
+          value: false,
+        },
+        url: {
+          type: String,
+          computed: '_computeUrl(responsePlanID)'
+        },
+        refresh: {
+          type: Boolean,
+          value: false
+        },
+        value: {
+          type: Array,
+          value: [],
+          notify: true,
+        },
+
+        updatePending: {
+          type: Boolean,
+          value: false,
+        },
+
+        invalid: {
+          type: Boolean,
+          notify: true,
+          value: true
+        },
+
+        _invalid: {
+          type: Boolean,
+          value: false,
+        },
+
+        _headingClassName: {
+          type: String,
+          computed: '_computeHeadingClassName(_invalid)',
+        },
+      },
+
+      observers: [
+        '_setValidity(value.splices)'
+      ],
+
+      _computeUrl: function(responsePlanID) {
+        return App.Endpoints.responseParametersClusterDisaggregations(responsePlanID);
+      },
+
+      close: function () {
+        this.set('opened', false);
+        this.set('refresh', false);
+      },
+      open: function () {
+        this.data = {};
+        this.set('opened', true);
+        this.set('refresh', true);
+      },
+      _setValidity: function () {
+        var invalid = this.value.length && this.value.some(function (disagg) {
+          return !disagg.name.length || !disagg.values.length;
+        });
+
+        this.set('invalid', invalid);
+      },
+
+      _computeHeadingClassName: function (invalid) {
+        return invalid ? 'error' : '';
+      },
+
+      _add: function () {
+        this.push('value', {
+          name: '',
+          values: [],
+        });
+      },
+
+      _redirectToDetail: function () {
+        var path = '/response-parameters/clusters/disaggregations/';
+        var url = this.buildUrl(this._baseUrlCluster, path);
+        this.set('path', url);
+      },
+
+      _remove: function (e) {
+        var toRemove = +e.target.index;
+
+        this.splice('value', toRemove, 1);
+      },
+
+      _onInput: function (e) {
+        var el = e.target;
+        var newValue = el.value;
+
+        this.async(function () {
+          var index = +el.index;
+          var field = el.name;
+          var change = {};
+
+          change[field] = typeof newValue === 'string' ?
+              newValue.trim() : newValue;
+
+          this.set(
+            ['value', index],
+            Object.assign({}, this.value[index], change)
+          );
+
+          el.validate();
+
+          this._setValidity();
+        });
+      },
+
+      _save: function () {
+        if (!this._fieldsAreValid()) {
+          return;
+        }
+
+        var self = this;
+        var thunk = this.$.createDisaggregation.thunk();
+        thunk()
+          .then(function (res) {
+            self.updatePending = false;
+            self._redirectToDetail(res.data.id);
+          })
+          .catch(function (err) { // jshint ignore:line
+            self.updatePending = false;
+            // TODO: error handling
+          });
+      },
+
+      _getField: function (index, name) {
+        return (this.value[index] || {})[name];
+      },
+
+      validate: function () {
+        this.set('_invalid', this.invalid);
+
+        this._forEach('.validate', function (element) {
+          element.validate();
+        });
+      },
+    });
+  </script>
+</dom-module>
