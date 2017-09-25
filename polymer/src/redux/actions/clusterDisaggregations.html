@@ -1,0 +1,98 @@
+<link rel="import" href="../../constants.html">
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Actions = App.Actions || {};
+
+    App.Actions.ClusterDisaggregations = {
+      fetchClusterDisaggregationsList: function (thunk) {
+        return function (dispatch) {
+          dispatch(App.Actions.ClusterDisaggregations.clusterDisaggregationsLoadingStart());
+          return thunk()
+            .catch(function () {
+              dispatch(App.Actions.ClusterDisaggregations.clusterDisaggregationsLoadingStart());
+            })
+            .then(function (res) {
+              dispatch(App.Actions.ClusterDisaggregations.setClusterDisaggregationsList(res.data));
+              dispatch(App.Actions.ClusterDisaggregations.setClusterDisaggregationsCount(res.data));
+              dispatch(App.Actions.ClusterDisaggregations.clusterDisaggregationsLoadingStop());
+            });
+        };
+      },
+
+      setClusterDisaggregationsList: function (data) {
+        return {
+          type: App.Constants.SET_CLUSTER_DISAGGREGATIONS_LIST,
+          data: data,
+        };
+      },
+
+      clusterDisaggregationsLoadingStart: function () {
+        return {
+          type: App.Constants.CLUSTER_DISAGGREGATIONS_LOADING_START,
+        };
+      },
+
+      clusterDisaggregationsLoadingStop: function () {
+        return {
+          type: App.Constants.CLUSTER_DISAGGREGATIONS_LOADING_STOP,
+        };
+      },
+
+      setClusterDisaggregationsCount: function (data) {
+        return {
+          type: App.Constants.SET_CLUSTER_DISAGGREGATIONS_COUNT,
+          count: data.count
+        };
+      },
+    };
+
+    // App.Actions.ClusterObjectives.indicators = {
+    //   fetch: function (thunk, clusterObjectiveId) {
+    //     return function (dispatch) {
+    //       dispatch(App.Actions.ClusterObjectives.indicators.setLoadingStart());
+    //       return thunk()
+    //         .then(function (res) {
+    //           dispatch(App.Actions.ClusterObjectives.indicators.setIndicators(
+    //             clusterObjectiveId, res.data.results
+    //           ));
+    //           dispatch(App.Actions.ClusterObjectives.indicators.setCount(
+    //             clusterObjectiveId, res.data.count
+    //           ));
+    //           dispatch(App.Actions.ClusterObjectives.indicators.setLoadingStop());
+    //         });
+    //     };
+    //   },
+
+    //   setIndicators: function (clusterObjectiveId, data) {
+    //     return {
+    //       type: App.Constants.SET_INDICATORS_BY_CLUSTER_OBJECTIVE_ID,
+    //       clusterObjectiveId: clusterObjectiveId,
+    //       data: data,
+    //     };
+    //   },
+
+    //   setCount: function (clusterObjectiveId, count) {
+    //     return {
+    //       type: App.Constants.SET_INDICATORS_BY_CLUSTER_OBJECTIVE_ID_COUNT,
+    //       clusterObjectiveId: clusterObjectiveId,
+    //       count: count,
+    //     };
+    //   },
+
+    //   setLoadingStop: function () {
+    //     return {
+    //       type: App.Constants.INDICATORS_BY_CLUSTER_OBJECTIVE_ID_LOADING_STOP,
+    //     };
+    //   },
+
+    //   setLoadingStart: function () {
+    //     return {
+    //       type: App.Constants.INDICATORS_BY_CLUSTER_OBJECTIVE_ID_LOADING_START,
+    //     };
+    //   },
+    // };
+  }());
+</script>
