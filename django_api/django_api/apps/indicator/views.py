@@ -127,7 +127,8 @@ class PDReportsDetailAPIView(RetrieveAPIView):
 
 class IndicatorListAPIView(ListAPIView):
     """
-    REST API endpoint to get a list of Indicator objects and to create a new Indicator object.
+    REST API endpoint to get a list of Indicator objects and to create a new
+    Indicator object.
 
     List filtering keywords:
     - locations (A comma-separated location id list)
@@ -185,8 +186,15 @@ class IndicatorListAPIView(ListAPIView):
             q_list.append(Q(lower_level_outputs__cp_output__programme_document__id__in=pd_list))
 
         if clusters:
-            cluster_list = map(lambda item: int(item), filter(lambda item: item != '' and item.isdigit(), clusters.split(',')))
-            q_list.append(Q(cluster_activities__cluster__id__in=cluster_list))
+            cluster_list = map(lambda item: int(item), filter(
+                lambda item: item != '' and item.isdigit(), clusters.split(
+                    ',')))
+            q_list.append(Q(cluster_objectives__cluster__id__in=cluster_list))
+            q_list.append(Q(
+                cluster_activities__cluster_objective__cluster__id__in=cluster_list))
+            q_list.append(Q(partner_projects__clusters__id__in=cluster_list))
+            q_list.append(Q(
+                partner_activities__project__clusters__id__in=cluster_list))
 
         if pd_statuses:
             pd_status_list = map(lambda item: item, filter(lambda item: item != '' and item.isdigit(), pd_statuses.split(',')))
@@ -198,6 +206,16 @@ class IndicatorListAPIView(ListAPIView):
         queryset = queryset.distinct()
 
         return queryset
+
+
+class ReportableDetailAPIView(RetrieveAPIView):
+    """
+    Get details about a single Reportable, its blueprint, its disaggregations
+    etc.
+    """
+    serializer_class = IndicatorListSerializer
+    queryset = Reportable.objects.all()
+    permission_classes = (IsAuthenticated, )
 
 
 class IndicatorDataAPIView(APIView):
@@ -338,13 +356,16 @@ class IndicatorDataReportableAPIView(APIView):
 
 class IndicatorReportListAPIView(APIView):
     """
-    REST API endpoint to get a list of IndicatorReport objects, including each set of disaggregation data per report.
+    REST API endpoint to get a list of IndicatorReport objects, including each
+    set of disaggregation data per report.
 
     kwargs:
-    - reportable_id: Reportable pk (if given, the API will only return IndicatorReport objects tied to this Reportable)
+    - reportable_id: Reportable pk (if given, the API will only return
+    IndicatorReport objects tied to this Reportable)
 
     GET parameter:
-    - pks = A comma-separated string for IndicatorReport pks (If this GET parameter is given, Reportable pk kwargs will be ignored)
+    - pks = A comma-separated string for IndicatorReport pks (If this GET
+    parameter is given, Reportable pk kwargs will be ignored)
     """
 
     def get_queryset(self, *args, **kwargs):
@@ -357,12 +378,13 @@ class IndicatorReportListAPIView(APIView):
             raise Http404
 
         if pks:
-            pk_list = map(lambda item: int(item), filter(lambda item: item != '' and item.isdigit(), pks.split(',')))
+            pk_list = map(lambda item: int(item), filter(
+                lambda item: item != '' and item.isdigit(), pks.split(',')))
             indicator_reports = IndicatorReport.objects.filter(id__in=pk_list)
-
         else:
             reportable = get_object_or_404(Reportable, pk=reportable_id)
-            indicator_reports = reportable.indicator_reports.all().order_by('-time_period_start')
+            indicator_reports = reportable.indicator_reports.all().order_by(
+                '-time_period_start')
 
         if 'limit' in self.request.query_params:
             limit = self.request.query_params.get('limit', 2)

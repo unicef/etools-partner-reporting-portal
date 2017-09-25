@@ -19,7 +19,8 @@ class ProgrammeDocumentAdmin(admin.ModelAdmin):
 
 class ProgressReportAdmin(admin.ModelAdmin):
     list_display = ('programme_document', 'status', 'submitted_by',
-                    'start_date', 'end_date', 'due_date', 'submission_date')
+                    'start_date', 'end_date', 'due_date', 'submission_date',
+                    'review_date')
     list_filter = ('status', 'programme_document__status', 'programme_document')
 
 

@@ -1,6 +1,7 @@
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
+import django_filters
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework import status as statuses
@@ -20,10 +21,12 @@ class WorkspaceAPIView(ListAPIView):
     Endpoint for getting Workspace.
     Workspace need to have defined location to be displayed on drop down menu.
     """
-    queryset = Workspace.objects.prefetch_related('locations').filter(
+    queryset = Workspace.objects.prefetch_related('countries').filter(
         locations__isnull=False).distinct()
     serializer_class = WorkspaceSerializer
     permission_classes = (IsAuthenticated, )
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
+    filter_fields = ('business_area_code', 'workspace_code')
 
 
 class LocationListAPIView(ListAPIView):
