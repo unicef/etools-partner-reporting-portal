@@ -1,9 +1,13 @@
 from django.conf import settings
 from rest_framework import serializers
 
-from .models import ProgrammeDocument, Section, ProgressReport, Person
+from .models import ProgrammeDocument, Section, ProgressReport, Person, \
+    LowerLevelOutput
 from core.common import PROGRESS_REPORT_STATUS
-from indicator.serializers import PDReportsSerializer
+from indicator.serializers import (
+    PDReportsSerializer,
+    IndicatorBlueprintSimpleSerializer
+)
 
 
 class PersonSerializer(serializers.ModelSerializer):
@@ -133,3 +137,32 @@ class ProgressReportReviewSerializer(serializers.Serializer):
         PROGRESS_REPORT_STATUS.accepted
     ])
     comment = serializers.CharField(allow_blank=True)
+
+
+class LLOutputSerializer(serializers.ModelSerializer):
+    # id added explicitely here since it gets stripped out from validated_dat
+    # as its read_only. https://stackoverflow.com/questions/36473795/django-rest-framework-model-id-field-in-nested-relationship-serializer
+    id = serializers.IntegerField()
+
+    class Meta:
+        model = LowerLevelOutput
+        fields = (
+            'id',
+            'title'
+        )
+
+
+class LLOutputIndicatorsSerializer(serializers.Serializer):
+    """
+    Represents indicators grouped by LLO.
+    """
+    ll_output = LLOutputSerializer()
+    indicators = IndicatorBlueprintSimpleSerializer(many=True)
+
+
+class ProgrammeDocumentCalculationMethodsSerializer(serializers.Serializer):
+    """
+    To serialize data needed when viewing/setting calculation methods on
+    indicators for a PD.
+    """
+    ll_outputs_and_indicators = LLOutputIndicatorsSerializer(many=True)

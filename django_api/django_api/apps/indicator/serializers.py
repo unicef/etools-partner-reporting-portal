@@ -64,11 +64,15 @@ class DisaggregationListSerializer(serializers.ModelSerializer):
 
 
 class IndicatorBlueprintSimpleSerializer(serializers.ModelSerializer):
+    # id added explicitely here since it gets stripped out from validated_dat
+    # as its read_only. https://stackoverflow.com/questions/36473795/django-rest-framework-model-id-field-in-nested-relationship-serializer
+    id = serializers.IntegerField()
 
     class Meta:
         model = IndicatorBlueprint
         fields = (
             'id',
+            # 'indicator_id',
             'title',
             'unit',
             'display_type',

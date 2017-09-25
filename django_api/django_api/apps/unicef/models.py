@@ -301,6 +301,11 @@ class ProgrammeDocument(TimeStampedModel):
         else:
             raise NotImplemented("Not recognized PD_FREQUENCY_LEVEL.")
 
+    @property
+    def lower_level_outputs(self):
+        return LowerLevelOutput.objects.filter(
+            cp_output__programme_document=self)
+
 
 def find_first_programme_document_id():
     try:

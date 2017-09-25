@@ -5,6 +5,7 @@ from django.utils.functional import cached_property
 from django.contrib.postgres.fields import JSONField, ArrayField
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -103,10 +104,12 @@ class IndicatorBlueprint(TimeStampedModel):
         (RATIO, RATIO)
     )
 
-    DISPLAY_TYPE_CHOICES = QUANTITY_DISPLAY_TYPE_CHOICES + RATIO_DISPLAY_TYPE_CHOICES
+    DISPLAY_TYPE_CHOICES = QUANTITY_DISPLAY_TYPE_CHOICES + \
+        RATIO_DISPLAY_TYPE_CHOICES
 
     title = models.CharField(max_length=1024)
-    unit = models.CharField(max_length=10, choices=UNIT_CHOICES, default=NUMBER)
+    unit = models.CharField(max_length=10, choices=UNIT_CHOICES,
+                            default=NUMBER)
     description = models.CharField(max_length=3072, null=True, blank=True)
     code = models.CharField(max_length=50, null=True, blank=True, unique=True)
     subdomain = models.CharField(max_length=255, null=True, blank=True)
@@ -114,7 +117,6 @@ class IndicatorBlueprint(TimeStampedModel):
 
     calculation_formula_across_periods = models.CharField(
         max_length=10, choices=CALC_CHOICES, default=SUM)
-
     calculation_formula_across_locations = models.CharField(
         max_length=10, choices=CALC_CHOICES, default=SUM)
 
@@ -134,6 +136,26 @@ class IndicatorBlueprint(TimeStampedModel):
         if self.code == '':
             self.code = None
         super(IndicatorBlueprint, self).save(*args, **kwargs)
+
+    def clean(self):
+        """
+        To check that the calculation method and display type being assigned
+        are appropriate based on type of unit.
+        """
+        unit_to_valid_calc_values = {
+            self.NUMBER: map(lambda x: x[0], self.QUANTITY_CALC_CHOICES),
+            self.PERCENTAGE: map(lambda x: x[0], self.RATIO_CALC_CHOICES),
+        }
+        if self.calculation_formula_across_periods not in unit_to_valid_calc_values.get(self.unit, []) or \
+        self.calculation_formula_across_locations not in unit_to_valid_calc_values.get(self.unit, []):
+            raise ValidationError('Calculation methods not supported by selected unit')
+
+        unit_to_valid_display_type_values = {
+            self.NUMBER: map(lambda x: x[0], self.QUANTITY_DISPLAY_TYPE_CHOICES),
+            self.PERCENTAGE: map(lambda x: x[0], self.RATIO_DISPLAY_TYPE_CHOICES),
+        }
+        if self.display_type not in unit_to_valid_display_type_values.get(self.unit, []):
+            raise ValidationError('Display type is not supported by selected unit')
 
     def __str__(self):
         return self.title
