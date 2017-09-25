@@ -8,7 +8,8 @@ from .models import (
 
 
 class PartnerAdmin(admin.ModelAdmin):
-    list_display = ('title', 'partner_type', 'email', 'city', 'rating')
+    list_display = ('title', 'partner_type', 'email', 'city', 'rating',
+                    'external_id')
     list_filter = ('partner_type', 'city')
     search_fields = ('title', 'short_title', 'alternate_title')
 

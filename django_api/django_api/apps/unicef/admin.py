@@ -12,7 +12,7 @@ from .models import (
 
 class ProgrammeDocumentAdmin(admin.ModelAdmin):
     list_display = ('title', 'reference_number', 'agreement', 'partner',
-                    'status', 'workspace')
+                    'status', 'workspace', 'external_id')
     list_filter = ('workspace', 'status', 'partner')
     search_fields = ('title', 'reference_number', 'agreement')
 

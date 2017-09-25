@@ -13,11 +13,12 @@ from core.common import (
     CSO_TYPES,
     PARTNER_PROJECT_STATUS,
 )
+from core.models import TimeStampedExternalSyncModelMixin
 
 from core.countries import COUNTRIES_ALPHA2_CODE_DICT, COUNTRIES_ALPHA2_CODE
 
 
-class Partner(TimeStampedModel):
+class Partner(TimeStampedExternalSyncModelMixin):
     """
     Partner model describe in details who is it and his activity humanitarian goals (clusters).
     related models:

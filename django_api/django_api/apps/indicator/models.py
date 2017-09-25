@@ -18,9 +18,10 @@ from core.common import (
     PROGRESS_REPORT_STATUS,
     OVERALL_STATUS,
 )
+from core.models import TimeStampedExternalSyncModelMixin
 
 
-class Disaggregation(TimeStampedModel):
+class Disaggregation(TimeStampedExternalSyncModelMixin):
     """
     Disaggregation module. For example: <Gender, Age>
 
@@ -40,7 +41,7 @@ class Disaggregation(TimeStampedModel):
         return "Disaggregation <pk:%s> %s" % (self.id, self.name)
 
 
-class DisaggregationValue(TimeStampedModel):
+class DisaggregationValue(TimeStampedExternalSyncModelMixin):
     """
     Disaggregation Value module. For example: Gender <Male, Female, Other>
 
@@ -60,7 +61,7 @@ class DisaggregationValue(TimeStampedModel):
         return "Disaggregation Value <pk:%s> %s" % (self.id, self.value)
 
 
-class IndicatorBlueprint(TimeStampedModel):
+class IndicatorBlueprint(TimeStampedExternalSyncModelMixin):
     """
     IndicatorBlueprint module is a pattern for indicator
     (here we setup basic parameter).
@@ -142,7 +143,7 @@ class IndicatorBlueprint(TimeStampedModel):
         ordering = ['-id']
 
 
-class Reportable(TimeStampedModel):
+class Reportable(TimeStampedExternalSyncModelMixin):
     """
     Reportable / Applied Indicator model.
 

@@ -20,12 +20,13 @@ from core.common import (
     PD_STATUS,
     CURRENCIES,
 )
+from core.models import TimeStampedExternalSyncModelMixin
 from indicator.models import Reportable  # IndicatorReport
 
 logger = logging.getLogger(__name__)
 
 
-class Section(models.Model):
+class Section(TimeStampedExternalSyncModelMixin):
     """
     Section model define atomic act of help like: bottle of water, blanket.
     """
@@ -35,7 +36,7 @@ class Section(models.Model):
         return self.name
 
 
-class Person(models.Model):
+class Person(TimeStampedExternalSyncModelMixin):
     name = models.CharField(max_length=128, verbose_name='Name')
     title = models.CharField(max_length=255, verbose_name='Title')
     phone_number = models.CharField(max_length=64, verbose_name='Phone Number')
@@ -45,7 +46,7 @@ class Person(models.Model):
         return self.name
 
 
-class ProgrammeDocument(TimeStampedModel):
+class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
     """
     ProgrammeDocument model describe agreement between UNICEF & Partner to realize document and
     reports are feedback for this assignment.
@@ -356,7 +357,7 @@ class ProgressReport(TimeStampedModel):
             settings.PRINT_DATA_FORMAT)
 
 
-class CountryProgrammeOutput(TimeStampedModel):
+class CountryProgrammeOutput(TimeStampedExternalSyncModelMixin):
     """
     CountryProgrammeOutput (LLO Parent) module.
 
@@ -373,7 +374,7 @@ class CountryProgrammeOutput(TimeStampedModel):
         return self.title
 
 
-class LowerLevelOutput(TimeStampedModel):
+class LowerLevelOutput(TimeStampedExternalSyncModelMixin):
     """
     LowerLevelOutput (PD output) module describe the goals to reach in PD scope.
 

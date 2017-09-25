@@ -28,7 +28,21 @@ def get_random_color():
     return '#%02X%02X%02X' % (r(), r(), r())
 
 
-class Country(TimeStampedModel):
+class TimeStampedExternalSyncModelMixin(TimeStampedModel):
+    """
+    A abstract class that provides external_id field that some models need since
+    they might have been synced from an external system.
+    """
+    external_id = models.CharField(
+        help_text='An ID representing this instance in an external system',
+        blank=True,
+        null=True,
+        max_length=32)
+
+    class Meta:
+        abstract = True
+
+class Country(TimeStampedExternalSyncModelMixin):
     """
     Represents a country which has many offices and sections.
     Taken from https://github.com/unicef/etools/blob/master/EquiTrack/users/models.py
@@ -45,7 +59,7 @@ class Country(TimeStampedModel):
         return self.name
 
 
-class Workspace(TimeStampedModel):
+class Workspace(TimeStampedExternalSyncModelMixin):
     """
     Workspace (previously called Workspace, also synonym was
     emergency/country) model.
@@ -142,7 +156,7 @@ class LocationManager(models.GeoManager):
 
 
 @python_2_unicode_compatible
-class Location(TimeStampedModel):
+class Location(TimeStampedExternalSyncModelMixin):
     """
     Location model define place where agents are working.
     The background of the location can be:
