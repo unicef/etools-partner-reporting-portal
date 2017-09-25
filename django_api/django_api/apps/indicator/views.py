@@ -356,13 +356,16 @@ class IndicatorDataReportableAPIView(APIView):
 
 class IndicatorReportListAPIView(APIView):
     """
-    REST API endpoint to get a list of IndicatorReport objects, including each set of disaggregation data per report.
+    REST API endpoint to get a list of IndicatorReport objects, including each
+    set of disaggregation data per report.
 
     kwargs:
-    - reportable_id: Reportable pk (if given, the API will only return IndicatorReport objects tied to this Reportable)
+    - reportable_id: Reportable pk (if given, the API will only return
+    IndicatorReport objects tied to this Reportable)
 
     GET parameter:
-    - pks = A comma-separated string for IndicatorReport pks (If this GET parameter is given, Reportable pk kwargs will be ignored)
+    - pks = A comma-separated string for IndicatorReport pks (If this GET
+    parameter is given, Reportable pk kwargs will be ignored)
     """
 
     def get_queryset(self, *args, **kwargs):
@@ -375,12 +378,13 @@ class IndicatorReportListAPIView(APIView):
             raise Http404
 
         if pks:
-            pk_list = map(lambda item: int(item), filter(lambda item: item != '' and item.isdigit(), pks.split(',')))
+            pk_list = map(lambda item: int(item), filter(
+                lambda item: item != '' and item.isdigit(), pks.split(',')))
             indicator_reports = IndicatorReport.objects.filter(id__in=pk_list)
-
         else:
             reportable = get_object_or_404(Reportable, pk=reportable_id)
-            indicator_reports = reportable.indicator_reports.all().order_by('-time_period_start')
+            indicator_reports = reportable.indicator_reports.all().order_by(
+                '-time_period_start')
 
         if 'limit' in self.request.query_params:
             limit = self.request.query_params.get('limit', 2)

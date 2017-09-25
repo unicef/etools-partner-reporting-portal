@@ -77,7 +77,8 @@ class ProgressReportFilter(django_filters.FilterSet):
 
     class Meta:
         model = ProgressReport
-        fields = ['status', 'pd_ref_title', 'due_date', 'programme_document']
+        fields = ['status', 'pd_ref_title', 'due_date', 'programme_document',
+                  'programme_document__id']
 
     def get_status(self, queryset, name, value):
         return queryset.filter(status=value)
