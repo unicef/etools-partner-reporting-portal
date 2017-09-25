@@ -7,6 +7,7 @@ from django.db.models import Q
 from django.http import HttpResponse
 from django.conf import settings
 from django.db import transaction
+from django.shortcuts import get_object_or_404
 
 from rest_framework.generics import RetrieveAPIView, ListAPIView
 from rest_framework.views import APIView
@@ -27,15 +28,19 @@ from core.permissions import IsAuthenticated
 from core.models import Location
 from core.serializers import ShortLocationSerializer
 
-from indicator.models import Reportable, IndicatorReport
+from indicator.models import Reportable, IndicatorReport, IndicatorBlueprint
 from indicator.serializers import IndicatorListSerializer, PDReportsSerializer
 from indicator.filters import PDReportsFilter
+from indicator.serializers import IndicatorBlueprintSimpleSerializer
 
 from .serializers import (
     ProgrammeDocumentSerializer,
     ProgrammeDocumentDetailSerializer,
     ProgressReportSerializer,
     ProgressReportReviewSerializer,
+    LLOutputSerializer,
+    LLOutputIndicatorsSerializer,
+    ProgrammeDocumentCalculationMethodsSerializer
 )
 
 from .models import ProgrammeDocument, ProgressReport
@@ -428,6 +433,71 @@ class ProgressReportReviewAPIView(APIView):
                     'comment']
             progress_report.save()
             serializer = ProgressReportSerializer(instance=progress_report)
+            return Response(serializer.data, status=statuses.HTTP_200_OK)
+
+        return Response({"errors": serializer.errors},
+                        status=statuses.HTTP_400_BAD_REQUEST)
+
+
+class ProgrammeDocumentCalculationMethodsAPIView(APIView):
+    """
+    Supports GET request to get the unit and calculation for each indicator
+    grouped by LLO for a particular PD.
+
+    POST request takes same format data to update the calculation methods then.
+    """
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ProgrammeDocumentCalculationMethodsSerializer
+
+    def get(self, request, workspace_id, pd_id):
+        """
+        Construct the input data to the serializer for the LLO and its
+        associated indicators.
+        """
+        pd = get_object_or_404(ProgrammeDocument,
+                               id=pd_id,
+                               workspace__id=workspace_id)
+
+        data = {'ll_outputs_and_indicators': []}
+        for llo in pd.lower_level_outputs:
+            indicator_blueprints = []
+            for reportable in llo.reportables.all():
+                indicator_blueprints.append(reportable.blueprint)
+
+            inner_data = {}
+            inner_data['ll_output'] = LLOutputSerializer(instance=llo).data
+            inner_data['indicators'] = IndicatorBlueprintSimpleSerializer(
+                indicator_blueprints, many=True).data
+
+            data['ll_outputs_and_indicators'].append(inner_data)
+
+        return Response(ProgrammeDocumentCalculationMethodsSerializer(
+            data).data)
+
+    @transaction.atomic
+    def post(self, request, workspace_id, pd_id, *args, **kwargs):
+        """
+        The goal of this is to set the calculation methods for the indicators
+        associated with lower level outputs of this PD.
+        """
+        serializer = ProgrammeDocumentCalculationMethodsSerializer(
+            data=request.data)
+        if serializer.is_valid():
+            print serializer.validated_data
+            for llo_and_indicators in serializer.validated_data[
+                    'll_outputs_and_indicators']:
+                for indicator_blueprint in llo_and_indicators['indicators']:
+                    print indicator_blueprint
+                    instance = get_object_or_404(IndicatorBlueprint,
+                                                 id=indicator_blueprint['id'])
+                    instance.calculation_formula_across_periods = \
+                        indicator_blueprint[
+                            'calculation_formula_across_periods']
+                    instance.calculation_formula_across_locations = \
+                        indicator_blueprint[
+                            'calculation_formula_across_locations']
+                    instance.clean()
+                    instance.save()
             return Response(serializer.data, status=statuses.HTTP_200_OK)
 
         return Response({"errors": serializer.errors},
