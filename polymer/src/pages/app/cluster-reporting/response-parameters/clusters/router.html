@@ -55,6 +55,13 @@
           route="{{subroute}}">
         </clusters-activity-details>
       </template>
+
+      <template is="dom-if" if="[[_equals(page, 'disaggregations')]]" restamp="true">
+        <clusters-disaggregations
+          name="disaggregations"
+          route="{{subroute}}">
+        </clusters-disaggregations>
+      </template>
     </iron-pages>
   </template>
 

@@ -2,7 +2,9 @@ from django.conf import settings
 from rest_framework import serializers
 
 from .models import ProgrammeDocument, Section, ProgressReport, Person
+from core.common import PROGRESS_REPORT_STATUS
 from indicator.serializers import PDReportsSerializer
+
 
 class PersonSerializer(serializers.ModelSerializer):
     class Meta:
@@ -95,18 +97,20 @@ class ProgressReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProgressReport
         fields = (
+            'id',
             'partner_contribution_to_date',
             'funds_received_to_date',
             'challenges_in_the_reporting_period',
             'proposed_way_forward',
-            'id',
-            'programme_document',
             'status',
             'reporting_period',
             'submission_date',
             'due_date',
             'is_draft',
-            'indicator_reports'
+            'indicator_reports',
+            'review_date',
+            'sent_back_feedback',
+            'programme_document',
         )
 
     def get_reporting_period(self, obj):
@@ -121,3 +125,11 @@ class ProgressReportSerializer(serializers.ModelSerializer):
 
 class ProgressReportUpdateSerializer(ProgressReportSerializer):
     programme_document = ProgrammeDocumentSerializer(read_only=True)
+
+
+class ProgressReportReviewSerializer(serializers.Serializer):
+    status = serializers.ChoiceField(choices=[
+        PROGRESS_REPORT_STATUS.sent_back,
+        PROGRESS_REPORT_STATUS.accepted
+    ])
+    comment = serializers.CharField(allow_blank=True)

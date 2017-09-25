@@ -10,7 +10,7 @@
 * Nginx proxy: [![Codefresh build status]( https://g.codefresh.io/api/badges/build?repoOwner=unicef&repoName=etools-partner-reporting-portal&branch=develop&pipelineName=proxy&accountName=unicef&type=cf-1)]( https://g.codefresh.io/repositories/unicef/etools-partner-reporting-portal/builds?filter=trigger:build;branch:develop;service:58d57dc1fa94a00100a3096c~proxy)
 
 ## Setup
-1. Install Docker for your OS
+1. Install Docker for your OS. Also install Fabric via ``pip install fabric``.
 2. Create .env file in `django_api` with the reference of `.env.example` or receive .env file from your team member.
 3. Run `fab up` !
 4. Go to http://127.0.0.1:8080/ to see the frontend / polymer running. The Django app is running under http://127.0.0.1:8080/api/
@@ -36,4 +36,3 @@ Here are some docker tips:
    ```
    $ fab rebuild
    ```
-
