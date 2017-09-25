@@ -15,7 +15,8 @@ class User(AbstractUser):
     related models:
         partner.Partnern (ForeignKey): "partner"
     """
-    partner = models.ForeignKey('partner.Partner', related_name="users", null=True, blank=True)
+    partner = models.ForeignKey('partner.Partner', related_name="users",
+                                null=True, blank=True)
     organization = models.CharField(max_length=255)
 
     def __str__(self):

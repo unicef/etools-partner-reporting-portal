@@ -158,7 +158,8 @@ class Location(TimeStampedModel):
     """
     title = models.CharField(max_length=255)
 
-    gateway = models.ForeignKey(GatewayType, verbose_name='Location Type')
+    gateway = models.ForeignKey(GatewayType, verbose_name='Location Type',
+                                related_name='locations')
     carto_db_table = models.ForeignKey('core.CartoDBTable', related_name="locations")
 
     latitude = models.DecimalField(

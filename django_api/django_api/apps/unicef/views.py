@@ -31,12 +31,11 @@ from indicator.models import Reportable, IndicatorReport
 from indicator.serializers import IndicatorListSerializer, PDReportsSerializer
 from indicator.filters import PDReportsFilter
 
-
-
 from .serializers import (
     ProgrammeDocumentSerializer,
     ProgrammeDocumentDetailSerializer,
-    ProgressReportSerializer
+    ProgressReportSerializer,
+    ProgressReportReviewSerializer,
 )
 
 from .models import ProgrammeDocument, ProgressReport
@@ -329,7 +328,10 @@ class ProgressReportSubmitAPIView(APIView):
 
     def get_object(self, pk):
         try:
-            return ProgressReport.objects.get(programme_document__partner=self.request.user.partner, programme_document__workspace=self.workspace_id, pk=pk)
+            return ProgressReport.objects.get(
+                programme_document__partner=self.request.user.partner,
+                programme_document__workspace=self.workspace_id,
+                pk=pk)
         except ProgressReport.DoesNotExist as exp:
             logger.exception({
                 "endpoint": "ProgressReportDetailsAPIView",
@@ -378,3 +380,55 @@ class ProgressReportSubmitAPIView(APIView):
                            "message": "Progress report was already submitted. Your IMO will need to send it back for you to edit your submission."}]
             return Response({"errors": _errors},
                             status=statuses.HTTP_400_BAD_REQUEST)
+
+
+class ProgressReportReviewAPIView(APIView):
+    """
+    Called by PO to accept or send back a submitted progress report. Called
+    from outside of PRP.
+
+    Only a PO (not a partner user) should be allowed to do this action.
+    """
+    permission_classes = (IsAuthenticated,)
+
+    def get_object(self, pk):
+        try:
+            return ProgressReport.objects.get(
+                programme_document__workspace=self.workspace_id,
+                pk=pk)
+        except ProgressReport.DoesNotExist as exp:
+            logger.exception({
+                "endpoint": "ProgressReportDetailsAPIView",
+                "request.data": self.request.data,
+                "pk": pk,
+                "exception": exp,
+            })
+            raise Http404
+
+    @transaction.atomic
+    def post(self, request, workspace_id, pk, *args, **kwargs):
+        """
+        Only if the progress report is in submitted state that this POST
+        request will be successful.
+        """
+        self.workspace_id = workspace_id
+        progress_report = self.get_object(pk)
+
+        if progress_report.status != PROGRESS_REPORT_STATUS.submitted:
+            _errors = [{"message": "This report is not in submitted state."}]
+            return Response({"errors": _errors},
+                            status=statuses.HTTP_400_BAD_REQUEST)
+
+        serializer = ProgressReportReviewSerializer(data=request.data)
+        if serializer.is_valid():
+            progress_report.status = serializer.validated_data['status']
+            progress_report.review_date = datetime.now().date()
+            if progress_report.status == PROGRESS_REPORT_STATUS.sent_back:
+                progress_report.sent_back_feedback = serializer.validated_data[
+                    'comment']
+            progress_report.save()
+            serializer = ProgressReportSerializer(instance=progress_report)
+            return Response(serializer.data, status=statuses.HTTP_200_OK)
+
+        return Response({"errors": serializer.errors},
+                        status=statuses.HTTP_400_BAD_REQUEST)

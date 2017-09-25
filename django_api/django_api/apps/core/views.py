@@ -1,7 +1,11 @@
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
+
+import django_filters
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework import status as statuses
+
 from .permissions import IsAuthenticated
 from .models import Workspace, Location, ResponsePlan
 from .serializers import (
@@ -17,28 +21,31 @@ class WorkspaceAPIView(ListAPIView):
     Endpoint for getting Workspace.
     Workspace need to have defined location to be displayed on drop down menu.
     """
-    queryset = Workspace.objects.prefetch_related('locations').filter(
+    queryset = Workspace.objects.prefetch_related('countries').filter(
         locations__isnull=False).distinct()
     serializer_class = WorkspaceSerializer
     permission_classes = (IsAuthenticated, )
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
+    filter_fields = ('business_area_code', 'workspace_code')
 
 
 class LocationListAPIView(ListAPIView):
     """
-    Endpoint for getting all Location objects.
+    Endpoint for getting all Location objects belonging to the response plan.
     """
     permission_classes = (IsAuthenticated, )
     serializer_class = ShortLocationSerializer
     lookup_field = lookup_url_kwarg = 'response_plan_id'
 
     def get_queryset(self):
+        """
+        Get the locations that belong to the countries contained by the
+        workspace this reponse plan belongs to
+        """
         response_plan_id = self.kwargs.get(self.lookup_field)
-        result = ResponsePlan.objects.filter(id=response_plan_id).values_list(
-            'clusters__cluster_objectives__reportables__locations',
-            'clusters__cluster_objectives__cluster_activities__reportables__locations',
-            'clusters__partner_projects__reportables__locations',
-            'clusters__partner_projects__partner_activities__reportables__locations',
-        ).distinct()
+        response_plan = get_object_or_404(ResponsePlan, id=response_plan_id)
+        result = response_plan.workspace.countries.all().values_list(
+            'gateway_types__locations').distinct()
         pks = []
         [pks.extend(filter(lambda x: x is not None, part)) for part in result]
         return Location.objects.filter(pk__in=pks)

@@ -92,9 +92,15 @@ class CountryAdmin(admin.ModelAdmin):
     search_fields = ('name', 'country_short_code')
 
 
+class ResponsePlanAdmin(admin.ModelAdmin):
+    list_display = ('title', 'plan_type', 'start', 'end', 'workspace')
+    list_filter = ('plan_type', 'workspace')
+    search_fields = ('title',)
+
+
 admin.site.register(Workspace, WorkspaceAdmin)
 admin.site.register(Location, LocationAdmin)
-admin.site.register(ResponsePlan)
+admin.site.register(ResponsePlan, ResponsePlanAdmin)
 admin.site.register(GatewayType)
 admin.site.register(CartoDBTable, CartoDBTableAdmin)
 admin.site.register(Country, CountryAdmin)

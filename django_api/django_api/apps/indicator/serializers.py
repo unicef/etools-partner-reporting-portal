@@ -29,20 +29,6 @@ from .models import (
 )
 
 
-class IndicatorBlueprintSimpleSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = IndicatorBlueprint
-        fields = (
-            'id',
-            'title',
-            'unit',
-            'display_type',
-            'calculation_formula_across_periods',
-            'calculation_formula_across_locations',
-        )
-
-
 class DisaggregationValueListSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -56,7 +42,15 @@ class DisaggregationValueListSerializer(serializers.ModelSerializer):
 
 class DisaggregationListSerializer(serializers.ModelSerializer):
     choices = DisaggregationValueListSerializer(
-        many=True, read_only=True, source='disaggregation_value')
+        many=True, source='disaggregation_values')
+
+    def create(self, validated_data):
+        disaggregation_values = validated_data.pop('disaggregation_values')
+        instance = Disaggregation.objects.create(**validated_data)
+        for choice in disaggregation_values:
+            DisaggregationValue.objects.create(disaggregation=instance,
+                                               value=choice['value'])
+        return instance
 
     class Meta:
         model = Disaggregation
@@ -64,7 +58,22 @@ class DisaggregationListSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'active',
+            'response_plan',
             'choices',
+        )
+
+
+class IndicatorBlueprintSimpleSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = IndicatorBlueprint
+        fields = (
+            'id',
+            'title',
+            'unit',
+            'display_type',
+            'calculation_formula_across_periods',
+            'calculation_formula_across_locations',
         )
 
 
@@ -110,9 +119,14 @@ class IndicatorListSerializer(serializers.ModelSerializer):
     achieved = serializers.JSONField()
     progress_percentage = serializers.FloatField()
     content_type_name = serializers.SerializerMethodField()
+    content_object_title = serializers.SerializerMethodField()
+    disaggregations = DisaggregationListSerializer(many=True, read_only=True)
 
     def get_content_type_name(self, obj):
         return obj.content_type.name
+
+    def get_content_object_title(self, obj):
+        return obj.content_object.title
 
     class Meta:
         model = Reportable
@@ -125,7 +139,9 @@ class IndicatorListSerializer(serializers.ModelSerializer):
             'achieved',
             'progress_percentage',
             'content_type_name',
-            'object_id'
+            'content_object_title',
+            'object_id',
+            'disaggregations'
         )
 
 

@@ -67,6 +67,10 @@
               <paper-tab name="activities">
                 <span class="tab-content">Activities</span>
               </paper-tab>
+
+              <paper-tab name="disaggregations">
+                <span class="tab-content">Disaggregations</span>
+              </paper-tab>
             </paper-tabs>
           </div>
         </page-header>
@@ -120,6 +124,11 @@
             this.tab = 'activities';
             break;
 
+          case 'disaggregations':
+            this.subpage = 'disaggregations';
+            this.tab = 'disaggregations';
+            break;
+
           case 'response-plan':
             this.subpage = 'response-plan';
             break;
@@ -140,7 +149,8 @@
       },
 
       _displayHeader: function(subpage) {
-        var requiresHeader = ['objectives', 'activities', 'response-plans'];
+        var requiresHeader = ['objectives', 'activities', 'disaggregations',
+          'response-plans'];
         return this._displayClusterHeader(subpage, requiresHeader);
       },
 

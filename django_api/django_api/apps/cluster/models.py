@@ -30,7 +30,8 @@ class Cluster(TimeStampedModel):
         account.User (ForeignKey): "user"
     """
     type = models.CharField(max_length=32, choices=CLUSTER_TYPES)
-    response_plan = models.ForeignKey('core.ResponsePlan', null=True, related_name="clusters")
+    response_plan = models.ForeignKey('core.ResponsePlan', null=True,
+                                      related_name="clusters")
     user = models.ForeignKey('account.User', related_name="clusters")
 
     class Meta:
@@ -258,8 +259,13 @@ class ClusterObjective(TimeStampedModel):
     class Meta:
         ordering = ['-id']
 
+    @property
+    def response_plan(self):
+        return self.cluster.response_plan
+
     def __str__(self):
         return "<pk: %s> %s" % (self.id, self.title)
+
 
 
 class ClusterActivity(TimeStampedModel):
@@ -284,6 +290,14 @@ class ClusterActivity(TimeStampedModel):
 
     class Meta:
         ordering = ['-id']
+
+    @property
+    def cluster(self):
+        return self.cluster_objective.cluster
+
+    @property
+    def response_plan(self):
+        return self.cluster.response_plan
 
     def __str__(self):
         return "<pk: %s> %s" % (self.id, self.title)

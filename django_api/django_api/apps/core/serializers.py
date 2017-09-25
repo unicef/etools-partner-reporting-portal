@@ -16,7 +16,8 @@ class WorkspaceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Workspace
-        fields = ('id', 'title', 'workspace_code', 'location_id', 'countries')
+        fields = ('id', 'title', 'workspace_code', 'location_id', 'countries',
+                  'business_area_code')
 
     def get_location_id(self, obj):
         # for example: Ukrain, Luhansk, Sorokyne .. we want to have only Ukrain (no parent - always one)
@@ -67,6 +68,8 @@ class ChildrenLocationSerializer(serializers.ModelSerializer):
 
 class ResponsePlanSerializer(serializers.ModelSerializer):
 
+    clusters = serializers.SerializerMethodField()
+
     class Meta:
         model = ResponsePlan
         fields = (
@@ -77,4 +80,9 @@ class ResponsePlanSerializer(serializers.ModelSerializer):
             'end',
             'workspace',
             'documents',
+            'clusters'
         )
+
+    def get_clusters(self, obj):
+        from cluster.serializers import ClusterSimpleSerializer
+        return ClusterSimpleSerializer(obj.clusters.all(), many=True).data

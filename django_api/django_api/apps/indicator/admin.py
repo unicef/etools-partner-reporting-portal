@@ -42,9 +42,21 @@ class IndicatorLocationDataAdmin(admin.ModelAdmin):
     list_filter = ('num_disaggregation', 'level_reported',)
 
 
+class DisaggregationAdmin(admin.ModelAdmin):
+    list_display = ('name', 'response_plan', 'active')
+    list_filter = ('response_plan', 'active')
+    search_fields = ('name',)
+
+
+class DisaggregationValueAdmin(admin.ModelAdmin):
+    list_display = ('disaggregation', 'value')
+    list_filter = ('disaggregation',)
+    search_fields = ('value',)
+
+
 admin.site.register(IndicatorBlueprint, IndicatorBlueprintAdmin)
 admin.site.register(Reportable, ReportableAdmin)
 admin.site.register(IndicatorReport, IndicatorReportAdmin)
 admin.site.register(IndicatorLocationData, IndicatorLocationDataAdmin)
-admin.site.register(Disaggregation)
-admin.site.register(DisaggregationValue)
+admin.site.register(Disaggregation, DisaggregationAdmin)
+admin.site.register(DisaggregationValue, DisaggregationValueAdmin)

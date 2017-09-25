@@ -12,6 +12,11 @@ class ClusterAdmin(admin.ModelAdmin):
     list_filter = ('type', 'response_plan', 'response_plan__workspace')
 
 
+class ClusterActivityAdmin(admin.ModelAdmin):
+    list_display = ('title', 'standard', 'frequency', 'cluster_objective')
+    list_filter = ('frequency', 'cluster_objective'
+)
+
 admin.site.register(Cluster, ClusterAdmin)
 admin.site.register(ClusterObjective)
-admin.site.register(ClusterActivity)
+admin.site.register(ClusterActivity, ClusterActivityAdmin)
