@@ -26,7 +26,7 @@ class XLSXWriter:
 
     def generate_sheet(self, disaggregation_types):
 
-        DISAGGREGATION_COLUMN_START = 28
+        DISAGGREGATION_COLUMN_START = 29
         INDICATOR_DATA_ROW_START = 4
 
         # Setup a title
@@ -81,6 +81,9 @@ class XLSXWriter:
 
         indicators = indicators.order_by('reportable__id')
 
+        if not indicators:
+            return False
+
         # Each row is one location per indicator
         start_row_id = INDICATOR_DATA_ROW_START
 
@@ -134,17 +137,18 @@ class XLSXWriter:
                 self.sheet.cell(row=start_row_id, column=16).value = indicator.time_period_start
                 self.sheet.cell(row=start_row_id, column=17).value = indicator.time_period_end
 
-                self.sheet.cell(row=start_row_id, column=18).value = indicator.get_overall_status_display()
+                self.sheet.cell(row=start_row_id, column=18).value = indicator.get_report_status_display()
+                self.sheet.cell(row=start_row_id, column=19).value = indicator.get_overall_status_display()
 
-                self.sheet.cell(row=start_row_id, column=19).value = indicator.submission_date
-                self.sheet.cell(row=start_row_id, column=20).value = cluster.id
-                self.sheet.cell(row=start_row_id, column=21).value = cluster_objective.id
-                self.sheet.cell(row=start_row_id, column=22).value = partner_activity.id
-                self.sheet.cell(row=start_row_id, column=23).value = indicator.reportable.blueprint.id
-                self.sheet.cell(row=start_row_id, column=24).value = partner_project.partner.id
-                self.sheet.cell(row=start_row_id, column=25).value = partner_project.id
-                self.sheet.cell(row=start_row_id, column=26).value = indicator.id
-                self.sheet.cell(row=start_row_id, column=27).value = location_data.id
+                self.sheet.cell(row=start_row_id, column=20).value = indicator.submission_date
+                self.sheet.cell(row=start_row_id, column=21).value = cluster.id
+                self.sheet.cell(row=start_row_id, column=22).value = cluster_objective.id
+                self.sheet.cell(row=start_row_id, column=23).value = partner_activity.id
+                self.sheet.cell(row=start_row_id, column=24).value = indicator.reportable.blueprint.id
+                self.sheet.cell(row=start_row_id, column=25).value = partner_project.partner.id
+                self.sheet.cell(row=start_row_id, column=26).value = partner_project.id
+                self.sheet.cell(row=start_row_id, column=27).value = indicator.id
+                self.sheet.cell(row=start_row_id, column=28).value = location_data.id
 
                 # Check location item disaggregation type
                 for reported_disaggregation_type in location_data.disaggregation_reported_on:
@@ -163,6 +167,8 @@ class XLSXWriter:
                                 self.sheet.cell(row=start_row_id, column=dv).value = v['c']
 
                 start_row_id += 1
+
+        return True
 
     def export_data(self):
 
@@ -188,7 +194,8 @@ class XLSXWriter:
         sheet_no = 0
         for disaggregation_types in disaggregation_types_list:
             self.sheet = sheets[sheet_no]
-            self.generate_sheet(disaggregation_types)
+            if not self.generate_sheet(disaggregation_types):
+                self.wb.remove_sheet(self.sheet)
             sheet_no += 1
 
         filepath = SAVE_PATH + 'export.xlsx'
