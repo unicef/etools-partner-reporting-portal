@@ -1,0 +1,74 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="dropdown-form-input.html">
+<link rel="import" href="../etools-prp-ajax.html">
+<link rel="import" href="../../endpoints.html">
+<link rel="import" href="../../redux/store.html">
+
+<dom-module id="disaggregation-dropdown-content">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <etools-prp-ajax
+        id="disaggregationNames"
+        url="[[disaggregationNamesUrl]]">
+    </etools-prp-ajax>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'disaggregation-dropdown-content',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        disaggregationNamesUrl: {
+          type: String,
+          computed: '_computeDisaggregationNamesUrl(responsePlanID)',
+          observer: '_fetchDisaggregationNames',
+        },
+
+        responsePlanID: {
+          type: String,
+          statePath: 'responsePlans.currentID',
+        },
+
+        disaggregations: {
+          type: Array,
+          value: [],
+          notify: true
+        },
+      },
+
+      _computeDisaggregationNamesUrl: function (responsePlanID) {
+        return App.Endpoints.disaggregationNames(responsePlanID);
+      },
+
+      _fetchDisaggregationNames: function () {
+        var self = this;
+
+        this.$.disaggregationNames.abort();
+
+        this.$.disaggregationNames.thunk()()
+            .then(function (res) {
+              self.set('disaggregations', res.results);
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
+
+      },
+
+      detached: function () {
+        this.$.disaggregationNames.abort();
+      },
+    });
+  </script>
+</dom-module>

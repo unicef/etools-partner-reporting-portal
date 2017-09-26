@@ -139,6 +139,10 @@
         return this._buildUrl('/cluster/' + responsePlanId + '/cluster-simple-list/');
       },
 
+      disaggregationNames: function (responsePlanId) {
+        return this._buildUrl('/indicator/' + responsePlanId + '/disaggregations')
+      },
+
       clusterProjectNames: function (responsePlanId) {
         return this._buildUrl('/partner/' + responsePlanId + '/partner-project-simple-list/');
       },
