@@ -100,63 +100,81 @@
                 <div class="table-cell">
                   <template
                       is="dom-if"
-                      if="[[_equals(item.data.display_type, 'number')]]"
-                      restamp="true">
-                    <paper-radio-group
-                        data-id$="[[item.data.id]]"
-                        data-llo-id$="[[item.llo_id]]"
-                        data-scope="calculation_formula_across_locations"
-                        on-paper-radio-group-changed="_onValueChanged"
-                        selected="[[_computeSelected(item.data, 'calculation_formula_across_locations')]]">
-                      <paper-radio-button name="sum">sum</paper-radio-button>
-                      <paper-radio-button name="max">max</paper-radio-button>
-                      <paper-radio-button name="avg">avg</paper-radio-button>
-                    </paper-radio-group>
+                      if="[[item.data.editable]]">
+                    <template
+                        is="dom-if"
+                        if="[[_equals(item.data.display_type, 'number')]]"
+                        restamp="true">
+                      <paper-radio-group
+                          data-id$="[[item.data.id]]"
+                          data-llo-id$="[[item.llo_id]]"
+                          data-scope="calculation_formula_across_locations"
+                          on-paper-radio-group-changed="_onValueChanged"
+                          selected="[[_computeSelected(item.data, 'calculation_formula_across_locations')]]">
+                        <paper-radio-button name="sum">sum</paper-radio-button>
+                        <paper-radio-button name="max">max</paper-radio-button>
+                        <paper-radio-button name="avg">avg</paper-radio-button>
+                      </paper-radio-group>
+                    </template>
+                    <template
+                        is="dom-if"
+                        if="[[_equals(item.data.display_type, 'percentage')]]"
+                        restamp="true">
+                      <paper-radio-group
+                          data-id$="[[item.data.id]]"
+                          data-llo-id$="[[item.llo_id]]"
+                          data-scope="calculation_formula_across_locations"
+                          on-paper-radio-group-changed="_onValueChanged"
+                          selected="[[_computeSelected(item.data, 'calculation_formula_across_locations')]]">
+                        <paper-radio-button name="percentage">percentage</paper-radio-button>
+                        <paper-radio-button name="ratio">ratio</paper-radio-button>
+                      </paper-radio-group>
+                    </template>
                   </template>
                   <template
                       is="dom-if"
-                      if="[[_equals(item.data.display_type, 'percentage')]]"
-                      restamp="true">
-                    <paper-radio-group
-                        data-id$="[[item.data.id]]"
-                        data-llo-id$="[[item.llo_id]]"
-                        data-scope="calculation_formula_across_locations"
-                        on-paper-radio-group-changed="_onValueChanged"
-                        selected="[[_computeSelected(item.data, 'calculation_formula_across_locations')]]">
-                      <paper-radio-button name="percentage">percentage</paper-radio-button>
-                      <paper-radio-button name="ratio">ratio</paper-radio-button>
-                    </paper-radio-group>
+                      if="[[!item.data.editable]]">
+                    [[item.data.calculation_formula_across_locations]]
                   </template>
                 </div>
                 <div class="table-cell">
                   <template
                       is="dom-if"
-                      if="[[_equals(item.data.display_type, 'number')]]"
-                      restamp="true">
-                    <paper-radio-group
-                        data-id$="[[item.data.id]]"
-                        data-llo-id$="[[item.llo_id]]"
-                        data-scope="calculation_formula_across_periods"
-                        on-paper-radio-group-changed="_onValueChanged"
-                        selected="[[_computeSelected(item.data, 'calculation_formula_across_periods')]]">
-                      <paper-radio-button name="sum">sum</paper-radio-button>
-                      <paper-radio-button name="max">max</paper-radio-button>
-                      <paper-radio-button name="avg">avg</paper-radio-button>
-                    </paper-radio-group>
+                      if="[[item.data.editable]]">
+                    <template
+                        is="dom-if"
+                        if="[[_equals(item.data.display_type, 'number')]]"
+                        restamp="true">
+                      <paper-radio-group
+                          data-id$="[[item.data.id]]"
+                          data-llo-id$="[[item.llo_id]]"
+                          data-scope="calculation_formula_across_periods"
+                          on-paper-radio-group-changed="_onValueChanged"
+                          selected="[[_computeSelected(item.data, 'calculation_formula_across_periods')]]">
+                        <paper-radio-button name="sum">sum</paper-radio-button>
+                        <paper-radio-button name="max">max</paper-radio-button>
+                        <paper-radio-button name="avg">avg</paper-radio-button>
+                      </paper-radio-group>
+                    </template>
+                    <template
+                        is="dom-if"
+                        if="[[_equals(item.data.display_type, 'percentage')]]"
+                        restamp="true">
+                      <paper-radio-group
+                          data-id$="[[item.data.id]]"
+                          data-llo-id$="[[item.llo_id]]"
+                          data-scope="calculation_formula_across_periods"
+                          on-paper-radio-group-changed="_onValueChanged"
+                          selected="[[_computeSelected(item.data, 'calculation_formula_across_periods')]]">
+                        <paper-radio-button name="percentage">percentage</paper-radio-button>
+                        <paper-radio-button name="ratio">ratio</paper-radio-button>
+                      </paper-radio-group>
+                    </template>
                   </template>
                   <template
                       is="dom-if"
-                      if="[[_equals(item.data.display_type, 'percentage')]]"
-                      restamp="true">
-                    <paper-radio-group
-                        data-id$="[[item.data.id]]"
-                        data-llo-id$="[[item.llo_id]]"
-                        data-scope="calculation_formula_across_periods"
-                        on-paper-radio-group-changed="_onValueChanged"
-                        selected="[[_computeSelected(item.data, 'calculation_formula_across_periods')]]">
-                      <paper-radio-button name="percentage">percentage</paper-radio-button>
-                      <paper-radio-button name="ratio">ratio</paper-radio-button>
-                    </paper-radio-group>
+                      if="[[!item.data.editable]]">
+                    [[item.data.calculation_formula_across_periods]]
                   </template>
                 </div>
               </template>
