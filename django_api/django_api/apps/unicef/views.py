@@ -308,7 +308,7 @@ class ProgressReportLocationsAPIView(ListAPIView):
         self.workspace_id = workspace_id
         pr = self.get_object(progress_report_id)
         queryset = self.get_queryset().filter(
-            reportables__indicator_reports__progress_report__programme_document__progress_reports=pr).distinct()
+            indicator_location_data__indicator_report__progress_report=pr).distinct()
         filtered = ProgressReportFilter(request.GET, queryset=queryset)
 
         page = self.paginate_queryset(filtered.qs)
