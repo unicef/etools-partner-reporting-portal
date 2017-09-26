@@ -49,6 +49,16 @@
         return this.programmeDocumentReport(workspaceId, reportId) + 'submit/';
       },
 
+      calculationMethods: function (workspaceId, pdId) {
+        return this._buildUrl(
+          '/unicef/' +
+          workspaceId +
+          '/programme-document/' +
+          pdId +
+          '/calculation-methods/'
+        );
+      },
+
       progressReports: function(locationId) {
         return this._buildUrl('/unicef/' + locationId + '/progress-reports');
       },

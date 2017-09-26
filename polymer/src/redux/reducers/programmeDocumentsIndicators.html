@@ -23,13 +23,10 @@
           return (function () {
             var change = {};
 
-            change[action.pdId] = action.indicators;
+            change[action.pdId] = action.indicatorData;
 
             return Object.assign({}, state, change);
           }());
-
-        case App.Constants.UPDATE_PD_INDICATOR:
-          return state; // TODO
 
         case App.Constants.RESET:
           return {};

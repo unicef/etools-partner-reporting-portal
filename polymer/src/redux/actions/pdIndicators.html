@@ -15,9 +15,7 @@
 
           return indicatorsThunk()
               .then(function (res) {
-                var indicatorData = res.data;
-
-                dispatch(App.Actions.PDIndicators.set(pdId, indicatorData.results));
+                dispatch(App.Actions.PDIndicators.set(pdId, res.data));
                 dispatch(App.Actions.PDIndicators.loadingStop(pdId));
               })
               .catch(function (err) {
@@ -28,11 +26,28 @@
         };
       },
 
-      set: function (pdId, indicators) {
+      update: function (updateThunk, pdId) {
+        return function (dispatch) {
+          dispatch(App.Actions.PDIndicators.loadingStart(pdId));
+
+          return updateThunk()
+              .then(function (res) {
+                dispatch(App.Actions.PDIndicators.set(pdId, res.data));
+                dispatch(App.Actions.PDIndicators.loadingStop(pdId));
+              })
+              .catch(function (err) {
+                dispatch(App.Actions.PDIndicators.loadingStop(pdId));
+
+                return Promise.reject(err);
+              });
+        };
+      },
+
+      set: function (pdId, indicatorData) {
         return {
           type: App.Constants.SET_PD_INDICATORS,
           pdId: pdId,
-          indicators: indicators,
+          indicatorData: indicatorData,
         };
       },
 
