@@ -1,65 +1,83 @@
 <link rel="import" href="../../../../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../../../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../../../../../../bower_components/etools-loading/etools-loading.html">
 <link rel="import" href="../../../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../../../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../../../../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../../../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../../../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../../../../../../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../../../../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../../../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../../../../../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../../../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 
-<link rel="import" href="../../../../../polyfills/es6-shim.html">
+<link rel="import" href="../../../../form-fields/cluster-dropdown-content.html">
 <link rel="import" href="../../../../etools-prp-ajax.html">
 <link rel="import" href="../../../../../styles/buttons.html">
 <link rel="import" href="../../../../../redux/store.html">
 <link rel="import" href="../../../../../redux/actions.html">
 <link rel="import" href="../../../../../behaviors/routing.html">
 <link rel="import" href="../../../../../behaviors/utils.html">
+
 <link rel="import" href="../../../../etools-prp-chips.html">
 <link rel="import" href="../../../chip-disagg-value.html">
 
 <dom-module id="cluster-disaggregations-modal">
   <template>
-    <style include="button-styles iron-flex iron-flex-alignment">
+    <style include="app-grid-style button-styles iron-flex iron-flex-alignment iron-flex-reverse">
       :host {
         display: block;
+
+        --app-grid-columns: 3;
+        --app-grid-gutter: 15px;
+        --app-grid-item-height: auto;
+        --app-grid-expandible-item-columns: 3;
+
+        --paper-dialog: {
+          width: 700px;
+
+          & > * {
+            margin: 0;
+          }
+        };
       }
 
-      h2 {
-        padding: 5px 10px;
-        margin: 0 0 1em;
-        font-size: 14px;
-        background-color: var(--paper-grey-200);
+      .full-width {
+        @apply --app-grid-expandible-item;
       }
 
-      .error,
-      .remove-btn {
-        color: var(--paper-deep-orange-a700);
-      }
-
-      .row {
-        margin-bottom: 1em;
-      }
-
-      .remove-btn {
-        width: 34px;
-        height: 34px;
-      }
-
-      .add-disaggregation-btn {
+      .header {
+        height: 48px;
+        padding: 0 24px;
         margin: 0;
+        color: white;
+        background: var(--theme-primary-color);
       }
 
-      .col-actions {
-        width: 40px;
-        border-right: 1px solid var(--paper-grey-400);
+      .header h2 {
+        @apply(--paper-font-title);
+
+        margin: 0;
+        line-height: 48px;
       }
 
-      .col-name,
-      .col-values {
-        padding-left: 24px;
+      .header paper-icon-button {
+        margin: 0 -13px 0 20px;
+        color: white;
+      }
+
+      .buttons {
+        padding: 24px;
       }
     </style>
-    
+
     <iron-location path="{{path}}"></iron-location>
-     <etools-prp-ajax
+
+    <cluster-dropdown-content clusters="{{clusters}}"></cluster-dropdown-content>
+
+    <etools-prp-ajax
         id="createDisaggregation"
         url="[[url]]"
         body="[[data]]"
@@ -67,8 +85,6 @@
         method="post">
     </etools-prp-ajax>
 
-<!--     <h2 class$="[[_headingClassName]]">Disaggregations ([[value.length]])</h2> -->
-    
     <paper-dialog
         id="dialog"
         with-backdrop
@@ -82,26 +98,21 @@
           </paper-icon-button>
         </div>
       </div>
+
       <paper-dialog-scrollable>
-    <template
-        is="dom-repeat"
-        items="[[value]]">
-      <div class="row layout horizontal">
-        <div class="flex-none layout vertical center-center col-actions">
-          <paper-icon-button
-              index="[[index]]"
-              class="remove-btn"
-              on-tap="_remove"
-              icon="icons:cancel">
-          </paper-icon-button>
-        </div>
-        <div class="flex col-name">
+        <template
+            is="dom-if"
+            if="[[refresh]]"
+            restamp="true">
+          <iron-form class="app-grid">
+
+              <div class="flex col-name">
           <paper-input
               class="validate"
-              index="[[index]]"
+              id="name"
               name="name"
               label="Disaggregation"
-              value="[[_getField(index, 'name', value.length)]]"
+              value="{{data.name}}"
               on-input="_onInput"
               always-float-label
               required>
@@ -110,20 +121,22 @@
         <div class="flex col-values">
           <etools-prp-chips
               class="validate"
-              index="[[index]]"
+              index="0"
               name="values"
               label="Disaggregation group"
-              value="[[_getField(index, 'values', value.length)]]"
+              value="{{data.choices}}"
               on-selected-chips-updated="_onInput"
               required>
             <chip-disagg-value></chip-disagg-value>
           </etools-prp-chips>
         </div>
-      </div>
-    </template>
-    </paper-dialog-scrollable>
-    <div class="buttons layout horizontal-reverse">
-    <paper-button class="btn-primary" on-tap="_save" raised>
+
+          </iron-form>
+        </template>
+      </paper-dialog-scrollable>
+
+      <div class="buttons layout horizontal-reverse">
+        <paper-button class="btn-primary" on-tap="_save" raised>
           Save
         </paper-button>
 
@@ -131,6 +144,7 @@
           Cancel
         </paper-button>
       </div>
+
     </paper-dialog>
   </template>
 
@@ -149,27 +163,22 @@
           type: String,
           statePath: 'responsePlans.currentID',
         },
-        opened: {
-          type: Boolean,
-          value: false,
-        },
-        url: {
-          type: String,
-          computed: '_computeUrl(responsePlanID)'
-        },
-        refresh: {
-          type: Boolean,
-          value: false
-        },
-        value: {
+
+        choices: {
           type: Array,
           value: [],
           notify: true,
         },
+        value: {
+          type: Object,
+          value: {},
+          notify: true
+        },
 
-        updatePending: {
-          type: Boolean,
-          value: false,
+        name: {
+          type: String,
+          value: "",
+          notify: true
         },
 
         invalid: {
@@ -178,20 +187,49 @@
           value: true
         },
 
-        _invalid: {
+        opened: {
           type: Boolean,
           value: false,
         },
 
-        _headingClassName: {
+        updatePending: {
+          type: Boolean,
+          value: false,
+        },
+
+        formatDate: {
           type: String,
-          computed: '_computeHeadingClassName(_invalid)',
+          value: 'DD MMM YYYY'
+        },
+
+        url: {
+          type: String,
+          computed: '_computeUrl(responsePlanID)'
+        },
+        disaggregations: {
+          type: Object,
+          statePath: 'clusterDisaggregations.all',
+        },
+
+        frequencies: {
+          type: Array,
+          value: [
+            {title: 'Weekly', id: 'Wee'},
+            {title: 'Monthly', id: 'Mon'},
+            {title: 'Quarterly', id: 'Qua'},
+          ],
+        },
+
+        clusters: {
+          type: Array,
+          value: []
+        },
+
+        refresh: {
+          type: Boolean,
+          value: false
         },
       },
-
-      observers: [
-        '_setValidity(value.splices)'
-      ],
 
       _computeUrl: function(responsePlanID) {
         return App.Endpoints.responseParametersClusterDisaggregations(responsePlanID);
@@ -201,28 +239,11 @@
         this.set('opened', false);
         this.set('refresh', false);
       },
+
       open: function () {
-        this.data = {};
+        this.data = {"response_plan":+this.responsePlanID, "choices": []};
         this.set('opened', true);
         this.set('refresh', true);
-      },
-      _setValidity: function () {
-        var invalid = this.value.length && this.value.some(function (disagg) {
-          return !disagg.name.length || !disagg.values.length;
-        });
-
-        this.set('invalid', invalid);
-      },
-
-      _computeHeadingClassName: function (invalid) {
-        return invalid ? 'error' : '';
-      },
-
-      _add: function () {
-        this.push('value', {
-          name: '',
-          values: [],
-        });
       },
 
       _redirectToDetail: function () {
@@ -231,18 +252,51 @@
         this.set('path', url);
       },
 
-      _remove: function (e) {
-        var toRemove = +e.target.index;
-
-        this.splice('value', toRemove, 1);
+      _validate: function (e) {
+        e.target.validate();
       },
 
+      _save: function () {
+        if (!this._fieldsAreValid()) {
+          return;
+        }
+        if (!this._checkMatchingName()) {
+          Polymer.dom(this.root).querySelector('#name').set('invalid', true)
+          return;
+        }
+        var self = this;
+        var thunk = this.$.createDisaggregation.thunk();
+        let newChoices = []
+        for (let choice of this.data.choices) {
+          newChoices.push({"value": choice})
+        }
+        this.data.choices = newChoices
+        thunk()
+          .then(function (res) {
+            console.log("then")
+            self.updatePending = false;
+            self._redirectToDetail();
+          })
+          .catch(function (err) { // jshint ignore:line
+            self.updatePending = false;
+            console.log("catch", err)
+            // TODO: error handling
+          });
+      },
+      _checkMatchingName: function() {
+        console.log('check')
+        let disaggregations = this.disaggregations;
+          for (let disagg of disaggregations) {
+            if (disagg.name === this.value.name.trim()) {
+                return false
+            }
+          }
+          return true
+      },
       _onInput: function (e) {
         var el = e.target;
         var newValue = el.value;
-
         this.async(function () {
-          var index = +el.index;
           var field = el.name;
           var change = {};
 
@@ -250,44 +304,20 @@
               newValue.trim() : newValue;
 
           this.set(
-            ['value', index],
-            Object.assign({}, this.value[index], change)
+            ['value'],
+            Object.assign({}, this.value, change)
           );
-
           el.validate();
 
           this._setValidity();
         });
       },
+     _setValidity: function () {
 
-      _save: function () {
-        if (!this._fieldsAreValid()) {
-          return;
-        }
-
-        var self = this;
-        var thunk = this.$.createDisaggregation.thunk();
-        thunk()
-          .then(function (res) {
-            self.updatePending = false;
-            self._redirectToDetail(res.data.id);
-          })
-          .catch(function (err) { // jshint ignore:line
-            self.updatePending = false;
-            // TODO: error handling
-          });
-      },
-
-      _getField: function (index, name) {
-        return (this.value[index] || {})[name];
-      },
-
-      validate: function () {
-        this.set('_invalid', this.invalid);
-
-        this._forEach('.validate', function (element) {
-          element.validate();
+        var invalid = this.value.length && this.value.some(function (disagg) {
+          return !disagg.name.length || !disagg.values.length;
         });
+        this.set('invalid', invalid);
       },
     });
   </script>
