@@ -82,6 +82,7 @@ from core.factories import (
     GatewayTypeFactory,
     CartoDBTableFactory,
     CountryFactory,
+    ReportingPeriodDatesFactory,
 )
 from core.common import INDICATOR_REPORT_STATUS
 
@@ -124,6 +125,7 @@ def clean_up_data():
 
 
 def generate_fake_data(workspace_quantity=10):
+
     if not settings.IS_TEST and workspace_quantity < 1:
         workspace_quantity = 5
 
@@ -370,9 +372,17 @@ def generate_fake_data(workspace_quantity=10):
     PersonFactory.create_batch(workspace_quantity)
     for partner in Partner.objects.all():
         for workspace in Workspace.objects.all():
-            ProgrammeDocumentFactory.create_batch(workspace_quantity * 5,
-                                                  partner=partner,
-                                                  workspace=workspace)
+            for i in range(workspace_quantity * 5):
+                pd = ProgrammeDocumentFactory.create(partner=partner, workspace=workspace)
+                for ir in range(3):
+                    d = datetime.datetime.now() + datetime.timedelta(days=ir * 30)
+                    ReportingPeriodDatesFactory.create(
+                        programme_document=pd,
+                        start_date=d,
+                        end_date=d + datetime.timedelta(days=30),
+                        due_date=d + datetime.timedelta(days=45),
+                    )
+
     print "{} ProgrammeDocument objects created".format(
         workspace_quantity * Partner.objects.count())
 
@@ -381,7 +391,7 @@ def generate_fake_data(workspace_quantity=10):
     # created LowerLevelOutput - QuantityReportableToLowerLevelOutput
     # Section - ProgrammeDocument via QuantityReportableToLowerLevelOutput
     # ProgressReport - IndicatorReport from
-    # QuantityReportableToLowerLevelOutput
+    # QuantityReportableToLowerLevelOutputA
     for idx, llo in enumerate(LowerLevelOutput.objects.all()):
         country = llo.cp_output.programme_document.workspace.countries.first()
         locations = list(Location.objects.filter(gateway__country=country))

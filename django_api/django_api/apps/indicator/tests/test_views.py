@@ -130,7 +130,6 @@ class TestIndicatorDataAPIView(BaseAPITestCase):
                 'partner_contribution_to_date': 'update field',
                 'challenges_in_the_reporting_period': 'new challanges',
                 'proposed_way_forward': 'update field',
-                'funds_received_to_date': 'updated funds',
                 'programme_document_id': ir.progress_report.programme_document.id,
             }
         }
