@@ -33,6 +33,8 @@ from indicator.serializers import IndicatorListSerializer, PDReportsSerializer
 from indicator.filters import PDReportsFilter
 from indicator.serializers import IndicatorBlueprintSimpleSerializer
 
+from partner.models import Partner
+
 from .serializers import (
     ProgrammeDocumentSerializer,
     ProgrammeDocumentDetailSerializer,
@@ -54,7 +56,8 @@ logger = logging.getLogger(__name__)
 
 class ProgrammeDocumentAPIView(ListAPIView):
     """
-    Endpoint for getting Programme Document.
+    Endpoint for getting a list of Programme Documents and being able to
+    filter by them.
     """
     serializer_class = ProgrammeDocumentSerializer
     permission_classes = (IsAuthenticated, )
@@ -199,6 +202,8 @@ class ProgressReportAPIView(ListAPIView):
     Endpoint for getting list of all Progress Reports. Supports filtering
     as per ProgressReportFilter by status, pd_ref_title, programme_document
     (id) etc.
+
+    Supports additional GET param to filter by external_partner_id
     """
     serializer_class = ProgressReportSimpleSerializer
     pagination_class = SmallPagination
@@ -207,9 +212,15 @@ class ProgressReportAPIView(ListAPIView):
     filter_class = ProgressReportFilter
 
     def get_queryset(self):
-        # Limit reports to partner only
-        return ProgressReport.objects.filter(
-            programme_document__partner=self.request.user.partner)
+        external_partner_id = self.request.GET.get('external_partner_id')
+        if external_partner_id is not None:
+            qset = Partner.objects.filter(external_id=external_partner_id)
+            return ProgressReport.objects.filter(
+                programme_document__partner__in=qset)
+        else:
+            # Limit reports to this user's partner only
+            return ProgressReport.objects.filter(
+                programme_document__partner=self.request.user.partner)
 
     def list(self, request, workspace_id, *args, **kwargs):
         queryset = self.get_queryset().filter(
