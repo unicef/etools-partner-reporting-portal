@@ -14,6 +14,7 @@
 <link rel="import" href="../../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-multi-selection-menu.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
 
 <link rel="import" href="../../polyfills/es6-shim.html">
 <link rel="import" href="disaggregations-widget.html">
@@ -47,6 +48,41 @@
         };
       }
 
+      h2 {
+        padding: 5px 10px;
+        margin: 0 0 1em;
+        font-size: 14px;
+        background-color: var(--paper-grey-200);
+      }
+
+      .error,
+      .remove-btn {
+        color: var(--paper-deep-orange-a700);
+      }
+
+      .rowDis {
+        margin-bottom: 1em;
+      }
+
+      .remove-btn {
+        width: 34px;
+        height: 34px;
+      }
+
+      .add-disaggregation-btn {
+        margin: 0;
+      }
+
+      .col-actions {
+        width: 40px;
+        border-right: 1px solid var(--paper-grey-400);
+      }
+
+      .col-name,
+      .col-values {
+        padding-left: 24px;
+      }
+
       .row {
         margin: 16px 0;
       }
@@ -67,6 +103,10 @@
     <etools-prp-ajax
         id="locations"
         url="[[locationsUrl]]">
+    </etools-prp-ajax>
+    <etools-prp-ajax
+        id="disaggregations"
+        url="[[disaggregationsUrl]]">
     </etools-prp-ajax>
 
     <etools-prp-ajax
@@ -236,13 +276,98 @@
                 required>
             </etools-multi-selection-menu>
           </div>
-
+          
           <div class="row">
-            <disaggregations-widget
+            <h2>Disaggregations ([[data.disaggregation.length]])</h2>
+          </div>
+          <div class="row">
+            <div class="app-grid">
+              
+              <div class="item">
+
+                <template is="dom-repeat" items="[[data.disaggregation]]">
+
+                  <div class="rowDis layout horizontal">
+                    
+                    <div class="flex-none layout vertical center-center col-actions">
+                      <paper-icon-button
+                        index="[[index]]"
+                        class="remove-btn"
+                        on-tap="_remove"
+                        icon="icons:cancel">
+                      </paper-icon-button>
+                    </div>
+
+                    <div class="flex col-name">
+                      <paper-dropdown-menu
+                        class="validate"
+                        index="[[index]]"
+                        label="Disaggregation By"
+                        on-value-changed="_validate"
+                        on-selected-item-changed="_setDisaggregation"
+                        always-float-label
+                        required>
+                      <paper-listbox
+                          slot="dropdown-content"
+                          class="dropdown-content"
+                          selected="{{selectedId}}">
+                        <template
+                            id="disaggregations"
+                            is="dom-repeat"
+                            items="[[disaggregations]]">
+                          <paper-item>[[item.name]]</paper-item>
+                        </template>
+                      </paper-listbox>
+                    </paper-dropdown-menu>
+                    </div>
+                  <div class="item">
+                    <div class="table-cell table-cell--text">
+                  <template is="dom-repeat" items="[[item.choices]]" as="choice">
+                    [[choice.value]];
+                  </template>
+                </div>
+                    
+                  </div>
+                </div>
+                  
+                  
+
+                </template>
+                </div>
+                <!-- <paper-dropdown-menu
+                    class="validate"
+                    label="Disaggregation By"
+                    on-value-changed="_validate"
+                    on-selected-item-changed="_setDisaggregation"
+                    always-float-label
+                    required>
+                  <paper-listbox
+                      slot="dropdown-content"
+                      class="dropdown-content"
+                      selected="{{selectedId}}">
+                    <template
+                        id="disaggregations"
+                        is="dom-repeat"
+                        items="[[disaggregations]]">
+                      <paper-item>[[item.name]]</paper-item>
+                    </template>
+                  </paper-listbox>
+                </paper-dropdown-menu> -->
+              
+
+              
+            </div>
+            <!-- <disaggregations-widget
                 class="validate"
                 value="{{data.disaggregation}}">
-            </disaggregations-widget>
+            </disaggregations-widget> -->
           </div>
+          <paper-button
+            class="btn-primary add-disaggregation-btn"
+            on-tap="_add"
+            disabled="[[!_canAddMore]]">
+          Add disaggregation
+        </paper-button>
         </template>
       </paper-dialog-scrollable>
 
@@ -285,6 +410,11 @@
 
         displayType: String,
 
+        responsePlanId: {
+         type: String,
+         statePath: 'responsePlans.currentID',
+       },
+
         locationId: {
           type: String,
           statePath: 'location.id',
@@ -293,6 +423,11 @@
         locationsUrl: {
           type: String,
           computed: '_computeLocationsUrl(locationId)',
+        },
+
+        disaggregationsUrl: {
+          type: String,
+          computed: '_computeDisaggregationsUrl(responsePlanId)'
         },
 
         indicatorsUrl: {
@@ -344,9 +479,29 @@
         },
       },
 
+      disaggregations: {
+        type: Array,
+        value: []
+      },
+
+      disaggregation: {
+        type: Array,
+        value: []
+      },
+
+      disagg: {
+        type: Object,
+        value: {}
+      },
+      _canAddMore: {
+          type: Boolean,
+          value: true,
+        },
+
       observers: [
         '_setDefaults(opened)',
         '_setLocations(selectedLocations.splices)',
+        '_setCanAddMore(data.disaggregation.splices)',
       ],
 
       _computeType: function (type, displayType) {
@@ -363,14 +518,46 @@
         this.set('data.blueprint.display_type', type);
       },
 
+      _setCanAddMore: function () {
+        console.log(this.data.disaggregation.length)
+        this.set('_canAddMore', this.data.disaggregation.length < 3);
+      },
+
       _setFrequency: function (e, data) {
         var freq = this.$$('#frequencies').itemForElement(data.value);
-
+        console.log(freq)
         if (!freq) {
           return;
         }
 
         this.set('data.frequency', freq.id);
+      },
+
+      _add: function () {
+        this.push('data.disaggregation', {
+          name: '',
+          choices: [],
+        });
+      },
+
+      _remove: function (e) {
+        var toRemove = +e.target.index;
+
+        this.splice('data.disaggregation', toRemove, 1);
+      },
+
+      _setDisaggregation: function (e, data) {
+        console.log('index', e.target.index)
+        var selected = this.disaggregations[this.selectedId]
+
+        if (!this.data.disaggregation.find(function(dis) {
+          return dis.id === selected.id
+        })) {
+          this.set(['data.disaggregation', +e.target.index], Object.assign({}, selected))
+        }
+        console.log(this.data.disaggregation)
+        this.set('disagg', selected)
+        console.log(this.disagg)
       },
 
       _setLocations: function () {
@@ -414,6 +601,7 @@
         this._forEach('paper-radio-group', this._updateValue);
 
         this._fetchLocations();
+        this._fetchDisaggregations();
       },
 
       _validate: function (e) {
@@ -428,6 +616,10 @@
         return App.Endpoints.childLocations(locationId);
       },
 
+      _computeDisaggregationsUrl: function(responsePlanId) {
+        return App.Endpoints.responseParametersClusterDisaggregations(responsePlanId)
+      },
+
       _fetchLocations: function () {
         var self = this;
 
@@ -435,6 +627,14 @@
             .then(function (res) {
               self.set('locations', res.data.map(self._formatLocation));
             });
+      },
+
+      _fetchDisaggregations: function() {
+        var self = this;
+        this.$.disaggregations.thunk()()
+          .then(function(res) {
+            self.set('disaggregations', res.data.results)
+          })
       },
 
       _formatLocation: function (data) {
