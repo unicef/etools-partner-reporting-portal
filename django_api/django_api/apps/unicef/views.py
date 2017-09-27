@@ -36,6 +36,7 @@ from indicator.serializers import IndicatorBlueprintSimpleSerializer
 from .serializers import (
     ProgrammeDocumentSerializer,
     ProgrammeDocumentDetailSerializer,
+    ProgressReportSimpleSerializer,
     ProgressReportSerializer,
     ProgressReportReviewSerializer,
     LLOutputSerializer,
@@ -154,9 +155,11 @@ class ProgrammeDocumentIndicatorsAPIView(ListAPIView):
 
 class ProgressReportAPIView(ListAPIView):
     """
-    Endpoint for getting list of all PD Progress Reports
+    Endpoint for getting list of all Progress Reports. Supports filtering
+    as per ProgressReportFilter by status, pd_ref_title, programme_document
+    (id) etc.
     """
-    serializer_class = ProgressReportSerializer
+    serializer_class = ProgressReportSimpleSerializer
     pagination_class = SmallPagination
     permission_classes = (IsAuthenticated, )
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
@@ -164,10 +167,12 @@ class ProgressReportAPIView(ListAPIView):
 
     def get_queryset(self):
         # Limit reports to partner only
-        return ProgressReport.objects.filter(programme_document__partner=self.request.user.partner)
+        return ProgressReport.objects.filter(
+            programme_document__partner=self.request.user.partner)
 
     def list(self, request, workspace_id, *args, **kwargs):
-        queryset = self.get_queryset().filter(programme_document__workspace=workspace_id)
+        queryset = self.get_queryset().filter(
+            programme_document__workspace=workspace_id)
         filtered = ProgressReportFilter(request.GET, queryset=queryset)
 
         page = self.paginate_queryset(filtered.qs)

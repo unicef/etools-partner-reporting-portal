@@ -136,11 +136,40 @@ class ProgrammeDocumentOutputNestedIndicatorReportSerializer(serializers.ModelSe
         )
 
 
-
-class ProgressReportSerializer(serializers.ModelSerializer):
-    programme_document = ProgrammeDocumentOutputNestedIndicatorReportSerializer()
+class ProgressReportSimpleSerializer(serializers.ModelSerializer):
+    programme_document = ProgrammeDocumentSerializer()
     reporting_period = serializers.SerializerMethodField()
     is_draft = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ProgressReport
+        fields = (
+            'id',
+            'partner_contribution_to_date',
+            'challenges_in_the_reporting_period',
+            'proposed_way_forward',
+            'status',
+            'reporting_period',
+            'submission_date',
+            'due_date',
+            'is_draft',
+            'review_date',
+            'sent_back_feedback',
+            'programme_document',
+        )
+
+    def get_reporting_period(self, obj):
+        return "%s - %s " % (
+            obj.start_date.strftime(settings.PRINT_DATA_FORMAT),
+            obj.end_date.strftime(settings.PRINT_DATA_FORMAT)
+        )
+
+    def get_is_draft(self, obj):
+        return obj.latest_indicator_report.is_draft
+
+
+class ProgressReportSerializer(ProgressReportSimpleSerializer):
+    programme_document = ProgrammeDocumentOutputNestedIndicatorReportSerializer()
     indicator_reports = PDReportsSerializer(read_only=True, many=True)
 
     class Meta:

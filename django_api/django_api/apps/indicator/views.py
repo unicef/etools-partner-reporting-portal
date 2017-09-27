@@ -216,6 +216,7 @@ class ReportableDetailAPIView(RetrieveAPIView):
     serializer_class = IndicatorListSerializer
     queryset = Reportable.objects.all()
     permission_classes = (IsAuthenticated, )
+    lookup_url_kwarg = 'reportable_id'
 
 
 class IndicatorDataAPIView(APIView):
