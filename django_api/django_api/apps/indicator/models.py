@@ -215,7 +215,7 @@ class Reportable(TimeStampedExternalSyncModelMixin):
 
     cs_dates = ArrayField(models.DateField(), default=list)
 
-    location_admin_refs = ArrayField(JSONField(), default=list)
+    location_admin_refs = ArrayField(JSONField(), default=list, null=True, blank=True)
     disaggregations = models.ManyToManyField(Disaggregation, blank=True)
 
     class Meta:
