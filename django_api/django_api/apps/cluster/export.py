@@ -11,13 +11,17 @@ from indicator.models import Disaggregation, DisaggregationValue
 PATH = settings.BASE_DIR + "/apps/cluster/templates/excel/export.xlsx"
 SAVE_PATH = settings.MEDIA_ROOT + '/'
 
+DISAGGREGATION_COLUMN_START = 29
+INDICATOR_DATA_ROW_START = 4
+
 class XLSXWriter:
-    def __init__(self, indicators, response_plan_id):
+    def __init__(self, indicators, response_plan_id, analysis=False):
 
         self.wb = load_workbook(PATH)
         self.sheet = self.wb.get_active_sheet()
         self.indicators = indicators
         self.response_plan_id = response_plan_id
+        self.analysis = analysis
 
 
     def duplicate_sheet(self, sheet):
@@ -25,9 +29,6 @@ class XLSXWriter:
 
 
     def generate_sheet(self, disaggregation_types):
-
-        DISAGGREGATION_COLUMN_START = 29
-        INDICATOR_DATA_ROW_START = 4
 
         # Setup a title
         self.sheet.title = ",".join([dt.name for dt in disaggregation_types]) if disaggregation_types else "None"
@@ -42,6 +43,9 @@ class XLSXWriter:
             # ID
             self.sheet.cell(row=2, column=DISAGGREGATION_COLUMN_START + idx).value = dt.id
             self.sheet.cell(row=2, column=DISAGGREGATION_COLUMN_START + idx).alignment = Alignment(horizontal='center')
+            # Type
+            self.sheet.cell(row=3, column=DISAGGREGATION_COLUMN_START + idx).value = "#dis_type"
+            self.sheet.cell(row=3, column=DISAGGREGATION_COLUMN_START + idx).alignment = Alignment(horizontal='center')
             disaggregation_types_map[dt.id] = DISAGGREGATION_COLUMN_START + idx
 
 
@@ -64,6 +68,7 @@ class XLSXWriter:
             self.sheet.cell(row=1, column=DISAGGREGATION_COLUMN_START + len(disaggregation_types) + idx).alignment = Alignment(horizontal='center')
             self.sheet.cell(row=1, column=DISAGGREGATION_COLUMN_START + len(disaggregation_types) + idx).font = Font(bold=True)
             self.sheet.cell(row=2, column=DISAGGREGATION_COLUMN_START + len(disaggregation_types) + idx).value = ", ".join([str(dv.id) for dv in dvs])
+            self.sheet.cell(row=3, column=DISAGGREGATION_COLUMN_START + len(disaggregation_types) + idx).value = "#dis_value"
             disaggregation_values_map[", ".join([str(dv.id) for dv in dvs])] = DISAGGREGATION_COLUMN_START + len(disaggregation_types) + idx
 
         # Generate Total disaggregation value
@@ -132,7 +137,7 @@ class XLSXWriter:
 
                 self.sheet.cell(row=start_row_id, column=13).value =location_data.location.title
                 self.sheet.cell(row=start_row_id, column=14).value = location_data.location.p_code
-                self.sheet.cell(row=start_row_id, column=15).value = "XXX" # TODO: no field here!
+                self.sheet.cell(row=start_row_id, column=15).value = location_data.location.gateway.name
 
                 self.sheet.cell(row=start_row_id, column=16).value = indicator.time_period_start
                 self.sheet.cell(row=start_row_id, column=17).value = indicator.time_period_end
@@ -170,6 +175,85 @@ class XLSXWriter:
 
         return True
 
+    def merge_sheets(self):
+        """
+        1. Merge column 1 and 2 of all spreadsheets
+        2. Iterate over all rows on all spreadsheets starting column INDICATOR_DATA_ROW_START
+        3. Merge data till column DISAGGREGATION_COLUMN_START
+        4. From column DISAGGREGATION_COLUMN_START map values to proper columns based on IDs stored in column 2
+        """
+
+        # Create new sheet
+        merged_sheet = self.wb.create_sheet(title="Analysis")
+
+        # Copy generic columns
+        for i in range(1, DISAGGREGATION_COLUMN_START):
+            merged_sheet.cell(column=i, row=1).value = self.sheet.cell(column=i, row=1).value
+            merged_sheet.cell(column=i, row=1).font = Font(bold=True)
+            merged_sheet.cell(column=i, row=1).alignment = Alignment(horizontal='center')
+            merged_sheet.cell(column=i, row=2).value = self.sheet.cell(column=i, row=2).value
+            merged_sheet.cell(column=i, row=2).alignment = Alignment(horizontal='center')
+            merged_sheet.cell(column=i, row=3).value = self.sheet.cell(column=i, row=3).value
+            merged_sheet.cell(column=i, row=3).alignment = Alignment(horizontal='center')
+
+        # Merge disaggregation types
+        merged_disaggregations = list()
+        for sheet in self.sheets:
+            column = DISAGGREGATION_COLUMN_START
+            while(True):
+                if sheet.cell(column=column, row=3).value != "#dis_type":
+                    break
+                if (
+                        sheet.cell(column=column, row=1).value,
+                        sheet.cell(column=column, row=2).value
+                    ) not in merged_disaggregations:
+                    merged_disaggregations.append(
+                        (
+                            sheet.cell(column=column, row=1).value,
+                            sheet.cell(column=column, row=2).value
+                        )
+                    )
+                column += 1
+
+        # Prepare new column headers for disaggregation types
+        for idx, merged_disaggregation in enumerate(merged_disaggregations):
+            merged_sheet.cell(column=DISAGGREGATION_COLUMN_START + idx, row=1).value = merged_disaggregation[0]
+            merged_sheet.cell(column=DISAGGREGATION_COLUMN_START + idx, row=1).font = Font(bold=True)
+            merged_sheet.cell(column=DISAGGREGATION_COLUMN_START + idx, row=1).alignment = Alignment(horizontal='center')
+            merged_sheet.cell(column=DISAGGREGATION_COLUMN_START + idx, row=2).value = merged_disaggregation[1]
+            merged_sheet.cell(column=DISAGGREGATION_COLUMN_START + idx, row=2).alignment = Alignment(horizontal='center')
+
+        # Merge disaggregation values
+        merged_disaggregation_values = list()
+        for sheet in self.sheets:
+            column = DISAGGREGATION_COLUMN_START + len(merged_disaggregations)
+            while (True):
+                if sheet.cell(column=column, row=3).value != "#dis_value":
+                    break
+                if (
+                        sheet.cell(column=column, row=1).value,
+                        sheet.cell(column=column, row=2).value
+                ) not in merged_disaggregation_values:
+                    merged_disaggregation_values.append(
+                        (
+                            sheet.cell(column=column, row=1).value,
+                            sheet.cell(column=column, row=2).value
+                        )
+                    )
+                column += 1
+
+        # Prepare new column headers for disaggregation values
+        for idx, merged_disaggregation_value in enumerate(merged_disaggregation_values):
+            merged_sheet.cell(column=DISAGGREGATION_COLUMN_START + len(merged_disaggregations) + idx, row=1).value = merged_disaggregation_value[0]
+            merged_sheet.cell(column=DISAGGREGATION_COLUMN_START + len(merged_disaggregations) + idx, row=1).font = Font(bold=True)
+            merged_sheet.cell(column=DISAGGREGATION_COLUMN_START + len(merged_disaggregations) + idx, row=1).alignment = Alignment(
+                horizontal='center')
+            merged_sheet.cell(column=DISAGGREGATION_COLUMN_START + len(merged_disaggregations) + idx, row=2).value = merged_disaggregation_value[1]
+            merged_sheet.cell(column=DISAGGREGATION_COLUMN_START + len(merged_disaggregations) + idx, row=2).alignment = Alignment(
+                horizontal='center')
+
+
+
     def export_data(self):
 
         MOVE_COLUMN = 0
@@ -186,17 +270,25 @@ class XLSXWriter:
             disaggregation_types_list += list(itertools.combinations(disaggregation_types_base, i))
 
         # Duplicate spreadsheets base
-        sheets = [self.sheet, ]
+        self.sheets = [self.sheet, ]
         for i in range(1, len(disaggregation_types_list)):
-            sheets.append(self.duplicate_sheet(self.sheet))
+            self.sheets.append(self.duplicate_sheet(self.sheet))
 
         # Generate data per spreadsheet
         sheet_no = 0
+        to_remove = list()
         for disaggregation_types in disaggregation_types_list:
-            self.sheet = sheets[sheet_no]
+            self.sheet = self.sheets[sheet_no]
             if not self.generate_sheet(disaggregation_types):
-                self.wb.remove_sheet(self.sheet)
+                to_remove.append(self.sheets[sheet_no])
             sheet_no += 1
+
+        # Remove empty spreadsheets
+        for s in to_remove:
+            self.sheets.remove(s)
+            self.wb.remove_sheet(s)
+
+        self.merge_sheets()
 
         filepath = SAVE_PATH + 'export.xlsx'
         self.wb.save(filepath)
