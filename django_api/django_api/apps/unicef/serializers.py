@@ -2,11 +2,12 @@ from django.conf import settings
 from rest_framework import serializers
 
 from .models import ProgrammeDocument, Section, ProgressReport, Person, \
-    LowerLevelOutput
+    LowerLevelOutput, CountryProgrammeOutput
 from core.common import PROGRESS_REPORT_STATUS
 from indicator.serializers import (
     PDReportsSerializer,
-    IndicatorBlueprintSimpleSerializer
+    IndicatorBlueprintSimpleSerializer,
+    IndicatorLLoutputsSerializer
 )
 
 
@@ -92,8 +93,52 @@ class ProgrammeDocumentDetailSerializer(serializers.ModelSerializer):
         )
 
 
+class LLOutputNestedIndicatorReportSerializer(serializers.ModelSerializer):
+    """
+    Nests with LL output.
+    """
+
+    class Meta:
+        model = LowerLevelOutput
+        fields = (
+            'id',
+            'title',
+        )
+
+
+class CPOutputNestedIndicatorReportSerializer(serializers.ModelSerializer):
+    """
+    Nests with CP output
+    """
+    ll_outputs = LLOutputNestedIndicatorReportSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = CountryProgrammeOutput
+        fields = (
+            'id',
+            'title',
+            'll_outputs'
+        )
+
+
+class ProgrammeDocumentOutputNestedIndicatorReportSerializer(serializers.ModelSerializer):
+    """
+    Serializer for PD with indicator reports nested by output.
+    """
+    cp_outputs = CPOutputNestedIndicatorReportSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = ProgrammeDocument
+        fields = (
+            'id',
+            'title',
+            'cp_outputs'
+        )
+
+
+
 class ProgressReportSerializer(serializers.ModelSerializer):
-    programme_document = ProgrammeDocumentSerializer()
+    programme_document = ProgrammeDocumentOutputNestedIndicatorReportSerializer()
     reporting_period = serializers.SerializerMethodField()
     is_draft = serializers.SerializerMethodField()
     indicator_reports = PDReportsSerializer(read_only=True, many=True)
@@ -110,10 +155,10 @@ class ProgressReportSerializer(serializers.ModelSerializer):
             'submission_date',
             'due_date',
             'is_draft',
-            'indicator_reports',
             'review_date',
             'sent_back_feedback',
             'programme_document',
+            'indicator_reports',
         )
 
     def get_reporting_period(self, obj):

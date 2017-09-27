@@ -69,7 +69,8 @@ class Workspace(TimeStampedExternalSyncModelMixin):
     """
     title = models.CharField(max_length=255)
     workspace_code = models.CharField(
-        max_length=8
+        max_length=8,
+        unique=True
     )
     countries = models.ManyToManyField(Country, related_name='workspaces')
     business_area_code = models.CharField(
@@ -93,6 +94,18 @@ class Workspace(TimeStampedExternalSyncModelMixin):
 
     def __str__(self):
         return self.title
+
+    @property
+    def locations(self):
+        """
+        Returns a list of locations that belong to countries associated with
+        this workspace.
+        """
+        result = self.countries.all().values_list(
+            'gateway_types__locations').distinct()
+        pks = []
+        [pks.extend(filter(lambda x: x is not None, part)) for part in result]
+        return Location.objects.filter(pk__in=pks)
 
 
 class ResponsePlan(TimeStampedModel):
@@ -120,6 +133,9 @@ class ResponsePlan(TimeStampedModel):
         verbose_name='End date'
     )
     workspace = models.ForeignKey('core.Workspace', related_name="response_plans")
+
+    class Meta:
+        unique_together = ('title', 'plan_type', 'workspace')
 
     def __unicode__(self):
         return self.title

@@ -43,11 +43,7 @@ class LocationListAPIView(ListAPIView):
         """
         response_plan_id = self.kwargs.get(self.lookup_field)
         response_plan = get_object_or_404(ResponsePlan, id=response_plan_id)
-        result = response_plan.workspace.countries.all().values_list(
-            'gateway_types__locations').distinct()
-        pks = []
-        [pks.extend(filter(lambda x: x is not None, part)) for part in result]
-        return Location.objects.filter(pk__in=pks)
+        return response_plan.workspace.locations
 
 
 class ChildrenLocationAPIView(ListAPIView):

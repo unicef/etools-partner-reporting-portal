@@ -219,7 +219,9 @@ class ReportableDetailAPIView(RetrieveAPIView):
 
 
 class IndicatorDataAPIView(APIView):
-
+    """
+    Takes an indicator report id.
+    """
     permission_classes = (IsAuthenticated, )
 
     def get_queryset(self, id):

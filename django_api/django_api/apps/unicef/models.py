@@ -375,6 +375,10 @@ class ProgressReport(TimeStampedModel):
         return self.submission_date.strftime(
             settings.PRINT_DATA_FORMAT)
 
+    def __str__(self):
+        return "Progress Report <pk:{}>: {} {} to {}".format(
+            self.id, self.programme_document, self.start_date, self.end_date)
+
 
 class ReportingPeriodDates(TimeStampedModel):
     """
