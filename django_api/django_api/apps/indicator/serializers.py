@@ -148,6 +148,10 @@ class ReportableSimpleSerializer(serializers.ModelSerializer):
 
 
 class IndicatorListSerializer(ReportableSimpleSerializer):
+    """
+    Useful anywhere a list of indicators needs to be shown with minimal
+    amount of data.
+    """
     disaggregations = DisaggregationListSerializer(many=True, read_only=True)
 
     class Meta:

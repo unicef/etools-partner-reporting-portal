@@ -41,7 +41,8 @@ from .serializers import (
     ProgressReportReviewSerializer,
     LLOutputSerializer,
     LLOutputIndicatorsSerializer,
-    ProgrammeDocumentCalculationMethodsSerializer
+    ProgrammeDocumentCalculationMethodsSerializer,
+    ProgrammeDocumentProgressSerializer
 )
 
 from .models import ProgrammeDocument, ProgressReport
@@ -85,28 +86,65 @@ class ProgrammeDocumentDetailsAPIView(RetrieveAPIView):
 
     serializer_class = ProgrammeDocumentDetailSerializer
     permission_classes = (IsAuthenticated, )
+    lookup_url_kwarg = 'pd_id'
 
-    def get(self, request, workspace_id, pk, *args, **kwargs):
+    def get(self, request, workspace_id, pd_id, *args, **kwargs):
         """
         Get Programme Document Details by given pk.
         """
         self.workspace_id = workspace_id
         serializer = self.get_serializer(
-            self.get_object(pk)
+            self.get_object(pd_id)
         )
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
-    def get_object(self, pk):
+    def get_object(self, pd_id):
         try:
-            return ProgrammeDocument.objects.get(partner=self.request.user.partner, workspace=self.workspace_id, pk=pk)
+            return ProgrammeDocument.objects.get(
+                partner=self.request.user.partner,
+                workspace=self.workspace_id,
+                pk=pd_id)
         except ProgrammeDocument.DoesNotExist as exp:
             logger.exception({
                 "endpoint": "ProgrammeDocumentDetailsAPIView",
                 "request.data": self.request.data,
-                "pk": pk,
+                "pk": pd_id,
                 "exception": exp,
             })
             raise Http404
+
+
+class ProgrammeDocumentProgressAPIView(RetrieveAPIView):
+
+    serializer_class = ProgrammeDocumentProgressSerializer
+    permission_classes = (IsAuthenticated, )
+    lookup_url_kwarg = 'pd_id'
+
+    def get(self, request, workspace_id, pd_id, *args, **kwargs):
+        """
+        Get Programme Document Details by given pk.
+        """
+        self.workspace_id = workspace_id
+        serializer = self.get_serializer(
+            self.get_object(pd_id)
+        )
+        return Response(serializer.data, status=statuses.HTTP_200_OK)
+
+    def get_object(self, pd_id):
+        try:
+            return ProgrammeDocument.objects.get(
+                partner=self.request.user.partner,
+                workspace=self.workspace_id,
+                pk=pd_id)
+        except ProgrammeDocument.DoesNotExist as exp:
+            logger.exception({
+                "endpoint": "ProgrammeDocumentProgressAPIView",
+                "request.data": self.request.data,
+                "pk": pd_id,
+                "exception": exp,
+            })
+            raise Http404
+
 
 class ProgrammeDocumentLocationsAPIView(ListAPIView):
 
@@ -138,9 +176,12 @@ class ProgrammeDocumentIndicatorsAPIView(ListAPIView):
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
 
     def list(self, request, workspace_id, *args, **kwargs):
-        pd = ProgrammeDocument.objects.filter(partner=self.request.user.partner, workspace=workspace_id)
-        queryset = self.get_queryset().filter(indicator_reports__progress_report__programme_document__in=pd)
-        filtered = ProgrammeDocumentIndicatorFilter(request.GET, queryset=queryset)
+        pd = ProgrammeDocument.objects.filter(
+            partner=self.request.user.partner, workspace=workspace_id)
+        queryset = self.get_queryset().filter(
+            indicator_reports__progress_report__programme_document__in=pd)
+        filtered = ProgrammeDocumentIndicatorFilter(request.GET,
+                                                    queryset=queryset)
 
         page = self.paginate_queryset(filtered.qs)
         if page is not None:

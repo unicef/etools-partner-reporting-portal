@@ -12,7 +12,8 @@ from .views import (
     ProgressReportSubmitAPIView,
     ProgressReportReviewAPIView,
     ProgressReportLocationsAPIView,
-    ProgrammeDocumentCalculationMethodsAPIView
+    ProgrammeDocumentCalculationMethodsAPIView,
+    ProgrammeDocumentProgressAPIView
 )
 
 
@@ -20,18 +21,23 @@ urlpatterns = [
     url(r'^(?P<workspace_id>\d+)/programme-document/$',
         ProgrammeDocumentAPIView.as_view(),
         name="programme-document"),
-    url(r'^(?P<workspace_id>\d+)/programme-document/(?P<pk>\d+)/$',
+    url(r'^(?P<workspace_id>\d+)/programme-document/(?P<pd_id>\d+)/$',
         ProgrammeDocumentDetailsAPIView.as_view(),
         name="programme-document-details"),
+    url(r'^(?P<workspace_id>\d+)/programme-document/(?P<pd_id>\d+)/progress/$',
+        ProgrammeDocumentProgressAPIView.as_view(),
+        name="programme-document-progress"),
+    url(r'^(?P<workspace_id>\d+)/programme-document/(?P<pd_id>\d+)/calculation-methods/$',
+        ProgrammeDocumentCalculationMethodsAPIView.as_view(),
+        name="programme-document-calculation-methods"),
+
     url(r'^(?P<workspace_id>\d+)/programme-document/locations/$',
         ProgrammeDocumentLocationsAPIView.as_view(),
         name="programme-document-locations"),
     url(r'^(?P<workspace_id>\d+)/programme-document/indicators/$',
         ProgrammeDocumentIndicatorsAPIView.as_view(),
         name="programme-document-indicators"),
-    url(r'^(?P<workspace_id>\d+)/programme-document/(?P<pd_id>\d+)/calculation-methods/$',
-        ProgrammeDocumentCalculationMethodsAPIView.as_view(),
-        name="programme-document-calculation-methods"),
+
     url(r'^(?P<workspace_id>\d+)/progress-reports/$',
         ProgressReportAPIView.as_view(),
         name="progress-reports"),

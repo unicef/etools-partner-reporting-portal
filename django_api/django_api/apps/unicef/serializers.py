@@ -4,10 +4,12 @@ from rest_framework import serializers
 from .models import ProgrammeDocument, Section, ProgressReport, Person, \
     LowerLevelOutput, CountryProgrammeOutput
 from core.common import PROGRESS_REPORT_STATUS
+from indicator.models import Reportable
 from indicator.serializers import (
     PDReportsSerializer,
     IndicatorBlueprintSimpleSerializer,
-    IndicatorLLoutputsSerializer
+    IndicatorLLoutputsSerializer,
+    ReportableSimpleSerializer
 )
 
 
@@ -93,7 +95,7 @@ class ProgrammeDocumentDetailSerializer(serializers.ModelSerializer):
         )
 
 
-class LLOutputNestedIndicatorReportSerializer(serializers.ModelSerializer):
+class LLOutputSerializer(serializers.ModelSerializer):
     """
     Nests with LL output.
     """
@@ -106,11 +108,11 @@ class LLOutputNestedIndicatorReportSerializer(serializers.ModelSerializer):
         )
 
 
-class CPOutputNestedIndicatorReportSerializer(serializers.ModelSerializer):
+class CPOutputSerializer(serializers.ModelSerializer):
     """
     Nests with CP output
     """
-    ll_outputs = LLOutputNestedIndicatorReportSerializer(many=True, read_only=True)
+    ll_outputs = LLOutputSerializer(many=True, read_only=True)
 
     class Meta:
         model = CountryProgrammeOutput
@@ -121,11 +123,11 @@ class CPOutputNestedIndicatorReportSerializer(serializers.ModelSerializer):
         )
 
 
-class ProgrammeDocumentOutputNestedIndicatorReportSerializer(serializers.ModelSerializer):
+class ProgrammeDocumentOutputSerializer(serializers.ModelSerializer):
     """
     Serializer for PD with indicator reports nested by output.
     """
-    cp_outputs = CPOutputNestedIndicatorReportSerializer(many=True, read_only=True)
+    cp_outputs = CPOutputSerializer(many=True, read_only=True)
 
     class Meta:
         model = ProgrammeDocument
@@ -169,7 +171,7 @@ class ProgressReportSimpleSerializer(serializers.ModelSerializer):
 
 
 class ProgressReportSerializer(ProgressReportSimpleSerializer):
-    programme_document = ProgrammeDocumentOutputNestedIndicatorReportSerializer()
+    programme_document = ProgrammeDocumentOutputSerializer()
     indicator_reports = PDReportsSerializer(read_only=True, many=True)
 
     class Meta:
@@ -239,3 +241,37 @@ class ProgrammeDocumentCalculationMethodsSerializer(serializers.Serializer):
     indicators for a PD.
     """
     ll_outputs_and_indicators = LLOutputIndicatorsSerializer(many=True)
+
+
+class ProgrammeDocumentProgressSerializer(serializers.ModelSerializer):
+    """
+    Serializer to show the progoress of a PD. This includes information
+    around the CP output, LL output and the indicators and their progress.
+    """
+    frequency = serializers.CharField(source='get_frequency_display')
+    sections = SectionSerializer(read_only=True, many=True)
+    details = serializers.SerializerMethodField()
+    indicators = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ProgrammeDocument
+        fields = (
+            'id',
+            'reference_number',
+            'title',
+            'start_date',
+            'end_date',
+            'frequency',
+            'sections',
+            'details',
+            'indicators',
+        )
+
+    def get_details(self, obj):
+        return ProgrammeDocumentOutputSerializer(obj).data
+
+    def get_indicators(self, obj):
+        reportables = []
+        map(lambda x: reportables.extend(x.reportables.all()),
+            LowerLevelOutput.objects.filter(cp_output__programme_document=obj))
+        return ReportableSimpleSerializer(reportables, many=True).data
