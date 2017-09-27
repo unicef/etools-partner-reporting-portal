@@ -117,20 +117,38 @@ class IndicatorReportStatusSerializer(serializers.ModelSerializer):
         )
 
 
-class IndicatorListSerializer(serializers.ModelSerializer):
+class ReportableSimpleSerializer(serializers.ModelSerializer):
     blueprint = IndicatorBlueprintSimpleSerializer()
     ref_num = serializers.CharField()
     achieved = serializers.JSONField()
     progress_percentage = serializers.FloatField()
     content_type_name = serializers.SerializerMethodField()
     content_object_title = serializers.SerializerMethodField()
-    disaggregations = DisaggregationListSerializer(many=True, read_only=True)
 
     def get_content_type_name(self, obj):
         return obj.content_type.name
 
     def get_content_object_title(self, obj):
         return obj.content_object.title
+
+    class Meta:
+        model = Reportable
+        fields = (
+            'id',
+            'target',
+            'baseline',
+            'blueprint',
+            'ref_num',
+            'achieved',
+            'progress_percentage',
+            'content_type_name',
+            'content_object_title',
+            'object_id',
+        )
+
+
+class IndicatorListSerializer(ReportableSimpleSerializer):
+    disaggregations = DisaggregationListSerializer(many=True, read_only=True)
 
     class Meta:
         model = Reportable
@@ -552,6 +570,7 @@ class PDReportsSerializer(serializers.ModelSerializer):
     reportable_object_id = serializers.SerializerMethodField()
     submission_date = serializers.SerializerMethodField()
     due_date = serializers.SerializerMethodField()
+    reportable = ReportableSimpleSerializer()
 
     class Meta:
         model = IndicatorReport
@@ -566,6 +585,7 @@ class PDReportsSerializer(serializers.ModelSerializer):
             'submission_date',
             'is_draft',
             'due_date',
+            'total',
         )
 
     def get_id(self, obj):
