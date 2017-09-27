@@ -150,7 +150,9 @@ class IndicatorListSerializer(serializers.ModelSerializer):
 
 
 class IndicatorLLoutputsSerializer(serializers.ModelSerializer):
-
+    """
+    Returns all indicator reports that belong to this reportable.
+    """
     __narrative_and_assessment = None
 
     name = serializers.SerializerMethodField()
@@ -540,9 +542,14 @@ class ClusterIndicatorReportListSerializer(IndicatorReportListSerializer):
 
 
 class PDReportsSerializer(serializers.ModelSerializer):
-
+    """
+    A serializer for IndicatorReport model but specific information
+    that is helpful in IP reporting from a Programme Document / Progress
+    Report perspective.
+    """
     id = serializers.SerializerMethodField()
     reporting_period = serializers.SerializerMethodField()
+    reportable_object_id = serializers.SerializerMethodField()
     submission_date = serializers.SerializerMethodField()
     due_date = serializers.SerializerMethodField()
 
@@ -550,6 +557,9 @@ class PDReportsSerializer(serializers.ModelSerializer):
         model = IndicatorReport
         fields = (
             'id',
+            'progress_report',
+            'reportable',
+            'reportable_object_id',
             'reporting_period',
             'progress_report_status',
             'report_status',
@@ -566,6 +576,9 @@ class PDReportsSerializer(serializers.ModelSerializer):
             obj.time_period_start.strftime(settings.PRINT_DATA_FORMAT),
             obj.time_period_end.strftime(settings.PRINT_DATA_FORMAT)
         )
+
+    def get_reportable_object_id(self, obj):
+        return obj.reportable.object_id
 
     def get_submission_date(self, obj):
         return obj.submission_date and obj.submission_date.strftime(settings.PRINT_DATA_FORMAT)

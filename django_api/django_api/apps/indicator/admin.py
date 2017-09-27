@@ -27,7 +27,8 @@ class ReportableAdmin(admin.ModelAdmin):
                     'cs_dates', 'content_object', 'content_type',
                     'external_id')
     list_filter = ('is_cluster_indicator',)
-    search_fields = ('context_code', 'description', 'code', 'assumptions')
+    search_fields = ('context_code', 'means_of_verification', 'target',
+                     'baseline', 'object_id')
 
 
 class IndicatorReportAdmin(admin.ModelAdmin):
@@ -35,7 +36,8 @@ class IndicatorReportAdmin(admin.ModelAdmin):
                     'time_period_end', 'due_date', 'submission_date',
                     'frequency', 'total', 'reportable')
     list_filter = ('frequency', 'report_status', 'overall_status')
-    search_fields = ('title', 'narrative_assessment', 'remarks')
+    search_fields = ('title', 'narrative_assessment', 'remarks',
+                     'reportable__blueprint__title')
 
 
 class IndicatorLocationDataAdmin(admin.ModelAdmin):

@@ -61,7 +61,8 @@ class ProgrammeDocumentAPIView(ListAPIView):
     filter_class = ProgrammeDocumentFilter
 
     def get_queryset(self):
-        return ProgrammeDocument.objects.filter(partner=self.request.user.partner)
+        return ProgrammeDocument.objects.filter(
+            partner=self.request.user.partner)
 
     def list(self, request, workspace_id, *args, **kwargs):
         queryset = self.get_queryset().filter(workspace=workspace_id)
@@ -254,7 +255,10 @@ class ProgressReportDetailsAPIView(RetrieveAPIView):
 
     def get_object(self, pk):
         try:
-            return ProgressReport.objects.get(programme_document__partner=self.request.user.partner, programme_document__workspace=self.workspace_id, pk=pk)
+            return ProgressReport.objects.get(
+                programme_document__partner=self.request.user.partner,  # TODO: check if needed?
+                programme_document__workspace=self.workspace_id,
+                pk=pk)
         except ProgressReport.DoesNotExist as exp:
             logger.exception({
                 "endpoint": "ProgressReportDetailsAPIView",

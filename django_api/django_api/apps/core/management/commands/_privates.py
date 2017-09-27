@@ -4,7 +4,6 @@
 
 from __future__ import unicode_literals
 import datetime
-
 import random
 
 from django.conf import settings
@@ -367,14 +366,18 @@ def generate_fake_data(workspace_quantity=10):
 
     print "ClusterActivity <-> PartnerActivity objects linked"
 
+    admin.partner = Partner.objects.first()
+    admin.save()
+
     PersonFactory.create_batch(workspace_quantity)
-    for partner in Partner.objects.all():
-        for workspace in Workspace.objects.all():
-            ProgrammeDocumentFactory.create_batch(workspace_quantity * 5,
-                                                  partner=partner,
-                                                  workspace=workspace)
+    # only create PD's for admin.partner
+    # for partner in Partner.objects.all():
+    for workspace in Workspace.objects.all():
+        ProgrammeDocumentFactory.create_batch(min(4, workspace_quantity * 2),
+                                              partner=admin.partner,
+                                              workspace=workspace)
     print "{} ProgrammeDocument objects created".format(
-        workspace_quantity * Partner.objects.count())
+        min(4, workspace_quantity * 2))
 
     # Linking the followings:
     # ProgressReport - ProgrammeDocument
@@ -382,42 +385,65 @@ def generate_fake_data(workspace_quantity=10):
     # Section - ProgrammeDocument via QuantityReportableToLowerLevelOutput
     # ProgressReport - IndicatorReport from
     # QuantityReportableToLowerLevelOutput
-    for idx, llo in enumerate(LowerLevelOutput.objects.all()):
-        country = llo.cp_output.programme_document.workspace.countries.first()
-        locations = list(Location.objects.filter(gateway__country=country))
-        progress_report = ProgressReportFactory(
-            programme_document=llo.cp_output.programme_document)
+    for idx, pd in enumerate(ProgrammeDocument.objects.all()):
+        locations = pd.workspace.locations
 
-        if idx < 20:
-            reportable = QuantityReportableToLowerLevelOutputFactory(
-                content_object=llo, indicator_report__progress_report=None,
-                locations=locations,
-            )
-
-        else:
-            reportable = RatioReportableToLowerLevelOutputFactory(
-                content_object=llo, indicator_report__progress_report=None,
-                locations=locations,
-            )
-
-        reportable.content_object \
-            .cp_output.programme_document.sections.add(
-                Section.objects.order_by('?').first())
-        reportable.content_object \
-            .cp_output.programme_document.unicef_focal_point.add(
+        pd.sections.add(Section.objects.order_by('?').first())
+        pd.unicef_focal_point.add(Person.objects.order_by('?').first())
+        pd.partner_focal_point.add(
             Person.objects.order_by('?').first())
+        pd.unicef_officers.add(Person.objects.order_by('?').first())
 
-        reportable.content_object \
-            .cp_output.programme_document.partner_focal_point.add(
-            Person.objects.order_by('?').first())
+        # generate reportables for this PD
+        for cp_output in pd.cp_outputs.all():
+            for llo in cp_output.ll_outputs.all():
 
-        reportable.content_object \
-            .cp_output.programme_document.unicef_officers.add(
-            Person.objects.order_by('?').first())
+                # generate 2 to 10 reportable (indicators) per llo
+                num_reportables_range = range(random.randint(2, 10))
+                for i in num_reportables_range:
+                    if i % 3 != 0:
+                        reportable = QuantityReportableToLowerLevelOutputFactory(
+                            content_object=llo,
+                            indicator_report__progress_report=None,
+                            locations=locations,
+                        )
+                    else:
+                        reportable = RatioReportableToLowerLevelOutputFactory(
+                            content_object=llo,
+                            indicator_report__progress_report=None,
+                            locations=locations,
+                        )
 
-        indicator_report = reportable.indicator_reports.first()
-        indicator_report.progress_report = progress_report
-        indicator_report.save()
+                    # delete the junk indicator report the factory creates
+                    # we create IR's in the next for loop down below
+                    reportable.indicator_reports.all().delete()
+
+                print "{} Reportables generated for {}".format(
+                    num_reportables_range[-1] + 1,
+                    llo
+                )
+
+        # Generate 2-8 progress reports per pd. Requires creating indicator
+        # reports for each llo and then associating them with a progress
+        # report
+        for idx in xrange(0, random.randint(2, 8)):
+            progress_report = ProgressReportFactory(programme_document=pd)
+            for cp_output in pd.cp_outputs.all():
+                for llo in cp_output.ll_outputs.all():
+                    for reportable in llo.reportables.all():
+                        if reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
+                            QuantityIndicatorReportFactory(
+                                reportable=reportable,
+                                progress_report=progress_report)
+                        elif reportable.blueprint.unit == IndicatorBlueprint.PERCENTAGE:
+                            RatioIndicatorReportFactory(
+                                reportable=reportable,
+                                progress_report=progress_report)
+
+        print "{} Progress Reports generated for {}".format(
+            ProgressReport.objects.filter(programme_document=pd).count(),
+            pd
+        )
 
     print "ProgrammeDocument <-> QuantityReportableToLowerLevelOutput <-> IndicatorReport objects linked".format(workspace_quantity)
 
@@ -430,6 +456,3 @@ def generate_fake_data(workspace_quantity=10):
     IndicatorReport.objects.filter(
         report_status=INDICATOR_REPORT_STATUS.submitted
     ).update(submission_date=today)
-
-    admin.partner = Partner.objects.first()
-    admin.save()

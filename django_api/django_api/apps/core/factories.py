@@ -489,6 +489,16 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = ProgrammeDocument
 
+    @factory.post_generation
+    def create_cpos(self, create, extracted, **kwargs):
+        """
+        Create 2-3 CP outputs per PD
+        """
+        if not create:
+            return
+        for i in range(random.randint(2, 3)):
+            CountryProgrammeOutputFactory.create(programme_document=self)
+
 
 class DisaggregationFactory(factory.django.DjangoModelFactory):
     active = True
@@ -543,6 +553,16 @@ class CountryProgrammeOutputFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = CountryProgrammeOutput
+
+    @factory.post_generation
+    def create_llos(self, create, extracted, **kwargs):
+        """
+        Create 2-5 LLO's per CP
+        """
+        if not create:
+            return
+        for i in range(random.randint(2, 5)):
+            LowerLevelOutputFactory.create(cp_output=self)
 
 
 class LowerLevelOutputFactory(factory.django.DjangoModelFactory):

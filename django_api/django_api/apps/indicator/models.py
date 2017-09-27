@@ -221,9 +221,6 @@ class Reportable(TimeStampedExternalSyncModelMixin):
     class Meta:
         ordering = ['-id']
 
-    def __str__(self):
-        return "Reportable <pk:%s>" % self.id
-
     @property
     def ref_num(self):
         from unicef.models import LowerLevelOutput
@@ -264,7 +261,9 @@ class Reportable(TimeStampedExternalSyncModelMixin):
         }
 
     def __str__(self):
-        return "Reportable <pk:%s> on %s" % (self.id, self.content_object)
+        return "Reportable <pk:%s> %s on %s" % (self.id,
+                                                self.blueprint.title,
+                                                self.content_object)
 
 
 class IndicatorReport(TimeStampedModel):
@@ -279,7 +278,9 @@ class IndicatorReport(TimeStampedModel):
 
     title = models.CharField(max_length=255)
     reportable = models.ForeignKey(Reportable, related_name="indicator_reports")
-    progress_report = models.ForeignKey('unicef.ProgressReport', related_name="indicator_reports", null=True)
+    progress_report = models.ForeignKey('unicef.ProgressReport',
+                                        related_name="indicator_reports",
+                                        null=True)
     time_period_start = models.DateField()  # first day of defined frequency mode
     time_period_end = models.DateField()  # last day of defined frequency mode
     due_date = models.DateField()  # can be few days/weeks out of the "end date"
