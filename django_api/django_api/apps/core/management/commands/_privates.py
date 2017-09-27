@@ -81,6 +81,7 @@ from core.factories import (
     GatewayTypeFactory,
     CartoDBTableFactory,
     CountryFactory,
+    ReportingPeriodDatesFactory,
 )
 from core.common import INDICATOR_REPORT_STATUS
 
@@ -123,6 +124,7 @@ def clean_up_data():
 
 
 def generate_fake_data(workspace_quantity=10):
+
     if not settings.IS_TEST and workspace_quantity < 1:
         workspace_quantity = 5
 
@@ -373,9 +375,16 @@ def generate_fake_data(workspace_quantity=10):
     # only create PD's for admin.partner
     # for partner in Partner.objects.all():
     for workspace in Workspace.objects.all():
-        ProgrammeDocumentFactory.create_batch(min(4, workspace_quantity * 2),
-                                              partner=admin.partner,
-                                              workspace=workspace)
+        for i in range(workspace_quantity * 5):
+            pd = ProgrammeDocumentFactory.create(partner=partner, workspace=workspace)
+            for ir in range(3):
+                d = datetime.datetime.now() + datetime.timedelta(days=ir * 30)
+                ReportingPeriodDatesFactory.create(
+                    programme_document=pd,
+                    start_date=d,
+                    end_date=d + datetime.timedelta(days=30),
+                    due_date=d + datetime.timedelta(days=45),
+                )
     print "{} ProgrammeDocument objects created".format(
         min(4, workspace_quantity * 2))
 

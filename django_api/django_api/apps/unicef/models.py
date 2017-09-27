@@ -170,7 +170,19 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
         verbose_name='UNICEF Supplies Currency'
     )
 
-    cs_dates = ArrayField(models.DateField(), default=list)
+    funds_received_to_date = models.DecimalField(
+        decimal_places=2,
+        max_digits=12,
+        default=0,
+        verbose_name='Funds received'
+    )
+
+    funds_received_to_date_currency = models.CharField(
+        choices=CURRENCIES,
+        default=CURRENCIES.usd,
+        max_length=16,
+        verbose_name='Funds received Currency'
+    )
 
     # TODO:
     # cron job will create new report with due period !!!
@@ -325,7 +337,6 @@ def find_first_programme_document_id():
 
 class ProgressReport(TimeStampedModel):
     partner_contribution_to_date = models.CharField(max_length=256)
-    funds_received_to_date = models.CharField(max_length=256)
     challenges_in_the_reporting_period = models.CharField(max_length=256)
     proposed_way_forward = models.CharField(max_length=256)
     status = models.CharField(max_length=3, choices=PROGRESS_REPORT_STATUS,
@@ -367,6 +378,16 @@ class ProgressReport(TimeStampedModel):
     def __str__(self):
         return "Progress Report <pk:{}>: {} {} to {}".format(
             self.id, self.programme_document, self.start_date, self.end_date)
+
+
+class ReportingPeriodDates(TimeStampedModel):
+    """
+    Used for storing start_date, end_date and due_date fields for multiple reports
+    """
+    start_date = models.DateField(verbose_name='Start date')
+    end_date = models.DateField(verbose_name='End date')
+    due_date = models.DateField(null=True, blank=True, verbose_name='Due date')
+    programme_document = models.ForeignKey(ProgrammeDocument, related_name='reporting_periods')
 
 
 class CountryProgrammeOutput(TimeStampedExternalSyncModelMixin):

@@ -148,7 +148,6 @@ class ProgressReportSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'partner_contribution_to_date',
-            'funds_received_to_date',
             'challenges_in_the_reporting_period',
             'proposed_way_forward',
             'status',

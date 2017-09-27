@@ -31,6 +31,7 @@ from unicef.models import (
     ProgrammeDocument,
     CountryProgrammeOutput,
     LowerLevelOutput,
+    ReportingPeriodDates,
 )
 from core.common import (
     FREQUENCY_LEVEL, PD_STATUS,
@@ -440,8 +441,8 @@ class LocationFactory(factory.django.DjangoModelFactory):
 
 class ProgressReportFactory(factory.django.DjangoModelFactory):
     start_date = beginning_of_this_year
-    end_date = beginning_of_this_year + datetime.timedelta(days=30)
-    due_date = beginning_of_this_year + datetime.timedelta(days=45)
+    end_date = start_date + datetime.timedelta(days=30)
+    due_date = start_date + datetime.timedelta(days=45)
 
     class Meta:
         model = ProgressReport
@@ -464,6 +465,17 @@ class PersonFactory(factory.django.DjangoModelFactory):
         model = Person
 
 
+class ReportingPeriodDatesFactory(factory.django.DjangoModelFactory):
+    start_date = beginning_of_this_year
+    end_date = start_date + datetime.timedelta(days=30)
+    due_date = start_date + datetime.timedelta(days=45)
+    programme_document = factory.Iterator(ProgrammeDocument.objects.all())
+
+    class Meta:
+        model = ReportingPeriodDates
+
+
+
 class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "programme_document_%d" % n)
     agreement = factory.Sequence(lambda n: "JOR/PCA2017%d" % n)
@@ -478,13 +490,14 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     cso_contribution = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
     total_unicef_cash = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
     in_kind_amount = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
+    funds_received_to_date = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
     partner = factory.SubFactory('core.factories.PartnerFactory')
-    workspace = factory.SubFactory('core.factories.WorkspaceFactory')
+    # workspace = factory.SubFactory('core.factories.WorkspaceFactory')
 
     cp_output = factory.RelatedFactory('core.factories.CountryProgrammeOutputFactory', 'programme_document')
     workspace = factory.Iterator(Workspace.objects.all())
 
-    cs_dates = [cs_date_1, cs_date_2, cs_date_3]
+    #cs_dates = [cs_date_1, cs_date_2, cs_date_3]
 
     class Meta:
         model = ProgrammeDocument

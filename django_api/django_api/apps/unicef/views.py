@@ -217,7 +217,7 @@ class ProgressReportPDFView(RetrieveAPIView):
         data['end_date'] = report.programme_document.end_date.strftime(settings.PRINT_DATA_FORMAT)
         data['cso_contribution'] = report.programme_document.cso_contribution
         data['budget'] = report.programme_document.budget
-        data['funds_received_to_date'] = report.funds_received_to_date
+        data['funds_received_to_date'] = report.programme_document.funds_received_to_date
         data['challenges_in_the_reporting_period'] = report.challenges_in_the_reporting_period
         data['proposed_way_forward'] = report.proposed_way_forward
         data['partner_contribution_to_date'] = report.partner_contribution_to_date
@@ -317,7 +317,7 @@ class ProgressReportLocationsAPIView(ListAPIView):
         self.workspace_id = workspace_id
         pr = self.get_object(progress_report_id)
         queryset = self.get_queryset().filter(
-            reportables__indicator_reports__progress_report__programme_document__progress_reports=pr).distinct()
+            indicator_location_data__indicator_report__progress_report=pr).distinct()
         filtered = ProgressReportFilter(request.GET, queryset=queryset)
 
         page = self.paginate_queryset(filtered.qs)
