@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from django.db import transaction
 from django.core.management.base import BaseCommand
@@ -25,6 +25,9 @@ from core.factories import (
 )
 from unicef.models import ProgressReport, ProgrammeDocument
 from indicator.models import IndicatorReport, Reportable, IndicatorBlueprint
+
+
+DUE_DATE_DAYS_TIMEDELTA = 15
 
 
 class Command(BaseCommand):
@@ -65,21 +68,16 @@ class Command(BaseCommand):
 
             reportable_queryset = pd.reportable_queryset
             frequency = pd.frequency
-            latest_progress_report = pd.progress_reports.last()
+            latest_progress_report = pd.progress_reports.order_by('end_date').last()
             date_list = []
 
             if frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
                 print "PD {} frequency is custom specific dates".format(
                     pd)
-
                 if not latest_progress_report:
-                    date_list = [pd.start_date]
-                    date_list.extend(pd.cs_dates)
-
+                    date_list = pd.reporting_periods.filter(start_date__gte=pd.start_date, end_date__lte=datetime.now())
                 else:
-                    date_list = [latest_progress_report.end_date + timedelta(days=1)]
-                    date_list.extend(filter(lambda item: item > latest_progress_report.end_date, pd.cs_dates))
-
+                    date_list = pd.reporting_periods.filter(start_date__gte=latest_progress_report.end_date, end_date__lte=datetime.now())
             else:
                 # Get missing date list based on progress report existence
                 if latest_progress_report:
@@ -102,26 +100,23 @@ class Command(BaseCommand):
             print "Missing dates: {}".format(date_list)
 
             with transaction.atomic():
-                last_element_idx = len(date_list) - 1
-
                 for idx, missing_date in enumerate(date_list):
-                    if frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
-                        if idx != last_element_idx:
-                            end_date = calculate_end_date_given_start_date(
-                                missing_date, frequency, cs_dates=date_list)
-
-                        else:
-                            break
-
-                    else:
+                    if frequency != PD_FREQUENCY_LEVEL.custom_specific_dates:
                         end_date = calculate_end_date_given_start_date(
                             missing_date, frequency)
+                        due_date = end_date + timedelta(days=DUE_DATE_DAYS_TIMEDELTA)
+                    else:
+                        end_date = missing_date.end_date
+                        due_date = missing_date.due_date
+                        missing_date = missing_date.start_date
+
 
                     # Create ProgressReport first
                     print "Creating PD {} ProgressReport object for {} - {}".format(pd, missing_date, end_date)
                     next_progress_report = ProgressReportFactory(
                         start_date=missing_date,
                         end_date=end_date,
+                        due_date=due_date,
                         programme_document=pd,
                     )
 
@@ -132,12 +127,13 @@ class Command(BaseCommand):
                                 reportable=reportable,
                                 time_period_start=missing_date,
                                 time_period_end=end_date,
+                                due_date=due_date,
                             )
 
                             for location in reportable.locations.all():
                                 print "Creating IndicatorReport {} IndicatorLocationData object for {} - {}".format(
                                     indicator_report, missing_date, end_date)
-                                location_data = IndicatorLocationDataFactory(
+                                IndicatorLocationDataFactory(
                                     indicator_report=indicator_report,
                                     location=location,
                                     num_disaggregation=indicator_report.disaggregations.count(),
@@ -155,12 +151,13 @@ class Command(BaseCommand):
                                 reportable=reportable,
                                 time_period_start=missing_date,
                                 time_period_end=end_date,
+                                due_date=due_date,
                             )
 
                             for location in reportable.locations.all():
                                 print "Creating IndicatorReport {} IndicatorLocationData object {} - {}".format(
                                     indicator_report, missing_date, end_date)
-                                location_data = IndicatorLocationDataFactory(
+                                IndicatorLocationDataFactory(
                                     indicator_report=indicator_report,
                                     location=location,
                                     num_disaggregation=indicator_report.disaggregations.count(),
@@ -183,7 +180,7 @@ class Command(BaseCommand):
                 indicator, indicator.start_date, indicator.end_date)
 
             frequency = indicator.frequency
-            latest_indicator_report = indicator.indicator_reports.last()
+            latest_indicator_report = indicator.indicator_reports.order_by('time_period_end').last()
             date_list = []
 
             if frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:

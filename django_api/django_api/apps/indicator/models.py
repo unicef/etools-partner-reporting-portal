@@ -5,6 +5,7 @@ from django.utils.functional import cached_property
 from django.contrib.postgres.fields import JSONField, ArrayField
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -18,9 +19,10 @@ from core.common import (
     PROGRESS_REPORT_STATUS,
     OVERALL_STATUS,
 )
+from core.models import TimeStampedExternalSyncModelMixin
 
 
-class Disaggregation(TimeStampedModel):
+class Disaggregation(TimeStampedExternalSyncModelMixin):
     """
     Disaggregation module. For example: <Gender, Age>
 
@@ -40,7 +42,7 @@ class Disaggregation(TimeStampedModel):
         return "Disaggregation <pk:%s> %s" % (self.id, self.name)
 
 
-class DisaggregationValue(TimeStampedModel):
+class DisaggregationValue(TimeStampedExternalSyncModelMixin):
     """
     Disaggregation Value module. For example: Gender <Male, Female, Other>
 
@@ -60,7 +62,7 @@ class DisaggregationValue(TimeStampedModel):
         return "Disaggregation Value <pk:%s> %s" % (self.id, self.value)
 
 
-class IndicatorBlueprint(TimeStampedModel):
+class IndicatorBlueprint(TimeStampedExternalSyncModelMixin):
     """
     IndicatorBlueprint module is a pattern for indicator
     (here we setup basic parameter).
@@ -103,10 +105,12 @@ class IndicatorBlueprint(TimeStampedModel):
         (RATIO, RATIO)
     )
 
-    DISPLAY_TYPE_CHOICES = QUANTITY_DISPLAY_TYPE_CHOICES + RATIO_DISPLAY_TYPE_CHOICES
+    DISPLAY_TYPE_CHOICES = QUANTITY_DISPLAY_TYPE_CHOICES + \
+        RATIO_DISPLAY_TYPE_CHOICES
 
     title = models.CharField(max_length=1024)
-    unit = models.CharField(max_length=10, choices=UNIT_CHOICES, default=NUMBER)
+    unit = models.CharField(max_length=10, choices=UNIT_CHOICES,
+                            default=NUMBER)
     description = models.CharField(max_length=3072, null=True, blank=True)
     code = models.CharField(max_length=50, null=True, blank=True, unique=True)
     subdomain = models.CharField(max_length=255, null=True, blank=True)
@@ -114,7 +118,6 @@ class IndicatorBlueprint(TimeStampedModel):
 
     calculation_formula_across_periods = models.CharField(
         max_length=10, choices=CALC_CHOICES, default=SUM)
-
     calculation_formula_across_locations = models.CharField(
         max_length=10, choices=CALC_CHOICES, default=SUM)
 
@@ -135,6 +138,26 @@ class IndicatorBlueprint(TimeStampedModel):
             self.code = None
         super(IndicatorBlueprint, self).save(*args, **kwargs)
 
+    def clean(self):
+        """
+        To check that the calculation method and display type being assigned
+        are appropriate based on type of unit.
+        """
+        unit_to_valid_calc_values = {
+            self.NUMBER: map(lambda x: x[0], self.QUANTITY_CALC_CHOICES),
+            self.PERCENTAGE: map(lambda x: x[0], self.RATIO_CALC_CHOICES),
+        }
+        if self.calculation_formula_across_periods not in unit_to_valid_calc_values.get(self.unit, []) or \
+        self.calculation_formula_across_locations not in unit_to_valid_calc_values.get(self.unit, []):
+            raise ValidationError('Calculation methods not supported by selected unit')
+
+        unit_to_valid_display_type_values = {
+            self.NUMBER: map(lambda x: x[0], self.QUANTITY_DISPLAY_TYPE_CHOICES),
+            self.PERCENTAGE: map(lambda x: x[0], self.RATIO_DISPLAY_TYPE_CHOICES),
+        }
+        if self.display_type not in unit_to_valid_display_type_values.get(self.unit, []):
+            raise ValidationError('Display type is not supported by selected unit')
+
     def __str__(self):
         return self.title
 
@@ -142,7 +165,7 @@ class IndicatorBlueprint(TimeStampedModel):
         ordering = ['-id']
 
 
-class Reportable(TimeStampedModel):
+class Reportable(TimeStampedExternalSyncModelMixin):
     """
     Reportable / Applied Indicator model.
 
@@ -198,9 +221,6 @@ class Reportable(TimeStampedModel):
     class Meta:
         ordering = ['-id']
 
-    def __str__(self):
-        return "Reportable <pk:%s>" % self.id
-
     @property
     def ref_num(self):
         from unicef.models import LowerLevelOutput
@@ -241,7 +261,9 @@ class Reportable(TimeStampedModel):
         }
 
     def __str__(self):
-        return "Reportable <pk:%s> on %s" % (self.id, self.content_object)
+        return "Reportable <pk:%s> %s on %s" % (self.id,
+                                                self.blueprint.title,
+                                                self.content_object)
 
 
 class IndicatorReport(TimeStampedModel):
@@ -256,7 +278,9 @@ class IndicatorReport(TimeStampedModel):
 
     title = models.CharField(max_length=255)
     reportable = models.ForeignKey(Reportable, related_name="indicator_reports")
-    progress_report = models.ForeignKey('unicef.ProgressReport', related_name="indicator_reports", null=True)
+    progress_report = models.ForeignKey('unicef.ProgressReport',
+                                        related_name="indicator_reports",
+                                        null=True)
     time_period_start = models.DateField()  # first day of defined frequency mode
     time_period_end = models.DateField()  # last day of defined frequency mode
     due_date = models.DateField()  # can be few days/weeks out of the "end date"

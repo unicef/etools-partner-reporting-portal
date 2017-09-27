@@ -20,12 +20,13 @@ from core.common import (
     PD_STATUS,
     CURRENCIES,
 )
+from core.models import TimeStampedExternalSyncModelMixin
 from indicator.models import Reportable  # IndicatorReport
 
 logger = logging.getLogger(__name__)
 
 
-class Section(models.Model):
+class Section(TimeStampedExternalSyncModelMixin):
     """
     Section model define atomic act of help like: bottle of water, blanket.
     """
@@ -35,7 +36,7 @@ class Section(models.Model):
         return self.name
 
 
-class Person(models.Model):
+class Person(TimeStampedExternalSyncModelMixin):
     name = models.CharField(max_length=128, verbose_name='Name')
     title = models.CharField(max_length=255, verbose_name='Title')
     phone_number = models.CharField(max_length=64, verbose_name='Phone Number')
@@ -45,10 +46,11 @@ class Person(models.Model):
         return self.name
 
 
-class ProgrammeDocument(TimeStampedModel):
+class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
     """
-    ProgrammeDocument model describe agreement between UNICEF & Partner to realize document and
-    reports are feedback for this assignment.
+    ProgrammeDocument model describe agreement between UNICEF & Partner to
+    realize document and reports are feedback for this assignment. The data
+    in this model will come from eTools/PMP via a regular sync.
 
     related models:
         unicef.Section (ManyToManyField): "sections"
@@ -168,7 +170,19 @@ class ProgrammeDocument(TimeStampedModel):
         verbose_name='UNICEF Supplies Currency'
     )
 
-    cs_dates = ArrayField(models.DateField(), default=list)
+    funds_received_to_date = models.DecimalField(
+        decimal_places=2,
+        max_digits=12,
+        default=0,
+        verbose_name='Funds received'
+    )
+
+    funds_received_to_date_currency = models.CharField(
+        choices=CURRENCIES,
+        default=CURRENCIES.usd,
+        max_length=16,
+        verbose_name='Funds received Currency'
+    )
 
     # TODO:
     # cron job will create new report with due period !!!
@@ -249,7 +263,8 @@ class ProgrammeDocument(TimeStampedModel):
         if due_report:
             self.__due_date = due_report.time_period_start
         else:
-            due_report = self.reportable_queryset.order_by('indicator_reports__time_period_start') \
+            due_report = self.reportable_queryset.order_by(
+                'indicator_reports__time_period_start') \
                 .last() \
                 .indicator_reports.last()
             self.__due_date = due_report and due_report.time_period_start
@@ -287,7 +302,8 @@ class ProgrammeDocument(TimeStampedModel):
             })
             percentage = 0
 
-        self.__budget = "{total} ({consumed}%)".format(total=total, consumed=consumed)
+        self.__budget = "{total} ({consumed}%)".format(total=total,
+                                                       consumed=consumed)
         return self.__budget
 
     @property
@@ -300,6 +316,11 @@ class ProgrammeDocument(TimeStampedModel):
             return 90
         else:
             raise NotImplemented("Not recognized PD_FREQUENCY_LEVEL.")
+
+    @property
+    def lower_level_outputs(self):
+        return LowerLevelOutput.objects.filter(
+            cp_output__programme_document=self)
 
 
 def find_first_programme_document_id():
@@ -316,7 +337,6 @@ def find_first_programme_document_id():
 
 class ProgressReport(TimeStampedModel):
     partner_contribution_to_date = models.CharField(max_length=256)
-    funds_received_to_date = models.CharField(max_length=256)
     challenges_in_the_reporting_period = models.CharField(max_length=256)
     proposed_way_forward = models.CharField(max_length=256)
     status = models.CharField(max_length=3, choices=PROGRESS_REPORT_STATUS,
@@ -355,8 +375,22 @@ class ProgressReport(TimeStampedModel):
         return self.submission_date.strftime(
             settings.PRINT_DATA_FORMAT)
 
+    def __str__(self):
+        return "Progress Report <pk:{}>: {} {} to {}".format(
+            self.id, self.programme_document, self.start_date, self.end_date)
 
-class CountryProgrammeOutput(TimeStampedModel):
+
+class ReportingPeriodDates(TimeStampedModel):
+    """
+    Used for storing start_date, end_date and due_date fields for multiple reports
+    """
+    start_date = models.DateField(verbose_name='Start date')
+    end_date = models.DateField(verbose_name='End date')
+    due_date = models.DateField(null=True, blank=True, verbose_name='Due date')
+    programme_document = models.ForeignKey(ProgrammeDocument, related_name='reporting_periods')
+
+
+class CountryProgrammeOutput(TimeStampedExternalSyncModelMixin):
     """
     CountryProgrammeOutput (LLO Parent) module.
 
@@ -364,7 +398,8 @@ class CountryProgrammeOutput(TimeStampedModel):
         unicef.ProgrammeDocument (ForeignKey): "programme_document"
     """
     title = models.CharField(max_length=255)
-    programme_document = models.ForeignKey(ProgrammeDocument, related_name="cp_outputs")
+    programme_document = models.ForeignKey(ProgrammeDocument,
+                                           related_name="cp_outputs")
 
     class Meta:
         ordering = ['id']
@@ -373,7 +408,7 @@ class CountryProgrammeOutput(TimeStampedModel):
         return self.title
 
 
-class LowerLevelOutput(TimeStampedModel):
+class LowerLevelOutput(TimeStampedExternalSyncModelMixin):
     """
     LowerLevelOutput (PD output) module describe the goals to reach in PD scope.
 
@@ -382,8 +417,10 @@ class LowerLevelOutput(TimeStampedModel):
         indicator.Reportable (GenericRelation): "reportables"
     """
     title = models.CharField(max_length=255)
-    cp_output = models.ForeignKey(CountryProgrammeOutput, related_name="ll_outputs")
-    reportables = GenericRelation('indicator.Reportable', related_query_name='lower_level_outputs')
+    cp_output = models.ForeignKey(CountryProgrammeOutput,
+                                  related_name="ll_outputs")
+    reportables = GenericRelation('indicator.Reportable',
+                                  related_query_name='lower_level_outputs')
 
     class Meta:
         ordering = ['id']

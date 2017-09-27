@@ -28,7 +28,21 @@ def get_random_color():
     return '#%02X%02X%02X' % (r(), r(), r())
 
 
-class Country(TimeStampedModel):
+class TimeStampedExternalSyncModelMixin(TimeStampedModel):
+    """
+    A abstract class that provides external_id field that some models need since
+    they might have been synced from an external system.
+    """
+    external_id = models.CharField(
+        help_text='An ID representing this instance in an external system',
+        blank=True,
+        null=True,
+        max_length=32)
+
+    class Meta:
+        abstract = True
+
+class Country(TimeStampedExternalSyncModelMixin):
     """
     Represents a country which has many offices and sections.
     Taken from https://github.com/unicef/etools/blob/master/EquiTrack/users/models.py
@@ -45,7 +59,7 @@ class Country(TimeStampedModel):
         return self.name
 
 
-class Workspace(TimeStampedModel):
+class Workspace(TimeStampedExternalSyncModelMixin):
     """
     Workspace (previously called Workspace, also synonym was
     emergency/country) model.
@@ -55,11 +69,10 @@ class Workspace(TimeStampedModel):
     """
     title = models.CharField(max_length=255)
     workspace_code = models.CharField(
-        max_length=8
+        max_length=8,
+        unique=True
     )
     countries = models.ManyToManyField(Country, related_name='workspaces')
-    locations = models.ManyToManyField('core.Location',
-                                       related_name='workspaces')
     business_area_code = models.CharField(
         max_length=10,
         null=True, blank=True
@@ -81,6 +94,18 @@ class Workspace(TimeStampedModel):
 
     def __str__(self):
         return self.title
+
+    @property
+    def locations(self):
+        """
+        Returns a list of locations that belong to countries associated with
+        this workspace.
+        """
+        result = self.countries.all().values_list(
+            'gateway_types__locations').distinct()
+        pks = []
+        [pks.extend(filter(lambda x: x is not None, part)) for part in result]
+        return Location.objects.filter(pk__in=pks)
 
 
 class ResponsePlan(TimeStampedModel):
@@ -108,6 +133,9 @@ class ResponsePlan(TimeStampedModel):
         verbose_name='End date'
     )
     workspace = models.ForeignKey('core.Workspace', related_name="response_plans")
+
+    class Meta:
+        unique_together = ('title', 'plan_type', 'workspace')
 
     def __unicode__(self):
         return self.title
@@ -142,7 +170,7 @@ class LocationManager(models.GeoManager):
 
 
 @python_2_unicode_compatible
-class Location(TimeStampedModel):
+class Location(TimeStampedExternalSyncModelMixin):
     """
     Location model define place where agents are working.
     The background of the location can be:
