@@ -105,30 +105,30 @@
             restamp="true">
           <iron-form class="app-grid">
 
-              <div class="flex col-name">
-          <paper-input
-              class="validate"
-              id="name"
-              name="name"
-              label="Disaggregation"
-              value="{{data.name}}"
-              on-input="_onInput"
-              always-float-label
-              required>
-          </paper-input>
-        </div>
-        <div class="flex col-values">
-          <etools-prp-chips
-              class="validate"
-              index="0"
-              name="values"
-              label="Disaggregation group"
-              value="{{data.choices}}"
-              on-selected-chips-updated="_onInput"
-              required>
-            <chip-disagg-value></chip-disagg-value>
-          </etools-prp-chips>
-        </div>
+            <div class="flex col-name">
+              <paper-input
+                  class="validate"
+                  id="name"
+                  name="name"
+                  label="Disaggregation"
+                  value="{{data.name}}"
+                  on-input="_onInput"
+                  always-float-label
+                  required>
+              </paper-input>
+            </div>
+            <div class="flex col-values">
+              <etools-prp-chips
+                  class="validate"
+                  index="0"
+                  name="values"
+                  label="Disaggregation group"
+                  value="{{data.choices}}"
+                  on-selected-chips-updated="_onInput"
+                  required>
+                <chip-disagg-value></chip-disagg-value>
+              </etools-prp-chips>
+            </div>
 
           </iron-form>
         </template>
@@ -256,12 +256,12 @@
           newChoices.push({"value": choice, "active": true})
         }
         this.data.choices = newChoices
-        console.log('data to send to server', this.data)
         thunk()
           .then(function (res) {
-            console.log("then")
+            self.fire('disaggregation-added', res.data)
             self.updatePending = false;
-            self._redirectToDetail();
+            self.close()
+            
           })
           .catch(function (err) { // jshint ignore:line
             self.updatePending = false;
