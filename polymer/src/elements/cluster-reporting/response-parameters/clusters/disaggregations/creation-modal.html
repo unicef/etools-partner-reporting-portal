@@ -75,7 +75,6 @@
 
     <iron-location path="{{path}}"></iron-location>
 
-    <cluster-dropdown-content clusters="{{clusters}}"></cluster-dropdown-content>
 
     <etools-prp-ajax
         id="createDisaggregation"
@@ -211,20 +210,6 @@
           statePath: 'clusterDisaggregations.all',
         },
 
-        frequencies: {
-          type: Array,
-          value: [
-            {title: 'Weekly', id: 'Wee'},
-            {title: 'Monthly', id: 'Mon'},
-            {title: 'Quarterly', id: 'Qua'},
-          ],
-        },
-
-        clusters: {
-          type: Array,
-          value: []
-        },
-
         refresh: {
           type: Boolean,
           value: false
@@ -241,7 +226,7 @@
       },
 
       open: function () {
-        this.data = {"response_plan":+this.responsePlanID, "choices": []};
+        this.data = {"response_plan":+this.responsePlanID, "choices": [], "active": true};
         this.set('opened', true);
         this.set('refresh', true);
       },
@@ -268,9 +253,10 @@
         var thunk = this.$.createDisaggregation.thunk();
         let newChoices = []
         for (let choice of this.data.choices) {
-          newChoices.push({"value": choice})
+          newChoices.push({"value": choice, "active": true})
         }
         this.data.choices = newChoices
+        console.log('data to send to server', this.data)
         thunk()
           .then(function (res) {
             console.log("then")
@@ -279,7 +265,7 @@
           })
           .catch(function (err) { // jshint ignore:line
             self.updatePending = false;
-            console.log("catch", err)
+            console.log("error", err)
             // TODO: error handling
           });
       },
