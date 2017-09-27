@@ -10,12 +10,6 @@
 <link rel="import" href="../etools-prp-chips.html">
 <link rel="import" href="chip-disagg-value.html">
 <link rel="import" href="../../styles/buttons.html">
-<link rel="import" href="../form-fields/dropdown-form-input.html">
-<link rel="import" href="../form-fields/disaggregation-dropdown-content.html">
-<link rel="import" href="../../endpoints.html">
-<link rel="import" href="../../redux/store.html">
-<link rel="import" href="../etools-prp-ajax.html">
-
 
 <dom-module id="disaggregations-widget">
   <template>
@@ -60,11 +54,6 @@
       }
     </style>
 
-    <etools-prp-ajax
-        id="disaggregationNames"
-        url="[[disaggregationNamesUrl]]">
-    </etools-prp-ajax>
-
     <h2 class$="[[_headingClassName]]">Disaggregations ([[value.length]])</h2>
 
     <template
@@ -80,26 +69,18 @@
           </paper-icon-button>
         </div>
         <div class="flex col-name">
-          <paper-dropdown-menu
-            class="validate"
-            label="Disaggregate By"
-            on-value-changed="_validate"
-            on-selected-item-changed="_setDisaggregation"
-            always-float-label
-            required>
-          <paper-listbox
-              slot="dropdown-content"
-              class="dropdown-content">
-            <template
-                id="disaggregations"
-                is="dom-repeat"
-                items="[[disaggregations.result]]">
-              <paper-item>[[item.name]]</paper-item>
-            </template>
-          </paper-listbox>
-        </paper-dropdown-menu>
+          <paper-input
+              class="validate"
+              index="[[index]]"
+              name="name"
+              label="Disaggregate by"
+              value="[[_getField(index, 'name', value.length)]]"
+              on-input="_onInput"
+              always-float-label
+              required>
+          </paper-input>
         </div>
-        <!-- <div class="flex col-values">
+        <div class="flex col-values">
           <etools-prp-chips
               class="validate"
               index="[[index]]"
@@ -110,7 +91,7 @@
               required>
             <chip-disagg-value></chip-disagg-value>
           </etools-prp-chips>
-        </div> -->
+        </div>
       </div>
     </template>
 
@@ -128,7 +109,6 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
-        App.Behaviors.ReduxBehavior
       ],
 
       properties: {
@@ -141,12 +121,6 @@
           type: Array,
           value: [],
           notify: true,
-        },
-
-        data: {
-          type: Object,
-          value: {},
-          notify: true
         },
 
         invalid: {
@@ -168,10 +142,6 @@
         _headingClassName: {
           type: String,
           computed: '_computeHeadingClassName(_invalid)',
-        },
-        disaggregations: {
-          type: Object,
-          statePath: 'clusterDisaggregations.all',
         },
       },
 
@@ -230,19 +200,6 @@
 
           this._setValidity();
         });
-      },
-
-            _validate: function (e) {
-        e.target.validate();
-      },
-
-      _setDisaggregation: function(e, data) {
-        var dis = this.$$('#disaggregations').itemForElement(data.value);
-
-        if (!dis) {
-          return;
-        }
-        this.set('data.disaggregation'. dis.id)
       },
 
       _getField: function (index, name) {
