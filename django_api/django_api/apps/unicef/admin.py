@@ -26,7 +26,7 @@ class ProgressReportAdmin(admin.ModelAdmin):
 
 class ReportingPeriodDatesAdmin(admin.ModelAdmin):
     list_display = ('programme_document', 'start_date', 'end_date', 'due_date')
-    search_fields = ('programme_document', )
+    search_fields = ('programme_document__title', )
 
 
 class CountryProgrammeOutputAdmin(admin.ModelAdmin):
