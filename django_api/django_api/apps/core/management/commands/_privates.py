@@ -376,7 +376,8 @@ def generate_fake_data(workspace_quantity=10):
     # for partner in Partner.objects.all():
     for workspace in Workspace.objects.all():
         for i in range(workspace_quantity * 5):
-            pd = ProgrammeDocumentFactory.create(partner=partner, workspace=workspace)
+            pd = ProgrammeDocumentFactory.create(
+                partner=admin.partner, workspace=workspace)
             for ir in range(3):
                 d = datetime.datetime.now() + datetime.timedelta(days=ir * 30)
                 ReportingPeriodDatesFactory.create(
