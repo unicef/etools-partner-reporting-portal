@@ -70,14 +70,14 @@
           statePath: 'indicators.count'
         },
 
-        locationId: {
+        workspaceId: {
           type: String,
           statePath: 'location.id',
         },
 
         indicatorsUrl: {
           type: String,
-          computed: '_computeIndicatorsUrl(locationId)',
+          computed: '_computeIndicatorsUrl(workspaceId)',
         },
 
         query: String,
@@ -89,8 +89,8 @@
         '_indicatorsAjax(indicatorsUrl, queryParams)',
       ],
 
-      _computeIndicatorsUrl: function (locationId) {
-        return App.Endpoints.allIndicators(locationId);
+      _computeIndicatorsUrl: function (workspaceId) {
+        return App.Endpoints.allPDIndicators(workspaceId);
       },
 
       _indicatorsAjax: function (_, queryParams) {

@@ -161,6 +161,7 @@ class IndicatorListSerializer(ReportableSimpleSerializer):
             'target',
             'baseline',
             'blueprint',
+            'pd_id',
             'ref_num',
             'achieved',
             'progress_percentage',
@@ -248,7 +249,10 @@ class IndicatorLLoutputsSerializer(serializers.ModelSerializer):
 
 
 class OverallNarrativeSerializer(serializers.ModelSerializer):
-
+    """
+    Sets the overall status and narrative assessment on an IndicatorReport
+    instance.
+    """
     class Meta:
         model = IndicatorReport
         fields = (
@@ -563,7 +567,7 @@ class ClusterIndicatorReportListSerializer(IndicatorReportListSerializer):
         )
 
 
-class PDReportsSerializer(serializers.ModelSerializer):
+class PDReportContextIndicatorReportSerializer(serializers.ModelSerializer):
     """
     A serializer for IndicatorReport model but specific information
     that is helpful in IP reporting from a Programme Document / Progress
@@ -590,6 +594,8 @@ class PDReportsSerializer(serializers.ModelSerializer):
             'is_draft',
             'due_date',
             'total',
+            'overall_status',
+            'narrative_assessment',
         )
 
     def get_id(self, obj):
