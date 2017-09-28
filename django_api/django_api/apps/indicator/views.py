@@ -216,10 +216,13 @@ class ReportableDetailAPIView(RetrieveAPIView):
     serializer_class = IndicatorListSerializer
     queryset = Reportable.objects.all()
     permission_classes = (IsAuthenticated, )
+    lookup_url_kwarg = 'reportable_id'
 
 
 class IndicatorDataAPIView(APIView):
-
+    """
+    Takes an indicator report id.
+    """
     permission_classes = (IsAuthenticated, )
 
     def get_queryset(self, id):
@@ -233,7 +236,7 @@ class IndicatorDataAPIView(APIView):
 
         location = self.request.query_params.get('location', None)
         if location:
-            queryset = queryset.filter(locations__id=location)
+            queryset = queryset.filter(indicator_reports__indicator_location_data__location=location)
 
         incomplete = self.request.query_params.get('incomplete', None)
         if incomplete == "1":

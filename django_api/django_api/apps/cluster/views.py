@@ -345,7 +345,7 @@ class ClusterIndicatorsListExcelView(ListAPIView):
         # Render to excel
         indicators = self.filter_queryset(self.get_queryset())
 
-        writer = XLSXWriter(indicators)
+        writer = XLSXWriter(indicators, response_plan_id)
 
         import os.path
         import mimetypes

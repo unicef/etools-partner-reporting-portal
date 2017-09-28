@@ -33,14 +33,18 @@ from indicator.serializers import IndicatorListSerializer, PDReportsSerializer
 from indicator.filters import PDReportsFilter
 from indicator.serializers import IndicatorBlueprintSimpleSerializer
 
+from partner.models import Partner
+
 from .serializers import (
     ProgrammeDocumentSerializer,
     ProgrammeDocumentDetailSerializer,
+    ProgressReportSimpleSerializer,
     ProgressReportSerializer,
     ProgressReportReviewSerializer,
     LLOutputSerializer,
     LLOutputIndicatorsSerializer,
-    ProgrammeDocumentCalculationMethodsSerializer
+    ProgrammeDocumentCalculationMethodsSerializer,
+    ProgrammeDocumentProgressSerializer
 )
 
 from .models import ProgrammeDocument, ProgressReport
@@ -52,7 +56,8 @@ logger = logging.getLogger(__name__)
 
 class ProgrammeDocumentAPIView(ListAPIView):
     """
-    Endpoint for getting Programme Document.
+    Endpoint for getting a list of Programme Documents and being able to
+    filter by them.
     """
     serializer_class = ProgrammeDocumentSerializer
     permission_classes = (IsAuthenticated, )
@@ -61,7 +66,8 @@ class ProgrammeDocumentAPIView(ListAPIView):
     filter_class = ProgrammeDocumentFilter
 
     def get_queryset(self):
-        return ProgrammeDocument.objects.filter(partner=self.request.user.partner)
+        return ProgrammeDocument.objects.filter(
+            partner=self.request.user.partner)
 
     def list(self, request, workspace_id, *args, **kwargs):
         queryset = self.get_queryset().filter(workspace=workspace_id)
@@ -83,28 +89,65 @@ class ProgrammeDocumentDetailsAPIView(RetrieveAPIView):
 
     serializer_class = ProgrammeDocumentDetailSerializer
     permission_classes = (IsAuthenticated, )
+    lookup_url_kwarg = 'pd_id'
 
-    def get(self, request, workspace_id, pk, *args, **kwargs):
+    def get(self, request, workspace_id, pd_id, *args, **kwargs):
         """
         Get Programme Document Details by given pk.
         """
         self.workspace_id = workspace_id
         serializer = self.get_serializer(
-            self.get_object(pk)
+            self.get_object(pd_id)
         )
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
-    def get_object(self, pk):
+    def get_object(self, pd_id):
         try:
-            return ProgrammeDocument.objects.get(partner=self.request.user.partner, workspace=self.workspace_id, pk=pk)
+            return ProgrammeDocument.objects.get(
+                partner=self.request.user.partner,
+                workspace=self.workspace_id,
+                pk=pd_id)
         except ProgrammeDocument.DoesNotExist as exp:
             logger.exception({
                 "endpoint": "ProgrammeDocumentDetailsAPIView",
                 "request.data": self.request.data,
-                "pk": pk,
+                "pk": pd_id,
                 "exception": exp,
             })
             raise Http404
+
+
+class ProgrammeDocumentProgressAPIView(RetrieveAPIView):
+
+    serializer_class = ProgrammeDocumentProgressSerializer
+    permission_classes = (IsAuthenticated, )
+    lookup_url_kwarg = 'pd_id'
+
+    def get(self, request, workspace_id, pd_id, *args, **kwargs):
+        """
+        Get Programme Document Details by given pk.
+        """
+        self.workspace_id = workspace_id
+        serializer = self.get_serializer(
+            self.get_object(pd_id)
+        )
+        return Response(serializer.data, status=statuses.HTTP_200_OK)
+
+    def get_object(self, pd_id):
+        try:
+            return ProgrammeDocument.objects.get(
+                partner=self.request.user.partner,
+                workspace=self.workspace_id,
+                pk=pd_id)
+        except ProgrammeDocument.DoesNotExist as exp:
+            logger.exception({
+                "endpoint": "ProgrammeDocumentProgressAPIView",
+                "request.data": self.request.data,
+                "pk": pd_id,
+                "exception": exp,
+            })
+            raise Http404
+
 
 class ProgrammeDocumentLocationsAPIView(ListAPIView):
 
@@ -136,9 +179,12 @@ class ProgrammeDocumentIndicatorsAPIView(ListAPIView):
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
 
     def list(self, request, workspace_id, *args, **kwargs):
-        pd = ProgrammeDocument.objects.filter(partner=self.request.user.partner, workspace=workspace_id)
-        queryset = self.get_queryset().filter(indicator_reports__progress_report__programme_document__in=pd)
-        filtered = ProgrammeDocumentIndicatorFilter(request.GET, queryset=queryset)
+        pd = ProgrammeDocument.objects.filter(
+            partner=self.request.user.partner, workspace=workspace_id)
+        queryset = self.get_queryset().filter(
+            indicator_reports__progress_report__programme_document__in=pd)
+        filtered = ProgrammeDocumentIndicatorFilter(request.GET,
+                                                    queryset=queryset)
 
         page = self.paginate_queryset(filtered.qs)
         if page is not None:
@@ -153,20 +199,32 @@ class ProgrammeDocumentIndicatorsAPIView(ListAPIView):
 
 class ProgressReportAPIView(ListAPIView):
     """
-    Endpoint for getting list of all PD Progress Reports
+    Endpoint for getting list of all Progress Reports. Supports filtering
+    as per ProgressReportFilter by status, pd_ref_title, programme_document
+    (id) etc.
+
+    Supports additional GET param to filter by external_partner_id
     """
-    serializer_class = ProgressReportSerializer
+    serializer_class = ProgressReportSimpleSerializer
     pagination_class = SmallPagination
     permission_classes = (IsAuthenticated, )
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     filter_class = ProgressReportFilter
 
     def get_queryset(self):
-        # Limit reports to partner only
-        return ProgressReport.objects.filter(programme_document__partner=self.request.user.partner)
+        external_partner_id = self.request.GET.get('external_partner_id')
+        if external_partner_id is not None:
+            qset = Partner.objects.filter(external_id=external_partner_id)
+            return ProgressReport.objects.filter(
+                programme_document__partner__in=qset)
+        else:
+            # Limit reports to this user's partner only
+            return ProgressReport.objects.filter(
+                programme_document__partner=self.request.user.partner)
 
     def list(self, request, workspace_id, *args, **kwargs):
-        queryset = self.get_queryset().filter(programme_document__workspace=workspace_id)
+        queryset = self.get_queryset().filter(
+            programme_document__workspace=workspace_id)
         filtered = ProgressReportFilter(request.GET, queryset=queryset)
 
         page = self.paginate_queryset(filtered.qs)
@@ -216,7 +274,7 @@ class ProgressReportPDFView(RetrieveAPIView):
         data['end_date'] = report.programme_document.end_date.strftime(settings.PRINT_DATA_FORMAT)
         data['cso_contribution'] = report.programme_document.cso_contribution
         data['budget'] = report.programme_document.budget
-        data['funds_received_to_date'] = report.funds_received_to_date
+        data['funds_received_to_date'] = report.programme_document.funds_received_to_date
         data['challenges_in_the_reporting_period'] = report.challenges_in_the_reporting_period
         data['proposed_way_forward'] = report.proposed_way_forward
         data['partner_contribution_to_date'] = report.partner_contribution_to_date
@@ -254,7 +312,10 @@ class ProgressReportDetailsAPIView(RetrieveAPIView):
 
     def get_object(self, pk):
         try:
-            return ProgressReport.objects.get(programme_document__partner=self.request.user.partner, programme_document__workspace=self.workspace_id, pk=pk)
+            return ProgressReport.objects.get(
+                programme_document__partner=self.request.user.partner,  # TODO: check if needed?
+                programme_document__workspace=self.workspace_id,
+                pk=pk)
         except ProgressReport.DoesNotExist as exp:
             logger.exception({
                 "endpoint": "ProgressReportDetailsAPIView",
@@ -313,7 +374,7 @@ class ProgressReportLocationsAPIView(ListAPIView):
         self.workspace_id = workspace_id
         pr = self.get_object(progress_report_id)
         queryset = self.get_queryset().filter(
-            reportables__indicator_reports__progress_report__programme_document__progress_reports=pr).distinct()
+            indicator_location_data__indicator_report__progress_report=pr).distinct()
         filtered = ProgressReportFilter(request.GET, queryset=queryset)
 
         page = self.paginate_queryset(filtered.qs)

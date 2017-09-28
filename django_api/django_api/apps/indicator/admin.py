@@ -11,7 +11,8 @@ from .models import (
 
 
 class IndicatorBlueprintAdmin(admin.ModelAdmin):
-    list_display = ('title', 'unit', 'code', 'disaggregatable', 'display_type')
+    list_display = ('title', 'unit', 'code', 'disaggregatable', 'display_type',
+                    'external_id')
     list_filter = ('disaggregatable', 'unit',
                    'calculation_formula_across_periods',
                    'calculation_formula_across_locations',
@@ -23,9 +24,11 @@ class ReportableAdmin(admin.ModelAdmin):
     list_display = ('blueprint', 'target', 'baseline', 'parent_indicator',
                     'frequency', 'assumptions', 'means_of_verification',
                     'is_cluster_indicator', 'start_date', 'end_date',
-                    'cs_dates', 'content_object', 'content_type')
+                    'cs_dates', 'content_object', 'content_type',
+                    'external_id')
     list_filter = ('is_cluster_indicator',)
-    search_fields = ('context_code', 'description', 'code', 'assumptions')
+    search_fields = ('context_code', 'means_of_verification', 'target',
+                     'baseline', 'object_id')
 
 
 class IndicatorReportAdmin(admin.ModelAdmin):
@@ -33,7 +36,8 @@ class IndicatorReportAdmin(admin.ModelAdmin):
                     'time_period_end', 'due_date', 'submission_date',
                     'frequency', 'total', 'reportable')
     list_filter = ('frequency', 'report_status', 'overall_status')
-    search_fields = ('title', 'narrative_assessment', 'remarks')
+    search_fields = ('title', 'narrative_assessment', 'remarks',
+                     'reportable__blueprint__title')
 
 
 class IndicatorLocationDataAdmin(admin.ModelAdmin):
@@ -43,13 +47,13 @@ class IndicatorLocationDataAdmin(admin.ModelAdmin):
 
 
 class DisaggregationAdmin(admin.ModelAdmin):
-    list_display = ('name', 'response_plan', 'active')
+    list_display = ('name', 'response_plan', 'active', 'external_id')
     list_filter = ('response_plan', 'active')
     search_fields = ('name',)
 
 
 class DisaggregationValueAdmin(admin.ModelAdmin):
-    list_display = ('disaggregation', 'value')
+    list_display = ('disaggregation', 'value', 'external_id')
     list_filter = ('disaggregation',)
     search_fields = ('value',)
 

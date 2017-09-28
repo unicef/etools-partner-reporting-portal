@@ -19,9 +19,10 @@ from core.common import (
     PROGRESS_REPORT_STATUS,
     OVERALL_STATUS,
 )
+from core.models import TimeStampedExternalSyncModelMixin
 
 
-class Disaggregation(TimeStampedModel):
+class Disaggregation(TimeStampedExternalSyncModelMixin):
     """
     Disaggregation module. For example: <Gender, Age>
 
@@ -41,7 +42,7 @@ class Disaggregation(TimeStampedModel):
         return "Disaggregation <pk:%s> %s" % (self.id, self.name)
 
 
-class DisaggregationValue(TimeStampedModel):
+class DisaggregationValue(TimeStampedExternalSyncModelMixin):
     """
     Disaggregation Value module. For example: Gender <Male, Female, Other>
 
@@ -61,7 +62,7 @@ class DisaggregationValue(TimeStampedModel):
         return "Disaggregation Value <pk:%s> %s" % (self.id, self.value)
 
 
-class IndicatorBlueprint(TimeStampedModel):
+class IndicatorBlueprint(TimeStampedExternalSyncModelMixin):
     """
     IndicatorBlueprint module is a pattern for indicator
     (here we setup basic parameter).
@@ -164,7 +165,7 @@ class IndicatorBlueprint(TimeStampedModel):
         ordering = ['-id']
 
 
-class Reportable(TimeStampedModel):
+class Reportable(TimeStampedExternalSyncModelMixin):
     """
     Reportable / Applied Indicator model.
 
@@ -214,14 +215,11 @@ class Reportable(TimeStampedModel):
 
     cs_dates = ArrayField(models.DateField(), default=list)
 
-    location_admin_refs = ArrayField(JSONField(), default=list)
+    location_admin_refs = ArrayField(JSONField(), default=list, null=True, blank=True)
     disaggregations = models.ManyToManyField(Disaggregation, blank=True)
 
     class Meta:
         ordering = ['-id']
-
-    def __str__(self):
-        return "Reportable <pk:%s>" % self.id
 
     @property
     def ref_num(self):
@@ -263,7 +261,9 @@ class Reportable(TimeStampedModel):
         }
 
     def __str__(self):
-        return "Reportable <pk:%s> on %s" % (self.id, self.content_object)
+        return "Reportable <pk:%s> %s on %s" % (self.id,
+                                                self.blueprint.title,
+                                                self.content_object)
 
 
 class IndicatorReport(TimeStampedModel):
@@ -278,7 +278,9 @@ class IndicatorReport(TimeStampedModel):
 
     title = models.CharField(max_length=255)
     reportable = models.ForeignKey(Reportable, related_name="indicator_reports")
-    progress_report = models.ForeignKey('unicef.ProgressReport', related_name="indicator_reports", null=True)
+    progress_report = models.ForeignKey('unicef.ProgressReport',
+                                        related_name="indicator_reports",
+                                        null=True)
     time_period_start = models.DateField()  # first day of defined frequency mode
     time_period_end = models.DateField()  # last day of defined frequency mode
     due_date = models.DateField()  # can be few days/weeks out of the "end date"

@@ -32,7 +32,7 @@ class LocationAdmin(LeafletGeoAdmin, admin.ModelAdmin):
         'gateway',
         'parent',
     )
-    list_display = ('title', 'parent', 'gateway', 'p_code')
+    list_display = ('title', 'parent', 'gateway', 'p_code', 'external_id')
     search_fields = ('carto_db_table', 'gateway')
     search_fields = ('title', 'p_code',)
 
@@ -82,14 +82,16 @@ class CartoDBTableAdmin(admin.ModelAdmin):
 
 
 class WorkspaceAdmin(admin.ModelAdmin):
-    list_display = ('title', 'workspace_code', 'business_area_code')
+    list_display = ('title', 'workspace_code', 'business_area_code',
+                    'external_id')
     list_filter = ('countries',)
-    search_fields = ('title', 'workspace_code', 'business_area_code')
+    search_fields = ('title', 'workspace_code', 'business_area_code',
+                     'external_id')
 
 
 class CountryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'country_short_code')
-    search_fields = ('name', 'country_short_code')
+    list_display = ('name', 'country_short_code', 'external_id')
+    search_fields = ('name', 'country_short_code', 'external_id')
 
 
 class ResponsePlanAdmin(admin.ModelAdmin):

@@ -44,7 +44,7 @@ urlpatterns = [
         ClusterPartnerDashboardAPIView.as_view(),
         name="cluster-partner-dashboard"),
 
-    url(r'^(?P<response_plan_id>\d+)/cluster-indicators-list/export/$',
+    url(r'^(?P<response_plan_id>\d+)/cluster-indicator-reports-list/export/$',
         ClusterIndicatorsListExcelView.as_view(),
         name="cluster-indicators-list-excel"),
 
