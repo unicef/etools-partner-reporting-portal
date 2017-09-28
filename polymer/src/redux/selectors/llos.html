@@ -18,7 +18,7 @@
             return [];
           }
 
-          var llos = currentReport.programme_document.cp_outputs
+          var llos = (currentReport.programme_document.cp_outputs || [])
               .reduce(function (acc, curr) {
                 return acc.concat(curr.ll_outputs);
               }, []);

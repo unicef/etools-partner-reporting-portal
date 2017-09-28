@@ -38,7 +38,19 @@
           return (function () {
             var change = {};
 
-            change[action.pdId] = (state[action.pdId] || []).concat(action.data);
+            var reports = state[action.pdId] || [];
+
+            var index = reports.findIndex(function (report) {
+              return Number(report.id) === Number(action.data.id);
+            });
+
+            if (index === -1) {
+              reports.push(action.data);
+            } else {
+              reports[index] = Object.assign({}, reports[index], action.data);
+            }
+
+            change[action.pdId] = reports;
 
             return Object.assign({}, state, change);
           }());
