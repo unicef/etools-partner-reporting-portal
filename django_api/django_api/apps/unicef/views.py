@@ -29,7 +29,7 @@ from core.models import Location
 from core.serializers import ShortLocationSerializer
 
 from indicator.models import Reportable, IndicatorReport, IndicatorBlueprint
-from indicator.serializers import IndicatorListSerializer, PDReportsSerializer
+from indicator.serializers import IndicatorListSerializer, PDReportContextIndicatorReportSerializer
 from indicator.filters import PDReportsFilter
 from indicator.serializers import IndicatorBlueprintSimpleSerializer
 
@@ -326,7 +326,7 @@ class ProgressReportDetailsAPIView(RetrieveAPIView):
             raise Http404
 
 class ProgressReportIndicatorsAPIView(ListAPIView):
-    serializer_class = PDReportsSerializer
+    serializer_class = PDReportContextIndicatorReportSerializer
     pagination_class = SmallPagination
     permission_classes = (IsAuthenticated,)
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
