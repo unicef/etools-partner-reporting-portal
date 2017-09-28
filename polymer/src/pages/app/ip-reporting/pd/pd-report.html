@@ -191,7 +191,6 @@
         reportUrl: {
           type: String,
           computed: '_computeReportUrl(locationId, reportId, pdId)',
-          observer: '_fetchReport',
         },
 
         currentReport: {
@@ -217,6 +216,7 @@
 
       observers: [
         '_onReportChanged(routeData.report_id, routeData.mode)',
+        '_fetchReport(reportUrl, queryParams)',
       ],
 
       _computeBackLink: function (pdId) {
@@ -252,17 +252,35 @@
         return App.Endpoints.programmeDocumentReport(locationId, reportId);
       },
 
-      _fetchReport: function () {
-        this.dispatch(
-          App.Actions.PDReports.fetchSingle(this.$.report.thunk(), this.pdId)
-        )
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-            });
+      _fetchReport: function (_, queryParams) {
+        if (!Object.keys(queryParams).length) {
+          return;
+        }
+
+        this.debounce('fetch-report', function () {
+          var reportThunk = this.$.report.thunk();
+
+          this.$.report.abort();
+
+          this.dispatch(
+            App.Actions.PDReports.fetchSingle(reportThunk, this.pdId)
+          )
+              .catch(function (err) { // jshint ignore:line
+                // TODO: error handling
+              });
+        }, 300);
       },
 
       _showPdDetails: function () {
         this.$.pdDetails.open();
+      },
+
+      detached: function () {
+        this.$.report.abort();
+
+        if (this.isDebouncerActive('fetch-report')) {
+          this.cancelDebouncer('fetch-report');
+        }
       },
     });
   </script>
