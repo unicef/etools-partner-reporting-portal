@@ -5,6 +5,8 @@
 <link rel="import" href="etools-prp-data-table-row.html">
 <link rel="import" href="etools-prp-progress-bar.html">
 <link rel="import" href="../styles/table-styles.html">
+<link rel="import" href="../behaviors/routing.html">
+
 
 <dom-module id="list-view-single-indicator">
   <template>
@@ -18,7 +20,7 @@
     <etools-prp-data-table-row details-opened="{{detailsOpened}}">
       <div slot="row-data">
         <span class="col-data flex-2">
-          <a href="/TODO">[[indicator.ref_num]]</a>
+          <a href="[[_getPDLink(indicator)]]">[[indicator.ref_num]]</a>
         </span>
         <span class="col-data flex-6">
           [[indicator.blueprint.title]]
@@ -39,7 +41,11 @@
 
   <script>
     Polymer({
-      is: 'list-view-single-indicator',
+      id: 'list-view-single-indicator',
+
+      behaviors: [
+        App.Behaviors.RoutingBehavior,
+      ],
 
       properties: {
         indicator: Object,
@@ -48,6 +54,13 @@
           type: Boolean,
           value: false
         },
+      },
+
+      _getPDLink: function (indicator) {
+        return this.buildUrl(
+          this._baseUrl,
+          '/pd/' + indicator.pd_id + '/view/details'
+        );
       },
     });
   </script>

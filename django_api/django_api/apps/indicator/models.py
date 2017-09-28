@@ -223,10 +223,21 @@ class Reportable(TimeStampedExternalSyncModelMixin):
 
     @property
     def ref_num(self):
+        """reference_number of the PD"""
         from unicef.models import LowerLevelOutput
 
         if isinstance(self.content_object, LowerLevelOutput):
             return self.content_object.cp_output.programme_document.reference_number
+        else:
+            return ''
+
+    @property
+    def pd_id(self):
+        """reference_number of the PD"""
+        from unicef.models import LowerLevelOutput
+
+        if isinstance(self.content_object, LowerLevelOutput):
+            return self.content_object.cp_output.programme_document.id
         else:
             return ''
 

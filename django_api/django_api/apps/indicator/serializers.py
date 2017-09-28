@@ -161,6 +161,7 @@ class IndicatorListSerializer(ReportableSimpleSerializer):
             'target',
             'baseline',
             'blueprint',
+            'pd_id',
             'ref_num',
             'achieved',
             'progress_percentage',
