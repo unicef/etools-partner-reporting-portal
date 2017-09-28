@@ -6,7 +6,7 @@ from .models import ProgrammeDocument, Section, ProgressReport, Person, \
 from core.common import PROGRESS_REPORT_STATUS
 from indicator.models import Reportable
 from indicator.serializers import (
-    PDReportsSerializer,
+    PDReportContextIndicatorReportSerializer,
     IndicatorBlueprintSimpleSerializer,
     IndicatorLLoutputsSerializer,
     ReportableSimpleSerializer
@@ -172,7 +172,7 @@ class ProgressReportSimpleSerializer(serializers.ModelSerializer):
 
 class ProgressReportSerializer(ProgressReportSimpleSerializer):
     programme_document = ProgrammeDocumentOutputSerializer()
-    indicator_reports = PDReportsSerializer(read_only=True, many=True)
+    indicator_reports = PDReportContextIndicatorReportSerializer(read_only=True, many=True)
 
     class Meta:
         model = ProgressReport
