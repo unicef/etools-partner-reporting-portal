@@ -17,7 +17,7 @@
 <link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
 
 <link rel="import" href="../../polyfills/es6-shim.html">
-<link rel="import" href="disaggregations-widget.html">
+<link rel="import" href="disaggregations-dropdown-widget.html">
 <link rel="import" href="chip-date-of-report.html">
 <link rel="import" href="../labelled-item.html">
 <link rel="import" href="../etools-prp-chips.html">
@@ -55,18 +55,14 @@
         background-color: var(--paper-grey-200);
       }
 
-      .error,
       .remove-btn {
         color: var(--paper-deep-orange-a700);
+        width: 34px;
+        height: 34px;
       }
 
       .rowDis {
         margin-bottom: 1em;
-      }
-
-      .remove-btn {
-        width: 34px;
-        height: 34px;
       }
 
       .add-disaggregation-btn {
@@ -81,6 +77,7 @@
       .col-name,
       .col-values {
         padding-left: 24px;
+        width: 270px;
       }
 
       .row {
@@ -98,12 +95,14 @@
       paper-dropdown-menu {
         width: 100%;
       }
+
     </style>
 
     <etools-prp-ajax
         id="locations"
         url="[[locationsUrl]]">
     </etools-prp-ajax>
+
     <etools-prp-ajax
         id="disaggregations"
         url="[[disaggregationsUrl]]">
@@ -281,14 +280,13 @@
             <h2>Disaggregations ([[data.disaggregation.length]])</h2>
           </div>
           <div class="row">
-            <div class="app-grid">
-              
+            
               <div class="item">
 
                 <template is="dom-repeat" items="[[data.disaggregation]]">
 
                   <div class="rowDis layout horizontal">
-                    
+
                     <div class="flex-none layout vertical center-center col-actions">
                       <paper-icon-button
                         index="[[index]]"
@@ -298,34 +296,45 @@
                       </paper-icon-button>
                     </div>
 
-                    <div class="flex col-name">
+                    <div class="col-name">
                       <paper-dropdown-menu
-                        class="validate"
+                        class="validate dis-menu"
                         index="[[index]]"
                         label="Disaggregation By"
                         on-value-changed="_validate"
                         on-selected-item-changed="_setDisaggregation"
                         always-float-label
                         required>
-                      <paper-listbox
+                        <paper-listbox
                           slot="dropdown-content"
-                          class="dropdown-content"
-                          selected="{{selectedId}}">
-                        <template
-                            id="disaggregations"
+                          class="dropdown-content">
+                          <template
+                            id="disaggregationsDrop"
                             is="dom-repeat"
                             items="[[disaggregations]]">
-                          <paper-item>[[item.name]]</paper-item>
-                        </template>
-                      </paper-listbox>
+                            <paper-item id="[[item.id]]">[[item.name]] - [[_formatChoices(item.choices)]]
+                            </paper-item>
+                          </template>
+                        </paper-listbox>
                     </paper-dropdown-menu>
                     </div>
-                  <div class="item">
-                    <div class="table-cell table-cell--text">
-                  <template is="dom-repeat" items="[[item.choices]]" as="choice">
-                    [[choice.value]];
-                  </template>
-                </div>
+                  
+<!--                     <div class="col-values">
+                      <paper-input
+                      
+                        label="Disaggregation Groups"
+                        value="[[_formatChoices(item.choices, index)]]"
+                   
+                        always-float-label
+                        disabled>
+                      </paper-input> -->
+                 
+<!--                   <template class="rowGroups" is="dom-repeat" items="[[data.disaggregation[index].choices]]" as="choice">
+                    
+                    [[choice.value]] 
+                  </template> -->
+
+                
                     
                   </div>
                 </div>
@@ -333,34 +342,10 @@
                   
 
                 </template>
-                </div>
-                <!-- <paper-dropdown-menu
-                    class="validate"
-                    label="Disaggregation By"
-                    on-value-changed="_validate"
-                    on-selected-item-changed="_setDisaggregation"
-                    always-float-label
-                    required>
-                  <paper-listbox
-                      slot="dropdown-content"
-                      class="dropdown-content"
-                      selected="{{selectedId}}">
-                    <template
-                        id="disaggregations"
-                        is="dom-repeat"
-                        items="[[disaggregations]]">
-                      <paper-item>[[item.name]]</paper-item>
-                    </template>
-                  </paper-listbox>
-                </paper-dropdown-menu> -->
-              
-
-              
+                
+                  
             </div>
-            <!-- <disaggregations-widget
-                class="validate"
-                value="{{data.disaggregation}}">
-            </disaggregations-widget> -->
+
           </div>
           <paper-button
             class="btn-primary add-disaggregation-btn"
@@ -543,21 +528,39 @@
       _remove: function (e) {
         var toRemove = +e.target.index;
 
+        // this.push('disaggregations', this.data.disaggregation[toRemove])
         this.splice('data.disaggregation', toRemove, 1);
       },
 
       _setDisaggregation: function (e, data) {
-        console.log('index', e.target.index)
-        var selected = this.disaggregations[this.selectedId]
-
-        if (!this.data.disaggregation.find(function(dis) {
-          return dis.id === selected.id
-        })) {
-          this.set(['data.disaggregation', +e.target.index], Object.assign({}, selected))
+        let index = +e.target.index;
+        console.log('index', index)
+        let id;
+        if (data.value) id = data.value.id
+        console.log('id', id)
+        let selected
+        if (id) {
+          selected = this.disaggregations.find((dis) => dis.id == id)
         }
-        console.log(this.data.disaggregation)
-        this.set('disagg', selected)
-        console.log(this.disagg)
+        // let filteredDis
+        if (selected) {
+          // if (this.data.disaggregation[index].id) {
+          //   this.push('disaggregations', this.data.disaggregation[index])
+          // }
+          this.set(['data.disaggregation', index], selected)
+          // filteredDis = this.disaggregations.filter((dis) => dis.id !== selected.id)
+          // this.set('disaggregations', filteredDis)
+
+        }
+        console.log('selected', selected)
+
+        console.log('set', this.data.disaggregation)
+
+      },
+
+      _formatChoices: function(choices, index) {
+        console.log('format', choices, index)
+        return choices.map((choice) => choice.value).join(', ')
       },
 
       _setLocations: function () {
