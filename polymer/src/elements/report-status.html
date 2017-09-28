@@ -51,9 +51,11 @@
           case 'Met':
           case 'OnT':
           case 'Com':
+          case 'Acc':
             return 'success';
           case 2:
           case 'Ove':
+          case 'Sen':
             return 'error';
           case 3:
           case 'Due':
@@ -99,6 +101,10 @@
             return 'Completed';
           case 'NoS':
             return 'No Status';
+          case 'Sen':
+            return 'Sent Back';
+          case 'Acc':
+            return 'Accepted';
         }
       },
 

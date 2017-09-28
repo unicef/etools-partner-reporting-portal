@@ -8,7 +8,7 @@ from .views import (
     IndicatorLocationDataUpdateAPIView,
     IndicatorDataAPIView,
     ClusterIndicatorAPIView,
-    IndicatorDataReportableAPIView,
+    PDLowerLevelOutputStatusAPIView,
     IndicatorDataLocationAPIView,
     DisaggregationListCreateAPIView,
     ReportableDetailAPIView
@@ -32,8 +32,8 @@ urlpatterns = [
 
     url(r'^indicator-data/(?P<ir_id>\d+)/$', IndicatorDataAPIView.as_view(),
         name='indicator-data'),
-    url(r'^indicator-data/(?P<ir_id>\d+)/reportable/(?P<reportable_id>\d+)/$',
-        IndicatorDataReportableAPIView.as_view(),
+    url(r'^pd-progress-report/(?P<pd_progress_report_id>\d+)/llo/(?P<llo_id>\d+)/$',
+        PDLowerLevelOutputStatusAPIView.as_view(),
         name='indicator-data-reportable'),
 
     url(r'^indicator-data-location/(?P<ir_id>\d+)/$',

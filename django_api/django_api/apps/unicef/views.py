@@ -29,7 +29,7 @@ from core.models import Location
 from core.serializers import ShortLocationSerializer
 
 from indicator.models import Reportable, IndicatorReport, IndicatorBlueprint
-from indicator.serializers import IndicatorListSerializer, PDReportsSerializer
+from indicator.serializers import IndicatorListSerializer, PDReportContextIndicatorReportSerializer
 from indicator.filters import PDReportsFilter
 from indicator.serializers import IndicatorBlueprintSimpleSerializer
 
@@ -173,16 +173,20 @@ class ProgrammeDocumentLocationsAPIView(ListAPIView):
 
 class ProgrammeDocumentIndicatorsAPIView(ListAPIView):
 
-    queryset = Reportable.objects.all()
+    queryset = Reportable.objects.filter(lower_level_outputs__isnull=False)
     serializer_class = IndicatorListSerializer
     pagination_class = SmallPagination
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
 
     def list(self, request, workspace_id, *args, **kwargs):
-        pd = ProgrammeDocument.objects.filter(
+        """
+        Return list of Reportable objects that are associated with LLO's
+        of the PD's that this users partner belongs to.
+        """
+        pds = ProgrammeDocument.objects.filter(
             partner=self.request.user.partner, workspace=workspace_id)
         queryset = self.get_queryset().filter(
-            indicator_reports__progress_report__programme_document__in=pd)
+            indicator_reports__progress_report__programme_document__in=pds).distinct()
         filtered = ProgrammeDocumentIndicatorFilter(request.GET,
                                                     queryset=queryset)
 
@@ -326,7 +330,7 @@ class ProgressReportDetailsAPIView(RetrieveAPIView):
             raise Http404
 
 class ProgressReportIndicatorsAPIView(ListAPIView):
-    serializer_class = PDReportsSerializer
+    serializer_class = PDReportContextIndicatorReportSerializer
     pagination_class = SmallPagination
     permission_classes = (IsAuthenticated,)
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)

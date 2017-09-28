@@ -37,6 +37,7 @@ class CountryProgrammeOutputAdmin(admin.ModelAdmin):
 class LowerLevelOutputAdmin(admin.ModelAdmin):
     list_display = ('title', 'cp_output')
     list_filter = ('cp_output',)
+    search_fields = ('title',)
 
 
 admin.site.register(ProgrammeDocument, ProgrammeDocumentAdmin)
