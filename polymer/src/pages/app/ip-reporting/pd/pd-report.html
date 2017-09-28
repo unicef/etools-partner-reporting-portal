@@ -261,26 +261,29 @@
         }
 
         this.debounce('fetch-indicator-data', function () {
-          var promises = currentReport.indicator_reports
-              .map(this._makeIndicatorReportPromise.bind(this, queryParams));
+          // var promises = currentReport.indicator_reports
+          //     .map(this._makeIndicatorReportPromise.bind(this, queryParams));
 
           var self = this;
 
-          self.dispatch(App.Actions.IndicatorData.loadingStart());
+          // self.dispatch(App.Actions.IndicatorData.loadingStart());
 
-          Promise.all(promises)
-              .then(function (results) {
-                return results.filter(Boolean); // Remove failed
-              })
-              .then(function (results) {
-                return results.reduce(function (acc, curr) {
-                  return acc.concat(curr.outputs); // Assumes output uniqueness
-                }, []);
-              })
-              .then(function (outputs) {
-                self.dispatch(App.Actions.IndicatorData.loadingStop());
-                self.dispatch(App.Actions.IndicatorData.set(self.reportId, outputs));
-              });
+          // FIXME
+          self.dispatch(App.Actions.IndicatorData.set(self.reportId, []));
+
+        //   Promise.all(promises)
+        //       .then(function (results) {
+        //         return results.filter(Boolean); // Remove failed
+        //       })
+        //       .then(function (results) {
+        //         return results.reduce(function (acc, curr) {
+        //           return acc.concat(curr.outputs); // Assumes output uniqueness
+        //         }, []);
+        //       })
+        //       .then(function (outputs) {
+        //         self.dispatch(App.Actions.IndicatorData.loadingStop());
+        //         self.dispatch(App.Actions.IndicatorData.set(self.reportId, outputs));
+        //       });
         }, 300);
       },
 
