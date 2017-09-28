@@ -37,7 +37,6 @@ urlpatterns = [
     url(r'^(?P<workspace_id>\d+)/programme-document/indicators/$',
         ProgrammeDocumentIndicatorsAPIView.as_view(),
         name="programme-document-indicators"),
-
     url(r'^(?P<workspace_id>\d+)/progress-reports/$',
         ProgressReportAPIView.as_view(),
         name="progress-reports"),

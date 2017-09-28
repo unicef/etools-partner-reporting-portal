@@ -1,0 +1,362 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
+<link rel="import" href="../../../bower_components/etools-data-table/etools-data-table.html">
+<link rel="import" href="../../../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../../../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
+<link rel="import" href="../../polyfills/es6-shim.html">
+<link rel="import" href="../../constants.html">
+<link rel="import" href="../../endpoints.html">
+<link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../redux/actions.html">
+<link rel="import" href="../../redux/selectors/programmeDocumentsIndicators.html">
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/data-table.html">
+<link rel="import" href="../page-body.html">
+<link rel="import" href="../etools-prp-ajax.html">
+<link rel="import" href="../confirm-box.html">
+<link rel="import" href="../../styles/table-styles.html">
+<link rel="import" href="../../styles/buttons.html">
+
+<dom-module id="pd-details-calculation-methods">
+  <template>
+    <style include="button-styles data-table-styles table-styles iron-flex iron-flex-reverse">
+      :host {
+        display: block;
+
+        --data-table-header: {
+          height: auto;
+        };
+
+        --header-title: {
+          display: none;
+        };
+      }
+
+      .wrapper {
+        min-height: 80px;
+        position: relative;
+      }
+
+      paper-radio-button {
+        padding: 0 !important;
+      }
+
+      paper-radio-button:not(:first-child) {
+        margin-left: 12px;
+      }
+
+      .buttons {
+        margin: 1em 0;
+      }
+    </style>
+
+    <etools-prp-ajax
+        id="indicators"
+        url="[[indicatorsUrl]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
+        id="update"
+        method="post"
+        url="[[indicatorsUrl]]"
+        body="[[localData]]"
+        content-type="application/json">
+    </etools-prp-ajax>
+
+    <page-body>
+      <etools-data-table-header no-collapse>
+        <etools-data-table-column>
+          <div class="table-column">PD output / SSFA expected result and indicator</div>
+        </etools-data-table-column>
+        <etools-data-table-column>
+          <div class="table-column">Calculation method across locations</div>
+        </etools-data-table-column>
+        <etools-data-table-column>
+          <div class="table-column">Calculation method across reporting periods</div>
+        </etools-data-table-column>
+      </etools-data-table-header>
+
+      <div class="wrapper">
+        <template
+            is="dom-repeat"
+            items="[[formattedData]]"
+            initial-count="[[pageSize]]">
+          <etools-data-table-row no-collapse>
+            <div slot="row-data">
+              <template
+                  is="dom-if"
+                  if="[[_equals(item.type, 'label')]]"
+                  restamp="true">
+                <div class="table-cell table-cell--text">[[item.text]]</div>
+              </template>
+              <template
+                  is="dom-if"
+                  if="[[_equals(item.type, 'data')]]"
+                  restamp="true">
+                <div class="table-cell">[[item.data.title]]</div>
+                <div class="table-cell">
+                  <template
+                      is="dom-if"
+                      if="[[item.data.editable]]">
+                    <template
+                        is="dom-if"
+                        if="[[_equals(item.data.display_type, 'number')]]"
+                        restamp="true">
+                      <paper-radio-group
+                          data-id$="[[item.data.id]]"
+                          data-llo-id$="[[item.llo_id]]"
+                          data-scope="calculation_formula_across_locations"
+                          on-paper-radio-group-changed="_onValueChanged"
+                          selected="[[_computeSelected(item.data, 'calculation_formula_across_locations')]]">
+                        <paper-radio-button name="sum">sum</paper-radio-button>
+                        <paper-radio-button name="max">max</paper-radio-button>
+                        <paper-radio-button name="avg">avg</paper-radio-button>
+                      </paper-radio-group>
+                    </template>
+                    <template
+                        is="dom-if"
+                        if="[[_equals(item.data.display_type, 'percentage')]]"
+                        restamp="true">
+                      <paper-radio-group
+                          data-id$="[[item.data.id]]"
+                          data-llo-id$="[[item.llo_id]]"
+                          data-scope="calculation_formula_across_locations"
+                          on-paper-radio-group-changed="_onValueChanged"
+                          selected="[[_computeSelected(item.data, 'calculation_formula_across_locations')]]">
+                        <paper-radio-button name="percentage">percentage</paper-radio-button>
+                        <paper-radio-button name="ratio">ratio</paper-radio-button>
+                      </paper-radio-group>
+                    </template>
+                  </template>
+                  <template
+                      is="dom-if"
+                      if="[[!item.data.editable]]">
+                    [[item.data.calculation_formula_across_locations]]
+                  </template>
+                </div>
+                <div class="table-cell">
+                  <template
+                      is="dom-if"
+                      if="[[item.data.editable]]">
+                    <template
+                        is="dom-if"
+                        if="[[_equals(item.data.display_type, 'number')]]"
+                        restamp="true">
+                      <paper-radio-group
+                          data-id$="[[item.data.id]]"
+                          data-llo-id$="[[item.llo_id]]"
+                          data-scope="calculation_formula_across_periods"
+                          on-paper-radio-group-changed="_onValueChanged"
+                          selected="[[_computeSelected(item.data, 'calculation_formula_across_periods')]]">
+                        <paper-radio-button name="sum">sum</paper-radio-button>
+                        <paper-radio-button name="max">max</paper-radio-button>
+                        <paper-radio-button name="avg">avg</paper-radio-button>
+                      </paper-radio-group>
+                    </template>
+                    <template
+                        is="dom-if"
+                        if="[[_equals(item.data.display_type, 'percentage')]]"
+                        restamp="true">
+                      <paper-radio-group
+                          data-id$="[[item.data.id]]"
+                          data-llo-id$="[[item.llo_id]]"
+                          data-scope="calculation_formula_across_periods"
+                          on-paper-radio-group-changed="_onValueChanged"
+                          selected="[[_computeSelected(item.data, 'calculation_formula_across_periods')]]">
+                        <paper-radio-button name="percentage">percentage</paper-radio-button>
+                        <paper-radio-button name="ratio">ratio</paper-radio-button>
+                      </paper-radio-group>
+                    </template>
+                  </template>
+                  <template
+                      is="dom-if"
+                      if="[[!item.data.editable]]">
+                    [[item.data.calculation_formula_across_periods]]
+                  </template>
+                </div>
+              </template>
+            </div>
+          </etools-data-table-row>
+        </template>
+
+        <etools-loading active="[[loading]]"></etools-loading>
+      </div>
+
+      <div class="buttons layout horizontal-reverse">
+        <paper-button
+            on-tap="_save"
+            class="btn-primary"
+            disabled="[[loading]]"
+            raised>
+          Save
+        </paper-button>
+      </div>
+    </page-body>
+
+    <confirm-box id="confirm"></confirm-box>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'pd-details-calculation-methods',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.DataTableBehavior,
+      ],
+
+      properties: {
+        localData: Object,
+
+        locationId: {
+          type: String,
+          statePath: 'location.id',
+        },
+
+        pdId: {
+          type: String,
+          statePath: 'programmeDocuments.current',
+        },
+
+        loading: {
+          type: Boolean,
+          statePath: App.Selectors.ProgrammeDocumentIndicators.loading,
+        },
+
+        data: {
+          typ: Array,
+          statePath: App.Selectors.ProgrammeDocumentIndicators.all,
+          observer: '_initLocalData',
+        },
+
+        formattedData: {
+          type: Array,
+          computed: '_computeFormattedData(data)',
+        },
+
+        indicatorsUrl: {
+          type: String,
+          computed: '_computeIndicatorsUrl(locationId, pdId)',
+          observer: '_fetchData',
+        },
+      },
+
+      _initLocalData: function (data) {
+        this.set('localData', this._clone(data));
+      },
+
+      _computeIndicatorsUrl: function (locationId, pdId) {
+        return locationId ? App.Endpoints.calculationMethods(locationId, pdId) : '';
+      },
+
+      _computeFormattedData: function (data) {
+        return data.ll_outputs_and_indicators.reduce(function (acc, curr) {
+          var items;
+
+          acc.push({
+            type: 'label',
+            text: curr.ll_output.title,
+          });
+
+          items = curr.indicators.map(function (indicator) {
+            return {
+              type: 'data',
+              data: indicator,
+              llo_id: curr.ll_output.id,
+            };
+          });
+
+          acc.push.apply(acc, items);
+
+          return acc;
+        }, []);
+      },
+
+      _computeSelected: function (data, scope) {
+        return data[scope];
+      },
+
+      _fetchData: function (url) {
+        if (!url) {
+          return;
+        }
+
+        this.debounce('fetch-data', function () {
+          var indicatorsThunk = this.$.indicators.thunk();
+
+          this.$.indicators.abort();
+
+          this.dispatch(App.Actions.PDIndicators.fetch(indicatorsThunk, this.pdId))
+              .catch(function (err) { // jshint ignore:line
+                // TODO: error handling
+              });
+        });
+      },
+
+      _onValueChanged: function (e) {
+        var newValue = e.target.selected;
+        var data = e.target.dataset;
+
+        // Here's what the lack of expression interpolation in polymer makes people do:
+
+        var lloIndex = this.localData.ll_outputs_and_indicators
+            .findIndex(function (item) {
+              return Number(item.ll_output.id) === Number(data.lloId);
+            });
+
+        var indicatorIndex = this.localData.ll_outputs_and_indicators[lloIndex].indicators
+            .findIndex(function (item) {
+              return Number(item.id) === Number(data.id);
+            });
+
+        this.set([
+          'localData.ll_outputs_and_indicators',
+          lloIndex,
+          'indicators',
+          indicatorIndex,
+          data.scope,
+        ], newValue);
+      },
+
+      _save: function () {
+        var self = this;
+
+        this._confirmIntent()
+            .then(function () {
+              var updateThunk = self.$.update.thunk();
+
+              self.dispatch(App.Actions.PDIndicators.update(updateThunk, self.pdId));
+            })
+            .catch(this._noop);
+      },
+
+      _confirmIntent: function () {
+        var deferred = this._deferred();
+
+        this.$.confirm.run({
+          body:
+              'Please make sure the calculation methods for your indicators are ' +
+              'properly configured. Changing calculation methods would recalculate ' +
+              'progress reports for your indicators!',
+          result: deferred,
+          maxWidth: '500px',
+          mode: App.Constants.CONFIRM_MODAL,
+        });
+
+        return deferred.promise;
+      },
+
+      detached: function () {
+        this.$.indicators.abort();
+
+        if (this.isDebouncerActive('fetch-data')) {
+          this.cancelDebouncer('fetch-data');
+        }
+      },
+    });
+  </script>
+</dom-module>
