@@ -12,7 +12,11 @@
       byPD: reportsByPDReducer,
       countByPD: reportsCountByPDReducer,
       allIds: pdIdsReducer,
-      current: currentPDReportReducer,
+      current: Redux.combineReducers({
+        id: idReducer,
+        mode: modeReducer,
+        loading: loadingReducer,
+      }),
     });
 
     function reportsByPDReducer(state, action) {
@@ -50,6 +54,11 @@
 
             return Object.assign({}, state, change);
           }());
+
+        case App.Constants.AMEND_REPORTABLE:
+          console.log('TODO:', action);
+
+          return state;
 
         case App.Constants.RESET:
           return {};
@@ -102,20 +111,54 @@
       }
     }
 
-    function currentPDReportReducer(state, action) {
+    function idReducer(state, action) {
       if (typeof state === 'undefined') {
-        state = {};
+        state = '';
       }
 
       switch (action.type) {
         case App.Constants.SET_CURRENT_PD_REPORT:
-          return {
-            id: action.reportId,
-            mode: action.mode,
-          };
+          return action.reportId;
 
         case App.Constants.RESET:
-          return {};
+          return '';
+
+        default:
+          return state;
+      }
+    }
+
+    function modeReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = '';
+      }
+
+      switch (action.type) {
+        case App.Constants.SET_CURRENT_PD_REPORT:
+          return action.mode;
+
+        case App.Constants.RESET:
+          return '';
+
+        default:
+          return state;
+      }
+    }
+
+    function loadingReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = false;
+      }
+
+      switch (action.type) {
+        case App.Constants.PD_REPORT_LOADING_START:
+          return true;
+
+        case App.Constants.PD_REPORT_LOADING_STOP:
+          return false;
+
+        case App.Constants.RESET:
+          return false;
 
         default:
           return state;

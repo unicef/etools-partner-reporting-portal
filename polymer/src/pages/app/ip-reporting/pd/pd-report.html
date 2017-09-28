@@ -183,14 +183,15 @@
           statePath: 'location.id',
         },
 
-        reportUrl: {
-          type: String,
-          computed: '_computeReportUrl(locationId, reportId)',
-        },
-
         pdId: {
           type: String,
           statePath: 'programmeDocuments.current',
+        },
+
+        reportUrl: {
+          type: String,
+          computed: '_computeReportUrl(locationId, reportId, pdId)',
+          observer: '_fetchReport',
         },
 
         currentReport: {
@@ -216,8 +217,6 @@
 
       observers: [
         '_onReportChanged(routeData.report_id, routeData.mode)',
-        '_handleInputChange(currentReport, queryParams)',
-        '_fetchReport(reportUrl, pdId)',
       ],
 
       _computeBackLink: function (pdId) {
@@ -246,68 +245,14 @@
             break;
         }
 
-        return prefix + ' ' + this._withDefault(pd.reference_number);
+        return prefix + ' ' + this._withDefault(pd.title);
       },
 
-      _computeReportUrl: function (locationId, reportId) {
-        return locationId ?
-            App.Endpoints.programmeDocumentReport(locationId, reportId) :
-            '';
+      _computeReportUrl: function (locationId, reportId, _) { // jshint ignore:line
+        return App.Endpoints.programmeDocumentReport(locationId, reportId);
       },
 
-      _handleInputChange: function (currentReport, queryParams) {
-        if (!Object.keys(currentReport).length) {
-          return;
-        }
-
-        this.debounce('fetch-indicator-data', function () {
-          var promises = currentReport.indicator_reports
-              .map(this._makeIndicatorReportPromise.bind(this, queryParams));
-
-          var self = this;
-
-          self.dispatch(App.Actions.IndicatorData.loadingStart());
-
-          Promise.all(promises)
-              .then(function (results) {
-                return results.filter(Boolean); // Remove failed
-              })
-              .then(function (results) {
-                return results.reduce(function (acc, curr) {
-                  return acc.concat(curr.outputs); // Assumes output uniqueness
-                }, []);
-              })
-              .then(function (outputs) {
-                self.dispatch(App.Actions.IndicatorData.loadingStop());
-                self.dispatch(App.Actions.IndicatorData.set(self.reportId, outputs));
-              });
-        }, 300);
-      },
-
-      _makeIndicatorReportPromise: function (queryParams, indicatorReport) {
-        var ajax = document.createElement('etools-prp-ajax');
-        var reportId = indicatorReport.id;
-        var thunk;
-
-        ajax.params = queryParams;
-        ajax.url = App.Endpoints.indicatorData(reportId);
-
-        thunk = ajax.thunk();
-
-        return thunk()
-            .then(function (res) {
-              return res.data;
-            })
-            .catch(function () {
-              return null; // Propagate failed
-            });
-      },
-
-      _fetchReport: function (reportUrl, pdId) {
-        if (!reportUrl || typeof pdId === 'undefined') {
-          return;
-        }
-
+      _fetchReport: function () {
         this.dispatch(
           App.Actions.PDReports.fetchSingle(this.$.report.thunk(), this.pdId)
         )
@@ -318,12 +263,6 @@
 
       _showPdDetails: function () {
         this.$.pdDetails.open();
-      },
-
-      detached: function () {
-        if (this.isDebouncerActive('fetch-indicator-data')) {
-          this.cancelDebouncer('fetch-indicator-data');
-        }
       },
     });
   </script>
