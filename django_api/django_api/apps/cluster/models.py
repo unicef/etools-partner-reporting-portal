@@ -21,18 +21,18 @@ from partner.models import PartnerActivity
 
 class Cluster(TimeStampedModel):
     """
-    Cluster model it is a group of partners that cooperate to reach the same goal
-    (Removal of the humanitarian crisis). We can divide clusters to few types for example
-    Partners will belong to Education, that are working on this background.
+    Cluster model it is a group of partners that cooperate to reach the same
+    goal (Removal of the humanitarian crisis). We can divide clusters to few
+    types for example Partners will belong to Education, that are working on
+    this background.
 
     related models:
         core.Workspace (ForeignKey): "intervention"
-        account.User (ForeignKey): "user"
+
     """
     type = models.CharField(max_length=32, choices=CLUSTER_TYPES)
     response_plan = models.ForeignKey('core.ResponsePlan', null=True,
                                       related_name="clusters")
-    user = models.ForeignKey('account.User', related_name="clusters")
 
     class Meta:
         """One response plan can only have a cluster of one type."""
@@ -236,17 +236,21 @@ class Cluster(TimeStampedModel):
 
 class ClusterObjective(TimeStampedModel):
     """
-    ClusterObjective model is goal of cluster. This goal should be reached via whole cluster aspect.
+    ClusterObjective model is goal of cluster. This goal should be reached via
+    whole cluster aspect.
     For example - to build 3'000 schools at some country.
 
     related models:
         cluster.Cluster (ForeignKey): "cluster"
         indicator.Reportable (GenericRelation): "reportables"
     """
-    title = models.CharField(max_length=255, verbose_name='Cluster Objective Title')
-    reference_number = models.CharField(max_length=255, verbose_name='Reference Number')
+    title = models.CharField(max_length=255,
+                             verbose_name='Cluster Objective Title')
+    reference_number = models.CharField(max_length=255,
+                                        verbose_name='Reference Number')
     cluster = models.ForeignKey(Cluster, related_name="cluster_objectives")
-    locations = models.ManyToManyField('core.Location', related_name="cluster_objectives")
+    locations = models.ManyToManyField('core.Location',
+                                       related_name="cluster_objectives")
     frequency = models.CharField(
         max_length=3,
         choices=FREQUENCY_LEVEL,
@@ -270,7 +274,10 @@ class ClusterObjective(TimeStampedModel):
 
 class ClusterActivity(TimeStampedModel):
     """
-    ClusterActivity models is an action, which one to take, to reach the goal (that is defined in ClusterObjective).
+    ClusterActivity models is an action, which one to take, to reach the goal
+    (that is defined in ClusterObjective). These activities are decided by
+    the cluster admins (IMO's) and the partners might adopt these activities
+    via PartnerActivity then.
 
     related models:
         cluster.ClusterObjective (ForeignKey): "cluster_objective"
@@ -284,9 +291,12 @@ class ClusterActivity(TimeStampedModel):
         default=FREQUENCY_LEVEL.monthly,
         verbose_name='Frequency of reporting'
     )
-    cluster_objective = models.ForeignKey(ClusterObjective, related_name="cluster_activities")
-    locations = models.ManyToManyField('core.Location', related_name="cluster_activities")
-    reportables = GenericRelation('indicator.Reportable', related_query_name='cluster_activities')
+    cluster_objective = models.ForeignKey(ClusterObjective,
+                                          related_name="cluster_activities")
+    locations = models.ManyToManyField('core.Location',
+                                       related_name="cluster_activities")
+    reportables = GenericRelation('indicator.Reportable',
+                                  related_query_name='cluster_activities')
 
     class Meta:
         ordering = ['-id']

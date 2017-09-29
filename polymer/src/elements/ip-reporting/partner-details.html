@@ -72,12 +72,12 @@
         </li>
         <li class="item">
           <labelled-item label="Partner Type">
-            <span class="field-value">[[_withDefault(partner.partner_type)]]</span>
+            <span class="field-value">[[_withDefault(partner.cso_type_display, partner.partner_type_display)]]</span>
           </labelled-item>
         </li>
         <li class="item">
           <labelled-item label="Shared Partner(s)">
-            <span class="field-value">[[_withDefault(partner.shared_partner)]]</span>
+            <span class="field-value">[[_withDefault(partner.shared_partner_display)]]</span>
           </labelled-item>
         </li>
         <li class="item">

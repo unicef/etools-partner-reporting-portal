@@ -23,6 +23,9 @@ class PartnerDetailsSerializer(serializers.ModelSerializer):
 
     partner_type_long = serializers.CharField(source='get_partner_type_display')
     shared_partner_long = serializers.CharField(source='get_shared_partner_display')
+    partner_type_display = serializers.SerializerMethodField()
+    cso_type_display = serializers.SerializerMethodField()
+    shared_partner_display = serializers.SerializerMethodField()
 
     class Meta:
         model = Partner
@@ -34,9 +37,13 @@ class PartnerDetailsSerializer(serializers.ModelSerializer):
             'alternate_title',
             'vendor_number',
             'partner_type',
+            'partner_type_display',
+            'cso_type',
+            'cso_type_display',
             'partner_type_long',
             'shared_partner_long',
             'shared_partner',
+            'shared_partner_display',
             'core_values_assessment_date',
             'address',
             'street_address',
@@ -51,6 +58,15 @@ class PartnerDetailsSerializer(serializers.ModelSerializer):
             'type_of_assessment',
             'rating'
         )
+
+    def get_partner_type_display(self, obj):
+        return obj.get_partner_type_display()
+
+    def get_cso_type_display(self, obj):
+        return obj.get_cso_type_display()
+
+    def get_shared_partner_display(self, obj):
+        return obj.get_shared_partner_display()
 
 
 class PartnerProjectSerializer(serializers.ModelSerializer):

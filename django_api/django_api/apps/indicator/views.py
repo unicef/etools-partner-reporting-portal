@@ -35,7 +35,7 @@ from .disaggregators import (
     RatioIndicatorDisaggregator,
 )
 from .serializers import (
-    IndicatorListSerializer, IndicatorReportListSerializer, PDReportsSerializer,
+    IndicatorListSerializer, IndicatorReportListSerializer, PDReportContextIndicatorReportSerializer,
     IndicatorLLoutputsSerializer, IndicatorLocationDataUpdateSerializer,
     OverallNarrativeSerializer,
     ClusterIndicatorSerializer,
@@ -70,7 +70,7 @@ class DisaggregationListCreateAPIView(ListCreateAPIView):
 
 class PDReportsAPIView(ListAPIView):
 
-    serializer_class = PDReportsSerializer
+    serializer_class = PDReportContextIndicatorReportSerializer
     pagination_class = SmallPagination
     permission_classes = (IsAuthenticated, )
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
@@ -104,7 +104,7 @@ class PDReportsAPIView(ListAPIView):
 
 class PDReportsDetailAPIView(RetrieveAPIView):
 
-    serializer_class = PDReportsSerializer
+    serializer_class = PDReportContextIndicatorReportSerializer
     permission_classes = (IsAuthenticated, )
 
     def get_indicator_report(self, report_id):
@@ -216,10 +216,15 @@ class ReportableDetailAPIView(RetrieveAPIView):
     serializer_class = IndicatorListSerializer
     queryset = Reportable.objects.all()
     permission_classes = (IsAuthenticated, )
+    lookup_url_kwarg = 'reportable_id'
 
 
 class IndicatorDataAPIView(APIView):
-
+    """
+    Takes an indicator report id to do various operations.
+    TODO: check on the GET data being sent / used in the frontend and other
+    HTTP operations being opened here.
+    """
     permission_classes = (IsAuthenticated, )
 
     def get_queryset(self, id):
@@ -233,7 +238,7 @@ class IndicatorDataAPIView(APIView):
 
         location = self.request.query_params.get('location', None)
         if location:
-            queryset = queryset.filter(locations__id=location)
+            queryset = queryset.filter(indicator_reports__indicator_location_data__location=location)
 
         incomplete = self.request.query_params.get('incomplete', None)
         if incomplete == "1":
@@ -315,7 +320,7 @@ class IndicatorDataAPIView(APIView):
             if ir.progress_report is not None:
                 ir.progress_report.status = PROGRESS_REPORT_STATUS.submitted
                 ir.progress_report.save()
-            serializer = PDReportsSerializer(instance=ir)
+            serializer = PDReportContextIndicatorReportSerializer(instance=ir)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             _errors = [{"message": "Indicator was already submitted. Your IMO will need to send it back for you to edit your submission."}]
@@ -323,33 +328,54 @@ class IndicatorDataAPIView(APIView):
                             status=status.HTTP_400_BAD_REQUEST)
 
     def patch(self, request, ir_id, *args, **kwargs):
-        indicator = self.get_indicator_report(ir_id)
-        if indicator:
-            serializer = OverallNarrativeSerializer(data=request.data, instance=indicator)
+        """
+        Sets the overall status and narrative assessment of this indicator report.
+        """
+        indicator_report = self.get_indicator_report(ir_id)
+        if indicator_report:
+            serializer = OverallNarrativeSerializer(data=request.data,
+                                                    instance=indicator_report)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
             else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response(serializer.errors,
+                                status=status.HTTP_400_BAD_REQUEST)
 
         return Response({"errors": "Indicator Report not found."}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class IndicatorDataReportableAPIView(APIView):
-
+class PDLowerLevelOutputStatusAPIView(APIView):
+    """
+    Store the overall status and narrative assessment of the lower level
+    output in a PD progress report.
+    """
     serializer_class = OverallNarrativeSerializer
     permission_classes = (IsAuthenticated, )
 
-    def patch(self, request, ir_id, reportable_id, *args, **kwargs):
-        reportable = get_object_or_404(Reportable, pk=reportable_id)
-        first_indicator = reportable.indicator_reports.first()
-        if first_indicator:
-            serializer = OverallNarrativeSerializer(data=request.data, instance=first_indicator)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def patch(self, request, pd_progress_report_id, llo_id, *args, **kwargs):
+        """
+        Since LLO's don't store overall status etc. we push that data down
+        to the all the indicator reports on that LLO, in the context
+        of this progress report.
+        """
+        pd_progress_report = get_object_or_404(ProgressReport,
+                                               id=pd_progress_report_id)
+        ir_qset = IndicatorReport.objects.filter(
+            progress_report=pd_progress_report).filter(
+                reportable__object_id=llo_id
+            )
+        if ir_qset:
+            for indicator_report in ir_qset.all():
+                serializer = OverallNarrativeSerializer(
+                    data=request.data,
+                    instance=indicator_report)
+                if serializer.is_valid():
+                    serializer.save()
+                else:
+                    return Response(serializer.errors,
+                                    status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
         return Response({"errors": "Reportable doesn't contain indicator."}, status=status.HTTP_400_BAD_REQUEST)
 

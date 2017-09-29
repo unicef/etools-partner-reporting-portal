@@ -13,13 +13,16 @@ from core.common import (
     CSO_TYPES,
     PARTNER_PROJECT_STATUS,
 )
+from core.models import TimeStampedExternalSyncModelMixin
 
 from core.countries import COUNTRIES_ALPHA2_CODE_DICT, COUNTRIES_ALPHA2_CODE
 
 
-class Partner(TimeStampedModel):
+class Partner(TimeStampedExternalSyncModelMixin):
     """
-    Partner model describe in details who is it and his activity humanitarian goals (clusters).
+    Partner model describe in details who is it and their activity humanitarian
+    goals (clusters).
+
     related models:
         cluster.Cluster (ManyToManyField): "clusters"
     """
@@ -132,7 +135,8 @@ class Partner(TimeStampedModel):
         null=True,
     )
 
-    clusters = models.ManyToManyField('cluster.Cluster', related_name="partners")
+    clusters = models.ManyToManyField('cluster.Cluster',
+                                      related_name="partners")
 
     class Meta:
         ordering = ['title']
@@ -147,12 +151,14 @@ class Partner(TimeStampedModel):
 
     @property
     def address(self):
-        return ", ".join([self.street_address, self.city, self.postal_code, self.country])
+        return ", ".join([self.street_address, self.city, self.postal_code,
+                          self.country])
 
 
 class PartnerProject(TimeStampedModel):
     """
-    PartnerProject model is a container for defined group of PartnerActivities model.
+    PartnerProject model is a container for defined group of PartnerActivities
+    model.
 
     related models:
         cluster.Cluster (ManyToManyField): "clusters"
@@ -172,10 +178,14 @@ class PartnerProject(TimeStampedModel):
                                        help_text='Total Budget', max_digits=12)
     funding_source = models.CharField(max_length=255)
 
-    clusters = models.ManyToManyField('cluster.Cluster', related_name="partner_projects")
-    locations = models.ManyToManyField('core.Location', related_name="partner_projects")
-    partner = models.ForeignKey(Partner, null=True, related_name="partner_projects")
-    reportables = GenericRelation('indicator.Reportable', related_query_name='partner_projects')
+    clusters = models.ManyToManyField('cluster.Cluster',
+                                      related_name="partner_projects")
+    locations = models.ManyToManyField('core.Location',
+                                       related_name="partner_projects")
+    partner = models.ForeignKey(Partner, null=True,
+                                related_name="partner_projects")
+    reportables = GenericRelation('indicator.Reportable',
+                                  related_query_name='partner_projects')
 
     class Meta:
         ordering = ['-id']
@@ -187,8 +197,9 @@ class PartnerProject(TimeStampedModel):
 
 class PartnerActivity(TimeStampedModel):
     """
-    PartnerActivity model define action that are not present in cluster activity.
-    Partner is allowed to define their ideas that wasn't defined.
+    PartnerActivity model define actions the partner intends to take. These
+    activities might link or be associated with a cluster activity. But the
+    partner is allowed to define their ideas that wasn't defined.
 
     related models:
         partner.PartnerProject (ForeignKey): "project"
@@ -206,13 +217,16 @@ class PartnerActivity(TimeStampedModel):
     cluster_objective = models.ForeignKey('cluster.ClusterObjective',
                                           related_name="partner_activities",
                                           null=True) # TODO: why needed?
-    reportables = GenericRelation('indicator.Reportable', related_query_name='partner_activities')
-    locations = models.ManyToManyField('core.Location', related_name="partner_activities")
+    reportables = GenericRelation('indicator.Reportable',
+                                  related_query_name='partner_activities')
+    locations = models.ManyToManyField('core.Location',
+                                       related_name="partner_activities")
     start_date = models.DateField()
     end_date = models.DateField()
 
     # PartnerActivity shares the status flags with PartnerProject
-    status = models.CharField(max_length=3, choices=PARTNER_PROJECT_STATUS, default=PARTNER_PROJECT_STATUS.ongoing)
+    status = models.CharField(max_length=3, choices=PARTNER_PROJECT_STATUS,
+                              default=PARTNER_PROJECT_STATUS.ongoing)
 
     class Meta:
         ordering = ['-id']

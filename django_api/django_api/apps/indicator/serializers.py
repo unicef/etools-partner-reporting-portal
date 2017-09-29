@@ -64,11 +64,15 @@ class DisaggregationListSerializer(serializers.ModelSerializer):
 
 
 class IndicatorBlueprintSimpleSerializer(serializers.ModelSerializer):
+    # id added explicitely here since it gets stripped out from validated_dat
+    # as its read_only. https://stackoverflow.com/questions/36473795/django-rest-framework-model-id-field-in-nested-relationship-serializer
+    id = serializers.IntegerField()
 
     class Meta:
         model = IndicatorBlueprint
         fields = (
             'id',
+            # 'indicator_id',
             'title',
             'unit',
             'display_type',
@@ -113,14 +117,13 @@ class IndicatorReportStatusSerializer(serializers.ModelSerializer):
         )
 
 
-class IndicatorListSerializer(serializers.ModelSerializer):
+class ReportableSimpleSerializer(serializers.ModelSerializer):
     blueprint = IndicatorBlueprintSimpleSerializer()
     ref_num = serializers.CharField()
     achieved = serializers.JSONField()
     progress_percentage = serializers.FloatField()
     content_type_name = serializers.SerializerMethodField()
     content_object_title = serializers.SerializerMethodField()
-    disaggregations = DisaggregationListSerializer(many=True, read_only=True)
 
     def get_content_type_name(self, obj):
         return obj.content_type.name
@@ -141,12 +144,38 @@ class IndicatorListSerializer(serializers.ModelSerializer):
             'content_type_name',
             'content_object_title',
             'object_id',
+        )
+
+
+class IndicatorListSerializer(ReportableSimpleSerializer):
+    """
+    Useful anywhere a list of indicators needs to be shown with minimal
+    amount of data.
+    """
+    disaggregations = DisaggregationListSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Reportable
+        fields = (
+            'id',
+            'target',
+            'baseline',
+            'blueprint',
+            'pd_id',
+            'ref_num',
+            'achieved',
+            'progress_percentage',
+            'content_type_name',
+            'content_object_title',
+            'object_id',
             'disaggregations'
         )
 
 
 class IndicatorLLoutputsSerializer(serializers.ModelSerializer):
-
+    """
+    Returns all indicator reports that belong to this reportable.
+    """
     __narrative_and_assessment = None
 
     name = serializers.SerializerMethodField()
@@ -220,7 +249,10 @@ class IndicatorLLoutputsSerializer(serializers.ModelSerializer):
 
 
 class OverallNarrativeSerializer(serializers.ModelSerializer):
-
+    """
+    Sets the overall status and narrative assessment on an IndicatorReport
+    instance.
+    """
     class Meta:
         model = IndicatorReport
         fields = (
@@ -535,23 +567,35 @@ class ClusterIndicatorReportListSerializer(IndicatorReportListSerializer):
         )
 
 
-class PDReportsSerializer(serializers.ModelSerializer):
-
+class PDReportContextIndicatorReportSerializer(serializers.ModelSerializer):
+    """
+    A serializer for IndicatorReport model but specific information
+    that is helpful in IP reporting from a Programme Document / Progress
+    Report perspective.
+    """
     id = serializers.SerializerMethodField()
     reporting_period = serializers.SerializerMethodField()
+    reportable_object_id = serializers.SerializerMethodField()
     submission_date = serializers.SerializerMethodField()
     due_date = serializers.SerializerMethodField()
+    reportable = ReportableSimpleSerializer()
 
     class Meta:
         model = IndicatorReport
         fields = (
             'id',
+            'progress_report',
+            'reportable',
+            'reportable_object_id',
             'reporting_period',
             'progress_report_status',
             'report_status',
             'submission_date',
             'is_draft',
             'due_date',
+            'total',
+            'overall_status',
+            'narrative_assessment',
         )
 
     def get_id(self, obj):
@@ -562,6 +606,9 @@ class PDReportsSerializer(serializers.ModelSerializer):
             obj.time_period_start.strftime(settings.PRINT_DATA_FORMAT),
             obj.time_period_end.strftime(settings.PRINT_DATA_FORMAT)
         )
+
+    def get_reportable_object_id(self, obj):
+        return obj.reportable.object_id
 
     def get_submission_date(self, obj):
         return obj.submission_date and obj.submission_date.strftime(settings.PRINT_DATA_FORMAT)

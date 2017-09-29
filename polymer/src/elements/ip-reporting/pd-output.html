@@ -98,13 +98,13 @@
         method="patch">
     </etools-prp-ajax>
 
-    <etools-content-panel panel-title="[[data.name]]">
+    <etools-content-panel panel-title="[[data.title]]">
       <div class="header">
         <template
             is="dom-if"
             if="[[showMeta]]">
           <reportable-meta
-              data="[[data]]"
+              data="[[reportableData]]"
               mode="[[computedMode]]">
           </reportable-meta>
         </template>
@@ -139,7 +139,7 @@
                         no-label>
                     </report-status>
                   </div>
-                  <h3>[[indicator.indicator_name]]</h3>
+                  <h3>[[indicator.reportable.blueprint.title]]</h3>
                 </div>
               </div>
               <div class="indicator-header__target flex-none layout vertical center-justified">
@@ -148,15 +148,15 @@
                   <dd class="flex">
                     <template
                         is="dom-if"
-                        if="[[_equals(indicatorType, 'number')]]"
+                        if="[[_equals(indicator.reportable.blueprint.display_type, 'number')]]"
                         restamp="true">
-                      <etools-prp-number value="[[indicator.target]]"></etools-prp-number>
+                      <etools-prp-number value="[[indicator.reportable.target]]"></etools-prp-number>
                     </template>
                     <template
                         is="dom-if"
-                        if="[[_equals(indicatorType, 'percentage')]]"
+                        if="[[_equals(indicator.reportable.blueprint.display_type, 'percentage')]]"
                         restamp="true">
-                      [[_toPercentage(indicator.target)]]
+                      [[_toPercentage(indicator.reportable.target)]]
                     </template>
                   </dd>
                 </dl>
@@ -164,7 +164,7 @@
                   <dt class="flex-3">Total cumulative progress:</dt>
                   <template
                       is="dom-if"
-                      if="[[_equals(indicatorType, 'number')]]"
+                      if="[[_equals(indicator.reportable.blueprint.display_type, 'number')]]"
                       restamp="true">
                     <dd class="flex">
                       <etools-prp-number value="[[indicator.total.v]]"></etools-prp-number>
@@ -172,7 +172,7 @@
                   </template>
                   <template
                       is="dom-if"
-                      if="[[_equals(indicatorType, 'percentage')]]"
+                      if="[[_equals(indicator.reportable.blueprint.display_type, 'percentage')]]"
                       restamp="true">
                     <dd class="flex">[[_toPercentage(indicator.total.c)]]</dd>
                   </template>
@@ -181,15 +181,15 @@
                   <dt class="flex-3">Achievement in reporting period:</dt>
                   <template
                       is="dom-if"
-                      if="[[_equals(indicatorType, 'number')]]"
+                      if="[[_equals(indicator.reportable.blueprint.display_type, 'number')]]"
                       restamp="true">
-                    <dd class="flex">[[_withDefault(indicator.achieved.v)]]</dd>
+                    <dd class="flex">[[_withDefault(indicator.reportable.achieved.v)]]</dd>
                   </template>
                   <template
                       is="dom-if"
-                      if="[[_equals(indicatorType, 'percentage')]]"
+                      if="[[_equals(indicator.reportable.blueprint.display_type, 'percentage')]]"
                       restamp="true">
-                    <dd class="flex">[[_toPercentage(indicator.achieved.c)]]</dd>
+                    <dd class="flex">[[_toPercentage(indicator.reportable.achieved.c)]]</dd>
                   </template>
                 </dl>
               </div>
@@ -229,6 +229,11 @@
 
         reportableMeta: Object,
 
+        reportableData: {
+          type: Object,
+          computed: '_computeReportableData(data)',
+        },
+
         overrideMode: {
           type: String,
           value: '',
@@ -244,6 +249,11 @@
           computed: '_computeMode(mode, overrideMode)',
         },
 
+        pdId: {
+          type: String,
+          statePath: 'programmeDocuments.current',
+        },
+
         reportId: {
           type: String,
           statePath: 'programmeDocumentReports.current.id',
@@ -257,11 +267,6 @@
         currentReport: {
           type: Object,
           statePath: App.Selectors.ProgrammeDocumentReports.current,
-        },
-
-        indicatorType: {
-          type: String,
-          computed: '_computeIndicatorType(data)',
         },
 
         showMeta: {
@@ -324,8 +329,9 @@
         this.$.update.abort();
 
         this.dispatch(
-          App.Actions.IndicatorData.updateReportable(
+          App.Actions.PDReports.updateReportable(
             updateThunk,
+            this.pdId,
             this.reportId,
             this.data.id
           )
@@ -342,8 +348,13 @@
         return overrideMode || mode;
       },
 
-      _computeIndicatorType: function (data) {
-        return data.display_type;
+      _computeReportableData: function (data) {
+        var first = data.indicator_reports[0] || {};
+
+        return {
+          overall_status: first.overall_status,
+          narrative_assessment: first.narrative_assessment,
+        };
       },
 
       detached: function () {

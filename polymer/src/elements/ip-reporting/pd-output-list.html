@@ -4,7 +4,7 @@
 
 <link rel="import" href="../../elements/ip-reporting/pd-output.html">
 <link rel="import" href="../../redux/store.html">
-<link rel="import" href="../../redux/selectors/indicatorData.html">
+<link rel="import" href="../../redux/selectors/llos.html">
 
 <dom-module id="pd-output-list">
   <template>
@@ -60,12 +60,12 @@
 
         loading: {
           type: Boolean,
-          statePath: 'indicatorData.loading',
+          statePath: 'programmeDocumentReports.current.loading',
         },
 
         data: {
           type: Array,
-          statePath: App.Selectors.IndicatorData.all,
+          statePath: App.Selectors.LLOs.all,
         },
       },
     });

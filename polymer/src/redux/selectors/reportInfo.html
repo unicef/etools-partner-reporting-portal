@@ -25,7 +25,14 @@
           return state.programmeDocumentReports.current.id;
         },
         function (byPD, pdId, reportId) {
-          var report = byPD[pdId].filter(function (report) {
+          var reports = byPD[pdId];
+          var report;
+
+          if (!reports) {
+            return {};
+          }
+
+          report = byPD[pdId].filter(function (report) {
             return Number(report.id) === Number(reportId);
           })[0] || {};
 
