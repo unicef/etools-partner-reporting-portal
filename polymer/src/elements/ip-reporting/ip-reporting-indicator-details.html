@@ -3,6 +3,7 @@
 <link rel="import" href="../../../bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="../../../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
 
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../etools-prp-ajax.html">
@@ -13,9 +14,7 @@
 
 <dom-module id="ip-reporting-indicator-details">
   <template>
-    <!-- Styles the headers above the disaggregation tables.
-    The tables themselves are styled in disaggregation-table-styles. -->
-    <style include="iron-flex iron-flex-factors disaggregation-table-styles">
+    <style include="iron-flex iron-flex-alignment iron-flex-factors app-grid-style">
       :host {
         display: block;
         width: 100%;
@@ -26,14 +25,33 @@
           padding-left: 13px;
           border-bottom: 1px solid var(--paper-grey-300);
         };
+
+        --app-grid-columns: 2;
+        --app-grid-gutter: 15px;
+        --app-grid-item-height: auto;
       }
 
-      h3 {
-        width: 100%;
-        float: left;
+      .item {
+        padding: 0;
       }
+
       .loading-wrapper {
         padding: 15px;
+      }
+
+      h4 {
+        margin: 0 0 1em;
+        font-size: 12px;
+        font-weight: normal;
+      }
+
+      h4 > span:last-child {
+        padding-left: 10px;
+        text-align: right;
+      }
+
+      .reporting-period {
+        color: var(--theme-primary-text-color-medium);
       }
     </style>
 
@@ -73,17 +91,18 @@
           items="[[locations]]"
           as="location">
         <div name="location-[[location.current.id]]">
-          <div class="container">
+          <div class="app-grid">
             <template is="dom-if" if="[[location.current]]">
               <div class="item">
-                <h4>
+                <h4 class="layout horizontal justified">
                   <span>
-                    <strong>Progress in current reporting period: </strong>
-                    [[location.reportInfo.time_period_start]] -
-                    [[location.reportInfo.time_period_end]]
+                    Progress in current reporting period:
+                    <span class="reporting-period">
+                      [[location.reportInfo.time_period_start]] - [[location.reportInfo.time_period_end]]
+                    </span>
                   </span>
-                  <span class="total">
-                    <strong>Total:</strong>
+                  <span>
+                    Total:
                     <template
                         is="dom-if"
                         if="[[_equals(location.current.display_type, 'number')]]"
@@ -108,14 +127,15 @@
 
             <template is="dom-if" if="[[location.previous]]">
               <div class="item">
-                <h4>
+                <h4 class="layout horizontal justified">
                   <span>
-                    <strong>Progress in previous reporting period: </strong>
-                    [[location.reportInfo.time_period_start]] -
-                    [[location.reportInfo.time_period_end]]
+                    Progress in previous reporting period:
+                    <span class="reporting-period">
+                      [[location.reportInfo.time_period_start]] - [[location.reportInfo.time_period_end]]
+                    </span>
                   </span>
-                  <span class="total">
-                    <strong>Total: </strong>
+                  <span>
+                    Total:
                     <template
                         is="dom-if"
                         if="[[_equals(location.previous.display_type, 'number')]]"

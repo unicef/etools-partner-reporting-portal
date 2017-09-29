@@ -14,6 +14,11 @@
 <dom-module id="list-view-indicators">
   <template>
     <style include="iron-flex iron-flex-factors data-table-styles table-styles">
+      :host {
+        --ecp-content: {
+          padding: 0;
+        };
+      }
     </style>
 
     <iron-location
@@ -26,21 +31,20 @@
     </iron-query-params>
 
     <etools-content-panel panel-title="List of Indicators">
-      <etools-loading active="[[loading]]"></etools-loading>
       <etools-data-table-header
         id="listHeader"
         label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
 
         <etools-data-table-column class="flex-2" field="number">
-          PD/SSFA ToR ref.#
+          <div class="table-column">PD/SSFA ToR ref.#</div>
         </etools-data-table-column>
 
         <etools-data-table-column class="flex-6" field="indicator">
-          Indicator
+          <div class="table-column">Indicator</div>
         </etools-data-table-column>
 
         <etools-data-table-column  class="flex-4" field="progress">
-          Current progress
+            <div class="table-column">Current progress</div>
         </etools-data-table-column>
 
       </etools-data-table-header>
