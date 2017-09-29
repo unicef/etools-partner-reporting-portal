@@ -178,7 +178,8 @@ class ProgressReportSimpleSerializer(serializers.ModelSerializer):
 
 class ProgressReportSerializer(ProgressReportSimpleSerializer):
     programme_document = ProgrammeDocumentOutputSerializer()
-    indicator_reports = PDReportContextIndicatorReportSerializer(read_only=True, many=True)
+    indicator_reports = PDReportContextIndicatorReportSerializer(
+        read_only=True, many=True)
 
     class Meta:
         model = ProgressReport
