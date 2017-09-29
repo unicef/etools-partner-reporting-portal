@@ -216,6 +216,7 @@
 
       observers: [
         '_onReportChanged(routeData.report_id, routeData.mode)',
+        '_onReportStatusChanged(currentReport, routeData.mode)',
         '_fetchReport(reportUrl, queryParams)',
       ],
 
@@ -225,6 +226,15 @@
 
       _onReportChanged: function (reportId, mode) {
         this.dispatch(App.Actions.PDReports.setCurrent(reportId, mode));
+      },
+
+      _onReportStatusChanged: function (currentReport, mode) {
+        if (
+          ['Sub', 'Acc'].indexOf(currentReport.status) !== -1 &&
+          (mode || '').toLowerCase !== 'view'
+        ) {
+          this.set('routeData.mode', 'view');
+        }
       },
 
       _computeHeadingText: function (report, mode) {
