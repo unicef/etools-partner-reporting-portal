@@ -21,6 +21,7 @@ from core.common import (
     PROGRESS_REPORT_STATUS,
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
+    PD_STATUS
 )
 
 from core.paginations import SmallPagination
@@ -48,7 +49,10 @@ from .serializers import (
 )
 
 from .models import ProgrammeDocument, ProgressReport
-from .filters import ProgrammeDocumentFilter, ProgressReportFilter, ProgrammeDocumentIndicatorFilter
+from .filters import (
+    ProgrammeDocumentFilter, ProgressReportFilter,
+    ProgrammeDocumentIndicatorFilter
+)
 
 logger = logging.getLogger(__name__)
 
@@ -187,9 +191,16 @@ class ProgrammeDocumentIndicatorsAPIView(ListAPIView):
             partner=self.request.user.partner, workspace=workspace_id)
         queryset = self.get_queryset().filter(
             indicator_reports__progress_report__programme_document__in=pds).distinct()
+
+        # filter for checkbox
+        active_pds_only = self.request.query_params.get(
+            'activepdsonly', None)
+        if active_pds_only is not None and active_pds_only == '1':
+            queryset = queryset.filter(
+                lower_level_outputs__cp_output__programme_document__status=PD_STATUS.active)
+
         filtered = ProgrammeDocumentIndicatorFilter(request.GET,
                                                     queryset=queryset)
-
         page = self.paginate_queryset(filtered.qs)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -228,7 +239,7 @@ class ProgressReportAPIView(ListAPIView):
 
     def list(self, request, workspace_id, *args, **kwargs):
         queryset = self.get_queryset().filter(
-            programme_document__workspace=workspace_id)
+            programme_document__workspace=workspace_id).distinct()
         filtered = ProgressReportFilter(request.GET, queryset=queryset)
 
         page = self.paginate_queryset(filtered.qs)
