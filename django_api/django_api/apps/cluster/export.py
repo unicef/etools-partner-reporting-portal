@@ -218,7 +218,7 @@ class XLSXWriter:
         for sheet in self.sheets:
             column = DISAGGREGATION_COLUMN_START
             while(True):
-                if sheet.cell(column=column, row=4).value != "#dis_type":
+                if sheet.cell(column=column, row=4).value == None or sheet.cell(column=column, row=4).value.find("#indicator+type+") < 0:
                     break
                 if (
                         sheet.cell(column=column, row=1).value,
@@ -243,9 +243,12 @@ class XLSXWriter:
         # Merge disaggregation values
         merged_disaggregation_values = list()
         for sheet in self.sheets:
-            column = DISAGGREGATION_COLUMN_START + len(merged_disaggregations)
+            column = DISAGGREGATION_COLUMN_START
             while (True):
-                if sheet.cell(column=column, row=4).value != "#dis_value":
+                if sheet.cell(column=column, row=4).value and sheet.cell(column=column, row=4).value.find("#indicator+type+") > -1:
+                    column += 1
+                    continue
+                if sheet.cell(column=column, row=4).value == None or sheet.cell(column=column, row=4).value.find("#indicator+value+") < 0:
                     break
                 if (
                         sheet.cell(column=column, row=1).value,
@@ -281,22 +284,26 @@ class XLSXWriter:
             max_columns = 1
             while(True):
                 # Stop condition
-                if sheet.cell(column=max_columns, row=1).value == "":
+                if sheet.cell(column=max_columns, row=1).value == None:
                     max_columns -= 1
-                    return
+                    break
                 max_columns += 1
-
             sheet_row = INDICATOR_DATA_ROW_START
-            column = 1
             while(True):
                 # Stop row condition
-                if sheet.cell(column=column, row=sheet_row).value == "":
+                if sheet.cell(column=1, row=sheet_row).value == None:
                     break
                 for column in range(max_columns):
                     column += 1
-                    # If value
+                    # If value less then DISAGGREGATION_COLUMN_START just copy data
                     if column < DISAGGREGATION_COLUMN_START:
+                        merged_sheet.cell(column=column, row=merged_row).value = sheet.cell(column=column, row=sheet_row).value
+                    else:
+                        #TODO: assign types/values to proper columns
                         pass
+                merged_row += 1
+                sheet_row += 1
+
 
 
 
@@ -342,7 +349,7 @@ class XLSXWriter:
             self.sheets.remove(s)
             self.wb.remove_sheet(s)
 
-        # self.merge_sheets()
+        self.merge_sheets()
 
         filepath = SAVE_PATH + 'export.xlsx'
         self.wb.save(filepath)
