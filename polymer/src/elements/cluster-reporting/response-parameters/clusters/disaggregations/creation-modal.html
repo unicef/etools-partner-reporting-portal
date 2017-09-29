@@ -11,9 +11,7 @@
 <link rel="import" href="../../../../../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../../../../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
 <link rel="import" href="../../../../../../bower_components/paper-dialog/paper-dialog.html">
-<link rel="import" href="../../../../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 
-<link rel="import" href="../../../../form-fields/cluster-dropdown-content.html">
 <link rel="import" href="../../../../etools-prp-ajax.html">
 <link rel="import" href="../../../../../styles/buttons.html">
 <link rel="import" href="../../../../../redux/store.html">
@@ -196,11 +194,6 @@
           value: false,
         },
 
-        formatDate: {
-          type: String,
-          value: 'DD MMM YYYY'
-        },
-
         url: {
           type: String,
           computed: '_computeUrl(responsePlanID)'
@@ -229,12 +222,6 @@
         this.data = {"response_plan":+this.responsePlanID, "choices": [], "active": true};
         this.set('opened', true);
         this.set('refresh', true);
-      },
-
-      _redirectToDetail: function () {
-        var path = '/response-parameters/clusters/disaggregations/';
-        var url = this.buildUrl(this._baseUrlCluster, path);
-        this.set('path', url);
       },
 
       _validate: function (e) {
@@ -269,6 +256,7 @@
             // TODO: error handling
           });
       },
+
       _checkMatchingName: function() {
         console.log('check')
         let disaggregations = this.disaggregations;
@@ -279,6 +267,7 @@
           }
           return true
       },
+
       _onInput: function (e) {
         var el = e.target;
         var newValue = el.value;
@@ -298,6 +287,7 @@
           this._setValidity();
         });
       },
+      
      _setValidity: function () {
 
         var invalid = this.value.length && this.value.some(function (disagg) {

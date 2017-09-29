@@ -298,7 +298,8 @@
 
                     <div class="col-name">
                       <paper-dropdown-menu
-                        class="dis-menu"
+                        class="dis-menu validate"
+                        id="disaggregationsDrop"
                         index="[[index]]"
                         label="Disaggregation By"
                         on-value-changed="_validate"
@@ -309,10 +310,9 @@
                           slot="dropdown-content"
                           class="dropdown-content">
                           <template
-                            id="disaggregationsDrop"
                             is="dom-repeat"
                             items="[[disaggregations]]">
-                            <paper-item id="[[item.id]]">[[item.name]] <!-- [[_formatChoices(item.choices)]] -->
+                            <paper-item name="[[item.id]]">[[item.name]] <!-- [[_formatChoices(item.choices)]] -->
                             </paper-item>
                           </template>
                         </paper-listbox>
@@ -435,6 +435,12 @@
           value: [],
         },
 
+        invalid: {
+          type: Boolean,
+          notify: true,
+          value: true
+        },
+
         selectedLocations: {
           type: Array,
           value: [],
@@ -535,7 +541,7 @@
         let index = +e.target.index;
         console.log('index', index)
         let id;
-        if (data.value) id = data.value.id
+        if (data.value) id = data.value.name
         let selected
         if (id) {
           selected = this.disaggregations.find((dis) => dis.id == id)
@@ -671,7 +677,25 @@
         });
       },
 
+      _checkMatchingDisaggregation: function() {
+        console.log('check')
+        let chosen = Polymer.dom(this.root).querySelectorAll('.dis-menu').map((choice) => choice.value)
+        if (chosen.length < 2) return;
+        for (let i = 0; i < chosen.length - 1; i++) {
+          for (let j = i + 1; j < chosen.length; j++) {
+            if (chosen[i] === chosen[j]) {
+              console.log('matched')
+              Polymer.dom(this.root).querySelectorAll('.dis-menu')[i].set('invalid', true)
+              Polymer.dom(this.root).querySelectorAll('.dis-menu')[j].set('invalid', true)
+            }
+          }
+        }
+        return
+      },
+
       _save: function () {
+
+        
         var fields = [].slice.call(
           Polymer.dom(this.root).querySelectorAll('.validate')
         );
@@ -682,6 +706,7 @@
         fields.forEach(function (field) {
           field.validate();
         });
+        this._checkMatchingDisaggregation();
 
         valid = fields.every(function (field) {
           return !field.invalid;
