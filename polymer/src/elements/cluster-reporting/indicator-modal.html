@@ -14,10 +14,9 @@
 <link rel="import" href="../../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-multi-selection-menu.html">
-<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
 
 <link rel="import" href="../../polyfills/es6-shim.html">
-<link rel="import" href="disaggregations-dropdown-widget.html">
+<link rel="import" href="disaggregation-dropdown-widget.html">
 <link rel="import" href="chip-date-of-report.html">
 <link rel="import" href="../labelled-item.html">
 <link rel="import" href="../etools-prp-chips.html">
@@ -119,6 +118,7 @@
         id="dialog"
         with-backdrop
         opened="{{opened}}">
+
       <div class="header layout horizontal justified">
         <h2>Add Indicator</h2>
 
@@ -277,81 +277,66 @@
           </div>
           
           <div class="row">
-            <h2>Disaggregations ([[data.disaggregation.length]])</h2>
+            <h2>Disaggregations ([[selectedDisaggregations.length]])</h2>
           </div>
           <div class="row">
-            
-              <div class="item">
+          
+            <template is="dom-repeat" items="[[selectedDisaggregations]]" as="dataDisagg">
 
-                <template is="dom-repeat" items="[[data.disaggregation]]" as="dataDisagg">
+              <div class="rowDis layout horizontal"">
 
-                  <div class="rowDis layout horizontal"">
-
-                    <div class="flex-none layout vertical center-center col-actions">
-                      <paper-icon-button
-                        index="[[index]]"
-                        class="remove-btn"
-                        on-tap="_remove"
-                        icon="icons:cancel">
-                      </paper-icon-button>
-                    </div>
-
-                    <div class="col-name">
-                      <paper-dropdown-menu
-                        class="dis-menu validate"
-                        id="disaggregationsDrop"
-                        index="[[index]]"
-                        label="Disaggregation By"
-                        on-value-changed="_validate"
-                        on-selected-item-changed="_setDisaggregation"
-                        always-float-label
-                        required>
-                        <paper-listbox
-                          slot="dropdown-content"
-                          class="dropdown-content">
-                          <template
-                            is="dom-repeat"
-                            items="[[disaggregations]]">
-                            <paper-item name="[[item.id]]">[[item.name]] <!-- [[_formatChoices(item.choices)]] -->
-                            </paper-item>
-                          </template>
-                        </paper-listbox>
-                    </paper-dropdown-menu>
-                    </div>
-                  
-                    <div class="col-values">
-                      <paper-input
-                        index="[[index]]"
-                        label="Disaggregation Groups"
-                        value="[[_formatChoices(dataDisagg, index)]]"
-                        always-float-label
-                        disabled>
-                      </paper-input>
-                 
-<!--                   <template class="rowGroups" is="dom-repeat" items="[[data.disaggregation[index].choices]]" as="choice">
-                    
-                    [[choice.value]] 
-                  </template> -->
-
-                
-                    
-                  </div>
+                <div class="flex-none layout vertical center-center col-actions">
+                  <paper-icon-button
+                    index="[[index]]"
+                    class="remove-btn"
+                    on-tap="_remove"
+                    icon="icons:cancel">
+                  </paper-icon-button>
                 </div>
-                  
-                  
 
-                </template>
-                
-                  
-            </div>
-
+                <div class="col-name">
+                  <paper-dropdown-menu
+                    class="dis-menu validate"
+                    id="disaggregationsDrop"
+                    index="[[index]]"
+                    label="Disaggregation By"
+                    on-value-changed="_validate"
+                    on-selected-item-changed="_setDisaggregation"
+                    always-float-label
+                    required>
+                    <paper-listbox
+                      slot="dropdown-content"
+                      class="dropdown-content">
+                      <template
+                        is="dom-repeat"
+                        items="[[disaggregations]]">
+                        <paper-item name="[[item.id]]">[[item.name]]
+                        </paper-item>
+                      </template>
+                    </paper-listbox>
+                  </paper-dropdown-menu>
+                </div>
+              
+                <div class="col-values">
+                  <paper-input
+                    index="[[index]]"
+                    label="Disaggregation Groups"
+                    value="[[_formatChoices(dataDisagg, index)]]"
+                    always-float-label
+                    disabled>
+                  </paper-input>
+                </div>
+              </div>
+            </template>
+    
+            <paper-button
+              class="btn-primary add-disaggregation-btn"
+              on-tap="_add"
+              disabled="[[!_canAddMore]]">
+              Add disaggregation
+            </paper-button>
           </div>
-          <paper-button
-            class="btn-primary add-disaggregation-btn"
-            on-tap="_add"
-            disabled="[[!_canAddMore]]">
-          Add disaggregation
-        </paper-button>
+
         </template>
       </paper-dialog-scrollable>
 
@@ -446,6 +431,11 @@
           value: [],
         },
 
+        selectedDisaggregations: {
+          type: Array,
+          value: []
+        },
+
         frequencies: {
           type: Array,
           value: [
@@ -491,7 +481,7 @@
       observers: [
         '_setDefaults(opened)',
         '_setLocations(selectedLocations.splices)',
-        '_setCanAddMore(data.disaggregation.splices)',
+        '_setCanAddMore(selectedDisaggregations.splices)',
       ],
 
       _computeType: function (type, displayType) {
@@ -509,8 +499,7 @@
       },
 
       _setCanAddMore: function () {
-        console.log(this.data.disaggregation.length)
-        this.set('_canAddMore', this.data.disaggregation.length < 3);
+        this.set('_canAddMore', this.selectedDisaggregations.length < 3);
       },
 
       _setFrequency: function (e, data) {
@@ -524,7 +513,7 @@
       },
 
       _add: function () {
-        this.push('data.disaggregation', {
+        this.push('selectedDisaggregations', {
           name: '',
           choices: [],
         });
@@ -532,9 +521,7 @@
 
       _remove: function (e) {
         var toRemove = +e.target.index;
-
-        // this.push('disaggregations', this.data.disaggregation[toRemove])
-        this.splice('data.disaggregation', toRemove, 1);
+        this.splice('selectedDisaggregations', toRemove, 1);
       },
 
       _setDisaggregation: function (e, data) {
@@ -546,20 +533,10 @@
         if (id) {
           selected = this.disaggregations.find((dis) => dis.id == id)
         }
-        // let filteredDis
         if (selected) {
-          // if (this.data.disaggregation[index].id) {
-          //   this.push('disaggregations', this.data.disaggregation[index])
-          // }
-          this.set(['data.disaggregation', index], selected)
-          // this.set(['selectedDisaggregations', index], selected)
-          // filteredDis = this.disaggregations.filter((dis) => dis.id !== selected.id)
-          // this.set('disaggregations', filteredDis)
-
+          this.set(['selectedDisaggregations', index], selected)
         }
-
-        console.log('set', this.data.disaggregation)
-
+        console.log('set', this.selectedDisaggregations)
       },
 
       _formatChoices: function(selected, index) {
@@ -570,7 +547,6 @@
         else {
           return ''
         }
-        // return choices.choices.map((choice) => choice.value).join(', ')
       },
 
       _setLocations: function () {
@@ -589,6 +565,16 @@
         this.set('data.locations', selected);
       },
 
+      _setDisaggregations: function () {
+        var selected = this.selectedDisaggregations ?
+        this.selectedDisaggregations.map((dis) => {
+          return {
+            id: dis.id
+          }
+        }) : [];
+        this.set('data.disaggregation', selected)
+      },
+
       _onValueChanged: function (e) {
         this._updateValue(e.target);
       },
@@ -601,8 +587,7 @@
         if (!opened) {
           return;
         }
-
-        this.set('selectedLocations', []);
+        this.set('selectedLocations', [])
         this.set('selectedDisaggregations', [])
 
         this.set('data', {
@@ -678,7 +663,6 @@
       },
 
       _checkMatchingDisaggregation: function() {
-        console.log('check')
         let chosen = Polymer.dom(this.root).querySelectorAll('.dis-menu').map((choice) => choice.value)
         if (chosen.length < 2) return;
         for (let i = 0; i < chosen.length - 1; i++) {
@@ -695,7 +679,6 @@
 
       _save: function () {
 
-        
         var fields = [].slice.call(
           Polymer.dom(this.root).querySelectorAll('.validate')
         );
@@ -706,7 +689,9 @@
         fields.forEach(function (field) {
           field.validate();
         });
+        
         this._checkMatchingDisaggregation();
+        
 
         valid = fields.every(function (field) {
           return !field.invalid;
@@ -717,7 +702,8 @@
         }
 
         this.set('updatePending', true);
-
+        this._setDisaggregations();
+        console.log(this.data.disaggregation)
         this.$.indicators.body = this._processData(this.data);
 
         this.$.indicators.thunk()()
