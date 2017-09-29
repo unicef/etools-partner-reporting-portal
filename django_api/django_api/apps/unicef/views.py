@@ -367,7 +367,7 @@ class ProgressReportLocationsAPIView(ListAPIView):
             return ProgressReport.objects.get(programme_document__partner=self.request.user.partner, programme_document__workspace=self.workspace_id, pk=pk)
         except ProgressReport.DoesNotExist as exp:
             logger.exception({
-                "endpoint": "ProgressReportDetailsAPIView",
+                "endpoint": "ProgressReportLocationsAPIView",
                 "request.data": self.request.data,
                 "pk": pk,
                 "exception": exp,
@@ -404,7 +404,7 @@ class ProgressReportSubmitAPIView(APIView):
                 pk=pk)
         except ProgressReport.DoesNotExist as exp:
             logger.exception({
-                "endpoint": "ProgressReportDetailsAPIView",
+                "endpoint": "ProgressReportSubmitAPIView",
                 "request.data": self.request.data,
                 "pk": pk,
                 "exception": exp,
@@ -468,7 +468,7 @@ class ProgressReportReviewAPIView(APIView):
                 pk=pk)
         except ProgressReport.DoesNotExist as exp:
             logger.exception({
-                "endpoint": "ProgressReportDetailsAPIView",
+                "endpoint": "ProgressReportReviewAPIView",
                 "request.data": self.request.data,
                 "pk": pk,
                 "exception": exp,
