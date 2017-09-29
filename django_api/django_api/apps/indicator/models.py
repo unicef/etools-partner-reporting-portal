@@ -108,7 +108,7 @@ class IndicatorBlueprint(TimeStampedExternalSyncModelMixin):
     DISPLAY_TYPE_CHOICES = QUANTITY_DISPLAY_TYPE_CHOICES + \
         RATIO_DISPLAY_TYPE_CHOICES
 
-    title = models.CharField(max_length=1024)
+    title = models.CharField(max_length=1024, db_index=True)
     unit = models.CharField(max_length=10, choices=UNIT_CHOICES,
                             default=NUMBER)
     description = models.CharField(max_length=3072, null=True, blank=True)
