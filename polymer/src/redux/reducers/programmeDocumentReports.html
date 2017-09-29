@@ -68,9 +68,36 @@
           }());
 
         case App.Constants.AMEND_REPORTABLE:
-          console.log('TODO:', action);
+          return (function () {
+          /**
+           * Narrative & status for a given LLO are currently extracted
+           * from the first of its indicator reports. Need to update all
+           * of them, to be consistent :(
+           */
 
-          return state;
+            var change = {};
+
+            change[action.pdId] = state[action.pdId].map(function (report) {
+              if (Number(report.id) !== Number(action.reportId)) {
+                return report;
+              }
+
+              return Object.assign({}, report, {
+                indicator_reports: report.indicator_reports.map(function (indicatorReport) {
+                  if (
+                    Number(indicatorReport.reportable.object_id) !==
+                    Number(action.reportableId)
+                  ) {
+                    return indicatorReport;
+                  }
+
+                  return Object.assign({}, indicatorReport, action.data);
+                }),
+              });
+            });
+
+            return Object.assign({}, state, change);
+          }());
 
         case App.Constants.RESET:
           return {};

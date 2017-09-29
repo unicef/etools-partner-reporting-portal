@@ -104,7 +104,7 @@
             is="dom-if"
             if="[[showMeta]]">
           <reportable-meta
-              data="[[data]]"
+              data="[[reportableData]]"
               mode="[[computedMode]]">
           </reportable-meta>
         </template>
@@ -229,6 +229,11 @@
 
         reportableMeta: Object,
 
+        reportableData: {
+          type: Object,
+          computed: '_computeReportableData(data)',
+        },
+
         overrideMode: {
           type: String,
           value: '',
@@ -341,6 +346,15 @@
 
       _computeMode: function (mode, overrideMode) {
         return overrideMode || mode;
+      },
+
+      _computeReportableData: function (data) {
+        var first = data.indicator_reports[0] || {};
+
+        return {
+          overall_status: first.overall_status,
+          narrative_assessment: first.narrative_assessment,
+        };
       },
 
       detached: function () {

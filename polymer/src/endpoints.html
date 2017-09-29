@@ -90,7 +90,13 @@
       },
 
       reportable: function (programmeDocumentProgressReportId, lowerLevelOutputId) {
-        return this._buildUrl('/indicator/pd-progress-report/' + programmeDocumentProgressReportId + '/llo/' + lowerLevelOutputId + '/');
+        return this._buildUrl(
+          '/indicator/pd-progress-report/' +
+          programmeDocumentProgressReportId +
+          '/llo/' +
+          lowerLevelOutputId +
+          '/'
+        );
       },
 
       indicatorLocationDataEntries: function() {
