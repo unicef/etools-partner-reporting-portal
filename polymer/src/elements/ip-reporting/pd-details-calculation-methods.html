@@ -48,6 +48,14 @@
         margin-left: 12px;
       }
 
+      .pd-output {
+        color: var(--theme-primary-text-color-medium);
+      }
+
+      .cell-indicator {
+        padding-left: 15px;
+      }
+
       .buttons {
         margin: 1em 0;
       }
@@ -90,13 +98,15 @@
                   is="dom-if"
                   if="[[_equals(item.type, 'label')]]"
                   restamp="true">
-                <div class="table-cell table-cell--text">[[item.text]]</div>
+                <div class="table-cell table-cell--text">
+                  <span class="pd-output">[[item.text]]</span>
+                </div>
               </template>
               <template
                   is="dom-if"
                   if="[[_equals(item.type, 'data')]]"
                   restamp="true">
-                <div class="table-cell">[[item.data.title]]</div>
+                <div class="table-cell cell-indicator">[[item.data.title]]</div>
                 <div class="table-cell">
                   <template
                       is="dom-if"
