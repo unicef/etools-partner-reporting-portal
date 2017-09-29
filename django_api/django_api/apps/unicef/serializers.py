@@ -27,6 +27,7 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
     unicef_officers = PersonSerializer(read_only=True, many=True)
     unicef_focal_point = PersonSerializer(read_only=True, many=True)
     partner_focal_point = PersonSerializer(read_only=True, many=True)
+    document_type_display = serializers.SerializerMethodField()
 
     class Meta:
         model = ProgrammeDocument
@@ -40,6 +41,8 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
             'end_date',
             'population_focus',
             'status',
+            'document_type',
+            'document_type_display',
             'calculated_budget',
             'cso_contribution',
             'total_unicef_cash',
@@ -54,6 +57,9 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
 
     def get_total_unicef_supplies(self, obj):
         return str(obj.in_kind_amount)
+
+    def get_document_type_display(self, obj):
+        return obj.get_document_type_display()
 
 
 class SectionSerializer(serializers.ModelSerializer):
