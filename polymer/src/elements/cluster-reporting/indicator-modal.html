@@ -285,7 +285,7 @@
 
                 <template is="dom-repeat" items="[[data.disaggregation]]" as="dataDisagg">
 
-                  <div class="rowDis layout horizontal">
+                  <div class="rowDis layout horizontal"">
 
                     <div class="flex-none layout vertical center-center col-actions">
                       <paper-icon-button
@@ -312,7 +312,7 @@
                             id="disaggregationsDrop"
                             is="dom-repeat"
                             items="[[disaggregations]]">
-                            <paper-item id="[[item.id]]">[[item.name]] - <!-- [[_formatChoices(item.choices)]] -->
+                            <paper-item id="[[item.id]]">[[item.name]] <!-- [[_formatChoices(item.choices)]] -->
                             </paper-item>
                           </template>
                         </paper-listbox>
@@ -321,10 +321,9 @@
                   
                     <div class="col-values">
                       <paper-input
-                        
+                        index="[[index]]"
                         label="Disaggregation Groups"
-                        value="{{_formatChoices(index, dataDisagg)}}"
-                   
+                        value="[[_formatChoices(dataDisagg, index)]]"
                         always-float-label
                         disabled>
                       </paper-input>
@@ -537,7 +536,6 @@
         console.log('index', index)
         let id;
         if (data.value) id = data.value.id
-        console.log('id', id)
         let selected
         if (id) {
           selected = this.disaggregations.find((dis) => dis.id == id)
@@ -547,23 +545,24 @@
           // if (this.data.disaggregation[index].id) {
           //   this.push('disaggregations', this.data.disaggregation[index])
           // }
-
           this.set(['data.disaggregation', index], selected)
           // this.set(['selectedDisaggregations', index], selected)
           // filteredDis = this.disaggregations.filter((dis) => dis.id !== selected.id)
           // this.set('disaggregations', filteredDis)
 
         }
-        console.log('selected', selected)
 
         console.log('set', this.data.disaggregation)
 
       },
 
-      _formatChoices: function(index, selectedDisaggregations) {
-        console.log('format', index, selectedDisaggregations)
-        if (selectedDisaggregations) {
-          return selectedDisaggregations.name
+      _formatChoices: function(selected, index) {
+        console.log('format', index, selected.name)
+        if (selected.name) {
+          return selected.choices.map((choice) => choice.value).join(', ')
+        }
+        else {
+          return ''
         }
         // return choices.choices.map((choice) => choice.value).join(', ')
       },
