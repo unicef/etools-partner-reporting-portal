@@ -44,7 +44,7 @@ class XLSXWriter:
             self.sheet.cell(row=2, column=DISAGGREGATION_COLUMN_START + idx).value = dt.id
             self.sheet.cell(row=2, column=DISAGGREGATION_COLUMN_START + idx).alignment = Alignment(horizontal='center')
             # Type
-            self.sheet.cell(row=4, column=DISAGGREGATION_COLUMN_START + idx).value = "#dis_type"
+            self.sheet.cell(row=4, column=DISAGGREGATION_COLUMN_START + idx).value = "#indicator+type+" + dt.name
             self.sheet.cell(row=4, column=DISAGGREGATION_COLUMN_START + idx).alignment = Alignment(horizontal='center')
             disaggregation_types_map[dt.id] = DISAGGREGATION_COLUMN_START + idx
 
@@ -53,9 +53,12 @@ class XLSXWriter:
         disaggregation_values = list()
         disaggregation_values_list = list()
         disaggregation_values_map = dict()
+        disaggregation_values_by_type = dict()
         for disaggregation_type in disaggregation_types:
                 disaggregation_values_base = DisaggregationValue.objects.filter(disaggregation=disaggregation_type).order_by('value')
                 disaggregation_values_list.append(disaggregation_values_base)
+                for dv in disaggregation_values_base:
+                    disaggregation_values_by_type[dv.id] = disaggregation_type.name
 
         # Create all possible combinations (max. 3 items per combination) for disaggregation values
         for combination_items in range(1, 4):
@@ -68,7 +71,8 @@ class XLSXWriter:
             self.sheet.cell(row=1, column=DISAGGREGATION_COLUMN_START + len(disaggregation_types) + idx).alignment = Alignment(horizontal='center')
             self.sheet.cell(row=1, column=DISAGGREGATION_COLUMN_START + len(disaggregation_types) + idx).font = Font(bold=True)
             self.sheet.cell(row=2, column=DISAGGREGATION_COLUMN_START + len(disaggregation_types) + idx).value = ", ".join([str(dv.id) for dv in dvs])
-            self.sheet.cell(row=4, column=DISAGGREGATION_COLUMN_START + len(disaggregation_types) + idx).value = "#dis_value"
+            self.sheet.cell(row=3, column=DISAGGREGATION_COLUMN_START + len(disaggregation_types) + idx).value = " + ".join([disaggregation_values_by_type[dv.id] for dv in dvs])
+            self.sheet.cell(row=4, column=DISAGGREGATION_COLUMN_START + len(disaggregation_types) + idx).value = "#indicator+value+" + str("+".join([dv.value for dv in dvs]))
             disaggregation_values_map[", ".join([str(dv.id) for dv in dvs])] = DISAGGREGATION_COLUMN_START + len(disaggregation_types) + idx
 
         # Generate Total disaggregation value
