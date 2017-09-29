@@ -275,7 +275,9 @@
           items = curr.indicators.map(function (indicator) {
             return {
               type: 'data',
-              data: indicator,
+              data: Object.assign({}, indicator, {
+                editable: true,
+              }),
               llo_id: curr.ll_output.id,
             };
           });
