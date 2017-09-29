@@ -5,7 +5,18 @@
 
 <dom-module id="etools-prp-number">
   <template>
-    <numeral-js number="[[value]]" format="[[_finalFormat]]" print></numeral-js>
+    <template
+        is="dom-if"
+        if="[[!_noValue(value)]]"
+        restamp="true">
+      <numeral-js number="[[value]]" format="[[_finalFormat]]" print></numeral-js>
+    </template>
+    <template
+        is="dom-if"
+        if="[[_noValue(value)]]"
+        restamp="true">
+      -
+    </template>
   </template>
 
   <script>
@@ -13,7 +24,10 @@
       is: 'etools-prp-number',
 
       properties: {
-        value: Number,
+        value: {
+          type: Number,
+          value: null,
+        },
 
         overrideFormat: {
           type: String,
@@ -29,6 +43,10 @@
           type: String,
           computed: '_computeFinalFormat(_defaultFormat, overrideFormat)',
         },
+      },
+
+      _noValue: function (value) {
+        return value == null; // jshint ignore:line
       },
 
       _computeFinalFormat: function (_defaultFormat, overrideFormat) {
