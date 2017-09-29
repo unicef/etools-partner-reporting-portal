@@ -11,8 +11,8 @@ from indicator.models import Disaggregation, DisaggregationValue
 PATH = settings.BASE_DIR + "/apps/cluster/templates/excel/export.xlsx"
 SAVE_PATH = settings.MEDIA_ROOT + '/'
 
-DISAGGREGATION_COLUMN_START = 29
-INDICATOR_DATA_ROW_START = 4
+DISAGGREGATION_COLUMN_START = 44
+INDICATOR_DATA_ROW_START = 5
 
 class XLSXWriter:
     def __init__(self, indicators, response_plan_id, analysis=False):
@@ -44,8 +44,8 @@ class XLSXWriter:
             self.sheet.cell(row=2, column=DISAGGREGATION_COLUMN_START + idx).value = dt.id
             self.sheet.cell(row=2, column=DISAGGREGATION_COLUMN_START + idx).alignment = Alignment(horizontal='center')
             # Type
-            self.sheet.cell(row=3, column=DISAGGREGATION_COLUMN_START + idx).value = "#dis_type"
-            self.sheet.cell(row=3, column=DISAGGREGATION_COLUMN_START + idx).alignment = Alignment(horizontal='center')
+            self.sheet.cell(row=4, column=DISAGGREGATION_COLUMN_START + idx).value = "#dis_type"
+            self.sheet.cell(row=4, column=DISAGGREGATION_COLUMN_START + idx).alignment = Alignment(horizontal='center')
             disaggregation_types_map[dt.id] = DISAGGREGATION_COLUMN_START + idx
 
 
@@ -68,7 +68,7 @@ class XLSXWriter:
             self.sheet.cell(row=1, column=DISAGGREGATION_COLUMN_START + len(disaggregation_types) + idx).alignment = Alignment(horizontal='center')
             self.sheet.cell(row=1, column=DISAGGREGATION_COLUMN_START + len(disaggregation_types) + idx).font = Font(bold=True)
             self.sheet.cell(row=2, column=DISAGGREGATION_COLUMN_START + len(disaggregation_types) + idx).value = ", ".join([str(dv.id) for dv in dvs])
-            self.sheet.cell(row=3, column=DISAGGREGATION_COLUMN_START + len(disaggregation_types) + idx).value = "#dis_value"
+            self.sheet.cell(row=4, column=DISAGGREGATION_COLUMN_START + len(disaggregation_types) + idx).value = "#dis_value"
             disaggregation_values_map[", ".join([str(dv.id) for dv in dvs])] = DISAGGREGATION_COLUMN_START + len(disaggregation_types) + idx
 
         # Generate Total disaggregation value
@@ -121,39 +121,52 @@ class XLSXWriter:
 
             for location_data in locations_data.all():
 
-                self.sheet.cell(row=start_row_id, column=1).value = cluster.get_type_display()
-                self.sheet.cell(row=start_row_id, column=2).value = cluster.partner_projects.first().partner.title
-                self.sheet.cell(row=start_row_id, column=3).value = cluster_objective.title
-                self.sheet.cell(row=start_row_id, column=4).value = partner_activity.title
-                self.sheet.cell(row=start_row_id, column=5).value = indicator.reportable.blueprint.title
-                self.sheet.cell(row=start_row_id, column=6).value = partner_project.title
-                self.sheet.cell(row=start_row_id, column=7).value = partner_project.get_status_display()
-                self.sheet.cell(row=start_row_id, column=8).value = partner_activity.start_date
-                self.sheet.cell(row=start_row_id, column=9).value = partner_activity.end_date
+                self.sheet.cell(row=start_row_id, column=1).value = location_data.location.gateway.country.name
+                self.sheet.cell(row=start_row_id, column=2).value = location_data.location.gateway.country.country_short_code
+                self.sheet.cell(row=start_row_id, column=3).value = cluster.response_plan.title
 
-                self.sheet.cell(row=start_row_id, column=10).value = indicator.reportable.baseline
-                self.sheet.cell(row=start_row_id, column=11).value = indicator.reportable.target
-                self.sheet.cell(row=start_row_id, column=12).value = indicator.reportable.total['c']
+                self.sheet.cell(row=start_row_id, column=4).value = cluster.get_type_display()
+                self.sheet.cell(row=start_row_id, column=5).value = cluster.partner_projects.first().partner.title
+                self.sheet.cell(row=start_row_id, column=6).value = cluster_objective.title
+                self.sheet.cell(row=start_row_id, column=7).value = partner_activity.title
+                self.sheet.cell(row=start_row_id, column=8).value = indicator.reportable.blueprint.title
 
-                self.sheet.cell(row=start_row_id, column=13).value =location_data.location.title
-                self.sheet.cell(row=start_row_id, column=14).value = location_data.location.p_code
-                self.sheet.cell(row=start_row_id, column=15).value = location_data.location.gateway.name
+                self.sheet.cell(row=start_row_id, column=9).value = indicator.reportable.blueprint.get_unit_display()
+                self.sheet.cell(row=start_row_id, column=10).value = indicator.reportable.blueprint.get_calculation_formula_across_locations_display()
+                self.sheet.cell(row=start_row_id, column=11).value = indicator.reportable.blueprint.get_calculation_formula_across_periods_display()
 
-                self.sheet.cell(row=start_row_id, column=16).value = indicator.time_period_start
-                self.sheet.cell(row=start_row_id, column=17).value = indicator.time_period_end
+                self.sheet.cell(row=start_row_id, column=12).value = partner_project.title
+                self.sheet.cell(row=start_row_id, column=13).value = partner_project.get_status_display()
+                self.sheet.cell(row=start_row_id, column=14).value = partner_activity.start_date
+                self.sheet.cell(row=start_row_id, column=15).value = partner_activity.end_date
 
-                self.sheet.cell(row=start_row_id, column=18).value = indicator.get_report_status_display()
-                self.sheet.cell(row=start_row_id, column=19).value = indicator.get_overall_status_display()
+                self.sheet.cell(row=start_row_id, column=16).value = indicator.reportable.baseline
+                self.sheet.cell(row=start_row_id, column=17).value = indicator.reportable.target
+                self.sheet.cell(row=start_row_id, column=18).value = indicator.reportable.total['c']
 
-                self.sheet.cell(row=start_row_id, column=20).value = indicator.submission_date
-                self.sheet.cell(row=start_row_id, column=21).value = cluster.id
-                self.sheet.cell(row=start_row_id, column=22).value = cluster_objective.id
-                self.sheet.cell(row=start_row_id, column=23).value = partner_activity.id
-                self.sheet.cell(row=start_row_id, column=24).value = indicator.reportable.blueprint.id
-                self.sheet.cell(row=start_row_id, column=25).value = partner_project.partner.id
-                self.sheet.cell(row=start_row_id, column=26).value = partner_project.id
-                self.sheet.cell(row=start_row_id, column=27).value = indicator.id
-                self.sheet.cell(row=start_row_id, column=28).value = location_data.id
+                self.sheet.cell(row=start_row_id, column=19).value = location_data.location.title
+                self.sheet.cell(row=start_row_id, column=20).value = location_data.location.gateway.name
+
+                # Iterate over location admin references:
+                if indicator.reportable.location_admin_refs:
+                    #TODO: add location_admin_refs if we fix admin panel to add any value there
+                    pass
+
+                self.sheet.cell(row=start_row_id, column=31).value = indicator.time_period_start
+                self.sheet.cell(row=start_row_id, column=32).value = indicator.time_period_end
+
+                self.sheet.cell(row=start_row_id, column=33).value = indicator.get_report_status_display()
+                self.sheet.cell(row=start_row_id, column=34).value = indicator.get_overall_status_display()
+
+                self.sheet.cell(row=start_row_id, column=35).value = indicator.submission_date
+                self.sheet.cell(row=start_row_id, column=36).value = cluster.id
+                self.sheet.cell(row=start_row_id, column=37).value = cluster_objective.id
+                self.sheet.cell(row=start_row_id, column=38).value = partner_activity.id
+                self.sheet.cell(row=start_row_id, column=39).value = indicator.reportable.blueprint.id
+                self.sheet.cell(row=start_row_id, column=40).value = partner_project.partner.id
+                self.sheet.cell(row=start_row_id, column=41).value = partner_project.id
+                self.sheet.cell(row=start_row_id, column=42).value = indicator.id
+                self.sheet.cell(row=start_row_id, column=43).value = location_data.id
 
                 # Check location item disaggregation type
                 for reported_disaggregation_type in location_data.disaggregation_reported_on:
@@ -193,15 +206,15 @@ class XLSXWriter:
             merged_sheet.cell(column=i, row=1).alignment = Alignment(horizontal='center')
             merged_sheet.cell(column=i, row=2).value = self.sheet.cell(column=i, row=2).value
             merged_sheet.cell(column=i, row=2).alignment = Alignment(horizontal='center')
-            merged_sheet.cell(column=i, row=3).value = self.sheet.cell(column=i, row=3).value
-            merged_sheet.cell(column=i, row=3).alignment = Alignment(horizontal='center')
+            merged_sheet.cell(column=i, row=4).value = self.sheet.cell(column=i, row=4).value
+            merged_sheet.cell(column=i, row=4).alignment = Alignment(horizontal='center')
 
         # Merge disaggregation types
         merged_disaggregations = list()
         for sheet in self.sheets:
             column = DISAGGREGATION_COLUMN_START
             while(True):
-                if sheet.cell(column=column, row=3).value != "#dis_type":
+                if sheet.cell(column=column, row=4).value != "#dis_type":
                     break
                 if (
                         sheet.cell(column=column, row=1).value,
@@ -228,7 +241,7 @@ class XLSXWriter:
         for sheet in self.sheets:
             column = DISAGGREGATION_COLUMN_START + len(merged_disaggregations)
             while (True):
-                if sheet.cell(column=column, row=3).value != "#dis_value":
+                if sheet.cell(column=column, row=4).value != "#dis_value":
                     break
                 if (
                         sheet.cell(column=column, row=1).value,
@@ -251,6 +264,43 @@ class XLSXWriter:
             merged_sheet.cell(column=DISAGGREGATION_COLUMN_START + len(merged_disaggregations) + idx, row=2).value = merged_disaggregation_value[1]
             merged_sheet.cell(column=DISAGGREGATION_COLUMN_START + len(merged_disaggregations) + idx, row=2).alignment = Alignment(
                 horizontal='center')
+
+        # Add Total column at the very end
+        merged_sheet.cell(column=DISAGGREGATION_COLUMN_START + len(merged_disaggregations) + len(merged_disaggregation_values), row=1).value = "Total"
+        merged_sheet.cell(column=DISAGGREGATION_COLUMN_START + len(merged_disaggregations) + len(merged_disaggregation_values), row=1).font = Font(bold=True)
+        merged_sheet.cell(column=DISAGGREGATION_COLUMN_START + len(merged_disaggregations) + len(merged_disaggregation_values), row=1).alignment = Alignment(horizontal='center')
+
+        # Merge data from all sheets
+        merged_row = INDICATOR_DATA_ROW_START
+        for sheet in self.sheets:
+            # Count columns
+            max_columns = 1
+            while(True):
+                # Stop condition
+                if sheet.cell(column=max_columns, row=1).value == "":
+                    max_columns -= 1
+                    return
+                max_columns += 1
+
+            sheet_row = INDICATOR_DATA_ROW_START
+            column = 1
+            while(True):
+                # Stop row condition
+                if sheet.cell(column=column, row=sheet_row).value == "":
+                    break
+                for column in range(max_columns):
+                    column += 1
+                    # If value
+                    if column < DISAGGREGATION_COLUMN_START:
+                        pass
+
+
+
+
+
+
+
+
 
 
 
@@ -288,7 +338,7 @@ class XLSXWriter:
             self.sheets.remove(s)
             self.wb.remove_sheet(s)
 
-        self.merge_sheets()
+        # self.merge_sheets()
 
         filepath = SAVE_PATH + 'export.xlsx'
         self.wb.save(filepath)
