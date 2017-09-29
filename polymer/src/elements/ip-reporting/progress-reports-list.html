@@ -94,10 +94,10 @@
               [[_withDefault(report.reporting_period)]]
             </div>
             <div class="table-cell table-cell--text cell-icon">
-              <template is="dom-if" if="[[_isDraft(report.is_draft)]]">
+              <template is="dom-if" if="[[report.is_draft]]">
                 <iron-icon icon="check"></iron-icon>
               </template>
-              <template is="dom-if" if="[[!_isDraft(report.is_draft)]]">
+              <template is="dom-if" if="[[!report.is_draft]]">
                 —
               </template>
             </div>
@@ -148,10 +148,6 @@
           type: Number,
           statePath: 'progressReports.count',
         },
-
-      },
-       _isDraft: function(is_draft) {
-        return is_draft;
       },
 
       _getPDLink: function (report) {
