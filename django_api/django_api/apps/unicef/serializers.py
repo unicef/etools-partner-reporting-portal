@@ -178,8 +178,13 @@ class ProgressReportSimpleSerializer(serializers.ModelSerializer):
 
 class ProgressReportSerializer(ProgressReportSimpleSerializer):
     programme_document = ProgrammeDocumentOutputSerializer()
-    indicator_reports = PDReportContextIndicatorReportSerializer(
-        read_only=True, many=True)
+    indicator_reports = serializers.SerializerMethodField()
+
+    def __init__(self, llo_id, location_id, *args, **kwargs):
+        self.llo_id = llo_id
+        self.location_id = location_id
+
+        super(ProgressReportSerializer, self).__init__(*args, **kwargs)
 
     class Meta:
         model = ProgressReport
@@ -196,8 +201,17 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
             'review_date',
             'sent_back_feedback',
             'programme_document',
-            'indicator_reports',
+            'indicator_reports'
         )
+
+    def get_indicator_reports(self, obj):
+        qset = obj.indicator_reports.all()
+        if self.llo_id is not None:
+            qset = qset.filter(reportable__object_id=self.llo_id)
+        if self.location_id is not None:
+            qset = qset.filter(reportable__locations__id=self.location_id)
+        return PDReportContextIndicatorReportSerializer(
+            instance=qset,read_only=True, many=True).data
 
     def get_reporting_period(self, obj):
         return "%s - %s " % (

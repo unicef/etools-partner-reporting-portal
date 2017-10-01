@@ -323,6 +323,8 @@ class ProgressReportDetailsAPIView(RetrieveAPIView):
         """
         self.workspace_id = workspace_id
         serializer = self.get_serializer(
+            request.GET.get('llo'),
+            request.GET.get('location'),
             self.get_object(pk)
         )
         return Response(serializer.data, status=statuses.HTTP_200_OK)
