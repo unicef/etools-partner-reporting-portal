@@ -206,9 +206,9 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
 
     def get_indicator_reports(self, obj):
         qset = obj.indicator_reports.all()
-        if self.llo_id is not None:
+        if self.llo_id and self.llo_id is not None:
             qset = qset.filter(reportable__object_id=self.llo_id)
-        if self.location_id is not None:
+        if self.location_id and self.llo_id is not None:
             qset = qset.filter(reportable__locations__id=self.location_id)
         return PDReportContextIndicatorReportSerializer(
             instance=qset,read_only=True, many=True).data
