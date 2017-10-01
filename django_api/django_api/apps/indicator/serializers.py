@@ -845,7 +845,9 @@ class IndicatorReportUpdateSerializer(serializers.ModelSerializer):
 
 
 class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
-
+    """
+    Used to represent an individual indicator report in the cluster.
+    """
     indicator_name = serializers.SerializerMethodField()
     reportable = IndicatorListSerializer()
     reporting_period = serializers.SerializerMethodField()
