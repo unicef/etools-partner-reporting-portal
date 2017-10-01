@@ -362,7 +362,7 @@ class ProgressReport(TimeStampedModel):
     sent_back_feedback = models.TextField(blank=True, null=True)
 
     class Meta:
-        ordering = ['-id']
+        ordering = ['-due_date', '-id']
 
     @cached_property
     def latest_indicator_report(self):

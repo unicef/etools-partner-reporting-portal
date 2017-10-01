@@ -180,10 +180,12 @@ class Reportable(TimeStampedExternalSyncModelMixin):
     target = models.CharField(max_length=255, null=True, blank=True)
     baseline = models.CharField(max_length=255, null=True, blank=True)
     assumptions = models.TextField(null=True, blank=True)
-    means_of_verification = models.CharField(max_length=255, null=True, blank=True)
+    means_of_verification = models.CharField(max_length=255,
+                                             null=True, blank=True)
     is_cluster_indicator = models.BooleanField(default=False)
 
-    # Current total, transactional and dynamically calculated based on IndicatorReports
+    # Current total, transactional and dynamically calculated based on
+    # IndicatorReports
     total = JSONField(default=dict([('c', 0), ('d', 0), ('v', 0)]))
 
     # unique code for this indicator within the current context
@@ -194,8 +196,10 @@ class Reportable(TimeStampedExternalSyncModelMixin):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
-    blueprint = models.ForeignKey(IndicatorBlueprint, null=True, related_name="reportables")
-    parent_indicator = models.ForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
+    blueprint = models.ForeignKey(IndicatorBlueprint, null=True,
+                                  related_name="reportables")
+    parent_indicator = models.ForeignKey('self', null=True, blank=True,
+                                         related_name='children', db_index=True)
     locations = models.ManyToManyField(
         'core.Location', related_name="reportables")
 
@@ -314,7 +318,7 @@ class IndicatorReport(TimeStampedModel):
 
 
     class Meta:
-        ordering = ['-id']
+        ordering = ['-due_date', '-id']
 
     overall_status = models.CharField(
         choices=OVERALL_STATUS,
