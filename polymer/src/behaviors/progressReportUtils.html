@@ -1,0 +1,15 @@
+<link rel="import" href="../settings.html">
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Behaviors = App.Behaviors || {};
+
+    App.Behaviors.ProgressReportUtilsBehavior = {
+      _isReadOnlyReport: function (report) {
+        return App.Settings.ip.readOnlyStatuses.indexOf(report.status) !== -1;
+      },
+    };
+  }());
+</script>
