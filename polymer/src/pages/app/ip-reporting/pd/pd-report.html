@@ -20,6 +20,7 @@
 <link rel="import" href="../../../../elements/ip-reporting/pd-modal.html">
 <link rel="import" href="../../../../endpoints.html">
 <link rel="import" href="../../../../behaviors/utils.html">
+<link rel="import" href="../../../../behaviors/progressReportUtils.html">
 <link rel="import" href="../../../../redux/store.html">
 <link rel="import" href="../../../../redux/actions.html">
 <link rel="import" href="../../../../redux/selectors/programmeDocumentReports.html">
@@ -162,6 +163,7 @@
       behaviors: [
         App.Behaviors.ReduxBehavior,
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ProgressReportUtilsBehavior,
       ],
 
       properties: {
@@ -231,7 +233,7 @@
 
       _onReportStatusChanged: function (currentReport, mode) {
         if (
-          ['Sub', 'Acc'].indexOf(currentReport.status) !== -1 &&
+          this._isReadOnlyReport(currentReport) &&
           (mode || '').toLowerCase !== 'view'
         ) {
           this.set('routeData.mode', 'view');
