@@ -6,5 +6,6 @@ from .models import User
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'first_name', 'last_name', 'profile', 'groups')
+        fields = ('id', 'email', 'first_name', 'last_name', 'profile',
+                  'groups')
         depth = 1
