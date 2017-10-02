@@ -9,6 +9,7 @@
 <link rel="import" href="../behaviors/pagination.html">
 <link rel="import" href="../behaviors/utils.html">
 <link rel="import" href="list-view-single-indicator.html">
+<link rel="import" href="list-placeholder.html">
 <link rel="import" href="../styles/table-styles.html">
 
 <dom-module id="list-view-indicators">
@@ -58,6 +59,8 @@
           indicator="{{indicator}}">
         </list-view-single-indicator>
       </template>
+
+      <list-placeholder data="[[data]]"></list-placeholder>
 
       <etools-data-table-footer
           page-size="[[pageSize]]"
