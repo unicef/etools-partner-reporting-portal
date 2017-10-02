@@ -52,9 +52,6 @@
         <etools-data-table-column field="groups">
           <div class="table-column">Disaggregation Groups</div>
         </etools-data-table-column>
-        <etools-data-table-column field="createdBy">
-          <div class="table-column">Created By</div>
-        </etools-data-table-column>
       </etools-data-table-header>
 
       <template
@@ -69,12 +66,7 @@
               [[disaggregation.name]]
             </div>
             <div class="table-cell table-cell--text">
-              <template is="dom-repeat" items="[[disaggregation.choices]]" as="choice">
-                [[choice.value]];
-              </template>
-            </div>
-            <div class="table-cell table-cell--text">
-              TODO: CREATED BY
+                [[_formatChoices(disaggregation)]]
             </div>
           </div>
         </etools-data-table-row>
@@ -108,7 +100,7 @@
       properties: {
         loading: {
           type: Boolean,
-          statePath: 'clusterDisaggregations.loading'
+          statePath: 'clusterDisaggregations.loading',
         },
 
         disaggregations: {
@@ -119,6 +111,12 @@
           type: Number,
           statePath: 'clusterDisaggregations.count',
         },
+      },
+
+      _formatChoices: function(data) {
+        return data.choices.map(function(choice) {
+          return choice.value;
+        }).join(', ');
       },
 
     });

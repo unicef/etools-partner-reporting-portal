@@ -110,6 +110,7 @@
         id="indicators"
         url="[[indicatorsUrl]]"
         method="post"
+        body="[[data]]"
         content-type="application/json">
     </etools-prp-ajax>
 
@@ -506,7 +507,6 @@
         if (!freq) {
           return;
         }
-
         this.set('data.frequency', freq.id);
       },
 
