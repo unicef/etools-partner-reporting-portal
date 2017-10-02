@@ -38,7 +38,7 @@
         if="[[!loading]]">
       <template
           is="dom-repeat"
-          items="[[data]]">
+          items="[[viewData]]">
         <pd-output
             data="[[item]]"
             override-mode="[[overrideMode]]">
@@ -67,6 +67,17 @@
           type: Array,
           statePath: App.Selectors.LLOs.all,
         },
+
+        viewData: {
+          type: Array,
+          computed: '_computeViewData(data)',
+        },
+      },
+
+      _computeViewData: function (data) {
+        return data.filter(function (item) {
+          return Boolean(item.indicator_reports.length);
+        });
       },
     });
   </script>
