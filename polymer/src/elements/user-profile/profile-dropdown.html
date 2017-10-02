@@ -1,0 +1,217 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../../../bower_components/iron-collapse/iron-collapse.html">
+<link rel="import" href="../../../bower_components/iron-icons/social-icons.html">
+<!-- <link rel="import" href="../../../bower_components/etools-dialog/etools-dialog.html"> -->
+<link rel="import" href="../../lodash/lodash.html">
+
+<link rel="import" href="user-profile-dialog.html">
+<!--
+`etools-profile-dropdown`
+User profile dropdown for header toolbar
+@demo demo/index.html 
+-->
+
+<dom-module id="etools-profile-dropdown">
+  <template>
+    <style>
+      :host {
+        @apply(--layout-horizontal);
+        @apply(--layout-center);
+        @apply(--layout-center-justified);
+        position: relative;
+        width: 60px;
+        height: 60px;
+      }
+      :host([opened="open"]) {
+        background: var(--primary-background-color, #FFFFFF);
+      }
+      :host([opened="open"]) #profile,
+      #accountProfile, #powerSettings {
+        color: var(--dark-scondary-text-color, rgba(0, 0, 0, 0.54));
+      }
+      #profile {
+        color: var(--header-secondary-text-color, rgba(255, 255, 255, 0.7));
+      }
+      .dropdown-content {
+        position: absolute;
+        top: 60px;
+        z-index: 100;
+        background: var(--primary-background-color, #FFFFFF);
+        padding: 8px 0;
+        right: 0px;
+      }
+      .dropdown-content .item {
+        height: 48px;
+        font-size: 16px;
+        color: rgba(0, 0, 0, 0.87);
+        @apply(--layout-horizontal);
+        @apply(--layout-center);
+        padding: 0 16px 0 8px;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .dropdown-content .item:hover {
+        background: var(--medium-theme-background-color, #EEEEEE);
+      }
+    </style>
+    <paper-icon-button id="profile" icon="social:person" role="button" on-tap="_handleTap"
+                       aria-disabled="false"></paper-icon-button>
+    <iron-collapse id="userDropdown">
+      <paper-material elevation="5" class="dropdown-content" id="user-dropdown">
+        <div class="item" on-tap="_openUserProfileDialog">
+          <paper-icon-button id="accountProfile" icon="account-circle"></paper-icon-button>
+          Profile
+        </div>
+        <div class="item" on-tap="_logout">
+          <paper-icon-button id="powerSettings" icon="power-settings-new"></paper-icon-button>
+          Sign out
+        </div>
+      </paper-material>
+    </iron-collapse>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'etools-profile-dropdown',
+      properties: {
+        opened: {
+          type: String,
+          value: '',
+          reflectToAttribute: true
+        },
+        userProfileDialog: Object,
+        /**
+         *
+         * Expected structure of array elements :
+         *
+         *      el = {
+         *        label: 'element label',
+         *        value: '234'
+         *      }
+         * @type (ArrayBuffer|ArrayBufferView)
+         */
+        sections: {
+          type: Array,
+          notify: true
+        },
+        /**
+         *
+         * Expected structure of array elements :
+         *
+         *      el = {
+         *        label: 'element label',
+         *        value: '234'
+         *      }
+         * @type (ArrayBuffer|ArrayBufferView)
+         */
+        offices: {
+          type: Array,
+          notify: true,
+        },
+        /**
+         *
+         * Expected structure of array elements :
+         *
+         *      user = {
+         *        label: user.full_name,
+         *        value: user.id
+         *      }
+         * @type (ArrayBuffer|ArrayBufferView)
+         */
+        users: {
+          type: Object,
+          notify: true
+        },
+        /**
+         *
+         *  Profile object should be according to api endpoint
+         *  `/users/myprofile/`
+         *  and all modifications should be POSTed to the same endpoint
+         */
+        profile: {
+          type: Object,
+          notify: true
+        },
+        _loadingProfileMsgActive: Boolean
+      },
+      observers: [
+        '_dataLoaded(sections, offices,users,profile)',
+      ],
+      ready: function() {
+        this.userProfileDialog = document.createElement('user-profile-dialog');
+        this.userProfileDialog.setAttribute('id', 'userProfileDialog');
+        // this.userProfileDialog.addEventListener('hacky-save', function(e) {
+        //   this.fire('save-profile', e.detail)
+        // }.bind(this), false);
+        Polymer.dom(document.querySelector('body')).appendChild(this.userProfileDialog);
+      },
+      attached: function() {
+        document.addEventListener('click', this._onCaptureClick.bind(this), true);
+      },
+      detached: function() {
+        if (this.userProfileDialog) {
+          Polymer.dom(document.querySelector('body')).removeChild(this.userProfileDialog);
+        }
+      },
+      _dataLoaded: function() {
+        if (this._allHaveValues('users', 'profile', 'offices', 'sections')) {
+          this.userProfileDialog.profile = this.profile;
+          this.userProfileDialog.offices = this.offices;
+          this.userProfileDialog.users = this.users;
+          this.userProfileDialog.sections = this.sections;
+          if (this._loadingProfileMsgActive) {
+            this.set('_loadingProfileMsgActive', false);
+            this.fire('global-loading');
+          }
+        }
+      },
+      _allHaveValues: function() {
+        var self = this;
+        var args = _.toArray(arguments);
+        return args.reduce(function(hasVal, prop) {
+          return !_.isEmpty(self[prop]) && hasVal;
+        }, true);
+      },
+      _logout: function() {
+        this.fire('sign-out');
+      },
+      _openUserProfileDialog: function(event) {
+        this.userProfileDialog.openUserProfileDialog();
+        if (!this._allHaveValues('users', 'profile', 'offices', 'sections')) {
+          this.fire('global-loading', {active: true, message: 'Loading profile...'});
+          this.set('_loadingProfileMsgActive', true);
+        }
+      },
+      _handleTap: function(e) {
+        this.$.userDropdown.toggle();
+        if (this.opened) {
+          this.set('opened', '');
+        } else {
+          this.set('opened', 'open');
+        }
+      },
+      _onCaptureClick: function(e) {
+        if (this._isInPath(Polymer.dom(e).path, 'id', 'profile')) {
+          return;
+        }
+        if (!this._isInPath(Polymer.dom(e).path, 'id', 'user-dropdown')) {
+          if (this.$.userDropdown.opened) {
+            this._handleTap();
+          }
+        }
+      },
+      _isInPath: function(path, prop, value) {
+        path = path || [];
+        for (var i = 0; i < path.length; i++) {
+          if (path[i][prop] === value) {
+            return true;
+          }
+        }
+        return false;
+      },
+    });
+  </script>
+</dom-module>

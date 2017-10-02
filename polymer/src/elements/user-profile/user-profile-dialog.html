@@ -1,0 +1,236 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/paper-material/paper-material.html">
+
+<link rel="import" href="../../../bower_components/etools-dialog/etools-dialog.html">
+<link rel="import"
+      href="../../../bower_components/etools-searchable-multiselection-menu/etools-searchable-multiselection-menu.html">"
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<dom-module id="user-profile-dialog">
+  <template>
+    <style>
+      [hidden] {
+        display: none !important;
+      }
+      :host {
+        --etools-checkable-input-label: {
+          font-size: 14px;
+        };
+        --paper-dialog-scrollable: {
+          width: 100%;
+          overflow-x: hidden;
+          max-height: 600px;
+        };
+      }
+      etools-checkable-input:not(:last-of-type) {
+        margin-right: 30px;
+      }
+      paper-input,
+      paper-material {
+        width: 100%;
+      }
+      paper-material {
+        padding: 0;
+      }
+      #profile-content {
+        overflow: hidden;
+        box-sizing: border-box;
+        @apply(--user-profile-dropdown-content);
+      }
+      .row-h {
+        @apply(--layout-horizontal);
+      }
+      .flex-c {
+        /* flex container */
+        @apply(--layout-flex);
+      }
+      .row-h + .row-h, .row-v + .row-v {
+        margin-top: 20px;
+      }
+      .row-h:first-child + .row-v {
+        margin-top: 0;
+      }
+      .col {
+        @apply(--layout-horizontal);
+        box-sizing: border-box;
+      }
+      .col:not(:first-child) {
+        padding-left: 24px;
+      }
+      .col-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+      }
+      .col-12 {
+        flex: 0 0 100%;
+        max-width: 100%;
+      }
+    </style>
+
+    <etools-dialog id="userProfileDialog" size="lg" ok-btn-text="Save" dialog-title="My Profile"
+                   on-close="_closeUserProfileDialog">
+      <div id="profile-content">
+        <div class="row-h flex-c">
+          <div class="col col-6">
+            <etools-searchable-multiselection-menu id="office"
+                                                   label="Office"
+                                                   placeholder="&#8212;"
+                                                   selected="{{profile.office}}"
+                                                   options="[[offices]]"
+                                                   update-selected
+                                                   no-change-event
+                                                   auto-validate
+                                                   error-message="Please select an office">
+            </etools-searchable-multiselection-menu>
+          </div>
+          <div class="col col-6">
+            <etools-searchable-multiselection-menu id="section"
+                                                   label="Section"
+                                                   placeholder="&#8212;"
+                                                   selected="{{profile.section}}"
+                                                   options="[[sections]]"
+                                                   update-selected
+                                                   no-change-event
+                                                   auto-validate
+                                                   error-message="Please select a section">
+            </etools-searchable-multiselection-menu>
+          </div>
+        </div>
+        <div class="row-h flex-c">
+          <div class="col col-6">
+            <paper-input label="Job title" value="{{profile.job_title}}" placeholder="&#8212;"></paper-input>
+          </div>
+          <div class="col col-6">
+            <paper-input label="Phone number" value="{{profile.phone_number}}" placeholder="&#8212;"></paper-input>
+          </div>
+        </div>
+        <div class="row-h flex-c">
+          <div class="col col-6">
+            <paper-input id="supervisor"
+                         label="My supervisor"
+                         placeholder="&#8212;"
+                         value="[[profile.supervisor]]"
+                         readonly>
+            </paper-input>
+          </div>
+          <div class="col col-6">
+            <etools-searchable-multiselection-menu id="oic"
+                                                   label="My OIC"
+                                                   placeholder="&#8212;"
+                                                   selected="{{profile.oic}}"
+                                                   options="[[users]]"
+                                                   update-selected
+                                                   no-change-event
+                                                   auto-validate
+                                                   error-message="Please select an OIC">
+            </etools-searchable-multiselection-menu>
+          </div>
+        </div>
+        <div class="row-h flex-c">
+          <div class="col col-12">
+            <etools-searchable-multiselection-menu id="workspaces"
+                                                   label="Available workspaces"
+                                                   placeholder="&#8212;"
+                                                   selected="[[availableCountryIds]]"
+                                                   options="[[profile.countries_available]]"
+                                                   custom-object-options
+                                                   update-selected
+                                                   option-value="id"
+                                                   option-label="name"
+                                                   no-change-event
+                                                   multi
+                                                   readonly>
+            </etools-searchable-multiselection-menu>
+          </div>
+        </div>
+        <div class="row-h flex-c">
+          <div class="col col-12">
+            <etools-searchable-multiselection-menu id="groups"
+                                                   label="My Groups"
+                                                   placeholder="&#8212;"
+                                                   selected="[[availableGroups]]"
+                                                   options="[[profile.groups]]"
+                                                   custom-object-options
+                                                   update-selected
+                                                   option-value="id"
+                                                   option-label="name"
+                                                   no-change-event
+                                                   multi
+                                                   readonly>
+            </etools-searchable-multiselection-menu>
+          </div>
+        </div>
+        <div class="row-h flex-c">
+          <div class="col col-12">
+            <etools-searchable-multiselection-menu id="supervisees"
+                                                   label="My supervisees"
+                                                   placeholder="&#8212;"
+                                                   selected="[[profile.supervisees]]"
+                                                   options="[[users]]"
+                                                   custom-object-options
+                                                   update-selected
+                                                   multi
+                                                   readonly>
+            </etools-searchable-multiselection-menu>
+          </div>
+        </div>
+      </div>
+
+
+      </div>
+    </etools-dialog>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+      Polymer({
+        is: 'user-profile-dialog',
+        properties: {
+          profile: {
+            type: Object,
+            notify: true
+          },
+          availableCountryIds: Array,
+          availableGroups: Array,
+        },
+        observers: [
+          '_mapIds(profile)'
+        ],
+        openUserProfileDialog: function() {
+          this.$.userProfileDialog.opened = true;
+        },
+        _centerDialog: function() {
+          var d = Polymer.dom(this.$.userProfileDialog.root).querySelector('paper-dialog');
+          if (d) {
+            d.center();
+          }
+        },
+        _closeUserProfileDialog: function(event) {
+          if (event.detail.confirmed) {
+            this.saveData();
+          }
+        },
+        _mapIds: function(profile) {
+          var availableCountryIds = _.map(this.profile.countries_available, 'id');
+          var availableGroups = _.map(this.profile.groups, 'id');
+          this.set('availableCountryIds', availableCountryIds);
+          this.set('availableGroups', availableGroups);
+        },
+        resetData: function() {
+          this.set('profile', JSON.parse(JSON.stringify(this.userProfileModel)));
+        },
+        saveData: function() {
+          this.fire('hacky-save', {profile: this.profile});
+        },
+        _convertOffices: function(data) {
+          var offices = data.map(function(office) {
+            return {label: office.name, value: office.id}
+          });
+          this.set('allOffices', offices);
+        }
+      });
+    })();
+  </script>
+</dom-module>

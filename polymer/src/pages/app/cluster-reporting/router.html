@@ -8,10 +8,12 @@
 <link rel="import" href="../../../../bower_components/etools-loading/etools-loading.html">
 <link rel="import" href="../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
+<link rel="import" href="../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../styles/app-theme-cluster.html">
 <link rel="import" href="../../../redux/store.html">
 <link rel="import" href="../../../redux/actions.html">
 <link rel="import" href="../../../behaviors/utils.html">
+<link rel="import" href="../../../behaviors/routing.html">
 <link rel="import" href="../../../elements/cluster-reporting/nav.html">
 <link rel="import" href="../../../elements/cluster-reporting/app-header.html">
 
@@ -149,6 +151,7 @@
       behaviors: [
         App.Behaviors.UtilsBehavior,
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.RoutingBehavior,
       ],
 
       properties: {
@@ -211,6 +214,7 @@
         }
 
       },
+
     });
   </script>
 </dom-module>
