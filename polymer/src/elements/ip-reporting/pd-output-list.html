@@ -2,7 +2,8 @@
 <link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
 
-<link rel="import" href="../../elements/ip-reporting/pd-output.html">
+<link rel="import" href="../list-placeholder.html">
+<link rel="import" href="../ip-reporting/pd-output.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/selectors/llos.html">
 
@@ -44,6 +45,11 @@
             override-mode="[[overrideMode]]">
         </pd-output>
       </template>
+
+      <list-placeholder
+          data="[[viewData]]"
+          loading="[[loading]]">
+      </list-placeholder>
     </template>
   </template>
 
