@@ -275,15 +275,15 @@
                 required>
             </etools-multi-selection-menu>
           </div>
-          
+
           <div class="row">
             <h2>Disaggregations ([[selectedDisaggregations.length]])</h2>
           </div>
           <div class="row">
-          
+
             <template is="dom-repeat" items="[[selectedDisaggregations]]" as="dataDisagg">
 
-              <div class="rowDis layout horizontal"">
+              <div class="rowDis layout horizontal">
 
                 <div class="flex-none layout vertical center-center col-actions">
                   <paper-icon-button
@@ -316,19 +316,19 @@
                     </paper-listbox>
                   </paper-dropdown-menu>
                 </div>
-              
+
                 <div class="col-values">
                   <paper-input
                     index="[[index]]"
                     label="Disaggregation Groups"
-                    value="[[_formatChoices(dataDisagg, index)]]"
+                    value="[[_formatChoices(dataDisagg)]]"
                     always-float-label
                     disabled>
                   </paper-input>
                 </div>
               </div>
             </template>
-    
+
             <paper-button
               class="btn-primary add-disaggregation-btn"
               on-tap="_add"
@@ -525,31 +525,31 @@
       },
 
       _setDisaggregation: function (e, data) {
-        this.async(function() {
           let index = +e.target.index;
-        console.log('index', index)
+
         let id;
         if (data.value) id = data.value.name
+
         let selected
         if (id) {
           selected = this.disaggregations.find((dis) => dis.id == id)
         }
+
+        var newSelectedDisaggregations;
+
         if (selected) {
-          this.set(['selectedDisaggregations', index], selected)
+          newSelectedDisaggregations = this.selectedDisaggregations.slice();
+
+          newSelectedDisaggregations[index] = selected;
+
+          this.set('selectedDisaggregations', newSelectedDisaggregations);
         }
-        console.log('set', this.selectedDisaggregations)
-      }, 100)
-        
       },
 
-      _formatChoices: function(selected, index) {
-        console.log('format', index, selected.name)
-        if (selected.name) {
-          return selected.choices.map((choice) => choice.value).join(', ')
-        }
-        else {
-          return ''
-        }
+      _formatChoices: function(selected) {
+        return selected.choices.map(function (choice) {
+          return choice.value;
+        }).join(', ');
       },
 
       _setLocations: function () {
@@ -692,9 +692,9 @@
         fields.forEach(function (field) {
           field.validate();
         });
-        
+
         this._checkMatchingDisaggregation();
-        
+
 
         valid = fields.every(function (field) {
           return !field.invalid;
