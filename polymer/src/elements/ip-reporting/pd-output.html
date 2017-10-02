@@ -167,14 +167,14 @@
                       if="[[_equals(indicator.reportable.blueprint.display_type, 'number')]]"
                       restamp="true">
                     <dd class="flex">
-                      <etools-prp-number value="[[indicator.total.v]]"></etools-prp-number>
+                      <etools-prp-number value="[[indicator.reportable.achieved.v]]"></etools-prp-number>
                     </dd>
                   </template>
                   <template
                       is="dom-if"
                       if="[[_equals(indicator.reportable.blueprint.display_type, 'percentage')]]"
                       restamp="true">
-                    <dd class="flex">[[_toPercentage(indicator.total.c)]]</dd>
+                    <dd class="flex">[[_toPercentage(indicator.reportable.achieved.c)]]</dd>
                   </template>
                 </dl>
                 <dl class="layout horizontal justified">
@@ -183,13 +183,13 @@
                       is="dom-if"
                       if="[[_equals(indicator.reportable.blueprint.display_type, 'number')]]"
                       restamp="true">
-                    <dd class="flex">[[_withDefault(indicator.reportable.achieved.v)]]</dd>
+                    <dd class="flex">[[_withDefault(indicator.total.v)]]</dd>
                   </template>
                   <template
                       is="dom-if"
                       if="[[_equals(indicator.reportable.blueprint.display_type, 'percentage')]]"
                       restamp="true">
-                    <dd class="flex">[[_toPercentage(indicator.reportable.achieved.c)]]</dd>
+                    <dd class="flex">[[_toPercentage(indicator.total.c)]]</dd>
                   </template>
                 </dl>
               </div>

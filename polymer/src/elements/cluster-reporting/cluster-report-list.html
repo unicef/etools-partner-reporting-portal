@@ -11,6 +11,7 @@
 <link rel="import" href="../../behaviors/pagination.html">
 <link rel="import" href="../../behaviors/data-table.html">
 <link rel="import" href="../confirm-box.html">
+<link rel="import" href="../list-placeholder.html">
 <link rel="import" href="cluster-report-proxy.html">
 
 <dom-module id="cluster-report-list">
@@ -60,6 +61,11 @@
           </div>
         </etools-data-table-row>
       </template>
+
+      <list-placeholder
+          data="[[data]]"
+          loading="[[loading]]">
+      </list-placeholder>
 
       <etools-loading active="[[loading]]"></etools-loading>
     </div>

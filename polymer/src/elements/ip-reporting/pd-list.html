@@ -10,6 +10,7 @@
 
 <link rel="import" href="../report-status.html">
 <link rel="import" href="../etools-prp-number.html">
+<link rel="import" href="../list-placeholder.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/data-table.html">
 <link rel="import" href="../../behaviors/pagination.html">
@@ -116,6 +117,11 @@
           </div>
         </etools-data-table-row>
       </template>
+
+      <list-placeholder
+          data="[[data]]"
+          loading="[[loading]]">
+      </list-placeholder>
 
       <etools-data-table-footer
           page-size="[[pageSize]]"

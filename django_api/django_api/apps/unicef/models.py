@@ -67,9 +67,12 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
         verbose_name='Document Type'
     )
 
-    reference_number = models.CharField(max_length=255, verbose_name='Reference Number')
+    reference_number = models.CharField(max_length=255,
+                                        verbose_name='Reference Number',
+                                        db_index=True)
     title = models.CharField(max_length=255,
-                             verbose_name='PD/SSFA ToR Title')
+                             verbose_name='PD/SSFA ToR Title',
+                             db_index=True)
     unicef_office = models.CharField(max_length=255,
                                      verbose_name='UNICEF Office(s)')
 
@@ -359,7 +362,7 @@ class ProgressReport(TimeStampedModel):
     sent_back_feedback = models.TextField(blank=True, null=True)
 
     class Meta:
-        ordering = ['-id']
+        ordering = ['-due_date', '-id']
 
     @cached_property
     def latest_indicator_report(self):

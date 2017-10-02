@@ -571,7 +571,7 @@ class PDReportContextIndicatorReportSerializer(serializers.ModelSerializer):
     """
     A serializer for IndicatorReport model but specific information
     that is helpful in IP reporting from a Programme Document / Progress
-    Report perspective.
+    Report perspective (TODO: specify what is PD specfic?).
     """
     id = serializers.SerializerMethodField()
     reporting_period = serializers.SerializerMethodField()
@@ -611,10 +611,12 @@ class PDReportContextIndicatorReportSerializer(serializers.ModelSerializer):
         return obj.reportable.object_id
 
     def get_submission_date(self, obj):
-        return obj.submission_date and obj.submission_date.strftime(settings.PRINT_DATA_FORMAT)
+        return obj.submission_date and obj.submission_date.strftime(
+            settings.PRINT_DATA_FORMAT)
 
     def get_due_date(self, obj):
-        return obj.due_date and obj.due_date.strftime(settings.PRINT_DATA_FORMAT)
+        return obj.due_date and obj.due_date.strftime(
+            settings.PRINT_DATA_FORMAT)
 
 
 class IndicatorBlueprintSerializer(serializers.ModelSerializer):
@@ -843,7 +845,9 @@ class IndicatorReportUpdateSerializer(serializers.ModelSerializer):
 
 
 class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
-
+    """
+    Used to represent an individual indicator report in the cluster.
+    """
     indicator_name = serializers.SerializerMethodField()
     reportable = IndicatorListSerializer()
     reporting_period = serializers.SerializerMethodField()

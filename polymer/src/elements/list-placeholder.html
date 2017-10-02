@@ -1,0 +1,48 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="list-placeholder">
+  <template>
+    <style>
+      .msg {
+        text-align: center;
+      }
+    </style>
+
+    <p class="msg">No results found</p>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'list-placeholder',
+
+      properties: {
+        data: Array,
+
+        loading: {
+          type: Boolean,
+          value: false,
+        },
+
+        hidden: {
+          type: Boolean,
+          reflectToAttribute: true,
+          computed: '_computeHidden(data, loading)',
+        },
+
+        ariaHidden: {
+          type: Boolean,
+          reflectToAttribute: true,
+          computed: '_computeAriaHidden(hidden)',
+        },
+      },
+
+      _computeHidden: function (data, loading) {
+        return loading || !!data.length;
+      },
+
+      _computeAriaHidden: function (hidden) {
+        return hidden ? 'true' : 'false';
+      },
+    });
+  </script>
+</dom-module>

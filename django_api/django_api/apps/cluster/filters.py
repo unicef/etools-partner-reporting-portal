@@ -1,4 +1,5 @@
 from django.db.models import Q
+
 import django_filters
 from django_filters.filters import CharFilter
 
@@ -68,10 +69,13 @@ class ClusterIndicatorsFilter(django_filters.FilterSet):
         ]
 
     def get_submitted(self, queryset, name, value):
+        """TODO: assuming accepted should be returned in submited as well."""
+        q_filter = Q(report_status=INDICATOR_REPORT_STATUS.submitted) | \
+            Q(report_status=INDICATOR_REPORT_STATUS.accepted)
         if value == "1":
-            return queryset.filter(report_status=INDICATOR_REPORT_STATUS.submitted)
+            return queryset.filter(q_filter)
         else:
-            return queryset.exclude(report_status=INDICATOR_REPORT_STATUS.submitted)
+            return queryset.exclude(q_filter)
 
     def get_cluster(self, queryset, name, value):
         return queryset.filter(

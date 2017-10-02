@@ -1,4 +1,10 @@
-from itertools import combinations
+"""
+Disaggregated data handling.
+
+Classes that handle the saving, sub-total caluclations etc. relating to
+indicator location data being saved for any disaggregation types.
+"""
+
 
 from core.helpers import (
     generate_data_combination_entries,
@@ -12,11 +18,17 @@ from indicator.models import Reportable, IndicatorReport, IndicatorBlueprint
 class BaseDisaggregator(object):
     """
     A class for disaggregation processing.
-    Each staticmethod should accept a Python dictionary
-    that represents a serialized IndicatorReport object.
+    Each staticmethod should accept a Python dictionary that represents a
+    serialized IndicatorLocationData object.
     """
     @staticmethod
-    def post_process():
+    def post_process(indicator_location_data):
+        """
+        Main goals of this function call are to:
+        #1 calculate all the sub-totals needed for the indicator location
+        data, based on level reported.
+        #2 Update the total on the indicator report itself.
+        """
         raise NotImplementedError()
 
 
