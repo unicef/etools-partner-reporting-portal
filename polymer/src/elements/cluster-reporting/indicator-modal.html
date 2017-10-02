@@ -525,7 +525,8 @@
       },
 
       _setDisaggregation: function (e, data) {
-        let index = +e.target.index;
+        this.async(function() {
+          let index = +e.target.index;
         console.log('index', index)
         let id;
         if (data.value) id = data.value.name
@@ -537,6 +538,8 @@
           this.set(['selectedDisaggregations', index], selected)
         }
         console.log('set', this.selectedDisaggregations)
+      }, 100)
+        
       },
 
       _formatChoices: function(selected, index) {
