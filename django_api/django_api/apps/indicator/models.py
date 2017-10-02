@@ -453,33 +453,35 @@ def recalculate_reportable_total(sender, instance, **kwargs):
         'v': 0,
     }
 
-    # If unit choice is NUMBER then have to handle sum, avg, max
-    if blueprint.unit == IndicatorBlueprint.NUMBER:
-        reportable_total['d'] = 1
+    if accepted_indicator_reports.count() > 0:
+        # If unit choice is NUMBER then have to handle sum, avg, max
+        if blueprint.unit == IndicatorBlueprint.NUMBER:
+            reportable_total['d'] = 1
 
-        if blueprint.calculation_formula_across_periods == IndicatorBlueprint.MAX:
-            max_total_ir = max(
-                accepted_indicator_reports,
-                key=lambda item: item.total['v'])
-            reportable_total = max_total_ir.total
-        else:   # if its SUM or avg then add data up
+            if blueprint.calculation_formula_across_periods == IndicatorBlueprint.MAX:
+                max_total_ir = max(
+                    accepted_indicator_reports,
+                    key=lambda item: item.total['v'])
+                reportable_total = max_total_ir.total
+            else:   # if its SUM or avg then add data up
+                for indicator_report in accepted_indicator_reports:
+                    reportable_total['v'] += indicator_report.total['v']
+                    reportable_total['c'] += indicator_report.total['c']
+
+                if blueprint.calculation_formula_across_periods == IndicatorBlueprint.AVG:
+                    ir_count = accepted_indicator_reports.count()
+                    if ir_count > 0:
+                        reportable_total['v'] = reportable_total['v'] / (ir_count * 1.0)
+                        reportable_total['c'] = reportable_total['c'] / (ir_count * 1.0)
+
+        # if unit is PERCENTAGE, doesn't matter if calc choice was percent or ratio
+        elif blueprint.unit == IndicatorBlueprint.PERCENTAGE:
             for indicator_report in accepted_indicator_reports:
                 reportable_total['v'] += indicator_report.total['v']
-                reportable_total['c'] += indicator_report.total['c']
+                reportable_total['d'] += indicator_report.total['d']
 
-            if blueprint.calculation_formula_across_periods == IndicatorBlueprint.AVG:
-                ir_count = accepted_indicator_reports.count()
-
-                reportable_total['v'] = reportable_total['v'] / (ir_count * 1.0)
-                reportable_total['c'] = reportable_total['c'] / (ir_count * 1.0)
-
-    # if unit is PERCENTAGE, doesn't matter if calc choice was percent or ratio
-    elif blueprint.unit == IndicatorBlueprint.PERCENTAGE:
-        for indicator_report in accepted_indicator_reports:
-            reportable_total['v'] += indicator_report.total['v']
-            reportable_total['d'] += indicator_report.total['d']
-
-        reportable_total['c'] = reportable_total['v'] / (reportable_total['d'] * 1.0)
+            if reportable_total['d'] != 0:
+                reportable_total['c'] = reportable_total['v'] / (reportable_total['d'] * 1.0)
 
     reportable.total = reportable_total
     reportable.save()
