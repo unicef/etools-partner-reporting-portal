@@ -16,7 +16,6 @@
 <link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-multi-selection-menu.html">
 
 <link rel="import" href="../../polyfills/es6-shim.html">
-<link rel="import" href="disaggregation-dropdown-widget.html">
 <link rel="import" href="chip-date-of-report.html">
 <link rel="import" href="../labelled-item.html">
 <link rel="import" href="../etools-prp-chips.html">
@@ -47,7 +46,7 @@
         };
       }
 
-      h2 {
+      .disagg-header {
         padding: 5px 10px;
         margin: 0 0 1em;
         font-size: 14px;
@@ -277,7 +276,7 @@
           </div>
 
           <div class="row">
-            <h2>Disaggregations ([[selectedDisaggregations.length]])</h2>
+            <h2 class="disagg-header">Disaggregations ([[selectedDisaggregations.length]])</h2>
           </div>
           <div class="row">
 
@@ -396,7 +395,7 @@
 
         disaggregationsUrl: {
           type: String,
-          computed: '_computeDisaggregationsUrl(responsePlanId)'
+          computed: '_computeDisaggregationsUrl(responsePlanId)',
         },
 
         indicatorsUrl: {
@@ -423,7 +422,7 @@
         invalid: {
           type: Boolean,
           notify: true,
-          value: true
+          value: true,
         },
 
         selectedLocations: {
@@ -433,7 +432,7 @@
 
         selectedDisaggregations: {
           type: Array,
-          value: []
+          value: [],
         },
 
         frequencies: {
@@ -461,17 +460,17 @@
 
       disaggregations: {
         type: Array,
-        value: []
+        value: [],
       },
 
       disaggregation: {
         type: Array,
-        value: []
+        value: [],
       },
 
       disagg: {
         type: Object,
-        value: {}
+        value: {},
       },
       _canAddMore: {
           type: Boolean,
@@ -504,7 +503,6 @@
 
       _setFrequency: function (e, data) {
         var freq = this.$$('#frequencies').itemForElement(data.value);
-        console.log(freq)
         if (!freq) {
           return;
         }
@@ -525,14 +523,17 @@
       },
 
       _setDisaggregation: function (e, data) {
-          let index = +e.target.index;
+          var index = +e.target.index;
 
-        let id;
-        if (data.value) id = data.value.name
+        var id;
+        if (data.value) {
+          id = data.value.name;
+        }
 
-        let selected
+        var selected;
         if (id) {
-          selected = this.disaggregations.find((dis) => dis.id == id)
+          selected = this.disaggregations.find(function(dis) {
+            return dis.id === id;});
         }
 
         var newSelectedDisaggregations;
@@ -570,12 +571,12 @@
 
       _setDisaggregations: function () {
         var selected = this.selectedDisaggregations ?
-        this.selectedDisaggregations.map((dis) => {
+        this.selectedDisaggregations.map(function(dis) {
           return {
-            id: dis.id
-          }
+            id: dis.id,
+          };
         }) : [];
-        this.set('data.disaggregation', selected)
+        this.set('data.disaggregation', selected);
       },
 
       _onValueChanged: function (e) {
@@ -590,8 +591,8 @@
         if (!opened) {
           return;
         }
-        this.set('selectedLocations', [])
-        this.set('selectedDisaggregations', [])
+        this.set('selectedLocations', []);
+        this.set('selectedDisaggregations', []);
 
         this.set('data', {
           cs_dates: [],
@@ -619,7 +620,7 @@
       },
 
       _computeDisaggregationsUrl: function(responsePlanId) {
-        return App.Endpoints.responseParametersClusterDisaggregations(responsePlanId)
+        return App.Endpoints.responseParametersClusterDisaggregations(responsePlanId);
       },
 
       _fetchLocations: function () {
@@ -635,8 +636,8 @@
         var self = this;
         this.$.disaggregations.thunk()()
           .then(function(res) {
-            self.set('disaggregations', res.data.results)
-          })
+            self.set('disaggregations', res.data.results);
+          });
       },
 
       _formatLocation: function (data) {
@@ -666,18 +667,21 @@
       },
 
       _checkMatchingDisaggregation: function() {
-        let chosen = Polymer.dom(this.root).querySelectorAll('.dis-menu').map((choice) => choice.value)
-        if (chosen.length < 2) return;
-        for (let i = 0; i < chosen.length - 1; i++) {
-          for (let j = i + 1; j < chosen.length; j++) {
+        var chosen = Polymer.dom(this.root).querySelectorAll('.dis-menu').map(function(choice) {
+          return choice.value;
+        });
+        if (chosen.length < 2) {
+          return;
+        }
+        for (var i = 0; i < chosen.length - 1; i++) {
+          for (var j = i + 1; j < chosen.length; j++) {
             if (chosen[i] === chosen[j]) {
-              console.log('matched')
-              Polymer.dom(this.root).querySelectorAll('.dis-menu')[i].set('invalid', true)
-              Polymer.dom(this.root).querySelectorAll('.dis-menu')[j].set('invalid', true)
+              Polymer.dom(this.root).querySelectorAll('.dis-menu')[i].set('invalid', true);
+              Polymer.dom(this.root).querySelectorAll('.dis-menu')[j].set('invalid', true);
             }
           }
         }
-        return
+        return;
       },
 
       _save: function () {
@@ -695,7 +699,6 @@
 
         this._checkMatchingDisaggregation();
 
-
         valid = fields.every(function (field) {
           return !field.invalid;
         });
@@ -706,7 +709,6 @@
 
         this.set('updatePending', true);
         this._setDisaggregations();
-        console.log(this.data.disaggregation)
         this.$.indicators.body = this._processData(this.data);
 
         this.$.indicators.thunk()()

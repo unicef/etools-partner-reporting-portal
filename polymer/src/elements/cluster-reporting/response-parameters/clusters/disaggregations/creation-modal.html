@@ -169,19 +169,19 @@
         value: {
           type: Object,
           value: {},
-          notify: true
+          notify: true,
         },
 
         name: {
           type: String,
-          value: "",
-          notify: true
+          value: '',
+          notify: true,
         },
 
         invalid: {
           type: Boolean,
           notify: true,
-          value: true
+          value: true,
         },
 
         opened: {
@@ -196,7 +196,7 @@
 
         url: {
           type: String,
-          computed: '_computeUrl(responsePlanID)'
+          computed: '_computeUrl(responsePlanID)',
         },
         disaggregations: {
           type: Object,
@@ -205,7 +205,7 @@
 
         refresh: {
           type: Boolean,
-          value: false
+          value: false,
         },
       },
 
@@ -219,7 +219,7 @@
       },
 
       open: function () {
-        this.data = {"response_plan":+this.responsePlanID, "choices": [], "active": true};
+        this.data = {'response_plan': +this.responsePlanID, 'choices': [], 'active': true};
         this.set('opened', true);
         this.set('refresh', true);
       },
@@ -233,39 +233,37 @@
           return;
         }
         if (!this._checkMatchingName()) {
-          Polymer.dom(this.root).querySelector('#name').set('invalid', true)
+          Polymer.dom(this.root).querySelector('#name').set('invalid', true);
           return;
         }
         var self = this;
         var thunk = this.$.createDisaggregation.thunk();
-        let newChoices = []
-        for (let choice of this.data.choices) {
-          newChoices.push({"value": choice, "active": true})
+        var newChoices = [];
+        for (var i = 0; i < this.data.choices.length; i++) {
+          newChoices.push({'value': this.data.choices[i], 'active': true});
         }
-        this.data.choices = newChoices
+        this.data.choices = newChoices;
         thunk()
           .then(function (res) {
-            self.fire('disaggregation-added', res.data)
+            self.fire('disaggregation-added', res.data);
             self.updatePending = false;
-            self.close()
+            self.close();
             
           })
           .catch(function (err) { // jshint ignore:line
             self.updatePending = false;
-            console.log("error", err)
             // TODO: error handling
           });
       },
 
       _checkMatchingName: function() {
-        console.log('check')
-        let disaggregations = this.disaggregations;
-          for (let disagg of disaggregations) {
-            if (disagg.name === this.value.name.trim()) {
-                return false
+        var disaggregations = this.disaggregations;
+          for (var i = 0; i < disaggregations.length; i++) {
+            if (disaggregations[i].name === this.value.name.trim()) {
+                return false;
             }
           }
-          return true
+          return true;
       },
 
       _onInput: function (e) {
