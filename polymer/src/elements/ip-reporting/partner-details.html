@@ -72,7 +72,7 @@
         </li>
         <li class="item">
           <labelled-item label="Partner Type">
-            <span class="field-value">[[_withDefault(partner.cso_type_display, partner.partner_type_display)]]</span>
+            <span class="field-value">[[_computePartnerType(partner)]]</span>
           </labelled-item>
         </li>
         <li class="item">
@@ -135,6 +135,15 @@
           type: Boolean,
           statePath: App.Selectors.Partner.loading,
         },
+      },
+
+      _computePartnerType: function (partner) {
+        var chunks = [
+          partner.cso_type_display,
+          partner.partner_type_display,
+        ].filter(Boolean);
+
+        return this._withDefault(chunks.length ? chunks.join(' ') : null);
       },
     });
   </script>
