@@ -9,11 +9,17 @@
 <link rel="import" href="../behaviors/pagination.html">
 <link rel="import" href="../behaviors/utils.html">
 <link rel="import" href="list-view-single-indicator.html">
+<link rel="import" href="list-placeholder.html">
 <link rel="import" href="../styles/table-styles.html">
 
 <dom-module id="list-view-indicators">
   <template>
     <style include="iron-flex iron-flex-factors data-table-styles table-styles">
+      :host {
+        --ecp-content: {
+          padding: 0;
+        };
+      }
     </style>
 
     <iron-location
@@ -26,21 +32,20 @@
     </iron-query-params>
 
     <etools-content-panel panel-title="List of Indicators">
-      <etools-loading active="[[loading]]"></etools-loading>
       <etools-data-table-header
         id="listHeader"
         label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
 
         <etools-data-table-column class="flex-2" field="number">
-          PD/SSFA ToR ref.#
+          <div class="table-column">PD/SSFA ToR ref.#</div>
         </etools-data-table-column>
 
         <etools-data-table-column class="flex-6" field="indicator">
-          Indicator
+          <div class="table-column">Indicator</div>
         </etools-data-table-column>
 
         <etools-data-table-column  class="flex-4" field="progress">
-          Current progress
+            <div class="table-column">Current progress</div>
         </etools-data-table-column>
 
       </etools-data-table-header>
@@ -54,6 +59,8 @@
           indicator="{{indicator}}">
         </list-view-single-indicator>
       </template>
+
+      <list-placeholder data="[[data]]"></list-placeholder>
 
       <etools-data-table-footer
           page-size="[[pageSize]]"

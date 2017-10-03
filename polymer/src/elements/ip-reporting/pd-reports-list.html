@@ -5,7 +5,8 @@
 <link rel="import" href="../../../bower_components/iron-location/iron-location.html">
 <link rel="import" href="../../../bower_components/iron-location/iron-query-params.html">
 
-<link rel="import" href="../../elements/report-status.html">
+<link rel="import" href="../report-status.html">
+<link rel="import" href="../list-placeholder.html">
 
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/selectors/programmeDocumentReports.html">
@@ -13,6 +14,7 @@
 <link rel="import" href="../../behaviors/data-table.html">
 <link rel="import" href="../../behaviors/pagination.html">
 <link rel="import" href="../../behaviors/routing.html">
+<link rel="import" href="../../behaviors/progressReportUtils.html">
 
 <link rel="import" href="../../styles/table-styles.html">
 
@@ -96,10 +98,10 @@
               [[_withDefault(report.reporting_period)]]
             </div>
             <div class="table-cell table-cell--text cell-icon">
-              <template is="dom-if" if="[[_isDraft(report.is_draft)]]">
+              <template is="dom-if" if="[[report.is_draft]]">
                 <iron-icon icon="check"></iron-icon>
               </template>
-              <template is="dom-if" if="[[!_isDraft(report.is_draft)]]">
+              <template is="dom-if" if="[[!report.is_draft]]">
                 —
               </template>
             </div>
@@ -109,6 +111,11 @@
           </div>
         </etools-data-table-row>
       </template>
+
+      <list-placeholder
+          data="[[data]]"
+          loading="[[!loaded]]">
+      </list-placeholder>
 
       <etools-data-table-footer
         page-size="[[pageSize]]"
@@ -134,6 +141,7 @@
         App.Behaviors.UtilsBehavior,
         App.Behaviors.ReduxBehavior,
         App.Behaviors.RoutingBehavior,
+        App.Behaviors.ProgressReportUtilsBehavior,
       ],
 
       properties: {
@@ -155,17 +163,12 @@
         },
       },
 
-      _isDraft: function(is_draft) {
-        return is_draft;
-      },
-
       _getLink: function (report) {
         var suffix;
 
         if (report.is_draft) {
           suffix = 'draft';
-        } else if (report.status === 'Sub' ||
-                   report.status === 'Rej') {
+        } else if (this._isReadOnlyReport(report)) {
           suffix = 'view';
         } else {
           suffix = 'edit';
@@ -180,14 +183,12 @@
       _getLinkText: function (report) {
         if (report.is_draft) {
           return 'Go To Draft';
-        } else if (report.status === 'Sub' ||
-                   report.status === 'Rej') {
+        } else if (this._isReadOnlyReport(report)) {
           return 'View Report';
         } else {
           return 'Enter Data';
         }
       },
-
     });
   </script>
 

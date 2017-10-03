@@ -147,15 +147,15 @@
             <tr>
                 <th rowspan="3">1.4 Budget information</th>
                 <th>Programme budget</th>
-                <td colspan="2">{{ cso_contribution }}</td>
+                <td colspan="2">{{pd.get_cso_contribution_currency_display}}{{ cso_contribution }}</td>
             </tr>
             <tr>
                 <th>UNICEF contribution</th>
-                <td colspan="2">{{ budget }}</td>
+                <td colspan="2">{{pd.get_budget_currency_display}}{{ budget }}</td>
             </tr>
             <tr>
                 <th>Funds received to date</th>
-                <td>{{ budget }}</td>
+                <td>{{pd.get_funds_received_to_date_currency_display}}{{ funds_received_to_date }}</td>
                 <td>100% to date</td>
             </tr>
             <tr>

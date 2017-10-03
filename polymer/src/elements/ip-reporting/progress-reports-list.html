@@ -7,12 +7,14 @@
 <link rel="import" href="../../../bower_components/iron-location/iron-location.html">
 <link rel="import" href="../../../bower_components/iron-location/iron-query-params.html">
 
-<link rel="import" href="../../elements/report-status.html">
+<link rel="import" href="../report-status.html">
+<link rel="import" href="../list-placeholder.html">
 
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/data-table.html">
 <link rel="import" href="../../behaviors/pagination.html">
 <link rel="import" href="../../behaviors/routing.html">
+<link rel="import" href="../../behaviors/progressReportUtils.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../styles/table-styles.html">
 
@@ -94,10 +96,10 @@
               [[_withDefault(report.reporting_period)]]
             </div>
             <div class="table-cell table-cell--text cell-icon">
-              <template is="dom-if" if="[[_isDraft(report.is_draft)]]">
+              <template is="dom-if" if="[[report.is_draft]]">
                 <iron-icon icon="check"></iron-icon>
               </template>
-              <template is="dom-if" if="[[!_isDraft(report.is_draft)]]">
+              <template is="dom-if" if="[[!report.is_draft]]">
                 —
               </template>
             </div>
@@ -107,6 +109,11 @@
           </div>
         </etools-data-table-row>
       </template>
+
+      <list-placeholder
+          data="[[data]]"
+          loading="[[loading]]">
+      </list-placeholder>
 
       <etools-data-table-footer
         page-size="[[pageSize]]"
@@ -131,6 +138,7 @@
         App.Behaviors.DataTableBehavior,
         App.Behaviors.PaginationBehavior,
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ProgressReportUtilsBehavior,
       ],
 
       properties: {
@@ -148,10 +156,6 @@
           type: Number,
           statePath: 'progressReports.count',
         },
-
-      },
-       _isDraft: function(is_draft) {
-        return is_draft;
       },
 
       _getPDLink: function (report) {
@@ -164,8 +168,7 @@
       _getReportLinkText: function (report) {
         if (report.is_draft) {
           return 'Go To Draft';
-        } else if (report.status === 'Sub' ||
-                   report.status === 'Rej') {
+        } else if (this._isReadOnlyReport(report)) {
           return 'View Report';
         } else {
           return 'Enter Data';
@@ -177,8 +180,7 @@
 
         if (report.is_draft) {
           suffix = 'draft';
-        } else if (report.status === 'Sub' ||
-                   report.status === 'Rej') {
+        } else if (this._isReadOnlyReport(report)) {
           suffix = 'view';
         } else {
           suffix = 'edit';

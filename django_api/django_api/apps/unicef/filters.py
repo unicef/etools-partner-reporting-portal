@@ -3,7 +3,9 @@ from django.conf import settings
 from django.db.models import Q
 import django_filters
 from distutils.util import strtobool
-from django_filters.filters import ChoiceFilter, CharFilter, DateFilter, TypedChoiceFilter
+from django_filters.filters import (
+    ChoiceFilter, CharFilter, DateFilter, TypedChoiceFilter
+)
 
 from core.common import PD_LIST_REPORT_STATUS, PD_STATUS, PROGRESS_REPORT_STATUS
 from indicator.models import Reportable
@@ -23,14 +25,16 @@ class  ProgrammeDocumentIndicatorFilter(django_filters.FilterSet):
     class Meta:
         model = Reportable
         fields = (
-            'id', 'blueprint__title'
+            'id', 'blueprint__title',
         )
 
     def get_status(self, queryset, name, value):
-        return queryset.filter(lower_level_outputs__cp_output__programme_document__status=value)
+        return queryset.filter(
+            lower_level_outputs__cp_output__programme_document__status=value)
 
     def get_programme_document(self, queryset, name, value):
-        return queryset.filter(lower_level_outputs__cp_output__programme_document_id=value)
+        return queryset.filter(
+            lower_level_outputs__cp_output__programme_document_id=value)
 
     def get_locations(self, queryset, name, value):
         return queryset.filter(locations=value)
@@ -39,8 +43,8 @@ class  ProgrammeDocumentIndicatorFilter(django_filters.FilterSet):
         return queryset.filter(blueprint__title__contains=value)
 
     def get_incomplete(self, queryset, name, value):
-        return queryset.filter(lower_level_outputs__cp_output__programme_document__progress_reports__indicator_reports__submission_date__isnull=True) if value == "1" else queryset
-
+        return queryset.filter(
+            lower_level_outputs__cp_output__programme_document__progress_reports__indicator_reports__submission_date__isnull=True) if value == "1" else queryset
 
 
 class ProgrammeDocumentFilter(django_filters.FilterSet):

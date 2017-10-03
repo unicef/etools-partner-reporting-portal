@@ -20,6 +20,7 @@
 <link rel="import" href="../../../../elements/ip-reporting/pd-modal.html">
 <link rel="import" href="../../../../endpoints.html">
 <link rel="import" href="../../../../behaviors/utils.html">
+<link rel="import" href="../../../../behaviors/progressReportUtils.html">
 <link rel="import" href="../../../../redux/store.html">
 <link rel="import" href="../../../../redux/actions.html">
 <link rel="import" href="../../../../redux/selectors/programmeDocumentReports.html">
@@ -68,7 +69,8 @@
 
     <etools-prp-ajax
         id="report"
-        url="[[reportUrl]]">
+        url="[[reportUrl]]"
+        params="[[queryParams]]">
     </etools-prp-ajax>
 
     <page-header
@@ -161,6 +163,7 @@
       behaviors: [
         App.Behaviors.ReduxBehavior,
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ProgressReportUtilsBehavior,
       ],
 
       properties: {
@@ -183,14 +186,14 @@
           statePath: 'location.id',
         },
 
-        reportUrl: {
-          type: String,
-          computed: '_computeReportUrl(locationId, reportId)',
-        },
-
         pdId: {
           type: String,
           statePath: 'programmeDocuments.current',
+        },
+
+        reportUrl: {
+          type: String,
+          computed: '_computeReportUrl(locationId, reportId, pdId)',
         },
 
         currentReport: {
@@ -216,8 +219,8 @@
 
       observers: [
         '_onReportChanged(routeData.report_id, routeData.mode)',
-        '_handleInputChange(currentReport, queryParams)',
-        '_fetchReport(reportUrl, pdId)',
+        '_onReportStatusChanged(currentReport, routeData.mode)',
+        '_fetchReport(reportUrl, queryParams)',
       ],
 
       _computeBackLink: function (pdId) {
@@ -226,6 +229,15 @@
 
       _onReportChanged: function (reportId, mode) {
         this.dispatch(App.Actions.PDReports.setCurrent(reportId, mode));
+      },
+
+      _onReportStatusChanged: function (currentReport, mode) {
+        if (
+          this._isReadOnlyReport(currentReport) &&
+          (mode || '').toLowerCase !== 'view'
+        ) {
+          this.set('routeData.mode', 'view');
+        }
       },
 
       _computeHeadingText: function (report, mode) {
@@ -246,74 +258,30 @@
             break;
         }
 
-        return prefix + ' ' + this._withDefault(pd.reference_number);
+        return prefix + ' ' + this._withDefault(pd.title);
       },
 
-      _computeReportUrl: function (locationId, reportId) {
-        return locationId ?
-            App.Endpoints.programmeDocumentReport(locationId, reportId) :
-            '';
+      _computeReportUrl: function (locationId, reportId, _) { // jshint ignore:line
+        return App.Endpoints.programmeDocumentReport(locationId, reportId);
       },
 
-      _handleInputChange: function (currentReport, queryParams) {
-        if (!Object.keys(currentReport).length) {
+      _fetchReport: function (_, queryParams) {
+        if (!Object.keys(queryParams).length) {
           return;
         }
 
-        this.debounce('fetch-indicator-data', function () {
-          var promises = currentReport.indicator_reports
-              .map(this._makeIndicatorReportPromise.bind(this, queryParams));
+        this.debounce('fetch-report', function () {
+          var reportThunk = this.$.report.thunk();
 
-          var self = this;
+          this.$.report.abort();
 
-          self.dispatch(App.Actions.IndicatorData.loadingStart());
-
-          Promise.all(promises)
-              .then(function (results) {
-                return results.filter(Boolean); // Remove failed
-              })
-              .then(function (results) {
-                return results.reduce(function (acc, curr) {
-                  return acc.concat(curr.outputs); // Assumes output uniqueness
-                }, []);
-              })
-              .then(function (outputs) {
-                self.dispatch(App.Actions.IndicatorData.loadingStop());
-                self.dispatch(App.Actions.IndicatorData.set(self.reportId, outputs));
+          this.dispatch(
+            App.Actions.PDReports.fetchSingle(reportThunk, this.pdId)
+          )
+              .catch(function (err) { // jshint ignore:line
+                // TODO: error handling
               });
         }, 300);
-      },
-
-      _makeIndicatorReportPromise: function (queryParams, indicatorReport) {
-        var ajax = document.createElement('etools-prp-ajax');
-        var reportId = indicatorReport.id;
-        var thunk;
-
-        ajax.params = queryParams;
-        ajax.url = App.Endpoints.indicatorData(reportId);
-
-        thunk = ajax.thunk();
-
-        return thunk()
-            .then(function (res) {
-              return res.data;
-            })
-            .catch(function () {
-              return null; // Propagate failed
-            });
-      },
-
-      _fetchReport: function (reportUrl, pdId) {
-        if (!reportUrl || typeof pdId === 'undefined') {
-          return;
-        }
-
-        this.dispatch(
-          App.Actions.PDReports.fetchSingle(this.$.report.thunk(), this.pdId)
-        )
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-            });
       },
 
       _showPdDetails: function () {
@@ -321,8 +289,10 @@
       },
 
       detached: function () {
-        if (this.isDebouncerActive('fetch-indicator-data')) {
-          this.cancelDebouncer('fetch-indicator-data');
+        this.$.report.abort();
+
+        if (this.isDebouncerActive('fetch-report')) {
+          this.cancelDebouncer('fetch-report');
         }
       },
     });

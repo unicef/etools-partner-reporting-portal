@@ -1,5 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
+<link rel="import" href="../behaviors/utils.html">
+
 <dom-module id="reporting-period">
   <template>
     <style>
@@ -18,15 +20,22 @@
       }
     </style>
 
-    Reporting period: <span class="range">[[range]]</span>
+    Reporting period: <span class="range">[[_withDefault(range)]]</span>
   </template>
 
   <script>
     Polymer({
       is: 'reporting-period',
 
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+      ],
+
       properties: {
-        range: String,
+        range: {
+          type: String,
+          value: null, // Triggers the placeholder
+        },
       },
     });
   </script>

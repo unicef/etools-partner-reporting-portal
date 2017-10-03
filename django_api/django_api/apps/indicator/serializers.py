@@ -161,6 +161,7 @@ class IndicatorListSerializer(ReportableSimpleSerializer):
             'target',
             'baseline',
             'blueprint',
+            'pd_id',
             'ref_num',
             'achieved',
             'progress_percentage',
@@ -248,7 +249,10 @@ class IndicatorLLoutputsSerializer(serializers.ModelSerializer):
 
 
 class OverallNarrativeSerializer(serializers.ModelSerializer):
-
+    """
+    Sets the overall status and narrative assessment on an IndicatorReport
+    instance.
+    """
     class Meta:
         model = IndicatorReport
         fields = (
@@ -563,11 +567,11 @@ class ClusterIndicatorReportListSerializer(IndicatorReportListSerializer):
         )
 
 
-class PDReportsSerializer(serializers.ModelSerializer):
+class PDReportContextIndicatorReportSerializer(serializers.ModelSerializer):
     """
     A serializer for IndicatorReport model but specific information
     that is helpful in IP reporting from a Programme Document / Progress
-    Report perspective.
+    Report perspective (TODO: specify what is PD specfic?).
     """
     id = serializers.SerializerMethodField()
     reporting_period = serializers.SerializerMethodField()
@@ -590,6 +594,8 @@ class PDReportsSerializer(serializers.ModelSerializer):
             'is_draft',
             'due_date',
             'total',
+            'overall_status',
+            'narrative_assessment',
         )
 
     def get_id(self, obj):
@@ -605,10 +611,12 @@ class PDReportsSerializer(serializers.ModelSerializer):
         return obj.reportable.object_id
 
     def get_submission_date(self, obj):
-        return obj.submission_date and obj.submission_date.strftime(settings.PRINT_DATA_FORMAT)
+        return obj.submission_date and obj.submission_date.strftime(
+            settings.PRINT_DATA_FORMAT)
 
     def get_due_date(self, obj):
-        return obj.due_date and obj.due_date.strftime(settings.PRINT_DATA_FORMAT)
+        return obj.due_date and obj.due_date.strftime(
+            settings.PRINT_DATA_FORMAT)
 
 
 class IndicatorBlueprintSerializer(serializers.ModelSerializer):
@@ -837,7 +845,9 @@ class IndicatorReportUpdateSerializer(serializers.ModelSerializer):
 
 
 class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
-
+    """
+    Used to represent an individual indicator report in the cluster.
+    """
     indicator_name = serializers.SerializerMethodField()
     reportable = IndicatorListSerializer()
     reporting_period = serializers.SerializerMethodField()

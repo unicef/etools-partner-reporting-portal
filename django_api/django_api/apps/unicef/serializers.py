@@ -6,7 +6,7 @@ from .models import ProgrammeDocument, Section, ProgressReport, Person, \
 from core.common import PROGRESS_REPORT_STATUS
 from indicator.models import Reportable
 from indicator.serializers import (
-    PDReportsSerializer,
+    PDReportContextIndicatorReportSerializer,
     IndicatorBlueprintSimpleSerializer,
     IndicatorLLoutputsSerializer,
     ReportableSimpleSerializer
@@ -27,6 +27,7 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
     unicef_officers = PersonSerializer(read_only=True, many=True)
     unicef_focal_point = PersonSerializer(read_only=True, many=True)
     partner_focal_point = PersonSerializer(read_only=True, many=True)
+    document_type_display = serializers.SerializerMethodField()
 
     class Meta:
         model = ProgrammeDocument
@@ -40,6 +41,8 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
             'end_date',
             'population_focus',
             'status',
+            'document_type',
+            'document_type_display',
             'calculated_budget',
             'cso_contribution',
             'total_unicef_cash',
@@ -54,6 +57,9 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
 
     def get_total_unicef_supplies(self, obj):
         return str(obj.in_kind_amount)
+
+    def get_document_type_display(self, obj):
+        return obj.get_document_type_display()
 
 
 class SectionSerializer(serializers.ModelSerializer):
@@ -172,7 +178,13 @@ class ProgressReportSimpleSerializer(serializers.ModelSerializer):
 
 class ProgressReportSerializer(ProgressReportSimpleSerializer):
     programme_document = ProgrammeDocumentOutputSerializer()
-    indicator_reports = PDReportsSerializer(read_only=True, many=True)
+    indicator_reports = serializers.SerializerMethodField()
+
+    def __init__(self, llo_id, location_id, *args, **kwargs):
+        self.llo_id = llo_id
+        self.location_id = location_id
+
+        super(ProgressReportSerializer, self).__init__(*args, **kwargs)
 
     class Meta:
         model = ProgressReport
@@ -189,8 +201,17 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
             'review_date',
             'sent_back_feedback',
             'programme_document',
-            'indicator_reports',
+            'indicator_reports'
         )
+
+    def get_indicator_reports(self, obj):
+        qset = obj.indicator_reports.all()
+        if self.llo_id and self.llo_id is not None:
+            qset = qset.filter(reportable__object_id=self.llo_id)
+        if self.location_id and self.llo_id is not None:
+            qset = qset.filter(reportable__locations__id=self.location_id)
+        return PDReportContextIndicatorReportSerializer(
+            instance=qset,read_only=True, many=True).data
 
     def get_reporting_period(self, obj):
         return "%s - %s " % (

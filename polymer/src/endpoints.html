@@ -17,7 +17,7 @@
         return this._buildUrl('/indicator/' + content_object);
       },
 
-      allIndicators: function (workspaceId) {
+      allPDIndicators: function (workspaceId) {
         return this._buildUrl('/unicef/' + workspaceId + '/programme-document/indicators/');
       },
 
@@ -47,6 +47,16 @@
 
       programmeDocumentReportSubmit: function (workspaceId, reportId) {
         return this.programmeDocumentReport(workspaceId, reportId) + 'submit/';
+      },
+
+      calculationMethods: function (workspaceId, pdId) {
+        return this._buildUrl(
+          '/unicef/' +
+          workspaceId +
+          '/programme-document/' +
+          pdId +
+          '/calculation-methods/'
+        );
       },
 
       progressReports: function(locationId) {
@@ -79,8 +89,14 @@
         );
       },
 
-      reportable: function (reportId, reportableId) {
-        return this.indicatorData(reportId) + 'reportable/' + reportableId + '/';
+      reportable: function (programmeDocumentProgressReportId, lowerLevelOutputId) {
+        return this._buildUrl(
+          '/indicator/pd-progress-report/' +
+          programmeDocumentProgressReportId +
+          '/llo/' +
+          lowerLevelOutputId +
+          '/'
+        );
       },
 
       indicatorLocationDataEntries: function() {

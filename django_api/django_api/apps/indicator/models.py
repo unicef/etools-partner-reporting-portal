@@ -108,7 +108,7 @@ class IndicatorBlueprint(TimeStampedExternalSyncModelMixin):
     DISPLAY_TYPE_CHOICES = QUANTITY_DISPLAY_TYPE_CHOICES + \
         RATIO_DISPLAY_TYPE_CHOICES
 
-    title = models.CharField(max_length=1024)
+    title = models.CharField(max_length=1024, db_index=True)
     unit = models.CharField(max_length=10, choices=UNIT_CHOICES,
                             default=NUMBER)
     description = models.CharField(max_length=3072, null=True, blank=True)
@@ -180,22 +180,31 @@ class Reportable(TimeStampedExternalSyncModelMixin):
     target = models.CharField(max_length=255, null=True, blank=True)
     baseline = models.CharField(max_length=255, null=True, blank=True)
     assumptions = models.TextField(null=True, blank=True)
-    means_of_verification = models.CharField(max_length=255, null=True, blank=True)
+    means_of_verification = models.CharField(max_length=255,
+                                             null=True,
+                                             blank=True)
     is_cluster_indicator = models.BooleanField(default=False)
 
-    # Current total, transactional and dynamically calculated based on IndicatorReports
+    # Current total, transactional and dynamically calculated based on
+    # IndicatorReports
     total = JSONField(default=dict([('c', 0), ('d', 0), ('v', 0)]))
 
     # unique code for this indicator within the current context
     # eg: (1.1) result code 1 - indicator code 1
-    context_code = models.CharField(max_length=50, null=True, blank=True,
+    context_code = models.CharField(max_length=50,
+                                    null=True,
+                                    blank=True,
                                     verbose_name="Code in current context")
 
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
-    blueprint = models.ForeignKey(IndicatorBlueprint, null=True, related_name="reportables")
-    parent_indicator = models.ForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
+    blueprint = models.ForeignKey(IndicatorBlueprint,
+                                  null=True,
+                                  related_name="reportables")
+    parent_indicator = models.ForeignKey('self', null=True, blank=True,
+                                         related_name='children',
+                                         db_index=True)
     locations = models.ManyToManyField(
         'core.Location', related_name="reportables")
 
@@ -214,8 +223,8 @@ class Reportable(TimeStampedExternalSyncModelMixin):
     )
 
     cs_dates = ArrayField(models.DateField(), default=list)
-
-    location_admin_refs = ArrayField(JSONField(), default=list)
+    location_admin_refs = ArrayField(JSONField(), default=list, null=True,
+                                     blank=True)
     disaggregations = models.ManyToManyField(Disaggregation, blank=True)
 
     class Meta:
@@ -223,6 +232,7 @@ class Reportable(TimeStampedExternalSyncModelMixin):
 
     @property
     def ref_num(self):
+        """reference_number of the PD"""
         from unicef.models import LowerLevelOutput
 
         if isinstance(self.content_object, LowerLevelOutput):
@@ -231,15 +241,22 @@ class Reportable(TimeStampedExternalSyncModelMixin):
             return ''
 
     @property
-    def achieved(self):
-        if self.indicator_reports.exists():
-            total = self.indicator_reports.last().total
+    def pd_id(self):
+        """reference_number of the PD"""
+        from unicef.models import LowerLevelOutput
 
-            if not isinstance(total, dict):
-                total = dict(total)
-            return total
+        if isinstance(self.content_object, LowerLevelOutput):
+            return self.content_object.cp_output.programme_document.id
         else:
-            return {'c': 0, 'd': 0, 'v': 0}
+            return ''
+
+    @property
+    def achieved(self):
+        """
+        TODO: old function, called from places, referred to in
+        serializers. Simply returning total for now.
+        """
+        return self.total
 
     @property
     def progress_percentage(self):
@@ -266,25 +283,34 @@ class Reportable(TimeStampedExternalSyncModelMixin):
                                                 self.content_object)
 
 
+class IndicatorReportManager(models.Manager):
+    def active_reports(self):
+        return self.objects.filter(
+            report_status=INDICATOR_REPORT_STATUS.accepted)
+
+
 class IndicatorReport(TimeStampedModel):
     """
-    IndicatorReport module is a result of partner staff activity (what they done in defined frequency scope).
+    IndicatorReport module is a result of partner staff activity (what they
+    done in defined frequency scope).
 
     related models:
         indicator.Reportable (ForeignKey): "indicator"
         unicef.ProgressReport (ForeignKey): "progress_report"
         core.Location (OneToOneField): "location"
     """
-
     title = models.CharField(max_length=255)
-    reportable = models.ForeignKey(Reportable, related_name="indicator_reports")
+    reportable = models.ForeignKey(Reportable,
+                                   related_name="indicator_reports")
     progress_report = models.ForeignKey('unicef.ProgressReport',
                                         related_name="indicator_reports",
-                                        null=True)
+                                        null=True, blank=True)
     time_period_start = models.DateField()  # first day of defined frequency mode
     time_period_end = models.DateField()  # last day of defined frequency mode
     due_date = models.DateField()  # can be few days/weeks out of the "end date"
-    submission_date = models.DateField(null=True, blank=True, verbose_name="Date of submission")
+    submission_date = models.DateField(null=True,
+                                       blank=True,
+                                       verbose_name="Date of submission")
     frequency = models.CharField(
         max_length=3,
         choices=FREQUENCY_LEVEL,
@@ -301,23 +327,27 @@ class IndicatorReport(TimeStampedModel):
         max_length=3
     )
 
-
-    class Meta:
-        ordering = ['-id']
-
     overall_status = models.CharField(
         choices=OVERALL_STATUS,
         default=OVERALL_STATUS.no_status,
         max_length=3
     )
-    narrative_assessment = models.CharField(max_length=255, null=True, blank=True)
+    narrative_assessment = models.CharField(max_length=255,
+                                            null=True,
+                                            blank=True)
+
+    objects = IndicatorReportManager()
+
+    class Meta:
+        ordering = ['-due_date', '-id']
 
     def __str__(self):
         return self.title
 
     @property
     def is_draft(self):
-        if self.submission_date is None and IndicatorLocationData.objects.filter(indicator_report=self).exists():
+        if self.submission_date is None and IndicatorLocationData.objects.filter(
+                indicator_report=self).exists():
             return True
         return False
 
@@ -334,7 +364,8 @@ class IndicatorReport(TimeStampedModel):
         if self.submission_date is not None and self.report_status == INDICATOR_REPORT_STATUS.sent_back:
             pass  # lets go and check throw disaggregation
         elif self.submission_date and  self.report_status in [
-                INDICATOR_REPORT_STATUS.accepted, INDICATOR_REPORT_STATUS.submitted]:
+                INDICATOR_REPORT_STATUS.accepted,
+                INDICATOR_REPORT_STATUS.submitted]:
             return False
 
         for data in self.indicator_location_data.all():
@@ -373,7 +404,8 @@ class IndicatorReport(TimeStampedModel):
     def calculation_formula_across_locations(self):
         return self.reportable.blueprint.calculation_formula_across_locations
 
-    def disaggregation_values(self, id_only=False, filter_by_id__in=None, flat=False):
+    def disaggregation_values(self, id_only=False, filter_by_id__in=None,
+                              flat=False):
         output_list = []
 
         disaggregations = self.disaggregations
@@ -396,10 +428,23 @@ class IndicatorReport(TimeStampedModel):
         return output_list
 
 
-@receiver(post_save, sender=IndicatorReport, dispatch_uid="recalculate_reportable_total")
+@receiver(post_save,
+          sender=IndicatorReport,
+          dispatch_uid="recalculate_reportable_total")
 def recalculate_reportable_total(sender, instance, **kwargs):
+    """
+    Whenever an indicator report is saved and found to be Accepted or in
+    Sent back state then trigger a recalculation fo the Reportable total.
+    """
+    if instance.report_status != INDICATOR_REPORT_STATUS.accepted and \
+            instance.report_status != INDICATOR_REPORT_STATUS.sent_back:
+        return
+
     reportable = instance.reportable
     blueprint = reportable.blueprint
+    # only accepted indicator reports should be used.
+    accepted_indicator_reports = reportable.indicator_reports.all().filter(
+        report_status=INDICATOR_REPORT_STATUS.accepted)
 
     # Reset the reportable total
     reportable_total = {
@@ -408,34 +453,35 @@ def recalculate_reportable_total(sender, instance, **kwargs):
         'v': 0,
     }
 
-    # IndicatorReport total calculation
-    if blueprint.unit == IndicatorBlueprint.NUMBER:
-        reportable_total['d'] = 1
+    if accepted_indicator_reports.count() > 0:
+        # If unit choice is NUMBER then have to handle sum, avg, max
+        if blueprint.unit == IndicatorBlueprint.NUMBER:
+            reportable_total['d'] = 1
 
-        if blueprint.calculation_formula_across_periods == IndicatorBlueprint.MAX:
-            max_total_ir = max(
-                reportable.indicator_reports.all(),
-                key=lambda item: item.total['v'])
-            reportable_total = max_total_ir.total
+            if blueprint.calculation_formula_across_periods == IndicatorBlueprint.MAX:
+                max_total_ir = max(
+                    accepted_indicator_reports,
+                    key=lambda item: item.total['v'])
+                reportable_total = max_total_ir.total
+            else:   # if its SUM or avg then add data up
+                for indicator_report in accepted_indicator_reports:
+                    reportable_total['v'] += indicator_report.total['v']
+                    reportable_total['c'] += indicator_report.total['c']
 
-        else:
-            for indicator_report in reportable.indicator_reports.all():
+                if blueprint.calculation_formula_across_periods == IndicatorBlueprint.AVG:
+                    ir_count = accepted_indicator_reports.count()
+                    if ir_count > 0:
+                        reportable_total['v'] = reportable_total['v'] / (ir_count * 1.0)
+                        reportable_total['c'] = reportable_total['c'] / (ir_count * 1.0)
+
+        # if unit is PERCENTAGE, doesn't matter if calc choice was percent or ratio
+        elif blueprint.unit == IndicatorBlueprint.PERCENTAGE:
+            for indicator_report in accepted_indicator_reports:
                 reportable_total['v'] += indicator_report.total['v']
-                reportable_total['c'] += indicator_report.total['c']
+                reportable_total['d'] += indicator_report.total['d']
 
-        if blueprint.calculation_formula_across_periods == IndicatorBlueprint.AVG:
-            ir_count = reportable.indicator_reports.count()
-
-            reportable_total['v'] = reportable_total['v'] / (ir_count * 1.0)
-            reportable_total['c'] = reportable_total['c'] / (ir_count * 1.0)
-
-    # IndicatorReport total calculation
-    elif blueprint.unit == IndicatorBlueprint.PERCENTAGE:
-        for indicator_report in reportable.indicator_reports.all():
-            reportable_total['v'] += indicator_report.total['v']
-            reportable_total['d'] += indicator_report.total['d']
-
-        reportable_total['c'] = reportable_total['v'] / (reportable_total['d'] * 1.0)
+            if reportable_total['d'] != 0:
+                reportable_total['c'] = reportable_total['v'] / (reportable_total['d'] * 1.0)
 
     reportable.total = reportable_total
     reportable.save()

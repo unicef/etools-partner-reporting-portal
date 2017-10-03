@@ -66,6 +66,7 @@
       }
 
       .report__meta dl {
+
         margin: 0;
         font-size: 11px;
       }
@@ -204,6 +205,10 @@
                 <dd>[[_withDefault(data.project)]]</dd>
               </dl>
               <dl>
+                <dt>Partner:</dt>
+                <dd>[[_withDefault(data.partner)]]</dd>
+              </dl>
+              <dl>
                 <dt>Activity:</dt>
                 <dd>[[_withDefault(data.partner_activity)]]</dd>
               </dl>
@@ -287,14 +292,14 @@
                     if="[[_equals(indicatorType, 'number')]]"
                     restamp="true">
                   <dd class="flex">
-                    <etools-prp-number value="[[data.total.v]]"></etools-prp-number>
+                    <etools-prp-number value="[[data.reportable.achieved.v]]"></etools-prp-number>
                   </dd>
                 </template>
                 <template
                     is="dom-if"
                     if="[[_equals(indicatorType, 'percentage')]]"
                     restamp="true">
-                  <dd class="flex">[[_toPercentage(data.total.c)]]</dd>
+                  <dd class="flex">[[_toPercentage(data.reportable.achieved.c)]]</dd>
                 </template>
               </dl>
               <dl class="layout horizontal justified">
@@ -304,14 +309,14 @@
                     if="[[_equals(indicatorType, 'number')]]"
                     restamp="true">
                   <dd class="flex">
-                    <etools-prp-number value="[[data.reportable.achieved.v]]"></etools-prp-number>
+                    <etools-prp-number value="[[data.total.v]]"></etools-prp-number>
                   </dd>
                 </template>
                 <template
                     is="dom-if"
                     if="[[_equals(indicatorType, 'percentage')]]"
                     restamp="true">
-                  <dd class="flex">[[_toPercentage(data.reportable.achieved.c)]]</dd>
+                  <dd class="flex">[[_toPercentage(data.total.c)]]</dd>
                 </template>
               </dl>
             </div>
