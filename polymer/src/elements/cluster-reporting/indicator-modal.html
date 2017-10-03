@@ -15,6 +15,7 @@
 <link rel="import" href="../../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-multi-selection-menu.html">
 
+<link rel="import" href="disaggregations-dropdown-widget.html">
 <link rel="import" href="../../polyfills/es6-shim.html">
 <link rel="import" href="chip-date-of-report.html">
 <link rel="import" href="../labelled-item.html">
@@ -46,38 +47,6 @@
         };
       }
 
-      .disagg-header {
-        padding: 5px 10px;
-        margin: 0 0 1em;
-        font-size: 14px;
-        background-color: var(--paper-grey-200);
-      }
-
-      .remove-btn {
-        color: var(--paper-deep-orange-a700);
-        width: 34px;
-        height: 34px;
-      }
-
-      .rowDis {
-        margin-bottom: 1em;
-      }
-
-      .add-disaggregation-btn {
-        margin: 0;
-      }
-
-      .col-actions {
-        width: 40px;
-        border-right: 1px solid var(--paper-grey-400);
-      }
-
-      .col-name,
-      .col-values {
-        padding-left: 24px;
-        width: 270px;
-      }
-
       .row {
         margin: 16px 0;
       }
@@ -89,11 +58,6 @@
       paper-radio-group {
         margin-left: -12px;
       }
-
-      paper-dropdown-menu {
-        width: 100%;
-      }
-
     </style>
 
     <etools-prp-ajax
@@ -277,67 +241,15 @@
           </div>
 
           <div class="row">
-            <h2 class="disagg-header">Disaggregations ([[selectedDisaggregations.length]])</h2>
-          </div>
-          <div class="row">
-
-            <template is="dom-repeat" items="[[selectedDisaggregations]]" as="dataDisagg">
-
-              <div class="rowDis layout horizontal">
-
-                <div class="flex-none layout vertical center-center col-actions">
-                  <paper-icon-button
-                    index="[[index]]"
-                    class="remove-btn"
-                    on-tap="_remove"
-                    icon="icons:cancel">
-                  </paper-icon-button>
-                </div>
-
-                <div class="col-name">
-                  <paper-dropdown-menu
-                    class="dis-menu validate"
-                    id="disaggregationsDrop"
-                    index="[[index]]"
-                    label="Disaggregation By"
-                    on-value-changed="_validate"
-                    on-selected-item-changed="_setDisaggregation"
-                    always-float-label
-                    required>
-                    <paper-listbox
-                      slot="dropdown-content"
-                      class="dropdown-content">
-                      <template
-                        is="dom-repeat"
-                        items="[[disaggregations]]">
-                        <paper-item name="[[item.id]]">[[item.name]]
-                        </paper-item>
-                      </template>
-                    </paper-listbox>
-                  </paper-dropdown-menu>
-                </div>
-
-                <div class="col-values">
-                  <paper-input
-                    index="[[index]]"
-                    label="Disaggregation Groups"
-                    value="[[_formatChoices(dataDisagg)]]"
-                    always-float-label
-                    disabled>
-                  </paper-input>
-                </div>
-              </div>
-            </template>
-
-            <paper-button
-              class="btn-primary add-disaggregation-btn"
-              on-tap="_add"
-              disabled="[[!_canAddMore]]">
-              Add disaggregation
-            </paper-button>
+            <disaggregations-dropdown-widget
+              class="validate"
+              value="{{selectedDisaggregations}}"
+              disaggregations="[[disaggregations]]">
+            </disaggregations-dropdown-widget>
           </div>
 
         </template>
+
       </paper-dialog-scrollable>
 
       <div class="buttons layout horizontal-reverse">
@@ -434,6 +346,7 @@
         selectedDisaggregations: {
           type: Array,
           value: [],
+          notify: true,
         },
 
         frequencies: {
@@ -469,10 +382,6 @@
         value: [],
       },
 
-      disagg: {
-        type: Object,
-        value: {},
-      },
       _canAddMore: {
           type: Boolean,
           value: true,
@@ -481,7 +390,6 @@
       observers: [
         '_setDefaults(opened)',
         '_setLocations(selectedLocations.splices)',
-        '_setCanAddMore(selectedDisaggregations.splices)',
       ],
 
       _computeType: function (type, displayType) {
@@ -498,59 +406,12 @@
         this.set('data.blueprint.display_type', type);
       },
 
-      _setCanAddMore: function () {
-        this.set('_canAddMore', this.selectedDisaggregations.length < 3);
-      },
-
       _setFrequency: function (e, data) {
         var freq = this.$$('#frequencies').itemForElement(data.value);
         if (!freq) {
           return;
         }
         this.set('data.frequency', freq.id);
-      },
-
-      _add: function () {
-        this.push('selectedDisaggregations', {
-          name: '',
-          choices: [],
-        });
-      },
-
-      _remove: function (e) {
-        var toRemove = +e.target.index;
-        this.splice('selectedDisaggregations', toRemove, 1);
-      },
-
-      _setDisaggregation: function (e, data) {
-          var index = +e.target.index;
-
-        var id;
-        if (data.value) {
-          id = data.value.name;
-        }
-
-        var selected;
-        if (id) {
-          selected = this.disaggregations.find(function(dis) {
-            return dis.id === id;});
-        }
-
-        var newSelectedDisaggregations;
-
-        if (selected) {
-          newSelectedDisaggregations = this.selectedDisaggregations.slice();
-
-          newSelectedDisaggregations[index] = selected;
-
-          this.set('selectedDisaggregations', newSelectedDisaggregations);
-        }
-      },
-
-      _formatChoices: function(selected) {
-        return selected.choices.map(function (choice) {
-          return choice.value;
-        }).join(', ');
       },
 
       _setLocations: function () {
@@ -666,24 +527,6 @@
         });
       },
 
-      _checkMatchingDisaggregation: function() {
-        var chosen = Polymer.dom(this.root).querySelectorAll('.dis-menu').map(function(choice) {
-          return choice.value;
-        });
-        if (chosen.length < 2) {
-          return;
-        }
-        for (var i = 0; i < chosen.length - 1; i++) {
-          for (var j = i + 1; j < chosen.length; j++) {
-            if (chosen[i] === chosen[j]) {
-              Polymer.dom(this.root).querySelectorAll('.dis-menu')[i].set('invalid', true);
-              Polymer.dom(this.root).querySelectorAll('.dis-menu')[j].set('invalid', true);
-            }
-          }
-        }
-        return;
-      },
-
       _save: function () {
 
         var fields = [].slice.call(
@@ -696,8 +539,6 @@
         fields.forEach(function (field) {
           field.validate();
         });
-
-        this._checkMatchingDisaggregation();
 
         valid = fields.every(function (field) {
           return !field.invalid;

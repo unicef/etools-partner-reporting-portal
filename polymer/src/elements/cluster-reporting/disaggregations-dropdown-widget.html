@@ -1,0 +1,249 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../../bower_components/paper-item/paper-item.html">
+
+<link rel="import" href="../../polyfills/es6-shim.html">
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../styles/buttons.html">
+
+<dom-module id="disaggregations-dropdown-widget">
+  <template>
+    <style include="button-styles iron-flex iron-flex-alignment">
+      :host {
+        display: block;
+      }
+
+      h2 {
+        padding: 5px 10px;
+        margin: 0 0 1em;
+        font-size: 14px;
+        background-color: var(--paper-grey-200);
+      }
+
+      .error,
+      .remove-btn {
+        color: var(--paper-deep-orange-a700);
+      }
+
+      .row {
+        margin-bottom: 1em;
+      }
+
+      .remove-btn {
+        width: 34px;
+        height: 34px;
+      }
+
+      .add-disaggregation-btn {
+        margin: 0;
+      }
+
+      .col-actions {
+        width: 40px;
+        border-right: 1px solid var(--paper-grey-400);
+      }
+
+      .col-name,
+      .col-values {
+        padding-left: 24px;
+        width: 270px;
+      }
+
+      paper-dropdown-menu {
+        width: 100%;
+      }
+    </style>
+
+    <h2>Disaggregations ([[value.length]])</h2>
+
+    <template is="dom-repeat" items="[[value]]" as="dataDisagg">
+      <div class="row layout horizontal">
+        <div class="flex-none layout vertical center-center col-actions">
+          <paper-icon-button
+              index="[[index]]"
+              class="remove-btn"
+              on-tap="_remove"
+              icon="icons:cancel">
+          </paper-icon-button>
+        </div>
+
+        <div class="col-name">
+          <paper-dropdown-menu
+            class="dis-menu validate"
+            id="disaggregationsDrop"
+            index="[[index]]"
+            label="Disaggregation By"
+            on-value-changed="_validate"
+            on-selected-item-changed="_setDisaggregation"
+            always-float-label
+            required>
+            <paper-listbox
+              slot="dropdown-content"
+              class="dropdown-content">
+              <template
+                is="dom-repeat"
+                items="[[disaggregations]]">
+                <paper-item name="[[item.id]]">[[item.name]]
+                </paper-item>
+              </template>
+            </paper-listbox>
+          </paper-dropdown-menu>
+        </div>
+
+        <div class="col-values">
+          <paper-input
+            index="[[index]]"
+            label="Disaggregation Groups"
+            value="[[_formatChoices(dataDisagg)]]"
+            always-float-label
+            disabled>
+          </paper-input>
+        </div>
+      
+      </div>
+    </template>
+
+    <paper-button
+        class="btn-primary add-disaggregation-btn"
+        on-tap="_add"
+        disabled="[[!_canAddMore]]">
+      Add disaggregation
+    </paper-button>
+
+  </template>
+
+    <script>
+      Polymer({
+        id: 'disaggregations-dropdown-widget',
+
+        behaviors: [
+          App.Behaviors.UtilsBehavior,
+        ],
+
+        properties: {
+          threshold: {
+          type: Number,
+          value: 3,
+        },
+
+          value: {
+            type: Array,
+            value: [],
+            notify: true,
+          },
+
+          disaggregations: {
+            type: Array,
+            value: [],
+          },
+
+          invalid: {
+            type: Boolean,
+            notify: true,
+            value: true
+          },
+
+          _canAddMore: {
+            type: Boolean,
+            value: true,
+          },
+
+          _invalid: {
+            type: Boolean,
+            value: false,
+          },
+        },
+
+        observers: [
+          '_setCanAddMore(value.splices)',
+        ],
+
+        _setCanAddMore: function () {
+          this.set('_canAddMore', this.value.length < 3);
+        },
+
+        _add: function () {
+          this.push('value', {
+            name: '',
+            choices: [],
+          });
+        },
+
+        _remove: function (e) {
+          var toRemove = +e.target.index;
+          this.splice('value', toRemove, 1);
+        },
+
+        _setDisaggregation: function (e, data) {
+          var index = +e.target.index;
+
+          var id;
+          if (data.value) {
+            id = data.value.name;
+          }
+
+          var selected;
+          if (id) {
+            selected = this.disaggregations.find(function(dis) {
+              return dis.id === id;});
+          }
+
+          var newSelectedDisaggregations;
+
+          if (selected) {
+            newSelectedDisaggregations = this.value.slice();
+
+            newSelectedDisaggregations[index] = selected;
+
+            this.set('value', newSelectedDisaggregations);
+          }
+        },
+
+        _formatChoices: function(selected) {
+          return selected.choices.map(function (choice) {
+            return choice.value;
+          }).join(', ');
+        },
+
+        _validate: function (e) {
+          e.target.validate();
+        },
+
+        validate: function () {
+          var allMenus = Polymer.dom(this.root).querySelectorAll('.dis-menu');
+          allMenus.forEach(function(menu) {
+            menu.set('invalid', false);
+          });
+          allMenus.forEach(function(menu) {
+            if (!menu.value) {
+              menu.set('invalid', true);
+            }
+          });
+          if (allMenus.length < 2) {
+            return;
+          }
+          var chosen = allMenus.map(function(choice) {
+            return choice.value;
+          });
+
+          for (var i = 0; i < chosen.length - 1; i++) {
+            for (var j = i + 1; j < chosen.length; j++) {
+              if (chosen[i] === chosen[j]) {
+                allMenus[i].set('invalid', true);
+                allMenus[j].set('invalid', true);
+              }
+            }
+          }
+        },
+
+      });
+
+    </script>
+
+</dom-module>
