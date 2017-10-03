@@ -1,0 +1,99 @@
+<script>
+    (function () {
+      'use strict';
+
+      var matchers = {
+        '(?,?)': function () {
+          return /^\((\d*),\s?(\d*)\)$/;
+        },
+
+        '(?,Y)': function (y) {
+          return new RegExp('^\\((\\d+),\\s?(' + y + ')\\)$');
+        },
+
+        '(X,?)': function (x) {
+          return new RegExp('^\\((' + x + '),\\s?(\\d+)\\)$');
+        },
+      };
+
+      function sumDisaggregations(fields) {
+        return fields.reduce(function (acc, curr) {
+          return acc + curr.v; // FIXME
+        }, 0);
+      }
+
+      function getCoords(key) {
+        return matchers['(?,?)']()
+            .exec(key)
+            .slice(1, 3);
+      }
+
+      App.Behaviors = App.Behaviors || {};
+
+      App.Behaviors.DisaggregationHelpersBehavior = {
+        _calculateLevel1: function (key, data) {
+          var coords = getCoords(key);
+          var y = coords[1];
+          var yRe = matchers['(?,Y)'](y);
+
+          var yFields = Object.keys(data)
+              .filter(function (k) {
+                return yRe.exec(k);
+              })
+              .map(function (k) {
+                return data[k];
+              });
+
+          var totals = {};
+
+          var keyY = '(' + y + ')';
+
+          totals[keyY] = {
+            v: sumDisaggregations(yFields), // FIXME
+          };
+
+          return totals;
+        },
+
+        _calculateLevel2: function (key, data) {
+          var keys = Object.keys(data);
+          var coords = getCoords(key);
+          var x = coords[0];
+          var y = coords[1];
+          var xRe = matchers['(X,?)'](x);
+          var yRe = matchers['(?,Y)'](y);
+
+          var xFields = keys
+              .filter(function (k) {
+                return xRe.exec(k);
+              })
+              .map(function (k) {
+                return data[k];
+              });
+
+          var yFields = keys
+              .filter(function (k) {
+                return yRe.exec(k);
+              })
+              .map(function (k) {
+                return data[k];
+              });
+
+          var totals = {};
+
+          var keyX = '(' + x + ',)';
+          var keyY = '(' + y + ',)';
+
+          totals[keyX] = {
+            v: sumDisaggregations(xFields), // FIXME
+          };
+
+          totals[keyY] = {
+            v: sumDisaggregations(yFields), // FIXME
+          };
+
+          return totals;
+        },
+      };
+    }());
+  </script>

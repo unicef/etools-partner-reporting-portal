@@ -129,6 +129,14 @@
       },
 
       _noop: function () {},
+
+      _mapKeys: function (obj, dict) {
+        return Object.assign({}, obj, Object.keys(dict).reduce(function (acc, curr) {
+          acc[curr] = dict[curr](obj[curr]);
+
+          return acc;
+        }, {}));
+      },
     };
   }());
 </script>
