@@ -100,24 +100,25 @@
   <script>
       Polymer({
         is: 'user-profile-dialog',
+
         behaviors: [
         App.Behaviors.ReduxBehavior,
         App.Behaviors.RoutingBehavior,
         App.Behaviors.UtilsBehavior,
       ],
+
         properties: {
-           opened: {
-          type: Boolean,
-          value: false,
-        },
-        profile: {
-          type: Object,
-          statePath: 'userProfile.profile'
-        },
+          opened: {
+            type: Boolean,
+            value: false,
+          },
+          profile: {
+            type: Object,
+            statePath: 'userProfile.profile'
+          },
         },
 
         close: function () {
-
           this.set('opened', false);
         },
 
@@ -126,10 +127,9 @@
         },
 
         _formatGroups: function(groups) {
-          return groups.join(", ");
+          return groups.join(', ');
         },
 
-        
       });
   </script>
 </dom-module>

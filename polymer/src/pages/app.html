@@ -254,9 +254,8 @@
       },
 
       _userProfileAjax: function() {
-        console.log('in ajax')
-        var userProfileThunk = this.$.userProfile.thunk()
-        return this.dispatch(App.Actions.fetchUserProfile(userProfileThunk))
+        var userProfileThunk = this.$.userProfile.thunk();
+        return this.dispatch(App.Actions.fetchUserProfile(userProfileThunk));
       },
 
       attached: function () {

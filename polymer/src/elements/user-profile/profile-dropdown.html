@@ -60,8 +60,7 @@ User profile dropdown for header toolbar
       }
     </style>
     <user-profile-dialog id="modal"></user-profile-dialog>
-    <paper-icon-button id="profile" icon="social:person" role="button" on-tap="_handleTap"
-                       aria-disabled="false"></paper-icon-button>
+    <paper-icon-button id="profile" icon="social:person" role="button" on-tap="_handleTap" aria-disabled="false"></paper-icon-button>
     <iron-collapse id="userDropdown" opened="[[dropdownOpened]]">
       <paper-material elevation="5" class="dropdown-content" id="user-dropdown">
         <div class="item" on-tap="_openModal">
@@ -79,20 +78,22 @@ User profile dropdown for header toolbar
   <script>
     Polymer({
       is: 'profile-dropdown',
+
       behaviors: [
         App.Behaviors.ReduxBehavior,
         App.Behaviors.UtilsBehavior,
       ],
+
       properties: {
         dropdownOpened: {
           type: String,
           value: '',
-          reflectToAttribute: true
+          reflectToAttribute: true,
         },
 
         profile: {
           type: Object,
-          statePath: 'userProfile.profile'
+          statePath: 'userProfile.profile',
         },
 
       },
@@ -106,12 +107,12 @@ User profile dropdown for header toolbar
         this.$$('#modal').open();
       },
 
-      _handleTap: function(e) {
+      _handleTap: function() {
         if (this.dropdownOpened === '') {
-          this.set('dropdownOpened', 'open')
-          this.set('opened', false)
+          this.set('dropdownOpened', 'open');
+          this.set('opened', false);
         } else {
-          this.set('dropdownOpened', '')
+          this.set('dropdownOpened', '');
         }
 
       },

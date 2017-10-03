@@ -46,18 +46,12 @@
       userLogout: function (logoutThunk) {
         return function (dispatch) {
           return logoutThunk()
-            .then(function(res) {
-              dispatch(App.Actions.reset())
-            })
-          /**
-           * TODO:
-           * - reset store
-           * - return logout api call
-           */
+            .then(function() {
+              dispatch(App.Actions.reset());
+            });
 
           // dispatch(App.Actions.resetToken());
 
-          // return Promise.resolve(); // FIXME
         };
       },
 
@@ -65,13 +59,12 @@
         return function (dispatch) {
           return profileThunk()
           .then(function(res) {
-            console.log('in fetch', res)
             dispatch(App.Actions.setUserProfile(res.data));
           });
         };
       },
+
       setUserProfile: function(data) {
-        console.log(data)
         return {
           type: App.Constants.SET_USER_PROFILE,
           data: data,
