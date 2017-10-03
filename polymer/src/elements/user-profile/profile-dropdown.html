@@ -8,13 +8,15 @@
 <link rel="import" href="../../lodash/lodash.html">
 
 <link rel="import" href="user-profile-dialog.html">
+
+<link rel="import" href="../../behaviors/utils.html">
 <!--
 `etools-profile-dropdown`
 User profile dropdown for header toolbar
 @demo demo/index.html 
 -->
 
-<dom-module id="etools-profile-dropdown">
+<dom-module id="profile-dropdown">
   <template>
     <style>
       :host {
@@ -25,10 +27,10 @@ User profile dropdown for header toolbar
         width: 60px;
         height: 60px;
       }
-      :host([opened="open"]) {
+      :host([dropdownOpened="open"]) {
         background: var(--primary-background-color, #FFFFFF);
       }
-      :host([opened="open"]) #profile,
+      :host([dropdownOpened="open"]) #profile,
       #accountProfile, #powerSettings {
         color: var(--dark-scondary-text-color, rgba(0, 0, 0, 0.54));
       }
@@ -57,11 +59,12 @@ User profile dropdown for header toolbar
         background: var(--medium-theme-background-color, #EEEEEE);
       }
     </style>
+    <user-profile-dialog id="modal"></user-profile-dialog>
     <paper-icon-button id="profile" icon="social:person" role="button" on-tap="_handleTap"
                        aria-disabled="false"></paper-icon-button>
-    <iron-collapse id="userDropdown">
+    <iron-collapse id="userDropdown" opened="[[dropdownOpened]]">
       <paper-material elevation="5" class="dropdown-content" id="user-dropdown">
-        <div class="item" on-tap="_openUserProfileDialog">
+        <div class="item" on-tap="_openModal">
           <paper-icon-button id="accountProfile" icon="account-circle"></paper-icon-button>
           Profile
         </div>
@@ -75,143 +78,44 @@ User profile dropdown for header toolbar
 
   <script>
     Polymer({
-      is: 'etools-profile-dropdown',
+      is: 'profile-dropdown',
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.UtilsBehavior,
+      ],
       properties: {
-        opened: {
+        dropdownOpened: {
           type: String,
           value: '',
           reflectToAttribute: true
         },
-        userProfileDialog: Object,
-        /**
-         *
-         * Expected structure of array elements :
-         *
-         *      el = {
-         *        label: 'element label',
-         *        value: '234'
-         *      }
-         * @type (ArrayBuffer|ArrayBufferView)
-         */
-        sections: {
-          type: Array,
-          notify: true
-        },
-        /**
-         *
-         * Expected structure of array elements :
-         *
-         *      el = {
-         *        label: 'element label',
-         *        value: '234'
-         *      }
-         * @type (ArrayBuffer|ArrayBufferView)
-         */
-        offices: {
-          type: Array,
-          notify: true,
-        },
-        /**
-         *
-         * Expected structure of array elements :
-         *
-         *      user = {
-         *        label: user.full_name,
-         *        value: user.id
-         *      }
-         * @type (ArrayBuffer|ArrayBufferView)
-         */
-        users: {
-          type: Object,
-          notify: true
-        },
-        /**
-         *
-         *  Profile object should be according to api endpoint
-         *  `/users/myprofile/`
-         *  and all modifications should be POSTed to the same endpoint
-         */
+
         profile: {
           type: Object,
-          notify: true
+          statePath: 'userProfile.profile'
         },
-        _loadingProfileMsgActive: Boolean
+
       },
-      observers: [
-        '_dataLoaded(sections, offices,users,profile)',
-      ],
-      ready: function() {
-        this.userProfileDialog = document.createElement('user-profile-dialog');
-        this.userProfileDialog.setAttribute('id', 'userProfileDialog');
-        // this.userProfileDialog.addEventListener('hacky-save', function(e) {
-        //   this.fire('save-profile', e.detail)
-        // }.bind(this), false);
-        Polymer.dom(document.querySelector('body')).appendChild(this.userProfileDialog);
-      },
-      attached: function() {
-        document.addEventListener('click', this._onCaptureClick.bind(this), true);
-      },
-      detached: function() {
-        if (this.userProfileDialog) {
-          Polymer.dom(document.querySelector('body')).removeChild(this.userProfileDialog);
-        }
-      },
-      _dataLoaded: function() {
-        if (this._allHaveValues('users', 'profile', 'offices', 'sections')) {
-          this.userProfileDialog.profile = this.profile;
-          this.userProfileDialog.offices = this.offices;
-          this.userProfileDialog.users = this.users;
-          this.userProfileDialog.sections = this.sections;
-          if (this._loadingProfileMsgActive) {
-            this.set('_loadingProfileMsgActive', false);
-            this.fire('global-loading');
-          }
-        }
-      },
-      _allHaveValues: function() {
-        var self = this;
-        var args = _.toArray(arguments);
-        return args.reduce(function(hasVal, prop) {
-          return !_.isEmpty(self[prop]) && hasVal;
-        }, true);
-      },
+
       _logout: function() {
         this.fire('sign-out');
       },
-      _openUserProfileDialog: function(event) {
-        this.userProfileDialog.openUserProfileDialog();
-        if (!this._allHaveValues('users', 'profile', 'offices', 'sections')) {
-          this.fire('global-loading', {active: true, message: 'Loading profile...'});
-          this.set('_loadingProfileMsgActive', true);
-        }
+
+      _openModal: function () {
+        this._handleTap();
+        this.$$('#modal').open();
       },
+
       _handleTap: function(e) {
-        this.$.userDropdown.toggle();
-        if (this.opened) {
-          this.set('opened', '');
+        if (this.dropdownOpened === '') {
+          this.set('dropdownOpened', 'open')
+          this.set('opened', false)
         } else {
-          this.set('opened', 'open');
+          this.set('dropdownOpened', '')
         }
+
       },
-      _onCaptureClick: function(e) {
-        if (this._isInPath(Polymer.dom(e).path, 'id', 'profile')) {
-          return;
-        }
-        if (!this._isInPath(Polymer.dom(e).path, 'id', 'user-dropdown')) {
-          if (this.$.userDropdown.opened) {
-            this._handleTap();
-          }
-        }
-      },
-      _isInPath: function(path, prop, value) {
-        path = path || [];
-        for (var i = 0; i < path.length; i++) {
-          if (path[i][prop] === value) {
-            return true;
-          }
-        }
-        return false;
-      },
+     
     });
   </script>
 </dom-module>

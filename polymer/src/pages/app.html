@@ -36,11 +36,16 @@
 
         <etools-prp-ajax
       id="signOut"
-      url="[[url]]"
+      url="[[signoutUrl]]"
       body="{}"
       content-type="application/json"
       method="post">
     </etools-prp-ajax>
+
+    <etools-prp-ajax
+    id="userProfile"
+    url="[[profileUrl]]">
+  </etools-prp-ajax>
 
     <app-route
         route="{{route}}"
@@ -107,9 +112,14 @@
           statePath: 'app.current',
         },
 
-        url: {
+        signoutUrl: {
           type: String,
           value: App.Endpoints.userSignOut(),
+        },
+
+        profileUrl: {
+          type: String,
+          value: App.Endpoints.userProfile(),
         },
       },
 
@@ -157,7 +167,7 @@
       _onSignOut: function() {
         var self = this;
         var thunk = this.$.signOut.thunk();
-        thunk()
+        this.dispatch(App.Actions.userLogout(thunk))
         .then(function () {
           self._redirectToLogin();
         })
@@ -243,10 +253,22 @@
         } catch (err) {}
       },
 
+      _userProfileAjax: function() {
+        console.log('in ajax')
+        var userProfileThunk = this.$.userProfile.thunk()
+        return this.dispatch(App.Actions.fetchUserProfile(userProfileThunk))
+      },
+
       attached: function () {
         var interventionsThunk = this.$.interventions.thunk();
+        var userProfileThunk = this.$.userProfile.thunk();
+        this.dispatch(App.Actions.fetchUserProfile(userProfileThunk))
+          .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
 
         this.dispatch(App.Actions.fetchWorkspaces(interventionsThunk))
+
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
             });
