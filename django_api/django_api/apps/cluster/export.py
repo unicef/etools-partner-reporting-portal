@@ -1,5 +1,6 @@
 from openpyxl.reader.excel import load_workbook
 from openpyxl.styles import Font, Alignment
+from openpyxl.utils import get_column_letter
 
 from django.conf import settings
 from django.db.models import Count
@@ -335,6 +336,25 @@ class XLSXWriter:
                 sheet_row += 1
             # Remove basic sheets
             self.wb.remove_sheet(sheet)
+
+        # Adjust columns width
+        for col in merged_sheet.columns:
+            max_length = 0
+            column = col[0].column  # Get the column name
+            for cell in col:
+                try:  # Necessary to avoid error on empty cells
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(cell.value)
+                except:
+                    pass
+            adjusted_width = max_length + 2
+            merged_sheet.column_dimensions[column].width = adjusted_width
+
+        # Add filters
+        merged_sheet.auto_filter.ref = "A1:%s%d" % (
+            get_column_letter(DISAGGREGATION_COLUMN_START + len(merged_disaggregations) + len(merged_disaggregation_values)),
+            merged_row
+        )
 
     def export_data(self):
 
