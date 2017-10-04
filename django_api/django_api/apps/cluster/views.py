@@ -314,7 +314,7 @@ class ClusterPartnerDashboardAPIView(APIView):
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
 
-class ClusterIndicatorsListExcelView(ListAPIView):
+class ClusterIndicatorsListExcelExportView(ListAPIView):
     """
         Used for generating excel file from filtered indicators
     """
@@ -340,13 +340,7 @@ class ClusterIndicatorsListExcelView(ListAPIView):
         )
         return queryset
 
-
-    def list(self, request, response_plan_id, *args, **kwargs):
-        # Render to excel
-        indicators = self.filter_queryset(self.get_queryset())
-
-        writer = XLSXWriter(indicators, response_plan_id)
-
+    def generate_excel(self, writer):
         import os.path
         import mimetypes
 
@@ -354,9 +348,27 @@ class ClusterIndicatorsListExcelView(ListAPIView):
         file_path = writer.export_data()
         file_name = os.path.basename(file_path)
         file_content = open(file_path, 'rb').read()
-        response = HttpResponse(file_content, content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        response = HttpResponse(file_content,
+                                content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
         response['Content-Disposition'] = 'attachment; filename=' + file_name
         return response
+
+
+    def list(self, request, response_plan_id, *args, **kwargs):
+        # Render to excel
+        indicators = self.filter_queryset(self.get_queryset())
+        writer = XLSXWriter(indicators, response_plan_id)
+        return self.generate_excel(writer)
+
+
+
+class ClusterIndicatorsListExcelExportForAnalysisView(ClusterIndicatorsListExcelExportView):
+
+    def list(self, request, response_plan_id, *args, **kwargs):
+        # Render to excel
+        indicators = self.filter_queryset(self.get_queryset())
+        writer = XLSXWriter(indicators, response_plan_id, analysis=True)
+        return self.generate_excel(writer)
 
 
 class ClusterIndicatorsLocationListAPIView(ListAPIView):
