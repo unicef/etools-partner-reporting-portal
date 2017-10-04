@@ -52,7 +52,7 @@
         background: var(--medium-theme-background-color, #EEEEEE);
       }
     </style>
-    <user-profile-dialog id="modal"></user-profile-dialog>
+    <user-profile-dialog id="userProfileDialog"></user-profile-dialog>
     <paper-icon-button id="profile" icon="social:person" role="button" on-tap="_handleTap" aria-disabled="false"></paper-icon-button>
     <iron-collapse id="userDropdown" opened="[[dropdownOpened]]">
       <paper-material elevation="5" class="dropdown-content" id="user-dropdown">
@@ -97,7 +97,9 @@
 
       _openModal: function () {
         this._handleTap();
-        this.$$('#modal').open();
+        var body = document.querySelector('body');
+        Polymer.dom(body).appendChild(this.$.userProfileDialog);
+        this.$.userProfileDialog.open();
       },
 
       _handleTap: function() {
