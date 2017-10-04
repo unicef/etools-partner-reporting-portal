@@ -25,6 +25,14 @@
       app-toolbar {
         @apply(--layout-justified);
       }
+
+      workspace-dropdown {
+        @apply(--layout-self-center);
+      }
+      .right-wrapper {
+        @apply(--layout-horizontal);
+        @apply(--layout-center-center);
+      }
     </style>
 
     <etools-prp-workspaces
@@ -36,13 +44,14 @@
       <app-header fixed>
         <app-toolbar>
           <etools-logo size="120" text-color="#fff"></etools-logo>
+          <div class="right-wrapper">
+            <workspace-dropdown
+                data="[[workspaces]]"
+                current="[[workspace]]">
+            </workspace-dropdown>
 
-          <workspace-dropdown
-              data="[[workspaces]]"
-              current="[[workspace]]">
-          </workspace-dropdown>
-
-          <profile-dropdown></profile-dropdown>
+            <profile-dropdown></profile-dropdown>
+          </div>
 
         </app-toolbar>
       </app-header>
