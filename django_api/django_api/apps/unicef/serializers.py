@@ -248,8 +248,20 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
         return obj.latest_indicator_report.is_draft
 
 
-class ProgressReportUpdateSerializer(ProgressReportSerializer):
-    programme_document = ProgrammeDocumentSerializer(read_only=True)
+class ProgressReportUpdateSerializer(serializers.ModelSerializer):
+
+    partner_contribution_to_date = serializers.CharField(required=False)
+    challenges_in_the_reporting_period = serializers.CharField(required=False)
+    proposed_way_forward = serializers.CharField(required=False)
+
+    class Meta:
+        model = ProgressReport
+        fields = (
+            'id',
+            'partner_contribution_to_date',
+            'challenges_in_the_reporting_period',
+            'proposed_way_forward',
+        )
 
 
 class ProgressReportReviewSerializer(serializers.Serializer):

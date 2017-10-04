@@ -9,7 +9,7 @@ from django.conf import settings
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 
-from rest_framework.generics import RetrieveAPIView, ListAPIView
+from rest_framework.generics import RetrieveAPIView, ListAPIView, UpdateAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status as statuses
@@ -45,7 +45,8 @@ from .serializers import (
     LLOutputSerializer,
     LLOutputIndicatorsSerializer,
     ProgrammeDocumentCalculationMethodsSerializer,
-    ProgrammeDocumentProgressSerializer
+    ProgrammeDocumentProgressSerializer,
+    ProgressReportUpdateSerializer
 )
 
 from .models import ProgrammeDocument, ProgressReport
@@ -307,6 +308,40 @@ class ProgressReportPDFView(RetrieveAPIView):
 
         pdf = render_to_pdf("report_annex_c_pdf.html", data)
         return HttpResponse(pdf, content_type='application/pdf')
+
+
+class ProgressReportDetailsUpdateAPIView(APIView):
+    """
+        Endpoint for updating Progress Report narrative fields
+    """
+    permission_classes = (IsAuthenticated,)
+
+    def get_object(self, pk):
+        try:
+            return ProgressReport.objects.get(
+                programme_document__partner=self.request.user.partner,  # TODO: check if needed?
+                programme_document__workspace=self.workspace_id,
+                pk=pk)
+        except ProgressReport.DoesNotExist as exp:
+            logger.exception({
+                "endpoint": "ProgressReportDetailsAPIView",
+                "request.data": self.request.data,
+                "pk": pk,
+                "exception": exp,
+            })
+            raise Http404def
+
+    def put(self, request, workspace_id, pk, *args, **kwargs):
+        self.workspace_id = workspace_id
+        pr = self.get_object(pk)
+        serializer = ProgressReportUpdateSerializer(instance=pr, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=statuses.HTTP_200_OK)
+
+        else:
+            return Response(serializer.errors, status=statuses.HTTP_400_BAD_REQUEST)
+
 
 
 class ProgressReportDetailsAPIView(RetrieveAPIView):
