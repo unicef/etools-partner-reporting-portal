@@ -100,7 +100,7 @@ class ProgressReportFilter(django_filters.FilterSet):
         )
 
     def get_due_date(self, queryset, name, value):
-        return queryset.filter(due_date=value)
+        return queryset.filter(due_date__lte=value)
 
     def get_location(self, queryset, name, value):
         return queryset.filter(indicator_reports__indicator_location_data__location=value)

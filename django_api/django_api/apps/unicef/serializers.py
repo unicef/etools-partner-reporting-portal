@@ -24,10 +24,15 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
     id = serializers.SerializerMethodField()
     status = serializers.CharField(source='get_status_display')
     total_unicef_supplies = serializers.SerializerMethodField()
+    total_unicef_supplies_currency = serializers.SerializerMethodField()
+    budget_currency = serializers.SerializerMethodField()
+    cso_contribution_currency = serializers.SerializerMethodField()
+    funds_received_to_date_currency = serializers.SerializerMethodField()
     unicef_officers = PersonSerializer(read_only=True, many=True)
     unicef_focal_point = PersonSerializer(read_only=True, many=True)
     partner_focal_point = PersonSerializer(read_only=True, many=True)
     document_type_display = serializers.SerializerMethodField()
+
 
     class Meta:
         model = ProgrammeDocument
@@ -44,9 +49,17 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
             'document_type',
             'document_type_display',
             'calculated_budget',
+            'budget',
+            'budget_currency',
             'cso_contribution',
+            'cso_contribution_currency',
             'total_unicef_cash',
+            'total_unicef_cash_currency',
+            'funds_received_to_date',
+            'funds_received_to_date_currency',
+            'funds_received_to_date_percentage',
             'total_unicef_supplies',
+            'total_unicef_supplies_currency',
             'partner_focal_point',
             'unicef_focal_point',
             'unicef_officers'
@@ -57,6 +70,18 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
 
     def get_total_unicef_supplies(self, obj):
         return str(obj.in_kind_amount)
+
+    def get_total_unicef_supplies_currency(self, obj):
+        return obj.get_in_kind_amount_currency_display()
+
+    def get_budget_currency(self, obj):
+        return obj.get_budget_currency_display()
+
+    def get_cso_contribution_currency(self, obj):
+        return obj.get_cso_contribution_currency_display()
+
+    def get_funds_received_to_date_currency(self, obj):
+        return obj.get_funds_received_to_date_currency_display()
 
     def get_document_type_display(self, obj):
         return obj.get_document_type_display()
