@@ -192,6 +192,9 @@ class XLSXWriter:
 
                 start_row_id += 1
 
+        # Lock first rows
+        self.sheet.freeze_panes = 'A%d' % INDICATOR_DATA_ROW_START
+
         return True
 
     def merge_sheets(self):
@@ -355,6 +358,9 @@ class XLSXWriter:
             get_column_letter(DISAGGREGATION_COLUMN_START + len(merged_disaggregations) + len(merged_disaggregation_values)),
             merged_row
         )
+
+        # Lock first rows
+        merged_sheet.freeze_panes = 'A%d' % INDICATOR_DATA_ROW_START
 
     def export_data(self):
 
