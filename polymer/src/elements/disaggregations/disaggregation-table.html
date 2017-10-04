@@ -218,42 +218,12 @@
 
         switch (this.formattedData.level_reported) {
           case 1:
-            totals = Object.assign(
-              {},
-              this.totals,
-              this._calculateLevel1(key, this.totals)
-            );
-            break;
-
           case 2:
-            totals = (function (self) {
-              var level2 = Object.assign(
-                {},
-                self.totals,
-                self._calculateLevel2(key, self.totals)
-              );
-
-              return self._mapKeys(
-                Object.assign(
-                  level2,
-                  self._calculateLevel1('(,)', level2)
-                ),
-                {
-                  '()': function (val) {
-                    return {
-                      v: val.v / 2, // FIXME
-                    };
-                  },
-                }
-              );
-            }(this));
-            break;
-
           case 3:
             totals = Object.assign(
               {},
               this.totals,
-              this._calculateLevel3(key, this.totals)
+              this['_calculateLevel' + this.formattedData.level_reported](key, this.totals)
             );
             break;
 

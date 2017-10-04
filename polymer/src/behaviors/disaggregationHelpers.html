@@ -1,3 +1,5 @@
+<link rel="import" href="../polyfills/es6-shim.html">
+
 <script>
     (function () {
       'use strict';
@@ -84,13 +86,16 @@
       App.Behaviors.DisaggregationHelpersBehavior = {
         _calculateLevel1: function (key, data) {
           var coords = getCoords(key);
+
           var y = coords[1];
+
           var yRe = matchers['(?,Y)'](y);
-          var yFields = extractFields(data, yRe);
 
           var totals = {};
 
           var yKey = formatKey(y);
+
+          var yFields = extractFields(data, yRe);
 
           totals[yKey] = formatField(sumDisaggValues(yFields));
 
@@ -99,26 +104,40 @@
 
         _calculateLevel2: function (key, data) {
           var coords = getCoords(key);
+
           var x = coords[0];
           var y = coords[1];
+
           var xRe = matchers['(X,?)'](x);
           var yRe = matchers['(?,Y)'](y);
-          var xFields = extractFields(data, xRe);
-          var yFields = extractFields(data, yRe);
+          var tRe = matchers['(?,Y)']('');
 
-          var totals = {};
+          var tmpTotals1 = {};
+          var tmpTotals2 = {};
 
           var xKey = formatKey(x, '');
           var yKey = formatKey(y, '');
 
-          totals[xKey] = formatField(sumDisaggValues(xFields));
-          totals[yKey] = formatField(sumDisaggValues(yFields));
+          var xFields = extractFields(data, xRe);
+          var yFields = extractFields(data, yRe);
 
-          return totals;
+          tmpTotals1[xKey] = formatField(sumDisaggValues(xFields));
+          tmpTotals1[yKey] = formatField(sumDisaggValues(yFields));
+
+          data = Object.assign({}, data, tmpTotals1);
+
+          var tKey = formatKey('');
+
+          var tFields = extractFields(data, tRe);
+
+          tmpTotals2[tKey] = formatField(sumDisaggValues(tFields) / 2);
+
+          return Object.assign({}, tmpTotals1, tmpTotals2);
         },
 
         _calculateLevel3: function (key, data) {
           var coords = getCoords(key);
+
           var x = coords[0];
           var y = coords[1];
           var z = coords[2];
