@@ -4,21 +4,20 @@
 <link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../../bower_components/paper-material/paper-material.html">
 
-<link rel="import" href="../../../bower_components/etools-dialog/etools-dialog.html">
 <link rel="import" href="../../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
 <link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
 
-<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/modal.html">
 <link rel="import" href="../../behaviors/routing.html">
-<link rel="import" href="../../styles/buttons.html">
-
+<link rel="import" href="../../styles/modal.html">
 
 <dom-module id="user-profile-dialog">
   <template>
-    <style include="button-styles modal-styles app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
+    <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
       :host {
         display: block;
 
@@ -60,9 +59,6 @@
         color: white;
       }
 
-      .buttons {
-        padding: 24px;
-      }
     </style>
 
     <paper-dialog id="userProfileDialog" opened="[[opened]]">
@@ -77,23 +73,25 @@
       </div>
 
        <paper-dialog-scrollable>
-        <div class="row">
-          <paper-input label="First Name" value="{{profile.first_name}}" readonly always-float-label></paper-input>
+        <iron-form class="app-grid">
+        <div class="full-width">
+          <paper-input label="First Name" value="{{profile.first_name}}" placeholder="---" readonly always-float-label></paper-input>
         </div>
 
-        <div class="row">
-          <paper-input label="Last Name" value="{{profile.last_name}}" readonly always-float-label></paper-input>
+        <div class="full-width">
+          <paper-input label="Last Name" value="{{profile.last_name}}" placeholder="---" readonly always-float-label></paper-input>
         </div>
 
-        <div class="row">
-          <paper-input label="Email" value="{{profile.email}}" always-float-label readonly></paper-input>
+        <div class="full-width">
+          <paper-input label="Email" value="{{profile.email}}" placeholder="---" always-float-label readonly></paper-input>
         </div>
 
-        <div class="row">
-          <paper-input label="My Groups" value="[[_formatGroups(profile.groups)]]" readonly always-float-label></paper-input>
+        <div class="full-width">
+          <paper-input label="My Groups" value="[[_formatGroups(profile.groups)]]" placeholder="---" readonly always-float-label></paper-input>
         </div>
 
-      </div>
+      </iron-form>
+    </paper-dialog-scrollable>
     </paper-dialog>
   </template>
 

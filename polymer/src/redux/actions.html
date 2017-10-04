@@ -47,11 +47,8 @@
         return function (dispatch) {
           return logoutThunk()
             .then(function() {
-              dispatch(App.Actions.reset());
+              dispatch(App.Actions.resetToken());
             });
-
-          // dispatch(App.Actions.resetToken());
-
         };
       },
 
