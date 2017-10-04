@@ -4,8 +4,12 @@
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 
 <link rel="import" href="elements/etools-prp-auth.html">
+<link rel="import" href="elements/etools-prp-ajax.html">
 <link rel="import" href="behaviors/utils.html">
 <link rel="import" href="behaviors/errors.html">
+<link rel="import" href="endpoints.html">
+<link rel="import" href="redux/actions.html">
+<link rel="import" href="redux/store.html">
 
 <dom-module id="app-shell">
   <template>
@@ -21,6 +25,14 @@
     </style>
 
     <etools-prp-auth authenticated="{{authenticated}}"></etools-prp-auth>
+
+    <etools-prp-ajax
+      id="signOut"
+      url="[[signoutUrl]]"
+      body="{}"
+      content-type="application/json"
+      method="post">
+    </etools-prp-ajax>
 
     <app-location route="{{route}}"></app-location>
 
@@ -59,6 +71,7 @@
       behaviors: [
         App.Behaviors.UtilsBehavior,
         App.Behaviors.ErrorHandlerBehavior,
+        App.Behaviors.ReduxBehavior,
       ],
 
       properties: {
@@ -70,6 +83,10 @@
         authenticated: {
           type: Boolean,
         },
+        signoutUrl: {
+          type: String,
+          value: App.Endpoints.userSignOut(),
+        },
 
         redirectPath: {
           type: String,
@@ -80,6 +97,10 @@
       observers: [
         '_routePageChanged(routeData.page)',
       ],
+
+      listeners: {
+        'sign-out': '_onSignOut'
+      },
 
       attached: function () {
         this.listen(this.root, 'error', '_handleError');
@@ -97,6 +118,19 @@
         var resolvedPageUrl = this.resolveUrl('pages/' + page + '.html');
 
         this.importHref(resolvedPageUrl, null, this._notFound, true);
+      },
+
+       _onSignOut: function() {
+        var self = this;
+        var thunk = this.$.signOut.thunk();
+        this.dispatch(App.Actions.userLogout(thunk))
+          .then(function () {
+            self.set('route.path', '/login');
+            self.dispatch(App.Actions.reset());
+          })
+        .catch(function (err) { //jshint ignore:line
+          // TODO: error handling
+        });
       },
 
       _notFound: function () {

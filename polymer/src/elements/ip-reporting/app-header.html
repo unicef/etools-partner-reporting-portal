@@ -3,6 +3,7 @@
 <link rel="import" href="../../../bower_components/app-layout/app-header-layout/app-header-layout.html">
 <link rel="import" href="../../../bower_components/app-layout/app-toolbar/app-toolbar.html">
 <link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../user-profile/profile-dropdown.html">
 
 <link rel="import" href="../etools-logo.html">
 <link rel="import" href="../workspace-dropdown.html">
@@ -40,6 +41,9 @@
               data="[[workspaces]]"
               current="[[workspace]]">
           </workspace-dropdown>
+
+          <profile-dropdown></profile-dropdown>
+
         </app-toolbar>
       </app-header>
     </app-header-layout>
