@@ -17,10 +17,9 @@
 
 <dom-module id="user-profile-dialog">
   <template>
-    <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
+    <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse modal-styles">
       :host {
         display: block;
-
         --app-grid-columns: 3;
         --app-grid-gutter: 15px;
         --app-grid-item-height: auto;
@@ -61,7 +60,7 @@
 
     </style>
 
-    <paper-dialog id="userProfileDialog" opened="[[opened]]">
+    <paper-dialog id="userProfileDialog" opened="{{opened}}" with-backdrop>
       <div class="header layout horizontal justified">
         <h2>My Profile</h2>
 
@@ -125,7 +124,9 @@
         },
 
         _formatGroups: function(groups) {
-          return groups.join(', ');
+          return groups.map(function(group) {
+            return group.name;
+          }).join(', ');
         },
 
       });
