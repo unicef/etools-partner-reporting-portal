@@ -29,6 +29,7 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
     partner_focal_point = PersonSerializer(read_only=True, many=True)
     document_type_display = serializers.SerializerMethodField()
 
+
     class Meta:
         model = ProgrammeDocument
         fields = (
@@ -44,8 +45,11 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
             'document_type',
             'document_type_display',
             'calculated_budget',
+            'budget',
             'cso_contribution',
             'total_unicef_cash',
+            'funds_received_to_date',
+            'funds_received_to_date_percentage',
             'total_unicef_supplies',
             'partner_focal_point',
             'unicef_focal_point',

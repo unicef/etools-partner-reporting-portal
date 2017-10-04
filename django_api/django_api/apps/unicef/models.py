@@ -279,6 +279,10 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
         return self.total_unicef_cash + self.in_kind_amount
 
     @property
+    def funds_received_to_date_percentage(self):
+        return "%.2f" % (self.funds_received_to_date * 100/ self.budget)
+
+    @property
     def calculated_budget(self):
         if self.__budget is not None:
             return self.__budget
