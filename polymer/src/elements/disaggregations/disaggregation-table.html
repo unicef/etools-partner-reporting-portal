@@ -252,6 +252,11 @@
             break;
 
           case 3:
+            totals = (function (self) {
+              var level3 = self._calculateLevel3(key, self.localData.disaggregation);
+
+              return level3;
+            }(this));
             break;
 
           default:
@@ -270,7 +275,7 @@
         }
 
         this.set('localData', this._clone(formattedData));
-        this.set('totals', {});
+        this.set('totals', this._clone(formattedData.disaggregation));
       },
 
       _resetFields: function () {
@@ -349,7 +354,9 @@
       },
 
       attached: function () {
-        this.set('totals', {});
+        if (!this.totals) {
+          this.set('totals', {});
+        }
       },
     });
   </script>
