@@ -199,31 +199,29 @@
       _fieldValueChanged: function (e, change) {
         var key = change.key;
         var value = change.value;
-        var updatePath = ['localData.disaggregation', key];
+        var totals;
+
+        var newValue = Object.assign(
+          {
+            c: null,
+            d: null,
+            v: null,
+          },
+          this.get(['localData.disaggregation', key]),
+          value
+        );
 
         e.stopPropagation();
 
-        this.set(
-          updatePath,
-          Object.assign(
-            {
-              c: null,
-              d: null,
-              v: null,
-            },
-            this.get(updatePath),
-            value
-          )
-        );
-
-        var totals;
+        this.set(['localData.disaggregation', key], newValue);
+        this.set(['totals', key], newValue);
 
         switch (this.formattedData.level_reported) {
           case 1:
             totals = Object.assign(
               {},
               this.totals,
-              this._calculateLevel1(key, this.localData.disaggregation)
+              this._calculateLevel1(key, this.totals)
             );
             break;
 
@@ -232,7 +230,7 @@
               var level2 = Object.assign(
                 {},
                 self.totals,
-                self._calculateLevel2(key, self.localData.disaggregation)
+                self._calculateLevel2(key, self.totals)
               );
 
               return self._mapKeys(
@@ -252,11 +250,11 @@
             break;
 
           case 3:
-            totals = (function (self) {
-              var level3 = self._calculateLevel3(key, self.localData.disaggregation);
-
-              return level3;
-            }(this));
+            totals = Object.assign(
+              {},
+              this.totals,
+              this._calculateLevel3(key, this.totals)
+            );
             break;
 
           default:
