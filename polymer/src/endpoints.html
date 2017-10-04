@@ -198,7 +198,15 @@
 
       clusterIndicatorLocations: function (responsePlanId) {
         return this._buildUrl('/cluster/' + responsePlanId + '/cluster-indicators-locations/');
-      }
+      },
+
+      userSignOut: function () {
+        return this._buildUrl('/account/user-logout/');
+      },
+
+      userProfile: function() {
+        return this._buildUrl('/account/user-profile/');
+      },
 
     };
   }());

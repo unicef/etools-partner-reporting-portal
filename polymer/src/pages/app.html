@@ -34,12 +34,26 @@
         url="[[interventionsUrl]]">
     </etools-prp-ajax>
 
+        <etools-prp-ajax
+      id="signOut"
+      url="[[signoutUrl]]"
+      body="{}"
+      content-type="application/json"
+      method="post">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
+    id="userProfile"
+    url="[[profileUrl]]">
+  </etools-prp-ajax>
+
     <app-route
         route="{{route}}"
         pattern="/:workspace_code/:app"
         data="{{routeData}}"
         tail="{{subroute}}">
     </app-route>
+    <iron-location id="ironLocation"></iron-location>
 
     <iron-pages
         selected="[[page]]"
@@ -97,6 +111,16 @@
           type: String,
           statePath: 'app.current',
         },
+
+        signoutUrl: {
+          type: String,
+          value: App.Endpoints.userSignOut(),
+        },
+
+        profileUrl: {
+          type: String,
+          value: App.Endpoints.userProfile(),
+        },
       },
 
       observers: [
@@ -107,6 +131,7 @@
 
       listeners: {
         'notify': '_notify',
+        'sign-out': '_onSignOut',
       },
 
       _redirectToWorkspace: function (workspace) {
@@ -132,6 +157,23 @@
             this._redirectToWorkspace(workspace);
           }
         } catch (err) {}
+      },
+
+      _redirectToLogin: function() {
+        this.dispatch(App.Actions.reset());
+        this.$.ironLocation.set('path', '/');
+      },
+
+      _onSignOut: function() {
+        var self = this;
+        var thunk = this.$.signOut.thunk();
+        this.dispatch(App.Actions.userLogout(thunk))
+        .then(function () {
+          self._redirectToLogin();
+        })
+        .catch(function (err) { //jshint ignore:line
+          // TODO: error handling
+        });
       },
 
       _routeWorkspaceChanged: function (workspace_code) {
@@ -211,10 +253,21 @@
         } catch (err) {}
       },
 
+      _userProfileAjax: function() {
+        var userProfileThunk = this.$.userProfile.thunk();
+        return this.dispatch(App.Actions.fetchUserProfile(userProfileThunk));
+      },
+
       attached: function () {
         var interventionsThunk = this.$.interventions.thunk();
+        var userProfileThunk = this.$.userProfile.thunk();
+        this.dispatch(App.Actions.fetchUserProfile(userProfileThunk))
+          .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
 
         this.dispatch(App.Actions.fetchWorkspaces(interventionsThunk))
+
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
             });
