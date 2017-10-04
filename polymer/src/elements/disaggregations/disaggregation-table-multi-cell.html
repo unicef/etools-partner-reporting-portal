@@ -1,6 +1,7 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
 
+<link rel="import" href="../../polyfills/es6-shim.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../etools-prp-number.html">
 <link rel="import" href="disaggregation-field.html">
@@ -66,7 +67,7 @@
               validator="[[vName]]">
           </disaggregation-field>
         </div>
-        <div class="computed-value">[[_toPercentage(data.c)]]</div>
+        <div class="computed-value">[[_toPercentage(localData.c)]]</div>
       </div>
     </template>
 
@@ -94,9 +95,14 @@
       ],
 
       properties: {
-        data: Object,
         vName: String,
         editable: Number,
+        localData: Object,
+
+        data: {
+          type: Object,
+          observer: '_cloneData',
+        },
 
         coords: {
           type: String,
@@ -118,11 +124,42 @@
       },
 
       _handleInput: function (e, data) {
+        var key = data.key;
         var value = data.value;
+        var calculated;
+
+        if (data.internal) {
+          // Dont handle self-fired events.
+          return;
+        }
+
+        e.stopPropagation();
+
+        var v = this.$$('#v');
+        var d = this.$$('#d');
 
         if (typeof value.v !== 'undefined') {
-          this.$$('#d').validate();
+          d.validate();
         }
+
+        var patch = Object.assign({}, this.get('localData'), value);
+
+        if (v.invalid || d.invalid) {
+          patch.c = null;
+        } else {
+          calculated = patch.v / patch.d;
+          patch.c = calculated;
+
+          this.fire('field-value-changed', {
+            key: key,
+            value: {
+              c: calculated,
+            },
+            internal: true,
+          });
+        }
+
+        this.set('localData', patch);
       },
 
       _bindValidation: function (coords) {
@@ -143,6 +180,12 @@
         });
 
         this.set('vName', vName);
+      },
+
+      _cloneData: function (data) {
+        if (!this.localData) {
+          this.set('localData', this._clone(data));
+        }
       },
     });
   </script>
