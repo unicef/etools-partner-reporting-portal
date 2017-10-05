@@ -7,7 +7,7 @@ DEBUG = True
 IS_DEV = True
 
 # domains/hosts etc.
-DOMAIN_NAME = '127.0.0.1:8000'
+DOMAIN_NAME = '127.0.0.1:8080'
 WWW_ROOT = 'http://%s/' % DOMAIN_NAME
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "*"]
 
