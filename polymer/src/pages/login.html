@@ -10,6 +10,7 @@
 <link rel="import" href="../elements/etools-logo.html">
 <link rel="import" href="../elements/etools-prp-ajax.html">
 <link rel="import" href="../behaviors/responsive.html">
+<link rel="import" href="../redux/store.html">
 <link rel="import" href="../settings.html">
 <link rel="import" href="../styles/app-theme-ip.html">
 
@@ -130,6 +131,11 @@
       method="post">
     </etools-prp-ajax>
 
+    <etools-prp-ajax
+      id="getProfile"
+      url="[[profileUrl]]">
+    </etools-prp-ajax>
+
     <div class="login-container">
       <div class="login-container-inner">
         <paper-card>
@@ -146,6 +152,9 @@
                 <li><p>If this is a valid email address, please check your email for instructions to Sign In.</p></li>
               </template>
               <template is="dom-if" if="{{!emailSubmitted}}">
+                <template is="dom-if" if="{{value}}">
+                  <p>There was an error.</p>
+                </template>
               <li>
               <iron-form>
               <paper-input label="Your Email" id="email" required type="email" value="{{data.email}}"> 
@@ -189,6 +198,7 @@
 
       behaviors: [
         App.Behaviors.ResponsiveBehavior,
+        App.Behaviors.ReduxBehavior,
       ],
 
       properties: {
@@ -204,15 +214,40 @@
           type: String,
           value: App.Endpoints.userLogin(),
         },
+        profileUrl: {
+          type: String,
+          value: App.Endpoints.userProfile(),
+        },
         emailSubmitted: {
           type: Boolean,
           value: false
-        }
+        },
+        error: {
+          type: Boolean,
+          value: false,
+        },
       },
 
       _computeLogoSize: function (isDesktop) {
         return isDesktop ? 180 : 120;
       },
+
+      attached: function() {
+        var self = this;
+        var thunk = this.$.getProfile.thunk();
+        thunk()
+          .then(function(res) {
+            if (res.status === 200) {
+              window.location.href = '/app/'
+            }
+          })
+          .catch(function(err) { // jshint ignore:line
+              // TODO: error handling
+
+          })
+      },
+
+
       submit: function() {
         var self = this;
         this.$$('#email').validate();

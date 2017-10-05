@@ -235,8 +235,8 @@
           .then(function() {
             self.dispatch(App.Actions.fetchUserProfile(userProfileThunk));
           })
-          .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
+          .catch(function () { 
+              window.location.href = '/login';
             });
 
       },

@@ -4,6 +4,7 @@
   "fragments": [
     "src/pages/login.html",
     "src/pages/not-found.html",
+    "src/pages/login-token",
 
     "src/pages/app.html",
     "src/pages/app/ip-reporting.html",
