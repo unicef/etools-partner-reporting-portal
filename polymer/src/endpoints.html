@@ -49,6 +49,10 @@
         return this.programmeDocumentReport(workspaceId, reportId) + 'submit/';
       },
 
+      programmeDocumentReportUpdate: function (workspaceId, reportId) {
+        return this.programmeDocumentReport(workspaceId, reportId) + 'update/';
+      },
+
       calculationMethods: function (workspaceId, pdId) {
         return this._buildUrl(
           '/unicef/' +

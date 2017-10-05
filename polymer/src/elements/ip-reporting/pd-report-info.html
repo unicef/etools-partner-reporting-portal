@@ -150,6 +150,11 @@
           statePath: 'programmeDocuments.current',
         },
 
+        locationId: {
+          type: String,
+          statePath: 'location.id',
+        },
+
         reportId: {
           type: String,
           statePath: 'programmeDocumentReports.current.id',
@@ -157,7 +162,7 @@
 
         updateUrl: {
           type: String,
-          computed: '_computeUpdateUrl(reportId)',
+          computed: '_computeUpdateUrl(locationId, reportId)',
         },
 
         overrideMode: {
@@ -177,21 +182,20 @@
       },
 
       observers: [
-        '_updateData(localData.progress_report.*)',
-        '_initLocalData(pdId, data.id)',
+        '_updateData(localData.*)',
       ],
 
       _handleInput: function () {
         var field = Polymer.dom(event).rootTarget;
         var id = field.id;
 
-        this.set(['localData.progress_report', id], field.value.trim());
+        this.set(['localData', id], field.value.trim());
       },
 
       _updateData: function (change) {
         var self = this;
 
-        if (change.path.split('.').length <= 2) {
+        if (change.path.split('.').length < 2) {
           // Skip the initial assignment
           return;
         }
@@ -217,21 +221,16 @@
         }, 300);
       },
 
-      _computeUpdateUrl: function (reportId) {
-        return App.Endpoints.indicatorData(reportId);
+      _computeUpdateUrl: function (locationId, reportId) {
+        return App.Endpoints.programmeDocumentReportUpdate(locationId, reportId);
       },
 
       _computeMode: function (mode, overrideMode) {
         return overrideMode || mode;
       },
 
-      _initLocalData: function (pdId, id) {
-        this.set('localData', {
-          progress_report: {
-            id: id,
-            programme_document_id: pdId,
-          },
-        });
+      attached: function () {
+        this.set('localData', {});
       },
 
       detached: function () {
