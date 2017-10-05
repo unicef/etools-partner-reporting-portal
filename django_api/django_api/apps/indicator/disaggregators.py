@@ -140,13 +140,13 @@ class RatioIndicatorDisaggregator(BaseDisaggregator):
     A class for Ratio indicator type disaggregation processing.
     """
 
-    """
-    post_process will perform the followings:
-    1. Calculate SUM of all v and d for all level_reported.
-    2. Calculate c value from v and d for all level_reported entries.
-    """
     @staticmethod
     def post_process(indicator_location_data):
+        """
+        post_process will perform the followings:
+        1. Calculate SUM of all v and d for all level_reported.
+        2. Calculate c value from v and d for all level_reported entries.
+        """
         level_reported = indicator_location_data.level_reported
 
         ordered_dict = get_cast_dictionary_keys_as_tuple(
@@ -194,7 +194,12 @@ class RatioIndicatorDisaggregator(BaseDisaggregator):
 
         # Calculating all level_reported N c values
         for key in ordered_dict_keys:
-            ordered_dict[key]["c"] = ordered_dict[key]["v"] / (ordered_dict[key]["d"] * 1.0)
+            if ordered_dict[key]["v"] == 0 and ordered_dict[key]["d"] == 0:
+                ordered_dict[key]["c"] = 0
+            elif ordered_dict[key]["d"] == 0:
+                raise Exception('Denominator is 0 when numerator is not for {}'.format(key))
+            else:
+                ordered_dict[key]["c"] = ordered_dict[key]["v"] / (ordered_dict[key]["d"] * 1.0)
 
         ordered_dict = get_cast_dictionary_keys_as_string(ordered_dict)
 
