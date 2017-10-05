@@ -21,6 +21,7 @@
 <link rel="import" href="reducers/clusterObjectives.html">
 <link rel="import" href="reducers/clusterDisaggregations.html">
 <link rel="import" href="reducers/clusterDashboardData.html">
+<link rel="import" href="reducers/userProfile.html">
 
 <script src="../../bower_components/redux-thunk/index.js"></script>
 
@@ -49,6 +50,7 @@
       clusterDisaggregations: App.Reducers.ClusterDisaggregations,
       clusterIndicatorReports: App.Reducers.ClusterIndicatorReports,
       clusterDashboardData: App.Reducers.ClusterDashboardData,
+      userProfile: App.Reducers.UserProfile,
     });
 
     var store = Redux.createStore(

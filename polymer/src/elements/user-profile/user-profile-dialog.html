@@ -1,0 +1,134 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/paper-material/paper-material.html">
+
+<link rel="import" href="../../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/modal.html">
+<link rel="import" href="../../behaviors/routing.html">
+<link rel="import" href="../../styles/modal.html">
+
+<dom-module id="user-profile-dialog">
+  <template>
+    <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse modal-styles">
+      :host {
+        display: block;
+        --app-grid-columns: 3;
+        --app-grid-gutter: 15px;
+        --app-grid-item-height: auto;
+        --app-grid-expandible-item-columns: 3;
+
+        --paper-dialog: {
+          width: 700px;
+
+          & > * {
+            margin: 0;
+          }
+        };
+      }
+
+      .full-width {
+        @apply --app-grid-expandible-item;
+      }
+
+      .header {
+        height: 48px;
+        padding: 0 24px;
+        margin: 0;
+        color: white;
+        background: var(--theme-primary-color);
+      }
+
+      .header h2 {
+        @apply(--paper-font-title);
+
+        margin: 0;
+        line-height: 48px;
+      }
+
+      .header paper-icon-button {
+        margin: 0 -13px 0 20px;
+        color: white;
+      }
+
+    </style>
+
+    <paper-dialog id="userProfileDialog" opened="{{opened}}" with-backdrop>
+      <div class="header layout horizontal justified">
+        <h2>My Profile</h2>
+
+        <paper-icon-button
+            class="self-center"
+            on-tap="close"
+            icon="icons:close">
+        </paper-icon-button>
+      </div>
+
+       <paper-dialog-scrollable>
+        <iron-form class="app-grid">
+        <div class="full-width">
+          <paper-input label="First Name" value="{{profile.first_name}}" placeholder="---" readonly always-float-label></paper-input>
+        </div>
+
+        <div class="full-width">
+          <paper-input label="Last Name" value="{{profile.last_name}}" placeholder="---" readonly always-float-label></paper-input>
+        </div>
+
+        <div class="full-width">
+          <paper-input label="Email" value="{{profile.email}}" placeholder="---" always-float-label readonly></paper-input>
+        </div>
+
+        <div class="full-width">
+          <paper-input label="My Groups" value="[[_formatGroups(profile.groups)]]" placeholder="---" readonly always-float-label></paper-input>
+        </div>
+
+      </iron-form>
+    </paper-dialog-scrollable>
+    </paper-dialog>
+  </template>
+
+  <script>
+      Polymer({
+        is: 'user-profile-dialog',
+
+        behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.RoutingBehavior,
+        App.Behaviors.UtilsBehavior,
+      ],
+
+        properties: {
+          opened: {
+            type: Boolean,
+            value: false,
+          },
+          profile: {
+            type: Object,
+            statePath: 'userProfile.profile'
+          },
+        },
+
+        close: function () {
+          this.set('opened', false);
+        },
+
+        open: function () {
+          this.set('opened', true);
+        },
+
+        _formatGroups: function(groups) {
+          return groups.map(function(group) {
+            return group.name;
+          }).join(', ');
+        },
+
+      });
+  </script>
+</dom-module>
