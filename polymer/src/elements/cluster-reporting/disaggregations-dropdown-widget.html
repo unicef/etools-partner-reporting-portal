@@ -8,7 +8,6 @@
 <link rel="import" href="../../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../../bower_components/paper-item/paper-item.html">
 
-<link rel="import" href="../../polyfills/es6-shim.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../styles/buttons.html">
 
@@ -105,7 +104,7 @@
             disabled>
           </paper-input>
         </div>
-      
+
       </div>
     </template>
 
@@ -128,9 +127,9 @@
 
         properties: {
           threshold: {
-          type: Number,
-          value: 3,
-        },
+            type: Number,
+            value: 3,
+          },
 
           value: {
             type: Array,
@@ -153,11 +152,6 @@
             type: Boolean,
             value: true,
           },
-
-          _invalid: {
-            type: Boolean,
-            value: false,
-          },
         },
 
         observers: [
@@ -165,7 +159,7 @@
         ],
 
         _setCanAddMore: function () {
-          this.set('_canAddMore', this.value.length < 3);
+          this.set('_canAddMore', this.value.length < this.threshold);
         },
 
         _add: function () {
@@ -189,9 +183,11 @@
           }
 
           var selected;
+
           if (id) {
             selected = this.disaggregations.find(function(dis) {
-              return dis.id === id;});
+              return dis.id === id;
+            });
           }
 
           var newSelectedDisaggregations;

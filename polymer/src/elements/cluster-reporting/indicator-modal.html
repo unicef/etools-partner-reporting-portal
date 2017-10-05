@@ -15,8 +15,8 @@
 <link rel="import" href="../../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-multi-selection-menu.html">
 
-<link rel="import" href="disaggregations-dropdown-widget.html">
 <link rel="import" href="../../polyfills/es6-shim.html">
+<link rel="import" href="disaggregations-dropdown-widget.html">
 <link rel="import" href="chip-date-of-report.html">
 <link rel="import" href="../labelled-item.html">
 <link rel="import" href="../etools-prp-chips.html">
@@ -58,6 +58,10 @@
       paper-radio-group {
         margin-left: -12px;
       }
+
+      paper-dropdown-menu {
+        width: 100%;
+      }
     </style>
 
     <etools-prp-ajax
@@ -67,7 +71,8 @@
 
     <etools-prp-ajax
         id="disaggregations"
-        url="[[disaggregationsUrl]]">
+        url="[[disaggregationsUrl]]"
+        params="[[disaggregationsParams]]">
     </etools-prp-ajax>
 
     <etools-prp-ajax
@@ -338,6 +343,13 @@
           value: true,
         },
 
+        disaggregationsParams: {
+          type: Object,
+          value: {
+            page_size: 99999,
+          },
+        },
+
         selectedLocations: {
           type: Array,
           value: [],
@@ -376,16 +388,6 @@
         type: Array,
         value: [],
       },
-
-      disaggregation: {
-        type: Array,
-        value: [],
-      },
-
-      _canAddMore: {
-          type: Boolean,
-          value: true,
-        },
 
       observers: [
         '_setDefaults(opened)',

@@ -1,11 +1,9 @@
 <link rel="import" href="../../../../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../../../../bower_components/app-layout/app-grid/app-grid-style.html">
-<link rel="import" href="../../../../../../bower_components/etools-loading/etools-loading.html">
 <link rel="import" href="../../../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../../../../../bower_components/iron-form/iron-form.html">
 <link rel="import" href="../../../../../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../../../../../bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="../../../../../../bower_components/iron-location/iron-location.html">
 <link rel="import" href="../../../../../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../../../../../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../../../../../bower_components/paper-button/paper-button.html">
@@ -15,8 +13,6 @@
 <link rel="import" href="../../../../etools-prp-ajax.html">
 <link rel="import" href="../../../../../styles/buttons.html">
 <link rel="import" href="../../../../../redux/store.html">
-<link rel="import" href="../../../../../redux/actions.html">
-<link rel="import" href="../../../../../behaviors/routing.html">
 <link rel="import" href="../../../../../behaviors/utils.html">
 
 <link rel="import" href="../../../../etools-prp-chips.html">
@@ -71,9 +67,6 @@
       }
     </style>
 
-    <iron-location path="{{path}}"></iron-location>
-
-
     <etools-prp-ajax
         id="createDisaggregation"
         url="[[url]]"
@@ -85,15 +78,14 @@
     <paper-dialog
         id="dialog"
         with-backdrop
-        opened="[[opened]]">
+        opened="{{opened}}">
       <div class="header layout horizontal justified">
         <h2>Add Disaggregation</h2>
-          <paper-icon-button
-              class="self-center"
-              on-tap="close"
-              icon="icons:close">
-          </paper-icon-button>
-        </div>
+        <paper-icon-button
+            class="self-center"
+            on-tap="close"
+            icon="icons:close">
+        </paper-icon-button>
       </div>
 
       <paper-dialog-scrollable>
@@ -111,6 +103,7 @@
                   label="Disaggregation"
                   value="{{data.name}}"
                   on-input="_onInput"
+                  on-blur="_formatName"
                   always-float-label
                   required>
               </paper-input>
@@ -151,7 +144,6 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
-        App.Behaviors.RoutingBehavior,
         App.Behaviors.UtilsBehavior
       ],
 
@@ -166,22 +158,11 @@
           value: [],
           notify: true,
         },
-        value: {
-          type: Object,
-          value: {},
-          notify: true,
-        },
 
         name: {
           type: String,
           value: '',
           notify: true,
-        },
-
-        invalid: {
-          type: Boolean,
-          notify: true,
-          value: true,
         },
 
         opened: {
@@ -198,6 +179,7 @@
           type: String,
           computed: '_computeUrl(responsePlanID)',
         },
+
         disaggregations: {
           type: Object,
           statePath: 'clusterDisaggregations.all',
@@ -224,10 +206,6 @@
         this.set('refresh', true);
       },
 
-      _validate: function (e) {
-        e.target.validate();
-      },
-
       _save: function () {
         if (!this._fieldsAreValid()) {
           return;
@@ -248,7 +226,7 @@
             self.fire('disaggregation-added', res.data);
             self.updatePending = false;
             self.close();
-            
+
           })
           .catch(function (err) { // jshint ignore:line
             // TODO: error handling
@@ -259,7 +237,7 @@
       _checkMatchingName: function() {
         var disaggregations = this.disaggregations;
           for (var i = 0; i < disaggregations.length; i++) {
-            if (disaggregations[i].name === this.value.name.trim()) {
+            if (disaggregations[i].name === this.data.name.trim()) {
                 return false;
             }
           }
@@ -268,30 +246,15 @@
 
       _onInput: function (e) {
         var el = e.target;
-        var newValue = el.value;
-        this.async(function () {
-          var field = el.name;
-          var change = {};
 
-          change[field] = typeof newValue === 'string' ?
-              newValue.trim() : newValue;
-
-          this.set(
-            ['value'],
-            Object.assign({}, this.value, change)
-          );
-          el.validate();
-
-          this._setValidity();
-        });
+        el.validate();
       },
-      
-     _setValidity: function () {
 
-        var invalid = this.value.length && this.value.some(function (disagg) {
-          return !disagg.name.length || !disagg.values.length;
-        });
-        this.set('invalid', invalid);
+      _formatName: function (e) {
+        var el = e.target;
+
+        el.value = el.value.trim();
+        el.validate();
       },
     });
   </script>

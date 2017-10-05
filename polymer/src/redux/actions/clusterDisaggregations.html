@@ -11,12 +11,12 @@
         return function (dispatch) {
           dispatch(App.Actions.ClusterDisaggregations.clusterDisaggregationsLoadingStart());
           return thunk()
-            .catch(function () {
-              dispatch(App.Actions.ClusterDisaggregations.clusterDisaggregationsLoadingStart());
-            })
             .then(function (res) {
+              dispatch(App.Actions.ClusterDisaggregations.clusterDisaggregationsLoadingStop());
               dispatch(App.Actions.ClusterDisaggregations.setClusterDisaggregationsList(res.data));
               dispatch(App.Actions.ClusterDisaggregations.setClusterDisaggregationsCount(res.data));
+            })
+            .catch(function () {
               dispatch(App.Actions.ClusterDisaggregations.clusterDisaggregationsLoadingStop());
             });
         };
