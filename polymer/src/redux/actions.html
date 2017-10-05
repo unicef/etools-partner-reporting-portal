@@ -44,17 +44,28 @@
         };
       },
 
-      userLogout: function () {
+      userLogout: function (logoutThunk) {
         return function (dispatch) {
-          /**
-           * TODO:
-           * - reset store
-           * - return logout api call
-           */
+          return logoutThunk()
+            .then(function() {
+              dispatch(App.Actions.resetToken());
+            });
+        };
+      },
 
-          dispatch(App.Actions.resetToken());
+      fetchUserProfile: function (profileThunk) {
+        return function (dispatch) {
+          return profileThunk()
+          .then(function(res) {
+            dispatch(App.Actions.setUserProfile(res.data));
+          });
+        };
+      },
 
-          return Promise.resolve(); // FIXME
+      setUserProfile: function(data) {
+        return {
+          type: App.Constants.SET_USER_PROFILE,
+          data: data,
         };
       },
 
