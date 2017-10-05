@@ -159,14 +159,14 @@
               </template>
 
                 <template is="dom-if" if="{{value}}">
-                  <p class='error-token'>Unable to login, invalid token, please try again.</p>
+                  <li><p class='error-token'>Unable to login, invalid token, please try again.</p></li>
                 </template>
               <li>
               <iron-form>
-              <paper-input label="Your Email" id="email" required type="email" value="{{data.email}}"> 
-              </paper-input>
-              <paper-button on-tap="submit">Submit
-              </paper-button>
+                <paper-input label="Your Email" id="email" required type="email" value="{{data.email}}"> 
+                </paper-input>
+                <paper-button on-tap="submit">Submit
+                </paper-button>
             </iron-form>
           </li>
  
