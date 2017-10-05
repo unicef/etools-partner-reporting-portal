@@ -64,16 +64,16 @@
           <div class="table-column">CSO contribution</div>
         </etools-data-table-column>
         <etools-data-table-column field="total_unicef_cash">
-          <div class="table-column">Total UNICEF cash</div>
+          <div class="table-column">UNICEF cash</div>
         </etools-data-table-column>
         <etools-data-table-column field="total_unicef_supplies">
-          <div class="table-column">Total UNICEF supplies</div>
+          <div class="table-column">UNICEF supplies</div>
         </etools-data-table-column>
+        <etools-data-table-column field="budget">
+            <div class="table-column">Planned Budget</div>
+          </etools-data-table-column>
         <etools-data-table-column field="calculated_budget">
-          <div class="table-column">
-            Budget
-            <paper-tooltip>Total budget $ (Disbursements to date %)</paper-tooltip>
-          </div>
+          <div class="table-column">$ Cash Transfers to Date (%)</div>
         </etools-data-table-column>
         <etools-data-table-column></etools-data-table-column>
       </etools-data-table-header>
@@ -107,6 +107,9 @@
             </div>
             <div class="table-cell table-cell--text">
               <etools-prp-number value="[[pd.total_unicef_supplies]]"></etools-prp-number>
+            </div>
+            <div class="table-cell table-cell--text">
+              <etools-prp-number value="[[pd.budget]]"></etools-prp-number>
             </div>
             <div class="table-cell table-cell--text">
               [[_withDefault(pd.calculated_budget)]]
