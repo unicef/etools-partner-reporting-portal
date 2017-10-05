@@ -157,6 +157,9 @@ class XLSXWriter:
                 location = location_data.location
                 while(True):
                     level = location.gateway.admin_level
+                    # TODO: secure in case of wrong location data
+                    if level > 5:
+                        level = 5
                     self.sheet.cell(row=start_row_id, column=20 + level * 2).value = location.p_code
                     self.sheet.cell(row=start_row_id, column=20 + level * 2 - 1).value = location.gateway.name
                     if location.parent:
