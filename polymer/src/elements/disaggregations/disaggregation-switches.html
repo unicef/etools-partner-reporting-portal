@@ -173,7 +173,7 @@
 
         if (checked) {
           this.push('reportedOn', id);
-        } else {
+        } else if (this.reportedOn.indexOf(id) !== -1) {
           this.splice('reportedOn', this.reportedOn.indexOf(id), 1);
         }
       },

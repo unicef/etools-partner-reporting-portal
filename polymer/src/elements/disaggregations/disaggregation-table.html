@@ -12,6 +12,7 @@
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
 <link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/disaggregationHelpers.html">
 <link rel="import" href="../../styles/disaggregation-table-styles.html">
 
 <dom-module id="disaggregation-table">
@@ -58,13 +59,13 @@
               is="dom-if"
               if="[[_equals(indicatorType, 'number')]]"
               restamp="true">
-            <dd>[[formattedData.location_progress.v]]</dd>
+            <dd>[[viewData.location_progress.v]]</dd>
           </template>
           <template
               is="dom-if"
               if="[[_equals(indicatorType, 'percentage')]]"
               restamp="true">
-            <dd>[[_toPercentage(formattedData.location_progress.c)]]</dd>
+            <dd>[[_toPercentage(viewData.location_progress.c)]]</dd>
           </template>
         </dl>
       </template>
@@ -75,7 +76,7 @@
             if="[[_equals(formattedMapping.length, 0)]]"
             restamp="true">
           <zero-disaggregations
-              data="[[formattedData]]"
+              data="[[viewData]]"
               mapping="[[formattedMapping]]"
               editable="[[editable]]">
           </zero-disaggregations>
@@ -86,7 +87,7 @@
             if="[[_equals(formattedMapping.length, 1)]]"
             restamp="true">
           <one-disaggregation
-              data="[[formattedData]]"
+              data="[[viewData]]"
               mapping="[[formattedMapping]]"
               editable="[[editable]]">
           </one-disaggregation>
@@ -97,7 +98,7 @@
             if="[[_equals(formattedMapping.length, 2)]]"
             restamp="true">
           <two-disaggregations
-              data="[[formattedData]]"
+              data="[[viewData]]"
               mapping="[[formattedMapping]]"
               editable="[[editable]]">
           </two-disaggregations>
@@ -108,7 +109,7 @@
             if="[[_equals(formattedMapping.length, 3)]]"
             restamp="true">
           <three-disaggregations
-              data="[[formattedData]]"
+              data="[[viewData]]"
               mapping="[[formattedMapping]]"
               editable="[[editable]]">
           </three-disaggregations>
@@ -126,6 +127,7 @@
       behaviors: [
         App.Behaviors.UtilsBehavior,
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.DisaggregationHelpersBehavior,
       ],
 
       properties: {
@@ -136,6 +138,8 @@
 
         data: Object,
 
+        totals: Object,
+
         formattedData: {
           type: Object,
           observer: '_cloneData',
@@ -144,6 +148,11 @@
         formattedMapping: {
           type: Array,
           computed: '_computeMapping(editableBool, formattedData, mapping)',
+        },
+
+        viewData: {
+          type: Object,
+          computed: '_computeViewData(formattedData, totals)',
         },
 
         updateUrl: {
@@ -188,22 +197,44 @@
       },
 
       _fieldValueChanged: function (e, change) {
-        var updatePath = ['localData.disaggregation', change.key];
+        var key = change.key;
+        var value = change.value;
+        var totals;
+
+        var newValue = Object.assign(
+          {
+            c: null,
+            d: null,
+            v: null,
+          },
+          this.get(['localData.disaggregation', key]),
+          value
+        );
 
         e.stopPropagation();
 
-        this.set(
-          updatePath,
-          Object.assign(
-            {
-              c: null,
-              d: null,
-              v: null,
-            },
-            this.get(updatePath),
-            change.value
-          )
-        );
+        this.set(['localData.disaggregation', key], newValue);
+        this.set(['totals', key], newValue);
+
+        switch (this.formattedData.level_reported) {
+          case 1:
+          case 2:
+          case 3:
+            totals = Object.assign(
+              {},
+              this.totals,
+              this['_calculateLevel' + this.formattedData.level_reported](key, this.totals)
+            );
+            break;
+
+          default:
+            // noop
+            break;
+        }
+
+        if (totals) {
+          this.set('totals', totals);
+        }
       },
 
       _cloneData: function (formattedData) {
@@ -212,6 +243,7 @@
         }
 
         this.set('localData', this._clone(formattedData));
+        this.set('totals', this._clone(formattedData.disaggregation));
       },
 
       _resetFields: function () {
@@ -281,6 +313,18 @@
 
       _computeIndicatorType: function (data) {
         return data.display_type;
+      },
+
+      _computeViewData: function (data, totals) {
+        return Object.assign({}, data, {
+          disaggregation: Object.assign({}, data.disaggregation, totals),
+        });
+      },
+
+      attached: function () {
+        if (!this.totals) {
+          this.set('totals', {});
+        }
       },
     });
   </script>
