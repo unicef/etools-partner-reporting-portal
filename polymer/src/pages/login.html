@@ -2,6 +2,7 @@
 <link rel="import" href="../../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../../bower_components/iron-media-query/iron-media-query.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../bower_components/iron-a11y-keys-behavior/iron-a11y-keys-behavior.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
@@ -199,6 +200,7 @@
       behaviors: [
         App.Behaviors.ResponsiveBehavior,
         App.Behaviors.ReduxBehavior,
+        Polymer.IronA11yKeysBehavior,
       ],
 
       properties: {
@@ -226,6 +228,16 @@
           type: Boolean,
           value: false,
         },
+        keyEventTarget: {
+          type: Object,
+          value: function() {
+            return document.body;
+          }
+        }
+      },
+
+      keyBindings: {
+        'enter': 'submit',
       },
 
       _computeLogoSize: function (isDesktop) {
