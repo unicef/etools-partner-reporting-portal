@@ -38,10 +38,40 @@
         },
       };
 
-      function sumDisaggValues(fields) {
-        return fields.reduce(function (acc, curr) {
-          return acc + curr.v; // FIXME
-        }, 0);
+      function identity(val) {
+        return val;
+      }
+
+      function divideBy(d) {
+        return function (v) {
+          return v / d;
+        };
+      }
+
+      function sumDisaggValues(fields, transform) {
+        var result;
+
+        if (typeof transform === 'undefined') {
+          transform = identity;
+        }
+
+        result = fields.reduce(function (acc, curr) {
+          ['v', 'd'].forEach(function (key) {
+            if (typeof curr[key] !== 'undefined') {
+              acc[key] = (acc[key] || 0) + transform(curr[key]);
+            }
+          });
+
+          return acc;
+        }, {});
+
+        var c = result.v / result.d;
+
+        if (c === c) {
+          result.c = c;
+        }
+
+        return result;
       }
 
       function getCoords(key) {
@@ -65,12 +95,6 @@
             .map(function (k) {
               return data[k];
             });
-      }
-
-      function formatField(v) {
-        return {
-          v: v, // FIXME
-        };
       }
 
       function formatKey() {
@@ -97,7 +121,7 @@
 
           var yFields = extractFields(data, yRe);
 
-          totals[yKey] = formatField(sumDisaggValues(yFields));
+          totals[yKey] = sumDisaggValues(yFields);
 
           return totals;
         },
@@ -121,8 +145,8 @@
           var xFields = extractFields(data, xRe);
           var yFields = extractFields(data, yRe);
 
-          tmpTotals1[xKey] = formatField(sumDisaggValues(xFields));
-          tmpTotals1[yKey] = formatField(sumDisaggValues(yFields));
+          tmpTotals1[xKey] = sumDisaggValues(xFields);
+          tmpTotals1[yKey] = sumDisaggValues(yFields);
 
           data = Object.assign({}, data, tmpTotals1);
 
@@ -130,7 +154,7 @@
 
           var tFields = extractFields(data, tRe);
 
-          tmpTotals2[tKey] = formatField(sumDisaggValues(tFields) / 2);
+          tmpTotals2[tKey] = sumDisaggValues(tFields, divideBy(2));
 
           return Object.assign({}, tmpTotals1, tmpTotals2);
         },
@@ -162,9 +186,9 @@
           var xzFields = extractFields(data, xzRe);
           var yzFields = extractFields(data, yzRe);
 
-          tmpTotals1[xyKey] = formatField(sumDisaggValues(xyFields));
-          tmpTotals1[xzKey] = formatField(sumDisaggValues(xzFields));
-          tmpTotals1[yzKey] = formatField(sumDisaggValues(yzFields));
+          tmpTotals1[xyKey] = sumDisaggValues(xyFields);
+          tmpTotals1[xzKey] = sumDisaggValues(xzFields);
+          tmpTotals1[yzKey] = sumDisaggValues(yzFields);
 
           data = Object.assign({}, data, tmpTotals1);
 
@@ -176,9 +200,9 @@
           var yFields = extractFields(data, yRe);
           var zFields = extractFields(data, zRe);
 
-          tmpTotals2[xKey] = formatField(sumDisaggValues(xFields) / 2);
-          tmpTotals2[yKey] = formatField(sumDisaggValues(yFields));
-          tmpTotals2[zKey] = formatField(sumDisaggValues(zFields));
+          tmpTotals2[xKey] = sumDisaggValues(xFields, divideBy(2));
+          tmpTotals2[yKey] = sumDisaggValues(yFields);
+          tmpTotals2[zKey] = sumDisaggValues(zFields);
 
           data = Object.assign({}, data, tmpTotals2);
 
@@ -186,7 +210,7 @@
 
           var tFields = extractFields(data, tRe);
 
-          tmpTotals3[tKey] = formatField(sumDisaggValues(tFields) / 3);
+          tmpTotals3[tKey] = sumDisaggValues(tFields, divideBy(3));
 
           return Object.assign({}, tmpTotals1, tmpTotals2, tmpTotals3);
         },

@@ -127,6 +127,7 @@
         var key = data.key;
         var value = data.value;
         var calculated;
+        var change;
 
         if (data.internal) {
           // Dont handle self-fired events.
@@ -142,24 +143,27 @@
           d.validate();
         }
 
-        var patch = Object.assign({}, this.get('localData'), value);
+        change = Object.assign({}, this.get('localData'), value);
 
         if (v.invalid || d.invalid) {
-          patch.c = null;
+          change.c = null;
         } else {
-          calculated = patch.v / patch.d;
-          patch.c = calculated;
+          calculated = change.v / change.d;
+
+          if (calculated !== calculated) {
+            calculated = 0;
+          }
+
+          change.c = calculated;
 
           this.fire('field-value-changed', {
             key: key,
-            value: {
-              c: calculated,
-            },
+            value: change,
             internal: true,
           });
         }
 
-        this.set('localData', patch);
+        this.set('localData', change);
       },
 
       _bindValidation: function (coords) {
