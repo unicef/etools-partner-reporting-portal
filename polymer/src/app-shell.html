@@ -87,7 +87,7 @@
         authenticated: {
           type: Boolean,
         },
-        
+
         signoutUrl: {
           type: String,
           value: App.Endpoints.userSignOut(),
@@ -126,9 +126,8 @@
       },
 
       _onTokenError: function() {
-        console.log('onnnn')
-        this.set('error', true)
-        this.set('route.path', '/login')
+        this.set('error', true);
+        this.set('route.path', '/login');
       },
 
       _pageChanged: function (page) {

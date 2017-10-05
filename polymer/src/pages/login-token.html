@@ -17,7 +17,7 @@
       }
     </style>
 
-        <iron-location
+    <iron-location
       query="{{query}}">
     </iron-location>
 
@@ -40,7 +40,7 @@
       properties: {
         data: {
           type: Object,
-          value: {}
+          value: {},
         },
         tokenUrl: {
           type: String,
@@ -49,25 +49,19 @@
       },
 
       attached: function() {
-        console.log('attched!!', this.query)
-        var token = this.query.split('=')[1]
-        this.set('data', {'token': token})
-        console.log(this.data)
+        var token = this.query.split('=')[1];
+        this.set('data', {'token': token});
         var self = this;
         var thunk = this.$.validateToken.thunk();
         thunk()
           .then(function(res) {
-            console.log('token valid!', res)
             if (res.data.success) {
-              window.location.href = '/app/'
+              window.location.href = '/app/';
             }
           })
-          .catch(function(err) { // jshint ignore:line
-            // TODO: error handling
-            console.log('error', err)
-            self.fire('token-error')
-            // window.location.href = '/login'
-          })
+          .catch(function() {
+            self.fire('token-error');
+          });
       },
 
     });

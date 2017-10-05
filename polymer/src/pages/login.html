@@ -153,7 +153,7 @@
               </template>
               <template is="dom-if" if="{{!emailSubmitted}}">
                 <template is="dom-if" if="{{value}}">
-                  <p>There was an error.</p>
+                  <p class='error-token'>Unable to login, invalid token, please try again.</p>
                 </template>
               <li>
               <iron-form>
@@ -233,40 +233,32 @@
       },
 
       attached: function() {
-        var self = this;
         var thunk = this.$.getProfile.thunk();
         thunk()
           .then(function(res) {
             if (res.status === 200) {
-              window.location.href = '/app/'
+              window.location.href = '/app/';
             }
           })
           .catch(function(err) { // jshint ignore:line
               // TODO: error handling
-
-          })
+          });
       },
-
 
       submit: function() {
         var self = this;
         this.$$('#email').validate();
-        console.log(this.$$('#email').invalid)
-        console.log('submit', this.data.email, this.loginUrl)
         if (this.$$('#email').invalid) {
           return;
         }
         var thunk = this.$.login.thunk();
         thunk()
-          .then(function (res) {
-            console.log('submitted!!!', res)
-            self.set('emailSubmitted', true)
+          .then(function () {
+            self.set('emailSubmitted', true);
           })
-          .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-              self.set('emailSubmitted', true)
-              console.log('error', err)
-          })
+          .catch(function () {
+            self.set('emailSubmitted', true);
+          });
       }
     });
   </script>
