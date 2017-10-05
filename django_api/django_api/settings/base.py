@@ -46,7 +46,7 @@ MEDIA_ROOT = os.path.join(DATA_VOLUME, '%s' % UPLOADS_DIR_NAME)
 STATIC_ROOT = '%s/staticserve' % DATA_VOLUME
 
 # Sendgrid stuff
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = DOMAIN_NAME = os.getenv('DOMAIN_NAME')
 
 EMAIL_HOST = 'smtp.sendgrid.net'
 EMAIL_PORT = 587
@@ -283,4 +283,5 @@ PASSWORDLESS_AUTH = {
     'PASSWORDLESS_EMAIL_NOREPLY_ADDRESS': 'no-reply@unicef.org',
     'PASSWORDLESS_CONTEXT_PROCESSORS': ['account.context_processors.passwordless_token_email', ],
     'PASSWORDLESS_REGISTER_NEW_USERS': False,
+    'PASSWORDLESS_EMAIL_SUBJECT': 'UNICEF Partner Reporting Portal: Your login link'
 }
