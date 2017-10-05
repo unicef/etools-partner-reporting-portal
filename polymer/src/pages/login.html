@@ -116,6 +116,10 @@
       p {
         color: #fff;
       }
+      p.error-token {
+        color: var(--paper-deep-orange-a700);
+        font-size: 1.2em;
+      }
 
     </style>
 
@@ -150,9 +154,10 @@
 
             <ul>
               <template is="dom-if" if="{{emailSubmitted}}">
-                <li><p>If this is a valid email address, please check your email for instructions to Sign In.</p></li>
+                <li><p>If this is a valid email address, please check your email for instructions to Sign In.<br>
+                You can also try another email.</p></li>
               </template>
-              <template is="dom-if" if="{{!emailSubmitted}}">
+
                 <template is="dom-if" if="{{value}}">
                   <p class='error-token'>Unable to login, invalid token, please try again.</p>
                 </template>
@@ -164,7 +169,7 @@
               </paper-button>
             </iron-form>
           </li>
-        </template>
+ 
               <!-- <li>
                 <a href="/todo">
                   <paper-button raised>
@@ -267,9 +272,11 @@
         thunk()
           .then(function () {
             self.set('emailSubmitted', true);
+            self.set('data.email', '');
           })
           .catch(function () {
             self.set('emailSubmitted', true);
+            self.set('data.email', '');
           });
       }
     });
