@@ -16,7 +16,7 @@
 <link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-multi-selection-menu.html">
 
 <link rel="import" href="../../polyfills/es6-shim.html">
-<link rel="import" href="disaggregations-widget.html">
+<link rel="import" href="disaggregations-dropdown-widget.html">
 <link rel="import" href="chip-date-of-report.html">
 <link rel="import" href="../labelled-item.html">
 <link rel="import" href="../etools-prp-chips.html">
@@ -70,9 +70,16 @@
     </etools-prp-ajax>
 
     <etools-prp-ajax
+        id="disaggregations"
+        url="[[disaggregationsUrl]]"
+        params="[[disaggregationsParams]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
         id="indicators"
         url="[[indicatorsUrl]]"
         method="post"
+        body="[[data]]"
         content-type="application/json">
     </etools-prp-ajax>
 
@@ -80,6 +87,7 @@
         id="dialog"
         with-backdrop
         opened="{{opened}}">
+
       <div class="header layout horizontal justified">
         <h2>Add Indicator</h2>
 
@@ -238,12 +246,15 @@
           </div>
 
           <div class="row">
-            <disaggregations-widget
-                class="validate"
-                value="{{data.disaggregation}}">
-            </disaggregations-widget>
+            <disaggregations-dropdown-widget
+              class="validate"
+              value="{{selectedDisaggregations}}"
+              disaggregations="[[disaggregations]]">
+            </disaggregations-dropdown-widget>
           </div>
+
         </template>
+
       </paper-dialog-scrollable>
 
       <div class="buttons layout horizontal-reverse">
@@ -285,6 +296,11 @@
 
         displayType: String,
 
+        responsePlanId: {
+         type: String,
+         statePath: 'responsePlans.currentID',
+       },
+
         locationId: {
           type: String,
           statePath: 'location.id',
@@ -293,6 +309,11 @@
         locationsUrl: {
           type: String,
           computed: '_computeLocationsUrl(locationId)',
+        },
+
+        disaggregationsUrl: {
+          type: String,
+          computed: '_computeDisaggregationsUrl(responsePlanId)',
         },
 
         indicatorsUrl: {
@@ -316,9 +337,28 @@
           value: [],
         },
 
+        invalid: {
+          type: Boolean,
+          notify: true,
+          value: true,
+        },
+
+        disaggregationsParams: {
+          type: Object,
+          value: {
+            page_size: 99999,
+          },
+        },
+
         selectedLocations: {
           type: Array,
           value: [],
+        },
+
+        selectedDisaggregations: {
+          type: Array,
+          value: [],
+          notify: true,
         },
 
         frequencies: {
@@ -344,6 +384,11 @@
         },
       },
 
+      disaggregations: {
+        type: Array,
+        value: [],
+      },
+
       observers: [
         '_setDefaults(opened)',
         '_setLocations(selectedLocations.splices)',
@@ -365,11 +410,9 @@
 
       _setFrequency: function (e, data) {
         var freq = this.$$('#frequencies').itemForElement(data.value);
-
         if (!freq) {
           return;
         }
-
         this.set('data.frequency', freq.id);
       },
 
@@ -389,6 +432,16 @@
         this.set('data.locations', selected);
       },
 
+      _setDisaggregations: function () {
+        var selected = this.selectedDisaggregations ?
+        this.selectedDisaggregations.map(function(dis) {
+          return {
+            id: dis.id,
+          };
+        }) : [];
+        this.set('data.disaggregation', selected);
+      },
+
       _onValueChanged: function (e) {
         this._updateValue(e.target);
       },
@@ -401,8 +454,8 @@
         if (!opened) {
           return;
         }
-
         this.set('selectedLocations', []);
+        this.set('selectedDisaggregations', []);
 
         this.set('data', {
           cs_dates: [],
@@ -414,6 +467,7 @@
         this._forEach('paper-radio-group', this._updateValue);
 
         this._fetchLocations();
+        this._fetchDisaggregations();
       },
 
       _validate: function (e) {
@@ -428,6 +482,10 @@
         return App.Endpoints.childLocations(locationId);
       },
 
+      _computeDisaggregationsUrl: function(responsePlanId) {
+        return App.Endpoints.responseParametersClusterDisaggregations(responsePlanId);
+      },
+
       _fetchLocations: function () {
         var self = this;
 
@@ -435,6 +493,14 @@
             .then(function (res) {
               self.set('locations', res.data.map(self._formatLocation));
             });
+      },
+
+      _fetchDisaggregations: function() {
+        var self = this;
+        this.$.disaggregations.thunk()()
+          .then(function(res) {
+            self.set('disaggregations', res.data.results);
+          });
       },
 
       _formatLocation: function (data) {
@@ -464,6 +530,7 @@
       },
 
       _save: function () {
+
         var fields = [].slice.call(
           Polymer.dom(this.root).querySelectorAll('.validate')
         );
@@ -484,7 +551,7 @@
         }
 
         this.set('updatePending', true);
-
+        this._setDisaggregations();
         this.$.indicators.body = this._processData(this.data);
 
         this.$.indicators.thunk()()
