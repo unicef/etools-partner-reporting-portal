@@ -168,14 +168,22 @@ def generate_fake_data(workspace_quantity=10):
                 end=beginning_of_this_year + datetime.timedelta(days=30)
             )
 
-        gateway = GatewayTypeFactory(country=country)
-        carto_db_table = CartoDBTableFactory(
-            location_type=gateway, country=country)
+        gateways = list()
+        for idx in range(5):
+            gateways.append(GatewayTypeFactory(country=country, admin_level=idx + 1))
 
-        LocationFactory.create_batch(
-            8,
-            gateway=gateway,
-            carto_db_table=carto_db_table)
+        carto_db_table = CartoDBTableFactory(
+            location_type=gateways[0], country=country)
+
+        locations = list()
+        for idx in range(8):
+            locations.append(
+                LocationFactory.create(
+                    gateway=gateways[idx] if idx < 5 else gateways[4],
+                    parent=None if idx == 0 else (locations[idx - 1] if idx < 6 else locations[4]),
+                    carto_db_table=carto_db_table,
+                )
+            )
 
         print "{} ResponsePlan objects created for {}".format(3, workspace)
 

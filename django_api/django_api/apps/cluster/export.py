@@ -154,9 +154,17 @@ class XLSXWriter:
                 self.sheet.cell(row=start_row_id, column=20).value = location_data.location.gateway.name
 
                 # Iterate over location admin references:
-                if indicator.reportable.location_admin_refs:
-                    #TODO: add location_admin_refs if we fix admin panel to add any value there
-                    pass
+                location = location_data.location
+                while(True):
+                    level = location.gateway.admin_level
+                    self.sheet.cell(row=start_row_id, column=20 + level * 2).value = location.p_code
+                    self.sheet.cell(row=start_row_id, column=20 + level * 2 - 1).value = location.gateway.name
+                    if location.parent:
+                        location = location.parent
+                    else:
+                        break
+
+
 
                 self.sheet.cell(row=start_row_id, column=31).value = indicator.time_period_start
                 self.sheet.cell(row=start_row_id, column=32).value = indicator.time_period_end
