@@ -17,13 +17,19 @@ class User(AbstractUser):
     """
     partner = models.ForeignKey('partner.Partner', related_name="users",
                                 null=True, blank=True)
-    organization = models.CharField(max_length=255)
+    organization = models.CharField(max_length=255, null=True, blank=True)
+    email = models.EmailField(
+        verbose_name='email address',
+        max_length=255,
+        unique=True,
+        db_index=True
+    )
 
     def __str__(self):
         return "{} - User".format(self.get_fullname())
 
     def get_fullname(self):
-        return self.username  # TODO: this should be improved
+        return "%s %s" % (self.first_name, self.last_name)
 
 
 class UserProfile(TimeStampedModel):

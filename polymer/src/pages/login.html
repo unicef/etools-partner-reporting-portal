@@ -4,9 +4,13 @@
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/iron-form/iron-form.html">
 
 <link rel="import" href="../elements/etools-logo.html">
+<link rel="import" href="../elements/etools-prp-ajax.html">
 <link rel="import" href="../behaviors/responsive.html">
+<link rel="import" href="../redux/store.html">
 <link rel="import" href="../settings.html">
 <link rel="import" href="../styles/app-theme-ip.html">
 
@@ -24,6 +28,9 @@
           padding: 1em;
           background: #fff;
         };
+        --paper-input-container-color: #fff;
+        --paper-input-container-input-color: #fff;
+        --paper-input-container-focus-underline-color: #fff;
       }
 
       @media (min-width: 600px) {
@@ -104,12 +111,30 @@
         text-decoration: none;
         color: inherit;
       }
+
+      p {
+        color: #fff;
+      }
+
     </style>
 
     <iron-media-query
         query="[[desktopLayoutQuery]]"
         query-matches="{{isDesktop}}">
     </iron-media-query>
+
+    <etools-prp-ajax
+      id="login"
+      url="[[loginUrl]]"
+      body="[[data]]"
+      content-type="application/json"
+      method="post">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
+      id="getProfile"
+      url="[[profileUrl]]">
+    </etools-prp-ajax>
 
     <div class="login-container">
       <div class="login-container-inner">
@@ -120,10 +145,26 @@
             <h1>Partner Reporting Portal</h1>
           </div>
           <div class="login-buttons">
-            <p class="login-buttons-label">Sign in with</p>
+            <p class="login-buttons-label">Sign in with email</p>
 
             <ul>
+              <template is="dom-if" if="{{emailSubmitted}}">
+                <li><p>If this is a valid email address, please check your email for instructions to Sign In.</p></li>
+              </template>
+              <template is="dom-if" if="{{!emailSubmitted}}">
+                <template is="dom-if" if="{{value}}">
+                  <p class='error-token'>Unable to login, invalid token, please try again.</p>
+                </template>
               <li>
+              <iron-form>
+              <paper-input label="Your Email" id="email" required type="email" value="{{data.email}}"> 
+              </paper-input>
+              <paper-button on-tap="submit">Submit
+              </paper-button>
+            </iron-form>
+          </li>
+        </template>
+              <!-- <li>
                 <a href="/todo">
                   <paper-button raised>
                     <img src="../../images/google.png" alt="Google" height="20">
@@ -143,7 +184,7 @@
                     <img src="../../images/humanitarianid.png" alt="Humanitarian ID" height="20">
                   </paper-button>
                 </a>
-              </li>
+              </li> -->
             </ul>
           </div>
         </paper-card>
@@ -157,6 +198,7 @@
 
       behaviors: [
         App.Behaviors.ResponsiveBehavior,
+        App.Behaviors.ReduxBehavior,
       ],
 
       properties: {
@@ -164,11 +206,60 @@
           type: Number,
           computed: '_computeLogoSize(isDesktop)',
         },
+        data: {
+          type: Object,
+          value: {},
+        },
+        loginUrl: {
+          type: String,
+          value: App.Endpoints.userLogin(),
+        },
+        profileUrl: {
+          type: String,
+          value: App.Endpoints.userProfile(),
+        },
+        emailSubmitted: {
+          type: Boolean,
+          value: false
+        },
+        error: {
+          type: Boolean,
+          value: false,
+        },
       },
 
       _computeLogoSize: function (isDesktop) {
         return isDesktop ? 180 : 120;
       },
+
+      attached: function() {
+        var thunk = this.$.getProfile.thunk();
+        thunk()
+          .then(function(res) {
+            if (res.status === 200) {
+              window.location.href = '/app/';
+            }
+          })
+          .catch(function(err) { // jshint ignore:line
+              // TODO: error handling
+          });
+      },
+
+      submit: function() {
+        var self = this;
+        this.$$('#email').validate();
+        if (this.$$('#email').invalid) {
+          return;
+        }
+        var thunk = this.$.login.thunk();
+        thunk()
+          .then(function () {
+            self.set('emailSubmitted', true);
+          })
+          .catch(function () {
+            self.set('emailSubmitted', true);
+          });
+      }
     });
   </script>
 </dom-module>

@@ -68,6 +68,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
+    'rest_framework.authtoken',
+    'drfpasswordless',
     'django_filters',
     'djcelery',
     'leaflet',
@@ -260,3 +262,25 @@ CARTODB_APIKEY = os.getenv('CARTODB_APIKEY')
 CRON_CLASSES = [
     "indicator.cron.IndicatorReportOverDueCronJob",
 ]
+
+# DRF settings
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES':
+        (
+            'rest_framework.authentication.SessionAuthentication',
+            'rest_framework.authentication.TokenAuthentication',
+        )
+}
+
+
+# Auth related settings
+PASSWORDLESS_AUTH = {
+    'PASSWORDLESS_AUTH_TYPES': ['EMAIL', ],
+    'PASSWORDLESS_EMAIL_TOKEN_HTML_TEMPLATE_NAME': "account/passwordless_login_email.html",
+    'PASSWORDLESS_EMAIL_NOREPLY_ADDRESS': 'no-reply@unicef.org',
+    'PASSWORDLESS_CONTEXT_PROCESSORS': ['account.context_processors.passwordless_token_email', ],
+    'PASSWORDLESS_REGISTER_NEW_USERS': False,
+}
