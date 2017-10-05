@@ -210,7 +210,23 @@
 
       clusterIndicatorLocations: function (responsePlanId) {
         return this._buildUrl('/cluster/' + responsePlanId + '/cluster-indicators-locations/');
-      }
+      },
+
+      userSignOut: function () {
+        return this._buildUrl('/account/user-logout/');
+      },
+
+      userLogin: function() {
+        return this._buildUrl('/account/auth/get-token/');
+      },
+
+      userLoginToken: function() {
+        return this._buildUrl('/account/auth/login-with-token/');
+      },
+
+      userProfile: function() {
+        return this._buildUrl('/account/user-profile/');
+      },
 
     };
   }());

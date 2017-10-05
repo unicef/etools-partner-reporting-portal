@@ -6,6 +6,7 @@
 
 <link rel="import" href="../elements/etools-prp-workspaces.html">
 <link rel="import" href="../elements/etools-prp-ajax.html">
+
 <link rel="import" href="../behaviors/utils.html">
 <link rel="import" href="../redux/actions.html">
 <link rel="import" href="../redux/store.html">
@@ -32,6 +33,11 @@
     <etools-prp-ajax
         id="interventions"
         url="[[interventionsUrl]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
+      id="userProfile"
+      url="[[profileUrl]]">
     </etools-prp-ajax>
 
     <app-route
@@ -96,6 +102,11 @@
         _app: {
           type: String,
           statePath: 'app.current',
+        },
+
+        profileUrl: {
+          type: String,
+          value: App.Endpoints.userProfile(),
         },
       },
 
@@ -211,13 +222,23 @@
         } catch (err) {}
       },
 
-      attached: function () {
-        var interventionsThunk = this.$.interventions.thunk();
+      _userProfileAjax: function() {
+        var userProfileThunk = this.$.userProfile.thunk();
+        return this.dispatch(App.Actions.fetchUserProfile(userProfileThunk));
+      },
 
+      attached: function () {
+        var self = this;
+        var interventionsThunk = this.$.interventions.thunk();
+        var userProfileThunk = this.$.userProfile.thunk();
         this.dispatch(App.Actions.fetchWorkspaces(interventionsThunk))
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
+          .then(function() {
+            self.dispatch(App.Actions.fetchUserProfile(userProfileThunk));
+          })
+          .catch(function () { 
+              window.location.href = '/login';
             });
+
       },
     });
   </script>
