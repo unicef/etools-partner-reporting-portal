@@ -101,6 +101,21 @@
         color: var(--theme-primary-text-color-medium);
       }
 
+      .location-progress {
+        margin: 0;
+        white-space: nowrap;
+      }
+
+      .location-progress dt,
+      .location-progress dd {
+        display: inline;
+        margin: 0;
+      }
+
+      .location-progress dt {
+        font-weight: bold;
+      }
+
       disaggregation-modal disaggregation-table {
         margin-top: 1em;
       }
@@ -194,20 +209,41 @@
                       id="modal-[[index]]"
                       reporting-period="[[reportingPeriod]]"
                       on-opened-changed="_updateModals">
-                    <div class="meta">
-                      <h3>[[indicatorName]]</h3>
-                      <p class="location">
-                        <iron-icon icon="maps:place"></iron-icon>
-                        [[location.location.title]]
-                      </p>
-                      <template
-                          is="dom-if"
-                          if="[[hasPD]]"
-                          restamp="true">
-                        <p class="current-pd">
-                          [[currentPD.agreement]] | [[currentPD.title]]
+                    <div class="meta layout horizontal justified">
+                      <div>
+                        <h3>[[indicatorName]]</h3>
+                        <p class="location">
+                          <iron-icon icon="maps:place"></iron-icon>
+                          [[location.location.title]]
                         </p>
-                      </template>
+                        <template
+                            is="dom-if"
+                            if="[[hasPD]]"
+                            restamp="true">
+                          <p class="current-pd">
+                            [[currentPD.agreement]] | [[currentPD.title]]
+                          </p>
+                        </template>
+                      </div>
+                      <div class="layout vertical end-justified">
+                        <dl class="location-progress">
+                          <dt>Location progress</dt>
+                          <dd>
+                            <template
+                                is="dom-if"
+                                if="[[_equals(location.display_type, 'number')]]"
+                                restamp="true">
+                              <etools-prp-number value="[[location.location_progress.v]]"></etools-prp-number>
+                            </template>
+                            <template
+                                is="dom-if"
+                                if="[[_equals(location.display_type, 'percentage')]]"
+                                restamp="true">
+                              <span>[[_toPercentage(location.location_progress.c)]]</span>
+                            </template>
+                          </dd>
+                        </dl>
+                      </div>
                     </div>
                     <template
                         is="dom-if"

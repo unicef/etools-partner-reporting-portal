@@ -18,18 +18,8 @@
 <dom-module id="disaggregation-table">
   <template>
     <style include="disaggregation-table-styles">
-      .location-progress {
-        text-align: right;
-      }
-
-      .location-progress dt,
-      .location-progress dd {
-        display: inline;
-        margin: 0;
-      }
-
-      .location-progress dt {
-        font-weight: bold;
+      disaggregation-switches {
+        margin-bottom: 1em;
       }
     </style>
 
@@ -49,26 +39,6 @@
           formatted-data="{{formattedData}}"
           on-formatted-data-changed="_triggerModalRefit">
       </disaggregation-switches>
-
-      <template
-          is="dom-if"
-          if="[[editableBool]]">
-        <dl class="location-progress">
-          <dt>Location progress:</dt>
-          <template
-              is="dom-if"
-              if="[[_equals(indicatorType, 'number')]]"
-              restamp="true">
-            <dd>[[viewData.location_progress.v]]</dd>
-          </template>
-          <template
-              is="dom-if"
-              if="[[_equals(indicatorType, 'percentage')]]"
-              restamp="true">
-            <dd>[[_toPercentage(viewData.location_progress.c)]]</dd>
-          </template>
-        </dl>
-      </template>
 
       <table class="vertical layout">
         <template
