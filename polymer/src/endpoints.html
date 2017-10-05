@@ -139,8 +139,12 @@
         return this._buildUrl('/cluster/' + responsePlanId + '/cluster-indicator-reports-list/');
       },
 
-      clusterIndicatorReportsExport: function (responsePlanId) {
+      clusterIndicatorReportsImportTemplate: function (responsePlanId) {
         return this.clusterIndicatorReports(responsePlanId) + 'export/';
+      },
+
+      clusterIndicatorReportsExport: function (responsePlanId) {
+        return this.clusterIndicatorReports(responsePlanId) + 'export-for-analysis/';
       },
 
       clusterIndicatorNames: function (responsePlanId) {
