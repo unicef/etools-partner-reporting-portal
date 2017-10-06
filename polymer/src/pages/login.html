@@ -2,6 +2,7 @@
 <link rel="import" href="../../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../../bower_components/iron-media-query/iron-media-query.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../bower_components/iron-a11y-keys-behavior/iron-a11y-keys-behavior.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
@@ -115,6 +116,10 @@
       p {
         color: #fff;
       }
+      p.error-token {
+        color: var(--paper-deep-orange-a700);
+        font-size: 1.2em;
+      }
 
     </style>
 
@@ -149,21 +154,22 @@
 
             <ul>
               <template is="dom-if" if="{{emailSubmitted}}">
-                <li><p>If this is a valid email address, please check your email for instructions to Sign In.</p></li>
+                <li><p>If this is a valid email address, please check your email for instructions to Sign In.<br>
+                You can also try another email.</p></li>
               </template>
-              <template is="dom-if" if="{{!emailSubmitted}}">
+
                 <template is="dom-if" if="{{value}}">
-                  <p class='error-token'>Unable to login, invalid token, please try again.</p>
+                  <li><p class="error-token">Unable to login, invalid token, please try again.</p></li>
                 </template>
               <li>
               <iron-form>
-              <paper-input label="Your Email" id="email" required type="email" value="{{data.email}}"> 
-              </paper-input>
-              <paper-button on-tap="submit">Submit
-              </paper-button>
+                <paper-input label="Your Email" id="email" required type="email" value="{{data.email}}"> 
+                </paper-input>
+                <paper-button on-tap="submit">Submit
+                </paper-button>
             </iron-form>
           </li>
-        </template>
+ 
               <!-- <li>
                 <a href="/todo">
                   <paper-button raised>
@@ -199,6 +205,7 @@
       behaviors: [
         App.Behaviors.ResponsiveBehavior,
         App.Behaviors.ReduxBehavior,
+        Polymer.IronA11yKeysBehavior,
       ],
 
       properties: {
@@ -226,6 +233,16 @@
           type: Boolean,
           value: false,
         },
+        keyEventTarget: {
+          type: Object,
+          value: function() {
+            return document.body;
+          }
+        }
+      },
+
+      keyBindings: {
+        'enter': 'submit',
       },
 
       _computeLogoSize: function (isDesktop) {
@@ -255,9 +272,11 @@
         thunk()
           .then(function () {
             self.set('emailSubmitted', true);
+            self.set('data.email', '');
           })
           .catch(function () {
             self.set('emailSubmitted', true);
+            self.set('data.email', '');
           });
       }
     });

@@ -112,7 +112,8 @@
               <etools-prp-number value="[[pd.budget]]"></etools-prp-number>
             </div>
             <div class="table-cell table-cell--text">
-              [[_withDefault(pd.calculated_budget)]]
+              <etools-prp-number value="[[pd.funds_received_to_date]]"></etools-prp-number>
+              ([[_toPercentage(pd.funds_received_to_date_percentage)]])
             </div>
             <div class="table-cell table-cell--text cell-reports">
               <a href="[[ pd.id ]]/view/reports">Reports</a>
