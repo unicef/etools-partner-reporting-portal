@@ -10,6 +10,7 @@
 
 <link rel="import" href="../report-status.html">
 <link rel="import" href="../etools-prp-number.html">
+<link rel="import" href="../etools-prp-currency.html">
 <link rel="import" href="../list-placeholder.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/data-table.html">
@@ -100,19 +101,34 @@
               [[_withDefault(pd.end_date)]]
             </div>
             <div class="table-cell table-cell--text">
-              <etools-prp-number value="[[pd.cso_contribution]]"></etools-prp-number>
+              <etools-prp-currency
+                  value="[[pd.cso_contribution]]"
+                  currency="[[pd.cso_contribution_currency]]">
+              </etools-prp-currency>
             </div>
             <div class="table-cell table-cell--text">
-              <etools-prp-number value="[[pd.total_unicef_cash]]"></etools-prp-number>
+              <etools-prp-currency
+                  value="[[pd.total_unicef_cash]]"
+                  currency="[[pd.total_unicef_cash_currency]]">
+              </etools-prp-currency>
             </div>
             <div class="table-cell table-cell--text">
-              <etools-prp-number value="[[pd.total_unicef_supplies]]"></etools-prp-number>
+              <etools-prp-currency
+                  value="[[pd.total_unicef_supplies]]"
+                  currency="[[pd.total_unicef_supplies_currency]]">
+              </etools-prp-currency>
             </div>
             <div class="table-cell table-cell--text">
-              <etools-prp-number value="[[pd.budget]]"></etools-prp-number>
+              <etools-prp-currency
+                  value="[[pd.budget]]"
+                  currency="[[pd.budget_currency]]">
+              </etools-prp-currency>
             </div>
             <div class="table-cell table-cell--text">
-              <etools-prp-number value="[[pd.funds_received_to_date]]"></etools-prp-number>
+              <etools-prp-currency
+                  value="[[pd.funds_received_to_date]]"
+                  currency="[[pd.funds_received_to_date_currency]]">
+              </etools-prp-currency>
               ([[_toPercentage(pd.funds_received_to_date_percentage)]])
             </div>
             <div class="table-cell table-cell--text cell-reports">
