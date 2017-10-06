@@ -72,16 +72,16 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
         return str(obj.in_kind_amount)
 
     def get_total_unicef_supplies_currency(self, obj):
-        return obj.get_in_kind_amount_currency_display()
+        return obj.in_kind_amount_currency
 
     def get_budget_currency(self, obj):
-        return obj.get_budget_currency_display()
+        return obj.budget_currency
 
     def get_cso_contribution_currency(self, obj):
-        return obj.get_cso_contribution_currency_display()
+        return obj.cso_contribution_currency
 
     def get_funds_received_to_date_currency(self, obj):
-        return obj.get_funds_received_to_date_currency_display()
+        return obj.funds_received_to_date_currency
 
     def get_document_type_display(self, obj):
         return obj.get_document_type_display()

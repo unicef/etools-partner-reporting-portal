@@ -280,7 +280,7 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
 
     @property
     def funds_received_to_date_percentage(self):
-        return "%.0f" % (self.funds_received_to_date * 100/ self.budget)
+        return "%.0f" % (self.funds_received_to_date / self.budget)
 
     @property
     def calculated_budget(self):
