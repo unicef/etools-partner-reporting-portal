@@ -481,12 +481,35 @@ class ProgressReportSubmitAPIView(APIView):
                                 "message": "You have not completed all required indicators for this progress report. Unless your Output status is Met or has No Progress, all indicator data needs to be completed."}]
                             return Response({"errors": _errors},
                                             status=statuses.HTTP_400_BAD_REQUEST)
+                if not ir.narrative_assessment:
+                    _errors = [{
+                        "message": "You have not completed narrative assessment for one of LLO (%s). Unless your Output status is Met or has No Progress, all indicator data needs to be completed." % ir.reportable.content_object }]
+                    return Response({"errors": _errors},
+                                    status=statuses.HTTP_400_BAD_REQUEST)
 
             # Check if indicator was already submitted or SENT BACK
             if ir.submission_date is None or ir.report_status == INDICATOR_REPORT_STATUS.sent_back:
                 ir.submission_date = datetime.now().date()
                 ir.report_status = INDICATOR_REPORT_STATUS.submitted
                 ir.save()
+
+
+        # Check if PR other tab is fulfilled
+        if not progress_report.partner_contribution_to_date:
+            _errors = [{
+                "message": "You have not completed Partner Contribution To Date field on Other Info tab."}]
+            return Response({"errors": _errors},
+                            status=statuses.HTTP_400_BAD_REQUEST)
+        if not progress_report.challenges_in_the_reporting_period:
+            _errors = [{
+                "message": "You have not completed Challenges/bottlenecks in the reporting period field on Other Info tab."}]
+            return Response({"errors": _errors},
+                            status=statuses.HTTP_400_BAD_REQUEST)
+        if not progress_report.proposed_way_forward:
+            _errors = [{
+                "message": "You have not completed Proposed way forward field on Other Info tab."}]
+            return Response({"errors": _errors},
+                            status=statuses.HTTP_400_BAD_REQUEST)
 
         if progress_report.submission_date is None or progress_report.status == PROGRESS_REPORT_STATUS.sent_back:
             progress_report.status = PROGRESS_REPORT_STATUS.submitted

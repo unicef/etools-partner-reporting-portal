@@ -205,7 +205,7 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
     programme_document = ProgrammeDocumentOutputSerializer()
     indicator_reports = serializers.SerializerMethodField()
 
-    def __init__(self, llo_id, location_id, *args, **kwargs):
+    def __init__(self, llo_id=None, location_id=None, *args, **kwargs):
         self.llo_id = llo_id
         self.location_id = location_id
 
