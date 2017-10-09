@@ -4,6 +4,11 @@
 <link rel="import" href="../../../elements/page-body.html">
 <link rel="import" href="../../../elements/cluster-reporting/activity-modal.html">
 
+<!-- FIXME -->
+<link rel="import" href="../../../elements/etools-prp-permissions.html">
+<link rel="import" href="../../../behaviors/utils.html">
+<!-- FIXME -->
+
 <dom-module id="page-cluster-reporting-analysis">
   <template>
     <style>
@@ -20,12 +25,24 @@
       </activity-modal>
 
       <button on-tap="_testModal">TEST</button>
+
+      <!-- FIXME -->
+      <etools-prp-permissions permissions="{{permissions}}"></etools-prp-permissions>
+
+      <pre>[[_debug(permissions)]]</pre>
+      <!-- FIXME -->
     </page-body>
   </template>
 
   <script>
     Polymer({
       is: 'page-cluster-reporting-analysis',
+
+      // FIXME
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+      ],
+      // FIXME
 
       listeners: {
         'activityModal.activity-added': '_onSuccess',
