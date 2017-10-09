@@ -83,13 +83,14 @@ from core.factories import (
     CountryFactory,
     ReportingPeriodDatesFactory,
 )
-from core.common import INDICATOR_REPORT_STATUS
+from core.common import INDICATOR_REPORT_STATUS, OVERALL_STATUS
 
 from _generate_disaggregation_fake_data import (
     generate_indicator_report_location_disaggregation_quantity_data,
     generate_indicator_report_location_disaggregation_ratio_data,
 )
 
+OVERALL_STATUS_LIST = [x[0] for x in OVERALL_STATUS]
 
 def clean_up_data():
     if settings.ENV == 'dev':
@@ -448,15 +449,22 @@ def generate_fake_data(workspace_quantity=10):
             progress_report = ProgressReportFactory(programme_document=pd)
             for cp_output in pd.cp_outputs.all():
                 for llo in cp_output.ll_outputs.all():
+                    # All Indicator Reports inside LLO should have same status
+                    # We should skip "No status"
+                    status = OVERALL_STATUS_LIST[random.randint(0, 4)]
                     for reportable in llo.reportables.all():
                         if reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
                             QuantityIndicatorReportFactory(
                                 reportable=reportable,
-                                progress_report=progress_report)
+                                progress_report=progress_report,
+                                overall_status=status,
+                            )
                         elif reportable.blueprint.unit == IndicatorBlueprint.PERCENTAGE:
                             RatioIndicatorReportFactory(
                                 reportable=reportable,
-                                progress_report=progress_report)
+                                progress_report=progress_report,
+                                overall_status=status,
+                            )
 
         print "{} Progress Reports generated for {}".format(
             ProgressReport.objects.filter(programme_document=pd).count(),
