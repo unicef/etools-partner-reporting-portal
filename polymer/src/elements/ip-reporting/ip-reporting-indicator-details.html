@@ -8,6 +8,8 @@
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../etools-prp-ajax.html">
 <link rel="import" href="../etools-prp-number.html">
+<link rel="import" href="../labelled-item.html">
+<link rel="import" href="../report-status.html">
 <link rel="import" href="../../elements/disaggregations/disaggregation-table.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../endpoints.html">
@@ -18,8 +20,6 @@
       :host {
         display: block;
         width: 100%;
-        /*Required so the loading message isn't cut off:*/
-        min-height: 250px;
 
         --paper-tabs: {
           padding-left: 13px;
@@ -53,6 +53,29 @@
       .reporting-period {
         color: var(--theme-primary-text-color-medium);
       }
+
+      .report-meta {
+        font-size: 12px;
+        background: var(--paper-grey-100);
+      }
+
+      .report-meta dt,
+      .report-meta dd {
+        display: inline;
+        margin: 0;
+      }
+
+      .report-meta dt {
+        font-weight: bold;
+      }
+
+      .report-meta dd {
+        color: var(--paper-grey-600);
+      }
+
+      .report-meta labelled-item {
+        margin: 1em 0;
+      }
     </style>
 
     <etools-prp-ajax
@@ -66,21 +89,68 @@
       <div>
     </template>
 
-    <paper-tabs
-        selected="{{selected}}"
-        fallback-selection="location-[[locations.0.current.id]]"
-        attr-for-selected="name"
-        scrollable
-        hide-scroll-buttons>
-      <template
-          is="dom-repeat"
-          items="[[locations]]"
-          as="location">
-        <paper-tab name="location-[[location.current.id]]">
-          [[location.name]]
-        </paper-tab>
-      </template>
-    </paper-tabs>
+    <template
+        is="dom-if"
+        if="[[!loading]]">
+      <div class="report-meta app-grid">
+        <template
+            is="dom-repeat"
+            items="[[data]]"
+            as="report">
+          <div class="item">
+            <dl>
+              <dt>Report submitted:</dt>
+              <dd>[[report.submission_date]]</dd>
+            </dl>
+            <dl>
+              <dt>Total progress:</dt>
+              <dd>
+                <template
+                    is="dom-if"
+                    if="[[_equals(report.display_type, 'number')]]"
+                    restamp="true">
+                  <etools-prp-number value="[[report.total.v]]"></etools-prp-number>
+                </template>
+                <template
+                    is="dom-if"
+                    if="[[_equals(report.display_type, 'percentage')]]"
+                    restamp="true">
+                  [[_toPercentage(report.total.c)]]
+                </template>
+              </dd>
+            </dl>
+
+            <labelled-item label="Overall status">
+              <report-status status="[[report.overall_status]]"></report-status>
+            </labelled-item>
+
+            <labelled-item label="Narrative assessment">
+              [[_withDefault(report.narrative_assessment)]]
+            </labelled-item>
+          </div>
+        </template>
+      </div>
+    </template>
+
+    <template
+        is="dom-if"
+        if="[[!loading]]">
+      <paper-tabs
+          selected="{{selected}}"
+          fallback-selection="location-[[locations.0.current.id]]"
+          attr-for-selected="name"
+          scrollable
+          hide-scroll-buttons>
+        <template
+            is="dom-repeat"
+            items="[[locations]]"
+            as="location">
+          <paper-tab name="location-[[location.current.id]]">
+            [[location.name]]
+          </paper-tab>
+        </template>
+      </paper-tabs>
+    </template>
 
     <iron-pages
         attr-for-selected="name"
@@ -272,9 +342,8 @@
           var thunk = this.$.indicatorDetail.thunk();
           var action = App.Actions.Indicators;
           this.dispatch(action.fetchIndicatorDetails(thunk, this.indicatorId))
-            .catch(function (err) {
+            .catch(function (err) { // jshint ignore:line
                 // TODO: error handling.
-              return Promise.reject(err);
             });
         } else {
           this.$.indicatorDetail.abort();

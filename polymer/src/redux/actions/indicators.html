@@ -54,14 +54,14 @@
         return function (dispatch) {
           dispatch(App.Actions.Indicators.indicatorDetailsLoadingStart());
           return indicatorsThunk()
-            .catch(function () {
-              dispatch(App.Actions.Indicators.indicatorDetailsLoadingStop());
-            })
             .then(function (res) {
               var formattedById = {};
               formattedById[id] = res.data;
               dispatch(App.Actions.Indicators.indicatorDetailsLoadingStop());
               dispatch(App.Actions.Indicators.setIndicatorDetails(formattedById));
+            })
+            .catch(function () {
+              dispatch(App.Actions.Indicators.indicatorDetailsLoadingStop());
             });
         };
       },
