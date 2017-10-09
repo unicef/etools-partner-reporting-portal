@@ -15,6 +15,7 @@
 <link rel="import" href="../../behaviors/pagination.html">
 <link rel="import" href="../../behaviors/routing.html">
 <link rel="import" href="../../behaviors/progressReportUtils.html">
+<link rel="import" href="../etools-prp-permissions.html">
 
 <link rel="import" href="../../styles/table-styles.html">
 
@@ -44,6 +45,10 @@
         text-decoration: none;
       }
     </style>
+
+    <etools-prp-permissions
+        permissions="{{permissions}}">
+    </etools-prp-permissions>
 
     <iron-location
         query="{{query}}">
@@ -106,7 +111,12 @@
               </template>
             </div>
             <div class="table-cell table-cell--text cell-reports">
-              <a href="[[_getLink(report)]]">[[_getLinkText(report)]]</a>
+              <template
+                  is="dom-if"
+                  if="[[_canNavigateToReport(permissions, report)]]"
+                  restamp="true">
+                <a href="[[_getLink(report)]]">[[_getLinkText(report)]]</a>
+              </template>
             </div>
           </div>
         </etools-data-table-row>
@@ -145,12 +155,13 @@
       ],
 
       properties: {
+        loaded: Boolean,
+        permissions: Object,
+
         pdId: {
           type: String,
           statePath: 'programmeDocuments.current',
         },
-
-        loaded: Boolean,
 
         data: {
           type: Array,
@@ -164,15 +175,7 @@
       },
 
       _getLink: function (report) {
-        var suffix;
-
-        if (report.is_draft) {
-          suffix = 'draft';
-        } else if (this._isReadOnlyReport(report)) {
-          suffix = 'view';
-        } else {
-          suffix = 'edit';
-        }
+        var suffix = this._getMode(report);
 
         return this.buildUrl(
           this._baseUrl,
@@ -181,12 +184,17 @@
       },
 
       _getLinkText: function (report) {
-        if (report.is_draft) {
-          return 'Go To Draft';
-        } else if (this._isReadOnlyReport(report)) {
-          return 'View Report';
-        } else {
-          return 'Enter Data';
+        var mode = this._getMode(report);
+
+        switch (mode) {
+          case 'draft':
+            return 'Go To Draft';
+
+          case 'view':
+            return 'View Report';
+
+          default:
+            return 'Enter Data';
         }
       },
     });
