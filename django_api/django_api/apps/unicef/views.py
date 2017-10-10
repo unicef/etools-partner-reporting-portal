@@ -569,6 +569,10 @@ class ProgressReportReviewAPIView(APIView):
             if progress_report.status == PROGRESS_REPORT_STATUS.sent_back:
                 progress_report.sent_back_feedback = serializer.validated_data[
                     'comment']
+            elif progress_report.status == PROGRESS_REPORT_STATUS.accepted:
+                progress_report.review_overall_status = serializer.validated_data[
+                    'overall_status']
+
             progress_report.save()
             serializer = ProgressReportSerializer(instance=progress_report)
             return Response(serializer.data, status=statuses.HTTP_200_OK)

@@ -183,6 +183,8 @@ class IndicatorLLoutputsSerializer(serializers.ModelSerializer):
     status = serializers.SerializerMethodField()
     indicator_reports = serializers.SerializerMethodField()
     overall_status = serializers.SerializerMethodField()
+    overall_status_display = serializers.CharField(
+            source='get_overall_status_display')
     narrative_assessment = serializers.SerializerMethodField()
     display_type = serializers.SerializerMethodField()
 
@@ -194,6 +196,7 @@ class IndicatorLLoutputsSerializer(serializers.ModelSerializer):
             'llo_id',
             'status',
             'overall_status',
+            'overall_status_display',
             'narrative_assessment',
             'indicator_reports',
             'display_type',
@@ -495,6 +498,28 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
     disagg_choice_lookup_map = serializers.SerializerMethodField()
     total = serializers.JSONField()
     display_type = serializers.SerializerMethodField()
+    overall_status_display = serializers.CharField(
+            source='get_overall_status_display')
+
+    class Meta:
+        model = IndicatorReport
+        fields = (
+            'id',
+            'title',
+            'indicator_location_data',
+            'time_period_start',
+            'time_period_end',
+            'display_type',
+            'submission_date',
+            'total',
+            'remarks',
+            'report_status',
+            'disagg_lookup_map',
+            'disagg_choice_lookup_map',
+            'overall_status',
+            'overall_status_display',
+            'narrative_assessment'
+        )
 
     def get_display_type(self, obj):
         return obj.display_type
@@ -513,26 +538,6 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
         lookup_array.sort(key=len)
 
         return lookup_array
-
-    class Meta:
-        model = IndicatorReport
-        fields = (
-            'id',
-            'title',
-            'indicator_location_data',
-            'time_period_start',
-            'time_period_end',
-            'display_type',
-            'submission_date',
-            'total',
-            'remarks',
-            'report_status',
-            'disagg_lookup_map',
-            'disagg_choice_lookup_map',
-            'overall_status',
-            'narrative_assessment'
-        )
-
 
 class ClusterIndicatorReportListSerializer(IndicatorReportListSerializer):
     cluster = serializers.SerializerMethodField()
@@ -581,6 +586,8 @@ class PDReportContextIndicatorReportSerializer(serializers.ModelSerializer):
     reportable = ReportableSimpleSerializer()
     report_status_display = serializers.CharField(
             source='get_report_status_display')
+    overall_status_display = serializers.CharField(
+            source='get_overall_status_display')
 
     class Meta:
         model = IndicatorReport
@@ -598,6 +605,7 @@ class PDReportContextIndicatorReportSerializer(serializers.ModelSerializer):
             'due_date',
             'total',
             'overall_status',
+            'overall_status_display',
             'narrative_assessment',
         )
 

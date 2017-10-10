@@ -265,8 +265,9 @@ class Reportable(TimeStampedExternalSyncModelMixin):
         percentage = 0.0
 
         if self.achieved and self.baseline is not None and self.target is not None:
-            percentage = (self.achieved['c'] - float(self.baseline)) / (float(self.target) - float(self.baseline))
-
+            percentage = (self.achieved['c'] - float(self.baseline)) / \
+                (float(self.target) - float(self.baseline))
+            percentage = round(percentage, 2)
         return percentage
 
     @classmethod
