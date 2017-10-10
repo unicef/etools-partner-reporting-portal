@@ -3,6 +3,7 @@
 <link rel="import" href="../../../../../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../../../../../bower_components/iron-location/iron-location.html">
 
+<link rel="import" href="../../../../../elements/etools-prp-permissions.html">
 <link rel="import" href="../../../../../elements/error-modal.html">
 <link rel="import" href="../../../../../elements/ip-reporting/pd-output-list.html">
 <link rel="import" href="../../../../../elements/ip-reporting/report-filters.html">
@@ -24,6 +25,10 @@
         path="{{path}}">
     </iron-location>
 
+    <etools-prp-permissions
+        permissions="{{permissions}}">
+    </etools-prp-permissions>
+
     <etools-prp-ajax
         id="submit"
         url="[[submitUrl]]"
@@ -40,15 +45,20 @@
         override-mode="view">
     </pd-report-info>
 
-    <div class="layout horizontal-reverse">
-      <paper-button
-          class="btn-primary"
-          on-tap="_submit"
-          disabled="[[busy]]"
-          raised>
-        Submit
-      </paper-button>
-    </div>
+    <template
+        is="dom-if"
+        if="[[_canSubmit(currentReport, permissions)]]"
+        restamp="true">
+      <div class="layout horizontal-reverse">
+        <paper-button
+            class="btn-primary"
+            on-tap="_submit"
+            disabled="[[busy]]"
+            raised>
+          Submit
+        </paper-button>
+      </div>
+    </template>
 
     <error-modal id="error"></error-modal>
   </template>
@@ -64,6 +74,7 @@
 
       properties: {
         path: String,
+        permissions: Object,
 
         busy: {
           type: Boolean,
@@ -83,6 +94,11 @@
         reportId: {
           type: String,
           statePath: 'programmeDocumentReports.current.id',
+        },
+
+        currentReport: {
+          type: Object,
+          statePath: App.Selectors.ProgrammeDocumentReports.current,
         },
 
         submitUrl: {
@@ -124,6 +140,17 @@
             .then(function () {
               self.set('busy', false);
             });
+      },
+
+      _canSubmit: function (report, permissions) {
+        switch (true) {
+          case report.is_draft && !permissions.submitDraftProgressReport:
+          case report.status === 'Sen' && !permissions.submitDraftProgressReport:
+            return false;
+
+          default:
+            return true;
+        }
       },
 
       detached: function () {
