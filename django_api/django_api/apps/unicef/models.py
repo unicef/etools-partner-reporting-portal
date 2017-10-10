@@ -29,15 +29,18 @@ from utils.groups.wrappers import GroupWrapper
 logger = logging.getLogger(__name__)
 
 # Define groups that UNICEF IP reporting users can belong to
-IPAuthorizedOfficerRole = GroupWrapper(code='ip_authorized_officer',
-                                       name='IP Authorized Officer',
-                                       create_group=True)
-IPEditorRole = GroupWrapper(code='ip_editor',
-                            name='IP Editor',
-                            create_group=True)
-IPViewerRole = GroupWrapper(code='ip_viewer',
-                            name='IP Viewer',
-                            create_group=True)
+try:
+    IPAuthorizedOfficerRole = GroupWrapper(code='ip_authorized_officer',
+                                           name='IP Authorized Officer',
+                                           create_group=True)
+    IPEditorRole = GroupWrapper(code='ip_editor',
+                                name='IP Editor',
+                                create_group=True)
+    IPViewerRole = GroupWrapper(code='ip_viewer',
+                                name='IP Viewer',
+                                create_group=True)
+except Exception as e:
+    print "Group DB is not ready yet! - Error: %s" % e
 
 
 class Section(TimeStampedExternalSyncModelMixin):
