@@ -91,16 +91,22 @@
         <report-status status="[[currentReport.report_status]]"></report-status>
         <template
             is="dom-if"
-            if="[[_canExport(mode, permissions)]]"
+            if="[[_canExport(loading, currentReport, mode, permissions)]]"
             restamp="true">
           <pd-report-export-button></pd-report-export-button>
         </template>
-        <paper-button
-            class="btn-primary"
-            on-tap="_showPdDetails"
-            raised>
-          Show PD/SSFA ToR Details
-        </paper-button>
+
+        <template
+            is="dom-if"
+            if="[[_canViewPdDetails(permissions)]]"
+            restamp="true">
+          <paper-button
+              class="btn-primary"
+              on-tap="_showPdDetails"
+              raised>
+            Show PD/SSFA ToR Details
+          </paper-button>
+        </template>
       </div>
 
       <div class="tabs">
@@ -208,6 +214,11 @@
           statePath: App.Selectors.ProgrammeDocumentReports.current,
         },
 
+        loading: {
+          type: Boolean,
+          statePath: 'programmeDocumentReports.current.loading',
+        },
+
         headingText: {
           type: String,
           computed: '_computeHeadingText(currentReport, mode)',
@@ -306,8 +317,27 @@
         }
       },
 
-      _canExport: function (mode, permissions) {
-        return mode === 'view' && permissions.exportSubmittedProgressReport;
+      _canExport: function (loading, report, mode, permissions) {
+        switch (true) {
+          case !!loading:
+            return false;
+
+          case report.status === 'Sub' && !permissions.exportSubmittedProgressReport:
+            return false;
+
+          case report.is_draft && !permissions.exportDraftProgressReport:
+            return false;
+
+          case mode === 'edit':
+            return false;
+
+          default:
+            return true;
+        }
+      },
+
+      _canViewPdDetails: function (permissions) {
+        return permissions.viewPdDetails;
       },
 
       detached: function () {
