@@ -33,7 +33,7 @@ urlpatterns = [
     url(r'^api/partner/', include('partner.urls')),
     url(r'^api/unicef/', include('unicef.urls')),
     url(r'^api/cluster/', include('cluster.urls')),
-    url(r'^api/docs$', schema_view),
+    url(r'^api/docs/', schema_view),
 ]
 
 if settings.DEBUG:
