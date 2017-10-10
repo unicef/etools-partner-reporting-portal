@@ -37,3 +37,4 @@ redis==2.10.6
 
 # Cron
 django-cron==0.5.0
+requests==2.18.4

@@ -260,7 +260,10 @@ CARTODB_APIKEY = os.getenv('CARTODB_APIKEY')
 # Cronjobs
 
 CRON_CLASSES = [
-    "indicator.cron.IndicatorReportOverDueCronJob",
+    'indicator.cron.IndicatorReportOverDueCronJob',
+    'core.cron.WorkspaceCronJob',
+    'partner.cron.PartnerCronJob',
+    'unicef.cron.ProgrammeDocumentCronJob'
 ]
 
 # DRF settings
@@ -285,3 +288,10 @@ PASSWORDLESS_AUTH = {
     'PASSWORDLESS_REGISTER_NEW_USERS': False,
     'PASSWORDLESS_EMAIL_SUBJECT': 'UNICEF Partner Reporting Portal: Your login link'
 }
+
+# PMP API
+PMP_API_ENDPOINT = "https://etools-demo.unicef.org/api"
+PMP_API_USER = os.getenv('PMP_API_USER')
+PMP_API_PASSWORD = os.getenv('PMP_API_PASSWORD')
+
+
