@@ -19,6 +19,7 @@ from core.common import (
     PROGRESS_REPORT_STATUS,
     PD_STATUS,
     CURRENCIES,
+    OVERALL_STATUS
 )
 from core.models import TimeStampedExternalSyncModelMixin
 from indicator.models import Reportable  # IndicatorReport
@@ -343,6 +344,10 @@ def find_first_programme_document_id():
 
 
 class ProgressReport(TimeStampedModel):
+    """
+    Represents a report on multiple lower level outputs by a partner
+    for a certain time period, against a PD.
+    """
     partner_contribution_to_date = models.CharField(max_length=256)
     challenges_in_the_reporting_period = models.CharField(max_length=256)
     proposed_way_forward = models.CharField(max_length=256)
@@ -361,9 +366,19 @@ class ProgressReport(TimeStampedModel):
     submitted_by = models.ForeignKey('account.User',
                                      blank=True, null=True)
 
+    # Fields set by PO in PMP when reviewing the progress report
     review_date = models.DateField(verbose_name='Review Date',
-                                   blank=True, null=True)
+                                   blank=True,
+                                   null=True)
+    review_overall_status = models.CharField(
+        verbose_name='Overall status set by UNICEF PO',
+        choices=OVERALL_STATUS,
+        max_length=3,
+        blank=True,
+        null=True
+    )
     sent_back_feedback = models.TextField(blank=True, null=True)
+
 
     class Meta:
         ordering = ['-due_date', '-id']

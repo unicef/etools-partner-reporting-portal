@@ -13,12 +13,15 @@ from .models import ClusterObjective, ClusterActivity, Cluster
 class ClusterSimpleSerializer(serializers.ModelSerializer):
 
     type = serializers.CharField(read_only=True)
+    type_display = serializers.CharField(read_only=True,
+                                         source='get_type_display')
 
     class Meta:
         model = Cluster
         fields = (
             'id',
             'type',
+            'type_display',
         )
 
 

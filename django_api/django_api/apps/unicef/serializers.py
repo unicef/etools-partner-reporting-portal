@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 from .models import ProgrammeDocument, Section, ProgressReport, Person, \
     LowerLevelOutput, CountryProgrammeOutput
-from core.common import PROGRESS_REPORT_STATUS
+from core.common import PROGRESS_REPORT_STATUS, OVERALL_STATUS
 from indicator.models import Reportable
 from indicator.serializers import (
     PDReportContextIndicatorReportSerializer,
@@ -31,7 +31,8 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
     unicef_officers = PersonSerializer(read_only=True, many=True)
     unicef_focal_point = PersonSerializer(read_only=True, many=True)
     partner_focal_point = PersonSerializer(read_only=True, many=True)
-    document_type_display = serializers.SerializerMethodField()
+    document_type_display = serializers.CharField(
+            source='get_document_type_display')
 
 
     class Meta:
@@ -82,9 +83,6 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
 
     def get_funds_received_to_date_currency(self, obj):
         return obj.funds_received_to_date_currency
-
-    def get_document_type_display(self, obj):
-        return obj.get_document_type_display()
 
 
 class SectionSerializer(serializers.ModelSerializer):
@@ -173,6 +171,8 @@ class ProgressReportSimpleSerializer(serializers.ModelSerializer):
     programme_document = ProgrammeDocumentSerializer()
     reporting_period = serializers.SerializerMethodField()
     is_draft = serializers.SerializerMethodField()
+    review_overall_status_display = serializers.CharField(
+            source='get_review_overall_status_display')
 
     class Meta:
         model = ProgressReport
@@ -187,6 +187,8 @@ class ProgressReportSimpleSerializer(serializers.ModelSerializer):
             'due_date',
             'is_draft',
             'review_date',
+            'review_overall_status',
+            'review_overall_status_display',
             'sent_back_feedback',
             'programme_document',
         )
@@ -204,6 +206,8 @@ class ProgressReportSimpleSerializer(serializers.ModelSerializer):
 class ProgressReportSerializer(ProgressReportSimpleSerializer):
     programme_document = ProgrammeDocumentOutputSerializer()
     indicator_reports = serializers.SerializerMethodField()
+    review_overall_status_display = serializers.CharField(
+            source='get_review_overall_status_display')
 
     def __init__(self, llo_id=None, location_id=None, *args, **kwargs):
         self.llo_id = llo_id
@@ -224,6 +228,8 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
             'due_date',
             'is_draft',
             'review_date',
+            'review_overall_status',
+            'review_overall_status_display',
             'sent_back_feedback',
             'programme_document',
             'indicator_reports'
@@ -236,7 +242,7 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
         if self.location_id and self.llo_id is not None:
             qset = qset.filter(reportable__locations__id=self.location_id)
         return PDReportContextIndicatorReportSerializer(
-            instance=qset,read_only=True, many=True).data
+            instance=qset, read_only=True, many=True).data
 
     def get_reporting_period(self, obj):
         return "%s - %s " % (
@@ -269,7 +275,31 @@ class ProgressReportReviewSerializer(serializers.Serializer):
         PROGRESS_REPORT_STATUS.sent_back,
         PROGRESS_REPORT_STATUS.accepted
     ])
-    comment = serializers.CharField(allow_blank=True)
+    comment = serializers.CharField(required=False)
+    overall_status = serializers.ChoiceField(required=False,
+                                             choices=OVERALL_STATUS)
+
+    def validate(self, data):
+        """
+        Make sure status is only accepted or sent back. Also overall_status
+        should be set if accepting
+        """
+        if data['status'] not in [PROGRESS_REPORT_STATUS.sent_back,
+                                  PROGRESS_REPORT_STATUS.accepted]:
+            raise serializers.ValidationError(
+                    'Report status should be accepted or sent back')
+        if data.get('overall_status', None) == OVERALL_STATUS.no_status:
+            raise serializers.ValidationError('Invalid overall status')
+        if data.get('status', None) == PROGRESS_REPORT_STATUS.accepted and data.get(
+                'overall_status', None) is None:
+            raise serializers.ValidationError(
+                'Overall status required when accepting a report')
+        if data.get('status', None) == PROGRESS_REPORT_STATUS.sent_back and data.get(
+                'comment') is None:
+            raise serializers.ValidationError(
+                'Comment required when sending back report')
+
+        return data
 
 
 class LLOutputSerializer(serializers.ModelSerializer):
@@ -304,12 +334,14 @@ class ProgrammeDocumentCalculationMethodsSerializer(serializers.Serializer):
 class ProgrammeDocumentProgressSerializer(serializers.ModelSerializer):
     """
     Serializer to show the progoress of a PD. This includes information
-    around the CP output, LL output and the indicators and their progress.
+    around the CP output, LL output, and the latest progress report and its
+    associated indicator reports as well.
     """
     frequency = serializers.CharField(source='get_frequency_display')
     sections = SectionSerializer(read_only=True, many=True)
     details = serializers.SerializerMethodField()
-    indicators = serializers.SerializerMethodField()
+    latest_accepted_pr = serializers.SerializerMethodField()
+    latest_accepted_pr_indicator_reports = serializers.SerializerMethodField()
 
     class Meta:
         model = ProgrammeDocument
@@ -322,14 +354,32 @@ class ProgrammeDocumentProgressSerializer(serializers.ModelSerializer):
             'frequency',
             'sections',
             'details',
-            'indicators',
+            'latest_accepted_pr',
+            'latest_accepted_pr_indicator_reports',
         )
 
     def get_details(self, obj):
         return ProgrammeDocumentOutputSerializer(obj).data
 
-    def get_indicators(self, obj):
-        reportables = []
-        map(lambda x: reportables.extend(x.reportables.all()),
-            LowerLevelOutput.objects.filter(cp_output__programme_document=obj))
-        return ReportableSimpleSerializer(reportables, many=True).data
+    def get_latest_accepted_pr(self, obj):
+        qset = ProgressReport.objects.filter(
+                status=PROGRESS_REPORT_STATUS.accepted).order_by('-end_date')
+        if qset:
+            return ProgressReportSimpleSerializer(
+                instance=qset[0], read_only=True).data
+        else:
+            return {}
+
+    def get_latest_accepted_pr_indicator_reports(self, obj):
+        """
+        Return data about the latest accepted indicator report associated
+        with this PD (if any).
+        """
+        qset = ProgressReport.objects.filter(
+                status=PROGRESS_REPORT_STATUS.accepted).order_by('-end_date')
+        if qset:
+            return PDReportContextIndicatorReportSerializer(
+                instance=qset[0].indicator_reports.all(),
+                read_only=True, many=True).data
+        else:
+            return []

@@ -324,7 +324,7 @@ class ProgressReportDetailsUpdateAPIView(APIView):
                 pk=pk)
         except ProgressReport.DoesNotExist as exp:
             logger.exception({
-                "endpoint": "ProgressReportDetailsAPIView",
+                "endpoint": "ProgressReportDetailsUpdateAPIView",
                 "request.data": self.request.data,
                 "pk": pk,
                 "exception": exp,
@@ -343,10 +343,9 @@ class ProgressReportDetailsUpdateAPIView(APIView):
             return Response(serializer.errors, status=statuses.HTTP_400_BAD_REQUEST)
 
 
-
 class ProgressReportDetailsAPIView(RetrieveAPIView):
     """
-    Endpoint for getting Progress Report
+    Endpoint for getting a single Progress Report
     """
     serializer_class = ProgressReportSerializer
     permission_classes = (IsAuthenticated, )
@@ -569,6 +568,10 @@ class ProgressReportReviewAPIView(APIView):
             if progress_report.status == PROGRESS_REPORT_STATUS.sent_back:
                 progress_report.sent_back_feedback = serializer.validated_data[
                     'comment']
+            elif progress_report.status == PROGRESS_REPORT_STATUS.accepted:
+                progress_report.review_overall_status = serializer.validated_data[
+                    'overall_status']
+
             progress_report.save()
             serializer = ProgressReportSerializer(instance=progress_report)
             return Response(serializer.data, status=statuses.HTTP_200_OK)
