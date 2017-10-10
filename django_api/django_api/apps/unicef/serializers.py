@@ -242,7 +242,7 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
         if self.location_id and self.llo_id is not None:
             qset = qset.filter(reportable__locations__id=self.location_id)
         return PDReportContextIndicatorReportSerializer(
-            instance=qset,read_only=True, many=True).data
+            instance=qset, read_only=True, many=True).data
 
     def get_reporting_period(self, obj):
         return "%s - %s " % (
@@ -334,12 +334,14 @@ class ProgrammeDocumentCalculationMethodsSerializer(serializers.Serializer):
 class ProgrammeDocumentProgressSerializer(serializers.ModelSerializer):
     """
     Serializer to show the progoress of a PD. This includes information
-    around the CP output, LL output and the indicators and their progress.
+    around the CP output, LL output, and the latest progress report and its
+    associated indicator reports as well.
     """
     frequency = serializers.CharField(source='get_frequency_display')
     sections = SectionSerializer(read_only=True, many=True)
     details = serializers.SerializerMethodField()
-    indicators = serializers.SerializerMethodField()
+    latest_accepted_pr = serializers.SerializerMethodField()
+    latest_accepted_pr_indicator_reports = serializers.SerializerMethodField()
 
     class Meta:
         model = ProgrammeDocument
@@ -352,14 +354,32 @@ class ProgrammeDocumentProgressSerializer(serializers.ModelSerializer):
             'frequency',
             'sections',
             'details',
-            'indicators',
+            'latest_accepted_pr',
+            'latest_accepted_pr_indicator_reports',
         )
 
     def get_details(self, obj):
         return ProgrammeDocumentOutputSerializer(obj).data
 
-    def get_indicators(self, obj):
-        reportables = []
-        map(lambda x: reportables.extend(x.reportables.all()),
-            LowerLevelOutput.objects.filter(cp_output__programme_document=obj))
-        return ReportableSimpleSerializer(reportables, many=True).data
+    def get_latest_accepted_pr(self, obj):
+        qset = ProgressReport.objects.filter(
+                status=PROGRESS_REPORT_STATUS.accepted).order_by('-end_date')
+        if qset:
+            return ProgressReportSimpleSerializer(
+                instance=qset[0], read_only=True).data
+        else:
+            return {}
+
+    def get_latest_accepted_pr_indicator_reports(self, obj):
+        """
+        Return data about the latest accepted indicator report associated
+        with this PD (if any).
+        """
+        qset = ProgressReport.objects.filter(
+                status=PROGRESS_REPORT_STATUS.accepted).order_by('-end_date')
+        if qset:
+            return PDReportContextIndicatorReportSerializer(
+                instance=qset[0].indicator_reports.all(),
+                read_only=True, many=True).data
+        else:
+            return []
