@@ -91,7 +91,7 @@
         <report-status status="[[currentReport.report_status]]"></report-status>
         <template
             is="dom-if"
-            if="[[_equals(mode, 'view')]]"
+            if="[[_canExport(mode, permissions)]]"
             restamp="true">
           <pd-report-export-button></pd-report-export-button>
         </template>
@@ -299,10 +299,15 @@
       _handlePermissions: function (permissions, mode, baseUrl, tail) {
         if (
           !permissions.viewProgressReport ||
-          (!permissions.viewProgressReportDraft && mode === 'draft')
+          (!permissions.viewProgressReportDraft && mode === 'draft') ||
+          (!permissions.editProgressReport && mode === 'edit')
         ) {
           window.history.pushState(null, document.title, this.buildUrl(baseUrl, tail));
         }
+      },
+
+      _canExport: function (mode, permissions) {
+        return mode === 'view' && permissions.exportSubmittedProgressReport;
       },
 
       detached: function () {

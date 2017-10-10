@@ -30,6 +30,7 @@
         switch (true) {
           case mode === 'view' && !permissions.viewProgressReport:
           case mode === 'draft' && !permissions.viewProgressReportDraft:
+          case mode === 'edit' && !permissions.editProgressReport:
             return false;
 
           default:
