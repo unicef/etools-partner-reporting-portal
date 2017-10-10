@@ -63,6 +63,7 @@ class ChildrenLocationSerializer(serializers.ModelSerializer):
 class ResponsePlanSerializer(serializers.ModelSerializer):
 
     clusters = serializers.SerializerMethodField()
+    plan_type_display = serializers.CharField(source='get_plan_type_display')
 
     class Meta:
         model = ResponsePlan
@@ -70,6 +71,7 @@ class ResponsePlanSerializer(serializers.ModelSerializer):
             'id',
             'title',
             'plan_type',
+            'plan_type_display',
             'start',
             'end',
             'workspace',

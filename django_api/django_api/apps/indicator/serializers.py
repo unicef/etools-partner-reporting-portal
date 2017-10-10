@@ -125,12 +125,6 @@ class ReportableSimpleSerializer(serializers.ModelSerializer):
     content_type_name = serializers.SerializerMethodField()
     content_object_title = serializers.SerializerMethodField()
 
-    def get_content_type_name(self, obj):
-        return obj.content_type.name
-
-    def get_content_object_title(self, obj):
-        return obj.content_object.title
-
     class Meta:
         model = Reportable
         fields = (
@@ -145,6 +139,12 @@ class ReportableSimpleSerializer(serializers.ModelSerializer):
             'content_object_title',
             'object_id',
         )
+
+    def get_content_type_name(self, obj):
+        return obj.content_type.name
+
+    def get_content_object_title(self, obj):
+        return obj.content_object.title
 
 
 class IndicatorListSerializer(ReportableSimpleSerializer):
@@ -579,6 +579,8 @@ class PDReportContextIndicatorReportSerializer(serializers.ModelSerializer):
     submission_date = serializers.SerializerMethodField()
     due_date = serializers.SerializerMethodField()
     reportable = ReportableSimpleSerializer()
+    report_status_display = serializers.CharField(
+            source='get_report_status_display')
 
     class Meta:
         model = IndicatorReport
@@ -590,6 +592,7 @@ class PDReportContextIndicatorReportSerializer(serializers.ModelSerializer):
             'reporting_period',
             'progress_report_status',
             'report_status',
+            'report_status_display',
             'submission_date',
             'is_draft',
             'due_date',

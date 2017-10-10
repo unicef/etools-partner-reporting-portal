@@ -391,7 +391,9 @@ class IndicatorReportListAPIView(APIView):
 
     GET parameter:
     - pks = A comma-separated string for IndicatorReport pks (If this GET
-    parameter is given, Reportable pk kwargs will be ignored)
+    parameter is given, Reportable pk kwargs will be ignored) - TODO: not
+    ideal design, since frontend is sending to this endpoint with irrelevant
+    reportable_id many times.
     """
 
     def get_queryset(self, *args, **kwargs):
@@ -420,9 +422,8 @@ class IndicatorReportListAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
         indicator_reports = self.get_queryset()
-
-        serializer = IndicatorReportListSerializer(indicator_reports, many=True)
-
+        serializer = IndicatorReportListSerializer(indicator_reports,
+                                                   many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 

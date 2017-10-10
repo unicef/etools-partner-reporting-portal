@@ -31,7 +31,8 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
     unicef_officers = PersonSerializer(read_only=True, many=True)
     unicef_focal_point = PersonSerializer(read_only=True, many=True)
     partner_focal_point = PersonSerializer(read_only=True, many=True)
-    document_type_display = serializers.SerializerMethodField()
+    document_type_display = serializers.CharField(
+            source='get_document_type_display')
 
 
     class Meta:
@@ -82,9 +83,6 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
 
     def get_funds_received_to_date_currency(self, obj):
         return obj.funds_received_to_date_currency
-
-    def get_document_type_display(self, obj):
-        return obj.get_document_type_display()
 
 
 class SectionSerializer(serializers.ModelSerializer):
