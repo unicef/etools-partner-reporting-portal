@@ -1,6 +1,8 @@
 from django_cron import CronJobBase, Schedule
 
 from core.api import PMP_API
+from core.serializers import PMPWorkspaceSerializer
+from core.models import Country
 
 
 class WorkspaceCronJob(CronJobBase):
@@ -11,6 +13,19 @@ class WorkspaceCronJob(CronJobBase):
 
 
     def do(self):
+
+        # Hit API
         api = PMP_API()
-        # DO some stuff
-        print api.workspaces()
+        data = api.workspaces()
+
+        # Create workspaces
+        serializer = PMPWorkspaceSerializer(data=data, many=True)
+        if not serializer.is_valid():
+            raise(serializer.errors)
+        workspaces = serializer.save()
+
+        # Create countries
+        for workspace in workspaces:
+            # TODO: switch to code when we get this data from PMP API
+            country, created = Country.objects.get_or_create(name=workspace.title)
+            workspace.countries.add(country)

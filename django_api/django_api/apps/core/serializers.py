@@ -1,3 +1,5 @@
+import hashlib
+
 from rest_framework import serializers
 
 from .models import Workspace, Location, ResponsePlan, Country
@@ -82,3 +84,29 @@ class ResponsePlanSerializer(serializers.ModelSerializer):
     def get_clusters(self, obj):
         from cluster.serializers import ClusterSimpleSerializer
         return ClusterSimpleSerializer(obj.clusters.all(), many=True).data
+
+
+# PMP API Serializers
+
+class PMPWorkspaceSerializer(serializers.ModelSerializer):
+
+    name = serializers.CharField(source='title')
+
+    def create(self, validated_data):
+
+        # TODO: remove when they add workspace_code field
+        validated_data['workspace_code'] = hashlib.md5(validated_data['title']).hexdigest()[:8]
+
+        # TODO: remove when they add ID field
+        validated_data['external_id'] = hashlib.md5(validated_data['title']).hexdigest()
+
+        # Update or create
+        try:
+            instance = Workspace.objects.get(external_id=validated_data['external_id'])
+            return self.update(instance, validated_data)
+        except Workspace.DoesNotExist:
+            return Workspace.objects.create(**validated_data)
+
+    class Meta:
+        model = Workspace
+        fields = ('name', 'latitude', 'longitude', 'initial_zoom')
