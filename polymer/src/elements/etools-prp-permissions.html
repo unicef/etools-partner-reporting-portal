@@ -76,7 +76,7 @@
               switch (true) {
                 case Array.isArray(granted):
                   return groups.some(function (group) {
-                    return granted.indexOf(group) !== -1;
+                    return granted.indexOf(group.name) !== -1;
                   });
 
                 case granted === App.Constants.GROUP_IP_ALL:
