@@ -475,7 +475,8 @@ class ClusterIndicatorAPIView(APIView):
     serializer_class = ClusterIndicatorSerializer
     permission_classes = (IsAuthenticated, )
 
-    def get_serializer(self, data, instance=None, many=False, read_only=False):
+    # Naming this to get_serializer_instance in order to avoid colision in Swagger schema generation
+    def get_serializer_instance(self, data, instance=None, many=False, read_only=False):
         return self.serializer_class(
             data=data,
             instance=instance,
@@ -484,7 +485,7 @@ class ClusterIndicatorAPIView(APIView):
         )
 
     def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(request.data)
+        serializer = self.get_serializer_instance(request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -498,7 +499,7 @@ class ClusterIndicatorAPIView(APIView):
         return get_object_or_404(Reportable, pk=self.request.data.get("id"))
 
     def put(self, request, *args, **kwargs):
-        serializer = self.get_serializer(
+        serializer = self.get_serializer_instance(
             instance=self.get_object(),
             data=request.data
         )
