@@ -5,7 +5,10 @@
 <link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../../bower_components/promise-polyfill/promise-polyfill-lite.html">
+<link rel="import" href="../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../bower_components/iron-location/iron-query-params.html">
 
+<link rel="import" href="../../polyfills/es6-shim.html">
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/notifications.html">
@@ -145,6 +148,20 @@
       }
     </style>
 
+    <iron-location
+        query="{{query}}">
+    </iron-location>
+
+    <iron-query-params
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
+    </iron-query-params>
+
+    <iron-query-params
+        params-string="{{exportQuery}}"
+        params-object="{{exportParams}}">
+    </iron-query-params>
+
     <etools-prp-ajax
         id="submit"
         url="[[reportUrl]]"
@@ -239,7 +256,7 @@
                   if="[[_equals(mode, 'view')]]"
                   restamp="true">
                 <a
-                    href="#"
+                    href="[[exportUrl]]"
                     target="_blank"
                     tabindex="-1">
                   <paper-button class="btn-primary">
@@ -374,6 +391,16 @@
           value: false,
         },
 
+        responsePlanId: {
+          type: String,
+          statePath: 'responsePlans.currentID',
+        },
+
+        exportParams: {
+          type: Object,
+          computed: '_computeExportParams(queryParams, data)',
+        },
+
         canSubmit: {
           type: Boolean,
           computed: '_computeCanSubmit(data, busy)',
@@ -382,6 +409,11 @@
         reportUrl: {
           type: String,
           computed: '_computeReportUrl(data)',
+        },
+
+        exportUrl: {
+          type: String,
+          computed: '_computeExportUrl(responsePlanId, exportQuery)',
         },
 
         indicatorType: {
@@ -405,6 +437,14 @@
 
       _computeReportUrl: function (data) {
         return App.Endpoints.indicatorData(data.id);
+      },
+
+      _computeExportUrl: function (responsePlanId, query) {
+        return [
+          App.Endpoints.clusterIndicatorReportsExport(responsePlanId),
+          '?',
+          query,
+        ].join('');
       },
 
       _computeIndicatorType: function (data) {
@@ -506,6 +546,12 @@
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
             });
+      },
+
+      _computeExportParams: function (queryParams, data) {
+        return Object.assign({}, queryParams, {
+          indicator: data.id,
+        });
       },
 
       detached: function () {
