@@ -31,16 +31,18 @@
 
     function accountTypeReducer(state, action) {
       if (typeof state === 'undefined') {
-        // state = '';
-
-        // FIXME:
-        state = App.Constants.ACCOUNT_TYPE_PARTNER;
-        // state = App.Constants.ACCOUNT_TYPE_IMO;
+        state = '';
       }
 
       switch (action.type) {
         case App.Constants.SET_ACCOUNT_TYPE:
-          return action.accountType;
+          return (function () {
+            var isPartner = !!action.data.partner;
+
+            return isPartner ?
+                App.Constants.ACCOUNT_TYPE_PARTNER :
+                App.Constants.ACCOUNT_TYPE_IMO;
+          }());
 
         case App.Constants.RESET:
           return '';
