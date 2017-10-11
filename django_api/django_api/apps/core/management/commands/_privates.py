@@ -17,6 +17,11 @@ from cluster.models import (
     ClusterObjective,
     ClusterActivity,
 )
+from core.models import (
+    PartnerAuthorizedOfficerRole,
+    PartnerEditorRole,
+    PartnerViewerRole
+)
 from partner.models import (
     Partner,
     PartnerProject,
@@ -37,11 +42,6 @@ from unicef.models import (
     CountryProgrammeOutput,
     LowerLevelOutput,
     Person,
-)
-from unicef.models import (
-    IPAuthorizedOfficerRole,
-    IPEditorRole,
-    IPViewerRole
 )
 from core.models import (
     Workspace,
@@ -140,9 +140,9 @@ def generate_fake_data(workspace_quantity=10):
     today = datetime.date.today()
 
     users_to_create = [
-        ('admin_iao', 'admin_iao@notanemail.com', IPAuthorizedOfficerRole),
-        ('admin_ipe', 'admin_ipe@notanemail.com', IPEditorRole),
-        ('admin_ipv', 'admin_ipv@notanemail.com', IPViewerRole),
+        ('admin_ao', 'admin_ao@notanemail.com', PartnerAuthorizedOfficerRole),
+        ('admin_pe', 'admin_pe@notanemail.com', PartnerEditorRole),
+        ('admin_pv', 'admin_pv@notanemail.com', PartnerViewerRole),
     ]
     users_created = []
     for u in users_to_create:
