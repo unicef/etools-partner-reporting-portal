@@ -21,7 +21,7 @@ class WorkspaceCronJob(CronJobBase):
         # Create workspaces
         serializer = PMPWorkspaceSerializer(data=data, many=True)
         if not serializer.is_valid():
-            raise(serializer.errors)
+            raise Exception(serializer.errors)
         workspaces = serializer.save()
 
         # Create countries

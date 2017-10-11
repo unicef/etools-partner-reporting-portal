@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from core.serializers import ShortLocationSerializer
-from core.common import PD_STATUS, PARTNER_PROJECT_STATUS
+from core.common import PD_STATUS, PARTNER_PROJECT_STATUS, PARTNER_TYPE, CSO_TYPES
 
 from cluster.models import (
     Cluster,
@@ -296,3 +296,48 @@ class PartnerActivitySerializer(serializers.ModelSerializer):
 
     def get_status(self, obj):
         return obj.project and obj.project.status
+
+# PMP API Serializers
+
+class PMPPartnerSerializer(serializers.ModelSerializer):
+
+    id = serializers.CharField(source='external_id')
+    name = serializers.CharField(source='title', allow_blank=True)
+    short_name = serializers.CharField(source='short_title', allow_blank=True)
+    partner_type = serializers.ChoiceField(choices=[(x[1], x[0]) for x in PARTNER_TYPE], allow_blank=True, allow_null=True)
+    cso_type = serializers.ChoiceField(choices=[(x[1], x[0]) for x in CSO_TYPES], allow_blank=True, allow_null=True)
+
+
+    def fix_choices(self, validated_data):
+        for pt in [(x[1], x[0]) for x in PARTNER_TYPE]:
+            if pt[0] == validated_data['partner_type']:
+                validated_data['partner_type'] = pt[1]
+        for ct in [(x[1], x[0]) for x in CSO_TYPES]:
+            if ct[0] == validated_data['cso_type']:
+                validated_data['cso_type'] = ct[1]
+        return validated_data
+
+    def update(self, instance, validated_data):
+        validated_data = self.fix_choices(validated_data)
+        return Partner.objects.filter(external_id=validated_data['external_id']).update(**validated_data)
+
+    def create(self, validated_data):
+        validated_data = self.fix_choices(validated_data)
+        return Partner.objects.create(**validated_data)
+
+    class Meta:
+        model = Partner
+        fields = (
+            "id",
+            "vendor_number",
+            "name",
+            "short_name",
+            "partner_type",
+            "cso_type",
+            "rating",
+            "shared_partner",
+            "email",
+            "phone_number",
+            "total_ct_cp",
+            "total_ct_cy",
+        )

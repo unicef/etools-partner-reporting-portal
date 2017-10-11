@@ -2,6 +2,8 @@ from django_cron import CronJobBase, Schedule
 
 from core.api import PMP_API
 
+from partner.serializers import PMPPartnerSerializer
+from partner.models import Partner
 
 class PartnerCronJob(CronJobBase):
     RUN_AT_TIMES = ['0:10']
@@ -11,6 +13,18 @@ class PartnerCronJob(CronJobBase):
 
 
     def do(self):
+        # Hit API
         api = PMP_API()
-        # DO some stuff
-        print api.partners()
+        data = api.partners()
+
+        # Create partners
+        for item in data:
+            try:
+                instance = Partner.objects.get(external_id=item['id'])
+                serializer = PMPPartnerSerializer(instance, data=item)
+            except Partner.DoesNotExist:
+                serializer = PMPPartnerSerializer(data=item)
+            if serializer.is_valid():
+                serializer.save()
+            else:
+                raise Exception(serializer.errors)
