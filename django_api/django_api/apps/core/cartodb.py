@@ -6,7 +6,7 @@ from carto.auth import APIKeyAuthClient
 from carto.sql import SQLClient
 from carto.exceptions import CartoException
 
-from core.celery import app
+from core.celery import app, FaultTolerantTask
 from core.models import Location
 
 logger = logging.getLogger('core.cartodb')
@@ -109,7 +109,7 @@ def create_location(pcode,
         return True, num_not_added, num_created, num_updated
 
 
-@app.task
+@app.task(base=FaultTolerantTask)
 def update_sites_from_cartodb(carto_table):
     """
     Creates or Retrieve Location objects based on
