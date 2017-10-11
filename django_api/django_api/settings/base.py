@@ -218,7 +218,7 @@ LOGGING = {
 
 import djcelery
 djcelery.setup_loader()
-BROKER_URL = 'redis://redis:6379/0'
+BROKER_URL = os.getenv('REDIS_URL', 'redis://redis:6379/0')
 BROKER_VISIBILITY_VAR = os.environ.get('CELERY_VISIBILITY_TIMEOUT', 1800)
 BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': int(BROKER_VISIBILITY_VAR)}  # 5 hours
 

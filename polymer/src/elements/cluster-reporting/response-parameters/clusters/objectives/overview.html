@@ -5,6 +5,7 @@
 <link rel="import" href="../../../../../elements/page-body.html">
 <link rel="import" href="../../../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../../../elements/page-body.html">
+<link rel="import" href="../../../../../elements/frequency-of-reporting.html">
 <link rel="import" href="../../../../../behaviors/utils.html">
 <link rel="import" href="../../../../../endpoints.html">
 <link rel="import" href="../../../../../redux/actions.html">
@@ -48,20 +49,24 @@
 
     <page-body>
       <etools-content-panel panel-title="Cluster Objective Details">
-          <div class="row">
-            <ul class="app-grid">
-              <li class="item">
-                <labelled-item label="Cluster">
-                  <span class="value">[[_withDefault(data.cluster_title, '')]]</span>
-                </labelled-item>
-              </li>
-              <li class="item">
-                <labelled-item label="Frequency of Reporting">
-                  <span class="value">[[_withDefault(data.frequency)]]</span>
-                </labelled-item>
-              </li>
-            </ul>
-          </div>
+        <div class="row">
+          <ul class="app-grid">
+            <li class="item">
+              <labelled-item label="Cluster">
+                <span class="value">[[_withDefault(data.cluster_title, '')]]</span>
+              </labelled-item>
+            </li>
+            <li class="item">
+              <labelled-item label="Frequency of Reporting">
+                <span class="value">
+                  <frequency-of-reporting
+                      type="[[data.frequency]]">
+                  </frequency-of-reporting>
+                </span>
+              </labelled-item>
+            </li>
+          </ul>
+        </div>
       </etools-content-panel>
     </page-body>
   </template>
