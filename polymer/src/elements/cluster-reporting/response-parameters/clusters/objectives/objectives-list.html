@@ -52,7 +52,7 @@
         <etools-data-table-column field="ref">
           <div class="table-column">CO ref. #</div>
         </etools-data-table-column>
-        <etools-data-table-column field="title">
+        <etools-data-table-column field="title" flex-3>
           <div class="table-column">Cluster Objective Title</div>
         </etools-data-table-column>
       </etools-data-table-header>
@@ -71,7 +71,7 @@
             <div class="table-cell table-cell--text">
               [[objective.reference_number]]
             </div>
-            <div class="table-cell table-cell--text">
+            <div class="table-cell table-cell--text" flex-3>
               <a href="[[_detailUrl(objective.id)]]">[[objective.title]]</a>
             </div>
           </div>

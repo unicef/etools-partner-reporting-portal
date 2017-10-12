@@ -86,7 +86,7 @@
         </div>
 
         <div class="full-width">
-          <paper-input label="My Groups" value="[[_formatGroups(profile.groups)]]" placeholder="---" readonly always-float-label></paper-input>
+          <paper-input label="My Groups" value="[[groups]]" placeholder="---" readonly always-float-label></paper-input>
         </div>
 
       </iron-form>
@@ -109,9 +109,15 @@
             type: Boolean,
             value: false,
           },
+
           profile: {
             type: Object,
-            statePath: 'userProfile.profile'
+            statePath: 'userProfile.profile',
+          },
+
+          groups: {
+            type: Array,
+            computed: '_computeGroups(profile)',
           },
         },
 
@@ -123,12 +129,11 @@
           this.set('opened', true);
         },
 
-        _formatGroups: function(groups) {
-          return groups.map(function(group) {
+        _computeGroups: function (profile) {
+          return (profile.groups || []).map(function(group) {
             return group.name;
           }).join(', ');
         },
-
       });
   </script>
 </dom-module>
