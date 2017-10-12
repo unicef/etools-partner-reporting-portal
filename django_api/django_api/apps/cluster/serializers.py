@@ -76,6 +76,7 @@ class ClusterActivitySerializer(serializers.ModelSerializer):
             'id',
             'title',
             'standard',
+            'title',
             'co_cluster_title',
             'co_title',
             'co_reference_number',
