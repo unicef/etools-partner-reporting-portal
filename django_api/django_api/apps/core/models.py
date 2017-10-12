@@ -26,13 +26,13 @@ logger = logging.getLogger('locations.models')
 try:
     PartnerAuthorizedOfficerRole = GroupWrapper(code='ip_authorized_officer',
                                                 name='IP Authorized Officer',
-                                                create_group=True)
+                                                create_group=False)
     PartnerEditorRole = GroupWrapper(code='ip_editor',
                                      name='IP Editor',
-                                     create_group=True)
+                                     create_group=False)
     PartnerViewerRole = GroupWrapper(code='ip_viewer',
                                      name='IP Viewer',
-                                     create_group=True)
+                                     create_group=False)
 except Exception as e:
     print "Group DB is not ready yet! - Error: %s" % e
 
