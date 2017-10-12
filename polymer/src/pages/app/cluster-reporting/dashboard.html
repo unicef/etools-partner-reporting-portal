@@ -187,12 +187,15 @@
         dataUrl: {
           type: String,
           computed: '_computeDataUrl(responsePlanId, mode, queryParams)',
-          observer: '_fetchData',
         },
       },
 
+      observers: [
+        '_fetchData(dataUrl, queryParams)',
+      ],
+
       listeners: {
-        'report-submitted': '_refreshData',
+        'report-submitted': '_fetchData',
       },
 
       _computeMode: function (accountType) {
@@ -205,29 +208,18 @@
         }
       },
 
-      _computeDataUrl: function (responsePlanId, mode, queryParams) {
-        var clusterId = queryParams.cluster_id;
-
-        return clusterId ?
-            App.Endpoints.clusterDashboard(responsePlanId, clusterId, mode) : '';
+      _computeDataUrl: function (responsePlanId, mode) {
+        return App.Endpoints.clusterDashboard(responsePlanId, mode);
       },
 
-      _refreshData: function () {
-        this._fetchData(this.dataUrl);
-      },
-
-      _fetchData: function (url) {
-        if (!url) {
-          return;
-        }
-
+      _fetchData: function () {
         this.debounce('fetch-data', function () {
           var dataThunk = this.$.data.thunk();
 
           this.$.data.abort();
 
           this.dispatch(App.Actions.ClusterDashboardData.fetch(dataThunk));
-        }, 100);
+        }, 300);
       },
 
       detached: function () {
