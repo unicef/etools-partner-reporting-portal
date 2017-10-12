@@ -17,8 +17,24 @@ from mptt.models import MPTTModel, TreeForeignKey
 from .common import (
     RESPONSE_PLAN_TYPE,
 )
+from utils.groups.wrappers import GroupWrapper
+
 
 logger = logging.getLogger('locations.models')
+
+# Define groups that UNICEF IP reporting users can belong to
+try:
+    PartnerAuthorizedOfficerRole = GroupWrapper(code='ip_authorized_officer',
+                                                name='IP Authorized Officer',
+                                                create_group=True)
+    PartnerEditorRole = GroupWrapper(code='ip_editor',
+                                     name='IP Editor',
+                                     create_group=True)
+    PartnerViewerRole = GroupWrapper(code='ip_viewer',
+                                     name='IP Viewer',
+                                     create_group=True)
+except Exception as e:
+    print "Group DB is not ready yet! - Error: %s" % e
 
 
 def get_random_color():

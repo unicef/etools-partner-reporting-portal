@@ -10,9 +10,10 @@
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
 <link rel="import" href="../../redux/selectors/reportInfo.html">
+<link rel="import" href="../../redux/selectors/programmeDocuments.html">
 <link rel="import" href="../labelled-item.html">
 <link rel="import" href="../etools-prp-ajax.html">
-
+<link rel="import" href="../etools-prp-permissions.html">
 
 <dom-module id="pd-report-info">
   <template>
@@ -35,6 +36,10 @@
         font-size: 16px;
       }
     </style>
+
+    <etools-prp-permissions
+        permissions="{{permissions}}">
+    </etools-prp-permissions>
 
     <etools-prp-ajax
         id="update"
@@ -139,6 +144,7 @@
 
       properties: {
         localData: Object,
+        permissions: Object,
 
         data: {
           type: Object,
@@ -177,7 +183,12 @@
 
         computedMode: {
           type: String,
-          computed: '_computeMode(mode, overrideMode)',
+          computed: '_computeMode(mode, overrideMode, currentReport, permissions)',
+        },
+
+        currentReport: {
+          type: Object,
+          statePath: App.Selectors.ProgrammeDocumentReports.current,
         },
       },
 
@@ -225,8 +236,17 @@
         return App.Endpoints.programmeDocumentReportUpdate(locationId, reportId);
       },
 
-      _computeMode: function (mode, overrideMode) {
-        return overrideMode || mode;
+      _computeMode: function (mode, overrideMode, report, permissions) {
+        var computedMode = overrideMode || mode;
+
+        switch (true) {
+          case report.is_draft && !permissions.savePdReport:
+          case report.status === 'Sen' && !permissions.savePdReport:
+            return 'view';
+
+          default:
+            return computedMode;
+        }
       },
 
       attached: function () {

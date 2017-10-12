@@ -10,6 +10,33 @@
       _isReadOnlyReport: function (report) {
         return App.Settings.ip.readOnlyStatuses.indexOf(report.status) !== -1;
       },
+
+      _getMode: function (report) {
+        switch (true) {
+          case report.is_draft:
+            return 'draft';
+
+          case this._isReadOnlyReport(report):
+            return 'view';
+
+          default:
+            return 'edit';
+        }
+      },
+
+      _canNavigateToReport: function (permissions, report) {
+        var mode = this._getMode(report);
+
+        switch (true) {
+          case mode === 'view' && !permissions.viewProgressReport:
+          case mode === 'draft' && !permissions.viewProgressReportDraft:
+          case mode === 'edit' && !permissions.editProgressReport:
+            return false;
+
+          default:
+            return true;
+        }
+      },
     };
   }());
 </script>
