@@ -196,12 +196,10 @@
           reportId + '/annex-C-export-PDF/');
       },
 
-      clusterDashboard: function (responsePlanId, clusterId, mode) {
+      clusterDashboard: function (responsePlanId, mode) {
         return this._buildUrl(
           '/cluster/' +
           responsePlanId +
-          '/' +
-          clusterId +
           '/' +
           mode +
           '-dashboard/'
