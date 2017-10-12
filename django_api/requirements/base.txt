@@ -5,6 +5,7 @@ Django==1.11.5
 djangorestframework==3.6.4
 django-filter==1.0.4
 drfpasswordless==1.1.2
+django-rest-swagger==2.1.2
 
 # Other Python packages
 psycopg2==2.7.3.1
@@ -33,7 +34,9 @@ django-leaflet==0.19.0
 
 # Celery
 django-celery==3.2.1
+kombu==3.0.37
 redis==2.10.6
+flower==0.9.2
 
 # Cron
 django-cron==0.5.0

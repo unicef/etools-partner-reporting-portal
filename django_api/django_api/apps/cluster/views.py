@@ -38,7 +38,16 @@ logger = logging.getLogger(__name__)
 
 
 class ClusterListAPIView(ListAPIView):
+    """
+    Cluster object list API - GET
+    Authentication required.
 
+    Parameters:
+    - rp_id: Response Plan ID
+
+    Returns:
+        ClusterSimpleSerializer object list.
+    """
     serializer_class = ClusterSimpleSerializer
     permission_classes = (IsAuthenticated, )
     lookup_field = lookup_url_kwarg = 'rp_id'
@@ -53,7 +62,17 @@ class ClusterListAPIView(ListAPIView):
 
 class ClusterObjectiveAPIView(APIView):
     """
-    ClusterObjective CRUD endpoint
+    ClusterObjective object API - GET/PATCH/PUT/DELETE
+    Authentication required.
+
+    Parameters:
+    - pk - ClusterObjective ID
+
+    Returns:
+        - GET method - ClusterSimpleSerializer object.
+        - PATCH method - ClusterObjectivePatchSerializer object.
+        - PUT method - ClusterObjectiveSerializer object.
+        - DELETE method - 204 response code
     """
     serializer_class = ClusterObjectiveSerializer
     permission_classes = (IsAuthenticated, )
@@ -112,6 +131,17 @@ class ClusterObjectiveAPIView(APIView):
 
 
 class ClusterObjectiveListCreateAPIView(ListCreateAPIView):
+    """
+    ClusterObjective object list API - GET/POST
+    Authentication required.
+
+    Parameters:
+    - response_plan_id - Response plan ID
+
+    Returns:
+        - GET method - ClusterObjectiveSerializer object.
+        - POST method - ClusterObjectiveSerializer object.
+    """
 
     serializer_class = ClusterObjectiveSerializer
     permission_classes = (IsAuthenticated, )
@@ -145,7 +175,17 @@ class ClusterObjectiveListCreateAPIView(ListCreateAPIView):
 
 class ClusterActivityAPIView(APIView):
     """
-    ClusterActivity CRUD endpoint
+    ClusterActivity object API - GET/PATCH/PUT/DELETE
+    Authentication required.
+
+    Parameters:
+    - pk - ClusterActivity ID
+
+    Returns:
+        - GET method - ClusterActivitySerializer object.
+        - PATCH method - ClusterActivityPatchSerializer object.
+        - PUT method - ClusterActivitySerializer object.
+        - DELETE method - 204 response code
     """
     permission_classes = (IsAuthenticated, )
 
@@ -198,7 +238,17 @@ class ClusterActivityAPIView(APIView):
 
 
 class ClusterActivityListAPIView(ListCreateAPIView):
+    """
+    ClusterActivity object list API - GET/POST
+    Authentication required.
 
+    Parameters:
+    - response_plan_id - Response plan ID
+
+    Returns:
+        - GET method - ClusterActivitySerializer object.
+        - POST method - ClusterActivitySerializer object.
+    """
     serializer_class = ClusterActivitySerializer
     permission_classes = (IsAuthenticated, )
     pagination_class = SmallPagination
@@ -225,7 +275,17 @@ class ClusterActivityListAPIView(ListCreateAPIView):
 
 
 class IndicatorReportsListAPIView(ListCreateAPIView):
+    """
+    Cluster IndicatorReport object list API - GET/POST
+    Authentication required.
 
+    Parameters:
+    - response_plan_id - Response plan ID
+
+    Returns:
+        - GET method - ClusterIndicatorReportSerializer object.
+        - POST method - ClusterIndicatorReportSerializer object.
+    """
     permission_classes = (IsAuthenticated, )
     serializer_class = ClusterIndicatorReportSerializer
     pagination_class = SmallPagination
@@ -250,25 +310,35 @@ class IndicatorReportsListAPIView(ListCreateAPIView):
 
 
 class IndicatorReportsSimpleListAPIView(IndicatorReportsListAPIView):
+    """
+    Cluster IndicatorReportsListAPIView simplified API - GET/POST
+    Authentication required.
+
+    Parameters:
+    - response_plan_id - Response plan ID
+
+    Returns:
+        - GET method - ClusterIndicatorReportSimpleSerializer object.
+        - POST method - ClusterIndicatorReportSimpleSerializer object.
+    """
     serializer_class = ClusterIndicatorReportSimpleSerializer
     pagination_class = filter_class = None
 
 
-class ClusterListAPIView(ListCreateAPIView):
-
-    permission_classes = (IsAuthenticated, )
-    serializer_class = ClusterSimpleSerializer
-    lookup_field = lookup_url_kwarg = 'response_plan_id'
-
-    def get_queryset(self):
-        response_plan_id = self.kwargs.get(self.lookup_field)
-        return Cluster.objects.filter(response_plan_id=response_plan_id)
-
-
 class ClusterDashboardAPIView(APIView):
     """
+    Cluster Dashboard API - GET
+    Authentication required.
+
     ClusterDashboardAPIView provides a high-level IMO-reserved dashboard info
     for the specified cluster in a country's response plan
+
+    Parameters:
+    - response_plan_id - Response plan ID
+    - cluster_id - Cluster ID
+
+    Returns:
+        - GET method - ClusterDashboardSerializer object.
     """
     permission_classes = (IsAuthenticated, )
 
@@ -290,9 +360,19 @@ class ClusterDashboardAPIView(APIView):
 
 class ClusterPartnerDashboardAPIView(APIView):
     """
+    Cluster Partner Dashboard API - GET
+    Authentication required.
+
     ClusterPartnerDashboardAPIView provides
     a high-level partner-reserved dashboard info
     for the specified cluster in a country's response plan
+
+    Parameters:
+    - response_plan_id - Response plan ID
+    - cluster_id - Cluster ID
+
+    Returns:
+        - GET method - ClusterPartnerDashboardSerializer object.
     """
     permission_classes = (IsAuthenticated, )
 
@@ -316,7 +396,16 @@ class ClusterPartnerDashboardAPIView(APIView):
 
 class ClusterIndicatorsListExcelExportView(ListAPIView):
     """
-        Used for generating excel file from filtered indicators
+    Cluster Indicator list export as excel API - GET
+    Authentication required.
+
+    Used for generating excel file from filtered indicators
+
+    Parameters:
+    - response_plan_id - Response plan ID
+
+    Returns:
+        - GET method - Cluster indicator list data as Excel file
     """
     permission_classes = (IsAuthenticated,)
     serializer_class = ClusterIndicatorReportSerializer
@@ -353,7 +442,6 @@ class ClusterIndicatorsListExcelExportView(ListAPIView):
         response['Content-Disposition'] = 'attachment; filename=' + file_name
         return response
 
-
     def list(self, request, response_plan_id, *args, **kwargs):
         # Render to excel
         indicators = self.filter_queryset(self.get_queryset())
@@ -361,8 +449,19 @@ class ClusterIndicatorsListExcelExportView(ListAPIView):
         return self.generate_excel(writer)
 
 
-
 class ClusterIndicatorsListExcelExportForAnalysisView(ClusterIndicatorsListExcelExportView):
+    """
+    Cluster Indicator list export as excel API for analysis - GET
+    Authentication required.
+
+    Used for generating excel file from filtered indicators
+
+    Parameters:
+    - response_plan_id - Response plan ID
+
+    Returns:
+        - GET method - Cluster indicator list data as Excel file
+    """
 
     def list(self, request, response_plan_id, *args, **kwargs):
         # Render to excel
@@ -373,7 +472,16 @@ class ClusterIndicatorsListExcelExportForAnalysisView(ClusterIndicatorsListExcel
 
 class ClusterIndicatorsLocationListAPIView(ListAPIView):
     """
+    Locations from Cluster IndicatorReport export as excel API - GET
+    Authentication required.
+
     Endpoint for getting all Indicator Locations objects for given plan
+
+    Parameters:
+    - response_plan_id - Response plan ID
+
+    Returns:
+        - GET method - ShortLocationSerializer object list.
     """
     permission_classes = (IsAuthenticated, )
     serializer_class = ShortLocationSerializer
@@ -393,4 +501,3 @@ class ClusterIndicatorsLocationListAPIView(ListAPIView):
             | Q(reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)
         ).values_list('reportable__indicator_reports__indicator_location_data__location', flat=True).distinct()
         return Location.objects.filter(pk__in=result)
-

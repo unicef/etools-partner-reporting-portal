@@ -14,7 +14,11 @@ from .serializers import UserSerializer
 
 class UserProfileAPIView(RetrieveAPIView):
     """
-    Returns the users profile details like name, id's, groups etc.
+    User Profile API - GET
+    Authentication required.
+
+    Returns:
+        UserSerializer object.
     """
     serializer_class = UserSerializer
     permission_classes = (IsAuthenticated, )
@@ -26,7 +30,10 @@ class UserProfileAPIView(RetrieveAPIView):
 
 class UserLogoutAPIView(APIView):
     """
-    Simply logs out the user on POST request.
+    User Logout API - POST
+
+    Returns:
+        Empty response.
     """
     # permission_classes = (IsAuthenticated, )
 
@@ -37,8 +44,13 @@ class UserLogoutAPIView(APIView):
 
 class LoginUserWithTokenAPIView(APIView):
     """
-    Logs in user and responds with auth token as well
+    User Login API - POST
+
+    Logs in user via token authentication.
     Taken from https://github.com/aaronn/django-rest-framework-passwordless/blob/master/drfpasswordless/views.py#L121
+
+    Returns:
+        JSON response.
     """
     permission_classes = []
 
