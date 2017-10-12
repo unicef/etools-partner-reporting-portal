@@ -91,6 +91,7 @@ class IndicatorBlueprint(TimeStampedExternalSyncModelMixin):
     QUANTITY_CALC_CHOICE_LIST = (
         SUM,
         MAX,
+        AVG,
     )
 
     RATIO_CALC_CHOICE_LIST = (
@@ -197,7 +198,7 @@ def trigger_indicator_report_recalculation(sender, instance, **kwargs):
 
     elif instance.calculation_formula_across_locations in IndicatorBlueprint.RATIO_CALC_CHOICE_LIST:
         for ir in irs:
-            QuantityIndicatorDisaggregator.calculate_indicator_report_total(ir)
+            RatioIndicatorDisaggregator.calculate_indicator_report_total(ir)
 
 
 class Reportable(TimeStampedExternalSyncModelMixin):

@@ -219,6 +219,9 @@ class RatioIndicatorDisaggregator(BaseDisaggregator):
 
     @staticmethod
     def calculate_indicator_report_total(indicator_report):
+        # Importing here to avoid circular dependencies
+        from indicator.models import IndicatorBlueprint
+        
         # Reset the IndicatorReport total
         ir_total = {
             'c': 0,
