@@ -43,14 +43,14 @@ class ClusterListAPIView(ListAPIView):
     Authentication required.
 
     Parameters:
-    - rp_id: Response Plan ID
+    - response_plan_id: Response Plan ID
 
     Returns:
         ClusterSimpleSerializer object list.
     """
     serializer_class = ClusterSimpleSerializer
     permission_classes = (IsAuthenticated, )
-    lookup_field = lookup_url_kwarg = 'rp_id'
+    lookup_field = lookup_url_kwarg = 'response_plan_id'
 
     def get_queryset(self, *args, **kwargs):
         queryset = Cluster.objects

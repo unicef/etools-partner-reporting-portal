@@ -17,7 +17,7 @@ from .views import (
 
 
 urlpatterns = [
-    url(r'^cluster-list/(?P<rp_id>\d+)/$', ClusterListAPIView.as_view(),
+    url(r'^cluster-list/(?P<response_plan_id>\d+)/$', ClusterListAPIView.as_view(),
         name="cluster-list"),
     url(r'^cluster-objective/$', ClusterObjectiveAPIView.as_view(),
         name="cluster-objective"),
