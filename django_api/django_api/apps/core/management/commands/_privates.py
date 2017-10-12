@@ -17,6 +17,11 @@ from cluster.models import (
     ClusterObjective,
     ClusterActivity,
 )
+from core.models import (
+    PartnerAuthorizedOfficerRole,
+    PartnerEditorRole,
+    PartnerViewerRole
+)
 from partner.models import (
     Partner,
     PartnerProject,
@@ -134,16 +139,25 @@ def generate_fake_data(workspace_quantity=10):
 
     today = datetime.date.today()
 
-    admin, created = User.objects.get_or_create(username='admin', defaults={
-        'email': 'admin@unicef.org',
-        'is_superuser': True,
-        'is_staff': True,
-        'organization': 'Tivix'
-    })
-    admin.set_password('Passw0rd!')
-    admin.save()
+    users_to_create = [
+        ('admin_ao', 'admin_ao@notanemail.com', PartnerAuthorizedOfficerRole),
+        ('admin_pe', 'admin_pe@notanemail.com', PartnerEditorRole),
+        ('admin_pv', 'admin_pv@notanemail.com', PartnerViewerRole),
+    ]
+    users_created = []
+    for u in users_to_create:
+        admin, created = User.objects.get_or_create(username=u[0], defaults={
+            'email': u[1],
+            'is_superuser': True,
+            'is_staff': True,
+            'organization': 'N/A'
+        })
+        admin.set_password('Passw0rd!')
+        admin.save()
+        admin.groups.add(u[2].as_group())
+        users_created.append(admin)
 
-    print "Superuser created: {}/{}\n".format(admin.username, 'Passw0rd!')
+    print "Users created: {}/{}\n".format(users_created, 'Passw0rd!')
 
     SectionFactory.create_batch(workspace_quantity)
     print "{} Section objects created".format(workspace_quantity)
@@ -377,16 +391,18 @@ def generate_fake_data(workspace_quantity=10):
 
     print "ClusterActivity <-> PartnerActivity objects linked"
 
-    admin.partner = Partner.objects.first()
-    admin.save()
+    first_partner = Partner.objects.first()
+    for u in users_created:
+        u.partner = first_partner
+        u.save()
 
     PersonFactory.create_batch(workspace_quantity)
-    # only create PD's for admin.partner
+    # only create PD's for the partner being used above
     # for partner in Partner.objects.all():
     for workspace in Workspace.objects.all():
         for i in range(workspace_quantity * 5):
             pd = ProgrammeDocumentFactory.create(
-                partner=admin.partner, workspace=workspace)
+                partner=first_partner, workspace=workspace)
             for ir in range(3):
                 d = datetime.datetime.now() + datetime.timedelta(days=ir * 30)
                 ReportingPeriodDatesFactory.create(

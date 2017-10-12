@@ -13,7 +13,11 @@ from rest_framework.views import APIView
 
 import django_filters.rest_framework
 
-from core.permissions import IsAuthenticated
+from core.permissions import (
+    IsAuthenticated,
+    IsPartnerAuthorizedOfficer,
+    IsPartnerEditor
+)
 from core.paginations import SmallPagination
 from core.models import Location
 from core.common import (
@@ -348,10 +352,12 @@ class IndicatorDataAPIView(APIView):
 class PDLowerLevelOutputStatusAPIView(APIView):
     """
     Store the overall status and narrative assessment of the lower level
-    output in a PD progress report.
+    output in a PD progress report. TODO: move to 'unicef' app?
     """
     serializer_class = OverallNarrativeSerializer
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,
+                          IsPartnerAuthorizedOfficer,
+                          IsPartnerEditor)
 
     def patch(self, request, pd_progress_report_id, llo_id, *args, **kwargs):
         """

@@ -16,11 +16,13 @@
 <link rel="import" href="../../../../elements/reporting-period.html">
 <link rel="import" href="../../../../elements/report-status.html">
 <link rel="import" href="../../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../../elements/etools-prp-permissions.html">
 <link rel="import" href="../../../../elements/ip-reporting/pd-report-export-button.html">
 <link rel="import" href="../../../../elements/ip-reporting/pd-modal.html">
 <link rel="import" href="../../../../endpoints.html">
 <link rel="import" href="../../../../behaviors/utils.html">
 <link rel="import" href="../../../../behaviors/progressReportUtils.html">
+<link rel="import" href="../../../../behaviors/routing.html">
 <link rel="import" href="../../../../redux/store.html">
 <link rel="import" href="../../../../redux/actions.html">
 <link rel="import" href="../../../../redux/selectors/programmeDocumentReports.html">
@@ -51,6 +53,10 @@
         text-transform: uppercase;
       }
     </style>
+
+    <etools-prp-permissions
+        permissions="{{permissions}}">
+    </etools-prp-permissions>
 
     <app-route
         route="{{route}}"
@@ -85,16 +91,22 @@
         <report-status status="[[currentReport.report_status]]"></report-status>
         <template
             is="dom-if"
-            if="[[_equals(mode, 'view')]]"
+            if="[[_canExport(loading, currentReport, mode, permissions)]]"
             restamp="true">
           <pd-report-export-button></pd-report-export-button>
         </template>
-        <paper-button
-            class="btn-primary"
-            on-tap="_showPdDetails"
-            raised>
-          Show PD/SSFA ToR Details
-        </paper-button>
+
+        <template
+            is="dom-if"
+            if="[[_canViewPdDetails(permissions)]]"
+            restamp="true">
+          <paper-button
+              class="btn-primary"
+              on-tap="_showPdDetails"
+              raised>
+            Show PD/SSFA ToR Details
+          </paper-button>
+        </template>
       </div>
 
       <div class="tabs">
@@ -108,7 +120,7 @@
 
           <template
               is="dom-if"
-              if="[[!_equals(mode, 'view')]]"
+              if="[[canSubmit]]"
               restamp="true">
             <paper-tab name="submit">Review and submit</paper-tab>
           </template>
@@ -140,7 +152,7 @@
 
         <template
             is="dom-if"
-            if="[[!_equals(mode, 'view')]]"
+            if="[[canSubmit]]"
             restamp="true">
           <template
               is="dom-if"
@@ -151,6 +163,7 @@
             </page-ip-reporting-report-submit>
           </template>
         </template>
+
     </page-body>
 
     <pd-modal id="pdDetails"></pd-modal>
@@ -164,6 +177,7 @@
         App.Behaviors.ReduxBehavior,
         App.Behaviors.UtilsBehavior,
         App.Behaviors.ProgressReportUtilsBehavior,
+        App.Behaviors.RoutingBehavior,
       ],
 
       properties: {
@@ -201,6 +215,11 @@
           statePath: App.Selectors.ProgrammeDocumentReports.current,
         },
 
+        loading: {
+          type: Boolean,
+          statePath: 'programmeDocumentReports.current.loading',
+        },
+
         headingText: {
           type: String,
           computed: '_computeHeadingText(currentReport, mode)',
@@ -215,12 +234,18 @@
           type: String,
           value: 'results',
         },
+
+        canSubmit: {
+          type: Boolean,
+          computed: '_computeCanSubmit(loading, mode, currentReport, permissions)',
+        },
       },
 
       observers: [
         '_onReportChanged(routeData.report_id, routeData.mode)',
         '_onReportStatusChanged(currentReport, routeData.mode)',
         '_fetchReport(reportUrl, queryParams)',
+        '_handlePermissions(permissions, mode, _baseUrl, backLink)',
       ],
 
       _computeBackLink: function (pdId) {
@@ -286,6 +311,46 @@
 
       _showPdDetails: function () {
         this.$.pdDetails.open();
+      },
+
+      _handlePermissions: function (permissions, mode, baseUrl, tail) {
+        if (
+          !permissions.viewProgressReport ||
+          (!permissions.viewProgressReportDraft && mode === 'draft') ||
+          (!permissions.editProgressReport && mode === 'edit')
+        ) {
+          window.history.pushState(null, document.title, this.buildUrl(baseUrl, tail));
+        }
+      },
+
+      _canExport: function (loading, report, mode, permissions) {
+        switch (true) {
+          case !!loading:
+          case report.status === 'Sub' && !permissions.exportSubmittedProgressReport:
+          case report.is_draft && !permissions.exportDraftProgressReport:
+          case mode === 'edit':
+            return false;
+
+          default:
+            return true;
+        }
+      },
+
+      _canViewPdDetails: function (permissions) {
+        return permissions.viewPdDetails;
+      },
+
+      _computeCanSubmit: function (loading, mode, report, permissions) {
+        switch (true) {
+          case mode === 'view':
+          case !!loading:
+          case report.status === 'Sen' && !permissions.submitDraftProgressReport:
+          case report.is_draft && !permissions.submitDraftProgressReport:
+            return false;
+
+          default:
+            return true;
+        }
       },
 
       detached: function () {
