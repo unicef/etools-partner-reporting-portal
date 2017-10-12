@@ -63,11 +63,14 @@
           value: false,
         },
 
+        dashboardData: {
+          type: Object,
+          statePath: 'clusterDashboardData.data',
+        },
+
         data: {
           type: Array,
-          statePath: function (state) {
-            return state.clusterDashboardData.data[this.collection];
-          },
+          computed: '_computeData(dashboardData, collection)',
           observer: '_refresh',
         },
 
@@ -88,6 +91,10 @@
         this.async(function () {
           this.set('active', true);
         });
+      },
+
+      _computeData: function (dashboardData, collection) {
+        return dashboardData[collection];
       },
 
       _onConfirm: function (e, result) {

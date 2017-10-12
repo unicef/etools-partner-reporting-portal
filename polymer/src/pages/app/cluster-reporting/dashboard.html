@@ -179,11 +179,6 @@
           statePath: 'responsePlans.currentID',
         },
 
-        clusterId: {
-          type: Number,
-          // FIXME
-        },
-
         mode: {
           type: String,
           computed: '_computeMode(accountType)',
@@ -191,16 +186,13 @@
 
         dataUrl: {
           type: String,
-          computed: '_computeDataUrl(responsePlanId, clusterId, mode)',
+          computed: '_computeDataUrl(responsePlanId, mode, queryParams)',
+          observer: '_fetchData',
         },
       },
 
-      observers: [
-        '_fetchData(dataUrl, queryParams)',
-      ],
-
       listeners: {
-        'report-submitted': '_fetchData',
+        'report-submitted': '_refreshData',
       },
 
       _computeMode: function (accountType) {
@@ -213,11 +205,22 @@
         }
       },
 
-      _computeDataUrl: function (responsePlanId, clusterId, mode) {
-        return App.Endpoints.clusterDashboard(responsePlanId, clusterId, mode);
+      _computeDataUrl: function (responsePlanId, mode, queryParams) {
+        var clusterId = queryParams.cluster_id;
+
+        return clusterId ?
+            App.Endpoints.clusterDashboard(responsePlanId, clusterId, mode) : '';
       },
 
-      _fetchData: function () {
+      _refreshData: function () {
+        this._fetchData(this.dataUrl);
+      },
+
+      _fetchData: function (url) {
+        if (!url) {
+          return;
+        }
+
         this.debounce('fetch-data', function () {
           var dataThunk = this.$.data.thunk();
 
