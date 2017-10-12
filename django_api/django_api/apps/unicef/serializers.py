@@ -2,7 +2,7 @@ from django.conf import settings
 from rest_framework import serializers
 
 from .models import ProgrammeDocument, Section, ProgressReport, Person, \
-    LowerLevelOutput, CountryProgrammeOutput
+    LowerLevelOutput, PDResultLink
 from core.common import PROGRESS_REPORT_STATUS, OVERALL_STATUS
 from indicator.models import Reportable
 from indicator.serializers import (
@@ -144,11 +144,12 @@ class CPOutputSerializer(serializers.ModelSerializer):
     ll_outputs = LLOutputSerializer(many=True, read_only=True)
 
     class Meta:
-        model = CountryProgrammeOutput
+        model = PDResultLink
         fields = (
             'id',
             'title',
-            'll_outputs'
+            'll_outputs',
+            'external_cp_output_id',
         )
 
 
@@ -163,7 +164,7 @@ class ProgrammeDocumentOutputSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'title',
-            'cp_outputs'
+            'cp_outputs',
         )
 
 

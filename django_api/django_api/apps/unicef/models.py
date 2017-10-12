@@ -412,19 +412,26 @@ class ReportingPeriodDates(TimeStampedModel):
     programme_document = models.ForeignKey(ProgrammeDocument, related_name='reporting_periods')
 
 
-class CountryProgrammeOutput(TimeStampedExternalSyncModelMixin):
+class PDResultLink(TimeStampedExternalSyncModelMixin):
     """
-    CountryProgrammeOutput (LLO Parent) module.
+    Represents flattended version of InterventionResultLink in eTools. Instead
+    of having 2 models for CP output and result link we have this here.
+
+    external_id - field on this model will be the result link id in eTools.
+    title - is the CP output title. Eg. "1.1 POLICY - NEWBORN & CHILD HEALTH"
 
     related models:
         unicef.ProgrammeDocument (ForeignKey): "programme_document"
     """
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=255,
+                             verbose_name='CP output title/name')
     programme_document = models.ForeignKey(ProgrammeDocument,
                                            related_name="cp_outputs")
+    external_cp_output_id = models.IntegerField()
 
     class Meta:
         ordering = ['id']
+        unique_together = ('external_id', 'external_cp_output_id')
 
     def __str__(self):
         return self.title
@@ -435,11 +442,11 @@ class LowerLevelOutput(TimeStampedExternalSyncModelMixin):
     LowerLevelOutput (PD output) module describe the goals to reach in PD scope.
 
     related models:
-        unicef.CountryProgrammeOutput (ForeignKey): "indicator"
+        unicef.PDResultLink (ForeignKey): "indicator"
         indicator.Reportable (GenericRelation): "reportables"
     """
     title = models.CharField(max_length=255)
-    cp_output = models.ForeignKey(CountryProgrammeOutput,
+    cp_output = models.ForeignKey(PDResultLink,
                                   related_name="ll_outputs")
     reportables = GenericRelation('indicator.Reportable',
                                   related_query_name='lower_level_outputs')

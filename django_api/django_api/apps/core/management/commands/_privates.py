@@ -34,7 +34,7 @@ from unicef.models import (
     Section,
     ProgrammeDocument,
     ProgressReport,
-    CountryProgrammeOutput,
+    PDResultLink,
     LowerLevelOutput,
     Person,
 )
@@ -72,7 +72,7 @@ from core.factories import (
     SectionFactory,
     ProgrammeDocumentFactory,
     ProgressReportFactory,
-    CountryProgrammeOutputFactory,
+    PDResultLinkFactory,
     LowerLevelOutputFactory,
     WorkspaceFactory,
     ResponsePlanFactory,
@@ -113,7 +113,7 @@ def clean_up_data():
         Section.objects.all().delete()
         ProgrammeDocument.objects.all().delete()
         ProgressReport.objects.all().delete()
-        CountryProgrammeOutput.objects.all().delete()
+        PDResultLink.objects.all().delete()
         LowerLevelOutput.objects.all().delete()
         Workspace.objects.all().delete()
         ResponsePlan.objects.all().delete()

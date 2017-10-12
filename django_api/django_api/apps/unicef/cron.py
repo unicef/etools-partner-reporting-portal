@@ -11,6 +11,23 @@ class ProgrammeDocumentCronJob(CronJobBase):
 
 
     def do(self):
+        """
+        Specifically each below expected_results instance has the following
+        mapping.
+
+        From this need to create indicator blueprint first, then disagg,
+        then PDResultLink, then LL output, then Reportable attached to that LLO.
+        {
+            id: 8,                  --> LLO.external_id
+            title: "blah",          --> LLO.title
+            result_link: 47,        --> PDResultLink.external_id
+            cp_output: {
+                id: 312,            --> PDResultLink.external_cp_output_id
+                title: "1.1 POLICY - NEWBORN & CHILD HEALTH"    --> PDResultLink.title
+            },
+            indicators: [ ]
+        }
+        """
         api = PMP_API()
         # DO some stuff
         print api.programme_documents()
