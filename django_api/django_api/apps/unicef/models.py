@@ -24,6 +24,7 @@ from core.common import (
 from core.models import TimeStampedExternalSyncModelMixin
 from indicator.models import Reportable  # IndicatorReport
 
+
 logger = logging.getLogger(__name__)
 
 

@@ -16,6 +16,7 @@
 <link rel="import" href="../../behaviors/data-table.html">
 <link rel="import" href="../page-body.html">
 <link rel="import" href="../etools-prp-ajax.html">
+<link rel="import" href="../etools-prp-permissions.html">
 <link rel="import" href="../confirm-box.html">
 <link rel="import" href="../../styles/table-styles.html">
 <link rel="import" href="../../styles/buttons.html">
@@ -58,6 +59,10 @@
         margin: 1em 0;
       }
     </style>
+
+    <etools-prp-permissions
+        permissions="{{permissions}}">
+    </etools-prp-permissions>
 
     <etools-prp-ajax
         id="indicators"
@@ -113,7 +118,7 @@
                 <div class="table-cell">
                   <template
                       is="dom-if"
-                      if="[[item.data.editable]]">
+                      if="[[_canEdit(item, permissions)]]">
                     <template
                         is="dom-if"
                         if="[[_equals(item.data.display_type, 'number')]]"
@@ -146,14 +151,14 @@
                   </template>
                   <template
                       is="dom-if"
-                      if="[[!item.data.editable]]">
+                      if="[[!_canEdit(item, permissions)]]">
                     [[item.data.calculation_formula_across_locations]]
                   </template>
                 </div>
                 <div class="table-cell">
                   <template
                       is="dom-if"
-                      if="[[item.data.editable]]">
+                      if="[[_canEdit(item, permissions)]]">
                     <template
                         is="dom-if"
                         if="[[_equals(item.data.display_type, 'number')]]"
@@ -186,7 +191,7 @@
                   </template>
                   <template
                       is="dom-if"
-                      if="[[!item.data.editable]]">
+                      if="[[!_canEdit(item, permissions)]]">
                     [[item.data.calculation_formula_across_periods]]
                   </template>
                 </div>
@@ -198,15 +203,20 @@
         <etools-loading active="[[loading]]"></etools-loading>
       </div>
 
-      <div class="buttons layout horizontal-reverse">
-        <paper-button
-            on-tap="_save"
-            class="btn-primary"
-            disabled="[[loading]]"
-            raised>
-          Save
-        </paper-button>
-      </div>
+      <template
+          is="dom-if"
+          if="[[_canSave(permissions)]]"
+          restamp="true">
+        <div class="buttons layout horizontal-reverse">
+          <paper-button
+              on-tap="_save"
+              class="btn-primary"
+              disabled="[[loading]]"
+              raised>
+            Save
+          </paper-button>
+        </div>
+      </template>
     </page-body>
 
     <confirm-box id="confirm"></confirm-box>
@@ -224,6 +234,7 @@
 
       properties: {
         localData: Object,
+        permissions: Object,
 
         locationId: {
           type: String,
@@ -363,6 +374,15 @@
         });
 
         return deferred.promise;
+      },
+
+      _canEdit: function (item, permissions) {
+        return item.data.editable &&
+            permissions.changeProgrammeDocumentCalculationMethod;
+      },
+
+      _canSave: function (permissions) {
+        return permissions.changeProgrammeDocumentCalculationMethod;
       },
 
       detached: function () {

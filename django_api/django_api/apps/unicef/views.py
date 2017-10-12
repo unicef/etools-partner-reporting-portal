@@ -23,17 +23,22 @@ from core.common import (
     OVERALL_STATUS,
     PD_STATUS
 )
-
 from core.paginations import SmallPagination
-from core.permissions import IsAuthenticated
+from core.permissions import (
+    IsAuthenticated,
+    IsPartnerAuthorizedOfficer,
+    IsPartnerEditor
+)
 from core.models import Location
 from core.serializers import ShortLocationSerializer
 
 from indicator.models import Reportable, IndicatorReport, IndicatorBlueprint
-from indicator.serializers import IndicatorListSerializer, PDReportContextIndicatorReportSerializer
+from indicator.serializers import (
+        IndicatorListSerializer,
+        PDReportContextIndicatorReportSerializer
+)
 from indicator.filters import PDReportsFilter
 from indicator.serializers import IndicatorBlueprintSimpleSerializer
-
 from partner.models import Partner
 
 from .serializers import (
@@ -48,8 +53,8 @@ from .serializers import (
     ProgrammeDocumentProgressSerializer,
     ProgressReportUpdateSerializer
 )
-
 from .models import ProgrammeDocument, ProgressReport
+from .permissions import CanChangePDCalculationMethod
 from .filters import (
     ProgrammeDocumentFilter, ProgressReportFilter,
     ProgrammeDocumentIndicatorFilter
@@ -259,8 +264,6 @@ class ProgressReportPDFView(RetrieveAPIView):
     """
         Endpoint for getting PDF of Progress Report Annex C.
     """
-    permission_classes = (IsAuthenticated,)
-
     def prepare_reportable(self, indicator_reports):
         result = list()
         temp = None
@@ -314,7 +317,9 @@ class ProgressReportDetailsUpdateAPIView(APIView):
     """
         Endpoint for updating Progress Report narrative fields
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,
+                          IsPartnerAuthorizedOfficer,
+                          IsPartnerEditor)
 
     def get_object(self, pk):
         try:
@@ -443,7 +448,10 @@ class ProgressReportLocationsAPIView(ListAPIView):
 
 
 class ProgressReportSubmitAPIView(APIView):
-    permission_classes = (IsAuthenticated,)
+    """
+    Only a partner authorized officer can submit a progress report.
+    """
+    permission_classes = (IsAuthenticated, IsPartnerAuthorizedOfficer)
 
     def get_object(self, pk):
         try:
@@ -586,8 +594,10 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
     grouped by LLO for a particular PD.
 
     POST request takes same format data to update the calculation methods then.
+    Only partner authorized officer and partner editor can change the
+    calculation methods.
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, CanChangePDCalculationMethod)
     serializer_class = ProgrammeDocumentCalculationMethodsSerializer
 
     def get(self, request, workspace_id, pd_id):

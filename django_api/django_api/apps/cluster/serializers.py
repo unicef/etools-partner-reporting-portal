@@ -13,15 +13,15 @@ from .models import ClusterObjective, ClusterActivity, Cluster
 class ClusterSimpleSerializer(serializers.ModelSerializer):
 
     type = serializers.CharField(read_only=True)
-    type_display = serializers.CharField(read_only=True,
-                                         source='get_type_display')
+    title = serializers.CharField(read_only=True,
+                                  source='get_type_display')
 
     class Meta:
         model = Cluster
         fields = (
             'id',
             'type',
-            'type_display',
+            'title',
         )
 
 
@@ -69,6 +69,7 @@ class ClusterActivitySerializer(serializers.ModelSerializer):
     co_cluster_title = serializers.SerializerMethodField()
     co_title = serializers.SerializerMethodField()
     co_reference_number = serializers.SerializerMethodField()
+    frequency_name = serializers.SerializerMethodField()
 
     class Meta:
         model = ClusterActivity
@@ -76,10 +77,12 @@ class ClusterActivitySerializer(serializers.ModelSerializer):
             'id',
             'title',
             'standard',
+            'title',
             'co_cluster_title',
             'co_title',
             'co_reference_number',
             'frequency',
+            'frequency_name',
             'cluster_objective',
         )
 
@@ -91,6 +94,9 @@ class ClusterActivitySerializer(serializers.ModelSerializer):
 
     def get_co_reference_number(self, obj):
         return obj.cluster_objective.reference_number
+
+    def get_frequency_name(self, obj):
+        return obj.get_frequency_display()
 
 
 class ClusterActivityPatchSerializer(serializers.ModelSerializer):

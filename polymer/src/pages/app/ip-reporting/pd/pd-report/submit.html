@@ -40,6 +40,7 @@
         override-mode="view">
     </pd-report-info>
 
+
     <div class="layout horizontal-reverse">
       <paper-button
           class="btn-primary"
@@ -83,6 +84,11 @@
         reportId: {
           type: String,
           statePath: 'programmeDocumentReports.current.id',
+        },
+
+        currentReport: {
+          type: Object,
+          statePath: App.Selectors.ProgrammeDocumentReports.current,
         },
 
         submitUrl: {
