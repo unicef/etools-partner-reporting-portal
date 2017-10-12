@@ -57,6 +57,12 @@
         };
       },
 
+      setCurrent: function (pdId) {
+        return {
+          type: App.Constants.SET_CURRENT_PD,
+          pdId: pdId,
+        };
+      },
     };
   }());
 </script>

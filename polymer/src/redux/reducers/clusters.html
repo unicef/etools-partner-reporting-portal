@@ -1,0 +1,32 @@
+<link rel="import" href="../redux.html">
+<link rel="import" href="../../constants.html">
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Reducers = App.Reducers || {};
+
+    App.Reducers.Clusters = Redux.combineReducers({
+      filterByClusterId: filterByClusterId
+    });
+
+    function filterByClusterId(state, action) {
+      if (typeof state === 'undefined') {
+        state = '';
+      }
+
+      switch (action.type) {
+        case App.Constants.SET_FILTER_BY_CLUSTER_ID:
+          return action.id;
+
+        case App.Constants.RESET:
+          return '';
+
+        default:
+          return state;
+      }
+    }
+
+  }());
+</script>

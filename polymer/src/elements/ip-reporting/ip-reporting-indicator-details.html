@@ -1,0 +1,354 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
+
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../etools-prp-ajax.html">
+<link rel="import" href="../etools-prp-number.html">
+<link rel="import" href="../labelled-item.html">
+<link rel="import" href="../report-status.html">
+<link rel="import" href="../../elements/disaggregations/disaggregation-table.html">
+<link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../endpoints.html">
+
+<dom-module id="ip-reporting-indicator-details">
+  <template>
+    <style include="iron-flex iron-flex-alignment iron-flex-factors app-grid-style">
+      :host {
+        display: block;
+        width: 100%;
+
+        --paper-tabs: {
+          padding-left: 13px;
+          border-bottom: 1px solid var(--paper-grey-300);
+        };
+
+        --app-grid-columns: 2;
+        --app-grid-gutter: 15px;
+        --app-grid-item-height: auto;
+      }
+
+      .item {
+        padding: 0;
+      }
+
+      .loading-wrapper {
+        padding: 15px;
+      }
+
+      h4 {
+        margin: 0 0 1em;
+        font-size: 12px;
+        font-weight: normal;
+      }
+
+      h4 > span:last-child {
+        padding-left: 10px;
+        text-align: right;
+      }
+
+      .reporting-period {
+        color: var(--theme-primary-text-color-medium);
+      }
+
+      .report-meta {
+        font-size: 12px;
+        background: var(--paper-grey-100);
+      }
+
+      .report-meta dt,
+      .report-meta dd {
+        display: inline;
+        margin: 0;
+      }
+
+      .report-meta dt {
+        font-weight: bold;
+      }
+
+      .report-meta dd {
+        color: var(--paper-grey-600);
+      }
+
+      .report-meta labelled-item {
+        margin: 1em 0;
+      }
+    </style>
+
+    <etools-prp-ajax
+        id="indicatorDetail"
+        url="[[indicatorDetailUrl]]">
+    </etools-prp-ajax>
+
+    <template is="dom-if" if="[[loading]]">
+      <div class="loading-wrapper">
+        <etools-loading no-overlay></etools-loading>
+      <div>
+    </template>
+
+    <template
+        is="dom-if"
+        if="[[!loading]]">
+      <div class="report-meta app-grid">
+        <template
+            is="dom-repeat"
+            items="[[data]]"
+            as="report">
+          <div class="item">
+            <dl>
+              <dt>Report submitted:</dt>
+              <dd>[[report.submission_date]]</dd>
+            </dl>
+            <dl>
+              <dt>Total progress:</dt>
+              <dd>
+                <template
+                    is="dom-if"
+                    if="[[_equals(report.display_type, 'number')]]"
+                    restamp="true">
+                  <etools-prp-number value="[[report.total.v]]"></etools-prp-number>
+                </template>
+                <template
+                    is="dom-if"
+                    if="[[_equals(report.display_type, 'percentage')]]"
+                    restamp="true">
+                  [[_toPercentage(report.total.c)]]
+                </template>
+              </dd>
+            </dl>
+
+            <labelled-item label="Overall status">
+              <report-status status="[[report.overall_status]]"></report-status>
+            </labelled-item>
+
+            <labelled-item label="Narrative assessment">
+              [[_withDefault(report.narrative_assessment)]]
+            </labelled-item>
+          </div>
+        </template>
+      </div>
+    </template>
+
+    <template
+        is="dom-if"
+        if="[[!loading]]">
+      <paper-tabs
+          selected="{{selected}}"
+          fallback-selection="location-[[locations.0.current.id]]"
+          attr-for-selected="name"
+          scrollable
+          hide-scroll-buttons>
+        <template
+            is="dom-repeat"
+            items="[[locations]]"
+            as="location">
+          <paper-tab name="location-[[location.current.id]]">
+            [[location.name]]
+          </paper-tab>
+        </template>
+      </paper-tabs>
+    </template>
+
+    <iron-pages
+        attr-for-selected="name"
+        selected="{{selected}}">
+
+      <template
+          is="dom-repeat"
+          items="[[locations]]"
+          as="location">
+        <div name="location-[[location.current.id]]">
+          <div class="app-grid">
+            <template is="dom-if" if="[[location.current]]">
+              <div class="item">
+                <h4 class="layout horizontal justified">
+                  <span>
+                    Progress in current reporting period:
+                    <span class="reporting-period">
+                      [[location.reportInfo.time_period_start]] - [[location.reportInfo.time_period_end]]
+                    </span>
+                  </span>
+                  <span>
+                    Total:
+                    <template
+                        is="dom-if"
+                        if="[[_equals(location.current.display_type, 'number')]]"
+                        restamp="true">
+                      <etools-prp-number value="[[location.reportInfo.total.v]]"></etools-prp-number>
+                    </template>
+                    <template
+                        is="dom-if"
+                        if="[[_equals(location.current.display_type, 'percentage')]]"
+                        restamp="true">
+                      [[_toPercentage(location.reportInfo.total.c)]]
+                    </template>
+                  </span>
+                </h4>
+                <!-- TODO: check - wrong use of total? -->
+                <disaggregation-table
+                  data=[[location.current]]
+                  mapping=[[location.reportInfo.disagg_lookup_map]]>
+                </disaggregation-table>
+              </div>
+            </template>
+
+            <template is="dom-if" if="[[location.previous]]">
+              <div class="item">
+                <h4 class="layout horizontal justified">
+                  <span>
+                    Progress in previous reporting period:
+                    <span class="reporting-period">
+                      [[location.reportInfo.time_period_start]] - [[location.reportInfo.time_period_end]]
+                    </span>
+                  </span>
+                  <span>
+                    Total:
+                    <template
+                        is="dom-if"
+                        if="[[_equals(location.previous.display_type, 'number')]]"
+                        restamp="true">
+                      <etools-prp-number value="[[location.reportInfo.total.v]]"></etools-prp-number>
+                    </template>
+                    <template
+                        is="dom-if"
+                        if="[[_equals(location.previous.display_type, 'percentage')]]"
+                        restamp="true">
+                      [[_toPercentage(location.reportInfo.total.c)]]
+                    </template>
+                  </span>
+                </h4>
+                <disaggregation-table
+                  data=[[location.previous]]
+                  mapping=[[location.reportInfo.disagg_lookup_map]]>
+                </disaggregation-table>
+              </div>
+            </template>
+          </div>
+        </div>
+      </template>
+    </iron-pages>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'ip-reporting-indicator-details',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        indicatorDetailUrl: {
+          type: String,
+          computed: '_computeIndicatorReportsUrl(indicatorId)',
+        },
+
+        selected: {
+          type: Number,
+          value: 0,
+        },
+
+        isOpen: {
+          type: Boolean,
+          observer: '_openChanged',
+        },
+
+        indicatorId: Number,
+
+        loading: {
+          type: Boolean,
+          statePath: 'indicators.loadingDetails'
+        },
+
+        data: {
+          type: Array,
+        },
+
+        dataDict: {
+          type: Object,
+          statePath: 'indicators.details'
+        },
+
+        locations: {
+          type: Array,
+          computed: '_bucketByLocation(data)'
+        }
+      },
+
+      observers: [
+        '_getDataByKey(dataDict)'
+      ],
+
+      _computeIndicatorReportsUrl: function(indicatorId) {
+        return App.Endpoints.indicatorReports(indicatorId) + '?limit=2';
+      },
+
+      _bucketByLocation: function(data) {
+        //API gives us two objects, one for current reporting period and
+        //one for previous. We want to create a list of locations, each with a
+        //current and/or previous report.
+        var locations = {};
+
+        if (!data) {
+          return [];
+        }
+
+        data.forEach(function(report, index) {
+          var timeframe = 'current';
+          if (index === 1) {
+            timeframe = 'previous';
+          }
+
+          report.indicator_location_data.forEach(function(locationReport) {
+            if (locations[locationReport.location.id]) {
+              var toUpdate = locations[locationReport.location.id];
+              toUpdate[timeframe] = locationReport;
+              locations[locationReport.location.id] = toUpdate;
+            } else {
+              var newDict = {};
+              newDict[timeframe] = locationReport;
+              newDict.name = locationReport.location.title;
+              newDict.reportInfo = report;
+              locations[locationReport.location.id] = newDict;
+            }
+          });
+        });
+
+        var locationList = [];
+
+        Object.keys(locations).forEach(function(i) {
+          locationList.push(locations[i]);
+        });
+
+        return locationList;
+      },
+
+      _updateDisaggregationStore: function(data) {
+        this.dispatch(App.Actions.setIndicatorDisaggregations(data));
+      },
+
+      _getDataByKey: function(dataDict) {
+        if (dataDict.details) {
+          this.data = dataDict.details[this.indicatorId];
+        }
+      },
+
+      _openChanged: function() {
+        if (this.isOpen) {
+          var thunk = this.$.indicatorDetail.thunk();
+          var action = App.Actions.Indicators;
+          this.dispatch(action.fetchIndicatorDetails(thunk, this.indicatorId))
+            .catch(function (err) { // jshint ignore:line
+                // TODO: error handling.
+            });
+        } else {
+          this.$.indicatorDetail.abort();
+        }
+      },
+    });
+  </script>
+</dom-module>

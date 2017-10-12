@@ -1,17 +1,26 @@
 <link rel="import" href="../../../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../../../bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="../../../../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../../../../bower_components/iron-pages/iron-pages.html">
 
 <link rel="import" href="../../../../elements/page-header.html">
 <link rel="import" href="../../../../elements/ip-reporting/pd-details-overview.html">
 <link rel="import" href="../../../../elements/ip-reporting/pd-details-reports.html">
-<link rel="import" href="../../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../../elements/ip-reporting/pd-details-calculation-methods.html">
 <link rel="import" href="../../../../endpoints.html">
 <link rel="import" href="../../../../redux/actions.html">
 <link rel="import" href="../../../../redux/store.html">
+<link rel="import" href="../../../../redux/selectors/programmeDocumentReports.html">
 <link rel="import" href="../../../../styles/shared-styles.html">
 
 <link rel="import" href="../../../../behaviors/utils.html">
+
+<link rel="import" href="../../../../elements/page-body.html">
+<link rel="import" href="../../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../../elements/etools-prp-permissions.html">
+<link rel="import" href="../../../../endpoints.html">
+<link rel="import" href="../../../../redux/actions.html">
+<link rel="import" href="../../../../redux/store.html">
 
 <dom-module id="page-ip-reporting-pd-details">
   <template>
@@ -19,26 +28,11 @@
       :host {
         display: block;
       }
-      .page-top-content {
-        box-shadow: 0 1px 2px 1px rgba(0, 0, 0, .1);
-      }
-      .page-top-content page-header {
-        padding-bottom:10px;
-      }
-      .top-content-row {
-        padding-left:25px;
-      }
-
     </style>
 
-    <iron-location
-        query="{{query}}">
-    </iron-location>
-
-    <etools-prp-ajax
-        id="programmeDocumentDetails"
-        url="[[ programmeDocumentDetailsUrl ]]">
-    </etools-prp-ajax>
+    <etools-prp-permissions
+        permissions="{{permissions}}">
+    </etools-prp-permissions>
 
     <app-route
       route="{{route}}"
@@ -46,32 +40,24 @@
       data="{{routeData}}">
     </app-route>
 
-    <div class="page-top-content">
-
-      <page-header title="[[ pd.title ]]" back="pd"></page-header>
-
-      <div class="top-content-row">
-
+    <page-header title="[[ pd.title ]]" back="pd">
+      <div class="tabs">
         <paper-tabs
-          selected="{{ routeData.dashTab }}"
-          attr-for-selected="name"
-          fallback-selection="details"
-          noink
-          bottom-item>
-
-          <paper-tab name="details" link>
-            <span class="tab-content">Details</span>
-          </paper-tab>
-
-          <paper-tab name="reports" link>
-            <span class="tab-content">Reports</span>
-          </paper-tab>
-
+            selected="{{ routeData.dashTab }}"
+            attr-for-selected="name"
+            scrollable
+            hide-scroll-buttons>
+          <template
+              is="dom-if"
+              if="[[canViewPdDetails]]"
+              restamp="true">
+            <paper-tab name="details">Details</paper-tab>
+          </template>
+          <paper-tab name="reports">Reports</paper-tab>
+          <paper-tab name="calculation-methods">Calculation Methods</paper-tab>
         </paper-tabs>
-
       </div>
-
-    </div>
+    </page-header>
 
     <iron-pages
       id="tabContent"
@@ -79,14 +65,22 @@
       fallback-selection="details"
       on-iron-items-changed="_updateTabSelection">
 
-      <template is="dom-if" if="[[_equals(pdTab, 'details')]]" restamp="true">
-          <pd-details-overview name="details" pd="[[ pd ]]" loaded="[[ loaded ]]"></pd-details-overview>
+      <template
+          is="dom-if"
+          if="[[canViewPdDetails]]"
+          restamp="true">
+        <template is="dom-if" if="[[_equals(pdTab, 'details')]]" restamp="true">
+          <pd-details-overview name="details"></pd-details-overview>
+        </template>
       </template>
 
       <template is="dom-if" if="[[_equals(pdTab, 'reports')]]" restamp="true">
-          <pd-details-reports name="reports"></pd-details-reports>
+        <pd-details-reports name="reports" ></pd-details-reports>
       </template>
 
+      <template is="dom-if" if="[[_equals(pdTab, 'calculation-methods')]]" restamp="true">
+        <pd-details-calculation-methods name="calculation-methods"></pd-details-calculation-methods>
+      </template>
     </iron-pages>
 
   </template>
@@ -101,66 +95,37 @@
       ],
 
       properties: {
-        pdTab: {
-          type: String,
-        },
+        pdTab: String,
+        routeData: Object,
+        permissions: Object,
 
         pd: {
           type: Object,
-          notify: true,
-          value: {}
+          value: {},
+          statePath: App.Selectors.ProgrammeDocuments.current,
         },
 
-        loaded: {
+        canViewPdDetails: {
           type: Boolean,
-          value: false
+          computed: '_computeCanViewPdDetails(permissions)',
         },
-
-        routeData: {
-          type: Object,
-          observer: '_updateUrlTab'
-        },
-
-        programmeDocumentDetailsUrl: {
-          type: String,
-          computed: '_computeProgrammeDocumentDetailsUrl(location, pdId)',
-        },
-
-        location: {
-          type: String,
-          statePath: 'location.id',
-        },
-
-        pdId: Number,
       },
+
+      observers: [
+        '_updateUrlTab(routeData.dashTab)',
+      ],
 
       _updateTabSelection: function () {
         this.$.tabContent.select(this.pdTab);
       },
 
-      _updateUrlTab: function (routeData) {
-        if (!routeData) {
-          return;
-        }
-
-        var dashTab = routeData.dashTab;
+      _updateUrlTab: function (dashTab) {
         this.set('pdTab', dashTab);
       },
 
-      _computeProgrammeDocumentDetailsUrl: function (location, pdId) {
-        return App.Endpoints.programmeDocumentDetail(location, pdId);
+      _computeCanViewPdDetails: function (permissions) {
+        return permissions.viewPdDetails;
       },
-
-      attached: function () {
-        var self = this;
-
-        this.$.programmeDocumentDetails.thunk()()
-          .then(function (res) {
-            self.pd = res.data;
-            self.loaded = true;
-          });
-      },
-
     });
   </script>
 </dom-module>

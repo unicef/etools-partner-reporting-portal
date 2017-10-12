@@ -1,0 +1,128 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../bower_components/iron-location/iron-query-params.html">
+
+<link rel="import" href="../../endpoints.html">
+<link rel="import" href="../../polyfills/es6-shim.html">
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../redux/actions.html">
+<link rel="import" href="cluster-report-list.html">
+<link rel="import" href="cluster-report-toolbar.html">
+<link rel="import" href="../etools-prp-ajax.html">
+
+<dom-module id="cluster-reports">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <iron-location
+        query="{{query}}">
+    </iron-location>
+
+    <iron-query-params
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
+    </iron-query-params>
+
+    <etools-prp-ajax
+        id="reports"
+        url="[[reportsUrl]]"
+        params="[[params]]">
+    </etools-prp-ajax>
+
+    <cluster-report-toolbar
+        params="[[params]]">
+    </cluster-report-toolbar>
+
+    <cluster-report-list mode="[[mode]]"></cluster-report-list>
+  </template>
+
+  <script>
+    Polymer({
+      id: 'cluster-reports',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        mode: String,
+
+        submitted: Number,
+
+        queryParams: Object,
+
+        responsePlanId: {
+          type: String,
+          statePath: 'responsePlans.currentID',
+        },
+
+        reportsUrl: {
+          type: String,
+          computed: '_computeReportsUrl(responsePlanId)',
+        },
+
+        params: {
+          type: Object,
+          computed: '_computeParams(queryParams)',
+        },
+      },
+
+      observers: [
+        '_onParamsChanged(reportsUrl, params)',
+      ],
+
+      listeners: {
+        'report-submitted': '_onReportSubmitted',
+      },
+
+      _computeParams: function (queryParams) {
+        return Object.assign({}, queryParams, {
+          submitted: this.submitted + '',
+        });
+      },
+
+      _computeReportsUrl: function (responsePlanId) {
+        return App.Endpoints.clusterIndicatorReports(responsePlanId);
+      },
+
+      _fetchData: function () {
+        var reportsThunk = this.$.reports.thunk();
+
+        this.$.reports.abort();
+
+        this.dispatch(
+          App.Actions.ClusterIndicatorReports.fetch(reportsThunk)
+        )
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
+      },
+
+      _onParamsChanged: function () {
+        this.debounce('fetch-data', function () {
+          this._fetchData();
+        });
+      },
+
+      _onReportSubmitted: function (e, id) { // jshint ignore:line
+        e.stopPropagation();
+
+        this._fetchData();
+      },
+
+      detached: function () {
+        this.$.reports.abort();
+
+        if (this.isDebouncerActive('fetch-data')) {
+          this.cancelDebouncer('fetch-data');
+        }
+      },
+    });
+  </script>
+</dom-module>

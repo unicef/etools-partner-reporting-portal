@@ -14,13 +14,13 @@
     </style>
 
     <etools-prp-ajax
-        id="childLocations"
-        url="[[childLocationsUrl]]">
+        id="locations"
+        url="[[locationsUrl]]">
     </etools-prp-ajax>
 
     <template is="dom-if" if="[[!loading]]">
       <dropdown-filter
-          label="PD Location"
+          label="Location"
           name="location"
           value="[[value]]"
           data="[[data]]">
@@ -37,12 +37,13 @@
       ],
 
       properties: {
-        childLocationsUrl: {
+        locationsUrl: {
           type: String,
-          computed: '_computeChildLocationsUrl(location)',
+          computed: '_computeLocationsUrl(locationId)',
+          observer: '_fetchLocations',
         },
 
-        location: {
+        locationId: {
           type: String,
           statePath: 'location.id',
         },
@@ -61,28 +62,37 @@
         value: String,
       },
 
-      _computeChildLocationsUrl: function (location) {
-        return App.Endpoints.childLocations(location);
+      _computeLocationsUrl: function (locationId) {
+        return locationId ? App.Endpoints.locations(locationId) : '';
       },
 
       _computeLoading: function (data) {
         return !data.length;
       },
 
-      attached: function () {
+      _fetchLocations: function (url) {
         var self = this;
 
-        this.$.childLocations.thunk()()
+        if (!url) {
+          return;
+        }
+
+        this.$.locations.abort();
+
+        this.$.locations.thunk()()
             .then(function (res) {
-              self.data = [{
+              self.set('data', [{
                 id: '',
-                title: 'All'
-              }].concat(res.data);
+                title: 'All',
+              }].concat(res.data));
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
             });
       },
 
       detached: function () {
-        this.$.childLocations.abort();
+        this.$.locations.abort();
       },
     });
   </script>

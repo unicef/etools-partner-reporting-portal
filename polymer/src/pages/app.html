@@ -1,9 +1,12 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/app-route/app-route.html">
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../bower_components/iron-localstorage/iron-localstorage.html">
+<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 
-<link rel="import" href="../elements/etools-prp-countries.html">
+<link rel="import" href="../elements/etools-prp-workspaces.html">
 <link rel="import" href="../elements/etools-prp-ajax.html">
+
 <link rel="import" href="../behaviors/utils.html">
 <link rel="import" href="../redux/actions.html">
 <link rel="import" href="../redux/store.html">
@@ -17,20 +20,29 @@
       }
     </style>
 
-    <etools-prp-countries
-        id="countries"
-        all="{{countries}}"
-        current="{{currentCountry}}">
-    </etools-prp-countries>
+    <iron-localstorage
+        name="defaultApp"
+        value="{{_defaultApp}}"></iron-localstorage>
+
+    <etools-prp-workspaces
+        id="workspaces"
+        all="{{workspaces}}"
+        current="{{currentWorkspace}}">
+    </etools-prp-workspaces>
 
     <etools-prp-ajax
         id="interventions"
         url="[[interventionsUrl]]">
     </etools-prp-ajax>
 
+    <etools-prp-ajax
+      id="userProfile"
+      url="[[profileUrl]]">
+    </etools-prp-ajax>
+
     <app-route
         route="{{route}}"
-        pattern="/:country_code/:app"
+        pattern="/:workspace_code/:app"
         data="{{routeData}}"
         tail="{{subroute}}">
     </app-route>
@@ -52,6 +64,12 @@
         </page-cluster-reporting>
       </template>
     </iron-pages>
+
+    <paper-toast
+        id="changes-saved"
+        text="Changes saved"
+        duration="1500">
+    </paper-toast>
   </template>
 
   <script>
@@ -69,89 +87,107 @@
           observer: '_pageChanged',
         },
 
+        _defaultApp: String,
+
         interventionsUrl: {
           type: String,
           value: App.Endpoints.interventions(),
         },
 
-        _countryCode: {
+        _workspaceCode: {
           type: String,
-          statePath: 'countries.current',
+          statePath: 'workspaces.current',
         },
 
         _app: {
           type: String,
           statePath: 'app.current',
         },
+
+        profileUrl: {
+          type: String,
+          value: App.Endpoints.userProfile(),
+        },
       },
 
       observers: [
-        '_routeCountryChanged(routeData.country_code)',
+        '_routeWorkspaceChanged(routeData.workspace_code)',
         '_routeAppChanged(routeData.app)',
-        '_handleCountryChange(currentCountry, countries)',
+        '_handleWorkspaceChange(currentWorkspace, workspaces)',
       ],
 
-      _redirectToCountry: function (country) {
-        var code = country.code;
+      listeners: {
+        'notify': '_notify',
+      },
+
+      _redirectToWorkspace: function (workspace) {
+        var code = workspace.code;
 
         this.set('route.path', '/' + code + '/');
-        this.set('routeData.country_code', code);
+        this.set('routeData.workspace_code', code);
       },
 
       _redirectToApp: function (app) {
-        this.set('route.path', '/' + this.routeData.country_code + '/' + app);
+        this.set('route.path', '/' + this.routeData.workspace_code + '/' + app);
       },
 
-      _handleCountriesAsync: function (e, change) {
-        var country;
+      _handleWorkspacesAsync: function (e, change) {
+        var workspace;
 
         try {
           if (change.value.length) {
-            this.unlisten(this.$.countries, 'all-changed', '_handleCountriesAsync');
+            this.unlisten(this.$.workspaces, 'all-changed', '_handleWorkspacesAsync');
 
-            country = change.value[0];
+            workspace = change.value[0];
 
-            this._redirectToCountry(country);
+            this._redirectToWorkspace(workspace);
           }
         } catch (err) {}
       },
 
-      _routeCountryChanged: function (country_code) {
-        var country;
+      _routeWorkspaceChanged: function (workspace_code) {
+        var workspace;
 
-        if (!country_code) {
-          this.dispatch(App.Actions.reset()); // Switch country === wipe all the data
+        if (!workspace_code) {
+          this.dispatch(App.Actions.reset()); // Switch workspace === wipe all the data
 
-          if (this.countries.length) {
+          if (this.workspaces.length) {
 
             // Default to first
-            country = this.countries[0];
+            workspace = this.workspaces[0];
 
-            this._redirectToCountry(country);
+            this._redirectToWorkspace(workspace);
           } else {
-            // Wait until countries are available, then pick one & redirect
-            this.listen(this.$.countries, 'all-changed', '_handleCountriesAsync');
+            // Wait until workspaces are available, then pick one & redirect
+            this.listen(this.$.workspaces, 'all-changed', '_handleWorkspacesAsync');
           }
-        } else if (!this._countryCode) {
-          this.dispatch(App.Actions.setCountry(country_code));
+        } else if (!this._workspaceCode) {
+          this.dispatch(App.Actions.setWorkspace(workspace_code));
         }
       },
 
       _routeAppChanged: function (app) {
-        var defaultApp = 'ip-reporting'; // FIXME: correct default?
+        this.async(function () {
+          var defaultApp = this._defaultApp || 'ip-reporting'; // FIXME: correct default?
 
-        if (!this.routeData.country_code) {
-          return;
-        }
+          if (!this.routeData.workspace_code) {
+            return;
+          }
 
-        if (!app) {
-          this._redirectToApp(defaultApp);
-        } else if (!this._app) {
-          this.dispatch(App.Actions.setApp(app));
+          if (!app) {
+            this._redirectToApp(defaultApp);
+          } else if (!this._app) {
+            this.dispatch(App.Actions.setApp(app));
 
-          // Render
-          this.page = app;
-        }
+            // Store selected app
+            this.set('_defaultApp', app);
+
+            // Render
+            this.page = app;
+          } else {
+            this.set('_defaultApp', app);
+          }
+        });
       },
 
       _pageChanged: function (page) {
@@ -164,27 +200,45 @@
         window.location.href = '/not-found';
       },
 
-      _handleCountryChange: function (currentCountry, countries) {
-        var currentCountryData;
+      _handleWorkspaceChange: function (currentWorkspace, workspaces) {
+        var currentWorkspaceData;
 
-        if (!currentCountry || !countries.length) {
+        if (!currentWorkspace || !workspaces.length) {
           return;
         }
 
-        currentCountryData = countries.filter(function (country) {
-          return country.code === currentCountry;
+        currentWorkspaceData = workspaces.filter(function (workspace) {
+          return workspace.code === currentWorkspace;
         })[0];
 
-        this.dispatch(App.Actions.Location.set(currentCountryData.location));
+        this.dispatch(App.Actions.Location.set(currentWorkspaceData.id));
+      },
+
+      _notify: function (e, options) {
+        e.stopPropagation();
+
+        try {
+          this.$[options.type].open();
+        } catch (err) {}
+      },
+
+      _userProfileAjax: function() {
+        var userProfileThunk = this.$.userProfile.thunk();
+        return this.dispatch(App.Actions.fetchUserProfile(userProfileThunk));
       },
 
       attached: function () {
+        var self = this;
         var interventionsThunk = this.$.interventions.thunk();
-
-        this.dispatch(App.Actions.fetchCountries(interventionsThunk))
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
+        var userProfileThunk = this.$.userProfile.thunk();
+        this.dispatch(App.Actions.fetchWorkspaces(interventionsThunk))
+          .then(function() {
+            self.dispatch(App.Actions.fetchUserProfile(userProfileThunk));
+          })
+          .catch(function () { 
+              window.location.href = '/login';
             });
+
       },
     });
   </script>

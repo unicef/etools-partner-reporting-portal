@@ -4,16 +4,18 @@
 <link rel="import" href="../../../bower_components/app-layout/app-drawer/app-drawer.html">
 <link rel="import" href="../../../bower_components/app-layout/app-header/app-header.html">
 <link rel="import" href="../../../bower_components/app-layout/app-toolbar/app-toolbar.html">
-<link rel="import" href="../../../bower_components/iron-pages/iron-pages.html">-->
+<link rel="import" href="../../../bower_components/iron-pages/iron-pages.html">
 
 <link rel="import" href="../../behaviors/utils.html">
 
 <link rel="import" href="../../elements/ip-reporting/nav.html">
 <link rel="import" href="../../elements/ip-reporting/app-header.html">
+<link rel="import" href="../../styles/app-theme-ip.html">
+
 
 <dom-module id="page-ip-reporting">
   <template>
-    <style>
+    <style include="app-theme-ip-styles">
       :host {
         display: block;
       }
@@ -68,13 +70,6 @@
       <iron-pages
           selected="[[page]]"
           attr-for-selected="name">
-        <template is="dom-if" if="[[_equals(page, 'dashboard')]]" restamp="true">
-          <page-ip-reporting-dashboard
-              name="dashboard"
-              route="{{subroute}}">
-          </page-ip-reporting-dashboard>
-        </template>
-
         <template is="dom-if" if="[[_equals(page, 'overview')]]" restamp="true">
           <page-ip-reporting-overview
               name="overview"
@@ -94,6 +89,13 @@
               name="indicators"
               route="{{subroute}}">
           </page-ip-reporting-indicators>
+        </template>
+
+        <template is="dom-if" if="[[_equals(page, 'progress-reports')]]" restamp="true">
+          <page-ip-progress-reports
+              name="progress-reports"
+              route="{{subroute}}">
+          </page-ip-progress-reports>
         </template>
       </iron-pages>
     </app-drawer-layout>
@@ -120,7 +122,7 @@
 
       _routePageChanged: function (page) {
         if (!page) {
-          this.set('route.path', '/dashboard'); // FIXME: correct default?
+          this.set('route.path', '/overview'); // FIXME: correct default?
         } else {
           this.page = page;
         }

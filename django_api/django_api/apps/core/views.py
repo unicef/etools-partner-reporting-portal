@@ -1,23 +1,49 @@
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
+
+import django_filters
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework import status as statuses
+
 from .permissions import IsAuthenticated
-from .models import Intervention, Location
-from .serializer import (
-    SimpleInterventionSerializer,
+from .models import Workspace, Location, ResponsePlan
+from .serializers import (
+    WorkspaceSerializer,
+    ShortLocationSerializer,
     ChildrenLocationSerializer,
+    ResponsePlanSerializer,
 )
 
 
-class SimpleInterventionAPIView(ListAPIView):
+class WorkspaceAPIView(ListAPIView):
     """
-    Endpoint for getting Intervention.
-    Intervention need to have defined location to be displayed on drop down menu.
+    Endpoint for getting Workspace.
+    Workspace need to have defined location to be displayed on drop down menu.
     """
-    queryset = Intervention.objects.filter(locations__isnull=False)
-    serializer_class = SimpleInterventionSerializer
+    queryset = Workspace.objects.prefetch_related('countries').distinct()
+    serializer_class = WorkspaceSerializer
     permission_classes = (IsAuthenticated, )
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
+    filter_fields = ('business_area_code', 'workspace_code')
+
+
+class LocationListAPIView(ListAPIView):
+    """
+    Endpoint for getting all Location objects belonging to the response plan.
+    """
+    permission_classes = (IsAuthenticated, )
+    serializer_class = ShortLocationSerializer
+    lookup_field = lookup_url_kwarg = 'response_plan_id'
+
+    def get_queryset(self):
+        """
+        Get the locations that belong to the countries contained by the
+        workspace this reponse plan belongs to
+        """
+        response_plan_id = self.kwargs.get(self.lookup_field)
+        response_plan = get_object_or_404(ResponsePlan, id=response_plan_id)
+        return response_plan.workspace.locations
 
 
 class ChildrenLocationAPIView(ListAPIView):
@@ -45,3 +71,17 @@ class ChildrenLocationAPIView(ListAPIView):
             serializer.data,
             status=statuses.HTTP_200_OK
         )
+
+
+class ResponsePlanAPIView(ListAPIView):
+    """
+    Endpoint for getting ResponsePlan.
+    ResponsePlan need to have defined of intervention to be displayed on drop down menu.
+    """
+
+    serializer_class = ResponsePlanSerializer
+    permission_classes = (IsAuthenticated, )
+
+    def get_queryset(self):
+        workspace_id = self.kwargs.get('workspace_id')
+        return ResponsePlan.objects.filter(workspace_id=workspace_id)

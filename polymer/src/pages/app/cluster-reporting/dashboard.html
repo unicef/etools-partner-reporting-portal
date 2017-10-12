@@ -1,0 +1,240 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../../bower_components/iron-location/iron-query-params.html">
+
+<link rel="import" href="../../../endpoints.html">
+<link rel="import" href="../../../redux/store.html">
+<link rel="import" href="../../../redux/actions.html">
+<link rel="import" href="../../../behaviors/utils.html">
+<link rel="import" href="../../../elements/etools-prp-auth.html">
+<link rel="import" href="../../../elements/page-header.html">
+<link rel="import" href="../../../elements/page-body.html">
+<link rel="import" href="../../../elements/filters/cluster-filter/filter-list-by-cluster.html">
+<link rel="import" href="../../../elements/cluster-reporting/dashboard/indicators-by-status.html">
+<link rel="import" href="../../../elements/cluster-reporting/dashboard/number-of-partners.html">
+<link rel="import" href="../../../elements/cluster-reporting/dashboard/number-of-projects.html">
+<link rel="import" href="../../../elements/cluster-reporting/dashboard/number-of-due-reports.html">
+<link rel="import" href="../../../elements/cluster-reporting/dashboard/number-of-non-cluster-activities.html">
+<link rel="import" href="../../../elements/cluster-reporting/dashboard/reports-list.html">
+<link rel="import" href="../../../elements/cluster-reporting/dashboard/constrained-reports-list.html">
+<link rel="import" href="../../../elements/cluster-reporting/dashboard/activities-list.html">
+
+<dom-module id="page-cluster-reporting-dashboard">]
+  <template>
+    <style include="app-grid-style">
+      :host {
+        display: block;
+
+        --app-grid-columns: 2;
+        --app-grid-gutter: 25px;
+        --app-grid-item-height: auto;
+        --app-grid-expandible-item-columns: 2;
+      }
+
+      .toolbar {
+        position: relative;
+      }
+
+      filter-list-by-cluster {
+        position: absolute;
+        right: 0;
+        top: -35px;
+      }
+
+      .row {
+        margin-bottom: var(--app-grid-gutter);
+      }
+
+      .app-grid {
+        margin: -var(--app-grid-gutter);
+      }
+
+      .item-wide {
+        @apply(--app-grid-expandible-item);
+      }
+    </style>
+
+    <etools-prp-auth
+        account-type="{{accountType}}">
+    </etools-prp-auth>
+
+    <iron-location
+        query="{{query}}">
+    </iron-location>
+
+    <iron-query-params
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
+    </iron-query-params>
+
+    <etools-prp-ajax
+        id="data"
+        url="[[dataUrl]]"
+        params="[[queryParams]]">
+    </etools-prp-ajax>
+
+    <page-header title="Dashboard">
+      <div class="toolbar">
+        <filter-list-by-cluster></filter-list-by-cluster>
+      </div>
+    </page-header>
+
+    <page-body>
+      <div class="row">
+        <div class="app-grid">
+          <div class="item">
+            <indicators-by-status></indicators-by-status>
+          </div>
+          <div class="item">
+            <div class="app-grid">
+              <div class="item">
+                <template
+                    is="dom-if"
+                    if="[[_equals(mode, 'cluster')]]"
+                    restamp="true">
+                  <number-of-partners></number-of-partners>
+                </template>
+
+                <template
+                    is="dom-if"
+                    if="[[_equals(mode, 'partner')]]"
+                    restamp="true">
+                  <number-of-projects></number-of-projects>
+                </template>
+              </div>
+              <div class="item">
+                <number-of-due-reports></number-of-due-reports>
+              </div>
+              <div class="item item-wide">
+                <number-of-non-cluster-activities></number-of-non-cluster-activities>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <template
+            is="dom-if"
+            if="[[_equals(mode, 'cluster')]]"
+            restamp="true">
+          <reports-list
+              label="List of overdue indicator reports"
+              collection="overdue_indicator_reports">
+          </reports-list>
+        </template>
+
+        <template
+            is="dom-if"
+            if="[[_equals(mode, 'partner')]]"
+            restamp="true">
+          <reports-list
+              label="List of overdue indicator reports from last 2 months"
+              collection="overdue_indicator_reports">
+          </reports-list>
+        </template>
+      </div>
+
+      <template
+          is="dom-if"
+          if="[[_equals(mode, 'cluster')]]"
+          restamp="true">
+        <div class="row">
+          <reports-list
+              label="List of upcoming indicator reports in last 15 days"
+              collection="new_indicator_reports">
+          </reports-list>
+        </div>
+      </template>
+
+      <div class="row">
+        <constrained-reports-list></constrained-reports-list>
+      </div>
+
+      <template
+          is="dom-if"
+          if="[[_equals(mode, 'partner')]]"
+          restamp="true">
+        <div class="row">
+          <activities-list></activities-list>
+        </div>
+      </template>
+    </page-body>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'page-cluster-reporting-dashboard',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        responsePlanId: {
+          type: String,
+          statePath: 'responsePlans.currentID',
+        },
+
+        mode: {
+          type: String,
+          computed: '_computeMode(accountType)',
+        },
+
+        dataUrl: {
+          type: String,
+          computed: '_computeDataUrl(responsePlanId, mode, queryParams)',
+          observer: '_fetchData',
+        },
+      },
+
+      listeners: {
+        'report-submitted': '_refreshData',
+      },
+
+      _computeMode: function (accountType) {
+        switch (accountType) {
+          case App.Constants.ACCOUNT_TYPE_PARTNER:
+            return 'partner';
+
+          case App.Constants.ACCOUNT_TYPE_IMO:
+            return 'cluster';
+        }
+      },
+
+      _computeDataUrl: function (responsePlanId, mode, queryParams) {
+        var clusterId = queryParams.cluster_id;
+
+        return clusterId ?
+            App.Endpoints.clusterDashboard(responsePlanId, clusterId, mode) : '';
+      },
+
+      _refreshData: function () {
+        this._fetchData(this.dataUrl);
+      },
+
+      _fetchData: function (url) {
+        if (!url) {
+          return;
+        }
+
+        this.debounce('fetch-data', function () {
+          var dataThunk = this.$.data.thunk();
+
+          this.$.data.abort();
+
+          this.dispatch(App.Actions.ClusterDashboardData.fetch(dataThunk));
+        }, 100);
+      },
+
+      detached: function () {
+        if (this.isDebouncerActive('fetch-data')) {
+          this.cancelDebouncer('fetch-data');
+        }
+      },
+    });
+  </script>
+</dom-module>

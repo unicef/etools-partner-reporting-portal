@@ -3,14 +3,17 @@
 <link rel="import" href="../bower_components/app-route/app-route.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 
-<link rel="import" href="styles/app-theme.html">
 <link rel="import" href="elements/etools-prp-auth.html">
+<link rel="import" href="elements/etools-prp-ajax.html">
 <link rel="import" href="behaviors/utils.html">
 <link rel="import" href="behaviors/errors.html">
+<link rel="import" href="endpoints.html">
+<link rel="import" href="redux/actions.html">
+<link rel="import" href="redux/store.html">
 
 <dom-module id="app-shell">
   <template>
-    <style include="app-theme">
+    <style>
       :host {
         display: block;
         height: 100%;
@@ -22,6 +25,14 @@
     </style>
 
     <etools-prp-auth authenticated="{{authenticated}}"></etools-prp-auth>
+
+    <etools-prp-ajax
+      id="signOut"
+      url="[[signoutUrl]]"
+      body="{}"
+      content-type="application/json"
+      method="post">
+    </etools-prp-ajax>
 
     <app-location route="{{route}}"></app-location>
 
@@ -43,12 +54,17 @@
       </template>
 
       <template is="dom-if" if="[[_equals(page, 'login')]]" restamp="true">
-        <page-login name="login"></page-login>
+        <page-login name="login" value="{{error}}"></page-login>
       </template>
 
-       <template is="dom-if" if="[[_equals(page, 'not-found')]]" restamp="true">
-          <page-not-found name="not-found"></page-not-found>
-        </template>
+      <template is="dom-if" if="[[_equals(page, 'not-found')]]" restamp="true">
+        <page-not-found name="not-found"></page-not-found>
+      </template>
+
+      <template is="dom-if" if="[[_equals(page, 'login-token')]]" restamp="true">
+        <page-login-token name="login-token"></page-login-token>
+      </template>
+
     </iron-pages>
   </template>
 
@@ -59,6 +75,7 @@
       behaviors: [
         App.Behaviors.UtilsBehavior,
         App.Behaviors.ErrorHandlerBehavior,
+        App.Behaviors.ReduxBehavior,
       ],
 
       properties: {
@@ -71,15 +88,30 @@
           type: Boolean,
         },
 
+        signoutUrl: {
+          type: String,
+          value: App.Endpoints.userSignOut(),
+        },
+
         redirectPath: {
           type: String,
           computed: '_computeRedirectPath(authenticated)',
         },
+
+        error: {
+          type: Boolean,
+          value: false,
+        }
       },
 
       observers: [
         '_routePageChanged(routeData.page)',
       ],
+
+      listeners: {
+        'sign-out': '_onSignOut',
+        'token-error': '_onTokenError'
+      },
 
       attached: function () {
         this.listen(this.root, 'error', '_handleError');
@@ -93,10 +125,28 @@
         }
       },
 
+      _onTokenError: function() {
+        this.set('error', true);
+        this.set('route.path', '/login');
+      },
+
       _pageChanged: function (page) {
         var resolvedPageUrl = this.resolveUrl('pages/' + page + '.html');
 
         this.importHref(resolvedPageUrl, null, this._notFound, true);
+      },
+
+       _onSignOut: function() {
+        var self = this;
+        var thunk = this.$.signOut.thunk();
+        this.dispatch(App.Actions.userLogout(thunk))
+          .then(function () {
+            self.set('route.path', '/login');
+            self.dispatch(App.Actions.reset());
+          })
+        .catch(function (err) { //jshint ignore:line
+          // TODO: error handling
+        });
       },
 
       _notFound: function () {

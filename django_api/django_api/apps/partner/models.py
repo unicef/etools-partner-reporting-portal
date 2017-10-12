@@ -1,7 +1,9 @@
 from __future__ import unicode_literals
 
-from django.db import models
 from django.contrib.contenttypes.fields import GenericRelation
+from django.db import models
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 
 from model_utils.models import TimeStampedModel
 
@@ -9,12 +11,21 @@ from core.common import (
     PARTNER_TYPE,
     SHARED_PARTNER_TYPE,
     CSO_TYPES,
+    PARTNER_PROJECT_STATUS,
 )
+from core.models import TimeStampedExternalSyncModelMixin
 
 from core.countries import COUNTRIES_ALPHA2_CODE_DICT, COUNTRIES_ALPHA2_CODE
 
 
-class Partner(TimeStampedModel):
+class Partner(TimeStampedExternalSyncModelMixin):
+    """
+    Partner model describe in details who is it and their activity humanitarian
+    goals (clusters).
+
+    related models:
+        cluster.Cluster (ManyToManyField): "clusters"
+    """
     title = models.CharField(
         max_length=255,
         verbose_name='Full Name',
@@ -114,11 +125,6 @@ class Partner(TimeStampedModel):
         blank=True,
         null=True
     )
-    alternate_title = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True
-    )
     rating = models.CharField(
         max_length=50,
         null=True,
@@ -129,7 +135,8 @@ class Partner(TimeStampedModel):
         null=True,
     )
 
-    cluster = models.ManyToManyField('cluster.Cluster', related_name="partners")
+    clusters = models.ManyToManyField('cluster.Cluster',
+                                      related_name="partners")
 
     class Meta:
         ordering = ['title']
@@ -144,24 +151,99 @@ class Partner(TimeStampedModel):
 
     @property
     def address(self):
-        return ", ".join([self.street_address, self.city, self.postal_code, self.country])
+        return ", ".join([self.street_address, self.city, self.postal_code,
+                          self.country])
 
 
 class PartnerProject(TimeStampedModel):
+    """
+    PartnerProject model is a container for defined group of PartnerActivities
+    model.
+
+    related models:
+        cluster.Cluster (ManyToManyField): "clusters"
+        core.Location (ManyToManyField): "locations"
+        partner.Partner (ForeignKey): "partner"
+        indicator.Reportable (GenericRelation): "reportables"
+    """
     title = models.CharField(max_length=255)
+    description = models.CharField(max_length=255)
+    additional_information = models.CharField(max_length=255,
+                                              verbose_name="Additional information (e.g. links)")
     start_date = models.DateField()
     end_date = models.DateField()
-    status = models.CharField(max_length=100)
+    status = models.CharField(max_length=3, choices=PARTNER_PROJECT_STATUS,
+                              default=PARTNER_PROJECT_STATUS.ongoing)
+    total_budget = models.DecimalField(null=True, decimal_places=2,
+                                       help_text='Total Budget', max_digits=12)
+    funding_source = models.CharField(max_length=255)
 
-    cluster = models.ManyToManyField('cluster.Cluster', related_name="partner_projects")
-    location = models.ManyToManyField('core.Location', related_name="partner_projects")
-    partner = models.ForeignKey(Partner, null=True, related_name="partner_projects")
-    reportables = GenericRelation('indicator.Reportable', related_query_name='partner_projects')
+    clusters = models.ManyToManyField('cluster.Cluster',
+                                      related_name="partner_projects")
+    locations = models.ManyToManyField('core.Location',
+                                       related_name="partner_projects")
+    partner = models.ForeignKey(Partner, null=True,
+                                related_name="partner_projects")
+    reportables = GenericRelation('indicator.Reportable',
+                                  related_query_name='partner_projects')
+
+    class Meta:
+        ordering = ['-id']
+
+    @property
+    def response_plan(self):
+        return self.clusters.all()[0].response_plan
 
 
 class PartnerActivity(TimeStampedModel):
+    """
+    PartnerActivity model define actions the partner intends to take. These
+    activities might link or be associated with a cluster activity. But the
+    partner is allowed to define their ideas that wasn't defined.
+
+    related models:
+        partner.PartnerProject (ForeignKey): "project"
+        partner.Partner (ForeignKey): "partner"
+        cluster.ClusterActivity (ForeignKey): "cluster_activity"
+        indicator.Reportable (GenericRelation): "reportables"
+    """
     title = models.CharField(max_length=255)
-    project = models.ForeignKey(PartnerProject, null=True, related_name="partner_activities")
+    project = models.ForeignKey(PartnerProject, null=True,
+                                related_name="partner_activities")
     partner = models.ForeignKey(Partner, related_name="partner_activities")
-    cluster_activity = models.ForeignKey('cluster.ClusterActivity', related_name="partner_activities")
-    reportables = GenericRelation('indicator.Reportable', related_query_name='partner_projects')
+    cluster_activity = models.ForeignKey('cluster.ClusterActivity',
+                                         related_name="partner_activities",
+                                         null=True)
+    cluster_objective = models.ForeignKey('cluster.ClusterObjective',
+                                          related_name="partner_activities",
+                                          null=True) # TODO: why needed?
+    reportables = GenericRelation('indicator.Reportable',
+                                  related_query_name='partner_activities')
+    locations = models.ManyToManyField('core.Location',
+                                       related_name="partner_activities")
+    start_date = models.DateField()
+    end_date = models.DateField()
+
+    # PartnerActivity shares the status flags with PartnerProject
+    status = models.CharField(max_length=3, choices=PARTNER_PROJECT_STATUS,
+                              default=PARTNER_PROJECT_STATUS.ongoing)
+
+    class Meta:
+        ordering = ['-id']
+
+    @property
+    def clusters(self):
+        return self.projects.clusters.all()
+
+    @property
+    def response_plan(self):
+        return self.project.clusters.all()[0].response_plan
+
+    def __str__(self):
+        return self.title
+
+
+@receiver(pre_save, sender=PartnerActivity, dispatch_uid="check_pa_double_fks")
+def check_pa_double_fks(sender, instance, **kwargs):
+    if instance.cluster_activity and instance.cluster_objective:
+        raise Exception("PartnerActivity cannot belong to both ClusterActivity and ClusterObjective")

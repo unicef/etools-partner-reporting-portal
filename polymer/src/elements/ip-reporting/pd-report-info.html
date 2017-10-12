@@ -1,0 +1,263 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/etools-content-panel/etools-content-panel.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-input-container.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-input-char-counter.html">
+<link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
+
+<link rel="import" href="../../endpoints.html">
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/notifications.html">
+<link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../redux/actions.html">
+<link rel="import" href="../../redux/selectors/reportInfo.html">
+<link rel="import" href="../../redux/selectors/programmeDocuments.html">
+<link rel="import" href="../labelled-item.html">
+<link rel="import" href="../etools-prp-ajax.html">
+<link rel="import" href="../etools-prp-permissions.html">
+
+<dom-module id="pd-report-info">
+  <template>
+    <style include="app-grid-style">
+      :host {
+        display: block;
+        margin-bottom: 25px;
+
+        --app-grid-columns: 8;
+        --app-grid-gutter: 25px;
+        --app-grid-item-height: auto;
+        --app-grid-expandible-item-columns: 7;
+      }
+
+      .row {
+        @apply --app-grid-expandible-item;
+      }
+
+      .value {
+        font-size: 16px;
+      }
+    </style>
+
+    <etools-prp-permissions
+        permissions="{{permissions}}">
+    </etools-prp-permissions>
+
+    <etools-prp-ajax
+        id="update"
+        url="[[updateUrl]]"
+        body="[[localData]]"
+        content-type="application/json"
+        method="put">
+    </etools-prp-ajax>
+
+    <etools-content-panel panel-title="Narrative">
+      <div class="app-grid">
+        <div class="row">
+          <labelled-item label="Partner contribution to date">
+            <template
+                is="dom-if"
+                if="[[_equals(computedMode, 'view')]]"
+                restamp="true">
+              <span class="value">[[_withDefault(data.partner_contribution_to_date)]]</span>
+            </template>
+
+            <template
+                is="dom-if"
+                if="[[!_equals(computedMode, 'view')]]"
+                restamp="true">
+              <paper-input-container
+                  no-label-float>
+                <input
+                    id="partner_contribution_to_date"
+                    on-input="_handleInput"
+                    value="[[data.partner_contribution_to_date]]"
+                    maxlength="256">
+                <paper-input-char-counter></paper-input-char-counter>
+              </paper-input-container>
+            </template>
+          </labelled-item>
+        </div>
+
+        <div class="row">
+          <labelled-item label="Challenges/bottlenecks in the reporting period (latest)">
+            <template
+                is="dom-if"
+                if="[[_equals(computedMode, 'view')]]"
+                restamp="true">
+              <span class="value">[[_withDefault(data.challenges_in_the_reporting_period)]]</span>
+            </template>
+
+            <template
+                is="dom-if"
+                if="[[!_equals(computedMode, 'view')]]"
+                restamp="true">
+              <paper-input-container
+                  no-label-float>
+                <input
+                    id="challenges_in_the_reporting_period"
+                    on-input="_handleInput"
+                    value="[[data.challenges_in_the_reporting_period]]"
+                    maxlength="256">
+                <paper-input-char-counter></paper-input-char-counter>
+              </paper-input-container>
+            </template>
+          </labelled-item>
+        </div>
+
+        <div class="row">
+          <labelled-item label="Proposed way forward (latest)">
+            <template
+                is="dom-if"
+                if="[[_equals(computedMode, 'view')]]"
+                restamp="true">
+              <span class="value">[[_withDefault(data.proposed_way_forward)]]</span>
+            </template>
+
+            <template
+                is="dom-if"
+                if="[[!_equals(computedMode, 'view')]]"
+                restamp="true">
+               <paper-input-container
+                  no-label-float>
+                <input
+                    id="proposed_way_forward"
+                    on-input="_handleInput"
+                    value="[[data.proposed_way_forward]]"
+                    maxlength="256">
+                <paper-input-char-counter></paper-input-char-counter>
+              </paper-input-container>
+            </template>
+          </labelled-item>
+        </div>
+      </div>
+    </etools-content-panel>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'pd-report-info',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.NotificationsBehavior,
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        localData: Object,
+        permissions: Object,
+
+        data: {
+          type: Object,
+          statePath: App.Selectors.ReportInfo.current,
+        },
+
+        pdId: {
+          type: Number,
+          statePath: 'programmeDocuments.current',
+        },
+
+        locationId: {
+          type: String,
+          statePath: 'location.id',
+        },
+
+        reportId: {
+          type: String,
+          statePath: 'programmeDocumentReports.current.id',
+        },
+
+        updateUrl: {
+          type: String,
+          computed: '_computeUpdateUrl(locationId, reportId)',
+        },
+
+        overrideMode: {
+          type: String,
+          value: '',
+        },
+
+        mode: {
+          type: String,
+          statePath: 'programmeDocumentReports.current.mode',
+        },
+
+        computedMode: {
+          type: String,
+          computed: '_computeMode(mode, overrideMode, currentReport, permissions)',
+        },
+
+        currentReport: {
+          type: Object,
+          statePath: App.Selectors.ProgrammeDocumentReports.current,
+        },
+      },
+
+      observers: [
+        '_updateData(localData.*)',
+      ],
+
+      _handleInput: function () {
+        var field = Polymer.dom(event).rootTarget;
+        var id = field.id;
+
+        this.set(['localData', id], field.value.trim());
+      },
+
+      _updateData: function (change) {
+        var self = this;
+
+        if (change.path.split('.').length < 2) {
+          // Skip the initial assignment
+          return;
+        }
+
+        this.debounce('update-data', function () {
+          var updateThunk = this.$.update.thunk();
+
+          this.$.update.abort();
+
+          this.dispatch(
+            App.Actions.PDReports.update(
+              updateThunk,
+              this.pdId,
+              this.reportId
+            )
+          )
+              .then(function () {
+                self._notifyChangesSaved();
+              })
+              .catch(function (err) { // jshint ignore:line
+                // TODO: error handling
+              });
+        }, 300);
+      },
+
+      _computeUpdateUrl: function (locationId, reportId) {
+        return App.Endpoints.programmeDocumentReportUpdate(locationId, reportId);
+      },
+
+      _computeMode: function (mode, overrideMode, report, permissions) {
+        var computedMode = overrideMode || mode;
+
+        switch (true) {
+          case report.is_draft && !permissions.savePdReport:
+          case report.status === 'Sen' && !permissions.savePdReport:
+            return 'view';
+
+          default:
+            return computedMode;
+        }
+      },
+
+      attached: function () {
+        this.set('localData', {});
+      },
+
+      detached: function () {
+        if (this.isDebouncerActive('update-data')) {
+          this.cancelDebouncer('update-data');
+        }
+      },
+    });
+  </script>
+</dom-module>

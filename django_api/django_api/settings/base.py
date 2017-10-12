@@ -10,7 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
-import os, sys
+import os
+import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -24,6 +25,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
+IS_TEST = False
 IS_DEV = False
 IS_STAGING = False
 IS_PROD = False
@@ -44,7 +46,7 @@ MEDIA_ROOT = os.path.join(DATA_VOLUME, '%s' % UPLOADS_DIR_NAME)
 STATIC_ROOT = '%s/staticserve' % DATA_VOLUME
 
 # Sendgrid stuff
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = DOMAIN_NAME = os.getenv('DOMAIN_NAME')
 
 EMAIL_HOST = 'smtp.sendgrid.net'
 EMAIL_PORT = 587
@@ -66,7 +68,15 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
+    'rest_framework.authtoken',
+    'rest_framework_swagger',
+    'drfpasswordless',
     'django_filters',
+    'djcelery',
+    'leaflet',
+    'suit',
+    'easy_pdf',
+    'django_cron',
 
     'account',
     'cluster',
@@ -85,6 +95,7 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'django_api.urls'
@@ -118,7 +129,7 @@ WSGI_APPLICATION = 'django_api.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': '%s' % os.getenv('POSTGRES_DB'),
         'USER': '%s' % os.getenv('POSTGRES_USER'),
         'PASSWORD': '%s' % os.getenv('POSTGRES_PASSWORD'),
@@ -168,3 +179,110 @@ STATIC_URL = '/api/static/'
 
 # Authentication settings
 AUTH_USER_MODEL = 'account.User'
+
+PRINT_DATA_FORMAT = "%d %b %Y"
+
+INPUT_DATA_FORMAT = "%Y-%m-%d"
+
+LOGS_PATH = os.path.join(DATA_VOLUME, 'django_api', 'logs')
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'standard': {
+            'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
+        },
+        'json': {
+            '()': 'pythonjsonlogger.jsonlogger.JsonFormatter',
+            'fmt': '%(levelname)s %(asctime)s',
+        },
+    },
+    'handlers': {
+        'default': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(LOGS_PATH, 'django.log'),
+            'maxBytes': 1024 * 1024 * 5,  # 5 MB
+            'backupCount': 5,
+            'formatter': 'standard'
+        },
+    },
+    'loggers': {
+        '': {
+            'handlers': ['default'],
+            'level': 'INFO',
+            'propagate': True},
+    }
+}
+
+import djcelery
+djcelery.setup_loader()
+BROKER_URL = os.getenv('REDIS_URL', 'redis://redis:6379/0')
+BROKER_VISIBILITY_VAR = os.environ.get('CELERY_VISIBILITY_TIMEOUT', 1800)
+BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': int(BROKER_VISIBILITY_VAR)}  # 5 hours
+
+CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
+CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
+
+# Sensible settings for celery
+CELERY_ALWAYS_EAGER = False
+CELERY_ACKS_LATE = True
+CELERY_TASK_PUBLISH_RETRY = True
+CELERY_DISABLE_RATE_LIMITS = False
+
+# By default we will ignore result
+# If you want to see results and try out tasks interactively, change it to False
+# Or change this setting on tasks level
+CELERY_IGNORE_RESULT = True
+CELERY_SEND_TASK_ERROR_EMAILS = False
+CELERY_TASK_RESULT_EXPIRES = 600
+
+# Don't use pickle as serializer, json is much safer
+# CELERY_TASK_SERIALIZER = "json"
+# CELERY_ACCEPT_CONTENT = ['application/json']
+
+# CELERYD_HIJACK_ROOT_LOGGER = False
+CELERYD_PREFETCH_MULTIPLIER = 1
+# CELERYD_MAX_TASKS_PER_CHILD = 1000
+
+LEAFLET_CONFIG = {
+    'TILES':  'http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+    'ATTRIBUTION_PREFIX': 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012',
+    'MIN_ZOOM': 3,
+    'MAX_ZOOM': 18,
+}
+
+# CartoDB settings
+CARTODB_USERNAME = os.getenv('CARTODB_USERNAME')
+CARTODB_APIKEY = os.getenv('CARTODB_APIKEY')
+
+
+# Cronjobs
+
+CRON_CLASSES = [
+    "indicator.cron.IndicatorReportOverDueCronJob",
+]
+
+# DRF settings
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES':
+        (
+            'rest_framework.authentication.SessionAuthentication',
+            'rest_framework.authentication.TokenAuthentication',
+        )
+}
+
+
+# Auth related settings
+PASSWORDLESS_AUTH = {
+    'PASSWORDLESS_AUTH_TYPES': ['EMAIL', ],
+    'PASSWORDLESS_EMAIL_TOKEN_HTML_TEMPLATE_NAME': "account/passwordless_login_email.html",
+    'PASSWORDLESS_EMAIL_NOREPLY_ADDRESS': 'no-reply@unicef.org',
+    'PASSWORDLESS_CONTEXT_PROCESSORS': ['account.context_processors.passwordless_token_email', ],
+    'PASSWORDLESS_REGISTER_NEW_USERS': False,
+    'PASSWORDLESS_EMAIL_SUBJECT': 'UNICEF Partner Reporting Portal: Your login link'
+}

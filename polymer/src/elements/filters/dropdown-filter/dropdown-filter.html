@@ -21,6 +21,7 @@
     <paper-dropdown-menu
         id="field"
         label="[[label]]"
+        disabled="[[disabled]]"
         always-float-label>
       <paper-listbox
           slot="dropdown-content"
@@ -59,6 +60,8 @@
           type: Number,
           computed: '_computeSelected(value)',
         },
+
+        disabled: Boolean
       },
 
       listeners: {
@@ -68,17 +71,15 @@
       _handleChange: function (e) {
         var newValue = this.$.repeat.itemForElement(e.detail.item).id;
 
-        if (newValue !== this.lastValue) {
-          this.fire('filter-changed', {
-            name: this.name,
-            value: String(newValue),
-          });
-        }
+        this.fire('filter-changed', {
+          name: this.name,
+          value: String(newValue),
+        });
       },
 
       _computeSelected: function (value) {
         return this.data.findIndex(function (item) {
-          return item.id === value;
+          return String(item.id) === value;
         });
       },
     });

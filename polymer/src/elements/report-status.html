@@ -1,4 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="status-badge.html">
 
 <dom-module id="report-status">
   <template>
@@ -7,21 +8,18 @@
         display: inline-block;
       }
 
-      .status-icon {
-        display: inline-block;
-        vertical-align: middle;
-        width: 1em;
-        height: 1em;
-        margin-right: .25em;
-        border-radius: .5em;
+      status-badge {
         position: relative;
-        top: -1px;
-        line-height: 1;
+        top: -2px;
       }
     </style>
 
-    <span class="status-icon" style="background: [[bgColor]];"></span>
-    [[label]]
+    <status-badge type="[[type]]"></status-badge>
+    <template
+        is="dom-if"
+        if="[[!noLabel]]">
+      [[label]]
+    </template>
   </template>
 
   <script>
@@ -31,15 +29,46 @@
       properties: {
         status: Number,
 
+        noLabel: {
+          type: Boolean,
+          value: false,
+        },
+
+        type: {
+          type: String,
+          computed: '_computeType(status)',
+        },
         label: {
           type: String,
           computed: '_computeLabel(status)',
         },
+      },
 
-        bgColor: {
-          type: String,
-          computed: '_computeBgColor(status)',
-        },
+      _computeType: function(status) {
+        switch (status) {
+          case 1:
+          case 'Sub':
+          case 'Met':
+          case 'OnT':
+          case 'Com':
+          case 'Acc':
+            return 'success';
+          case 2:
+          case 'Ove':
+          case 'Sen':
+            return 'error';
+          case 3:
+          case 'Due':
+          case 'NoP':
+          case 'Ong':
+            return 'neutral';
+          case 'Rej':
+          case 'Con':
+          case 'Pla':
+            return 'warning';
+          case 'NoS':
+            return 'no-status';
+        }
       },
 
       _computeLabel: function (status) {
@@ -47,22 +76,38 @@
           case 1:
             return 'Nothing due';
           case 2:
+          case 'Ove':
             return 'Overdue';
           case 3:
+          case 'Due':
             return 'Due';
+          case 'Sub':
+            return 'Submitted';
+          case 'Rej':
+            return 'Rejected';
+          case 'Met':
+            return 'Met';
+          case 'OnT':
+            return 'On Track';
+          case 'NoP':
+            return 'No Progress';
+          case 'Con':
+            return 'Constrained';
+          case 'Ong':
+            return 'Ongoing';
+          case 'Pla':
+            return 'Planned';
+          case 'Com':
+            return 'Completed';
+          case 'NoS':
+            return 'No Status';
+          case 'Sen':
+            return 'Sent Back';
+          case 'Acc':
+            return 'Accepted';
         }
       },
 
-      _computeBgColor: function (status) {
-        switch (status) {
-          case 1:
-            return '#72c300';
-          case 2:
-            return '#d0021b';
-          case 3:
-            return '#d8d8d8';
-        }
-      },
     });
   </script>
 </dom-module>

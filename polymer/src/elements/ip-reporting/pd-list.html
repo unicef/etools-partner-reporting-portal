@@ -8,7 +8,11 @@
 <link rel="import" href="../../../bower_components/iron-location/iron-location.html">
 <link rel="import" href="../../../bower_components/iron-location/iron-query-params.html">
 
-<link rel="import" href="../../elements/report-status.html">
+<link rel="import" href="../report-status.html">
+<link rel="import" href="../etools-prp-number.html">
+<link rel="import" href="../etools-prp-currency.html">
+<link rel="import" href="../etools-prp-permissions.html">
+<link rel="import" href="../list-placeholder.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/data-table.html">
 <link rel="import" href="../../behaviors/pagination.html">
@@ -32,6 +36,10 @@
       }
     </style>
 
+    <etools-prp-permissions
+        permissions="{{permissions}}">
+    </etools-prp-permissions>
+
     <iron-location
         query="{{query}}">
     </iron-location>
@@ -52,20 +60,26 @@
         <etools-data-table-column field="status">
           <div class="table-column">PD/SSFA status</div>
         </etools-data-table-column>
-        <etools-data-table-column field="title" flex-3>
-          <div class="table-column">PD/SSFA ToR Title</div>
+        <etools-data-table-column field="start_date">
+          <div class="table-column">Start date</div>
         </etools-data-table-column>
+        <etools-data-table-column field="end_date">
+          <div class="table-column">End date</div>
+        </etools-data-table-column>
+        <etools-data-table-column field="cso_contribution">
+          <div class="table-column">CSO contribution</div>
+        </etools-data-table-column>
+        <etools-data-table-column field="total_unicef_cash">
+          <div class="table-column">UNICEF cash</div>
+        </etools-data-table-column>
+        <etools-data-table-column field="total_unicef_supplies">
+          <div class="table-column">UNICEF supplies</div>
+        </etools-data-table-column>
+        <etools-data-table-column field="budget">
+            <div class="table-column">Planned Budget</div>
+          </etools-data-table-column>
         <etools-data-table-column field="calculated_budget">
-          <div class="table-column">
-            Budget
-            <paper-tooltip>Total budget $ (Disbursements to date %)</paper-tooltip>
-          </div>
-        </etools-data-table-column>
-        <etools-data-table-column field="report_status">
-          <div class="table-column">Report status</div>
-        </etools-data-table-column>
-        <etools-data-table-column field="due_date">
-          <div class="table-column">Due date</div>
+          <div class="table-column">$ Cash Transfers to Date (%)</div>
         </etools-data-table-column>
         <etools-data-table-column></etools-data-table-column>
       </etools-data-table-header>
@@ -79,29 +93,71 @@
         <etools-data-table-row no-collapse>
           <div slot="row-data">
             <div class="table-cell table-cell--text">
-              <a href="pd/[[ pd.id ]]/">[[_withDefault(pd.reference_number)]]</a>
+              <template
+                  is="dom-if"
+                  if="[[canViewPdDetails]]"
+                  restamp="true">
+                <a href="[[ pd.id ]]/view/details">[[_withDefault(pd.reference_number)]]</a>
+              </template>
+              <template
+                  is="dom-if"
+                  if="[[!canViewPdDetails]]"
+                  restamp="true">
+                <span>[[_withDefault(pd.reference_number)]]</span>
+              </template>
+              <paper-tooltip>[[pd.title]]</paper-tooltip>
             </div>
             <div class="table-cell table-cell--text">
               [[_withDefault(pd.status)]]
             </div>
-            <div class="table-cell table-cell--text" flex-3>
-              [[_withDefault(pd.title)]]
+            <div class="table-cell table-cell--text">
+              [[_withDefault(pd.start_date)]]
             </div>
             <div class="table-cell table-cell--text">
-              [[_withDefault(pd.calculated_budget)]]
+              [[_withDefault(pd.end_date)]]
             </div>
             <div class="table-cell table-cell--text">
-              <report-status status="[[pd.report_status]]"></report-status>
+              <etools-prp-currency
+                  value="[[pd.cso_contribution]]"
+                  currency="[[pd.cso_contribution_currency]]">
+              </etools-prp-currency>
             </div>
             <div class="table-cell table-cell--text">
-              [[_withDefault(pd.due_date, '-')]]
+              <etools-prp-currency
+                  value="[[pd.total_unicef_cash]]"
+                  currency="[[pd.total_unicef_cash_currency]]">
+              </etools-prp-currency>
+            </div>
+            <div class="table-cell table-cell--text">
+              <etools-prp-currency
+                  value="[[pd.total_unicef_supplies]]"
+                  currency="[[pd.total_unicef_supplies_currency]]">
+              </etools-prp-currency>
+            </div>
+            <div class="table-cell table-cell--text">
+              <etools-prp-currency
+                  value="[[pd.budget]]"
+                  currency="[[pd.budget_currency]]">
+              </etools-prp-currency>
+            </div>
+            <div class="table-cell table-cell--text">
+              <etools-prp-currency
+                  value="[[pd.funds_received_to_date]]"
+                  currency="[[pd.funds_received_to_date_currency]]">
+              </etools-prp-currency>
+              ([[_toPercentage(pd.funds_received_to_date_percentage)]])
             </div>
             <div class="table-cell table-cell--text cell-reports">
-              <a href="pd/[[ pd.id ]]/reports">Reports</a>
+              <a href="[[ pd.id ]]/view/reports">Reports</a>
             </div>
           </div>
         </etools-data-table-row>
       </template>
+
+      <list-placeholder
+          data="[[data]]"
+          loading="[[loading]]">
+      </list-placeholder>
 
       <etools-data-table-footer
           page-size="[[pageSize]]"
@@ -128,6 +184,8 @@
       ],
 
       properties: {
+        permissions: Object,
+
         loading: {
           type: Boolean,
           statePath: 'programmeDocuments.loading',
@@ -142,6 +200,15 @@
           type: Number,
           statePath: 'programmeDocuments.count',
         },
+
+        canViewPdDetails: {
+          type: Boolean,
+          computed: '_computeCanViewPdDetails(permissions)',
+        },
+      },
+
+      _computeCanViewPdDetails: function (permissions) {
+        return permissions.viewPdDetails;
       },
     });
   </script>

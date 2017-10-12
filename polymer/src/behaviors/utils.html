@@ -1,4 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/promise-polyfill/promise-polyfill-lite.html">
 
 <script>
   (function () {
@@ -24,17 +25,110 @@
           defaultValue = '...';
         }
 
-        return value == null /* undefinded & null */ ? defaultValue : value; // jshint ignore:line
+        return value == null /* undefinded & null */ ? // jshint ignore:line
+            defaultValue : value;
       },
 
       _debug: function (val) {
         return JSON.stringify(val, null, 2);
       },
 
+      _log: function (val) {
+        console.log(val);
+      },
+
       _toNumber: function (val) {
         return Number(val);
       },
-    };
 
+      _capitalizeFirstLetter: function (text) {
+        if (text) {
+          return text[0].toUpperCase() + text.substring(1);
+        }
+      },
+
+      _notFound: function () {
+        window.location.href = '/not-found';
+      },
+
+      _clone: function _clone(val) {
+        var typeStr = Object.prototype.toString.call(val);
+
+        switch (typeStr) {
+          case '[object Array]':
+            return val.map(_clone);
+
+          case '[object Object]':
+            return Object.keys(val).reduce(function (prev, curr) {
+              prev[curr] = _clone(val[curr]);
+
+              return prev;
+            }, {});
+
+          default:
+            return val;
+        }
+      },
+
+      _deferred: function () {
+        var defer = {};
+
+        defer.promise = new Promise(function (resolve, reject) {
+          defer.resolve = resolve;
+          defer.reject = reject;
+        });
+
+        return defer;
+      },
+
+      _toPercentage: function (value) {
+        return value == null /* undefinded & null */ ? // jshint ignore:line
+            value : Math.floor(value * 100) + '%';
+      },
+
+      _displayClusterHeader: function (subpage, needsHeaderList) {
+        if (needsHeaderList.indexOf(subpage) >= 0) {
+          return true;
+        }
+        return false;
+      },
+
+      _commaSeparatedDictValues: function (items, key) {
+        var newList = (items || []).map(function(item) {
+          return item[key];
+        });
+
+        return newList.join(', ');
+      },
+
+      _formatAddress: function (street, city, zip) {
+        if (!(street || city || zip)) {
+          return undefined;
+        } else if (!street) {
+          return city + ' ' + zip;
+        } else {
+          return street + ',' + city + ' ' + zip;
+        }
+      },
+
+      _fieldsAreValid: function() {
+        var valid;
+        var fields = [].slice.call(
+          Polymer.dom(this.root).querySelectorAll('.validate')
+        );
+
+        fields.forEach(function (field) {
+          field.validate();
+        });
+
+        valid = fields.every(function (field) {
+          return !field.invalid;
+        });
+
+        return valid;
+      },
+
+      _noop: function () {},
+    };
   }());
 </script>

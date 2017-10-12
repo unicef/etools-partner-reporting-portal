@@ -10,11 +10,19 @@
       },
 
       interventions: function () {
-        return this._buildUrl('/core/simple-intervention/');
+        return this._buildUrl('/core/workspace/');
       },
 
-      indicators: function () {
-        return this._buildUrl('/indicator/');
+      indicators: function (content_object) {
+        return this._buildUrl('/indicator/' + content_object);
+      },
+
+      allPDIndicators: function (workspaceId) {
+        return this._buildUrl('/unicef/' + workspaceId + '/programme-document/indicators/');
+      },
+
+      indicatorReports: function (reportableId) {
+        return this._buildUrl('/indicator/' + reportableId + '/indicator-reports/');
       },
 
       partnerDetails: function () {
@@ -26,12 +34,200 @@
       },
 
       programmeDocumentDetail: function (locationId, pdId) {
-        return this._buildUrl('/unicef/' + locationId + '/programme-document/details/' + pdId);
+        return this._buildUrl('/unicef/' + locationId + '/programme-document/' + pdId);
+      },
+
+      programmeDocumentReports: function (workspaceId) {
+        return this._buildUrl('/unicef/' + workspaceId + '/progress-reports/');
+      },
+
+      programmeDocumentReport: function (workspaceId, reportId) {
+        return this.programmeDocumentReports(workspaceId) + reportId + '/';
+      },
+
+      programmeDocumentReportSubmit: function (workspaceId, reportId) {
+        return this.programmeDocumentReport(workspaceId, reportId) + 'submit/';
+      },
+
+      programmeDocumentReportUpdate: function (workspaceId, reportId) {
+        return this.programmeDocumentReport(workspaceId, reportId) + 'update/';
+      },
+
+      calculationMethods: function (workspaceId, pdId) {
+        return this._buildUrl(
+          '/unicef/' +
+          workspaceId +
+          '/programme-document/' +
+          pdId +
+          '/calculation-methods/'
+        );
+      },
+
+      progressReports: function(locationId) {
+        return this._buildUrl('/unicef/' + locationId + '/progress-reports');
+      },
+
+      responsePlans: function (workspaceId) {
+        return this._buildUrl('/core/workspace/' + workspaceId + '/response-plan/');
+      },
+
+      locations: function (workspaceId) {
+        return this._buildUrl('/unicef/' + workspaceId + '/programme-document/locations/');
       },
 
       childLocations: function (locationId) {
         return this._buildUrl('/core/' + locationId + '/children-location/');
       },
+
+      indicatorData: function (reportId) {
+        return this._buildUrl('/indicator/indicator-data/' + reportId + '/');
+      },
+
+      indicatorDataLocation: function (workspaceId, reportId) {
+        return this._buildUrl(
+          '/unicef/' +
+          workspaceId +
+          '/progress-reports/' +
+          reportId +
+          '/locations/'
+        );
+      },
+
+      reportable: function (programmeDocumentProgressReportId, lowerLevelOutputId) {
+        return this._buildUrl(
+          '/indicator/pd-progress-report/' +
+          programmeDocumentProgressReportId +
+          '/llo/' +
+          lowerLevelOutputId +
+          '/'
+        );
+      },
+
+      indicatorLocationDataEntries: function() {
+        return this._buildUrl('/indicator/indicator-location-data-entries/');
+      },
+
+      responseParametersClusterObjectives: function(responsePlanId) {
+        return this._buildUrl('/cluster/' + responsePlanId + '/cluster-objective-list/');
+      },
+
+      responseParametersClusterDisaggregations: function(responsePlanId) {
+        return this._buildUrl('/indicator/response-plan/' + responsePlanId + '/disaggregations/');
+      },
+
+      responseParametersClusterActivities: function(responsePlanId) {
+        return this._buildUrl('/cluster/' + responsePlanId + '/cluster-activity-list/');
+      },
+
+      clusterActivities: function (clusterId) {
+        return this._buildUrl('/cluster/' + clusterId + '/cluster-activity-list/');
+      },
+
+      plannedActions: function(responsePlanId) {
+        return this._buildUrl('/partner/' + responsePlanId + '/partner-project-list/');
+      },
+
+      plannedActionsProjectOverview: function(projectId) {
+        return this._buildUrl('/partner/partner-project-details/' + projectId + '/');
+      },
+
+      responseParamtersClustersObjectiveDetail: function(objectiveId) {
+        return this._buildUrl('/cluster/cluster-objective/' + objectiveId + '/');
+      },
+
+      responseParamtersClustersActivityDetail: function(activityId) {
+        return this._buildUrl('/cluster/cluster-activity/' + activityId + '/');
+      },
+
+      clusterIndicatorReports: function (responsePlanId) {
+        return this._buildUrl('/cluster/' + responsePlanId + '/cluster-indicator-reports-list/');
+      },
+
+      clusterIndicatorReportsImportTemplate: function (responsePlanId) {
+        return this.clusterIndicatorReports(responsePlanId) + 'export/';
+      },
+
+      clusterIndicatorReportsExport: function (responsePlanId) {
+        return this.clusterIndicatorReports(responsePlanId) + 'export-for-analysis/';
+      },
+
+      clusterIndicatorNames: function (responsePlanId) {
+        return this._buildUrl(
+          '/cluster/' +
+          responsePlanId +
+          '/cluster-indicator-reports-simple-list/'
+        );
+      },
+
+      clusterNames: function (responsePlanId) {
+        return this._buildUrl('/cluster/' + responsePlanId + '/cluster-simple-list/');
+      },
+
+      clusterProjectNames: function (responsePlanId) {
+        return this._buildUrl('/partner/' + responsePlanId + '/partner-project-simple-list/');
+      },
+
+      clusterPartnerNames: function (responsePlanId) {
+        return this._buildUrl('/partner/' + responsePlanId + '/partner-simple-list/');
+      },
+
+      clusterLocationNames: function (responsePlanId) {
+        return this._buildUrl('/core/' + responsePlanId + '/location/');
+      },
+
+      clusterIndicators: function () {
+        return this._buildUrl('/indicator/cluster-indicator/');
+      },
+
+      partnerActivity: function (responsePlanId, mode) {
+        return this._buildUrl('/partner/' + responsePlanId + '/create-partner-activity/' + mode);
+      },
+
+      partnersByClusterActivityId: function (clusterActivityId) {
+        return this._buildUrl('/partner/cluster-activity/' + clusterActivityId + '/partners');
+      },
+
+      partnerActivityList: function () {
+        return this._buildUrl('/partner/partner-activity-list/');
+      },
+
+      reportExport: function (locationId, reportId) {
+        return this._buildUrl('/unicef/' + locationId + '/progress-reports/' +
+          reportId + '/annex-C-export-PDF/');
+      },
+
+      clusterDashboard: function (responsePlanId, clusterId, mode) {
+        return this._buildUrl(
+          '/cluster/' +
+          responsePlanId +
+          '/' +
+          clusterId +
+          '/' +
+          mode +
+          '-dashboard/'
+        );
+      },
+
+      clusterIndicatorLocations: function (responsePlanId) {
+        return this._buildUrl('/cluster/' + responsePlanId + '/cluster-indicators-locations/');
+      },
+
+      userSignOut: function () {
+        return this._buildUrl('/account/user-logout/');
+      },
+
+      userLogin: function() {
+        return this._buildUrl('/account/auth/get-token/');
+      },
+
+      userLoginToken: function() {
+        return this._buildUrl('/account/auth/login-with-token/');
+      },
+
+      userProfile: function() {
+        return this._buildUrl('/account/user-profile/');
+      },
+
     };
   }());
 </script>

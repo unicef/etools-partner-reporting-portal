@@ -1,0 +1,365 @@
+<link rel="import" href="../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../../../bower_components/iron-location/iron-query-params.html">
+<link rel="import" href="../../../../../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../../../../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../../../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../../../bower_components/promise-polyfill/promise-polyfill-lite.html">
+
+<link rel="import" href="../../../../pages/app/ip-reporting/pd/pd-report/results.html">
+<link rel="import" href="../../../../pages/app/ip-reporting/pd/pd-report/info.html">
+<link rel="import" href="../../../../pages/app/ip-reporting/pd/pd-report/submit.html">
+<link rel="import" href="../../../../elements/page-header.html">
+<link rel="import" href="../../../../elements/page-body.html">
+<link rel="import" href="../../../../elements/reporting-period.html">
+<link rel="import" href="../../../../elements/report-status.html">
+<link rel="import" href="../../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../../elements/etools-prp-permissions.html">
+<link rel="import" href="../../../../elements/ip-reporting/pd-report-export-button.html">
+<link rel="import" href="../../../../elements/ip-reporting/pd-modal.html">
+<link rel="import" href="../../../../endpoints.html">
+<link rel="import" href="../../../../behaviors/utils.html">
+<link rel="import" href="../../../../behaviors/progressReportUtils.html">
+<link rel="import" href="../../../../behaviors/routing.html">
+<link rel="import" href="../../../../redux/store.html">
+<link rel="import" href="../../../../redux/actions.html">
+<link rel="import" href="../../../../redux/selectors/programmeDocumentReports.html">
+<link rel="import" href="../../../../styles/buttons.html">
+
+<dom-module id="page-ip-reporting-pd-report">
+  <template>
+    <style include="button-styles">
+      :host {
+        display: block;
+
+        --page-header-above-title: {
+          position: absolute;
+          left: 0;
+          top: -23px;
+        };
+      }
+
+      .toolbar report-status {
+        margin-right: .5em;
+      }
+
+      .toolbar a {
+        text-decoration: none;
+      }
+
+      .tabs paper-tab {
+        text-transform: uppercase;
+      }
+    </style>
+
+    <etools-prp-permissions
+        permissions="{{permissions}}">
+    </etools-prp-permissions>
+
+    <app-route
+        route="{{route}}"
+        pattern="/:report_id/:mode"
+        data="{{routeData}}">
+    </app-route>
+
+    <iron-location
+        query="{{query}}">
+    </iron-location>
+
+    <iron-query-params
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
+    </iron-query-params>
+
+    <etools-prp-ajax
+        id="report"
+        url="[[reportUrl]]"
+        params="[[queryParams]]">
+    </etools-prp-ajax>
+
+    <page-header
+        title="[[headingText]]"
+        back="[[backLink]]">
+      <reporting-period
+          class="above-title"
+          range="[[currentReport.reporting_period]]">
+      </reporting-period>
+
+      <div class="toolbar">
+        <report-status status="[[currentReport.report_status]]"></report-status>
+        <template
+            is="dom-if"
+            if="[[_canExport(loading, currentReport, mode, permissions)]]"
+            restamp="true">
+          <pd-report-export-button></pd-report-export-button>
+        </template>
+
+        <template
+            is="dom-if"
+            if="[[_canViewPdDetails(permissions)]]"
+            restamp="true">
+          <paper-button
+              class="btn-primary"
+              on-tap="_showPdDetails"
+              raised>
+            Show PD/SSFA ToR Details
+          </paper-button>
+        </template>
+      </div>
+
+      <div class="tabs">
+        <paper-tabs
+            selected="{{selectedTab}}"
+            attr-for-selected="name"
+            scrollable
+            hide-scroll-buttons>
+          <paper-tab name="results">Reporting on results</paper-tab>
+          <paper-tab name="info">Other info</paper-tab>
+
+          <template
+              is="dom-if"
+              if="[[canSubmit]]"
+              restamp="true">
+            <paper-tab name="submit">Review and submit</paper-tab>
+          </template>
+        </paper-tabs>
+      </div>
+    </page-header>
+
+    <page-body>
+      <iron-pages
+          attr-for-selected="name"
+          selected="{{selectedTab}}">
+        <template
+            is="dom-if"
+            if="[[_equals(selectedTab, 'results')]]"
+            restamp="true">
+          <page-ip-reporting-report-results
+              name="results">
+          </page-ip-reporting-report-results>
+        </template>
+
+        <template
+            is="dom-if"
+            if="[[_equals(selectedTab, 'info')]]"
+            restamp="true">
+          <page-ip-reporting-report-info
+              name="info">
+          </page-ip-reporting-report-info>
+        </template>
+
+        <template
+            is="dom-if"
+            if="[[canSubmit]]"
+            restamp="true">
+          <template
+              is="dom-if"
+              if="[[_equals(selectedTab, 'submit')]]"
+              restamp="true">
+            <page-ip-reporting-report-submit
+                name="submit">
+            </page-ip-reporting-report-submit>
+          </template>
+        </template>
+
+    </page-body>
+
+    <pd-modal id="pdDetails"></pd-modal>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'page-ip-reporting-pd-report',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.ProgressReportUtilsBehavior,
+        App.Behaviors.RoutingBehavior,
+      ],
+
+      properties: {
+        routeData: Object,
+
+        queryParams: Object,
+
+        mode: {
+          type: String,
+          statePath: 'programmeDocumentReports.current.mode',
+        },
+
+        reportId: {
+          type: String,
+          statePath: 'programmeDocumentReports.current.id',
+        },
+
+        locationId: {
+          type: String,
+          statePath: 'location.id',
+        },
+
+        pdId: {
+          type: String,
+          statePath: 'programmeDocuments.current',
+        },
+
+        reportUrl: {
+          type: String,
+          computed: '_computeReportUrl(locationId, reportId, pdId)',
+        },
+
+        currentReport: {
+          type: Object,
+          statePath: App.Selectors.ProgrammeDocumentReports.current,
+        },
+
+        loading: {
+          type: Boolean,
+          statePath: 'programmeDocumentReports.current.loading',
+        },
+
+        headingText: {
+          type: String,
+          computed: '_computeHeadingText(currentReport, mode)',
+        },
+
+        backLink: {
+          type: String,
+          computed: '_computeBackLink(pdId)',
+        },
+
+        selectedTab: {
+          type: String,
+          value: 'results',
+        },
+
+        canSubmit: {
+          type: Boolean,
+          computed: '_computeCanSubmit(loading, mode, currentReport, permissions)',
+        },
+      },
+
+      observers: [
+        '_onReportChanged(routeData.report_id, routeData.mode)',
+        '_onReportStatusChanged(currentReport, routeData.mode)',
+        '_fetchReport(reportUrl, queryParams)',
+        '_handlePermissions(permissions, mode, _baseUrl, backLink)',
+      ],
+
+      _computeBackLink: function (pdId) {
+        return 'pd/' + pdId + '/view/reports';
+      },
+
+      _onReportChanged: function (reportId, mode) {
+        this.dispatch(App.Actions.PDReports.setCurrent(reportId, mode));
+      },
+
+      _onReportStatusChanged: function (currentReport, mode) {
+        if (
+          this._isReadOnlyReport(currentReport) &&
+          (mode || '').toLowerCase !== 'view'
+        ) {
+          this.set('routeData.mode', 'view');
+        }
+      },
+
+      _computeHeadingText: function (report, mode) {
+        var pd = report.programme_document || {};
+        var prefix;
+
+        switch (mode) {
+          case 'view':
+            prefix = 'Report for';
+            break;
+
+          case 'edit':
+            prefix = 'Enter data for';
+            break;
+
+          case 'draft':
+            prefix = 'Draft for';
+            break;
+        }
+
+        return prefix + ' ' + this._withDefault(pd.title);
+      },
+
+      _computeReportUrl: function (locationId, reportId, _) { // jshint ignore:line
+        return App.Endpoints.programmeDocumentReport(locationId, reportId);
+      },
+
+      _fetchReport: function (_, queryParams) {
+        if (!Object.keys(queryParams).length) {
+          return;
+        }
+
+        this.debounce('fetch-report', function () {
+          var reportThunk = this.$.report.thunk();
+
+          this.$.report.abort();
+
+          this.dispatch(
+            App.Actions.PDReports.fetchSingle(reportThunk, this.pdId)
+          )
+              .catch(function (err) { // jshint ignore:line
+                // TODO: error handling
+              });
+        }, 300);
+      },
+
+      _showPdDetails: function () {
+        this.$.pdDetails.open();
+      },
+
+      _handlePermissions: function (permissions, mode, baseUrl, tail) {
+        if (
+          !permissions.viewProgressReport ||
+          (!permissions.viewProgressReportDraft && mode === 'draft') ||
+          (!permissions.editProgressReport && mode === 'edit')
+        ) {
+          window.history.pushState(null, document.title, this.buildUrl(baseUrl, tail));
+        }
+      },
+
+      _canExport: function (loading, report, mode, permissions) {
+        switch (true) {
+          case !!loading:
+          case report.status === 'Sub' && !permissions.exportSubmittedProgressReport:
+          case report.is_draft && !permissions.exportDraftProgressReport:
+          case mode === 'edit':
+            return false;
+
+          default:
+            return true;
+        }
+      },
+
+      _canViewPdDetails: function (permissions) {
+        return permissions.viewPdDetails;
+      },
+
+      _computeCanSubmit: function (loading, mode, report, permissions) {
+        switch (true) {
+          case mode === 'view':
+          case !!loading:
+          case report.status === 'Sen' && !permissions.submitDraftProgressReport:
+          case report.is_draft && !permissions.submitDraftProgressReport:
+            return false;
+
+          default:
+            return true;
+        }
+      },
+
+      detached: function () {
+        this.$.report.abort();
+
+        if (this.isDebouncerActive('fetch-report')) {
+          this.cancelDebouncer('fetch-report');
+        }
+      },
+    });
+  </script>
+</dom-module>

@@ -1,0 +1,153 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../../../bower_components/paper-styles/typography.html">
+
+
+<link rel="import" href="../../behaviors/modal.html">
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../redux/selectors/programmeDocuments.html">
+<link rel="import" href="../../styles/buttons.html">
+<link rel="import" href="../../styles/modal.html">
+
+<dom-module id="pd-modal">
+  <template>
+    <style include="button-styles modal-styles app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
+      :host {
+        display: block;
+
+        --app-grid-columns: 3;
+        --app-grid-gutter: 25px;
+        --app-grid-item-height: auto;
+        --app-grid-expandible-item-columns: 3;
+
+        --paper-dialog: {
+          width: 600px;
+
+          & > * {
+            margin: 0;
+          }
+        };
+      }
+
+      .app-grid {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+      }
+
+      .full-width {
+        @apply --app-grid-expandible-item;
+      }
+
+      h3 {
+        @apply(--paper-font-title);
+      }
+    </style>
+
+    <paper-dialog
+        id="dialog"
+        with-backdrop
+        opened="{{opened}}">
+      <div class="header layout horizontal justified">
+        <h2>[[pd.title]]</h2>
+
+        <paper-icon-button
+            class="self-center"
+            on-tap="close"
+            icon="icons:close">
+        </paper-icon-button>
+      </div>
+
+      <paper-dialog-scrollable>
+        <h3>Partnership Information</h3>
+        <ul class="app-grid">
+          <li class="item">
+            <labelled-item label="Agreement">
+              <span class="field-value">[[_withDefault(pd.agreement)]]</span>
+            </labelled-item>
+          </li>
+          <li class="item">
+            <labelled-item label="Document Type">
+              <span class="field-value">[[_withDefault(pd.document_type_display)]]</span>
+            </labelled-item>
+          </li>
+          <li class="item">
+            <labelled-item label="Reference Number">
+              <span class="field-value">[[_withDefault(pd.reference_number)]]</span>
+            </labelled-item>
+          </li>
+          <li class="item full-width">
+            <labelled-item label="Title">
+              <span class="field-value">[[_withDefault(pd.title)]]</span>
+            </labelled-item>
+          </li>
+          <li class="item">
+            <labelled-item label="UNICEF Office(s)">
+              <span class="field-value">[[_withDefault(pd.unicef_office)]]</span>
+            </labelled-item>
+          </li>
+          <li class="item">
+            <labelled-item label="UNICEF Focal Point(s)">
+              <span class="field-value">[[_formatFocalPoint(pd.unicef_focal_point)]]</span>
+            </labelled-item>
+          </li>
+          <li class="item">
+            <labelled-item label="Partner Focal Point(s)">
+              <span class="field-value">[[_formatFocalPoint(pd.partner_focal_point)]]</span>
+            </labelled-item>
+          </li>
+        </ul>
+
+        <h3>PD or SSFA Details</h3>
+        <ul class="app-grid">
+          <li class="item">
+            <labelled-item label="Start date">
+              <span class="field-value">[[_withDefault(pd.start_date)]]</span>
+            </labelled-item>
+          </li>
+          <li class="item">
+            <labelled-item label="End date">
+              <span class="field-value">[[_withDefault(pd.end_date)]]</span>
+            </labelled-item>
+          </li>
+          <li class="item">
+            <labelled-item label="Population Focus">
+              <span class="field-value">[[_withDefault(pd.population_focus)]]</span>
+            </labelled-item>
+          </li>
+        </ul>
+      </paper-dialog-scrollable>
+
+      <div class="buttons layout horizontal-reverse">
+        <paper-button dialog-dismiss>Cancel</paper-button>
+      </div>
+    </paper-dialog>
+  </template>
+
+  <script>
+    Polymer({
+      id: 'pd-modal',
+
+      behaviors: [
+        App.Behaviors.ModalBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.UtilsBehavior,
+      ],
+
+      properties: {
+        pd: {
+          type: Object,
+          statePath: App.Selectors.ProgrammeDocuments.current,
+        },
+      },
+
+      _formatFocalPoint: function (items) {
+        return this._withDefault(this._commaSeparatedDictValues(items, 'name'));
+      },
+    });
+  </script>
+</dom-module>

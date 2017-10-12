@@ -1,0 +1,571 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../../../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../../../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
+<link rel="import" href="../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-multi-selection-menu.html">
+
+<link rel="import" href="../../polyfills/es6-shim.html">
+<link rel="import" href="disaggregations-dropdown-widget.html">
+<link rel="import" href="chip-date-of-report.html">
+<link rel="import" href="../labelled-item.html">
+<link rel="import" href="../etools-prp-chips.html">
+<link rel="import" href="../etools-prp-ajax.html">
+<link rel="import" href="../../endpoints.html">
+<link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/modal.html">
+<link rel="import" href="../../styles/buttons.html">
+<link rel="import" href="../../styles/modal.html">
+
+<dom-module id="indicator-modal">
+  <template>
+    <style include="button-styles modal-styles app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
+      :host {
+        display: block;
+
+        --app-grid-columns: 2;
+        --app-grid-gutter: 24px;
+        --app-grid-item-height: auto;
+
+        --paper-dialog: {
+          width: 600px;
+
+          & > * {
+            margin: 0;
+          }
+        };
+      }
+
+      .row {
+        margin: 16px 0;
+      }
+
+      .app-grid {
+         margin: -var(--app-grid-gutter);
+      }
+
+      paper-radio-group {
+        margin-left: -12px;
+      }
+
+      paper-dropdown-menu {
+        width: 100%;
+      }
+    </style>
+
+    <etools-prp-ajax
+        id="locations"
+        url="[[locationsUrl]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
+        id="disaggregations"
+        url="[[disaggregationsUrl]]"
+        params="[[disaggregationsParams]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
+        id="indicators"
+        url="[[indicatorsUrl]]"
+        method="post"
+        body="[[data]]"
+        content-type="application/json">
+    </etools-prp-ajax>
+
+    <paper-dialog
+        id="dialog"
+        with-backdrop
+        opened="{{opened}}">
+
+      <div class="header layout horizontal justified">
+        <h2>Add Indicator</h2>
+
+        <paper-icon-button
+            class="self-center"
+            on-tap="close"
+            icon="icons:close">
+        </paper-icon-button>
+      </div>
+
+      <paper-dialog-scrollable>
+        <div class="row">
+          <labelled-item label="Type">
+            <paper-radio-group
+                data-path="type"
+                on-paper-radio-group-changed="_onValueChanged"
+                selected="number">
+              <paper-radio-button name="number">Quantity (#)</paper-radio-button>
+              <paper-radio-button name="percentage_ratio">Percent/Ratio</paper-radio-button>
+            </paper-radio-group>
+          </labelled-item>
+        </div>
+
+        <div
+            class="row"
+            hidden$="[[!_equals(computedType, 'number')]]">
+          <div class="app-grid">
+            <div class="item">
+              <labelled-item label="Calculation method across locations">
+                <paper-radio-group
+                    data-path="data.blueprint.calculation_formula_across_locations"
+                    on-paper-radio-group-changed="_onValueChanged"
+                    selected="sum">
+                  <paper-radio-button name="sum">sum</paper-radio-button>
+                  <paper-radio-button name="max">max</paper-radio-button>
+                  <paper-radio-button name="avg">avg</paper-radio-button>
+                </paper-radio-group>
+              </labelled-item>
+            </div>
+            <div class="item">
+              <labelled-item label="Calculation method across reporting periods">
+                <paper-radio-group
+                    data-path="data.blueprint.calculation_formula_across_periods"
+                    on-paper-radio-group-changed="_onValueChanged"
+                    selected="sum">
+                  <paper-radio-button name="sum">sum</paper-radio-button>
+                  <paper-radio-button name="max">max</paper-radio-button>
+                  <paper-radio-button name="avg">avg</paper-radio-button>
+                </paper-radio-group>
+              </labelled-item>
+            </div>
+          </div>
+        </div>
+
+        <div
+            class="row"
+            hidden$="[[_equals(computedType, 'number')]]">
+          <labelled-item label="Display type">
+            <paper-radio-group
+                data-path="displayType"
+                on-paper-radio-group-changed="_onValueChanged"
+                selected="percentage">
+              <paper-radio-button name="percentage">Percentage</paper-radio-button>
+              <paper-radio-button name="ratio">Ratio</paper-radio-button>
+            </paper-radio-group>
+          </labelled-item>
+        </div>
+
+        <template
+            is="dom-if"
+            if="[[opened]]"
+            restamp="true">
+          <div class="row">
+            <paper-input
+                class="validate"
+                label="Title"
+                on-input="_validate"
+                value="{{data.blueprint.title::change}}"
+                always-float-label
+                required>
+            </paper-input>
+          </div>
+
+          <div class="row">
+            <paper-input
+                class="validate"
+                label="Means of verification"
+                on-input="_validate"
+                value="{{data.means_of_verification::change}}"
+                always-float-label
+                required>
+            </paper-input>
+          </div>
+
+          <div class="row">
+            <paper-input
+                class="validate"
+                label="Measurement specifications"
+                on-input="_validate"
+                value="{{data.measurement_specifications::change}}"
+                always-float-label
+                required>
+            </paper-input>
+          </div>
+
+          <div class="row">
+            <div class="app-grid">
+              <div class="item">
+                <paper-dropdown-menu
+                    class="validate"
+                    label="Frequency of reporting"
+                    on-value-changed="_validate"
+                    on-selected-item-changed="_setFrequency"
+                    always-float-label
+                    required>
+                  <paper-listbox
+                      slot="dropdown-content"
+                      class="dropdown-content">
+                    <template
+                        id="frequencies"
+                        is="dom-repeat"
+                        items="[[frequencies]]">
+                      <paper-item>[[item.title]]</paper-item>
+                    </template>
+                  </paper-listbox>
+                </paper-dropdown-menu>
+              </div>
+
+              <template
+                  is="dom-if"
+                  if="[[_showCSD(data.frequency)]]">
+                <div class="item">
+                  <etools-prp-chips
+                      value="{{data.cs_dates}}"
+                      class="validate"
+                      label="Date of report"
+                      on-selected-chips-updated="_validate"
+                      required>
+                    <chip-date-of-report></chip-date-of-report>
+                  </etools-prp-chips>
+                </div>
+              </template>
+            </div>
+          </div>
+
+          <div class="row">
+            <etools-multi-selection-menu
+                class="validate"
+                label="Location"
+                options="[[locations]]"
+                selected-values="{{selectedLocations}}"
+                on-selected-values-changed="_validate"
+                trigger-value-change-event
+                required>
+            </etools-multi-selection-menu>
+          </div>
+
+          <div class="row">
+            <disaggregations-dropdown-widget
+              class="validate"
+              value="{{selectedDisaggregations}}"
+              disaggregations="[[disaggregations]]">
+            </disaggregations-dropdown-widget>
+          </div>
+
+        </template>
+
+      </paper-dialog-scrollable>
+
+      <div class="buttons layout horizontal-reverse">
+        <paper-button
+            on-tap="_save"
+            class="btn-primary"
+            raised>
+          Save
+        </paper-button>
+
+        <paper-button
+            on-tap="close">
+          Cancel
+        </paper-button>
+      </div>
+
+      <etools-loading active="[[updatePending]]"></etools-loading>
+    </paper-dialog>
+  </template>
+
+  <script>
+    Polymer({
+      id: 'indicator-modal',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.ModalBehavior,
+      ],
+
+      properties: {
+        data: Object,
+
+        type: String,
+
+        objectId: Number,
+
+        objectType: String,
+
+        displayType: String,
+
+        responsePlanId: {
+         type: String,
+         statePath: 'responsePlans.currentID',
+       },
+
+        locationId: {
+          type: String,
+          statePath: 'location.id',
+        },
+
+        locationsUrl: {
+          type: String,
+          computed: '_computeLocationsUrl(locationId)',
+        },
+
+        disaggregationsUrl: {
+          type: String,
+          computed: '_computeDisaggregationsUrl(responsePlanId)',
+        },
+
+        indicatorsUrl: {
+          type: String,
+          value: App.Endpoints.clusterIndicators(),
+        },
+
+        computedType: {
+          type: String,
+          computed: '_computeType(type, displayType)',
+          observer: '_setDisplayType',
+        },
+
+        updatePending: {
+          type: Boolean,
+          value: false,
+        },
+
+        locations: {
+          type: Array,
+          value: [],
+        },
+
+        invalid: {
+          type: Boolean,
+          notify: true,
+          value: true,
+        },
+
+        disaggregationsParams: {
+          type: Object,
+          value: {
+            page_size: 99999,
+          },
+        },
+
+        selectedLocations: {
+          type: Array,
+          value: [],
+        },
+
+        selectedDisaggregations: {
+          type: Array,
+          value: [],
+          notify: true,
+        },
+
+        frequencies: {
+          type: Array,
+          value: [
+            {
+              id: 'Wee',
+              title: 'Weekly',
+            },
+            {
+              id: 'Mon',
+              title: 'Monthly',
+            },
+            {
+              id: 'Qua',
+              title: 'Quarterly',
+            },
+            {
+              id: 'Csd',
+              title: 'Custom specific dates',
+            },
+          ],
+        },
+      },
+
+      disaggregations: {
+        type: Array,
+        value: [],
+      },
+
+      observers: [
+        '_setDefaults(opened)',
+        '_setLocations(selectedLocations.splices)',
+      ],
+
+      _computeType: function (type, displayType) {
+        switch (type) {
+          case 'number':
+            return type;
+
+          case 'percentage_ratio':
+            return displayType;
+        }
+      },
+
+      _setDisplayType: function (type) {
+        this.set('data.blueprint.display_type', type);
+      },
+
+      _setFrequency: function (e, data) {
+        var freq = this.$$('#frequencies').itemForElement(data.value);
+        if (!freq) {
+          return;
+        }
+        this.set('data.frequency', freq.id);
+      },
+
+      _setLocations: function () {
+        var selected = this.selectedLocations ?
+            this.locations
+                .filter(function (location) {
+                  return this.selectedLocations.indexOf(location.value) !== -1;
+                }, this)
+                .map(function (location) {
+                  return {
+                    id: location.id,
+                  };
+                }) :
+            [];
+
+        this.set('data.locations', selected);
+      },
+
+      _setDisaggregations: function () {
+        var selected = this.selectedDisaggregations ?
+        this.selectedDisaggregations.map(function(dis) {
+          return {
+            id: dis.id,
+          };
+        }) : [];
+        this.set('data.disaggregation', selected);
+      },
+
+      _onValueChanged: function (e) {
+        this._updateValue(e.target);
+      },
+
+      _updateValue: function (el) {
+        this.set(el.dataset.path, el.selected);
+      },
+
+      _setDefaults: function (opened) {
+        if (!opened) {
+          return;
+        }
+        this.set('selectedLocations', []);
+        this.set('selectedDisaggregations', []);
+
+        this.set('data', {
+          cs_dates: [],
+          locations: [],
+          blueprint: {},
+          disaggregation: [],
+        });
+
+        this._forEach('paper-radio-group', this._updateValue);
+
+        this._fetchLocations();
+        this._fetchDisaggregations();
+      },
+
+      _validate: function (e) {
+        e.target.validate();
+      },
+
+      _showCSD: function (frequency) {
+        return frequency && this._equals(frequency, 'Csd');
+      },
+
+      _computeLocationsUrl: function (locationId) {
+        return App.Endpoints.childLocations(locationId);
+      },
+
+      _computeDisaggregationsUrl: function(responsePlanId) {
+        return App.Endpoints.responseParametersClusterDisaggregations(responsePlanId);
+      },
+
+      _fetchLocations: function () {
+        var self = this;
+
+        this.$.locations.thunk()()
+            .then(function (res) {
+              self.set('locations', res.data.map(self._formatLocation));
+            });
+      },
+
+      _fetchDisaggregations: function() {
+        var self = this;
+        this.$.disaggregations.thunk()()
+          .then(function(res) {
+            self.set('disaggregations', res.data.results);
+          });
+      },
+
+      _formatLocation: function (data) {
+        return {
+          id: data.id,
+          value: data.title,
+          label: data.title,
+        };
+      },
+
+      _processData: function (rawData) {
+        var data = this._clone(rawData);
+
+        if (['percentage', 'ratio'].indexOf(data.blueprint.display_type) !== -1) {
+          delete data.blueprint.calculation_formula_across_locations;
+          delete data.blueprint.calculation_formula_across_periods;
+        }
+
+        if (data.frequency !== 'Csd') {
+          delete data.cs_dates;
+        }
+
+        return Object.assign(data, {
+          object_id: this.objectId,
+          object_type: this.objectType,
+        });
+      },
+
+      _save: function () {
+
+        var fields = [].slice.call(
+          Polymer.dom(this.root).querySelectorAll('.validate')
+        );
+
+        var self = this;
+        var valid;
+
+        fields.forEach(function (field) {
+          field.validate();
+        });
+
+        valid = fields.every(function (field) {
+          return !field.invalid;
+        });
+
+        if (!valid) {
+          return;
+        }
+
+        this.set('updatePending', true);
+        this._setDisaggregations();
+        this.$.indicators.body = this._processData(this.data);
+
+        this.$.indicators.thunk()()
+            .then(function (res) {
+              self.fire('indicator-added', res.data);
+              self.set('updatePending', false);
+              self.close();
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+
+              self.set('updatePending', false);
+            });
+      },
+    });
+  </script>
+</dom-module>

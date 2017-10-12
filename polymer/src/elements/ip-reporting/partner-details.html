@@ -8,7 +8,7 @@
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/selectors/partner.html">
 <link rel="import" href="../../behaviors/utils.html">
-<link rel="import" href="../../elements/labelled-item.html">
+<link rel="import" href="../labelled-item.html">
 
 <dom-module id="partner-details">
   <template>
@@ -72,12 +72,12 @@
         </li>
         <li class="item">
           <labelled-item label="Partner Type">
-            <span class="field-value">[[_withDefault(partner.partner_type)]]</span>
+            <span class="field-value">[[_computePartnerType(partner)]]</span>
           </labelled-item>
         </li>
         <li class="item">
           <labelled-item label="Shared Partner(s)">
-            <span class="field-value">[[_withDefault(partner.shared_partner)]]</span>
+            <span class="field-value">[[_withDefault(partner.shared_partner_display)]]</span>
           </labelled-item>
         </li>
         <li class="item">
@@ -135,6 +135,15 @@
           type: Boolean,
           statePath: App.Selectors.Partner.loading,
         },
+      },
+
+      _computePartnerType: function (partner) {
+        var chunks = [
+          partner.cso_type_display,
+          partner.partner_type_display,
+        ].filter(Boolean);
+
+        return this._withDefault(chunks.length ? chunks.join(' ') : null);
       },
     });
   </script>

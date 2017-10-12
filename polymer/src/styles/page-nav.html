@@ -44,6 +44,19 @@
         top: 0;
         bottom: 0;
         padding: 0 16px;
+        font-size: 14px;
+      }
+
+      iron-icon {
+        margin-right: 10px;
+      }
+
+      paper-item:not(.iron-selected) iron-icon {
+        color: var(--paper-grey-600);
+      }
+
+      paper-submenu paper-menu a {
+        font-size: 12px;
       }
 
       .menu-trigger {
@@ -66,7 +79,7 @@
       }
 
       .menu-content a {
-        padding-left: 32px;
+        padding-left: 50px;
       }
     </style>
   </template>

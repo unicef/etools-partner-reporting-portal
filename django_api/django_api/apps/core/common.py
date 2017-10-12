@@ -3,6 +3,26 @@ from __future__ import unicode_literals
 from model_utils import Choices
 
 
+REPORTABLE_LLO_CONTENT_OBJECT = 'llo'
+REPORTABLE_CO_CONTENT_OBJECT = 'co'
+REPORTABLE_CA_CONTENT_OBJECT = 'ca'
+REPORTABLE_PP_CONTENT_OBJECT = 'pp'
+REPORTABLE_PA_CONTENT_OBJECT = 'pa'
+
+CLUSTER_TYPES = Choices(
+    ('cccm', 'CCCM'),
+    ('early_recovery', 'Early Recovery'),
+    ('education', 'Education'),
+    ('emergency_telecommunications', 'Emergency Telecommunications'),
+    ('food_security', 'Food Security'),
+    ('health', 'Health'),
+    ('logistics', 'Logistics'),
+    ('nutrition', 'Nutrition'),
+    ('protection', 'Protection'),
+    ('shelter', 'Shelter'),
+    ('wash', 'WASH'),
+)
+
 CSO_TYPES = Choices(
     ('Int', 'International', 'International'),
     ('Nat', 'National', 'National'),
@@ -40,22 +60,31 @@ INTERVENTION_STATUS = Choices(
 )
 
 INDICATOR_REPORT_STATUS = Choices(
-    ('OT', 'ontrack', 'On Track'),
-    ('Con', 'constrained', 'Constrained'),
-    ('NP', 'noprogress', 'No Progress'),
-    ('TM', 'targetmet', 'Target Met')
-)
-
-ADMINISTRATIVE_LEVEL = Choices(
-    ('Cou', 'country', 'Country level'),
-    ('Reg', 'region', 'Region level'),
-    ('Cit', 'city', 'City level'),
+    ('Due', 'due', 'Due'),  # grey
+    ('Ove', 'overdue', 'Overdue'),  # red
+    ('Sub', 'submitted', 'Submitted'),  # orange
+    ('Sen', 'sent_back', 'Sent back'),  # red
+    ('Acc', 'accepted', 'Accepted'),  # green
 )
 
 FREQUENCY_LEVEL = Choices(
     ('Wee', 'weekly', 'Weekly'),
     ('Mon', 'monthly', 'Monthly'),
     ('Qua', 'quarterly', 'Quarterly'),
+)
+
+PD_FREQUENCY_LEVEL = Choices(
+    ('Wee', 'weekly', 'Weekly'),
+    ('Mon', 'monthly', 'Monthly'),
+    ('Qua', 'quarterly', 'Quarterly'),
+    ('Csd', 'custom_specific_dates', 'Custom specific dates'),
+)
+
+REPORTABLE_FREQUENCY_LEVEL = Choices(
+    ('Wee', 'weekly', 'Weekly'),
+    ('Mon', 'monthly', 'Monthly'),
+    ('Qua', 'quarterly', 'Quarterly'),
+    ('Csd', 'custom_specific_dates', 'Custom specific dates'),
 )
 
 PD_LIST_REPORT_STATUS = Choices(
@@ -70,8 +99,41 @@ PD_DOCUMENT_TYPE = Choices(
     ('SSF', 'SSFA_TOR', u'SSFA TOR'),
 )
 
+PROGRESS_REPORT_STATUS = Choices(
+    ('Due', 'due', 'Due'),
+    ('Ove', 'overdue', 'Overdue'),
+    ('Sub', 'submitted', 'Submitted'),
+    ('Sen', 'sent_back', 'Sent back'),
+    ('Acc', 'accepted', 'Accepted'),
+)
+
 PD_STATUS = Choices(
     ("Dra", "draft", "Draft"),
     ("Act", "active", "Active"),
     ("Imp", "implemented", "Implemented"),
+    ('Rej', 'rejected', 'Rejected'),
+)
+
+RESPONSE_PLAN_TYPE = Choices(
+    ("HRP", "hrp", "HRP"),
+    ("FA", "fa", "FA"),
+)
+
+OVERALL_STATUS = Choices(
+    ("Met", "met", "Met"),
+    ("OnT", "on_track", "On Track"),
+    ("NoP", "no_progress", "No Progress"),
+    ('Con', 'constrained', 'Constrained'),
+    ('NoS', 'no_status', 'No Status'),
+)
+
+PARTNER_PROJECT_STATUS = Choices(
+    ("Ong", "ongoing", "Ongoing"),
+    ("Pla", "planned", "Planned"),
+    ("Com", "completed", "Completed"),
+)
+
+CURRENCIES = Choices(
+    ("USD", "usd", "$"),
+    ("EUR", "euro", u"\u20ac"),
 )

@@ -1,75 +1,38 @@
+import datetime
+from django.conf import settings
+from django.db.models import Q
 from django.urls import reverse
-
 from rest_framework import status
-from rest_framework.test import APITestCase, APIClient
-
-from account.models import User
-from core.models import Intervention, Location
+from core.common import PROGRESS_REPORT_STATUS
+from core.tests.base import BaseAPITestCase
+from core.models import Workspace, Location
 from core.factories import (
-    IndicatorReportFactory, ProgrammeDocumentFactory, ReportableToLowerLevelOutputFactory,
+    QuantityReportableToLowerLevelOutputFactory,
+    ProgrammeDocumentFactory,
     ProgressReportFactory,
-    SectionFactory,
-    InterventionFactory,
     IndicatorLocationDataFactory,
 )
-from indicator.models import Reportable, IndicatorBlueprint, IndicatorReport
+from indicator.models import IndicatorReport
+from unicef.models import LowerLevelOutput, Section, ProgrammeDocument, ProgressReport
 
-from unicef.models import LowerLevelOutput, Section, ProgrammeDocument
 
+class TestProgrammeDocumentAPIView25(BaseAPITestCase):
 
-class TestProgrammeDocumentAPIView(APITestCase):
-
-    def setUp(self):
-        self.quantity = 5
-
-        ProgrammeDocumentFactory.create_batch(self.quantity)
-        print "{} ProgrammeDocument objects created".format(self.quantity)
-
-        SectionFactory.create_batch(self.quantity)
-        print "{} Section objects created".format(self.quantity)
-
-        # Linking the followings:
-        # created LowerLevelOutput - ReportableToLowerLevelOutput
-        # Section - ProgrammeDocument via ReportableToLowerLevelOutput
-        # ProgressReport - IndicatorReport from ReportableToLowerLevelOutput
-        # IndicatorReport & Location from ReportableToLowerLevelOutput - IndicatorLocationData
-        for idx in xrange(self.quantity):
-            llo = LowerLevelOutput.objects.all()[idx]
-            reportable = ReportableToLowerLevelOutputFactory(content_object=llo)
-
-            reportable.content_object.indicator.programme_document.sections.add(Section.objects.all()[idx])
-
-            indicator_report = reportable.indicator_reports.first()
-            indicator_report.progress_report = ProgressReportFactory()
-            indicator_report.save()
-
-            indicator_location_data = IndicatorLocationDataFactory(indicator_report=indicator_report, location=reportable.locations.first())
-
-        # Intervention creates Cluster and Locations
-        InterventionFactory.create_batch(self.quantity, locations=Location.objects.all())
-        print "{} Intervention objects created".format(self.quantity)
-
-        # Make all requests in the context of a logged in session.
-        admin, created = User.objects.get_or_create(username='admin', defaults={
-            'email': 'admin@unicef.org',
-            'is_superuser': True,
-            'is_staff': True
-        })
-        admin.set_password('Passw0rd!')
-        admin.save()
-        self.client = APIClient()
-        self.client.login(username='admin', password='Passw0rd!')
+    generate_fake_data_quantity = 25
 
     def test_list_api(self):
-        intervention = Intervention.objects.filter(locations__isnull=False).first()
-        url = reverse('programme-document', kwargs={'location_id': intervention.locations.first().id})
+        intervention = Workspace.objects.filter(locations__isnull=False).first()
+
+        location_id = intervention.locations.first().id
+
+        url = reverse('programme-document', kwargs={'location_id': location_id})
         response = self.client.get(url, format='json')
 
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(len(response.data['results']), 1)
 
     def test_list_filter_api(self):
-        intervention = Intervention.objects.filter(locations__isnull=False).first()
+        intervention = Workspace.objects.filter(locations__isnull=False).first()
         url = reverse('programme-document', kwargs={'location_id': intervention.locations.first().id})
         response = self.client.get(
             url+"?ref_title=&status=&location=",
@@ -102,16 +65,105 @@ class TestProgrammeDocumentAPIView(APITestCase):
             url+"?ref_title=&status=&location=%s" % loc.id,
             format='json'
         )
+
         self.assertTrue(status.is_success(response.status_code))
-        self.assertEquals(len(response.data), 4)
+        for result in response.data['results']:
+            self.assertEquals(result['title'], document['title'])
+
+
+class TestProgrammeDocumentAPIView(BaseAPITestCase):
 
     def test_detail_api(self):
         pd = ProgrammeDocument.objects.first()
-        intervention = Intervention.objects.filter(locations__isnull=False).first()
-        location = intervention.locations.first()
-        url = reverse('programme-document-details', kwargs={'pk': pd.pk, 'location_id': location.id})
+        # location_id is redundantly!
+        url = reverse('programme-document-details', kwargs={'location_id': 1, 'pk': pd.pk})
         response = self.client.get(url, format='json')
 
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(pd.agreement, response.data['agreement'])
         self.assertEquals(pd.reference_number, response.data['reference_number'])
+
+
+class TestProgressReportAPIView(BaseAPITestCase):
+
+    def setUp(self):
+        super(TestProgressReportAPIView, self).setUp()
+        self.location_id = Workspace.objects.filter(locations__isnull=False).first().locations.first().id
+        self.queryset = self.get_queryset()
+
+    def get_queryset(self):
+        pd_ids = Location.objects.filter(
+            Q(id=self.location_id) |
+            Q(parent_id=self.location_id) |
+            Q(parent__parent_id=self.location_id) |
+            Q(parent__parent__parent_id=self.location_id) |
+            Q(parent__parent__parent__parent_id=self.location_id)
+        ).values_list(
+             'reportable__lower_level_outputs__cp_output__programme_document__id',
+             flat=True
+        )
+        return ProgressReport.objects.filter(programme_document_id__in=pd_ids)
+
+    def test_list_api(self):
+        url = reverse('progress-reports', kwargs={'location_id': self.location_id})
+        response = self.client.get(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(len(response.data['results']), self.queryset.count())
+
+    def test_list_api_filter_by_status(self):
+        self.reports = self.queryset.filter(
+            status=PROGRESS_REPORT_STATUS.due
+        )
+
+        url = reverse('progress-reports', kwargs={'location_id': self.location_id})
+        url += '?status=' + PROGRESS_REPORT_STATUS.due
+        response = self.client.get(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(len(response.data['results']), len(self.reports))
+
+    def test_list_api_filter_by_due_status(self):
+        self.reports = self.queryset.filter(
+            status__in=[PROGRESS_REPORT_STATUS.due, PROGRESS_REPORT_STATUS.overdue]
+        )
+
+        url = reverse('progress-reports', kwargs={'location_id': self.location_id})
+        url += '?due=1'
+        response = self.client.get(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(len(response.data['results']), len(self.reports))
+
+    def test_list_api_filter_by_pd_title(self):
+        filter_string = 'reference'
+        self.reports = self.queryset.filter(
+            Q(programme_document__reference_number__icontains=filter_string) |
+            Q(programme_document__title__icontains=filter_string)
+            )
+
+        url = reverse('progress-reports', kwargs={'location_id': self.location_id})
+        url += '?pd_ref_title=' + filter_string
+        response = self.client.get(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(len(response.data['results']), len(self.reports))
+
+    def test_list_api_filter_by_due_date(self):
+        today = datetime.datetime.today()
+        date_format = settings.PRINT_DATA_FORMAT
+        pr_ids = ProgressReport.objects.all().values_list('id', flat=True)
+
+        ir_ids = IndicatorReport.objects \
+            .filter(progress_report_id__in=pr_ids) \
+            .filter(due_date=today) \
+            .values_list('progress_report_id') \
+            .distinct()
+        pr_queryset = self.queryset.filter(id__in=ir_ids)
+
+        url = reverse('progress-reports', kwargs={'location_id': self.location_id})
+        url += '?due_date=' + today.strftime(date_format)
+        response = self.client.get(url, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(len(response.data['results']), len(pr_queryset))

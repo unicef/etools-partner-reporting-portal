@@ -7,7 +7,9 @@ ARG requirement_file
 ENV REQUIREMENT_FILE ${requirement_file:-dev.txt}
 
 # Install dependencies
-RUN apt-get update
+RUN apt-get update && \
+    # fix certificates for easy_install "certificate verify failed"
+    apt-get install --assume-yes --reinstall ca-certificates
 RUN apt-get install -y --no-install-recommends \
     build-essential \
     libcurl4-openssl-dev \
@@ -41,10 +43,11 @@ RUN apt-get install -y --no-install-recommends \
 # Install Python tools
 RUN pip install --upgrade \
     virtualenv \
-    virtualenvwrapper \
+    # virtualenvwrapper \ I guess it's not needed!
     fabric \
     pip \
-    wheel
+    wheel \
+    --trusted-host pypi.python.org
 
 # http://gis.stackexchange.com/a/74060
 ENV CPLUS_INCLUDE_PATH /usr/include/gdal
@@ -54,15 +57,14 @@ ADD ./requirements/* /tmp/
 
 # Install PyPi dependencies
 WORKDIR /tmp
-RUN pip install -r $REQUIREMENT_FILE
+RUN pip install -r $REQUIREMENT_FILE --trusted-host pypi.python.org
 
 ADD . /code/
-VOLUME /code
 
 RUN mkdir -p /data/django_api/logs
+RUN mkdir -p /data/uploads
 RUN touch /data/django_api/logs/django.log
 
-VOLUME /data
 RUN chmod -R a+rw /data
 
 ENV PYTHONUNBUFFERED 1

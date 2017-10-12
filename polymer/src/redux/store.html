@@ -2,12 +2,26 @@
 
 <link rel="import" href="redux.html">
 <link rel="import" href="reducers/auth.html">
-<link rel="import" href="reducers/countries.html">
+<link rel="import" href="reducers/workspaces.html">
 <link rel="import" href="reducers/location.html">
 <link rel="import" href="reducers/app.html">
 <link rel="import" href="reducers/partner.html">
 <link rel="import" href="reducers/indicators.html">
 <link rel="import" href="reducers/programmeDocuments.html">
+<link rel="import" href="reducers/programmeDocumentsIndicators.html">
+<link rel="import" href="reducers/progressReports.html">
+<link rel="import" href="reducers/programmeDocumentDetails.html">
+<link rel="import" href="reducers/programmeDocumentReports.html">
+<link rel="import" href="reducers/responsePlans.html">
+<link rel="import" href="reducers/disaggregations.html">
+<link rel="import" href="reducers/partnerProjects.html">
+<link rel="import" href="reducers/clusters.html">
+<link rel="import" href="reducers/clusterIndicatorReports.html">
+<link rel="import" href="reducers/clusterActivities.html">
+<link rel="import" href="reducers/clusterObjectives.html">
+<link rel="import" href="reducers/clusterDisaggregations.html">
+<link rel="import" href="reducers/clusterDashboardData.html">
+<link rel="import" href="reducers/userProfile.html">
 
 <script src="../../bower_components/redux-thunk/index.js"></script>
 
@@ -17,12 +31,26 @@
 
     var rootReducer = Redux.combineReducers({
       auth: App.Reducers.Auth,
-      countries: App.Reducers.Countries,
+      workspaces: App.Reducers.Workspaces,
       location: App.Reducers.Location,
       app: App.Reducers.App,
       partner: App.Reducers.Partner,
       indicators: App.Reducers.Indicators,
       programmeDocuments: App.Reducers.ProgrammeDocuments,
+      programmeDocumentsIndicators: App.Reducers.ProgrammeDocumentsIndicators,
+      programmeDocumentDetails: App.Reducers.ProgrammeDocumentDetails,
+      programmeDocumentReports: App.Reducers.ProgrammeDocumentReports,
+      progressReports: App.Reducers.ProgressReports,
+      responsePlans: App.Reducers.ResponsePlans,
+      disaggregations: App.Reducers.Disaggregations,
+      partnerProjects: App.Reducers.PartnerProjects,
+      clusters: App.Reducers.Clusters,
+      clusterActivities: App.Reducers.ClusterActivities,
+      clusterObjectives: App.Reducers.ClusterObjectives,
+      clusterDisaggregations: App.Reducers.ClusterDisaggregations,
+      clusterIndicatorReports: App.Reducers.ClusterIndicatorReports,
+      clusterDashboardData: App.Reducers.ClusterDashboardData,
+      userProfile: App.Reducers.UserProfile,
     });
 
     var store = Redux.createStore(

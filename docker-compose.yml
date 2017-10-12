@@ -15,9 +15,9 @@ services:
       - polymer
 
   django_api:
-    image: unicef/etools-prp-django-api
+    image: unicef/etools-prp
     env_file:
-      - django_api/.env
+      - .env
     build:
       context: ./django_api
       dockerfile: ./Dockerfile
@@ -26,17 +26,25 @@ services:
         REQUIREMENT_FILE: dev.txt
     volumes:
       - './django_api:/code/'
-    command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 && python /code/manage.py migrate && python manage.py collectstatic --noinput && uwsgi --ini /code/django_api/uwsgi.ini"
+    command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 && python /code/manage.py makemigrations --merge --noinput && python /code/manage.py migrate && python manage.py collectstatic --noinput && uwsgi --ini /code/django_api/uwsgi.ini"
     depends_on:
       - db
 
   db:
     image: unicef/etools-prp-db
+    env_file:
+      - .env
     build:
       context: ./db
       dockerfile: ./Dockerfile
 #    volumes:
 #      - './postgres_data:/var/lib/postgresql/data'
+
+  redis:
+    image: unicef/etools-prp-redis
+    build:
+      context: ./redis
+      dockerfile: ./Dockerfile
 
   polymer:
     image: unicef/etools-prp-polymer

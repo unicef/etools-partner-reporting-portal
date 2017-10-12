@@ -1,10 +1,13 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
+<link rel="import" href="../styles/shared-styles.html">
+
 <dom-module id="labelled-item">
   <template>
-    <style>
+    <style include="shared-styles">
       :host {
         display: block;
+        position: relative;
       }
 
       .labelled-item {
@@ -13,11 +16,17 @@
 
       .labelled-item__label {
         font-size: 12px;
-        color: var(--theme-primary-text-color-medium);
+        color: #737373;
+
+        @apply(--truncate);
       }
 
       .labelled-item__content {
         margin: 0;
+      }
+
+      .error {
+        color: var(--paper-deep-orange-a700);
       }
 
       :host ::content .field-value {
@@ -26,7 +35,7 @@
     </style>
 
     <dl class="labelled-item">
-      <dt class="labelled-item__label">[[label]]</dt>
+      <dt class$="labelled-item__label [[labelClassName]]">[[label]]</dt>
       <dd class="labelled-item__content">
         <content></content>
       </dd>
@@ -36,6 +45,24 @@
   <script>
     Polymer({
       is: 'labelled-item',
+
+      properties: {
+        label: String,
+
+        invalid: {
+          type: Boolean,
+          value: false,
+        },
+
+        labelClassName: {
+          type: String,
+          computed: '_computeLabelClassName(invalid)',
+        },
+      },
+
+      _computeLabelClassName: function (invalid) {
+        return invalid ? 'error' : '';
+      },
     });
   </script>
 </dom-module>

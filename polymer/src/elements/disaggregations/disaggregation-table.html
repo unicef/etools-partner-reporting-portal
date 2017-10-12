@@ -1,0 +1,301 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/promise-polyfill/promise-polyfill-lite.html">
+
+<link rel="import" href="table-content/three-disaggregations.html">
+<link rel="import" href="table-content/two-disaggregations.html">
+<link rel="import" href="table-content/one-disaggregation.html">
+<link rel="import" href="table-content/zero-disaggregations.html">
+<link rel="import" href="disaggregation-switches.html">
+<link rel="import" href="../etools-prp-ajax.html">
+<link rel="import" href="../../polyfills/es6-shim.html">
+<link rel="import" href="../../endpoints.html">
+<link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../redux/actions.html">
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/disaggregationHelpers.html">
+<link rel="import" href="../../styles/disaggregation-table-styles.html">
+
+<dom-module id="disaggregation-table">
+  <template>
+    <style include="disaggregation-table-styles">
+      disaggregation-switches {
+        margin-bottom: 1em;
+      }
+    </style>
+
+    <etools-prp-ajax
+        id="update"
+        url="[[updateUrl]]"
+        body="[[localData]]"
+        content-type="application/json"
+        method="put">
+    </etools-prp-ajax>
+
+    <div>
+      <disaggregation-switches
+          data="[[data]]"
+          mapping="[[mapping]]"
+          editable="[[editable]]"
+          formatted-data="{{formattedData}}"
+          on-formatted-data-changed="_triggerModalRefit">
+      </disaggregation-switches>
+
+      <table class="vertical layout">
+        <template
+            is="dom-if"
+            if="[[_equals(formattedMapping.length, 0)]]"
+            restamp="true">
+          <zero-disaggregations
+              data="[[viewData]]"
+              mapping="[[formattedMapping]]"
+              editable="[[editable]]">
+          </zero-disaggregations>
+        </template>
+
+        <template
+            is="dom-if"
+            if="[[_equals(formattedMapping.length, 1)]]"
+            restamp="true">
+          <one-disaggregation
+              data="[[viewData]]"
+              mapping="[[formattedMapping]]"
+              editable="[[editable]]">
+          </one-disaggregation>
+        </template>
+
+        <template
+            is="dom-if"
+            if="[[_equals(formattedMapping.length, 2)]]"
+            restamp="true">
+          <two-disaggregations
+              data="[[viewData]]"
+              mapping="[[formattedMapping]]"
+              editable="[[editable]]">
+          </two-disaggregations>
+        </template>
+
+        <template
+            is="dom-if"
+            if="[[_equals(formattedMapping.length, 3)]]"
+            restamp="true">
+          <three-disaggregations
+              data="[[viewData]]"
+              mapping="[[formattedMapping]]"
+              editable="[[editable]]">
+          </three-disaggregations>
+        </template>
+      </table>
+    </div>
+
+  </template>
+
+  <script>
+
+    Polymer({
+      is: 'disaggregation-table',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.DisaggregationHelpersBehavior,
+      ],
+
+      properties: {
+        editable: {
+          type: Number,
+          value: 0,
+        },
+
+        data: Object,
+
+        totals: Object,
+
+        formattedData: {
+          type: Object,
+          observer: '_cloneData',
+        },
+
+        formattedMapping: {
+          type: Array,
+          computed: '_computeMapping(editableBool, formattedData, mapping)',
+        },
+
+        viewData: {
+          type: Object,
+          computed: '_computeViewData(formattedData, totals)',
+        },
+
+        updateUrl: {
+          type: String,
+          value: App.Endpoints.indicatorLocationDataEntries(),
+        },
+
+        editableBool: {
+          type: Boolean,
+          computed: '_computeEditableBool(editable)',
+        },
+
+        indicatorType: {
+          type: String,
+          computed: '_computeIndicatorType(data)',
+        },
+
+        fields: Array,
+
+        localData: Object,
+
+        mapping: Array,
+      },
+
+      listeners: {
+        'register-field': '_registerField',
+        'field-value-changed': '_fieldValueChanged',
+      },
+
+      observers: [
+        '_resetFields(formattedData.disaggregation_reported_on)',
+      ],
+
+      _registerField: function (e, field) {
+        e.stopPropagation();
+
+        if (!this.fields) {
+          this.set('fields', []);
+        }
+
+        this.push('fields', field);
+      },
+
+      _fieldValueChanged: function (e, change) {
+        var key = change.key;
+        var value = change.value;
+        var totals;
+
+        var newValue = Object.assign(
+          {
+            c: null,
+            d: null,
+            v: null,
+          },
+          this.get(['localData.disaggregation', key]),
+          value
+        );
+
+        e.stopPropagation();
+
+        this.set(['localData.disaggregation', key], newValue);
+        this.set(['totals', key], newValue);
+
+        switch (this.formattedData.level_reported) {
+          case 1:
+          case 2:
+          case 3:
+            totals = Object.assign(
+              {},
+              this.totals,
+              this['_calculateLevel' + this.formattedData.level_reported](key, this.totals)
+            );
+            break;
+
+          default:
+            // noop
+            break;
+        }
+
+        if (totals) {
+          this.set('totals', totals);
+        }
+      },
+
+      _cloneData: function (formattedData) {
+        if (!this.editableBool) {
+          return;
+        }
+
+        this.set('localData', this._clone(formattedData));
+        this.set('totals', this._clone(formattedData.disaggregation));
+      },
+
+      _resetFields: function () {
+        this.set('fields', []);
+      },
+
+      _computeEditableBool: function (editable) {
+        return editable === 1;
+      },
+
+      save: function () {
+        var self = this;
+        var updateThunk;
+        var valid;
+
+        if (!this.editable) {
+          return Promise.reject();
+        }
+
+        this.fields.forEach(function (field) {
+          field.validate();
+        });
+
+        valid = this.fields.every(function (field) {
+          return !field.invalid;
+        });
+
+        if (!valid) {
+          return Promise.reject();
+        }
+
+        updateThunk = this.$.update.thunk();
+
+        this.$.update.abort();
+
+        return this.dispatch(
+          App.Actions.Disaggregations.updateForLocation(
+            updateThunk,
+            this.indicatorId,
+            this.formattedData.location.id
+          )
+        )
+            .then(function (value) {
+              self.fire('location-updated');
+
+              return value;
+            });
+      },
+
+      _triggerModalRefit: function (e) {
+        e.stopPropagation();
+
+        if (!this.editableBool) {
+          return;
+        }
+
+        this.fire('disaggregation-modal-refit');
+      },
+
+      _computeMapping: function (editableBool, formattedData, mapping) {
+        var reportedOn = formattedData.disaggregation_reported_on;
+
+        return editableBool ? mapping.filter(function (disagg) {
+          return reportedOn.indexOf(disagg.id) !== -1;
+        }) : mapping;
+      },
+
+      _computeIndicatorType: function (data) {
+        return data.display_type;
+      },
+
+      _computeViewData: function (data, totals) {
+        return Object.assign({}, data, {
+          disaggregation: Object.assign({}, data.disaggregation, totals),
+        });
+      },
+
+      attached: function () {
+        if (!this.totals) {
+          this.set('totals', {});
+        }
+      },
+    });
+  </script>
+</dom-module>

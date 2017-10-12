@@ -1,40 +1,66 @@
 from __future__ import unicode_literals
 from decimal import Decimal
 from datetime import date
+import logging
 
-from django.db import models, transaction
+from django.db import models
+from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.postgres.fields import ArrayField
 from django.utils.functional import cached_property
 
 from model_utils.models import TimeStampedModel
 
 from core.common import (
-    ADMINISTRATIVE_LEVEL,
-    FREQUENCY_LEVEL,
+    PD_FREQUENCY_LEVEL,
     INDICATOR_REPORT_STATUS,
     PD_LIST_REPORT_STATUS,
-    PD_STATUS,
     PD_DOCUMENT_TYPE,
+    PROGRESS_REPORT_STATUS,
+    PD_STATUS,
+    CURRENCIES,
+    OVERALL_STATUS
 )
-from indicator.models import IndicatorReport, Reportable
+from core.models import TimeStampedExternalSyncModelMixin
+from indicator.models import Reportable  # IndicatorReport
 
 
-class ProgressReport(TimeStampedModel):
-    partner_contribution_to_date = models.CharField(max_length=256)
-    funds_received_to_date = models.CharField(max_length=256)
-    challenges_in_the_reporting_period = models.CharField(max_length=256)
-    proposed_way_forward = models.CharField(max_length=256)
-    # attachements ???
+logger = logging.getLogger(__name__)
 
 
-class Section(models.Model):
+class Section(TimeStampedExternalSyncModelMixin):
+    """
+    Section model define atomic act of help like: bottle of water, blanket.
+    """
     name = models.CharField(max_length=255)
 
     def __str__(self):
         return self.name
 
 
-class ProgrammeDocument(TimeStampedModel):
+class Person(TimeStampedExternalSyncModelMixin):
+    name = models.CharField(max_length=128, verbose_name='Name')
+    title = models.CharField(max_length=255, verbose_name='Title')
+    phone_number = models.CharField(max_length=64, verbose_name='Phone Number')
+    email = models.CharField(max_length=255, verbose_name='Phone Number')
+
+    def __unicode__(self):
+        return self.name
+
+
+class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
+    """
+    ProgrammeDocument model describe agreement between UNICEF & Partner to
+    realize document and reports are feedback for this assignment. The data
+    in this model will come from eTools/PMP via a regular sync.
+
+    related models:
+        unicef.Section (ManyToManyField): "sections"
+        Person  (ManyToManyField): "officer_programme_documents"
+        Person  (ManyToManyField): "unicef_focal_programme_documents"
+        Person  (ManyToManyField): "officer_programme_documents"
+        Workspace (ForeignKey): "workspace_programme_documents"
+    """
     agreement = models.CharField(max_length=255, verbose_name='Agreement')
     document_type = models.CharField(
         max_length=3,
@@ -42,11 +68,30 @@ class ProgrammeDocument(TimeStampedModel):
         default=PD_DOCUMENT_TYPE.PD,
         verbose_name='Document Type'
     )
-    reference_number = models.CharField(max_length=255, verbose_name='Reference Number')
-    title = models.CharField(max_length=255, verbose_name='PD/SSFA ToR Title')
-    unicef_office = models.CharField(max_length=255, verbose_name='UNICEF Office(s)')
-    unicef_focal_point = models.CharField(max_length=255, verbose_name='UNICEF Focal Point(s)')
-    partner_focal_point = models.CharField(max_length=255, verbose_name='Partner Focal Point(s)')
+
+    reference_number = models.CharField(max_length=255,
+                                        verbose_name='Reference Number',
+                                        db_index=True)
+    title = models.CharField(max_length=255,
+                             verbose_name='PD/SSFA ToR Title',
+                             db_index=True)
+    unicef_office = models.CharField(max_length=255,
+                                     verbose_name='UNICEF Office(s)')
+
+    unicef_officers = models.ManyToManyField(Person,
+                                              verbose_name='UNICEF Officer(s)',
+                                              related_name="officer_programme_documents")
+    unicef_focal_point = models.ManyToManyField(Person,
+                                                verbose_name='UNICEF Focal Point(s)',
+                                                related_name="unicef_focal_programme_documents")
+    partner_focal_point = models.ManyToManyField(Person,
+                                                 verbose_name='Partner Focal Point(s)',
+                                                 related_name="partner_focal_programme_documents")
+    workspace = models.ForeignKey('core.Workspace',
+                                  related_name="partner_focal_programme_documents")
+
+    partner = models.ForeignKey('partner.Partner')
+
     start_date = models.DateField(
         verbose_name='Start Programme Date',
     )
@@ -56,11 +101,6 @@ class ProgrammeDocument(TimeStampedModel):
     population_focus = models.CharField(
         max_length=256,
         verbose_name='Population Focus')
-    response_to_HRP = models.CharField(
-        max_length=256,
-        blank=True,
-        null=True,
-        verbose_name='In response to an HRP')
     status = models.CharField(
         choices=PD_STATUS,
         default=PD_STATUS.draft,
@@ -72,24 +112,81 @@ class ProgrammeDocument(TimeStampedModel):
         default=True,
         verbose_name='Contributing to Cluster'
     )
-    administrative_level = models.CharField(
-        max_length=3,
-        choices=ADMINISTRATIVE_LEVEL,
-        default=ADMINISTRATIVE_LEVEL.country,
-        verbose_name='Locations - administrative level'
-    )
     frequency = models.CharField(
         max_length=3,
-        choices=FREQUENCY_LEVEL,
-        default=FREQUENCY_LEVEL.monthly,
+        choices=PD_FREQUENCY_LEVEL,
+        default=PD_FREQUENCY_LEVEL.monthly,
         verbose_name='Frequency of reporting'
     )
+
     budget = models.DecimalField(
         decimal_places=2,
         max_digits=12,
         blank=True,
         null=True,
         help_text='Total Budget'
+    )
+    budget_currency = models.CharField(
+        choices=CURRENCIES,
+        default=CURRENCIES.usd,
+        max_length=16,
+        verbose_name='Budget Currency'
+    )
+
+    # intervention budged model from etool !!!
+    cso_contribution = models.DecimalField(
+        decimal_places=2,
+        max_digits=12,
+        default=0,
+        verbose_name='CSO Contribution'
+    )
+    cso_contribution_currency = models.CharField(
+        choices=CURRENCIES,
+        default=CURRENCIES.usd,
+        max_length=16,
+        verbose_name='CSO Contribution Currency'
+    )
+
+    # intervention budged model from etool !!!
+    total_unicef_cash = models.DecimalField(
+        decimal_places=2,
+        max_digits=12,
+        default=0,
+        verbose_name='UNICEF cash'
+    )
+    total_unicef_cash_currency = models.CharField(
+        choices=CURRENCIES,
+        default=CURRENCIES.usd,
+        max_length=16,
+        verbose_name='UNICEF cash Currency'
+    )
+
+    # intervention budged model from etool !!!
+    in_kind_amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        default=0,
+        verbose_name='UNICEF Supplies'
+    )
+    in_kind_amount_currency = models.CharField(
+        choices=CURRENCIES,
+        default=CURRENCIES.usd,
+        max_length=16,
+        verbose_name='UNICEF Supplies Currency'
+    )
+
+    funds_received_to_date = models.DecimalField(
+        decimal_places=2,
+        max_digits=12,
+        default=0,
+        verbose_name='Funds received'
+    )
+
+    funds_received_to_date_currency = models.CharField(
+        choices=CURRENCIES,
+        default=CURRENCIES.usd,
+        max_length=16,
+        verbose_name='Funds received Currency'
     )
 
     # TODO:
@@ -103,10 +200,16 @@ class ProgrammeDocument(TimeStampedModel):
     __reports_exists = None
     __budget = None
 
+    class Meta:
+        ordering = ['-id']
+
+    def __str__(self):
+        return self.title
+
     @cached_property
     def reportable_queryset(self):
         return Reportable.objects.filter(
-            lower_level_outputs__indicator__programme_document=self)
+            lower_level_outputs__cp_output__programme_document=self)
 
     @property
     def reports_exists(self):
@@ -118,7 +221,7 @@ class ProgrammeDocument(TimeStampedModel):
     def contain_overdue_report(self):
         return self.reportable_queryset.filter(
             indicator_reports__time_period_start__lt=date.today(),
-            indicator_reports__report_status=INDICATOR_REPORT_STATUS.ontrack
+            indicator_reports__report_status=INDICATOR_REPORT_STATUS.due
         ).exists()
 
     @property
@@ -128,7 +231,7 @@ class ProgrammeDocument(TimeStampedModel):
                 .order_by('indicator_reports__time_period_start') \
                 .indicator_reports.last()
 
-            if ontop_report and ontop_report.report_status != INDICATOR_REPORT_STATUS.ontrack:
+            if ontop_report and ontop_report.report_status != INDICATOR_REPORT_STATUS.due:
                 return True
         return False
 
@@ -157,7 +260,7 @@ class ProgrammeDocument(TimeStampedModel):
 
         due_report = self.reportable_queryset.filter(
             indicator_reports__time_period_start__lt=date.today(),
-            indicator_reports__report_status=INDICATOR_REPORT_STATUS.ontrack
+            indicator_reports__report_status=INDICATOR_REPORT_STATUS.due
         ) \
             .order_by('indicator_reports__time_period_start') \
             .last().indicator_reports.last()
@@ -165,12 +268,21 @@ class ProgrammeDocument(TimeStampedModel):
         if due_report:
             self.__due_date = due_report.time_period_start
         else:
-            due_report = self.reportable_queryset.order_by('indicator_reports__time_period_start') \
+            due_report = self.reportable_queryset.order_by(
+                'indicator_reports__time_period_start') \
                 .last() \
                 .indicator_reports.last()
             self.__due_date = due_report and due_report.time_period_start
 
         return self.__due_date
+
+    @property
+    def total_unicef_contribution(self):
+        return self.total_unicef_cash + self.in_kind_amount
+
+    @property
+    def funds_received_to_date_percentage(self):
+        return "%.0f" % (self.funds_received_to_date / self.budget)
 
     @property
     def calculated_budget(self):
@@ -185,52 +297,156 @@ class ProgrammeDocument(TimeStampedModel):
             return self.__budget
         else:
             consumed = self.reportable_queryset.last().total
+            consumed = consumed['c']
 
         try:
             percentage = Decimal(consumed) / Decimal(total)
             percentage = int(percentage * 100)
         except Exception as exp:
-            # TODO log
+            logger.exception({
+                "model": "ProgrammeDocument",
+                "def": 'calculated_budget',
+                "pk": self.id,
+                "exception": exp
+            })
             percentage = 0
 
-        self.__budget = "{total} ({consumed}%)".format(total=total, consumed=consumed)
+        self.__budget = "{total} ({consumed}%)".format(total=total,
+                                                       consumed=consumed)
         return self.__budget
 
     @property
     def frequency_delta_days(self):
-        if self.frequency == FREQUENCY_LEVEL.weekly:
+        if self.frequency == PD_FREQUENCY_LEVEL.weekly:
             return 7
-        elif self.frequency == FREQUENCY_LEVEL.monthly:
+        elif self.frequency == PD_FREQUENCY_LEVEL.monthly:
             return 30
-        elif self.frequency == FREQUENCY_LEVEL.quartely:
+        elif self.frequency == PD_FREQUENCY_LEVEL.quarterly:
             return 90
         else:
-            raise NotImplemented("Not recognized FREQUENCY_LEVEL.")
+            raise NotImplemented("Not recognized PD_FREQUENCY_LEVEL.")
+
+    @property
+    def lower_level_outputs(self):
+        return LowerLevelOutput.objects.filter(
+            cp_output__programme_document=self)
+
+
+def find_first_programme_document_id():
+    try:
+        import pdb; pdb.set_trace()
+        pd_id = ProgrammeDocument.objects.first().id
+    except AttributeError:
+        from core.factories import ProgrammeDocumentFactory
+        pd = ProgrammeDocumentFactory()
+        pd_id = pd.id
+    else:
+        return pd_id
+
+
+class ProgressReport(TimeStampedModel):
+    """
+    Represents a report on multiple lower level outputs by a partner
+    for a certain time period, against a PD.
+    """
+    partner_contribution_to_date = models.CharField(max_length=256)
+    challenges_in_the_reporting_period = models.CharField(max_length=256)
+    proposed_way_forward = models.CharField(max_length=256)
+    status = models.CharField(max_length=3, choices=PROGRESS_REPORT_STATUS,
+                              default=PROGRESS_REPORT_STATUS.due)
+    programme_document = models.ForeignKey(ProgrammeDocument,
+                                           related_name="progress_reports",
+                                           default=-1)
+    # attachements ???
+
+    start_date = models.DateField(verbose_name='Start Date')
+    end_date = models.DateField(verbose_name='End Date')
+    due_date = models.DateField(verbose_name='Due Date')
+    submission_date = models.DateField(verbose_name='Submission Date',
+                                       blank=True, null=True)
+    submitted_by = models.ForeignKey('account.User',
+                                     blank=True, null=True)
+
+    # Fields set by PO in PMP when reviewing the progress report
+    review_date = models.DateField(verbose_name='Review Date',
+                                   blank=True,
+                                   null=True)
+    review_overall_status = models.CharField(
+        verbose_name='Overall status set by UNICEF PO',
+        choices=OVERALL_STATUS,
+        max_length=3,
+        blank=True,
+        null=True
+    )
+    sent_back_feedback = models.TextField(blank=True, null=True)
+
+
+    class Meta:
+        ordering = ['-due_date', '-id']
+
+    @cached_property
+    def latest_indicator_report(self):
+        return self.indicator_reports.all().order_by('-created').first()
+
+    def get_reporting_period(self):
+        return "%s - %s " % (
+            self.start_date.strftime(settings.PRINT_DATA_FORMAT),
+            self.end_date.strftime(settings.PRINT_DATA_FORMAT)
+        )
+
+    def get_submission_date(self):
+        return self.submission_date.strftime(
+            settings.PRINT_DATA_FORMAT)
+
+    def __str__(self):
+        return "Progress Report <pk:{}>: {} {} to {}".format(
+            self.id, self.programme_document, self.start_date, self.end_date)
+
+
+class ReportingPeriodDates(TimeStampedModel):
+    """
+    Used for storing start_date, end_date and due_date fields for multiple reports
+    """
+    start_date = models.DateField(verbose_name='Start date')
+    end_date = models.DateField(verbose_name='End date')
+    due_date = models.DateField(null=True, blank=True, verbose_name='Due date')
+    programme_document = models.ForeignKey(ProgrammeDocument, related_name='reporting_periods')
+
+
+class CountryProgrammeOutput(TimeStampedExternalSyncModelMixin):
+    """
+    CountryProgrammeOutput (LLO Parent) module.
+
+    related models:
+        unicef.ProgrammeDocument (ForeignKey): "programme_document"
+    """
+    title = models.CharField(max_length=255)
+    programme_document = models.ForeignKey(ProgrammeDocument,
+                                           related_name="cp_outputs")
+
+    class Meta:
+        ordering = ['id']
 
     def __str__(self):
         return self.title
 
-    # @transaction.atomic
-    # def save(self, *args, **kwargs):
-    #     is_new = self.pk is None
-    #     super(ProgrammeDocument, self).save(*args, **kwargs)
-    #     if is_new:
-    #         IndicatorReport.objects.create(
-    #             title='enter data',
-    #             programme_document=self,
-    #             time_period=self.start_date,
-    #         )
 
+class LowerLevelOutput(TimeStampedExternalSyncModelMixin):
+    """
+    LowerLevelOutput (PD output) module describe the goals to reach in PD scope.
 
-class CountryProgrammeOutput(TimeStampedModel):
+    related models:
+        unicef.CountryProgrammeOutput (ForeignKey): "indicator"
+        indicator.Reportable (GenericRelation): "reportables"
+    """
     title = models.CharField(max_length=255)
+    cp_output = models.ForeignKey(CountryProgrammeOutput,
+                                  related_name="ll_outputs")
+    reportables = GenericRelation('indicator.Reportable',
+                                  related_query_name='lower_level_outputs')
 
-    programme_document = models.ForeignKey(ProgrammeDocument, related_name="cp_outputs")
+    class Meta:
+        ordering = ['id']
 
-
-class LowerLevelOutput(TimeStampedModel):
-    title = models.CharField(max_length=255)
-
-    indicator = models.ForeignKey(CountryProgrammeOutput, related_name="ll_outputs")
-
-    reportables = GenericRelation('indicator.Reportable', related_query_name='lower_level_outputs')
+    def __str__(self):
+        return self.title

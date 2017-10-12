@@ -1,0 +1,74 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../dropdown-filter/dropdown-filter.html">
+<link rel="import" href="../../../redux/store.html">
+<link rel="import" href="../../../redux/selectors/llos.html">
+
+<dom-module id="reportable-filter">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <template is="dom-if" if="[[!loading]]">
+      <dropdown-filter
+          class="item"
+          label="PD output"
+          name="llo"
+          value="[[value]]"
+          data="[[options]]">
+      </dropdown-filter>
+    </template>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'reportable-filter',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        value: String,
+
+        data: {
+          type: Array,
+          statePath: App.Selectors.LLOs.all,
+        },
+
+        options: {
+          type: Array,
+          value: [],
+          computed: '_computeOptions(data)',
+        },
+
+        loading: {
+          type: Boolean,
+          value: true,
+          computed: '_computeLoading(options)',
+        },
+      },
+
+      _computeOptions: function (data) {
+        var other = data.map(function (item) {
+          return {
+            id: String(item.id),
+            title: item.title,
+          };
+        });
+
+        return [{
+          id: '',
+          title: 'All',
+        }].concat(other);
+      },
+
+      _computeLoading: function (options) {
+        return !options.length;
+      },
+    });
+  </script>
+</dom-module>

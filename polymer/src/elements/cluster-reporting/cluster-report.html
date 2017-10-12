@@ -1,0 +1,564 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/iron-collapse/iron-collapse.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../bower_components/promise-polyfill/promise-polyfill-lite.html">
+<link rel="import" href="../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../bower_components/iron-location/iron-query-params.html">
+
+<link rel="import" href="../../polyfills/es6-shim.html">
+<link rel="import" href="../../endpoints.html">
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/notifications.html">
+<link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../redux/actions.html">
+<link rel="import" href="../reportable-meta.html">
+<link rel="import" href="../error-modal.html">
+<link rel="import" href="../report-status.html">
+<link rel="import" href="../etools-prp-ajax.html">
+<link rel="import" href="../etools-prp-number.html">
+<link rel="import" href="../indicator-details.html">
+<link rel="import" href="../../styles/shared-styles.html">
+<link rel="import" href="../../styles/buttons.html">
+
+<dom-module id="cluster-report">
+  <template>
+    <style include="iron-flex iron-flex-alignment iron-flex-factors shared-styles button-styles">
+      :host {
+        display: block;
+      }
+
+      .report {
+        background: var(--paper-grey-200);
+      }
+
+      .report__meta {
+        padding: 10px 25px 10px 10px;
+        color: var(--paper-grey-600);
+      }
+
+      .report__meta .column {
+        box-sizing: border-box;
+        min-width: 0;
+      }
+
+      .report__meta .column:not(:first-child) {
+        padding-left: 1em;
+      }
+
+      .report__meta a {
+        text-decoration: none;
+      }
+
+      .report__meta paper-button {
+        margin: 0;
+      }
+
+      .report__meta report-status {
+        --status-badge-size: 12px;
+
+        margin-right: 1.5em;
+        font-size: 11px;
+        color: var(--theme-primary-text-color-dark);
+      }
+
+      .report__meta report-status + dl {
+        display: inline;
+      }
+
+      .report__meta dl {
+
+        margin: 0;
+        font-size: 11px;
+      }
+
+      .report__meta dl:not(:first-of-type) {
+        margin-top: .5em;
+      }
+
+      .report__meta dt,
+      .report__meta dd {
+        display: inline;
+        margin: 0;
+      }
+
+      .report__toggle {
+        width: 25px;
+        position: relative;
+        z-index: 1;
+        color: white;
+        background: var(--theme-primary-color);
+        cursor: pointer;
+      }
+
+      .reportable {
+        padding: 6px 25px 6px 10px;
+        background: var(--paper-grey-300);
+      }
+
+      .reportable__title h3 {
+        margin: 0;
+        font-size: 14px;
+      }
+
+      .status-badge {
+        margin-right: 10px;
+      }
+
+      .reportable__target {
+        width: 250px;
+        padding-left: 10px;
+      }
+
+      .reportable__target dl {
+        margin: 0;
+        text-align: right;
+        font-size: 11px;
+      }
+
+      .reportable__target dt {
+        color: var(--theme-secondary-text-color);
+      }
+
+      .reportable__target dd {
+        margin: 0;
+        font-weight: bold;
+      }
+
+      .iron-collapse-opened {
+        @apply(--cluster-report-content);
+
+        background: white;
+      }
+
+      .draft-badge {
+        display: inline-block;
+        padding: 0 5px;
+        border-radius: 2px;
+        font-size: 10px;
+        text-transform: uppercase;
+        color: white;
+        background: var(--paper-grey-500);
+      }
+
+      reportable-meta {
+        padding: 25px;
+      }
+    </style>
+
+    <iron-location
+        query="{{query}}">
+    </iron-location>
+
+    <iron-query-params
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
+    </iron-query-params>
+
+    <iron-query-params
+        params-string="{{exportQuery}}"
+        params-object="{{exportParams}}">
+    </iron-query-params>
+
+    <etools-prp-ajax
+        id="submit"
+        url="[[reportUrl]]"
+        method="post">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
+        id="update"
+        url="[[reportUrl]]"
+        body="[[reportMeta]]"
+        method="patch"
+        content-type="application/json">
+    </etools-prp-ajax>
+
+    <div class="report">
+      <div class="layout horizontal">
+        <div
+            class="report__toggle flex-none layout horizontal center-center"
+            on-tap="_toggle"
+            toggles="[[index]]"
+            role="button"
+            aria-expanded$="[[opened]]"
+            aria-controls$="collapse"
+            tabindex="-1">
+          <iron-icon
+              icon="icons:expand-[[_computeIcon(opened)]]">
+          </iron-icon>
+        </div>
+
+        <div class="flex layout vertical">
+          <div class="report__meta layout horizontal">
+            <div class="column flex">
+              <report-status status="[[data.overall_status]]"></report-status>
+              <dl>
+                <template
+                    is="dom-if"
+                    if="[[!_equals(mode, 'view')]]"
+                    restamp="true">
+                  <dt>Due date:</dt>
+                  <dd>[[data.due_date]]</dd>
+                </template>
+                <template
+                    is="dom-if"
+                    if="[[_equals(mode, 'view')]]"
+                    restamp="true">
+                  <dt>Submission date:</dt>
+                  <dd>[[data.submission_date]]</dd>
+                </template>
+              </dl>
+              <dl>
+                <dt>Reporting period:</dt>
+                <dd>[[data.reporting_period]]</dd>
+              </dl>
+            </div>
+            <div class="column flex">
+              <dl>
+                <dt>Project:</dt>
+                <dd>[[_withDefault(data.project)]]</dd>
+              </dl>
+              <dl>
+                <dt>Partner:</dt>
+                <dd>[[_withDefault(data.partner)]]</dd>
+              </dl>
+              <dl>
+                <dt>Activity:</dt>
+                <dd>[[_withDefault(data.partner_activity)]]</dd>
+              </dl>
+            </div>
+            <template
+                is="dom-if"
+                if="[[data.is_draft]]"
+                restamp="true">
+              <div class="column layout horizontal center-center flex-none">
+                <span class="draft-badge">Draft</span>
+              </div>
+            </template>
+            <div class="column layout horizontal center-center flex-none">
+              <template
+                  is="dom-if"
+                  if="[[!_equals(mode, 'view')]]"
+                  restamp="true">
+                <paper-button
+                    class="btn-primary"
+                    disabled="[[!canSubmit]]"
+                    on-tap="_submit"
+                    raised>
+                  Submit
+                </paper-button>
+              </template>
+              <template
+                  is="dom-if"
+                  if="[[_equals(mode, 'view')]]"
+                  restamp="true">
+                <a
+                    href="[[exportUrl]]"
+                    target="_blank"
+                    tabindex="-1">
+                  <paper-button class="btn-primary">
+                    <iron-icon icon="icons:file-download"></iron-icon>
+                    Export
+                  </paper-button>
+                </a>
+              </template>
+            </div>
+          </div>
+          <div class="reportable layout horizontal">
+            <div class="reportable__title flex-3 layout vertical center-justified">
+              <div class="layout horizontal">
+                <template
+                    is="dom-if"
+                    if="[[!_equals(mode, 'view')]]"
+                    restamp="true">
+                  <div class="status-badge layout vertical center-justified">
+                    <report-status
+                        status="[[data.report_status]]"
+                        no-label>
+                    </report-status>
+                  </div>
+                </template>
+                <h3>[[data.indicator_name]]</h3>
+              </div>
+            </div>
+            <div class="reportable__target flex-none layout vertical center-justified">
+              <dl class="layout horizontal justified">
+                <dt class="flex-3">Target:</dt>
+                <dd class="flex">
+                  <template
+                      is="dom-if"
+                      if="[[_equals(indicatorType, 'number')]]"
+                      restamp="true">
+                    <etools-prp-number value="[[data.reportable.target]]"></etools-prp-number>
+                  </template>
+                  <template
+                      is="dom-if"
+                      if="[[_equals(indicatorType, 'percentage')]]"
+                      restamp="true">
+                    [[_toPercentage(data.reportable.target)]]
+                  </template>
+                </dd>
+              </dl>
+              <dl class="layout horizontal justified">
+                <dt class="flex-3">Total cumulative progress:</dt>
+                <template
+                    is="dom-if"
+                    if="[[_equals(indicatorType, 'number')]]"
+                    restamp="true">
+                  <dd class="flex">
+                    <etools-prp-number value="[[data.reportable.achieved.v]]"></etools-prp-number>
+                  </dd>
+                </template>
+                <template
+                    is="dom-if"
+                    if="[[_equals(indicatorType, 'percentage')]]"
+                    restamp="true">
+                  <dd class="flex">[[_toPercentage(data.reportable.achieved.c)]]</dd>
+                </template>
+              </dl>
+              <dl class="layout horizontal justified">
+                <dt class="flex-3">Achievement in reporting period:</dt>
+                <template
+                    is="dom-if"
+                    if="[[_equals(indicatorType, 'number')]]"
+                    restamp="true">
+                  <dd class="flex">
+                    <etools-prp-number value="[[data.total.v]]"></etools-prp-number>
+                  </dd>
+                </template>
+                <template
+                    is="dom-if"
+                    if="[[_equals(indicatorType, 'percentage')]]"
+                    restamp="true">
+                  <dd class="flex">[[_toPercentage(data.total.c)]]</dd>
+                </template>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <iron-collapse
+            id="collapse"
+            opened="{{opened}}"
+            on-opened-changed="_handleOpenedChanged"
+            no-animation>
+          <reportable-meta
+              data="[[data]]"
+              mode="[[mode]]"
+              allow-no-status>
+          </reportable-meta>
+
+          <indicator-details
+            reportable-id="[[data.reportable.id]]"
+            indicator-name="[[data.indicator_name]]"
+            indicator-id="[[data.id]]"
+            reporting-period="[[data.reporting_period]]"
+            override-mode="[[mode]]">
+          </indicator-details>
+        </iron-collapse>
+      </div>
+    </div>
+
+    <error-modal id="error"></error-modal>
+  </template>
+
+  <script>
+    Polymer({
+      id: 'cluster-report',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.NotificationsBehavior,
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        data: Object,
+
+        reportMeta: Object,
+
+        opened: Boolean,
+
+        mode: String,
+
+        busy: {
+          type: Boolean,
+          value: false,
+        },
+
+        responsePlanId: {
+          type: String,
+          statePath: 'responsePlans.currentID',
+        },
+
+        exportParams: {
+          type: Object,
+          computed: '_computeExportParams(queryParams, data)',
+        },
+
+        canSubmit: {
+          type: Boolean,
+          computed: '_computeCanSubmit(data, busy)',
+        },
+
+        reportUrl: {
+          type: String,
+          computed: '_computeReportUrl(data)',
+        },
+
+        exportUrl: {
+          type: String,
+          computed: '_computeExportUrl(responsePlanId, exportQuery)',
+        },
+
+        indicatorType: {
+          type: String,
+          computed: '_computeIndicatorType(data)',
+        },
+      },
+
+      listeners: {
+        'report-complete': '_onReportComplete',
+        'reportable-meta-changed': '_updateMeta',
+      },
+
+      _computeIcon: function (opened) {
+        return opened ? 'less' : 'more';
+      },
+
+      _computeCanSubmit: function (data, busy) {
+        return data.can_submit && !busy;
+      },
+
+      _computeReportUrl: function (data) {
+        return App.Endpoints.indicatorData(data.id);
+      },
+
+      _computeExportUrl: function (responsePlanId, query) {
+        return [
+          App.Endpoints.clusterIndicatorReportsExport(responsePlanId),
+          '?',
+          query,
+        ].join('');
+      },
+
+      _computeIndicatorType: function (data) {
+        return data.reportable.blueprint.display_type;
+      },
+
+      _toggle: function () {
+        this.$.collapse.toggle();
+      },
+
+      _handleOpenedChanged: function (e, data) {
+        var indicatorDetails;
+
+        e.stopPropagation();
+
+        if (data.value) {
+          indicatorDetails = Polymer.dom(e.srcElement).querySelector('indicator-details');
+
+          try {
+            indicatorDetails.init();
+          } catch (err) {}
+        }
+      },
+
+      _submit: function () {
+        this.set('busy', true);
+
+        this._confirmIntent()
+            .then(this._commit.bind(this))
+            .catch(this._revert.bind(this));
+      },
+
+      _confirmIntent: function () {
+        var deferred = this._deferred();
+
+        this.fire('report-submit-confirm', deferred);
+
+        return deferred.promise;
+      },
+
+      _commit: function () {
+        var submitThunk = this.$.submit.thunk();
+        var self = this;
+
+        return this.dispatch(
+          App.Actions.ClusterIndicatorReports.submit(submitThunk)
+        )
+            .then(function () {
+              self.set('busy', false);
+              self.fire('report-submitted', self.data.id);
+            })
+            .catch(function (res) {
+              var errors = res.data.errors;
+
+              return self.$.error.open(errors).then(function () {
+                return Promise.reject(); // Revert
+              });
+            });
+      },
+
+      _revert: function () {
+        this.set('busy', false);
+      },
+
+      _onReportComplete: function (e, data) {
+        e.stopPropagation();
+
+        this.dispatch(
+          App.Actions.ClusterIndicatorReports.updateSingle(
+            data.indicatorId,
+            {
+              can_submit: true,
+            }
+          )
+        );
+      },
+
+      _updateMeta: function (e, data) {
+        var self = this;
+        var updateThunk;
+
+        e.stopPropagation();
+
+        this.set('reportMeta', data);
+
+        updateThunk = this.$.update.thunk();
+
+        this.$.update.abort();
+
+        this.dispatch(
+          App.Actions.ClusterIndicatorReports.update(
+            updateThunk,
+            this.data.id
+          )
+        )
+            .then(function () {
+              self._notifyChangesSaved();
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
+      },
+
+      _computeExportParams: function (queryParams, data) {
+        return Object.assign({}, queryParams, {
+          indicator: data.id,
+        });
+      },
+
+      detached: function () {
+        this.$.submit.abort();
+        this.$.update.abort();
+        this.$.error.close();
+      },
+    });
+  </script>
+</dom-module>

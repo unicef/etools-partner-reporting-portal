@@ -1,29 +1,40 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../bower_components/etools-content-panel/etools-content-panel.html">
-<link rel="import" href="../../../bower_components/iron-icons/communication-icons.html">
-<link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
-<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
-<link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
+<link rel="import" href="../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../bower_components/iron-location/iron-query-params.html">
 
+<link rel="import" href="../../polyfills/es6-shim.html">
+<link rel="import" href="../../elements/ip-reporting/pd-report-filters.html">
+<link rel="import" href="../../elements/ip-reporting/pd-reports-list.html">
 <link rel="import" href="../../redux/store.html">
-<link rel="import" href="../../behaviors/utils.html">
-<link rel="import" href="../../elements/labelled-item.html">
+<link rel="import" href="../../redux/actions.html">
 
 <dom-module id="pd-details-reports">
   <template>
-    <style>
+    <style include="data-table-styles table-styles">
       :host {
         display: block;
       }
     </style>
 
+    <iron-location
+        query="{{query}}">
+    </iron-location>
+
+    <iron-query-params
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
+    </iron-query-params>
+
+    <etools-prp-ajax
+        id="pdReports"
+        url="[[pdReportsUrl]]"
+        params="[[pdReportsParams]]">
+    </etools-prp-ajax>
+
     <page-body>
-      <etools-content-panel panel-title="Reports">
-        <h3>TODO</h3>
-      </etools-content-panel>
-
+      <pd-report-filters></pd-report-filters>
+      <pd-reports-list></pd-reports-list>
     </page-body>
-
 
   </template>
 
@@ -31,6 +42,71 @@
     Polymer({
       is: 'pd-details-reports',
 
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        pdId: {
+          type: String,
+          statePath: 'programmeDocuments.current',
+        },
+
+        locationId: {
+          type: String,
+          statePath: 'location.id',
+        },
+
+        pdReportsUrl: {
+          type: String,
+          computed: '_computePDReportsUrl(locationId)',
+        },
+
+        pdReportsParams: {
+          type: Object,
+          computed: '_computePDReportsParams(pdId, queryParams)',
+        },
+      },
+
+      observers: [
+        '_handleInputChange(pdReportsUrl, pdReportsParams)',
+      ],
+
+      _computePDReportsUrl: function (locationId) {
+        return locationId ? App.Endpoints.programmeDocumentReports(locationId) : '';
+      },
+
+      _computePDReportsParams: function (pdId, queryParams) {
+        return Object.assign({}, queryParams, {
+          programme_document: pdId,
+        });
+      },
+
+      _handleInputChange: function (url) {
+        this.debounce('fetch-data', function () {
+          var pdReportsThunk;
+
+          if (!url) {
+            return;
+          }
+
+          pdReportsThunk = this.$.pdReports.thunk();
+
+          // Cancel the pending request, if any
+          this.$.pdReports.abort();
+
+          this.dispatch(App.Actions.PDReports.fetch(pdReportsThunk, this.pdId))
+              .catch(function (err) { // jshint ignore:line
+                // TODO: error handling
+              });
+        }, 300);
+      },
+
+      detached: function () {
+        if (this.isDebouncerActive('fetch-data')) {
+          this.cancelDebouncer('fetch-data');
+        }
+      },
     });
   </script>
 </dom-module>

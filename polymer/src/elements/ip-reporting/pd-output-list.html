@@ -1,0 +1,90 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
+
+<link rel="import" href="../list-placeholder.html">
+<link rel="import" href="../ip-reporting/pd-output.html">
+<link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../redux/selectors/llos.html">
+
+<dom-module id="pd-output-list">
+  <template>
+    <style include="iron-flex iron-flex-alignment">
+      :host {
+        display: block;
+      }
+
+      .loader {
+        margin: 2em 0;
+      }
+
+      pd-output {
+        margin-bottom: 25px;
+      }
+    </style>
+
+    <template
+        is="dom-if"
+        if="[[loading]]"
+        restamp="true">
+      <div class="loader layout horizontal center-center">
+        <div>
+          <etools-loading no-overlay active></etools-loading>
+        </div>
+      </div>
+    </template>
+
+    <template
+        is="dom-if"
+        if="[[!loading]]">
+      <template
+          is="dom-repeat"
+          items="[[viewData]]">
+        <pd-output
+            data="[[item]]"
+            override-mode="[[overrideMode]]">
+        </pd-output>
+      </template>
+
+      <list-placeholder
+          data="[[viewData]]"
+          loading="[[loading]]">
+      </list-placeholder>
+    </template>
+  </template>
+
+  <script>
+    Polymer({
+      id: 'pd-output-list',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        overrideMode: String,
+
+        loading: {
+          type: Boolean,
+          statePath: 'programmeDocumentReports.current.loading',
+        },
+
+        data: {
+          type: Array,
+          statePath: App.Selectors.LLOs.all,
+        },
+
+        viewData: {
+          type: Array,
+          computed: '_computeViewData(data)',
+        },
+      },
+
+      _computeViewData: function (data) {
+        return data.filter(function (item) {
+          return Boolean(item.indicator_reports.length);
+        });
+      },
+    });
+  </script>
+</dom-module>
