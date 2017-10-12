@@ -120,7 +120,7 @@
 
           <template
               is="dom-if"
-              if="[[!_equals(mode, 'view')]]"
+              if="[[canSubmit]]"
               restamp="true">
             <paper-tab name="submit">Review and submit</paper-tab>
           </template>
@@ -152,7 +152,7 @@
 
         <template
             is="dom-if"
-            if="[[!_equals(mode, 'view')]]"
+            if="[[canSubmit]]"
             restamp="true">
           <template
               is="dom-if"
@@ -163,6 +163,7 @@
             </page-ip-reporting-report-submit>
           </template>
         </template>
+
     </page-body>
 
     <pd-modal id="pdDetails"></pd-modal>
@@ -232,6 +233,11 @@
         selectedTab: {
           type: String,
           value: 'results',
+        },
+
+        canSubmit: {
+          type: Boolean,
+          computed: '_computeCanSubmit(loading, mode, currentReport, permissions)',
         },
       },
 
@@ -320,14 +326,8 @@
       _canExport: function (loading, report, mode, permissions) {
         switch (true) {
           case !!loading:
-            return false;
-
           case report.status === 'Sub' && !permissions.exportSubmittedProgressReport:
-            return false;
-
           case report.is_draft && !permissions.exportDraftProgressReport:
-            return false;
-
           case mode === 'edit':
             return false;
 
@@ -338,6 +338,19 @@
 
       _canViewPdDetails: function (permissions) {
         return permissions.viewPdDetails;
+      },
+
+      _computeCanSubmit: function (loading, mode, report, permissions) {
+        switch (true) {
+          case mode === 'view':
+          case !!loading:
+          case report.status === 'Sen' && !permissions.submitDraftProgressReport:
+          case report.is_draft && !permissions.submitDraftProgressReport:
+            return false;
+
+          default:
+            return true;
+        }
       },
 
       detached: function () {

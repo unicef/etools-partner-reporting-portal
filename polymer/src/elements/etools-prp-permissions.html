@@ -67,7 +67,7 @@
         },
 
         _computePermissions: function (profile) {
-          var groups = profile.groups;
+          var groups = profile.groups || [];
 
           return Object.keys(permissions).reduce(function (acc, key) {
             var granted = permissions[key];
