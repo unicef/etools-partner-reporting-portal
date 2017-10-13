@@ -96,7 +96,7 @@ function source() {
     .pipe(gulpif('**/*.js', javascript.lint())).on('end', log('Linted Javascript'))
     .pipe(gulpif('**/*.js', javascript.minify())).on('end', log('Minified Javascript'))
 
-    .pipe(gulpif('**/*.{png,gif,jpg,svg}', images.minify())).on('end', log('Minified Images'))
+    // .pipe(gulpif('**/*.{png,gif,jpg,svg}', images.minify())).on('end', log('Minified Images'))
 
     .pipe(project.rejoin()); // Call rejoin when you're finished
 }
