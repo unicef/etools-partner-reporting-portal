@@ -203,7 +203,7 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
     class Meta:
         ordering = ['-id']
 
-    def __str__(self):
+    def __unicode__(self):
         return self.title
 
     @cached_property

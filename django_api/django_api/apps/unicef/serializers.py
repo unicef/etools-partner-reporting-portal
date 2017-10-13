@@ -434,7 +434,6 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
     end_date = serializers.DateField(required=False, allow_null=True)
     partner = serializers.PrimaryKeyRelatedField(queryset=Partner.objects.all())
     workspace = serializers.PrimaryKeyRelatedField(queryset=Workspace.objects.all())
-    #unicef_focal_points = serializers.PrimaryKeyRelatedField(queryset=Person.objects.all(), many=True, source="unicef_focal_point")
 
     def update(self, instance, validated_data):
         return ProgrammeDocument.objects.filter(external_id=validated_data['external_id']).update(**validated_data)
@@ -450,9 +449,6 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
             "offices",
             "number",
             "partner",
-            #"unicef_focal_points",
-            #"agreement_auth_officers", TODO: add Personas first
-            #"focal_points", TODO: add Personas first
             "start_date",
             "end_date",
             "cso_budget",

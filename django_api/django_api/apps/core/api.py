@@ -67,8 +67,8 @@ class PMP_API(object):
         data = self._push_request(timeout=30)
         return data
 
-    def programme_documents(self):
-        self.url = self.url_prototype + "/prp/v1/interventions"
+    def programme_documents(self, business_area_code, page=0, url=None):
+        self.url = self.url_prototype + "/prp/v1/interventions?page=%s&workspace=%s" % (page, business_area_code) if not url else url
         data = self._push_request(timeout=30)
         return data
 
