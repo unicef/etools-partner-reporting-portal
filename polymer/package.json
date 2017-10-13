@@ -15,8 +15,8 @@
   },
   "scripts": {
     "dev": "./node_modules/lite-server/bin/lite-server",
-    "bundle": "polymer build --bundle",
-    "serve": "./node_modules/lite-server/bin/lite-server --baseDir='bundle'",
+    "bundle": "polymer build --js-minify --css-minify --html-minify --bundle",
+    "serve": "./node_modules/lite-server/bin/lite-server --baseDir='./build/default'",
     "test": "wct"
   },
   "private": true,
