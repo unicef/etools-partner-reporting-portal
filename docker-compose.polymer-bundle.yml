@@ -55,4 +55,4 @@ services:
         - ./polymer/:/code
         - /code/node_modules
         - /code/bower_components
-    command: ash -c "rm -rf /code/build/default && npm run bundle && npm run serve"
+    command: ash -c "rm -rf /code/build/bundled && npm run bundle && npm run serve"
