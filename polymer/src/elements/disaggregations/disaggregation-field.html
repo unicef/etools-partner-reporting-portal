@@ -53,6 +53,8 @@
 
         validator: String,
 
+        disaggIndex: Number,
+
         value: {
           type: Number,
           notify: true,
@@ -94,6 +96,7 @@
         this.fire('field-value-changed', {
           key: this.coords,
           value: this._toNumericValues(change),
+          index: this.disaggIndex,
         });
       },
     });

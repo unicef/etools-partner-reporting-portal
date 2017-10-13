@@ -54,7 +54,8 @@
               key="v"
               min="0"
               value="[[data.v]]"
-              coords="[[coords]]">
+              coords="[[coords]]"
+              disagg-index="[[disaggIndex]]">
           </disaggregation-field>
         </div>
         <div class="item">
@@ -64,7 +65,8 @@
               min="0"
               value="[[data.d]]"
               coords="[[coords]]"
-              validator="[[vName]]">
+              validator="[[vName]]"
+              disagg-index="[[disaggIndex]]">
           </disaggregation-field>
         </div>
         <div class="computed-value">[[_toPercentage(localData.c)]]</div>
@@ -98,6 +100,7 @@
         vName: String,
         editable: Number,
         localData: Object,
+        disaggIndex: Number,
 
         data: {
           type: Object,
@@ -126,6 +129,7 @@
       _handleInput: function (e, data) {
         var key = data.key;
         var value = data.value;
+        var index = data.index;
         var calculated;
         var change;
 
@@ -159,6 +163,7 @@
           this.fire('field-value-changed', {
             key: key,
             value: change,
+            index: index,
             internal: true,
           });
         }

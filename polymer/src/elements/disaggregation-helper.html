@@ -1,0 +1,42 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../polyfills/es6-shim.html">
+<link rel="import" href="../behaviors/utils.html">
+
+<dom-module id="disaggregation-helper">
+  <script>
+    // FIXME:
+    Polymer({
+      is: 'disaggregation-helper',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+      ],
+
+      properties: {
+        input: Object,
+
+        output: {
+          type: Object,
+          notify: true,
+          computed: '_computeOutput(input)',
+        },
+      },
+
+      _computeOutput: function (input) {
+        var self = this;
+
+        return Object.assign({}, input, {
+          indicator_location_data: input.indicator_location_data.map(function (loc) {
+            return Object.assign({}, loc, {
+              disaggregation: [
+                self._clone(loc.disaggregation),
+                // self._clone(loc.disaggregation), // TODO
+              ],
+            });
+          }),
+        });
+      },
+    });
+  </script>
+</dom-module>

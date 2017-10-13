@@ -1,21 +1,31 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/app-layout/app-grid/app-grid-style.html">
 
 <link rel="import" href="../../../styles/disaggregation-table-styles.html">
 <link rel="import" href="../disaggregation-table-row.html">
 
 <dom-module id="zero-disaggregations">
   <template>
+    <style include="disaggregation-table-styles app-grid-style"></style>
 
-    <style include='disaggregation-table-styles'></style>
-
-    <disaggregation-table-row
-        data="[[totalRow]]"
-        level-reported="[[data.level_reported]]"
-        indicator-type="[[data.display_type]]"
-        row-type="totalsRow"
-        editable="[[editable]]">
-    </disaggregation-table-row>
-
+    <div class="app-grid">
+      <template
+          is="dom-repeat"
+          items="[[data.disaggregation]]">
+        <div class="item">
+          <table>
+            <disaggregation-table-row
+                data="[[_determineTotalRow(item)]]"
+                level-reported="[[data.level_reported]]"
+                indicator-type="[[data.display_type]]"
+                row-type="totalsRow"
+                editable="[[editable]]"
+                disagg-index="[[index]]">
+            </disaggregation-table-row>
+          </table>
+        </div>
+      </template>
+    </div>
   </template>
 
   <script>
@@ -24,21 +34,15 @@
 
       properties: {
         editable: Number,
-
         data: Object,
-
-        totalRow: {
-          type: Array,
-          computed: '_determineTotalRow(mapping, data)'
-        },
       },
 
-      _determineTotalRow: function (_, data) { // jshint ignore:line
+      _determineTotalRow: function (data) {
         return {
           title: 'total',
           total: {
             key: '()',
-            data: data.disaggregation['()'],
+            data: data['()'],
           },
         };
       },
