@@ -18,13 +18,20 @@ class PartnerCronJob(CronJobBase):
         data = api.partners()
 
         # Create partners
-        for item in data:
-            try:
-                instance = Partner.objects.get(external_id=item['id'])
-                serializer = PMPPartnerSerializer(instance, data=item)
-            except Partner.DoesNotExist:
-                serializer = PMPPartnerSerializer(data=item)
-            if serializer.is_valid():
-                serializer.save()
-            else:
-                raise Exception(serializer.errors)
+        try:
+            for item in data:
+                if item['hidden']:
+                    continue
+                print "Creating Partner: %s" % item['vendor_number']
+                try:
+                    instance = Partner.objects.get(vendor_number=item['vendor_number'])
+                    serializer = PMPPartnerSerializer(instance, data=item)
+                except Partner.DoesNotExist:
+                    serializer = PMPPartnerSerializer(data=item)
+                if serializer.is_valid():
+                    serializer.save()
+                else:
+                    raise Exception(serializer.errors)
+        except Exception as e:
+            print e
+            raise Exception(e)
