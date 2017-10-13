@@ -3,8 +3,8 @@ from django_cron import CronJobBase, Schedule
 from core.api import PMP_API
 from core.models import Workspace
 
-from unicef.serializers import PMPProgrammeDocumentSerializer, PMPPDPartnerSerializer
-from unicef.models import ProgrammeDocument
+from unicef.serializers import PMPProgrammeDocumentSerializer, PMPPDPartnerSerializer, PMPPDPersonSerializer
+from unicef.models import ProgrammeDocument, Person
 from partner.models import Partner
 
 class ProgrammeDocumentCronJob(CronJobBase):
@@ -50,7 +50,7 @@ class ProgrammeDocumentCronJob(CronJobBase):
                 except Partner.DoesNotExist:
                     serializer = PMPPDPartnerSerializer(data=partner_data)
                 if serializer.is_valid():
-                    serializer.save()
+                    partner = serializer.save()
                 else:
                     raise Exception(serializer.errors)
 
@@ -87,15 +87,73 @@ class ProgrammeDocumentCronJob(CronJobBase):
 
                 # Create PD
                 try:
-                    instance = ProgrammeDocument.objects.get(external_id=item['id'])
+                    pd = ProgrammeDocument.objects.get(external_id=item['id'])
                     serializer = PMPProgrammeDocumentSerializer(instance, data=item)
                 except ProgrammeDocument.DoesNotExist:
                     serializer = PMPProgrammeDocumentSerializer(data=item)
                 if serializer.is_valid():
-                    serializer.save()
+                    print "Saving PD"
+                    pd = serializer.save()
                 else:
                     print serializer.errors
                     raise Exception(serializer.errors)
+
+                # Create unicef_focal_points
+                person_data_list = item['unicef_focal_points']
+                for person_data in person_data_list:
+                    print "Adding Person: %s" % person_data['email']
+                    try:
+                        # Skip entries without unicef_vendor_number
+                        if not person_data['email']:
+                            continue
+                        person = Person.objects.get(email=person_data['email'])
+                        serializer = PMPPDPersonSerializer(person, data=person_data)
+                    except Person.DoesNotExist:
+                        serializer = PMPPDPersonSerializer(data=person_data)
+                    if serializer.is_valid():
+                        person = serializer.save()
+                    else:
+                        raise Exception(serializer.errors)
+                    pd.unicef_focal_point.add(person)
+
+                    # Create agreement_auth_officers
+                    person_data_list = item['agreement_auth_officers']
+                    for person_data in person_data_list:
+                        print "Adding Person: %s" % person_data['email']
+                        try:
+                            # Skip entries without unicef_vendor_number
+                            if not person_data['email']:
+                                continue
+                            person = Person.objects.get(email=person_data['email'])
+                            serializer = PMPPDPersonSerializer(person, data=person_data)
+                        except Person.DoesNotExist:
+                            serializer = PMPPDPersonSerializer(data=person_data)
+                        if serializer.is_valid():
+                            person = serializer.save()
+                        else:
+                            raise Exception(serializer.errors)
+                        pd.unicef_officers.add(person)
+
+                    # Create agreement_auth_officers
+                    person_data_list = item['focal_points']
+                    for person_data in person_data_list:
+                        print "Adding Person: %s" % person_data['email']
+                        try:
+                            # Skip entries without unicef_vendor_number
+                            if not person_data['email']:
+                                continue
+                            person = Person.objects.get(email=person_data['email'])
+                            serializer = PMPPDPersonSerializer(person, data=person_data)
+                        except Person.DoesNotExist:
+                            serializer = PMPPDPersonSerializer(data=person_data)
+                        if serializer.is_valid():
+                            person = serializer.save()
+                        else:
+                            raise Exception(serializer.errors)
+                        pd.partner_focal_point.add(person)
+
+
+
         except Exception as e:
             print e
             raise(1)

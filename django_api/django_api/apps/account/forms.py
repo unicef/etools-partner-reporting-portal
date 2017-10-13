@@ -8,18 +8,20 @@ from core.models import (
 )
 from .models import User
 
+try:
+    PRP_AGENCY_GROUPS = [
+        IMORole.as_group()
+    ]
 
-PRP_AGENCY_GROUPS = [
-    IMORole.as_group()
-]
+    PRP_PARTNER_GROUPS = [
+        PartnerAuthorizedOfficerRole.as_group(),
+        PartnerEditorRole.as_group(),
+        PartnerViewerRole.as_group(),
+    ]
 
-PRP_PARTNER_GROUPS = [
-    PartnerAuthorizedOfficerRole.as_group(),
-    PartnerEditorRole.as_group(),
-    PartnerViewerRole.as_group(),
-]
-
-PRP_GROUPS = PRP_PARTNER_GROUPS + PRP_AGENCY_GROUPS
+    PRP_GROUPS = PRP_PARTNER_GROUPS + PRP_AGENCY_GROUPS
+except:
+    print "No groups created yet!"
 
 class UserAdminForm(forms.ModelForm):
     class Meta:

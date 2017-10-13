@@ -39,10 +39,10 @@ class Section(TimeStampedExternalSyncModelMixin):
 
 
 class Person(TimeStampedExternalSyncModelMixin):
-    name = models.CharField(max_length=128, verbose_name='Name')
-    title = models.CharField(max_length=255, verbose_name='Title')
-    phone_number = models.CharField(max_length=64, verbose_name='Phone Number')
-    email = models.CharField(max_length=255, verbose_name='Phone Number')
+    name = models.CharField(max_length=128, verbose_name='Name', blank=True, null=True)
+    title = models.CharField(max_length=255, verbose_name='Title', blank=True, null=True)
+    phone_number = models.CharField(max_length=64, verbose_name='Phone Number', blank=True, null=True)
+    email = models.CharField(max_length=255, verbose_name='Email    ')
 
     def __unicode__(self):
         return self.name
