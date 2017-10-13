@@ -20,7 +20,8 @@ from cluster.models import (
 from core.models import (
     PartnerAuthorizedOfficerRole,
     PartnerEditorRole,
-    PartnerViewerRole
+    PartnerViewerRole,
+    IMORole
 )
 from partner.models import (
     Partner,
@@ -140,6 +141,7 @@ def generate_fake_data(workspace_quantity=10):
     today = datetime.date.today()
 
     users_to_create = [
+        ('admin_imo', 'admin_imo@notanemail.com', IMORole),
         ('admin_ao', 'admin_ao@notanemail.com', PartnerAuthorizedOfficerRole),
         ('admin_pe', 'admin_pe@notanemail.com', PartnerEditorRole),
         ('admin_pv', 'admin_pv@notanemail.com', PartnerViewerRole),
@@ -150,7 +152,6 @@ def generate_fake_data(workspace_quantity=10):
             'email': u[1],
             'is_superuser': True,
             'is_staff': True,
-            'organization': 'N/A'
         })
         admin.set_password('Passw0rd!')
         admin.save()
@@ -319,6 +320,18 @@ def generate_fake_data(workspace_quantity=10):
     table = CartoDBTable.objects.first()
     locations = list(Location.objects.filter(carto_db_table=table, carto_db_table__country=carto_db_table.country))
 
+    # associate partner, workspace, imo_clustes etc. with the users
+    first_partner = Partner.objects.first()
+    for u in users_created:
+        for w in Workspace.objects.all():
+            u.workspaces.add(w)
+        if not u.groups.filter(name=IMORole.as_group().name):
+            u.partner = first_partner
+        else:
+            u.organization = 'UNICEF Cluster Team'
+            u.imo_clusters = Cluster.objects.all().order_by('?')[:2]
+        u.save()
+
     for cluster_objective in ClusterObjective.objects.all():
         for idx in xrange(2, 0, -1):
             ca = ClusterActivityFactory(
@@ -390,11 +403,6 @@ def generate_fake_data(workspace_quantity=10):
             print "{} PartnerActivity objects created for {} under {} Cluster Activity and Custom Activity".format(4, partner, cluster_activity.title)
 
     print "ClusterActivity <-> PartnerActivity objects linked"
-
-    first_partner = Partner.objects.first()
-    for u in users_created:
-        u.partner = first_partner
-        u.save()
 
     PersonFactory.create_batch(workspace_quantity)
     # only create PD's for the partner being used above

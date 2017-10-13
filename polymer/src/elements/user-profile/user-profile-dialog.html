@@ -86,8 +86,31 @@
         </div>
 
         <div class="full-width">
-          <paper-input label="My Groups" value="[[groups]]" placeholder="---" readonly always-float-label></paper-input>
+          <paper-input label="My Roles/Groups" value="[[groups]]" placeholder="---" readonly always-float-label></paper-input>
         </div>
+
+        <template is="dom-if" if="{{profile.partner}}">
+          <div class="full-width">
+            <paper-input label="Partner" value="{{profile.partner.title}}" placeholder="---" readonly always-float-label></paper-input>
+          </div>
+        </template>
+
+        <template is="dom-if" if="{{profile.organization}}">
+          <div class="full-width">
+            <paper-input label="My Organization" value="{{profile.organization}}" placeholder="---" readonly always-float-label></paper-input>
+          </div>
+        </template>
+
+        <template is="dom-if" if="{{is_imo_clusters}}">
+          <div class="full-width">
+            <paper-input-container always-float-label auto-validate attr-for-value="value">
+              <label>IMO for Clusters</label>
+              <template is="dom-repeat" items="{{profile.imo_clusters}}">
+                  <div><span>{{item.title}}: {{ item.response_plan.title }}</span></div>
+              </template>
+            </paper-input-container>
+          </div>
+        </template>
 
       </iron-form>
     </paper-dialog-scrollable>
@@ -119,6 +142,11 @@
             type: Array,
             computed: '_computeGroups(profile)',
           },
+
+          is_imo_clusters: {
+            type: Object,
+            computed: '_computeIsIMOClusters(profile)'
+          },
         },
 
         close: function () {
@@ -133,6 +161,10 @@
           return (profile.groups || []).map(function(group) {
             return group.name;
           }).join(', ');
+        },
+
+        _computeIsIMOClusters: function (profile) {
+          return (profile.imo_clusters.length > 0 || null);
         },
       });
   </script>
