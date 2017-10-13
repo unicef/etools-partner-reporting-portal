@@ -33,6 +33,7 @@ try:
     PartnerViewerRole = GroupWrapper(code='ip_viewer',
                                      name='IP Viewer',
                                      create_group=False)
+    IMORole = GroupWrapper(code='imo', name='IMO', create_group=False)
 except Exception as e:
     print "Group DB is not ready yet! - Error: %s" % e
 
