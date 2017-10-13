@@ -101,9 +101,14 @@
           </div>
         </template>
 
-        <template is="dom-if" if="{{profile.imo_clusters}}">
+        <template is="dom-if" if="{{is_imo_clusters}}">
           <div class="full-width">
-            <paper-input label="IMO for Clusters" value="[[imo_clusters]]" placeholder="---" readonly always-float-label></paper-input>
+            <paper-input-container always-float-label auto-validate attr-for-value="value">
+              <label>IMO for Clusters</label>
+              <template is="dom-repeat" items="{{profile.imo_clusters}}">
+                  <div><span>{{item.title}}: {{ item.response_plan.title }}</span></div>
+              </template>
+            </paper-input-container>
           </div>
         </template>
 
@@ -138,9 +143,9 @@
             computed: '_computeGroups(profile)',
           },
 
-          imo_clusters: {
-            type: Array,
-            computed: '_computeIMOClusters(profile)'
+          is_imo_clusters: {
+            type: Object,
+            computed: '_computeIsIMOClusters(profile)'
           },
         },
 
@@ -158,10 +163,8 @@
           }).join(', ');
         },
 
-        _computeIMOClusters: function (profile) {
-          return (profile.imo_clusters || []).map(function(cluster) {
-            return cluster.title + ': ' + cluster.response_plan.title;
-          }).join(', ');
+        _computeIsIMOClusters: function (profile) {
+          return (profile.imo_clusters.length > 0 || null);
         },
       });
   </script>
