@@ -90,23 +90,18 @@ class ResponsePlanSerializer(serializers.ModelSerializer):
 
 class PMPWorkspaceSerializer(serializers.ModelSerializer):
 
+    id = serializers.CharField(source='external_id')
     name = serializers.CharField(source='title')
+    country_short_code = serializers.CharField(source='workspace_code')
 
     def create(self, validated_data):
-
-        # TODO: remove when they add workspace_code field
-        validated_data['workspace_code'] = hashlib.md5(validated_data['title']).hexdigest()[:8]
-
-        # TODO: remove when they add ID field
-        validated_data['external_id'] = hashlib.md5(validated_data['title']).hexdigest()
-
         # Update or create
         try:
-            instance = Workspace.objects.get(external_id=validated_data['external_id'])
+            instance = Workspace.objects.get(workspace_code=validated_data['workspace_code'])
             return self.update(instance, validated_data)
         except Workspace.DoesNotExist:
             return Workspace.objects.create(**validated_data)
 
     class Meta:
         model = Workspace
-        fields = ('name', 'latitude', 'longitude', 'initial_zoom')
+        fields = ('id', 'name', 'latitude', 'longitude', 'initial_zoom', 'business_area_code', 'country_short_code')
