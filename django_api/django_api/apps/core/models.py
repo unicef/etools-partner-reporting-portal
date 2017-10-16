@@ -9,6 +9,7 @@ from django.core.validators import (
     MinValueValidator,
     MaxValueValidator
 )
+from django.db.models import Q
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
 
@@ -17,6 +18,7 @@ from mptt.models import MPTTModel, TreeForeignKey
 
 from .common import (
     RESPONSE_PLAN_TYPE,
+    INDICATOR_REPORT_STATUS
 )
 from utils.groups.wrappers import GroupWrapper
 
@@ -240,6 +242,32 @@ class ResponsePlan(TimeStampedModel):
         for c in clusters:
             count += c.num_of_no_status_indicator_reports(partner=partner)
         return count
+
+    def _latest_indicator_reports(self, clusters):
+        from indicator.models import Reportable, IndicatorReport
+        reportables = Reportable.objects.filter(
+            Q(partner_activities__partner__clusters__in=clusters)
+        )
+        return IndicatorReport.objects.filter(
+                reportable__in=reportables).order_by(
+                        '-time_period_end').distinct()
+
+    def overdue_indicator_reports(self, clusters=None, partner=None,
+                                  limit=None):
+        """
+        Returns indicator reports associated with partner activities.
+        """
+        if not clusters:
+            clusters = self.all_clusters
+
+        indicator_reports = self._latest_indicator_reports(clusters)
+        indicator_reports = indicator_reports.filter(
+            report_status=INDICATOR_REPORT_STATUS.overdue)
+
+        if limit:
+            indicator_reports = indicator_reports[:limit]
+
+        return indicator_reports
 
 
 class GatewayType(TimeStampedModel):
