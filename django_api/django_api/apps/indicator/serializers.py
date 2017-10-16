@@ -980,3 +980,16 @@ class ClusterIndicatorReportSimpleSerializer(serializers.ModelSerializer):
 
     def get_title(self, obj):
         return obj.reportable.blueprint.title
+
+# PMP API Serializers
+
+class PMPIndicatorBlueprintSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='external_id')
+
+    class Meta:
+        model = IndicatorBlueprint
+        fields = (
+            'id',
+            'title',
+            'disaggregatable',
+        )

@@ -5,7 +5,9 @@ from core.models import Workspace
 
 from unicef.serializers import PMPProgrammeDocumentSerializer, PMPPDPartnerSerializer, PMPPDPersonSerializer, \
     PMPLLOSerializer, PMPPDResultLinkSerializer
+from indicator.serializers import PMPIndicatorBlueprintSerializer
 from unicef.models import ProgrammeDocument, Person, LowerLevelOutput, PDResultLink
+from indicator.models import IndicatorBlueprint
 from partner.models import Partner
 
 class ProgrammeDocumentCronJob(CronJobBase):
@@ -187,6 +189,7 @@ class ProgrammeDocumentCronJob(CronJobBase):
 
                         # Parsing expecting results
                         for d in item['expected_results']:
+
                             # Create PDResultLink
                             d['programme_document'] = pd.id
                             try:
@@ -203,7 +206,6 @@ class ProgrammeDocumentCronJob(CronJobBase):
                                 else:
                                     raise Exception(serializer.errors)
 
-
                             # Create LLOs
                             d['cp_output'] = pdresultlink.id
                             try:
@@ -219,6 +221,24 @@ class ProgrammeDocumentCronJob(CronJobBase):
                                     llo = serializer.save()
                                 else:
                                     raise Exception(serializer.errors)
+
+                            # Iterate over indicators
+                            for i in d['indicators']:
+                                # Create IndicatorBlueprint
+                                i['disaggregatable'] = True
+                                try:
+                                    blueprint = IndicatorBlueprint.objects.get(external_id=i['id'])
+                                    serializer = PMPIndicatorBlueprintSerializer(blueprint, data=i)
+                                    if serializer.is_valid():
+                                        serializer.save()
+                                    else:
+                                        raise Exception(serializer.errors)
+                                except IndicatorBlueprint.DoesNotExist:
+                                    serializer = PMPIndicatorBlueprintSerializer(data=i)
+                                    if serializer.is_valid():
+                                        blueprint = serializer.save()
+                                    else:
+                                        raise Exception(serializer.errors)
 
                     # Check if another page exists
                     if list_data['next']:
