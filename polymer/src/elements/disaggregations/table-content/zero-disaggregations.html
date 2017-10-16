@@ -1,36 +1,57 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../../bower_components/app-layout/app-grid/app-grid-style.html">
 
 <link rel="import" href="../../../styles/disaggregation-table-styles.html">
+<link rel="import" href="../../../behaviors/disaggregations.html">
 <link rel="import" href="../disaggregation-table-row.html">
 
 <dom-module id="zero-disaggregations">
   <template>
-    <style include="disaggregation-table-styles app-grid-style"></style>
+    <style include="disaggregation-table-styles"></style>
 
     <div class="app-grid">
-      <template
-          is="dom-repeat"
-          items="[[data.disaggregation]]">
-        <div class="item">
-          <table>
+      <div class="item">
+        <table>
+          <template
+              is="dom-if"
+              if="[[_hasDisaggregationData(data.disaggregation, 0)]]">
             <disaggregation-table-row
-                data="[[_determineTotalRow(item)]]"
+                data="[[_determineTotalRow(data.disaggregation.0)]]"
                 level-reported="[[data.level_reported]]"
                 indicator-type="[[data.display_type]]"
                 row-type="totalsRow"
                 editable="[[editable]]"
-                disagg-index="[[index]]">
+                disagg-index="0">
             </disaggregation-table-row>
-          </table>
-        </div>
-      </template>
+          </template>
+        </table>
+      </div>
+
+      <div class="item">
+        <table>
+          <template
+              is="dom-if"
+              if="[[_hasDisaggregationData(data.disaggregation, 1)]]">
+            <disaggregation-table-row
+                data="[[_determineTotalRow(data.disaggregation.1)]]"
+                level-reported="[[data.level_reported]]"
+                indicator-type="[[data.display_type]]"
+                row-type="totalsRow"
+                editable="[[editable]]"
+                disagg-index="1">
+            </disaggregation-table-row>
+          </template>
+        </table>
+      </div>
     </div>
   </template>
 
   <script>
     Polymer({
       is: 'zero-disaggregations',
+
+      behaviors: [
+        App.Behaviors.DisaggregationBehavior,
+      ],
 
       properties: {
         editable: Number,

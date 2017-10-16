@@ -196,9 +196,17 @@
             break;
         }
 
-        if (totals) {
-          this.set(['totals', index], totals);
+        if (!totals) {
+          return;
         }
+
+        (function (self) {
+          var _totals = self.totals.slice();
+
+          _totals[index] = totals;
+
+          self.set('totals', _totals);
+        }(this));
       },
 
       _cloneData: function (formattedData) {

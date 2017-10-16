@@ -107,16 +107,17 @@
           observer: '_cloneData',
         },
 
-        coords: {
-          type: String,
-          observer: '_bindValidation',
-        },
+        coords: String,
 
         editableBool: {
           type: Boolean,
           computed: '_computeEditableBool(editable)',
         },
       },
+
+      observers: [
+        '_bindValidation(coords, disaggIndex)',
+      ],
 
       listeners: {
         'field-value-changed': '_handleInput',
@@ -171,8 +172,8 @@
         this.set('localData', change);
       },
 
-      _bindValidation: function (coords) {
-        var vName = 'v-' + coords;
+      _bindValidation: function (coords, disaggIndex) {
+        var vName = 'v-' + disaggIndex + '-' + coords;
 
         var validator = {
           validatorName: vName,
