@@ -25,7 +25,6 @@ from .serializers import (
     ClusterObjectivePatchSerializer,
     ClusterActivitySerializer,
     ClusterActivityPatchSerializer,
-    ClusterDashboardSerializer,
     ClusterPartnerDashboardSerializer,
     ResponsePlanClusterDashboardSerializer
 )
@@ -324,39 +323,6 @@ class IndicatorReportsSimpleListAPIView(IndicatorReportsListAPIView):
     """
     serializer_class = ClusterIndicatorReportSimpleSerializer
     pagination_class = filter_class = None
-
-
-class ClusterDashboardAPIView(APIView):
-    """
-    Cluster Dashboard API - GET
-    Authentication required.
-
-    ClusterDashboardAPIView provides a high-level IMO-reserved dashboard info
-    for the specified cluster in a country's response plan
-
-    Parameters:
-    - response_plan_id - Response plan ID
-    - cluster_id - Cluster ID
-
-    Returns:
-        - GET method - ClusterDashboardSerializer object.
-    """
-    permission_classes = (IsAuthenticated, )
-
-    def get_instance(self, request, response_plan_id=None, cluster_id=None):
-        try:
-            instance = Cluster.objects.get(
-                id=cluster_id, response_plan_id=response_plan_id)
-        except Cluster.DoesNotExist:
-            # TODO: log exception
-            raise Http404
-        return instance
-
-    def get(self, request, response_plan_id, cluster_id, *args, **kwargs):
-        cluster = self.get_instance(request, response_plan_id, cluster_id)
-
-        serializer = ClusterDashboardSerializer(instance=cluster)
-        return Response(serializer.data, status=statuses.HTTP_200_OK)
 
 
 class ResponsePlanClusterDashboardAPIView(APIView):
