@@ -6,6 +6,7 @@
 
 <link rel="import" href="../../../../../behaviors/utils.html">
 <link rel="import" href="projects.html">
+<link rel="import" href="activities.html">
 
 <dom-module id="response-parameters-partners-router">
   <template>
@@ -48,7 +49,10 @@
       </template>
 
       <template is="dom-if" if="[[_equals(page, 'activities')]]" restamp="true">
-        TODO: Activities
+        <rp-partners-activities
+          name="activities"
+          route="{{subroute}}">
+        </rp-partners-activities>
       </template>
 
       <template is="dom-if" if="[[_equals(page, 'activity')]]" restamp="true">
