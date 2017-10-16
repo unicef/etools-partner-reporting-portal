@@ -152,31 +152,38 @@ class ResponsePlanClusterDashboardSerializer(serializers.ModelSerializer):
 
     def get_num_of_met_indicator_reports(self, obj):
         return obj.num_of_met_indicator_reports(
-            clusters=self.context['clusters'])
+            clusters=self.context['clusters'],
+            partner=self.context.get('partner', None))
 
     def get_num_of_constrained_indicator_reports(self, obj):
         return obj.num_of_constrained_indicator_reports(
-            clusters=self.context['clusters'])
+            clusters=self.context['clusters'],
+            partner=self.context.get('partner', None))
 
     def num_of_on_track_indicator_reports(self, obj):
         return obj.num_of_on_track_indicator_reports(
-            clusters=self.context['clusters'])
+            clusters=self.context['clusters'],
+            partner=self.context.get('partner', None))
 
     def get_num_of_no_progress_indicator_reports(self, obj):
         return obj.num_of_no_progress_indicator_reports(
-            clusters=self.context['clusters'])
+            clusters=self.context['clusters'],
+            partner=self.context.get('partner', None))
 
     def get_num_of_no_status_indicator_reports(self, obj):
         return obj.num_of_no_status_indicator_reports(
-            clusters=self.context['clusters'])
+            clusters=self.context['clusters'],
+            partner=self.context.get('partner', None))
 
     def get_num_of_due_overdue_indicator_reports(self, obj):
         return obj.num_of_due_overdue_indicator_reports(
-                clusters=self.context['clusters'])
+                clusters=self.context['clusters'],
+                partner=self.context.get('partner', None))
 
     def get_num_of_non_cluster_activities(self, obj):
         return obj.num_of_non_cluster_activities(
-                clusters=self.context['clusters'])
+                clusters=self.context['clusters'],
+                partner=self.context.get('partner', None))
 
     def get_upcoming_indicator_reports(self, obj):
         return ClusterIndicatorReportSerializer(
@@ -198,6 +205,30 @@ class ResponsePlanClusterDashboardSerializer(serializers.ModelSerializer):
                 clusters=self.context['clusters'],
                 limit=10),
             many=True).data
+
+
+class ResponsePlanPartnerDashboardSerializer(ResponsePlanClusterDashboardSerializer):
+    num_of_projects_in_my_organization = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ResponsePlan
+        fields = (
+            'num_of_met_indicator_reports',
+            'num_of_constrained_indicator_reports',
+            'num_of_on_track_indicator_reports',
+            'num_of_no_progress_indicator_reports',
+            'num_of_no_status_indicator_reports',
+            'num_of_due_overdue_indicator_reports',
+            'num_of_non_cluster_activities',
+            'num_of_projects_in_my_organization',
+            'overdue_indicator_reports',
+            # 'constrained_indicator_reports',
+        )
+
+    def get_num_of_projects_in_my_organization(self, obj):
+        return obj.num_of_projects(
+                clusters=self.context['clusters'],
+                partner=self.context.get('partner', None))
 
 
 class ClusterPartnerDashboardSerializer(serializers.ModelSerializer):

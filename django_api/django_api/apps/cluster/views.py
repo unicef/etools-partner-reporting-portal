@@ -26,7 +26,8 @@ from .serializers import (
     ClusterActivitySerializer,
     ClusterActivityPatchSerializer,
     ClusterPartnerDashboardSerializer,
-    ResponsePlanClusterDashboardSerializer
+    ResponsePlanClusterDashboardSerializer,
+    ResponsePlanPartnerDashboardSerializer
 )
 from .filters import (
     ClusterObjectiveFilter,
@@ -330,8 +331,8 @@ class ResponsePlanClusterDashboardAPIView(APIView):
     Repsonse plan dashbaord from a Cluster (non-partner) perspective - GET
     Authentication required.
 
-    ClusterDashboardAPIView provides a high-level IMO-reserved dashboard info
-    for the specified cluster in a country's response plan
+    ResponsePlanClusterDashboardAPIView provides a high-level IMO-reserved
+    dashboard info for the specified response plan.
 
     Parameters:
     - response_plan_id - Response plan ID
@@ -367,6 +368,50 @@ class ResponsePlanClusterDashboardAPIView(APIView):
 
         serializer = ResponsePlanClusterDashboardSerializer(
             instance=response_plan, context={'clusters': clusters})
+        return Response(serializer.data, status=statuses.HTTP_200_OK)
+
+
+class ResponsePlanPartnerDashboardAPIView(ResponsePlanClusterDashboardAPIView):
+    """
+    Cluster Partner Dashboard API - GET
+    Authentication required.
+
+    ResponsePlanPartnerDashboardAPIView provides a high-level
+    partner-reserved dashboard info for the specified response plan
+
+    Kwargs Parameters:
+    - response_plan_id - Response plan ID
+
+    GET Parameters:
+    - cluster_id - Cluster ID
+
+    Returns:
+        - GET method - ClusterPartnerDashboardSerializer object.
+    """
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request, response_plan_id, *args, **kwargs):
+        response_plan = self.get_instance(request, response_plan_id)
+        cluster_ids = request.GET.get('cluster_id', None)
+
+        if not request.user.partner:
+            raise Exception('User has no partner associated')
+
+        # validate this cluster belongs to the response plan
+        if cluster_ids:
+            cluster_ids = cluster_ids.split(',')
+            clusters = Cluster.objects.filter(id__in=cluster_ids,
+                                              response_plan=response_plan)
+            if not clusters:
+                raise Exception('Invalid cluster ids')
+        else:
+            clusters = []
+
+        serializer = ResponsePlanPartnerDashboardSerializer(
+            instance=response_plan, context={
+                'clusters': clusters,
+                'partner': request.user.partner
+            })
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
 

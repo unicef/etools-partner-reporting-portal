@@ -245,6 +245,17 @@ class ResponsePlan(TimeStampedModel):
             count += c.num_of_no_status_indicator_reports(partner=partner)
         return count
 
+    def num_of_projects(self, clusters=None, partner=None):
+        from partner.models import PartnerProject
+
+        if not clusters:
+            clusters = self.all_clusters
+
+        qset = PartnerProject.objects.filter(clusters__in=clusters)
+        if partner:
+            qset = qset.filter(partner=partner)
+        return qset.count()
+
     def _latest_indicator_reports(self, clusters):
         from indicator.models import Reportable, IndicatorReport
         reportables = Reportable.objects.filter(
@@ -280,6 +291,12 @@ class ResponsePlan(TimeStampedModel):
         indicator_reports = self._latest_indicator_reports(clusters)
         indicator_reports = indicator_reports.filter(
             report_status=INDICATOR_REPORT_STATUS.overdue)
+
+        if partner:
+            indicator_reports = indicator_reports.filter(
+                Q(reportable__partner_projects__partner=partner)
+                | Q(reportable__partner_activities__partner=partner)
+            )
 
         if limit:
             indicator_reports = indicator_reports[:limit]
