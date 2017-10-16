@@ -369,7 +369,7 @@ class ResponsePlanClusterDashboardAPIView(APIView):
 
     Parameters:
     - response_plan_id - Response plan ID
-    - cluster_id - Cluster ID
+    - cluster_id - Comma separated lsit of Cluster ID's
 
     Returns:
         - GET method - ClusterDashboardSerializer object.
@@ -387,7 +387,7 @@ class ResponsePlanClusterDashboardAPIView(APIView):
 
     def get(self, request, response_plan_id, *args, **kwargs):
         response_plan = self.get_instance(request, response_plan_id)
-        cluster_ids = request.GET.get('cluster_ids', None)
+        cluster_ids = request.GET.get('cluster_id', None)
 
         # validate this cluster belongs to the response plan
         if cluster_ids:
