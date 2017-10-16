@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import random
 import logging
+from datetime import datetime, timedelta
 from decimal import Decimal
 
 from django.contrib.gis.db import models
@@ -251,6 +252,21 @@ class ResponsePlan(TimeStampedModel):
         return IndicatorReport.objects.filter(
                 reportable__in=reportables).order_by(
                         '-time_period_end').distinct()
+
+    def upcoming_indicator_reports(self, clusters=None, partner=None,
+                                  limit=None, days=15):
+        if not clusters:
+            clusters = self.all_clusters
+
+        days_in_future = datetime.today() + timedelta(days=days)
+        indicator_reports = self._latest_indicator_reports(clusters).filter(
+                report_status=INDICATOR_REPORT_STATUS.due
+            ).filter(
+                due_date__gte=datetime.today()
+            ).filter(
+                due_date__lte=days_in_future
+            )
+        return indicator_reports
 
     def overdue_indicator_reports(self, clusters=None, partner=None,
                                   limit=None):

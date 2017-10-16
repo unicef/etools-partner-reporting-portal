@@ -127,6 +127,7 @@ class ResponsePlanClusterDashboardSerializer(serializers.ModelSerializer):
     num_of_on_track_indicator_reports = serializers.SerializerMethodField()
     num_of_no_progress_indicator_reports = serializers.SerializerMethodField()
     num_of_no_status_indicator_reports = serializers.SerializerMethodField()
+    upcoming_indicator_reports = serializers.SerializerMethodField()
     overdue_indicator_reports = serializers.SerializerMethodField()
 
     class Meta:
@@ -140,7 +141,7 @@ class ResponsePlanClusterDashboardSerializer(serializers.ModelSerializer):
             'num_of_no_status_indicator_reports',
             'num_of_due_overdue_indicator_reports',
             'num_of_non_cluster_activities',
-            # 'new_indicator_reports',
+            'upcoming_indicator_reports',
             'overdue_indicator_reports',
             # 'constrained_indicator_reports',
         )
@@ -176,9 +177,12 @@ class ResponsePlanClusterDashboardSerializer(serializers.ModelSerializer):
         return obj.num_of_non_cluster_activities(
                 clusters=self.context['clusters'])
 
-    def get_new_indicator_reports(self, obj):
+    def get_upcoming_indicator_reports(self, obj):
         return ClusterIndicatorReportSerializer(
-            obj.new_indicator_reports, many=True).data
+            obj.upcoming_indicator_reports(
+                clusters=self.context['clusters'],
+                limit=10, days=15),
+            many=True).data
 
     def get_overdue_indicator_reports(self, obj):
         return ClusterIndicatorReportSerializer(
