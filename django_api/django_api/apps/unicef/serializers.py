@@ -460,3 +460,29 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
             "workspace",
         )
 
+class PMPLLOSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='external_id')
+    cp_output = serializers.PrimaryKeyRelatedField(queryset=PDResultLink.objects.all())
+
+    class Meta:
+        model = LowerLevelOutput
+        fields = (
+            'id',
+            'title',
+            'cp_output'
+        )
+
+class PMPPDResultLinkSerializer(serializers.ModelSerializer):
+    result_link = serializers.CharField(source='external_id')
+    id = serializers.CharField(source='external_cp_output_id')
+    programme_document = serializers.PrimaryKeyRelatedField(queryset=ProgrammeDocument.objects.all())
+
+    class Meta:
+        model = PDResultLink
+        fields = (
+            'id',
+            'title',
+            'result_link',
+            'programme_document'
+        )
+
