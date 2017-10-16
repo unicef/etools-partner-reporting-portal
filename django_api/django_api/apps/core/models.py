@@ -19,7 +19,8 @@ from mptt.models import MPTTModel, TreeForeignKey
 
 from .common import (
     RESPONSE_PLAN_TYPE,
-    INDICATOR_REPORT_STATUS
+    INDICATOR_REPORT_STATUS,
+    OVERALL_STATUS
 )
 from utils.groups.wrappers import GroupWrapper
 
@@ -283,6 +284,19 @@ class ResponsePlan(TimeStampedModel):
         if limit:
             indicator_reports = indicator_reports[:limit]
 
+        return indicator_reports
+
+    def constrained_indicator_reports(self, clusters=None, partner=None,
+                                  limit=None):
+        if not clusters:
+            clusters = self.all_clusters
+
+        indicator_reports = self._latest_indicator_reports(clusters)
+        indicator_reports = indicator_reports.filter(
+            report_status=INDICATOR_REPORT_STATUS.accepted,
+            overall_status=OVERALL_STATUS.constrained).order_by(
+                'reportable__id', '-submission_date'
+            ).distinct('reportable__id')
         return indicator_reports
 
 
