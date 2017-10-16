@@ -46,30 +46,42 @@ class Cluster(TimeStampedModel):
     def num_of_partners(self):
         return self.partners.count()
 
-    @property
-    def num_of_met_indicator_reports(self):
-        return self.met_indicator_reports.count()
+    def num_of_met_indicator_reports(self, partner=None):
+        qset = self.met_indicator_reports
+        if partner:
+            qset = qset.filter(reportable__partner_activities__partner=partner)
+        return qset.count()
 
-    @property
-    def num_of_constrained_indicator_reports(self):
-        return self.constrained_indicator_reports.count()
+    def num_of_constrained_indicator_reports(self, partner=None):
+        qset = self.constrained_indicator_reports
+        if partner:
+            qset = qset.filter(reportable__partner_activities__partner=partner)
+        return qset.count()
 
-    @property
-    def num_of_on_track_indicator_reports(self):
-        return self.on_track_indicator_reports.count()
+    def num_of_on_track_indicator_reports(self, partner=None):
+        qset = self.on_track_indicator_reports
+        if partner:
+            qset = qset.filter(reportable__partner_activities__partner=partner)
+        return qset.count()
 
-    @property
-    def num_of_no_progress_indicator_reports(self):
-        return self.no_progress_indicator_reports.count()
+    def num_of_no_progress_indicator_reports(self, partner=None):
+        qset = self.no_progress_indicator_reports
+        if partner:
+            qset = qset.filter(reportable__partner_activities__partner=partner)
+        return qset.count()
 
-    @property
-    def num_of_no_status_indicator_reports(self):
-        return self.no_status_indicator_reports.count()
+    def num_of_no_status_indicator_reports(self, partner=None):
+        qset = self.no_status_indicator_reports
+        if partner:
+            qset = qset.filter(reportable__partner_activities__partner=partner)
+        return qset.count()
 
-    @property
-    def num_of_non_cluster_activities(self):
-        return self.partner_activities.filter(
-            cluster_activity__isnull=True).count()
+    def num_of_non_cluster_activities(self, partner=None):
+        qset = self.partner_activities.filter(
+            cluster_activity__isnull=True)
+        if partner:
+            qset = qset.filter(partner=partner)
+        return qset.count()
 
     @cached_property
     def partner_activities(self):
@@ -158,14 +170,20 @@ class Cluster(TimeStampedModel):
             overall_status=OVERALL_STATUS.no_status,
         )
 
-    @cached_property
-    def num_of_due_overdue_indicator_reports(self):
+    def num_of_due_overdue_indicator_reports(self, partner=None):
         overdue = self.overdue_indicator_reports
         due = self.due_indicator_reports
+
+        if partner:
+            overdue = overdue.filter(
+                reportable__partner_activities__partner=partner)
+            due = due.filter(
+                reportable__partner_activities__partner=partner)
 
         return overdue.count() + due.count()
 
     def num_of_due_overdue_indicator_reports_partner(self, partner=None):
+        """TODO: delete."""
         overdue = self.overdue_indicator_reports.filter(
             reportable__partner_activities__partner=partner)
 

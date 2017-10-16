@@ -12,7 +12,8 @@ from .views import (
     ClusterPartnerDashboardAPIView,
     ClusterIndicatorsListExcelExportView,
     ClusterIndicatorsLocationListAPIView,
-    ClusterIndicatorsListExcelExportForAnalysisView
+    ClusterIndicatorsListExcelExportForAnalysisView,
+    ResponsePlanClusterDashboardAPIView,
 )
 
 
@@ -43,6 +44,9 @@ urlpatterns = [
 
     url(r'^(?P<response_plan_id>\d+)/(?P<cluster_id>\d+)/cluster-dashboard/$',
         ClusterDashboardAPIView.as_view(),
+        name="cluster-dashboard"),
+    url(r'^(?P<response_plan_id>\d+)/cluster-dashboard/$',
+        ResponsePlanClusterDashboardAPIView.as_view(),
         name="cluster-dashboard"),
 
     url(r'^(?P<response_plan_id>\d+)/(?P<cluster_id>\d+)/partner-dashboard/$',

@@ -10,6 +10,7 @@ from django.core.validators import (
     MaxValueValidator
 )
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.functional import cached_property
 
 from model_utils.models import TimeStampedModel
 from mptt.models import MPTTModel, TreeForeignKey
@@ -149,7 +150,8 @@ class ResponsePlan(TimeStampedModel):
         blank=True,
         verbose_name='End date'
     )
-    workspace = models.ForeignKey('core.Workspace', related_name="response_plans")
+    workspace = models.ForeignKey('core.Workspace',
+                                  related_name="response_plans")
 
     class Meta:
         unique_together = ('title', 'plan_type', 'workspace')
@@ -160,6 +162,84 @@ class ResponsePlan(TimeStampedModel):
     @property
     def documents(self):
         return []  # TODO probably create file field
+
+    @cached_property
+    def all_clusters(self):
+        return self.clusters.all()
+
+    def num_of_partners(self, clusters=None):
+        from partner.models import Partner
+
+        if not clusters:
+            clusters = self.all_clusters
+        return Partner.objects.filter(clusters__in=clusters).distinct().count()
+
+    def num_of_due_overdue_indicator_reports(self,
+                                             clusters=None,
+                                             partner=None):
+        if not clusters:
+            clusters = self.all_clusters
+
+        count = 0
+        for c in clusters:
+            count += c.num_of_due_overdue_indicator_reports(partner=partner)
+        return count
+
+    def num_of_non_cluster_activities(self,
+                                      clusters=None,
+                                      partner=None):
+        if not clusters:
+            clusters = self.all_clusters
+
+        count = 0
+        for c in clusters:
+            count += c.num_of_non_cluster_activities(partner=partner)
+        return count
+
+    def num_of_met_indicator_reports(self, clusters=None, partner=None):
+        if not clusters:
+            clusters = self.all_clusters
+
+        count = 0
+        for c in clusters:
+            count += c.num_of_met_indicator_reports(partner=partner)
+        return count
+
+    def num_of_constrained_indicator_reports(self, clusters=None, partner=None):
+        if not clusters:
+            clusters = self.all_clusters
+
+        count = 0
+        for c in clusters:
+            count += c.num_of_constrained_indicator_reports(partner=partner)
+        return count
+
+    def num_of_on_track_indicator_reports(self, clusters=None, partner=None):
+        if not clusters:
+            clusters = self.all_clusters
+
+        count = 0
+        for c in clusters:
+            count += c.num_of_on_track_indicator_reports(partner=partner)
+        return count
+
+    def num_of_no_progress_indicator_reports(self, clusters=None, partner=None):
+        if not clusters:
+            clusters = self.all_clusters
+
+        count = 0
+        for c in clusters:
+            count += c.num_of_no_progress_indicator_reports(partner=partner)
+        return count
+
+    def num_of_no_status_indicator_reports(self, clusters=None, partner=None):
+        if not clusters:
+            clusters = self.all_clusters
+
+        count = 0
+        for c in clusters:
+            count += c.num_of_no_status_indicator_reports(partner=partner)
+        return count
 
 
 class GatewayType(TimeStampedModel):
