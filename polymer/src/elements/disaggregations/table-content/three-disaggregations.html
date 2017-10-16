@@ -7,65 +7,147 @@
 
 <dom-module id="three-disaggregations">
   <template>
+    <style include="disaggregation-table-styles"></style>
 
-    <style include='disaggregation-table-styles'></style>
+    <div class="app-grid">
+      <div class="item">
+        <table>
+          <template
+              is="dom-if"
+              if="[[_hasDisaggregationData(data.disaggregation, 0)]]">
+            <!-- Column names -->
+            <tr class="horizontal layout headerRow">
+              <th></th>
+              <template
+                  is="dom-repeat"
+                  items="[[columns]]"
+                  as="column">
+                <th>[[_capitalizeFirstLetter(column.value)]]</th>
+              </template>
+              <th>Total</th>
+            </tr>
 
-    <!-- Column names -->
-    <tr class="horizontal layout headerRow">
-      <th></th>
-      <template is="dom-repeat"
-                items="[[columns]]"
-                as="column">
-        <th>[[_capitalizeFirstLetter(column.value)]]</th>
-      </template>
-      <th>Total</th>
-    </tr>
+            <!-- Data rows: outer and middle. -->
+            <template is="dom-repeat"
+                items="[[_determineOuterRows(columns, rows, data.disaggregation.0)]]"
+                as="outerRow">
+              <disaggregation-table-row
+                  data="[[outerRow]]"
+                  indicator-type="[[data.display_type]]"
+                  row-type="outerRow"
+                  disagg-index="0">
+              </disaggregation-table-row>
 
-    <!-- Data rows: outer and middle. -->
-    <template is="dom-repeat"
-              items="[[outerRowsForDisplay]]"
-              as="outerRow">
-      <disaggregation-table-row
-          data="[[outerRow]]"
-          indicator-type="[[data.display_type]]"
-          row-type="outerRow">
-      </disaggregation-table-row>
+              <template
+                  is="dom-repeat"
+                  items="[[_determineMiddleRows(outerRow.id, columns, middleRows, data.disaggregation.0)]]"
+                  as="middleRow">
+                <disaggregation-table-row
+                    data="[[middleRow]]"
+                    level-reported="[[data.level_reported]]"
+                    indicator-type="[[data.display_type]]"
+                    row-type="middleRow"
+                    editable="[[editable]]"
+                    disagg-index="0">
+                </disaggregation-table-row>
+              </template>
+            </template>
 
-      <template
-          is="dom-repeat"
-          items="[[_determineMiddleRows(outerRow.id, columns, middleRows, data)]]"
-          as="middleRow">
-        <disaggregation-table-row
-            data="[[middleRow]]"
-            level-reported="[[data.level_reported]]"
-            indicator-type="[[data.display_type]]"
-            row-type="middleRow"
-            editable="[[editable]]">
-        </disaggregation-table-row>
-      </template>
+            <!-- Totals row -->
+            <disaggregation-table-row
+                data="[[_determineColumnTotalRow(columns, middleRows, data.disaggregation.0)]]"
+                level-reported="[[data.level_reported]]"
+                indicator-type="[[data.display_type]]"
+                row-type="totalsRow"
+                disagg-index="0">
+            </disaggregation-table-row>
 
-   </template>
+            <!-- Bottom table -->
+            <template
+                is="dom-repeat"
+                items="[[_determineBottomRows(middleRows, columns, data.disaggregation.0)]]"
+                as="bottomRow">
+              <disaggregation-table-row
+                  data="[[bottomRow]]"
+                  level-reported="[[data.level_reported]]"
+                  indicator-type="[[data.display_type]]"
+                  row-type="bottomRow"
+                  disagg-index="0">
+              </disaggregation-table-row>
+            </template>
+          </template>
+        </table>
+      </div>
 
-   <!-- Totals row -->
-   <disaggregation-table-row
-      data="[[columnTotalRow]]"
-      level-reported="[[data.level_reported]]"
-      indicator-type="[[data.display_type]]"
-      row-type="totalsRow">
-   </disaggregation-table-row>
+      <div class="item">
+        <table>
+          <template
+              is="dom-if"
+              if="[[_hasDisaggregationData(data.disaggregation, 1)]]">
+            <!-- Column names -->
+            <tr class="horizontal layout headerRow">
+              <th></th>
+              <template
+                  is="dom-repeat"
+                  items="[[columns]]"
+                  as="column">
+                <th>[[_capitalizeFirstLetter(column.value)]]</th>
+              </template>
+              <th>Total</th>
+            </tr>
 
-   <!-- Bottom table -->
-   <template is="dom-repeat"
-             items="[[bottomRows]]"
-             as="bottomRow">
-    <disaggregation-table-row
-        data="[[bottomRow]]"
-        level-reported="[[data.level_reported]]"
-        indicator-type="[[data.display_type]]"
-        row-type="bottomRow">
-    </disaggregation-table-row>
-  </template>
+            <!-- Data rows: outer and middle. -->
+            <template is="dom-repeat"
+                items="[[_determineOuterRows(columns, rows, data.disaggregation.1)]]"
+                as="outerRow">
+              <disaggregation-table-row
+                  data="[[outerRow]]"
+                  indicator-type="[[data.display_type]]"
+                  row-type="outerRow"
+                  disagg-index="1">
+              </disaggregation-table-row>
 
+              <template
+                  is="dom-repeat"
+                  items="[[_determineMiddleRows(outerRow.id, columns, middleRows, data.disaggregation.1)]]"
+                  as="middleRow">
+                <disaggregation-table-row
+                    data="[[middleRow]]"
+                    level-reported="[[data.level_reported]]"
+                    indicator-type="[[data.display_type]]"
+                    row-type="middleRow"
+                    editable="[[editable]]"
+                    disagg-index="1">
+                </disaggregation-table-row>
+              </template>
+            </template>
+
+            <!-- Totals row -->
+            <disaggregation-table-row
+                data="[[_determineColumnTotalRow(columns, middleRows, data.disaggregation.1)]]"
+                level-reported="[[data.level_reported]]"
+                indicator-type="[[data.display_type]]"
+                row-type="totalsRow"
+                disagg-index="1">
+            </disaggregation-table-row>
+
+            <!-- Bottom table -->
+            <template
+                is="dom-repeat"
+                items="[[_determineBottomRows(middleRows, columns, data.disaggregation.1)]]"
+                as="bottomRow">
+              <disaggregation-table-row
+                  data="[[bottomRow]]"
+                  level-reported="[[data.level_reported]]"
+                  indicator-type="[[data.display_type]]"
+                  row-type="bottomRow"
+                  disagg-index="1">
+              </disaggregation-table-row>
+            </template>
+          </template>
+        </table>
+      </div>
+    </div>
   </template>
 
   <script>
@@ -75,10 +157,6 @@
       behaviors: [
         App.Behaviors.UtilsBehavior,
         App.Behaviors.DisaggregationBehavior,
-      ],
-
-      observers: [
-        '_determineTotals(columns, middleRows, data)'
       ],
 
       properties: {
@@ -104,12 +182,6 @@
           type: Array,
           computed: '_getMiddleRows(mapping)',
         },
-
-        outerRowsForDisplay: {
-          type: Array,
-          computed: '_determineOuterRows(columns, rows, data)'
-        },
-
       },
 
       _getColumns: function (mapping) {
@@ -124,11 +196,11 @@
         return (mapping[2] || []).choices;
       },
 
-      _determineOuterRows: function(columns, rows) {
-        return this._determineRows(this, rows, columns);
+      _determineOuterRows: function (columns, rows, data) {
+        return this._determineRows(rows, columns, data);
       },
 
-      _determineMiddleRows: function(outerRowID, columns, middleRows, data) {
+      _determineMiddleRows: function (outerRowID, columns, middleRows, data) {
         if (!columns || !middleRows) {
           return [];
         }
@@ -141,7 +213,7 @@
 
             return {
               key: formatted,
-              data: data.disaggregation[formatted],
+              data: data[formatted],
             };
           }, this);
 
@@ -153,33 +225,34 @@
             id: y.id,
             total: {
               key: formatted,
-              data: data.disaggregation[formatted],
+              data: data[formatted],
             },
           };
         }, this);
       },
 
-      _determineTotals: function(columns, middleRows, data) {
+      _determineColumnTotalRow: function (columns, middleRows, data) {
         var columnData = columns.map(function (z) {
           var formatted = this._formatDisaggregationIds([z.id]);
 
           return {
             key: formatted,
-            data: data.disaggregation[formatted],
+            data: data[formatted],
           };
         }, this);
 
-        var columnTotalRow = {
+        return {
           title: 'total',
           data: columnData,
           total: {
             key: '', // unused
-            data: data.disaggregation['()'],
+            data: data['()'],
           },
         };
+      },
 
-        this.set('columnTotalRow', columnTotalRow);
-        this.set('bottomRows', this._determineRows(this, middleRows, columns));
+      _determineBottomRows: function (middleRows, columns, data) {
+        return this._determineRows(middleRows, columns, data);
       },
     });
   </script>
