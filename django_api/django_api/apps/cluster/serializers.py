@@ -1,12 +1,16 @@
 from rest_framework import serializers
 
-from core.common import FREQUENCY_LEVEL
-from core.models import ResponsePlan
+from core.common import FREQUENCY_LEVEL, OVERALL_STATUS
+from core.models import ResponsePlan, GatewayType
 
+from indicator.models import Reportable, IndicatorLocationData
 from indicator.serializers import (
     ClusterIndicatorReportSerializer,
     ClusterIndicatorReportListSerializer,
+    ReportableSimpleSerializer,
 )
+from partner.models import Partner
+from unicef.models import ProgressReport
 
 from .models import ClusterObjective, ClusterActivity, Cluster
 
@@ -335,3 +339,54 @@ class ClusterPartnerDashboardSerializer(serializers.ModelSerializer):
             'my_project_activities',
             'constrained_indicator_reports',
         )
+
+
+class PartnerAnalysisSummarySerializer(serializers.ModelSerializer):
+    summary = serializers.SerializerMethodField()
+    reportable_list = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Partner
+
+    def get_summary(self, obj):
+        pa_list = obj.partner_activities
+        progress_reports = ProgressReport.objects.filter(
+            indicator_report__reportable__partner_activities=pa_list
+        ).distinct()
+
+        num_met_pr = progress_reports.filter(status=OVERALL_STATUS.Met).count()
+        num_ont_pr = progress_reports.filter(status=OVERALL_STATUS.OnT).count()
+        num_nop_pr = progress_reports.filter(status=OVERALL_STATUS.NoP).count()
+        num_con_pr = progress_reports.filter(status=OVERALL_STATUS.Con).count()
+
+        location_data = IndicatorLocationData.objects.filter(
+            indicator_report__reportable__partner_activities=pa_list)
+
+        location_types = GatewayType.objects.filter(
+            location__indicator_location_data=location_data).distinct()
+
+        num_of_reports_by_location_type = {}
+
+        for location_type in location_types:
+            num_of_reports_by_location_type[str(location_type)] = location_data.filter(location__gateway=location_type).count()
+
+        return {
+            'num_of_activities': pa_list.count(),
+            'recent_progress_reports_by_status': {
+                'met': num_met_pr,
+                'on_track': num_ont_pr,
+                'no_progress': num_nop_pr,
+                'constrained': num_con_pr,
+            },
+            'num_of_reports_by_location_type': num_of_reports_by_location_type,
+            'num_of_projects': obj.partner_projects.count(),
+            'cluster_contributing_to': list(
+                obj.clusters.values_list('type', flat=True).distinct()
+            ),
+        }
+
+    def get_reportable_list(self, obj):
+        reportables = Reportable.objects.filter(
+            partner_activities=obj.partner_activities)
+
+        return ReportableSimpleSerializer(reportables, many=True)
