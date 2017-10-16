@@ -547,3 +547,52 @@ class ClusterIndicatorsLocationListAPIView(ListAPIView):
             | Q(reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)
         ).values_list('reportable__indicator_reports__indicator_location_data__location', flat=True).distinct()
         return Location.objects.filter(pk__in=result)
+
+
+class PartnerAnalysisSummaryAPIView(APIView):
+    """
+    Cluster analysis API for Partner - GET
+    Authentication required.
+
+    PartnerAnalysisSummaryAPIView provides a high-level summary
+    for the specified partner: # of Activities, Recent progresses, etc.
+
+    Parameters:
+    - response_plan_id - Response plan ID
+
+    GET Parameter filters:
+    - partner
+    - project
+    - activity
+    - cluster_activity_indicator
+    - cluster
+    - report_status
+
+    Returns:
+        - GET method - PartnerAnalysisSummarySerializer object.
+    """
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request, *args, **kwargs):
+        return Response({"message": "OK"}, status=statuses.HTTP_200_OK)
+
+
+class PartnerAnalysisIndicatorResultAPIView(APIView):
+    """
+    Data API for given Cluster Partner analysis indicator - GET
+    Authentication required.
+
+    PartnerAnalysisIndicatorResultAPIView provides indicator progress data and
+    IndicatorReport data for current and previous state.
+
+    Parameters:
+    - response_plan_id - Response plan ID
+    - reportable_id - Reportable ID
+
+    Returns:
+        - GET method - PartnerAnalysisIndicatorResultSerializer object.
+    """
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request, response_plan_id, reportable_id, *args, **kwargs):
+        return Response({"message": "OK"}, status=statuses.HTTP_200_OK)
