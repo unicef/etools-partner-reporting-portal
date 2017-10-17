@@ -560,7 +560,7 @@ class PartnerAnalysisSummaryAPIView(APIView):
         partner = get_object_or_404(
             Partner, id=request.query_params.get('partner'))
 
-        if 'project' not in request.query_params:
+        if 'project' in request.query_params:
             project = get_object_or_404(
                 PartnerProject, id=request.query_params.get('project'))
 

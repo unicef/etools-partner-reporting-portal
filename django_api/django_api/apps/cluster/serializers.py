@@ -252,6 +252,10 @@ class PartnerAnalysisSummarySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Partner
+        fields = (
+            'summary',
+            'reportable_list',
+        )
 
     def get_summary(self, obj):
         pa_list = None
@@ -295,8 +299,8 @@ class PartnerAnalysisSummarySerializer(serializers.ModelSerializer):
             for c_type in obj.clusters.values_list('type', flat=True).distinct():
                 cluster_contributing_to.append(CLUSTER_TYPE_NAME_DICT[c_type])
 
-        num_ca = pa_list.filter(cluster_activity__isnull=True).count()
-        num_pa = pa_list.filter(cluster_activity__isnull=False).count()
+        num_ca = pa_list.filter(cluster_activity__isnull=False).count()
+        num_pa = pa_list.filter(cluster_activity__isnull=True).count()
 
         ir_list = []
 
@@ -319,7 +323,7 @@ class PartnerAnalysisSummarySerializer(serializers.ModelSerializer):
             indicator_report__in=indicator_reports)
 
         location_types = GatewayType.objects.filter(
-            locations__indicator_location_data=location_data).distinct()
+            locations__indicator_location_data__in=location_data).distinct()
 
         num_of_reports_by_location_type = {}
 
@@ -343,7 +347,8 @@ class PartnerAnalysisSummarySerializer(serializers.ModelSerializer):
         }
 
     def get_reportable_list(self, obj):
-        reportables = Reportable.objects.filter(
-            partner_activities__in=obj.partner_activities.all())
+        id_list = Reportable.objects.filter(
+            partner_activities__in=obj.partner_activities.all()) \
+            .values_list('id', flat=True)
 
-        return ReportableSimpleSerializer(reportables, many=True)
+        return id_list

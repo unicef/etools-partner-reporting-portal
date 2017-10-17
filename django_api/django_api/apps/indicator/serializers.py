@@ -1031,3 +1031,37 @@ class PMPReportableSerializer(serializers.ModelSerializer):
             'end_date'
         )
 
+
+class ClusterPartnerAnalysisReportableSerializer(ReportableSimpleSerializer):
+    progress_by_location = serializers.SerializerMethodField()
+    indicator_reports = serializers.SerializerMethodField()
+
+    def get_progress_by_location(self, obj):
+        ir_list = []
+
+        for r in reportables:
+            ir_id = r.values_list('indicator_reports', flat=True).latest('id')
+
+            if ir_id:
+                ir_list.append(ir_id)
+
+        indicator_reports = IndicatorReport.objects.filter(
+            id__in=ir_list
+        )
+
+        location_data = IndicatorLocationData.objects.filter(
+            indicator_report__in=indicator_reports)
+
+        locations = Location.objects.filter(indicator_location_data__in=location_data).distinct()
+
+        return {}
+
+    def get_indicator_reports(self, obj):
+        irs = obj.indicator_reports.order_by('-time_period_start')[:2]
+        return IndicatorReportListSerializer(irs, many=True, read_only=True).data
+
+    class Meta(ReportableSimpleSerializer.Meta):
+        fields = ReportableSimpleSerializer.Meta.fields + (
+            'progress_by_location',
+            'indicator_reports',
+        )
