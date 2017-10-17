@@ -564,11 +564,17 @@ class PartnerAnalysisSummaryAPIView(APIView):
             project = get_object_or_404(
                 PartnerProject, id=request.query_params.get('project'))
 
+            if project.partner.id != partner.id:
+                return Response({'message': "project does not belong to partner."}, status=statuses.HTTP_400_BAD_REQUEST)
+
             serializer_context['project'] = project
 
         if 'activity' in request.query_params:
             activity = get_object_or_404(
                 PartnerActivity, id=request.query_params.get('activity'))
+
+            if activity.partner.id != partner.id:
+                return Response({'message': "activity does not belong to partner."}, status=statuses.HTTP_400_BAD_REQUEST)
 
             serializer_context['activity'] = activity
 
@@ -582,6 +588,9 @@ class PartnerAnalysisSummaryAPIView(APIView):
         if 'cluster' in request.query_params:
             cluster = get_object_or_404(
                 Cluster, id=request.query_params.get('cluster'))
+
+            if not partner.clusters.filter(id=cluster.id).exists():
+                return Response({'message': "cluster does not belong to partner."}, status=statuses.HTTP_400_BAD_REQUEST)
 
             serializer_context['cluster'] = cluster
 

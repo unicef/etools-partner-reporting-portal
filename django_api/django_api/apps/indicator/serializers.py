@@ -1037,22 +1037,13 @@ class ClusterPartnerAnalysisReportableSerializer(ReportableSimpleSerializer):
     indicator_reports = serializers.SerializerMethodField()
 
     def get_progress_by_location(self, obj):
-        ir_list = []
-
-        for r in reportables:
-            ir_id = r.values_list('indicator_reports', flat=True).latest('id')
-
-            if ir_id:
-                ir_list.append(ir_id)
-
-        indicator_reports = IndicatorReport.objects.filter(
-            id__in=ir_list
-        )
+        ir_id = obj.values_list('indicator_reports', flat=True).latest('id')
 
         location_data = IndicatorLocationData.objects.filter(
-            indicator_report__in=indicator_reports)
+            indicator_report__pk=ir_id)
 
-        locations = Location.objects.filter(indicator_location_data__in=location_data).distinct()
+        locations = Location.objects.filter(
+            indicator_location_data=location_data).distinct()
 
         return {}
 

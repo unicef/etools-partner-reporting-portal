@@ -290,12 +290,12 @@ class PartnerAnalysisSummarySerializer(serializers.ModelSerializer):
                 elif proj.status == PARTNER_PROJECT_STATUS.completed:
                     projects['completed'].append(proj.title)
 
+        cluster_contributing_to = list()
+
         if 'cluster' in self.context:
-            cluster_contributing_to = list(CLUSTER_TYPE_NAME_DICT[self.context['cluster'].type],)
+            cluster_contributing_to.append(CLUSTER_TYPE_NAME_DICT[self.context['cluster'].type])
 
         else:
-            cluster_contributing_to = list()
-
             for c_type in obj.clusters.values_list('type', flat=True).distinct():
                 cluster_contributing_to.append(CLUSTER_TYPE_NAME_DICT[c_type])
 
