@@ -56,7 +56,10 @@
       </template>
 
       <template is="dom-if" if="[[_equals(page, 'activity')]]" restamp="true">
-        TODO: Activity
+        <rp-partners-activity-detail
+          name="activity"
+          route="{{subroute}}">
+        </rp-partners-activity-detail>
       </template>
     </iron-pages>
   </template>
@@ -94,7 +97,7 @@
         }
 
         // TODO: Remove when other pages are ready.
-        if (page === 'activities' || page === 'contacts') {
+        if (page === 'contacts') {
           return;
         }
 

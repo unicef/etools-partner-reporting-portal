@@ -109,8 +109,7 @@
                 <project-status status="[[activity.status]]"></project-status>
               </div>
               <div class="table-cell table-cell--text">
-                <!-- <a href="[[_detailUrl(activity)]]">[[activity.title]]</a> -->
-                [[activity.title]]
+                <a href="[[_detailUrl(activity)]]">[[activity.title]]</a>
               </div>
               <template is="dom-if" if="[[!_equals(page, 'response-parameters')]]">
                 <div class="table-cell table-cell--text">
@@ -238,14 +237,14 @@
           'details-opened-changed': '_detailsChange'
         },
 
-        // _detailUrl: function(project) {
-        //   var path = '/response-parameters/partners/project/' + project.id;
-        //   if (this.page === 'planned-action') {
-        //     path = '/planned-action/project/' + project.id;
-        //   }
-        //   //Query string is passed to construct the back button.
-        //   return this.buildUrl(this._baseUrlCluster, path) + '?' + this.query;
-        // },
+        _detailUrl: function(activity) {
+          var path = '/response-parameters/partners/activity/' + activity.id;
+          if (this.page === 'planned-action') {
+            path = '/planned-action/activity/' + activity.id;
+          }
+          //Query string is passed to construct the back button.
+          return this.buildUrl(this._baseUrlCluster, path) + '?' + this.query;
+        },
 
         detached: function () {
           this.openedDetails.length = 0;
