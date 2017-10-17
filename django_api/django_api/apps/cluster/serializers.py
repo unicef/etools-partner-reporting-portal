@@ -387,6 +387,6 @@ class PartnerAnalysisSummarySerializer(serializers.ModelSerializer):
 
     def get_reportable_list(self, obj):
         reportables = Reportable.objects.filter(
-            partner_activities=obj.partner_activities)
+            partner_activities__in=obj.partner_activities.all())
 
         return ReportableSimpleSerializer(reportables, many=True)
