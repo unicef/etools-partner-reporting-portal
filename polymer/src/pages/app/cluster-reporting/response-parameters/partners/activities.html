@@ -26,11 +26,11 @@
         params-object="{{queryParams}}">
     </iron-query-params>
 
-<!--     <etools-prp-ajax
-        id="plannedActionsProjects"
+    <etools-prp-ajax
+        id="partnerActivities"
         url="[[url]]"
         params="[[queryParams]]">
-    </etools-prp-ajax> -->
+    </etools-prp-ajax>
 
     <page-body>
 
@@ -44,48 +44,46 @@
     Polymer({
       is: 'rp-partners-activities',
 
-      // observers: [
-      //   '_projectsAjax(queryParams, url)',
-      // ],
+      observers: [
+        '_activitiesAjax(queryParams, url)',
+      ],
 
-      // behaviors: [
-      //   App.Behaviors.ReduxBehavior,
-      //   App.Behaviors.RoutingBehavior,
-      //   App.Behaviors.UtilsBehavior,
-      // ],
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.RoutingBehavior,
+        App.Behaviors.UtilsBehavior,
+      ],
 
-      // properties: {
-      //   queryParams: Object,
+      properties: {
+        queryParams: Object,
 
-      //   responsePlanID: {
-      //     type: String,
-      //     statePath: 'responsePlans.currentID',
-      //   },
+        responsePlanID: {
+          type: String,
+          statePath: 'responsePlans.currentID',
+        },
 
-      //   url: {
-      //     type: String,
-      //     computed: '_computeUrl(responsePlanID)'
-      //   },
-      // },
+        url: {
+          type: String,
+          computed: '_computeUrl(responsePlanID)'
+        },
+      },
 
-      // _computeUrl: function(responsePlanID) {
-      //   return App.Endpoints.plannedActions(responsePlanID);
-      // },
+      _computeUrl: function(responsePlanID) {
+        return App.Endpoints.partnerActivityList(); // TODO: update to the correct one with responseplanid as kwarg
+      },
 
-      // _projectsAjax: function (queryParams) {
-      //   var thunk = this.$.plannedActionsProjects.thunk();
+      _activitiesAjax: function (queryParams) {
+        var thunk = this.$.partnerActivities.thunk();
+        if (!Object.keys(queryParams).length) {
+          return;
+        }
+        this.$.partnerActivities.abort();
 
-      //   if (!Object.keys(queryParams).length) {
-      //     return;
-      //   }
-
-      //   this.$.plannedActionsProjects.abort();
-
-      //   this.dispatch(App.Actions.PartnerProjects.fetchPartnerProjectsList(thunk))
-      //     .catch(function (err) { // jshint ignore:line
-      //         // TODO: error handling.
-      //     });
-      // },
+        this.dispatch(App.Actions.PartnerActivities.fetchPartnerActivitiesList(thunk))
+          .catch(function (err) { // jshint ignore:line
+              // TODO: error handling.
+          });
+      },
 
     });
   </script>

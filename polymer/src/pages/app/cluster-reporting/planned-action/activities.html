@@ -31,8 +31,8 @@
         params-object="{{queryParams}}">
     </iron-query-params>
 
-   <!--  <etools-prp-ajax
-        id="plannedActionsProjects"
+    <etools-prp-ajax
+        id="plannedActionsActivities"
         url="[[url]]"
         params="[[queryParams]]">
     </etools-prp-ajax>
@@ -40,7 +40,7 @@
     <etools-prp-ajax
         id="partnerDetails"
         url="[[partnerDetailsUrl]]">
-    </etools-prp-ajax> -->
+    </etools-prp-ajax>
 
     <page-body>
       <planned-action-activities-filters></planned-action-activities-filters>
@@ -69,72 +69,72 @@
         'modal.activity-added': '_onSuccess'
       },
 
-      // observers: [
-      //   '_projectsAjax(queryParams, url)',
-      // ],
+      observers: [
+        '_activitiesAjax(queryParams, url)',
+      ],
 
-      // behaviors: [
-      //   App.Behaviors.ReduxBehavior,
-      //   App.Behaviors.RoutingBehavior,
-      //   App.Behaviors.UtilsBehavior,
-      // ],
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.RoutingBehavior,
+        App.Behaviors.UtilsBehavior,
+      ],
 
       _onSuccess: function(e, data) {
         console.log("added activity", data)
       },
       properties: {
-      //   queryParams: Object,
+        queryParams: Object,
 
-      //   responsePlanID: {
-      //     type: String,
-      //     statePath: 'responsePlans.currentID',
-      //   },
+        responsePlanID: {
+          type: String,
+          statePath: 'responsePlans.currentID',
+        },
 
-      //   partnerID: {
-      //     type: String,
-      //     statePath: 'partner.current.id',
-      //   },
+        partnerID: {
+          type: String,
+          statePath: 'partner.current.id',
+        },
 
-      //   url: {
-      //     type: String,
-      //     computed: '_computeUrl(responsePlanID, queryParams, partnerID)'
-      //   },
+        url: {
+          type: String,
+          computed: '_computeUrl(responsePlanID, queryParams, partnerID)'
+        },
 
-      //   partnerDetailsUrl: {
-      //     type: String,
-      //     value: App.Endpoints.partnerDetails(),
-      //     observer: '_fetchCurrentPartner',
-      //   },
-      // },
+        partnerDetailsUrl: {
+          type: String,
+          value: App.Endpoints.partnerDetails(),
+          observer: '_fetchCurrentPartner',
+        },
+      },
 
-      // _fetchCurrentPartner: function () {
-      //   var partnerThunk = this.$.partnerDetails.thunk();
+      _fetchCurrentPartner: function () {
+        var partnerThunk = this.$.partnerDetails.thunk();
 
-      //   this.dispatch(App.Actions.fetchPartner(partnerThunk))
-      //       .catch(function (err) { // jshint ignore:line
-      //       // TODO: error handling
-      //       });
-      // },
+        this.dispatch(App.Actions.fetchPartner(partnerThunk))
+            .catch(function (err) { // jshint ignore:line
+            // TODO: error handling
+            });
+      },
 
-      // _computeUrl: function (responsePlanID) {
-      //   return App.Endpoints.plannedActions(responsePlanID);
-      // },
+      _computeUrl: function (responsePlanID) {
+        return App.Endpoints.partnerActivityList();
+      },
 
-      // _projectsAjax: function (queryParams) {
-      //   queryParams.partner = this.partnerID;
+      _activitiesAjax: function (queryParams) {
+        queryParams.partner = this.partnerID;
 
-      //   var thunk = this.$.plannedActionsProjects.thunk();
+        var thunk = this.$.plannedActionsActivities.thunk();
 
-      //   if (!Object.keys(queryParams).length) {
-      //     return;
-      //   }
+        if (!Object.keys(queryParams).length) {
+          return;
+        }
 
-      //   this.$.plannedActionsProjects.abort();
+        this.$.plannedActionsActivities.abort();
 
-      //   this.dispatch(App.Actions.PartnerProjects.fetchPartnerProjectsList(thunk))
-      //     .catch(function (err) { // jshint ignore:line
-      //         // TODO: error handling.
-      //     });
+        this.dispatch(App.Actions.PartnerActivities.fetchPartnerActivitiesList(thunk))
+          .catch(function (err) { // jshint ignore:line
+              // TODO: error handling.
+          });
       },
 
     });

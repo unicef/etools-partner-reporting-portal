@@ -88,63 +88,93 @@
             <div class="table-column">Location</div>
           </etools-data-table-column>
         </etools-data-table-header>
-        <!-- <template
+
+        <template
             id="list"
             is="dom-repeat"
-            items="[[actvities]]"
+            items="[[activities]]"
             as="activity"
             initial-count="[[pageSize]]">
           <etools-prp-data-table-row details-opened="[[detailsOpened]]">
             <div slot="row-data">
               <div class="table-cell table-cell--text">
-                [[_commaSeparatedDictValues(activity.clusters, 'title')]]
+                [[activity.cluster]]
               </div>
               <template is="dom-if" if="[[_equals(page, 'response-parameters')]]">
                 <div class="table-cell table-cell--text">
-                  [[actvity.partner]]
+                  [[activity.partner]]
                 </div>
               </template>
               <div class="table-cell table-cell--text">
                 <project-status status="[[activity.status]]"></project-status>
               </div>
               <div class="table-cell table-cell--text">
-                <a href="[[_detailUrl(activity)]]">[[actvity.title]]</a>
+                <!-- <a href="[[_detailUrl(activity)]]">[[activity.title]]</a> -->
+                [[activity.title]]
               </div>
               <template is="dom-if" if="[[!_equals(page, 'response-parameters')]]">
                 <div class="table-cell table-cell--text">
-                  [[actvity.clusterActivity]]
+                  [[activity.cluster_activity]]
                 </div>
               </template>
               <div class="table-cell table-cell--text">
-                [[_commaSeparatedDictValues(activity.locations, 'title')]]
+                <template is="dom-repeat" items="[[activity.reportables]]" as="report">
+                [[_commaSeparatedDictValues(report.locations, 'title')]]
+              </template>
               </div>
             </div>
             <div slot="row-data-details" class="row-details-expanded-wrapper">
+              <template is="dom-repeat" items="[[activity.reportables]]" as="report">
               <div slot="row-data">
                 <div class="table-cell table-cell--text">
                   <span class="label">Start Date</span>
-                  [[activity.start_date]]
-                  <span class="label">Total Budget</span>
-                  [[activity.total_budget]]
+                  [[report.start_date]]
+<!--                   <span class="label">Total Budget</span>
+                  [[activity.total_budget]] -->
                 </div>
                 <div class="table-cell table-cell--text">
                   <span class="label">End Date</span>
-                  [[activity.end_date]]
-                  <span class="label">Funding Source</span>
-                  [[activity.funding_source]]
+                  [[report.end_date]]
+<!--                   <span class="label">Funding Source</span>
+                  [[activity.funding_source]] -->
                 </div>
-                <div class="table-cell table-cell--text">
+<!--                 <div class="table-cell table-cell--text">
                   <span class="label">Part of a Joint Response Plan</span>
                   [[activity.part_response_plan]]
-                </div>
+                </div> -->
                 <div class="table-cell table-cell--text">
                   <span class="label">Frequency of Reporting</span>
-                  [[activity.frequency]]
+                  [[report.frequency]]
                 </div>
               </div>
+            </template>
+            <template is="dom-if" if="[[!activity.reportables.length]]">
+              <div slot="row-data">
+                <div class="table-cell table-cell--text">
+                  <span class="label">Start Date</span>
+                  ---
+<!--                   <span class="label">Total Budget</span>
+                  [[activity.total_budget]] -->
+                </div>
+                <div class="table-cell table-cell--text">
+                  <span class="label">End Date</span>
+                  ---
+<!--                   <span class="label">Funding Source</span>
+                  [[activity.funding_source]] -->
+                </div>
+<!--                 <div class="table-cell table-cell--text">
+                  <span class="label">Part of a Joint Response Plan</span>
+                  [[activity.part_response_plan]]
+                </div> -->
+                <div class="table-cell table-cell--text">
+                  <span class="label">Frequency of Reporting</span>
+                  ---
+                </div>
+              </div>
+            </template>
             </div>
           </etools-prp-data-table-row>
-        </template> -->
+        </template>
 
         <etools-data-table-footer
             page-size="[[pageSize]]"
@@ -172,41 +202,41 @@
           App.Behaviors.UtilsBehavior,
         ],
 
-        // properties: {
-        //   projects: {
-        //     type: Object,
-        //     statePath: 'partnerProjects.all',
-        //   },
+        properties: {
+          activities: {
+            type: Object,
+            statePath: 'partnerActivities.all',
+          },
 
-        //   loading: {
-        //     type: Boolean,
-        //     statePath: 'partnerProjects.loading'
-        //   },
+          loading: {
+            type: Boolean,
+            statePath: 'partnerActivities.loading'
+          },
 
-        //   totalResults: {
-        //     type: Number,
-        //     statePath: 'partnerProjects.count',
-        //   },
+          totalResults: {
+            type: Number,
+            statePath: 'partnerActivities.count',
+          },
 
-        //   detailsOpened: {
-        //     type: Boolean,
-        //     value: false
-        //   },
+          detailsOpened: {
+            type: Boolean,
+            value: false
+          },
 
-        //   openedDetails: {
-        //     type: Array,
-        //     value: []
-        //   }
-        // },
+          openedDetails: {
+            type: Array,
+            value: []
+          }
+        },
 
-        // _openModal: function () {
-        //   this.$$('#modal').open();
-        // },
+        _openModal: function () {
+          this.$$('#modal').open();
+        },
 
-        // listeners: {
-        //   'page-number-changed': '_pageNumberModified',
-        //   'details-opened-changed': '_detailsChange'
-        // },
+        listeners: {
+          'page-number-changed': '_pageNumberModified',
+          'details-opened-changed': '_detailsChange'
+        },
 
         // _detailUrl: function(project) {
         //   var path = '/response-parameters/partners/project/' + project.id;
@@ -217,9 +247,9 @@
         //   return this.buildUrl(this._baseUrlCluster, path) + '?' + this.query;
         // },
 
-        // detached: function () {
-        //   this.openedDetails.length = 0;
-        // }
+        detached: function () {
+          this.openedDetails.length = 0;
+        }
 
       });
     </script>

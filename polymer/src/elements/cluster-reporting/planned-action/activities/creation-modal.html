@@ -568,11 +568,12 @@
         }
         this.set('activities', []);
         this.set('data.cluster.cluster_activity', undefined);
-        this.set('activitiesUrl', App.Endpoints.clusterActivities(clusterId));
+        this.set('activitiesUrl', App.Endpoints.partnerActivityList()); //TODO: need to include clusterId and results need to be based on it
         this.$.activities.abort();
 
         this.$.activities.thunk()()
             .then(function (res) {
+              console.log('res.data')
               self.set('activities', res.data.results);
             })
             .catch(function (err) { // jshint ignore:line
@@ -662,7 +663,7 @@
         this.$.activity.body = Object.assign({
           partner: this.partner.id,
         }, this.data[this.mode]);
-
+        console.log(this.$.activity.body)
         this.$.activity.thunk()()
             .then(function (res) {
               self.fire('activity-added', res.data);
