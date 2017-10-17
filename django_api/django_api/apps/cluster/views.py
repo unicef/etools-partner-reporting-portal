@@ -17,7 +17,12 @@ from core.serializers import ShortLocationSerializer
 from core.models import Location, ResponsePlan
 from indicator.serializers import ClusterIndicatorReportSerializer, ClusterIndicatorReportSimpleSerializer
 from indicator.models import IndicatorReport
-from cluster.export import XLSXWriter
+from partner.models import (
+    Partner,
+    PartnerProject,
+)
+
+from .export import XLSXWriter
 from .models import ClusterObjective, ClusterActivity, Cluster
 from .serializers import (
     ClusterSimpleSerializer,
@@ -27,7 +32,8 @@ from .serializers import (
     ClusterActivityPatchSerializer,
     ClusterDashboardSerializer,
     ClusterPartnerDashboardSerializer,
-    ResponsePlanClusterDashboardSerializer
+    ResponsePlanClusterDashboardSerializer,
+    PartnerAnalysisSummarySerializer,
 )
 from .filters import (
     ClusterObjectiveFilter,
@@ -574,7 +580,23 @@ class PartnerAnalysisSummaryAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def get(self, request, *args, **kwargs):
-        return Response({"message": "OK"}, status=statuses.HTTP_200_OK)
+        if 'partner' not in request.query_params:
+            return Response({'message': "partner GET parameter is required."}, status=statuses.HTTP_400_BAD_REQUEST)
+
+        if 'project' not in request.query_params:
+            return Response({'message': "project GET parameter is required."}, status=statuses.HTTP_400_BAD_REQUEST)
+
+        partner = get_object_or_404(
+            Partner, id=request.query_params.get('partner'))
+
+        project = get_object_or_404(
+            PartnerProject, id=request.query_params.get('project'))
+
+        serializer = PartnerAnalysisSummarySerializer(partner, context={
+            'project': project,
+        })
+
+        return Response(serializer.data, status=statuses.HTTP_200_OK)
 
 
 class PartnerAnalysisIndicatorResultAPIView(APIView):
