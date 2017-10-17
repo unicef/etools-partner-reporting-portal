@@ -24,7 +24,7 @@
       }
     </style>
 
-    <iron-location query="{{query}}"></iron-location>
+    <iron-location query="{{query}}" path="{{path}}"></iron-location>
 
     <iron-query-params
         params-string="{{query}}"
@@ -79,9 +79,6 @@
         App.Behaviors.UtilsBehavior,
       ],
 
-      _onSuccess: function(e, data) {
-        console.log("added activity", data)
-      },
       properties: {
         queryParams: Object,
 
@@ -89,6 +86,8 @@
           type: String,
           statePath: 'responsePlans.currentID',
         },
+
+        path: String,
 
         partnerID: {
           type: String,
@@ -105,6 +104,12 @@
           value: App.Endpoints.partnerDetails(),
           observer: '_fetchCurrentPartner',
         },
+      },
+
+      _onSuccess: function(e, data) {
+        var path = '/planned-action/activity/' + String(data.id);
+        var url = this.buildUrl(this._baseUrlCluster, path);
+        this.set('path', url);
       },
 
       _fetchCurrentPartner: function () {
