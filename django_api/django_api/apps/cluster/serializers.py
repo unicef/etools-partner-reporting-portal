@@ -1,3 +1,7 @@
+import operator
+
+from django.db.models import Q
+
 from rest_framework import serializers
 
 from core.common import FREQUENCY_LEVEL, OVERALL_STATUS, PARTNER_PROJECT_STATUS, CLUSTER_TYPE_NAME_DICT
@@ -347,8 +351,30 @@ class PartnerAnalysisSummarySerializer(serializers.ModelSerializer):
         }
 
     def get_reportable_list(self, obj):
-        id_list = Reportable.objects.filter(
-            partner_activities__in=obj.partner_activities.all()) \
+        q_list = []
+
+        if 'activity' in self.context:
+            q_list.append(Q(partner_activities=self.context['activity']))
+
+        else:
+            q_list.append(Q(partner_activities__in=obj.partner_activities.all()))
+
+        if 'cluster' in self.context:
+            q_list.append(Q(partner_activities__partner__cluster=self.context['cluster']))
+
+        if 'project' in self.context:
+            q_list.append(Q(partner_activities__project=self.context['project']))
+
+        if 'ca_indicator' in self.context:
+            q_list.append(Q(partner_activities__cluster_activity__reportables=self.context['ca_indicator']))
+
+        if 'report_status' in self.context:
+            q_list.append(Q(partner_activities__reportables__indicator_reports__overall_status__iexact=self.context['report_status']))
+
+        queryset = Reportable.objects.filter(
+            partner_activities__in=obj.partner_activities.all())
+
+        id_list = queryset.filter(reduce(operator.and_, q_list)) \
             .values_list('id', flat=True)
 
         return id_list
