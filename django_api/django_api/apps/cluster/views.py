@@ -16,10 +16,11 @@ from core.paginations import SmallPagination
 from core.serializers import ShortLocationSerializer
 from core.models import Location, ResponsePlan
 from indicator.serializers import ClusterIndicatorReportSerializer, ClusterIndicatorReportSimpleSerializer
-from indicator.models import IndicatorReport
+from indicator.models import IndicatorReport, Reportable
 from partner.models import (
     Partner,
     PartnerProject,
+    PartnerActivity,
 )
 
 from .export import XLSXWriter
@@ -570,7 +571,7 @@ class PartnerAnalysisSummaryAPIView(APIView):
     - partner
     - project
     - activity
-    - cluster_activity_indicator
+    - ca_indicator
     - cluster
     - report_status
 
@@ -586,15 +587,40 @@ class PartnerAnalysisSummaryAPIView(APIView):
         if 'project' not in request.query_params:
             return Response({'message': "project GET parameter is required."}, status=statuses.HTTP_400_BAD_REQUEST)
 
+        serializer_context = {}
+
         partner = get_object_or_404(
             Partner, id=request.query_params.get('partner'))
 
         project = get_object_or_404(
             PartnerProject, id=request.query_params.get('project'))
 
-        serializer = PartnerAnalysisSummarySerializer(partner, context={
-            'project': project,
-        })
+        serializer_context['project'] = project
+
+        if 'activity' in request.query_params:
+            activity = get_object_or_404(
+                PartnerActivity, id=request.query_params.get('activity'))
+
+            serializer_context['activity'] = activity
+
+        if 'ca_indicator' in request.query_params:
+            ca_indicator = get_object_or_404(
+                Reportable,
+                id=request.query_params.get('ca_indicator'))
+
+            serializer_context['ca_indicator'] = cluster_activity_indicator
+
+        if 'cluster' in request.query_params:
+            cluster = get_object_or_404(
+                Cluster, id=request.query_params.get('cluster'))
+
+            serializer_context['cluster'] = cluster
+
+        if 'report_status' in request.query_params:
+            serializer_context['report_status'] = request.query_params.get('report_status')
+
+        serializer = PartnerAnalysisSummarySerializer(
+            partner, context=serializer_context)
 
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
