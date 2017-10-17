@@ -33,7 +33,7 @@ def up_with_bundle():
     """
     Create and start containers with polymer bundle served.
     """
-    local('docker-compose up -f docker-compose.yml -f docker-compose.polymer-bundle.yml')
+    local('docker-compose -f docker-compose.polymer-bundle.yml up --build')
 
 
 def down():
