@@ -349,10 +349,10 @@ class PartnerAnalysisSummarySerializer(serializers.ModelSerializer):
         model = Partner
 
     def get_summary(self, obj):
-        pa_list = obj.partner_activities
+        pa_list = obj.partner_activities.all()
         progress_reports = ProgressReport.objects.filter(
-            indicator_report__reportable__partner_activities=pa_list
-        ).distinct()
+            indicator_reports__reportable__partner_activities__in=pa_list
+        )
 
         num_met_pr = progress_reports.filter(status=OVERALL_STATUS.Met).count()
         num_ont_pr = progress_reports.filter(status=OVERALL_STATUS.OnT).count()
@@ -360,10 +360,10 @@ class PartnerAnalysisSummarySerializer(serializers.ModelSerializer):
         num_con_pr = progress_reports.filter(status=OVERALL_STATUS.Con).count()
 
         location_data = IndicatorLocationData.objects.filter(
-            indicator_report__reportable__partner_activities=pa_list)
+            indicator_report__progress_report__in=progress_reports)
 
         location_types = GatewayType.objects.filter(
-            location__indicator_location_data=location_data).distinct()
+            locations__indicator_location_data=location_data).distinct()
 
         num_of_reports_by_location_type = {}
 
