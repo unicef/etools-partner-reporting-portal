@@ -25,7 +25,6 @@ from .serializers import (
     ClusterObjectivePatchSerializer,
     ClusterActivitySerializer,
     ClusterActivityPatchSerializer,
-    ClusterPartnerDashboardSerializer,
     ResponsePlanClusterDashboardSerializer,
     ResponsePlanPartnerDashboardSerializer
 )
@@ -386,7 +385,7 @@ class ResponsePlanPartnerDashboardAPIView(ResponsePlanClusterDashboardAPIView):
     - cluster_id - Cluster ID
 
     Returns:
-        - GET method - ClusterPartnerDashboardSerializer object.
+        - GET method - ResponsePlanPartnerDashboardSerializer object.
     """
     permission_classes = (IsAuthenticated, )
 
@@ -412,42 +411,6 @@ class ResponsePlanPartnerDashboardAPIView(ResponsePlanClusterDashboardAPIView):
                 'clusters': clusters,
                 'partner': request.user.partner
             })
-        return Response(serializer.data, status=statuses.HTTP_200_OK)
-
-
-class ClusterPartnerDashboardAPIView(APIView):
-    """
-    Cluster Partner Dashboard API - GET
-    Authentication required.
-
-    ClusterPartnerDashboardAPIView provides
-    a high-level partner-reserved dashboard info
-    for the specified cluster in a country's response plan
-
-    Parameters:
-    - response_plan_id - Response plan ID
-    - cluster_id - Cluster ID
-
-    Returns:
-        - GET method - ClusterPartnerDashboardSerializer object.
-    """
-    permission_classes = (IsAuthenticated, )
-
-    def get_instance(self, request, response_plan_id=None, cluster_id=None):
-        try:
-            instance = Cluster.objects.get(
-                id=cluster_id, response_plan_id=response_plan_id)
-        except Cluster.DoesNotExist:
-            # TODO: log exception
-            raise Http404
-        return instance
-
-    def get(self, request, response_plan_id, cluster_id, *args, **kwargs):
-        cluster = self.get_instance(request, response_plan_id, cluster_id)
-        partner = request.user.partner
-
-        serializer = ClusterPartnerDashboardSerializer(
-            instance=cluster, context={'partner': partner})
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
 
