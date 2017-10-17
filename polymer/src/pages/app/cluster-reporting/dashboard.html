@@ -192,9 +192,12 @@
         dataUrl: {
           type: String,
           computed: '_computeDataUrl(responsePlanId, mode, queryParams)',
-          observer: '_fetchData',
         },
       },
+
+      observers: [
+        '_fetchData(dataUrl, queryParams)',
+      ],
 
       listeners: {
         'report-submitted': '_fetchData',
