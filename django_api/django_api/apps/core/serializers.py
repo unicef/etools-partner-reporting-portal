@@ -2,7 +2,7 @@ import hashlib
 
 from rest_framework import serializers
 
-from .models import Workspace, Location, ResponsePlan, Country
+from .models import Workspace, Location, ResponsePlan, Country, GatewayType
 
 
 class CountrySerializer(serializers.ModelSerializer):
@@ -105,3 +105,22 @@ class PMPWorkspaceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Workspace
         fields = ('id', 'name', 'latitude', 'longitude', 'initial_zoom', 'business_area_code', 'country_short_code')
+
+
+class PMPGatewayTypeSerializer(serializers.ModelSerializer):
+    gateway_country = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all(), source="country")
+    pcode = serializers.CharField(source='name')
+
+    class Meta:
+        model = GatewayType
+        fields = ('pcode', 'admin_level', 'gateway_country')
+
+
+class PMPLocationSerializer(serializers.ModelSerializer):
+    pcode = serializers.CharField(source='p_code')
+    name = serializers.CharField(source='title')
+    gateway = serializers.PrimaryKeyRelatedField(queryset=GatewayType.objects.all())
+
+    class Meta:
+        model = Location
+        fields = ('name', 'pcode', 'gateway')

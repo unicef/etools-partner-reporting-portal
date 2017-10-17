@@ -1,13 +1,16 @@
 from django_cron import CronJobBase, Schedule
 
+from django.contrib.contenttypes.models import ContentType
+
 from core.api import PMP_API
-from core.models import Workspace
+from core.models import Workspace, GatewayType, Location
+from core.serializers import PMPGatewayTypeSerializer, PMPLocationSerializer
 
 from unicef.serializers import PMPProgrammeDocumentSerializer, PMPPDPartnerSerializer, PMPPDPersonSerializer, \
     PMPLLOSerializer, PMPPDResultLinkSerializer
-from indicator.serializers import PMPIndicatorBlueprintSerializer
+from indicator.serializers import PMPIndicatorBlueprintSerializer, PMPDisaggregationSerializer, PMPReportableSerializer
 from unicef.models import ProgrammeDocument, Person, LowerLevelOutput, PDResultLink
-from indicator.models import IndicatorBlueprint
+from indicator.models import IndicatorBlueprint, Disaggregation, Reportable
 from partner.models import Partner
 
 class ProgrammeDocumentCronJob(CronJobBase):
@@ -237,6 +240,85 @@ class ProgrammeDocumentCronJob(CronJobBase):
                                     serializer = PMPIndicatorBlueprintSerializer(data=i)
                                     if serializer.is_valid():
                                         blueprint = serializer.save()
+                                    else:
+                                        raise Exception(serializer.errors)
+
+                                locations = list()
+                                for l in i['locations']:
+                                    # Create gateway for location
+                                    # TODO: assign country after PMP add these fields into API
+                                    l['gateway_country'] = workspace.countries.all()[0].id
+                                    l['admin_level'] = 1
+                                    try:
+                                        gateway = GatewayType.objects.get(name=l['pcode'])
+                                        serializer = PMPGatewayTypeSerializer(gateway, data=l)
+                                        if serializer.is_valid():
+                                            gateway = serializer.save()
+                                        else:
+                                            raise Exception(serializer.errors)
+                                    except GatewayType.DoesNotExist:
+                                        serializer = PMPGatewayTypeSerializer(data=l)
+                                        if serializer.is_valid():
+                                            gateway = serializer.save()
+                                        else:
+                                            raise Exception(serializer.errors)
+
+                                    # Create location
+                                    l['gateway'] = gateway.id
+                                    try:
+                                        location = Location.objects.get(p_code=l['pcode'])
+                                        serializer = PMPLocationSerializer(location, data=l)
+                                        if serializer.is_valid():
+                                            serializer.save()
+                                        else:
+                                            raise Exception(serializer.errors)
+                                    except Location.DoesNotExist:
+                                        serializer = PMPLocationSerializer(data=l)
+                                        if serializer.is_valid():
+                                            location = serializer.save()
+                                        else:
+                                            raise Exception(serializer.errors)
+                                    locations.append(location)
+
+                                # Create Disaggregations
+                                disaggregations = list()
+                                for dis in i['disaggregation']:
+                                    dis['active'] = True
+                                    try:
+                                        disaggregation = Disaggregation.objects.get(name=dis['name'])
+                                        serializer = PMPDisaggregationSerializer(disaggregation, data=dis)
+                                        if serializer.is_valid():
+                                            serializer.save()
+                                        else:
+                                            raise Exception(serializer.errors)
+                                    except Disaggregation.DoesNotExist:
+                                        serializer = PMPDisaggregationSerializer(data=dis)
+                                        if serializer.is_valid():
+                                            disaggregation = serializer.save()
+                                        else:
+                                            raise Exception(serializer.errors)
+                                    disaggregations.append(disaggregation)
+
+                                # Create Reportable
+                                i['blueprint_id'] = blueprint.id
+                                i['location_ids'] = [l.id for l in locations]
+                                i['disaggregation_ids'] = [ds.id for ds in disaggregations]
+                                i['is_cluster_indicator'] = True if i['cluster_indicator_id'] else False
+                                i['content_type'] = ContentType.objects.get_for_model(llo).id
+                                i['object_id'] = llo.id
+                                i['start_date'] = item['start_date']
+                                i['end_date'] = item['end_date']
+                                try:
+                                    reportable = Reportable.objects.get(external_id=i['id'])
+                                    serializer = PMPReportableSerializer(reportable, data=i)
+                                    if serializer.is_valid():
+                                        serializer.save()
+                                    else:
+                                        raise Exception(serializer.errors)
+                                except Reportable.DoesNotExist:
+                                    serializer = PMPReportableSerializer(data=i)
+                                    if serializer.is_valid():
+                                        reportable = serializer.save()
                                     else:
                                         raise Exception(serializer.errors)
 
