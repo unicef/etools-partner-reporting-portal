@@ -1,16 +1,15 @@
 from rest_framework import serializers
 
-from core.common import FREQUENCY_LEVEL, OVERALL_STATUS
+from core.common import FREQUENCY_LEVEL, OVERALL_STATUS, PARTNER_PROJECT_STATUS, CLUSTER_TYPE_NAME_DICT
 from core.models import ResponsePlan, GatewayType
 
-from indicator.models import Reportable, IndicatorLocationData
+from indicator.models import Reportable, IndicatorReport, IndicatorLocationData
 from indicator.serializers import (
     ClusterIndicatorReportSerializer,
     ClusterIndicatorReportListSerializer,
     ReportableSimpleSerializer,
 )
 from partner.models import Partner
-from unicef.models import ProgressReport
 
 from .models import ClusterObjective, ClusterActivity, Cluster
 
@@ -255,18 +254,69 @@ class PartnerAnalysisSummarySerializer(serializers.ModelSerializer):
         model = Partner
 
     def get_summary(self, obj):
-        pa_list = obj.partner_activities.all()
-        progress_reports = ProgressReport.objects.filter(
-            indicator_reports__reportable__partner_activities__in=pa_list
+        pa_list = None
+        projects = {
+            'ongoing': [],
+            'planned': [],
+            'completed': [],
+        }
+
+        if 'project' in self.context:
+            pa_list = self.context['project'].partner_activities.all()
+
+            if self.context['project'].status == PARTNER_PROJECT_STATUS.ongoing:
+                projects['ongoing'].append(self.context['project'].title)
+
+            elif self.context['project'].status == PARTNER_PROJECT_STATUS.planned:
+                projects['planned'].append(self.context['project'].title)
+
+            elif self.context['project'].status == PARTNER_PROJECT_STATUS.completed:
+                projects['completed'].append(self.context['project'].title)
+
+        else:
+            pa_list = obj.partner_activities.all()
+
+            for proj in obj.partner_projects.all():
+                if proj.status == PARTNER_PROJECT_STATUS.ongoing:
+                    projects['ongoing'].append(proj.title)
+
+                elif proj.status == PARTNER_PROJECT_STATUS.planned:
+                    projects['planned'].append(proj.title)
+
+                elif proj.status == PARTNER_PROJECT_STATUS.completed:
+                    projects['completed'].append(proj.title)
+
+        if 'cluster' in self.context:
+            cluster_contributing_to = list(CLUSTER_TYPE_NAME_DICT[self.context['cluster'].type],)
+
+        else:
+            cluster_contributing_to = list()
+
+            for c_type in obj.clusters.values_list('type', flat=True).distinct():
+                cluster_contributing_to.append(CLUSTER_TYPE_NAME_DICT[c_type])
+
+        num_ca = pa_list.filter(cluster_activity__isnull=True).count()
+        num_pa = pa_list.filter(cluster_activity__isnull=False).count()
+
+        ir_list = []
+
+        for pa in pa_list:
+            ir_id = pa.reportables.values_list('indicator_reports', flat=True).latest('id')
+
+            if ir_id:
+                ir_list.append(ir_id)
+
+        indicator_reports = IndicatorReport.objects.filter(
+            id__in=ir_list
         )
 
-        num_met_pr = progress_reports.filter(status=OVERALL_STATUS.Met).count()
-        num_ont_pr = progress_reports.filter(status=OVERALL_STATUS.OnT).count()
-        num_nop_pr = progress_reports.filter(status=OVERALL_STATUS.NoP).count()
-        num_con_pr = progress_reports.filter(status=OVERALL_STATUS.Con).count()
+        num_met_pr = indicator_reports.filter(overall_status=OVERALL_STATUS.met).count()
+        num_ont_pr = indicator_reports.filter(overall_status=OVERALL_STATUS.on_track).count()
+        num_nop_pr = indicator_reports.filter(overall_status=OVERALL_STATUS.no_progress).count()
+        num_con_pr = indicator_reports.filter(overall_status=OVERALL_STATUS.constrained).count()
 
         location_data = IndicatorLocationData.objects.filter(
-            indicator_report__progress_report__in=progress_reports)
+            indicator_report__in=indicator_reports)
 
         location_types = GatewayType.objects.filter(
             locations__indicator_location_data=location_data).distinct()
@@ -277,7 +327,10 @@ class PartnerAnalysisSummarySerializer(serializers.ModelSerializer):
             num_of_reports_by_location_type[str(location_type)] = location_data.filter(location__gateway=location_type).count()
 
         return {
-            'num_of_activities': pa_list.count(),
+            'num_of_activities': {
+                'num_of_ca': num_ca,
+                'num_of_pa': num_pa,
+            },
             'recent_progress_reports_by_status': {
                 'met': num_met_pr,
                 'on_track': num_ont_pr,
@@ -285,10 +338,8 @@ class PartnerAnalysisSummarySerializer(serializers.ModelSerializer):
                 'constrained': num_con_pr,
             },
             'num_of_reports_by_location_type': num_of_reports_by_location_type,
-            'num_of_projects': obj.partner_projects.count(),
-            'cluster_contributing_to': list(
-                obj.clusters.values_list('type', flat=True).distinct()
-            ),
+            'num_of_projects': projects,
+            'cluster_contributing_to': cluster_contributing_to,
         }
 
     def get_reportable_list(self, obj):

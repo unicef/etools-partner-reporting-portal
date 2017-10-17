@@ -538,9 +538,6 @@ class PartnerAnalysisSummaryAPIView(APIView):
     PartnerAnalysisSummaryAPIView provides a high-level summary
     for the specified partner: # of Activities, Recent progresses, etc.
 
-    Parameters:
-    - response_plan_id - Response plan ID
-
     GET Parameter filters:
     - partner
     - project
@@ -558,18 +555,16 @@ class PartnerAnalysisSummaryAPIView(APIView):
         if 'partner' not in request.query_params:
             return Response({'message': "partner GET parameter is required."}, status=statuses.HTTP_400_BAD_REQUEST)
 
-        if 'project' not in request.query_params:
-            return Response({'message': "project GET parameter is required."}, status=statuses.HTTP_400_BAD_REQUEST)
-
         serializer_context = {}
 
         partner = get_object_or_404(
             Partner, id=request.query_params.get('partner'))
 
-        project = get_object_or_404(
-            PartnerProject, id=request.query_params.get('project'))
+        if 'project' not in request.query_params:
+            project = get_object_or_404(
+                PartnerProject, id=request.query_params.get('project'))
 
-        serializer_context['project'] = project
+            serializer_context['project'] = project
 
         if 'activity' in request.query_params:
             activity = get_object_or_404(
