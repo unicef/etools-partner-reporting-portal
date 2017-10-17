@@ -1,13 +1,16 @@
 from django_cron import CronJobBase, Schedule
 
+from django.contrib.contenttypes.models import ContentType
+
 from core.api import PMP_API
-from core.models import Workspace
+from core.models import Workspace, GatewayType, Location
+from core.serializers import PMPGatewayTypeSerializer, PMPLocationSerializer
 
 from unicef.serializers import PMPProgrammeDocumentSerializer, PMPPDPartnerSerializer, PMPPDPersonSerializer, \
     PMPLLOSerializer, PMPPDResultLinkSerializer
-from indicator.serializers import PMPIndicatorBlueprintSerializer
+from indicator.serializers import PMPIndicatorBlueprintSerializer, PMPDisaggregationSerializer, PMPReportableSerializer
 from unicef.models import ProgrammeDocument, Person, LowerLevelOutput, PDResultLink
-from indicator.models import IndicatorBlueprint
+from indicator.models import IndicatorBlueprint, Disaggregation, Reportable
 from partner.models import Partner
 
 class ProgrammeDocumentCronJob(CronJobBase):
@@ -16,6 +19,22 @@ class ProgrammeDocumentCronJob(CronJobBase):
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
     code = 'partner.ProgrammeDocumentCronJob'    # a unique code
 
+
+    def process_model(self, process_model, process_serializer, data, filter_dict):
+        try:
+            obj = process_model.objects.get(**filter_dict)
+            serializer = process_serializer(obj, data=data)
+            if serializer.is_valid():
+                serializer.save()
+            else:
+                raise Exception(serializer.errors)
+        except process_model.DoesNotExist:
+            serializer = process_serializer(data=data)
+            if serializer.is_valid():
+                obj = serializer.save()
+            else:
+                raise Exception(serializer.errors)
+        return obj
 
     def do(self):
         """
@@ -53,27 +72,18 @@ class ProgrammeDocumentCronJob(CronJobBase):
                     print "Found %s PDs for %s Workspace (%s)" % (list_data['count'], workspace.title, workspace.business_area_code)
 
                     for item in list_data['results']:
-                        print "Processing PD: %s - " % item['id'],
+                        print "Processing PD: %s" % item['id']
+
+                        # Get partner data
+                        partner_data = item['partner_org']
+
+                        # Skip entries without unicef_vendor_number
+                        if not partner_data['unicef_vendor_number']:
+                            print "No unicef_vendor_number - skipping!"
+                            continue
 
                         # Create/Assign Partner
-                        partner_data = item['partner_org']
-                        try:
-                            # Skip entries without unicef_vendor_number
-                            if not partner_data['unicef_vendor_number']:
-                                print "No unicef_vendor_number - skipping!"
-                                continue
-                            partner = Partner.objects.get(vendor_number=partner_data['unicef_vendor_number'])
-                            serializer = PMPPDPartnerSerializer(partner, data=partner_data)
-                            if serializer.is_valid():
-                                serializer.save()
-                            else:
-                                raise Exception(serializer.errors)
-                        except Partner.DoesNotExist:
-                            serializer = PMPPDPartnerSerializer(data=partner_data)
-                            if serializer.is_valid():
-                                partner = serializer.save()
-                            else:
-                                raise Exception(serializer.errors)
+                        partner = self.process_model(Partner, PMPPDPartnerSerializer, partner_data, {'vendor_number': partner_data['unicef_vendor_number']})
 
                         # Assign partner
                         item['partner'] = partner.id
@@ -105,86 +115,37 @@ class ProgrammeDocumentCronJob(CronJobBase):
 
 
                         # Create PD
-                        try:
-                            pd = ProgrammeDocument.objects.get(external_id=item['id'], workspace=workspace)
-                            print "Found!"
-                            serializer = PMPProgrammeDocumentSerializer(pd, data=item)
-                            if serializer.is_valid():
-                                serializer.save()
-                            else:
-                                raise Exception(serializer.errors)
-                        except ProgrammeDocument.DoesNotExist:
-                            serializer = PMPProgrammeDocumentSerializer(data=item)
-                            print "Created!"
-                            if serializer.is_valid():
-                                pd = serializer.save()
-                            else:
-                                raise Exception(serializer.errors)
+                        pd = self.process_model(ProgrammeDocument, PMPProgrammeDocumentSerializer, item,
+                                                     {'external_id': item['id'], 'workspace': workspace})
 
                         # Create unicef_focal_points
                         person_data_list = item['unicef_focal_points']
                         for person_data in person_data_list:
-                            #print "\tAdding Unicef Focal Point Person: %s" % person_data['email']
-                            try:
-                                # Skip entries without unicef_vendor_number
-                                if not person_data['email']:
-                                    continue
-                                person = Person.objects.get(email=person_data['email'])
-                                serializer = PMPPDPersonSerializer(person, data=person_data)
-                                if serializer.is_valid():
-                                    serializer.save()
-                                else:
-                                    raise Exception(serializer.errors)
-                            except Person.DoesNotExist:
-                                serializer = PMPPDPersonSerializer(data=person_data)
-                                if serializer.is_valid():
-                                    person = serializer.save()
-                                else:
-                                    raise Exception(serializer.errors)
+                            # Skip entries without unicef_vendor_number
+                            if not person_data['email']:
+                                continue
+                            person = self.process_model(Person, PMPPDPersonSerializer, person_data,
+                                                    {'email': person_data['email']})
                             pd.unicef_focal_point.add(person)
 
                         # Create agreement_auth_officers
                         person_data_list = item['agreement_auth_officers']
                         for person_data in person_data_list:
-                            #print "\tAdding Officer Person: %s" % person_data['email']
-                            try:
-                                # Skip entries without unicef_vendor_number
-                                if not person_data['email']:
-                                    continue
-                                person = Person.objects.get(email=person_data['email'])
-                                serializer = PMPPDPersonSerializer(person, data=person_data)
-                                if serializer.is_valid():
-                                    serializer.save()
-                                else:
-                                    raise Exception(serializer.errors)
-                            except Person.DoesNotExist:
-                                serializer = PMPPDPersonSerializer(data=person_data)
-                                if serializer.is_valid():
-                                    person = serializer.save()
-                                else:
-                                    raise Exception(serializer.errors)
+                            # Skip entries without unicef_vendor_number
+                            if not person_data['email']:
+                                continue
+                            person = self.process_model(Person, PMPPDPersonSerializer, person_data,
+                                                        {'email': person_data['email']})
                             pd.unicef_officers.add(person)
 
                         # Create agreement_auth_officers
                         person_data_list = item['focal_points']
                         for person_data in person_data_list:
-                            #print "\tAdding Partner Focal Point Person: %s" % person_data['email']
-                            try:
-                                # Skip entries without unicef_vendor_number
-                                if not person_data['email']:
-                                    continue
-                                person = Person.objects.get(email=person_data['email'])
-                                serializer = PMPPDPersonSerializer(person, data=person_data)
-                                if serializer.is_valid():
-                                    serializer.save()
-                                else:
-                                    raise Exception(serializer.errors)
-                            except Person.DoesNotExist:
-                                serializer = PMPPDPersonSerializer(data=person_data)
-                                if serializer.is_valid():
-                                    person = serializer.save()
-                                else:
-                                    raise Exception(serializer.errors)
+                            # Skip entries without unicef_vendor_number
+                            if not person_data['email']:
+                                continue
+                            person = self.process_model(Person, PMPPDPersonSerializer, person_data,
+                                                        {'email': person_data['email']})
                             pd.partner_focal_point.add(person)
 
                         # Parsing expecting results
@@ -192,53 +153,53 @@ class ProgrammeDocumentCronJob(CronJobBase):
 
                             # Create PDResultLink
                             d['programme_document'] = pd.id
-                            try:
-                                pdresultlink = PDResultLink.objects.get(external_id=d['result_link'], external_cp_output_id=d['id'])
-                                serializer = PMPPDResultLinkSerializer(pdresultlink, data=d)
-                                if serializer.is_valid():
-                                    serializer.save()
-                                else:
-                                    raise Exception(serializer.errors)
-                            except PDResultLink.DoesNotExist:
-                                serializer = PMPPDResultLinkSerializer(data=d)
-                                if serializer.is_valid():
-                                    pdresultlink = serializer.save()
-                                else:
-                                    raise Exception(serializer.errors)
+                            pdresultlink = self.process_model(PDResultLink, PMPPDResultLinkSerializer, d,
+                                                        {'external_id': d['result_link'], 'external_cp_output_id': d['id']})
 
                             # Create LLOs
                             d['cp_output'] = pdresultlink.id
-                            try:
-                                llo = LowerLevelOutput.objects.get(external_id=d['id'])
-                                serializer = PMPLLOSerializer(llo, data=d)
-                                if serializer.is_valid():
-                                    serializer.save()
-                                else:
-                                    raise Exception(serializer.errors)
-                            except LowerLevelOutput.DoesNotExist:
-                                serializer = PMPLLOSerializer(data=d)
-                                if serializer.is_valid():
-                                    llo = serializer.save()
-                                else:
-                                    raise Exception(serializer.errors)
+                            llo = self.process_model(LowerLevelOutput, PMPLLOSerializer, d,
+                                                              {'external_id': d['id']})
 
                             # Iterate over indicators
                             for i in d['indicators']:
                                 # Create IndicatorBlueprint
                                 i['disaggregatable'] = True
-                                try:
-                                    blueprint = IndicatorBlueprint.objects.get(external_id=i['id'])
-                                    serializer = PMPIndicatorBlueprintSerializer(blueprint, data=i)
-                                    if serializer.is_valid():
-                                        serializer.save()
-                                    else:
-                                        raise Exception(serializer.errors)
-                                except IndicatorBlueprint.DoesNotExist:
-                                    serializer = PMPIndicatorBlueprintSerializer(data=i)
-                                    if serializer.is_valid():
-                                        blueprint = serializer.save()
-                                    else:
-                                        raise Exception(serializer.errors)
+                                blueprint = self.process_model(IndicatorBlueprint, PMPIndicatorBlueprintSerializer, i,
+                                                         {'external_id': i['id']})
+
+                                locations = list()
+                                for l in i['locations']:
+                                    # Create gateway for location
+                                    # TODO: assign country after PMP add these fields into API
+                                    l['gateway_country'] = workspace.countries.all()[0].id
+                                    l['admin_level'] = 1
+                                    gateway = self.process_model(GatewayType, PMPGatewayTypeSerializer, l, {'name': l['pcode']})
+
+                                    # Create location
+                                    l['gateway'] = gateway.id
+                                    location = self.process_model(Location, PMPLocationSerializer, l, {'p_code': l['pcode']})
+                                    locations.append(location)
+
+                                # Create Disaggregations
+                                disaggregations = list()
+                                for dis in i['disaggregation']:
+                                    dis['active'] = True
+                                    disaggregation = self.process_model(Disaggregation, PMPDisaggregationSerializer, dis,
+                                                                  {'name': dis['name']})
+                                    disaggregations.append(disaggregation)
+
+                                # Create Reportable
+                                i['blueprint_id'] = blueprint.id
+                                i['location_ids'] = [l.id for l in locations]
+                                i['disaggregation_ids'] = [ds.id for ds in disaggregations]
+                                i['is_cluster_indicator'] = True if i['cluster_indicator_id'] else False
+                                i['content_type'] = ContentType.objects.get_for_model(llo).id
+                                i['object_id'] = llo.id
+                                i['start_date'] = item['start_date']
+                                i['end_date'] = item['end_date']
+                                self.process_model(Reportable, PMPReportableSerializer, i,
+                                                                    {'external_id': i['id']})
 
                     # Check if another page exists
                     if list_data['next']:

@@ -205,7 +205,7 @@ class ProgressReportSimpleSerializer(serializers.ModelSerializer):
         )
 
     def get_is_draft(self, obj):
-        return obj.latest_indicator_report.is_draft
+        return obj.latest_indicator_report.is_draft if obj.latest_indicator_report else None
 
 
 class ProgressReportSerializer(ProgressReportSimpleSerializer):
