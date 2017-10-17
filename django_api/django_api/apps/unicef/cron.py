@@ -3,8 +3,11 @@ from django_cron import CronJobBase, Schedule
 from core.api import PMP_API
 from core.models import Workspace
 
-from unicef.serializers import PMPProgrammeDocumentSerializer, PMPPDPartnerSerializer, PMPPDPersonSerializer
-from unicef.models import ProgrammeDocument, Person
+from unicef.serializers import PMPProgrammeDocumentSerializer, PMPPDPartnerSerializer, PMPPDPersonSerializer, \
+    PMPLLOSerializer, PMPPDResultLinkSerializer
+from indicator.serializers import PMPIndicatorBlueprintSerializer
+from unicef.models import ProgrammeDocument, Person, LowerLevelOutput, PDResultLink
+from indicator.models import IndicatorBlueprint
 from partner.models import Partner
 
 class ProgrammeDocumentCronJob(CronJobBase):
@@ -32,7 +35,9 @@ class ProgrammeDocumentCronJob(CronJobBase):
             indicators: [ ]
         }
         """
-        workspaces = Workspace.objects.all()[:1]
+        # Iterate over all workspaces
+        # TODO: remove filtering for Jordan only - testing country with fulfilled indicators
+        workspaces = Workspace.objects.filter(business_area_code="2340")
         for workspace in workspaces:
             try:
                 # Iterate over all pages
@@ -48,7 +53,7 @@ class ProgrammeDocumentCronJob(CronJobBase):
                     print "Found %s PDs for %s Workspace (%s)" % (list_data['count'], workspace.title, workspace.business_area_code)
 
                     for item in list_data['results']:
-                        print "Processing PD: %s" % item['id']
+                        print "Processing PD: %s - " % item['id'],
 
                         # Create/Assign Partner
                         partner_data = item['partner_org']
@@ -102,6 +107,7 @@ class ProgrammeDocumentCronJob(CronJobBase):
                         # Create PD
                         try:
                             pd = ProgrammeDocument.objects.get(external_id=item['id'], workspace=workspace)
+                            print "Found!"
                             serializer = PMPProgrammeDocumentSerializer(pd, data=item)
                             if serializer.is_valid():
                                 serializer.save()
@@ -109,6 +115,7 @@ class ProgrammeDocumentCronJob(CronJobBase):
                                 raise Exception(serializer.errors)
                         except ProgrammeDocument.DoesNotExist:
                             serializer = PMPProgrammeDocumentSerializer(data=item)
+                            print "Created!"
                             if serializer.is_valid():
                                 pd = serializer.save()
                             else:
@@ -179,6 +186,60 @@ class ProgrammeDocumentCronJob(CronJobBase):
                                 else:
                                     raise Exception(serializer.errors)
                             pd.partner_focal_point.add(person)
+
+                        # Parsing expecting results
+                        for d in item['expected_results']:
+
+                            # Create PDResultLink
+                            d['programme_document'] = pd.id
+                            try:
+                                pdresultlink = PDResultLink.objects.get(external_id=d['result_link'], external_cp_output_id=d['id'])
+                                serializer = PMPPDResultLinkSerializer(pdresultlink, data=d)
+                                if serializer.is_valid():
+                                    serializer.save()
+                                else:
+                                    raise Exception(serializer.errors)
+                            except PDResultLink.DoesNotExist:
+                                serializer = PMPPDResultLinkSerializer(data=d)
+                                if serializer.is_valid():
+                                    pdresultlink = serializer.save()
+                                else:
+                                    raise Exception(serializer.errors)
+
+                            # Create LLOs
+                            d['cp_output'] = pdresultlink.id
+                            try:
+                                llo = LowerLevelOutput.objects.get(external_id=d['id'])
+                                serializer = PMPLLOSerializer(llo, data=d)
+                                if serializer.is_valid():
+                                    serializer.save()
+                                else:
+                                    raise Exception(serializer.errors)
+                            except LowerLevelOutput.DoesNotExist:
+                                serializer = PMPLLOSerializer(data=d)
+                                if serializer.is_valid():
+                                    llo = serializer.save()
+                                else:
+                                    raise Exception(serializer.errors)
+
+                            # Iterate over indicators
+                            for i in d['indicators']:
+                                # Create IndicatorBlueprint
+                                i['disaggregatable'] = True
+                                try:
+                                    blueprint = IndicatorBlueprint.objects.get(external_id=i['id'])
+                                    serializer = PMPIndicatorBlueprintSerializer(blueprint, data=i)
+                                    if serializer.is_valid():
+                                        serializer.save()
+                                    else:
+                                        raise Exception(serializer.errors)
+                                except IndicatorBlueprint.DoesNotExist:
+                                    serializer = PMPIndicatorBlueprintSerializer(data=i)
+                                    if serializer.is_valid():
+                                        blueprint = serializer.save()
+                                    else:
+                                        raise Exception(serializer.errors)
+
                     # Check if another page exists
                     if list_data['next']:
                         print "Found new page"
