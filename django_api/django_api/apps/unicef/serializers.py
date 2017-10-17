@@ -205,7 +205,7 @@ class ProgressReportSimpleSerializer(serializers.ModelSerializer):
         )
 
     def get_is_draft(self, obj):
-        return obj.latest_indicator_report.is_draft
+        return obj.latest_indicator_report.is_draft if obj.latest_indicator_report else None
 
 
 class ProgressReportSerializer(ProgressReportSimpleSerializer):
@@ -458,5 +458,31 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
             "funds_received",
             "funds_received_currency",
             "workspace",
+        )
+
+class PMPLLOSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='external_id')
+    cp_output = serializers.PrimaryKeyRelatedField(queryset=PDResultLink.objects.all())
+
+    class Meta:
+        model = LowerLevelOutput
+        fields = (
+            'id',
+            'title',
+            'cp_output'
+        )
+
+class PMPPDResultLinkSerializer(serializers.ModelSerializer):
+    result_link = serializers.CharField(source='external_id')
+    id = serializers.CharField(source='external_cp_output_id')
+    programme_document = serializers.PrimaryKeyRelatedField(queryset=ProgrammeDocument.objects.all())
+
+    class Meta:
+        model = PDResultLink
+        fields = (
+            'id',
+            'title',
+            'result_link',
+            'programme_document'
         )
 

@@ -74,7 +74,7 @@
         params="[[queryParams]]">
     </etools-prp-ajax>
 
-    <page-header title="Dashboard">
+    <page-header title="{{page_title}}">
       <div class="toolbar">
         <filter-list-by-cluster></filter-list-by-cluster>
       </div>
@@ -130,7 +130,7 @@
             if="[[_equals(mode, 'partner')]]"
             restamp="true">
           <reports-list
-              label="List of overdue indicator reports from last 2 months"
+              label="List of overdue indicator reports"
               collection="overdue_indicator_reports">
           </reports-list>
         </template>
@@ -143,7 +143,7 @@
         <div class="row">
           <reports-list
               label="List of upcoming indicator reports in last 15 days"
-              collection="new_indicator_reports">
+              collection="upcoming_indicator_reports">
           </reports-list>
         </div>
       </template>
@@ -184,15 +184,23 @@
           computed: '_computeMode(accountType)',
         },
 
+        page_title: {
+          type: String,
+          computed: '_computePageTitle(mode)',
+        },
+
         dataUrl: {
           type: String,
           computed: '_computeDataUrl(responsePlanId, mode, queryParams)',
-          observer: '_fetchData',
         },
       },
 
+      observers: [
+        '_fetchData(dataUrl, queryParams)',
+      ],
+
       listeners: {
-        'report-submitted': '_refreshData',
+        'report-submitted': '_fetchData',
       },
 
       _computeMode: function (accountType) {
@@ -205,29 +213,28 @@
         }
       },
 
-      _computeDataUrl: function (responsePlanId, mode, queryParams) {
-        var clusterId = queryParams.cluster_id;
+      _computePageTitle: function(mode) {
+        switch (mode) {
+          case 'partner':
+            return 'Partner Dashboard';
 
-        return clusterId ?
-            App.Endpoints.clusterDashboard(responsePlanId, clusterId, mode) : '';
-      },
-
-      _refreshData: function () {
-        this._fetchData(this.dataUrl);
-      },
-
-      _fetchData: function (url) {
-        if (!url) {
-          return;
+          case 'cluster':
+            return 'Cluster Dashboard';
         }
+      },
 
+      _computeDataUrl: function (responsePlanId, mode) {
+        return App.Endpoints.clusterDashboard(responsePlanId, mode);
+      },
+
+      _fetchData: function () {
         this.debounce('fetch-data', function () {
           var dataThunk = this.$.data.thunk();
 
           this.$.data.abort();
 
           this.dispatch(App.Actions.ClusterDashboardData.fetch(dataThunk));
-        }, 100);
+        }, 300);
       },
 
       detached: function () {
