@@ -96,6 +96,10 @@ from _generate_disaggregation_fake_data import (
     generate_indicator_report_location_disaggregation_ratio_data,
 )
 
+from core.cron import WorkspaceCronJob
+from partner.cron import PartnerCronJob
+from unicef.cron import ProgrammeDocumentCronJob
+
 OVERALL_STATUS_LIST = [x[0] for x in OVERALL_STATUS]
 
 def clean_up_data():
@@ -128,6 +132,39 @@ def clean_up_data():
         CartoDBTable.objects.all().delete()
         Person.objects.all().delete()
         print "All ORM objects deleted"
+
+
+def generate_real_data(fast=True):
+
+    users_to_create = [
+        ('admin_imo', 'admin_imo@notanemail.com', IMORole),
+        ('admin_ao', 'admin_ao@notanemail.com', PartnerAuthorizedOfficerRole),
+        ('admin_pe', 'admin_pe@notanemail.com', PartnerEditorRole),
+        ('admin_pv', 'admin_pv@notanemail.com', PartnerViewerRole),
+    ]
+    users_created = []
+    for u in users_to_create:
+        admin, created = User.objects.get_or_create(username=u[0], defaults={
+            'email': u[1],
+            'is_superuser': True,
+            'is_staff': True,
+        })
+        admin.set_password('Passw0rd!')
+        admin.save()
+        admin.groups.add(u[2].as_group())
+        users_created.append(admin)
+
+    # Generate workspaces
+    workspace_cron = WorkspaceCronJob()
+    workspace_cron.do()
+
+    # Generate partners
+    partner_cron = PartnerCronJob()
+    partner_cron.do()
+
+    # Generate programme documents
+    pd_cron = ProgrammeDocumentCronJob()
+    pd_cron.do(fast)
 
 
 def generate_fake_data(workspace_quantity=10):
