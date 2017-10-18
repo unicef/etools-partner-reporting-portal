@@ -360,7 +360,7 @@ class PartnerAnalysisSummarySerializer(serializers.ModelSerializer):
             q_list.append(Q(partner_activities__in=obj.partner_activities.all()))
 
         if 'cluster' in self.context:
-            q_list.append(Q(partner_activities__partner__cluster=self.context['cluster']))
+            q_list.append(Q(partner_activities__partner__clusters=self.context['cluster']))
 
         if 'project' in self.context:
             q_list.append(Q(partner_activities__project=self.context['project']))
@@ -371,10 +371,7 @@ class PartnerAnalysisSummarySerializer(serializers.ModelSerializer):
         if 'report_status' in self.context:
             q_list.append(Q(partner_activities__reportables__indicator_reports__overall_status__iexact=self.context['report_status']))
 
-        queryset = Reportable.objects.filter(
-            partner_activities__in=obj.partner_activities.all())
-
-        id_list = queryset.filter(reduce(operator.and_, q_list)) \
+        id_list = Reportable.objects.filter(reduce(operator.and_, q_list)) \
             .values_list('id', flat=True)
 
         return id_list

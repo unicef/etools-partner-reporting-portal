@@ -583,7 +583,7 @@ class PartnerAnalysisSummaryAPIView(APIView):
                 Reportable,
                 id=request.query_params.get('ca_indicator'))
 
-            serializer_context['ca_indicator'] = cluster_activity_indicator
+            serializer_context['ca_indicator'] = ca_indicator
 
         if 'cluster' in request.query_params:
             cluster = get_object_or_404(
