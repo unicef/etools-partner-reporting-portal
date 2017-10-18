@@ -1,6 +1,9 @@
 from django_cron import CronJobBase, Schedule
 
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth.models import Group
+
+from account.models import User
 
 from core.api import PMP_API
 from core.models import Workspace, GatewayType, Location
@@ -36,6 +39,18 @@ class ProgrammeDocumentCronJob(CronJobBase):
                 raise Exception(serializer.errors)
         return obj
 
+    def create_user(self, person):
+        # Check if given person already exists in user model (by email)
+
+        user, created = User.objects.get_or_create(email=person.email, username=person.email)
+        if created:
+            user.set_password("Passw0rd!")
+        # Update credentials
+        user.first_name = person.name
+        user.save()
+        return user
+
+
     def do(self):
         """
         Specifically each below expected_results instance has the following
@@ -54,6 +69,8 @@ class ProgrammeDocumentCronJob(CronJobBase):
             indicators: [ ]
         }
         """
+        # Get/Create Group that will be assigned to persons
+        group, created = Group.objects.get_or_create(name="IP Authorized Officer")
         # Iterate over all workspaces
         # TODO: remove filtering for Jordan only - testing country with fulfilled indicators
         workspaces = Workspace.objects.filter(business_area_code="2340")
@@ -138,6 +155,13 @@ class ProgrammeDocumentCronJob(CronJobBase):
                                                         {'email': person_data['email']})
                             pd.unicef_officers.add(person)
 
+                            # Create user for this Person
+                            u = self.create_user(person)
+                            u.partner = partner
+                            u.workspaces.add(workspace)
+                            u.groups.add(group)
+                            u.save()
+
                         # Create agreement_auth_officers
                         person_data_list = item['focal_points']
                         for person_data in person_data_list:
@@ -147,6 +171,13 @@ class ProgrammeDocumentCronJob(CronJobBase):
                             person = self.process_model(Person, PMPPDPersonSerializer, person_data,
                                                         {'email': person_data['email']})
                             pd.partner_focal_point.add(person)
+
+                            # Create user for this Person
+                            u = self.create_user(person)
+                            u.partner = partner
+                            u.save()
+                            u.workspaces.add(workspace)
+                            u.groups.add(group)
 
                         # Parsing expecting results
                         for d in item['expected_results']:
