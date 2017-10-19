@@ -14,9 +14,9 @@
       // activities: activitiesByPartnerProjectIdReducer,
       // activitiesCount: activitiesByPartnerProjectIdCountReducer,
       // activitiesLoading: activitiesByPartnerProjectIdLoadingReducer,
-      // indicators: indicatorsReducer,
-      // indicatorsCount: indicatorsCountReducer,
-      // indicatorsLoading: indicatorsLoadingReducer
+      indicators: indicatorsReducer,
+      indicatorsCount: indicatorsCountReducer,
+      indicatorsLoading: indicatorsLoadingReducer
     });
 
     function partnerActivitiesListReducer(state, action) {
@@ -126,62 +126,62 @@
     //   }
     // }
 
-    // function indicatorsReducer(state, action) {
-    //   if (typeof state === 'undefined') {
-    //     state = {};
-    //   }
+    function indicatorsReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = {};
+      }
 
-    //   switch (action.type) {
-    //     case App.Constants.SET_INDICATORS_BY_PARTNER_PROJECT_ID:
-    //       return (function () {
-    //         var change = {};
+      switch (action.type) {
+        case App.Constants.SET_INDICATORS_BY_PARTNER_ACTIVITY_ID:
+          return (function () {
+            var change = {};
 
-    //         change[action.partnerProjectId] = action.data;
-    //         return Object.assign({}, state, change);
-    //       }());
+            change[action.partnerActivityId] = action.data;
+            return Object.assign({}, state, change);
+          }());
 
-    //     case App.Constants.RESET:
-    //       return {};
+        case App.Constants.RESET:
+          return {};
 
-    //     default:
-    //       return state;
-    //   }
-    // }
+        default:
+          return state;
+      }
+    }
 
-    // function indicatorsCountReducer(state, action) {
-    //   if (typeof state === 'undefined') {
-    //     state = 0;
-    //   }
+    function indicatorsCountReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = 0;
+      }
 
-    //   switch (action.type) {
-    //     case App.Constants.SET_INDICATORS_BY_PARTNER_PROJECT_ID_COUNT:
-    //       return (function () {
-    //         var change = {};
+      switch (action.type) {
+        case App.Constants.SET_INDICATORS_BY_PARTNER_ACTIVITY_ID_COUNT:
+          return (function () {
+            var change = {};
 
-    //         change[action.partnerProjectId] = action.count;
-    //         return Object.assign({}, state, change);
-    //       }());
+            change[action.partnerActivityId] = action.count;
+            return Object.assign({}, state, change);
+          }());
 
-    //     default:
-    //       return state;
-    //   }
-    // }
+        default:
+          return state;
+      }
+    }
 
-    // function indicatorsLoadingReducer(state, action) {
-    //   if (typeof state === 'undefined') {
-    //     state = false;
-    //   }
+    function indicatorsLoadingReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = false;
+      }
 
-    //   switch (action.type) {
-    //     case App.Constants.INDICATORS_BY_PARTNER_PROJECT_ID_LOADING_START:
-    //       return true;
+      switch (action.type) {
+        case App.Constants.INDICATORS_BY_PARTNER_ACTIVITY_ID_LOADING_START:
+          return true;
 
-    //     case App.Constants.INDICATORS_BY_PARTNER_PROJECT_ID_LOADING_STOP:
-    //       return false;
+        case App.Constants.INDICATORS_BY_PARTNER_ACTIVITY_ID_LOADING_STOP:
+          return false;
 
-    //     default:
-    //       return state;
-    //   }
-    // }
+        default:
+          return state;
+      }
+    }
   }());
 </script>

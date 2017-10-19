@@ -33,10 +33,10 @@
       query="{{query}}">
     </iron-location>
 
-<!--     <etools-prp-ajax
-      id="acitivty"
+    <etools-prp-ajax
+      id="activity"
       url="[[overviewUrl]]">
-    </etools-prp-ajax> -->
+    </etools-prp-ajax>
 
     <app-route
       route="{{route}}"
@@ -46,7 +46,7 @@
     </app-route>
 
     <page-header
-        title="[[acitivityData.title]]"
+        title="[[activityData.title]]"
         back="[[backLink]]">
 
       <page-badge
@@ -109,10 +109,10 @@
           value: {}
         },
 
-        // overviewUrl: {
-        //   type: String,
-        //   computed: '_computeOverviewUrl(projectId)'
-        // },
+        overviewUrl: {
+          type: String,
+          computed: '_computeOverviewUrl(activityId)'
+        },
 
         backLink: {
           type: String,

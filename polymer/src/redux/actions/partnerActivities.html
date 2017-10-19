@@ -97,50 +97,50 @@
     //   },
     // };
 
-    // App.Actions.PartnerProjects.indicators = {
-    //   fetch: function (thunk, partnerProjectId) {
-    //     return function (dispatch) {
-    //       dispatch(App.Actions.PartnerProjects.indicators.setLoadingStart());
-    //       return thunk()
-    //         .then(function (res) {
-    //           dispatch(App.Actions.PartnerProjects.indicators.setIndicators(
-    //             partnerProjectId, res.data.results
-    //           ));
-    //           dispatch(App.Actions.PartnerProjects.indicators.setCount(
-    //             partnerProjectId, res.data.count
-    //           ));
-    //           dispatch(App.Actions.PartnerProjects.indicators.setLoadingStop());
-    //         });
-    //     };
-    //   },
+    App.Actions.PartnerActivities.indicators = {
+      fetch: function (thunk, partnerActivityId) {
+        return function (dispatch) {
+          dispatch(App.Actions.PartnerActivities.indicators.setLoadingStart());
+          return thunk()
+            .then(function (res) {
+              dispatch(App.Actions.PartnerActivities.indicators.setIndicators(
+                partnerActivityId, res.data.results
+              ));
+              dispatch(App.Actions.PartnerActivities.indicators.setCount(
+                partnerActivityId, res.data.count
+              ));
+              dispatch(App.Actions.PartnerActivities.indicators.setLoadingStop());
+            });
+        };
+      },
 
-    //   setIndicators: function (partnerProjectId, data) {
-    //     return {
-    //       type: App.Constants.SET_INDICATORS_BY_PARTNER_PROJECT_ID,
-    //       partnerProjectId: partnerProjectId,
-    //       data: data,
-    //     };
-    //   },
+      setIndicators: function (partnerActivityId, data) {
+        return {
+          type: App.Constants.SET_INDICATORS_BY_PARTNER_ACTIVITY_ID,
+          partnerActivityId: partnerActivityId,
+          data: data,
+        };
+      },
 
-    //   setCount: function (partnerProjectId, count) {
-    //     return {
-    //       type: App.Constants.SET_INDICATORS_BY_PARTNER_PROJECT_ID_COUNT,
-    //       partnerProjectId: partnerProjectId,
-    //       count: count,
-    //     };
-    //   },
+      setCount: function (partnerActivityId, count) {
+        return {
+          type: App.Constants.SET_INDICATORS_BY_PARTNER_ACTIVITY_ID_COUNT,
+          partnerActivityId: partnerActivityId,
+          count: count,
+        };
+      },
 
-    //   setLoadingStop: function () {
-    //     return {
-    //       type: App.Constants.INDICATORS_BY_PARTNER_PROJECT_ID_LOADING_STOP,
-    //     };
-    //   },
+      setLoadingStop: function () {
+        return {
+          type: App.Constants.INDICATORS_BY_PARTNER_ACTIVITY_ID_LOADING_STOP,
+        };
+      },
 
-    //   setLoadingStart: function () {
-    //     return {
-    //       type: App.Constants.INDICATORS_BY_PARTNER_PROJECT_ID_LOADING_START,
-    //     };
-    //   },
-    // };
+      setLoadingStart: function () {
+        return {
+          type: App.Constants.INDICATORS_BY_PARTNER_ACTIVITY_ID_LOADING_START,
+        };
+      },
+    };
   }());
 </script>

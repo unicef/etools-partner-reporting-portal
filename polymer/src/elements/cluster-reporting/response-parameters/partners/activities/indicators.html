@@ -33,7 +33,7 @@
         params-object="{{queryParams}}">
     </iron-query-params>
 
-   <!--  <etools-prp-ajax
+    <etools-prp-ajax
         id="indicators"
         url="[[url]]"
         params="[[queryParams]]">
@@ -48,15 +48,15 @@
 
       <indicator-modal
         id="indicatorModal"
-        object-id="[[projectId]]"
-        object-type="PartnerProject">
-      </indicator-modal> -->
+        object-id="[[activityId]]"
+        object-type="PartnerActivity">
+      </indicator-modal>
 
-      <!-- <list-view-indicators
+      <list-view-indicators
           data="[[data]]"
           total-results="[[totalResults]]">
-      </list-view-indicators> -->
-      <h4>TODO: INDICATORS</h4>
+      </list-view-indicators>
+
     </page-body>
   </template>
 
@@ -64,83 +64,82 @@
     Polymer({
       is: 'rp-partner-activity-details-indicators',
 
-      // behaviors: [
-      //   App.Behaviors.ReduxBehavior,
-      //   App.Behaviors.UtilsBehavior,
-      // ],
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.UtilsBehavior,
+      ],
 
-      // properties: {
-      //   queryParams: Object,
+      properties: {
+        queryParams: Object,
 
-      //   projectId: Number,
+        activityId: Number,
 
-      //   data: {
-      //     type: Array,
-      //     computed: '_computeCurrentIndicators(projectId, allIndicators)'
-      //   },
+        data: {
+          type: Array,
+          computed: '_computeCurrentIndicators(activityId, allIndicators)'
+        },
 
-      //   totalResults: {
-      //     type: Number,
-      //     computed: '_computeCurrentIndicatorsCount(projectId, allIndicatorsCount)'
-      //   },
+        totalResults: {
+          type: Number,
+          computed: '_computeCurrentIndicatorsCount(activityId, allIndicatorsCount)'
+        },
 
-      //   url: {
-      //     type: String,
-      //     computed: '_computeUrl(projectId, queryParams)'
-      //   },
+        url: {
+          type: String,
+          computed: '_computeUrl(activityId, queryParams)'
+        },
 
-      //   allIndicators: {
-      //     type: Object,
-      //     statePath: 'partnerProjects.indicators',
-      //   },
+        allIndicators: {
+          type: Object,
+          statePath: 'partnerActivities.indicators',
+        },
 
-      //   allIndicatorsCount: {
-      //     type: Number,
-      //     statePath: 'partnerProjects.indicatorsCount',
-      //   },
-      // },
+        allIndicatorsCount: {
+          type: Number,
+          statePath: 'partnerActivities.indicatorsCount',
+        },
+      },
 
-      // listeners: {
-      //   'indicatorModal.indicator-added': '_onSuccess',
-      // },
+      listeners: {
+        'indicatorModal.indicator-added': '_onSuccess',
+      },
 
-      // observers: [
-      //   '_indicatorsAjax(queryParams, projectId)',
-      // ],
+      observers: [
+        '_indicatorsAjax(queryParams, activityId)',
+      ],
 
-      // _openModal: function () {
-      //   this.$.indicatorModal.open();
-      // },
+      _openModal: function () {
+        this.$.indicatorModal.open();
+      },
 
-      // _onSuccess: function () {
-      //   this._indicatorsAjax();
-      // },
+      _onSuccess: function () {
+        this._indicatorsAjax();
+      },
 
-      // _computeCurrentIndicators: function(projectId, allIndicators) {
-      //   return allIndicators[projectId];
-      // },
+      _computeCurrentIndicators: function(activityId, allIndicators) {
+        return allIndicators[activityId];
+      },
 
-      // _computeCurrentIndicatorsCount: function(projectId, allIndicatorsCount) {
-      //   return allIndicatorsCount[projectId];
-      // },
+      _computeCurrentIndicatorsCount: function(activityId, allIndicatorsCount) {
+        return allIndicatorsCount[activityId];
+      },
 
-      // _computeUrl: function () {
-      //   //Make sure the queryParams are updated before the thunk is created:
-      //   this.set('queryParams.object_id', this.projectId);
+      _computeUrl: function () {
+        //Make sure the queryParams are updated before the thunk is created:
+        this.set('queryParams.object_id', this.activityId);
+        return App.Endpoints.indicators('pa');
+      },
 
-      //   return App.Endpoints.indicators('pp');
-      // },
+      _indicatorsAjax: function () {
+        var thunk = this.$.indicators.thunk();
 
-      // _indicatorsAjax: function () {
-      //   var thunk = this.$.indicators.thunk();
-
-      //   this.$.indicators.abort();
-
-      //   this.dispatch(App.Actions.PartnerProjects.indicators.fetch(thunk, this.projectId))
-      //     .catch(function (err) { // jshint ignore:line
-      //         // TODO: error handling.
-      //     });
-      // },
+        this.$.indicators.abort();
+        console.log('thunk', this.queryParams)
+        this.dispatch(App.Actions.PartnerActivities.indicators.fetch(thunk, this.activityId))
+          .catch(function (err) { // jshint ignore:line
+              // TODO: error handling.
+          });
+      },
     });
   </script>
 </dom-module>

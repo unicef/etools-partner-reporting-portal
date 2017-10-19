@@ -462,6 +462,13 @@
           },
         },
 
+        activitiesParams: {
+          type: Object,
+          value: {
+            page_size: 99999,
+          },
+        },
+
         projectsUrl: {
           type: String,
           computed: '_computeProjectsUrl(responsePlanId)',
@@ -568,12 +575,13 @@
         }
         this.set('activities', []);
         this.set('data.cluster.cluster_activity', undefined);
+        this.set('activitiesParams.cluster_id', clusterId)
         this.set('activitiesUrl', App.Endpoints.partnerActivityList()); //TODO: need to include clusterId and results need to be based on it
         this.$.activities.abort();
 
         this.$.activities.thunk()()
             .then(function (res) {
-              console.log('res.data')
+              console.log('res.data', res.data)
               self.set('activities', res.data.results);
             })
             .catch(function (err) { // jshint ignore:line
