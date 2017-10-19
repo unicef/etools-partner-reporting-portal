@@ -115,25 +115,10 @@
       </div>
 
       <div class="row">
-        <template
-            is="dom-if"
-            if="[[_equals(mode, 'cluster')]]"
-            restamp="true">
-          <reports-list
-              label="List of overdue indicator reports"
-              collection="overdue_indicator_reports">
-          </reports-list>
-        </template>
-
-        <template
-            is="dom-if"
-            if="[[_equals(mode, 'partner')]]"
-            restamp="true">
-          <reports-list
-              label="List of overdue indicator reports"
-              collection="overdue_indicator_reports">
-          </reports-list>
-        </template>
+        <reports-list
+            label="List of overdue indicator reports"
+            collection="overdue_indicator_reports">
+        </reports-list>
       </div>
 
       <template
