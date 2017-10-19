@@ -1,6 +1,6 @@
 import operator
 
-from django.db.models import Q
+from django.db.models import Q, F
 
 from rest_framework import serializers
 
@@ -297,11 +297,17 @@ class PartnerAnalysisSummarySerializer(serializers.ModelSerializer):
         cluster_contributing_to = list()
 
         if 'cluster' in self.context:
-            cluster_contributing_to.append(CLUSTER_TYPE_NAME_DICT[self.context['cluster'].type])
+            cluster_contributing_to.append({
+                'id': self.context['cluster'].id,
+                'title': CLUSTER_TYPE_NAME_DICT[self.context['cluster'].type]
+            })
 
         else:
-            for c_type in obj.clusters.values_list('type', flat=True).distinct():
-                cluster_contributing_to.append(CLUSTER_TYPE_NAME_DICT[c_type])
+            for c_info in obj.clusters.values('id', 'type').distinct():
+                cluster_contributing_to.append({
+                    'id': c_info['id'],
+                    'title': CLUSTER_TYPE_NAME_DICT[c_type]
+                })
 
         num_ca = pa_list.filter(cluster_activity__isnull=False).count()
         num_pa = pa_list.filter(cluster_activity__isnull=True).count()
@@ -371,7 +377,7 @@ class PartnerAnalysisSummarySerializer(serializers.ModelSerializer):
         if 'report_status' in self.context:
             q_list.append(Q(partner_activities__reportables__indicator_reports__overall_status__iexact=self.context['report_status']))
 
-        id_list = Reportable.objects.filter(reduce(operator.and_, q_list)) \
-            .values_list('id', flat=True)
+        id_list = Reportable.objects.annotate(title=F('blueprint__title')).filter(reduce(operator.and_, q_list)) \
+            .values('id', 'title')
 
         return id_list
