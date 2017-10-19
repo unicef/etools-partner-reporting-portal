@@ -15,7 +15,10 @@ from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
 from core.serializers import ShortLocationSerializer
 from core.models import Location, ResponsePlan
-from indicator.serializers import ClusterIndicatorReportSerializer, ClusterIndicatorReportSimpleSerializer
+from indicator.serializers import (
+    ClusterIndicatorReportSerializer, ClusterIndicatorReportSimpleSerializer,
+    ClusterPartnerAnalysisIndicatorResultSerializer,
+)
 from indicator.models import IndicatorReport, Reportable
 from partner.models import (
     Partner,
@@ -616,9 +619,14 @@ class PartnerAnalysisIndicatorResultAPIView(APIView):
     - reportable_id - Reportable ID
 
     Returns:
-        - GET method - PartnerAnalysisIndicatorResultSerializer object.
+        - GET method - ClusterPartnerAnalysisIndicatorResultSerializer object.
     """
     permission_classes = (IsAuthenticated, )
 
     def get(self, request, response_plan_id, reportable_id, *args, **kwargs):
-        return Response({"message": "OK"}, status=statuses.HTTP_200_OK)
+        reportable = get_object_or_404(
+            Reportable, id=reportable_id)
+
+        serializer = ClusterPartnerAnalysisIndicatorResultSerializer(reportable)
+
+        return Response(serializer.data, status=statuses.HTTP_200_OK)
