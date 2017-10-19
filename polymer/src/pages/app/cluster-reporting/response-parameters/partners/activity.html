@@ -34,7 +34,7 @@
     </iron-location>
 
     <etools-prp-ajax
-      id="activity"
+      id="overview"
       url="[[overviewUrl]]">
     </etools-prp-ajax>
 
@@ -54,7 +54,7 @@
       </page-badge>
 
       <div class="toolbar">
-        <project-status status="[[data.status]]"></project-status>
+        <project-status status="[[activityData.status]]"></project-status>
       </div>
 
       <div class="tabs">
@@ -141,7 +141,7 @@
       },
 
       attached: function () {
-        var thunk = this.$.activity.thunk();
+        var thunk = this.$.overview.thunk();
         var self = this;
         thunk()
           .then(function (res) {

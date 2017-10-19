@@ -134,7 +134,6 @@
         var thunk = this.$.indicators.thunk();
 
         this.$.indicators.abort();
-
         this.dispatch(App.Actions.PartnerActivities.indicators.fetch(thunk, this.activityId))
           .catch(function (err) { // jshint ignore:line
               // TODO: error handling.
