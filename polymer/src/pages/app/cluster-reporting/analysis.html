@@ -2,7 +2,6 @@
 
 <link rel="import" href="../../../elements/page-header.html">
 <link rel="import" href="../../../elements/page-body.html">
-<link rel="import" href="../../../elements/cluster-reporting/activity-modal.html">
 
 <dom-module id="page-cluster-reporting-analysis">
   <template>
@@ -15,30 +14,12 @@
     <page-header title="Analysis"></page-header>
 
     <page-body>
-      <activity-modal
-          id="activityModal">
-      </activity-modal>
-
-      <button on-tap="_testModal">TEST</button>
-
     </page-body>
   </template>
 
   <script>
     Polymer({
       is: 'page-cluster-reporting-analysis',
-
-      listeners: {
-        'activityModal.activity-added': '_onSuccess',
-      },
-
-      _testModal: function () {
-        this.$.activityModal.open();
-      },
-
-      _onSuccess: function (e, data) {
-        console.log('Added activity', data);
-      },
     });
   </script>
 </dom-module>
