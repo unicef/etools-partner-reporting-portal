@@ -38,4 +38,4 @@ class Command(BaseCommand):
 
         generate_fake_data(options['quantity'])
 
-        print "Fake data are generated! :D"
+        print("Fake data are generated! :D")

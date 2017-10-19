@@ -634,11 +634,11 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
         serializer = ProgrammeDocumentCalculationMethodsSerializer(
             data=request.data)
         if serializer.is_valid():
-            print serializer.validated_data
+            print(serializer.validated_data)
             for llo_and_indicators in serializer.validated_data[
                     'll_outputs_and_indicators']:
                 for indicator_blueprint in llo_and_indicators['indicators']:
-                    print indicator_blueprint
+                    print(indicator_blueprint)
                     instance = get_object_or_404(IndicatorBlueprint,
                                                  id=indicator_blueprint['id'])
                     instance.calculation_formula_across_periods = \

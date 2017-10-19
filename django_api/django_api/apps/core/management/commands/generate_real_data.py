@@ -32,4 +32,4 @@ class Command(BaseCommand):
 
         generate_real_data(fast=options['fast'])
 
-        print u"Synchronization complete! ༼ つ ◕_◕ ༽つ"
+        print("Synchronization complete! ༼ つ ◕_◕ ༽つ")

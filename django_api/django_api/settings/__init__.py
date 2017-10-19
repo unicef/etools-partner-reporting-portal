@@ -4,12 +4,16 @@ import os
 # import defaults
 from .base import *
 
+# This will make sure the app is always imported when
+# Django starts so that shared_task will use this app.
+from django_api.apps.core.celery import app as celery_app
+
+__all__ = ['celery_app']
 
 overrides = __import__(
-    ENV,
+    'django_api.settings.{}'.format(ENV),
     globals(),
     locals(),
-    ['settings']
 )
 
 # apply imported overrides
