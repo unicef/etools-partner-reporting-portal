@@ -82,10 +82,10 @@
       properties: {
         queryParams: Object,
 
-        // responsePlanID: {
-        //   type: String,
-        //   statePath: 'responsePlans.currentID',
-        // },
+        responsePlanID: {
+          type: String,
+          statePath: 'responsePlans.currentID',
+        },
 
         path: String,
 
@@ -121,14 +121,13 @@
             });
       },
 
-      _computeUrl: function () {
+      _computeUrl: function (responsePlanID) {
         // TODO: update to response plan id as kwarg passing it to this func
-        return App.Endpoints.partnerActivityList(); 
+        return App.Endpoints.partnerActivityList(responsePlanID); 
       },
 
       _activitiesAjax: function (queryParams) {
         queryParams.partner = this.partnerID;
-
         var thunk = this.$.plannedActionsActivities.thunk();
 
         if (!Object.keys(queryParams).length) {
