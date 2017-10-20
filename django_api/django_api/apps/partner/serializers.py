@@ -101,7 +101,8 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
         return str(obj.id)
 
     def get_frequency(self, obj):
-        return obj.reportables.first().get_frequency_display()
+        r = obj.reportables.first()
+        return r.get_frequency_display() if r else '---'
 
     def get_partner(self, obj):
         return obj.partner and str(obj.partner_id)

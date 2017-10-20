@@ -65,6 +65,12 @@ def fixtures(quantity=40):
 
     print "Fake data generated!"
 
+def real_fixtures():
+    """
+    Uses real sync with PMP API to get all data.
+    """
+    local('docker-compose exec django_api python manage.py generate_real_data --clean_before --fast')
+
 def remove_untagged_images():
     """
     Delete all untagged (<none>) images

@@ -114,22 +114,29 @@
       },
 
       _projectsAjax: function (queryParams) {
-        queryParams.partner = this.partnerID;
+        this.debounce('projects-ajax', function () {
+          queryParams.partner = this.partnerID;
 
-        var thunk = this.$.plannedActionsProjects.thunk();
+          var thunk = this.$.plannedActionsProjects.thunk();
 
-        if (!Object.keys(queryParams).length) {
-          return;
-        }
+          if (!Object.keys(queryParams).length) {
+            return;
+          }
 
-        this.$.plannedActionsProjects.abort();
+          this.$.plannedActionsProjects.abort();
 
-        this.dispatch(App.Actions.PartnerProjects.fetchPartnerProjectsList(thunk))
-          .catch(function (err) { // jshint ignore:line
-              // TODO: error handling.
-          });
+          this.dispatch(App.Actions.PartnerProjects.fetchPartnerProjectsList(thunk))
+            .catch(function (err) { // jshint ignore:line
+                // TODO: error handling.
+            });
+        }, 300);
       },
 
+      detached: function () {
+        if (this.isDebouncerActive('projects-ajax')) {
+          this.cancelDebouncer('projects-ajax');
+        }
+      },
     });
   </script>
 </dom-module>

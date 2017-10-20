@@ -995,3 +995,39 @@ class PMPIndicatorBlueprintSerializer(serializers.ModelSerializer):
             'title',
             'disaggregatable',
         )
+
+class PMPDisaggregationSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='external_id')
+
+    class Meta:
+        model = Disaggregation
+        fields = (
+            'id',
+            'name',
+            'active',
+        )
+
+class PMPReportableSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='external_id')
+    title = serializers.CharField(source='means_of_verification')
+    blueprint_id = serializers.PrimaryKeyRelatedField(queryset=IndicatorBlueprint.objects.all(), source="blueprint")
+    location_ids = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all(), many=True, source="locations")
+    disaggregation_ids = serializers.PrimaryKeyRelatedField(queryset=Disaggregation.objects.all(), many=True, allow_null=True, source="disaggregations")
+
+    class Meta:
+        model = Reportable
+        fields = (
+            'id',
+            'target',
+            'baseline',
+            'title',
+            'is_cluster_indicator',
+            'blueprint_id',
+            'location_ids',
+            'disaggregation_ids',
+            'content_type',
+            'object_id',
+            'start_date',
+            'end_date'
+        )
+

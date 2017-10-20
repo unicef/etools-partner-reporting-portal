@@ -98,18 +98,26 @@
       },
 
       _clusterObjectivesAjax: function (queryParams) {
-        var thunk = this.$.objectives.thunk();
+        this.debounce('cluster-objectives-ajax', function () {
+          var thunk = this.$.objectives.thunk();
 
-        if (!Object.keys(queryParams).length) {
-          return;
+          if (!Object.keys(queryParams).length) {
+            return;
+          }
+
+          this.$.objectives.abort();
+
+          this.dispatch(App.Actions.ClusterObjectives.fetchClusterObjectivesList(thunk))
+            .catch(function (err) { // jshint ignore:line
+                // TODO: error handling.
+            });
+        }, 300);
+      },
+
+      detached: function () {
+        if (this.isDebouncerActive('cluster-objectives-ajax')) {
+          this.cancelDebouncer('cluster-objectives-ajax');
         }
-
-        this.$.objectives.abort();
-
-        this.dispatch(App.Actions.ClusterObjectives.fetchClusterObjectivesList(thunk))
-          .catch(function (err) { // jshint ignore:line
-              // TODO: error handling.
-          });
       },
     });
   </script>
