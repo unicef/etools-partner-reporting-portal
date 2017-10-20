@@ -540,6 +540,11 @@ def generate_fake_data(workspace_quantity=10):
     print "Generating IndicatorLocationData for Ratio type"
     generate_indicator_report_location_disaggregation_ratio_data()
 
+    # Fulfill submission date for closed IR
     IndicatorReport.objects.filter(
-        report_status=INDICATOR_REPORT_STATUS.submitted
+        report_status__in=(INDICATOR_REPORT_STATUS.submitted, INDICATOR_REPORT_STATUS.accepted)
     ).update(submission_date=today)
+    # Null submission date for open IR
+    IndicatorReport.objects.exclude(
+        report_status__in=(INDICATOR_REPORT_STATUS.submitted, INDICATOR_REPORT_STATUS.accepted)
+    ).update(submission_date=None)
