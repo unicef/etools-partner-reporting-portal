@@ -22,7 +22,9 @@ class PMP_API(object):
         headers['Keep-Alive'] = '1800'
         if data:
             headers['Content-Length'] = len(data)
-        headers['Authorization'] = 'Basic ' + base64.b64encode('%s:%s' % (self.username, self.password))
+
+        auth_pair_str = '%s:%s' % (self.username, self.password)
+        headers['Authorization'] = 'Basic ' + base64.b64encode(auth_pair_str.encode()).decode()
         self.headers = headers
 
     def _push_request(self, data=None, timeout=None):
