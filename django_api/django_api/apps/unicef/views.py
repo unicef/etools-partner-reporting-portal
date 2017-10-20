@@ -477,7 +477,7 @@ class ProgressReportSubmitAPIView(APIView):
             # Check if all indicator data is fulfilled for IR status different then Met or No Progress
             if ir.overall_status not in (OVERALL_STATUS.met, OVERALL_STATUS.no_progress):
                 for data in ir.indicator_location_data.all():
-                    for key, vals in data.disaggregation.iteritems():
+                    for key, vals in data.disaggregation.items():
                         if ir.is_percentage and (vals.get('c', None) in [None, '']):
                             _errors = [{
                                 "message": "You have not completed all required indicators for this progress report. Unless your Output status is Met or has No Progress, all indicator data needs to be completed."}]

@@ -426,10 +426,10 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
                 + "extra combination pair keys"
             )
 
-        valid_level_reported_key_count = len(filter(
+        valid_level_reported_key_count = len(list(filter(
             lambda key: len(key) == data['level_reported'],
             valid_disaggregation_value_pairs
-        ))
+        )))
         level_reported_key_count = 0
 
         # Disaggregation data coordinate space check from level_reported
