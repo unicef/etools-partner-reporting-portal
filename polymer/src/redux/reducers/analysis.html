@@ -9,23 +9,42 @@
 
     App.Reducers.Analysis = Redux.combineReducers({
       partner: Redux.combineReducers({
-        data: partnerAnalysisDataReducer,
+        data: Redux.combineReducers({
+          summary: partnerAnalysisSummaryReducer,
+          reportables: partnerAnalysisReportablesReducer,
+        }),
         loading: partnerAnalysisLoadingReducer,
       }),
     });
 
-
-    function partnerAnalysisDataReducer(state, action) {
+    function partnerAnalysisSummaryReducer(state, action) {
       if (typeof state === 'undefined') {
         state = {};
       }
 
       switch (action.type) {
-        case App.Constants.SET_PARTNER_ANALYSIS_DATA:
+        case App.Constants.SET_PARTNER_ANALYSIS_SUMMARY:
           return action.data;
 
         case App.Constants.RESET:
           return {};
+
+        default:
+          return state;
+      }
+    }
+
+    function partnerAnalysisReportablesReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = [];
+      }
+
+      switch (action.type) {
+        case App.Constants.SET_PARTNER_ANALYSIS_REPORTABLES:
+          return action.data;
+
+        case App.Constants.RESET:
+          return [];
 
         default:
           return state;
@@ -38,10 +57,10 @@
       }
 
       switch (action.type) {
-        case App.Constants.PARTNER_ANALYSIS_DATA_LOADING_START:
+        case App.Constants.PARTNER_ANALYSIS_LOADING_START:
           return true;
 
-        case App.Constants.PARTNER_ANALYSIS_DATA_LOADING_STOP:
+        case App.Constants.PARTNER_ANALYSIS_LOADING_STOP:
           return false;
 
         default:

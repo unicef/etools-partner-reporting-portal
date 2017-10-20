@@ -1,0 +1,98 @@
+
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/google-chart/google-chart.html">
+
+<link rel="import" href="../../../styles/analysis-widget.html">
+<link rel="import" href="../../chart-legend.html">
+
+<dom-module id="analysis-reports-by-status">
+  <template>
+    <style include="analysis-widget-styles">
+      google-chart {
+        width: 100px;
+        height: 100px;
+        margin-bottom: 1.5em;
+      }
+    </style>
+
+    <div class="widget-container">
+      <h3 class="widget-heading">Recent Progress Reports by Status</h3>
+
+      <google-chart
+          type="pie"
+          options="[[chartOptions]]"
+          data="[[chartData]]">
+      </google-chart>
+
+      <chart-legend
+          rows="[[chartRows]]"
+          colors="[[colors]]">
+      </chart-legend>
+    </div>
+  </template>
+
+  <script>
+    Polymer({
+      id: 'analysis-reports-by-status',
+
+      properties: {
+        data: Object,
+
+        chartOptions: {
+          type: Object,
+          computed: '_computeChartOptions(colors)',
+        },
+
+        chartRows: {
+          type: Array,
+          computed: '_computeChartRows(data)',
+        },
+
+        chartData: {
+          type: Array,
+          computed: '_computeChartData(chartRows)',
+        },
+
+        colors: {
+          type: Array,
+          value: [
+            '#029a53',
+            '#2bb0f2',
+            '#d8d8d8',
+            '#fecc02',
+          ],
+        },
+      },
+
+      _computeChartOptions: function (colors) {
+        return {
+          chartArea: {
+            left: 0,
+            top: 0,
+            width: '100%',
+            height: '100%',
+          },
+          enableInteractivity: false,
+          legend: 'none',
+          pieSliceText: 'none',
+          colors: colors,
+        };
+      },
+
+      _computeChartRows: function (data) {
+        return [
+          ['Met', data.met],
+          ['On Track', data.on_track],
+          ['No Progress', data.no_progress],
+          ['Constrained', data.constrained],
+        ];
+      },
+
+      _computeChartData: function (chartRows) {
+        return [
+          ['Report Status', 'Count'],
+        ].concat(chartRows);
+      },
+    });
+  </script>
+</dom-module>

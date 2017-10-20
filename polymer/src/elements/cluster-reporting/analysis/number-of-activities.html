@@ -1,0 +1,94 @@
+
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/google-chart/google-chart.html">
+
+<link rel="import" href="../../../styles/analysis-widget.html">
+<link rel="import" href="../../chart-legend.html">
+
+<dom-module id="analysis-number-of-activities">
+  <template>
+    <style include="analysis-widget-styles">
+      google-chart {
+        width: 100px;
+        height: 100px;
+        margin-bottom: 1.5em;
+      }
+    </style>
+
+    <div class="widget-container">
+      <h3 class="widget-heading">Number of Activities</h3>
+
+      <google-chart
+          type="pie"
+          options="[[chartOptions]]"
+          data="[[chartData]]">
+      </google-chart>
+
+      <chart-legend
+          rows="[[chartRows]]"
+          colors="[[colors]]">
+      </chart-legend>
+    </div>
+  </template>
+
+  <script>
+    Polymer({
+      id: 'analysis-number-of-activities',
+
+      properties: {
+        data: Object,
+
+        chartOptions: {
+          type: Object,
+          computed: '_computeChartOptions(colors)',
+        },
+
+        chartRows: {
+          type: Array,
+          computed: '_computeChartRows(data)',
+        },
+
+        chartData: {
+          type: Array,
+          computed: '_computeChartData(chartRows)',
+        },
+
+        colors: {
+          type: Array,
+          value: [
+            '#029a53',
+            '#2bb0f2',
+          ],
+        },
+      },
+
+      _computeChartOptions: function (colors) {
+        return {
+          chartArea: {
+            left: 0,
+            top: 0,
+            width: '100%',
+            height: '100%',
+          },
+          enableInteractivity: false,
+          legend: 'none',
+          pieSliceText: 'none',
+          colors: colors,
+        };
+      },
+
+      _computeChartRows: function (data) {
+        return [
+          ['Cluster Activities', data.num_of_ca],
+          ['Partner-specific Activities', data.num_of_pa],
+        ];
+      },
+
+      _computeChartData: function (chartRows) {
+        return [
+          ['Activity Type', 'Count'],
+        ].concat(chartRows);
+      },
+    });
+  </script>
+</dom-module>

@@ -6,7 +6,8 @@
 <link rel="import" href="../../../../redux/store.html">
 <link rel="import" href="../../../../redux/actions/analysis.html">
 <link rel="import" href="../../../../elements/etools-prp-ajax.html">
-<link rel="import" href="../../../../elements/cluster-reporting/analysis/partnerFilters.html">
+<link rel="import" href="../../../../elements/cluster-reporting/analysis/partner-filters.html">
+<link rel="import" href="../../../../elements/cluster-reporting/analysis/partner-summary.html">
 
 <dom-module id="partner-analysis">
   <template>
@@ -33,9 +34,7 @@
 
     <partner-analysis-filters></partner-analysis-filters>
 
-    <div>
-
-    </div>
+    <partner-analysis-summary></partner-analysis-summary>
   </template>
 
   <script>
@@ -49,11 +48,6 @@
       properties: {
         queryParams: Object,
 
-        data: {
-          type: Object,
-          statePath: 'analysis.partner.data',
-        },
-
         dataUrl: {
           type: String,
           value: App.Endpoints.partnerAnalysis(),
@@ -62,11 +56,6 @@
         dataParams: {
           type: Object,
           computed: '_computeDataParams(queryParams)',
-        },
-
-        loading: {
-          type: Boolean,
-          statePath: 'analysis.partner.loading',
         },
       },
 

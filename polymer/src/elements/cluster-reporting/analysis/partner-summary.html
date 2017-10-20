@@ -1,0 +1,75 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../../../../bower_components/etools-content-panel/etools-content-panel.html">
+<link rel="import" href="../../../../bower_components/etools-loading/etools-loading.html">
+
+<link rel="import" href="../../../redux/store.html">
+<link rel="import" href="number-of-activities.html">
+<link rel="import" href="reports-by-status.html">
+<link rel="import" href="number-of-projects.html">
+
+<dom-module id="partner-analysis-summary">
+  <template>
+    <style include="app-grid-style">
+      :host {
+        display: block;
+        margin-bottom: 25px;
+
+        --app-grid-columns: 3;
+        --app-grid-gutter: 25px;
+        --app-grid-item-height: auto;
+
+        --ecp-content: {
+          min-height: 150px;
+          padding: 0;
+        };
+      }
+    </style>
+
+    <etools-content-panel panel-title="Summary">
+      <div class="app-grid">
+        <div class="item">
+          <analysis-number-of-activities
+              data="[[data.num_of_activities]]">
+          </analysis-number-of-activities>
+        </div>
+        <div class="item">
+          <analysis-reports-by-status
+              data="[[data.recent_progress_reports_by_status]]">
+          </analysis-reports-by-status>
+        </div>
+        <div class="item">
+          TODO
+        </div>
+        <div class="item">
+          <analysis-number-of-projects
+              data="[[data.num_of_projects]]">
+          </analysis-number-of-projects>
+        </div>
+      </div>
+      <etools-loading active="[[loading]]"></etools-loading>
+    </etools-content-panel>
+  </template>
+
+  <script>
+    Polymer({
+      id: 'partner-analysis-summary',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        data: {
+          type: Object,
+          statePath: 'analysis.partner.data.summary',
+        },
+
+        loading: {
+          type: Boolean,
+          statePath: 'analysis.partner.loading',
+        },
+      },
+    });
+  </script>
+</dom-module>

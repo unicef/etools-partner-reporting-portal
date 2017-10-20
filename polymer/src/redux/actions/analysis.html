@@ -13,7 +13,10 @@
 
           return thunk()
             .then(function (res) {
-              dispatch(App.Actions.Analysis.setPartner(res.data));
+              var data = res.data;
+
+              dispatch(App.Actions.Analysis.setPartnerSummary(data.summary));
+              dispatch(App.Actions.Analysis.setPartnerReportables(data.reportable_list));
               dispatch(App.Actions.Analysis.partnerLoadingStop());
             })
             .catch(function () {
@@ -22,9 +25,16 @@
         };
       },
 
-      setPartner: function (data) {
+      setPartnerSummary: function (data) {
         return {
-          type: App.Constants.SET_PARTNER_ANALYSIS_DATA,
+          type: App.Constants.SET_PARTNER_ANALYSIS_SUMMARY,
+          data: data,
+        };
+      },
+
+      setPartnerReportables: function (data) {
+        return {
+          type: App.Constants.SET_PARTNER_ANALYSIS_REPORTABLES,
           data: data,
         };
       },
