@@ -12,6 +12,7 @@
 <link rel="import" href="../../frequency-of-reporting.html">
 <link rel="import" href="../../etools-prp-progress-bar.html">
 <link rel="import" href="../../labelled-item.html">
+<link rel="import" href="../../list-placeholder.html">
 <link rel="import" href="../../../styles/table-styles.html">
 
 <dom-module id="activities-list">
@@ -144,6 +145,11 @@
           </div>
         </etools-data-table-row>
       </template>
+
+      <list-placeholder
+          data="[[data]]"
+          loading="[[loading]]">
+      </list-placeholder>
 
       <footer>
         <a href="[[activitiesUrl]]">See more</a>
