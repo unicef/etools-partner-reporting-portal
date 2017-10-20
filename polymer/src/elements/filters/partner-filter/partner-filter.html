@@ -37,6 +37,10 @@
       ],
 
       properties: {
+        value: String,
+
+        required: Boolean,
+
         partnerNamesUrl: {
           type: String,
           computed: '_computeUrl(responsePlanID)',
@@ -57,9 +61,8 @@
         data: {
           type: Array,
           value: [],
+          observer: '_updateValue',
         },
-
-        value: String,
       },
 
       _computeUrl: function (responsePlanID) {
@@ -77,14 +80,24 @@
 
         this.$.partnerNames.thunk()()
             .then(function (res) {
-              self.set('data', [{
+              var data = self.required ? [] : [{
                 id: '',
                 title: 'All',
-              }].concat(res.data));
+              }];
+
+              self.set('data', data.concat(res.data));
             })
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
             });
+      },
+
+      _updateValue: function (data) {
+        if (!data.length) {
+          return;
+        }
+
+        this.set('value', this.data[0].id);
       },
 
       detached: function () {

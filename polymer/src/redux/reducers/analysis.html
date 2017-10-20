@@ -1,0 +1,52 @@
+<link rel="import" href="../redux.html">
+<link rel="import" href="../../constants.html">
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Reducers = App.Reducers || {};
+
+    App.Reducers.Analysis = Redux.combineReducers({
+      partner: Redux.combineReducers({
+        data: partnerAnalysisDataReducer,
+        loading: partnerAnalysisLoadingReducer,
+      }),
+    });
+
+
+    function partnerAnalysisDataReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = {};
+      }
+
+      switch (action.type) {
+        case App.Constants.SET_PARTNER_ANALYSIS_DATA:
+          return action.data;
+
+        case App.Constants.RESET:
+          return {};
+
+        default:
+          return state;
+      }
+    }
+
+    function partnerAnalysisLoadingReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = false;
+      }
+
+      switch (action.type) {
+        case App.Constants.PARTNER_ANALYSIS_DATA_LOADING_START:
+          return true;
+
+        case App.Constants.PARTNER_ANALYSIS_DATA_LOADING_STOP:
+          return false;
+
+        default:
+          return state;
+      }
+    }
+  }());
+</script>

@@ -1,0 +1,45 @@
+<link rel="import" href="../../constants.html">
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Actions = App.Actions || {};
+
+    App.Actions.Analysis = {
+      fetchPartner: function (thunk) {
+        return function (dispatch) {
+          dispatch(App.Actions.Analysis.partnerLoadingStart());
+
+          return thunk()
+            .then(function (res) {
+              dispatch(App.Actions.Analysis.setPartner(res.data));
+              dispatch(App.Actions.Analysis.partnerLoadingStop());
+            })
+            .catch(function () {
+              dispatch(App.Actions.Analysis.partnerLoadingStop());
+            });
+        };
+      },
+
+      setPartner: function (data) {
+        return {
+          type: App.Constants.SET_PARTNER_ANALYSIS_DATA,
+          data: data,
+        };
+      },
+
+      partnerLoadingStart: function () {
+        return {
+          type: App.Constants.PARTNER_ANALYSIS_LOADING_START,
+        };
+      },
+
+      partnerLoadingStop: function () {
+        return {
+          type: App.Constants.PARTNER_ANALYSIS_LOADING_STOP,
+        };
+      },
+    };
+  }());
+</script>

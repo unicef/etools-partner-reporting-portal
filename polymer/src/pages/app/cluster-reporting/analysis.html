@@ -1,7 +1,14 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../../../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../../../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../../../bower_components/app-route/app-route.html">
 
+<link rel="import" href="../../../behaviors/utils.html">
 <link rel="import" href="../../../elements/page-header.html">
 <link rel="import" href="../../../elements/page-body.html">
+<link rel="import" href="analysis/cluster.html">
+<link rel="import" href="analysis/partner.html">
 
 <dom-module id="page-cluster-reporting-analysis">
   <template>
@@ -11,15 +18,76 @@
       }
     </style>
 
-    <page-header title="Analysis"></page-header>
+    <app-route
+        route="{{route}}"
+        pattern="/:tab"
+        data="{{routeData}}">
+    </app-route>
+
+    <page-header title="Analysis">
+      <div class="tabs">
+        <paper-tabs
+            selected="{{tab}}"
+            attr-for-selected="name"
+            scrollable
+            hide-scroll-buttons>
+          <paper-tab name="cluster">Cluster</paper-tab>
+          <paper-tab name="partner">Partner</paper-tab>
+        </paper-tabs>
+      </div>
+    </page-header>
 
     <page-body>
+      <iron-pages
+          selected="[[tab]]"
+          attr-for-selected="name">
+        <template
+            is="dom-if"
+            if="[[_equals(tab, 'cluster')]]"
+            restamp="true">
+          <cluster-analysis name="cluster"></cluster-analysis>
+        </template>
+
+        <template
+            is="dom-if"
+            if="[[_equals(tab, 'partner')]]"
+            restamp="true">
+          <partner-analysis name="partner"></partner-analysis>
+        </template>
+      </iron-pages>
     </page-body>
   </template>
 
   <script>
     Polymer({
       is: 'page-cluster-reporting-analysis',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+      ],
+
+      properties: {
+        queryParams: Object,
+
+        tab: {
+          type: String,
+          observer: '_tabChanged',
+        },
+      },
+
+      observers: [
+        '_routeTabChanged(routeData.tab)',
+      ],
+
+      _tabChanged: function (tab) {
+        if (tab !== this.routeData.tab) {
+          this.set('route.path', tab);
+        }
+      },
+
+      _routeTabChanged: function (tab) {
+        this.tab = tab || 'cluster';
+      },
     });
   </script>
 </dom-module>
