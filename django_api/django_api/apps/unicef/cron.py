@@ -13,7 +13,7 @@ from unicef.serializers import PMPProgrammeDocumentSerializer, PMPPDPartnerSeria
     PMPLLOSerializer, PMPPDResultLinkSerializer
 from indicator.serializers import PMPIndicatorBlueprintSerializer, PMPDisaggregationSerializer, PMPReportableSerializer
 from unicef.models import ProgrammeDocument, Person, LowerLevelOutput, PDResultLink
-from indicator.models import IndicatorBlueprint, Disaggregation, Reportable
+from indicator.models import IndicatorBlueprint, Disaggregation, Reportable, DisaggregationValue
 from partner.models import Partner
 
 class ProgrammeDocumentCronJob(CronJobBase):
@@ -197,10 +197,21 @@ class ProgrammeDocumentCronJob(CronJobBase):
 
                             # Iterate over indicators
                             for i in d['indicators']:
-                                # Create IndicatorBlueprint
-                                i['disaggregatable'] = True
-                                blueprint = self.process_model(IndicatorBlueprint, PMPIndicatorBlueprintSerializer, i,
-                                                         {'external_id': i['id']})
+                                # Check if indicator is cluster indicator
+                                i['is_cluster_indicator'] = True if i['cluster_indicator_id'] else False
+
+                                # If indicator is not cluster, create Blueprint otherwise use parent Blueprint
+                                if i['is_cluster_indicator']:
+                                    # Get blueprint of parent indicator
+                                    try:
+                                        blueprint = Reportable.objects.get(external_id=i['cluster_indicator_id']).blueprint
+                                    except Reportable.DoesNotExist:
+                                        blueprint = None
+                                else:
+                                    # Create IndicatorBlueprint
+                                    i['disaggregatable'] = True
+                                    blueprint = self.process_model(IndicatorBlueprint, PMPIndicatorBlueprintSerializer, i,
+                                                             {'external_id': i['id']})
 
                                 locations = list()
                                 for l in i['locations']:
@@ -215,19 +226,36 @@ class ProgrammeDocumentCronJob(CronJobBase):
                                     location = self.process_model(Location, PMPLocationSerializer, l, {'p_code': l['pcode']})
                                     locations.append(location)
 
-                                # Create Disaggregations
+                                # If indicator is not cluster, create Disaggregation otherwise use parent Disaggregation
                                 disaggregations = list()
-                                for dis in i['disaggregation']:
-                                    dis['active'] = True
-                                    disaggregation = self.process_model(Disaggregation, PMPDisaggregationSerializer, dis,
-                                                                  {'name': dis['name']})
-                                    disaggregations.append(disaggregation)
+                                if i['is_cluster_indicator']:
+                                    # Get Disaggregation
+                                    try:
+                                        disaggregations = list(Reportable.objects.get(external_id=i['cluster_indicator_id']).disaggregations.all())
+                                    except Reportable.DoesNotExist:
+                                        disaggregations = list()
+                                else:
+                                    # Create Disaggregation
+                                    for dis in i['disaggregation']:
+                                        dis['active'] = True
+                                        disaggregation = self.process_model(Disaggregation, PMPDisaggregationSerializer, dis,
+                                                                      {'name': dis['name']})
+                                        disaggregations.append(disaggregation)
+
+                                # TODO: REMOVE THIS TEMPORARY DISAGGREGATION VALUES CREATE
+                                for dis in disaggregations:
+                                    if dis.disaggregation_values.all().count() < 1:
+                                        for number in range(5):
+                                            DisaggregationValue.objects.create(
+                                                disaggregation=dis,
+                                                value="Value %s" % number
+                                            )
 
                                 # Create Reportable
-                                i['blueprint_id'] = blueprint.id
+                                i['blueprint_id'] = blueprint.id if blueprint else None
                                 i['location_ids'] = [l.id for l in locations]
                                 i['disaggregation_ids'] = [ds.id for ds in disaggregations]
-                                i['is_cluster_indicator'] = True if i['cluster_indicator_id'] else False
+
                                 i['content_type'] = ContentType.objects.get_for_model(llo).id
                                 i['object_id'] = llo.id
                                 i['start_date'] = item['start_date']
