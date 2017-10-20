@@ -54,11 +54,11 @@ class PMP_API(object):
 
             try:
                 data = json.loads(content)
-            except Exception, e:
+            except Exception as e:
                 Exception(e)
 
             return data
-        except Exception, e:
+        except Exception as e:
             raise Exception(e)
 
 

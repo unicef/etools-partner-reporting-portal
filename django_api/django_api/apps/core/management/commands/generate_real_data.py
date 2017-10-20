@@ -2,7 +2,7 @@
 
 from django.core.management.base import BaseCommand
 
-from _privates import clean_up_data, generate_real_data
+from ._privates import clean_up_data, generate_real_data
 
 
 class Command(BaseCommand):

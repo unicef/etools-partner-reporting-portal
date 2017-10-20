@@ -91,7 +91,7 @@ from core.factories import (
 )
 from core.common import INDICATOR_REPORT_STATUS, OVERALL_STATUS
 
-from _generate_disaggregation_fake_data import (
+from ._generate_disaggregation_fake_data import (
     generate_indicator_report_location_disaggregation_quantity_data,
     generate_indicator_report_location_disaggregation_ratio_data,
 )
@@ -534,11 +534,11 @@ def generate_fake_data(workspace_quantity=10):
 
     print("ProgrammeDocument <-> QuantityReportableToLowerLevelOutput <-> IndicatorReport objects linked".format(workspace_quantity))
 
-    print("Generating IndicatorLocationData for Quantity type"
-    generate_indicator_report_location_disaggregation_quantity_data())
+    print("Generating IndicatorLocationData for Quantity type")
+    generate_indicator_report_location_disaggregation_quantity_data()
 
-    print("Generating IndicatorLocationData for Ratio type"
-    generate_indicator_report_location_disaggregation_ratio_data())
+    print("Generating IndicatorLocationData for Ratio type")
+    generate_indicator_report_location_disaggregation_ratio_data()
 
     # Fulfill submission date for closed IR
     IndicatorReport.objects.filter(
