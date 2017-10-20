@@ -57,10 +57,10 @@
       properties: {
         queryParams: Object,
 
-        responsePlanID: {
-          type: String,
-          statePath: 'responsePlans.currentID',
-        },
+        // responsePlanID: {
+        //   type: String,
+        //   statePath: 'responsePlans.currentID',
+        // },
 
         url: {
           type: String,
@@ -68,8 +68,9 @@
         },
       },
 
-      _computeUrl: function(responsePlanID) {
-        return App.Endpoints.partnerActivityList(); // TODO: update to the correct one with responseplanid as kwarg
+      _computeUrl: function() {
+        // TODO: update to the correct one with responseplanid as kwarg passing it to this func
+        return App.Endpoints.partnerActivityList(); 
       },
 
       _activitiesAjax: function (queryParams) {
