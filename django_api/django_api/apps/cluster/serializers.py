@@ -159,7 +159,7 @@ class ResponsePlanClusterDashboardSerializer(serializers.ModelSerializer):
             clusters=self.context['clusters'],
             partner=self.context.get('partner', None))
 
-    def num_of_on_track_indicator_reports(self, obj):
+    def get_num_of_on_track_indicator_reports(self, obj):
         return obj.num_of_on_track_indicator_reports(
             clusters=self.context['clusters'],
             partner=self.context.get('partner', None))

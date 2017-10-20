@@ -349,7 +349,7 @@ class TestClusterPartnerDashboardAPIView(BaseAPITestCase):
         self.assertEquals(response.data['num_of_due_overdue_indicator_reports'], first_cluster.num_of_due_overdue_indicator_reports_partner(partner))
         self.assertEquals(response.data['num_of_indicator_targets_met'], first_cluster.num_of_indicator_targets_met_partner(partner))
         self.assertEquals(response.data['num_of_projects_in_my_organization'], first_cluster.num_of_projects_in_my_organization_partner(partner))
-        self.assertEquals(response.data['num_of_constrained_indicator_reports'], first_cluster.num_of_constrained_indicator_reports_partner(partner))
+        self.assertEquals(response.data['num_of_constrained_indicator_reports'], first_cluster.num_of_constrained_indicator_reports(partner=partner))
         self.assertEquals(response.data['num_of_non_cluster_activities'], first_cluster.num_of_non_cluster_activities_partner(partner))
         self.assertEquals(len(response.data['overdue_indicator_reports']), first_cluster.overdue_indicator_reports_partner(partner).count())
         self.assertEquals(len(response.data['my_project_activities']), first_cluster.my_project_activities_partner(partner).count())
