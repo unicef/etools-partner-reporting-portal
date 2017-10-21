@@ -29,7 +29,7 @@ from unicef.models import (
     Person,
     ProgressReport,
     ProgrammeDocument,
-    CountryProgrammeOutput,
+    PDResultLink,
     LowerLevelOutput,
     ReportingPeriodDates,
 )
@@ -494,7 +494,7 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     partner = factory.SubFactory('core.factories.PartnerFactory')
     # workspace = factory.SubFactory('core.factories.WorkspaceFactory')
 
-    cp_output = factory.RelatedFactory('core.factories.CountryProgrammeOutputFactory', 'programme_document')
+    cp_output = factory.RelatedFactory('core.factories.PDResultLinkFactory', 'programme_document')
     workspace = factory.Iterator(Workspace.objects.all())
 
     #cs_dates = [cs_date_1, cs_date_2, cs_date_3]
@@ -510,7 +510,7 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
         if not create:
             return
         for i in range(random.randint(2, 3)):
-            CountryProgrammeOutputFactory.create(programme_document=self)
+            PDResultLinkFactory.create(programme_document=self)
 
 
 class DisaggregationFactory(factory.django.DjangoModelFactory):
@@ -560,17 +560,19 @@ class RatioIndicatorReportFactory(factory.django.DjangoModelFactory):
         model = IndicatorReport
 
 
-class CountryProgrammeOutputFactory(factory.django.DjangoModelFactory):
-    title = factory.Sequence(lambda n: "country_programme_%d" % n)
+class PDResultLinkFactory(factory.django.DjangoModelFactory):
+    external_id = factory.Sequence(lambda n: "%d" % n)
+    external_cp_output_id = factory.Sequence(lambda n: "%d" % (n % 4))
+    title = factory.Sequence(lambda n: "result link to country_programme_%d" % (n % 4))
     lower_level_output = factory.RelatedFactory('core.factories.LowerLevelOutputFactory', 'cp_output')
 
     class Meta:
-        model = CountryProgrammeOutput
+        model = PDResultLink
 
     @factory.post_generation
     def create_llos(self, create, extracted, **kwargs):
         """
-        Create 2-5 LLO's per CP
+        Create 2-5 LLO's per Result link
         """
         if not create:
             return

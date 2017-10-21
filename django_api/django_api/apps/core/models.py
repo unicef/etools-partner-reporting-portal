@@ -33,6 +33,7 @@ try:
     PartnerViewerRole = GroupWrapper(code='ip_viewer',
                                      name='IP Viewer',
                                      create_group=False)
+    IMORole = GroupWrapper(code='imo', name='IMO', create_group=False)
 except Exception as e:
     print "Group DB is not ready yet! - Error: %s" % e
 
@@ -204,7 +205,7 @@ class Location(TimeStampedExternalSyncModelMixin):
 
     gateway = models.ForeignKey(GatewayType, verbose_name='Location Type',
                                 related_name='locations')
-    carto_db_table = models.ForeignKey('core.CartoDBTable', related_name="locations")
+    carto_db_table = models.ForeignKey('core.CartoDBTable', related_name="locations", blank=True, null=True)
 
     latitude = models.DecimalField(
         null=True,

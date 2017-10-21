@@ -136,4 +136,5 @@ PARTNER_PROJECT_STATUS = Choices(
 CURRENCIES = Choices(
     ("USD", "usd", "$"),
     ("EUR", "euro", u"\u20ac"),
+    ("JOD", "jod", "JOD"),
 )
