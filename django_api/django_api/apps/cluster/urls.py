@@ -8,11 +8,11 @@ from .views import (
     ClusterActivityListAPIView,
     IndicatorReportsListAPIView,
     IndicatorReportsSimpleListAPIView,
-    ClusterDashboardAPIView,
-    ClusterPartnerDashboardAPIView,
     ClusterIndicatorsListExcelExportView,
     ClusterIndicatorsLocationListAPIView,
-    ClusterIndicatorsListExcelExportForAnalysisView
+    ClusterIndicatorsListExcelExportForAnalysisView,
+    ResponsePlanClusterDashboardAPIView,
+    ResponsePlanPartnerDashboardAPIView
 )
 
 
@@ -41,13 +41,12 @@ urlpatterns = [
         ClusterListAPIView.as_view(),
         name="cluster-simple-list"),
 
-    url(r'^(?P<response_plan_id>\d+)/(?P<cluster_id>\d+)/cluster-dashboard/$',
-        ClusterDashboardAPIView.as_view(),
-        name="cluster-dashboard"),
-
-    url(r'^(?P<response_plan_id>\d+)/(?P<cluster_id>\d+)/partner-dashboard/$',
-        ClusterPartnerDashboardAPIView.as_view(),
-        name="cluster-partner-dashboard"),
+    url(r'^(?P<response_plan_id>\d+)/cluster-dashboard/$',
+        ResponsePlanClusterDashboardAPIView.as_view(),
+        name="response-plan-cluster-dashboard"),
+    url(r'^(?P<response_plan_id>\d+)/partner-dashboard/$',
+        ResponsePlanPartnerDashboardAPIView.as_view(),
+        name="response-plan-partner-dashboard"),
 
     url(r'^(?P<response_plan_id>\d+)/cluster-indicator-reports-list/export/$',
         ClusterIndicatorsListExcelExportView.as_view(),

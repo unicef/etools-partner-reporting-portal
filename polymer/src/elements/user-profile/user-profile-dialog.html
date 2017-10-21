@@ -101,7 +101,7 @@
           </div>
         </template>
 
-        <template is="dom-if" if="{{is_imo_clusters}}">
+        <template is="dom-if" if="[[is_imo_clusters]]">
           <div class="full-width">
             <paper-input-container always-float-label auto-validate attr-for-value="value">
               <label>IMO for Clusters</label>
@@ -144,7 +144,7 @@
           },
 
           is_imo_clusters: {
-            type: Object,
+            type: Boolean,
             computed: '_computeIsIMOClusters(profile)'
           },
         },
@@ -164,7 +164,7 @@
         },
 
         _computeIsIMOClusters: function (profile) {
-          return (profile.imo_clusters.length > 0 || null);
+          return (profile.imo_clusters || []).length > 0;
         },
       });
   </script>

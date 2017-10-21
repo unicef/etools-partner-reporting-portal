@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import random
 import logging
+from datetime import datetime, timedelta
 from decimal import Decimal
 
 from django.contrib.gis.db import models
@@ -9,13 +10,17 @@ from django.core.validators import (
     MinValueValidator,
     MaxValueValidator
 )
+from django.db.models import Q
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.functional import cached_property
 
 from model_utils.models import TimeStampedModel
 from mptt.models import MPTTModel, TreeForeignKey
 
 from .common import (
     RESPONSE_PLAN_TYPE,
+    INDICATOR_REPORT_STATUS,
+    OVERALL_STATUS
 )
 from utils.groups.wrappers import GroupWrapper
 
@@ -149,7 +154,8 @@ class ResponsePlan(TimeStampedModel):
         blank=True,
         verbose_name='End date'
     )
-    workspace = models.ForeignKey('core.Workspace', related_name="response_plans")
+    workspace = models.ForeignKey('core.Workspace',
+                                  related_name="response_plans")
 
     class Meta:
         unique_together = ('title', 'plan_type', 'workspace')
@@ -160,6 +166,172 @@ class ResponsePlan(TimeStampedModel):
     @property
     def documents(self):
         return []  # TODO probably create file field
+
+    @cached_property
+    def all_clusters(self):
+        return self.clusters.all()
+
+    def num_of_partners(self, clusters=None):
+        from partner.models import Partner
+
+        if not clusters:
+            clusters = self.all_clusters
+        return Partner.objects.filter(clusters__in=clusters).distinct().count()
+
+    def num_of_due_overdue_indicator_reports(self,
+                                             clusters=None,
+                                             partner=None):
+        if not clusters:
+            clusters = self.all_clusters
+
+        count = 0
+        for c in clusters:
+            count += c.num_of_due_overdue_indicator_reports(partner=partner)
+        return count
+
+    def num_of_non_cluster_activities(self,
+                                      clusters=None,
+                                      partner=None):
+        if not clusters:
+            clusters = self.all_clusters
+
+        count = 0
+        for c in clusters:
+            count += c.num_of_non_cluster_activities(partner=partner)
+        return count
+
+    def num_of_met_indicator_reports(self, clusters=None, partner=None):
+        if not clusters:
+            clusters = self.all_clusters
+
+        count = 0
+        for c in clusters:
+            count += c.num_of_met_indicator_reports(partner=partner)
+        return count
+
+    def num_of_constrained_indicator_reports(self, clusters=None, partner=None):
+        if not clusters:
+            clusters = self.all_clusters
+
+        count = 0
+        for c in clusters:
+            count += c.num_of_constrained_indicator_reports(partner=partner)
+        return count
+
+    def num_of_on_track_indicator_reports(self, clusters=None, partner=None):
+        if not clusters:
+            clusters = self.all_clusters
+
+        count = 0
+        for c in clusters:
+            count += c.num_of_on_track_indicator_reports(partner=partner)
+        return count
+
+    def num_of_no_progress_indicator_reports(self, clusters=None, partner=None):
+        if not clusters:
+            clusters = self.all_clusters
+
+        count = 0
+        for c in clusters:
+            count += c.num_of_no_progress_indicator_reports(partner=partner)
+        return count
+
+    def num_of_no_status_indicator_reports(self, clusters=None, partner=None):
+        if not clusters:
+            clusters = self.all_clusters
+
+        count = 0
+        for c in clusters:
+            count += c.num_of_no_status_indicator_reports(partner=partner)
+        return count
+
+    def num_of_projects(self, clusters=None, partner=None):
+        from partner.models import PartnerProject
+
+        if not clusters:
+            clusters = self.all_clusters
+
+        qset = PartnerProject.objects.filter(clusters__in=clusters)
+        if partner:
+            qset = qset.filter(partner=partner)
+        return qset.count()
+
+    def _latest_indicator_reports(self, clusters):
+        from indicator.models import Reportable, IndicatorReport
+        reportables = Reportable.objects.filter(
+            Q(partner_activities__partner__clusters__in=clusters)
+        )
+        return IndicatorReport.objects.filter(
+                reportable__in=reportables).order_by(
+                        '-time_period_end').distinct()
+
+    def upcoming_indicator_reports(self, clusters=None, partner=None,
+                                  limit=None, days=15):
+        if not clusters:
+            clusters = self.all_clusters
+
+        days_in_future = datetime.today() + timedelta(days=days)
+        indicator_reports = self._latest_indicator_reports(clusters).filter(
+                report_status=INDICATOR_REPORT_STATUS.due
+            ).filter(
+                due_date__gte=datetime.today()
+            ).filter(
+                due_date__lte=days_in_future
+            )
+        return indicator_reports
+
+    def overdue_indicator_reports(self, clusters=None, partner=None,
+                                  limit=None):
+        """
+        Returns indicator reports associated with partner activities or
+        partner projects that are overdue, if partner is specified.
+        """
+        if not clusters:
+            clusters = self.all_clusters
+
+        indicator_reports = self._latest_indicator_reports(clusters)
+        indicator_reports = indicator_reports.filter(
+            report_status=INDICATOR_REPORT_STATUS.overdue)
+
+        if partner:
+            indicator_reports = indicator_reports.filter(
+                Q(reportable__partner_projects__partner=partner)
+                | Q(reportable__partner_activities__partner=partner)
+            )
+
+        if limit:
+            indicator_reports = indicator_reports[:limit]
+
+        return indicator_reports
+
+    def constrained_indicator_reports(self, clusters=None, partner=None,
+                                  limit=None):
+        if not clusters:
+            clusters = self.all_clusters
+
+        indicator_reports = self._latest_indicator_reports(clusters)
+        if partner:
+            indicator_reports = indicator_reports.filter(
+                Q(reportable__partner_projects__partner=partner)
+                | Q(reportable__partner_activities__partner=partner)
+            )
+        indicator_reports = indicator_reports.filter(
+            report_status=INDICATOR_REPORT_STATUS.accepted,
+            overall_status=OVERALL_STATUS.constrained).order_by(
+                'reportable__id', '-submission_date'
+            ).distinct('reportable__id')
+        if limit:
+            indicator_reports = indicator_reports[:limit]
+        return indicator_reports
+
+    def partner_activities(self, partner, clusters=None, limit=None):
+        if not clusters:
+            clusters = self.all_clusters
+        qset = partner.partner_activities.filter(
+            partner__clusters__in=clusters)
+        if limit:
+            qset = qset[:limit]
+        return qset
 
 
 class GatewayType(TimeStampedModel):

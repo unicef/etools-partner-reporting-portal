@@ -891,6 +891,8 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
             'partner_activity',
             'is_draft',
             'can_submit',
+            'time_period_start',
+            'time_period_end',
         )
 
     def get_indicator_name(self, obj):

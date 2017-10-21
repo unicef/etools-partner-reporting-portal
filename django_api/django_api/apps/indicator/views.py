@@ -319,11 +319,17 @@ class IndicatorDataAPIView(APIView):
         # Check if indicator was already submitted or SENT BACK
         if ir.submission_date is None or ir.report_status == INDICATOR_REPORT_STATUS.sent_back:
             ir.submission_date = date.today()
-            ir.report_status = INDICATOR_REPORT_STATUS.submitted
-            ir.save()
+
+            # set status on progress report
             if ir.progress_report is not None:
+                ir.report_status = INDICATOR_REPORT_STATUS.submitted
+                ir.save()
                 ir.progress_report.status = PROGRESS_REPORT_STATUS.submitted
                 ir.progress_report.save()
+            else:
+                ir.report_status = INDICATOR_REPORT_STATUS.accepted # cluster IR's go to accepted directly
+                ir.save()
+
             serializer = PDReportContextIndicatorReportSerializer(instance=ir)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:

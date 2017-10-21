@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from core.common import FREQUENCY_LEVEL
+from core.models import ResponsePlan
 
 from indicator.serializers import (
     ClusterIndicatorReportSerializer,
@@ -116,57 +117,21 @@ class ClusterActivityPatchSerializer(serializers.ModelSerializer):
         )
 
 
-class ClusterDashboardSerializer(serializers.ModelSerializer):
+class ResponsePlanClusterDashboardSerializer(serializers.ModelSerializer):
     num_of_partners = serializers.SerializerMethodField()
+    num_of_due_overdue_indicator_reports = serializers.SerializerMethodField()
+    num_of_non_cluster_activities = serializers.SerializerMethodField()
     num_of_met_indicator_reports = serializers.SerializerMethodField()
     num_of_constrained_indicator_reports = serializers.SerializerMethodField()
     num_of_on_track_indicator_reports = serializers.SerializerMethodField()
     num_of_no_progress_indicator_reports = serializers.SerializerMethodField()
     num_of_no_status_indicator_reports = serializers.SerializerMethodField()
-    num_of_due_overdue_indicator_reports = serializers.SerializerMethodField()
-    num_of_non_cluster_activities = serializers.SerializerMethodField()
-    new_indicator_reports = serializers.SerializerMethodField()
+    upcoming_indicator_reports = serializers.SerializerMethodField()
     overdue_indicator_reports = serializers.SerializerMethodField()
     constrained_indicator_reports = serializers.SerializerMethodField()
 
-    def get_num_of_partners(self, obj):
-        return obj.num_of_partners
-
-    def get_num_of_met_indicator_reports(self, obj):
-        return obj.num_of_met_indicator_reports
-
-    def get_num_of_constrained_indicator_reports(self, obj):
-        return obj.num_of_constrained_indicator_reports
-
-    def get_num_of_on_track_indicator_reports(self, obj):
-        return obj.num_of_on_track_indicator_reports
-
-    def get_num_of_no_progress_indicator_reports(self, obj):
-        return obj.num_of_no_progress_indicator_reports
-
-    def get_num_of_no_status_indicator_reports(self, obj):
-        return obj.num_of_no_status_indicator_reports
-
-    def get_num_of_due_overdue_indicator_reports(self, obj):
-        return obj.num_of_due_overdue_indicator_reports
-
-    def get_num_of_non_cluster_activities(self, obj):
-        return obj.num_of_non_cluster_activities
-
-    def get_new_indicator_reports(self, obj):
-        return ClusterIndicatorReportSerializer(
-            obj.new_indicator_reports, many=True).data
-
-    def get_overdue_indicator_reports(self, obj):
-        return ClusterIndicatorReportSerializer(
-            obj.overdue_indicator_reports, many=True).data
-
-    def get_constrained_indicator_reports(self, obj):
-        return ClusterIndicatorReportListSerializer(
-            obj.constrained_indicator_reports, many=True).data
-
     class Meta:
-        model = Cluster
+        model = ResponsePlan
         fields = (
             'num_of_partners',
             'num_of_met_indicator_reports',
@@ -176,86 +141,102 @@ class ClusterDashboardSerializer(serializers.ModelSerializer):
             'num_of_no_status_indicator_reports',
             'num_of_due_overdue_indicator_reports',
             'num_of_non_cluster_activities',
-            'new_indicator_reports',
+            'upcoming_indicator_reports',
             'overdue_indicator_reports',
             'constrained_indicator_reports',
         )
 
+    def get_num_of_partners(self, obj):
+        return obj.num_of_partners(clusters=self.context['clusters'])
 
-class ClusterPartnerDashboardSerializer(serializers.ModelSerializer):
-    num_of_due_overdue_indicator_reports = serializers.SerializerMethodField()
-    num_of_met_indicator_reports = serializers.SerializerMethodField()
-    num_of_constrained_indicator_reports = serializers.SerializerMethodField()
-    num_of_on_track_indicator_reports = serializers.SerializerMethodField()
-    num_of_no_progress_indicator_reports = serializers.SerializerMethodField()
-    num_of_no_status_indicator_reports = serializers.SerializerMethodField()
-    num_of_projects_in_my_organization = serializers.SerializerMethodField()
-    num_of_non_cluster_activities = serializers.SerializerMethodField()
-    overdue_indicator_reports = serializers.SerializerMethodField()
-    my_project_activities = serializers.SerializerMethodField()
-    constrained_indicator_reports = serializers.SerializerMethodField()
+    def get_num_of_met_indicator_reports(self, obj):
+        return obj.num_of_met_indicator_reports(
+            clusters=self.context['clusters'],
+            partner=self.context.get('partner', None))
+
+    def get_num_of_constrained_indicator_reports(self, obj):
+        return obj.num_of_constrained_indicator_reports(
+            clusters=self.context['clusters'],
+            partner=self.context.get('partner', None))
+
+    def get_num_of_on_track_indicator_reports(self, obj):
+        return obj.num_of_on_track_indicator_reports(
+            clusters=self.context['clusters'],
+            partner=self.context.get('partner', None))
+
+    def get_num_of_no_progress_indicator_reports(self, obj):
+        return obj.num_of_no_progress_indicator_reports(
+            clusters=self.context['clusters'],
+            partner=self.context.get('partner', None))
+
+    def get_num_of_no_status_indicator_reports(self, obj):
+        return obj.num_of_no_status_indicator_reports(
+            clusters=self.context['clusters'],
+            partner=self.context.get('partner', None))
 
     def get_num_of_due_overdue_indicator_reports(self, obj):
-        return obj.num_of_due_overdue_indicator_reports_partner(
-            self.context['partner'])
-
-    def get_num_of_projects_in_my_organization(self, obj):
-        return obj.num_of_projects_in_my_organization_partner(
-            self.context['partner'])
-
-    def num_of_met_indicator_reports(self, obj):
-        return obj.num_of_met_indicator_reports_partner(
-            self.context['partner'])
-
-    def num_of_constrained_indicator_reports(self, obj):
-        return obj.num_of_constrained_indicator_reports_partner(
-            self.context['partner'])
-
-    def num_of_on_track_indicator_reports(self, obj):
-        return obj.num_of_on_track_indicator_reports_partner(
-            self.context['partner'])
-
-    def num_of_no_progress_indicator_reports(self, obj):
-        return obj.num_of_no_progress_indicator_reports_partner(
-            self.context['partner'])
-
-    def num_of_no_status_indicator_reports(self, obj):
-        return obj.num_of_no_status_indicator_reports_partner(
-            self.context['partner'])
+        return obj.num_of_due_overdue_indicator_reports(
+                clusters=self.context['clusters'],
+                partner=self.context.get('partner', None))
 
     def get_num_of_non_cluster_activities(self, obj):
-        return obj.num_of_non_cluster_activities_partner(
-            self.context['partner'])
+        return obj.num_of_non_cluster_activities(
+                clusters=self.context['clusters'],
+                partner=self.context.get('partner', None))
+
+    def get_upcoming_indicator_reports(self, obj):
+        return ClusterIndicatorReportSerializer(
+            obj.upcoming_indicator_reports(
+                clusters=self.context['clusters'],
+                limit=10, days=15),
+            many=True).data
 
     def get_overdue_indicator_reports(self, obj):
         return ClusterIndicatorReportSerializer(
-            obj.overdue_indicator_reports_partner(
-                self.context['partner']), many=True).data
-
-    def get_my_project_activities(self, obj):
-        from partner.serializers import PartnerActivitySerializer
-
-        return PartnerActivitySerializer(
-            obj.my_project_activities_partner(
-                self.context['partner']), many=True).data
+            obj.overdue_indicator_reports(
+                clusters=self.context['clusters'],
+                limit=10),
+            many=True).data
 
     def get_constrained_indicator_reports(self, obj):
-        return ClusterIndicatorReportListSerializer(
-            obj.constrained_indicator_reports_partner(
-                self.context['partner']), many=True).data
+        return ClusterIndicatorReportSerializer(
+            obj.constrained_indicator_reports(
+                clusters=self.context['clusters'],
+                partner=self.context.get('partner', None),
+                limit=10),
+            many=True).data
+
+
+class ResponsePlanPartnerDashboardSerializer(ResponsePlanClusterDashboardSerializer):
+    num_of_projects_in_my_organization = serializers.SerializerMethodField()
+    my_project_activities = serializers.SerializerMethodField()
 
     class Meta:
-        model = Cluster
+        model = ResponsePlan
         fields = (
-            'num_of_due_overdue_indicator_reports',
             'num_of_met_indicator_reports',
             'num_of_constrained_indicator_reports',
             'num_of_on_track_indicator_reports',
             'num_of_no_progress_indicator_reports',
             'num_of_no_status_indicator_reports',
-            'num_of_projects_in_my_organization',
+            'num_of_due_overdue_indicator_reports',
             'num_of_non_cluster_activities',
+            'num_of_projects_in_my_organization',
             'overdue_indicator_reports',
-            'my_project_activities',
             'constrained_indicator_reports',
+            'my_project_activities'
         )
+
+    def get_num_of_projects_in_my_organization(self, obj):
+        return obj.num_of_projects(
+                clusters=self.context['clusters'],
+                partner=self.context.get('partner', None))
+
+    def get_my_project_activities(self, obj):
+        from partner.serializers import PartnerActivitySerializer
+
+        return PartnerActivitySerializer(
+            obj.partner_activities(
+                self.context['partner'],
+                clusters=self.context['clusters'],
+                limit=10), many=True).data
