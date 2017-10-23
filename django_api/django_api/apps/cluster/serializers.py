@@ -306,7 +306,7 @@ class PartnerAnalysisSummarySerializer(serializers.ModelSerializer):
             for c_info in obj.clusters.values('id', 'type').distinct():
                 cluster_contributing_to.append({
                     'id': c_info['id'],
-                    'title': CLUSTER_TYPE_NAME_DICT[c_info]
+                    'title': CLUSTER_TYPE_NAME_DICT[c_info['type']]
                 })
 
         num_ca = pa_list.filter(cluster_activity__isnull=False).count()
