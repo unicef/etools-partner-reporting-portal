@@ -1,0 +1,45 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../../styles/analysis-widget.html">
+
+<dom-module id="analysis-clusters-contributing-to">
+  <template>
+    <style include="analysis-widget-styles">
+      .clusters {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+        font-size: 12px;
+      }
+
+      .clusters li:not(:last-of-type) {
+        padding-bottom: .5em;
+        margin-bottom: .5em;
+        border-bottom: 1px solid var(--paper-grey-200);
+      }
+    </style>
+
+    <div class="widget-container">
+      <h3 class="widget-heading">Clusters Contributing To</h3>
+
+      <ul class="clusters">
+        <template
+            is="dom-repeat"
+            items="[[data]]"
+            as="cluster">
+          <li>[[cluster]]</li>
+        </template>
+      </ul>
+    </div>
+  </template>
+
+  <script>
+    Polymer({
+      id: 'analysis-clusters-contributing-to',
+
+      properties: {
+        data: Array,
+      },
+    });
+  </script>
+</dom-module>

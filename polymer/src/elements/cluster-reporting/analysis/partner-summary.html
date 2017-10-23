@@ -6,7 +6,9 @@
 <link rel="import" href="../../../redux/store.html">
 <link rel="import" href="number-of-activities.html">
 <link rel="import" href="reports-by-status.html">
+<link rel="import" href="reports-by-location.html">
 <link rel="import" href="number-of-projects.html">
+<link rel="import" href="clusters-contributing-to.html">
 
 <dom-module id="partner-analysis-summary">
   <template>
@@ -39,12 +41,19 @@
           </analysis-reports-by-status>
         </div>
         <div class="item">
-          TODO
+          <analysis-reports-by-location
+              data="[[data.num_of_reports_by_location_type]]">
+          </analysis-reports-by-location>
         </div>
         <div class="item">
           <analysis-number-of-projects
               data="[[data.num_of_projects]]">
           </analysis-number-of-projects>
+        </div>
+        <div class="item">
+          <analysis-clusters-contributing-to
+              data="[[data.cluster_contributing_to]]">
+          </analysis-clusters-contributing-to>
         </div>
       </div>
       <etools-loading active="[[loading]]"></etools-loading>
