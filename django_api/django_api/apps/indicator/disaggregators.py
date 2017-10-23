@@ -197,9 +197,11 @@ class RatioIndicatorDisaggregator(BaseDisaggregator):
             if ordered_dict[key]["v"] == 0 and ordered_dict[key]["d"] == 0:
                 ordered_dict[key]["c"] = 0
             elif ordered_dict[key]["d"] == 0:
-                raise Exception('Denominator is 0 when numerator is not for {}'.format(key))
+                raise Exception(
+                    'Denominator is 0 when numerator is not for {}'.format(key))
             else:
-                ordered_dict[key]["c"] = ordered_dict[key]["v"] / (ordered_dict[key]["d"] * 1.0)
+                ordered_dict[key]["c"] = ordered_dict[key]["v"] / \
+                    (ordered_dict[key]["d"] * 1.0)
 
         ordered_dict = get_cast_dictionary_keys_as_string(ordered_dict)
 

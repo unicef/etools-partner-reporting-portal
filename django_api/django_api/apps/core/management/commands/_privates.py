@@ -105,6 +105,7 @@ from indicator.cron import IndicatorReportOverDueCronJob
 
 OVERALL_STATUS_LIST = [x[0] for x in OVERALL_STATUS]
 
+
 def clean_up_data():
     if settings.ENV == 'dev':
         print("Deleting all ORM objects")
@@ -226,14 +227,18 @@ def generate_fake_data(workspace_quantity=10):
             # TODO: use ResponsePlanFactory
             ResponsePlan.objects.create(
                 workspace=workspace,
-                title="{} {} Humanitarian Response Plan".format(workspace.title, year),
+                title="{} {} Humanitarian Response Plan".format(
+                    workspace.title, year),
                 start=beginning_of_this_year,
                 end=beginning_of_this_year + datetime.timedelta(days=30)
             )
 
         gateways = list()
         for idx in range(5):
-            gateways.append(GatewayTypeFactory(country=country, admin_level=idx + 1))
+            gateways.append(
+                GatewayTypeFactory(
+                    country=country,
+                    admin_level=idx + 1))
 
         carto_db_table = CartoDBTableFactory(
             location_type=gateways[0], country=country)
@@ -243,7 +248,8 @@ def generate_fake_data(workspace_quantity=10):
             locations.append(
                 LocationFactory.create(
                     gateway=gateways[idx] if idx < 5 else gateways[4],
-                    parent=None if idx == 0 else (locations[idx - 1] if idx < 6 else locations[4]),
+                    parent=None if idx == 0 else (
+                        locations[idx - 1] if idx < 6 else locations[4]),
                     carto_db_table=carto_db_table,
                 )
             )
@@ -302,7 +308,8 @@ def generate_fake_data(workspace_quantity=10):
 
         for idx in xrange(2, 0, -1):
             co = ClusterObjectiveFactory(
-                title="{} - {} Cluster Objective".format(cluster.response_plan.title, cluster.type.upper()),
+                title="{} - {} Cluster Objective".format(
+                    cluster.response_plan.title, cluster.type.upper()),
                 cluster=cluster,
             )
 
@@ -318,7 +325,8 @@ def generate_fake_data(workspace_quantity=10):
             last_name="Partner")
 
         partner = PartnerFactory(
-            title="{} - {} Cluster Partner".format(cluster.response_plan.title, cluster.type.upper()),
+            title="{} - {} Cluster Partner".format(
+                cluster.response_plan.title, cluster.type.upper()),
             partner_activity=None,
             partner_project=None,
             user=user,
@@ -336,7 +344,8 @@ def generate_fake_data(workspace_quantity=10):
 
         for idx in xrange(2, 0, -1):
             co = ClusterObjectiveFactory(
-                title="{} - {} Cluster Objective".format(cluster.response_plan.title, cluster.type.upper()),
+                title="{} - {} Cluster Objective".format(
+                    cluster.response_plan.title, cluster.type.upper()),
                 cluster=cluster,
             )
 
@@ -351,21 +360,32 @@ def generate_fake_data(workspace_quantity=10):
             last_name="Partner")
 
         partner = PartnerFactory(
-            title="{} - {} Cluster Partner".format(cluster.response_plan.title, cluster.type.upper()),
+            title="{} - {} Cluster Partner".format(
+                cluster.response_plan.title, cluster.type.upper()),
             partner_activity=None,
             partner_project=None,
             user=user,
         )
         partner.clusters.add(cluster)
 
-        print("{} Cluster & Cluster user objects created for {}".format(3, response_plan.title))
+        print(
+            "{} Cluster & Cluster user objects created for {}".format(
+                3, response_plan.title))
 
-        print("{} Partner objects & Partner user objects created for {}".format(3, cluster))
+        print(
+            "{} Partner objects & Partner user objects created for {}".format(
+                3,
+                cluster))
 
-        print("{} Cluster Objective objects created for {}".format(2 * 3, cluster))
+        print(
+            "{} Cluster Objective objects created for {}".format(
+                2 * 3, cluster))
 
     table = CartoDBTable.objects.first()
-    locations = list(Location.objects.filter(carto_db_table=table, carto_db_table__country=carto_db_table.country))
+    locations = list(
+        Location.objects.filter(
+            carto_db_table=table,
+            carto_db_table__country=carto_db_table.country))
 
     # associate partner, workspace, imo_clustes etc. with the users
     first_partner = Partner.objects.first()
@@ -392,7 +412,9 @@ def generate_fake_data(workspace_quantity=10):
             )
             ca.locations.add(*locations)
 
-        print("{} Cluster Activity objects created for {}".format(2, cluster_objective.title))
+        print(
+            "{} Cluster Activity objects created for {}".format(
+                2, cluster_objective.title))
 
     for partner in Partner.objects.all():
         for idx in xrange(2, 0, -1):
@@ -410,7 +432,9 @@ def generate_fake_data(workspace_quantity=10):
             )
             pp.locations.add(*locations)
 
-        print("{} PartnerProject objects created for {} under {} Cluster".format(2, partner, first_cluster.type.upper()))
+        print(
+            "{} PartnerProject objects created for {} under {} Cluster".format(
+                2, partner, first_cluster.type.upper()))
 
     # ClusterActivity <-> PartnerActivity link
     for cluster_activity in ClusterActivity.objects.all():
@@ -447,7 +471,11 @@ def generate_fake_data(workspace_quantity=10):
                 )
                 pa.locations.add(*locations)
 
-            print("{} PartnerActivity objects created for {} under {} Cluster Activity and Custom Activity".format(4, partner, cluster_activity.title))
+            print(
+                "{} PartnerActivity objects created for {} under {} Cluster Activity and Custom Activity".format(
+                    4,
+                    partner,
+                    cluster_activity.title))
 
     print("ClusterActivity <-> PartnerActivity objects linked")
 
@@ -552,9 +580,13 @@ def generate_fake_data(workspace_quantity=10):
 
     # Fulfill submission date for closed IR
     IndicatorReport.objects.filter(
-        report_status__in=(INDICATOR_REPORT_STATUS.submitted, INDICATOR_REPORT_STATUS.accepted)
+        report_status__in=(
+            INDICATOR_REPORT_STATUS.submitted,
+            INDICATOR_REPORT_STATUS.accepted)
     ).update(submission_date=today)
     # Null submission date for open IR
     IndicatorReport.objects.exclude(
-        report_status__in=(INDICATOR_REPORT_STATUS.submitted, INDICATOR_REPORT_STATUS.accepted)
+        report_status__in=(
+            INDICATOR_REPORT_STATUS.submitted,
+            INDICATOR_REPORT_STATUS.accepted)
     ).update(submission_date=None)

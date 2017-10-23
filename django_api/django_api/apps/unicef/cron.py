@@ -19,14 +19,15 @@ from indicator.models import IndicatorBlueprint, Disaggregation, Reportable, Dis
 
 from partner.models import Partner
 
+
 class ProgrammeDocumentCronJob(CronJobBase):
     RUN_AT_TIMES = ['0:10']
 
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
     code = 'partner.ProgrammeDocumentCronJob'    # a unique code
 
-
-    def process_model(self, process_model, process_serializer, data, filter_dict):
+    def process_model(self, process_model,
+                      process_serializer, data, filter_dict):
         try:
             obj = process_model.objects.get(**filter_dict)
             serializer = process_serializer(obj, data=data)
@@ -45,14 +46,14 @@ class ProgrammeDocumentCronJob(CronJobBase):
     def create_user(self, person):
         # Check if given person already exists in user model (by email)
 
-        user, created = User.objects.get_or_create(email=person.email, username=person.email)
+        user, created = User.objects.get_or_create(
+            email=person.email, username=person.email)
         if created:
             user.set_password("Passw0rd!")
         # Update credentials
         user.first_name = person.name
         user.save()
         return user
-
 
     def do(self, fast=True):
         """
@@ -73,9 +74,11 @@ class ProgrammeDocumentCronJob(CronJobBase):
         }
         """
         # Get/Create Group that will be assigned to persons
-        group, created = Group.objects.get_or_create(name="IP Authorized Officer")
+        group, created = Group.objects.get_or_create(
+            name="IP Authorized Officer")
         # Iterate over all workspaces
-        # TODO: remove filtering for Jordan only - testing country with fulfilled indicators
+        # TODO: remove filtering for Jordan only - testing country with
+        # fulfilled indicators
         if fast:
             workspaces = Workspace.objects.filter(business_area_code="2340")
         else:
@@ -87,12 +90,18 @@ class ProgrammeDocumentCronJob(CronJobBase):
                 while(True):
                     try:
                         api = PMP_API()
-                        list_data = api.programme_documents(business_area_code=str(workspace.business_area_code), url=page_url)
+                        list_data = api.programme_documents(
+                            business_area_code=str(
+                                workspace.business_area_code), url=page_url)
                     except Exception as e:
                         print("API Endpoint error: %s" % e)
                         break
 
-                    print("Found %s PDs for %s Workspace (%s)" % (list_data['count'], workspace.title, workspace.business_area_code))
+                    print(
+                        "Found %s PDs for %s Workspace (%s)" %
+                        (list_data['count'],
+                         workspace.title,
+                         workspace.business_area_code))
 
                     for item in list_data['results']:
                         print("Processing PD: %s" % item['id'])
@@ -106,7 +115,9 @@ class ProgrammeDocumentCronJob(CronJobBase):
                             continue
 
                         # Create/Assign Partner
-                        partner = self.process_model(Partner, PMPPDPartnerSerializer, partner_data, {'vendor_number': partner_data['unicef_vendor_number']})
+                        partner = self.process_model(
+                            Partner, PMPPDPartnerSerializer, partner_data, {
+                                'vendor_number': partner_data['unicef_vendor_number']})
 
                         # Assign partner
                         item['partner'] = partner.id
@@ -116,7 +127,8 @@ class ProgrammeDocumentCronJob(CronJobBase):
 
                         # TODO: Remove all below this - temporary fixes due wrong API data
                         # Modify offices entry
-                        item['offices'] = ", ".join(item['offices']) if item['offices'] else "N/A"
+                        item['offices'] = ", ".join(
+                            item['offices']) if item['offices'] else "N/A"
                         if not item['start_date']:
                             item['start_date'] = "2017-09-01"
                         if not item['end_date']:
@@ -136,11 +148,11 @@ class ProgrammeDocumentCronJob(CronJobBase):
 
                         # TODO: End remove section
 
-
                         # Create PD
                         pd = self.process_model(ProgrammeDocument, PMPProgrammeDocumentSerializer, item,
-                                                     {'external_id': item['id'], 'workspace': workspace})
-                        # TODO: remove temporary ACTIVE status, agreement, population focus
+                                                {'external_id': item['id'], 'workspace': workspace})
+                        # TODO: remove temporary ACTIVE status, agreement,
+                        # population focus
                         if pd.status == PD_STATUS.draft:
                             pd.status = PD_STATUS.active
                         if not pd.agreement:
@@ -156,7 +168,7 @@ class ProgrammeDocumentCronJob(CronJobBase):
                             if not person_data['email']:
                                 continue
                             person = self.process_model(Person, PMPPDPersonSerializer, person_data,
-                                                    {'email': person_data['email']})
+                                                        {'email': person_data['email']})
                             pd.unicef_focal_point.add(person)
 
                         # Create agreement_auth_officers
@@ -199,50 +211,62 @@ class ProgrammeDocumentCronJob(CronJobBase):
                             # Create PDResultLink
                             d['programme_document'] = pd.id
                             pdresultlink = self.process_model(PDResultLink, PMPPDResultLinkSerializer, d,
-                                                        {'external_id': d['result_link'], 'external_cp_output_id': d['id']})
+                                                              {'external_id': d['result_link'], 'external_cp_output_id': d['id']})
 
                             # Create LLOs
                             d['cp_output'] = pdresultlink.id
                             llo = self.process_model(LowerLevelOutput, PMPLLOSerializer, d,
-                                                              {'external_id': d['id']})
+                                                     {'external_id': d['id']})
 
                             # Iterate over indicators
                             for i in d['indicators']:
                                 # Check if indicator is cluster indicator
                                 i['is_cluster_indicator'] = True if i['cluster_indicator_id'] else False
 
-                                # If indicator is not cluster, create Blueprint otherwise use parent Blueprint
+                                # If indicator is not cluster, create Blueprint
+                                # otherwise use parent Blueprint
                                 if i['is_cluster_indicator']:
                                     # Get blueprint of parent indicator
                                     try:
-                                        blueprint = Reportable.objects.get(external_id=i['cluster_indicator_id']).blueprint
+                                        blueprint = Reportable.objects.get(
+                                            external_id=i['cluster_indicator_id']).blueprint
                                     except Reportable.DoesNotExist:
                                         blueprint = None
                                 else:
                                     # Create IndicatorBlueprint
                                     i['disaggregatable'] = True
                                     blueprint = self.process_model(IndicatorBlueprint, PMPIndicatorBlueprintSerializer, i,
-                                                             {'external_id': i['id']})
+                                                                   {'external_id': i['id']})
 
                                 locations = list()
                                 for l in i['locations']:
                                     # Create gateway for location
-                                    # TODO: assign country after PMP add these fields into API
-                                    l['gateway_country'] = workspace.countries.all()[0].id
+                                    # TODO: assign country after PMP add these
+                                    # fields into API
+                                    l['gateway_country'] = workspace.countries.all()[
+                                        0].id
                                     l['admin_level'] = 1
-                                    gateway = self.process_model(GatewayType, PMPGatewayTypeSerializer, l, {'name': l['pcode']})
+                                    gateway = self.process_model(
+                                        GatewayType, PMPGatewayTypeSerializer, l, {
+                                            'name': l['pcode']})
 
                                     # Create location
                                     l['gateway'] = gateway.id
-                                    location = self.process_model(Location, PMPLocationSerializer, l, {'p_code': l['pcode']})
+                                    location = self.process_model(
+                                        Location, PMPLocationSerializer, l, {
+                                            'p_code': l['pcode']})
                                     locations.append(location)
 
-                                # If indicator is not cluster, create Disaggregation otherwise use parent Disaggregation
+                                # If indicator is not cluster, create
+                                # Disaggregation otherwise use parent
+                                # Disaggregation
                                 disaggregations = list()
                                 if i['is_cluster_indicator']:
                                     # Get Disaggregation
                                     try:
-                                        disaggregations = list(Reportable.objects.get(external_id=i['cluster_indicator_id']).disaggregations.all())
+                                        disaggregations = list(
+                                            Reportable.objects.get(
+                                                external_id=i['cluster_indicator_id']).disaggregations.all())
                                     except Reportable.DoesNotExist:
                                         disaggregations = list()
                                 else:
@@ -250,10 +274,11 @@ class ProgrammeDocumentCronJob(CronJobBase):
                                     for dis in i['disaggregation']:
                                         dis['active'] = True
                                         disaggregation = self.process_model(Disaggregation, PMPDisaggregationSerializer, dis,
-                                                                      {'name': dis['name']})
+                                                                            {'name': dis['name']})
                                         disaggregations.append(disaggregation)
 
-                                # TODO: REMOVE THIS TEMPORARY DISAGGREGATION VALUES CREATE
+                                # TODO: REMOVE THIS TEMPORARY DISAGGREGATION
+                                # VALUES CREATE
                                 for dis in disaggregations:
                                     if dis.disaggregation_values.all().count() < 1:
                                         for number in range(5):
@@ -265,14 +290,16 @@ class ProgrammeDocumentCronJob(CronJobBase):
                                 # Create Reportable
                                 i['blueprint_id'] = blueprint.id if blueprint else None
                                 i['location_ids'] = [l.id for l in locations]
-                                i['disaggregation_ids'] = [ds.id for ds in disaggregations]
+                                i['disaggregation_ids'] = [
+                                    ds.id for ds in disaggregations]
 
-                                i['content_type'] = ContentType.objects.get_for_model(llo).id
+                                i['content_type'] = ContentType.objects.get_for_model(
+                                    llo).id
                                 i['object_id'] = llo.id
                                 i['start_date'] = item['start_date']
                                 i['end_date'] = item['end_date']
                                 self.process_model(Reportable, PMPReportableSerializer, i,
-                                                                    {'external_id': i['id']})
+                                                   {'external_id': i['id']})
 
                     # Check if another page exists
                     if list_data['next']:

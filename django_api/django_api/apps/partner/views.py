@@ -50,7 +50,8 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
     def get_queryset(self, *args, **kwargs):
         response_plan_id = self.kwargs.get('response_plan_id')
 
-        return PartnerProject.objects.select_related('partner').prefetch_related('clusters', 'locations').filter(clusters__response_plan_id=response_plan_id)
+        return PartnerProject.objects.select_related('partner').prefetch_related(
+            'clusters', 'locations').filter(clusters__response_plan_id=response_plan_id)
 
     def add_many_to_many_relations(self, instance):
         """
@@ -83,14 +84,16 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
         serializer = self.get_serializer(data=self.request.data)
 
         if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
 
         serializer.save()
         errors = self.add_many_to_many_relations(serializer.instance)
         if errors:
             return Response(errors, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({'id': serializer.instance.id}, status=status.HTTP_201_CREATED)
+        return Response({'id': serializer.instance.id},
+                        status=status.HTTP_201_CREATED)
 
 
 class PartnerProjectAPIView(APIView):
@@ -101,7 +104,8 @@ class PartnerProjectAPIView(APIView):
 
     def get_instance(self, request, pk=None):
         try:
-            instance = PartnerProject.objects.get(id=(pk or request.data['id']))
+            instance = PartnerProject.objects.get(
+                id=(pk or request.data['id']))
         except PartnerProject.DoesNotExist:
             # TODO: log exception
             raise Http404
@@ -118,7 +122,8 @@ class PartnerProjectAPIView(APIView):
             data=self.request.data
         )
         if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -135,7 +140,8 @@ class PartnerProjectSimpleListAPIView(ListAPIView):
 
     def get_queryset(self):
         response_plan_id = self.kwargs.get(self.lookup_field)
-        return PartnerProject.objects.filter(partner__clusters__response_plan_id=response_plan_id)
+        return PartnerProject.objects.filter(
+            partner__clusters__response_plan_id=response_plan_id)
 
 
 class PartnerSimpleListAPIView(ListAPIView):
@@ -145,7 +151,8 @@ class PartnerSimpleListAPIView(ListAPIView):
 
     def get_queryset(self):
         response_plan_id = self.kwargs.get(self.lookup_field)
-        return Partner.objects.filter(clusters__response_plan_id=response_plan_id)
+        return Partner.objects.filter(
+            clusters__response_plan_id=response_plan_id)
 
 
 class PartnerActivityAPIView(APIView):
@@ -186,7 +193,8 @@ class PartnerActivityAPIView(APIView):
                 data=self.request.data)
 
             if not serializer.is_valid():
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response(serializer.errors,
+                                status=status.HTTP_400_BAD_REQUEST)
 
             try:
                 pa = PartnerActivity.objects.create(
@@ -203,7 +211,8 @@ class PartnerActivityAPIView(APIView):
                     {'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
         else:
-            return Response({'error': "Wrong create mode flag"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': "Wrong create mode flag"},
+                            status=status.HTTP_400_BAD_REQUEST)
 
         return Response({'id': pa.id}, status=status.HTTP_201_CREATED)
 
@@ -219,7 +228,8 @@ class ClusterActivityPartnersAPIView(ListAPIView):
 
     def get_queryset(self, *args, **kwargs):
         cluster_activity_id = self.kwargs.get(self.lookup_field)
-        return Partner.objects.filter(partner_activities__cluster_activity_id=cluster_activity_id)
+        return Partner.objects.filter(
+            partner_activities__cluster_activity_id=cluster_activity_id)
 
 
 class PartnerActivityListCreateAPIView(ListCreateAPIView):

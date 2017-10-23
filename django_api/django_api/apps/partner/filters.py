@@ -16,7 +16,6 @@ class PartnerProjectFilter(filters.FilterSet):
     end_date = DateFilter(method='get_end_date')
     cluster_id = CharFilter(method='get_cluster_id')
 
-
     class Meta:
         model = PartnerProject
         fields = ['title', 'location', 'status', 'start_date', 'end_date']
