@@ -8,8 +8,9 @@
     <style include="analysis-widget-styles iron-flex iron-flex-alignment">
 
       .reports {
-        padding: .75em 0 0;
+        padding: 0;
         margin: 0;
+        border-top: 1px solid var(--paper-grey-400);
         list-style: none;
         font-size: 12px;
       }
@@ -17,9 +18,6 @@
       .reports li {
         padding: .75em .5em;
         position: relative;
-      }
-
-      .reports li:not(:last-of-type) {
         border-bottom: 1px solid var(--paper-grey-200);
       }
 
@@ -34,7 +32,7 @@
         top: .5em;
         bottom: .5em;
         z-index: 1;
-        background: var(--paper-grey-300);
+        background: var(--paper-grey-200);
       }
     </style>
 
