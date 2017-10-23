@@ -76,3 +76,9 @@ def remove_untagged_images():
     Delete all untagged (<none>) images
     """
     local('docker rmi $(docker images | grep "^<none>" | awk "{print $3}")')
+
+def autopep8():
+    """
+    Format all Python files to pep8-compliant
+    """
+    local('docker-compose exec django_api find . -name \*.py -exec autopep8 --in-place --aggressive --aggressive --ignore=E402 {} +')
