@@ -133,12 +133,10 @@ def get_cast_dictionary_keys_as_tuple(dictionary):
     Returns a copy of passed-in dictionary as dict instance,
     after casting all of its keys as tuple.
     """
-    casted_dictionary = dictionary.copy()
-    keys = casted_dictionary.keys()
+    casted_dictionary = dict()
 
-    for key in keys:
-        casted_dictionary[literal_eval(key)] = casted_dictionary[key]
-        casted_dictionary.pop(key)
+    for key in dictionary.copy().keys():
+        casted_dictionary[literal_eval(key)] = dictionary[key]
 
     return casted_dictionary
 
@@ -148,12 +146,10 @@ def get_cast_dictionary_keys_as_string(dictionary):
     Returns a copy of passed-in dictionary as dict instance,
     after casting all of its keys as string.
     """
-    casted_dictionary = dictionary.copy()
-    keys = casted_dictionary.keys()
+    casted_dictionary = dict()
 
-    for key in keys:
-        casted_dictionary[str(key)] = casted_dictionary[key]
-        casted_dictionary.pop(key)
+    for key in dictionary.copy().keys():
+        casted_dictionary[str(key)] = dictionary[key]
 
     return casted_dictionary
 
