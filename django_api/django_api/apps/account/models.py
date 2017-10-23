@@ -45,6 +45,7 @@ class User(AbstractUser):
             instance.set_unusable_password()
             instance.save()
 
+
 class UserProfile(TimeStampedModel):
     """
     User Profile model related with user as profile.

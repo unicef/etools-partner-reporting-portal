@@ -47,7 +47,8 @@ def generate_0_num_disagg_data(reportable, indicator_type="quantity"):
     location = reportable.locations.first()
     disagg_idx = 0
 
-    for idx, indicator_report_from_reportable in enumerate(reportable.indicator_reports.all()):
+    for idx, indicator_report_from_reportable in enumerate(
+            reportable.indicator_reports.all()):
         if indicator_type == "quantity":
             disaggregation = {
                 '()': {
@@ -82,7 +83,8 @@ def generate_1_num_disagg_data(reportable, indicator_type="quantity"):
     # IndicatorLocationData
     locations = Location.objects.all()
 
-    for idx, indicator_report_from_reportable in enumerate(reportable.indicator_reports.all()):
+    for idx, indicator_report_from_reportable in enumerate(
+            reportable.indicator_reports.all()):
         disagg_idx = 0
 
         # 1 num_disaggregation & 0 level_reported
@@ -156,7 +158,8 @@ def generate_2_num_disagg_data(reportable, indicator_type="quantity"):
     # IndicatorLocationData
     locations = Location.objects.all()
 
-    for idx, indicator_report_from_reportable in enumerate(reportable.indicator_reports.all()):
+    for idx, indicator_report_from_reportable in enumerate(
+            reportable.indicator_reports.all()):
         disagg_idx = 0
 
         # 2 num_disaggregation & 0 level_reported
@@ -257,7 +260,8 @@ def generate_3_num_disagg_data(reportable, indicator_type="quantity"):
     # IndicatorLocationData
     locations = Location.objects.all()
 
-    for idx, indicator_report_from_reportable in enumerate(reportable.indicator_reports.all()):
+    for idx, indicator_report_from_reportable in enumerate(
+            reportable.indicator_reports.all()):
         disagg_idx = 0
 
         # 3 num_disaggregation & 0 level_reported
@@ -540,7 +544,8 @@ def generate_indicator_report_location_disaggregation_quantity_data():
             for location_id in list(reportable.indicator_reports.values_list(
                                     'indicator_location_data__location',
                                     flat=True)):
-                if not first_reportable_location_id or (first_reportable_location_id and first_reportable_location_id != location_id):
+                if not first_reportable_location_id or (
+                        first_reportable_location_id and first_reportable_location_id != location_id):
                     reportable.locations.add(
                         Location.objects.get(id=location_id))
 
@@ -589,7 +594,8 @@ def generate_indicator_report_location_disaggregation_ratio_data():
         if reportable.content_type.model in cluster_indicator_types:
             # ProgressReport - IndicatorReport from
             # RatioReportable object
-            indicator_report = RatioIndicatorReportFactory(reportable=reportable)
+            indicator_report = RatioIndicatorReportFactory(
+                reportable=reportable)
             indicator_report.progress_report = reportable.indicator_reports.first().progress_report
             indicator_report.save()
 
@@ -679,7 +685,8 @@ def generate_indicator_report_location_disaggregation_ratio_data():
             for location_id in list(reportable.indicator_reports.values_list(
                                     'indicator_location_data__location',
                                     flat=True)):
-                if not first_reportable_location_id or (first_reportable_location_id and first_reportable_location_id != location_id):
+                if not first_reportable_location_id or (
+                        first_reportable_location_id and first_reportable_location_id != location_id):
                     reportable.locations.add(
                         Location.objects.get(id=location_id))
 

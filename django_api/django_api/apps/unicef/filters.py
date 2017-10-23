@@ -14,7 +14,7 @@ from .models import ProgrammeDocument, ProgressReport
 BOOLEAN_CHOICES = (('0', 'False'), ('1', 'True'),)
 
 
-class  ProgrammeDocumentIndicatorFilter(django_filters.FilterSet):
+class ProgrammeDocumentIndicatorFilter(django_filters.FilterSet):
 
     pd_statuses = ChoiceFilter(choices=PD_STATUS, method='get_status')
     pds = CharFilter(method='get_programme_document')
@@ -65,11 +65,15 @@ class ProgrammeDocumentFilter(django_filters.FilterSet):
         return queryset.filter(status=value)
 
     def get_location(self, queryset, name, value):
-        return queryset.filter(progress_reports__indicator_reports__indicator_location_data__location=value)
+        return queryset.filter(
+            progress_reports__indicator_reports__indicator_location_data__location=value)
 
 
 class ProgressReportFilter(django_filters.FilterSet):
-    status = ChoiceFilter(name='status', choices=PROGRESS_REPORT_STATUS, label='Status')
+    status = ChoiceFilter(
+        name='status',
+        choices=PROGRESS_REPORT_STATUS,
+        label='Status')
     pd_ref_title = CharFilter(name='pd ref title', method='get_pd_ref_title',
                               label='PD/Ref # title')
     due_date = DateFilter(name='due date', method='get_due_date', label='Due date',
@@ -77,7 +81,7 @@ class ProgressReportFilter(django_filters.FilterSet):
     due = TypedChoiceFilter(name='due', choices=BOOLEAN_CHOICES, coerce=strtobool,
                             method='get_due_overdue_status', label='Show only due or overdue')
     location = CharFilter(name='location', method='get_location',
-                              label='Location')
+                          label='Location')
 
     class Meta:
         model = ProgressReport
@@ -103,4 +107,5 @@ class ProgressReportFilter(django_filters.FilterSet):
         return queryset.filter(due_date__lte=value)
 
     def get_location(self, queryset, name, value):
-        return queryset.filter(indicator_reports__indicator_location_data__location=value)
+        return queryset.filter(
+            indicator_reports__indicator_location_data__location=value)

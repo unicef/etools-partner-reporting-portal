@@ -55,6 +55,7 @@ from .models import (
     IndicatorLocationData,
     Disaggregation
 )
+from functools import reduce
 
 logger = logging.getLogger(__name__)
 
@@ -86,7 +87,8 @@ class PDReportsAPIView(ListAPIView):
 
         pd = get_object_or_404(ProgrammeDocument, pk=self.pd_id)
 
-        pks = pd.reportable_queryset.values_list('indicator_reports__pk', flat=True)
+        pks = pd.reportable_queryset.values_list(
+            'indicator_reports__pk', flat=True)
         return IndicatorReport.objects.filter(id__in=pks)
 
     def list(self, request, pd_id, *args, **kwargs):
@@ -157,18 +159,22 @@ class IndicatorListAPIView(ListAPIView):
     def get_queryset(self):
         content_object = self.kwargs.get(self.lookup_url_kwarg)
         if content_object == REPORTABLE_LLO_CONTENT_OBJECT:
-            queryset = Reportable.objects.filter(lower_level_outputs__isnull=False)
+            queryset = Reportable.objects.filter(
+                lower_level_outputs__isnull=False)
         elif content_object == REPORTABLE_CO_CONTENT_OBJECT:
-            queryset = Reportable.objects.filter(cluster_objectives__isnull=False)
+            queryset = Reportable.objects.filter(
+                cluster_objectives__isnull=False)
         elif content_object == REPORTABLE_CA_CONTENT_OBJECT:
-            queryset = Reportable.objects.filter(cluster_activities__isnull=False)
+            queryset = Reportable.objects.filter(
+                cluster_activities__isnull=False)
         elif content_object == REPORTABLE_PP_CONTENT_OBJECT:
-            queryset = Reportable.objects.filter(partner_projects__isnull=False)
+            queryset = Reportable.objects.filter(
+                partner_projects__isnull=False)
         elif content_object == REPORTABLE_PA_CONTENT_OBJECT:
-            queryset = Reportable.objects.filter(partner_activities__isnull=False)
+            queryset = Reportable.objects.filter(
+                partner_activities__isnull=False)
         else:
             raise Http404
-
 
         object_id = self.request.query_params.get('object_id', None)
         if content_object is not None and object_id is not None:
@@ -183,12 +189,21 @@ class IndicatorListAPIView(ListAPIView):
         pd_statuses = self.request.query_params.get('pd_statuses', None)
 
         if locations:
-            location_list = map(lambda item: int(item), filter(lambda item: item != '' and item.isdigit(), locations.split(',')))
+            location_list = map(
+                lambda item: int(item),
+                filter(
+                    lambda item: item != '' and item.isdigit(),
+                    locations.split(',')))
             q_list.append(Q(locations__id__in=location_list))
 
         if pds:
-            pd_list = map(lambda item: int(item), filter(lambda item: item != '' and item.isdigit(), pds.split(',')))
-            q_list.append(Q(lower_level_outputs__cp_output__programme_document__id__in=pd_list))
+            pd_list = map(
+                lambda item: int(item),
+                filter(
+                    lambda item: item != '' and item.isdigit(),
+                    pds.split(',')))
+            q_list.append(
+                Q(lower_level_outputs__cp_output__programme_document__id__in=pd_list))
 
         if clusters:
             cluster_list = map(lambda item: int(item), filter(
@@ -202,8 +217,13 @@ class IndicatorListAPIView(ListAPIView):
                 partner_activities__project__clusters__id__in=cluster_list))
 
         if pd_statuses:
-            pd_status_list = map(lambda item: item, filter(lambda item: item != '' and item.isdigit(), pd_statuses.split(',')))
-            q_list.append(Q(lower_level_outputs__cp_output__programme_document__status__in=pd_status_list))
+            pd_status_list = map(
+                lambda item: item,
+                filter(
+                    lambda item: item != '' and item.isdigit(),
+                    pd_statuses.split(',')))
+            q_list.append(
+                Q(lower_level_outputs__cp_output__programme_document__status__in=pd_status_list))
 
         if q_list:
             queryset = queryset.filter(reduce(operator.or_, q_list))
@@ -243,7 +263,8 @@ class IndicatorDataAPIView(APIView):
 
         location = self.request.query_params.get('location', None)
         if location:
-            queryset = queryset.filter(indicator_reports__indicator_location_data__location=location)
+            queryset = queryset.filter(
+                indicator_reports__indicator_location_data__location=location)
 
         incomplete = self.request.query_params.get('incomplete', None)
         if incomplete == "1":
@@ -287,7 +308,8 @@ class IndicatorDataAPIView(APIView):
             return Response({"errors": _errors},
                             status=status.HTTP_400_BAD_REQUEST)
 
-        pr = get_object_or_404(ProgressReport, pk=request.data['progress_report'].get('id'))
+        pr = get_object_or_404(ProgressReport,
+                               pk=request.data['progress_report'].get('id'))
         progress_report = ProgressReportUpdateSerializer(
             instance=pr,
             data=request.data['progress_report']
@@ -296,17 +318,21 @@ class IndicatorDataAPIView(APIView):
         if progress_report.is_valid():
             progress_report.save()
 
-        return Response(dict(progress_report=progress_report.data), status=status.HTTP_200_OK)
+        return Response(dict(progress_report=progress_report.data),
+                        status=status.HTTP_200_OK)
 
     @transaction.atomic
     def post(self, request, ir_id, *args, **kwargs):
         ir = self.get_indicator_report(ir_id)
 
-        # Check if all indicator data is fulfilled for IR status different then Met or No Progress
-        if ir.overall_status not in (OVERALL_STATUS.met, OVERALL_STATUS.no_progress):
+        # Check if all indicator data is fulfilled for IR status different then
+        # Met or No Progress
+        if ir.overall_status not in (
+                OVERALL_STATUS.met, OVERALL_STATUS.no_progress):
             for data in ir.indicator_location_data.all():
                 for key, vals in data.disaggregation.iteritems():
-                    if ir.is_percentage and (vals.get('c', None) in [None, '']):
+                    if ir.is_percentage and (
+                            vals.get('c', None) in [None, '']):
                         _errors = [{
                             "message": "You have not completed all required indicators for this progress report. Unless your Output status is Met or has No Progress, all indicator data needs to be completed."}]
                         return Response({"errors": _errors},
@@ -328,13 +354,15 @@ class IndicatorDataAPIView(APIView):
                 ir.progress_report.status = PROGRESS_REPORT_STATUS.submitted
                 ir.progress_report.save()
             else:
-                ir.report_status = INDICATOR_REPORT_STATUS.accepted # cluster IR's go to accepted directly
+                # cluster IR's go to accepted directly
+                ir.report_status = INDICATOR_REPORT_STATUS.accepted
                 ir.save()
 
             serializer = PDReportContextIndicatorReportSerializer(instance=ir)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            _errors = [{"message": "Indicator was already submitted. Your IMO will need to send it back for you to edit your submission."}]
+            _errors = [
+                {"message": "Indicator was already submitted. Your IMO will need to send it back for you to edit your submission."}]
             return Response({"errors": _errors},
                             status=status.HTTP_400_BAD_REQUEST)
 
@@ -353,7 +381,8 @@ class IndicatorDataAPIView(APIView):
                 return Response(serializer.errors,
                                 status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({"errors": "Indicator Report not found."}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"errors": "Indicator Report not found."},
+                        status=status.HTTP_400_BAD_REQUEST)
 
 
 class PDLowerLevelOutputStatusAPIView(APIView):
@@ -362,7 +391,9 @@ class PDLowerLevelOutputStatusAPIView(APIView):
     output in a PD progress report. TODO: move to 'unicef' app?
     """
     serializer_class = OverallNarrativeSerializer
-    permission_classes = (IsAuthenticated, IsPartnerEditorOrPartnerAuthorizedOfficer)
+    permission_classes = (
+        IsAuthenticated,
+        IsPartnerEditorOrPartnerAuthorizedOfficer)
 
     def patch(self, request, pd_progress_report_id, llo_id, *args, **kwargs):
         """
@@ -375,7 +406,7 @@ class PDLowerLevelOutputStatusAPIView(APIView):
         ir_qset = IndicatorReport.objects.filter(
             progress_report=pd_progress_report).filter(
                 reportable__object_id=llo_id
-            )
+        )
         if ir_qset:
             for indicator_report in ir_qset.all():
                 serializer = OverallNarrativeSerializer(
@@ -388,7 +419,8 @@ class PDLowerLevelOutputStatusAPIView(APIView):
                                     status=status.HTTP_400_BAD_REQUEST)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
-        return Response({"errors": "Reportable doesn't contain indicator."}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"errors": "Reportable doesn't contain indicator."},
+                        status=status.HTTP_400_BAD_REQUEST)
 
 
 class IndicatorReportListAPIView(APIView):
@@ -475,7 +507,8 @@ class IndicatorLocationDataUpdateAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
 
 
 class ClusterIndicatorAPIView(APIView):
@@ -486,8 +519,10 @@ class ClusterIndicatorAPIView(APIView):
     serializer_class = ClusterIndicatorSerializer
     permission_classes = (IsAuthenticated, )
 
-    # Naming this to get_serializer_instance in order to avoid colision in Swagger schema generation
-    def get_serializer_instance(self, data, instance=None, many=False, read_only=False):
+    # Naming this to get_serializer_instance in order to avoid colision in
+    # Swagger schema generation
+    def get_serializer_instance(
+            self, data, instance=None, many=False, read_only=False):
         return self.serializer_class(
             data=data,
             instance=instance,
@@ -498,7 +533,8 @@ class ClusterIndicatorAPIView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer_instance(request.data)
         if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
 
         serializer.save()
         return Response(
@@ -515,10 +551,12 @@ class ClusterIndicatorAPIView(APIView):
             data=request.data
         )
         if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
 
         serializer.save()
-        return Response({'id': serializer.instance.id}, status=status.HTTP_200_OK)
+        return Response({'id': serializer.instance.id},
+                        status=status.HTTP_200_OK)
 
 
 class IndicatorDataLocationAPIView(ListAPIView):

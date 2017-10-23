@@ -11,7 +11,6 @@ class WorkspaceCronJob(CronJobBase):
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
     code = 'core.WorkspaceCronJob'    # a unique code
 
-
     def do(self):
 
         # Hit API
@@ -30,7 +29,8 @@ class WorkspaceCronJob(CronJobBase):
                     raise Exception(serializer.errors)
                 workspace = serializer.save()
                 print "Create Country for Workspace: %s" % data['country_short_code']
-                country, created = Country.objects.get_or_create(name=workspace.title, country_short_code=data['country_short_code'])
+                country, created = Country.objects.get_or_create(
+                    name=workspace.title, country_short_code=data['country_short_code'])
                 workspace.countries.add(country)
         except Exception as e:
             print e

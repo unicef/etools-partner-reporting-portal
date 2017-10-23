@@ -49,7 +49,7 @@ urlpatterns = [
         name="progress-reports-details"),
     url(r'^(?P<workspace_id>\d+)/progress-reports/(?P<pk>\d+)/annex-C-export-PDF/$',
         ProgressReportPDFView.as_view(),
-            name="progress-reports-pdf"),
+        name="progress-reports-pdf"),
     url(r'^(?P<workspace_id>\d+)/progress-reports/(?P<pk>\d+)/submit/$',
         ProgressReportSubmitAPIView.as_view(),
         name="progress-reports-submit"),

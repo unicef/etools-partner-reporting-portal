@@ -21,8 +21,10 @@ from .models import (
 
 class PartnerDetailsSerializer(serializers.ModelSerializer):
 
-    partner_type_long = serializers.CharField(source='get_partner_type_display')
-    shared_partner_long = serializers.CharField(source='get_shared_partner_display')
+    partner_type_long = serializers.CharField(
+        source='get_partner_type_display')
+    shared_partner_long = serializers.CharField(
+        source='get_shared_partner_display')
     partner_type_display = serializers.SerializerMethodField()
     cso_type_display = serializers.SerializerMethodField()
     shared_partner_display = serializers.SerializerMethodField()
@@ -172,7 +174,8 @@ class ClusterActivityPartnersSerializer(serializers.ModelSerializer):
     partner_projects = PartnerProjectSimpleSerializer(many=True)
     links = serializers.SerializerMethodField()
     clusters = ClusterSimpleSerializer(many=True, read_only=True)
-    partner_activities = PartnerActivitySimpleSerializer(many=True, read_only=True)
+    partner_activities = PartnerActivitySimpleSerializer(
+        many=True, read_only=True)
 
     class Meta:
         model = Partner
@@ -229,19 +232,24 @@ class PartnerActivityBaseCreateSerializer(serializers.Serializer):
                 'PartnerProject ID {} does not exist.'.format(data['project']))
 
         if data['start_date'] > data['end_date']:
-            raise serializers.ValidationError("start_date should come before end_date")
+            raise serializers.ValidationError(
+                "start_date should come before end_date")
 
         return data
 
 
-class PartnerActivityFromClusterActivitySerializer(PartnerActivityBaseCreateSerializer):
+class PartnerActivityFromClusterActivitySerializer(
+        PartnerActivityBaseCreateSerializer):
     cluster_activity = serializers.IntegerField()
 
     def validate(self, data):
-        data = super(PartnerActivityFromClusterActivitySerializer, self).validate(data)
+        data = super(
+            PartnerActivityFromClusterActivitySerializer,
+            self).validate(data)
 
         try:
-            data['cluster_activity'] = ClusterActivity.objects.get(id=data['cluster_activity'])
+            data['cluster_activity'] = ClusterActivity.objects.get(
+                id=data['cluster_activity'])
 
             if data['cluster_activity'].cluster_objective.cluster.id != self.initial_data['cluster']:
                 raise serializers.ValidationError(
@@ -253,15 +261,19 @@ class PartnerActivityFromClusterActivitySerializer(PartnerActivityBaseCreateSeri
         return data
 
 
-class PartnerActivityFromCustomActivitySerializer(PartnerActivityBaseCreateSerializer):
+class PartnerActivityFromCustomActivitySerializer(
+        PartnerActivityBaseCreateSerializer):
     cluster_objective = serializers.IntegerField()
     title = serializers.CharField(max_length=255)
 
     def validate(self, data):
-        data = super(PartnerActivityFromCustomActivitySerializer, self).validate(data)
+        data = super(
+            PartnerActivityFromCustomActivitySerializer,
+            self).validate(data)
 
         try:
-            data['cluster_objective'] = ClusterObjective.objects.get(id=data['cluster_objective'])
+            data['cluster_objective'] = ClusterObjective.objects.get(
+                id=data['cluster_objective'])
 
             if data['cluster_objective'].cluster.id != self.initial_data['cluster']:
                 raise serializers.ValidationError(
@@ -300,14 +312,24 @@ class PartnerActivitySerializer(serializers.ModelSerializer):
 
 # PMP API Serializers
 
+
 class PMPPartnerSerializer(serializers.ModelSerializer):
 
     id = serializers.CharField(source='external_id')
     name = serializers.CharField(source='title', allow_blank=True)
     short_name = serializers.CharField(source='short_title', allow_blank=True)
-    partner_type = serializers.ChoiceField(choices=[(x[1], x[0]) for x in PARTNER_TYPE], allow_blank=True, allow_null=True)
-    cso_type = serializers.ChoiceField(choices=[(x[1], x[0]) for x in CSO_TYPES], allow_blank=True, allow_null=True)
-
+    partner_type = serializers.ChoiceField(
+        choices=[
+            (x[1],
+             x[0]) for x in PARTNER_TYPE],
+        allow_blank=True,
+        allow_null=True)
+    cso_type = serializers.ChoiceField(
+        choices=[
+            (x[1],
+             x[0]) for x in CSO_TYPES],
+        allow_blank=True,
+        allow_null=True)
 
     def fix_choices(self, validated_data):
         for pt in [(x[1], x[0]) for x in PARTNER_TYPE]:
@@ -320,7 +342,8 @@ class PMPPartnerSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         validated_data = self.fix_choices(validated_data)
-        return Partner.objects.filter(external_id=validated_data['external_id']).update(**validated_data)
+        return Partner.objects.filter(
+            external_id=validated_data['external_id']).update(**validated_data)
 
     def create(self, validated_data):
         validated_data = self.fix_choices(validated_data)

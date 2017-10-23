@@ -81,4 +81,4 @@ def autopep8():
     """
     Format all Python files to pep8-compliant
     """
-    local('docker-compose exec django_api find . -name \*.py -exec autopep8 --in-place --aggressive --aggressive --ignore=E402 {} +')
+    local('docker-compose exec django_api find . -name \*.py -not -path "./django_api/apps/**/migrations/*.py" -exec autopep8 --in-place --aggressive --recursive --jobs 2 --ignore=E402 {} +')

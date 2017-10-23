@@ -220,7 +220,8 @@ import djcelery
 djcelery.setup_loader()
 BROKER_URL = os.getenv('REDIS_URL', 'redis://redis:6379/0')
 BROKER_VISIBILITY_VAR = os.environ.get('CELERY_VISIBILITY_TIMEOUT', 1800)
-BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': int(BROKER_VISIBILITY_VAR)}  # 5 hours
+BROKER_TRANSPORT_OPTIONS = {
+    'visibility_timeout': int(BROKER_VISIBILITY_VAR)}  # 5 hours
 
 CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
@@ -247,7 +248,7 @@ CELERYD_PREFETCH_MULTIPLIER = 1
 # CELERYD_MAX_TASKS_PER_CHILD = 1000
 
 LEAFLET_CONFIG = {
-    'TILES':  'http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+    'TILES': 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
     'ATTRIBUTION_PREFIX': 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012',
     'MIN_ZOOM': 3,
     'MAX_ZOOM': 18,
@@ -276,7 +277,7 @@ REST_FRAMEWORK = {
         (
             'rest_framework.authentication.SessionAuthentication',
             'rest_framework.authentication.TokenAuthentication',
-        )
+    )
 }
 
 
@@ -294,5 +295,3 @@ PASSWORDLESS_AUTH = {
 PMP_API_ENDPOINT = "https://etools-demo.unicef.org/api"
 PMP_API_USER = os.getenv('PMP_API_USER')
 PMP_API_PASSWORD = os.getenv('PMP_API_PASSWORD')
-
-

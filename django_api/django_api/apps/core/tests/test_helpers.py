@@ -84,8 +84,7 @@ class TestCombinatorics(TestCase):
             r=2
         )
 
-        key_combinations = list(set(key_combinations))
-        key_combinations.sort()
+        key_combinations = sorted(set(key_combinations))
 
         expected = [
             (3, 1),
@@ -107,6 +106,7 @@ class TestCombinatorics(TestCase):
 
         self.assertEquals(key_combinations, expected)
 
+
 class TestDictionaryHelpers(TestCase):
     def setUp(self):
         self.entry_dict = {
@@ -125,7 +125,8 @@ class TestDictionaryHelpers(TestCase):
         self.assertEquals(sorted_dict.keys(), expected_key_list)
 
     def test_get_sorted_ordered_dict_by_keys_ascending(self):
-        sorted_dict = get_sorted_ordered_dict_by_keys(self.entry_dict, reverse=False)
+        sorted_dict = get_sorted_ordered_dict_by_keys(
+            self.entry_dict, reverse=False)
 
         expected_key_list = [(111,), (101,), (100,), ()]
         expected_key_list.reverse()
@@ -133,7 +134,8 @@ class TestDictionaryHelpers(TestCase):
         self.assertEquals(sorted_dict.keys(), expected_key_list)
 
     def test_get_sorted_ordered_dict_by_keys_with_key_func(self):
-        sorted_dict = get_sorted_ordered_dict_by_keys(self.entry_dict, key_func=len)
+        sorted_dict = get_sorted_ordered_dict_by_keys(
+            self.entry_dict, key_func=len)
 
         expected_key_list = [(111,), (101,), (), (100,)]
 

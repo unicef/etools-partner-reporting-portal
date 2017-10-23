@@ -20,8 +20,9 @@ try:
     ]
 
     PRP_GROUPS = PRP_PARTNER_GROUPS + PRP_AGENCY_GROUPS
-except:
+except BaseException:
     print "No groups created yet!"
+
 
 class UserAdminForm(forms.ModelForm):
     class Meta:
@@ -56,27 +57,30 @@ class UserAdminForm(forms.ModelForm):
             raise forms.ValidationError("User should belong to a PRP group")
         elif prp_group_count > 1:
             raise forms.ValidationError(
-                    "User cannot belong to more than one PRP group")
+                "User cannot belong to more than one PRP group")
 
         return self.cleaned_data['groups']
 
     def clean_organization(self):
         if not self.cleaned_data['partner'] and not self.cleaned_data['organization']:
-            raise forms.ValidationError('Organization required for non-partner users')
+            raise forms.ValidationError(
+                'Organization required for non-partner users')
         return self.cleaned_data['organization']
 
     def clean_imo_clusters(self):
         if self.cleaned_data.get('imo_clusters') and self.cleaned_data.get('groups') and \
-            IMORole.as_group() not in self.cleaned_data['groups']:
-            raise forms.ValidationError('IMO clusters cannot be set for a user who does not belong to IMO role/group')
+                IMORole.as_group() not in self.cleaned_data['groups']:
+            raise forms.ValidationError(
+                'IMO clusters cannot be set for a user who does not belong to IMO role/group')
         return self.cleaned_data['imo_clusters']
 
     def clean(self):
         super(UserAdminForm, self).clean()
 
         if self.cleaned_data.get('partner') and self.cleaned_data.get('imo_clusters') and \
-            self.cleaned_data['imo_clusters'].count() > 0:
-            raise forms.ValidationError("A user cannot be assigned both a partner and IMO Clusters.")
+                self.cleaned_data['imo_clusters'].count() > 0:
+            raise forms.ValidationError(
+                "A user cannot be assigned both a partner and IMO Clusters.")
 
         partner_group_count = 0
         for g in self.cleaned_data.get('groups', []):
@@ -85,7 +89,7 @@ class UserAdminForm(forms.ModelForm):
 
         if self.cleaned_data.get('imo_clusters') and partner_group_count > 0:
             raise forms.ValidationError(
-                    "User who belongs to an partner role/group cannot be assigned IMO groups.")
+                "User who belongs to an partner role/group cannot be assigned IMO groups.")
 
         agency_group_count = 0
         for g in self.cleaned_data.get('groups', []):
@@ -94,12 +98,15 @@ class UserAdminForm(forms.ModelForm):
 
         if self.cleaned_data.get('partner') and agency_group_count > 0:
             raise forms.ValidationError(
-                    "User who belongs to an agency role/group cannot be assigned a partner.")
+                "User who belongs to an agency role/group cannot be assigned a partner.")
 
-        if not self.cleaned_data.get('imo_clusters') and agency_group_count > 0:
-            raise forms.ValidationError('Please select one or more IMO clusters.')
+        if not self.cleaned_data.get(
+                'imo_clusters') and agency_group_count > 0:
+            raise forms.ValidationError(
+                'Please select one or more IMO clusters.')
 
         if not self.cleaned_data.get('partner') and partner_group_count > 0:
-            raise forms.ValidationError('Please select a partner for this user.')
+            raise forms.ValidationError(
+                'Please select a partner for this user.')
 
         return self.cleaned_data
