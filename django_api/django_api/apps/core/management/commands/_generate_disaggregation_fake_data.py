@@ -462,7 +462,8 @@ def generate_indicator_report_location_disaggregation_quantity_data():
 
         # -- 0 num_disaggregation generation for 3 entries --
         if idx % 8 == 0:
-            print "NO Disaggregation (and DisaggregationValue) objects for QuantityReportable object {} created".format(idx)
+            print(
+                "NO Disaggregation (and DisaggregationValue) objects for QuantityReportable object {} created".format(idx))
 
         # -- 1 num_disaggregation generation for 3 entries --
         elif idx % 8 == 1:
@@ -470,21 +471,24 @@ def generate_indicator_report_location_disaggregation_quantity_data():
                 reportable,
                 disaggregation_targets=["height"])
 
-            print "Disaggregation (and DisaggregationValue) objects for QuantityReportable object {} created".format(idx)
+            print(
+                "Disaggregation (and DisaggregationValue) objects for QuantityReportable object {} created".format(idx))
 
         elif idx % 8 == 2:
             add_disaggregations_to_reportable(
                 reportable,
                 disaggregation_targets=["age"])
 
-            print "Disaggregation (and DisaggregationValue) objects for QuantityReportable object {} created".format(idx)
+            print(
+                "Disaggregation (and DisaggregationValue) objects for QuantityReportable object {} created".format(idx))
 
         elif idx % 8 == 3:
             add_disaggregations_to_reportable(
                 reportable,
                 disaggregation_targets=["gender"])
 
-            print "Disaggregation (and DisaggregationValue) objects for QuantityReportable object {} created".format(idx)
+            print(
+                "Disaggregation (and DisaggregationValue) objects for QuantityReportable object {} created".format(idx))
 
         # -- 2 num_disaggregation generation for 3 entries --
         elif idx % 8 == 4:
@@ -492,21 +496,24 @@ def generate_indicator_report_location_disaggregation_quantity_data():
                 reportable,
                 disaggregation_targets=["height", "age"])
 
-            print "Disaggregation (and DisaggregationValue) objects for QuantityReportable object {} created".format(idx)
+            print(
+                "Disaggregation (and DisaggregationValue) objects for QuantityReportable object {} created".format(idx))
 
         elif idx % 8 == 5:
             add_disaggregations_to_reportable(
                 reportable,
                 disaggregation_targets=["height", "gender"])
 
-            print "Disaggregation (and DisaggregationValue) objects for QuantityReportable object {} created".format(idx)
+            print(
+                "Disaggregation (and DisaggregationValue) objects for QuantityReportable object {} created".format(idx))
 
         elif idx % 8 == 6:
             add_disaggregations_to_reportable(
                 reportable,
                 disaggregation_targets=["gender", "age"])
 
-            print "Disaggregation (and DisaggregationValue) objects for QuantityReportable object {} created".format(idx)
+            print(
+                "Disaggregation (and DisaggregationValue) objects for QuantityReportable object {} created".format(idx))
 
         # -- 3 num_disaggregation generation for 3 entries --
         elif idx % 8 == 7:
@@ -514,7 +521,8 @@ def generate_indicator_report_location_disaggregation_quantity_data():
                 reportable,
                 disaggregation_targets=["age", "gender", "height"])
 
-            print "Disaggregation (and DisaggregationValue) objects for QuantityReportable object {} created".format(idx)
+            print(
+                "Disaggregation (and DisaggregationValue) objects for QuantityReportable object {} created".format(idx))
 
     for idx, reportable in enumerate(queryset):
         # -- 0 num_disaggregation generation for 3 entries --
@@ -549,7 +557,7 @@ def generate_indicator_report_location_disaggregation_quantity_data():
                     reportable.locations.add(
                         Location.objects.get(id=location_id))
 
-        print "IndicatorReport and its Disaggregation data entries for QuantityReportable object {} created".format(idx)
+        print("IndicatorReport and its Disaggregation data entries for QuantityReportable object {} created".format(idx))
 
     # Making the rest of IndicatorReport objects not latest so that
     # IndicatorReport objects with location data are guaranteed to show up
@@ -603,7 +611,8 @@ def generate_indicator_report_location_disaggregation_ratio_data():
 
         # -- 0 num_disaggregation generation for 3 entries --
         if idx % 8 == 0:
-            print "NO Disaggregation (and DisaggregationValue) objects for RatioReportable object {} created".format(idx)
+            print(
+                "NO Disaggregation (and DisaggregationValue) objects for RatioReportable object {} created".format(idx))
 
         # -- 1 num_disaggregation generation for 3 entries --
         elif idx % 8 == 1:
@@ -611,21 +620,24 @@ def generate_indicator_report_location_disaggregation_ratio_data():
                 reportable,
                 disaggregation_targets=["height"])
 
-            print "Disaggregation (and DisaggregationValue) objects for RatioReportable object {} created".format(idx)
+            print(
+                "Disaggregation (and DisaggregationValue) objects for RatioReportable object {} created".format(idx))
 
         elif idx % 8 == 2:
             add_disaggregations_to_reportable(
                 reportable,
                 disaggregation_targets=["age"])
 
-            print "Disaggregation (and DisaggregationValue) objects for RatioReportable object {} created".format(idx)
+            print(
+                "Disaggregation (and DisaggregationValue) objects for RatioReportable object {} created".format(idx))
 
         elif idx % 8 == 3:
             add_disaggregations_to_reportable(
                 reportable,
                 disaggregation_targets=["gender"])
 
-            print "Disaggregation (and DisaggregationValue) objects for RatioReportable object {} created".format(idx)
+            print(
+                "Disaggregation (and DisaggregationValue) objects for RatioReportable object {} created".format(idx))
 
         # -- 2 num_disaggregation generation for 3 entries --
         elif idx % 8 == 4:
@@ -633,21 +645,24 @@ def generate_indicator_report_location_disaggregation_ratio_data():
                 reportable,
                 disaggregation_targets=["height", "age"])
 
-            print "Disaggregation (and DisaggregationValue) objects for RatioReportable object {} created".format(idx)
+            print(
+                "Disaggregation (and DisaggregationValue) objects for RatioReportable object {} created".format(idx))
 
         elif idx % 8 == 5:
             add_disaggregations_to_reportable(
                 reportable,
                 disaggregation_targets=["height", "gender"])
 
-            print "Disaggregation (and DisaggregationValue) objects for RatioReportable object {} created".format(idx)
+            print(
+                "Disaggregation (and DisaggregationValue) objects for RatioReportable object {} created".format(idx))
 
         elif idx % 8 == 6:
             add_disaggregations_to_reportable(
                 reportable,
                 disaggregation_targets=["gender", "age"])
 
-            print "Disaggregation (and DisaggregationValue) objects for RatioReportable object {} created".format(idx)
+            print(
+                "Disaggregation (and DisaggregationValue) objects for RatioReportable object {} created".format(idx))
 
         # -- 3 num_disaggregation generation for 3 entries --
         elif idx % 8 == 7:
@@ -655,7 +670,8 @@ def generate_indicator_report_location_disaggregation_ratio_data():
                 reportable,
                 disaggregation_targets=["age", "gender", "height"])
 
-            print "Disaggregation (and DisaggregationValue) objects for RatioReportable object {} created".format(idx)
+            print(
+                "Disaggregation (and DisaggregationValue) objects for RatioReportable object {} created".format(idx))
 
     for idx, reportable in enumerate(queryset):
         # -- 0 num_disaggregation generation for 3 entries --
@@ -690,7 +706,7 @@ def generate_indicator_report_location_disaggregation_ratio_data():
                     reportable.locations.add(
                         Location.objects.get(id=location_id))
 
-        print "IndicatorReport and its Disaggregation data entries for RatioReportable object {} created".format(idx)
+        print("IndicatorReport and its Disaggregation data entries for RatioReportable object {} created".format(idx))
 
     # Making the rest of IndicatorReport objects not latest so that
     # IndicatorReport objects with location data are guaranteed to show up

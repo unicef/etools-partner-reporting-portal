@@ -711,10 +711,10 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
         update_data = IndicatorLocationDataUpdateSerializer(
             indicator_location_data).data
 
-        level_reported_key = filter(
+        level_reported_key = list(filter(
             lambda item: len(make_tuple(item)) ==
             indicator_location_data.level_reported,
-            update_data['disaggregation'].keys())[0]
+            update_data['disaggregation'].keys()))[0]
         update_data['disaggregation'].pop(level_reported_key)
 
         url = reverse('indicator-location-data-entries-put-api')

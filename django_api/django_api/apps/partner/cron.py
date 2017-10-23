@@ -22,7 +22,7 @@ class PartnerCronJob(CronJobBase):
             for item in data:
                 if item['hidden']:
                     continue
-                print "Creating Partner: %s" % item['vendor_number']
+                print("Creating Partner: %s" % item['vendor_number'])
                 try:
                     instance = Partner.objects.get(
                         vendor_number=item['vendor_number'])
@@ -34,5 +34,5 @@ class PartnerCronJob(CronJobBase):
                 else:
                     raise Exception(serializer.errors)
         except Exception as e:
-            print e
+            print(e)
             raise Exception(e)

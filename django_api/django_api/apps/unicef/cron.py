@@ -94,20 +94,24 @@ class ProgrammeDocumentCronJob(CronJobBase):
                             business_area_code=str(
                                 workspace.business_area_code), url=page_url)
                     except Exception as e:
-                        print "API Endpoint error: %s" % e
+                        print("API Endpoint error: %s" % e)
                         break
 
-                    print "Found %s PDs for %s Workspace (%s)" % (list_data['count'], workspace.title, workspace.business_area_code)
+                    print(
+                        "Found %s PDs for %s Workspace (%s)" %
+                        (list_data['count'],
+                         workspace.title,
+                         workspace.business_area_code))
 
                     for item in list_data['results']:
-                        print "Processing PD: %s" % item['id']
+                        print("Processing PD: %s" % item['id'])
 
                         # Get partner data
                         partner_data = item['partner_org']
 
                         # Skip entries without unicef_vendor_number
                         if not partner_data['unicef_vendor_number']:
-                            print "No unicef_vendor_number - skipping!"
+                            print("No unicef_vendor_number - skipping!")
                             continue
 
                         # Create/Assign Partner
@@ -299,11 +303,11 @@ class ProgrammeDocumentCronJob(CronJobBase):
 
                     # Check if another page exists
                     if list_data['next']:
-                        print "Found new page"
+                        print("Found new page")
                         page_url = list_data['next']
                     else:
-                        print "End of workspace"
+                        print("End of workspace")
                         break
             except Exception as e:
-                print e
+                print(e)
                 raise Exception(e)

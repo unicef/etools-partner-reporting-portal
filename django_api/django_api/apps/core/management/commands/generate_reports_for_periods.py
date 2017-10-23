@@ -63,8 +63,8 @@ class Command(BaseCommand):
         IndicatorLocationData objects.
         """
         for pd in ProgrammeDocument.objects.filter(status=PD_STATUS.active):
-            print "Processing ProgrammeDocument {} between {} - {}".format(
-                pd, pd.start_date, pd.end_date)
+            print("Processing ProgrammeDocument {} between {} - {}".format(
+                pd, pd.start_date, pd.end_date))
 
             reportable_queryset = pd.reportable_queryset
             frequency = pd.frequency
@@ -73,8 +73,8 @@ class Command(BaseCommand):
             date_list = []
 
             if frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
-                print "PD {} frequency is custom specific dates".format(
-                    pd)
+                print("PD {} frequency is custom specific dates".format(
+                    pd))
                 if not latest_progress_report:
                     date_list = pd.reporting_periods.filter(
                         start_date__gte=pd.start_date, end_date__lte=datetime.now())
@@ -84,23 +84,23 @@ class Command(BaseCommand):
             else:
                 # Get missing date list based on progress report existence
                 if latest_progress_report:
-                    print "PD {} ProgressReport Found with period of {} - {} ".format(
+                    print("PD {} ProgressReport Found with period of {} - {} ".format(
                         pd,
                         latest_progress_report.start_date,
-                        latest_progress_report.end_date)
+                        latest_progress_report.end_date))
 
                     date_list = find_missing_frequency_period_dates(
                         pd.start_date, latest_progress_report.end_date, frequency
                     )
 
                 else:
-                    print "PD {} ProgressReport NOT Found".format(
-                        pd)
+                    print("PD {} ProgressReport NOT Found".format(
+                        pd))
 
                     date_list = find_missing_frequency_period_dates(
                         pd.start_date, None, frequency)
 
-            print "Missing dates: {}".format(date_list)
+            print("Missing dates: {}".format(date_list))
 
             with transaction.atomic():
                 for idx, missing_date in enumerate(date_list):
@@ -115,7 +115,8 @@ class Command(BaseCommand):
                         missing_date = missing_date.start_date
 
                     # Create ProgressReport first
-                    print "Creating PD {} ProgressReport object for {} - {}".format(pd, missing_date, end_date)
+                    print(
+                        "Creating PD {} ProgressReport object for {} - {}".format(pd, missing_date, end_date))
                     next_progress_report = ProgressReportFactory(
                         start_date=missing_date,
                         end_date=end_date,
@@ -125,7 +126,9 @@ class Command(BaseCommand):
 
                     for reportable in reportable_queryset:
                         if reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
-                            print "Creating PD {} Quantity IndicatorReport object for {} - {}".format(pd, missing_date, end_date)
+                            print(
+                                "Creating PD {} Quantity IndicatorReport object for {} - {}".format(
+                                    pd, missing_date, end_date))
                             indicator_report = QuantityIndicatorReportFactory(
                                 reportable=reportable,
                                 time_period_start=missing_date,
@@ -134,8 +137,8 @@ class Command(BaseCommand):
                             )
 
                             for location in reportable.locations.all():
-                                print "Creating IndicatorReport {} IndicatorLocationData object for {} - {}".format(
-                                    indicator_report, missing_date, end_date)
+                                print("Creating IndicatorReport {} IndicatorLocationData object for {} - {}".format(
+                                    indicator_report, missing_date, end_date))
                                 IndicatorLocationDataFactory(
                                     indicator_report=indicator_report,
                                     location=location,
@@ -149,7 +152,9 @@ class Command(BaseCommand):
                                 )
 
                         else:
-                            print "Creating PD {} Ratio IndicatorReport object for {} - {}".format(pd, missing_date, end_date)
+                            print(
+                                "Creating PD {} Ratio IndicatorReport object for {} - {}".format(
+                                    pd, missing_date, end_date))
                             indicator_report = RatioIndicatorReportFactory(
                                 reportable=reportable,
                                 time_period_start=missing_date,
@@ -158,8 +163,8 @@ class Command(BaseCommand):
                             )
 
                             for location in reportable.locations.all():
-                                print "Creating IndicatorReport {} IndicatorLocationData object {} - {}".format(
-                                    indicator_report, missing_date, end_date)
+                                print("Creating IndicatorReport {} IndicatorLocationData object {} - {}".format(
+                                    indicator_report, missing_date, end_date))
                                 IndicatorLocationDataFactory(
                                     indicator_report=indicator_report,
                                     location=location,
@@ -179,8 +184,8 @@ class Command(BaseCommand):
         for indicator in Reportable.objects.filter(
             content_type__model__in=[
                 'partnerproject', 'partneractivity', 'clusterobjective']):
-            print "Processing Reportable {} between {} - {}".format(
-                indicator, indicator.start_date, indicator.end_date)
+            print("Processing Reportable {} between {} - {}".format(
+                indicator, indicator.start_date, indicator.end_date))
 
             frequency = indicator.frequency
             latest_indicator_report = indicator.indicator_reports.order_by(
@@ -188,8 +193,8 @@ class Command(BaseCommand):
             date_list = []
 
             if frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
-                print "Indicator {} frequency is custom specific dates".format(
-                    indicator)
+                print("Indicator {} frequency is custom specific dates".format(
+                    indicator))
 
                 if not latest_indicator_report:
                     date_list = [indicator.start_date]
@@ -208,10 +213,10 @@ class Command(BaseCommand):
             else:
                 # Get missing date list based on progress report existence
                 if latest_indicator_report:
-                    print "Indicator {} IndicatorReport Found with period of {} - {} ".format(
+                    print("Indicator {} IndicatorReport Found with period of {} - {} ".format(
                         indicator,
                         latest_indicator_report.time_period_start,
-                        latest_indicator_report.time_period_end)
+                        latest_indicator_report.time_period_end))
 
                     date_list = find_missing_frequency_period_dates(
                         indicator.start_date,
@@ -220,13 +225,13 @@ class Command(BaseCommand):
                     )
 
                 else:
-                    print "Indicator {} IndicatorReport Not Found".format(
-                        indicator)
+                    print("Indicator {} IndicatorReport Not Found".format(
+                        indicator))
 
                     date_list = find_missing_frequency_period_dates(
                         indicator.start_date, None, frequency)
 
-            print "Missing dates: {}".format(date_list)
+            print("Missing dates: {}".format(date_list))
 
             with transaction.atomic():
                 last_element_idx = len(date_list) - 1
@@ -245,7 +250,9 @@ class Command(BaseCommand):
                             missing_date, frequency)
 
                     if indicator.blueprint.unit == IndicatorBlueprint.NUMBER:
-                        print "Creating Indicator {} Quantity IndicatorReport object for {} - {}".format(indicator, missing_date, end_date)
+                        print(
+                            "Creating Indicator {} Quantity IndicatorReport object for {} - {}".format(
+                                indicator, missing_date, end_date))
 
                         indicator_report = QuantityIndicatorReportFactory(
                             reportable=indicator,
@@ -254,8 +261,8 @@ class Command(BaseCommand):
                         )
 
                         for location in indicator.locations.all():
-                            print "Creating IndicatorReport {} IndicatorLocationData object {} - {}".format(
-                                indicator_report, missing_date, end_date)
+                            print("Creating IndicatorReport {} IndicatorLocationData object {} - {}".format(
+                                indicator_report, missing_date, end_date))
 
                             location_data = IndicatorLocationDataFactory(
                                 indicator_report=indicator_report,
@@ -270,7 +277,9 @@ class Command(BaseCommand):
                             )
 
                     else:
-                        print "Creating Indicator {} Ratio IndicatorReport object for {} - {}".format(indicator, missing_date, end_date)
+                        print(
+                            "Creating Indicator {} Ratio IndicatorReport object for {} - {}".format(
+                                indicator, missing_date, end_date))
 
                         indicator_report = RatioIndicatorReportFactory(
                             reportable=indicator,
@@ -279,8 +288,8 @@ class Command(BaseCommand):
                         )
 
                         for location in indicator.locations.all():
-                            print "Creating IndicatorReport {} IndicatorLocationData object {} - {}".format(
-                                indicator_report, missing_date, end_date)
+                            print("Creating IndicatorReport {} IndicatorLocationData object {} - {}".format(
+                                indicator_report, missing_date, end_date))
 
                             location_data = IndicatorLocationDataFactory(
                                 indicator_report=indicator_report,

@@ -330,7 +330,7 @@ class IndicatorDataAPIView(APIView):
         if ir.overall_status not in (
                 OVERALL_STATUS.met, OVERALL_STATUS.no_progress):
             for data in ir.indicator_location_data.all():
-                for key, vals in data.disaggregation.iteritems():
+                for key, vals in data.disaggregation.items():
                     if ir.is_percentage and (
                             vals.get('c', None) in [None, '']):
                         _errors = [{
@@ -458,7 +458,7 @@ class IndicatorReportListAPIView(APIView):
                 '-time_period_start')
 
         if 'limit' in self.request.query_params:
-            limit = self.request.query_params.get('limit', 2)
+            limit = int(self.request.query_params.get('limit', '2'))
             indicator_reports = indicator_reports[:limit]
 
         return indicator_reports
