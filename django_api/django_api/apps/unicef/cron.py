@@ -5,15 +5,18 @@ from django.contrib.auth.models import Group
 
 from account.models import User
 
+from core.common import PD_STATUS
 from core.api import PMP_API
 from core.models import Workspace, GatewayType, Location
 from core.serializers import PMPGatewayTypeSerializer, PMPLocationSerializer
 
 from unicef.serializers import PMPProgrammeDocumentSerializer, PMPPDPartnerSerializer, PMPPDPersonSerializer, \
     PMPLLOSerializer, PMPPDResultLinkSerializer
-from indicator.serializers import PMPIndicatorBlueprintSerializer, PMPDisaggregationSerializer, PMPReportableSerializer
 from unicef.models import ProgrammeDocument, Person, LowerLevelOutput, PDResultLink
+
+from indicator.serializers import PMPIndicatorBlueprintSerializer, PMPDisaggregationSerializer, PMPReportableSerializer
 from indicator.models import IndicatorBlueprint, Disaggregation, Reportable, DisaggregationValue
+
 from partner.models import Partner
 
 class ProgrammeDocumentCronJob(CronJobBase):
@@ -137,6 +140,14 @@ class ProgrammeDocumentCronJob(CronJobBase):
                         # Create PD
                         pd = self.process_model(ProgrammeDocument, PMPProgrammeDocumentSerializer, item,
                                                      {'external_id': item['id'], 'workspace': workspace})
+                        # TODO: remove temporary ACTIVE status, agreement, population focus
+                        if pd.status == PD_STATUS.draft:
+                            pd.status = PD_STATUS.active
+                        if not pd.agreement:
+                            pd.agreement = pd.reference_number
+                        if not pd.population_focus:
+                            pd.population_focus = "Detail Information"
+                        pd.save()
 
                         # Create unicef_focal_points
                         person_data_list = item['unicef_focal_points']

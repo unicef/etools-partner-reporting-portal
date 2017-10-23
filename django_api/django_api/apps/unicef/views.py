@@ -27,7 +27,8 @@ from core.paginations import SmallPagination
 from core.permissions import (
     IsAuthenticated,
     IsPartnerAuthorizedOfficer,
-    IsPartnerEditor
+    IsPartnerEditor,
+    IsPartnerEditorOrPartnerAuthorizedOfficer
 )
 from core.models import Location
 from core.serializers import ShortLocationSerializer
@@ -318,8 +319,7 @@ class ProgressReportDetailsUpdateAPIView(APIView):
         Endpoint for updating Progress Report narrative fields
     """
     permission_classes = (IsAuthenticated,
-                          IsPartnerAuthorizedOfficer,
-                          IsPartnerEditor)
+                          IsPartnerEditorOrPartnerAuthorizedOfficer)
 
     def get_object(self, pk):
         try:
