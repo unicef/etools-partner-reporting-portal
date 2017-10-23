@@ -1071,18 +1071,24 @@ class ClusterPartnerAnalysisIndicatorResultSerializer(serializers.ModelSerialize
             return []
 
     def get_project(self, obj):
-        return obj.content_object.project.title if obj.content_object.project \
-            else ""
+        if isinstance(obj.content_object, PartnerActivity) \
+                and obj.content_object.project:
+            return obj.content_object.project.title
+        else:
+            return ""
 
     def get_cluster_activity(self, obj):
-        return obj.content_object.cluster_activity.title \
-            if obj.content_object.cluster_activity else ""
+        if isinstance(obj.content_object, PartnerActivity) \
+                and obj.content_object.cluster_activity:
+            return obj.content_object.cluster_activity.title
+        else:
+            return ""
 
     def get_latest_report_status(self, obj):
         ir = obj.indicator_reports.latest('id')
 
         if ir:
-            return OVERALL_STATUS_DICT[ir.overall_status]
+            return ir.overall_status
         else:
             return ""
 
