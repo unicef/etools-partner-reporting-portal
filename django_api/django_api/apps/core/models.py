@@ -40,7 +40,7 @@ try:
                                      create_group=False)
     IMORole = GroupWrapper(code='imo', name='IMO', create_group=False)
 except Exception as e:
-    print "Group DB is not ready yet! - Error: %s" % e
+    print("Group DB is not ready yet! - Error: %s" % e)
 
 
 def get_random_color():
@@ -339,7 +339,7 @@ class GatewayType(TimeStampedModel):
     Represents an Admin Type in location-related models.
     """
 
-    name = models.CharField(max_length=64L, unique=True)
+    name = models.CharField(max_length=64, unique=True)
     admin_level = models.PositiveSmallIntegerField()
 
     country = models.ForeignKey(Country, related_name="gateway_types")

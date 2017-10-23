@@ -21,7 +21,7 @@ try:
 
     PRP_GROUPS = PRP_PARTNER_GROUPS + PRP_AGENCY_GROUPS
 except:
-    print "No groups created yet!"
+    print("No groups created yet!")
 
 class UserAdminForm(forms.ModelForm):
     class Meta:

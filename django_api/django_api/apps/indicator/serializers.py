@@ -416,7 +416,7 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
         disaggregation_data_keys = data['disaggregation'].keys()
 
         valid_entry_count = len(valid_disaggregation_value_pairs)
-        disaggregation_data_key_count = len(disaggregation_data_keys)
+        disaggregation_data_key_count = len(list(disaggregation_data_keys))
 
         # Assertion on all combinatoric entries for num_disaggregation and
         # level_reported against submitted disaggregation data
@@ -426,10 +426,10 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
                 + "extra combination pair keys"
             )
 
-        valid_level_reported_key_count = len(filter(
+        valid_level_reported_key_count = len(list(filter(
             lambda key: len(key) == data['level_reported'],
             valid_disaggregation_value_pairs
-        ))
+        )))
         level_reported_key_count = 0
 
         # Disaggregation data coordinate space check from level_reported
@@ -461,7 +461,7 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
                     "%s coordinate space does not " % (key)
                     + "have a correct value dictionary")
 
-            elif data['disaggregation'][key].keys() != ['c', 'd', 'v']:
+            elif list(data['disaggregation'][key].keys()) != ['c', 'd', 'v']:
                 raise serializers.ValidationError(
                     "%s coordinate space value does not " % (key)
                     + "have correct value key structure: c, d, v")
@@ -1030,4 +1030,3 @@ class PMPReportableSerializer(serializers.ModelSerializer):
             'start_date',
             'end_date'
         )
-
