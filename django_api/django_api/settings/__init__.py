@@ -1,5 +1,4 @@
-from __future__ import absolute_import
-import os
+from importlib import import_module
 
 # import defaults
 from .base import *
@@ -10,11 +9,7 @@ from django_api.apps.core.celery import app as celery_app
 
 __all__ = ['celery_app']
 
-overrides = __import__(
-    'django_api.settings.{}'.format(ENV),
-    globals(),
-    locals(),
-)
+overrides = import_module('django_api.settings.{}'.format(ENV))
 
 # apply imported overrides
 for attr in dir(overrides):
