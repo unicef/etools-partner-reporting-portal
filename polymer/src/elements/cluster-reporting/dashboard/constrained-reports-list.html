@@ -5,7 +5,8 @@
 
 <link rel="import" href="../../../redux/store.html">
 <link rel="import" href="../../../behaviors/routing.html">
-<link rel="import" href="../../../elements/etools-prp-progress-bar.html">
+<link rel="import" href="../../etools-prp-progress-bar.html">
+<link rel="import" href="../../list-placeholder.html">
 <link rel="import" href="../../../styles/table-styles.html">
 
 <dom-module id="constrained-reports-list">
@@ -61,7 +62,7 @@
               [[item.cluster]]
             </div>
             <div class="table-cell table-cell--text" flex-2>
-              <a href="[[_getReportUrl(_baseUrlCluster, item.indicator_id)]]">[[item.title]]</a>
+              <a href="[[_getReportUrl(_baseUrlCluster, item.id)]]">[[item.title]]</a>
             </div>
             <div class="table-cell table-cell--text">
               [[item.partner]]
@@ -71,12 +72,17 @@
             </div>
             <div class="table-cell" flex-2>
               <etools-prp-progress-bar
-                  number="[[item.progress_percentage]]">
+                  number="[[item.reportable.progress_percentage]]">
               </etools-prp-progress-bar>
             </div>
           </div>
         </etools-data-table-row>
       </template>
+
+      <list-placeholder
+          data="[[data]]"
+          loading="[[loading]]">
+      </list-placeholder>
 
       <footer>
         <a href="[[reportsUrl]]">See more</a>

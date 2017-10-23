@@ -2,15 +2,19 @@ from django.conf import settings
 from rest_framework import serializers
 
 from .models import ProgrammeDocument, Section, ProgressReport, Person, \
-    LowerLevelOutput, CountryProgrammeOutput
-from core.common import PROGRESS_REPORT_STATUS, OVERALL_STATUS
-from indicator.models import Reportable
+    LowerLevelOutput, PDResultLink
+
+from core.common import PROGRESS_REPORT_STATUS, OVERALL_STATUS, CURRENCIES
+from core.models import Workspace
+
 from indicator.serializers import (
     PDReportContextIndicatorReportSerializer,
     IndicatorBlueprintSimpleSerializer,
     IndicatorLLoutputsSerializer,
     ReportableSimpleSerializer
 )
+
+from partner.models import Partner
 
 
 class PersonSerializer(serializers.ModelSerializer):
@@ -144,11 +148,12 @@ class CPOutputSerializer(serializers.ModelSerializer):
     ll_outputs = LLOutputSerializer(many=True, read_only=True)
 
     class Meta:
-        model = CountryProgrammeOutput
+        model = PDResultLink
         fields = (
             'id',
             'title',
-            'll_outputs'
+            'll_outputs',
+            'external_cp_output_id',
         )
 
 
@@ -163,7 +168,7 @@ class ProgrammeDocumentOutputSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'title',
-            'cp_outputs'
+            'cp_outputs',
         )
 
 
@@ -200,7 +205,7 @@ class ProgressReportSimpleSerializer(serializers.ModelSerializer):
         )
 
     def get_is_draft(self, obj):
-        return obj.latest_indicator_report.is_draft
+        return obj.latest_indicator_report.is_draft if obj.latest_indicator_report else None
 
 
 class ProgressReportSerializer(ProgressReportSimpleSerializer):
@@ -383,3 +388,101 @@ class ProgrammeDocumentProgressSerializer(serializers.ModelSerializer):
                 read_only=True, many=True).data
         else:
             return []
+
+# PMP API Serializers
+
+class PMPPDPersonSerializer(serializers.ModelSerializer):
+
+    phone_num = serializers.CharField(source='phone_number', required=False, allow_blank=True, allow_null=True)
+
+    class Meta:
+        model = Person
+        fields = (
+            "name",
+            "title",
+            "phone_num",
+            "email",
+        )
+
+
+class PMPPDPartnerSerializer(serializers.ModelSerializer):
+
+    name = serializers.CharField(source='title')
+    short_name = serializers.CharField(source='short_title', allow_blank=True)
+    unicef_vendor_number = serializers.CharField(source='vendor_number')
+
+    class Meta:
+        model = Partner
+        fields = (
+            "name",
+            "short_name",
+            "unicef_vendor_number",
+        )
+        validators = []
+
+class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='external_id')
+    offices = serializers.CharField(source='unicef_office')
+    number = serializers.CharField(source='reference_number')
+    cso_budget = serializers.CharField(source='budget')
+    unicef_budget = serializers.CharField(source='total_unicef_cash')
+    funds_received = serializers.CharField(source='funds_received_to_date')
+    cso_budget_currency = serializers.ChoiceField(choices=CURRENCIES, allow_null=True, source="budget_currency")
+    funds_received_currency = serializers.ChoiceField(choices=CURRENCIES, allow_null=True, source="funds_received_to_date_currency")
+    unicef_budget_currency = serializers.ChoiceField(choices=CURRENCIES, allow_null=True, source="total_unicef_cash_currency")
+    start_date = serializers.DateField(required=False, allow_null=True)
+    end_date = serializers.DateField(required=False, allow_null=True)
+    partner = serializers.PrimaryKeyRelatedField(queryset=Partner.objects.all())
+    workspace = serializers.PrimaryKeyRelatedField(queryset=Workspace.objects.all())
+
+    def update(self, instance, validated_data):
+        return ProgrammeDocument.objects.filter(external_id=validated_data['external_id']).update(**validated_data)
+
+    def create(self, validated_data):
+        return ProgrammeDocument.objects.create(**validated_data)
+
+    class Meta:
+        model = ProgrammeDocument
+        fields = (
+            "id",
+            "title",
+            "offices",
+            "number",
+            "partner",
+            "start_date",
+            "end_date",
+            "cso_budget",
+            "cso_budget_currency",
+            "unicef_budget",
+            "unicef_budget_currency",
+            "funds_received",
+            "funds_received_currency",
+            "workspace",
+        )
+
+class PMPLLOSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='external_id')
+    cp_output = serializers.PrimaryKeyRelatedField(queryset=PDResultLink.objects.all())
+
+    class Meta:
+        model = LowerLevelOutput
+        fields = (
+            'id',
+            'title',
+            'cp_output'
+        )
+
+class PMPPDResultLinkSerializer(serializers.ModelSerializer):
+    result_link = serializers.CharField(source='external_id')
+    id = serializers.CharField(source='external_cp_output_id')
+    programme_document = serializers.PrimaryKeyRelatedField(queryset=ProgrammeDocument.objects.all())
+
+    class Meta:
+        model = PDResultLink
+        fields = (
+            'id',
+            'title',
+            'result_link',
+            'programme_document'
+        )
+

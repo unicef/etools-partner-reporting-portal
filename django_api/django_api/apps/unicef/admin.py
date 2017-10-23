@@ -3,7 +3,7 @@ from django.contrib import admin
 from .models import (
     ProgressReport,
     ProgrammeDocument,
-    CountryProgrammeOutput,
+    PDResultLink,
     LowerLevelOutput,
     Section,
     Person,
@@ -29,8 +29,9 @@ class ReportingPeriodDatesAdmin(admin.ModelAdmin):
     search_fields = ('programme_document__title', )
 
 
-class CountryProgrammeOutputAdmin(admin.ModelAdmin):
-    list_display = ('title', 'programme_document')
+class PDResultLinkAdmin(admin.ModelAdmin):
+    list_display = ('title', 'programme_document', 'external_cp_output_id',
+                    'external_id')
     list_filter = ('programme_document',)
 
 
@@ -42,7 +43,7 @@ class LowerLevelOutputAdmin(admin.ModelAdmin):
 
 admin.site.register(ProgrammeDocument, ProgrammeDocumentAdmin)
 admin.site.register(ProgressReport, ProgressReportAdmin)
-admin.site.register(CountryProgrammeOutput, CountryProgrammeOutputAdmin)
+admin.site.register(PDResultLink, PDResultLinkAdmin)
 admin.site.register(LowerLevelOutput, LowerLevelOutputAdmin)
 admin.site.register(Section)
 admin.site.register(Person)
