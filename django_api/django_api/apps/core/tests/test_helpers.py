@@ -122,7 +122,7 @@ class TestDictionaryHelpers(TestCase):
 
         expected_key_list = [(111,), (101,), (100,), ()]
 
-        self.assertEquals(sorted_dict.keys(), expected_key_list)
+        self.assertEquals(list(sorted_dict.keys()), expected_key_list)
 
     def test_get_sorted_ordered_dict_by_keys_ascending(self):
         sorted_dict = get_sorted_ordered_dict_by_keys(self.entry_dict, reverse=False)
@@ -130,14 +130,14 @@ class TestDictionaryHelpers(TestCase):
         expected_key_list = [(111,), (101,), (100,), ()]
         expected_key_list.reverse()
 
-        self.assertEquals(sorted_dict.keys(), expected_key_list)
+        self.assertEquals(list(sorted_dict.keys()), expected_key_list)
 
     def test_get_sorted_ordered_dict_by_keys_with_key_func(self):
         sorted_dict = get_sorted_ordered_dict_by_keys(self.entry_dict, key_func=len)
 
         expected_key_list = [(111,), (101,), (), (100,)]
 
-        self.assertEquals(sorted_dict.keys(), expected_key_list)
+        self.assertEquals(list(sorted_dict.keys()), expected_key_list)
 
     def test_get_cast_dictionary_keys_as_string(self):
         converted_dict = get_cast_dictionary_keys_as_string(self.entry_dict)
