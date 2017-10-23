@@ -31,3 +31,14 @@ class IsPartnerEditor(BasePermission):
         return user.is_authenticated() and \
             user.groups.filter(
                     name=PartnerEditorRole.as_group().name).exists()
+
+
+class IsPartnerEditorOrPartnerAuthorizedOfficer(BasePermission):
+    def has_permission(self, request, view):
+        user = request.user
+        return user.is_authenticated() and (\
+            user.groups.filter(
+                    name=PartnerEditorRole.as_group().name).exists() or
+            user.groups.filter(
+                name=PartnerAuthorizedOfficerRole.as_group().name).exists()
+        )

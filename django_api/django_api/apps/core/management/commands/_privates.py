@@ -3,10 +3,12 @@
 # encoding: utf-8
 
 from __future__ import unicode_literals
+
 import datetime
 import random
 
 from django.conf import settings
+from django.core.management import call_command
 
 from account.models import (
     User,
@@ -99,6 +101,7 @@ from ._generate_disaggregation_fake_data import (
 from core.cron import WorkspaceCronJob
 from partner.cron import PartnerCronJob
 from unicef.cron import ProgrammeDocumentCronJob
+from indicator.cron import IndicatorReportOverDueCronJob
 
 OVERALL_STATUS_LIST = [x[0] for x in OVERALL_STATUS]
 
@@ -165,6 +168,13 @@ def generate_real_data(fast=True):
     # Generate programme documents
     pd_cron = ProgrammeDocumentCronJob()
     pd_cron.do(fast)
+
+    # Generate PR/IR
+    call_command('generate_reports_for_periods')
+
+    # Generate due/overdue reports
+    due_reports = IndicatorReportOverDueCronJob()
+    due_reports.do()
 
 
 def generate_fake_data(workspace_quantity=10):
