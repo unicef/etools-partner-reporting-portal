@@ -16,7 +16,8 @@ import django_filters.rest_framework
 from core.permissions import (
     IsAuthenticated,
     IsPartnerAuthorizedOfficer,
-    IsPartnerEditor
+    IsPartnerEditor,
+    IsPartnerEditorOrPartnerAuthorizedOfficer
 )
 from core.paginations import SmallPagination
 from core.models import Location
@@ -361,9 +362,7 @@ class PDLowerLevelOutputStatusAPIView(APIView):
     output in a PD progress report. TODO: move to 'unicef' app?
     """
     serializer_class = OverallNarrativeSerializer
-    permission_classes = (IsAuthenticated,
-                          IsPartnerAuthorizedOfficer,
-                          IsPartnerEditor)
+    permission_classes = (IsAuthenticated, IsPartnerEditorOrPartnerAuthorizedOfficer)
 
     def patch(self, request, pd_progress_report_id, llo_id, *args, **kwargs):
         """

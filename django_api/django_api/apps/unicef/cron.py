@@ -141,9 +141,12 @@ class ProgrammeDocumentCronJob(CronJobBase):
                         pd = self.process_model(ProgrammeDocument, PMPProgrammeDocumentSerializer, item,
                                                      {'external_id': item['id'], 'workspace': workspace})
                         # TODO: remove temporary ACTIVE status, agreement, population focus
-                        pd.status = PD_STATUS.active
-                        pd.agreement = pd.reference_number
-                        pd.population_focus = "Detail Information"
+                        if pd.status == PD_STATUS.draft:
+                            pd.status = PD_STATUS.active
+                        if not pd.agreement:
+                            pd.agreement = pd.reference_number
+                        if not pd.population_focus:
+                            pd.population_focus = "Detail Information"
                         pd.save()
 
                         # Create unicef_focal_points
