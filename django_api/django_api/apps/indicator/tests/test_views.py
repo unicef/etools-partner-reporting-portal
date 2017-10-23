@@ -74,7 +74,8 @@ class TestIndicatorDataAPIView(BaseAPITestCase):
     generate_fake_data_quantity = 30
 
     def test_list_api(self):
-        ir = IndicatorReport.objects.filter(reportable__lower_level_outputs__isnull=False).first()
+        ir = IndicatorReport.objects.filter(
+            reportable__lower_level_outputs__isnull=False).first()
 
         if not ir.progress_report:
             ir.progress_report = ProgressReportFactory(
@@ -115,7 +116,8 @@ class TestIndicatorDataAPIView(BaseAPITestCase):
         self.assertEquals(response.data['outputs'][0]['id'], reportable_id)
 
     def test_enter_indicator(self):
-        ir = IndicatorReport.objects.filter(reportable__lower_level_outputs__isnull=False).first()
+        ir = IndicatorReport.objects.filter(
+            reportable__lower_level_outputs__isnull=False).first()
 
         if not ir.progress_report:
             ir.progress_report = ProgressReportFactory(
@@ -123,7 +125,8 @@ class TestIndicatorDataAPIView(BaseAPITestCase):
             ir.save()
 
         self.assertEquals(ir.progress_report.partner_contribution_to_date, '')
-        self.assertEquals(ir.progress_report.challenges_in_the_reporting_period, '')
+        self.assertEquals(
+            ir.progress_report.challenges_in_the_reporting_period, '')
         data = {
             'progress_report': {
                 'id': ir.progress_report.id,
@@ -138,9 +141,15 @@ class TestIndicatorDataAPIView(BaseAPITestCase):
         response = self.client.put(url, data=data, format='json')
         updated_ir = IndicatorReport.objects.get(id=ir.id)
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(response.data['progress_report']['partner_contribution_to_date'], u'update field')
-        self.assertEquals(updated_ir.progress_report.partner_contribution_to_date, u'update field')
-        self.assertEquals(updated_ir.progress_report.challenges_in_the_reporting_period, u'new challanges')
+        self.assertEquals(
+            response.data['progress_report']['partner_contribution_to_date'],
+            u'update field')
+        self.assertEquals(
+            updated_ir.progress_report.partner_contribution_to_date,
+            u'update field')
+        self.assertEquals(
+            updated_ir.progress_report.challenges_in_the_reporting_period,
+            u'new challanges')
 
         del data['progress_report']
         response = self.client.put(url, data=data, format='json')
@@ -159,9 +168,14 @@ class TestIndicatorDataAPIView(BaseAPITestCase):
         url = reverse('indicator-data', kwargs={'ir_id': ir.id})
         response = self.client.post(url, format='json')
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-        self.assertEquals(response.data['submission_date'], date.today().strftime(settings.PRINT_DATA_FORMAT))
+        self.assertEquals(
+            response.data['submission_date'],
+            date.today().strftime(
+                settings.PRINT_DATA_FORMAT))
         self.assertEquals(response.data['is_draft'], False)
-        self.assertEquals(response.data['progress_report_status'], PROGRESS_REPORT_STATUS.submitted)
+        self.assertEquals(
+            response.data['progress_report_status'],
+            PROGRESS_REPORT_STATUS.submitted)
 
 
 class TestIndicatorListAPIView30(BaseAPITestCase):
@@ -207,7 +221,11 @@ class TestIndicatorDataReportableAPIView(BaseAPITestCase):
 
     def test_overall_narrative(self):
         ir = IndicatorReport.objects.first()
-        url = reverse('indicator-data-reportable', kwargs={'ir_id': ir.id, 'reportable_id': ir.reportable.id})
+        url = reverse(
+            'indicator-data-reportable',
+            kwargs={
+                'ir_id': ir.id,
+                'reportable_id': ir.reportable.id})
 
         new_overall_status = OVERALL_STATUS.met
         data = dict(overall_status=new_overall_status)
@@ -223,7 +241,9 @@ class TestIndicatorDataReportableAPIView(BaseAPITestCase):
         response = self.client.patch(url, data=data, format='json')
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         updated_ir = IndicatorReport.objects.get(id=ir.id)
-        self.assertEquals(updated_ir.narrative_assessment, new_narrative_assessment)
+        self.assertEquals(
+            updated_ir.narrative_assessment,
+            new_narrative_assessment)
 
 
 class TestIndicatorReportListAPIView(BaseAPITestCase):
@@ -290,19 +310,29 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
 
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
-        self.assertEquals(Reportable.objects.count(), self.reportable_count+1)
-        self.assertEquals(IndicatorBlueprint.objects.count(), self.blueprint_count+1)
+        self.assertEquals(
+            Reportable.objects.count(),
+            self.reportable_count + 1)
+        self.assertEquals(
+            IndicatorBlueprint.objects.count(),
+            self.blueprint_count + 1)
 
         reportable = Reportable.objects.get(id=response.data['id'])
-        self.assertEquals(reportable.frequency, REPORTABLE_FREQUENCY_LEVEL.weekly)
+        self.assertEquals(
+            reportable.frequency,
+            REPORTABLE_FREQUENCY_LEVEL.weekly)
 
         rep_dis = Disaggregation.objects.filter(reportable=response.data['id'])
         self.assertTrue(rep_dis.first().name in ['Gender', 'Age'])
         self.assertTrue(rep_dis.last().name in ['Gender', 'Age'])
-        first_dis_vals = DisaggregationValue.objects.filter(disaggregation=rep_dis.first())
-        last_dis_vals = DisaggregationValue.objects.filter(disaggregation=rep_dis.last())
-        self.assertTrue(first_dis_vals.first().value in self.data['disaggregation'][0]['values'])
-        self.assertTrue(last_dis_vals.first().value in self.data['disaggregation'][1]['values'])
+        first_dis_vals = DisaggregationValue.objects.filter(
+            disaggregation=rep_dis.first())
+        last_dis_vals = DisaggregationValue.objects.filter(
+            disaggregation=rep_dis.last())
+        self.assertTrue(
+            first_dis_vals.first().value in self.data['disaggregation'][0]['values'])
+        self.assertTrue(
+            last_dis_vals.first().value in self.data['disaggregation'][1]['values'])
 
         self.data['locations'].append(dict(failkey=1))
         response = self.client.post(self.url, data=self.data, format='json')
@@ -321,22 +351,33 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
 
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
-        self.assertEquals(Reportable.objects.count(), self.reportable_count+1)
-        self.assertEquals(IndicatorBlueprint.objects.count(), self.blueprint_count+1)
+        self.assertEquals(
+            Reportable.objects.count(),
+            self.reportable_count + 1)
+        self.assertEquals(
+            IndicatorBlueprint.objects.count(),
+            self.blueprint_count + 1)
 
         reportable = Reportable.objects.get(id=response.data['id'])
-        self.assertEquals(reportable.blueprint.display_type, IndicatorBlueprint.PERCENTAGE)
+        self.assertEquals(
+            reportable.blueprint.display_type,
+            IndicatorBlueprint.PERCENTAGE)
 
     def test_create_indicator_disaggregation_max_length_reporting(self):
         max_length = DisaggregationValue._meta.get_field('value').max_length
-        over_max_val = "".join(random.sample(string.ascii_uppercase, max_length+1))
+        over_max_val = "".join(
+            random.sample(
+                string.ascii_uppercase,
+                max_length + 1))
         self.data['disaggregation'][1]['values'][0] = over_max_val
         response = self.client.post(self.url, data=self.data, format='json')
 
         self.assertFalse(status.is_success(response.status_code))
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEquals(Reportable.objects.count(), self.reportable_count)
-        self.assertEquals(IndicatorBlueprint.objects.count(), self.blueprint_count)
+        self.assertEquals(
+            IndicatorBlueprint.objects.count(),
+            self.blueprint_count)
         self.assertEquals(
             response.data,
             {"disaggregation": "Disaggregation Value expected max %s chars" % max_length}
@@ -358,11 +399,16 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
 
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
-        self.assertEquals(Reportable.objects.count(), self.reportable_count+1)
-        self.assertEquals(IndicatorBlueprint.objects.count(), self.blueprint_count+1)
+        self.assertEquals(
+            Reportable.objects.count(),
+            self.reportable_count + 1)
+        self.assertEquals(
+            IndicatorBlueprint.objects.count(),
+            self.blueprint_count + 1)
 
         reportable = Reportable.objects.get(id=response.data['id'])
-        self.assertEquals(reportable.frequency, REPORTABLE_FREQUENCY_LEVEL.custom_specific_dates)
+        self.assertEquals(reportable.frequency,
+                          REPORTABLE_FREQUENCY_LEVEL.custom_specific_dates)
         self.assertEquals(len(reportable.cs_dates), len(cs_dates))
 
     def test_create_indicator_partner_project_reporting(self):
@@ -373,8 +419,12 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
 
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
-        self.assertEquals(Reportable.objects.count(), self.reportable_count+1)
-        self.assertEquals(IndicatorBlueprint.objects.count(), self.blueprint_count+1)
+        self.assertEquals(
+            Reportable.objects.count(),
+            self.reportable_count + 1)
+        self.assertEquals(
+            IndicatorBlueprint.objects.count(),
+            self.blueprint_count + 1)
 
     def test_create_indicator_partner_activities_reporting(self):
         pa = PartnerActivity.objects.filter(project__isnull=False).first()
@@ -384,8 +434,12 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
 
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
-        self.assertEquals(Reportable.objects.count(), self.reportable_count+1)
-        self.assertEquals(IndicatorBlueprint.objects.count(), self.blueprint_count+1)
+        self.assertEquals(
+            Reportable.objects.count(),
+            self.reportable_count + 1)
+        self.assertEquals(
+            IndicatorBlueprint.objects.count(),
+            self.blueprint_count + 1)
 
     def test_create_indicator_fake_object_type_reporting(self):
         self.data['object_id'] = 1
@@ -398,7 +452,9 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
             ['Not valid data. Expected value is ClusterObjective, ClusterActivity, PartnerProject, PartnerActivity.']
         )
         self.assertEquals(Reportable.objects.count(), self.reportable_count)
-        self.assertEquals(IndicatorBlueprint.objects.count(), self.blueprint_count)
+        self.assertEquals(
+            IndicatorBlueprint.objects.count(),
+            self.blueprint_count)
 
     def test_update_indicator_cluster_reporting(self):
         response = self.client.post(self.url, data=self.data, format='json')
@@ -428,9 +484,13 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
         response = self.client.put(self.url, data=self.data, format='json')
 
         reportable = Reportable.objects.get(id=response.data['id'])
-        self.assertEquals(reportable.means_of_verification, new_means_of_verification)
+        self.assertEquals(
+            reportable.means_of_verification,
+            new_means_of_verification)
         self.assertEquals(reportable.blueprint.title, new_title)
-        self.assertEquals(reportable.blueprint.calculation_formula_across_locations, IndicatorBlueprint.AVG)
+        self.assertEquals(
+            reportable.blueprint.calculation_formula_across_locations,
+            IndicatorBlueprint.AVG)
         self.assertEquals(reportable.locations.count(), 1)
         self.assertEquals(
             reportable.locations.first().id,
@@ -607,7 +667,8 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
             indicator_location_data).data
 
         update_data['disaggregation_reported_on'].pop(0)
-        update_data['disaggregation_reported_on'].append(next_disaggregation_id)
+        update_data['disaggregation_reported_on'].append(
+            next_disaggregation_id)
 
         url = reverse('indicator-location-data-entries-put-api')
         response = self.client.put(url, update_data, format='json')
@@ -650,10 +711,10 @@ class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
         update_data = IndicatorLocationDataUpdateSerializer(
             indicator_location_data).data
 
-        level_reported_key = filter(
+        level_reported_key = list(filter(
             lambda item: len(make_tuple(item)) ==
             indicator_location_data.level_reported,
-            update_data['disaggregation'].keys())[0]
+            update_data['disaggregation'].keys()))[0]
         update_data['disaggregation'].pop(level_reported_key)
 
         url = reverse('indicator-location-data-entries-put-api')

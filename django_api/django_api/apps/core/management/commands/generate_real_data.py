@@ -1,20 +1,14 @@
+# -*- coding: utf-8 -*-
+
 from django.core.management.base import BaseCommand
 
-from ._privates import clean_up_data, generate_fake_data
+from ._privates import clean_up_data, generate_real_data
 
 
 class Command(BaseCommand):
     help = 'Creates a set of ORM objects for initial data'
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            '--quantity',
-            action='store',
-            type=int,
-            dest='quantity',
-            default=10,
-            help='# of workspaces to create'
-        )
 
         parser.add_argument(
             '--clean_before',
@@ -36,6 +30,6 @@ class Command(BaseCommand):
         if options['clean_before']:
             clean_up_data()
 
-        generate_fake_data(options['quantity'])
+        generate_real_data(fast=options['fast'])
 
-        print("Fake data are generated! :D")
+        print("Synchronization complete! ༼ つ ◕_◕ ༽つ")

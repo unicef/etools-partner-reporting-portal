@@ -1,6 +1,8 @@
+import hashlib
+
 from rest_framework import serializers
 
-from .models import Workspace, Location, ResponsePlan, Country
+from .models import Workspace, Location, ResponsePlan, Country, GatewayType
 
 
 class CountrySerializer(serializers.ModelSerializer):
@@ -82,3 +84,53 @@ class ResponsePlanSerializer(serializers.ModelSerializer):
     def get_clusters(self, obj):
         from cluster.serializers import ClusterSimpleSerializer
         return ClusterSimpleSerializer(obj.clusters.all(), many=True).data
+
+
+# PMP API Serializers
+
+class PMPWorkspaceSerializer(serializers.ModelSerializer):
+
+    id = serializers.CharField(source='external_id')
+    name = serializers.CharField(source='title')
+    country_short_code = serializers.CharField(source='workspace_code')
+
+    def create(self, validated_data):
+        # Update or create
+        try:
+            instance = Workspace.objects.get(
+                workspace_code=validated_data['workspace_code'])
+            return self.update(instance, validated_data)
+        except Workspace.DoesNotExist:
+            return Workspace.objects.create(**validated_data)
+
+    class Meta:
+        model = Workspace
+        fields = (
+            'id',
+            'name',
+            'latitude',
+            'longitude',
+            'initial_zoom',
+            'business_area_code',
+            'country_short_code')
+
+
+class PMPGatewayTypeSerializer(serializers.ModelSerializer):
+    gateway_country = serializers.PrimaryKeyRelatedField(
+        queryset=Country.objects.all(), source="country")
+    pcode = serializers.CharField(source='name')
+
+    class Meta:
+        model = GatewayType
+        fields = ('pcode', 'admin_level', 'gateway_country')
+
+
+class PMPLocationSerializer(serializers.ModelSerializer):
+    pcode = serializers.CharField(source='p_code')
+    name = serializers.CharField(source='title')
+    gateway = serializers.PrimaryKeyRelatedField(
+        queryset=GatewayType.objects.all())
+
+    class Meta:
+        model = Location
+        fields = ('name', 'pcode', 'gateway')

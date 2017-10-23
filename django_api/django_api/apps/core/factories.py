@@ -29,7 +29,7 @@ from unicef.models import (
     Person,
     ProgressReport,
     ProgrammeDocument,
-    CountryProgrammeOutput,
+    PDResultLink,
     LowerLevelOutput,
     ReportingPeriodDates,
 )
@@ -56,13 +56,18 @@ PD_STATUS_LIST = [x[0] for x in PD_STATUS]
 COUNTRIES_LIST = [x[0] for x in COUNTRIES_ALPHA2_CODE]
 COUNTRY_NAMES_LIST = [x[1] for x in COUNTRIES_ALPHA2_CODE]
 CALC_CHOICES_LIST = [x[0] for x in IndicatorBlueprint.CALC_CHOICES]
-DISPLAY_TYPE_CHOICES_LIST = [x[0] for x in IndicatorBlueprint.DISPLAY_TYPE_CHOICES]
-QUANTITY_CALC_CHOICES_LIST = [x[0] for x in IndicatorBlueprint.QUANTITY_CALC_CHOICES]
-QUANTITY_DISPLAY_TYPE_CHOICES_LIST = [x[0] for x in IndicatorBlueprint.QUANTITY_DISPLAY_TYPE_CHOICES]
+DISPLAY_TYPE_CHOICES_LIST = [x[0]
+                             for x in IndicatorBlueprint.DISPLAY_TYPE_CHOICES]
+QUANTITY_CALC_CHOICES_LIST = [x[0]
+                              for x in IndicatorBlueprint.QUANTITY_CALC_CHOICES]
+QUANTITY_DISPLAY_TYPE_CHOICES_LIST = [
+    x[0] for x in IndicatorBlueprint.QUANTITY_DISPLAY_TYPE_CHOICES]
 RATIO_CALC_CHOICES_LIST = [x[0] for x in IndicatorBlueprint.RATIO_CALC_CHOICES]
-RATIO_DISPLAY_TYPE_CHOICES_LIST = [x[0] for x in IndicatorBlueprint.RATIO_DISPLAY_TYPE_CHOICES]
+RATIO_DISPLAY_TYPE_CHOICES_LIST = [
+    x[0] for x in IndicatorBlueprint.RATIO_DISPLAY_TYPE_CHOICES]
 PD_FREQUENCY_LEVEL_CHOICE_LIST = [x[0] for x in PD_FREQUENCY_LEVEL]
-REPORTABLE_FREQUENCY_LEVEL_CHOICE_LIST = [x[0] for x in REPORTABLE_FREQUENCY_LEVEL]
+REPORTABLE_FREQUENCY_LEVEL_CHOICE_LIST = [
+    x[0] for x in REPORTABLE_FREQUENCY_LEVEL]
 OVERALL_STATUS_LIST = [x[0] for x in OVERALL_STATUS]
 REPORT_STATUS_LIST = [x[0] for x in INDICATOR_REPORT_STATUS]
 CLUSTER_TYPES_LIST = [x[0] for x in CLUSTER_TYPES]
@@ -93,8 +98,10 @@ class JSONFactory(factory.DictFactory):
 class PartnerFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "partner_%d" % n)
     total_ct_cp = fuzzy.FuzzyInteger(1000, 10000, 100)
-    partner_activity = factory.RelatedFactory('core.factories.PartnerActivityFactory', 'partner')
-    partner_project = factory.RelatedFactory('core.factories.PartnerProjectFactory', 'partner')
+    partner_activity = factory.RelatedFactory(
+        'core.factories.PartnerActivityFactory', 'partner')
+    partner_project = factory.RelatedFactory(
+        'core.factories.PartnerProjectFactory', 'partner')
     user = factory.RelatedFactory('core.factories.UserFactory', 'partner')
 
     @factory.post_generation
@@ -137,7 +144,8 @@ class PartnerProjectFactory(factory.django.DjangoModelFactory):
     end_date = today
 
     description = factory.Sequence(lambda n: "description %d" % n)
-    additional_information = factory.Sequence(lambda n: "additional_information %d" % n)
+    additional_information = factory.Sequence(
+        lambda n: "additional_information %d" % n)
     total_budget = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
     funding_source = factory.Sequence(lambda n: "funding_source %d" % n)
 
@@ -186,7 +194,8 @@ class UserFactory(factory.django.DjangoModelFactory):
     def _generate(cls, create, attrs):
         """Override the default _generate() to disable the post-save signal."""
 
-        # Note: If the signal was defined with a dispatch_uid, include that in both calls.
+        # Note: If the signal was defined with a dispatch_uid, include that in
+        # both calls.
         post_save.disconnect(UserProfile.create_user_profile, User)
         user = super(UserFactory, cls)._generate(create, attrs)
         post_save.connect(UserProfile.create_user_profile, User)
@@ -203,6 +212,7 @@ class UserFactory(factory.django.DjangoModelFactory):
 
 class CountryFactory(factory.django.DjangoModelFactory):
     name = fuzzy.FuzzyChoice(COUNTRY_NAMES_LIST)
+
     class Meta:
         model = Country
 
@@ -220,7 +230,9 @@ class ResponsePlanFactory(factory.django.DjangoModelFactory):
     start = beginning_of_this_year
     end = beginning_of_this_year + datetime.timedelta(days=364)
 
-    cluster = factory.RelatedFactory('core.factories.ClusterFactory', 'response_plan')
+    cluster = factory.RelatedFactory(
+        'core.factories.ClusterFactory',
+        'response_plan')
     workspace = factory.SubFactory('core.factories.WorkspaceFactory')
 
     class Meta:
@@ -239,7 +251,9 @@ class ClusterFactory(factory.django.DjangoModelFactory):
 class ClusterObjectiveFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "cluster_objective_%d" % n)
 
-    activity = factory.RelatedFactory('core.factories.ClusterActivityFactory', 'cluster_objective')
+    activity = factory.RelatedFactory(
+        'core.factories.ClusterActivityFactory',
+        'cluster_objective')
     cluster = factory.SubFactory(ClusterFactory)
 
     @factory.post_generation
@@ -275,8 +289,10 @@ class ClusterActivityFactory(factory.django.DjangoModelFactory):
 class QuantityTypeIndicatorBlueprintFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "quantity_indicator_%d" % n)
     unit = IndicatorBlueprint.NUMBER
-    calculation_formula_across_locations = fuzzy.FuzzyChoice(QUANTITY_CALC_CHOICES_LIST)
-    calculation_formula_across_periods = fuzzy.FuzzyChoice(QUANTITY_CALC_CHOICES_LIST)
+    calculation_formula_across_locations = fuzzy.FuzzyChoice(
+        QUANTITY_CALC_CHOICES_LIST)
+    calculation_formula_across_periods = fuzzy.FuzzyChoice(
+        QUANTITY_CALC_CHOICES_LIST)
     display_type = IndicatorBlueprint.NUMBER
 
     class Meta:
@@ -286,8 +302,10 @@ class QuantityTypeIndicatorBlueprintFactory(factory.django.DjangoModelFactory):
 class RatioTypeIndicatorBlueprintFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "ratio_indicator_%d" % n)
     unit = IndicatorBlueprint.PERCENTAGE
-    calculation_formula_across_locations = fuzzy.FuzzyChoice(RATIO_CALC_CHOICES_LIST)
-    calculation_formula_across_periods = fuzzy.FuzzyChoice(RATIO_CALC_CHOICES_LIST)
+    calculation_formula_across_locations = fuzzy.FuzzyChoice(
+        RATIO_CALC_CHOICES_LIST)
+    calculation_formula_across_periods = fuzzy.FuzzyChoice(
+        RATIO_CALC_CHOICES_LIST)
     display_type = IndicatorBlueprint.PERCENTAGE
 
     class Meta:
@@ -322,11 +340,13 @@ class ReportableFactory(factory.django.DjangoModelFactory):
 
 
 class QuantityReportableToLowerLevelOutputFactory(ReportableFactory):
-    content_object = factory.SubFactory('core.factories.LowerLevelOutputFactory')
+    content_object = factory.SubFactory(
+        'core.factories.LowerLevelOutputFactory')
     target = '5000'
     baseline = '0'
 
-    indicator_report = factory.RelatedFactory('core.factories.QuantityIndicatorReportFactory', 'reportable')
+    indicator_report = factory.RelatedFactory(
+        'core.factories.QuantityIndicatorReportFactory', 'reportable')
 
     blueprint = factory.SubFactory(QuantityTypeIndicatorBlueprintFactory)
 
@@ -338,11 +358,13 @@ class QuantityReportableToLowerLevelOutputFactory(ReportableFactory):
 
 
 class RatioReportableToLowerLevelOutputFactory(ReportableFactory):
-    content_object = factory.SubFactory('core.factories.LowerLevelOutputFactory')
+    content_object = factory.SubFactory(
+        'core.factories.LowerLevelOutputFactory')
     target = '5000'
     baseline = '0'
 
-    indicator_report = factory.RelatedFactory('core.factories.RatioIndicatorReportFactory', 'reportable')
+    indicator_report = factory.RelatedFactory(
+        'core.factories.RatioIndicatorReportFactory', 'reportable')
 
     blueprint = factory.SubFactory(RatioTypeIndicatorBlueprintFactory)
 
@@ -358,7 +380,8 @@ class RatioReportableToClusterObjectiveFactory(ReportableFactory):
     target = '5000'
     baseline = '0'
 
-    indicator_report = factory.RelatedFactory('core.factories.RatioIndicatorReportFactory', 'reportable')
+    indicator_report = factory.RelatedFactory(
+        'core.factories.RatioIndicatorReportFactory', 'reportable')
 
     blueprint = factory.SubFactory(RatioTypeIndicatorBlueprintFactory)
 
@@ -371,24 +394,26 @@ class QuantityReportableToPartnerProjectFactory(ReportableFactory):
     target = '5000'
     baseline = '0'
 
-    indicator_report = factory.RelatedFactory('core.factories.QuantityIndicatorReportFactory', 'reportable')
+    indicator_report = factory.RelatedFactory(
+        'core.factories.QuantityIndicatorReportFactory', 'reportable')
 
     blueprint = factory.SubFactory(QuantityTypeIndicatorBlueprintFactory)
 
     total = dict(
         [('c', 0), ('d', 0), ('v', random.randint(0, 3000))])
 
-
     class Meta:
         model = Reportable
 
 
 class QuantityReportableToClusterObjectiveFactory(ReportableFactory):
-    content_object = factory.SubFactory('core.factories.ClusterObjectiveFactory')
+    content_object = factory.SubFactory(
+        'core.factories.ClusterObjectiveFactory')
     target = '5000'
     baseline = '0'
 
-    indicator_report = factory.RelatedFactory('core.factories.QuantityIndicatorReportFactory', 'reportable')
+    indicator_report = factory.RelatedFactory(
+        'core.factories.QuantityIndicatorReportFactory', 'reportable')
 
     blueprint = factory.SubFactory(QuantityTypeIndicatorBlueprintFactory)
 
@@ -400,11 +425,13 @@ class QuantityReportableToClusterObjectiveFactory(ReportableFactory):
 
 
 class QuantityReportableToClusterActivityFactory(ReportableFactory):
-    content_object = factory.SubFactory('core.factories.ClusterActivityFactory')
+    content_object = factory.SubFactory(
+        'core.factories.ClusterActivityFactory')
     target = '5000'
     baseline = '0'
 
-    indicator_report = factory.RelatedFactory('core.factories.QuantityIndicatorReportFactory', 'reportable')
+    indicator_report = factory.RelatedFactory(
+        'core.factories.QuantityIndicatorReportFactory', 'reportable')
 
     blueprint = factory.SubFactory(QuantityTypeIndicatorBlueprintFactory)
 
@@ -416,11 +443,13 @@ class QuantityReportableToClusterActivityFactory(ReportableFactory):
 
 
 class QuantityReportableToPartnerActivityFactory(ReportableFactory):
-    content_object = factory.SubFactory('core.factories.PartnerActivityFactory')
+    content_object = factory.SubFactory(
+        'core.factories.PartnerActivityFactory')
     target = '5000'
     baseline = '0'
 
-    indicator_report = factory.RelatedFactory('core.factories.QuantityIndicatorReportFactory', 'reportable')
+    indicator_report = factory.RelatedFactory(
+        'core.factories.QuantityIndicatorReportFactory', 'reportable')
 
     blueprint = factory.SubFactory(QuantityTypeIndicatorBlueprintFactory)
 
@@ -475,7 +504,6 @@ class ReportingPeriodDatesFactory(factory.django.DjangoModelFactory):
         model = ReportingPeriodDates
 
 
-
 class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "programme_document_%d" % n)
     agreement = factory.Sequence(lambda n: "JOR/PCA2017%d" % n)
@@ -487,14 +515,20 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     frequency = fuzzy.FuzzyChoice(PD_FREQUENCY_LEVEL_CHOICE_LIST)
     budget = fuzzy.FuzzyDecimal(low=1000.0, high=100000.0, precision=2)
     unicef_office = factory.Sequence(lambda n: "JCO country programme %d" % n)
-    cso_contribution = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
-    total_unicef_cash = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
-    in_kind_amount = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
-    funds_received_to_date = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
+    cso_contribution = fuzzy.FuzzyDecimal(
+        low=10000.0, high=100000.0, precision=2)
+    total_unicef_cash = fuzzy.FuzzyDecimal(
+        low=10000.0, high=100000.0, precision=2)
+    in_kind_amount = fuzzy.FuzzyDecimal(
+        low=10000.0, high=100000.0, precision=2)
+    funds_received_to_date = fuzzy.FuzzyDecimal(
+        low=10000.0, high=100000.0, precision=2)
     partner = factory.SubFactory('core.factories.PartnerFactory')
     # workspace = factory.SubFactory('core.factories.WorkspaceFactory')
 
-    cp_output = factory.RelatedFactory('core.factories.CountryProgrammeOutputFactory', 'programme_document')
+    cp_output = factory.RelatedFactory(
+        'core.factories.PDResultLinkFactory',
+        'programme_document')
     workspace = factory.Iterator(Workspace.objects.all())
 
     #cs_dates = [cs_date_1, cs_date_2, cs_date_3]
@@ -510,7 +544,7 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
         if not create:
             return
         for i in range(random.randint(2, 3)):
-            CountryProgrammeOutputFactory.create(programme_document=self)
+            PDResultLinkFactory.create(programme_document=self)
 
 
 class DisaggregationFactory(factory.django.DjangoModelFactory):
@@ -560,17 +594,23 @@ class RatioIndicatorReportFactory(factory.django.DjangoModelFactory):
         model = IndicatorReport
 
 
-class CountryProgrammeOutputFactory(factory.django.DjangoModelFactory):
-    title = factory.Sequence(lambda n: "country_programme_%d" % n)
-    lower_level_output = factory.RelatedFactory('core.factories.LowerLevelOutputFactory', 'cp_output')
+class PDResultLinkFactory(factory.django.DjangoModelFactory):
+    external_id = factory.Sequence(lambda n: "%d" % n)
+    external_cp_output_id = factory.Sequence(lambda n: "%d" % (n % 4))
+    title = factory.Sequence(
+        lambda n: "result link to country_programme_%d" %
+        (n %
+         4))
+    lower_level_output = factory.RelatedFactory(
+        'core.factories.LowerLevelOutputFactory', 'cp_output')
 
     class Meta:
-        model = CountryProgrammeOutput
+        model = PDResultLink
 
     @factory.post_generation
     def create_llos(self, create, extracted, **kwargs):
         """
-        Create 2-5 LLO's per CP
+        Create 2-5 LLO's per Result link
         """
         if not create:
             return

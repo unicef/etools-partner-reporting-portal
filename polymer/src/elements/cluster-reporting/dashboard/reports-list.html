@@ -5,6 +5,7 @@
 <link rel="import" href="../../../constants.html">
 <link rel="import" href="../../../redux/store.html">
 <link rel="import" href="../../confirm-box.html">
+<link rel="import" href="../../list-placeholder.html">
 <link rel="import" href="../../cluster-reporting/cluster-report.html">
 
 <dom-module id="reports-list">
@@ -15,7 +16,7 @@
 
         --ecp-content: {
           min-height: 110px;
-          padding: 0;
+          padding: 1px 0 0;
         };
       }
 
@@ -40,6 +41,11 @@
           </cluster-report>
         </template>
       </template>
+
+      <list-placeholder
+          data="[[data]]"
+          loading="[[loading]]">
+      </list-placeholder>
 
       <etools-loading active="[[loading]]"></etools-loading>
     </etools-content-panel>

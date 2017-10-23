@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from core.serializers import ShortLocationSerializer
-from core.common import PD_STATUS, PARTNER_PROJECT_STATUS
+from core.common import PD_STATUS, PARTNER_PROJECT_STATUS, PARTNER_TYPE, CSO_TYPES
 
 from cluster.models import (
     Cluster,
@@ -21,8 +21,10 @@ from .models import (
 
 class PartnerDetailsSerializer(serializers.ModelSerializer):
 
-    partner_type_long = serializers.CharField(source='get_partner_type_display')
-    shared_partner_long = serializers.CharField(source='get_shared_partner_display')
+    partner_type_long = serializers.CharField(
+        source='get_partner_type_display')
+    shared_partner_long = serializers.CharField(
+        source='get_shared_partner_display')
     partner_type_display = serializers.SerializerMethodField()
     cso_type_display = serializers.SerializerMethodField()
     shared_partner_display = serializers.SerializerMethodField()
@@ -101,7 +103,8 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
         return str(obj.id)
 
     def get_frequency(self, obj):
-        return obj.reportables.first().get_frequency_display()
+        r = obj.reportables.first()
+        return r.get_frequency_display() if r else '---'
 
     def get_partner(self, obj):
         return obj.partner and str(obj.partner_id)
@@ -171,7 +174,8 @@ class ClusterActivityPartnersSerializer(serializers.ModelSerializer):
     partner_projects = PartnerProjectSimpleSerializer(many=True)
     links = serializers.SerializerMethodField()
     clusters = ClusterSimpleSerializer(many=True, read_only=True)
-    partner_activities = PartnerActivitySimpleSerializer(many=True, read_only=True)
+    partner_activities = PartnerActivitySimpleSerializer(
+        many=True, read_only=True)
 
     class Meta:
         model = Partner
@@ -228,19 +232,24 @@ class PartnerActivityBaseCreateSerializer(serializers.Serializer):
                 'PartnerProject ID {} does not exist.'.format(data['project']))
 
         if data['start_date'] > data['end_date']:
-            raise serializers.ValidationError("start_date should come before end_date")
+            raise serializers.ValidationError(
+                "start_date should come before end_date")
 
         return data
 
 
-class PartnerActivityFromClusterActivitySerializer(PartnerActivityBaseCreateSerializer):
+class PartnerActivityFromClusterActivitySerializer(
+        PartnerActivityBaseCreateSerializer):
     cluster_activity = serializers.IntegerField()
 
     def validate(self, data):
-        data = super(PartnerActivityFromClusterActivitySerializer, self).validate(data)
+        data = super(
+            PartnerActivityFromClusterActivitySerializer,
+            self).validate(data)
 
         try:
-            data['cluster_activity'] = ClusterActivity.objects.get(id=data['cluster_activity'])
+            data['cluster_activity'] = ClusterActivity.objects.get(
+                id=data['cluster_activity'])
 
             if data['cluster_activity'].cluster_objective.cluster.id != self.initial_data['cluster']:
                 raise serializers.ValidationError(
@@ -252,15 +261,19 @@ class PartnerActivityFromClusterActivitySerializer(PartnerActivityBaseCreateSeri
         return data
 
 
-class PartnerActivityFromCustomActivitySerializer(PartnerActivityBaseCreateSerializer):
+class PartnerActivityFromCustomActivitySerializer(
+        PartnerActivityBaseCreateSerializer):
     cluster_objective = serializers.IntegerField()
     title = serializers.CharField(max_length=255)
 
     def validate(self, data):
-        data = super(PartnerActivityFromCustomActivitySerializer, self).validate(data)
+        data = super(
+            PartnerActivityFromCustomActivitySerializer,
+            self).validate(data)
 
         try:
-            data['cluster_objective'] = ClusterObjective.objects.get(id=data['cluster_objective'])
+            data['cluster_objective'] = ClusterObjective.objects.get(
+                id=data['cluster_objective'])
 
             if data['cluster_objective'].cluster.id != self.initial_data['cluster']:
                 raise serializers.ValidationError(
@@ -296,3 +309,59 @@ class PartnerActivitySerializer(serializers.ModelSerializer):
 
     def get_status(self, obj):
         return obj.project and obj.project.status
+
+# PMP API Serializers
+
+
+class PMPPartnerSerializer(serializers.ModelSerializer):
+
+    id = serializers.CharField(source='external_id')
+    name = serializers.CharField(source='title', allow_blank=True)
+    short_name = serializers.CharField(source='short_title', allow_blank=True)
+    partner_type = serializers.ChoiceField(
+        choices=[
+            (x[1],
+             x[0]) for x in PARTNER_TYPE],
+        allow_blank=True,
+        allow_null=True)
+    cso_type = serializers.ChoiceField(
+        choices=[
+            (x[1],
+             x[0]) for x in CSO_TYPES],
+        allow_blank=True,
+        allow_null=True)
+
+    def fix_choices(self, validated_data):
+        for pt in [(x[1], x[0]) for x in PARTNER_TYPE]:
+            if pt[0] == validated_data['partner_type']:
+                validated_data['partner_type'] = pt[1]
+        for ct in [(x[1], x[0]) for x in CSO_TYPES]:
+            if ct[0] == validated_data['cso_type']:
+                validated_data['cso_type'] = ct[1]
+        return validated_data
+
+    def update(self, instance, validated_data):
+        validated_data = self.fix_choices(validated_data)
+        return Partner.objects.filter(
+            external_id=validated_data['external_id']).update(**validated_data)
+
+    def create(self, validated_data):
+        validated_data = self.fix_choices(validated_data)
+        return Partner.objects.create(**validated_data)
+
+    class Meta:
+        model = Partner
+        fields = (
+            "id",
+            "vendor_number",
+            "name",
+            "short_name",
+            "partner_type",
+            "cso_type",
+            "rating",
+            "shared_partner",
+            "email",
+            "phone_number",
+            "total_ct_cp",
+            "total_ct_cy",
+        )
