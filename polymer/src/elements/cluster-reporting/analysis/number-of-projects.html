@@ -1,35 +1,54 @@
 
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../../bower_components/google-chart/google-chart.html">
+<link rel="import" href="../../../../bower_components/paper-styles/typography.html">
 
 <link rel="import" href="../../../styles/analysis-widget.html">
 
 <dom-module id="analysis-number-of-projects">
   <template>
     <style include="analysis-widget-styles">
+      .widget-heading {
+        margin-bottom: .5em;
+      }
+
+      .chart-container {
+        position: relative;
+      }
+
+      .total {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        z-index: 1;
+        line-height: 1;
+        transform: translate(-50%, -50%);
+
+        @apply(--paper-font-display1);
+      }
+
       google-chart {
         width: 140px;
         height: 140px;
-        margin: 0 auto 1.5em;
-      }
-
-      google-chart /deep/ .google-visualization-tooltip {
-        position: absolute;
-        left: 140px;
-        top: 0;
-        font-size: 10px;
+        margin: 0 auto 1em;
+        position: relative;
+        z-index: 2;
       }
     </style>
 
     <div class="widget-container">
       <h3 class="widget-heading">Number of Projects</h3>
 
-      <google-chart
-          type="pie"
-          options="[[chartOptions]]"
-          cols="[[chartCols]]"
-          rows="[[chartRows]]">
-      </google-chart>
+      <div class="chart-container">
+        <google-chart
+            type="pie"
+            options="[[chartOptions]]"
+            cols="[[chartCols]]"
+            rows="[[chartRows]]">
+        </google-chart>
+        <span class="total">[[total]]</span>
+      </div>
+
     </div>
   </template>
 
@@ -72,10 +91,16 @@
             '#273d48',
           ],
         },
+
+        total: {
+          type: Number,
+          computed: '_computeTotal(data)',
+        },
       },
 
       _computeChartOptions: function (colors) {
         return {
+          backgroundColor: 'transparent',
           chartArea: {
             left: 12,
             top: 12,
@@ -84,6 +109,7 @@
           },
           legend: 'none',
           pieSliceText: 'none',
+          pieHole: 0.7,
           colors: colors,
           tooltip: {
             textStyle: {
@@ -99,6 +125,12 @@
           ['Ongoing', data.ongoing.length],
           ['Planned', data.planned.length],
         ];
+      },
+
+      _computeTotal: function (data) {
+        return Object.keys(data).reduce(function (acc, key) {
+          return acc + data[key].length;
+        }, 0);
       },
     });
   </script>

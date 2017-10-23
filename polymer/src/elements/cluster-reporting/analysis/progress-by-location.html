@@ -1,0 +1,29 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../../behaviors/utils.html">
+
+<dom-module id="analysis-progress-by-location">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <pre>[[_debug(data)]]</pre>
+  </template>
+
+  <script>
+    Polymer({
+      id: 'analysis-progress-by-location',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+      ],
+
+      properties: {
+        data: Object,
+      },
+    });
+  </script>
+</dom-module>

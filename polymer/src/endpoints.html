@@ -229,6 +229,15 @@
       partnerAnalysis: function () {
         return this._buildUrl('/cluster/partner-analysis/');
       },
+
+      partnerAnalysisReportableDetails: function (responsePlanId, reportableId) {
+        return this._buildUrl([
+          '/cluster/partner-analysis/response-plan/',
+          responsePlanId,
+          '/indicator/',
+          reportableId,
+        ].join(''));
+      },
     };
   }());
 </script>
