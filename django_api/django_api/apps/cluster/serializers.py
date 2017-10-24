@@ -28,7 +28,8 @@ class ClusterSimpleSerializer(serializers.ModelSerializer):
 
 class ClusterObjectiveSerializer(serializers.ModelSerializer):
 
-    frequency = serializers.ChoiceField(choices=FREQUENCY_LEVEL)
+    frequency = serializers.ChoiceField(choices=FREQUENCY_LEVEL, required=False)
+    reference_number = serializers.CharField(required=False)
     cluster_title = serializers.SerializerMethodField()
 
     class Meta:
