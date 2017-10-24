@@ -59,7 +59,8 @@ class ClusterObjectivePatchSerializer(ClusterObjectiveSerializer):
     title = serializers.CharField(required=False)
     reference_number = serializers.CharField(required=False)
     cluster = serializers.CharField(required=False)
-    frequency = serializers.ChoiceField(choices=FREQUENCY_LEVEL, required=False)
+    frequency = serializers.ChoiceField(
+        choices=FREQUENCY_LEVEL, required=False)
 
     class Meta:
         model = ClusterObjective
@@ -85,7 +86,6 @@ class ClusterActivitySerializer(serializers.ModelSerializer):
             'id',
             'title',
             'standard',
-            'title',
             'co_cluster_title',
             'co_title',
             'co_reference_number',
@@ -111,7 +111,8 @@ class ClusterActivityPatchSerializer(serializers.ModelSerializer):
 
     title = serializers.CharField(required=False)
     standard = serializers.CharField(required=False)
-    frequency = serializers.ChoiceField(choices=FREQUENCY_LEVEL, required=False)
+    frequency = serializers.ChoiceField(
+        choices=FREQUENCY_LEVEL, required=False)
     cluster_objective = serializers.CharField(required=False)
 
     class Meta:
@@ -167,7 +168,7 @@ class ResponsePlanClusterDashboardSerializer(serializers.ModelSerializer):
             clusters=self.context['clusters'],
             partner=self.context.get('partner', None))
 
-    def num_of_on_track_indicator_reports(self, obj):
+    def get_num_of_on_track_indicator_reports(self, obj):
         return obj.num_of_on_track_indicator_reports(
             clusters=self.context['clusters'],
             partner=self.context.get('partner', None))
@@ -184,13 +185,13 @@ class ResponsePlanClusterDashboardSerializer(serializers.ModelSerializer):
 
     def get_num_of_due_overdue_indicator_reports(self, obj):
         return obj.num_of_due_overdue_indicator_reports(
-                clusters=self.context['clusters'],
-                partner=self.context.get('partner', None))
+            clusters=self.context['clusters'],
+            partner=self.context.get('partner', None))
 
     def get_num_of_non_cluster_activities(self, obj):
         return obj.num_of_non_cluster_activities(
-                clusters=self.context['clusters'],
-                partner=self.context.get('partner', None))
+            clusters=self.context['clusters'],
+            partner=self.context.get('partner', None))
 
     def get_upcoming_indicator_reports(self, obj):
         return ClusterIndicatorReportSerializer(
@@ -215,7 +216,8 @@ class ResponsePlanClusterDashboardSerializer(serializers.ModelSerializer):
             many=True).data
 
 
-class ResponsePlanPartnerDashboardSerializer(ResponsePlanClusterDashboardSerializer):
+class ResponsePlanPartnerDashboardSerializer(
+        ResponsePlanClusterDashboardSerializer):
     num_of_projects_in_my_organization = serializers.SerializerMethodField()
     my_project_activities = serializers.SerializerMethodField()
 
@@ -237,8 +239,8 @@ class ResponsePlanPartnerDashboardSerializer(ResponsePlanClusterDashboardSeriali
 
     def get_num_of_projects_in_my_organization(self, obj):
         return obj.num_of_projects(
-                clusters=self.context['clusters'],
-                partner=self.context.get('partner', None))
+            clusters=self.context['clusters'],
+            partner=self.context.get('partner', None))
 
     def get_my_project_activities(self, obj):
         from partner.serializers import PartnerActivitySerializer

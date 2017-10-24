@@ -62,4 +62,4 @@ class LoginUserWithTokenAPIView(APIView):
             return Response({'success': True}, status=statuses.HTTP_200_OK)
         else:
             return Response({'detail': 'Couldn\'t log you in. Invalid token.'},
-                        status=statuses.HTTP_400_BAD_REQUEST)
+                            status=statuses.HTTP_400_BAD_REQUEST)

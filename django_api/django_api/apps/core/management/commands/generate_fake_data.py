@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from _privates import clean_up_data, generate_fake_data
+from ._privates import clean_up_data, generate_fake_data
 
 
 class Command(BaseCommand):
@@ -38,4 +38,4 @@ class Command(BaseCommand):
 
         generate_fake_data(options['quantity'])
 
-        print "Fake data are generated! :D"
+        print("Fake data are generated! :D")

@@ -21,6 +21,7 @@ from partner.models import (
     PartnerActivity,
 )
 
+
 class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
 
     def setUp(self):
@@ -29,7 +30,8 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
         self.cluster = Cluster.objects.first()
 
         self.partner = PartnerFactory(
-            title="{} - {} Cluster Partner".format(self.cluster.response_plan.title, self.cluster.type),
+            title="{} - {} Cluster Partner".format(
+                self.cluster.response_plan.title, self.cluster.type),
             partner_activity=None,
             partner_project=None,
             user=None,
@@ -39,7 +41,8 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
 
         self.pp = PartnerProjectFactory(
             partner=self.cluster.partners.first(),
-            title="{} Partner Project".format(self.cluster.partners.first().title)
+            title="{} Partner Project".format(
+                self.cluster.partners.first().title)
         )
 
         self.pp.clusters.add(self.cluster)
@@ -61,22 +64,32 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
         """
         get list unit test for PartnerProjectListCreateAPIView
         """
-        url = reverse('partner-project-list', kwargs={'response_plan_id': self.cluster.response_plan_id})
+        url = reverse(
+            'partner-project-list',
+            kwargs={
+                'response_plan_id': self.cluster.response_plan_id})
         response = self.client.get(url, format='json')
 
         self.assertTrue(status.is_success(response.status_code))
-        self.assertEquals(response.data['count'], PartnerProject.objects.filter(clusters__response_plan_id=self.cluster.response_plan_id).count())
+        self.assertEquals(response.data['count'], PartnerProject.objects.filter(
+            clusters__response_plan_id=self.cluster.response_plan_id).count())
 
     def test_list_partner_project_by_cluster(self):
         """
         get list by given cluster id unit test for PartnerProjectListCreateAPIView
         """
         cluster_id = self.cluster.id
-        url = reverse('partner-project-list', kwargs={'response_plan_id': self.cluster.response_plan_id}) + "?cluster_id=" + str(cluster_id)
+        url = reverse(
+            'partner-project-list',
+            kwargs={
+                'response_plan_id': self.cluster.response_plan_id}) + "?cluster_id=" + str(cluster_id)
         response = self.client.get(url, format='json')
 
         self.assertTrue(status.is_success(response.status_code))
-        self.assertEquals(response.data['count'], PartnerProject.objects.filter(clusters__in=[cluster_id]).count())
+        self.assertEquals(
+            response.data['count'],
+            PartnerProject.objects.filter(
+                clusters__in=[cluster_id]).count())
 
     def test_create_partner_project(self):
         """
@@ -86,13 +99,16 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
         last = PartnerProject.objects.last()
 
         # test for creating object
-        url = reverse('partner-project-list', kwargs={'response_plan_id': self.cluster.response_plan_id})
+        url = reverse(
+            'partner-project-list',
+            kwargs={
+                'response_plan_id': self.cluster.response_plan_id})
         response = self.client.post(url, data=self.data, format='json')
 
         self.assertTrue(status.is_success(response.status_code))
         created_obj = PartnerProject.objects.get(id=response.data['id'])
         self.assertEquals(created_obj.title, self.data['title'])
-        self.assertEquals(PartnerProject.objects.all().count(),  base_count + 1)
+        self.assertEquals(PartnerProject.objects.all().count(), base_count + 1)
 
     def test_list_filters_partner_project(self):
         """
@@ -101,7 +117,10 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
         pp = self.cluster.partner_projects.first()
         location = Location.objects.first()
         pp.locations.add(location)
-        url = reverse('partner-project-list', kwargs={'response_plan_id': self.cluster.response_plan_id})
+        url = reverse(
+            'partner-project-list',
+            kwargs={
+                'response_plan_id': self.cluster.response_plan_id})
         url += "?location=%d" % location.id
         response = self.client.get(url, format='json')
 
@@ -109,15 +128,22 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
         self.assertEquals(response.data['count'], 1)
         self.assertEquals(response.data['results'][0]['id'], str(pp.id))
         self.assertEquals(response.data['results'][0]['title'], pp.title)
-        self.assertEquals(response.data['results'][0]['locations'][0]['id'], str(location.id))
+        self.assertEquals(
+            response.data['results'][0]['locations'][0]['id'], str(
+                location.id))
 
         partner = self.cluster.partners.first()
-        url = reverse('partner-project-list', kwargs={'response_plan_id': self.cluster.response_plan_id})
+        url = reverse(
+            'partner-project-list',
+            kwargs={
+                'response_plan_id': self.cluster.response_plan_id})
         url += "?partner=%d" % partner.id
         response = self.client.get(url, format='json')
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(response.data['count'], 1)
-        self.assertEquals(response.data['results'][0]['partner'], str(partner.id))
+        self.assertEquals(
+            response.data['results'][0]['partner'], str(
+                partner.id))
 
 
 class TestPartnerProjectAPIView(BaseAPITestCase):
@@ -149,7 +175,10 @@ class TestPartnerProjectAPIView(BaseAPITestCase):
         response = self.client.patch(url, data=data, format='json')
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(PartnerProject.objects.all().count(), base_count)
-        self.assertEquals(PartnerProject.objects.get(id=response.data['id']).title, data['title'])
+        self.assertEquals(
+            PartnerProject.objects.get(
+                id=response.data['id']).title,
+            data['title'])
 
     def test_update_patch_non_existent_partner_project(self):
         """
@@ -171,13 +200,14 @@ class TestPartnerProjectAPIView(BaseAPITestCase):
         self.assertTrue(status.is_success(response.status_code))
         self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEquals(response.data, None)
-        self.assertEquals(PartnerProject.objects.all().count(), base_count-1)
+        self.assertEquals(PartnerProject.objects.all().count(), base_count - 1)
 
     def test_delete_non_existent_partner_project(self):
         base_count = PartnerProject.objects.all().count()
         last = PartnerProject.objects.last()
         url = reverse('partner-project-details', kwargs={"pk": 9999999})
-        response = self.client.delete(url, data={"id": last.pk+1}, format='json')
+        response = self.client.delete(
+            url, data={"id": last.pk + 1}, format='json')
 
         self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEquals(PartnerProject.objects.all().count(), base_count)
@@ -226,7 +256,9 @@ class TestPartnerActivityAPIView(BaseAPITestCase):
         self.assertTrue(status.is_success(response.status_code))
         created_obj = PartnerActivity.objects.get(id=response.data['id'])
         self.assertEquals(created_obj.title, self.cluster_activity.title)
-        self.assertEquals(PartnerActivity.objects.all().count(),  base_count + 1)
+        self.assertEquals(
+            PartnerActivity.objects.all().count(),
+            base_count + 1)
 
     def test_create_activity_from_custom_activity(self):
         base_count = PartnerActivity.objects.all().count()
@@ -250,4 +282,6 @@ class TestPartnerActivityAPIView(BaseAPITestCase):
         self.assertTrue(status.is_success(response.status_code))
         created_obj = PartnerActivity.objects.get(id=response.data['id'])
         self.assertEquals(created_obj.title, self.data['title'])
-        self.assertEquals(PartnerActivity.objects.all().count(),  base_count + 1)
+        self.assertEquals(
+            PartnerActivity.objects.all().count(),
+            base_count + 1)
