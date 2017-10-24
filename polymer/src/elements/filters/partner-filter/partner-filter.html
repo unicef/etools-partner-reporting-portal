@@ -22,7 +22,7 @@
       <dropdown-filter
         label="Partner"
         name="partner"
-        value="[[value]]"
+        value="[[computedValue]]"
         data="[[data]]">
       </dropdown-filter>
     </template>
@@ -37,8 +37,9 @@
       ],
 
       properties: {
+        data: Array,
         value: String,
-
+        computedValue: String,
         required: Boolean,
 
         partnerNamesUrl: {
@@ -57,13 +58,11 @@
           value: true,
           computed: '_computeLoading(data)',
         },
-
-        data: {
-          type: Array,
-          value: [],
-          observer: '_updateValue',
-        },
       },
+
+      observers: [
+        '_computeValue(data, value)',
+      ],
 
       _computeUrl: function (responsePlanID) {
         return App.Endpoints.clusterPartnerNames(responsePlanID);
@@ -73,6 +72,14 @@
         return !data.length;
       },
 
+      _computeValue: function (data, value) {
+        var index = data.findIndex(function (item) {
+          return value === String(item.id);
+        });
+
+        this.set('computedValue', data[index === -1 ? 0 : index].id);
+      },
+
       _fetchPartnerNames: function () {
         var self = this;
 
@@ -80,24 +87,16 @@
 
         this.$.partnerNames.thunk()()
             .then(function (res) {
-              var data = self.required ? [] : [{
+              var data = (self.required ? [] : [{
                 id: '',
                 title: 'All',
-              }];
+              }]).concat(res.data);
 
-              self.set('data', data.concat(res.data));
+              self.set('data', data);
             })
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
             });
-      },
-
-      _updateValue: function (data) {
-        if (!data.length) {
-          return;
-        }
-
-        this.set('value', this.data[0].id);
       },
 
       detached: function () {
