@@ -158,7 +158,7 @@
                 always-float-label
                 required>
                 <paper-listbox
-                    selected="{{data.reference_number}}"
+                    selected="{{data.cluster_objective}}"
                     attr-for-selected="value"
                     slot="dropdown-content"
                     class="dropdown-content">
@@ -293,7 +293,7 @@
       },
 
       _computeUrl: function(responsePlanID) {
-        return App.Endpoints.responseParametersClusterObjectives(responsePlanID);
+        return App.Endpoints.responseParametersClusterActivities(responsePlanID);
       },
 
       _computeObjectivesUrl: function(responsePlanID) {
