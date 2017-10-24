@@ -7,6 +7,7 @@
 <link rel="import" href="../../filter-list.html">
 <link rel="import" href="../../filters/partner-filter/partner-filter.html">
 <link rel="import" href="../../filters/cluster-project-filter/cluster-project-filter.html">
+<link rel="import" href="../../filters/cluster-activity-filter/cluster-activity-filter.html">
 
 <dom-module id="partner-analysis-filters">
   <template>
@@ -40,16 +41,28 @@
         class="app-grid"
         ignore="partner">
       <partner-filter
+          id="partner"
           class="item"
           value="[[_withDefaultFrom(queryParams, 'partner', '')]]"
           required>
       </partner-filter>
 
-      <cluster-project-filter
-          class="item"
-          value="[[_withDefault(queryParams.project, '')]]"
-          params="partner">
-      </cluster-project-filter>
+      <template
+          is="dom-if"
+          if="[[renderOthers]]"
+          restamp="true">
+        <cluster-project-filter
+            class="item"
+            value="[[_withDefaultFrom(queryParams, 'project', '')]]"
+            dependencies="partner">
+        </cluster-project-filter>
+
+        <cluster-activity-filter
+            class="item filter-2-col"
+            value="[[_withDefaultFrom(queryParams, 'activity', '')]]"
+            dependencies="partner">
+        </cluster-activity-filter>
+      </template>
     </filter-list>
   </template>
 
@@ -63,6 +76,27 @@
 
       properties: {
         queryParams: Object,
+
+        renderOthers: {
+          type: Boolean,
+          value: true,
+        },
+      },
+
+      listeners: {
+        'partner.selected-changed': '_resetFilters',
+      },
+
+      _resetFilters: function () {
+        this.set('renderOthers', false);
+
+        this.async(function () {
+          this.set('queryParams', {
+            partner: this.queryParams.partner,
+          });
+
+          this.set('renderOthers', true);
+        });
       },
     });
   </script>
