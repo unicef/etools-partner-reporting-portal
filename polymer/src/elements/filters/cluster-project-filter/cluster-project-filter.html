@@ -1,4 +1,6 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../../bower_components/iron-location/iron-query-params.html">
 
 <link rel="import" href="../dropdown-filter/dropdown-filter.html">
 <link rel="import" href="../../etools-prp-ajax.html">
@@ -13,9 +15,19 @@
       }
     </style>
 
+    <iron-location
+        query="{{query}}">
+    </iron-location>
+
+    <iron-query-params
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
+    </iron-query-params>
+
     <etools-prp-ajax
         id="projectNames"
-        url="[[projectNamesUrl]]">
+        url="[[projectNamesUrl]]"
+        params="[[projectNamesParams]]">
     </etools-prp-ajax>
 
     <template is="dom-if" if="[[!loading]]">
@@ -37,15 +49,26 @@
       ],
 
       properties: {
+        queryParams: Object,
+
+        params: {
+          type: String,
+          value: '',
+        },
+
         projectNamesUrl: {
           type: String,
           computed: '_computeProjectNamesUrl(responsePlanID)',
-          observer: '_fetchProjectNames',
         },
 
         responsePlanID: {
           type: String,
           statePath: 'responsePlans.currentID',
+        },
+
+        projectNamesParams: {
+          type: Object,
+          computed: '_computeProjectNamesParams(params, queryParams)',
         },
 
         loading: {
@@ -62,6 +85,10 @@
         value: String,
       },
 
+      observers: [
+        '_fetchProjectNames(projectNamesUrl, projectNamesParams)',
+      ],
+
       _computeProjectNamesUrl: function (responsePlanID) {
         return App.Endpoints.clusterProjectNames(responsePlanID);
       },
@@ -70,25 +97,44 @@
         return !data.length;
       },
 
+      _computeProjectNamesParams: function (params, queryParams) {
+        return params
+            .split(',')
+            .filter(Boolean)
+            .reduce(function (acc, key) {
+              if (typeof queryParams[key] !== 'undefined') {
+                acc[key] = queryParams[key];
+              }
+
+              return acc;
+            }, {});
+      },
+
       _fetchProjectNames: function () {
-        var self = this;
+        this.debounce('fetch-project-names', function () {
+          var self = this;
 
-        this.$.projectNames.abort();
+          this.$.projectNames.abort();
 
-        this.$.projectNames.thunk()()
-            .then(function (res) {
-              self.set('data', [{
-                id: '',
-                title: 'All',
-              }].concat(res.data));
-            })
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-            });
+          this.$.projectNames.thunk()()
+              .then(function (res) {
+                self.set('data', [{
+                  id: '',
+                  title: 'All',
+                }].concat(res.data));
+              })
+              .catch(function (err) { // jshint ignore:line
+                // TODO: error handling
+              });
+        }, 100);
       },
 
       detached: function () {
         this.$.projectNames.abort();
+
+        if (this.isDebouncerActive('fetch-project-names')) {
+          this.cancelDebouncer('fetch-project-names');
+        }
       },
     });
   </script>
