@@ -22,41 +22,48 @@
         --app-grid-item-height: auto;
 
         --ecp-content: {
-          min-height: 150px;
           padding: 0;
         };
+      }
+
+      .wrapper {
+        min-height: 120px;
+        position: relative;
       }
     </style>
 
     <etools-content-panel panel-title="Summary">
-      <div class="app-grid">
-        <div class="item">
-          <analysis-number-of-activities
-              data="[[data.num_of_activities]]">
-          </analysis-number-of-activities>
+      <div class="wrapper">
+        <div class="app-grid">
+          <div class="item">
+            <analysis-number-of-activities
+                data="[[data.num_of_activities]]">
+            </analysis-number-of-activities>
+          </div>
+          <div class="item">
+            <analysis-reports-by-status
+                data="[[data.recent_progress_reports_by_status]]">
+            </analysis-reports-by-status>
+          </div>
+          <div class="item">
+            <analysis-reports-by-location
+                data="[[data.num_of_reports_by_location_type]]">
+            </analysis-reports-by-location>
+          </div>
+          <div class="item">
+            <analysis-number-of-projects
+                data="[[data.num_of_projects]]">
+            </analysis-number-of-projects>
+          </div>
+          <div class="item">
+            <analysis-clusters-contributing-to
+                data="[[data.cluster_contributing_to]]">
+            </analysis-clusters-contributing-to>
+          </div>
         </div>
-        <div class="item">
-          <analysis-reports-by-status
-              data="[[data.recent_progress_reports_by_status]]">
-          </analysis-reports-by-status>
-        </div>
-        <div class="item">
-          <analysis-reports-by-location
-              data="[[data.num_of_reports_by_location_type]]">
-          </analysis-reports-by-location>
-        </div>
-        <div class="item">
-          <analysis-number-of-projects
-              data="[[data.num_of_projects]]">
-          </analysis-number-of-projects>
-        </div>
-        <div class="item">
-          <analysis-clusters-contributing-to
-              data="[[data.cluster_contributing_to]]">
-          </analysis-clusters-contributing-to>
-        </div>
+
+        <etools-loading active="[[loading]]"></etools-loading>
       </div>
-      <etools-loading active="[[loading]]"></etools-loading>
     </etools-content-panel>
   </template>
 

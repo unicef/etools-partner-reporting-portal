@@ -2,6 +2,7 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../../bower_components/google-chart/google-chart.html">
 
+<link rel="import" href="../../../behaviors/analysis-widget.html">
 <link rel="import" href="../../../styles/analysis-widget.html">
 <link rel="import" href="../../chart-legend.html">
 
@@ -15,29 +16,35 @@
       }
     </style>
 
-    <div class="widget-container">
-      <h3 class="widget-heading">Number of Activities</h3>
+    <template
+        is="dom-if"
+        if="[[_hasData]]">
+      <div class="widget-container">
+        <h3 class="widget-heading">Number of Activities</h3>
 
-      <google-chart
-          type="pie"
-          options="[[chartOptions]]"
-          data="[[chartData]]">
-      </google-chart>
+        <google-chart
+            type="pie"
+            options="[[chartOptions]]"
+            data="[[chartData]]">
+        </google-chart>
 
-      <chart-legend
-          rows="[[chartRows]]"
-          colors="[[colors]]">
-      </chart-legend>
-    </div>
+        <chart-legend
+            rows="[[chartRows]]"
+            colors="[[colors]]">
+        </chart-legend>
+      </div>
+    </template>
   </template>
 
   <script>
     Polymer({
       id: 'analysis-number-of-activities',
 
-      properties: {
-        data: Object,
+      behaviors: [
+        App.Behaviors.AnalysisWidget,
+      ],
 
+      properties: {
         chartOptions: {
           type: Object,
           computed: '_computeChartOptions(colors)',

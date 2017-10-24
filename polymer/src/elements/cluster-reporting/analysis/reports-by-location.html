@@ -1,6 +1,7 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
+<link rel="import" href="../../../behaviors/analysis-widget.html">
 <link rel="import" href="../../../styles/analysis-widget.html">
 
 <dom-module id="analysis-reports-by-location">
@@ -21,7 +22,7 @@
         border-bottom: 1px solid var(--paper-grey-200);
       }
 
-      .data {
+      .report-data {
         position: relative;
         z-index: 2;
       }
@@ -36,33 +37,42 @@
       }
     </style>
 
-    <div class="widget-container">
-      <h3 class="widget-heading">Number of Reports by Location Type</h3>
+    <template
+        is="dom-if"
+        if="[[_hasData]]">
+      <div class="widget-container">
+        <h3 class="widget-heading">Number of Reports by Location Type</h3>
 
-      <ul class="reports">
-        <template
-            is="dom-repeat"
-            items="[[formattedData]]">
-          <li>
-            <div class="data layout horizontal justified">
-              <span>[[item.type]]</span>
-              <span>[[item.num]]</span>
-            </div>
-            <div class="stripe" style="width: [[_calculatePercentage(item.num, total)]]%;"></div>
-          </li>
-        </template>
-      </ul>
+        <ul class="reports">
+          <template
+              is="dom-repeat"
+              items="[[formattedData]]">
+            <li>
+              <div class="report-data layout horizontal justified">
+                <span>[[item.type]]</span>
+                <span>[[item.num]]</span>
+              </div>
 
-    </div>
+              <div
+                  class="stripe"
+                  style="width: [[_calculateStripeWidth(item.num, total)]]%;">
+              </div>
+            </li>
+          </template>
+        </ul>
+      </div>
+    </template>
   </template>
 
   <script>
     Polymer({
       id: 'analysis-reports-by-location',
 
-      properties: {
-        data: Object,
+      behaviors: [
+        App.Behaviors.AnalysisWidget,
+      ],
 
+      properties: {
         total: {
           type: Number,
           computed: '_computeTotal(data)',
@@ -91,8 +101,8 @@
         }, []);
       },
 
-      _calculatePercentage: function (val, total) {
-        return Math.round(val / total * 100);
+      _calculateStripeWidth: function (val, total) {
+        return Math.floor(val / total * 100);
       },
     });
   </script>
