@@ -1,12 +1,13 @@
 import operator
 
+from functools import reduce
+
 from django.db.models import Q, F
 
 from rest_framework import serializers
 
 from core.common import FREQUENCY_LEVEL, OVERALL_STATUS, PARTNER_PROJECT_STATUS, CLUSTER_TYPE_NAME_DICT
 from core.models import ResponsePlan, GatewayType
-
 from indicator.models import Reportable, IndicatorReport, IndicatorLocationData
 from indicator.serializers import (
     ClusterIndicatorReportSerializer,
@@ -14,7 +15,6 @@ from indicator.serializers import (
     ReportableSimpleSerializer,
 )
 from partner.models import Partner
-
 from .models import ClusterObjective, ClusterActivity, Cluster
 
 
