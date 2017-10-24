@@ -41,7 +41,9 @@
         position: relative;
       }
 
-      .reportable-meta dl {
+      .reportable-meta,
+      .report-meta {
+        background: var(--paper-grey-100);
         font-size: 12px;
       }
 
@@ -54,12 +56,6 @@
       .reportable-meta dt {
         width: 120px;
         color: var(--paper-grey-400);
-      }
-
-      .chart-heading {
-        margin: 0 0 1em;
-
-        @apply(--paper-font-body1);
       }
 
       .report-heading {
@@ -83,11 +79,6 @@
         color: var(--theme-primary-text-color-medium);
       }
 
-      .report-meta {
-        font-size: 12px;
-        background: var(--paper-grey-100);
-      }
-
       .report-meta dt,
       .report-meta dd {
         display: inline;
@@ -105,6 +96,11 @@
       .report-meta labelled-item {
         margin: 1em 0;
       }
+
+      paper-tabs {
+        padding-left: 15px;
+        border-bottom: 1px solid var(--paper-grey-300);
+      }
     </style>
 
     <etools-prp-ajax
@@ -113,24 +109,20 @@
     </etools-prp-ajax>
 
     <etools-content-panel
-        panel-title="TODO [[data]]"
+        panel-title="[[data.title]]"
         open="{{open}}"
         show-expand-btn>
       <div class="wrapper">
         <template
             is="dom-if"
             if="[[!loading]]">
-
-          <div class="app-grid">
+          <div class="app-grid reportable-meta">
             <div class="item"></div>
             <div class="item">
               <div class="layout horizontal-reverse">
                 <etools-prp-progress-bar number="[[formattedDetails.progress_percentage]]">
               </div>
             </div>
-          </div>
-
-          <div class="app-grid reportable-meta">
             <div class="item">
               <dl class="layout horizontal">
                 <dt class="flex-none">Project</dt>
@@ -208,9 +200,9 @@
 
           <div class="app-grid">
             <div class="item">
-              <h3 class="chart-heading">Progress by Location</h3>
               <analysis-progress-by-location
-                  data="[[formattedDetails.progress_by_location]]">
+                  data="[[formattedDetails.progress_by_location]]"
+                  indicator-type="[[formattedDetails.indicator_reports.0.display_type]]">
               </analysis-progress-by-location>
             </div>
           </div>
@@ -392,7 +384,7 @@
       ],
 
       properties: {
-        data: Number, // FIXME: Object
+        data: Object,
 
         details: Object,
 
@@ -463,10 +455,10 @@
             });
       },
 
-      _computeDetailsUrl: function (responsePlanId, reportableId) {
+      _computeDetailsUrl: function (responsePlanId, data) {
         return App.Endpoints.partnerAnalysisReportableDetails(
           responsePlanId,
-          reportableId
+          data.id
         );
       },
 

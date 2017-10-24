@@ -3,11 +3,11 @@
 
 <link rel="import" href="../../../behaviors/analysis-widget.html">
 <link rel="import" href="../../../styles/analysis-widget.html">
+<link rel="import" href="../../../styles/shared-styles.html">
 
 <dom-module id="analysis-reports-by-location">
   <template>
-    <style include="analysis-widget-styles iron-flex iron-flex-alignment">
-
+    <style include="analysis-widget-styles iron-flex iron-flex-alignment shared-styles">
       .reports {
         padding: 0;
         margin: 0;
@@ -25,6 +25,16 @@
       .report-data {
         position: relative;
         z-index: 2;
+      }
+
+      .report-data__type {
+        @apply(--truncate);
+
+        min-width: 0;
+      }
+
+      .report-data__count {
+        padding-left: .5em;
       }
 
       .stripe {
@@ -49,13 +59,13 @@
               items="[[formattedData]]">
             <li>
               <div class="report-data layout horizontal justified">
-                <span>[[item.type]]</span>
-                <span>[[item.num]]</span>
+                <span class="report-data__type">[[item.type]]</span>
+                <span class="report-data__count">[[item.count]]</span>
               </div>
 
               <div
                   class="stripe"
-                  style="width: [[_calculateStripeWidth(item.num, total)]]%;">
+                  style="width: [[_calculateStripeWidth(item.count, total)]]%;">
               </div>
             </li>
           </template>
@@ -69,7 +79,7 @@
       id: 'analysis-reports-by-location',
 
       behaviors: [
-        App.Behaviors.AnalysisWidget,
+        App.Behaviors.AnalysisWidgetBehavior,
       ],
 
       properties: {
@@ -94,7 +104,7 @@
         return Object.keys(data).reduce(function (acc, key) {
           acc.push({
             type: key,
-            num: data[key],
+            count: data[key],
           });
 
           return acc;
