@@ -97,18 +97,27 @@ class PMPWorkspaceSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # Update or create
         try:
-            instance = Workspace.objects.get(workspace_code=validated_data['workspace_code'])
+            instance = Workspace.objects.get(
+                workspace_code=validated_data['workspace_code'])
             return self.update(instance, validated_data)
         except Workspace.DoesNotExist:
             return Workspace.objects.create(**validated_data)
 
     class Meta:
         model = Workspace
-        fields = ('id', 'name', 'latitude', 'longitude', 'initial_zoom', 'business_area_code', 'country_short_code')
+        fields = (
+            'id',
+            'name',
+            'latitude',
+            'longitude',
+            'initial_zoom',
+            'business_area_code',
+            'country_short_code')
 
 
 class PMPGatewayTypeSerializer(serializers.ModelSerializer):
-    gateway_country = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all(), source="country")
+    gateway_country = serializers.PrimaryKeyRelatedField(
+        queryset=Country.objects.all(), source="country")
     pcode = serializers.CharField(source='name')
 
     class Meta:
@@ -119,7 +128,8 @@ class PMPGatewayTypeSerializer(serializers.ModelSerializer):
 class PMPLocationSerializer(serializers.ModelSerializer):
     pcode = serializers.CharField(source='p_code')
     name = serializers.CharField(source='title')
-    gateway = serializers.PrimaryKeyRelatedField(queryset=GatewayType.objects.all())
+    gateway = serializers.PrimaryKeyRelatedField(
+        queryset=GatewayType.objects.all())
 
     class Meta:
         model = Location

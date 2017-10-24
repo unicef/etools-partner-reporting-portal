@@ -44,8 +44,8 @@ def get_combination_pairs(array, r=3):
 
 
 def generate_data_combination_entries(
-    array, entries_only=False, key_type=str,
-    indicator_type="quantity", r=3):
+        array, entries_only=False, key_type=str,
+        indicator_type="quantity", r=3):
     if entries_only:
         output = []
 
@@ -261,7 +261,8 @@ def find_missing_frequency_period_dates(start_date, last_date, frequency):
 
             elif frequency == PD_FREQUENCY_LEVEL.monthly:
                 # Get the # of days in target month
-                num_of_days = get_num_of_days_in_a_month(missing_date.year, missing_date.month)
+                num_of_days = get_num_of_days_in_a_month(
+                    missing_date.year, missing_date.month)
 
                 # Check if we should proceed to next date
                 if day_delta >= num_of_days:
@@ -283,9 +284,12 @@ def find_missing_frequency_period_dates(start_date, last_date, frequency):
 
                 quarter_day_delta = (end_quarter_date - missing_date).days
 
-                # See if we got more days to go but we are at the last day of the quarter
+                # See if we got more days to go but we are at the last day of
+                # the quarter
                 if quarter_day_delta == 0:
-                    # If current missing date is in same month as today's month, then we know we have exhausted day_delta_counter successfully. Exiting
+                    # If current missing date is in same month as today's
+                    # month, then we know we have exhausted day_delta_counter
+                    # successfully. Exiting
                     if missing_date.month == today.month:
                         day_delta_counter = 0
 

@@ -80,7 +80,8 @@ class ClusterIndicatorsFilter(django_filters.FilterSet):
     def get_cluster(self, queryset, name, value):
         return queryset.filter(
             # Q(reportable__cluster_objectives__cluster=value) |
-            # Q(reportable__cluster_activities__cluster_objective__cluster=value) |
+            # Q(reportable__cluster_activities__cluster_objective__cluster=value)
+            # |
             Q(reportable__partner_activities__cluster_activity__cluster_objective__cluster=value) |
             Q(reportable__partner_projects__clusters__id__exact=value)
         )
@@ -90,7 +91,8 @@ class ClusterIndicatorsFilter(django_filters.FilterSet):
             # Q(reportable__cluster_objectives__cluster__partner_projects__partner=value) |
             # Q(reportable__cluster_objectives__cluster_activities__partner_activities__partner=value) |
             # Q(reportable__cluster_activities__cluster_objective__cluster__partner_projects__partner=value) |
-            # Q(reportable__cluster_activities__partner_activities__partner=value) |
+            # Q(reportable__cluster_activities__partner_activities__partner=value)
+            # |
             Q(reportable__partner_activities__project__partner=value) |
             Q(reportable__partner_projects__partner=value)
         ).distinct()
@@ -103,13 +105,15 @@ class ClusterIndicatorsFilter(django_filters.FilterSet):
             # Q(reportable__cluster_objectives__cluster__partner_projects=value) |
             # Q(reportable__cluster_objectives__cluster_activities__partner_activities__project=value) |
             # Q(reportable__cluster_activities__cluster_objective__cluster__partner_projects=value) |
-            # Q(reportable__cluster_activities__partner_activities__project=value) |
+            # Q(reportable__cluster_activities__partner_activities__project=value)
+            # |
             Q(reportable__partner_activities__project=value) |
             Q(reportable__partner_projects=value)
         ).distinct()
 
     def get_location(self, queryset, name, value):
-        return queryset.filter(reportable__indicator_reports__indicator_location_data__location=value).distinct()
+        return queryset.filter(
+            reportable__indicator_reports__indicator_location_data__location=value).distinct()
 
     def get_cluster_objective(self, queryset, name, value):
         return queryset.filter(reportable__cluster_objectives=value)

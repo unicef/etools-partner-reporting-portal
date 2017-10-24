@@ -85,7 +85,8 @@ class Cluster(TimeStampedModel):
 
     @cached_property
     def partner_activities(self):
-        id_list = self.partners.values_list('partner_activities', flat=True).distinct()
+        id_list = self.partners.values_list(
+            'partner_activities', flat=True).distinct()
 
         return PartnerActivity.objects.filter(
             id__in=id_list
@@ -114,7 +115,7 @@ class Cluster(TimeStampedModel):
         return IndicatorReport.objects.filter(
             reportable__in=self.partner_activity_reportables_queryset).order_by(
                 'reportable__id', '-submission_date'
-            ).distinct('reportable__id')
+        ).distinct('reportable__id')
 
     @cached_property
     def overdue_indicator_reports(self):
@@ -247,7 +248,6 @@ class ClusterObjective(TimeStampedModel):
 
     def __str__(self):
         return "<pk: %s> %s" % (self.id, self.title)
-
 
 
 class ClusterActivity(TimeStampedModel):

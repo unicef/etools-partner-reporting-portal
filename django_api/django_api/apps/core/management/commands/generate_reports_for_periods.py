@@ -68,16 +68,19 @@ class Command(BaseCommand):
 
             reportable_queryset = pd.reportable_queryset
             frequency = pd.frequency
-            latest_progress_report = pd.progress_reports.order_by('end_date').last()
+            latest_progress_report = pd.progress_reports.order_by(
+                'end_date').last()
             date_list = []
 
             if frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
                 print("PD {} frequency is custom specific dates".format(
                     pd))
                 if not latest_progress_report:
-                    date_list = pd.reporting_periods.filter(start_date__gte=pd.start_date, end_date__lte=datetime.now())
+                    date_list = pd.reporting_periods.filter(
+                        start_date__gte=pd.start_date, end_date__lte=datetime.now())
                 else:
-                    date_list = pd.reporting_periods.filter(start_date__gte=latest_progress_report.end_date, end_date__lte=datetime.now())
+                    date_list = pd.reporting_periods.filter(
+                        start_date__gte=latest_progress_report.end_date, end_date__lte=datetime.now())
             else:
                 # Get missing date list based on progress report existence
                 if latest_progress_report:
@@ -104,15 +107,16 @@ class Command(BaseCommand):
                     if frequency != PD_FREQUENCY_LEVEL.custom_specific_dates:
                         end_date = calculate_end_date_given_start_date(
                             missing_date, frequency)
-                        due_date = end_date + timedelta(days=DUE_DATE_DAYS_TIMEDELTA)
+                        due_date = end_date + \
+                            timedelta(days=DUE_DATE_DAYS_TIMEDELTA)
                     else:
                         end_date = missing_date.end_date
                         due_date = missing_date.due_date
                         missing_date = missing_date.start_date
 
-
                     # Create ProgressReport first
-                    print("Creating PD {} ProgressReport object for {} - {}".format(pd, missing_date, end_date))
+                    print(
+                        "Creating PD {} ProgressReport object for {} - {}".format(pd, missing_date, end_date))
                     next_progress_report = ProgressReportFactory(
                         start_date=missing_date,
                         end_date=end_date,
@@ -122,7 +126,9 @@ class Command(BaseCommand):
 
                     for reportable in reportable_queryset:
                         if reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
-                            print("Creating PD {} Quantity IndicatorReport object for {} - {}".format(pd, missing_date, end_date))
+                            print(
+                                "Creating PD {} Quantity IndicatorReport object for {} - {}".format(
+                                    pd, missing_date, end_date))
                             indicator_report = QuantityIndicatorReportFactory(
                                 reportable=reportable,
                                 time_period_start=missing_date,
@@ -146,7 +152,9 @@ class Command(BaseCommand):
                                 )
 
                         else:
-                            print("Creating PD {} Ratio IndicatorReport object for {} - {}".format(pd, missing_date, end_date))
+                            print(
+                                "Creating PD {} Ratio IndicatorReport object for {} - {}".format(
+                                    pd, missing_date, end_date))
                             indicator_report = RatioIndicatorReportFactory(
                                 reportable=reportable,
                                 time_period_start=missing_date,
@@ -180,7 +188,8 @@ class Command(BaseCommand):
                 indicator, indicator.start_date, indicator.end_date))
 
             frequency = indicator.frequency
-            latest_indicator_report = indicator.indicator_reports.order_by('time_period_end').last()
+            latest_indicator_report = indicator.indicator_reports.order_by(
+                'time_period_end').last()
             date_list = []
 
             if frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
@@ -192,8 +201,14 @@ class Command(BaseCommand):
                     date_list.extend(indicator.cs_dates)
 
                 else:
-                    date_list = [latest_indicator_report.time_period_end + timedelta(days=1)]
-                    date_list.extend(filter(lambda item: item > latest_indicator_report.time_period_end, indicator.cs_dates))
+                    date_list = [
+                        latest_indicator_report.time_period_end +
+                        timedelta(
+                            days=1)]
+                    date_list.extend(
+                        filter(
+                            lambda item: item > latest_indicator_report.time_period_end,
+                            indicator.cs_dates))
 
             else:
                 # Get missing date list based on progress report existence
@@ -235,7 +250,9 @@ class Command(BaseCommand):
                             missing_date, frequency)
 
                     if indicator.blueprint.unit == IndicatorBlueprint.NUMBER:
-                        print("Creating Indicator {} Quantity IndicatorReport object for {} - {}".format(indicator, missing_date, end_date))
+                        print(
+                            "Creating Indicator {} Quantity IndicatorReport object for {} - {}".format(
+                                indicator, missing_date, end_date))
 
                         indicator_report = QuantityIndicatorReportFactory(
                             reportable=indicator,
@@ -260,7 +277,9 @@ class Command(BaseCommand):
                             )
 
                     else:
-                        print("Creating Indicator {} Ratio IndicatorReport object for {} - {}".format(indicator, missing_date, end_date))
+                        print(
+                            "Creating Indicator {} Ratio IndicatorReport object for {} - {}".format(
+                                indicator, missing_date, end_date))
 
                         indicator_report = RatioIndicatorReportFactory(
                             reportable=indicator,

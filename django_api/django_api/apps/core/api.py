@@ -24,7 +24,8 @@ class PMP_API(object):
             headers['Content-Length'] = len(data)
 
         auth_pair_str = '%s:%s' % (self.username, self.password)
-        headers['Authorization'] = 'Basic ' + base64.b64encode(auth_pair_str.encode()).decode()
+        headers['Authorization'] = 'Basic ' + \
+            base64.b64encode(auth_pair_str.encode()).decode()
         self.headers = headers
 
     def _push_request(self, data=None, timeout=None):
@@ -63,14 +64,15 @@ class PMP_API(object):
         except Exception as e:
             raise Exception(e)
 
-
     def workspaces(self):
         self.url = self.url_prototype + "/v2/workspaces/"
         data = self._push_request(timeout=30)
         return data
 
     def programme_documents(self, business_area_code, page=0, url=None):
-        self.url = self.url_prototype + "/prp/v1/interventions?page=%s&workspace=%s" % (page, business_area_code) if not url else url
+        self.url = self.url_prototype + \
+            "/prp/v1/interventions?page=%s&workspace=%s" % (
+                page, business_area_code) if not url else url
         data = self._push_request(timeout=30)
         return data
 
