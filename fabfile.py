@@ -29,11 +29,11 @@ def up():
     local('docker-compose up')
 
 
-def up_with_bundle():
+def up_with_bundle(quick=True):
     """
     Create and start containers with polymer bundle served.
     """
-    local('docker-compose -f docker-compose.polymer-bundle.yml up --build')
+    local('docker-compose -f docker-compose.polymer-bundle.yml up %s' % '' if quick else '--build')
 
 
 def down():
