@@ -38,6 +38,7 @@ class WorkspaceAPIView(ListAPIView):
             status=statuses.HTTP_200_OK
         )
 
+
 class LocationListAPIView(ListAPIView):
     """
     Endpoint for getting all Location objects belonging to the response plan.

@@ -89,7 +89,8 @@ class ClusterObjectiveAPIView(APIView):
 
     def get_instance(self, request, pk=None):
         try:
-            instance = ClusterObjective.objects.get(id=(pk or request.data['id']))
+            instance = ClusterObjective.objects.get(
+                id=(pk or request.data['id']))
         except ClusterObjective.DoesNotExist as exp:
             logger.exception({
                 "endpoint": "ClusterObjectiveAPIView",
@@ -111,7 +112,8 @@ class ClusterObjectiveAPIView(APIView):
             data=self.request.data
         )
         if not serializer.is_valid():
-            return Response(serializer.errors, status=statuses.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors,
+                            status=statuses.HTTP_400_BAD_REQUEST)
         serializer.save()
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
@@ -126,10 +128,12 @@ class ClusterObjectiveAPIView(APIView):
                 data=self.request.data
             )
         else:
-            return Response({"id": "This field is required!"}, status=statuses.HTTP_400_BAD_REQUEST)
+            return Response({"id": "This field is required!"},
+                            status=statuses.HTTP_400_BAD_REQUEST)
 
         if not serializer.is_valid():
-            return Response(serializer.errors, status=statuses.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors,
+                            status=statuses.HTTP_400_BAD_REQUEST)
 
         serializer.save()
         return Response(serializer.data, status=statuses.HTTP_200_OK)
@@ -177,10 +181,12 @@ class ClusterObjectiveListCreateAPIView(ListCreateAPIView):
         serializer = ClusterObjectiveSerializer(data=self.request.data)
 
         if not serializer.is_valid():
-            return Response(serializer.errors, status=statuses.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors,
+                            status=statuses.HTTP_400_BAD_REQUEST)
 
         serializer.save()
-        return Response({'id': serializer.instance.id}, status=statuses.HTTP_201_CREATED)
+        return Response({'id': serializer.instance.id},
+                        status=statuses.HTTP_201_CREATED)
 
 
 class ClusterActivityAPIView(APIView):
@@ -201,7 +207,8 @@ class ClusterActivityAPIView(APIView):
 
     def get_instance(self, request, pk=None):
         try:
-            instance = ClusterActivity.objects.get(id=(pk or request.data['id']))
+            instance = ClusterActivity.objects.get(
+                id=(pk or request.data['id']))
         except ClusterActivity.DoesNotExist:
             # TODO: log exception
             raise Http404
@@ -218,7 +225,8 @@ class ClusterActivityAPIView(APIView):
             data=self.request.data
         )
         if not serializer.is_valid():
-            return Response(serializer.errors, status=statuses.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors,
+                            status=statuses.HTTP_400_BAD_REQUEST)
         serializer.save()
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
@@ -233,10 +241,12 @@ class ClusterActivityAPIView(APIView):
                 data=self.request.data
             )
         else:
-            return Response({"id": "This field is required!"}, status=statuses.HTTP_400_BAD_REQUEST)
+            return Response({"id": "This field is required!"},
+                            status=statuses.HTTP_400_BAD_REQUEST)
 
         if not serializer.is_valid():
-            return Response(serializer.errors, status=statuses.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors,
+                            status=statuses.HTTP_400_BAD_REQUEST)
 
         serializer.save()
         return Response(serializer.data, status=statuses.HTTP_200_OK)
@@ -268,7 +278,8 @@ class ClusterActivityListAPIView(ListCreateAPIView):
     def get_queryset(self, *args, **kwargs):
         response_plan_id = self.kwargs.get('response_plan_id')
 
-        return ClusterActivity.objects.select_related('cluster_objective__cluster').filter(cluster_objective__cluster__response_plan_id=response_plan_id)
+        return ClusterActivity.objects.select_related('cluster_objective__cluster').filter(
+            cluster_objective__cluster__response_plan_id=response_plan_id)
 
     def post(self, request, *args, **kwargs):
         """
@@ -278,10 +289,12 @@ class ClusterActivityListAPIView(ListCreateAPIView):
         serializer = ClusterActivitySerializer(data=self.request.data)
 
         if not serializer.is_valid():
-            return Response(serializer.errors, status=statuses.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors,
+                            status=statuses.HTTP_400_BAD_REQUEST)
 
         serializer.save()
-        return Response({'id': serializer.instance.id}, status=statuses.HTTP_201_CREATED)
+        return Response({'id': serializer.instance.id},
+                        status=statuses.HTTP_201_CREATED)
 
 
 class IndicatorReportsListAPIView(ListCreateAPIView):
@@ -315,7 +328,7 @@ class IndicatorReportsListAPIView(ListCreateAPIView):
             # | Q(reportable__cluster_activities__cluster_objective__cluster__response_plan=response_plan_id)
             Q(reportable__partner_projects__clusters__response_plan=response_plan_id)
             | Q(reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)
-            )
+        )
         return queryset
 
 
@@ -479,7 +492,8 @@ class ClusterIndicatorsListExcelExportView(ListAPIView):
         return self.generate_excel(writer)
 
 
-class ClusterIndicatorsListExcelExportForAnalysisView(ClusterIndicatorsListExcelExportView):
+class ClusterIndicatorsListExcelExportForAnalysisView(
+        ClusterIndicatorsListExcelExportView):
     """
     Cluster Indicator list export as excel API for analysis - GET
     Authentication required.

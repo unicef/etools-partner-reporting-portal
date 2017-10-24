@@ -40,7 +40,7 @@ try:
                                      create_group=False)
     IMORole = GroupWrapper(code='imo', name='IMO', create_group=False)
 except Exception as e:
-    print "Group DB is not ready yet! - Error: %s" % e
+    print("Group DB is not ready yet! - Error: %s" % e)
 
 
 def get_random_color():
@@ -63,6 +63,7 @@ class TimeStampedExternalSyncModelMixin(TimeStampedModel):
 
     class Meta:
         abstract = True
+
 
 class Country(TimeStampedExternalSyncModelMixin):
     """
@@ -102,12 +103,14 @@ class Workspace(TimeStampedExternalSyncModelMixin):
     latitude = models.DecimalField(
         null=True, blank=True,
         max_digits=8, decimal_places=5,
-        validators=[MinValueValidator(Decimal(-90)), MaxValueValidator(Decimal(90))]
+        validators=[MinValueValidator(
+            Decimal(-90)), MaxValueValidator(Decimal(90))]
     )
     longitude = models.DecimalField(
         null=True, blank=True,
         max_digits=8, decimal_places=5,
-        validators=[MinValueValidator(Decimal(-180)), MaxValueValidator(Decimal(180))]
+        validators=[MinValueValidator(
+            Decimal(-180)), MaxValueValidator(Decimal(180))]
     )
     initial_zoom = models.IntegerField(default=8)
 
@@ -209,7 +212,8 @@ class ResponsePlan(TimeStampedModel):
             count += c.num_of_met_indicator_reports(partner=partner)
         return count
 
-    def num_of_constrained_indicator_reports(self, clusters=None, partner=None):
+    def num_of_constrained_indicator_reports(
+            self, clusters=None, partner=None):
         if not clusters:
             clusters = self.all_clusters
 
@@ -227,7 +231,8 @@ class ResponsePlan(TimeStampedModel):
             count += c.num_of_on_track_indicator_reports(partner=partner)
         return count
 
-    def num_of_no_progress_indicator_reports(self, clusters=None, partner=None):
+    def num_of_no_progress_indicator_reports(
+            self, clusters=None, partner=None):
         if not clusters:
             clusters = self.all_clusters
 
@@ -262,22 +267,22 @@ class ResponsePlan(TimeStampedModel):
             Q(partner_activities__partner__clusters__in=clusters)
         )
         return IndicatorReport.objects.filter(
-                reportable__in=reportables).order_by(
-                        '-time_period_end').distinct()
+            reportable__in=reportables).order_by(
+            '-time_period_end').distinct()
 
     def upcoming_indicator_reports(self, clusters=None, partner=None,
-                                  limit=None, days=15):
+                                   limit=None, days=15):
         if not clusters:
             clusters = self.all_clusters
 
         days_in_future = datetime.today() + timedelta(days=days)
         indicator_reports = self._latest_indicator_reports(clusters).filter(
-                report_status=INDICATOR_REPORT_STATUS.due
-            ).filter(
-                due_date__gte=datetime.today()
-            ).filter(
-                due_date__lte=days_in_future
-            )
+            report_status=INDICATOR_REPORT_STATUS.due
+        ).filter(
+            due_date__gte=datetime.today()
+        ).filter(
+            due_date__lte=days_in_future
+        )
         return indicator_reports
 
     def overdue_indicator_reports(self, clusters=None, partner=None,
@@ -305,7 +310,7 @@ class ResponsePlan(TimeStampedModel):
         return indicator_reports
 
     def constrained_indicator_reports(self, clusters=None, partner=None,
-                                  limit=None):
+                                      limit=None):
         if not clusters:
             clusters = self.all_clusters
 
@@ -319,7 +324,7 @@ class ResponsePlan(TimeStampedModel):
             report_status=INDICATOR_REPORT_STATUS.accepted,
             overall_status=OVERALL_STATUS.constrained).order_by(
                 'reportable__id', '-submission_date'
-            ).distinct('reportable__id')
+        ).distinct('reportable__id')
         if limit:
             indicator_reports = indicator_reports[:limit]
         return indicator_reports
@@ -339,7 +344,7 @@ class GatewayType(TimeStampedModel):
     Represents an Admin Type in location-related models.
     """
 
-    name = models.CharField(max_length=64L, unique=True)
+    name = models.CharField(max_length=64, unique=True)
     admin_level = models.PositiveSmallIntegerField()
 
     country = models.ForeignKey(Country, related_name="gateway_types")
@@ -355,7 +360,8 @@ class GatewayType(TimeStampedModel):
 class LocationManager(models.GeoManager):
 
     def get_queryset(self):
-        return super(LocationManager, self).get_queryset().select_related('gateway')
+        return super(LocationManager, self).get_queryset(
+        ).select_related('gateway')
 
 
 @python_2_unicode_compatible
@@ -377,7 +383,11 @@ class Location(TimeStampedExternalSyncModelMixin):
 
     gateway = models.ForeignKey(GatewayType, verbose_name='Location Type',
                                 related_name='locations')
-    carto_db_table = models.ForeignKey('core.CartoDBTable', related_name="locations", blank=True, null=True)
+    carto_db_table = models.ForeignKey(
+        'core.CartoDBTable',
+        related_name="locations",
+        blank=True,
+        null=True)
 
     latitude = models.DecimalField(
         null=True,

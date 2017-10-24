@@ -5,12 +5,12 @@ from core.api import PMP_API
 from partner.serializers import PMPPartnerSerializer
 from partner.models import Partner
 
+
 class PartnerCronJob(CronJobBase):
     RUN_AT_TIMES = ['0:10']
 
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
     code = 'partner.PartnerCronJob'    # a unique code
-
 
     def do(self):
         # Hit API
@@ -22,9 +22,10 @@ class PartnerCronJob(CronJobBase):
             for item in data:
                 if item['hidden']:
                     continue
-                print "Creating Partner: %s" % item['vendor_number']
+                print("Creating Partner: %s" % item['vendor_number'])
                 try:
-                    instance = Partner.objects.get(vendor_number=item['vendor_number'])
+                    instance = Partner.objects.get(
+                        vendor_number=item['vendor_number'])
                     serializer = PMPPartnerSerializer(instance, data=item)
                 except Partner.DoesNotExist:
                     serializer = PMPPartnerSerializer(data=item)
@@ -33,5 +34,5 @@ class PartnerCronJob(CronJobBase):
                 else:
                     raise Exception(serializer.errors)
         except Exception as e:
-            print e
+            print(e)
             raise Exception(e)

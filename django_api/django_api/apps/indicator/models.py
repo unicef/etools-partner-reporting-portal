@@ -20,6 +20,7 @@ from core.common import (
     OVERALL_STATUS,
 )
 from core.models import TimeStampedExternalSyncModelMixin
+from functools import reduce
 
 
 class Disaggregation(TimeStampedExternalSyncModelMixin):
@@ -130,10 +131,12 @@ class IndicatorBlueprint(TimeStampedExternalSyncModelMixin):
     # other_representation (exact copies with different names for some random reason)
     # children (indicators that aggregate up to this or contribute to this indicator through a formula)
     # aggregation_types (potential aggregation types: geographic, time-periods ?)
-    # aggregation_formulas (how the total value is aggregated from the reports if possible)
+    # aggregation_formulas (how the total value is aggregated from the reports
+    # if possible)
 
     def save(self, *args, **kwargs):
-        # Prevent from saving empty strings as code because of the unique together constraint
+        # Prevent from saving empty strings as code because of the unique
+        # together constraint
         if self.code == '':
             self.code = None
         super(IndicatorBlueprint, self).save(*args, **kwargs)
@@ -148,15 +151,18 @@ class IndicatorBlueprint(TimeStampedExternalSyncModelMixin):
             self.PERCENTAGE: map(lambda x: x[0], self.RATIO_CALC_CHOICES),
         }
         if self.calculation_formula_across_periods not in unit_to_valid_calc_values.get(self.unit, []) or \
-        self.calculation_formula_across_locations not in unit_to_valid_calc_values.get(self.unit, []):
-            raise ValidationError('Calculation methods not supported by selected unit')
+                self.calculation_formula_across_locations not in unit_to_valid_calc_values.get(self.unit, []):
+            raise ValidationError(
+                'Calculation methods not supported by selected unit')
 
         unit_to_valid_display_type_values = {
             self.NUMBER: map(lambda x: x[0], self.QUANTITY_DISPLAY_TYPE_CHOICES),
             self.PERCENTAGE: map(lambda x: x[0], self.RATIO_DISPLAY_TYPE_CHOICES),
         }
-        if self.display_type not in unit_to_valid_display_type_values.get(self.unit, []):
-            raise ValidationError('Display type is not supported by selected unit')
+        if self.display_type not in unit_to_valid_display_type_values.get(self.unit, [
+        ]):
+            raise ValidationError(
+                'Display type is not supported by selected unit')
 
     def __str__(self):
         return self.title
@@ -272,7 +278,8 @@ class Reportable(TimeStampedExternalSyncModelMixin):
 
     @classmethod
     def get_narrative_and_assessment(cls, progress_report_id):
-        progress_report = IndicatorReport.objects.filter(progress_report_id=progress_report_id).first()
+        progress_report = IndicatorReport.objects.filter(
+            progress_report_id=progress_report_id).first()
         return {
             'overall_status': progress_report and progress_report.overall_status,
             'narrative_assessment': progress_report and progress_report.narrative_assessment,
@@ -364,13 +371,13 @@ class IndicatorReport(TimeStampedModel):
     def can_submit(self):
         if self.submission_date is not None and self.report_status == INDICATOR_REPORT_STATUS.sent_back:
             pass  # lets go and check throw disaggregation
-        elif self.submission_date and  self.report_status in [
+        elif self.submission_date and self.report_status in [
                 INDICATOR_REPORT_STATUS.accepted,
                 INDICATOR_REPORT_STATUS.submitted]:
             return False
 
         for data in self.indicator_location_data.all():
-            for key, vals in data.disaggregation.iteritems():
+            for key, vals in data.disaggregation.items():
                 if self.is_percentage and (vals.get('c', None) in [None, '']):
                     return False
                 elif self.is_number and (vals.get('v', None) in [None, '']):
@@ -386,7 +393,8 @@ class IndicatorReport(TimeStampedModel):
 
     @property
     def status(self):
-        # TODO: Check all disaggregation data across locations and return status
+        # TODO: Check all disaggregation data across locations and return
+        # status
         return 'fulfilled'
 
     @cached_property
@@ -416,15 +424,21 @@ class IndicatorReport(TimeStampedModel):
 
         for disaggregation in disaggregations:
             if not id_only:
-                disaggregation_value = disaggregation.disaggregation_values.order_by('id').values_list('id', 'value')
+                disaggregation_value = disaggregation.disaggregation_values.order_by(
+                    'id').values_list('id', 'value')
 
             else:
-                disaggregation_value = disaggregation.disaggregation_values.order_by('id').values_list('id', flat=True)
+                disaggregation_value = disaggregation.disaggregation_values.order_by(
+                    'id').values_list('id', flat=True)
 
             output_list.append(list(disaggregation_value))
 
         if flat:
-            output_list = set(reduce(lambda acc, curr: acc + curr, output_list))
+            output_list = set(
+                reduce(
+                    lambda acc,
+                    curr: acc + curr,
+                    output_list))
 
         return output_list
 
@@ -472,17 +486,21 @@ def recalculate_reportable_total(sender, instance, **kwargs):
                 if blueprint.calculation_formula_across_periods == IndicatorBlueprint.AVG:
                     ir_count = accepted_indicator_reports.count()
                     if ir_count > 0:
-                        reportable_total['v'] = reportable_total['v'] / (ir_count * 1.0)
-                        reportable_total['c'] = reportable_total['c'] / (ir_count * 1.0)
+                        reportable_total['v'] = reportable_total['v'] / \
+                            (ir_count * 1.0)
+                        reportable_total['c'] = reportable_total['c'] / \
+                            (ir_count * 1.0)
 
-        # if unit is PERCENTAGE, doesn't matter if calc choice was percent or ratio
+        # if unit is PERCENTAGE, doesn't matter if calc choice was percent or
+        # ratio
         elif blueprint.unit == IndicatorBlueprint.PERCENTAGE:
             for indicator_report in accepted_indicator_reports:
                 reportable_total['v'] += indicator_report.total['v']
                 reportable_total['d'] += indicator_report.total['d']
 
             if reportable_total['d'] != 0:
-                reportable_total['c'] = reportable_total['v'] / (reportable_total['d'] * 1.0)
+                reportable_total['c'] = reportable_total['v'] / \
+                    (reportable_total['d'] * 1.0)
 
     reportable.total = reportable_total
     reportable.save()
@@ -496,8 +514,11 @@ class IndicatorLocationData(TimeStampedModel):
         indicator.IndicatorReport (ForeignKey): "indicator_report"
         core.Location (OneToOneField): "location"
     """
-    indicator_report = models.ForeignKey(IndicatorReport, related_name="indicator_location_data")
-    location = models.ForeignKey('core.Location', related_name="indicator_location_data")
+    indicator_report = models.ForeignKey(
+        IndicatorReport, related_name="indicator_location_data")
+    location = models.ForeignKey(
+        'core.Location',
+        related_name="indicator_location_data")
 
     disaggregation = JSONField(default=dict)
     num_disaggregation = models.IntegerField()
@@ -510,4 +531,5 @@ class IndicatorLocationData(TimeStampedModel):
         ordering = ['id']
 
     def __str__(self):
-        return "{} Location Data for {}".format(self.location, self.indicator_report)
+        return "{} Location Data for {}".format(
+            self.location, self.indicator_report)

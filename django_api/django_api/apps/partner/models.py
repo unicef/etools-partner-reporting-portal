@@ -216,7 +216,7 @@ class PartnerActivity(TimeStampedModel):
                                          null=True)
     cluster_objective = models.ForeignKey('cluster.ClusterObjective',
                                           related_name="partner_activities",
-                                          null=True) # TODO: why needed?
+                                          null=True)  # TODO: why needed?
     reportables = GenericRelation('indicator.Reportable',
                                   related_query_name='partner_activities')
     locations = models.ManyToManyField('core.Location',
@@ -246,4 +246,5 @@ class PartnerActivity(TimeStampedModel):
 @receiver(pre_save, sender=PartnerActivity, dispatch_uid="check_pa_double_fks")
 def check_pa_double_fks(sender, instance, **kwargs):
     if instance.cluster_activity and instance.cluster_objective:
-        raise Exception("PartnerActivity cannot belong to both ClusterActivity and ClusterObjective")
+        raise Exception(
+            "PartnerActivity cannot belong to both ClusterActivity and ClusterObjective")

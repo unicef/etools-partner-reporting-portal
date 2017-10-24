@@ -16,7 +16,10 @@ class IndicatorFilter(filters.FilterSet):
 
 
 class PDReportsFilter(filters.FilterSet):
-    status = ChoiceFilter(choices=PROGRESS_REPORT_STATUS, method="get_status", label="Status")
+    status = ChoiceFilter(
+        choices=PROGRESS_REPORT_STATUS,
+        method="get_status",
+        label="Status")
 
     class Meta:
         model = IndicatorReport

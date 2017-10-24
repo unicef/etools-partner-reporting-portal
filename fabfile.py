@@ -63,7 +63,6 @@ def fixtures(quantity=40):
     """
     local('docker-compose exec django_api python manage.py generate_fake_data --quantity %d --clean_before' % (int(quantity)))
 
-    print "Fake data generated!"
 
 def real_fixtures():
     """
@@ -71,8 +70,15 @@ def real_fixtures():
     """
     local('docker-compose exec django_api python manage.py generate_real_data --clean_before --fast')
 
+
 def remove_untagged_images():
     """
     Delete all untagged (<none>) images
     """
     local('docker rmi $(docker images | grep "^<none>" | awk "{print $3}")')
+
+def autopep8():
+    """
+    Format all Python files to pep8-compliant
+    """
+    local('docker-compose exec django_api find . -name \*.py -not -path "./django_api/apps/**/migrations/*.py" -exec autopep8 --in-place --aggressive --recursive --jobs 2 --ignore=E402 {} +')
