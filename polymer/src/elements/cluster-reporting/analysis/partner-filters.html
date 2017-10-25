@@ -47,22 +47,17 @@
           required>
       </partner-filter>
 
-      <template
-          is="dom-if"
-          if="[[renderOthers]]"
-          restamp="true">
-        <cluster-project-filter
-            class="item"
-            value="[[_withDefaultFrom(queryParams, 'project', '')]]"
-            dependencies="partner">
-        </cluster-project-filter>
+      <cluster-project-filter
+          class="item"
+          value="[[_withDefault(queryParams.project, '')]]"
+          dependencies="partner">
+      </cluster-project-filter>
 
-        <cluster-activity-filter
-            class="item filter-2-col"
-            value="[[_withDefaultFrom(queryParams, 'activity', '')]]"
-            dependencies="partner">
-        </cluster-activity-filter>
-      </template>
+      <cluster-activity-filter
+          class="item filter-2-col"
+          value="[[_withDefault(queryParams.activity, '')]]"
+          dependencies="partner">
+      </cluster-activity-filter>
     </filter-list>
   </template>
 
@@ -76,11 +71,6 @@
 
       properties: {
         queryParams: Object,
-
-        renderOthers: {
-          type: Boolean,
-          value: true,
-        },
       },
 
       listeners: {
@@ -88,14 +78,12 @@
       },
 
       _resetFilters: function () {
-        this.set('renderOthers', false);
-
         this.async(function () {
-          this.set('queryParams', {
-            partner: this.queryParams.partner,
-          });
-
-          this.set('renderOthers', true);
+          Object.keys(this.queryParams).forEach(function (key) {
+            if (['partner', 'page'].indexOf(key) === -1) {
+              this.set(['queryParams', key], '');
+            }
+          }, this);
         });
       },
     });

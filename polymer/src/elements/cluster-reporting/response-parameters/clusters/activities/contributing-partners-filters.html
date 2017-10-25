@@ -33,7 +33,7 @@
 
     <filter-list filters="{{filters}}" class="app-grid">
       <partner-filter
-          value="[[_withDefaultFrom(queryParams, 'partner', '')]]">
+          value="[[_withDefault(queryParams.partner, '')]]">
       </partner-filter>
     </filter-list>
   </template>

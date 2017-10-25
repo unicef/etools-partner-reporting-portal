@@ -73,11 +73,13 @@
       },
 
       _computeValue: function (data, value) {
-        var index = data.findIndex(function (item) {
-          return value === String(item.id);
-        });
+        this.debounce('compute-value', function () {
+          var index = data.findIndex(function (item) {
+            return value === String(item.id);
+          });
 
-        this.set('computedValue', data[index === -1 ? 0 : index].id);
+          this.set('computedValue', data[index === -1 ? 0 : index].id);
+        }, 100);
       },
 
       _fetchPartnerNames: function () {
@@ -101,6 +103,10 @@
 
       detached: function () {
         this.$.partnerNames.abort();
+
+        if (this.isDebouncerActive('compute-value')) {
+          this.cancelDebouncer('compute-value');
+        }
       },
     });
   </script>
