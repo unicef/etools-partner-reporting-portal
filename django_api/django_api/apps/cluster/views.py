@@ -42,6 +42,7 @@ from .filters import (
     ClusterObjectiveFilter,
     ClusterActivityFilter,
     ClusterIndicatorsFilter,
+    ClusterFilter,
 )
 
 logger = logging.getLogger(__name__)
@@ -61,6 +62,8 @@ class ClusterListAPIView(ListAPIView):
     serializer_class = ClusterSimpleSerializer
     permission_classes = (IsAuthenticated, )
     lookup_field = lookup_url_kwarg = 'response_plan_id'
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
+    filter_class = ClusterFilter
 
     def get_queryset(self, *args, **kwargs):
         queryset = Cluster.objects
@@ -602,9 +605,9 @@ class PartnerAnalysisSummaryAPIView(APIView):
 
             serializer_context['ca_indicator'] = ca_indicator
 
-        if 'cluster' in request.query_params:
+        if 'cluster_id' in request.query_params:
             cluster = get_object_or_404(
-                Cluster, id=request.query_params.get('cluster'))
+                Cluster, id=request.query_params.get('cluster_id'))
 
             if not partner.clusters.filter(id=cluster.id).exists():
                 return Response({'message': "cluster does not belong to partner."}, status=statuses.HTTP_400_BAD_REQUEST)
