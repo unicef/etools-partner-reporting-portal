@@ -8,6 +8,7 @@
 <link rel="import" href="../../filters/partner-filter/partner-filter.html">
 <link rel="import" href="../../filters/cluster-project-filter/cluster-project-filter.html">
 <link rel="import" href="../../filters/cluster-activity-filter/cluster-activity-filter.html">
+<link rel="import" href="../../filters/cluster-filter/cluster-filter.html">
 
 <dom-module id="partner-analysis-filters">
   <template>
@@ -58,6 +59,12 @@
           value="[[_withDefault(queryParams.activity, '')]]"
           dependencies="partner">
       </cluster-activity-filter>
+
+      <cluster-filter
+          class="item"
+          value="[[_withDefault(queryParams.cluster_id, '')]]"
+          dependencies="partner">
+      </cluster-filter>
     </filter-list>
   </template>
 
