@@ -9,6 +9,7 @@
 <link rel="import" href="../../filters/cluster-project-filter/cluster-project-filter.html">
 <link rel="import" href="../../filters/cluster-activity-filter/cluster-activity-filter.html">
 <link rel="import" href="../../filters/cluster-filter/cluster-filter.html">
+<link rel="import" href="../../filters/dropdown-filter/dropdown-filter.html">
 
 <dom-module id="partner-analysis-filters">
   <template>
@@ -65,6 +66,14 @@
           value="[[_withDefault(queryParams.cluster_id, '')]]"
           dependencies="partner">
       </cluster-filter>
+
+      <dropdown-filter
+          class="item"
+          label="Report Status"
+          name="report_status"
+          value="[[_withDefault(queryParams.report_status, '')]]"
+          data="[[statuses]]">
+      </dropdown-filter>
     </filter-list>
   </template>
 
@@ -78,6 +87,17 @@
 
       properties: {
         queryParams: Object,
+
+        statuses: {
+          type: Array,
+          value: [
+            {title: 'All', id: ''},
+            {title: 'Met', id: 'Met'},
+            {title: 'On Track', id: 'OnT'},
+            {title: 'No Progress', id: 'NoP'},
+            {title: 'Constrained', id: 'Con'},
+          ],
+        },
       },
 
       listeners: {
