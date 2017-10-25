@@ -315,6 +315,11 @@
           value: []
         },
 
+        partnerID: {
+          type: String,
+          statePath: 'partner.current.id',
+        },
+
         formattedLocations: {
           type: Array,
           computed: '_formatForMultiselect(locations)'
@@ -399,6 +404,8 @@
         this.data.clusters = this.selectedClusters.map(function(item) {
           return {id: Number(item)};
         });
+
+        this.data.partner = this.partnerID;
 
         this.updatePending = true;
         var thunk = this.$.createProject.thunk();
