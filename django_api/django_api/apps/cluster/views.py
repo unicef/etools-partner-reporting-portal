@@ -581,38 +581,42 @@ class PartnerAnalysisSummaryAPIView(APIView):
             Partner, id=request.query_params.get('partner'))
 
         if 'project' in request.query_params:
-            project = get_object_or_404(
-                PartnerProject, id=request.query_params.get('project'))
+            if request.query_params.get('project'):
+                project = get_object_or_404(
+                    PartnerProject, id=request.query_params.get('project'))
 
-            if project.partner.id != partner.id:
-                return Response({'message': "project does not belong to partner."}, status=statuses.HTTP_400_BAD_REQUEST)
+                if project.partner.id != partner.id:
+                    return Response({'message': "project does not belong to partner."}, status=statuses.HTTP_400_BAD_REQUEST)
 
-            serializer_context['project'] = project
+                serializer_context['project'] = project
 
         if 'activity' in request.query_params:
-            activity = get_object_or_404(
-                PartnerActivity, id=request.query_params.get('activity'))
+            if request.query_params.get('activity'):
+                activity = get_object_or_404(
+                    PartnerActivity, id=request.query_params.get('activity'))
 
-            if activity.partner.id != partner.id:
-                return Response({'message': "activity does not belong to partner."}, status=statuses.HTTP_400_BAD_REQUEST)
+                if activity.partner.id != partner.id:
+                    return Response({'message': "activity does not belong to partner."}, status=statuses.HTTP_400_BAD_REQUEST)
 
-            serializer_context['activity'] = activity
+                serializer_context['activity'] = activity
 
         if 'ca_indicator' in request.query_params:
-            ca_indicator = get_object_or_404(
-                Reportable,
-                id=request.query_params.get('ca_indicator'))
+            if request.query_params.get('ca_indicator'):
+                ca_indicator = get_object_or_404(
+                    Reportable,
+                    id=request.query_params.get('ca_indicator'))
 
-            serializer_context['ca_indicator'] = ca_indicator
+                serializer_context['ca_indicator'] = ca_indicator
 
         if 'cluster_id' in request.query_params:
-            cluster = get_object_or_404(
-                Cluster, id=request.query_params.get('cluster_id'))
+            if request.query_params.get('cluster_id'):
+                cluster = get_object_or_404(
+                    Cluster, id=request.query_params.get('cluster_id'))
 
-            if not partner.clusters.filter(id=cluster.id).exists():
-                return Response({'message': "cluster does not belong to partner."}, status=statuses.HTTP_400_BAD_REQUEST)
+                if not partner.clusters.filter(id=cluster.id).exists():
+                    return Response({'message': "cluster does not belong to partner."}, status=statuses.HTTP_400_BAD_REQUEST)
 
-            serializer_context['cluster'] = cluster
+                serializer_context['cluster'] = cluster
 
         if 'report_status' in request.query_params:
             serializer_context['report_status'] = request.query_params.get('report_status')
