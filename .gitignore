@@ -10,3 +10,5 @@
 
 # Python compiled
 *.pyc
+*.pem
+
