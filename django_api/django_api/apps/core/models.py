@@ -78,7 +78,7 @@ class Country(TimeStampedExternalSyncModelMixin):
     )
     long_name = models.CharField(max_length=255, null=True, blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -163,7 +163,7 @@ class ResponsePlan(TimeStampedModel):
     class Meta:
         unique_together = ('title', 'plan_type', 'workspace')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     @property

@@ -109,9 +109,11 @@ PROGRESS_REPORT_STATUS = Choices(
 
 PD_STATUS = Choices(
     ("Dra", "draft", "Draft"),
+    ("Sig", "signed", "Signed"),
     ("Act", "active", "Active"),
-    ("Imp", "implemented", "Implemented"),
-    ('Rej', 'rejected', 'Rejected'),
+    ("Sus", "suspended", "Suspended"),
+    ('End', 'ended', 'Ended'),
+    ('Clo', 'closed', 'Closed'),
 )
 
 RESPONSE_PLAN_TYPE = Choices(

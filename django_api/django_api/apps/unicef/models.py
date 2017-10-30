@@ -54,9 +54,9 @@ class Person(TimeStampedExternalSyncModelMixin):
         verbose_name='Phone Number',
         blank=True,
         null=True)
-    email = models.CharField(max_length=255, verbose_name='Email    ')
+    email = models.CharField(max_length=255, verbose_name='Email')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -198,7 +198,9 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
         choices=CURRENCIES,
         default=CURRENCIES.usd,
         max_length=16,
-        verbose_name='Funds received Currency'
+        verbose_name='Funds received Currency',
+        blank = True,
+        null = True,
     )
 
     # TODO:
@@ -215,7 +217,7 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
     class Meta:
         ordering = ['-id']
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     @cached_property
@@ -467,6 +469,8 @@ class LowerLevelOutput(TimeStampedExternalSyncModelMixin):
                                   related_name="ll_outputs")
     reportables = GenericRelation('indicator.Reportable',
                                   related_query_name='lower_level_outputs')
+
+    active = models.BooleanField(default=True)
 
     class Meta:
         ordering = ['id']

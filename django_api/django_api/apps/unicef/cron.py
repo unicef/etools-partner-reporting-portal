@@ -129,37 +129,16 @@ class ProgrammeDocumentCronJob(CronJobBase):
                         # Modify offices entry
                         item['offices'] = ", ".join(
                             item['offices']) if item['offices'] else "N/A"
-                        if not item['start_date']:
-                            item['start_date'] = "2017-09-01"
-                        if not item['end_date']:
-                            item['end_date'] = "2017-11-30"
-                        # TODO: Add real currency here
-                        # if not item['cso_budget_currency']:
-                        #     item['cso_budget_currency'] = "USD"
-                        # if not item['funds_received_currency']:
-                        #     item['funds_received_currency'] = "USD"
-                        # if not item['unicef_budget_currency']:
-                        #     item['unicef_budget_currency'] = "USD"
-                        item['cso_budget_currency'] = "USD"
-                        item['funds_received_currency'] = "USD"
-                        item['unicef_budget_currency'] = "USD"
+
                         # title has more then 255 chars
                         item['title'] = item['title'][:255]
 
                         # TODO: End remove section
 
                         # Create PD
+                        item['status'] = item['status'].title()[:3]
                         pd = self.process_model(ProgrammeDocument, PMPProgrammeDocumentSerializer, item,
                                                 {'external_id': item['id'], 'workspace': workspace})
-                        # TODO: remove temporary ACTIVE status, agreement,
-                        # population focus
-                        if pd.status == PD_STATUS.draft:
-                            pd.status = PD_STATUS.active
-                        if not pd.agreement:
-                            pd.agreement = pd.reference_number
-                        if not pd.population_focus:
-                            pd.population_focus = "Detail Information"
-                        pd.save()
 
                         # Create unicef_focal_points
                         person_data_list = item['unicef_focal_points']
@@ -205,101 +184,108 @@ class ProgrammeDocumentCronJob(CronJobBase):
                             u.workspaces.add(workspace)
                             u.groups.add(group)
 
-                        # Parsing expecting results
-                        for d in item['expected_results']:
+                        if item['status'] == "active":
+                            # Mark all LLO assigned to this PD as inactive
+                            LowerLevelOutput.objects.filter(cp_output__programme_document=pd).update(active=False)
 
-                            # Create PDResultLink
-                            d['programme_document'] = pd.id
-                            pdresultlink = self.process_model(PDResultLink, PMPPDResultLinkSerializer, d,
-                                                              {'external_id': d['result_link'], 'external_cp_output_id': d['id']})
+                            # Parsing expecting results
+                            for d in item['expected_results']:
 
-                            # Create LLOs
-                            d['cp_output'] = pdresultlink.id
-                            llo = self.process_model(LowerLevelOutput, PMPLLOSerializer, d,
-                                                     {'external_id': d['id']})
+                                # Create PDResultLink
+                                d['programme_document'] = pd.id
+                                pdresultlink = self.process_model(PDResultLink, PMPPDResultLinkSerializer, d,
+                                                                  {'external_id': d['result_link'], 'external_cp_output_id': d['id']})
 
-                            # Iterate over indicators
-                            for i in d['indicators']:
-                                # Check if indicator is cluster indicator
-                                i['is_cluster_indicator'] = True if i['cluster_indicator_id'] else False
+                                # Create LLO
+                                d['cp_output'] = pdresultlink.id
+                                llo = self.process_model(LowerLevelOutput, PMPLLOSerializer, d,
+                                                         {'external_id': d['id']})
+                                # Mark LLO as active
+                                llo.active=True
+                                llo.save()
 
-                                # If indicator is not cluster, create Blueprint
-                                # otherwise use parent Blueprint
-                                if i['is_cluster_indicator']:
-                                    # Get blueprint of parent indicator
-                                    try:
-                                        blueprint = Reportable.objects.get(
-                                            external_id=i['cluster_indicator_id']).blueprint
-                                    except Reportable.DoesNotExist:
-                                        blueprint = None
-                                else:
-                                    # Create IndicatorBlueprint
-                                    i['disaggregatable'] = True
-                                    blueprint = self.process_model(IndicatorBlueprint, PMPIndicatorBlueprintSerializer, i,
-                                                                   {'external_id': i['id']})
+                                # Iterate over indicators
+                                for i in d['indicators']:
+                                    # Check if indicator is cluster indicator
+                                    i['is_cluster_indicator'] = True if i['cluster_indicator_id'] else False
 
-                                locations = list()
-                                for l in i['locations']:
-                                    # Create gateway for location
-                                    # TODO: assign country after PMP add these
-                                    # fields into API
-                                    l['gateway_country'] = workspace.countries.all()[
-                                        0].id
-                                    l['admin_level'] = 1
-                                    gateway = self.process_model(
-                                        GatewayType, PMPGatewayTypeSerializer, l, {
-                                            'name': l['pcode']})
+                                    # If indicator is not cluster, create Blueprint
+                                    # otherwise use parent Blueprint
+                                    if i['is_cluster_indicator']:
+                                        # Get blueprint of parent indicator
+                                        try:
+                                            blueprint = Reportable.objects.get(
+                                                external_id=i['cluster_indicator_id']).blueprint
+                                        except Reportable.DoesNotExist:
+                                            blueprint = None
+                                    else:
+                                        # Create IndicatorBlueprint
+                                        i['disaggregatable'] = True
+                                        blueprint = self.process_model(IndicatorBlueprint, PMPIndicatorBlueprintSerializer, i,
+                                                                       {'external_id': i['id']})
 
-                                    # Create location
-                                    l['gateway'] = gateway.id
-                                    location = self.process_model(
-                                        Location, PMPLocationSerializer, l, {
-                                            'p_code': l['pcode']})
-                                    locations.append(location)
+                                    locations = list()
+                                    for l in i['locations']:
+                                        # Create gateway for location
+                                        # TODO: assign country after PMP add these
+                                        # fields into API
+                                        l['gateway_country'] = workspace.countries.all()[
+                                            0].id
+                                        l['admin_level'] = 1
+                                        gateway = self.process_model(
+                                            GatewayType, PMPGatewayTypeSerializer, l, {
+                                                'name': l['pcode']})
 
-                                # If indicator is not cluster, create
-                                # Disaggregation otherwise use parent
-                                # Disaggregation
-                                disaggregations = list()
-                                if i['is_cluster_indicator']:
-                                    # Get Disaggregation
-                                    try:
-                                        disaggregations = list(
-                                            Reportable.objects.get(
-                                                external_id=i['cluster_indicator_id']).disaggregations.all())
-                                    except Reportable.DoesNotExist:
-                                        disaggregations = list()
-                                else:
-                                    # Create Disaggregation
-                                    for dis in i['disaggregation']:
-                                        dis['active'] = True
-                                        disaggregation = self.process_model(Disaggregation, PMPDisaggregationSerializer, dis,
-                                                                            {'name': dis['name']})
-                                        disaggregations.append(disaggregation)
+                                        # Create location
+                                        l['gateway'] = gateway.id
+                                        location = self.process_model(
+                                            Location, PMPLocationSerializer, l, {
+                                                'p_code': l['pcode']})
+                                        locations.append(location)
 
-                                # TODO: REMOVE THIS TEMPORARY DISAGGREGATION
-                                # VALUES CREATE
-                                for dis in disaggregations:
-                                    if dis.disaggregation_values.all().count() < 1:
-                                        for number in range(5):
-                                            DisaggregationValue.objects.create(
-                                                disaggregation=dis,
-                                                value="Value %s" % number
-                                            )
+                                    # If indicator is not cluster, create
+                                    # Disaggregation otherwise use parent
+                                    # Disaggregation
+                                    disaggregations = list()
+                                    if i['is_cluster_indicator']:
+                                        # Get Disaggregation
+                                        try:
+                                            disaggregations = list(
+                                                Reportable.objects.get(
+                                                    external_id=i['cluster_indicator_id']).disaggregations.all())
+                                        except Reportable.DoesNotExist:
+                                            disaggregations = list()
+                                    else:
+                                        # Create Disaggregation
+                                        for dis in i['disaggregation']:
+                                            dis['active'] = True
+                                            disaggregation = self.process_model(Disaggregation, PMPDisaggregationSerializer, dis,
+                                                                                {'name': dis['name']})
+                                            disaggregations.append(disaggregation)
 
-                                # Create Reportable
-                                i['blueprint_id'] = blueprint.id if blueprint else None
-                                i['location_ids'] = [l.id for l in locations]
-                                i['disaggregation_ids'] = [
-                                    ds.id for ds in disaggregations]
+                                    # TODO: REMOVE THIS TEMPORARY DISAGGREGATION
+                                    # VALUES CREATE
+                                    for dis in disaggregations:
+                                        if dis.disaggregation_values.all().count() < 1:
+                                            for number in range(5):
+                                                DisaggregationValue.objects.create(
+                                                    disaggregation=dis,
+                                                    value="Value %s" % number
+                                                )
 
-                                i['content_type'] = ContentType.objects.get_for_model(
-                                    llo).id
-                                i['object_id'] = llo.id
-                                i['start_date'] = item['start_date']
-                                i['end_date'] = item['end_date']
-                                self.process_model(Reportable, PMPReportableSerializer, i,
-                                                   {'external_id': i['id']})
+                                    # Create Reportable
+                                    i['blueprint_id'] = blueprint.id if blueprint else None
+                                    i['location_ids'] = [l.id for l in locations]
+                                    i['disaggregation_ids'] = [
+                                        ds.id for ds in disaggregations]
+
+                                    i['content_type'] = ContentType.objects.get_for_model(
+                                        llo).id
+                                    i['object_id'] = llo.id
+                                    i['start_date'] = item['start_date']
+                                    i['end_date'] = item['end_date']
+                                    self.process_model(Reportable, PMPReportableSerializer, i,
+                                                       {'external_id': i['id']})
 
                     # Check if another page exists
                     if list_data['next']:
