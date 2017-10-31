@@ -292,7 +292,6 @@ class PartnerActivityFromCustomActivitySerializer(
 class PartnerActivitySerializer(serializers.ModelSerializer):
 
     cluster = serializers.SerializerMethodField()
-    status = serializers.SerializerMethodField()
     project = PartnerProjectSimpleSerializer()
     reportables = ClusterIndicatorForPartnerActivitySerializer(many=True)
     cluster_activity = ClusterActivitySerializer()
@@ -309,6 +308,8 @@ class PartnerActivitySerializer(serializers.ModelSerializer):
             'project',
             'cluster_activity',
             'reportables',
+            'start_date',
+            'end_date'
         )
 
     def get_cluster(self, obj):
@@ -318,11 +319,6 @@ class PartnerActivitySerializer(serializers.ModelSerializer):
             return obj.cluster_objective.cluster.get_type_display()
         else:
             return None
-
-    def get_status(self, obj):
-        return obj.project and obj.project.status
-
-# PMP API Serializers
 
 
 class PMPPartnerSerializer(serializers.ModelSerializer):
