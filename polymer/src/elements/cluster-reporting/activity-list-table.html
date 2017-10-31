@@ -118,9 +118,7 @@
                 </div>
               </template>
               <div class="table-cell table-cell--text">
-                <template is="dom-repeat" items="[[activity.reportables]]" as="report">
-                [[_commaSeparatedDictValues(report.locations, 'title')]]
-              </template>
+                [[_commaSeparatedDictValues(activity.locations, 'title')]]
               </div>
             </div>
             <div slot="row-data-details" class="row-details-expanded-wrapper">
