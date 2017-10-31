@@ -41,21 +41,6 @@
 
     <page-body>
 
-  <!--TODO: check if can add new indicator from response activities>partners>activities -->
-      <template is="dom-if" if="[[!clusterActivity]]">
-        <div id="action">
-          <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
-            Add Indicator
-          </paper-button>
-        </div>
-      </template>
-
-      <indicator-modal
-        id="indicatorModal"
-        object-id="[[activityId]]"
-        object-type="PartnerActivity">
-      </indicator-modal>
-
       <list-view-indicators
           data="[[data]]"
           total-results="[[totalResults]]"
@@ -105,21 +90,9 @@
         },
       },
 
-      listeners: {
-        'indicatorModal.indicator-added': '_onSuccess',
-      },
-
       observers: [
         '_indicatorsAjax(queryParams, activityId)',
       ],
-
-      _openModal: function () {
-        this.$.indicatorModal.open();
-      },
-
-      _onSuccess: function () {
-        this._indicatorsAjax();
-      },
 
       _computeCurrentIndicators: function(activityId, allIndicators) {
         return allIndicators[activityId];
