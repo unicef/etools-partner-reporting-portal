@@ -5,7 +5,20 @@ from django_filters.filters import CharFilter
 
 from core.common import INDICATOR_REPORT_STATUS
 from indicator.models import IndicatorReport
-from .models import ClusterObjective, ClusterActivity
+from .models import ClusterObjective, ClusterActivity, Cluster
+
+
+class ClusterFilter(django_filters.FilterSet):
+    partner = CharFilter(method='get_partner')
+
+    class Meta:
+        model = Cluster
+        fields = ['partner', ]
+
+    def get_partner(self, queryset, name, value):
+        return queryset.filter(
+            partners=value
+        )
 
 
 class ClusterObjectiveFilter(django_filters.FilterSet):

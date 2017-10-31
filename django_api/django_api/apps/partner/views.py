@@ -141,6 +141,8 @@ class PartnerProjectSimpleListAPIView(ListAPIView):
     serializer_class = PartnerProjectSimpleSerializer
     permission_classes = (IsAuthenticated, )
     lookup_field = lookup_url_kwarg = 'response_plan_id'
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
+    filter_class = PartnerProjectFilter
 
     def get_queryset(self):
         response_plan_id = self.kwargs.get(self.lookup_field)

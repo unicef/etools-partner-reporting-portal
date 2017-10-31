@@ -1,0 +1,22 @@
+<script>
+  (function () {
+    'use strict';
+
+    App.Behaviors = App.Behaviors || {};
+
+    App.Behaviors.AnalysisWidgetBehavior = {
+      properties: {
+        _hasData: {
+          type: Boolean,
+          value: false,
+          computed: '_computeHasData(data)',
+        },
+      },
+
+      _computeHasData: function () {
+        return true; // Anything but undefined works
+      },
+    };
+
+  }());
+</script>

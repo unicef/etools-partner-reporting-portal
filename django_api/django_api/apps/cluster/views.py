@@ -15,9 +15,18 @@ from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
 from core.serializers import ShortLocationSerializer
 from core.models import Location, ResponsePlan
-from indicator.serializers import ClusterIndicatorReportSerializer, ClusterIndicatorReportSimpleSerializer
-from indicator.models import IndicatorReport
-from cluster.export import XLSXWriter
+from indicator.serializers import (
+    ClusterIndicatorReportSerializer, ClusterIndicatorReportSimpleSerializer,
+    ClusterPartnerAnalysisIndicatorResultSerializer,
+)
+from indicator.models import IndicatorReport, Reportable
+from partner.models import (
+    Partner,
+    PartnerProject,
+    PartnerActivity,
+)
+
+from .export import XLSXWriter
 from .models import ClusterObjective, ClusterActivity, Cluster
 from .serializers import (
     ClusterSimpleSerializer,
@@ -26,12 +35,14 @@ from .serializers import (
     ClusterActivitySerializer,
     ClusterActivityPatchSerializer,
     ResponsePlanClusterDashboardSerializer,
-    ResponsePlanPartnerDashboardSerializer
+    ResponsePlanPartnerDashboardSerializer,
+    PartnerAnalysisSummarySerializer,
 )
 from .filters import (
     ClusterObjectiveFilter,
     ClusterActivityFilter,
     ClusterIndicatorsFilter,
+    ClusterFilter,
 )
 
 logger = logging.getLogger(__name__)
@@ -51,6 +62,8 @@ class ClusterListAPIView(ListAPIView):
     serializer_class = ClusterSimpleSerializer
     permission_classes = (IsAuthenticated, )
     lookup_field = lookup_url_kwarg = 'response_plan_id'
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
+    filter_class = ClusterFilter
 
     def get_queryset(self, *args, **kwargs):
         queryset = Cluster.objects
@@ -535,3 +548,106 @@ class ClusterIndicatorsLocationListAPIView(ListAPIView):
             | Q(reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)
         ).values_list('reportable__indicator_reports__indicator_location_data__location', flat=True).distinct()
         return Location.objects.filter(pk__in=result)
+
+
+class PartnerAnalysisSummaryAPIView(APIView):
+    """
+    Cluster analysis API for Partner - GET
+    Authentication required.
+
+    PartnerAnalysisSummaryAPIView provides a high-level summary
+    for the specified partner: # of Activities, Recent progresses, etc.
+
+    GET Parameter filters:
+    - partner
+    - project
+    - activity
+    - ca_indicator
+    - cluster
+    - report_status
+
+    Returns:
+        - GET method - PartnerAnalysisSummarySerializer object.
+    """
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request, *args, **kwargs):
+        if 'partner' not in request.query_params:
+            return Response({'message': "partner GET parameter is required."}, status=statuses.HTTP_400_BAD_REQUEST)
+
+        serializer_context = {}
+
+        partner = get_object_or_404(
+            Partner, id=request.query_params.get('partner'))
+
+        if 'project' in request.query_params:
+            if request.query_params.get('project'):
+                project = get_object_or_404(
+                    PartnerProject, id=request.query_params.get('project'))
+
+                if project.partner.id != partner.id:
+                    return Response({'message': "project does not belong to partner."}, status=statuses.HTTP_400_BAD_REQUEST)
+
+                serializer_context['project'] = project
+
+        if 'activity' in request.query_params:
+            if request.query_params.get('activity'):
+                activity = get_object_or_404(
+                    PartnerActivity, id=request.query_params.get('activity'))
+
+                if activity.partner.id != partner.id:
+                    return Response({'message': "activity does not belong to partner."}, status=statuses.HTTP_400_BAD_REQUEST)
+
+                serializer_context['activity'] = activity
+
+        if 'ca_indicator' in request.query_params:
+            if request.query_params.get('ca_indicator'):
+                ca_indicator = get_object_or_404(
+                    Reportable,
+                    id=request.query_params.get('ca_indicator'))
+
+                serializer_context['ca_indicator'] = ca_indicator
+
+        if 'cluster_id' in request.query_params:
+            if request.query_params.get('cluster_id'):
+                cluster = get_object_or_404(
+                    Cluster, id=request.query_params.get('cluster_id'))
+
+                if not partner.clusters.filter(id=cluster.id).exists():
+                    return Response({'message': "cluster does not belong to partner."}, status=statuses.HTTP_400_BAD_REQUEST)
+
+                serializer_context['cluster'] = cluster
+
+        if 'report_status' in request.query_params:
+            serializer_context['report_status'] = request.query_params.get('report_status')
+
+        serializer = PartnerAnalysisSummarySerializer(
+            partner, context=serializer_context)
+
+        return Response(serializer.data, status=statuses.HTTP_200_OK)
+
+
+class PartnerAnalysisIndicatorResultAPIView(APIView):
+    """
+    Data API for given Cluster Partner analysis indicator - GET
+    Authentication required.
+
+    PartnerAnalysisIndicatorResultAPIView provides indicator progress data and
+    IndicatorReport data for current and previous state.
+
+    Parameters:
+    - response_plan_id - Response plan ID
+    - reportable_id - Reportable ID
+
+    Returns:
+        - GET method - ClusterPartnerAnalysisIndicatorResultSerializer object.
+    """
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request, response_plan_id, reportable_id, *args, **kwargs):
+        reportable = get_object_or_404(
+            Reportable, id=reportable_id)
+
+        serializer = ClusterPartnerAnalysisIndicatorResultSerializer(reportable)
+
+        return Response(serializer.data, status=statuses.HTTP_200_OK)
