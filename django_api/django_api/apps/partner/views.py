@@ -158,9 +158,9 @@ class PartnerSimpleListAPIView(ListAPIView):
             clusters__response_plan_id=response_plan_id)
 
 
-class PartnerActivityAPIView(APIView):
+class PartnerActivityCreateAPIView(APIView):
     """
-    PartnerActivityAPIView CRUD endpoint
+    PartnerActivityCreateAPIView CRUD endpoint
     """
     permission_classes = (IsAuthenticated, )
 
@@ -197,6 +197,10 @@ class PartnerActivityAPIView(APIView):
 
             if not serializer.is_valid():
                 return Response(serializer.errors,
+                                status=status.HTTP_400_BAD_REQUEST)
+
+            if serializer.validated_data['partner'] != request.user.partner:
+                return Response({'error': "Partner id did not match this user's partner"},
                                 status=status.HTTP_400_BAD_REQUEST)
 
             try:

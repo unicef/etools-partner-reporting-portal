@@ -570,7 +570,8 @@
         this.set('data.cluster.cluster_activity', undefined);
         this.set('activitiesParams.cluster_id', clusterId);
         //TODO: need to include clusterId and results need to be based on it
-        this.set('activitiesUrl', App.Endpoints.partnerActivityList()); 
+        this.set('activitiesUrl',
+            App.Endpoints.partnerActivityList(this.responsePlanId)+'?cluster_id=' + clusterId + '&partner=' + this.partner.id);
         this.$.activities.abort();
 
         this.$.activities.thunk()()
@@ -664,7 +665,7 @@
         this.$.activity.body = Object.assign({
           partner: this.partner.id,
         }, this.data[this.mode]);
-        
+
         this.$.activity.thunk()()
             .then(function (res) {
               self.fire('activity-added', res.data);
