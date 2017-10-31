@@ -571,7 +571,8 @@
         this.set('activitiesParams.cluster_id', clusterId);
         //TODO: need to include clusterId and results need to be based on it
         this.set('activitiesUrl',
-            App.Endpoints.responseParametersClusterActivities(this.responsePlanId)+'?cluster_id=' + clusterId);
+            App.Endpoints.responseParametersClusterActivities(this.responsePlanId) 
+            + '?cluster_id=' + clusterId);
         this.$.activities.abort();
 
         this.$.activities.thunk()()
