@@ -1,5 +1,6 @@
 from django.db.models import Q
 from django.http import Http404
+from django.shortcuts import get_object_or_404
 
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveAPIView, ListCreateAPIView, ListAPIView
@@ -254,3 +255,20 @@ class PartnerActivityListAPIView(ListAPIView):
                 Q(cluster_activity__cluster_objective__cluster__response_plan_id=response_plan_id) |
                 Q(cluster_objective__cluster__response_plan_id=response_plan_id)
             )
+
+
+class PartnerActivityAPIView(RetrieveAPIView):
+    """
+    Endpoint for getting Partner Details for overview tab.
+    """
+    serializer_class = PartnerActivitySerializer
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request, response_plan_id, pk, *args, **kwargs):
+        """
+        Get User Partner Details.
+        TODO: enforce user access to this response plan.
+        """
+        instance = get_object_or_404(PartnerActivity, id=pk)
+        serializer = self.get_serializer(instance=instance)
+        return Response(serializer.data, status=status.HTTP_200_OK)
