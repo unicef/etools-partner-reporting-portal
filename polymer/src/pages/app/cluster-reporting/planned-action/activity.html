@@ -10,7 +10,6 @@
 <link rel="import" href="../../../../behaviors/routing.html">
 <link rel="import" href="../../../../elements/cluster-reporting/planned-action/activities/overview.html">
 <link rel="import" href="../../../../elements/cluster-reporting/planned-action/activities/indicators.html">
-<link rel="import" href="../../../../elements/cluster-reporting/planned-action/activities/progress.html">
 <link rel="import" href="../../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../../elements/page-header.html">
 <link rel="import" href="../../../../elements/project-status.html">
@@ -89,7 +88,6 @@
             hide-scroll-buttons>
           <paper-tab name="overview">Overview</paper-tab>
           <paper-tab name="indicators">Indicators</paper-tab>
-          <paper-tab name="progress">Progress</paper-tab>
         </paper-tabs>
       </div>
     </page-header>
@@ -102,12 +100,6 @@
       <pa-activity-details-indicators
         activity-id="[[activityId]]">
       </pa-activity-details-indicators>
-    </template>
-
-    <template is="dom-if" if="[[_equals(tab, 'progress')]]" restamp="true">
-      <pa-activity-details-progress
-        activity-id="[[activityId]]">
-      </pa-project-details-progress>
     </template>
 
   </template>
@@ -136,9 +128,19 @@
           value: {}
         },
 
+        partner: {
+          type: Object,
+          statePath: 'partner.current',
+        },
+
+        responsePlanID: {
+          type: String,
+          statePath: 'responsePlans.currentID',
+        },
+
         overviewUrl: {
           type: String,
-          computed: '_computeOverviewUrl(activityId)'
+          computed: '_computeOverviewUrl(responsePlanID, activityId)'
         },
 
         backLink: {
@@ -167,9 +169,9 @@
         this.set('route.path', '/' + this.tab);
       },
 
-      // _computeOverviewUrl: function(activityId) {
-      //   return App.Endpoints.plannedActionsActivityOverview(activityId);
-      // },
+      _computeOverviewUrl: function(responsePlanId, activityId) {
+        return App.Endpoints.plannedActionsActivityOverview(responsePlanId, activityId);
+      },
 
       attached: function () {
         var thunk = this.$.overview.thunk();

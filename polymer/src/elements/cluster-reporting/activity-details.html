@@ -49,7 +49,12 @@
 
             <li class="item">
               <labelled-item label="Cluster Activity">
-                <span class="value">[[activityData.cluster_activity]]</span>
+                <template is="dom-if" if="[[activityData.cluster_activity]]">
+                  <span class="value">[[activityData.cluster_activity.title]]</span>
+                </template>
+                <template is="dom-if" if="[[!activityData.cluster_activity]]">
+                  <span class="value">---</span>
+                </template>
               </labelled-item>
             </li>
             <li class="item">
@@ -64,25 +69,24 @@
             </li>
              <li class="item">
               <labelled-item label="Partner Project">
-                <span class="value"></span>
+                <span class="value">[[activityData.project.title]]</span>
               </labelled-item>
             </li>
-
-            <li class="item">
-              <labelled-item label="Start Date">
-                <span class="value">[[activityData.start_date]]</span>
-              </labelled-item>
-            </li>
-            <li class="item">
-              <labelled-item label="End Date">
-                <span class="value">[[activityData.end_date]]</span>
-              </labelled-item>
-            </li>
+            <template is="dom-repeat" items="[[activityData.reportables]]" as="report">
+              <li class="item">
+                <labelled-item label="Start Date">
+                  <span class="value">[[report.start_date]]</span>
+                </labelled-item>
+              </li>
+              <li class="item">
+                <labelled-item label="End Date">
+                  <span class="value">[[report.end_date]]</span>
+                </labelled-item>
+              </li>
+            </template>
             <li class="item">
               <labelled-item label="Partner">
-                <span class="value">
-                  <etools-prp-number value="[[activityData.partner]]"></etools-prp-number>
-                </span>
+                <span class="value">[[activityData.partner.title]]</span>
               </labelled-item>
             </li>
 

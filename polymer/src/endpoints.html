@@ -131,6 +131,10 @@
         return this._buildUrl('/partner/partner-project-details/' + projectId + '/');
       },
 
+      plannedActionsActivityOverview: function(responsePlanId, activityId) {
+        return this._buildUrl('/partner/' + responsePlanId + '/partner-activity/' + activityId + '/');
+      },
+
       responseParamtersClustersObjectiveDetail: function(objectiveId) {
         return this._buildUrl('/cluster/cluster-objective/' + objectiveId + '/');
       },
@@ -184,7 +188,7 @@
       },
 
       partnersByClusterActivityId: function (clusterActivityId) {
-        return this._buildUrl('/partner/cluster-activity/' + clusterActivityId + '/partners');
+        return this._buildUrl('/partner/cluster-activity/' + clusterActivityId + '/partners/');
       },
 
       partnerActivityList: function (responsePlanId) {

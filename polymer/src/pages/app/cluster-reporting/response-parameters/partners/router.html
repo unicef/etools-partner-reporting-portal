@@ -59,6 +59,7 @@
         <rp-partners-activity-detail
           name="activity"
           activity-id="{{id}}"
+          response-plan-id="{{responsePlanID}}"
           route="{{subroute}}">
         </rp-partners-activity-detail>
       </template>
@@ -71,6 +72,7 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
       ],
 
       observers: [
@@ -81,6 +83,11 @@
         page: {
           type: String,
           observer: '_pageChanged',
+        },
+
+        responsePlanID: {
+          type: String,
+          statePath: 'responsePlans.currentID',
         },
 
         id: String,

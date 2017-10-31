@@ -665,7 +665,6 @@
         this.$.activity.body = Object.assign({
           partner: this.partner.id,
         }, this.data[this.mode]);
-
         this.$.activity.thunk()()
             .then(function (res) {
               self.fire('activity-added', res.data);

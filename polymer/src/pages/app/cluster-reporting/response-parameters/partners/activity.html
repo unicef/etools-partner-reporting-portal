@@ -7,7 +7,6 @@
 
 <link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/partners/activities/overview.html">
 <link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/partners/activities/indicators.html">
-<link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/partners/activities/progress.html">
 <link rel="import" href="../../../../../elements/page-body.html">
 <link rel="import" href="../../../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../../../elements/page-body.html">
@@ -34,7 +33,7 @@
     </iron-location>
 
     <etools-prp-ajax
-      id="overview"
+      id="activity"
       url="[[overviewUrl]]">
     </etools-prp-ajax>
 
@@ -65,7 +64,6 @@
             hide-scroll-buttons>
           <paper-tab name="overview">Overview</paper-tab>
           <paper-tab name="indicators">Indicators</paper-tab>
-          <paper-tab name="progress">Progress</paper-tab>
         </paper-tabs>
       </div>
     </page-header>
@@ -80,9 +78,6 @@
       </rp-partner-activity-details-indicators>
     </template>
 
-    <template is="dom-if" if="[[_equals(tab, 'progress')]]" restamp="true">
-      <rp-partner-activity-details-progress activity-id=[[activityId]]></rp-partner-activity-details-progress>
-    </template>
   </template>
 
   <script>
@@ -103,6 +98,7 @@
         routeData: Object,
 
         activityId: String,
+        responsePlanId: String,
 
         activityData: {
           type: Object,
@@ -111,7 +107,7 @@
 
         overviewUrl: {
           type: String,
-          computed: '_computeOverviewUrl(activityId)'
+          computed: '_computeOverviewUrl(responsePlanId, activityId)'
         },
 
         backLink: {
@@ -124,9 +120,9 @@
         return '/response-parameters/partners/activities' + '?' + query;
       },
 
-      // _computeOverviewUrl: function(projectId) {
-      //   return App.Endpoints.plannedActionsActivityOverview(activityId);
-      // },
+      _computeOverviewUrl: function(responsePlanId, activityId) {
+        return App.Endpoints.plannedActionsActivityOverview(responsePlanId, activityId);
+      },
 
       _updateTabSelection: function () {
         this.$.tabContent.select(this.tab);
@@ -141,7 +137,7 @@
       },
 
       attached: function () {
-        var thunk = this.$.overview.thunk();
+        var thunk = this.$.activity.thunk();
         var self = this;
         thunk()
           .then(function (res) {

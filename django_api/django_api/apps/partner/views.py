@@ -259,7 +259,7 @@ class PartnerActivityListAPIView(ListAPIView):
 
 class PartnerActivityAPIView(RetrieveAPIView):
     """
-    Endpoint for getting Partner Details for overview tab.
+    Endpoint for getting Partner Activity Details for overview tab.
     """
     serializer_class = PartnerActivitySerializer
     permission_classes = (IsAuthenticated, )
