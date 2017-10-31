@@ -1,6 +1,6 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
 
-<link rel="import" href="../dropdown-filter/dropdown-filter.html">
+<link rel="import" href="../dropdown-filter/searchable-dropdown-filter.html">
 <link rel="import" href="../../etools-prp-ajax.html">
 <link rel="import" href="../../../endpoints.html">
 <link rel="import" href="../../../redux/store.html">
@@ -19,12 +19,12 @@
     </etools-prp-ajax>
 
     <template is="dom-if" if="[[!loading]]">
-      <dropdown-filter
+      <searchable-dropdown-filter
           label="Partner"
           name="partner"
           value="[[value]]"
           data="[[data]]">
-      </dropdown-filter>
+      </searchable-dropdown-filter>
     </template>
   </template>
 
