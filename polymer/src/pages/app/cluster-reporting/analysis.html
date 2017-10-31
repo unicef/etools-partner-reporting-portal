@@ -7,7 +7,6 @@
 <link rel="import" href="../../../behaviors/utils.html">
 <link rel="import" href="../../../elements/page-header.html">
 <link rel="import" href="../../../elements/page-body.html">
-<link rel="import" href="analysis/cluster.html">
 <link rel="import" href="analysis/partner.html">
 
 <dom-module id="page-cluster-reporting-analysis">
@@ -31,7 +30,6 @@
             attr-for-selected="name"
             scrollable
             hide-scroll-buttons>
-          <paper-tab name="cluster">Cluster</paper-tab>
           <paper-tab name="partner">Partner</paper-tab>
         </paper-tabs>
       </div>
@@ -41,13 +39,6 @@
       <iron-pages
           selected="[[tab]]"
           attr-for-selected="name">
-        <template
-            is="dom-if"
-            if="[[_equals(tab, 'cluster')]]"
-            restamp="true">
-          <cluster-analysis name="cluster"></cluster-analysis>
-        </template>
-
         <template
             is="dom-if"
             if="[[_equals(tab, 'partner')]]"
@@ -86,7 +77,7 @@
       },
 
       _routeTabChanged: function (tab) {
-        this.tab = tab || 'cluster';
+        this.tab = tab || 'partner';
       },
     });
   </script>
