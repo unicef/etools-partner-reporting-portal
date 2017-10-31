@@ -180,10 +180,9 @@ class Command(BaseCommand):
                         indicator_report.progress_report = next_progress_report
                         indicator_report.save()
 
-        # TODO: Add active flag to Reportable
         for indicator in Reportable.objects.filter(
             content_type__model__in=[
-                'partnerproject', 'partneractivity', 'clusterobjective']):
+                'partnerproject', 'partneractivity', 'clusterobjective'], active=True):
             print("Processing Reportable {} between {} - {}".format(
                 indicator, indicator.start_date, indicator.end_date))
 

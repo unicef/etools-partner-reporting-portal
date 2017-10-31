@@ -184,11 +184,13 @@ class ProgrammeDocumentCronJob(CronJobBase):
                             u.workspaces.add(workspace)
                             u.groups.add(group)
 
-                        if item['status'] == "active":
-                            # Mark all LLO assigned to this PD as inactive
-                            LowerLevelOutput.objects.filter(cp_output__programme_document=pd).update(active=False)
+                        if item['status'] not in ("draft", "signed"):
+                            # Mark all LLO/reportables assigned to this PD as inactive
+                            llos = LowerLevelOutput.objects.filter(cp_output__programme_document=pd)
+                            llos.update(active=False)
+                            Reportable.objects.filter(lower_level_outputs__in=llos).update(active=False)
 
-                            # Parsing expecting results
+                            # Parsing expecting results and set them active, rest will stay inactive for this PD
                             for d in item['expected_results']:
 
                                 # Create PDResultLink
@@ -284,8 +286,10 @@ class ProgrammeDocumentCronJob(CronJobBase):
                                     i['object_id'] = llo.id
                                     i['start_date'] = item['start_date']
                                     i['end_date'] = item['end_date']
-                                    self.process_model(Reportable, PMPReportableSerializer, i,
+                                    reportable = self.process_model(Reportable, PMPReportableSerializer, i,
                                                        {'external_id': i['id']})
+                                    reportable.active = True
+                                    reportable.save()
 
                     # Check if another page exists
                     if list_data['next']:
