@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
 
     'rest_framework',
     'rest_framework.authtoken',
@@ -92,6 +93,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE_CLASSES = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -102,6 +104,14 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
+
+CORS_ORIGIN_WHITELIST = (
+    'etools.unicef.org',
+    'etools-demo.unicef.org',
+    'etools-test.unicef.org',
+    'etools-staging.unicef.org',
+    'etools-dev.unicef.org'
+)
 
 ROOT_URLCONF = 'django_api.urls'
 

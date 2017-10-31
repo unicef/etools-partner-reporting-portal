@@ -12,3 +12,4 @@
 *.pyc
 *.pem
 
+node_modules/

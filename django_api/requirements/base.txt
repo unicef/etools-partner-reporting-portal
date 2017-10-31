@@ -12,6 +12,7 @@ django-rest-swagger==2.1.2
 cryptography==2.1.2
 psycopg2==2.7.3.1
 django-model-utils==2.6.1  # latest 3.0.0 but need to check changes
+django-cors-headers==2.1.0
 django-mptt==0.8.6
 python-json-logger==0.1.7
 django-suit==0.2.21

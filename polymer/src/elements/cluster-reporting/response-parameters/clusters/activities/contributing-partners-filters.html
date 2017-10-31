@@ -32,7 +32,9 @@
     </iron-query-params>
 
     <filter-list filters="{{filters}}" class="app-grid">
-      <partner-filter></partner-filter>
+      <partner-filter
+          value="[[_withDefault(queryParams.partner, '')]]">
+      </partner-filter>
     </filter-list>
   </template>
 
