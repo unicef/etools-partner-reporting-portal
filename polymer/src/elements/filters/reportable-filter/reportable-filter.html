@@ -1,6 +1,6 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
 
-<link rel="import" href="../dropdown-filter/dropdown-filter.html">
+<link rel="import" href="../dropdown-filter/searchable-dropdown-filter.html">
 <link rel="import" href="../../../redux/store.html">
 <link rel="import" href="../../../redux/selectors/llos.html">
 
@@ -13,13 +13,13 @@
     </style>
 
     <template is="dom-if" if="[[!loading]]">
-      <dropdown-filter
+      <searchable-dropdown-filter
           class="item"
           label="PD output"
           name="llo"
           value="[[value]]"
           data="[[options]]">
-      </dropdown-filter>
+      </searchable-dropdown-filter>
     </template>
   </template>
 
