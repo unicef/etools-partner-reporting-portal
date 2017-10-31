@@ -10,7 +10,8 @@ from cluster.models import (
 )
 from cluster.serializers import (
     ClusterSimpleSerializer,
-    ClusterActivitySerializer
+    ClusterActivitySerializer,
+    ClusterObjectiveSerializer
 )
 
 from indicator.serializers import ClusterIndicatorForPartnerActivitySerializer
@@ -292,11 +293,12 @@ class PartnerActivityFromCustomActivitySerializer(
 class PartnerActivitySerializer(serializers.ModelSerializer):
 
     cluster = serializers.SerializerMethodField()
-    status = serializers.SerializerMethodField()
     project = PartnerProjectSimpleSerializer()
     reportables = ClusterIndicatorForPartnerActivitySerializer(many=True)
     cluster_activity = ClusterActivitySerializer()
     partner = PartnerDetailsSerializer()
+    cluster_objective = serializers.SerializerMethodField()
+    is_custom = serializers.SerializerMethodField()
 
     class Meta:
         model = PartnerActivity
@@ -308,7 +310,11 @@ class PartnerActivitySerializer(serializers.ModelSerializer):
             'status',
             'project',
             'cluster_activity',
+            'cluster_objective',
             'reportables',
+            'start_date',
+            'end_date',
+            'is_custom',
         )
 
     def get_cluster(self, obj):
@@ -319,10 +325,16 @@ class PartnerActivitySerializer(serializers.ModelSerializer):
         else:
             return None
 
-    def get_status(self, obj):
-        return obj.project and obj.project.status
+    def get_cluster_objective(self, obj):
+        if obj.cluster_activity:
+            return ClusterObjectiveSerializer(instance=obj.cluster_activity.cluster_objective).data
+        elif obj.cluster_objective:
+            return ClusterObjectiveSerializer(instance=obj.cluster_objective).data
+        else:
+            return None
 
-# PMP API Serializers
+    def get_is_custom(self, obj):
+        return obj.cluster_activity is None
 
 
 class PMPPartnerSerializer(serializers.ModelSerializer):
