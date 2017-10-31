@@ -79,7 +79,7 @@
 
       _computeSelected: function (value) {
         return this.data.findIndex(function (item) {
-          return String(item.id) === value;
+          return String(item.id) === String(value);
         });
       },
     });
