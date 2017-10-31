@@ -182,7 +182,7 @@ class PartnerProject(TimeStampedModel):
                                       related_name="partner_projects")
     locations = models.ManyToManyField('core.Location',
                                        related_name="partner_projects")
-    partner = models.ForeignKey(Partner, null=True,
+    partner = models.ForeignKey(Partner,
                                 related_name="partner_projects")
     reportables = GenericRelation('indicator.Reportable',
                                   related_query_name='partner_projects')

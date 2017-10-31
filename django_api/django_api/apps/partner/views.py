@@ -50,8 +50,9 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
     def get_queryset(self, *args, **kwargs):
         response_plan_id = self.kwargs.get('response_plan_id')
 
-        return PartnerProject.objects.select_related('partner').prefetch_related(
-            'clusters', 'locations').filter(clusters__response_plan_id=response_plan_id)
+        return PartnerProject.objects.select_related(
+            'partner').prefetch_related('clusters', 'locations').filter(
+                clusters__response_plan_id=response_plan_id).distinct()
 
     def add_many_to_many_relations(self, instance):
         """
@@ -87,7 +88,7 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
 
-        serializer.save()
+        serializer.save(partner=request.user.partner)
         errors = self.add_many_to_many_relations(serializer.instance)
         if errors:
             return Response(errors, status=status.HTTP_400_BAD_REQUEST)
