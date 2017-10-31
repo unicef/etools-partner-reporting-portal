@@ -1,3 +1,5 @@
+from django.db.models import Q
+
 import django_filters
 from django_filters import rest_framework as filters
 from django_filters.filters import ChoiceFilter, CharFilter, DateFilter
@@ -55,13 +57,20 @@ class PartnerActivityFilter(django_filters.FilterSet):
 
     partner = CharFilter(method='get_partner')
     project = CharFilter(method='get_project')
+    cluster_id = CharFilter(method='get_cluster_id')
 
     class Meta:
         model = PartnerActivity
-        fields = ['partner', 'project']
+        fields = ['partner', 'project', 'cluster_id']
 
     def get_partner(self, queryset, name, value):
         return queryset.filter(partner=value)
 
     def get_project(self, queryset, name, value):
         return queryset.filter(project=value)
+
+    def get_cluster_id(self, queryset, name, value):
+        return queryset.filter(
+            Q(cluster_activity__cluster_objective__cluster__id=value) |
+            Q(cluster_objective__cluster__id=value)
+        )
