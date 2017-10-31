@@ -12,6 +12,7 @@
 <link rel="import" href="../../../../filters/status-filter/project-status-filter.html">
 <link rel="import" href="../../../../filters/cluster-location-filter/cluster-location-filter.html">
 <link rel="import" href="../../../../filters/cluster-partner-filter/cluster-partner-filter.html">
+<link rel="import" href="../../../../filters/cluster-project-filter/cluster-project-filter.html">
 
 <dom-module id="partner-activities-filters">
   <template>
@@ -45,12 +46,10 @@
             value="[[_withDefault(queryParams.partner, '')]]">
         </cluster-partner-filter>
 
-        <text-filter
-          class="item"
-          label="Project"
-          name="title"
-          value="[[queryParams.title]]">
-        </text-filter>
+        <cluster-project-filter
+            class="item"
+            value="[[_withDefault(queryParams.project, '')]]">
+        </cluster-project-filter>
 
         <!-- FIXME: Bug #209 -->
         <!-- <project-status-filter
