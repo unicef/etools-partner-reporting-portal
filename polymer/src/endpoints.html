@@ -187,8 +187,8 @@
         return this._buildUrl('/partner/cluster-activity/' + clusterActivityId + '/partners');
       },
 
-      partnerActivityList: function () {
-        return this._buildUrl('/partner/partner-activity-list/');
+      partnerActivityList: function (responsePlanId) {
+        return this._buildUrl('/partner/' + responsePlanId + '/partner-activity-list/');
       },
 
       reportExport: function (locationId, reportId) {

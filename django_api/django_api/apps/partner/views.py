@@ -1,4 +1,6 @@
+from django.db.models import Q
 from django.http import Http404
+
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveAPIView, ListCreateAPIView, ListAPIView
 from rest_framework.response import Response
@@ -233,7 +235,7 @@ class ClusterActivityPartnersAPIView(ListAPIView):
             partner_activities__cluster_activity_id=cluster_activity_id)
 
 
-class PartnerActivityListCreateAPIView(ListCreateAPIView):
+class PartnerActivityListAPIView(ListAPIView):
 
     serializer_class = PartnerActivitySerializer
     permission_classes = (IsAuthenticated, )
@@ -242,4 +244,9 @@ class PartnerActivityListCreateAPIView(ListCreateAPIView):
     filter_class = PartnerActivityFilter
 
     def get_queryset(self, *args, **kwargs):
-        return PartnerActivity.objects.all()
+        response_plan_id = self.kwargs.get('response_plan_id')
+        return PartnerActivity.objects.select_related(
+            'cluster_activity').filter(
+                Q(cluster_activity__cluster_objective__cluster__response_plan_id=response_plan_id) |
+                Q(cluster_objective__cluster__response_plan_id=response_plan_id)
+            )

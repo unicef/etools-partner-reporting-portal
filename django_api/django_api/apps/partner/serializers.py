@@ -8,7 +8,10 @@ from cluster.models import (
     ClusterActivity,
     ClusterObjective,
 )
-from cluster.serializers import ClusterSimpleSerializer
+from cluster.serializers import (
+    ClusterSimpleSerializer,
+    ClusterActivitySerializer
+)
 
 from indicator.serializers import ClusterIndicatorForPartnerActivitySerializer
 
@@ -291,19 +294,25 @@ class PartnerActivitySerializer(serializers.ModelSerializer):
     status = serializers.SerializerMethodField()
     project = PartnerProjectSimpleSerializer()
     reportables = ClusterIndicatorForPartnerActivitySerializer(many=True)
+    cluster_activity = ClusterActivitySerializer()
 
     class Meta:
         model = PartnerActivity
         fields = (
-            'id', 'title',
-            'cluster', 'status',
-            'project', 'cluster_activity',
+            'id',
+            'title',
+            'cluster',
+            'status',
+            'project',
+            'cluster_activity',
             'reportables',
         )
 
     def get_cluster(self, obj):
         if obj.cluster_activity:
-            return obj.cluster_activity.cluster_objective.cluster.type
+            return obj.cluster_activity.cluster_objective.cluster.get_type_display()
+        elif obj.cluster_objective:
+            return obj.cluster_objective.cluster.get_type_display()
         else:
             return None
 
