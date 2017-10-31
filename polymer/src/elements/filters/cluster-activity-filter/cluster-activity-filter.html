@@ -4,11 +4,10 @@
 
 <link rel="import" href="../dropdown-filter/searchable-dropdown-filter.html">
 <link rel="import" href="../../etools-prp-ajax.html">
-<link rel="import" href="../../../endpoints.html">
-<link rel="import" href="../../../redux/store.html">
 <link rel="import" href="../../../behaviors/filter-dependencies.html">
+<link rel="import" href="../../../endpoints.html">
 
-<dom-module id="cluster-project-filter">
+<dom-module id="cluster-activity-filter">
   <template>
     <style>
       :host {
@@ -26,15 +25,15 @@
     </iron-query-params>
 
     <etools-prp-ajax
-        id="projectNames"
-        url="[[projectNamesUrl]]"
+        id="activities"
+        url="[[activitiesUrl]]"
         params="[[params]]">
     </etools-prp-ajax>
 
     <template is="dom-if" if="[[!loading]]">
       <searchable-dropdown-filter
-          label="Project"
-          name="project"
+          label="Activity"
+          name="activity"
           value="[[value]]"
           data="[[data]]">
       </searchable-dropdown-filter>
@@ -43,24 +42,18 @@
 
   <script>
     Polymer({
-      is: 'cluster-project-filter',
+      is: 'cluster-activity-filter',
 
       behaviors: [
-        App.Behaviors.ReduxBehavior,
         App.Behaviors.FilterDependenciesBehavior,
       ],
 
       properties: {
         queryParams: Object,
 
-        projectNamesUrl: {
+        activitiesUrl: {
           type: String,
-          computed: '_computeProjectNamesUrl(responsePlanID)',
-        },
-
-        responsePlanID: {
-          type: String,
-          statePath: 'responsePlans.currentID',
+          value: App.Endpoints.partnerActivityList(),
         },
 
         loading: {
@@ -74,33 +67,36 @@
           value: [],
         },
 
+        defaultParams: {
+          type: Object,
+          value: {
+            page_size: 99999,
+          },
+        },
+
         value: String,
       },
 
       observers: [
-        '_fetchProjectNames(projectNamesUrl, params)',
+        '_fetchActivities(activitiesUrl, params)',
       ],
-
-      _computeProjectNamesUrl: function (responsePlanID) {
-        return App.Endpoints.clusterProjectNames(responsePlanID);
-      },
 
       _computeLoading: function (data) {
         return !data.length;
       },
 
-      _fetchProjectNames: function () {
-        this.debounce('fetch-project-names', function () {
+      _fetchActivities: function () {
+        this.debounce('fetch-activities', function () {
           var self = this;
 
-          this.$.projectNames.abort();
+          this.$.activities.abort();
 
-          this.$.projectNames.thunk()()
+          this.$.activities.thunk()()
               .then(function (res) {
                 self.set('data', [{
                   id: '',
                   title: 'All',
-                }].concat(res.data));
+                }].concat(res.data.results));
               })
               .catch(function (err) { // jshint ignore:line
                 // TODO: error handling
@@ -109,10 +105,10 @@
       },
 
       detached: function () {
-        this.$.projectNames.abort();
+        this.$.activities.abort();
 
-        if (this.isDebouncerActive('fetch-project-names')) {
-          this.cancelDebouncer('fetch-project-names');
+        if (this.isDebouncerActive('fetch-activities')) {
+          this.cancelDebouncer('fetch-activities');
         }
       },
     });

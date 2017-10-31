@@ -23,6 +23,20 @@ CLUSTER_TYPES = Choices(
     ('wash', 'WASH'),
 )
 
+CLUSTER_TYPE_NAME_DICT = {
+    'cccm': 'CCCM',
+    'early_recovery': 'Early Recovery',
+    'education': 'Education',
+    'emergency_telecommunications': 'Emergency Telecommunications',
+    'food_security': 'Food Security',
+    'health': 'Health',
+    'logistics': 'Logistics',
+    'nutrition': 'Nutrition',
+    'protection': 'Protection',
+    'shelter': 'Shelter',
+    'wash': 'WASH',
+}
+
 CSO_TYPES = Choices(
     ('Int', 'International', 'International'),
     ('Nat', 'National', 'National'),
@@ -129,6 +143,14 @@ OVERALL_STATUS = Choices(
     ('Con', 'constrained', 'Constrained'),
     ('NoS', 'no_status', 'No Status'),
 )
+
+OVERALL_STATUS_DICT = {
+    "Met": "Met",
+    "OnT": "On Track",
+    "NoP": "No Progress",
+    'Con': 'Constrained',
+    'NoS': 'No Status',
+}
 
 PARTNER_PROJECT_STATUS = Choices(
     ("Ong", "ongoing", "Ongoing"),

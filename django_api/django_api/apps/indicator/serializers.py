@@ -12,6 +12,7 @@ from unicef.models import LowerLevelOutput
 from partner.models import PartnerProject, PartnerActivity
 from cluster.models import ClusterObjective, ClusterActivity
 
+from core.common import OVERALL_STATUS_DICT
 from core.serializers import LocationSerializer, IdLocationSerializer
 from core.models import Location
 from core.validators import add_indicator_object_type_validator
@@ -1059,4 +1060,79 @@ class PMPReportableSerializer(serializers.ModelSerializer):
             'object_id',
             'start_date',
             'end_date'
+        )
+
+class ClusterPartnerAnalysisIndicatorResultSerializer(serializers.ModelSerializer):
+    blueprint = IndicatorBlueprintSimpleSerializer()
+    achieved = serializers.JSONField()
+    progress_percentage = serializers.FloatField()
+    progress_by_location = serializers.SerializerMethodField()
+    indicator_reports = serializers.SerializerMethodField()
+    project = serializers.SerializerMethodField()
+    cluster_activity = serializers.SerializerMethodField()
+    latest_report_status = serializers.SerializerMethodField()
+
+    def get_progress_by_location(self, obj):
+        result = {}
+        ir = obj.indicator_reports.latest('id')
+
+        locations = Location.objects.filter(
+            indicator_location_data__indicator_report=ir
+        ).distinct()
+
+        for loc in locations:
+            progress = 0
+
+            for loc_data in loc.indicator_location_data.values_list('disaggregation', flat=True):
+                progress += loc_data['()']['c']
+
+            result[loc.title] = progress
+
+        return result
+
+    def get_indicator_reports(self, obj):
+        irs = obj.indicator_reports.order_by('-id')[:2]
+
+        if irs:
+            return IndicatorReportListSerializer(
+                irs, many=True, read_only=True).data
+        else:
+            return []
+
+    def get_project(self, obj):
+        if isinstance(obj.content_object, PartnerActivity) \
+                and obj.content_object.project:
+            return obj.content_object.project.title
+        else:
+            return ""
+
+    def get_cluster_activity(self, obj):
+        if isinstance(obj.content_object, PartnerActivity) \
+                and obj.content_object.cluster_activity:
+            return obj.content_object.cluster_activity.title
+        else:
+            return ""
+
+    def get_latest_report_status(self, obj):
+        ir = obj.indicator_reports.latest('id')
+
+        if ir:
+            return ir.overall_status
+        else:
+            return ""
+
+    class Meta:
+        model = Reportable
+        fields = (
+            'id',
+            'target',
+            'baseline',
+            'blueprint',
+            'achieved',
+            'progress_percentage',
+            'progress_by_location',
+            'indicator_reports',
+            'project',
+            'cluster_activity',
+            'latest_report_status',
         )

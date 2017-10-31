@@ -1,0 +1,64 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html">
+
+<link rel="import" href="../../../behaviors/filter.html">
+
+<dom-module id="searchable-dropdown-filter">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <etools-single-selection-menu
+        id="field"
+        label="[[label]]"
+        options="[[data]]"
+        option-value="id"
+        option-label="title"
+        selected="[[value]]"
+        selected-item="{{selectedItem}}"
+        disabled="[[disabled]]"
+        trigger-value-change-event>
+    </etools-single-selection-menu>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'searchable-dropdown-filter',
+
+      behaviors: [
+        App.Behaviors.FilterBehavior,
+      ],
+
+      properties: {
+        disabled: Boolean,
+        selectedItem: Object,
+
+        data: {
+          type: Array,
+          value: [],
+        },
+
+        value: {
+          type: String,
+          value: '',
+        },
+      },
+
+      listeners: {
+        'field.iron-select': '_handleChange',
+      },
+
+      _handleChange: function () {
+        this.async(function () {
+          this.fire('filter-changed', {
+            name: this.name,
+            value: String(this.selectedItem.id),
+          });
+        });
+      },
+    });
+  </script>
+</dom-module>
