@@ -12,4 +12,5 @@
 *.pyc
 *.pem
 
+# Frontend
 node_modules/
