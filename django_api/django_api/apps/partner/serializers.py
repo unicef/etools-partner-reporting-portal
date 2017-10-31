@@ -82,6 +82,7 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
     partner = serializers.SerializerMethodField()
     part_response_plan = serializers.SerializerMethodField()
     frequency = serializers.SerializerMethodField()
+    partner = PartnerDetailsSerializer()
 
     class Meta:
         model = PartnerProject
@@ -295,12 +296,14 @@ class PartnerActivitySerializer(serializers.ModelSerializer):
     project = PartnerProjectSimpleSerializer()
     reportables = ClusterIndicatorForPartnerActivitySerializer(many=True)
     cluster_activity = ClusterActivitySerializer()
+    partner = PartnerDetailsSerializer()
 
     class Meta:
         model = PartnerActivity
         fields = (
             'id',
             'title',
+            'partner',
             'cluster',
             'status',
             'project',
