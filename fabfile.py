@@ -64,11 +64,11 @@ def fixtures(quantity=40):
     local('docker-compose exec django_api python manage.py generate_fake_data --quantity %d --clean_before' % (int(quantity)))
 
 
-def real_fixtures():
+def real_fixtures(fast=False):
     """
     Uses real sync with PMP API to get all data.
     """
-    local('docker-compose exec django_api python manage.py generate_real_data --clean_before --fast')
+    local('docker-compose exec django_api python manage.py generate_real_data --clean_before %s' % ("--fast" if fast else ""))
 
 
 def remove_untagged_images():

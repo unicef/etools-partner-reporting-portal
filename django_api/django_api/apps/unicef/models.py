@@ -84,7 +84,7 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
     reference_number = models.CharField(max_length=255,
                                         verbose_name='Reference Number',
                                         db_index=True)
-    title = models.CharField(max_length=255,
+    title = models.CharField(max_length=512,
                              verbose_name='PD/SSFA ToR Title',
                              db_index=True)
     unicef_office = models.CharField(max_length=255,
@@ -442,7 +442,7 @@ class PDResultLink(TimeStampedExternalSyncModelMixin):
     related models:
         unicef.ProgrammeDocument (ForeignKey): "programme_document"
     """
-    title = models.CharField(max_length=255,
+    title = models.CharField(max_length=512,
                              verbose_name='CP output title/name')
     programme_document = models.ForeignKey(ProgrammeDocument,
                                            related_name="cp_outputs")
@@ -464,7 +464,7 @@ class LowerLevelOutput(TimeStampedExternalSyncModelMixin):
         unicef.PDResultLink (ForeignKey): "indicator"
         indicator.Reportable (GenericRelation): "reportables"
     """
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=512)
     cp_output = models.ForeignKey(PDResultLink,
                                   related_name="ll_outputs")
     reportables = GenericRelation('indicator.Reportable',

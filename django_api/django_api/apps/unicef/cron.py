@@ -14,7 +14,7 @@ from unicef.serializers import PMPProgrammeDocumentSerializer, PMPPDPartnerSeria
     PMPLLOSerializer, PMPPDResultLinkSerializer
 from unicef.models import ProgrammeDocument, Person, LowerLevelOutput, PDResultLink
 
-from indicator.serializers import PMPIndicatorBlueprintSerializer, PMPDisaggregationSerializer, PMPReportableSerializer
+from indicator.serializers import PMPIndicatorBlueprintSerializer, PMPDisaggregationSerializer, PMPDisaggregationValueSerializer, PMPReportableSerializer
 from indicator.models import IndicatorBlueprint, Disaggregation, Reportable, DisaggregationValue
 
 from partner.models import Partner
@@ -55,7 +55,7 @@ class ProgrammeDocumentCronJob(CronJobBase):
         user.save()
         return user
 
-    def do(self, fast=True):
+    def do(self, fast=False):
         """
         Specifically each below expected_results instance has the following
         mapping.
@@ -80,10 +80,13 @@ class ProgrammeDocumentCronJob(CronJobBase):
         # TODO: remove filtering for Jordan only - testing country with
         # fulfilled indicators
         if fast:
-            workspaces = Workspace.objects.filter(business_area_code="2340")
+            workspaces = Workspace.objects.filter(business_area_code="2340")  #2130 for Iraq
         else:
             workspaces = Workspace.objects.all()
         for workspace in workspaces:
+            # Skip global workspace
+            if workspace.business_area_code == "0":
+                continue
             try:
                 # Iterate over all pages
                 page_url = None
@@ -115,6 +118,9 @@ class ProgrammeDocumentCronJob(CronJobBase):
                             continue
 
                         # Create/Assign Partner
+                        if not partner_data['name']:
+                            print("No partner name - skipping!")
+                            continue
                         partner = self.process_model(
                             Partner, PMPPDPartnerSerializer, partner_data, {
                                 'vendor_number': partner_data['unicef_vendor_number']})
@@ -125,15 +131,17 @@ class ProgrammeDocumentCronJob(CronJobBase):
                         # Assign workspace
                         item['workspace'] = workspace.id
 
-                        # TODO: Remove all below this - temporary fixes due wrong API data
                         # Modify offices entry
                         item['offices'] = ", ".join(
                             item['offices']) if item['offices'] else "N/A"
 
-                        # title has more then 255 chars
-                        item['title'] = item['title'][:255]
+                        if not item['start_date']:
+                            print("Start date is required - skipping!")
+                            continue
 
-                        # TODO: End remove section
+                        if not item['end_date']:
+                            print("End date is required - skipping!")
+                            continue
 
                         # Create PD
                         item['status'] = item['status'].title()[:3]
@@ -146,6 +154,8 @@ class ProgrammeDocumentCronJob(CronJobBase):
                             # Skip entries without unicef_vendor_number
                             if not person_data['email']:
                                 continue
+                            if not person_data['name']:
+                                continue
                             person = self.process_model(Person, PMPPDPersonSerializer, person_data,
                                                         {'email': person_data['email']})
                             pd.unicef_focal_point.add(person)
@@ -155,6 +165,8 @@ class ProgrammeDocumentCronJob(CronJobBase):
                         for person_data in person_data_list:
                             # Skip entries without unicef_vendor_number
                             if not person_data['email']:
+                                continue
+                            if not person_data['name']:
                                 continue
                             person = self.process_model(Person, PMPPDPersonSerializer, person_data,
                                                         {'email': person_data['email']})
@@ -172,6 +184,8 @@ class ProgrammeDocumentCronJob(CronJobBase):
                         for person_data in person_data_list:
                             # Skip entries without unicef_vendor_number
                             if not person_data['email']:
+                                continue
+                            if not person_data['name']:
                                 continue
                             person = self.process_model(Person, PMPPDPersonSerializer, person_data,
                                                         {'email': person_data['email']})
@@ -265,15 +279,12 @@ class ProgrammeDocumentCronJob(CronJobBase):
                                                                                 {'name': dis['name']})
                                             disaggregations.append(disaggregation)
 
-                                    # TODO: REMOVE THIS TEMPORARY DISAGGREGATION
-                                    # VALUES CREATE
-                                    for dis in disaggregations:
-                                        if dis.disaggregation_values.all().count() < 1:
-                                            for number in range(5):
-                                                DisaggregationValue.objects.create(
-                                                    disaggregation=dis,
-                                                    value="Value %s" % number
-                                                )
+                                            # Create Disaggregation Values
+                                            for dv in dis['disaggregation_values']:
+                                                dv['disaggregation'] = disaggregation.id
+                                                self.process_model(DisaggregationValue, PMPDisaggregationValueSerializer, dv,
+                                                               {'external_id': dv['id']})
+
 
                                     # Create Reportable
                                     i['blueprint_id'] = blueprint.id if blueprint else None

@@ -1017,6 +1017,19 @@ class PMPDisaggregationSerializer(serializers.ModelSerializer):
             'active',
         )
 
+class PMPDisaggregationValueSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='external_id')
+    disaggregation = serializers.PrimaryKeyRelatedField(queryset=Disaggregation.objects.all())
+
+    class Meta:
+        model = DisaggregationValue
+        fields = (
+            'id',
+            'value',
+            'active',
+            'disaggregation',
+        )
+
 
 class PMPReportableSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='external_id')
