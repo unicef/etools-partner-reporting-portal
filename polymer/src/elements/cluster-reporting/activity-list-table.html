@@ -124,42 +124,16 @@
               </div>
             </div>
             <div slot="row-data-details" class="row-details-expanded-wrapper">
-              <template is="dom-repeat" items="[[activity.reportables]]" as="report">
                 <div slot="row-data">
                   <div class="table-cell table-cell--text">
                     <span class="label">Start Date</span>
-                    [[report.start_date]]
+                    [[activity.start_date]]
                   </div>
                   <div class="table-cell table-cell--text">
                     <span class="label">End Date</span>
-                    [[report.end_date]]
-                  </div>
-
-                  <div class="table-cell table-cell--text">
-                    <span class="label">Frequency of Reporting</span>
-                    <frequency-of-reporting
-                           type="[[report.frequency]]">
-                    </frequency-of-reporting>
+                    [[activity.end_date]]
                   </div>
                 </div>
-              </template>
-              <template is="dom-if" if="[[!activity.reportables.length]]">
-                <div slot="row-data">
-                  <div class="table-cell table-cell--text">
-                    <span class="label">Start Date</span>
-                    ---
-                  </div>
-                  <div class="table-cell table-cell--text">
-                    <span class="label">End Date</span>
-                    ---
-                  </div>
-
-                  <div class="table-cell table-cell--text">
-                    <span class="label">Frequency of Reporting</span>
-                    ---
-                  </div>
-                </div>
-              </template>
             </div>
           </etools-prp-data-table-row>
         </template>
