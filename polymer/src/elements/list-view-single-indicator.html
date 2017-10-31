@@ -7,6 +7,7 @@
 <link rel="import" href="../styles/table-styles.html">
 <link rel="import" href="../redux/store.html">
 <link rel="import" href="../behaviors/routing.html">
+<link rel="import" href="status-badge.html">
 
 
 <dom-module id="list-view-single-indicator">
@@ -21,7 +22,10 @@
     <etools-prp-data-table-row details-opened="{{detailsOpened}}">
       <div slot="row-data">
         <span class="col-data flex-6">
-          [[indicator.blueprint.title]]
+          <template is="dom-if" if="[[_flagIndicator(indicator.target, indicator.baseline, clusterActivity)]]">
+            <status-badge type="error">
+          </template>
+          </status-badge>[[indicator.blueprint.title]]
         </span>
         <span class="col-data flex-4">
           <etools-prp-progress-bar number="[[indicator.progress_percentage]]">
@@ -45,6 +49,10 @@
         App.Behaviors.ReduxBehavior,
         App.Behaviors.RoutingBehavior,
       ],
+
+      _flagIndicator: function(target, baseline, clusterActivity) {
+        return clusterActivity && (!target || !baseline);
+      },
 
       properties: {
         indicator: Object,

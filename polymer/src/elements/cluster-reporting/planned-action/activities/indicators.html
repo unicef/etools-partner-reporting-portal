@@ -40,11 +40,14 @@
     </etools-prp-ajax>
 
     <page-body>
-      <div id="action">
-        <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
-          Add Indicator
-        </paper-button>
-      </div>
+
+      <template is="dom-if" if="[[!clusterActivity]]">
+        <div id="action">
+          <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
+            Add Indicator
+          </paper-button>
+        </div>
+      </template>
 
       <indicator-modal
         id="indicatorModal"
@@ -54,7 +57,8 @@
 
       <list-view-indicators
           data="[[data]]"
-          total-results="[[totalResults]]">
+          total-results="[[totalResults]]"
+          cluster-activity="[[clusterActivity]]">
       </list-view-indicators>
     </page-body>
   </template>

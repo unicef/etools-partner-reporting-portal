@@ -74,7 +74,8 @@
 
     <template is="dom-if" if="[[_equals(tab, 'indicators')]]" restamp="true">
       <rp-partner-activity-details-indicators
-        activity-id="[[activityId]]">
+        activity-id="[[activityId]]"
+        cluster-activity="[[activityData.cluster_activity]]">
       </rp-partner-activity-details-indicators>
     </template>
 

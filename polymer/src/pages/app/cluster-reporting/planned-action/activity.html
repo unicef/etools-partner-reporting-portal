@@ -98,7 +98,8 @@
 
     <template is="dom-if" if="[[_equals(tab, 'indicators')]]" restamp="true">
       <pa-activity-details-indicators
-        activity-id="[[activityId]]">
+        activity-id="[[activityId]]"
+        cluster-activity="[[activityData.cluster_activity]]">
       </pa-activity-details-indicators>
     </template>
 
