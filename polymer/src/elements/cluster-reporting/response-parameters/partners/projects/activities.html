@@ -72,7 +72,6 @@
       _computeUrl: function(responsePlanId, projectId) {
         //Make sure the queryParams are updated before the thunk is created:
         this.set('queryParams.project', projectId);
-        this.set('queryParams.page', 1);
 
         return App.Endpoints.partnerActivityList(responsePlanId);
       },
