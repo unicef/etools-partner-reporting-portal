@@ -62,7 +62,8 @@ class Command(BaseCommand):
         Afterwards, the command will create IndicatorReport and
         IndicatorLocationData objects.
         """
-        for pd in ProgrammeDocument.objects.filter(status=PD_STATUS.active):
+        # TODO: REMOVE DRAFT FROM HERE. TEMPORARY DUE PMP ISSUE WITH SACING ACTIVE PDS.
+        for pd in ProgrammeDocument.objects.filter(status__in=(PD_STATUS.active, PD_STATUS.draft)):
             print("Processing ProgrammeDocument {} between {} - {}".format(
                 pd, pd.start_date, pd.end_date))
 
@@ -179,6 +180,7 @@ class Command(BaseCommand):
 
                         indicator_report.progress_report = next_progress_report
                         indicator_report.save()
+
 
         for indicator in Reportable.objects.filter(
             content_type__model__in=[
