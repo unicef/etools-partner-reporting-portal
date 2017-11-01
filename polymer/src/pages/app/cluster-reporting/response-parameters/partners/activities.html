@@ -73,16 +73,24 @@
       },
 
       _activitiesAjax: function (queryParams) {
-        var thunk = this.$.partnerActivities.thunk();
-        if (!Object.keys(queryParams).length) {
-          return;
-        }
-        this.$.partnerActivities.abort();
+        this.debounce('activities-ajax', function() {
+          var thunk = this.$.partnerActivities.thunk();
+          if (!Object.keys(queryParams).length) {
+            return;
+          }
+          this.$.partnerActivities.abort();
 
-        this.dispatch(App.Actions.PartnerActivities.fetchPartnerActivitiesList(thunk))
-          .catch(function (err) { // jshint ignore:line
-              // TODO: error handling.
-          });
+          this.dispatch(App.Actions.PartnerActivities.fetchPartnerActivitiesList(thunk))
+            .catch(function (err) { // jshint ignore:line
+                // TODO: error handling.
+            });
+          }, 300);
+      },
+
+      detached: function () {
+        if (this.isDebouncerActive('activities-ajax')) {
+          this.cancelDebouncer('activities-ajax');
+        }
       },
 
     });

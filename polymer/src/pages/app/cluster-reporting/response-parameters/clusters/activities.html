@@ -113,14 +113,21 @@
       },
 
       _clusterActivitiesAjax: function () {
-        var thunk = this.$.activities.thunk();
+        this.debounce('cluster-activities-ajax', function() {
+          var thunk = this.$.activities.thunk();
+          this.$.activities.abort();
 
-        this.$.activities.abort();
+          this.dispatch(App.Actions.ClusterActivities.fetchClusterActivitiesList(thunk))
+            .catch(function (err) { // jshint ignore:line
+                // TODO: error handling.
+            });
+          }, 300);
+      },
 
-        this.dispatch(App.Actions.ClusterActivities.fetchClusterActivitiesList(thunk))
-          .catch(function (err) { // jshint ignore:line
-              // TODO: error handling.
-          });
+      detached: function () {
+        if (this.isDebouncerActive('cluster-activities-ajax')) {
+          this.cancelDebouncer('cluster-activities-ajax');
+        }
       },
     });
   </script>

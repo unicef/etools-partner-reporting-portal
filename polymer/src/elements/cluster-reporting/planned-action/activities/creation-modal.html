@@ -548,7 +548,6 @@
 
       _fetchClusters: function () {
         var self = this;
-
         this.$.clusters.abort();
 
         this.$.clusters.thunk()()
@@ -562,14 +561,12 @@
 
       _fetchActivities: function (clusterId) {
         var self = this;
-
         if (typeof clusterId === 'undefined') {
           return;
         }
         this.set('activities', []);
         this.set('data.cluster.cluster_activity', undefined);
         this.set('activitiesParams.cluster_id', clusterId);
-        //TODO: need to include clusterId and results need to be based on it
         this.set('activitiesUrl',
             App.Endpoints.responseParametersClusterActivities(this.responsePlanId) 
             + '?cluster_id=' + clusterId);
