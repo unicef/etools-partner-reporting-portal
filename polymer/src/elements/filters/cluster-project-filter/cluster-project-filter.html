@@ -1,9 +1,12 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../../bower_components/iron-location/iron-query-params.html">
 
-<link rel="import" href="../dropdown-filter/dropdown-filter.html">
+<link rel="import" href="../dropdown-filter/searchable-dropdown-filter.html">
 <link rel="import" href="../../etools-prp-ajax.html">
 <link rel="import" href="../../../endpoints.html">
 <link rel="import" href="../../../redux/store.html">
+<link rel="import" href="../../../behaviors/filter-dependencies.html">
 
 <dom-module id="cluster-project-filter">
   <template>
@@ -13,18 +16,28 @@
       }
     </style>
 
+    <iron-location
+        query="{{query}}">
+    </iron-location>
+
+    <iron-query-params
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
+    </iron-query-params>
+
     <etools-prp-ajax
         id="projectNames"
-        url="[[projectNamesUrl]]">
+        url="[[projectNamesUrl]]"
+        params="[[params]]">
     </etools-prp-ajax>
 
     <template is="dom-if" if="[[!loading]]">
-      <dropdown-filter
+      <searchable-dropdown-filter
           label="Project"
           name="project"
           value="[[value]]"
           data="[[data]]">
-      </dropdown-filter>
+      </searchable-dropdown-filter>
     </template>
   </template>
 
@@ -34,13 +47,15 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.FilterDependenciesBehavior,
       ],
 
       properties: {
+        queryParams: Object,
+
         projectNamesUrl: {
           type: String,
           computed: '_computeProjectNamesUrl(responsePlanID)',
-          observer: '_fetchProjectNames',
         },
 
         responsePlanID: {
@@ -62,6 +77,10 @@
         value: String,
       },
 
+      observers: [
+        '_fetchProjectNames(projectNamesUrl, params)',
+      ],
+
       _computeProjectNamesUrl: function (responsePlanID) {
         return App.Endpoints.clusterProjectNames(responsePlanID);
       },
@@ -71,24 +90,30 @@
       },
 
       _fetchProjectNames: function () {
-        var self = this;
+        this.debounce('fetch-project-names', function () {
+          var self = this;
 
-        this.$.projectNames.abort();
+          this.$.projectNames.abort();
 
-        this.$.projectNames.thunk()()
-            .then(function (res) {
-              self.set('data', [{
-                id: '',
-                title: 'All',
-              }].concat(res.data));
-            })
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-            });
+          this.$.projectNames.thunk()()
+              .then(function (res) {
+                self.set('data', [{
+                  id: '',
+                  title: 'All',
+                }].concat(res.data));
+              })
+              .catch(function (err) { // jshint ignore:line
+                // TODO: error handling
+              });
+        }, 100);
       },
 
       detached: function () {
         this.$.projectNames.abort();
+
+        if (this.isDebouncerActive('fetch-project-names')) {
+          this.cancelDebouncer('fetch-project-names');
+        }
       },
     });
   </script>

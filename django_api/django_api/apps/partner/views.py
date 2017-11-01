@@ -1,4 +1,7 @@
+from django.db.models import Q
 from django.http import Http404
+from django.shortcuts import get_object_or_404
+
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveAPIView, ListCreateAPIView, ListAPIView
 from rest_framework.response import Response
@@ -50,8 +53,9 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
     def get_queryset(self, *args, **kwargs):
         response_plan_id = self.kwargs.get('response_plan_id')
 
-        return PartnerProject.objects.select_related('partner').prefetch_related(
-            'clusters', 'locations').filter(clusters__response_plan_id=response_plan_id)
+        return PartnerProject.objects.select_related(
+            'partner').prefetch_related('clusters', 'locations').filter(
+                clusters__response_plan_id=response_plan_id).distinct()
 
     def add_many_to_many_relations(self, instance):
         """
@@ -87,7 +91,7 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
 
-        serializer.save()
+        serializer.save(partner=request.user.partner)
         errors = self.add_many_to_many_relations(serializer.instance)
         if errors:
             return Response(errors, status=status.HTTP_400_BAD_REQUEST)
@@ -137,6 +141,8 @@ class PartnerProjectSimpleListAPIView(ListAPIView):
     serializer_class = PartnerProjectSimpleSerializer
     permission_classes = (IsAuthenticated, )
     lookup_field = lookup_url_kwarg = 'response_plan_id'
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
+    filter_class = PartnerProjectFilter
 
     def get_queryset(self):
         response_plan_id = self.kwargs.get(self.lookup_field)
@@ -155,9 +161,9 @@ class PartnerSimpleListAPIView(ListAPIView):
             clusters__response_plan_id=response_plan_id)
 
 
-class PartnerActivityAPIView(APIView):
+class PartnerActivityCreateAPIView(APIView):
     """
-    PartnerActivityAPIView CRUD endpoint
+    PartnerActivityCreateAPIView CRUD endpoint
     """
     permission_classes = (IsAuthenticated, )
 
@@ -196,6 +202,10 @@ class PartnerActivityAPIView(APIView):
                 return Response(serializer.errors,
                                 status=status.HTTP_400_BAD_REQUEST)
 
+            if serializer.validated_data['partner'] != request.user.partner:
+                return Response({'error': "Partner id did not match this user's partner"},
+                                status=status.HTTP_400_BAD_REQUEST)
+
             try:
                 pa = PartnerActivity.objects.create(
                     title=serializer.validated_data['title'],
@@ -232,7 +242,7 @@ class ClusterActivityPartnersAPIView(ListAPIView):
             partner_activities__cluster_activity_id=cluster_activity_id)
 
 
-class PartnerActivityListCreateAPIView(ListCreateAPIView):
+class PartnerActivityListAPIView(ListAPIView):
 
     serializer_class = PartnerActivitySerializer
     permission_classes = (IsAuthenticated, )
@@ -241,4 +251,26 @@ class PartnerActivityListCreateAPIView(ListCreateAPIView):
     filter_class = PartnerActivityFilter
 
     def get_queryset(self, *args, **kwargs):
-        return PartnerActivity.objects.all()
+        response_plan_id = self.kwargs.get('response_plan_id')
+        return PartnerActivity.objects.select_related(
+            'cluster_activity').filter(
+                Q(cluster_activity__cluster_objective__cluster__response_plan_id=response_plan_id) |
+                Q(cluster_objective__cluster__response_plan_id=response_plan_id)
+            )
+
+
+class PartnerActivityAPIView(RetrieveAPIView):
+    """
+    Endpoint for getting Partner Activity Details for overview tab.
+    """
+    serializer_class = PartnerActivitySerializer
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request, response_plan_id, pk, *args, **kwargs):
+        """
+        Get User Partner Details.
+        TODO: enforce user access to this response plan.
+        """
+        instance = get_object_or_404(PartnerActivity, id=pk)
+        serializer = self.get_serializer(instance=instance)
+        return Response(serializer.data, status=status.HTTP_200_OK)

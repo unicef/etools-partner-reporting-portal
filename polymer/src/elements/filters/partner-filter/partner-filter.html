@@ -1,6 +1,6 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
 
-<link rel="import" href="../dropdown-filter/dropdown-filter.html">
+<link rel="import" href="../dropdown-filter/searchable-dropdown-filter.html">
 <link rel="import" href="../../etools-prp-ajax.html">
 <link rel="import" href="../../../endpoints.html">
 <link rel="import" href="../../../redux/store.html">
@@ -19,12 +19,12 @@
     </etools-prp-ajax>
 
     <template is="dom-if" if="[[!loading]]">
-      <dropdown-filter
+      <searchable-dropdown-filter
         label="Partner"
         name="partner"
-        value="[[value]]"
+        value="[[computedValue]]"
         data="[[data]]">
-      </dropdown-filter>
+      </searchable-dropdown-filter>
     </template>
   </template>
 
@@ -37,6 +37,11 @@
       ],
 
       properties: {
+        data: Array,
+        value: String,
+        computedValue: String,
+        required: Boolean,
+
         partnerNamesUrl: {
           type: String,
           computed: '_computeUrl(responsePlanID)',
@@ -53,14 +58,11 @@
           value: true,
           computed: '_computeLoading(data)',
         },
-
-        data: {
-          type: Array,
-          value: [],
-        },
-
-        value: String,
       },
+
+      observers: [
+        '_computeValue(data, value)',
+      ],
 
       _computeUrl: function (responsePlanID) {
         return App.Endpoints.clusterPartnerNames(responsePlanID);
@@ -70,6 +72,16 @@
         return !data.length;
       },
 
+      _computeValue: function (data, value) {
+        this.debounce('compute-value', function () {
+          var index = data.findIndex(function (item) {
+            return value === String(item.id);
+          });
+
+          this.set('computedValue', data[index === -1 ? 0 : index].id);
+        }, 100);
+      },
+
       _fetchPartnerNames: function () {
         var self = this;
 
@@ -77,10 +89,12 @@
 
         this.$.partnerNames.thunk()()
             .then(function (res) {
-              self.set('data', [{
+              var data = (self.required ? [] : [{
                 id: '',
                 title: 'All',
-              }].concat(res.data));
+              }]).concat(res.data);
+
+              self.set('data', data);
             })
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
@@ -89,6 +103,10 @@
 
       detached: function () {
         this.$.partnerNames.abort();
+
+        if (this.isDebouncerActive('compute-value')) {
+          this.cancelDebouncer('compute-value');
+        }
       },
     });
   </script>

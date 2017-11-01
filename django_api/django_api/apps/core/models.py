@@ -163,7 +163,7 @@ class ResponsePlan(TimeStampedModel):
     class Meta:
         unique_together = ('title', 'plan_type', 'workspace')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     @property

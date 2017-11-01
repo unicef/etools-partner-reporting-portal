@@ -167,6 +167,7 @@ class ProgrammeDocumentOutputSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'title',
+            'reference_number',
             'cp_outputs',
         )
 
