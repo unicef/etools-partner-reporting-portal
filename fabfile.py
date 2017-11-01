@@ -71,6 +71,13 @@ def real_fixtures(fast=False):
     local('docker-compose exec django_api python manage.py generate_real_data --clean_before %s' % ("--fast" if fast else ""))
 
 
+def update_real_fixtures(area=False):
+    """
+    Uses real sync with PMP API to get all data.
+    """
+    local('docker-compose exec django_api python manage.py generate_real_data %s --update' % ("--area %s --fast" % area if area else ""))
+
+
 def remove_untagged_images():
     """
     Delete all untagged (<none>) images

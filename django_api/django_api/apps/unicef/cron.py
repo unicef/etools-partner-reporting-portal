@@ -55,7 +55,7 @@ class ProgrammeDocumentCronJob(CronJobBase):
         user.save()
         return user
 
-    def do(self, fast=False):
+    def do(self, fast=False, area=False):
         """
         Specifically each below expected_results instance has the following
         mapping.
@@ -76,11 +76,10 @@ class ProgrammeDocumentCronJob(CronJobBase):
         # Get/Create Group that will be assigned to persons
         group, created = Group.objects.get_or_create(
             name="IP Authorized Officer")
+
         # Iterate over all workspaces
-        # TODO: remove filtering for Jordan only - testing country with
-        # fulfilled indicators
         if fast:
-            workspaces = Workspace.objects.filter(business_area_code="2340")  #2130 for Iraq
+            workspaces = Workspace.objects.filter(business_area_code=area)  #2130 for Iraq
         else:
             workspaces = Workspace.objects.all()
         for workspace in workspaces:

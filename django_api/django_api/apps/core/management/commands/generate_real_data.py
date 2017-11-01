@@ -26,10 +26,26 @@ class Command(BaseCommand):
             help='Use light fake data'
         )
 
+        parser.add_argument(
+            '--update',
+            action='store_true',
+            dest='update',
+            default=False,
+            help='Only update PDs'
+        )
+
+        parser.add_argument(
+            '--area',
+            action='store',
+            dest='area',
+            default="2340",
+            help='Business area code to update'
+        )
+
     def handle(self, *args, **options):
         if options['clean_before']:
             clean_up_data()
 
-        generate_real_data(fast=options['fast'])
+        generate_real_data(fast=options['fast'], area=options['area'], update=options['update'])
 
         print("Synchronization complete! ༼ つ ◕_◕ ༽つ")
