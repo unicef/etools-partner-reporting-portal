@@ -88,7 +88,7 @@
       </reporting-period>
 
       <div class="toolbar">
-        <report-status status="[[currentReport.report_status]]"></report-status>
+        <report-status status="[[currentReport.status]]"></report-status>
         <template
             is="dom-if"
             if="[[_canExport(loading, currentReport, mode, permissions)]]"

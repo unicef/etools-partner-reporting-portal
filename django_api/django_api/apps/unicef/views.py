@@ -55,7 +55,7 @@ from .serializers import (
     ProgressReportUpdateSerializer
 )
 from .models import ProgrammeDocument, ProgressReport
-from .permissions import CanChangePDCalculationMethod
+from .permissions import CanChangePDCalculationMethod, UnicefPartnershipManagerOrRead
 from .filters import (
     ProgrammeDocumentFilter, ProgressReportFilter,
     ProgrammeDocumentIndicatorFilter
@@ -244,6 +244,7 @@ class ProgressReportAPIView(ListAPIView):
             return ProgressReport.objects.filter(
                 programme_document__partner__in=qset)
         else:
+            # TODO: In case of UNICEF user.. allow for all (maybe create a special group for the unicef api user?)
             # Limit reports to this user's partner only
             return ProgressReport.objects.filter(
                 programme_document__partner=self.request.user.partner)
@@ -508,7 +509,7 @@ class ProgressReportSubmitAPIView(APIView):
                                             status=statuses.HTTP_400_BAD_REQUEST)
                 if not ir.narrative_assessment:
                     _errors = [{
-                        "message": "You have not completed narrative assessment for one of LLO (%s). Unless your Output status is Met or has No Progress, all indicator data needs to be completed." % ir.reportable.content_object}]
+                        "message": "You have not completed narrative assessment for one of Outputs (%s). Unless your Output status is Met or has No Progress, all indicator data needs to be completed." % ir.reportable.content_object}]
                     return Response({"errors": _errors},
                                     status=statuses.HTTP_400_BAD_REQUEST)
 
@@ -556,7 +557,7 @@ class ProgressReportReviewAPIView(APIView):
 
     Only a PO (not a partner user) should be allowed to do this action.
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (UnicefPartnershipManagerOrRead,)
 
     def get_object(self, pk):
         try:

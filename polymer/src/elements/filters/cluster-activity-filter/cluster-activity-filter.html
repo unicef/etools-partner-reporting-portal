@@ -4,6 +4,7 @@
 
 <link rel="import" href="../dropdown-filter/searchable-dropdown-filter.html">
 <link rel="import" href="../../etools-prp-ajax.html">
+<link rel="import" href="../../../redux/store.html">
 <link rel="import" href="../../../behaviors/filter-dependencies.html">
 <link rel="import" href="../../../endpoints.html">
 
@@ -46,6 +47,7 @@
 
       behaviors: [
         App.Behaviors.FilterDependenciesBehavior,
+        App.Behaviors.ReduxBehavior,
       ],
 
       properties: {
@@ -53,7 +55,12 @@
 
         activitiesUrl: {
           type: String,
-          value: App.Endpoints.partnerActivityList(),
+          computed: '_computeActivitiesUrl(responsePlanId)',
+        },
+
+        responsePlanId: {
+          type: String,
+          statePath: 'responsePlans.currentID',
         },
 
         loading: {
@@ -80,6 +87,10 @@
       observers: [
         '_fetchActivities(activitiesUrl, params)',
       ],
+
+      _computeActivitiesUrl: function (responsePlanId) {
+        return App.Endpoints.partnerActivityList(responsePlanId);
+      },
 
       _computeLoading: function (data) {
         return !data.length;

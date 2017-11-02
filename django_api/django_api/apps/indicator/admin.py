@@ -21,7 +21,7 @@ class IndicatorBlueprintAdmin(admin.ModelAdmin):
 
 
 class ReportableAdmin(admin.ModelAdmin):
-    list_display = ('blueprint', 'target', 'baseline', 'total',
+    list_display = ('blueprint', 'active', 'target', 'baseline', 'total',
                     'parent_indicator', 'frequency', 'assumptions',
                     'means_of_verification', 'is_cluster_indicator',
                     'start_date', 'end_date', 'cs_dates', 'content_object',

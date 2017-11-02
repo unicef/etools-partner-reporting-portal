@@ -40,7 +40,7 @@ class PDResultLinkAdmin(admin.ModelAdmin):
 
 
 class LowerLevelOutputAdmin(admin.ModelAdmin):
-    list_display = ('title', 'cp_output')
+    list_display = ('title', 'active', 'cp_output')
     list_filter = ('cp_output',)
     search_fields = ('title',)
 
