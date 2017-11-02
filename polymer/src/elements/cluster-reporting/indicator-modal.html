@@ -439,7 +439,7 @@
             id: dis.id,
           };
         }) : [];
-        this.set('data.disaggregation', selected);
+        this.set('data.disaggregations', selected);
       },
 
       _onValueChanged: function (e) {
@@ -461,7 +461,7 @@
           cs_dates: [],
           locations: [],
           blueprint: {},
-          disaggregation: [],
+          disaggregations: [],
         });
 
         this._forEach('paper-radio-group', this._updateValue);
