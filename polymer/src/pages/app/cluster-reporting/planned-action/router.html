@@ -40,6 +40,21 @@
             route="{{subroute}}">
         </planned-action-projects-details>
       </template>
+
+      <template is="dom-if" if="[[_equals(page, 'activities')]]" restamp="true">
+        <planned-action-activities-list
+            name="activities"
+            route="{{subroute}}">
+        </planned-action-activities-list>
+      </template>
+
+            <template is="dom-if" if="[[_equals(page, 'activity')]]" restamp="true">
+        <planned-action-activities-details
+            name="activity"
+            activity-id="{{id}}"
+            route="{{subroute}}">
+        </planned-action-activities-details>
+      </template>
     </iron-pages>
   </template>
 

@@ -463,6 +463,7 @@ def generate_fake_data(workspace_quantity=10):
                     partner=project.partner,
                     project=project,
                     cluster_activity=None,
+                    cluster_objective=cluster_activity.cluster_objective,
                     title="{} Partner Activity".format(project.title)
                 )
 

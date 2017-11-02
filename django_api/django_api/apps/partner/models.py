@@ -182,7 +182,7 @@ class PartnerProject(TimeStampedModel):
                                       related_name="partner_projects")
     locations = models.ManyToManyField('core.Location',
                                        related_name="partner_projects")
-    partner = models.ForeignKey(Partner, null=True,
+    partner = models.ForeignKey(Partner,
                                 related_name="partner_projects")
     reportables = GenericRelation('indicator.Reportable',
                                   related_query_name='partner_projects')
@@ -213,10 +213,10 @@ class PartnerActivity(TimeStampedModel):
     partner = models.ForeignKey(Partner, related_name="partner_activities")
     cluster_activity = models.ForeignKey('cluster.ClusterActivity',
                                          related_name="partner_activities",
-                                         null=True)
+                                         null=True, blank=True)
     cluster_objective = models.ForeignKey('cluster.ClusterObjective',
                                           related_name="partner_activities",
-                                          null=True)  # TODO: why needed?
+                                          null=True, blank=True)
     reportables = GenericRelation('indicator.Reportable',
                                   related_query_name='partner_activities')
     locations = models.ManyToManyField('core.Location',

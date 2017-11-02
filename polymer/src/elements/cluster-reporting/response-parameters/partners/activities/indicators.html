@@ -12,7 +12,7 @@
 <link rel="import" href="../../../../../styles/buttons.html">
 <link rel="import" href="../../../../list-view-indicators.html">
 
-<dom-module id="rp-partner-project-details-indicators">
+<dom-module id="rp-partner-activity-details-indicators">
   <template>
     <style include="button-styles iron-flex data-table-styles table-styles">
       :host {
@@ -43,14 +43,16 @@
 
       <list-view-indicators
           data="[[data]]"
-          total-results="[[totalResults]]">
+          total-results="[[totalResults]]"
+          is-custom="[[isCustom]]">
       </list-view-indicators>
+
     </page-body>
   </template>
 
   <script>
     Polymer({
-      is: 'rp-partner-project-details-indicators',
+      is: 'rp-partner-activity-details-indicators',
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
@@ -60,59 +62,58 @@
       properties: {
         queryParams: Object,
 
-        projectId: Number,
+        activityId: Number,
 
         data: {
           type: Array,
-          computed: '_computeCurrentIndicators(projectId, allIndicators)'
+          computed: '_computeCurrentIndicators(activityId, allIndicators)'
         },
 
         totalResults: {
           type: Number,
-          computed: '_computeCurrentIndicatorsCount(projectId, allIndicatorsCount)'
+          computed: '_computeCurrentIndicatorsCount(activityId, allIndicatorsCount)'
         },
 
         url: {
           type: String,
-          computed: '_computeUrl(projectId, queryParams)'
+          computed: '_computeUrl(activityId, queryParams)'
         },
 
         allIndicators: {
           type: Object,
-          statePath: 'partnerProjects.indicators',
+          statePath: 'partnerActivities.indicators',
         },
 
         allIndicatorsCount: {
           type: Number,
-          statePath: 'partnerProjects.indicatorsCount',
+          statePath: 'partnerActivities.indicatorsCount',
         },
       },
 
       observers: [
-        '_indicatorsAjax(queryParams, projectId)',
+        '_indicatorsAjax(queryParams, activityId)',
       ],
 
-      _computeCurrentIndicators: function(projectId, allIndicators) {
-        return allIndicators[projectId];
+      _computeCurrentIndicators: function(activityId, allIndicators) {
+        return allIndicators[activityId];
       },
 
-      _computeCurrentIndicatorsCount: function(projectId, allIndicatorsCount) {
-        return allIndicatorsCount[projectId];
+      _computeCurrentIndicatorsCount: function(activityId, allIndicatorsCount) {
+        return allIndicatorsCount[activityId];
       },
 
       _computeUrl: function () {
         //Make sure the queryParams are updated before the thunk is created:
-        this.set('queryParams.object_id', this.projectId);
-
-        return App.Endpoints.indicators('pp');
+        this.set('queryParams.object_id', this.activityId);
+        this.set('queryParams.page', 1);
+        return App.Endpoints.indicators('pa');
       },
 
       _indicatorsAjax: function () {
         var thunk = this.$.indicators.thunk();
 
         this.$.indicators.abort();
-
-        this.dispatch(App.Actions.PartnerProjects.indicators.fetch(thunk, this.projectId))
+        this.dispatch(App.Actions.PartnerActivities.indicators.fetch(thunk, this.activityId))
           .catch(function (err) { // jshint ignore:line
               // TODO: error handling.
           });

@@ -1,0 +1,29 @@
+<link rel="import" href="../../../../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../../../../elements/page-body.html">
+<link rel="import" href="../../../activity-details.html">
+
+<dom-module id="rp-partner-activity-details-overview">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <page-body>
+      <activity-details-display activity-data=[[activityData]]></activity-details-display>
+    </page-body>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'rp-partner-activity-details-overview',
+
+      properties: {
+        activityData: Object,
+      },
+
+    });
+  </script>
+</dom-module>
