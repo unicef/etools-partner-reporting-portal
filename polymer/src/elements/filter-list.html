@@ -49,6 +49,16 @@
           type: Array,
           value: [],
         },
+
+        ignore: {
+          type: String,
+          value: '',
+        },
+
+        ignoredFilters: {
+          type: Array,
+          computed: '_computeIgnoredFilters(ignore)',
+        },
       },
 
       listeners: {
@@ -81,6 +91,10 @@
 
       _registerFilter: function (e, name) {
         e.stopPropagation();
+
+        if (this.ignoredFilters.indexOf(name) !== -1) {
+          return;
+        }
 
         this.push('filters', name);
       },
@@ -118,6 +132,11 @@
         this.set('queryParams', Object.assign({}, this.queryParams, {
           page: 1,
         }));
+      },
+
+      _computeIgnoredFilters: function (ignore) {
+        return ignore.split(',')
+            .filter(Boolean);
       },
     });
   </script>

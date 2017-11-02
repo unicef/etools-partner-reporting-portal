@@ -17,12 +17,12 @@ class IndicatorReportOverDueCronJob(CronJobBase):
 
     def do(self):
         updates = list()
-        print "Create due/overdue indicator reports"
+        print("Create due/overdue indicator reports")
         # Get all open (without submission date) indicator reports
         reports = IndicatorReport.objects.filter(submission_date__isnull=True)
         # Iterate and set proper status
         for report in reports:
-            print "Indicator Report: %s" % report.id
+            print("Indicator Report: %s" % report.id)
             due_date = report.due_date or report.time_period_end + \
                 timedelta(days=self.OVERDUE_DAYS)
             if due_date < datetime.now().date(
@@ -38,7 +38,7 @@ class IndicatorReportOverDueCronJob(CronJobBase):
         reports = ProgressReport.objects.filter(submission_date__isnull=True)
         # Iterate and set proper status
         for report in reports:
-            print "Progress Report: %s" % report.id
+            print("Progress Report: %s" % report.id)
             due_date = report.due_date or report.end_date + \
                 timedelta(days=self.OVERDUE_DAYS)
             if due_date < datetime.now().date() and report.status != PROGRESS_REPORT_STATUS.overdue:

@@ -1,0 +1,73 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/etools-loading/etools-loading.html">
+
+<link rel="import" href="../../../redux/store.html">
+<link rel="import" href="partner-reportable.html">
+
+<dom-module id="partner-analysis-reportables">
+  <template>
+    <style>
+      :host {
+        display: block;
+        margin-bottom: 25px;
+      }
+
+      .wrapper {
+        min-height: 120px;
+        position: relative;
+      }
+    </style>
+
+    <div class="wrapper">
+      <template
+          is="dom-if"
+          if="[[active]]"
+          restamp="true">
+        <template
+            is="dom-repeat"
+            items="[[data]]">
+          <partner-analysis-reportable data="[[item]]"></partner-analysis-reportable>
+        </template>
+      </template>
+
+      <etools-loading active="[[loading]]"></etools-loading>
+    </div>
+  </template>
+
+  <script>
+    Polymer({
+      id: 'partner-analysis-reportables',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        data: {
+          type: Object,
+          statePath: 'analysis.partner.data.reportables',
+          observer: '_refresh',
+        },
+
+        loading: {
+          type: Boolean,
+          statePath: 'analysis.partner.loading',
+        },
+
+        active: {
+          type: Boolean,
+          value: false,
+        },
+      },
+
+      _refresh: function () {
+        // Force re-render:
+        this.set('active', false);
+
+        this.async(function () {
+          this.set('active', true);
+        });
+      },
+    });
+  </script>
+</dom-module>

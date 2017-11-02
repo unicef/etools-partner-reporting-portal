@@ -138,37 +138,38 @@ def clean_up_data():
         print("All ORM objects deleted")
 
 
-def generate_real_data(fast=True):
+def generate_real_data(fast=False, area=None, update=False):
 
-    users_to_create = [
-        ('admin_imo', 'admin_imo@notanemail.com', IMORole),
-        ('admin_ao', 'admin_ao@notanemail.com', PartnerAuthorizedOfficerRole),
-        ('admin_pe', 'admin_pe@notanemail.com', PartnerEditorRole),
-        ('admin_pv', 'admin_pv@notanemail.com', PartnerViewerRole),
-    ]
-    users_created = []
-    for u in users_to_create:
-        admin, created = User.objects.get_or_create(username=u[0], defaults={
-            'email': u[1],
-            'is_superuser': True,
-            'is_staff': True,
-        })
-        admin.set_password('Passw0rd!')
-        admin.save()
-        admin.groups.add(u[2].as_group())
-        users_created.append(admin)
+    if not update:
+        users_to_create = [
+            ('admin_imo', 'admin_imo@notanemail.com', IMORole),
+            ('admin_ao', 'admin_ao@notanemail.com', PartnerAuthorizedOfficerRole),
+            ('admin_pe', 'admin_pe@notanemail.com', PartnerEditorRole),
+            ('admin_pv', 'admin_pv@notanemail.com', PartnerViewerRole),
+        ]
+        users_created = []
+        for u in users_to_create:
+            admin, created = User.objects.get_or_create(username=u[0], defaults={
+                'email': u[1],
+                'is_superuser': True,
+                'is_staff': True,
+            })
+            admin.set_password('Passw0rd!')
+            admin.save()
+            admin.groups.add(u[2].as_group())
+            users_created.append(admin)
 
-    # Generate workspaces
-    workspace_cron = WorkspaceCronJob()
-    workspace_cron.do()
+        # Generate workspaces
+        workspace_cron = WorkspaceCronJob()
+        workspace_cron.do()
 
-    # Generate partners
-    partner_cron = PartnerCronJob()
-    partner_cron.do()
+        # Generate partners
+        partner_cron = PartnerCronJob()
+        partner_cron.do()
 
     # Generate programme documents
     pd_cron = ProgrammeDocumentCronJob()
-    pd_cron.do(fast)
+    pd_cron.do(fast, area)
 
     # Generate PR/IR
     call_command('generate_reports_for_periods')
@@ -462,6 +463,7 @@ def generate_fake_data(workspace_quantity=10):
                     partner=project.partner,
                     project=project,
                     cluster_activity=None,
+                    cluster_objective=cluster_activity.cluster_objective,
                     title="{} Partner Activity".format(project.title)
                 )
 

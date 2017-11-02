@@ -43,32 +43,37 @@
     Polymer({
       is: 'rp-partner-project-details-activities',
 
-      properties: {
-        queryParams: Object,
-
-        projectId: Number,
-
-        url: {
-          type: String,
-          computed: '_computeUrl(projectId, queryParams)'
-        },
-      },
-
       behaviors: [
         App.Behaviors.UtilsBehavior,
         App.Behaviors.ReduxBehavior,
       ],
 
+      properties: {
+        queryParams: Object,
+
+        projectId: Number,
+
+        responsePlanId: {
+          type: String,
+          statePath: 'responsePlans.currentID',
+        },
+
+        url: {
+          type: String,
+          computed: '_computeUrl(responsePlanId, projectId, queryParams)'
+        },
+      },
+
       observers: [
         '_activitiesByPartnerProjectIdAjax(queryParams)',
       ],
 
-      _computeUrl: function (projectId) {
+      _computeUrl: function(responsePlanId, projectId) {
         //Make sure the queryParams are updated before the thunk is created:
         this.set('queryParams.project', projectId);
         this.set('queryParams.page', 1);
 
-        return App.Endpoints.partnerActivityList();
+        return App.Endpoints.partnerActivityList(responsePlanId);
       },
 
       _activitiesByPartnerProjectIdAjax: function () {

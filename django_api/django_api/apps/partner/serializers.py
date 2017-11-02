@@ -8,7 +8,11 @@ from cluster.models import (
     ClusterActivity,
     ClusterObjective,
 )
-from cluster.serializers import ClusterSimpleSerializer
+from cluster.serializers import (
+    ClusterSimpleSerializer,
+    ClusterActivitySerializer,
+    ClusterObjectiveSerializer
+)
 
 from indicator.serializers import ClusterIndicatorForPartnerActivitySerializer
 
@@ -79,6 +83,7 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
     partner = serializers.SerializerMethodField()
     part_response_plan = serializers.SerializerMethodField()
     frequency = serializers.SerializerMethodField()
+    partner = PartnerDetailsSerializer()
 
     class Meta:
         model = PartnerProject
@@ -288,29 +293,48 @@ class PartnerActivityFromCustomActivitySerializer(
 class PartnerActivitySerializer(serializers.ModelSerializer):
 
     cluster = serializers.SerializerMethodField()
-    status = serializers.SerializerMethodField()
     project = PartnerProjectSimpleSerializer()
     reportables = ClusterIndicatorForPartnerActivitySerializer(many=True)
+    cluster_activity = ClusterActivitySerializer()
+    partner = PartnerDetailsSerializer()
+    cluster_objective = serializers.SerializerMethodField()
+    is_custom = serializers.SerializerMethodField()
 
     class Meta:
         model = PartnerActivity
         fields = (
-            'id', 'title',
-            'cluster', 'status',
-            'project', 'cluster_activity',
+            'id',
+            'title',
+            'partner',
+            'cluster',
+            'status',
+            'project',
+            'cluster_activity',
+            'cluster_objective',
             'reportables',
+            'start_date',
+            'end_date',
+            'is_custom',
         )
 
     def get_cluster(self, obj):
         if obj.cluster_activity:
-            return obj.cluster_activity.cluster_objective.cluster.type
+            return obj.cluster_activity.cluster_objective.cluster.get_type_display()
+        elif obj.cluster_objective:
+            return obj.cluster_objective.cluster.get_type_display()
         else:
             return None
 
-    def get_status(self, obj):
-        return obj.project and obj.project.status
+    def get_cluster_objective(self, obj):
+        if obj.cluster_activity:
+            return ClusterObjectiveSerializer(instance=obj.cluster_activity.cluster_objective).data
+        elif obj.cluster_objective:
+            return ClusterObjectiveSerializer(instance=obj.cluster_objective).data
+        else:
+            return None
 
-# PMP API Serializers
+    def get_is_custom(self, obj):
+        return obj.cluster_activity is None
 
 
 class PMPPartnerSerializer(serializers.ModelSerializer):

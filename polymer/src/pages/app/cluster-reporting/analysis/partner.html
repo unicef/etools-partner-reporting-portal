@@ -1,0 +1,100 @@
+<link rel="import" href="../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../../../bower_components/iron-location/iron-query-params.html">
+
+<link rel="import" href="../../../../endpoints.html">
+<link rel="import" href="../../../../redux/store.html">
+<link rel="import" href="../../../../redux/actions/analysis.html">
+<link rel="import" href="../../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../../elements/cluster-reporting/analysis/partner-filters.html">
+<link rel="import" href="../../../../elements/cluster-reporting/analysis/partner-summary.html">
+<link rel="import" href="../../../../elements/cluster-reporting/analysis/partner-reportables.html">
+
+<dom-module id="partner-analysis">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <iron-location
+        query="{{query}}">
+    </iron-location>
+
+    <iron-query-params
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
+    </iron-query-params>
+
+    <etools-prp-ajax
+        id="analysis"
+        url="[[dataUrl]]"
+        params="[[dataParams]]">
+    </etools-prp-ajax>
+
+    <partner-analysis-filters></partner-analysis-filters>
+    <partner-analysis-summary></partner-analysis-summary>
+    <partner-analysis-reportables></partner-analysis-reportables>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'partner-analysis',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        queryParams: Object,
+
+        dataUrl: {
+          type: String,
+          value: App.Endpoints.partnerAnalysis(),
+        },
+
+        dataParams: {
+          type: Object,
+          computed: '_computeDataParams(queryParams)',
+        },
+      },
+
+      observers: [
+        '_fetchData(dataUrl, dataParams)',
+      ],
+
+      _computeDataParams: function (queryParams) {
+        return Object.assign({}, queryParams);
+      },
+
+      _fetchData: function (_, params) {
+        if (!params.partner) {
+          return;
+        }
+
+        this.debounce('fetch-data', function () {
+          var analysisThunk = this.$.analysis.thunk();
+
+          this.$.analysis.abort();
+
+          this.dispatch(
+            App.Actions.Analysis.fetchPartner(analysisThunk)
+          )
+              .catch(function (err) { // jshint ignore:line
+                // TODO: error handling
+              });
+        }, 300);
+      },
+
+      detached: function () {
+        this.$.analysis.abort();
+
+        if (this.isDebouncerActive('fetch-data')) {
+          this.cancelDebouncer('fetch-data');
+        }
+      },
+    });
+  </script>
+</dom-module>
+

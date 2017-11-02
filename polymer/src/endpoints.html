@@ -64,7 +64,7 @@
       },
 
       progressReports: function(locationId) {
-        return this._buildUrl('/unicef/' + locationId + '/progress-reports');
+        return this._buildUrl('/unicef/' + locationId + '/progress-reports/');
       },
 
       responsePlans: function (workspaceId) {
@@ -131,6 +131,11 @@
         return this._buildUrl('/partner/partner-project-details/' + projectId + '/');
       },
 
+      plannedActionsActivityOverview: function(responsePlanId, activityId) {
+        return this._buildUrl('/partner/' + responsePlanId 
+          + '/partner-activity/' + activityId + '/');
+      },
+
       responseParamtersClustersObjectiveDetail: function(objectiveId) {
         return this._buildUrl('/cluster/cluster-objective/' + objectiveId + '/');
       },
@@ -184,11 +189,11 @@
       },
 
       partnersByClusterActivityId: function (clusterActivityId) {
-        return this._buildUrl('/partner/cluster-activity/' + clusterActivityId + '/partners');
+        return this._buildUrl('/partner/cluster-activity/' + clusterActivityId + '/partners/');
       },
 
-      partnerActivityList: function () {
-        return this._buildUrl('/partner/partner-activity-list/');
+      partnerActivityList: function (responsePlanId) {
+        return this._buildUrl('/partner/' + responsePlanId + '/partner-activity-list/');
       },
 
       reportExport: function (locationId, reportId) {
@@ -226,6 +231,18 @@
         return this._buildUrl('/account/user-profile/');
       },
 
+      partnerAnalysis: function () {
+        return this._buildUrl('/cluster/partner-analysis/');
+      },
+
+      partnerAnalysisReportableDetails: function (responsePlanId, reportableId) {
+        return this._buildUrl([
+          '/cluster/partner-analysis/response-plan/',
+          responsePlanId,
+          '/indicator/',
+          reportableId,
+        ].join(''));
+      },
     };
   }());
 </script>

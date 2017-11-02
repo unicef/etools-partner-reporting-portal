@@ -1,8 +1,10 @@
+from django.db.models import Q
+
 import django_filters
 from django_filters import rest_framework as filters
 from django_filters.filters import ChoiceFilter, CharFilter, DateFilter
 
-from core.common import PD_STATUS
+from core.common import PARTNER_PROJECT_STATUS
 
 from .models import PartnerProject, Partner, PartnerActivity
 
@@ -11,7 +13,7 @@ class PartnerProjectFilter(filters.FilterSet):
     partner = CharFilter(method='get_partner')
     title = CharFilter(method='get_title')
     location = CharFilter(method='get_location')
-    status = ChoiceFilter(choices=PD_STATUS)
+    status = ChoiceFilter(choices=PARTNER_PROJECT_STATUS)
     start_date = DateFilter(method='get_start_date')
     end_date = DateFilter(method='get_end_date')
     cluster_id = CharFilter(method='get_cluster_id')
@@ -55,13 +57,20 @@ class PartnerActivityFilter(django_filters.FilterSet):
 
     partner = CharFilter(method='get_partner')
     project = CharFilter(method='get_project')
+    cluster_id = CharFilter(method='get_cluster_id')
 
     class Meta:
         model = PartnerActivity
-        fields = ['partner', 'project']
+        fields = ['partner', 'project', 'cluster_id']
 
     def get_partner(self, queryset, name, value):
         return queryset.filter(partner=value)
 
     def get_project(self, queryset, name, value):
         return queryset.filter(project=value)
+
+    def get_cluster_id(self, queryset, name, value):
+        return queryset.filter(
+            Q(cluster_activity__cluster_objective__cluster__id=value) |
+            Q(cluster_objective__cluster__id=value)
+        )
