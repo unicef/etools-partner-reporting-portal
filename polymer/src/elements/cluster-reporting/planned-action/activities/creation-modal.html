@@ -1,32 +1,32 @@
-<link rel="import" href="../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../bower_components/paper-dialog/paper-dialog.html">
-<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
-<link rel="import" href="../../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
-<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
-<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
-<link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
-<link rel="import" href="../../../bower_components/paper-radio-group/paper-radio-group.html">
-<link rel="import" href="../../../bower_components/paper-radio-button/paper-radio-button.html">
-<link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
-<link rel="import" href="../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
-<link rel="import" href="../../../bower_components/paper-listbox/paper-listbox.html">
-<link rel="import" href="../../../bower_components/paper-item/paper-item.html">
-<link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html">
+<link rel="import" href="../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../../../../../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../../../../../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../../../../../bower_components/etools-loading/etools-loading.html">
+<link rel="import" href="../../../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../../../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../../../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html">
 
-<link rel="import" href="../../polyfills/es6-shim.html">
-<link rel="import" href="../../endpoints.html">
-<link rel="import" href="../../redux/store.html">
-<link rel="import" href="../../behaviors/utils.html">
-<link rel="import" href="../../behaviors/modal.html">
-<link rel="import" href="../../styles/buttons.html">
-<link rel="import" href="../../styles/modal.html">
-<link rel="import" href="../etools-prp-ajax.html">
-<link rel="import" href="../etools-prp-date-input.html">
+<link rel="import" href="../../../../polyfills/es6-shim.html">
+<link rel="import" href="../../../../endpoints.html">
+<link rel="import" href="../../../../redux/store.html">
+<link rel="import" href="../../../../behaviors/utils.html">
+<link rel="import" href="../../../../behaviors/modal.html">
+<link rel="import" href="../../../../styles/buttons.html">
+<link rel="import" href="../../../../styles/modal.html">
+<link rel="import" href="../../../etools-prp-ajax.html">
+<link rel="import" href="../../../etools-prp-date-input.html">
 
-<dom-module id="activity-modal">
+<dom-module id="planned-action-activity-modal">
   <template>
     <style include="button-styles modal-styles app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
       :host {
@@ -178,7 +178,7 @@
                 <div class="item item-wide">
                    <etools-single-selection-menu
                       class="validate"
-                      label="Project"
+                      label="Partner Project"
                       options="[[projects]]"
                       option-value="id"
                       option-label="title"
@@ -295,7 +295,7 @@
                 <div class="item item-wide">
                   <etools-single-selection-menu
                       class="validate"
-                      label="Project"
+                      label="Partner Project"
                       options="[[projects]]"
                       option-value="id"
                       option-label="title"
@@ -375,7 +375,7 @@
 
   <script>
     Polymer({
-      id: 'activity-modal',
+      id: 'planned-action-activity-modal',
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
@@ -566,11 +566,13 @@
         if (typeof clusterId === 'undefined') {
           return;
         }
-
         this.set('activities', []);
         this.set('data.cluster.cluster_activity', undefined);
-        this.set('activitiesUrl', App.Endpoints.clusterActivities(clusterId));
-
+        this.set('activitiesParams.cluster_id', clusterId);
+        //TODO: need to include clusterId and results need to be based on it
+        this.set('activitiesUrl',
+            App.Endpoints.responseParametersClusterActivities(this.responsePlanId) 
+            + '?cluster_id=' + clusterId);
         this.$.activities.abort();
 
         this.$.activities.thunk()()
@@ -664,7 +666,6 @@
         this.$.activity.body = Object.assign({
           partner: this.partner.id,
         }, this.data[this.mode]);
-
         this.$.activity.thunk()()
             .then(function (res) {
               self.fire('activity-added', res.data);

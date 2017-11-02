@@ -1,0 +1,156 @@
+<link rel="import" href="../../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../../../../../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../../../../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../../../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../../../../bower_components/iron-location/iron-location.html">
+
+<link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/partners/activities/overview.html">
+<link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/partners/activities/indicators.html">
+<link rel="import" href="../../../../../elements/page-body.html">
+<link rel="import" href="../../../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../../../elements/page-body.html">
+<link rel="import" href="../../../../../elements/page-header.html">
+<link rel="import" href="../../../../../elements/page-badge.html">
+<link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="../../../../../endpoints.html">
+<link rel="import" href="../../../../../redux/actions.html">
+<link rel="import" href="../../../../../redux/store.html">
+
+<dom-module id="rp-partners-activity-detail">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      .tabs paper-tab {
+        text-transform: uppercase;
+      }
+    </style>
+
+    <iron-location
+      query="{{query}}">
+    </iron-location>
+
+    <etools-prp-ajax
+      id="activity"
+      url="[[overviewUrl]]">
+    </etools-prp-ajax>
+
+    <app-route
+      route="{{route}}"
+      pattern="/:tab"
+      subroute="{{subroute}}"
+      data="{{routeData}}">
+    </app-route>
+
+    <page-header
+        title="[[activityData.title]]"
+        back="[[backLink]]">
+
+      <page-badge
+          class="above-title" name="activity">
+      </page-badge>
+
+      <div class="toolbar">
+        <project-status status="[[activityData.status]]"></project-status>
+      </div>
+
+      <div class="tabs">
+        <paper-tabs
+            selected="{{routeData.tab}}"
+            attr-for-selected="name"
+            scrollable
+            hide-scroll-buttons>
+          <paper-tab name="overview">Overview</paper-tab>
+          <paper-tab name="indicators">Indicators</paper-tab>
+        </paper-tabs>
+      </div>
+    </page-header>
+
+    <template is="dom-if" if="[[_equals(tab, 'overview')]]" restamp="true">
+      <rp-partner-activity-details-overview activity-data=[[activityData]]></rp-partner-activity-details-overview>
+    </template>
+
+    <template is="dom-if" if="[[_equals(tab, 'indicators')]]" restamp="true">
+      <rp-partner-activity-details-indicators
+        activity-id="[[activityId]]"
+        is_custom="[[activityData.is_custom]]">
+      </rp-partner-activity-details-indicators>
+    </template>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'rp-partners-activity-detail',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+      ],
+
+      observers: [
+        '_updateUrlTab(routeData.tab)',
+      ],
+
+      properties: {
+        tab: String,
+
+        routeData: Object,
+
+        activityId: String,
+        responsePlanId: String,
+
+        activityData: {
+          type: Object,
+          value: {}
+        },
+
+        overviewUrl: {
+          type: String,
+          computed: '_computeOverviewUrl(responsePlanId, activityId)'
+        },
+
+        backLink: {
+          type: String,
+          computed: '_computeBackLink(query)',
+        },
+      },
+
+      _computeBackLink: function(query) {
+        return '/response-parameters/partners/activities' + '?' + query;
+      },
+
+      _computeOverviewUrl: function(responsePlanId, activityId) {
+        return App.Endpoints.plannedActionsActivityOverview(responsePlanId, activityId);
+      },
+
+      _updateTabSelection: function () {
+        this.$.tabContent.select(this.tab);
+      },
+
+      _updateUrlTab: function (tab) {
+        if (!tab) {
+          tab = 'overview';
+        }
+        this.set('tab', tab);
+        this.set('route.path', '/' + this.tab);
+      },
+
+      attached: function () {
+        var thunk = this.$.activity.thunk();
+        var self = this;
+        thunk()
+          .then(function (res) {
+            self.updatePending = false;
+            self.activityData = res.data;
+          })
+          .catch(function (err) { // jshint ignore:line
+            self.updatePending = false;
+            // TODO: error handling
+          });
+      },
+
+    });
+  </script>
+</dom-module>

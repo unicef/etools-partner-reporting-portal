@@ -7,6 +7,7 @@
 <link rel="import" href="../../../bower_components/iron-location/iron-location.html">
 <link rel="import" href="../../../bower_components/iron-location/iron-query-params.html">
 <link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../elements/frequency-of-reporting.html">
 
 <link rel="import" href="../../behaviors/data-table.html">
 <link rel="import" href="../../behaviors/pagination.html">
@@ -20,7 +21,7 @@
 <link rel="import" href="../../redux/actions.html">
 <link rel="import" href="../../styles/table-styles.html">
 
-<dom-module id="project-list-table">
+<dom-module id="activity-list-table">
   <template>
     <style include="data-table-styles table-styles iron-flex">
       :host {
@@ -69,7 +70,7 @@
             <div class="table-column">Cluster</div>
           </etools-data-table-column>
           <template is="dom-if" if="[[_equals(page, 'response-parameters')]]">
-            <etools-data-table-column field="status">
+            <etools-data-table-column field="partner">
               <div class="table-column">Partner</div>
             </etools-data-table-column>
           </template>
@@ -77,8 +78,13 @@
             <div class="table-column">Status</div>
           </etools-data-table-column>
           <etools-data-table-column field="project">
-            <div class="table-column">Project</div>
+            <div class="table-column">Activity</div>
           </etools-data-table-column>
+          <template is="dom-if" if="[[!_equals(page, 'response-parameters')]]">
+            <etools-data-table-column field="clusterActivity">
+              <div class="table-column">Cluster Activity</div>
+            </etools-data-table-column>
+          </template>
           <etools-data-table-column field="Location">
             <div class="table-column">Location</div>
           </etools-data-table-column>
@@ -87,52 +93,45 @@
         <template
             id="list"
             is="dom-repeat"
-            items="[[projects]]"
-            as="project"
+            items="[[activities]]"
+            as="activity"
             initial-count="[[pageSize]]">
           <etools-prp-data-table-row details-opened="[[detailsOpened]]">
             <div slot="row-data">
               <div class="table-cell table-cell--text">
-                [[_commaSeparatedDictValues(project.clusters, 'title')]]
+                [[activity.cluster]]
               </div>
               <template is="dom-if" if="[[_equals(page, 'response-parameters')]]">
                 <div class="table-cell table-cell--text">
-                  [[project.partner.title]]
+                  [[activity.partner.title]]
                 </div>
               </template>
               <div class="table-cell table-cell--text">
-                <project-status status="[[project.status]]"></project-status>
+                <project-status status="[[activity.status]]"></project-status>
               </div>
               <div class="table-cell table-cell--text">
-                <a href="[[_detailUrl(project)]]">[[project.title]]</a>
+                <a href="[[_detailUrl(activity)]]">[[activity.title]]</a>
               </div>
+              <template is="dom-if" if="[[!_equals(page, 'response-parameters')]]">
+                <div class="table-cell table-cell--text">
+                  [[activity.cluster_activity.title]]
+                </div>
+              </template>
               <div class="table-cell table-cell--text">
-                [[_commaSeparatedDictValues(project.locations, 'title')]]
+                [[_commaSeparatedDictValues(activity.locations, 'title')]]
               </div>
             </div>
             <div slot="row-data-details" class="row-details-expanded-wrapper">
-              <div slot="row-data">
-                <div class="table-cell table-cell--text">
-                  <span class="label">Start Date</span>
-                  [[project.start_date]]
-                  <span class="label">Total Budget</span>
-                  [[project.total_budget]]
+                <div slot="row-data">
+                  <div class="table-cell table-cell--text">
+                    <span class="label">Start Date</span>
+                    [[activity.start_date]]
+                  </div>
+                  <div class="table-cell table-cell--text">
+                    <span class="label">End Date</span>
+                    [[activity.end_date]]
+                  </div>
                 </div>
-                <div class="table-cell table-cell--text">
-                  <span class="label">End Date</span>
-                  [[project.end_date]]
-                  <span class="label">Funding Source</span>
-                  [[project.funding_source]]
-                </div>
-                <div class="table-cell table-cell--text">
-                  <span class="label">Part of a Joint Response Plan</span>
-                  [[project.part_response_plan]]
-                </div>
-                <div class="table-cell table-cell--text">
-                  <span class="label">Frequency of Reporting</span>
-                  [[project.frequency]]
-                </div>
-              </div>
             </div>
           </etools-prp-data-table-row>
         </template>
@@ -153,7 +152,7 @@
 
     <script>
       Polymer({
-        is: 'project-list-table',
+        is: 'activity-list-table',
 
         behaviors: [
           App.Behaviors.PaginationBehavior,
@@ -164,19 +163,19 @@
         ],
 
         properties: {
-          projects: {
+          activities: {
             type: Object,
-            statePath: 'partnerProjects.all',
+            statePath: 'partnerActivities.all',
           },
 
           loading: {
             type: Boolean,
-            statePath: 'partnerProjects.loading'
+            statePath: 'partnerActivities.loading'
           },
 
           totalResults: {
             type: Number,
-            statePath: 'partnerProjects.count',
+            statePath: 'partnerActivities.count',
           },
 
           detailsOpened: {
@@ -199,10 +198,10 @@
           'details-opened-changed': '_detailsChange'
         },
 
-        _detailUrl: function(project) {
-          var path = '/response-parameters/partners/project/' + project.id;
+        _detailUrl: function(activity) {
+          var path = '/response-parameters/partners/activity/' + activity.id;
           if (this.page === 'planned-action') {
-            path = '/planned-action/project/' + project.id;
+            path = '/planned-action/activity/' + activity.id;
           }
           //Query string is passed to construct the back button.
           return this.buildUrl(this._baseUrlCluster, path) + '?' + this.query;
