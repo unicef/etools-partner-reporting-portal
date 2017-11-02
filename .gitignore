@@ -10,5 +10,7 @@
 
 # Python compiled
 *.pyc
+*.pem
 
+# Frontend
 node_modules/

@@ -40,6 +40,26 @@
   }
 },
 {
+  "model": "account.user",
+  "pk": 3,
+  "fields": {
+    "password": "pbkdf2_sha256$30000$mWjdGI2hOk44$0hWkyyTPYSaHRu5FKD/NzkU3IGo/u+OHcAAw3pE/AJQ=",
+    "last_login": "2017-05-15T09:52:38.512Z",
+    "is_superuser": false,
+    "username": "default_unicef_user",
+    "first_name": "",
+    "last_name": "",
+    "email": "default_unicef_etools@unicef.org",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2017-05-12T07:46:28Z",
+    "partner": null,
+    "organization": "UNICEF",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
   "model": "account.userprofile",
   "pk": 1,
   "fields": {
@@ -55,6 +75,15 @@
     "created": "2017-05-15T10:31:28.514Z",
     "modified": "2017-05-15T10:31:28.519Z",
     "user": 2
+  }
+},
+{
+  "model": "account.userprofile",
+  "pk": 3,
+  "fields": {
+    "created": "2017-05-15T10:16:04.611Z",
+    "modified": "2017-05-15T10:16:04.614Z",
+    "user": 3
   }
 }
 ]

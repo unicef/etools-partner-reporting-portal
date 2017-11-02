@@ -22,11 +22,16 @@ def up_recreate():
     local('docker-compose down && docker-compose up')
 
 
-def up():
+def up(quick=False):
     """
     Create and start containers.
     """
-    local('docker-compose up')
+    if quick:
+        command = 'docker-compose up'
+    else:
+        command = 'docker-compose up --force-recreate --build'
+
+    local(command)
 
 
 def down():
