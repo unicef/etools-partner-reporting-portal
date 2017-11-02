@@ -38,7 +38,7 @@ class Command(BaseCommand):
             '--area',
             action='store',
             dest='area',
-            default="2340",
+            default="2490",
             help='Business area code to update'
         )
 
