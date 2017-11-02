@@ -558,6 +558,8 @@
             .then(function (res) {
               self.fire('indicator-added', res.data);
               self.set('updatePending', false);
+              self.set('type', '');
+              self.set('displayType', '');
               self.close();
             })
             .catch(function (err) { // jshint ignore:line
