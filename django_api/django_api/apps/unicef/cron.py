@@ -251,6 +251,9 @@ class ProgrammeDocumentCronJob(CronJobBase):
                                             l['gateway_country'] = workspace.countries.all()[
                                                 0].id
                                             l['admin_level'] = 1
+                                            if not l['pcode']:
+                                                print("Location code empty! Skipping!")
+                                                continue
                                             gateway = self.process_model(
                                                 GatewayType, PMPGatewayTypeSerializer, l, {
                                                     'name': l['pcode']})
