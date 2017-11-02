@@ -200,7 +200,8 @@ class ProgrammeDocumentCronJob(CronJobBase):
                                 u.workspaces.add(workspace)
                                 u.groups.add(group)
 
-                            if item['status'] not in ("draft", "signed"):
+                            # TODO: add draft status. Removed temporary due PMP active PD issue
+                            if item['status'] not in ("signed", ):
                                 # Mark all LLO/reportables assigned to this PD as inactive
                                 llos = LowerLevelOutput.objects.filter(cp_output__programme_document=pd)
                                 llos.update(active=False)
