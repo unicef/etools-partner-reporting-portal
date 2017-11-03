@@ -42,5 +42,5 @@ class UnicefPartnershipManagerOrRead(BasePermission):
 
         return (user.is_authenticated() and user.is_superuser) or \
             (user.is_authenticated and hasattr(user, 'jwt_payload') and
-             hasattr(user, 'jwt_payload') and "groups" in user.jwt_payload and
+             "groups" in user.jwt_payload and
              "Partnership Manager" in user.jwt_payload['groups'])
