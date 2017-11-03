@@ -509,7 +509,7 @@ class ProgressReportSubmitAPIView(APIView):
                                             status=statuses.HTTP_400_BAD_REQUEST)
                 if not ir.narrative_assessment:
                     _errors = [{
-                        "message": "You have not completed narrative assessment for one of LLO (%s). Unless your Output status is Met or has No Progress, all indicator data needs to be completed." % ir.reportable.content_object}]
+                        "message": "You have not completed narrative assessment for one of Outputs (%s). Unless your Output status is Met or has No Progress, all indicator data needs to be completed." % ir.reportable.content_object}]
                     return Response({"errors": _errors},
                                     status=statuses.HTTP_400_BAD_REQUEST)
 

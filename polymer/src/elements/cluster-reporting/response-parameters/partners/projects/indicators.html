@@ -40,17 +40,6 @@
     </etools-prp-ajax>
 
     <page-body>
-      <div id="action">
-        <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
-          Add Indicator
-        </paper-button>
-      </div>
-
-      <indicator-modal
-        id="indicatorModal"
-        object-id="[[projectId]]"
-        object-type="PartnerProject">
-      </indicator-modal>
 
       <list-view-indicators
           data="[[data]]"
@@ -99,21 +88,9 @@
         },
       },
 
-      listeners: {
-        'indicatorModal.indicator-added': '_onSuccess',
-      },
-
       observers: [
         '_indicatorsAjax(queryParams, projectId)',
       ],
-
-      _openModal: function () {
-        this.$.indicatorModal.open();
-      },
-
-      _onSuccess: function () {
-        this._indicatorsAjax();
-      },
 
       _computeCurrentIndicators: function(projectId, allIndicators) {
         return allIndicators[projectId];

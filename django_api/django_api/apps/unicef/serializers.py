@@ -4,7 +4,7 @@ from rest_framework import serializers
 from .models import ProgrammeDocument, Section, ProgressReport, Person, \
     LowerLevelOutput, PDResultLink
 
-from core.common import PROGRESS_REPORT_STATUS, OVERALL_STATUS, CURRENCIES
+from core.common import PROGRESS_REPORT_STATUS, OVERALL_STATUS, CURRENCIES, PD_STATUS
 from core.models import Workspace
 
 from indicator.serializers import (
@@ -440,6 +440,7 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
         choices=CURRENCIES, allow_null=True, source="funds_received_to_date_currency")
     unicef_budget_currency = serializers.ChoiceField(
         choices=CURRENCIES, allow_null=True, source="total_unicef_cash_currency")
+    status = serializers.ChoiceField(choices=PD_STATUS)
     start_date = serializers.DateField(required=False, allow_null=True)
     end_date = serializers.DateField(required=False, allow_null=True)
     partner = serializers.PrimaryKeyRelatedField(
@@ -458,6 +459,8 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
         model = ProgrammeDocument
         fields = (
             "id",
+            "status",
+            "agreement",
             "title",
             "offices",
             "number",

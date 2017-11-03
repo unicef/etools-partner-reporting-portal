@@ -6,10 +6,11 @@
 
 <link rel="import" href="../redux/store.html">
 <link rel="import" href="../behaviors/routing.html">
+<link rel="import" href="../styles/shared-styles.html">
 
 <dom-module id="page-header">
   <template>
-    <style include="iron-flex">
+    <style include="iron-flex iron-flex-alignment iron-flex-factors shared-styles">
       :host {
         --header-gutter: 25px;
 
@@ -24,11 +25,14 @@
       }
 
       .title {
+        min-width: 0;
         position: relative;
       }
 
       .title h1 {
         @apply(--paper-font-title);
+        @apply(--truncate);
+        max-width: 100%;
         margin: 0;
       }
 
@@ -57,7 +61,7 @@
         </a>
       </template>
 
-      <div class="title">
+      <div class="title flex">
         <div class="above-title">
           <content select=".above-title"></content>
         </div>

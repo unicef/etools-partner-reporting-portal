@@ -54,9 +54,9 @@ class Person(TimeStampedExternalSyncModelMixin):
         verbose_name='Phone Number',
         blank=True,
         null=True)
-    email = models.CharField(max_length=255, verbose_name='Email    ')
+    email = models.CharField(max_length=255, verbose_name='Email')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -84,7 +84,7 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
     reference_number = models.CharField(max_length=255,
                                         verbose_name='Reference Number',
                                         db_index=True)
-    title = models.CharField(max_length=255,
+    title = models.CharField(max_length=512,
                              verbose_name='PD/SSFA ToR Title',
                              db_index=True)
     unicef_office = models.CharField(max_length=255,
@@ -198,7 +198,9 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
         choices=CURRENCIES,
         default=CURRENCIES.usd,
         max_length=16,
-        verbose_name='Funds received Currency'
+        verbose_name='Funds received Currency',
+        blank = True,
+        null = True,
     )
 
     # TODO:
@@ -215,13 +217,13 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
     class Meta:
         ordering = ['-id']
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     @cached_property
     def reportable_queryset(self):
         return Reportable.objects.filter(
-            lower_level_outputs__cp_output__programme_document=self)
+            lower_level_outputs__cp_output__programme_document=self, active=True)
 
     @property
     def reports_exists(self):
@@ -440,7 +442,7 @@ class PDResultLink(TimeStampedExternalSyncModelMixin):
     related models:
         unicef.ProgrammeDocument (ForeignKey): "programme_document"
     """
-    title = models.CharField(max_length=255,
+    title = models.CharField(max_length=512,
                              verbose_name='CP output title/name')
     programme_document = models.ForeignKey(ProgrammeDocument,
                                            related_name="cp_outputs")
@@ -462,11 +464,13 @@ class LowerLevelOutput(TimeStampedExternalSyncModelMixin):
         unicef.PDResultLink (ForeignKey): "indicator"
         indicator.Reportable (GenericRelation): "reportables"
     """
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=512)
     cp_output = models.ForeignKey(PDResultLink,
                                   related_name="ll_outputs")
     reportables = GenericRelation('indicator.Reportable',
                                   related_query_name='lower_level_outputs')
+
+    active = models.BooleanField(default=True)
 
     class Meta:
         ordering = ['id']

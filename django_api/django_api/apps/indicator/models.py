@@ -233,6 +233,8 @@ class Reportable(TimeStampedExternalSyncModelMixin):
                                      blank=True)
     disaggregations = models.ManyToManyField(Disaggregation, blank=True)
 
+    active = models.BooleanField(default=True)
+
     class Meta:
         ordering = ['-id']
 
