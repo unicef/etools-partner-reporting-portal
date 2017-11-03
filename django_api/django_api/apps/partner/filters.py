@@ -2,11 +2,14 @@ from django.db.models import Q
 
 import django_filters
 from django_filters import rest_framework as filters
-from django_filters.filters import ChoiceFilter, CharFilter, DateFilter
+from django_filters.filters import ChoiceFilter, CharFilter, DateFilter, TypedChoiceFilter
+from distutils.util import strtobool
 
-from core.common import PARTNER_PROJECT_STATUS
+from core.common import PARTNER_PROJECT_STATUS, PARTNER_ACTIVITY_STATUS
 
 from .models import PartnerProject, Partner, PartnerActivity
+
+BOOLEAN_CHOICES = (('0', 'False'), ('1', 'True'),)
 
 
 class PartnerProjectFilter(filters.FilterSet):
@@ -58,10 +61,15 @@ class PartnerActivityFilter(django_filters.FilterSet):
     partner = CharFilter(method='get_partner')
     project = CharFilter(method='get_project')
     cluster_id = CharFilter(method='get_cluster_id')
+    activity = CharFilter(method='get_activity')
+    custom = TypedChoiceFilter(name='custom', choices=BOOLEAN_CHOICES, coerce=strtobool,
+                            method='get_custom', label='Show only custom activities')
+    status = ChoiceFilter(choices=PARTNER_PROJECT_STATUS)
+    location = CharFilter(method='get_location')
 
     class Meta:
         model = PartnerActivity
-        fields = ['partner', 'project', 'cluster_id']
+        fields = ['partner', 'project', 'cluster_id', 'activity', 'custom', 'status', 'location']
 
     def get_partner(self, queryset, name, value):
         return queryset.filter(partner=value)
@@ -74,3 +82,15 @@ class PartnerActivityFilter(django_filters.FilterSet):
             Q(cluster_activity__cluster_objective__cluster__id=value) |
             Q(cluster_objective__cluster__id=value)
         )
+
+    def get_activity(self, queryset, name, value):
+        return queryset.filter(title__icontains=value)
+
+    def get_custom(self, queryset, name, value):
+        if value:
+            return queryset.filter(
+                cluster_activity=None)
+        return queryset
+
+    def get_location(self, queryset, name, value):
+        return queryset.filter(locations__id=value)
