@@ -41,6 +41,7 @@ from indicator.serializers import (
 from indicator.filters import PDReportsFilter
 from indicator.serializers import IndicatorBlueprintSimpleSerializer
 from partner.models import Partner
+from unicef.utils import user_is_unicef
 
 from .serializers import (
     ProgrammeDocumentSerializer,
@@ -144,10 +145,11 @@ class ProgrammeDocumentProgressAPIView(RetrieveAPIView):
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
     def get_object(self, pd_id):
+        user_has_global_view = user_is_unicef(self.request.user)
         external_request = self.request.query_params.get('external', False)
         search_by = 'external_id' if external_request else 'pk'
         query_params = {}
-        if self.request.user.username != settings.DEFAULT_UNICEF_USER:
+        if not user_has_global_view:
             query_params['partner'] = self.request.user.partner
         query_params['workspace'] = self.workspace_id,
         query_params[search_by] = pd_id
@@ -242,6 +244,8 @@ class ProgressReportAPIView(ListAPIView):
     filter_class = ProgressReportFilter
 
     def get_queryset(self):
+        user_has_global_view = user_is_unicef(self.request.user)
+
         external_partner_id = self.request.GET.get('external_partner_id')
         if external_partner_id is not None:
             qset = Partner.objects.filter(external_id=external_partner_id)
@@ -250,8 +254,11 @@ class ProgressReportAPIView(ListAPIView):
         else:
             # TODO: In case of UNICEF user.. allow for all (maybe create a special group for the unicef api user?)
             # Limit reports to this user's partner only
-            return ProgressReport.objects.filter(
-                programme_document__partner=self.request.user.partner)
+            if user_has_global_view:
+                return ProgressReport.objects.all()
+            else:
+                return ProgressReport.objects.filter(
+                    programme_document__partner=self.request.user.partner)
 
     def list(self, request, workspace_id, *args, **kwargs):
         queryset = self.get_queryset().filter(
