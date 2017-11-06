@@ -42,6 +42,7 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
         model = ProgrammeDocument
         fields = (
             'id',
+            'external_id',
             'agreement',
             'reference_number',
             'title',
