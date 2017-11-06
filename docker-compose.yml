@@ -8,6 +8,7 @@ services:
       - .env
     depends_on:
       - django_api
+      - redis
     restart: always
 
   celerycam-prp:
@@ -17,6 +18,7 @@ services:
       - .env
     depends_on:
       - django_api
+      - redis
     restart: always
 
 #  flower-prp:
@@ -37,7 +39,10 @@ services:
       - .env
     depends_on:
       - django_api
+      - redis
     restart: always
+    volumes:
+      - './django_api:/code/'
 
   proxy:
     image: unicef/etools-prp-nginx-proxy
