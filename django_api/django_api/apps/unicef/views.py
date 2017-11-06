@@ -243,7 +243,7 @@ class ProgressReportAPIView(ListAPIView):
     filter_class = ProgressReportFilter
 
     def get_queryset(self):
-        user_has_global_view = user_is_unicef(self.request.user)
+        user_has_global_view = self.request.user.is_unicef
 
         external_partner_id = self.request.GET.get('external_partner_id')
         if external_partner_id is not None:
