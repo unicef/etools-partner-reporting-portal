@@ -354,7 +354,7 @@ class ProgressReportDetailsUpdateAPIView(APIView):
                 "pk": pk,
                 "exception": exp,
             })
-            raise Http404def
+            raise Http404
 
     def put(self, request, workspace_id, pk, *args, **kwargs):
         self.workspace_id = workspace_id
@@ -391,11 +391,14 @@ class ProgressReportDetailsAPIView(RetrieveAPIView):
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
     def get_object(self, pk):
+        user_has_global_view = user_is_unicef(self.request.user)
+        query_params = {}
+        if not user_has_global_view:
+            query_params["programme_document__partner"] = self.request.user.partner
+        query_params['programme_document__workspace'] = self.workspace_id
+        query_params['pk'] = pk
         try:
-            return ProgressReport.objects.get(
-                programme_document__partner=self.request.user.partner,  # TODO: check if needed?
-                programme_document__workspace=self.workspace_id,
-                pk=pk)
+            return ProgressReport.objects.get(**query_params)
         except ProgressReport.DoesNotExist as exp:
             logger.exception({
                 "endpoint": "ProgressReportDetailsAPIView",
