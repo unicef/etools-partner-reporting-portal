@@ -144,16 +144,20 @@ class ProgrammeDocumentProgressAPIView(RetrieveAPIView):
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
     def get_object(self, pd_id):
+        external_request = self.request.query_params.get('external', False)
+        search_by = 'external_id' if external_request else 'pk'
+        query_params = {}
+        if self.request.user.username != settings.DEFAULT_UNICEF_USER:
+            query_params['partner'] = self.request.user.partner
+        query_params['workspace'] = self.workspace_id,
+        query_params[search_by] = pd_id
         try:
-            return ProgrammeDocument.objects.get(
-                partner=self.request.user.partner,
-                workspace=self.workspace_id,
-                pk=pd_id)
+            return ProgrammeDocument.objects.get(**query_params)
         except ProgrammeDocument.DoesNotExist as exp:
             logger.exception({
                 "endpoint": "ProgrammeDocumentProgressAPIView",
                 "request.data": self.request.data,
-                "pk": pd_id,
+                search_by: pd_id,
                 "exception": exp,
             })
             raise Http404
