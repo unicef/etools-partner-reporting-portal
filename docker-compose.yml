@@ -1,36 +1,43 @@
 version: '2.1'
 
 services:
-beater-prp:
-  command: python manage.py celery beat --loglevel=debug
-  image: 'unicef/etools-prp:develop'
-  env_file:
-    - .env
-  restart: always
- 
-celerycam-prp:
-  autoredeploy: true
-  command: python manage.py celerycam
-  image: 'unicef/etools-prp:develop'
-  env_file:
-    - .env
-  restart: always
+  beater-prp:
+    command: python manage.py celery beat --loglevel=debug
+    image: 'unicef/etools-prp'
+    env_file:
+      - .env
+    depends_on:
+      - django_api
+    restart: always
 
-flower-prp:
-  command: 'flower --address=0.0.0.0 --port=8080 --broker=redis://prp-redis:6379/0 -l DEBUG --auto_refresh=False --debug=True --autoreload=False --url_prefix=flower'
-  expose:
-    - '8080'
-  image: 'unicef/etools-prp:develop'
-  env_file:
-    - .env
-  restart: always
+  celerycam-prp:
+    command: python manage.py celerycam
+    image: 'unicef/etools-prp'
+    env_file:
+      - .env
+    depends_on:
+      - django_api
+    restart: always
 
-worker-prp:
-  command: python manage.py celery worker -E --loglevel=info
-  image: 'unicef/etools-prp:develop'
-  env_file:
-    - .env
-  restart: always
+#  flower-prp:
+#    command: 'flower --address=0.0.0.0 --port=8080 --broker=redis://prp-redis:6379/0 -l DEBUG --auto_refresh=False --debug=True --autoreload=False --url_prefix=flower'
+#    expose:
+#      - '8080'
+#    image: 'unicef/etools-prp'
+#    env_file:
+#      - .env
+#    depends_on:
+#      - django_api
+#    restart: always
+
+  worker-prp:
+    command: python manage.py celery worker -E --loglevel=info
+    image: 'unicef/etools-prp'
+    env_file:
+      - .env
+    depends_on:
+      - django_api
+    restart: always
 
   proxy:
     image: unicef/etools-prp-nginx-proxy
