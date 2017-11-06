@@ -83,7 +83,7 @@ class ProgressReportFilter(django_filters.FilterSet):
     location = CharFilter(name='location', method='get_location',
                           label='Location')
     programme_document_ext = CharFilter(name='programme_document_ext', method='get_pd_ext',
-                          label='programme_document_ext')
+                                        label='programme_document_ext')
 
     class Meta:
         model = ProgressReport

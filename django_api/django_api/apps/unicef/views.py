@@ -41,7 +41,6 @@ from indicator.serializers import (
 from indicator.filters import PDReportsFilter
 from indicator.serializers import IndicatorBlueprintSimpleSerializer
 from partner.models import Partner
-from unicef.utils import user_is_unicef
 
 from .serializers import (
     ProgrammeDocumentSerializer,
@@ -145,7 +144,7 @@ class ProgrammeDocumentProgressAPIView(RetrieveAPIView):
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
     def get_object(self, pd_id):
-        user_has_global_view = user_is_unicef(self.request.user)
+        user_has_global_view = self.request.user.is_unicef
         external_request = self.request.query_params.get('external', False)
         search_by = 'external_id' if external_request else 'pk'
         query_params = {}
@@ -391,7 +390,7 @@ class ProgressReportDetailsAPIView(RetrieveAPIView):
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
     def get_object(self, pk):
-        user_has_global_view = user_is_unicef(self.request.user)
+        user_has_global_view = self.request.user.is_unicef
         query_params = {}
         if not user_has_global_view:
             query_params["programme_document__partner"] = self.request.user.partner
