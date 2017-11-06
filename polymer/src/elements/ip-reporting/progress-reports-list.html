@@ -54,9 +54,7 @@
       <etools-data-table-header
         no-collapse
         label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
-        <etools-data-table-column field="">
-          <div class="table-column">PD/SSFA ToR ref. #</div>
-        </etools-data-table-column>
+        <etools-data-table-column></etools-data-table-column>
         <etools-data-table-column field="status">
           <div class="table-column">Report Status</div>
         </etools-data-table-column>
@@ -72,7 +70,9 @@
         <etools-data-table-column field="draft" class="cell-icon">
           <div class="table-column">Draft</div>
         </etools-data-table-column>
-        <etools-data-table-column></etools-data-table-column>
+        <etools-data-table-column field="">
+          <div class="table-column">PD/SSFA ToR ref. #</div>
+        </etools-data-table-column>
       </etools-data-table-header>
 
       <template
@@ -83,10 +83,13 @@
         initial-count="[[pageSize]]">
         <etools-data-table-row no-collapse>
           <div slot="row-data">
-            <div class="table-cell table-cell--text">
-              <a href="[[_getPDLink(report)]]">
-                [[_withDefault(report.programme_document.reference_number, '-')]]
-              </a>
+            <div class="table-cell table-cell--text cell-reports">
+              <template
+                  is="dom-if"
+                  if="[[_canNavigateToReport(permissions, report)]]"
+                  restamp="true">
+                <a href="[[_getReportLink(report)]]">[[_getReportLinkText(report)]]</a>
+              </template>
             </div>
             <div class="table-cell table-cell--text">
               <report-status status="[[report.status]]"></report-status>
@@ -108,13 +111,10 @@
                 —
               </template>
             </div>
-            <div class="table-cell table-cell--text cell-reports">
-              <template
-                  is="dom-if"
-                  if="[[_canNavigateToReport(permissions, report)]]"
-                  restamp="true">
-                <a href="[[_getReportLink(report)]]">[[_getReportLinkText(report)]]</a>
-              </template>
+            <div class="table-cell table-cell--text">
+              <a href="[[_getPDLink(report)]]">
+                [[_withDefault(report.programme_document.reference_number, '-')]]
+              </a>
             </div>
           </div>
         </etools-data-table-row>

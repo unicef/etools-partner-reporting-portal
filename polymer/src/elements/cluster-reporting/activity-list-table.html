@@ -66,6 +66,9 @@
       <etools-content-panel no-header>
         <etools-data-table-header
             label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
+          <etools-data-table-column field="activity">
+            <div class="table-column">Activity</div>
+          </etools-data-table-column>
           <etools-data-table-column field="cluster">
             <div class="table-column">Cluster</div>
           </etools-data-table-column>
@@ -77,15 +80,12 @@
           <etools-data-table-column field="status">
             <div class="table-column">Status</div>
           </etools-data-table-column>
-          <etools-data-table-column field="project">
-            <div class="table-column">Activity</div>
-          </etools-data-table-column>
           <template is="dom-if" if="[[!_equals(page, 'response-parameters')]]">
             <etools-data-table-column field="clusterActivity">
               <div class="table-column">Cluster Activity</div>
             </etools-data-table-column>
           </template>
-          <etools-data-table-column field="Location">
+          <etools-data-table-column field="location">
             <div class="table-column">Location</div>
           </etools-data-table-column>
         </etools-data-table-header>
@@ -99,6 +99,9 @@
           <etools-prp-data-table-row details-opened="[[detailsOpened]]">
             <div slot="row-data">
               <div class="table-cell table-cell--text">
+                <a href="[[_detailUrl(activity)]]">[[activity.title]]</a>
+              </div>
+              <div class="table-cell table-cell--text">
                 [[activity.cluster]]
               </div>
               <template is="dom-if" if="[[_equals(page, 'response-parameters')]]">
@@ -108,9 +111,6 @@
               </template>
               <div class="table-cell table-cell--text">
                 <project-status status="[[activity.status]]"></project-status>
-              </div>
-              <div class="table-cell table-cell--text">
-                <a href="[[_detailUrl(activity)]]">[[activity.title]]</a>
               </div>
               <template is="dom-if" if="[[!_equals(page, 'response-parameters')]]">
                 <div class="table-cell table-cell--text">
