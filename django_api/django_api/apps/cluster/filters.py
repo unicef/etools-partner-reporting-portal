@@ -30,9 +30,7 @@ class ClusterObjectiveFilter(django_filters.FilterSet):
         fields = ['ref_title', 'cluster_id']
 
     def get_reference_number_title(self, queryset, name, value):
-        return queryset.filter(
-            Q(reference_number__icontains=value) | Q(title__icontains=value)
-        )
+        return queryset.filter(title__icontains=value)
 
     def get_cluster_id(self, queryset, name, value):
         return queryset.filter(cluster_id=value)
