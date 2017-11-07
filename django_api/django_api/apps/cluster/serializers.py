@@ -6,7 +6,7 @@ from django.db.models import Q, F
 
 from rest_framework import serializers
 
-from core.common import FREQUENCY_LEVEL, OVERALL_STATUS, PARTNER_PROJECT_STATUS, CLUSTER_TYPE_NAME_DICT
+from core.common import OVERALL_STATUS, PARTNER_PROJECT_STATUS, CLUSTER_TYPE_NAME_DICT
 from core.models import ResponsePlan, GatewayType
 from indicator.models import Reportable, IndicatorReport, IndicatorLocationData
 from indicator.serializers import (
@@ -34,9 +34,6 @@ class ClusterSimpleSerializer(serializers.ModelSerializer):
 
 
 class ClusterObjectiveSerializer(serializers.ModelSerializer):
-
-    frequency = serializers.ChoiceField(choices=FREQUENCY_LEVEL, required=False)
-    reference_number = serializers.CharField(required=False)
     cluster_title = serializers.SerializerMethodField()
 
     class Meta:
@@ -44,10 +41,8 @@ class ClusterObjectiveSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'title',
-            'reference_number',
             'cluster',
             'cluster_title',
-            'frequency',
             # 'reportables',
         )
 
@@ -56,21 +51,15 @@ class ClusterObjectiveSerializer(serializers.ModelSerializer):
 
 
 class ClusterObjectivePatchSerializer(ClusterObjectiveSerializer):
-
     title = serializers.CharField(required=False)
-    reference_number = serializers.CharField(required=False)
     cluster = serializers.CharField(required=False)
-    frequency = serializers.ChoiceField(
-        choices=FREQUENCY_LEVEL, required=False)
 
     class Meta:
         model = ClusterObjective
         fields = (
             'id',
             'title',
-            'reference_number',
             'cluster',
-            'frequency',
         )
 
 
@@ -84,7 +73,6 @@ class ClusterActivitySerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'title',
-            'standard',
             'co_cluster_title',
             'co_title',
             'cluster_objective',
@@ -100,9 +88,6 @@ class ClusterActivitySerializer(serializers.ModelSerializer):
 class ClusterActivityPatchSerializer(serializers.ModelSerializer):
 
     title = serializers.CharField(required=False)
-    standard = serializers.CharField(required=False)
-    frequency = serializers.ChoiceField(
-        choices=FREQUENCY_LEVEL, required=False)
     cluster_objective = serializers.CharField(required=False)
 
     class Meta:
@@ -110,8 +95,6 @@ class ClusterActivityPatchSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'title',
-            'standard',
-            'frequency',
             'cluster_objective',
         )
 

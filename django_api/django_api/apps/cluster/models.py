@@ -254,13 +254,6 @@ class ClusterActivity(TimeStampedModel):
         indicator.Reportable (GenericRelation): "reportables"
     """
     title = models.CharField(max_length=255)
-    standard = models.CharField(max_length=255)
-    frequency = models.CharField(
-        max_length=3,
-        choices=FREQUENCY_LEVEL,
-        default=FREQUENCY_LEVEL.monthly,
-        verbose_name='Frequency of reporting'
-    )
     cluster_objective = models.ForeignKey(ClusterObjective,
                                           related_name="cluster_activities")
     locations = models.ManyToManyField('core.Location',
