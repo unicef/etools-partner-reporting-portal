@@ -4,10 +4,6 @@
 <link rel="import" href="../../../elements/page-body.html">
 <link rel="import" href="../../../elements/ip-reporting/partner-details.html">
 <link rel="import" href="../../../elements/ip-reporting/risk-rating.html">
-<link rel="import" href="../../../elements/etools-prp-ajax.html">
-<link rel="import" href="../../../endpoints.html">
-<link rel="import" href="../../../redux/actions.html">
-<link rel="import" href="../../../redux/store.html">
 
 <dom-module id="page-ip-reporting-overview">
   <template>
@@ -16,11 +12,6 @@
         display: block;
       }
     </style>
-
-    <etools-prp-ajax
-        id="partnerDetails"
-        url="[[partnerDetailsUrl]]">
-    </etools-prp-ajax>
 
     <page-header title="Overview"></page-header>
 
@@ -33,26 +24,6 @@
   <script>
     Polymer({
       is: 'page-ip-reporting-overview',
-
-      behaviors: [
-        App.Behaviors.ReduxBehavior,
-      ],
-
-      properties: {
-        partnerDetailsUrl: {
-          type: String,
-          value: App.Endpoints.partnerDetails(),
-        },
-      },
-
-      attached: function () {
-        var partnerThunk = this.$.partnerDetails.thunk();
-
-        this.dispatch(App.Actions.fetchPartner(partnerThunk))
-            .catch(function (err) { // jshint ignore:line
-            // TODO: error handling
-            });
-      },
     });
   </script>
 </dom-module>

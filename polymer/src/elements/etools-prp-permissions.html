@@ -44,6 +44,8 @@
           App.Constants.GROUP_IP_AUTHORIZED_OFFICER,
           App.Constants.GROUP_IP_EDITOR,
         ],
+
+        viewClusterContent: App.Constants.GROUP_CLUSTER_ALL,
       };
 
       Polymer({
@@ -80,6 +82,7 @@
                   });
 
                 case granted === App.Constants.GROUP_IP_ALL:
+                case granted === App.Constants.GROUP_CLUSTER_ALL:
                   return true;
 
                 default:
