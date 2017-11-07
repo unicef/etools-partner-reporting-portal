@@ -45,6 +45,18 @@
           App.Constants.GROUP_IP_EDITOR,
         ],
 
+        createClusterEntities: function (params) {
+          return params.groups.some(function (group) {
+            return group.name === App.Constants.GROUP_IMO;
+          });
+        },
+
+        createClusterEntitiesForCluster: function (params, clusterId) {
+          return params.imoClusters.some(function (cluster) {
+            return cluster.id === clusterId;
+          });
+        },
+
         viewClusterContent: App.Constants.GROUP_CLUSTER_ALL,
       };
 
@@ -61,25 +73,51 @@
             statePath: 'userProfile.profile',
           },
 
+          groups: {
+            type: Array,
+            computed: '_computeGroups(profile)',
+          },
+
+          imoClusters: {
+            type: Array,
+            computed: '_computeImoClusters(profile)',
+          },
+
+          partner: {
+            type: Object,
+            statePath: 'partner.current',
+          },
+
+          params: {
+            type: Object,
+            computed: '_computeParams(groups, imoClusters, partner)',
+          },
+
           permissions: {
             type: Object,
-            computed: '_computePermissions(profile)',
+            computed: '_computePermissions(params)',
             notify: true,
           },
+
         },
 
-        _computePermissions: function (profile) {
-          var groups = profile.groups || [];
-
+        _computePermissions: function (params) {
           return Object.keys(permissions).reduce(function (acc, key) {
             var granted = permissions[key];
 
             acc[key] = (function () {
               switch (true) {
                 case Array.isArray(granted):
-                  return groups.some(function (group) {
+                  return params.groups.some(function (group) {
                     return granted.indexOf(group.name) !== -1;
                   });
+
+                case typeof granted === 'function':
+                  return function () {
+                    var args = [].slice.call(arguments);
+
+                    return granted.apply(null, [params].concat(args));
+                  };
 
                 case granted === App.Constants.GROUP_IP_ALL:
                 case granted === App.Constants.GROUP_CLUSTER_ALL:
@@ -92,6 +130,22 @@
 
             return acc;
           }, {});
+        },
+
+        _computeGroups: function (profile) {
+          return profile.groups || [];
+        },
+
+        _computeImoClusters: function (profile) {
+          return profile.imo_clusters || [];
+        },
+
+        _computeParams: function (groups, imoClusters, partner) {
+          return {
+            groups: groups,
+            imoClusters: imoClusters,
+            partner: partner,
+          };
         },
       });
     }());
