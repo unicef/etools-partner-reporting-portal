@@ -158,6 +158,12 @@ PARTNER_PROJECT_STATUS = Choices(
     ("Com", "completed", "Completed"),
 )
 
+PARTNER_ACTIVITY_STATUS = Choices(
+    ("Ong", "ongoing", "Ongoing"),
+    ("Pla", "planned", "Planned"),
+    ("Com", "completed", "Completed"),
+)
+
 CURRENCIES = Choices(
     ("AED", "aed", "aed"),
     ("AFN", "afn", "afn"),

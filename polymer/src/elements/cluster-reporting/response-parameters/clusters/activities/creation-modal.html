@@ -118,16 +118,6 @@
               required>
             </paper-input>
 
-            <paper-input
-              class="item validate full-width"
-              id="standard"
-              label="Standard"
-              value="{{data.standard}}"
-              type="string"
-              on-input="_validate"
-              required>
-            </paper-input>
-
             <paper-dropdown-menu
                 class="item validate"
                 label="Cluster"
@@ -151,14 +141,14 @@
 
             <paper-dropdown-menu
                 class="item validate"
-                label="CO ref #"
+                label="Cluster Objective"
                 id="objective"
                 on-value-changed="_validate"
                 disabled="[[isObjectivesDisabled]]"
                 always-float-label
                 required>
                 <paper-listbox
-                    selected="{{data.reference_number}}"
+                    selected="{{data.cluster_objective}}"
                     attr-for-selected="value"
                     slot="dropdown-content"
                     class="dropdown-content">
@@ -166,29 +156,9 @@
                       id="objectives"
                       is="dom-repeat"
                       items="[[objectives]]">
-                    <paper-item value="[[item.id]]">[[item.reference_number]]</paper-item>
+                    <paper-item value="[[item.id]]">[[item.title]]</paper-item>
                   </template>
                 </paper-listbox>
-            </paper-dropdown-menu>
-
-            <paper-dropdown-menu
-                class="item validate"
-                label="Frequency of reporting"
-                on-value-changed="_validate"
-                always-float-label
-                required>
-              <paper-listbox
-                  selected="{{data.frequency}}"
-                  attr-for-selected="value"
-                  slot="dropdown-content"
-                  class="dropdown-content">
-                <template
-                    id="frequencies"
-                    is="dom-repeat"
-                    items="[[frequencies]]">
-                  <paper-item value="[[item.id]]">[[item.title]]</paper-item>
-                </template>
-              </paper-listbox>
             </paper-dropdown-menu>
           </iron-form>
         </template>
@@ -240,15 +210,6 @@
           value: false,
         },
 
-        frequencies: {
-          type: Array,
-          value: [
-            {title: 'Weekly', id: 'Wee'},
-            {title: 'Monthly', id: 'Mon'},
-            {title: 'Quarterly', id: 'Qua'},
-          ],
-        },
-
         url: {
           type: String,
           computed: '_computeUrl(responsePlanID)'
@@ -293,7 +254,7 @@
       },
 
       _computeUrl: function(responsePlanID) {
-        return App.Endpoints.responseParametersClusterObjectives(responsePlanID);
+        return App.Endpoints.responseParametersClusterActivities(responsePlanID);
       },
 
       _computeObjectivesUrl: function(responsePlanID) {

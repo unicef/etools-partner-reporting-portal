@@ -49,7 +49,7 @@
 
             <li class="item">
               <labelled-item label="Project owner">
-                <span class="value">[[_withDefault(projectData.partner.title, '')]]</span>
+                <span class="value">[[_withDefault(projectData.partner, '')]]</span>
               </labelled-item>
             </li>
             <li class="item">
@@ -86,11 +86,6 @@
               </labelled-item>
             </li>
 
-            <li class="item">
-              <labelled-item label="Frequency of reporting">
-                <span class="value">[[_withDefault(projectData.frequency)]]</span>
-              </labelled-item>
-            </li>
             <li class="item">
               <labelled-item label="Description">
                 <span class="value">[[projectData.description]]</span>

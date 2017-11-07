@@ -63,6 +63,10 @@ class DisaggregationListSerializer(serializers.ModelSerializer):
             'choices',
         )
 
+class IdDisaggregationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Disaggregation
+        fields = ('id',)
 
 class IndicatorBlueprintSimpleSerializer(serializers.ModelSerializer):
     # id added explicitely here since it gets stripped out from validated_dat
@@ -651,7 +655,7 @@ class IndicatorBlueprintSerializer(serializers.ModelSerializer):
 
 class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
-    disaggregation = serializers.JSONField()
+    disaggregations = IdDisaggregationSerializer(many=True)
     object_type = serializers.CharField(
         validators=[add_indicator_object_type_validator])
     blueprint = IndicatorBlueprintSerializer()
@@ -666,7 +670,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             'object_id',
             'object_type',
             'locations',
-            'disaggregation',
+            'disaggregations',
             'frequency',
             'cs_dates',
         )
@@ -680,22 +684,17 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             raise ValidationError(
                 {"locations": "List of dict location or one dict location expected"})
 
-    def check_disaggregation(self, disaggregation):
-        if not isinstance(disaggregation, list):
+    def check_disaggregation(self, disaggregations):
+        if not isinstance(disaggregations, list) or\
+            False in [dis.get('id', False) for dis in disaggregations]:
             raise ValidationError(
-                {"disaggregation": "List of dict disaggregation expected"})
-        max_length = DisaggregationValue._meta.get_field('value').max_length
-        for dis in disaggregation:
-            for val in dis['values']:
-                if len(val) > max_length:
-                    msg = "Disaggregation Value expected max %s chars" % max_length
-                    raise ValidationError({"disaggregation": msg})
+                {"disaggregations": "List of dict disaggregation expected"})
 
     @transaction.atomic
     def create(self, validated_data):
 
         self.check_location(self.initial_data.get('locations'))
-        self.check_disaggregation(self.initial_data.get('disaggregation'))
+        self.check_disaggregation(self.initial_data.get('disaggregations'))
 
         validated_data['blueprint']['unit'] = validated_data[
             'blueprint']['display_type']
@@ -750,8 +749,8 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
         del validated_data['object_type']
         del validated_data['locations']
-        disaggregations = validated_data['disaggregation']
-        del validated_data['disaggregation']
+        disaggregations = validated_data['disaggregations']
+        del validated_data['disaggregations']
 
         self.instance = Reportable.objects.create(**validated_data)
 
@@ -759,18 +758,9 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             self.instance.locations.add(
                 Location.objects.get(id=location.get('id')))
 
-        for disaggregation in disaggregations:
-            disaggregation_instance = Disaggregation.objects.create(
-                name=disaggregation['name'],
-                reportable=self.instance,
-                active=True,
-            )
-            for value in disaggregation['values']:
-                DisaggregationValue.objects.create(
-                    disaggregation=disaggregation_instance,
-                    value=value,
-                    active=True
-                )
+        for dis in self.initial_data.get('disaggregations'):
+            self.instance.disaggregations.add(
+                Disaggregation.objects.get(id=dis.get('id')))
 
         return self.instance
 
@@ -814,7 +804,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
 class ClusterIndicatorDataSerializer(serializers.ModelSerializer):
 
-    disaggregation = DisaggregationListSerializer(many=True)
+    disaggregations = DisaggregationListSerializer(many=True)
     blueprint = IndicatorBlueprintSerializer()
     locations = IdLocationSerializer(many=True)
 
@@ -825,7 +815,7 @@ class ClusterIndicatorDataSerializer(serializers.ModelSerializer):
             'means_of_verification',
             'blueprint',
             'locations',
-            'disaggregation',
+            'disaggregations',
             'frequency',
             'cs_dates',
         )
