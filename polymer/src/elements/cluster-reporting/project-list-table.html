@@ -93,7 +93,12 @@
           <etools-prp-data-table-row details-opened="[[detailsOpened]]">
             <div slot="row-data">
               <div class="table-cell table-cell--text">
-                <!-- <a href="[[_detailUrl(project)]]"> -->[[project.title]]<!-- </a> -->
+                <template is="dom-if" if="[[_equals(page, 'response-parameters')]]">
+                  <!-- <a href="[[_detailUrl(project)]]"> -->[[project.title]]<!-- </a> -->
+                </template>
+                <template is="dom-if" if="[[!_equals(page, 'response-parameters')]]">
+                  <a href="[[_detailUrl(project)]]">[[project.title]]</a>
+                </template>
               </div>
               <div class="table-cell table-cell--text">
                 [[_commaSeparatedDictValues(project.clusters, 'title')]]
