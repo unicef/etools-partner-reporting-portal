@@ -184,25 +184,6 @@
               </paper-listbox>
             </paper-dropdown-menu>
 
-            <paper-dropdown-menu
-                class="item validate"
-                label="Frequency of reporting"
-                on-value-changed="_validate"
-                always-float-label
-                required>
-              <paper-listbox
-                  selected="{{data.frequency}}"
-                  attr-for-selected="value"
-                  slot="dropdown-content"
-                  class="dropdown-content">
-                <template
-                    is="dom-repeat"
-                    items="[[frequencies]]">
-                  <paper-item value="[[item.id]]">[[item.title]]</paper-item>
-                </template>
-              </paper-listbox>
-            </paper-dropdown-menu>
-
             <paper-input
               class="item validate"
               id="total_budget"
@@ -214,7 +195,7 @@
             </paper-input>
 
             <paper-input
-              class="item validate"
+              class="item validate full-width"
               id="funding_source"
               label="Funding Source"
               value="{{data.funding_source}}"
