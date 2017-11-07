@@ -1,9 +1,11 @@
 from __future__ import unicode_literals
 
+from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db.models.signals import post_save
+from django.utils.functional import cached_property
 
 from model_utils.models import TimeStampedModel
 
@@ -41,6 +43,10 @@ class User(AbstractUser):
 
     def get_fullname(self):
         return "%s %s" % (self.first_name, self.last_name)
+
+    @cached_property
+    def is_unicef(self):
+        return self.username == getattr(settings, 'DEFAULT_UNICEF_USER', None)
 
     @classmethod
     def send_random_password(cls, sender, instance, created, **kwargs):

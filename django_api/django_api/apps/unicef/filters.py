@@ -82,14 +82,19 @@ class ProgressReportFilter(django_filters.FilterSet):
                             method='get_due_overdue_status', label='Show only due or overdue')
     location = CharFilter(name='location', method='get_location',
                           label='Location')
+    programme_document_ext = CharFilter(name='programme_document_ext', method='get_pd_ext',
+                                        label='programme_document_ext')
 
     class Meta:
         model = ProgressReport
         fields = ['status', 'pd_ref_title', 'due_date', 'programme_document',
-                  'programme_document__id']
+                  'programme_document__id', 'programme_document__external_id']
 
     def get_status(self, queryset, name, value):
         return queryset.filter(status=value)
+
+    def get_pd_ext(self, queryset, name, value):
+        return queryset.filter(programme_document__external_id=value)
 
     def get_due_overdue_status(self, queryset, name, value):
         if value:
