@@ -115,25 +115,6 @@
       </div>
 
       <div class="row">
-        <reports-list
-            label="List of overdue indicator reports"
-            collection="overdue_indicator_reports">
-        </reports-list>
-      </div>
-
-      <template
-          is="dom-if"
-          if="[[_equals(mode, 'cluster')]]"
-          restamp="true">
-        <div class="row">
-          <reports-list
-              label="List of upcoming indicator reports in last 15 days"
-              collection="upcoming_indicator_reports">
-          </reports-list>
-        </div>
-      </template>
-
-      <div class="row">
         <constrained-reports-list></constrained-reports-list>
       </div>
 
