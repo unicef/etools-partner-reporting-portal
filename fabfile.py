@@ -76,6 +76,13 @@ def real_fixtures(fast=False):
     local('docker-compose exec django_api python manage.py generate_real_data --clean_before %s' % ("--fast" if fast else ""))
 
 
+def fake_users(fast=False):
+    """
+    Uses real sync with PMP API to get all data.
+    """
+    local('docker-compose exec django_api python manage.py generate_fake_users --clean_before')
+
+
 def update_real_fixtures(area=False):
     """
     Uses real sync with PMP API to get all data.

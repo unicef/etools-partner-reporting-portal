@@ -138,6 +138,26 @@ def clean_up_data():
         print("All ORM objects deleted")
 
 
+def generate_fake_users():
+    users_to_create = [
+        ('admin_imo', 'admin_imo@notanemail.com', IMORole),
+        ('admin_ao', 'admin_ao@notanemail.com', PartnerAuthorizedOfficerRole),
+        ('admin_pe', 'admin_pe@notanemail.com', PartnerEditorRole),
+        ('admin_pv', 'admin_pv@notanemail.com', PartnerViewerRole),
+    ]
+    users_created = []
+    for u in users_to_create:
+        admin, created = User.objects.get_or_create(username=u[0], defaults={
+            'email': u[1],
+            'is_superuser': True,
+            'is_staff': True,
+        })
+        admin.set_password('Passw0rd!')
+        admin.save()
+        admin.groups.add(u[2].as_group())
+        users_created.append(admin)
+
+
 def generate_real_data(fast=False, area=None, update=False):
 
     if not update:
