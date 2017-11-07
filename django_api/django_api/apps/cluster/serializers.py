@@ -78,8 +78,6 @@ class ClusterActivitySerializer(serializers.ModelSerializer):
 
     co_cluster_title = serializers.SerializerMethodField()
     co_title = serializers.SerializerMethodField()
-    co_reference_number = serializers.SerializerMethodField()
-    frequency_name = serializers.SerializerMethodField()
 
     class Meta:
         model = ClusterActivity
@@ -89,9 +87,6 @@ class ClusterActivitySerializer(serializers.ModelSerializer):
             'standard',
             'co_cluster_title',
             'co_title',
-            'co_reference_number',
-            'frequency',
-            'frequency_name',
             'cluster_objective',
         )
 
@@ -100,12 +95,6 @@ class ClusterActivitySerializer(serializers.ModelSerializer):
 
     def get_co_title(self, obj):
         return obj.cluster_objective.title
-
-    def get_co_reference_number(self, obj):
-        return obj.cluster_objective.reference_number
-
-    def get_frequency_name(self, obj):
-        return obj.get_frequency_display()
 
 
 class ClusterActivityPatchSerializer(serializers.ModelSerializer):

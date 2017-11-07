@@ -18,9 +18,7 @@ class TestClusterObjectiveAPIView(BaseAPITestCase):
         super(TestClusterObjectiveAPIView, self).setUp()
         self.data = {
             "cluster": Cluster.objects.first().id,
-            "reference_number": self.reference_number,
             "title": self.title,
-            "frequency": FREQUENCY_LEVEL.weekly,
         }
 
     def test_create_cluster_objective(self):
@@ -40,8 +38,6 @@ class TestClusterObjectiveAPIView(BaseAPITestCase):
 
         self.assertTrue(status.is_success(response.status_code))
         created_obj = ClusterObjective.objects.get(id=response.data['id'])
-        self.assertEquals(created_obj.reference_number, "ref no 123")
-        self.assertEquals(created_obj.frequency, FREQUENCY_LEVEL.weekly)
         self.assertEquals(
             ClusterObjective.objects.all().count(),
             base_count + 1)

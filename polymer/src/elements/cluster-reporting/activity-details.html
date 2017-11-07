@@ -62,16 +62,6 @@
                 <span class="value">[[activityData.cluster]]</span>
               </labelled-item>
             </li>
-            <li class="item">
-              <labelled-item label="CO ref.#">
-                <template is="dom-if" if="[[activityData.cluster_objective.reference_number]]">
-                  <span class="value">[[activityData.cluster_objective.reference_number]]</span>
-                </template>
-                <template is="dom-if" if="[[!activityData.cluster_objective.reference_number]]">
-                  <span class="value">---</span>
-                </template>
-              </labelled-item>
-            </li>
              <li class="item">
               <labelled-item label="Partner Project">
                 <span class="value">[[activityData.project.title]]</span>
