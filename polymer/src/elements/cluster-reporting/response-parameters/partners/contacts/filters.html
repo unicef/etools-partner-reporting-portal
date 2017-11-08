@@ -5,15 +5,9 @@
 
 <link rel="import" href="../../../../../behaviors/utils.html">
 <link rel="import" href="../../../../filter-list.html">
-<link rel="import" href="../../../../filters/text-filter/text-filter.html">
-<link rel="import" href="../../../../filters/dropdown-filter/dropdown-filter.html">
-<link rel="import" href="../../../../filters/checkbox-filter/checkbox-filter.html">
-<link rel="import" href="../../../../filters/date-filter/date-filter.html">
-<link rel="import" href="../../../../filters/status-filter/project-status-filter.html">
-<link rel="import" href="../../../../filters/cluster-location-filter/cluster-location-filter.html">
 <link rel="import" href="../../../../filters/cluster-partner-filter/cluster-partner-filter.html">
 
-<dom-module id="partner-projects-filters">
+<dom-module id="partner-contacts-filters">
   <template>
     <style include="app-grid-style">
       :host {
@@ -21,7 +15,6 @@
         margin-bottom: 25px;
         background: white;
 
-        --app-grid-columns: 3;
         --app-grid-gutter: 25px;
         --app-grid-item-height: auto;
       }
@@ -45,28 +38,13 @@
             value="[[_withDefault(queryParams.partner, '')]]">
         </cluster-partner-filter>
 
-        <text-filter
-          class="item"
-          label="Project"
-          name="title"
-          value="[[queryParams.title]]">
-        </text-filter>
-
-        <project-status-filter
-          value="[[_withDefault(queryParams.status, '')]]">
-        </project-status-filter>
-
-        <cluster-location-filter
-          class="item"
-          value="[[_withDefault(queryParams.location, '')]]">
-        </cluster-location-filter>
       </div>
     </filter-list>
   </template>
 
   <script>
     Polymer({
-      id: 'partner-projects-filters',
+      id: 'partner-contacts-filters',
 
       behaviors: [
         App.Behaviors.UtilsBehavior,

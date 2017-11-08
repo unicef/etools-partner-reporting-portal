@@ -45,12 +45,15 @@
       <etools-data-table-header
           no-collapse
           label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
+        <etools-data-table-column field="activity">
+          <div class="table-column">Cluster Activity Title</div>
+        </etools-data-table-column>
         <template is="dom-if" if="[[!isMinimalList]]" restamp="true">
-          <etools-data-table-column field="activity">
-            <div class="table-column">Cluster Activity</div>
-          </etools-data-table-column>
           <etools-data-table-column field="cluster">
             <div class="table-column">Cluster</div>
+          </etools-data-table-column>
+          <etools-data-table-column field="cluster">
+            <div class="table-column">Cluster Objective Title</div>
           </etools-data-table-column>
         </template>
       </etools-data-table-header>
@@ -69,6 +72,9 @@
             <template is="dom-if" if="[[!isMinimalList]]" restamp="true">
               <div class="table-cell table-cell--text">
                 [[activity.co_cluster_title]]
+              </div>
+              <div class="table-cell table-cell--text">
+                [[activity.co_title]]
               </div>
             </template>
           </div>
