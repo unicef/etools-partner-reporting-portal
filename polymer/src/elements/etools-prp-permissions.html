@@ -7,96 +7,44 @@
 <dom-module id="etools-prp-permissions">
   <script>
     (function () {
-      var isViewer = isMember.bind(null, App.Constants.GROUP_VIEWER);
-      var isIMO = isMember.bind(null, App.Constants.GROUP_IMO);
-      var isAuthorizedOfficer = isMember.bind(null, App.Constants.GROUP_AUTHORIZED_OFFICER);
-
       var permissions = {
-        viewProgressReport: App.Constants.GROUP_ALL,
+        viewProgressReport: App.Constants.GROUP_IP_ALL,
 
-        viewProgressReportDraft: App.Constants.GROUP_ALL,
+        viewProgressReportDraft: App.Constants.GROUP_IP_ALL,
 
         editProgressReport: [
-          App.Constants.GROUP_AUTHORIZED_OFFICER,
-          App.Constants.GROUP_EDITOR,
+          App.Constants.GROUP_IP_AUTHORIZED_OFFICER,
+          App.Constants.GROUP_IP_EDITOR,
         ],
 
-        exportSubmittedProgressReport: App.Constants.GROUP_ALL,
+        exportSubmittedProgressReport: App.Constants.GROUP_IP_ALL,
 
         exportDraftProgressReport: [
-          App.Constants.GROUP_AUTHORIZED_OFFICER,
-          App.Constants.GROUP_EDITOR,
+          App.Constants.GROUP_IP_AUTHORIZED_OFFICER,
+          App.Constants.GROUP_IP_EDITOR,
         ],
 
         importDraftProgressReport: [
-          App.Constants.GROUP_AUTHORIZED_OFFICER,
-          App.Constants.GROUP_EDITOR,
+          App.Constants.GROUP_IP_AUTHORIZED_OFFICER,
+          App.Constants.GROUP_IP_EDITOR,
         ],
 
-        viewPdDetails: App.Constants.GROUP_ALL,
+        viewPdDetails: App.Constants.GROUP_IP_ALL,
 
         savePdReport: [
-          App.Constants.GROUP_AUTHORIZED_OFFICER,
-          App.Constants.GROUP_EDITOR,
+          App.Constants.GROUP_IP_AUTHORIZED_OFFICER,
+          App.Constants.GROUP_IP_EDITOR,
         ],
 
         submitDraftProgressReport: [
-          App.Constants.GROUP_AUTHORIZED_OFFICER,
+          App.Constants.GROUP_IP_AUTHORIZED_OFFICER,
         ],
 
         changeProgrammeDocumentCalculationMethod: [
-          App.Constants.GROUP_AUTHORIZED_OFFICER,
-          App.Constants.GROUP_EDITOR,
+          App.Constants.GROUP_IP_AUTHORIZED_OFFICER,
+          App.Constants.GROUP_IP_EDITOR,
         ],
-
-        createClusterEntities: function (params) {
-          return isIMO(params.groups);
-        },
-
-        createClusterEntitiesForCluster: function (params, clusterId) {
-          return params.imoClusters.some(function (cluster) {
-            return cluster.id === clusterId;
-          });
-        },
-
-        editIndicatorReport: function (params, clusterId, partnerId) {
-          switch (true) {
-            case isViewer(params.groups):
-              return false;
-
-            case isIMO(params.groups):
-              return params.imoClusters.some(function (cluster) {
-                return cluster.id === clusterId;
-              });
-
-            default:
-              return partnerId === (params.partner && params.partner.id);
-          }
-        },
-
-        submitIndicatorReport: function (params, clusterId, partnerId) {
-          switch (true) {
-            case isIMO(params.groups):
-              return params.imoClusters.some(function (cluster) {
-                return cluster.id === clusterId;
-              });
-
-            case isAuthorizedOfficer(params.groups):
-              return partnerId === (params.partner && params.partner.id);
-
-            default:
-              return false;
-          }
-        },
-
-        viewClusterContent: App.Constants.GROUP_CLUSTER_ALL,
       };
-
-      function isMember(groupName, groups) {
-        return groups.some(function (group) {
-          return group.name === groupName;
-        });
-      }
 
       Polymer({
         is: 'etools-prp-permissions',
@@ -111,53 +59,27 @@
             statePath: 'userProfile.profile',
           },
 
-          groups: {
-            type: Array,
-            computed: '_computeGroups(profile)',
-          },
-
-          imoClusters: {
-            type: Array,
-            computed: '_computeImoClusters(profile)',
-          },
-
-          partner: {
-            type: Object,
-            statePath: 'partner.current',
-          },
-
-          params: {
-            type: Object,
-            computed: '_computeParams(groups, imoClusters, partner)',
-          },
-
           permissions: {
             type: Object,
-            computed: '_computePermissions(params)',
+            computed: '_computePermissions(profile)',
             notify: true,
           },
-
         },
 
-        _computePermissions: function (params) {
+        _computePermissions: function (profile) {
+          var groups = profile.groups || [];
+
           return Object.keys(permissions).reduce(function (acc, key) {
             var granted = permissions[key];
 
             acc[key] = (function () {
               switch (true) {
                 case Array.isArray(granted):
-                  return params.groups.some(function (group) {
+                  return groups.some(function (group) {
                     return granted.indexOf(group.name) !== -1;
                   });
 
-                case typeof granted === 'function':
-                  return function () {
-                    var args = [].slice.call(arguments);
-
-                    return granted.apply(null, [params].concat(args));
-                  };
-
-                case granted === App.Constants.GROUP_ALL:
+                case granted === App.Constants.GROUP_IP_ALL:
                   return true;
 
                 default:
@@ -167,22 +89,6 @@
 
             return acc;
           }, {});
-        },
-
-        _computeGroups: function (profile) {
-          return profile.groups || [];
-        },
-
-        _computeImoClusters: function (profile) {
-          return profile.imo_clusters || [];
-        },
-
-        _computeParams: function (groups, imoClusters, partner) {
-          return {
-            groups: groups,
-            imoClusters: imoClusters,
-            partner: partner,
-          };
         },
       });
     }());

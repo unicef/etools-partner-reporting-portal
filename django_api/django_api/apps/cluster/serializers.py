@@ -66,7 +66,6 @@ class ClusterObjectivePatchSerializer(ClusterObjectiveSerializer):
 class ClusterActivitySerializer(serializers.ModelSerializer):
 
     co_cluster_title = serializers.SerializerMethodField()
-    co_cluster_id = serializers.SerializerMethodField()
     co_title = serializers.SerializerMethodField()
 
     class Meta:
@@ -75,13 +74,9 @@ class ClusterActivitySerializer(serializers.ModelSerializer):
             'id',
             'title',
             'co_cluster_title',
-            'co_cluster_id',
             'co_title',
             'cluster_objective',
         )
-
-    def get_co_cluster_id(self, obj):
-        return obj.cluster_objective.cluster.id
 
     def get_co_cluster_title(self, obj):
         return obj.cluster_objective.cluster.get_type_display()

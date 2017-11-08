@@ -37,6 +37,11 @@
         params="[[queryParams]]">
     </etools-prp-ajax>
 
+    <etools-prp-ajax
+        id="partnerDetails"
+        url="[[partnerDetailsUrl]]">
+    </etools-prp-ajax>
+
     <page-body>
       <planned-action-projects-filters></planned-action-projects-filters>
 
@@ -87,6 +92,21 @@
           type: String,
           computed: '_computeUrl(responsePlanID, queryParams, partnerID)'
         },
+
+        partnerDetailsUrl: {
+          type: String,
+          value: App.Endpoints.partnerDetails(),
+          observer: '_fetchCurrentPartner',
+        },
+      },
+
+      _fetchCurrentPartner: function () {
+        var partnerThunk = this.$.partnerDetails.thunk();
+
+        this.dispatch(App.Actions.fetchPartner(partnerThunk))
+            .catch(function (err) { // jshint ignore:line
+            // TODO: error handling
+            });
       },
 
       _computeUrl: function (responsePlanID) {

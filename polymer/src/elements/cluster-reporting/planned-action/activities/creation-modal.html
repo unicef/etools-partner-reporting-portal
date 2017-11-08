@@ -77,6 +77,11 @@
     </style>
 
     <etools-prp-ajax
+        id="partner"
+        url="[[partnerUrl]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
         id="activity"
         url="[[activityUrl]]"
         method="post"
@@ -483,6 +488,11 @@
           type: Object,
           statePath: 'partner.current',
         },
+
+        partnerUrl: {
+          type: String,
+          value: App.Endpoints.partnerDetails(),
+        },
       },
 
       listeners: {
@@ -558,7 +568,7 @@
         this.set('data.cluster.cluster_activity', undefined);
         this.set('activitiesParams.cluster_id', clusterId);
         this.set('activitiesUrl',
-            App.Endpoints.responseParametersClusterActivities(this.responsePlanId)
+            App.Endpoints.responseParametersClusterActivities(this.responsePlanId) 
             + '?cluster_id=' + clusterId);
         this.$.activities.abort();
 
@@ -611,6 +621,23 @@
             });
       },
 
+      _fetchPartner: function (partnerId) {
+        this.debounce('fetch-partner', function () {
+          var partnerThunk;
+
+          if (typeof partnerId !== 'undefined') {
+            return;
+          }
+
+          partnerThunk = this.$.partner.thunk();
+
+          this.dispatch(App.Actions.fetchPartner(partnerThunk))
+              .catch(function (err) { // jshint ignore:line
+                // TODO: error handling
+              });
+        }, 100);
+      },
+
       _save: function () {
         var fields = [].slice.call(
           Polymer.dom(this.root).querySelectorAll('.validate')
@@ -647,6 +674,12 @@
 
               self.set('updatePending', false);
             });
+      },
+
+      detached: function () {
+        if (this.isDebouncerActive('fetch-partner')) {
+          this.cancelDebouncer('fetch-partner');
+        }
       },
     });
   </script>

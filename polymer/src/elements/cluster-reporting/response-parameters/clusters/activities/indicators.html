@@ -4,7 +4,6 @@
 <link rel="import" href="../../../../../../bower_components/iron-location/iron-query-params.html">
 
 <link rel="import" href="../../../../etools-prp-ajax.html">
-<link rel="import" href="../../../../etools-prp-permissions.html">
 <link rel="import" href="../../../../page-body.html">
 <link rel="import" href="../../../indicator-modal.html">
 <link rel="import" href="../../../../../behaviors/utils.html">
@@ -27,10 +26,6 @@
       }
     </style>
 
-    <etools-prp-permissions
-        permissions="{{permissions}}">
-    </etools-prp-permissions>
-
     <iron-location query="{{query}}"></iron-location>
 
     <iron-query-params
@@ -45,16 +40,11 @@
     </etools-prp-ajax>
 
     <page-body>
-      <template
-          is="dom-if"
-          if="[[canAddIndicator]]"
-          restamp="true">
-        <div id="action">
-          <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
-            Add Cluster Activity Indicator
-          </paper-button>
-        </div>
-      </template>
+      <div id="action">
+        <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
+          Add Cluster Activity Indicator
+        </paper-button>
+      </div>
 
       <indicator-modal
         id="indicatorModal"
@@ -79,13 +69,9 @@
       ],
 
       properties: {
-        permissions: Object,
-
         queryParams: Object,
 
         activityId: Number,
-
-        clusterId: Number,
 
         data: {
           type: Array,
@@ -110,11 +96,6 @@
         allIndicatorsCount: {
           type: Number,
           statePath: 'clusterActivities.indicatorsCount',
-        },
-
-        canAddIndicator: {
-          type: Boolean,
-          computed: '_computeCanAddIndicator(permissions, clusterId)',
         },
       },
 
@@ -158,11 +139,6 @@
           .catch(function (err) { // jshint ignore:line
               // TODO: error handling.
           });
-      },
-
-      _computeCanAddIndicator: function (permissions, clusterId) {
-        return permissions.createClusterEntities() &&
-            permissions.createClusterEntitiesForCluster(clusterId);
       },
     });
   </script>

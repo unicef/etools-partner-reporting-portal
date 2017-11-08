@@ -2,7 +2,6 @@
 
 <link rel="import" href="dropdown-form-input.html">
 <link rel="import" href="../etools-prp-ajax.html">
-<link rel="import" href="../etools-prp-permissions.html">
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../redux/store.html">
 
@@ -19,9 +18,6 @@
         url="[[clusterNamesUrl]]">
     </etools-prp-ajax>
 
-    <etools-prp-permissions
-        permissions="{{permissions}}">
-    </etools-prp-permissions>
   </template>
 
   <script>
@@ -33,11 +29,10 @@
       ],
 
       properties: {
-        permissions: Object,
-
         clusterNamesUrl: {
           type: String,
           computed: '_computeClusterNamesUrl(responsePlanID)',
+          observer: '_fetchClusterNames',
         },
 
         responsePlanID: {
@@ -52,24 +47,18 @@
         },
       },
 
-      observers: [
-        '_fetchClusterNames(clusterNamesUrl, permissions)',
-      ],
-
       _computeClusterNamesUrl: function (responsePlanID) {
         return App.Endpoints.clusterNames(responsePlanID);
       },
 
-      _fetchClusterNames: function (_, permissions) {
+      _fetchClusterNames: function () {
         var self = this;
 
         this.$.clusterNames.abort();
 
         this.$.clusterNames.thunk()()
             .then(function (res) {
-              self.set('clusters', res.data.filter(function (cluster) {
-                return permissions.createClusterEntitiesForCluster(cluster.id);
-              }));
+              self.set('clusters', res.data);
             })
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling

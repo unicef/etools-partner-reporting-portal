@@ -25,6 +25,10 @@
         return this._buildUrl('/indicator/' + reportableId + '/indicator-reports/');
       },
 
+      partnerDetails: function () {
+        return this._buildUrl('/partner/partner-details/');
+      },
+
       programmeDocuments: function (locationId) {
         return this._buildUrl('/unicef/' + locationId + '/programme-document/');
       },
@@ -128,7 +132,7 @@
       },
 
       plannedActionsActivityOverview: function(responsePlanId, activityId) {
-        return this._buildUrl('/partner/' + responsePlanId
+        return this._buildUrl('/partner/' + responsePlanId 
           + '/partner-activity/' + activityId + '/');
       },
 

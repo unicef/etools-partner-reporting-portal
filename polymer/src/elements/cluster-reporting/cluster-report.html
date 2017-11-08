@@ -19,7 +19,6 @@
 <link rel="import" href="../report-status.html">
 <link rel="import" href="../etools-prp-ajax.html">
 <link rel="import" href="../etools-prp-number.html">
-<link rel="import" href="../etools-prp-permissions.html">
 <link rel="import" href="../indicator-details.html">
 <link rel="import" href="../../styles/shared-styles.html">
 <link rel="import" href="../../styles/buttons.html">
@@ -149,10 +148,6 @@
       }
     </style>
 
-    <etools-prp-permissions
-        permissions="{{permissions}}">
-    </etools-prp-permissions>
-
     <iron-location
         query="{{query}}">
     </iron-location>
@@ -246,7 +241,7 @@
             <div class="column layout horizontal center-center flex-none">
               <template
                   is="dom-if"
-                  if="[[!_equals(submitMode, 'view')]]"
+                  if="[[!_equals(mode, 'view')]]"
                   restamp="true">
                 <paper-button
                     class="btn-primary"
@@ -354,7 +349,7 @@
             no-animation>
           <reportable-meta
               data="[[data]]"
-              mode="[[editMode]]"
+              mode="[[mode]]"
               allow-no-status>
           </reportable-meta>
 
@@ -363,7 +358,7 @@
             indicator-name="[[data.indicator_name]]"
             indicator-id="[[data.id]]"
             reporting-period="[[data.reporting_period]]"
-            override-mode="[[editMode]]">
+            override-mode="[[mode]]">
           </indicator-details>
         </iron-collapse>
       </div>
@@ -383,8 +378,6 @@
       ],
 
       properties: {
-        permissions: Object,
-
         data: Object,
 
         reportMeta: Object,
@@ -426,16 +419,6 @@
         indicatorType: {
           type: String,
           computed: '_computeIndicatorType(data)',
-        },
-
-        editMode: {
-          type: String,
-          computed: '_computeEditMode(mode, data, permissions)',
-        },
-
-        submitMode: {
-          type: String,
-          computed: '_computeSubmitMode(mode, data, permissions)',
         },
       },
 
@@ -569,30 +552,6 @@
         return Object.assign({}, queryParams, {
           indicator: data.id,
         });
-      },
-
-      _computeEditMode: function (mode, data, permissions) {
-        var canEdit;
-
-        if (mode === 'view') {
-          return mode;
-        }
-
-        canEdit = permissions.editIndicatorReport(data.cluster_id, data.partner_id);
-
-        return canEdit ? mode : 'view';
-      },
-
-      _computeSubmitMode: function (mode, data, permissions) {
-        var canSubmit;
-
-        if (mode === 'view') {
-          return mode;
-        }
-
-        canSubmit = permissions.submitIndicatorReport(data.cluster_id, data.partner_id);
-
-        return canSubmit ? mode : 'view';
       },
 
       detached: function () {

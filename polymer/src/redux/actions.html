@@ -60,7 +60,6 @@
           .then(function(res) {
             dispatch(App.Actions.setUserProfile(res.data));
             dispatch(App.Actions.setAccountType(res.data));
-            dispatch(App.Actions.setPartner(res.data.partner));
           });
         };
       },
@@ -151,6 +150,17 @@
       },
 
       // Partner data
+      fetchPartner: function (partnerThunk) {
+        return function (dispatch) {
+          return partnerThunk()
+              .then(function (res) {
+                var partnerDetails = res.data;
+
+                dispatch(App.Actions.setPartner(partnerDetails));
+              });
+        };
+      },
+
       setPartner: function (partnerData) {
         return {
           type: App.Constants.SET_PARTNER,
