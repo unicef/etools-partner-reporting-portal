@@ -101,7 +101,7 @@
                 <template is="dom-if" if="[[_equals(page, 'response-parameters')]]">
                   [[activity.title]]
                 </template>
-                <template is="dom-if" if="[[_equals(page, 'response-parameters')]]">
+                <template is="dom-if" if="[[!_equals(page, 'response-parameters')]]">
                   <a href="[[_detailUrl(activity)]]">[[activity.title]]</a>
                 </template>
               </div>
