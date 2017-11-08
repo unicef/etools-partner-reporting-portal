@@ -7,48 +7,50 @@
 <dom-module id="etools-prp-permissions">
   <script>
     (function () {
-      var permissions = {
-        viewProgressReport: App.Constants.GROUP_IP_ALL,
+      var isViewer = isMember.bind(null, App.Constants.GROUP_VIEWER);
+      var isIMO = isMember.bind(null, App.Constants.GROUP_IMO);
+      var isAuthorizedOfficer = isMember.bind(null, App.Constants.GROUP_AUTHORIZED_OFFICER);
 
-        viewProgressReportDraft: App.Constants.GROUP_IP_ALL,
+      var permissions = {
+        viewProgressReport: App.Constants.GROUP_ALL,
+
+        viewProgressReportDraft: App.Constants.GROUP_ALL,
 
         editProgressReport: [
-          App.Constants.GROUP_IP_AUTHORIZED_OFFICER,
-          App.Constants.GROUP_IP_EDITOR,
+          App.Constants.GROUP_AUTHORIZED_OFFICER,
+          App.Constants.GROUP_EDITOR,
         ],
 
-        exportSubmittedProgressReport: App.Constants.GROUP_IP_ALL,
+        exportSubmittedProgressReport: App.Constants.GROUP_ALL,
 
         exportDraftProgressReport: [
-          App.Constants.GROUP_IP_AUTHORIZED_OFFICER,
-          App.Constants.GROUP_IP_EDITOR,
+          App.Constants.GROUP_AUTHORIZED_OFFICER,
+          App.Constants.GROUP_EDITOR,
         ],
 
         importDraftProgressReport: [
-          App.Constants.GROUP_IP_AUTHORIZED_OFFICER,
-          App.Constants.GROUP_IP_EDITOR,
+          App.Constants.GROUP_AUTHORIZED_OFFICER,
+          App.Constants.GROUP_EDITOR,
         ],
 
-        viewPdDetails: App.Constants.GROUP_IP_ALL,
+        viewPdDetails: App.Constants.GROUP_ALL,
 
         savePdReport: [
-          App.Constants.GROUP_IP_AUTHORIZED_OFFICER,
-          App.Constants.GROUP_IP_EDITOR,
+          App.Constants.GROUP_AUTHORIZED_OFFICER,
+          App.Constants.GROUP_EDITOR,
         ],
 
         submitDraftProgressReport: [
-          App.Constants.GROUP_IP_AUTHORIZED_OFFICER,
+          App.Constants.GROUP_AUTHORIZED_OFFICER,
         ],
 
         changeProgrammeDocumentCalculationMethod: [
-          App.Constants.GROUP_IP_AUTHORIZED_OFFICER,
-          App.Constants.GROUP_IP_EDITOR,
+          App.Constants.GROUP_AUTHORIZED_OFFICER,
+          App.Constants.GROUP_EDITOR,
         ],
 
         createClusterEntities: function (params) {
-          return params.groups.some(function (group) {
-            return group.name === App.Constants.GROUP_IMO;
-          });
+          return isIMO(params.groups);
         },
 
         createClusterEntitiesForCluster: function (params, clusterId) {
@@ -57,8 +59,44 @@
           });
         },
 
+        editIndicatorReport: function (params, clusterId, partnerId) {
+          switch (true) {
+            case isViewer(params.groups):
+              return false;
+
+            case isIMO(params.groups):
+              return params.imoClusters.some(function (cluster) {
+                return cluster.id === clusterId;
+              });
+
+            default:
+              return partnerId === (params.partner && params.partner.id);
+          }
+        },
+
+        submitIndicatorReport: function (params, clusterId, partnerId) {
+          switch (true) {
+            case isIMO(params.groups):
+              return params.imoClusters.some(function (cluster) {
+                return cluster.id === clusterId;
+              });
+
+            case isAuthorizedOfficer(params.groups):
+              return partnerId === (params.partner && params.partner.id);
+
+            default:
+              return false;
+          }
+        },
+
         viewClusterContent: App.Constants.GROUP_CLUSTER_ALL,
       };
+
+      function isMember(groupName, groups) {
+        return groups.some(function (group) {
+          return group.name === groupName;
+        });
+      }
 
       Polymer({
         is: 'etools-prp-permissions',
@@ -119,8 +157,7 @@
                     return granted.apply(null, [params].concat(args));
                   };
 
-                case granted === App.Constants.GROUP_IP_ALL:
-                case granted === App.Constants.GROUP_CLUSTER_ALL:
+                case granted === App.Constants.GROUP_ALL:
                   return true;
 
                 default:

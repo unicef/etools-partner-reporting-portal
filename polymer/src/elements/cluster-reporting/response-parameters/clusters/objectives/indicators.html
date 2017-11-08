@@ -160,7 +160,8 @@
       },
 
       _computeCanAddIndicator: function (permissions, clusterId) {
-        return permissions.createClusterEntitiesForCluster(clusterId);
+        return permissions.createClusterEntities() &&
+            permissions.createClusterEntitiesForCluster(clusterId);
       },
     });
   </script>
