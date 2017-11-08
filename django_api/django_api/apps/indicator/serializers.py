@@ -862,6 +862,7 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
     cluster_id = serializers.SerializerMethodField()
     project = serializers.SerializerMethodField()
     partner = serializers.SerializerMethodField()
+    partner_id = serializers.SerializerMethodField()
     partner_activity = serializers.SerializerMethodField()
     is_draft = serializers.SerializerMethodField()
     can_submit = serializers.SerializerMethodField()
@@ -886,6 +887,7 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
             'cluster_id',
             'project',
             'partner',
+            'partner_id',
             'partner_activity',
             'is_draft',
             'can_submit',
@@ -944,12 +946,18 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
         else:
             return ''
 
-    def get_partner(self, obj):
+    def _get_partner(self, obj):
         if isinstance(obj.reportable.content_object,
                       (PartnerProject, PartnerActivity)):
-            return obj.reportable.content_object.partner.title
+            return obj.reportable.content_object.partner
         else:
-            return ''
+            return None
+
+    def get_partner(self, obj):
+        return self._get_partner(obj).title
+
+    def get_partner_id(self, obj):
+        return self._get_partner(obj).id
 
     def get_partner_activity(self, obj):
         if isinstance(obj.reportable.content_object, (PartnerProject, )):
