@@ -859,6 +859,7 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
     reportable = IndicatorListSerializer()
     reporting_period = serializers.SerializerMethodField()
     cluster = serializers.SerializerMethodField()
+    cluster_id = serializers.SerializerMethodField()
     project = serializers.SerializerMethodField()
     partner = serializers.SerializerMethodField()
     partner_activity = serializers.SerializerMethodField()
@@ -882,6 +883,7 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
             'overall_status',
             'narrative_assessment',
             'cluster',
+            'cluster_id',
             'project',
             'partner',
             'partner_activity',
@@ -900,13 +902,25 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
             obj.time_period_end.strftime(settings.PRINT_DATA_FORMAT)
         )
 
-    def get_cluster(self, obj):
+    def _get_cluster(self, obj):
         if isinstance(obj.reportable.content_object, (ClusterObjective, )):
-            return obj.reportable.content_object.cluster.title
+            return obj.reportable.content_object.cluster
         elif isinstance(obj.reportable.content_object, (ClusterActivity, )):
-            return obj.reportable.content_object.cluster_objective.cluster.title
+            return obj.reportable.content_object.cluster_objective.cluster
+        elif isinstance(obj.reportable.content_object, (PartnerActivity, )):
+            return obj.reportable.content_object.cluster_activity.cluster_objective.cluster
+        elif isinstance(obj.reportable.content_object, (PartnerProject, )):
+            return obj.reportable.content_object.clusters.first()
         else:
-            ''
+            return None
+
+    def get_cluster(self, obj):
+        cluster = self._get_cluster(obj)
+        return cluster.title if cluster else ""
+
+    def get_cluster_id(self, obj):
+        cluster = self._get_cluster(obj)
+        return cluster.id if cluster else ""
 
     def get_project(self, obj):
         if isinstance(obj.reportable.content_object, (PartnerProject, )):
