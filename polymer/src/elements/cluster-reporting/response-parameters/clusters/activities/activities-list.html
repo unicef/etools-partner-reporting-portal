@@ -63,10 +63,10 @@
           initial-count="[[pageSize]]">
         <etools-data-table-row no-collapse>
           <div slot="row-data">
-            <template is="dom-if" if="[[!isMinimalList]]" restamp="true">
             <div class="table-cell table-cell--text">
               <a href="[[_detailUrl(activity.id)]]">[[activity.title]]</a>
             </div>
+            <template is="dom-if" if="[[!isMinimalList]]" restamp="true">
               <div class="table-cell table-cell--text">
                 [[activity.co_cluster_title]]
               </div>

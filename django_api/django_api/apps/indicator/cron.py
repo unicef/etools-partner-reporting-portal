@@ -25,8 +25,7 @@ class IndicatorReportOverDueCronJob(CronJobBase):
             print("Indicator Report: %s" % report.id)
             due_date = report.due_date or report.time_period_end + \
                 timedelta(days=self.OVERDUE_DAYS)
-            if due_date < datetime.now().date(
-            ) and report.report_status != INDICATOR_REPORT_STATUS.overdue:
+            if due_date < datetime.now().date() and report.report_status != INDICATOR_REPORT_STATUS.overdue:
                 report.report_status = INDICATOR_REPORT_STATUS.overdue
                 report.save()
                 updates.append(['Overdue', report])
