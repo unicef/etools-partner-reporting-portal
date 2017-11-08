@@ -673,6 +673,8 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             'disaggregations',
             'frequency',
             'cs_dates',
+            'target',
+            'baseline',
         )
 
     def get_object_type(self, obj):
