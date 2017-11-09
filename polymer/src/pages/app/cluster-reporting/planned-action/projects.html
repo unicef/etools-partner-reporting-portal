@@ -8,6 +8,7 @@
 <link rel="import" href="../../../../elements/cluster-reporting/planned-action/projects/creation-modal.html">
 <link rel="import" href="../../../../elements/cluster-reporting/project-list-table.html">
 <link rel="import" href="../../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../../elements/etools-prp-permissions.html">
 <link rel="import" href="../../../../styles/shared-styles.html">
 <link rel="import" href="../../../../styles/buttons.html">
 
@@ -23,6 +24,10 @@
         @apply(--layout-end-justified)
       }
     </style>
+
+    <etools-prp-permissions
+        permissions="{{permissions}}">
+    </etools-prp-permissions>
 
     <iron-location query="{{query}}"></iron-location>
 
@@ -40,11 +45,17 @@
     <page-body>
       <planned-action-projects-filters></planned-action-projects-filters>
 
-      <div id="action">
-        <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
-          Add Project
-        </paper-button>
-      </div>
+
+      <template
+          is="dom-if"
+          if="[[permissions.createPartnerEntities]]"
+          restamp="true">
+        <div id="action">
+          <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
+            Add Project
+          </paper-button>
+        </div>
+      </template>
 
       <planned-action-projects-modal id="modal"></planned-action-projects-modal>
 
@@ -71,6 +82,7 @@
       ],
 
       properties: {
+        permissions: Object,
         queryParams: Object,
 
         responsePlanID: {
