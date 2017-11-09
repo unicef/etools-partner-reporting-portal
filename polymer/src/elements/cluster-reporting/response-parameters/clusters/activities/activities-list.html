@@ -30,9 +30,9 @@
       a {
         color: var(--theme-primary-color);
       }
-      a#edit {
+      a.edit {
         text-decoration: none;
-      },
+      }
 
       .wrapper {
         position: relative;
@@ -81,7 +81,7 @@
                 [[activity.co_cluster_title]]
               </div>
               <div class="table-cell table-cell--text">
-                <a href="#" id="[[activity.id]]" on-tap="_openModal">EDIT</a>
+                <a class="edit" href="#" id="[[activity.id]]" on-tap="_openModal">EDIT</a>
               </div>
             </template>
           </div>
