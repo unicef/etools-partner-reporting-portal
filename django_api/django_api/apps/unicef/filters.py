@@ -85,6 +85,8 @@ class ProgressReportFilter(django_filters.FilterSet):
     programme_document_ext = CharFilter(name='programme_document_ext', method='get_pd_ext',
                                         label='programme_document_ext')
 
+    # We need CP Output filter.. we're passing an id and you can check against external_cp_output_id
+    # we need a Section filter, newly added section to the prp api will come from "sections"
     class Meta:
         model = ProgressReport
         fields = ['status', 'pd_ref_title', 'due_date', 'programme_document',
@@ -95,6 +97,7 @@ class ProgressReportFilter(django_filters.FilterSet):
 
     def get_pd_ext(self, queryset, name, value):
         return queryset.filter(programme_document__external_id=value)
+
 
     def get_due_overdue_status(self, queryset, name, value):
         if value:

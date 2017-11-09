@@ -205,15 +205,15 @@ def process_programme_documents(fast=False, area=False):
 
                             # Parsing expecting results and set them active, rest will stay inactive for this PD
                             for d in item['expected_results']:
-
+                                # don't forget about reporting periods
                                 # Create PDResultLink
                                 d['programme_document'] = pd.id
                                 pdresultlink = process_model(PDResultLink, PMPPDResultLinkSerializer, d,
                                                                   {'external_id': d['result_link'],
-                                                                   'external_cp_output_id': d['id']})
+                                                                   'external_cp_output_id': d['id']}) # d['cp_output']['id'], maye add output title: d['cp_output']['title'] need to align in the serializer
 
                                 # Create LLO
-                                d['cp_output'] = pdresultlink.id
+                                d['cp_output'] = pdresultlink.id # this model was renamed
                                 llo = process_model(LowerLevelOutput, PMPLLOSerializer, d,
                                                          {'external_id': d['id']})
                                 # Mark LLO as active
@@ -231,15 +231,15 @@ def process_programme_documents(fast=False, area=False):
                                         # Get blueprint of parent indicator
                                         try:
                                             blueprint = Reportable.objects.get(
-                                                external_id=i['cluster_indicator_id']).blueprint
+                                                external_id=i['cluster_indicator_id']).blueprint  # This should be "id=i['cluster_indicator_id']"
                                         except Reportable.DoesNotExist:
-                                            blueprint = None
+                                            blueprint = None  # Print/Raise Exception?
                                     else:
                                         # Create IndicatorBlueprint
                                         i['disaggregatable'] = True
                                         blueprint = process_model(IndicatorBlueprint,
                                                                        PMPIndicatorBlueprintSerializer, i,
-                                                                       {'external_id': i['id']})
+                                                                       {'external_id': i['id']})  # we're not passing in the blueprint ID.. only the "Applied Indicator" id (aka Reportable) use newly added blueprint_id
 
                                     locations = list()
                                     for l in i['locations']:
@@ -247,8 +247,8 @@ def process_programme_documents(fast=False, area=False):
                                         # TODO: assign country after PMP add these
                                         # fields into API
                                         l['gateway_country'] = workspace.countries.all()[
-                                            0].id
-                                        l['admin_level'] = 1
+                                            0].id  # TODO: later figure out how to fix this on eTools PMP side
+                                        l['admin_level'] = 1  # you can now use l.admin_level .. however this can be null in our case if data is messed up
                                         if not l['pcode']:
                                             print("Location code empty! Skipping!")
                                             continue
