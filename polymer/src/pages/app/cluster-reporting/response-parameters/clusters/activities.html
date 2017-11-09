@@ -10,6 +10,7 @@
 <link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/clusters/activities/creation-modal.html">
 <link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/clusters/activities/activities-list.html">
 <link rel="import" href="../../../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../../../elements/etools-prp-permissions.html">
 <link rel="import" href="../../../../../styles/table-styles.html">
 <link rel="import" href="../../../../../styles/shared-styles.html">
 <link rel="import" href="../../../../../styles/buttons.html">
@@ -32,6 +33,10 @@
       }
     </style>
 
+    <etools-prp-permissions
+        permissions="{{permissions}}">
+    </etools-prp-permissions>
+
     <iron-location query="{{query}}"></iron-location>
 
     <iron-query-params
@@ -48,13 +53,18 @@
     <page-body>
       <cluster-activities-filters></cluster-activities-filters>
 
-      <cluster-activities-modal id="modal"></cluster-activities-modal>
+      <template
+          is="dom-if"
+          if="[[_canAddActivity(permissions)]]"
+          restamp="true">
+        <cluster-activities-modal id="modal"></cluster-activities-modal>
 
-      <div id="action">
-        <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
-          Add Cluster Activity
-        </paper-button>
-      </div>
+        <div id="action">
+          <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
+            Add Cluster Activity
+          </paper-button>
+        </div>
+      </template>
 
       <clusters-activities-list></clusters-activities-list>
     </page-body>
@@ -75,7 +85,7 @@
       ],
 
       properties: {
-
+        permissions: Object,
         queryParams: Object,
 
         activitiesUrl: {
@@ -122,6 +132,10 @@
                 // TODO: error handling.
             });
           }, 300);
+      },
+
+      _canAddActivity: function (permissions) {
+        return permissions.createClusterEntities();
       },
 
       detached: function () {
