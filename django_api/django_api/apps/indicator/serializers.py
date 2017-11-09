@@ -912,7 +912,10 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
         elif isinstance(obj.reportable.content_object, (ClusterActivity, )):
             return obj.reportable.content_object.cluster_objective.cluster
         elif isinstance(obj.reportable.content_object, (PartnerActivity, )):
-            return obj.reportable.content_object.cluster_activity.cluster_objective.cluster
+            if obj.reportable.content_object.cluster_activity:
+                return obj.reportable.content_object.cluster_activity.cluster_objective.cluster
+            else:
+                return obj.reportable.content_object.cluster_objective.cluster
         elif isinstance(obj.reportable.content_object, (PartnerProject, )):
             return obj.reportable.content_object.clusters.first()
         else:
