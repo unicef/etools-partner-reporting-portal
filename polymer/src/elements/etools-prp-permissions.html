@@ -89,7 +89,15 @@
           }
         },
 
-        viewClusterContent: App.Constants.GROUP_CLUSTER_ALL,
+        createPartnerEntities: [
+          App.Constants.GROUP_AUTHORIZED_OFFICER,
+        ],
+
+        viewPlannedAction: [
+          App.Constants.GROUP_AUTHORIZED_OFFICER,
+          App.Constants.GROUP_EDITOR,
+          App.Constants.GROUP_VIEWER,
+        ],
       };
 
       function isMember(groupName, groups) {
