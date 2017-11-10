@@ -50,36 +50,7 @@
         @apply --app-grid-expandible-item;
       }
 
-      paper-radio-group {
-        display: block;
-        padding-top: 16px;
-      }
-
-      paper-radio-group > .fields {
-        padding: calc(var(--app-grid-gutter) / 2) 0;
-      }
-
-      paper-radio-group > .fields[empty] {
-        padding: 0;
-      }
-
-      paper-radio-group .app-grid {
-        margin: -var(--app-grid-gutter);
-      }
-
-      paper-radio-button {
-        margin-left: -12px;
-      }
-
-      paper-dropdown-menu {
-        width: 100%;
-      }
     </style>
-
-    <etools-prp-ajax
-      id="editActivityData"
-      url="[[editActivityDataUrl]]">
-    </etools-prp-ajax>
 
     <etools-prp-ajax
         id="editActivity"
@@ -90,26 +61,9 @@
     </etools-prp-ajax>
 
     <etools-prp-ajax
-        id="clusters"
-        url="[[clustersUrl]]">
-    </etools-prp-ajax>
-
-    <etools-prp-ajax
-        id="activities"
-        params="[[activitiesParams]]"
-        url="[[activitiesUrl]]">
-    </etools-prp-ajax>
-
-    <etools-prp-ajax
         id="projects"
         params="[[projectsParams]]"
         url="[[projectsUrl]]">
-    </etools-prp-ajax>
-
-    <etools-prp-ajax
-        id="objectives"
-        params="[[objectivesParams]]"
-        url="[[objectivesUrl]]">
     </etools-prp-ajax>
 
     <paper-dialog
@@ -132,40 +86,7 @@
           if="[[_equals(mode, 'cluster')]]"
           restamp="true">
           <iron-form class="app-grid">
-            <div class="item">
-                  <paper-dropdown-menu
-                      class="validate"
-                      label="Cluster"
-                      on-value-changed="_validate"
-                      always-float-label
-                      required>
-                    <paper-listbox
-                        selected="{{data.cluster.cluster}}"
-                        attr-for-selected="value"
-                        slot="dropdown-content"
-                        class="dropdown-content">
-                      <template
-                          is="dom-repeat"
-                          items="[[clusters]]">
-                        <paper-item value="[[item.id]]">[[item.title]]</paper-item>
-                      </template>
-                    </paper-listbox>
-                  </paper-dropdown-menu>
-                </div>
-                <div class="item">
-                  <etools-single-selection-menu
-                      class="validate"
-                      label="Activity"
-                      options="[[activities]]"
-                      option-value="id"
-                      option-label="title"
-                      selected="{{data.cluster.cluster_activity}}"
-                      on-iron-activate="_validate"
-                      disabled="[[_equals(activities.length, 0)]]"
-                      trigger-value-change-event
-                      required>
-                  </etools-single-selection-menu>
-                </div>
+                
                 <div class="item item-wide">
                    <etools-single-selection-menu
                       class="validate"
@@ -173,7 +94,7 @@
                       options="[[projects]]"
                       option-value="id"
                       option-label="title"
-                      selected="{{data.cluster.project}}"
+                      selected="{{data.project}}"
                       on-iron-activate="_validate"
                       disabled="[[_equals(projects.length, 0)]]"
                       trigger-value-change-event
@@ -184,7 +105,7 @@
                    <etools-prp-date-input
                       class="validate"
                       label="Start date"
-                      value="{{editActivityData.start_date}}"
+                      value="{{data.start_date}}"
                       error-message=""
                       auto-validate
                       required
@@ -196,7 +117,7 @@
                   <etools-prp-date-input
                       class="validate"
                       label="End date"
-                      value="{{editActivityData.end_date}}"
+                      value="{{data.end_date}}"
                       error-message=""
                       auto-validate
                       required
@@ -211,7 +132,7 @@
                       always-float-label
                       required>
                     <paper-listbox
-                        selected="{{data.cluster.status}}"
+                        selected="{{data.status}}"
                         attr-for-selected="value"
                         slot="dropdown-content"
                         class="dropdown-content">
@@ -231,45 +152,12 @@
                 if="[[_equals(mode, 'custom')]]"
                 restamp="true">
               <iron-form class="app-grid">
-                <div class="item">
-                  <paper-dropdown-menu
-                      class="validate"
-                      label="Cluster"
-                      on-value-changed="_validate"
-                      always-float-label
-                      required>
-                    <paper-listbox
-                        selected="{{data.custom.cluster}}"
-                        attr-for-selected="value"
-                        slot="dropdown-content"
-                        class="dropdown-content">
-                      <template
-                          is="dom-repeat"
-                          items="[[clusters]]">
-                        <paper-item value="[[item.id]]">[[item.title]]</paper-item>
-                      </template>
-                    </paper-listbox>
-                  </paper-dropdown-menu>
-                </div>
-                <div class="item">
-                  <etools-single-selection-menu
-                      class="validate"
-                      label="Cluster Objective"
-                      options="[[objectives]]"
-                      option-value="id"
-                      option-label="title"
-                      selected="{{data.custom.cluster_objective}}"
-                      on-iron-activate="_validate"
-                      disabled="[[_equals(objectives.length, 0)]]"
-                      trigger-value-change-event
-                      required>
-                  </etools-single-selection-menu>
-                </div>
+                
                 <div class="item item-wide">
                   <paper-input
                       class="validate"
                       label="Title"
-                      value="{{editActivityData.title}}"
+                      value="{{data.title}}"
                       on-input="_validate"
                       always-float-label
                       required>
@@ -282,7 +170,7 @@
                       options="[[projects]]"
                       option-value="id"
                       option-label="title"
-                      selected="{{data.custom.project}}"
+                      selected="{{data.project}}"
                       on-iron-activate="_validate"
                       disabled="[[_equals(projects.length, 0)]]"
                       trigger-value-change-event
@@ -293,7 +181,7 @@
                    <etools-prp-date-input
                       class="validate"
                       label="Start date"
-                      value="{{editActivityData.start_date}}"
+                      value="{{data.start_date}}"
                       error-message=""
                       auto-validate
                       required
@@ -305,7 +193,7 @@
                   <etools-prp-date-input
                       class="validate"
                       label="End date"
-                      value="{{editActivityData.end_date}}"
+                      value="{{data.end_date}}"
                       error-message=""
                       auto-validate
                       required
@@ -320,7 +208,7 @@
                       always-float-label
                       required>
                     <paper-listbox
-                        selected="{{data.custom.status}}"
+                        selected="{{data.status}}"
                         attr-for-selected="value"
                         slot="dropdown-content"
                         class="dropdown-content">
@@ -368,7 +256,7 @@
         data: Object,
 
         activitiesUrl: String,
-        activityId: String,
+        editData: Object,
 
         updatePending: {
           type: Boolean,
@@ -377,12 +265,7 @@
 
         mode: {
           type: String,
-          computed: '_setMode(editActivityData)'
-        },
-
-        editActivityData: {
-          type: Object,
-          value: {}
+          computed: '_setMode(editData)'
         },
 
         opened: {
@@ -407,17 +290,6 @@
           },
         },
 
-        clustersUrl: {
-          type: String,
-          computed: '_computeClustersUrl(responsePlanId)',
-          observer: '_fetchClusters',
-        },
-
-        clusters: {
-          type: Array,
-          value: [],
-        },
-
         statuses: {
           type: Array,
           value: [
@@ -430,11 +302,6 @@
         locationId: {
           type: String,
           statePath: 'location.id',
-        },
-
-        activities: {
-          type: Array,
-          value: [],
         },
 
         projects: {
@@ -454,59 +321,38 @@
           computed: '_computeProjectsUrl(responsePlanId)',
         },
 
-        objectives: {
-          type: Array,
-          value: [],
-        },
-
-        objectivesParams: {
-          type: Object,
-          value: {
-            page_size: 99999,
-          },
-        },
-
-        objectivesUrl: {
-          type: String,
-          computed: '_computeObjectivesUrl(responsePlanId)',
-        },
-
         partner: {
           type: Object,
           statePath: 'partner.current',
         },
-
-        editActivityDataUrl: {
-          type: String,
-          computed: '_computeEditActivityUrl(responsePlanId, activityId)'
-        }
       },
 
       observers: [
         '_fetchProjects(partner.id)',
-        '_fetchActivities(data.cluster.cluster)',
-        '_fetchObjectives(data.custom.cluster)',
       ],
 
       _setDefaults: function () {
-        this.set('data', {
-          cluster: {},
-          custom: {},
-        });
+        this.set('data', Object.assign({}, 
+          {id: this.editData.id, 
+          status: this.editData.status,
+          start_date: this.editData.start_date,
+          end_date: this.editData.end_date,
+          project: this.editData.project.id}));
 
-        this.set('activities', []);
-        this.set('objectives', []);
+        if (this.editData.is_custom) {
+          this.set('data.title', this.editData.title);
+        }
+
       },
 
       open: function () {
         this.set('opened', true);
         this.set('refresh', true);
         this._setDefaults();
-        this._getEditActivityData();
       },
 
       close: function () {
-
+        this.set('data', {});
         this.set('opened', false);
         this.set('refresh', false);
       },
@@ -519,34 +365,8 @@
         return App.Endpoints.partnerActivity(responsePlanId, mode);
       },
 
-      _computeClustersUrl: function (responsePlanId) {
-        return App.Endpoints.clusterNames(responsePlanId);
-      },
-
       _computeProjectsUrl: function (responsePlanId) {
         return App.Endpoints.plannedActions(responsePlanId);
-      },
-
-      _computeObjectivesUrl: function (responsePlanId) {
-        return App.Endpoints.responseParametersClusterObjectives(responsePlanId);
-      },
-
-      _computeEditActivityUrl: function(responsePlanId, activityId) {
-
-        return App.Endpoints.plannedActionsActivityOverview(responsePlanId, activityId);
-      },
-
-      _getEditActivityData: function() {
-        var self = this;
-        var thunk = this.$.editActivityData.thunk();
-        thunk()
-        .then(function(res) {
-          self.set('editActivityData', res.data);
-        })
-        .catch(function (err) { // jshint ignore:line
-              self.updatePending = false;
-              // TODO: error handling
-            });
       },
 
       _setMode: function(editActivityData) {
@@ -555,41 +375,6 @@
         } else {
           return 'cluster';
         }
-      },
-
-      _fetchClusters: function () {
-        var self = this;
-        this.$.clusters.abort();
-
-        this.$.clusters.thunk()()
-            .then(function (res) {
-              self.set('clusters', res.data);
-            })
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-            });
-      },
-
-      _fetchActivities: function (clusterId) {
-        var self = this;
-        if (typeof clusterId === 'undefined') {
-          return;
-        }
-        this.set('activities', []);
-        this.set('data.cluster.cluster_activity', undefined);
-        this.set('activitiesParams.cluster_id', clusterId);
-        this.set('activitiesUrl',
-            App.Endpoints.responseParametersClusterActivities(this.responsePlanId)
-            + '?cluster_id=' + clusterId);
-        this.$.activities.abort();
-
-        this.$.activities.thunk()()
-            .then(function (res) {
-              self.set('activities', res.data.results);
-            })
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-            });
       },
 
       _fetchProjects: function (partnerId) {
@@ -604,28 +389,6 @@
         this.$.projects.thunk()()
             .then(function (res) {
               self.set('projects', res.data.results);
-            })
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-            });
-      },
-
-      _fetchObjectives: function (clusterId) {
-        var self = this;
-
-        if (typeof clusterId === 'undefined') {
-          return;
-        }
-
-        this.set('objectivesParams.cluster_id', clusterId);
-        this.set('objectives', []);
-        this.set('data.custom.cluster_objective', undefined);
-
-        this.$.objectives.abort();
-
-        this.$.objectives.thunk()()
-            .then(function (res) {
-              self.set('objectives', res.data.results);
             })
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
@@ -654,12 +417,9 @@
 
         this.set('updatePending', true);
 
-        this.$.activity.body = Object.assign({
-          partner: this.partner.id,
-        }, this.data[this.mode]);
-        this.$.activity.thunk()()
+        this.$.editActivity.thunk()()
             .then(function (res) {
-              self.fire('activity-added', res.data);
+              self.fire('pa-activity-edited', res.data);
               self.set('updatePending', false);
               self.close();
             })

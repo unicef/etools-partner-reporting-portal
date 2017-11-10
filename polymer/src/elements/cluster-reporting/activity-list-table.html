@@ -8,8 +8,6 @@
 <link rel="import" href="../../../bower_components/iron-location/iron-query-params.html">
 <link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout.html">
 
-<link rel="import" href="planned-action/activities/editing-modal.html">
-
 <link rel="import" href="../../behaviors/data-table.html">
 <link rel="import" href="../../behaviors/pagination.html">
 <link rel="import" href="../../behaviors/routing.html">
@@ -67,9 +65,6 @@
       params-object="{{queryParams}}">
     </iron-query-params>
 
-    <planned-action-activity-editing-modal id="modal" activity-id="[[activityId]]">
-    </planned-action-activity-editing-modal>
-
     <div class="wrapper">
       <etools-content-panel no-header>
         <etools-data-table-header
@@ -96,11 +91,6 @@
           <etools-data-table-column field="location">
             <div class="table-column">Location</div>
           </etools-data-table-column>
-          <template is="dom-if" if="[[!_equals(page, 'response-parameters')]]">
-            <etools-data-table-column field="">
-              <div class="table-column">&nbsp;</div>
-            </etools-data-table-column>
-          </template>
         </etools-data-table-header>
 
         <template
@@ -133,11 +123,6 @@
               <div class="table-cell table-cell--text">
                 [[_commaSeparatedDictValues(activity.locations, 'title')]]
               </div>
-              <template is="dom-if" if="[[!_equals(page, 'response-parameters')]]">
-                <div class="table-cell table-cell--text">
-                  <a href="#" class="edit" id="[[activity.id]]" on-tap="_openModal">EDIT</a>
-                </div>
-              </template>
             </div>
             <div slot="row-data-details" class="row-details-expanded-wrapper">
                 <div slot="row-data">
@@ -196,8 +181,6 @@
             statePath: 'partnerActivities.count',
           },
 
-          activityId: String,
-
           detailsOpened: {
             type: Boolean,
             value: false
@@ -209,8 +192,7 @@
           }
         },
 
-        _openModal: function (e) {
-          this.set('activityId', e.target.id);
+        _openModal: function () {
           this.$$('#modal').open();
         },
 
