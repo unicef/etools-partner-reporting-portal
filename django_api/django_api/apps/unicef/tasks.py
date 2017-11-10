@@ -207,10 +207,12 @@ def process_programme_documents(fast=False, area=False):
                             for d in item['expected_results']:
                                 # don't forget about reporting periods
                                 # Create PDResultLink
-                                d['programme_document'] = pd.id
-                                pdresultlink = process_model(PDResultLink, PMPPDResultLinkSerializer, d,
-                                                                  {'external_id': d['result_link'],
-                                                                   'external_cp_output_id': d['id']}) # d['cp_output']['id'], maye add output title: d['cp_output']['title'] need to align in the serializer
+                                rl = d['cp_output']
+                                rl['programme_document'] = pd.id
+                                rl['result_link'] = d['result_link']
+                                pdresultlink = process_model(PDResultLink, PMPPDResultLinkSerializer, rl,
+                                                                  {'external_id': rl['result_link'],
+                                                                   'external_cp_output_id': rl['id']})
 
                                 # Create LLO
                                 d['cp_output'] = pdresultlink.id # this model was renamed
