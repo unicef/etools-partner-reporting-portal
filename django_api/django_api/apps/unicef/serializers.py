@@ -449,10 +449,6 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
     workspace = serializers.PrimaryKeyRelatedField(
         queryset=Workspace.objects.all())
 
-    def update(self, instance, validated_data):
-        return ProgrammeDocument.objects.filter(
-            external_id=validated_data['external_id']).update(**validated_data)
-
     def create(self, validated_data):
         return ProgrammeDocument.objects.create(**validated_data)
 
