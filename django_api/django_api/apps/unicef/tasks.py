@@ -218,7 +218,6 @@ def process_programme_documents(fast=False, area=False):
 
                             # Parsing expecting results and set them active, rest will stay inactive for this PD
                             for d in item['expected_results']:
-                                # don't forget about reporting periods
                                 # Create PDResultLink
                                 rl = d['cp_output']
                                 rl['programme_document'] = pd.id
@@ -255,7 +254,7 @@ def process_programme_documents(fast=False, area=False):
                                         i['disaggregatable'] = True
                                         blueprint = process_model(IndicatorBlueprint,
                                                                        PMPIndicatorBlueprintSerializer, i,
-                                                                       {'external_id': i['blueprint_id']})  # we're not passing in the blueprint ID.. only the "Applied Indicator" id (aka Reportable) use newly added blueprint_id
+                                                                       {'external_id': i['blueprint_id']})
 
                                     locations = list()
                                     for l in i['locations']:

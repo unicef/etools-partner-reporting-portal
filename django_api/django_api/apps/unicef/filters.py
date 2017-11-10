@@ -99,7 +99,7 @@ class ProgressReportFilter(django_filters.FilterSet):
         return queryset.filter(programme_document__external_id=value)
 
     def get_section(self, queryset, name, value):
-        return queryset.filter(programme_document__sections__id=value)
+        return queryset.filter(programme_document__sections__external_id=value)
 
     def get_cp_output(self, queryset, name, value):
         return queryset.filter(programme_document__cp_outputs__external_cp_output_id=value)
