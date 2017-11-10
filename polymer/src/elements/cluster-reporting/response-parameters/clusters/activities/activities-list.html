@@ -4,8 +4,6 @@
 <link rel="import" href="../../../../../../bower_components/iron-location/iron-query-params.html">
 <link rel="import" href="../../../../../../bower_components/iron-flex-layout/iron-flex-layout.html">
 
-<link rel="import" href="editing-modal.html">
-
 <link rel="import" href="../../../../../behaviors/data-table.html">
 <link rel="import" href="../../../../../behaviors/pagination.html">
 <link rel="import" href="../../../../../behaviors/utils.html">
@@ -30,9 +28,6 @@
       a {
         color: var(--theme-primary-color);
       }
-      a.edit {
-        text-decoration: none;
-      }
 
       .wrapper {
         position: relative;
@@ -46,21 +41,17 @@
         params-object="{{queryParams}}">
     </iron-query-params>
 
-    <cluster-activities-editing-modal id="modal" activity-id="[[activityId]]"></cluster-activities-editing-modal>
-
     <div class="wrapper">
       <etools-data-table-header
           no-collapse
           label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
         <template is="dom-if" if="[[!isMinimalList]]" restamp="true">
-          <etools-data-table-column field="activity">
+          <etools-data-table-column field="activity" flex-3>
             <div class="table-column">Cluster Activity Title</div>
           </etools-data-table-column>
           <etools-data-table-column field="cluster">
             <div class="table-column">Cluster</div>
           </etools-data-table-column>
-          <etools-data-table-column field="">
-            <div class="table-column">&nbsp;</div>
           <etools-data-table-column field="cluster">
              <div class="table-column">Cluster Objective Title</div>
           </etools-data-table-column>
@@ -83,11 +74,7 @@
                 [[activity.co_cluster_title]]
               </div>
               <div class="table-cell table-cell--text">
-                  [[activity.co_title]]
-                </div>
-                <div class="table-cell table-cell--text">
-                <a class="edit" href="#" id="[[activity.id]]" on-tap="_openModal">EDIT</a>
-              </div>         
+                [[activity.co_title]]     
              </div>
             </template>
           </div>
@@ -125,10 +112,6 @@
           statePath: 'clusterActivities.loading'
         },
 
-        activityId: {
-          type: String,
-        },
-
         activities: {
           type: Object,
           statePath: 'clusterActivities.all',
@@ -143,11 +126,6 @@
           type: Boolean,
           value: false
         }
-      },
-
-      _openModal: function (e) {
-        this.set('activityId', e.target.id);
-        this.$$('#modal').open();
       },
 
       _detailUrl: function(id) {

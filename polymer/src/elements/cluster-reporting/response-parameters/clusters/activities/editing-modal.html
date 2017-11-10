@@ -72,26 +72,12 @@
 
     <iron-location path="{{path}}"></iron-location>
 
-    <cluster-dropdown-content clusters="{{clusters}}"></cluster-dropdown-content>
-
-    <etools-prp-ajax
-        id="editActivityData"
-        url="[[editActivityDataUrl]]">
-    </etools-prp-ajax>
-
     <etools-prp-ajax
         id="editActivity"
         url="[[url]]"
         body="[[data]]"
         content-type="application/json"
         method="patch">
-    </etools-prp-ajax>
-
-
-    <etools-prp-ajax
-        id="objectivesByClusterID"
-        url="[[objectivesUrl]]"
-        params="[[objectivesParams]]">
     </etools-prp-ajax>
 
     <paper-dialog
@@ -117,41 +103,12 @@
             <paper-input
               class="item validate full-width"
               id="title"
-              label="Title"
-              value="{{editActivityData.title}}"
+              label="Cluster Activity Title"
+              value="{{data.title}}"
               type="string"
               on-input="_validate"
               required>
             </paper-input>
-
-            <paper-input
-              class="item"
-              id="cluster"
-              label="Cluster"
-              value="{{editActivityData.co_cluster_title}}"
-              disabled>
-            </paper-input>
-
-            <paper-dropdown-menu
-                class="item validate"
-                label="Cluster Objective"
-                id="objective"
-                on-value-changed="_validate"
-                always-float-label
-                required>
-                <paper-listbox
-                    selected="{{data.cluster_objective}}"
-                    attr-for-selected="value"
-                    slot="dropdown-content"
-                    class="dropdown-content">
-                  <template
-                      id="objectives"
-                      is="dom-repeat"
-                      items="[[objectives]]">
-                    <paper-item value="[[item.id]]">[[item.title]]</paper-item>
-                  </template>
-                </paper-listbox>
-            </paper-dropdown-menu>
           </iron-form>
         </template>
       </paper-dialog-scrollable>
@@ -176,14 +133,9 @@
       is: 'cluster-activities-editing-modal',
 
       behaviors: [
-        App.Behaviors.DateBehavior,
         App.Behaviors.ReduxBehavior,
         App.Behaviors.RoutingBehavior,
         App.Behaviors.UtilsBehavior,
-      ],
-
-      observers: [
-        '_getObjectivesByClusterID(editActivityData.co_cluster_id)'
       ],
 
       properties: {
@@ -212,120 +164,47 @@
           value: {}
         },
 
-        editActivityData: {
-          type: Object,
-          value: {}
-        },
-
-        objectives: {
-          type: Array,
-          value: []
-        },
-
-        objectivesUrl: {
-          type: String,
-          value: '',
-          computed: '_computeObjectivesUrl(responsePlanID, editActivityData.co_cluster_id)'
-        },
-
-        objectivesParams: {
-          type: Object,
-          value: {cluster_id: ''}
-        },
+        editData: Object,
 
         refresh: {
           type: Boolean,
           value: false
         },
-
-        editActivityDataUrl: {
-          type: String,
-          computed: '_computeEditActivityUrl(activityId)'
-        }
       },
 
       _computeUrl: function(responsePlanID) {
         return App.Endpoints.responseParametersClusterActivities(responsePlanID);
       },
 
-      _computeObjectivesUrl: function(responsePlanID) {
-        return App.Endpoints.responseParametersClusterObjectives(responsePlanID);
-      },
-
-      _computeEditActivityUrl: function(activityId) {
-        return App.Endpoints.responseParamtersClustersActivityDetail(activityId);
-      },
-
-      _getObjectivesByClusterID: function(clusterID) {
-        var self = this;
-        if (clusterID) {
-          var thunk = this.$.objectivesByClusterID.thunk();
-
-          this.objectivesParams = {cluster_id: this.editActivityData.co_cluster_id};
-          thunk()
-            .then(function (res) {
-              self.set('objectives', res.data.results);
-            })
-            .catch(function (err) { // jshint ignore:line
-              self.updatePending = false;
-              // TODO: error handling
-            });
-        } else {
-          self.set('objectives', []);
-        }
-
-      },
-
-      _getEditActivityData: function() {
-        var self = this;
-        var thunk = this.$.editActivityData.thunk();
-        thunk()
-        .then(function(res) {
-          self.set('editActivityData', res.data);
-        })
-        .catch(function (err) { // jshint ignore:line
-              self.updatePending = false;
-              // TODO: error handling
-            });
-
-      },
-
       close: function () {
+        this.set('data', {});
         this.set('opened', false);
         this.set('refresh', false);
       },
 
       open: function () {
-        this.data = {};
+        this.set('data', Object.assign({}, {id: this.editData.id, title: this.editData.title}));
         this.set('opened', true);
         this.set('refresh', true);
-        this._getEditActivityData();
       },
 
       _validate: function (e) {
         e.target.validate();
       },
 
-      _redirectToDetail: function (id) {
-        var path = '/response-parameters/clusters/activity/' + String(id);
-        var url = this.buildUrl(this._baseUrlCluster, path);
-        this.set('path', url);
-      },
-
       _save: function () {
-        this.set('data.title', this.editActivityData.title);
-        var self = this;
-        var thunk = this.$.editActivity.thunk();
-
         if (!this._fieldsAreValid()) {
           return;
         }
 
+        var self = this;
+        var thunk = this.$.editActivity.thunk();
         self.updatePending = true;
         thunk()
           .then(function (res) {
             self.updatePending = false;
-            self._redirectToDetail(res.editActivityData.id);
+            self.fire('activity-edited', res.data);
+            self.close();
           })
           .catch(function (err) { // jshint ignore:line
             self.updatePending = false;
