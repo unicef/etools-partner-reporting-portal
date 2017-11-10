@@ -60,6 +60,7 @@ class ClusterIndicatorsFilter(django_filters.FilterSet):
 
     submitted = CharFilter(method='get_submitted')
     cluster = CharFilter(method='get_cluster')
+    cluster_id = CharFilter(method='get_cluster')
     partner = CharFilter(method='get_partner')
     indicator = CharFilter(method='get_indicator')
     project = CharFilter(method='get_project')
