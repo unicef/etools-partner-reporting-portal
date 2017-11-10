@@ -234,6 +234,34 @@
           </div>
 
           <div class="row">
+            <div class="app-grid">
+              <div class="item">
+                <paper-input
+                  class="validate"
+                  label="Baseline"
+                  on-input="_validate"
+                  value="{{data.baseline}}"
+                  type="number"
+                  always-float-label
+                  required>
+                </paper-input>
+              </div>
+
+              <div class="item">
+                <paper-input
+                  class="validate"
+                  label="Target"
+                  on-input="_validate"
+                  value="{{data.target}}"
+                  type="number"
+                  always-float-label
+                  required>
+                </paper-input>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
             <etools-multi-selection-menu
                 class="validate"
                 label="Location"
@@ -295,6 +323,10 @@
         objectType: String,
 
         displayType: String,
+
+        baseline: Number,
+        
+        target: Number,
 
         responsePlanId: {
          type: String,

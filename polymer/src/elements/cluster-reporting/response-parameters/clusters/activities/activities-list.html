@@ -53,14 +53,16 @@
           no-collapse
           label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
         <template is="dom-if" if="[[!isMinimalList]]" restamp="true">
-          <etools-data-table-column field="activity" flex-3>
-            <div class="table-column">Cluster Activity</div>
+          <etools-data-table-column field="activity">
+            <div class="table-column">Cluster Activity Title</div>
           </etools-data-table-column>
           <etools-data-table-column field="cluster">
             <div class="table-column">Cluster</div>
           </etools-data-table-column>
           <etools-data-table-column field="">
             <div class="table-column">&nbsp;</div>
+          <etools-data-table-column field="cluster">
+             <div class="table-column">Cluster Objective Title</div>
           </etools-data-table-column>
         </template>
       </etools-data-table-header>
@@ -81,8 +83,12 @@
                 [[activity.co_cluster_title]]
               </div>
               <div class="table-cell table-cell--text">
+                  [[activity.co_title]]
+                </div>
+                <div class="table-cell table-cell--text">
                 <a class="edit" href="#" id="[[activity.id]]" on-tap="_openModal">EDIT</a>
-              </div>
+              </div>         
+             </div>
             </template>
           </div>
         </etools-data-table-row>
