@@ -3,7 +3,8 @@ from rest_framework.permissions import BasePermission
 from .models import (
     PartnerAuthorizedOfficerRole,
     PartnerEditorRole,
-    PartnerViewerRole
+    PartnerViewerRole,
+    IMORole
 )
 
 
@@ -42,3 +43,8 @@ class IsPartnerEditorOrPartnerAuthorizedOfficer(BasePermission):
             user.groups.filter(
                 name=PartnerAuthorizedOfficerRole.as_group().name).exists()
         )
+
+class IsIMO(BasePermission):
+    def has_permission(self, request, view):
+        user = request.user
+        return user.is_authenticated() and user.groups.filter(name=IMORole.as_group().name).exists()

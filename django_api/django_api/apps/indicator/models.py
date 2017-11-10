@@ -346,6 +346,11 @@ class IndicatorReport(TimeStampedModel):
                                             null=True,
                                             blank=True)
 
+    review_date = models.DateField(verbose_name='Review Date',
+                                   blank=True,
+                                   null=True)
+    sent_back_feedback = models.TextField(blank=True, null=True)
+
     objects = IndicatorReportManager()
 
     class Meta:
