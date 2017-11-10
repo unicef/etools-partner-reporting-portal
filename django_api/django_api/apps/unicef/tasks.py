@@ -11,8 +11,8 @@ from core.models import Workspace, GatewayType, Location
 from core.serializers import PMPGatewayTypeSerializer, PMPLocationSerializer
 
 from unicef.serializers import PMPProgrammeDocumentSerializer, PMPPDPartnerSerializer, PMPPDPersonSerializer, \
-    PMPLLOSerializer, PMPPDResultLinkSerializer
-from unicef.models import ProgrammeDocument, Person, LowerLevelOutput, PDResultLink
+    PMPLLOSerializer, PMPPDResultLinkSerializer, PMPSectionSerializer, PMPReportingPeriodDatesSerializer
+from unicef.models import ProgrammeDocument, Person, LowerLevelOutput, PDResultLink, Section, ReportingPeriodDates
 
 from indicator.serializers import PMPIndicatorBlueprintSerializer, PMPDisaggregationSerializer, PMPDisaggregationValueSerializer, PMPReportableSerializer
 from indicator.models import IndicatorBlueprint, Disaggregation, Reportable, DisaggregationValue
@@ -196,8 +196,21 @@ def process_programme_documents(fast=False, area=False):
                             u.workspaces.add(workspace)
                             u.groups.add(group)
 
-                        # TODO: add draft status. Removed temporary due PMP active PD issue
-                        if item['status'] not in ("signed",):
+                        # Create sections
+                        section_data_list = item['sections']
+                        for section_data in section_data_list:
+                            section = process_model(Section, PMPSectionSerializer, section_data,
+                                                   {'external_id': section_data['id']}) # Is section unique globally or per workspace?
+                            pd.sections.add(section)
+
+                        # Create Reporting Date Periods
+                        reporting_periods = item['reporting_periods']
+                        for reporting_period in reporting_periods:
+                            reporting_period['programme_document'] = pd.id
+                            process_model(ReportingPeriodDates, PMPReportingPeriodDatesSerializer, reporting_period,
+                                                    {'external_id': reporting_period['id']})
+
+                        if item['status'] not in ("draft, signed",):
                             # Mark all LLO/reportables assigned to this PD as inactive
                             llos = LowerLevelOutput.objects.filter(cp_output__programme_document=pd)
                             llos.update(active=False)
@@ -205,12 +218,14 @@ def process_programme_documents(fast=False, area=False):
 
                             # Parsing expecting results and set them active, rest will stay inactive for this PD
                             for d in item['expected_results']:
-
+                                # don't forget about reporting periods
                                 # Create PDResultLink
-                                d['programme_document'] = pd.id
-                                pdresultlink = process_model(PDResultLink, PMPPDResultLinkSerializer, d,
-                                                                  {'external_id': d['result_link'],
-                                                                   'external_cp_output_id': d['id']})
+                                rl = d['cp_output']
+                                rl['programme_document'] = pd.id
+                                rl['result_link'] = d['result_link']
+                                pdresultlink = process_model(PDResultLink, PMPPDResultLinkSerializer, rl,
+                                                                  {'external_id': rl['result_link'],
+                                                                   'external_cp_output_id': rl['id']})
 
                                 # Create LLO
                                 d['cp_output'] = pdresultlink.id
@@ -231,15 +246,16 @@ def process_programme_documents(fast=False, area=False):
                                         # Get blueprint of parent indicator
                                         try:
                                             blueprint = Reportable.objects.get(
-                                                external_id=i['cluster_indicator_id']).blueprint
+                                                id=i['cluster_indicator_id']).blueprint
                                         except Reportable.DoesNotExist:
+                                            print("Blueprint not exists! Skipping!")
                                             blueprint = None
                                     else:
                                         # Create IndicatorBlueprint
                                         i['disaggregatable'] = True
                                         blueprint = process_model(IndicatorBlueprint,
                                                                        PMPIndicatorBlueprintSerializer, i,
-                                                                       {'external_id': i['id']})
+                                                                       {'external_id': i['blueprint_id']})  # we're not passing in the blueprint ID.. only the "Applied Indicator" id (aka Reportable) use newly added blueprint_id
 
                                     locations = list()
                                     for l in i['locations']:
@@ -247,8 +263,9 @@ def process_programme_documents(fast=False, area=False):
                                         # TODO: assign country after PMP add these
                                         # fields into API
                                         l['gateway_country'] = workspace.countries.all()[
-                                            0].id
-                                        l['admin_level'] = 1
+                                            0].id  # TODO: later figure out how to fix this on eTools PMP side
+                                        if not l['admin_level']:
+                                            l['admin_level'] = 1
                                         if not l['pcode']:
                                             print("Location code empty! Skipping!")
                                             continue
