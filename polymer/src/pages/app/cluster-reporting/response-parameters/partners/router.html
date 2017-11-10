@@ -7,6 +7,7 @@
 <link rel="import" href="../../../../../behaviors/utils.html">
 <link rel="import" href="projects.html">
 <link rel="import" href="activities.html">
+<link rel="import" href="contacts.html">
 
 <dom-module id="response-parameters-partners-router">
   <template>
@@ -29,9 +30,12 @@
         selected="[[page]]"
         attr-for-selected="name">
 
-      <template is="dom-if" if="[[_equals(page, 'contacts')]]" restamp="true">
-        TODO: Contacts
-      </template>
+<!--       <template is="dom-if" if="[[_equals(page, 'contacts')]]" restamp="true">
+        <rp-partners-contacts
+          name="contacts"
+          route="{{subroute}}">
+        </rp-partners-contacts>
+      </template> -->
 
       <template is="dom-if" if="[[_equals(page, 'projects')]]" restamp="true">
         <rp-partners-projects
@@ -101,11 +105,6 @@
         var resolvedPageUrl;
 
         if (!page) {
-          return;
-        }
-
-        // TODO: Remove when other pages are ready.
-        if (page === 'contacts') {
           return;
         }
 
