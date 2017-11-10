@@ -196,8 +196,7 @@ def process_programme_documents(fast=False, area=False):
                             u.workspaces.add(workspace)
                             u.groups.add(group)
 
-                        # TODO: add draft status. Removed temporary due PMP active PD issue
-                        if item['status'] not in ("signed",):
+                        if item['status'] not in ("draft, signed",):
                             # Mark all LLO/reportables assigned to this PD as inactive
                             llos = LowerLevelOutput.objects.filter(cp_output__programme_document=pd)
                             llos.update(active=False)
@@ -215,7 +214,7 @@ def process_programme_documents(fast=False, area=False):
                                                                    'external_cp_output_id': rl['id']})
 
                                 # Create LLO
-                                d['cp_output'] = pdresultlink.id # this model was renamed
+                                d['cp_output'] = pdresultlink.id
                                 llo = process_model(LowerLevelOutput, PMPLLOSerializer, d,
                                                          {'external_id': d['id']})
                                 # Mark LLO as active
@@ -233,15 +232,16 @@ def process_programme_documents(fast=False, area=False):
                                         # Get blueprint of parent indicator
                                         try:
                                             blueprint = Reportable.objects.get(
-                                                external_id=i['cluster_indicator_id']).blueprint  # This should be "id=i['cluster_indicator_id']"
+                                                id=i['cluster_indicator_id']).blueprint
                                         except Reportable.DoesNotExist:
-                                            blueprint = None  # Print/Raise Exception?
+                                            print("Blueprint not exists! Skipping!")
+                                            blueprint = None
                                     else:
                                         # Create IndicatorBlueprint
                                         i['disaggregatable'] = True
                                         blueprint = process_model(IndicatorBlueprint,
                                                                        PMPIndicatorBlueprintSerializer, i,
-                                                                       {'external_id': i['id']})  # we're not passing in the blueprint ID.. only the "Applied Indicator" id (aka Reportable) use newly added blueprint_id
+                                                                       {'external_id': i['blueprint_id']})  # we're not passing in the blueprint ID.. only the "Applied Indicator" id (aka Reportable) use newly added blueprint_id
 
                                     locations = list()
                                     for l in i['locations']:
@@ -250,7 +250,8 @@ def process_programme_documents(fast=False, area=False):
                                         # fields into API
                                         l['gateway_country'] = workspace.countries.all()[
                                             0].id  # TODO: later figure out how to fix this on eTools PMP side
-                                        l['admin_level'] = 1  # you can now use l.admin_level .. however this can be null in our case if data is messed up
+                                        if not l['admin_level']:
+                                            l['admin_level'] = 1
                                         if not l['pcode']:
                                             print("Location code empty! Skipping!")
                                             continue
