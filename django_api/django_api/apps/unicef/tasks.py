@@ -11,7 +11,7 @@ from core.models import Workspace, GatewayType, Location
 from core.serializers import PMPGatewayTypeSerializer, PMPLocationSerializer
 
 from unicef.serializers import PMPProgrammeDocumentSerializer, PMPPDPartnerSerializer, PMPPDPersonSerializer, \
-    PMPLLOSerializer, PMPPDResultLinkSerializer
+    PMPLLOSerializer, PMPPDResultLinkSerializer, PMPSectionSerializer
 from unicef.models import ProgrammeDocument, Person, LowerLevelOutput, PDResultLink
 
 from indicator.serializers import PMPIndicatorBlueprintSerializer, PMPDisaggregationSerializer, PMPDisaggregationValueSerializer, PMPReportableSerializer
@@ -195,6 +195,13 @@ def process_programme_documents(fast=False, area=False):
                             u.save()
                             u.workspaces.add(workspace)
                             u.groups.add(group)
+
+                        # Create sections
+                        section_data_list = item['sections']
+                        for section_data in section_data_list:
+                            section = process_model(Person, PMPSectionSerializer, section_data,
+                                                   {'external_id': section_data['id']}) # Is section unique globally or per workspace?
+                            pd.sections.add(section)
 
                         if item['status'] not in ("draft, signed",):
                             # Mark all LLO/reportables assigned to this PD as inactive

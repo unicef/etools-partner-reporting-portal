@@ -492,6 +492,17 @@ class PMPLLOSerializer(serializers.ModelSerializer):
         )
 
 
+class PMPSectionSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='external_id')
+
+    class Meta:
+        model = Section
+        fields = (
+            'id',
+            'name',
+        )
+
+
 class PMPPDResultLinkSerializer(serializers.ModelSerializer):
     result_link = serializers.CharField(source='external_id')
     id = serializers.CharField(source='external_cp_output_id')
