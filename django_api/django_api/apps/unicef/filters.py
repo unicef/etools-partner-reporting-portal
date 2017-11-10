@@ -84,19 +84,25 @@ class ProgressReportFilter(django_filters.FilterSet):
                           label='Location')
     programme_document_ext = CharFilter(name='programme_document_ext', method='get_pd_ext',
                                         label='programme_document_ext')
+    section = CharFilter(name='section', method='get_section')
+    cp_output = CharFilter(name='cp_output', method='get_cp_output')
 
-    # We need CP Output filter.. we're passing an id and you can check against external_cp_output_id
-    # we need a Section filter, newly added section to the prp api will come from "sections"
     class Meta:
         model = ProgressReport
         fields = ['status', 'pd_ref_title', 'due_date', 'programme_document',
-                  'programme_document__id', 'programme_document__external_id']
+                  'programme_document__id', 'programme_document__external_id', 'section', 'cp_output']
 
     def get_status(self, queryset, name, value):
         return queryset.filter(status=value)
 
     def get_pd_ext(self, queryset, name, value):
         return queryset.filter(programme_document__external_id=value)
+
+    def get_section(self, queryset, name, value):
+        return queryset.filter(programme_document__sections__id=value)
+
+    def get_cp_output(self, queryset, name, value):
+        return queryset.filter(programme_document__cp_outputs__external_cp_output_id=value)
 
 
     def get_due_overdue_status(self, queryset, name, value):
