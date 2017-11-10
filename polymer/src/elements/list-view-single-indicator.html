@@ -7,6 +7,7 @@
 <link rel="import" href="../styles/table-styles.html">
 <link rel="import" href="../redux/store.html">
 <link rel="import" href="../behaviors/routing.html">
+<link rel="import" href="../behaviors/utils.html">
 <link rel="import" href="status-badge.html">
 
 
@@ -21,13 +22,19 @@
 
     <etools-prp-data-table-row details-opened="{{detailsOpened}}">
       <div slot="row-data">
-        <span class="col-data flex-6">
+        <span class="col-data flex-3">
           <template is="dom-if" if="[[_flagIndicator(indicator.target, indicator.baseline, isCustom)]]">
-            <status-badge type="error">
+            <status-badge type="error"></status-badge>
           </template>
-          </status-badge>[[indicator.blueprint.title]]
+            [[indicator.blueprint.title]]
         </span>
-        <span class="col-data flex-4">
+        <span class="col-data flex-3">
+          [[_withDefault(indicator.baseline)]]
+         </span>
+        <span class="col-data flex-3">
+          [[_withDefault(indicator.target)]]
+        </span>
+        <span class="col-data flex-3">
           <etools-prp-progress-bar number="[[indicator.progress_percentage]]">
         </span>
       </div>
@@ -48,6 +55,7 @@
       behaviors: [
         App.Behaviors.ReduxBehavior,
         App.Behaviors.RoutingBehavior,
+        App.Behaviors.UtilsBehavior,
       ],
 
       _flagIndicator: function(target, baseline, isCustom) {

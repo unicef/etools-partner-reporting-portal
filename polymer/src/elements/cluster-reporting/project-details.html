@@ -48,11 +48,6 @@
             </li>
 
             <li class="item">
-              <labelled-item label="Project owner">
-                <span class="value">[[_withDefault(projectData.partner, '')]]</span>
-              </labelled-item>
-            </li>
-            <li class="item">
               <labelled-item label="Clusters">
                 <span class="value">[[_commaSeparatedDictValues(projectData.clusters, 'title')]]</span>
               </labelled-item>
@@ -92,11 +87,12 @@
               </labelled-item>
             </li>
 
-            <li class="item full-width">
+            <li class="item">
               <labelled-item label="Additional Information (e.g. links)">
                 [[_withDefault(projectData.additional_information)]]
               </labelled-item>
             </li>
+
           </ul>
         </div>
     </etools-content-panel>
