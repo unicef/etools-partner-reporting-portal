@@ -79,11 +79,6 @@
     <cluster-location-content locations="{{locations}}"></cluster-location-content>
 
     <etools-prp-ajax
-        id="editProjectData"
-        url="[[editProjectDataUrl]]">
-    </etools-prp-ajax>
-
-    <etools-prp-ajax
         id="editProject"
         url="[[url]]"
         body="[[data]]"
@@ -115,7 +110,7 @@
               class="item validate full-width"
               id="title"
               label="Title"
-              value="{{editProjectData.title}}"
+              value="{{data.title}}"
               type="string"
               required
               on-input="_validate">
@@ -149,7 +144,7 @@
                <etools-prp-date-input
                   class="validate"
                   label="Start date"
-                  value="{{editProjectData.start_date}}"
+                  value="{{data.start_date}}"
                   error-message=""
                   auto-validate
                   required
@@ -162,7 +157,7 @@
               <etools-prp-date-input
                   class="validate"
                   label="End date"
-                  value="{{editProjectData.end_date}}"
+                  value="{{data.end_date}}"
                   error-message=""
                   auto-validate
                   required
@@ -193,7 +188,7 @@
               class="item validate"
               id="total_budget"
               label="Total Budget"
-              value="{{editProjectData.total_budget}}"
+              value="{{data.total_budget}}"
               type="number"
               required
               on-input="_validate">
@@ -203,7 +198,7 @@
               class="item validate full-width"
               id="funding_source"
               label="Funding Source"
-              value="{{editProjectData.funding_source}}"
+              value="{{data.funding_source}}"
               type="string"
               required
               on-input="_validate">
@@ -213,7 +208,7 @@
               class="item validate full-width"
               id="description"
               label="Description"
-              value="{{editProjectData.description}}"
+              value="{{data.description}}"
               type="string"
               required
               on-input="_validate">
@@ -223,7 +218,7 @@
               class="item validate full-width"
               id="additional_information"
               label="Additional information (e.g. links)"
-              value="{{editProjectData.additional_information}}"
+              value="{{data.additional_information}}"
               type="string"
               required
               on-input="_validate">
@@ -338,55 +333,32 @@
 
         selectedClusters: Array,
 
-        editProjectDataUrl: {
-          type: String,
-          computed: '_computeEditProjectUrl(projectId)'
-        },
       },
 
       _computeUrl: function(responsePlanID) {
         return App.Endpoints.plannedActions(responsePlanID);
       },
 
-      _computeEditProjectUrl: function(projectId) {
-        return App.Endpoints.plannedActionsProjectOverview(projectId);
-      },
-
-      _getEditProjectData: function() {
-        var self = this;
-        var thunk = this.$.editProjectData.thunk();
-        thunk()
-        .then(function(res) {
-          self.set('editProjectData', res.data);
-        })
-        .catch(function (err) { // jshint ignore:line
-              self.updatePending = false;
-              // TODO: error handling
-            });
-      },
-
       close: function () {
+        this.set('data', {});
         this.set('opened', false);
         this.set('refresh', false);
       },
 
       open: function () {
-        this.data = {};
-        this.selectedClusters = [];
-        this.selectedLocations = [];
+        this.set('data', Object.assign({}, this.editData));
+        this.selectedClusters = this.editData.clusters.map(function(item) {
+          return item.id;
+        });
+        this.selectedLocations = this.editData.locations.map(function(item) {
+          return item.id;
+        });
         this.set('opened', true);
         this.set('refresh', true);
-        this._getEditProjectData();
       },
 
       _validate: function (e) {
         e.target.validate();
-      },
-
-      _redirectToDetail: function(id) {
-        var path = '/planned-action/project/' + String(id);
-        var url = this.buildUrl(this._baseUrlCluster, path);
-        this.set('path', url);
       },
 
       _formatForMultiselect: function(list) {
@@ -417,11 +389,12 @@
         this.data.partner = this.partnerID;
 
         this.updatePending = true;
-        var thunk = this.$.createProject.thunk();
+        var thunk = this.$.editProject.thunk();
         thunk()
           .then(function (res) {
             self.updatePending = false;
-            self._redirectToDetail(res.data.id);
+            self.fire('project-edited', res.data);
+            self.close();
           })
           .catch(function (err) { // jshint ignore:line
             self.updatePending = false;

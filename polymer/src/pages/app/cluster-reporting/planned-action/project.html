@@ -151,6 +151,14 @@
         '_updateUrlTab(routeData.tab)',
       ],
 
+      listeners: {
+        'project-edited': '_onSuccess',
+      },
+
+      _onSuccess: function() {
+        this._getProjectAjax();
+      },
+
       _computeBackLink: function () {
         return '/planned-action/projects' + '?' + this.query;
       },
@@ -172,7 +180,7 @@
         return App.Endpoints.plannedActionsProjectOverview(projectId);
       },
 
-      attached: function () {
+      _getProjectAjax: function() {
         var thunk = this.$.overview.thunk();
         var self = this;
         thunk()
@@ -184,6 +192,10 @@
             self.updatePending = false;
             // TODO: error handling
           });
+      },
+
+      attached: function () {
+        this._getProjectAjax();
       },
     });
   </script>

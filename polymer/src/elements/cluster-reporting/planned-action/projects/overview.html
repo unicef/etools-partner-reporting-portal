@@ -1,6 +1,7 @@
 <link rel="import" href="../../../../../bower_components/polymer/polymer.html">
 
 <link rel="import" href="../../../../elements/page-body.html">
+<link rel="import" href="../../../../elements/etools-prp-permissions.html">
 <link rel="import" href="../../../../styles/buttons.html">
 <link rel="import" href="../../project-details.html">
 <link rel="import" href="editing-modal.html">
@@ -18,14 +19,23 @@
       }
     </style>
 
-    <page-body>
-      <planned-action-projects-editing-modal id="modal" project-id="[[projectData.id]]"></planned-action-projects-editing-modal>
+    <etools-prp-permissions
+        permissions="{{permissions}}">
+    </etools-prp-permissions>
 
-      <div id="action">
-        <paper-button id="edit" on-tap="_openModal" class="btn-primary" raised>
-          Edit Project
-        </paper-button>
-      </div>
+    <page-body>
+
+       <template is="dom-if"
+        if="[[permissions.createPartnerEntities]]"
+        restamp="true">
+        <planned-action-projects-editing-modal id="modal" edit-data="[[projectData]]"></planned-action-projects-editing-modal>
+
+        <div id="action">
+          <paper-button id="edit" on-tap="_openModal" class="btn-primary" raised>
+            Edit Project
+          </paper-button>
+        </div>
+      </template>
       <project-details-display project-data=[[projectData]]></project-details-display>
     </page-body>
   </template>
@@ -36,10 +46,11 @@
 
       properties: {
         projectData: Object,
+        permissions: Object,
       },
 
       _openModal: function () {
-        this.$.modal.open();
+        this.$$('#modal').open();
       },
 
     });
