@@ -2,7 +2,7 @@ from django.conf import settings
 from rest_framework import serializers
 
 from .models import ProgrammeDocument, Section, ProgressReport, Person, \
-    LowerLevelOutput, PDResultLink
+    LowerLevelOutput, PDResultLink, ReportingPeriodDates
 
 from core.common import PROGRESS_REPORT_STATUS, OVERALL_STATUS, CURRENCIES, PD_STATUS
 from core.models import Workspace
@@ -501,6 +501,23 @@ class PMPSectionSerializer(serializers.ModelSerializer):
             'id',
             'name',
         )
+
+class PMPReportingPeriodDatesSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='external_id')
+    programme_document = serializers.PrimaryKeyRelatedField(
+        queryset=ProgrammeDocument.objects.all())
+
+    class Meta:
+        model = ReportingPeriodDates
+        fields = (
+            'id',
+            'start_date',
+            'end_date',
+            'due_date',
+            'programme_document',
+        )
+
+
 
 
 class PMPPDResultLinkSerializer(serializers.ModelSerializer):

@@ -11,8 +11,8 @@ from core.models import Workspace, GatewayType, Location
 from core.serializers import PMPGatewayTypeSerializer, PMPLocationSerializer
 
 from unicef.serializers import PMPProgrammeDocumentSerializer, PMPPDPartnerSerializer, PMPPDPersonSerializer, \
-    PMPLLOSerializer, PMPPDResultLinkSerializer, PMPSectionSerializer
-from unicef.models import ProgrammeDocument, Person, LowerLevelOutput, PDResultLink
+    PMPLLOSerializer, PMPPDResultLinkSerializer, PMPSectionSerializer, PMPReportingPeriodDatesSerializer
+from unicef.models import ProgrammeDocument, Person, LowerLevelOutput, PDResultLink, Section, ReportingPeriodDates
 
 from indicator.serializers import PMPIndicatorBlueprintSerializer, PMPDisaggregationSerializer, PMPDisaggregationValueSerializer, PMPReportableSerializer
 from indicator.models import IndicatorBlueprint, Disaggregation, Reportable, DisaggregationValue
@@ -199,9 +199,16 @@ def process_programme_documents(fast=False, area=False):
                         # Create sections
                         section_data_list = item['sections']
                         for section_data in section_data_list:
-                            section = process_model(Person, PMPSectionSerializer, section_data,
+                            section = process_model(Section, PMPSectionSerializer, section_data,
                                                    {'external_id': section_data['id']}) # Is section unique globally or per workspace?
                             pd.sections.add(section)
+
+                        # Create Reporting Date Periods
+                        reporting_periods = item['reporting_periods']
+                        for reporting_period in reporting_periods:
+                            reporting_period['programme_document'] = pd.id
+                            process_model(ReportingPeriodDates, PMPReportingPeriodDatesSerializer, reporting_period,
+                                                    {'external_id': reporting_period['id']})
 
                         if item['status'] not in ("draft, signed",):
                             # Mark all LLO/reportables assigned to this PD as inactive
