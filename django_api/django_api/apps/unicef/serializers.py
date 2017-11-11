@@ -2,7 +2,7 @@ from django.conf import settings
 from rest_framework import serializers
 
 from .models import ProgrammeDocument, Section, ProgressReport, Person, \
-    LowerLevelOutput, PDResultLink
+    LowerLevelOutput, PDResultLink, ReportingPeriodDates
 
 from core.common import PROGRESS_REPORT_STATUS, OVERALL_STATUS, CURRENCIES, PD_STATUS
 from core.models import Workspace
@@ -449,10 +449,6 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
     workspace = serializers.PrimaryKeyRelatedField(
         queryset=Workspace.objects.all())
 
-    def update(self, instance, validated_data):
-        return ProgrammeDocument.objects.filter(
-            external_id=validated_data['external_id']).update(**validated_data)
-
     def create(self, validated_data):
         return ProgrammeDocument.objects.create(**validated_data)
 
@@ -492,6 +488,34 @@ class PMPLLOSerializer(serializers.ModelSerializer):
         )
 
 
+class PMPSectionSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='external_id')
+
+    class Meta:
+        model = Section
+        fields = (
+            'id',
+            'name',
+        )
+
+class PMPReportingPeriodDatesSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='external_id')
+    programme_document = serializers.PrimaryKeyRelatedField(
+        queryset=ProgrammeDocument.objects.all())
+
+    class Meta:
+        model = ReportingPeriodDates
+        fields = (
+            'id',
+            'start_date',
+            'end_date',
+            'due_date',
+            'programme_document',
+        )
+
+
+
+
 class PMPPDResultLinkSerializer(serializers.ModelSerializer):
     result_link = serializers.CharField(source='external_id')
     id = serializers.CharField(source='external_cp_output_id')
@@ -500,6 +524,7 @@ class PMPPDResultLinkSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PDResultLink
+        # we neeed to align this
         fields = (
             'id',
             'title',

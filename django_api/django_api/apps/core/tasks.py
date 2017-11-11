@@ -59,65 +59,47 @@ def process_workspaces():
         print(e)
         raise Exception(e)
 
+
+
 @shared_task
 def process_period_reports():
     for pd in ProgrammeDocument.objects.filter(status__in=(PD_STATUS.active, )):
-        print("Processing ProgrammeDocument {} between {} - {}".format(
-            pd, pd.start_date, pd.end_date))
+        print("\nProcessing ProgrammeDocument {}".format(
+           pd.id))
+        print(10*"****")
 
         reportable_queryset = pd.reportable_queryset
-        frequency = pd.frequency
         latest_progress_report = pd.progress_reports.order_by(
             'end_date').last()
-        date_list = []
 
-        if frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
-            print("PD {} frequency is custom specific dates".format(
-                pd))
-            if not latest_progress_report:
-                date_list = pd.reporting_periods.filter(
-                    start_date__gte=pd.start_date, end_date__lte=datetime.now())
-            else:
-                date_list = pd.reporting_periods.filter(
-                    start_date__gte=latest_progress_report.end_date, end_date__lte=datetime.now())
-        else:
-            # Get missing date list based on progress report existence
-            if latest_progress_report:
-                print("PD {} ProgressReport Found with period of {} - {} ".format(
-                    pd,
-                    latest_progress_report.start_date,
-                    latest_progress_report.end_date))
+        generate_from_date = None
 
-                date_list = find_missing_frequency_period_dates(
-                    pd.start_date, latest_progress_report.end_date, frequency
-                )
+        # Get missing date list based on progress report existence
+        if latest_progress_report:
+            generate_from_date = latest_progress_report.start_date
 
-            else:
-                print("PD {} ProgressReport NOT Found".format(
-                    pd))
-
-                date_list = find_missing_frequency_period_dates(
-                    pd.start_date, None, frequency)
-
-        print("Missing dates: {}".format(date_list))
+        print("Last report: %s" % generate_from_date)
 
         with transaction.atomic():
-            for idx, missing_date in enumerate(date_list):
-                if frequency != PD_FREQUENCY_LEVEL.custom_specific_dates:
-                    end_date = calculate_end_date_given_start_date(
-                        missing_date, frequency)
-                    due_date = end_date + \
-                               timedelta(days=DUE_DATE_DAYS_TIMEDELTA)
-                else:
-                    end_date = missing_date.end_date
-                    due_date = missing_date.due_date
-                    missing_date = missing_date.start_date
+            for reporting_period in pd.reporting_periods.all():
+                # If PR start date is greater than now, skip!
+                if reporting_period.start_date > datetime.now().date():
+                    print("No new reports to generate")
+                    continue
+                # If PR was already generated, skip!
+                if generate_from_date and reporting_period.start_date <= generate_from_date:
+                    print("No new reports to generate")
+                    continue
 
+                end_date = reporting_period.end_date
+                due_date = reporting_period.due_date
+                start_date = reporting_period.start_date
+    #
                 # Create ProgressReport first
                 print(
-                    "Creating PD {} ProgressReport object for {} - {}".format(pd, missing_date, end_date))
+                    "Creating ProgressReport for {} - {}".format(start_date, end_date))
                 next_progress_report = ProgressReportFactory(
-                    start_date=missing_date,
+                    start_date=start_date,
                     end_date=end_date,
                     due_date=due_date,
                     programme_document=pd,
@@ -126,18 +108,18 @@ def process_period_reports():
                 for reportable in reportable_queryset:
                     if reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
                         print(
-                            "Creating PD {} Quantity IndicatorReport object for {} - {}".format(
-                                pd, missing_date, end_date))
+                            "Creating Quantity IndicatorReport for {} - {}".format(
+                                start_date, end_date))
                         indicator_report = QuantityIndicatorReportFactory(
                             reportable=reportable,
-                            time_period_start=missing_date,
+                            time_period_start=start_date,
                             time_period_end=end_date,
                             due_date=due_date,
                         )
 
                         for location in reportable.locations.all():
-                            print("Creating IndicatorReport {} IndicatorLocationData object for {} - {}".format(
-                                indicator_report, missing_date, end_date))
+                            print("Creating IndicatorReport {} IndicatorLocationData for {} - {}".format(
+                                indicator_report, start_date, end_date))
                             IndicatorLocationDataFactory(
                                 indicator_report=indicator_report,
                                 location=location,
@@ -152,18 +134,18 @@ def process_period_reports():
 
                     else:
                         print(
-                            "Creating PD {} Ratio IndicatorReport object for {} - {}".format(
-                                pd, missing_date, end_date))
+                            "Creating PD {} Ratio IndicatorReport for {} - {}".format(
+                                pd, start_date, end_date))
                         indicator_report = RatioIndicatorReportFactory(
                             reportable=reportable,
-                            time_period_start=missing_date,
+                            time_period_start=start_date,
                             time_period_end=end_date,
                             due_date=due_date,
                         )
 
                         for location in reportable.locations.all():
-                            print("Creating IndicatorReport {} IndicatorLocationData object {} - {}".format(
-                                indicator_report, missing_date, end_date))
+                            print("Creating IndicatorReport {} IndicatorLocationData {} - {}".format(
+                                indicator_report, start_date, end_date))
                             IndicatorLocationDataFactory(
                                 indicator_report=indicator_report,
                                 location=location,
@@ -178,6 +160,7 @@ def process_period_reports():
 
                     indicator_report.progress_report = next_progress_report
                     indicator_report.save()
+
 
     for indicator in Reportable.objects.filter(
             content_type__model__in=[
@@ -234,33 +217,33 @@ def process_period_reports():
         with transaction.atomic():
             last_element_idx = len(date_list) - 1
 
-            for idx, missing_date in enumerate(date_list):
+            for idx, start_date in enumerate(date_list):
                 if frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
                     if idx != last_element_idx:
                         end_date = calculate_end_date_given_start_date(
-                            missing_date, frequency, cs_dates=date_list)
+                            start_date, frequency, cs_dates=date_list)
 
                     else:
                         break
 
                 else:
                     end_date = calculate_end_date_given_start_date(
-                        missing_date, frequency)
+                        start_date, frequency)
 
                 if indicator.blueprint.unit == IndicatorBlueprint.NUMBER:
                     print(
                         "Creating Indicator {} Quantity IndicatorReport object for {} - {}".format(
-                            indicator, missing_date, end_date))
+                            indicator, start_date, end_date))
 
                     indicator_report = QuantityIndicatorReportFactory(
                         reportable=indicator,
-                        time_period_start=missing_date,
+                        time_period_start=start_date,
                         time_period_end=end_date,
                     )
 
                     for location in indicator.locations.all():
                         print("Creating IndicatorReport {} IndicatorLocationData object {} - {}".format(
-                            indicator_report, missing_date, end_date))
+                            indicator_report, start_date, end_date))
 
                         location_data = IndicatorLocationDataFactory(
                             indicator_report=indicator_report,
@@ -277,17 +260,17 @@ def process_period_reports():
                 else:
                     print(
                         "Creating Indicator {} Ratio IndicatorReport object for {} - {}".format(
-                            indicator, missing_date, end_date))
+                            indicator, start_date, end_date))
 
                     indicator_report = RatioIndicatorReportFactory(
                         reportable=indicator,
-                        time_period_start=missing_date,
+                        time_period_start=start_date,
                         time_period_end=end_date,
                     )
 
                     for location in indicator.locations.all():
                         print("Creating IndicatorReport {} IndicatorLocationData object {} - {}".format(
-                            indicator_report, missing_date, end_date))
+                            indicator_report, start_date, end_date))
 
                         location_data = IndicatorLocationDataFactory(
                             indicator_report=indicator_report,
