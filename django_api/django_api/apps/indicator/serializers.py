@@ -910,6 +910,8 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
             'report_status',
             'overall_status',
             'narrative_assessment',
+            'sent_back_feedback',
+            'review_date',
             'cluster',
             'cluster_id',
             'project',
