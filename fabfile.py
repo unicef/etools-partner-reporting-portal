@@ -22,11 +22,16 @@ def up_recreate():
     local('docker-compose down && docker-compose up')
 
 
-def up():
+def up(quick=False):
     """
     Create and start containers.
     """
-    local('docker-compose up')
+    if quick:
+        command = 'docker-compose up'
+    else:
+        command = 'docker-compose up --force-recreate --build'
+
+    local(command)
 
 
 def up_with_bundle(quick=True):
@@ -71,11 +76,18 @@ def fixtures(quantity=40):
     local('docker-compose exec django_api python manage.py generate_fake_data --quantity %d --clean_before' % (int(quantity)))
 
 
-def real_fixtures(fast=False):
+def real_fixtures(area=False):
     """
     Uses real sync with PMP API to get all data.
     """
-    local('docker-compose exec django_api python manage.py generate_real_data --clean_before %s' % ("--fast" if fast else ""))
+    local('docker-compose exec django_api python manage.py generate_real_data --clean_before %s' % ("--area %s --fast" % area if area else ""))
+
+
+def fake_users(fast=False):
+    """
+    Uses real sync with PMP API to get all data.
+    """
+    local('docker-compose exec django_api python manage.py generate_fake_users --clean_before')
 
 
 def update_real_fixtures(area=False):

@@ -89,7 +89,7 @@
             hide-scroll-buttons>
           <paper-tab name="overview">Overview</paper-tab>
           <paper-tab name="indicators">Project Indicators</paper-tab>
-          <paper-tab name="activities">Activities</paper-tab>
+          <paper-tab name="activities">Project Activities</paper-tab>
         </paper-tabs>
       </div>
     </page-header>
@@ -164,6 +164,7 @@
           tab = 'overview';
         }
         this.set('tab', tab);
+        this.set('queryParams.page', 1);
         this.set('route.path', '/' + this.tab);
       },
 

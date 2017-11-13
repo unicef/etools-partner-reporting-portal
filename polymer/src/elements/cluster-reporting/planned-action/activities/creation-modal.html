@@ -77,11 +77,6 @@
     </style>
 
     <etools-prp-ajax
-        id="partner"
-        url="[[partnerUrl]]">
-    </etools-prp-ajax>
-
-    <etools-prp-ajax
         id="activity"
         url="[[activityUrl]]"
         method="post"
@@ -271,7 +266,7 @@
                 <div class="item">
                   <etools-single-selection-menu
                       class="validate"
-                      label="CO ref. #"
+                      label="Cluster Objective"
                       options="[[objectives]]"
                       option-value="id"
                       option-label="title"
@@ -488,11 +483,6 @@
           type: Object,
           statePath: 'partner.current',
         },
-
-        partnerUrl: {
-          type: String,
-          value: App.Endpoints.partnerDetails(),
-        },
       },
 
       listeners: {
@@ -500,7 +490,6 @@
       },
 
       observers: [
-        '_fetchPartner(partner.id)',
         '_fetchProjects(partner.id)',
         '_fetchActivities(data.cluster.cluster)',
         '_fetchObjectives(data.custom.cluster)',
@@ -548,7 +537,6 @@
 
       _fetchClusters: function () {
         var self = this;
-
         this.$.clusters.abort();
 
         this.$.clusters.thunk()()
@@ -562,16 +550,14 @@
 
       _fetchActivities: function (clusterId) {
         var self = this;
-
         if (typeof clusterId === 'undefined') {
           return;
         }
         this.set('activities', []);
         this.set('data.cluster.cluster_activity', undefined);
         this.set('activitiesParams.cluster_id', clusterId);
-        //TODO: need to include clusterId and results need to be based on it
         this.set('activitiesUrl',
-            App.Endpoints.responseParametersClusterActivities(this.responsePlanId) 
+            App.Endpoints.responseParametersClusterActivities(this.responsePlanId)
             + '?cluster_id=' + clusterId);
         this.$.activities.abort();
 
@@ -624,23 +610,6 @@
             });
       },
 
-      _fetchPartner: function (partnerId) {
-        this.debounce('fetch-partner', function () {
-          var partnerThunk;
-
-          if (typeof partnerId !== 'undefined') {
-            return;
-          }
-
-          partnerThunk = this.$.partner.thunk();
-
-          this.dispatch(App.Actions.fetchPartner(partnerThunk))
-              .catch(function (err) { // jshint ignore:line
-                // TODO: error handling
-              });
-        }, 100);
-      },
-
       _save: function () {
         var fields = [].slice.call(
           Polymer.dom(this.root).querySelectorAll('.validate')
@@ -677,12 +646,6 @@
 
               self.set('updatePending', false);
             });
-      },
-
-      detached: function () {
-        if (this.isDebouncerActive('fetch-partner')) {
-          this.cancelDebouncer('fetch-partner');
-        }
       },
     });
   </script>

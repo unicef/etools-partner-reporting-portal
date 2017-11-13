@@ -103,6 +103,11 @@ from partner.cron import PartnerCronJob
 from unicef.cron import ProgrammeDocumentCronJob
 from indicator.cron import IndicatorReportOverDueCronJob
 
+from core.tasks import *
+from indicator.tasks import *
+from partner.tasks import *
+from unicef.tasks import *
+
 OVERALL_STATUS_LIST = [x[0] for x in OVERALL_STATUS]
 
 
@@ -138,6 +143,26 @@ def clean_up_data():
         print("All ORM objects deleted")
 
 
+def generate_fake_users():
+    users_to_create = [
+        ('admin_imo', 'admin_imo@notanemail.com', IMORole),
+        ('admin_ao', 'admin_ao@notanemail.com', PartnerAuthorizedOfficerRole),
+        ('admin_pe', 'admin_pe@notanemail.com', PartnerEditorRole),
+        ('admin_pv', 'admin_pv@notanemail.com', PartnerViewerRole),
+    ]
+    users_created = []
+    for u in users_to_create:
+        admin, created = User.objects.get_or_create(username=u[0], defaults={
+            'email': u[1],
+            'is_superuser': True,
+            'is_staff': True,
+        })
+        admin.set_password('Passw0rd!')
+        admin.save()
+        admin.groups.add(u[2].as_group())
+        users_created.append(admin)
+
+
 def generate_real_data(fast=False, area=None, update=False):
 
     if not update:
@@ -160,23 +185,19 @@ def generate_real_data(fast=False, area=None, update=False):
             users_created.append(admin)
 
         # Generate workspaces
-        workspace_cron = WorkspaceCronJob()
-        workspace_cron.do()
+        process_workspaces()
 
         # Generate partners
-        partner_cron = PartnerCronJob()
-        partner_cron.do()
+        process_partners()
 
     # Generate programme documents
-    pd_cron = ProgrammeDocumentCronJob()
-    pd_cron.do(fast, area)
+    process_programme_documents(fast, area)
 
     # Generate PR/IR
-    call_command('generate_reports_for_periods')
+    process_period_reports()
 
     # Generate due/overdue reports
-    due_reports = IndicatorReportOverDueCronJob()
-    due_reports.do()
+    process_due_reports()
 
 
 def generate_fake_data(workspace_quantity=10):

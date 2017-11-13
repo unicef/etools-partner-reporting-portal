@@ -71,20 +71,27 @@
       _computeUrl: function(responsePlanId, projectId) {
         //Make sure the queryParams are updated before the thunk is created:
         this.set('queryParams.project', projectId);
-        this.set('queryParams.page', 1);
 
         return App.Endpoints.partnerActivityList(responsePlanId);
       },
 
       _activitiesByPartnerProjectIdAjax: function () {
-        var thunk = this.$.activities.thunk();
+        this.debounce('activities-by-partner', function() { 
+          var thunk = this.$.activities.thunk();
 
-        this.$.activities.abort();
+          this.$.activities.abort();
 
-        this.dispatch(App.Actions.PartnerProjects.activities.fetch(thunk, this.projectId))
-          .catch(function (err) { // jshint ignore:line
-              // TODO: error handling.
-          });
+          this.dispatch(App.Actions.PartnerProjects.activities.fetch(thunk, this.projectId))
+            .catch(function (err) { // jshint ignore:line
+                // TODO: error handling.
+            });
+        }, 100);
+      },
+
+      detached: function () {
+        if (this.isDebouncerActive('activities-by-partner')) {
+          this.cancelDebouncer('activities-by-partner');
+        }
       },
     });
   </script>

@@ -8,6 +8,7 @@
 <link rel="import" href="../../../../elements/cluster-reporting/planned-action/activities/creation-modal.html">
 <link rel="import" href="../../../../elements/cluster-reporting/activity-list-table.html">
 <link rel="import" href="../../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../../elements/etools-prp-permissions.html">
 <link rel="import" href="../../../../styles/shared-styles.html">
 <link rel="import" href="../../../../styles/buttons.html">
 
@@ -24,6 +25,10 @@
       }
     </style>
 
+    <etools-prp-permissions
+        permissions="{{permissions}}">
+    </etools-prp-permissions>
+
     <iron-location query="{{query}}" path="{{path}}"></iron-location>
 
     <iron-query-params
@@ -37,19 +42,19 @@
         params="[[queryParams]]">
     </etools-prp-ajax>
 
-    <etools-prp-ajax
-        id="partnerDetails"
-        url="[[partnerDetailsUrl]]">
-    </etools-prp-ajax>
-
     <page-body>
       <planned-action-activities-filters></planned-action-activities-filters>
 
-      <div id="action">
-        <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
-          Add Activity
-        </paper-button>
-      </div>
+      <template
+          is="dom-if"
+          if="[[permissions.createPartnerEntities]]"
+          restamp="true">
+        <div id="action">
+          <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
+            Add Activity
+          </paper-button>
+        </div>
+      </template>
 
       <planned-action-activity-modal id="modal"></planned-action-activity-modal>
 
@@ -80,6 +85,8 @@
       ],
 
       properties: {
+        permissions: Object,
+
         queryParams: Object,
 
         responsePlanID: {
@@ -98,12 +105,6 @@
           type: String,
           computed: '_computeUrl(responsePlanID, queryParams, partnerID)'
         },
-
-        partnerDetailsUrl: {
-          type: String,
-          value: App.Endpoints.partnerDetails(),
-          observer: '_fetchCurrentPartner',
-        },
       },
 
       _onSuccess: function(e, data) {
@@ -112,34 +113,32 @@
         this.set('path', url);
       },
 
-      _fetchCurrentPartner: function () {
-        var partnerThunk = this.$.partnerDetails.thunk();
-
-        this.dispatch(App.Actions.fetchPartner(partnerThunk))
-            .catch(function (err) { // jshint ignore:line
-            // TODO: error handling
-            });
-      },
-
       _computeUrl: function (responsePlanID) {
-        // TODO: update to response plan id as kwarg passing it to this func
-        return App.Endpoints.partnerActivityList(responsePlanID); 
+        return App.Endpoints.partnerActivityList(responsePlanID);
       },
 
       _activitiesAjax: function (queryParams) {
-        queryParams.partner = this.partnerID;
-        var thunk = this.$.plannedActionsActivities.thunk();
+        this.debounce('activities-ajax', function() {
+          queryParams.partner = this.partnerID;
+          var thunk = this.$.plannedActionsActivities.thunk();
 
-        if (!Object.keys(queryParams).length) {
-          return;
+          if (!Object.keys(queryParams).length) {
+            return;
+          }
+
+          this.$.plannedActionsActivities.abort();
+
+          this.dispatch(App.Actions.PartnerActivities.fetchPartnerActivitiesList(thunk))
+            .catch(function (err) { // jshint ignore:line
+                // TODO: error handling.
+            });
+          }, 300);
+      },
+
+      detached: function () {
+        if (this.isDebouncerActive('activities-ajax')) {
+          this.cancelDebouncer('activities-ajax');
         }
-
-        this.$.plannedActionsActivities.abort();
-
-        this.dispatch(App.Actions.PartnerActivities.fetchPartnerActivitiesList(thunk))
-          .catch(function (err) { // jshint ignore:line
-              // TODO: error handling.
-          });
       },
 
     });

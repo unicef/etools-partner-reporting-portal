@@ -51,18 +51,14 @@
       <etools-content-panel panel-title="Cluster Objective Details">
         <div class="row">
           <ul class="app-grid">
-            <li class="item">
-              <labelled-item label="Cluster">
-                <span class="value">[[_withDefault(data.cluster_title, '')]]</span>
+            <li class="item full-width">
+              <labelled-item label="Title">
+                <span class="value">[[_withDefault(data.title, '')]]</span>
               </labelled-item>
             </li>
             <li class="item">
-              <labelled-item label="Frequency of Reporting">
-                <span class="value">
-                  <frequency-of-reporting
-                      type="[[data.frequency]]">
-                  </frequency-of-reporting>
-                </span>
+              <labelled-item label="Cluster">
+                <span class="value">[[_withDefault(data.cluster_title, '')]]</span>
               </labelled-item>
             </li>
           </ul>

@@ -63,6 +63,10 @@ class DisaggregationListSerializer(serializers.ModelSerializer):
             'choices',
         )
 
+class IdDisaggregationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Disaggregation
+        fields = ('id',)
 
 class IndicatorBlueprintSimpleSerializer(serializers.ModelSerializer):
     # id added explicitely here since it gets stripped out from validated_dat
@@ -651,7 +655,7 @@ class IndicatorBlueprintSerializer(serializers.ModelSerializer):
 
 class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
-    disaggregation = serializers.JSONField()
+    disaggregations = IdDisaggregationSerializer(many=True)
     object_type = serializers.CharField(
         validators=[add_indicator_object_type_validator])
     blueprint = IndicatorBlueprintSerializer()
@@ -666,9 +670,11 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             'object_id',
             'object_type',
             'locations',
-            'disaggregation',
+            'disaggregations',
             'frequency',
             'cs_dates',
+            'target',
+            'baseline',
         )
 
     def get_object_type(self, obj):
@@ -680,22 +686,17 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             raise ValidationError(
                 {"locations": "List of dict location or one dict location expected"})
 
-    def check_disaggregation(self, disaggregation):
-        if not isinstance(disaggregation, list):
+    def check_disaggregation(self, disaggregations):
+        if not isinstance(disaggregations, list) or\
+            False in [dis.get('id', False) for dis in disaggregations]:
             raise ValidationError(
-                {"disaggregation": "List of dict disaggregation expected"})
-        max_length = DisaggregationValue._meta.get_field('value').max_length
-        for dis in disaggregation:
-            for val in dis['values']:
-                if len(val) > max_length:
-                    msg = "Disaggregation Value expected max %s chars" % max_length
-                    raise ValidationError({"disaggregation": msg})
+                {"disaggregations": "List of dict disaggregation expected"})
 
     @transaction.atomic
     def create(self, validated_data):
 
         self.check_location(self.initial_data.get('locations'))
-        self.check_disaggregation(self.initial_data.get('disaggregation'))
+        self.check_disaggregation(self.initial_data.get('disaggregations'))
 
         validated_data['blueprint']['unit'] = validated_data[
             'blueprint']['display_type']
@@ -750,8 +751,8 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
         del validated_data['object_type']
         del validated_data['locations']
-        disaggregations = validated_data['disaggregation']
-        del validated_data['disaggregation']
+        disaggregations = validated_data['disaggregations']
+        del validated_data['disaggregations']
 
         self.instance = Reportable.objects.create(**validated_data)
 
@@ -759,18 +760,9 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             self.instance.locations.add(
                 Location.objects.get(id=location.get('id')))
 
-        for disaggregation in disaggregations:
-            disaggregation_instance = Disaggregation.objects.create(
-                name=disaggregation['name'],
-                reportable=self.instance,
-                active=True,
-            )
-            for value in disaggregation['values']:
-                DisaggregationValue.objects.create(
-                    disaggregation=disaggregation_instance,
-                    value=value,
-                    active=True
-                )
+        for dis in self.initial_data.get('disaggregations'):
+            self.instance.disaggregations.add(
+                Disaggregation.objects.get(id=dis.get('id')))
 
         return self.instance
 
@@ -814,7 +806,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
 class ClusterIndicatorDataSerializer(serializers.ModelSerializer):
 
-    disaggregation = DisaggregationListSerializer(many=True)
+    disaggregations = DisaggregationListSerializer(many=True)
     blueprint = IndicatorBlueprintSerializer()
     locations = IdLocationSerializer(many=True)
 
@@ -825,7 +817,7 @@ class ClusterIndicatorDataSerializer(serializers.ModelSerializer):
             'means_of_verification',
             'blueprint',
             'locations',
-            'disaggregation',
+            'disaggregations',
             'frequency',
             'cs_dates',
         )
@@ -869,8 +861,10 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
     reportable = IndicatorListSerializer()
     reporting_period = serializers.SerializerMethodField()
     cluster = serializers.SerializerMethodField()
+    cluster_id = serializers.SerializerMethodField()
     project = serializers.SerializerMethodField()
     partner = serializers.SerializerMethodField()
+    partner_id = serializers.SerializerMethodField()
     partner_activity = serializers.SerializerMethodField()
     is_draft = serializers.SerializerMethodField()
     can_submit = serializers.SerializerMethodField()
@@ -892,8 +886,10 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
             'overall_status',
             'narrative_assessment',
             'cluster',
+            'cluster_id',
             'project',
             'partner',
+            'partner_id',
             'partner_activity',
             'is_draft',
             'can_submit',
@@ -910,13 +906,28 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
             obj.time_period_end.strftime(settings.PRINT_DATA_FORMAT)
         )
 
-    def get_cluster(self, obj):
+    def _get_cluster(self, obj):
         if isinstance(obj.reportable.content_object, (ClusterObjective, )):
-            return obj.reportable.content_object.cluster.title
+            return obj.reportable.content_object.cluster
         elif isinstance(obj.reportable.content_object, (ClusterActivity, )):
-            return obj.reportable.content_object.cluster_objective.cluster.title
+            return obj.reportable.content_object.cluster_objective.cluster
+        elif isinstance(obj.reportable.content_object, (PartnerActivity, )):
+            if obj.reportable.content_object.cluster_activity:
+                return obj.reportable.content_object.cluster_activity.cluster_objective.cluster
+            else:
+                return obj.reportable.content_object.cluster_objective.cluster
+        elif isinstance(obj.reportable.content_object, (PartnerProject, )):
+            return obj.reportable.content_object.clusters.first()
         else:
-            ''
+            return None
+
+    def get_cluster(self, obj):
+        cluster = self._get_cluster(obj)
+        return cluster.get_type_display() if cluster else ""
+
+    def get_cluster_id(self, obj):
+        cluster = self._get_cluster(obj)
+        return cluster.id if cluster else ""
 
     def get_project(self, obj):
         if isinstance(obj.reportable.content_object, (PartnerProject, )):
@@ -940,12 +951,18 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
         else:
             return ''
 
-    def get_partner(self, obj):
+    def _get_partner(self, obj):
         if isinstance(obj.reportable.content_object,
                       (PartnerProject, PartnerActivity)):
-            return obj.reportable.content_object.partner.title
+            return obj.reportable.content_object.partner
         else:
-            return ''
+            return None
+
+    def get_partner(self, obj):
+        return self._get_partner(obj).title
+
+    def get_partner_id(self, obj):
+        return self._get_partner(obj).id
 
     def get_partner_activity(self, obj):
         if isinstance(obj.reportable.content_object, (PartnerProject, )):

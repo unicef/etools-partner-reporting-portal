@@ -52,6 +52,7 @@ from core.models import (
 )
 from core.countries import COUNTRIES_ALPHA2_CODE
 
+PARTNER_PROJECT_STATUS_LIST = [x[0] for x in PARTNER_PROJECT_STATUS]
 PD_STATUS_LIST = [x[0] for x in PD_STATUS]
 COUNTRIES_LIST = [x[0] for x in COUNTRIES_ALPHA2_CODE]
 COUNTRY_NAMES_LIST = [x[1] for x in COUNTRIES_ALPHA2_CODE]
@@ -123,7 +124,7 @@ class PartnerActivityFactory(factory.django.DjangoModelFactory):
 
     start_date = beginning_of_this_year
     end_date = beginning_of_this_year + datetime.timedelta(days=30)
-    status = fuzzy.FuzzyChoice(PARTNER_PROJECT_STATUS.ongoing)
+    status = fuzzy.FuzzyChoice(PARTNER_PROJECT_STATUS_LIST)
 
     @factory.post_generation
     def locations(self, create, extracted, **kwargs):

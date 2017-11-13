@@ -74,7 +74,7 @@
         back="[[backLink]]">
 
       <page-badge
-          class="above-title" name="activity">
+          class="above-title" name="cluster activity">
       </page-badge>
 
       <div class="toolbar">
@@ -100,7 +100,8 @@
 
     <template is="dom-if" if="[[_equals(tab, 'indicators')]]" restamp="true">
       <rp-clusters-activity-indicators
-        activity-id=[[activityId]]>
+        activity-id="[[activityId]]"
+        cluster-id="[[data.co_cluster_id]]">
       </rp-clusters-activity-indicators>
     </template>
 
@@ -109,7 +110,6 @@
         activity-id=[[activityId]]>
       </rp-clusters-activity-contributing-partners>
     </template>
-
   </template>
 
   <script>

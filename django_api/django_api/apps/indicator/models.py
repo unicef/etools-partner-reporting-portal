@@ -147,8 +147,8 @@ class IndicatorBlueprint(TimeStampedExternalSyncModelMixin):
         are appropriate based on type of unit.
         """
         unit_to_valid_calc_values = {
-            self.NUMBER: map(lambda x: x[0], self.QUANTITY_CALC_CHOICES),
-            self.PERCENTAGE: map(lambda x: x[0], self.RATIO_CALC_CHOICES),
+            self.NUMBER: list(map(lambda x: x[0], self.QUANTITY_CALC_CHOICES)),
+            self.PERCENTAGE: list(map(lambda x: x[0], self.RATIO_CALC_CHOICES)),
         }
         if self.calculation_formula_across_periods not in unit_to_valid_calc_values.get(self.unit, []) or \
                 self.calculation_formula_across_locations not in unit_to_valid_calc_values.get(self.unit, []):

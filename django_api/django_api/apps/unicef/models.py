@@ -420,7 +420,7 @@ class ProgressReport(TimeStampedModel):
             self.id, self.programme_document, self.start_date, self.end_date)
 
 
-class ReportingPeriodDates(TimeStampedModel):
+class ReportingPeriodDates(TimeStampedExternalSyncModelMixin):
     """
     Used for storing start_date, end_date and due_date fields for multiple reports
     """

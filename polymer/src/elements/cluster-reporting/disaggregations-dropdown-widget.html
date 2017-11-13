@@ -145,7 +145,7 @@
           invalid: {
             type: Boolean,
             notify: true,
-            value: true
+            value: false
           },
 
           _canAddMore: {
@@ -212,6 +212,8 @@
         },
 
         validate: function () {
+          var self = this;
+          this.set('invalid', false);
           var allMenus = Polymer.dom(this.root).querySelectorAll('.dis-menu');
           allMenus.forEach(function(menu) {
             menu.set('invalid', false);
@@ -219,6 +221,7 @@
           allMenus.forEach(function(menu) {
             if (!menu.value) {
               menu.set('invalid', true);
+              self.set('invalid', true);
             }
           });
           if (allMenus.length < 2) {
@@ -233,6 +236,7 @@
               if (chosen[i] === chosen[j]) {
                 allMenus[i].set('invalid', true);
                 allMenus[j].set('invalid', true);
+                self.set('invalid', true);
               }
             }
           }

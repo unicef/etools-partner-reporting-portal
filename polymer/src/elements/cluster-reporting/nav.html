@@ -11,10 +11,9 @@
 <link rel="import" href="../../behaviors/page-nav.html">
 <link rel="import" href="../../behaviors/routing.html">
 <link rel="import" href="../../redux/store.html">
+<link rel="import" href="../etools-prp-permissions.html">
 
 <link rel="import" href="../../styles/page-nav.html">
-
-<app-route route="{{route}}"></app-route>
 
 <dom-module id="cluster-reporting-nav">
   <template>
@@ -27,6 +26,12 @@
       }
 
     </style>
+
+    <etools-prp-permissions
+        permissions="{{permissions}}">
+    </etools-prp-permissions>
+
+    <app-route route="{{route}}"></app-route>
 
     <paper-menu
         id="menu"
@@ -59,11 +64,16 @@
           </paper-submenu>
         </div>
 
-        <paper-item name="planned-action" class="selectable">
-          <a href="[[buildUrl(_baseUrlCluster, '/planned-action/')]]">
-            <span><iron-icon icon="av:playlist-add" role="presentation"></iron-icon>My Planned Action</span>
-          </a>
-        </paper-item>
+        <template
+            is="dom-if"
+            if="[[permissions.viewPlannedAction]]"
+            restamp="true">
+          <paper-item name="planned-action" class="selectable">
+            <a href="[[buildUrl(_baseUrlCluster, '/planned-action/')]]">
+              <span><iron-icon icon="av:playlist-add" role="presentation"></iron-icon>My Planned Action</span>
+            </a>
+          </paper-item>
+        </template>
 
         <paper-item name="results" class="selectable">
           <a href="[[buildUrl(_baseUrlCluster, '/results')]]">
@@ -91,8 +101,8 @@
 
       properties: {
         clustersSelected: String,
-        partnersSelected: String
-
+        partnersSelected: String,
+        permissions: Object,
       },
 
       observers: [

@@ -53,7 +53,7 @@
       </page-badge>
 
       <div class="toolbar">
-        <project-status status="[[data.status]]"></project-status>
+        <project-status status="[[projectData.status]]"></project-status>
       </div>
 
       <div class="tabs">
@@ -136,6 +136,7 @@
           tab = 'overview';
         }
         this.set('tab', tab);
+        this.set('queryParams.page', 1);
         this.set('route.path', '/' + this.tab);
       },
 

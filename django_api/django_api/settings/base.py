@@ -13,6 +13,11 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 import os
 import sys
 
+import datetime
+
+from cryptography.hazmat.backends import default_backend
+from cryptography.x509 import load_pem_x509_certificate
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(os.path.join(BASE_DIR, 'apps/'))
@@ -66,6 +71,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
 
     'rest_framework',
     'rest_framework.authtoken',
@@ -87,6 +93,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE_CLASSES = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -97,6 +104,14 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
+
+CORS_ORIGIN_WHITELIST = (
+    'etools.unicef.org',
+    'etools-demo.unicef.org',
+    'etools-test.unicef.org',
+    'etools-staging.unicef.org',
+    'etools-dev.unicef.org'
+)
 
 ROOT_URLCONF = 'django_api.urls'
 
@@ -156,6 +171,45 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# JWT
+# django-rest-framework-jwt: http://getblimp.github.io/django-rest-framework-jwt/
+JWT_AUTH = {
+   'JWT_ENCODE_HANDLER':
+   'rest_framework_jwt.utils.jwt_encode_handler',
+
+   'JWT_DECODE_HANDLER':
+   'rest_framework_jwt.utils.jwt_decode_handler',
+
+   'JWT_PAYLOAD_HANDLER':
+   'rest_framework_jwt.utils.jwt_payload_handler',
+
+   'JWT_PAYLOAD_GET_USER_ID_HANDLER':
+   'rest_framework_jwt.utils.jwt_get_user_id_from_payload_handler',
+
+   'JWT_PAYLOAD_GET_USERNAME_HANDLER':
+   'rest_framework_jwt.utils.jwt_get_username_from_payload_handler',
+
+   'JWT_RESPONSE_PAYLOAD_HANDLER':
+   'rest_framework_jwt.utils.jwt_response_payload_handler',
+
+   'JWT_ALGORITHM': 'HS256',
+   'JWT_VERIFY': True,
+   'JWT_VERIFY_EXPIRATION': True,
+   'JWT_LEEWAY': 30,
+   'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=30000),
+   'JWT_AUDIENCE': None,
+   'JWT_ISSUER': None,
+
+   'JWT_ALLOW_REFRESH': False,
+   'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
+
+   'JWT_AUTH_HEADER_PREFIX': 'JWT',
+}
+DISABLE_JWT_AUTH = os.getenv('DISABLE_JWT_AUTH', False)
+# This user will be used for all externals that have a valid JWT but no user account in the system
+DEFAULT_UNICEF_USER = 'default_unicef_user'
+# Allows login for users that do not have a User account in the system, without creating a user account by using default
+JWT_ALLOW_NON_EXISTENT_USERS = True
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
@@ -276,6 +330,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES':
         (
             'rest_framework.authentication.SessionAuthentication',
+            'utils.mixins.CustomJSONWebTokenAuthentication',
             'rest_framework.authentication.TokenAuthentication',
     )
 }
@@ -295,3 +350,38 @@ PASSWORDLESS_AUTH = {
 PMP_API_ENDPOINT = "https://etools-demo.unicef.org/api"
 PMP_API_USER = os.getenv('PMP_API_USER')
 PMP_API_PASSWORD = os.getenv('PMP_API_PASSWORD')
+
+# assuming we're using Azure Storage:
+# django-storages: https://django-storages.readthedocs.io/en/latest/backends/azure.html
+AZURE_ACCOUNT_NAME = os.environ.get('AZURE_ACCOUNT_NAME', None)  # noqa: F405
+AZURE_ACCOUNT_KEY = os.environ.get('AZURE_ACCOUNT_KEY', None)  # noqa: F405
+AZURE_CONTAINER = os.environ.get('AZURE_CONTAINER', None)  # noqa: F405
+AZURE_SSL = True
+AZURE_AUTO_SIGN = True  # flag for automatically signing urls
+AZURE_ACCESS_POLICY_EXPIRY = 120  # length of time before signature expires in seconds
+AZURE_ACCESS_POLICY_PERMISSION = 'r'  # read permission
+
+if all([AZURE_ACCOUNT_NAME, AZURE_ACCOUNT_KEY, AZURE_CONTAINER]):
+    DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
+    from storages.backends.azure_storage import AzureStorage
+    storage = AzureStorage()
+    with storage.open('keys/jwt/certificate.pem') as jwt_cert:
+        with open('keys/jwt/certificate.pem', 'w+') as new_jwt_cert:
+            new_jwt_cert.write(jwt_cert.read())
+
+# JWT Authentication
+# production overrides for django-rest-framework-jwt
+if not DISABLE_JWT_AUTH:
+    public_key_text = open(os.path.join(BASE_DIR, 'keys/jwt/certificate.pem'), 'rb').read()  # noqa: F405
+    certificate = load_pem_x509_certificate(public_key_text, default_backend())
+
+    JWT_PUBLIC_KEY = certificate.public_key()
+
+    JWT_AUTH.update({  # noqa: F405
+        'JWT_SECRET_KEY': SECRET_KEY,
+        'JWT_PUBLIC_KEY': JWT_PUBLIC_KEY,
+        'JWT_ALGORITHM': 'RS256',
+        'JWT_LEEWAY': 60,
+        'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=3000),  # noqa: F405
+        'JWT_AUDIENCE': 'https://etools.unicef.org/',
+    })

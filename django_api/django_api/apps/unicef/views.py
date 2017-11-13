@@ -55,7 +55,7 @@ from .serializers import (
     ProgressReportUpdateSerializer
 )
 from .models import ProgrammeDocument, ProgressReport
-from .permissions import CanChangePDCalculationMethod
+from .permissions import CanChangePDCalculationMethod, UnicefPartnershipManagerOrRead
 from .filters import (
     ProgrammeDocumentFilter, ProgressReportFilter,
     ProgrammeDocumentIndicatorFilter
@@ -144,16 +144,21 @@ class ProgrammeDocumentProgressAPIView(RetrieveAPIView):
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
     def get_object(self, pd_id):
+        user_has_global_view = self.request.user.is_unicef
+        external_request = self.request.query_params.get('external', False)
+        search_by = 'external_id' if external_request else 'pk'
+        query_params = {}
+        if not user_has_global_view:
+            query_params['partner'] = self.request.user.partner
+        query_params['workspace'] = self.workspace_id,
+        query_params[search_by] = pd_id
         try:
-            return ProgrammeDocument.objects.get(
-                partner=self.request.user.partner,
-                workspace=self.workspace_id,
-                pk=pd_id)
+            return ProgrammeDocument.objects.get(**query_params)
         except ProgrammeDocument.DoesNotExist as exp:
             logger.exception({
                 "endpoint": "ProgrammeDocumentProgressAPIView",
                 "request.data": self.request.data,
-                "pk": pd_id,
+                search_by: pd_id,
                 "exception": exp,
             })
             raise Http404
@@ -238,15 +243,21 @@ class ProgressReportAPIView(ListAPIView):
     filter_class = ProgressReportFilter
 
     def get_queryset(self):
+        user_has_global_view = self.request.user.is_unicef
+
         external_partner_id = self.request.GET.get('external_partner_id')
         if external_partner_id is not None:
             qset = Partner.objects.filter(external_id=external_partner_id)
             return ProgressReport.objects.filter(
                 programme_document__partner__in=qset)
         else:
+            # TODO: In case of UNICEF user.. allow for all (maybe create a special group for the unicef api user?)
             # Limit reports to this user's partner only
-            return ProgressReport.objects.filter(
-                programme_document__partner=self.request.user.partner)
+            if user_has_global_view:
+                return ProgressReport.objects.all()
+            else:
+                return ProgressReport.objects.filter(
+                    programme_document__partner=self.request.user.partner)
 
     def list(self, request, workspace_id, *args, **kwargs):
         queryset = self.get_queryset().filter(
@@ -342,7 +353,7 @@ class ProgressReportDetailsUpdateAPIView(APIView):
                 "pk": pk,
                 "exception": exp,
             })
-            raise Http404def
+            raise Http404
 
     def put(self, request, workspace_id, pk, *args, **kwargs):
         self.workspace_id = workspace_id
@@ -379,11 +390,14 @@ class ProgressReportDetailsAPIView(RetrieveAPIView):
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
     def get_object(self, pk):
+        user_has_global_view = self.request.user.is_unicef
+        query_params = {}
+        if not user_has_global_view:
+            query_params["programme_document__partner"] = self.request.user.partner
+        query_params['programme_document__workspace'] = self.workspace_id
+        query_params['pk'] = pk
         try:
-            return ProgressReport.objects.get(
-                programme_document__partner=self.request.user.partner,  # TODO: check if needed?
-                programme_document__workspace=self.workspace_id,
-                pk=pk)
+            return ProgressReport.objects.get(**query_params)
         except ProgressReport.DoesNotExist as exp:
             logger.exception({
                 "endpoint": "ProgressReportDetailsAPIView",
@@ -556,7 +570,7 @@ class ProgressReportReviewAPIView(APIView):
 
     Only a PO (not a partner user) should be allowed to do this action.
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (UnicefPartnershipManagerOrRead,)
 
     def get_object(self, pk):
         try:
@@ -651,11 +665,9 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
         serializer = ProgrammeDocumentCalculationMethodsSerializer(
             data=request.data)
         if serializer.is_valid():
-            print(serializer.validated_data)
             for llo_and_indicators in serializer.validated_data[
                     'll_outputs_and_indicators']:
                 for indicator_blueprint in llo_and_indicators['indicators']:
-                    print(indicator_blueprint)
                     instance = get_object_or_404(IndicatorBlueprint,
                                                  id=indicator_blueprint['id'])
                     instance.calculation_formula_across_periods = \
