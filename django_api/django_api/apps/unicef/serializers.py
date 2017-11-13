@@ -214,6 +214,7 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
     indicator_reports = serializers.SerializerMethodField()
     review_overall_status_display = serializers.CharField(
         source='get_review_overall_status_display')
+    funds_received_to_date = serializers.SerializerMethodField()
 
     def __init__(self, llo_id=None, location_id=None, *args, **kwargs):
         self.llo_id = llo_id
@@ -238,8 +239,13 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
             'review_overall_status_display',
             'sent_back_feedback',
             'programme_document',
-            'indicator_reports'
+            'funds_received_to_date',
+            'indicator_reports',
+            'submitted_by',
         )
+
+    def get_funds_received_to_date(self, obj):
+        return obj.programme_document.funds_received_to_date
 
     def get_indicator_reports(self, obj):
         qset = obj.indicator_reports.all()
