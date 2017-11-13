@@ -7,6 +7,10 @@
 <link rel="import" href="../../../bower_components/promise-polyfill/promise-polyfill-lite.html">
 <link rel="import" href="../../../bower_components/iron-location/iron-location.html">
 <link rel="import" href="../../../bower_components/iron-location/iron-query-params.html">
+<link rel="import" href="../../../bower_components/paper-menu-button/paper-menu-button.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../../bower_components/paper-item/paper-icon-item.html">
 
 <link rel="import" href="../../polyfills/es6-shim.html">
 <link rel="import" href="../../endpoints.html">
@@ -14,6 +18,7 @@
 <link rel="import" href="../../behaviors/notifications.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
+<link rel="import" href="send-back-modal.html">
 <link rel="import" href="../reportable-meta.html">
 <link rel="import" href="../error-modal.html">
 <link rel="import" href="../report-status.html">
@@ -29,6 +34,8 @@
     <style include="iron-flex iron-flex-alignment iron-flex-factors shared-styles button-styles">
       :host {
         display: block;
+
+        --paper-item-icon-width: auto;
       }
 
       .report {
@@ -36,7 +43,7 @@
       }
 
       .report__meta {
-        padding: 10px 25px 10px 10px;
+        padding: 10px;
         color: var(--paper-grey-600);
       }
 
@@ -147,6 +154,18 @@
       reportable-meta {
         padding: 25px;
       }
+
+      paper-menu {
+        white-space: nowrap;
+      }
+
+      paper-menu a {
+        color: inherit;
+      }
+
+      paper-menu iron-icon {
+        margin-right: .25em;
+      }
     </style>
 
     <etools-prp-permissions
@@ -199,7 +218,7 @@
         <div class="flex layout vertical">
           <div class="report__meta layout horizontal">
             <div class="column flex">
-              <report-status status="[[data.overall_status]]"></report-status>
+              <report-status status="[[data.report_status]]"></report-status>
               <dl>
                 <template
                     is="dom-if"
@@ -256,19 +275,37 @@
                   Submit
                 </paper-button>
               </template>
+
               <template
                   is="dom-if"
                   if="[[_equals(mode, 'view')]]"
                   restamp="true">
-                <a
-                    href="[[exportUrl]]"
-                    target="_blank"
-                    tabindex="-1">
-                  <paper-button class="btn-primary">
-                    <iron-icon icon="icons:file-download"></iron-icon>
-                    Export
-                  </paper-button>
-                </a>
+                <send-back-modal
+                    id="sendBackModal"
+                    report="[[data]]">
+                </send-back-modal>
+
+                <paper-menu-button dynamic-align>
+                  <paper-icon-button icon="icons:more-vert" class="dropdown-trigger"></paper-icon-button>
+                  <paper-menu
+                      id="menu"
+                      class="dropdown-content"
+                      selected="1">
+                    <paper-icon-item on-tap="_sendBack">
+                      <iron-icon icon="icons:reply" item-icon></iron-icon>
+                      Send back to partner
+                    </paper-icon-item>
+                    <a
+                        href="[[exportUrl]]"
+                        target="_blank"
+                        tabindex="-1">
+                      <paper-icon-item>
+                        <iron-icon icon="icons:file-download" item-icon></iron-icon>
+                        Export
+                      </paper-icon-item>
+                    </a>
+                  </paper-menu>
+                </paper-menu-button>
               </template>
             </div>
           </div>
@@ -593,6 +630,14 @@
         canSubmit = permissions.submitIndicatorReport(data.cluster_id, data.partner_id);
 
         return canSubmit ? mode : 'view';
+      },
+
+      _sendBack: function () {
+        this.$$('#sendBackModal').open();
+
+        this.async(function () {
+          this.$$('#menu').select(1);
+        });
       },
 
       detached: function () {
