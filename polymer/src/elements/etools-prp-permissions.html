@@ -49,9 +49,9 @@
           App.Constants.GROUP_EDITOR,
         ],
 
-        createClusterEntities: function (params) {
-          return isIMO(params.groups);
-        },
+        createClusterEntities: [
+          App.Constants.GROUP_IMO,
+        ],
 
         createClusterEntitiesForCluster: function (params, clusterId) {
           return params.imoClusters.some(function (cluster) {
@@ -88,6 +88,10 @@
               return false;
           }
         },
+
+        sendBackIndicatorReport: [
+          App.Constants.GROUP_IMO,
+        ],
 
         createPartnerEntities: [
           App.Constants.GROUP_AUTHORIZED_OFFICER,

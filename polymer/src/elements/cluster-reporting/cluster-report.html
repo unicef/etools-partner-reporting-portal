@@ -291,10 +291,19 @@
                       id="menu"
                       class="dropdown-content"
                       selected="1">
-                    <paper-icon-item on-tap="_sendBack">
-                      <iron-icon icon="icons:reply" item-icon></iron-icon>
-                      Send back to partner
-                    </paper-icon-item>
+                    <template
+                        is="dom-if"
+                        if="[[canSendBack]]">
+                      <paper-icon-item on-tap="_sendBack">
+                        <iron-icon icon="icons:reply" item-icon></iron-icon>
+                        Send back to partner
+                      </paper-icon-item>
+                    </template>
+
+                    <!-- <paper-icon-item>
+                      <iron-icon icon="icons:announcement" item-icon></iron-icon>
+                      View feedback
+                    </paper-icon-item> -->
                     <a
                         href="[[exportUrl]]"
                         target="_blank"
@@ -474,6 +483,11 @@
           type: String,
           computed: '_computeSubmitMode(mode, data, permissions)',
         },
+
+        canSendBack: {
+          type: Boolean,
+          computed: '_computeCanSendBack(data, permissions)',
+        },
       },
 
       listeners: {
@@ -630,6 +644,10 @@
         canSubmit = permissions.submitIndicatorReport(data.cluster_id, data.partner_id);
 
         return canSubmit ? mode : 'view';
+      },
+
+      _computeCanSendBack: function (data, permissions) {
+        return data.report_status === 'Sub' && permissions.sendBackIndicatorReport;
       },
 
       _sendBack: function () {

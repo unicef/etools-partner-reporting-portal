@@ -57,7 +57,7 @@
 
       <template
           is="dom-if"
-          if="[[_canAddObjective(permissions)]]"
+          if="[[permissions.createClusterEntities]]"
           restamp="true">
         <cluster-objectives-modal id="modal"></cluster-objectives-modal>
 
@@ -124,10 +124,6 @@
                 // TODO: error handling.
             });
         }, 300);
-      },
-
-      _canAddObjective: function (permissions) {
-        return permissions.createClusterEntities();
       },
 
       detached: function () {
