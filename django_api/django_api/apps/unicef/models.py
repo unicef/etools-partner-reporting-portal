@@ -39,12 +39,24 @@ class Section(TimeStampedExternalSyncModelMixin):
 
 
 class Person(TimeStampedExternalSyncModelMixin):
-    name = models.CharField(max_length=128, verbose_name='Name')
-    title = models.CharField(max_length=255, verbose_name='Title')
-    phone_number = models.CharField(max_length=64, verbose_name='Phone Number')
-    email = models.CharField(max_length=255, verbose_name='Phone Number')
+    name = models.CharField(
+        max_length=128,
+        verbose_name='Name',
+        blank=True,
+        null=True)
+    title = models.CharField(
+        max_length=255,
+        verbose_name='Title',
+        blank=True,
+        null=True)
+    phone_number = models.CharField(
+        max_length=64,
+        verbose_name='Phone Number',
+        blank=True,
+        null=True)
+    email = models.CharField(max_length=255, verbose_name='Email')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -72,15 +84,15 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
     reference_number = models.CharField(max_length=255,
                                         verbose_name='Reference Number',
                                         db_index=True)
-    title = models.CharField(max_length=255,
+    title = models.CharField(max_length=512,
                              verbose_name='PD/SSFA ToR Title',
                              db_index=True)
     unicef_office = models.CharField(max_length=255,
                                      verbose_name='UNICEF Office(s)')
 
     unicef_officers = models.ManyToManyField(Person,
-                                              verbose_name='UNICEF Officer(s)',
-                                              related_name="officer_programme_documents")
+                                             verbose_name='UNICEF Officer(s)',
+                                             related_name="officer_programme_documents")
     unicef_focal_point = models.ManyToManyField(Person,
                                                 verbose_name='UNICEF Focal Point(s)',
                                                 related_name="unicef_focal_programme_documents")
@@ -186,7 +198,9 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
         choices=CURRENCIES,
         default=CURRENCIES.usd,
         max_length=16,
-        verbose_name='Funds received Currency'
+        verbose_name='Funds received Currency',
+        blank = True,
+        null = True,
     )
 
     # TODO:
@@ -209,7 +223,7 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
     @cached_property
     def reportable_queryset(self):
         return Reportable.objects.filter(
-            lower_level_outputs__cp_output__programme_document=self)
+            lower_level_outputs__cp_output__programme_document=self, active=True)
 
     @property
     def reports_exists(self):
@@ -237,7 +251,8 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
 
     @property
     def report_status(self):
-        # TODO: this should be cached (it's expensive) - redis will be perfect with midnight reset !!!
+        # TODO: this should be cached (it's expensive) - redis will be perfect
+        # with midnight reset !!!
         if self.__report_status is not None:
             return self.__report_status
         if not self.reports_exists:
@@ -252,7 +267,8 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
 
     @property
     def due_date(self):
-        # TODO: this can be cached - redis will be perfect with midnight reset !!!
+        # TODO: this can be cached - redis will be perfect with midnight reset
+        # !!!
         if self.__due_date is not None:
             return self.__due_date
         elif not self.reports_exists:
@@ -282,7 +298,8 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
 
     @property
     def funds_received_to_date_percentage(self):
-        return "%.0f" % (self.funds_received_to_date / self.budget)
+        return "%.0f" % (self.funds_received_to_date /
+                         self.budget) if self.budget > 0 else 0
 
     @property
     def calculated_budget(self):
@@ -334,7 +351,8 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
 
 def find_first_programme_document_id():
     try:
-        import pdb; pdb.set_trace()
+        import pdb
+        pdb.set_trace()
         pd_id = ProgrammeDocument.objects.first().id
     except AttributeError:
         from core.factories import ProgrammeDocumentFactory
@@ -380,7 +398,6 @@ class ProgressReport(TimeStampedModel):
     )
     sent_back_feedback = models.TextField(blank=True, null=True)
 
-
     class Meta:
         ordering = ['-due_date', '-id']
 
@@ -403,29 +420,37 @@ class ProgressReport(TimeStampedModel):
             self.id, self.programme_document, self.start_date, self.end_date)
 
 
-class ReportingPeriodDates(TimeStampedModel):
+class ReportingPeriodDates(TimeStampedExternalSyncModelMixin):
     """
     Used for storing start_date, end_date and due_date fields for multiple reports
     """
     start_date = models.DateField(verbose_name='Start date')
     end_date = models.DateField(verbose_name='End date')
     due_date = models.DateField(null=True, blank=True, verbose_name='Due date')
-    programme_document = models.ForeignKey(ProgrammeDocument, related_name='reporting_periods')
+    programme_document = models.ForeignKey(
+        ProgrammeDocument, related_name='reporting_periods')
 
 
-class CountryProgrammeOutput(TimeStampedExternalSyncModelMixin):
+class PDResultLink(TimeStampedExternalSyncModelMixin):
     """
-    CountryProgrammeOutput (LLO Parent) module.
+    Represents flattended version of InterventionResultLink in eTools. Instead
+    of having 2 models for CP output and result link we have this here.
+
+    external_id - field on this model will be the result link id in eTools.
+    title - is the CP output title. Eg. "1.1 POLICY - NEWBORN & CHILD HEALTH"
 
     related models:
         unicef.ProgrammeDocument (ForeignKey): "programme_document"
     """
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=512,
+                             verbose_name='CP output title/name')
     programme_document = models.ForeignKey(ProgrammeDocument,
                                            related_name="cp_outputs")
+    external_cp_output_id = models.IntegerField()
 
     class Meta:
         ordering = ['id']
+        unique_together = ('external_id', 'external_cp_output_id')
 
     def __str__(self):
         return self.title
@@ -436,14 +461,16 @@ class LowerLevelOutput(TimeStampedExternalSyncModelMixin):
     LowerLevelOutput (PD output) module describe the goals to reach in PD scope.
 
     related models:
-        unicef.CountryProgrammeOutput (ForeignKey): "indicator"
+        unicef.PDResultLink (ForeignKey): "indicator"
         indicator.Reportable (GenericRelation): "reportables"
     """
-    title = models.CharField(max_length=255)
-    cp_output = models.ForeignKey(CountryProgrammeOutput,
+    title = models.CharField(max_length=512)
+    cp_output = models.ForeignKey(PDResultLink,
                                   related_name="ll_outputs")
     reportables = GenericRelation('indicator.Reportable',
                                   related_query_name='lower_level_outputs')
+
+    active = models.BooleanField(default=True)
 
     class Meta:
         ordering = ['id']

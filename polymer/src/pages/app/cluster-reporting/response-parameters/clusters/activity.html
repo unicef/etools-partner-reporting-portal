@@ -77,7 +77,7 @@ contributing-partners.html">
         back="[[backLink]]">
 
       <page-badge
-          class="above-title" name="activity">
+          class="above-title" name="cluster activity">
       </page-badge>
 
       <div class="toolbar">
@@ -91,7 +91,7 @@ contributing-partners.html">
             scrollable
             hide-scroll-buttons>
           <paper-tab name="overview">Overview</paper-tab>
-          <paper-tab name="indicators">Indicators</paper-tab>
+          <paper-tab name="indicators">Activity Indicators</paper-tab>
           <paper-tab name="contributing-partners">Contributing Partners</paper-tab>
         </paper-tabs>
       </div>
@@ -103,7 +103,8 @@ contributing-partners.html">
 
     <template is="dom-if" if="[[_equals(tab, 'indicators')]]" restamp="true">
       <rp-clusters-activity-indicators
-        activity-id=[[activityId]]>
+        activity-id="[[activityId]]"
+        cluster-id="[[data.co_cluster_id]]">
       </rp-clusters-activity-indicators>
     </template>
 
@@ -112,7 +113,6 @@ contributing-partners.html">
         activity-id=[[activityId]]>
       </rp-clusters-activity-contributing-partners>
     </template>
-
   </template>
 
   <script>

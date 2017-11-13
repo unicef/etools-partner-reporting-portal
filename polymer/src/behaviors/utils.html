@@ -20,7 +20,7 @@
         );
       },
 
-      _withDefault: function(value, defaultValue) {
+      _withDefault: function (value, defaultValue) {
         if (!defaultValue) {
           defaultValue = '...';
         }
@@ -29,12 +29,20 @@
             defaultValue : value;
       },
 
+      _withDefaultFrom: function (obj, key, defaultValue) {
+        if (typeof defaultValue === 'undefined') {
+          defaultValue = '...';
+        }
+
+        return obj[key] || defaultValue;
+      },
+
       _debug: function (val) {
         return JSON.stringify(val, null, 2);
       },
 
       _log: function (val) {
-        console.log(val);
+        console.log('_log', val);
       },
 
       _toNumber: function (val) {

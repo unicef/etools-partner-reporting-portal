@@ -5,7 +5,6 @@
 <link rel="import" href="../../../../../elements/page-body.html">
 <link rel="import" href="../../../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../../../elements/page-body.html">
-<link rel="import" href="../../../../../elements/frequency-of-reporting.html">
 <link rel="import" href="../../../../../behaviors/utils.html">
 <link rel="import" href="../../../../../endpoints.html">
 <link rel="import" href="../../../../../redux/actions.html">
@@ -56,28 +55,9 @@
                 <span class="value">[[_withDefault(data.title, '')]]</span>
               </labelled-item>
             </li>
-            <li class="item full-width">
-              <labelled-item label="Standard">
-                <span class="value">[[_withDefault(data.standard)]]</span>
-              </labelled-item>
-            </li>
             <li class="item">
               <labelled-item label="Cluster">
-                <span class="value">[[_withDefault(data.cluster)]]</span>
-              </labelled-item>
-            </li>
-            <li class="item">
-              <labelled-item label="CO ref #">
-                <span class="value">[[_withDefault(data.co_reference_number)]]</span>
-              </labelled-item>
-            </li>
-            <li class="item">
-              <labelled-item label="Frequency of Reporting">
-                <span class="value">
-                  <frequency-of-reporting
-                      type="[[data.frequency]]">
-                  </frequency-of-reporting>
-                </span>
+                <span class="value">[[_withDefault(data.co_cluster_title)]]</span>
               </labelled-item>
             </li>
           </ul>

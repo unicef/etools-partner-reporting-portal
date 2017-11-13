@@ -15,7 +15,7 @@
         },
 
         EUR: {
-          prefix: '€',
+          prefix: '€ ',
         },
       };
 
@@ -33,7 +33,9 @@
         },
 
         _computeMeta: function (currency) {
-          return currencies[currency];
+          return currencies[currency] || {
+            suffix: ' ' + currency,
+          };
         },
       });
     }());

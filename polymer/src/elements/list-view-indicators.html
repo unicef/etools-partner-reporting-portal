@@ -36,11 +36,19 @@
         id="listHeader"
         label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
 
-        <etools-data-table-column class="flex-6" field="indicator">
+        <etools-data-table-column class="flex-3" field="indicator">
           <div class="table-column">Indicator</div>
         </etools-data-table-column>
 
-        <etools-data-table-column  class="flex-4" field="progress">
+        <etools-data-table-column class="flex-3" field="indicator">
+          <div class="table-column">Baseline</div>
+        </etools-data-table-column>
+
+        <etools-data-table-column class="flex-3" field="indicator">
+          <div class="table-column">Target</div>
+        </etools-data-table-column>
+
+        <etools-data-table-column  class="flex-3" field="progress">
             <div class="table-column">Current progress</div>
         </etools-data-table-column>
 
@@ -52,7 +60,8 @@
                 initial-count="[[pageSize]]"
                 as="indicator">
         <list-view-single-indicator
-          indicator="{{indicator}}">
+          indicator="{{indicator}}"
+          is-custom="[[isCustom]]">
         </list-view-single-indicator>
       </template>
 

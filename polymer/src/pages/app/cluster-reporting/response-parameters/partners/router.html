@@ -6,6 +6,8 @@
 
 <link rel="import" href="../../../../../behaviors/utils.html">
 <link rel="import" href="projects.html">
+<link rel="import" href="activities.html">
+<link rel="import" href="contacts.html">
 
 <dom-module id="response-parameters-partners-router">
   <template>
@@ -28,9 +30,12 @@
         selected="[[page]]"
         attr-for-selected="name">
 
-      <template is="dom-if" if="[[_equals(page, 'contacts')]]" restamp="true">
-        TODO: Contacts
-      </template>
+<!--       <template is="dom-if" if="[[_equals(page, 'contacts')]]" restamp="true">
+        <rp-partners-contacts
+          name="contacts"
+          route="{{subroute}}">
+        </rp-partners-contacts>
+      </template> -->
 
       <template is="dom-if" if="[[_equals(page, 'projects')]]" restamp="true">
         <rp-partners-projects
@@ -48,11 +53,19 @@
       </template>
 
       <template is="dom-if" if="[[_equals(page, 'activities')]]" restamp="true">
-        TODO: Activities
+        <rp-partners-activities
+          name="activities"
+          route="{{subroute}}">
+        </rp-partners-activities>
       </template>
 
       <template is="dom-if" if="[[_equals(page, 'activity')]]" restamp="true">
-        TODO: Activity
+        <rp-partners-activity-detail
+          name="activity"
+          activity-id="{{id}}"
+          response-plan-id="{{responsePlanID}}"
+          route="{{subroute}}">
+        </rp-partners-activity-detail>
       </template>
     </iron-pages>
   </template>
@@ -63,6 +76,7 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
       ],
 
       observers: [
@@ -73,6 +87,11 @@
         page: {
           type: String,
           observer: '_pageChanged',
+        },
+
+        responsePlanID: {
+          type: String,
+          statePath: 'responsePlans.currentID',
         },
 
         id: String,
@@ -86,11 +105,6 @@
         var resolvedPageUrl;
 
         if (!page) {
-          return;
-        }
-
-        // TODO: Remove when other pages are ready.
-        if (page === 'activities' || page === 'contacts') {
           return;
         }
 

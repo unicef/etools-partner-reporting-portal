@@ -27,6 +27,17 @@ class WorkspaceAPIView(ListAPIView):
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     filter_fields = ('business_area_code', 'workspace_code')
 
+    def list(self, request, *args, **kwargs):
+        """
+        Only return workspaces that the user is associated with.
+        """
+        queryset = request.user.workspaces.all()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(
+            serializer.data,
+            status=statuses.HTTP_200_OK
+        )
+
 
 class LocationListAPIView(ListAPIView):
     """

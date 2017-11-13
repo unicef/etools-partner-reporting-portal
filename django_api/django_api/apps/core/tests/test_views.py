@@ -29,7 +29,8 @@ class TestWorkspaceListAPIView(BaseAPITestCase):
         self.assertEquals(response.status_code, status.HTTP_200_OK)
         self.assertEquals(
             len(response.data),
-            Workspace.objects.prefetch_related('locations').filter(locations__isnull=False).distinct().count()
+            Workspace.objects.prefetch_related('locations').filter(
+                locations__isnull=False).distinct().count()
         )
 
 
@@ -37,7 +38,9 @@ class TestLocationListAPIView(BaseAPITestCase):
 
     def test_list_api(self):
         response_plan_id = ResponsePlan.objects.first().id
-        url = reverse('location', kwargs={'response_plan_id': response_plan_id})
+        url = reverse(
+            'location', kwargs={
+                'response_plan_id': response_plan_id})
         response = self.client.get(url, format='json')
 
         result = ResponsePlan.objects.filter(id=response_plan_id).values_list(

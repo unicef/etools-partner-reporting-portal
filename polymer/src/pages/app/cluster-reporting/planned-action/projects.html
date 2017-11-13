@@ -8,6 +8,7 @@
 <link rel="import" href="../../../../elements/cluster-reporting/planned-action/projects/creation-modal.html">
 <link rel="import" href="../../../../elements/cluster-reporting/project-list-table.html">
 <link rel="import" href="../../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../../elements/etools-prp-permissions.html">
 <link rel="import" href="../../../../styles/shared-styles.html">
 <link rel="import" href="../../../../styles/buttons.html">
 
@@ -24,6 +25,10 @@
       }
     </style>
 
+    <etools-prp-permissions
+        permissions="{{permissions}}">
+    </etools-prp-permissions>
+
     <iron-location query="{{query}}"></iron-location>
 
     <iron-query-params
@@ -37,19 +42,20 @@
         params="[[queryParams]]">
     </etools-prp-ajax>
 
-    <etools-prp-ajax
-        id="partnerDetails"
-        url="[[partnerDetailsUrl]]">
-    </etools-prp-ajax>
-
     <page-body>
       <planned-action-projects-filters></planned-action-projects-filters>
 
-      <div id="action">
-        <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
-          Add Project
-        </paper-button>
-      </div>
+
+      <template
+          is="dom-if"
+          if="[[permissions.createPartnerEntities]]"
+          restamp="true">
+        <div id="action">
+          <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
+            Add Project
+          </paper-button>
+        </div>
+      </template>
 
       <planned-action-projects-modal id="modal"></planned-action-projects-modal>
 
@@ -76,6 +82,7 @@
       ],
 
       properties: {
+        permissions: Object,
         queryParams: Object,
 
         responsePlanID: {
@@ -92,21 +99,6 @@
           type: String,
           computed: '_computeUrl(responsePlanID, queryParams, partnerID)'
         },
-
-        partnerDetailsUrl: {
-          type: String,
-          value: App.Endpoints.partnerDetails(),
-          observer: '_fetchCurrentPartner',
-        },
-      },
-
-      _fetchCurrentPartner: function () {
-        var partnerThunk = this.$.partnerDetails.thunk();
-
-        this.dispatch(App.Actions.fetchPartner(partnerThunk))
-            .catch(function (err) { // jshint ignore:line
-            // TODO: error handling
-            });
       },
 
       _computeUrl: function (responsePlanID) {
@@ -114,22 +106,29 @@
       },
 
       _projectsAjax: function (queryParams) {
-        queryParams.partner = this.partnerID;
+        this.debounce('projects-ajax', function () {
+          queryParams.partner = this.partnerID;
 
-        var thunk = this.$.plannedActionsProjects.thunk();
+          var thunk = this.$.plannedActionsProjects.thunk();
 
-        if (!Object.keys(queryParams).length) {
-          return;
-        }
+          if (!Object.keys(queryParams).length) {
+            return;
+          }
 
-        this.$.plannedActionsProjects.abort();
+          this.$.plannedActionsProjects.abort();
 
-        this.dispatch(App.Actions.PartnerProjects.fetchPartnerProjectsList(thunk))
-          .catch(function (err) { // jshint ignore:line
-              // TODO: error handling.
-          });
+          this.dispatch(App.Actions.PartnerProjects.fetchPartnerProjectsList(thunk))
+            .catch(function (err) { // jshint ignore:line
+                // TODO: error handling.
+            });
+        }, 300);
       },
 
+      detached: function () {
+        if (this.isDebouncerActive('projects-ajax')) {
+          this.cancelDebouncer('projects-ajax');
+        }
+      },
     });
   </script>
 </dom-module>

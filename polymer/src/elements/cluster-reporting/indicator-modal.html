@@ -234,6 +234,34 @@
           </div>
 
           <div class="row">
+            <div class="app-grid">
+              <div class="item">
+                <paper-input
+                  class="validate"
+                  label="Baseline"
+                  on-input="_validate"
+                  value="{{data.baseline}}"
+                  type="number"
+                  always-float-label
+                  required>
+                </paper-input>
+              </div>
+
+              <div class="item">
+                <paper-input
+                  class="validate"
+                  label="Target"
+                  on-input="_validate"
+                  value="{{data.target}}"
+                  type="number"
+                  always-float-label
+                  required>
+                </paper-input>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
             <etools-multi-selection-menu
                 class="validate"
                 label="Location"
@@ -295,6 +323,10 @@
         objectType: String,
 
         displayType: String,
+
+        baseline: Number,
+        
+        target: Number,
 
         responsePlanId: {
          type: String,
@@ -439,7 +471,7 @@
             id: dis.id,
           };
         }) : [];
-        this.set('data.disaggregation', selected);
+        this.set('data.disaggregations', selected);
       },
 
       _onValueChanged: function (e) {
@@ -461,7 +493,7 @@
           cs_dates: [],
           locations: [],
           blueprint: {},
-          disaggregation: [],
+          disaggregations: [],
         });
 
         this._forEach('paper-radio-group', this._updateValue);
@@ -558,6 +590,8 @@
             .then(function (res) {
               self.fire('indicator-added', res.data);
               self.set('updatePending', false);
+              self.set('type', '');
+              self.set('displayType', '');
               self.close();
             })
             .catch(function (err) { // jshint ignore:line

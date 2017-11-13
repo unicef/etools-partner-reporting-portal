@@ -75,24 +75,31 @@
       },
 
       _clusterActivitiesAjax: function (queryParams) {
-        var thunk;
+        this.debounce('cluster-activities', function() { 
+          var thunk;
+          if (typeof queryParams.cluster_objective_id === 'undefined') {
+            return;
+          }
 
-        if (typeof queryParams.cluster_objective_id === 'undefined') {
-          return;
-        }
+          thunk = this.$.activities.thunk();
 
-        thunk = this.$.activities.thunk();
+          this.$.activities.abort();
 
-        this.$.activities.abort();
-
-        this.dispatch(App.Actions.ClusterActivities.fetchClusterActivitiesList(thunk))
-          .catch(function (err) { // jshint ignore:line
-              // TODO: error handling.
-          });
+          this.dispatch(App.Actions.ClusterActivities.fetchClusterActivitiesList(thunk))
+            .catch(function (err) { // jshint ignore:line
+                // TODO: error handling.
+            });
+        }, 100);
       },
 
       _computeActivitiesUrl: function () {
         return App.Endpoints.responseParametersClusterActivities(this.responsePlanID);
+      },
+
+      detached: function () {
+        if (this.isDebouncerActive('cluster-activities')) {
+          this.cancelDebouncer('cluster-activities');
+        }
       },
     });
   </script>

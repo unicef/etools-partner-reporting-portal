@@ -14,7 +14,7 @@ from .models import ProgrammeDocument, ProgressReport
 BOOLEAN_CHOICES = (('0', 'False'), ('1', 'True'),)
 
 
-class  ProgrammeDocumentIndicatorFilter(django_filters.FilterSet):
+class ProgrammeDocumentIndicatorFilter(django_filters.FilterSet):
 
     pd_statuses = ChoiceFilter(choices=PD_STATUS, method='get_status')
     pds = CharFilter(method='get_programme_document')
@@ -65,11 +65,15 @@ class ProgrammeDocumentFilter(django_filters.FilterSet):
         return queryset.filter(status=value)
 
     def get_location(self, queryset, name, value):
-        return queryset.filter(progress_reports__indicator_reports__indicator_location_data__location=value)
+        return queryset.filter(
+            progress_reports__indicator_reports__indicator_location_data__location=value)
 
 
 class ProgressReportFilter(django_filters.FilterSet):
-    status = ChoiceFilter(name='status', choices=PROGRESS_REPORT_STATUS, label='Status')
+    status = ChoiceFilter(
+        name='status',
+        choices=PROGRESS_REPORT_STATUS,
+        label='Status')
     pd_ref_title = CharFilter(name='pd ref title', method='get_pd_ref_title',
                               label='PD/Ref # title')
     due_date = DateFilter(name='due date', method='get_due_date', label='Due date',
@@ -77,15 +81,29 @@ class ProgressReportFilter(django_filters.FilterSet):
     due = TypedChoiceFilter(name='due', choices=BOOLEAN_CHOICES, coerce=strtobool,
                             method='get_due_overdue_status', label='Show only due or overdue')
     location = CharFilter(name='location', method='get_location',
-                              label='Location')
+                          label='Location')
+    programme_document_ext = CharFilter(name='programme_document_ext', method='get_pd_ext',
+                                        label='programme_document_ext')
+    section = CharFilter(name='section', method='get_section')
+    cp_output = CharFilter(name='cp_output', method='get_cp_output')
 
     class Meta:
         model = ProgressReport
         fields = ['status', 'pd_ref_title', 'due_date', 'programme_document',
-                  'programme_document__id']
+                  'programme_document__id', 'programme_document__external_id', 'section', 'cp_output']
 
     def get_status(self, queryset, name, value):
         return queryset.filter(status=value)
+
+    def get_pd_ext(self, queryset, name, value):
+        return queryset.filter(programme_document__external_id=value)
+
+    def get_section(self, queryset, name, value):
+        return queryset.filter(programme_document__sections__external_id=value)
+
+    def get_cp_output(self, queryset, name, value):
+        return queryset.filter(programme_document__cp_outputs__external_cp_output_id=value)
+
 
     def get_due_overdue_status(self, queryset, name, value):
         if value:
@@ -103,4 +121,5 @@ class ProgressReportFilter(django_filters.FilterSet):
         return queryset.filter(due_date__lte=value)
 
     def get_location(self, queryset, name, value):
-        return queryset.filter(indicator_reports__indicator_location_data__location=value)
+        return queryset.filter(
+            indicator_reports__indicator_location_data__location=value)

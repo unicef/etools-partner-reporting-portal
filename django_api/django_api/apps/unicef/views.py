@@ -27,15 +27,16 @@ from core.paginations import SmallPagination
 from core.permissions import (
     IsAuthenticated,
     IsPartnerAuthorizedOfficer,
-    IsPartnerEditor
+    IsPartnerEditor,
+    IsPartnerEditorOrPartnerAuthorizedOfficer
 )
 from core.models import Location
 from core.serializers import ShortLocationSerializer
 
 from indicator.models import Reportable, IndicatorReport, IndicatorBlueprint
 from indicator.serializers import (
-        IndicatorListSerializer,
-        PDReportContextIndicatorReportSerializer
+    IndicatorListSerializer,
+    PDReportContextIndicatorReportSerializer
 )
 from indicator.filters import PDReportsFilter
 from indicator.serializers import IndicatorBlueprintSimpleSerializer
@@ -54,14 +55,13 @@ from .serializers import (
     ProgressReportUpdateSerializer
 )
 from .models import ProgrammeDocument, ProgressReport
-from .permissions import CanChangePDCalculationMethod
+from .permissions import CanChangePDCalculationMethod, UnicefPartnershipManagerOrRead
 from .filters import (
     ProgrammeDocumentFilter, ProgressReportFilter,
     ProgrammeDocumentIndicatorFilter
 )
 
 logger = logging.getLogger(__name__)
-
 
 
 class ProgrammeDocumentAPIView(ListAPIView):
@@ -144,16 +144,21 @@ class ProgrammeDocumentProgressAPIView(RetrieveAPIView):
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
     def get_object(self, pd_id):
+        user_has_global_view = self.request.user.is_unicef
+        external_request = self.request.query_params.get('external', False)
+        search_by = 'external_id' if external_request else 'pk'
+        query_params = {}
+        if not user_has_global_view:
+            query_params['partner'] = self.request.user.partner
+        query_params['workspace'] = self.workspace_id,
+        query_params[search_by] = pd_id
         try:
-            return ProgrammeDocument.objects.get(
-                partner=self.request.user.partner,
-                workspace=self.workspace_id,
-                pk=pd_id)
+            return ProgrammeDocument.objects.get(**query_params)
         except ProgrammeDocument.DoesNotExist as exp:
             logger.exception({
                 "endpoint": "ProgrammeDocumentProgressAPIView",
                 "request.data": self.request.data,
-                "pk": pd_id,
+                search_by: pd_id,
                 "exception": exp,
             })
             raise Http404
@@ -166,8 +171,11 @@ class ProgrammeDocumentLocationsAPIView(ListAPIView):
     permission_classes = (IsAuthenticated,)
 
     def list(self, request, workspace_id, *args, **kwargs):
-        pd = ProgrammeDocument.objects.filter(partner=self.request.user.partner, workspace=workspace_id)
-        queryset = self.get_queryset().filter(indicator_location_data__indicator_report__progress_report__programme_document__in=pd).distinct()
+        pd = ProgrammeDocument.objects.filter(
+            partner=self.request.user.partner,
+            workspace=workspace_id)
+        queryset = self.get_queryset().filter(
+            indicator_location_data__indicator_report__progress_report__programme_document__in=pd).distinct()
         filtered = ProgressReportFilter(request.GET, queryset=queryset)
 
         page = self.paginate_queryset(filtered.qs)
@@ -180,6 +188,7 @@ class ProgrammeDocumentLocationsAPIView(ListAPIView):
             serializer.data,
             status=statuses.HTTP_200_OK
         )
+
 
 class ProgrammeDocumentIndicatorsAPIView(ListAPIView):
 
@@ -218,6 +227,7 @@ class ProgrammeDocumentIndicatorsAPIView(ListAPIView):
             status=statuses.HTTP_200_OK
         )
 
+
 class ProgressReportAPIView(ListAPIView):
     """
     Endpoint for getting list of all Progress Reports. Supports filtering
@@ -233,15 +243,21 @@ class ProgressReportAPIView(ListAPIView):
     filter_class = ProgressReportFilter
 
     def get_queryset(self):
+        user_has_global_view = self.request.user.is_unicef
+
         external_partner_id = self.request.GET.get('external_partner_id')
         if external_partner_id is not None:
             qset = Partner.objects.filter(external_id=external_partner_id)
             return ProgressReport.objects.filter(
                 programme_document__partner__in=qset)
         else:
+            # TODO: In case of UNICEF user.. allow for all (maybe create a special group for the unicef api user?)
             # Limit reports to this user's partner only
-            return ProgressReport.objects.filter(
-                programme_document__partner=self.request.user.partner)
+            if user_has_global_view:
+                return ProgressReport.objects.all()
+            else:
+                return ProgressReport.objects.filter(
+                    programme_document__partner=self.request.user.partner)
 
     def list(self, request, workspace_id, *args, **kwargs):
         queryset = self.get_queryset().filter(
@@ -264,6 +280,7 @@ class ProgressReportPDFView(RetrieveAPIView):
     """
         Endpoint for getting PDF of Progress Report Annex C.
     """
+
     def prepare_reportable(self, indicator_reports):
         result = list()
         temp = None
@@ -291,8 +308,10 @@ class ProgressReportPDFView(RetrieveAPIView):
         data['unicef_office'] = report.programme_document.unicef_office
         data['title'] = report.programme_document.title
         data['reference_number'] = report.programme_document.reference_number
-        data['start_date'] = report.programme_document.start_date.strftime(settings.PRINT_DATA_FORMAT)
-        data['end_date'] = report.programme_document.end_date.strftime(settings.PRINT_DATA_FORMAT)
+        data['start_date'] = report.programme_document.start_date.strftime(
+            settings.PRINT_DATA_FORMAT)
+        data['end_date'] = report.programme_document.end_date.strftime(
+            settings.PRINT_DATA_FORMAT)
         data['cso_contribution'] = report.programme_document.cso_contribution
         data['budget'] = report.programme_document.budget
         data['funds_received_to_date'] = report.programme_document.funds_received_to_date
@@ -307,7 +326,8 @@ class ProgressReportPDFView(RetrieveAPIView):
         data['authorized_officer'] = report.programme_document.unicef_officers.first()
         data['focal_point'] = report.programme_document.unicef_focal_point.first()
 
-        data['outputs'] = self.prepare_reportable(report.indicator_reports.all().order_by('reportable'))
+        data['outputs'] = self.prepare_reportable(
+            report.indicator_reports.all().order_by('reportable'))
 
         pdf = render_to_pdf("report_annex_c_pdf.html", data)
         return HttpResponse(pdf, content_type='application/pdf')
@@ -318,8 +338,7 @@ class ProgressReportDetailsUpdateAPIView(APIView):
         Endpoint for updating Progress Report narrative fields
     """
     permission_classes = (IsAuthenticated,
-                          IsPartnerAuthorizedOfficer,
-                          IsPartnerEditor)
+                          IsPartnerEditorOrPartnerAuthorizedOfficer)
 
     def get_object(self, pk):
         try:
@@ -334,18 +353,20 @@ class ProgressReportDetailsUpdateAPIView(APIView):
                 "pk": pk,
                 "exception": exp,
             })
-            raise Http404def
+            raise Http404
 
     def put(self, request, workspace_id, pk, *args, **kwargs):
         self.workspace_id = workspace_id
         pr = self.get_object(pk)
-        serializer = ProgressReportUpdateSerializer(instance=pr, data=request.data)
+        serializer = ProgressReportUpdateSerializer(
+            instance=pr, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=statuses.HTTP_200_OK)
 
         else:
-            return Response(serializer.errors, status=statuses.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors,
+                            status=statuses.HTTP_400_BAD_REQUEST)
 
 
 class ProgressReportDetailsAPIView(RetrieveAPIView):
@@ -369,11 +390,14 @@ class ProgressReportDetailsAPIView(RetrieveAPIView):
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
     def get_object(self, pk):
+        user_has_global_view = self.request.user.is_unicef
+        query_params = {}
+        if not user_has_global_view:
+            query_params["programme_document__partner"] = self.request.user.partner
+        query_params['programme_document__workspace'] = self.workspace_id
+        query_params['pk'] = pk
         try:
-            return ProgressReport.objects.get(
-                programme_document__partner=self.request.user.partner,  # TODO: check if needed?
-                programme_document__workspace=self.workspace_id,
-                pk=pk)
+            return ProgressReport.objects.get(**query_params)
         except ProgressReport.DoesNotExist as exp:
             logger.exception({
                 "endpoint": "ProgressReportDetailsAPIView",
@@ -382,6 +406,7 @@ class ProgressReportDetailsAPIView(RetrieveAPIView):
                 "exception": exp,
             })
             raise Http404
+
 
 class ProgressReportIndicatorsAPIView(ListAPIView):
     serializer_class = PDReportContextIndicatorReportSerializer
@@ -392,13 +417,16 @@ class ProgressReportIndicatorsAPIView(ListAPIView):
 
     def get_queryset(self):
         # Limit reports to partner only
-        return IndicatorReport.objects.filter(progress_report__programme_document__partner=self.request.user.partner)
+        return IndicatorReport.objects.filter(
+            progress_report__programme_document__partner=self.request.user.partner)
 
     def list(self, request, workspace_id, progress_report_id, *args, **kwargs):
         """
         Get Programme Document Details by given pk.
         """
-        queryset = self.get_queryset().filter(progress_report__id=progress_report_id, progress_report__programme_document__workspace=workspace_id)
+        queryset = self.get_queryset().filter(
+            progress_report__id=progress_report_id,
+            progress_report__programme_document__workspace=workspace_id)
         filtered = PDReportsFilter(request.GET, queryset=queryset)
 
         page = self.paginate_queryset(filtered.qs)
@@ -418,7 +446,8 @@ class ProgressReportLocationsAPIView(ListAPIView):
 
     def get_object(self, pk):
         try:
-            return ProgressReport.objects.get(programme_document__partner=self.request.user.partner, programme_document__workspace=self.workspace_id, pk=pk)
+            return ProgressReport.objects.get(
+                programme_document__partner=self.request.user.partner, programme_document__workspace=self.workspace_id, pk=pk)
         except ProgressReport.DoesNotExist as exp:
             logger.exception({
                 "endpoint": "ProgressReportLocationsAPIView",
@@ -474,11 +503,14 @@ class ProgressReportSubmitAPIView(APIView):
         progress_report = self.get_object(pk)
 
         for ir in progress_report.indicator_reports.all():
-            # Check if all indicator data is fulfilled for IR status different then Met or No Progress
-            if ir.overall_status not in (OVERALL_STATUS.met, OVERALL_STATUS.no_progress):
+            # Check if all indicator data is fulfilled for IR status different
+            # then Met or No Progress
+            if ir.overall_status not in (
+                    OVERALL_STATUS.met, OVERALL_STATUS.no_progress):
                 for data in ir.indicator_location_data.all():
-                    for key, vals in data.disaggregation.iteritems():
-                        if ir.is_percentage and (vals.get('c', None) in [None, '']):
+                    for key, vals in data.disaggregation.items():
+                        if ir.is_percentage and (
+                                vals.get('c', None) in [None, '']):
                             _errors = [{
                                 "message": "You have not completed all required indicators for this progress report. Unless your Output status is Met or has No Progress, all indicator data needs to be completed."}]
                             return Response({"errors": _errors},
@@ -490,7 +522,7 @@ class ProgressReportSubmitAPIView(APIView):
                                             status=statuses.HTTP_400_BAD_REQUEST)
                 if not ir.narrative_assessment:
                     _errors = [{
-                        "message": "You have not completed narrative assessment for one of LLO (%s). Unless your Output status is Met or has No Progress, all indicator data needs to be completed." % ir.reportable.content_object }]
+                        "message": "You have not completed narrative assessment for one of Outputs (%s). Unless your Output status is Met or has No Progress, all indicator data needs to be completed." % ir.reportable.content_object}]
                     return Response({"errors": _errors},
                                     status=statuses.HTTP_400_BAD_REQUEST)
 
@@ -499,7 +531,6 @@ class ProgressReportSubmitAPIView(APIView):
                 ir.submission_date = datetime.now().date()
                 ir.report_status = INDICATOR_REPORT_STATUS.submitted
                 ir.save()
-
 
         # Check if PR other tab is fulfilled
         if not progress_report.partner_contribution_to_date:
@@ -527,7 +558,7 @@ class ProgressReportSubmitAPIView(APIView):
             return Response(serializer.data, status=statuses.HTTP_200_OK)
         else:
             _errors = [{
-                           "message": "Progress report was already submitted. Your IMO will need to send it back for you to edit your submission."}]
+                "message": "Progress report was already submitted. Your IMO will need to send it back for you to edit your submission."}]
             return Response({"errors": _errors},
                             status=statuses.HTTP_400_BAD_REQUEST)
 
@@ -539,7 +570,7 @@ class ProgressReportReviewAPIView(APIView):
 
     Only a PO (not a partner user) should be allowed to do this action.
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (UnicefPartnershipManagerOrRead,)
 
     def get_object(self, pk):
         try:
@@ -634,11 +665,9 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
         serializer = ProgrammeDocumentCalculationMethodsSerializer(
             data=request.data)
         if serializer.is_valid():
-            print serializer.validated_data
             for llo_and_indicators in serializer.validated_data[
                     'll_outputs_and_indicators']:
                 for indicator_blueprint in llo_and_indicators['indicators']:
-                    print indicator_blueprint
                     instance = get_object_or_404(IndicatorBlueprint,
                                                  id=indicator_blueprint['id'])
                     instance.calculation_formula_across_periods = \

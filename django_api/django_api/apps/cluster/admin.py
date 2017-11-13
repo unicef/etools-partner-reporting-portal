@@ -13,9 +13,9 @@ class ClusterAdmin(admin.ModelAdmin):
 
 
 class ClusterActivityAdmin(admin.ModelAdmin):
-    list_display = ('title', 'standard', 'frequency', 'cluster_objective')
-    list_filter = ('frequency', 'cluster_objective'
-)
+    list_display = ('title', 'cluster_objective')
+    list_filter = ('cluster_objective', )
+
 
 admin.site.register(Cluster, ClusterAdmin)
 admin.site.register(ClusterObjective)

@@ -15,11 +15,19 @@ class PartnerAdmin(admin.ModelAdmin):
 
 
 class PartnerProjectAdmin(admin.ModelAdmin):
-    list_display = ('title', 'description', 'start_date', 'end_date', 'status')
-    list_filter = ('status', 'partner')
+    list_display = ('title', 'partner', 'description', 'start_date',
+                    'end_date', 'status',)
+    list_filter = ('status', 'partner', 'clusters')
     search_fields = ('title', 'description', 'additional_information')
+
+
+class PartnerActivityAdmin(admin.ModelAdmin):
+    list_display = ('title', 'partner', 'project', 'cluster_activity',
+                    'cluster_objective', 'start_date', 'end_date', 'status',)
+    list_filter = ('status', 'partner', 'project')
+    search_fields = ('title', )
 
 
 admin.site.register(Partner, PartnerAdmin)
 admin.site.register(PartnerProject, PartnerProjectAdmin)
-admin.site.register(PartnerActivity)
+admin.site.register(PartnerActivity, PartnerActivityAdmin)

@@ -48,12 +48,6 @@
             </li>
 
             <li class="item">
-              <labelled-item label="Project owner">
-                <!-- TODO: Show partner name instead of ID when available. -->
-                <span class="value">[[_withDefault(projectData.partner, '')]]</span>
-              </labelled-item>
-            </li>
-            <li class="item">
               <labelled-item label="Clusters">
                 <span class="value">[[_commaSeparatedDictValues(projectData.clusters, 'title')]]</span>
               </labelled-item>
@@ -88,21 +82,17 @@
             </li>
 
             <li class="item">
-              <labelled-item label="Frequency of reporting">
-                <span class="value">[[_withDefault(projectData.frequency)]]</span>
-              </labelled-item>
-            </li>
-            <li class="item">
               <labelled-item label="Description">
                 <span class="value">[[projectData.description]]</span>
               </labelled-item>
             </li>
 
-            <li class="item full-width">
+            <li class="item">
               <labelled-item label="Additional Information (e.g. links)">
                 [[_withDefault(projectData.additional_information)]]
               </labelled-item>
             </li>
+
           </ul>
         </div>
     </etools-content-panel>

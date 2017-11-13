@@ -13,6 +13,7 @@
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/modal.html">
 <link rel="import" href="../../behaviors/routing.html">
+<link rel="import" href="../labelled-item.html">
 <link rel="import" href="../../styles/modal.html">
 
 <dom-module id="user-profile-dialog">
@@ -58,6 +59,20 @@
         color: white;
       }
 
+      .clusters {
+        margin: 0;
+      }
+
+      .clusters dt,
+      .clusters dd {
+        display: inline;
+        margin: 0;
+      }
+
+      .clusters dd::after {
+        content: "\A";
+        white-space: pre;
+      }
     </style>
 
     <paper-dialog id="userProfileDialog" opened="{{opened}}" with-backdrop>
@@ -86,8 +101,33 @@
         </div>
 
         <div class="full-width">
-          <paper-input label="My Groups" value="[[groups]]" placeholder="---" readonly always-float-label></paper-input>
+          <paper-input label="My Roles/Groups" value="[[groups]]" placeholder="---" readonly always-float-label></paper-input>
         </div>
+
+        <template is="dom-if" if="{{profile.partner}}">
+          <div class="full-width">
+            <paper-input label="Partner" value="{{profile.partner.title}}" placeholder="---" readonly always-float-label></paper-input>
+          </div>
+        </template>
+
+        <template is="dom-if" if="{{profile.organization}}">
+          <div class="full-width">
+            <paper-input label="My Organization" value="{{profile.organization}}" placeholder="---" readonly always-float-label></paper-input>
+          </div>
+        </template>
+
+        <template is="dom-if" if="[[is_imo_clusters]]">
+          <div class="full-width">
+            <labelled-item label="IMO for Clusters">
+              <dl class="clusters">
+                <template is="dom-repeat" items="[[profile.imo_clusters]]">
+                  <dt>[[item.title]]:</dt>
+                  <dd>[[item.response_plan.title]]</dd>
+                </template>
+              </dl>
+            </labelled-item>
+          </div>
+        </template>
 
       </iron-form>
     </paper-dialog-scrollable>
@@ -119,6 +159,11 @@
             type: Array,
             computed: '_computeGroups(profile)',
           },
+
+          is_imo_clusters: {
+            type: Boolean,
+            computed: '_computeIsIMOClusters(profile)'
+          },
         },
 
         close: function () {
@@ -133,6 +178,10 @@
           return (profile.groups || []).map(function(group) {
             return group.name;
           }).join(', ');
+        },
+
+        _computeIsIMOClusters: function (profile) {
+          return (profile.imo_clusters || []).length > 0;
         },
       });
   </script>

@@ -25,10 +25,6 @@
         return this._buildUrl('/indicator/' + reportableId + '/indicator-reports/');
       },
 
-      partnerDetails: function () {
-        return this._buildUrl('/partner/partner-details/');
-      },
-
       programmeDocuments: function (locationId) {
         return this._buildUrl('/unicef/' + locationId + '/programme-document/');
       },
@@ -64,7 +60,7 @@
       },
 
       progressReports: function(locationId) {
-        return this._buildUrl('/unicef/' + locationId + '/progress-reports');
+        return this._buildUrl('/unicef/' + locationId + '/progress-reports/');
       },
 
       responsePlans: function (workspaceId) {
@@ -131,6 +127,11 @@
         return this._buildUrl('/partner/partner-project-details/' + projectId + '/');
       },
 
+      plannedActionsActivityOverview: function(responsePlanId, activityId) {
+        return this._buildUrl('/partner/' + responsePlanId
+          + '/partner-activity/' + activityId + '/');
+      },
+
       responseParamtersClustersObjectiveDetail: function(objectiveId) {
         return this._buildUrl('/cluster/cluster-objective/' + objectiveId + '/');
       },
@@ -184,11 +185,11 @@
       },
 
       partnersByClusterActivityId: function (clusterActivityId) {
-        return this._buildUrl('/partner/cluster-activity/' + clusterActivityId + '/partners');
+        return this._buildUrl('/partner/cluster-activity/' + clusterActivityId + '/partners/');
       },
 
-      partnerActivityList: function () {
-        return this._buildUrl('/partner/partner-activity-list/');
+      partnerActivityList: function (responsePlanId) {
+        return this._buildUrl('/partner/' + responsePlanId + '/partner-activity-list/');
       },
 
       reportExport: function (locationId, reportId) {
@@ -196,12 +197,10 @@
           reportId + '/annex-C-export-PDF/');
       },
 
-      clusterDashboard: function (responsePlanId, clusterId, mode) {
+      clusterDashboard: function (responsePlanId, mode) {
         return this._buildUrl(
           '/cluster/' +
           responsePlanId +
-          '/' +
-          clusterId +
           '/' +
           mode +
           '-dashboard/'
@@ -228,6 +227,18 @@
         return this._buildUrl('/account/user-profile/');
       },
 
+      partnerAnalysis: function () {
+        return this._buildUrl('/cluster/partner-analysis/');
+      },
+
+      partnerAnalysisReportableDetails: function (responsePlanId, reportableId) {
+        return this._buildUrl([
+          '/cluster/partner-analysis/response-plan/',
+          responsePlanId,
+          '/indicator/',
+          reportableId,
+        ].join(''));
+      },
     };
   }());
 </script>

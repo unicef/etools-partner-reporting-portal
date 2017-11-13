@@ -43,7 +43,7 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
         ordered_dict = get_cast_dictionary_keys_as_tuple(
             indicator_location_data.disaggregation)
 
-        ordered_dict_keys = ordered_dict.keys()
+        ordered_dict_keys = list(ordered_dict.keys())
 
         if level_reported == 0:
             ordered_dict[tuple()]["d"] = 1
@@ -71,7 +71,7 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
                             'v': 0,
                         }
 
-            ordered_dict_keys = ordered_dict.keys()
+            ordered_dict_keys = list(ordered_dict.keys())
 
             # Calculating subtotals
             for key in ordered_dict_keys:
@@ -158,7 +158,7 @@ class RatioIndicatorDisaggregator(BaseDisaggregator):
         ordered_dict = get_cast_dictionary_keys_as_tuple(
             indicator_location_data.disaggregation)
 
-        ordered_dict_keys = ordered_dict.keys()
+        ordered_dict_keys = list(ordered_dict.keys())
 
         if level_reported != 0:
             # Reset all subtotals
@@ -203,9 +203,11 @@ class RatioIndicatorDisaggregator(BaseDisaggregator):
             if ordered_dict[key]["v"] == 0 and ordered_dict[key]["d"] == 0:
                 ordered_dict[key]["c"] = 0
             elif ordered_dict[key]["d"] == 0:
-                raise Exception('Denominator is 0 when numerator is not for {}'.format(key))
+                raise Exception(
+                    'Denominator is 0 when numerator is not for {}'.format(key))
             else:
-                ordered_dict[key]["c"] = ordered_dict[key]["v"] / (ordered_dict[key]["d"] * 1.0)
+                ordered_dict[key]["c"] = ordered_dict[key]["v"] / \
+                    (ordered_dict[key]["d"] * 1.0)
 
         ordered_dict = get_cast_dictionary_keys_as_string(ordered_dict)
 

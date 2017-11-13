@@ -107,17 +107,25 @@
       },
 
       _clusterDisaggregationsAjax: function (queryParams) {
-        var thunk = this.$.disaggregations.thunk();
+        this.debounce('cluster-disaggregations-ajax', function() {
+          var thunk = this.$.disaggregations.thunk();
+        
+          if (!Object.keys(queryParams).length) {
+            return;
+          }
 
-        if (!Object.keys(queryParams).length) {
-          return;
+          this.$.disaggregations.abort();
+          this.dispatch(App.Actions.ClusterDisaggregations.fetchClusterDisaggregationsList(thunk))
+            .catch(function (err) { // jshint ignore:line
+                // TODO: error handling.
+            });
+          }, 300);
+      },
+
+      detached: function () {
+        if (this.isDebouncerActive('cluster-disaggregations-ajax')) {
+          this.cancelDebouncer('cluster-disaggregations-ajax');
         }
-
-        this.$.disaggregations.abort();
-        this.dispatch(App.Actions.ClusterDisaggregations.fetchClusterDisaggregationsList(thunk))
-          .catch(function (err) { // jshint ignore:line
-              // TODO: error handling.
-          });
       },
     });
   </script>
