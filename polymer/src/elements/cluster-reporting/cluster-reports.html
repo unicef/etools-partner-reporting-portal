@@ -78,7 +78,8 @@
       ],
 
       listeners: {
-        'report-submitted': '_onReportSubmitted',
+        'report-submitted': '_onContentsChanged',
+        'report-reviewed': '_onContentsChanged',
       },
 
       _computeParams: function (queryParams) {
@@ -110,7 +111,7 @@
         });
       },
 
-      _onReportSubmitted: function (e, id) { // jshint ignore:line
+      _onContentsChanged: function (e, id) { // jshint ignore:line
         e.stopPropagation();
 
         this._fetchData();
