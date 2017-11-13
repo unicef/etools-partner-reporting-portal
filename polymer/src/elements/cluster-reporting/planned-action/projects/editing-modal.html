@@ -283,7 +283,7 @@
 
         url: {
           type: String,
-          computed: '_computeUrl(responsePlanID)'
+          computed: '_computeUrl(data.id)'
         },
 
         locations: {
@@ -335,8 +335,8 @@
 
       },
 
-      _computeUrl: function(responsePlanID) {
-        return App.Endpoints.plannedActions(responsePlanID);
+      _computeUrl: function(projectID) {
+        return App.Endpoints.plannedActionsProjectOverview(projectID);
       },
 
       close: function () {
