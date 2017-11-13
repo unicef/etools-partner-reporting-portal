@@ -89,16 +89,13 @@ class ClusterActivitySerializer(serializers.ModelSerializer):
 
 
 class ClusterActivityPatchSerializer(serializers.ModelSerializer):
-
     title = serializers.CharField(required=False)
-    cluster_objective = serializers.CharField(required=False)
 
     class Meta:
         model = ClusterActivity
         fields = (
             'id',
             'title',
-            'cluster_objective',
         )
 
 

@@ -156,7 +156,7 @@
 
         url: {
           type: String,
-          computed: '_computeUrl(responsePlanID)'
+          computed: '_computeUrl(data.id)'
         },
 
         data: {
@@ -172,8 +172,8 @@
         },
       },
 
-      _computeUrl: function(responsePlanID) {
-        return App.Endpoints.responseParametersClusterActivities(responsePlanID);
+      _computeUrl: function(activityID) {
+        return App.Endpoints.responseParamtersClustersActivityDetail(activityID);
       },
 
       close: function () {
