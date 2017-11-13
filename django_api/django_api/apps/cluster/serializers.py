@@ -52,14 +52,12 @@ class ClusterObjectiveSerializer(serializers.ModelSerializer):
 
 class ClusterObjectivePatchSerializer(ClusterObjectiveSerializer):
     title = serializers.CharField(required=False)
-    cluster = serializers.CharField(required=False)
 
     class Meta:
         model = ClusterObjective
         fields = (
             'id',
             'title',
-            'cluster',
         )
 
 

@@ -119,7 +119,7 @@
           Save
         </paper-button>
 
-        <paper-button  on-tap="close">
+        <paper-button on-tap="close">
           Cancel
         </paper-button>
       </div>
@@ -160,7 +160,7 @@
 
         url: {
           type: String,
-          computed: '_computeUrl(responsePlanID)'
+          computed: '_computeUrl(data.id)'
         },
 
         refresh: {
@@ -176,8 +176,8 @@
         }
       },
 
-      _computeUrl: function(responsePlanID) {
-        return App.Endpoints.responseParametersClusterObjectives(responsePlanID);
+      _computeUrl: function(objectiveId) {
+        return App.Endpoints.responseParametersClustersObjectiveDetail(objectiveId);
       },
 
       close: function () {
