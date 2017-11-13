@@ -288,9 +288,9 @@
                 <paper-menu-button dynamic-align>
                   <paper-icon-button icon="icons:more-vert" class="dropdown-trigger"></paper-icon-button>
                   <paper-menu
-                      id="menu"
+                      id="viewMenu"
                       class="dropdown-content"
-                      selected="1">
+                      selected="2">
                     <template
                         is="dom-if"
                         if="[[canSendBack]]">
@@ -300,10 +300,6 @@
                       </paper-icon-item>
                     </template>
 
-                    <!-- <paper-icon-item>
-                      <iron-icon icon="icons:announcement" item-icon></iron-icon>
-                      View feedback
-                    </paper-icon-item> -->
                     <a
                         href="[[exportUrl]]"
                         target="_blank"
@@ -313,6 +309,28 @@
                         Export
                       </paper-icon-item>
                     </a>
+
+                    <div></div>
+                  </paper-menu>
+                </paper-menu-button>
+              </template>
+
+              <template
+                  is="dom-if"
+                  if="[[!_equals(mode, 'view')]]"
+                  restamp="true">
+                <paper-menu-button dynamic-align>
+                  <paper-icon-button icon="icons:more-vert" class="dropdown-trigger"></paper-icon-button>
+                  <paper-menu
+                      id="nonViewMenu"
+                      class="dropdown-content"
+                      selected="1">
+                    <paper-icon-item on-tap="_viewFeedback">
+                      <iron-icon icon="icons:announcement" item-icon></iron-icon>
+                      View feedback
+                    </paper-icon-item>
+
+                    <div></div>
                   </paper-menu>
                 </paper-menu-button>
               </template>
@@ -654,7 +672,13 @@
         this.$$('#sendBackModal').open();
 
         this.async(function () {
-          this.$$('#menu').select(1);
+          this.$$('#viewMenu').select(2);
+        });
+      },
+
+      _viewFeedback: function () {
+        this.async(function () {
+          this.$$('#nonViewMenu').select(1);
         });
       },
 
