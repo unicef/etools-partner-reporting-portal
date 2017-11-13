@@ -19,6 +19,7 @@
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
 <link rel="import" href="send-back-modal.html">
+<link rel="import" href="feedback-modal.html">
 <link rel="import" href="../reportable-meta.html">
 <link rel="import" href="../error-modal.html">
 <link rel="import" href="../report-status.html">
@@ -317,8 +318,13 @@
 
               <template
                   is="dom-if"
-                  if="[[!_equals(mode, 'view')]]"
+                  if="[[showFeedback]]"
                   restamp="true">
+
+                <feedback-modal
+                    id="feedbackModal"
+                    report="[[data]]">
+                </feedback-modal>
                 <paper-menu-button dynamic-align>
                   <paper-icon-button icon="icons:more-vert" class="dropdown-trigger"></paper-icon-button>
                   <paper-menu
@@ -506,6 +512,11 @@
           type: Boolean,
           computed: '_computeCanSendBack(data, permissions)',
         },
+
+        showFeedback: {
+          type: Boolean,
+          computed: '_computeShowFeedback(data, permissions)',
+        },
       },
 
       listeners: {
@@ -668,6 +679,11 @@
         return data.report_status === 'Sub' && permissions.sendBackIndicatorReport;
       },
 
+      _computeShowFeedback: function (data, permissions) {
+        return data.report_status === 'Sen' &&
+            permissions.submitIndicatorReport(data.cluster_id, data.partner_id);
+      },
+
       _sendBack: function () {
         this.$$('#sendBackModal').open();
 
@@ -677,6 +693,8 @@
       },
 
       _viewFeedback: function () {
+        this.$$('#feedbackModal').open();
+
         this.async(function () {
           this.$$('#nonViewMenu').select(1);
         });
