@@ -590,6 +590,7 @@ class PDReportContextIndicatorReportSerializer(serializers.ModelSerializer):
     reportable_object_id = serializers.SerializerMethodField()
     submission_date = serializers.SerializerMethodField()
     due_date = serializers.SerializerMethodField()
+    is_cluster_indicator = serializers.SerializerMethodField()
     reportable = ReportableSimpleSerializer()
     report_status_display = serializers.CharField(
         source='get_report_status_display')
@@ -609,6 +610,7 @@ class PDReportContextIndicatorReportSerializer(serializers.ModelSerializer):
             'report_status_display',
             'submission_date',
             'is_draft',
+            'is_cluster_indicator',
             'due_date',
             'total',
             'overall_status',
@@ -627,6 +629,9 @@ class PDReportContextIndicatorReportSerializer(serializers.ModelSerializer):
 
     def get_reportable_object_id(self, obj):
         return obj.reportable.object_id
+
+    def get_is_cluster_indicator(self, obj):
+        return obj.reportable.is_cluster_indicator
 
     def get_submission_date(self, obj):
         return obj.submission_date and obj.submission_date.strftime(
