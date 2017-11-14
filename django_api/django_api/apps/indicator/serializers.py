@@ -12,7 +12,7 @@ from unicef.models import LowerLevelOutput
 from partner.models import PartnerProject, PartnerActivity
 from cluster.models import ClusterObjective, ClusterActivity
 
-from core.common import OVERALL_STATUS_DICT
+from core.common import OVERALL_STATUS_DICT, INDICATOR_REPORT_STATUS
 from core.serializers import LocationSerializer, IdLocationSerializer
 from core.models import Location
 from core.validators import add_indicator_object_type_validator
@@ -102,6 +102,8 @@ class IndicatorReportSimpleSerializer(serializers.ModelSerializer):
             'achieved',
             'total',
             'report_status',
+            'review_date',
+            'sent_back_feedback'
         )
 
     def get_indicator_name(self, obj):
@@ -856,6 +858,29 @@ class IndicatorReportUpdateSerializer(serializers.ModelSerializer):
         fields = (
             'reporting_period',
         )
+        
+class IndicatorReportReviewSerializer(serializers.Serializer):
+    status = serializers.ChoiceField(choices=[
+        INDICATOR_REPORT_STATUS.sent_back,
+        INDICATOR_REPORT_STATUS.accepted
+    ])
+    comment = serializers.CharField(required=False)
+
+    def validate(self, data):
+        """
+        Make sure status is only accepted or sent back. Also overall_status
+        should be set if accepting
+        """
+        if data['status'] not in [INDICATOR_REPORT_STATUS.sent_back,
+                                  INDICATOR_REPORT_STATUS.accepted]:
+            raise serializers.ValidationError(
+                'Report status should be accepted or sent back')
+        if data.get('status', None) == INDICATOR_REPORT_STATUS.sent_back and data.get(
+                'comment') is None:
+            raise serializers.ValidationError(
+                'Comment required when sending back report')
+
+        return data
 
 
 class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
@@ -890,6 +915,8 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
             'report_status',
             'overall_status',
             'narrative_assessment',
+            'sent_back_feedback',
+            'review_date',
             'cluster',
             'cluster_id',
             'project',
