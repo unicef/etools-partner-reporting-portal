@@ -93,6 +93,17 @@
           App.Constants.GROUP_AUTHORIZED_OFFICER,
         ],
 
+        createPartnerEntitiesByResponsePlan: function(params, responsePlanClusters) {
+          return isAuthorizedOfficer(params.groups) && 
+            responsePlanClusters.some(function (cluster) {
+              return params.partner.clusters.indexOf(cluster.id) !== -1;
+            });
+        },
+
+        editPartnerEntities: function(params, entityPartnerId) {
+          return isAuthorizedOfficer(params.groups) && entityPartnerId === params.partner.id;
+        },
+
         viewPlannedAction: [
           App.Constants.GROUP_AUTHORIZED_OFFICER,
           App.Constants.GROUP_EDITOR,

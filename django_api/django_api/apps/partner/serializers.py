@@ -114,14 +114,12 @@ class PartnerProjectPatchSerializer(serializers.ModelSerializer):
     title = serializers.CharField(required=False)
     start_date = serializers.DateField(required=False)
     end_date = serializers.DateField(required=False)
-    status = serializers.ChoiceField(choices=PD_STATUS, required=False)
     description = serializers.CharField(required=False)
     additional_information = serializers.CharField(required=False)
     total_budget = serializers.CharField(required=False)
     funding_source = serializers.CharField(required=False)
-    clusters = serializers.CharField(required=False)
-    locations = serializers.CharField(required=False)
-    partner = serializers.CharField(required=False)
+    clusters = ClusterSimpleSerializer(many=True, read_only=True)
+    locations = ShortLocationSerializer(many=True, read_only=True)
 
     class Meta:
         model = PartnerProject
@@ -137,7 +135,6 @@ class PartnerProjectPatchSerializer(serializers.ModelSerializer):
             'funding_source',
             'clusters',
             'locations',
-            'partner',
         )
 
 

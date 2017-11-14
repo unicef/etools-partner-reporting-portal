@@ -64,7 +64,8 @@
 
       <list-view-indicators
           data="[[data]]"
-          total-results="[[totalResults]]">
+          total-results="[[totalResults]]"
+          can-edit="[[canAddIndicator]]">
       </list-view-indicators>
     </page-body>
   </template>
@@ -120,6 +121,7 @@
 
       listeners: {
         'indicatorModal.indicator-added': '_onSuccess',
+        'indicator-edited': '_onSuccess',
       },
 
       observers: [

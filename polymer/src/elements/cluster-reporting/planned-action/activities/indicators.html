@@ -4,6 +4,7 @@
 <link rel="import" href="../../../../../bower_components/iron-location/iron-query-params.html">
 
 <link rel="import" href="../../../etools-prp-ajax.html">
+<link rel="import" href="../../../etools-prp-permissions.html">
 <link rel="import" href="../../../page-body.html">
 <link rel="import" href="../../indicator-modal.html">
 <link rel="import" href="../../../../behaviors/utils.html">
@@ -25,6 +26,10 @@
         @apply(--layout-end-justified)
       }
     </style>
+
+    <etools-prp-permissions
+        permissions="{{permissions}}">
+    </etools-prp-permissions>
 
     <iron-location query="{{query}}"></iron-location>
 
@@ -58,7 +63,8 @@
       <list-view-indicators
           data="[[data]]"
           total-results="[[totalResults]]"
-          is-custom="[[isCustom]]">
+          is-custom="[[isCustom]]"
+          can-edit="[[isCustom]]">
       </list-view-indicators>
     </page-body>
   </template>
@@ -105,6 +111,7 @@
 
       listeners: {
         'indicatorModal.indicator-added': '_onSuccess',
+        'indicator-edited': '_onSuccess',
       },
 
       observers: [
