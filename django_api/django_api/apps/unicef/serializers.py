@@ -215,6 +215,9 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
     review_overall_status_display = serializers.CharField(
         source='get_review_overall_status_display')
     funds_received_to_date = serializers.SerializerMethodField()
+    funds_received_to_date_currency = serializers.SerializerMethodField()
+    funds_received_to_date_percentage = serializers.SerializerMethodField()
+    submitted_by = serializers.SerializerMethodField()
 
     def __init__(self, llo_id=None, location_id=None, *args, **kwargs):
         self.llo_id = llo_id
@@ -240,12 +243,26 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
             'sent_back_feedback',
             'programme_document',
             'funds_received_to_date',
+            'funds_received_to_date_currency',
+            'funds_received_to_date_percentage',
             'indicator_reports',
             'submitted_by',
         )
 
+    def get_submitted_by(self, obj):
+        if obj.submitted_by:
+            return obj.submitted_by.first_name + (" %s" % obj.submitted_by.last_name if obj.submitted_by.last_name else "")
+        else:
+            return None
+
     def get_funds_received_to_date(self, obj):
         return obj.programme_document.funds_received_to_date
+
+    def get_funds_received_to_date_currency(self, obj):
+        return obj.programme_document.funds_received_to_date_currency
+
+    def get_funds_received_to_date_percentage(self, obj):
+        return obj.programme_document.funds_received_to_date_percentage
 
     def get_indicator_reports(self, obj):
         qset = obj.indicator_reports.all()
