@@ -55,7 +55,7 @@
 
       <template
           is="dom-if"
-          if="[[_canAddActivity(permissions)]]"
+          if="[[permissions.createClusterEntities]]"
           restamp="true">
         <cluster-activities-modal id="modal"></cluster-activities-modal>
 
@@ -132,10 +132,6 @@
                 // TODO: error handling.
             });
           }, 300);
-      },
-
-      _canAddActivity: function (permissions) {
-        return permissions.createClusterEntities();
       },
 
       detached: function () {

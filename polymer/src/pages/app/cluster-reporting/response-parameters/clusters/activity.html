@@ -152,6 +152,14 @@ contributing-partners.html">
         '_updateUrlTab(routeData.tab)',
       ],
 
+      listeners: {
+        'activity-edited': '_onSuccess'
+      },
+
+      _onSuccess: function() {
+        this._getActivityAjax();
+      },
+
       _updateTabSelection: function () {
         this.$.tabContent.select(this.tab);
       },
@@ -172,7 +180,7 @@ contributing-partners.html">
         return '/response-parameters/clusters/activities' + '?' + query;
       },
 
-      attached: function () {
+      _getActivityAjax: function() {
         var thunk = this.$.activity.thunk();
         var self = this;
 
@@ -185,6 +193,10 @@ contributing-partners.html">
             self.updatePending = false;
             // TODO: error handling
           });
+      },
+
+      attached: function () {
+        this._getActivityAjax();
       },
     });
   </script>
