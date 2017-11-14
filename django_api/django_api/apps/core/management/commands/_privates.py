@@ -103,10 +103,10 @@ from partner.cron import PartnerCronJob
 from unicef.cron import ProgrammeDocumentCronJob
 from indicator.cron import IndicatorReportOverDueCronJob
 
-from core.tasks import *
-from indicator.tasks import *
-from partner.tasks import *
-from unicef.tasks import *
+from core.tasks import process_workspaces, process_period_reports
+from indicator.tasks import process_due_reports
+from partner.tasks import process_partners
+from unicef.tasks import process_programme_documents
 
 OVERALL_STATUS_LIST = [x[0] for x in OVERALL_STATUS]
 
