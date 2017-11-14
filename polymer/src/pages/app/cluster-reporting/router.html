@@ -214,9 +214,12 @@
       },
 
       _routeCurrentPlanChanged: function(id, allPlans) {
-        this.dispatch(App.Actions.setCurrentResponsePlan(allPlans.find(function(plan) {
+        var current = allPlans.find(function(plan) {
           return Number(id) === plan.id;
-        })));
+        });
+        if (current) {
+          this.dispatch(App.Actions.setCurrentResponsePlan(current));
+        }
       },
 
       _routePageChanged: function (page) {
