@@ -100,7 +100,9 @@
 
       _routeChanged: function (subpage) {
         if (!subpage) {
-          this.set('route.path', '/projects');
+          this.async(function () {
+            this.set('route.path', '/projects');
+          });
         } else {
           this.subpage = subpage;
         }
