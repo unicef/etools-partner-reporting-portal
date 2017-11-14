@@ -48,7 +48,7 @@
 
       <template
           is="dom-if"
-          if="[[_canAddProject(permissions, responsePlanCurrent.clusters)]]"
+          if="[[_canAddProject(permissions, responsePlanCurrent)]]"
           restamp="true">
         <div id="action">
           <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
@@ -99,14 +99,10 @@
           type: String,
           computed: '_computeUrl(responsePlanID, queryParams, partnerID)'
         },
-        responsePlans: {
-          type: Object,
-          statePath: 'responsePlans.all'
-        },
 
         responsePlanCurrent: {
           type: Object,
-          computed: '_setCurrentPlan(responsePlans, responsePlanID)',
+          statePath: 'responsePlans.current',
         },
       },
 
@@ -114,14 +110,10 @@
         return App.Endpoints.plannedActions(responsePlanID);
       },
 
-       _setCurrentPlan: function (responsePlans, responsePlanID) {
-        return responsePlans.find(function(item) {
-          return item.id === Number(responsePlanID);
-        }) || {};
-      },
-
-      _canAddProject: function(permissions, responsePlanClusters) {
-        return permissions.createPartnerEntitiesByResponsePlan(responsePlanClusters);
+      _canAddProject: function(permissions, responsePlanCurrent) {
+        if (responsePlanCurrent) {
+          return permissions.createPartnerEntitiesByResponsePlan(responsePlanCurrent.clusters);
+        }
       },
 
       _projectsAjax: function (queryParams) {
