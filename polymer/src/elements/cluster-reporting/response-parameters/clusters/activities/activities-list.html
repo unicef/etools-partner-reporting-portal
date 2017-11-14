@@ -51,7 +51,7 @@
           no-collapse
           label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
         <template is="dom-if" if="[[!isMinimalList]]" restamp="true">
-          <etools-data-table-column field="activity">
+          <etools-data-table-column field="activity" flex-3>
             <div class="table-column">Cluster Activity Title</div>
           </etools-data-table-column>
           <etools-data-table-column field="cluster">
@@ -71,7 +71,7 @@
           initial-count="[[pageSize]]">
         <etools-data-table-row no-collapse>
           <div slot="row-data">
-            <div class="table-cell table-cell--text">
+            <div class="table-cell table-cell--text" flex-3>
               <a href="[[_detailUrl(activity.id, anchorQuery)]]">[[activity.title]]</a>
             </div>
             <template is="dom-if" if="[[!isMinimalList]]" restamp="true">
@@ -81,7 +81,6 @@
               <div class="table-cell table-cell--text">
                 [[activity.co_title]]
              </div>
-
             </template>
           </div>
         </etools-data-table-row>
@@ -145,7 +144,7 @@
         this.$$('#modal').open();
       },
 
-      _detailUrl: function(id, query) {
+      _detailUrl: function (id, query) {
         var path = '/response-parameters/clusters/activity/' + id;
         return this.buildUrl(this._baseUrlCluster, path) + '?' + query;
       },

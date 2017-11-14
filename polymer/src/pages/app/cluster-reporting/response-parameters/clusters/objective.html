@@ -144,6 +144,14 @@
         '_updateUrlTab(routeData.tab)',
       ],
 
+      listeners: {
+      'objective-edited': '_onSuccess',
+      },
+
+      _onSuccess: function() {
+        this._getObjectiveAjax();
+      },
+
       _updateTabSelection: function () {
         this.$.tabContent.select(this.tab);
       },
@@ -157,14 +165,14 @@
       },
 
       _computeObjectiveUrl: function(objectiveId) {
-        return App.Endpoints.responseParamtersClustersObjectiveDetail(objectiveId);
+        return App.Endpoints.responseParametersClustersObjectiveDetail(objectiveId);
       },
 
       _computeBackLink: function(query) {
         return '/response-parameters/clusters/objectives' + '?' + query;
       },
 
-      attached: function () {
+      _getObjectiveAjax: function() {
         var thunk = this.$.objective.thunk();
         var self = this;
         thunk()
@@ -176,6 +184,10 @@
             self.updatePending = false;
             // TODO: error handling
           });
+      },
+
+      attached: function () {
+        this._getObjectiveAjax();
       },
     });
   </script>

@@ -10,6 +10,7 @@
 <link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/clusters/disaggregations/disaggregations-list.html">
 <link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/clusters/disaggregations/creation-modal.html">
 <link rel="import" href="../../../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../../../elements/etools-prp-permissions.html">
 <link rel="import" href="../../../../../elements/page-body.html">
 <link rel="import" href="../../../../../styles/buttons.html">
 <link rel="import" href="../../../../../styles/shared-styles.html">
@@ -35,6 +36,10 @@
       }
     </style>
 
+    <etools-prp-permissions
+        permissions="{{permissions}}">
+    </etools-prp-permissions>
+
     <iron-location query="{{query}}"></iron-location>
 
     <iron-query-params
@@ -50,7 +55,10 @@
 
     <page-body>
 
-
+      <template
+        is="dom-if"
+        if="[[_canAddDisaggregation(permissions)]]"
+        restamp="true">
       <cluster-disaggregations-modal id="modal"></cluster-disaggregations-modal>
 
       <div id="action">
@@ -58,6 +66,7 @@
           Add Disaggregation
         </paper-button>
       </div>
+    </template>
 
       <clusters-disaggregations-list></clusters-disaggregations-list>
     </page-body>
@@ -120,6 +129,10 @@
                 // TODO: error handling.
             });
           }, 300);
+      },
+
+      _canAddDisaggregation: function (permissions) {
+        return permissions.createClusterEntities();
       },
 
       detached: function () {

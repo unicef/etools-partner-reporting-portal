@@ -154,6 +154,14 @@
         '_updateUrlTab(routeData.tab)',
       ],
 
+      listeners: {
+        'pa-activity-edited': '_onSuccess',
+      },
+
+      _onSuccess: function() {
+        this._getActivityAjax();
+      },
+
       _computeBackLink: function () {
         return '/planned-action/activities' + '?' + this.query;
       },
@@ -175,7 +183,7 @@
         return App.Endpoints.plannedActionsActivityOverview(responsePlanId, activityId);
       },
 
-      attached: function () {
+      _getActivityAjax: function() {
         var thunk = this.$.overview.thunk();
         var self = this;
         thunk()
@@ -187,6 +195,10 @@
             self.updatePending = false;
             // TODO: error handling
           });
+      },
+
+      attached: function () {
+        this._getActivityAjax();
       },
     });
   </script>

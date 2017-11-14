@@ -49,9 +49,9 @@
           App.Constants.GROUP_EDITOR,
         ],
 
-        createClusterEntities: function (params) {
-          return isIMO(params.groups);
-        },
+        createClusterEntities: [
+          App.Constants.GROUP_IMO,
+        ],
 
         createClusterEntitiesForCluster: function (params, clusterId) {
           return params.imoClusters.some(function (cluster) {
@@ -89,9 +89,24 @@
           }
         },
 
+        sendBackIndicatorReport: [
+          App.Constants.GROUP_IMO,
+        ],
+
         createPartnerEntities: [
           App.Constants.GROUP_AUTHORIZED_OFFICER,
         ],
+
+        createPartnerEntitiesByResponsePlan: function(params, responsePlanClusters) {
+          return isAuthorizedOfficer(params.groups) && 
+            responsePlanClusters.some(function (cluster) {
+              return params.partner.clusters.indexOf(cluster.id) !== -1;
+            });
+        },
+
+        editPartnerEntities: function(params, entityPartnerId) {
+          return isAuthorizedOfficer(params.groups) && entityPartnerId === params.partner.id;
+        },
 
         viewPlannedAction: [
           App.Constants.GROUP_AUTHORIZED_OFFICER,
