@@ -57,8 +57,13 @@
     </iron-location>
 
     <iron-query-params
-      params-string="{{query}}"
-      params-object="{{queryParams}}">
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
+    </iron-query-params>
+
+    <iron-query-params
+        params-string="{{anchorQuery}}"
+        params-object="{{anchorQueryParams}}">
     </iron-query-params>
 
     <div class="wrapper">
@@ -93,7 +98,7 @@
           <etools-prp-data-table-row details-opened="[[detailsOpened]]">
             <div slot="row-data">
               <div class="table-cell table-cell--text">
-                <a href="[[_detailUrl(project)]]">[[project.title]]</a>
+                <a href="[[_detailUrl(project, anchorQuery)]]">[[project.title]]</a>
               </div>
               <div class="table-cell table-cell--text">
                 [[_commaSeparatedDictValues(project.clusters, 'title')]]
@@ -160,6 +165,8 @@
         ],
 
         properties: {
+          queryParams: Object,
+
           projects: {
             type: Object,
             statePath: 'partnerProjects.all',
@@ -183,7 +190,12 @@
           openedDetails: {
             type: Array,
             value: []
-          }
+          },
+
+          anchorQueryParams: {
+            type: Object,
+            computed: '_withDefaultParams(queryParams)',
+          },
         },
 
         _openModal: function () {
@@ -195,19 +207,18 @@
           'details-opened-changed': '_detailsChange'
         },
 
-        _detailUrl: function(project) {
+        _detailUrl: function(project, query) {
           var path = '/response-parameters/partners/project/' + project.id;
           if (this.page === 'planned-action') {
             path = '/planned-action/project/' + project.id;
           }
           //Query string is passed to construct the back button.
-          return this.buildUrl(this._baseUrlCluster, path) + '?' + this.query;
+          return this.buildUrl(this._baseUrlCluster, path) + '?' + query;
         },
 
         detached: function () {
           this.openedDetails.length = 0;
-        }
-
+        },
       });
     </script>
   </dom-module>

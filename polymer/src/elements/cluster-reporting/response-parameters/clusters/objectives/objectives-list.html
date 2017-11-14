@@ -42,6 +42,11 @@
         params-object="{{queryParams}}">
     </iron-query-params>
 
+    <iron-query-params
+        params-string="{{anchorQuery}}"
+        params-object="{{anchorQueryParams}}">
+    </iron-query-params>
+
     <div class="wrapper">
       <etools-data-table-header
           no-collapse
@@ -63,7 +68,7 @@
         <etools-data-table-row no-collapse>
           <div slot="row-data">
             <div class="table-cell table-cell--text" flex-3>
-              <a href="[[_detailUrl(objective.id)]]">[[objective.title]]</a>
+              <a href="[[_detailUrl(objective.id, anchorQuery)]]">[[objective.title]]</a>
             </div>
             <div class="table-cell table-cell--text">
               [[objective.cluster_title]]
@@ -98,6 +103,8 @@
       ],
 
       properties: {
+        queryParams: Object,
+
         loading: {
           type: Boolean,
           statePath: 'clusterObjectives.loading'
@@ -112,15 +119,20 @@
           type: Number,
           statePath: 'clusterObjectives.count',
         },
+
+        anchorQueryParams: {
+          type: Object,
+          computed: '_withDefaultParams(queryParams)',
+        },
       },
 
       _openModal: function () {
         this.$$('#modal').open();
       },
 
-      _detailUrl: function (id) {
+      _detailUrl: function (id, query) {
         var path = '/response-parameters/clusters/objective/' + id;
-        return this.buildUrl(this._baseUrlCluster, path) + '?' + this.query;
+        return this.buildUrl(this._baseUrlCluster, path) + '?' + query;
       },
     });
   </script>
