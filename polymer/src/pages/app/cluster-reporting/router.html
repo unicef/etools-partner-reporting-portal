@@ -213,10 +213,7 @@
 
         if (newPage !== page) {
           this.async(function () {
-            this.set(
-              'route.path',
-              '/' + this.routeData.plan + '/' + newPage
-            );
+            this.set('routeData.page', newPage);
           });
         }
       },

@@ -54,15 +54,11 @@
 
           <div class="tabs">
             <paper-tabs
-              selected="{{tab}}"
-              attr-for-selected="name"
-              on-iron-activate="_resetPage"
-              scrollable
-              hide-scroll-buttons>
-
-<!--               <paper-tab name="contacts">
-                <span class="tab-content">Contacts</span>
-              </paper-tab> -->
+                selected="{{routeData.subpage}}"
+                attr-for-selected="name"
+                on-iron-activate="_resetPage"
+                scrollable
+                hide-scroll-buttons>
 
               <paper-tab name="projects">
                 <span class="tab-content">Projects</span>
@@ -90,8 +86,6 @@
 
       properties: {
         subpage: String,
-
-        tab: String
       },
 
       behaviors: [
@@ -102,48 +96,19 @@
 
       observers: [
         '_routeChanged(routeData.subpage)',
-        '_tabChanged(tab)'
       ],
 
       _routeChanged: function (subpage) {
-        switch (subpage) {
-          case 'contacts':
-            this.subpage = 'contacts';
-            this.tab = 'contacts';
-            break;
-
-          case 'projects':
-            this.subpage = 'projects';
-            this.tab = 'projects';
-            break;
-
-          case 'project':
-            this.subpage = 'project';
-            break;
-
-          case 'activities':
-            this.subpage = 'activities';
-            this.tab = 'activities';
-            break;
-
-          case 'activity':
-            this.subpage = 'activity';
-            break;
-
-          default:
-            this.subpage = 'projects';
-            this.set('route.path', '/projects');
-            break;
+        if (!subpage) {
+          this.set('route.path', '/projects');
+        } else {
+          this.subpage = subpage;
         }
       },
 
       _displayHeader: function(subpage) {
         var requiresHeader = ['projects', 'contacts', 'activities'];
         return this._displayClusterHeader(subpage, requiresHeader);
-      },
-
-      _tabChanged: function (tab) {
-        this.set('route.path', '/' + tab);
       },
 
       _resetPage: function () {

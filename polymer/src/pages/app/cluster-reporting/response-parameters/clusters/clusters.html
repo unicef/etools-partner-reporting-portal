@@ -54,7 +54,7 @@
           </div>
           <div class="tabs">
             <paper-tabs
-              selected="{{tab}}"
+              selected="{{routeData.subpage}}"
               attr-for-selected="name"
               on-iron-activate="_resetPage"
               scrollable
@@ -90,10 +90,7 @@
 
       properties: {
         queryParams: Object,
-
         subpage: String,
-
-        tab: String,
       },
 
       behaviors: [
@@ -104,47 +101,13 @@
 
       observers: [
         '_routeChanged(routeData.subpage)',
-        '_tabChanged(tab)',
       ],
 
       _routeChanged: function (subpage) {
-        switch (subpage) {
-          case 'response-plans':
-            this.subpage = 'response-plans';
-            this.tab = 'response-plans';
-            break;
-
-          case 'objectives':
-            this.subpage = 'objectives';
-            this.tab = 'objectives';
-            break;
-
-          case 'activities':
-            this.subpage = 'activities';
-            this.tab = 'activities';
-            break;
-
-          case 'disaggregations':
-            this.subpage = 'disaggregations';
-            this.tab = 'disaggregations';
-            break;
-
-          case 'response-plan':
-            this.subpage = 'response-plan';
-            break;
-
-          case 'objective':
-            this.subpage = 'objective';
-            break;
-
-          case 'activity':
-            this.subpage = 'activity';
-            break;
-
-          default:
-            this.subpage = 'objectives';
-            this.set('route.path', '/objectives');
-            break;
+        if (!subpage) {
+          this.set('route.path', '/objectives');
+        } else {
+          this.subpage = subpage;
         }
       },
 
@@ -154,11 +117,17 @@
         return this._displayClusterHeader(subpage, requiresHeader);
       },
 
-      _tabChanged: function (tab) {
-        this.set('route.path', '/' + tab);
-      },
+      _resetPage: function (e) {
+        var isSelected = false;
 
-      _resetPage: function () {
+        try {
+          isSelected = e.detail.item.classList.contains('iron-selected');
+        } catch (err) {}
+
+        if (isSelected) {
+          return;
+        }
+
         var queryParams = {};
         // Cluster filtering should persist across tabs.
         if (this.queryParams.cluster_id) {
