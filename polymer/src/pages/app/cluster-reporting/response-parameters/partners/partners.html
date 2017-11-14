@@ -111,8 +111,18 @@
         return this._displayClusterHeader(subpage, requiresHeader);
       },
 
-      _resetPage: function () {
+      _resetPage: function (e) {
+        var isSelected = false;
         var queryParams = {};
+
+        try {
+          isSelected = e.detail.item.classList.contains('iron-selected');
+        } catch (err) {}
+
+        if (isSelected) {
+          return;
+        }
+
         // Cluster filtering should persist across tabs.
         if (this.queryParams.cluster_id) {
           queryParams.cluster_id = this.queryParams.cluster_id;
