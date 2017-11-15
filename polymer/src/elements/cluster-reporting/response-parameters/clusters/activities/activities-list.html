@@ -13,7 +13,7 @@
 <link rel="import" href="../../../../../styles/shared-styles.html">
 
 <dom-module id="clusters-activities-list">
-    <template>
+  <template>
     <style include="data-table-styles table-styles iron-flex">
       :host {
         display: block;
@@ -39,6 +39,11 @@
     <iron-query-params
         params-string="{{query}}"
         params-object="{{queryParams}}">
+    </iron-query-params>
+
+    <iron-query-params
+        params-string="{{anchorQuery}}"
+        params-object="{{anchorQueryParams}}">
     </iron-query-params>
 
     <div class="wrapper">
@@ -67,14 +72,14 @@
         <etools-data-table-row no-collapse>
           <div slot="row-data">
             <div class="table-cell table-cell--text" flex-3>
-              <a href="[[_detailUrl(activity.id)]]">[[activity.title]]</a>
+              <a href="[[_detailUrl(activity.id, anchorQuery)]]">[[activity.title]]</a>
             </div>
             <template is="dom-if" if="[[!isMinimalList]]" restamp="true">
               <div class="table-cell table-cell--text">
                 [[activity.co_cluster_title]]
               </div>
               <div class="table-cell table-cell--text">
-                [[activity.co_title]]     
+                [[activity.co_title]]
              </div>
             </template>
           </div>
@@ -107,6 +112,8 @@
       ],
 
       properties: {
+        queryParams: Object,
+
         loading: {
           type: Boolean,
           statePath: 'clusterActivities.loading'
@@ -125,12 +132,21 @@
         isMinimalList: {
           type: Boolean,
           value: false
-        }
+        },
+
+        anchorQueryParams: {
+          type: Object,
+          computed: '_withDefaultParams(queryParams)',
+        },
       },
 
-      _detailUrl: function(id) {
+      _openModal: function () {
+        this.$$('#modal').open();
+      },
+
+      _detailUrl: function (id, query) {
         var path = '/response-parameters/clusters/activity/' + id;
-        return this.buildUrl(this._baseUrlCluster, path) + '?' + this.query;
+        return this.buildUrl(this._baseUrlCluster, path) + '?' + query;
       },
 
     });
