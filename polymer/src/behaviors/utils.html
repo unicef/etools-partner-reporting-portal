@@ -23,7 +23,7 @@
       },
 
       _withDefault: function (value, defaultValue) {
-        if (!defaultValue) {
+        if (typeof defaultValue === 'undefined') {
           defaultValue = '...';
         }
 

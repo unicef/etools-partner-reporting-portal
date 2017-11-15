@@ -31,14 +31,12 @@
         params="[[params]]">
     </etools-prp-ajax>
 
-    <template is="dom-if" if="[[!loading]]">
-      <searchable-dropdown-filter
-          label="Activity"
-          name="activity"
-          value="[[value]]"
-          data="[[data]]">
-      </searchable-dropdown-filter>
-    </template>
+    <searchable-dropdown-filter
+        label="Activity"
+        name="activity"
+        value="[[value]]"
+        data="[[data]]">
+    </searchable-dropdown-filter>
   </template>
 
   <script>
@@ -63,12 +61,6 @@
           statePath: 'responsePlans.currentID',
         },
 
-        loading: {
-          type: Boolean,
-          value: true,
-          computed: '_computeLoading(data)',
-        },
-
         data: {
           type: Array,
           value: [],
@@ -90,10 +82,6 @@
 
       _computeActivitiesUrl: function (responsePlanId) {
         return App.Endpoints.partnerActivityList(responsePlanId);
-      },
-
-      _computeLoading: function (data) {
-        return !data.length;
       },
 
       _fetchActivities: function () {

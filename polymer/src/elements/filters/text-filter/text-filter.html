@@ -54,6 +54,10 @@
         }, this._debounceDelay);
       },
 
+      attached: function () {
+        this._filterReady();
+      },
+
       detached: function () {
         if (this.isDebouncerActive('input')) {
           this.cancelDebouncer('input');

@@ -18,14 +18,12 @@
         url="[[indicatorNamesUrl]]">
     </etools-prp-ajax>
 
-    <template is="dom-if" if="[[!loading]]">
-      <searchable-dropdown-filter
-          label="Indicator"
-          name="indicator"
-          value="[[value]]"
-          data="[[data]]">
-      </searchable-dropdown-filter>
-    </template>
+    <searchable-dropdown-filter
+        label="Indicator"
+        name="indicator"
+        value="[[value]]"
+        data="[[data]]">
+    </searchable-dropdown-filter>
   </template>
 
   <script>
@@ -48,12 +46,6 @@
           statePath: 'responsePlans.currentID',
         },
 
-        loading: {
-          type: Boolean,
-          value: true,
-          computed: '_computeLoading(data)',
-        },
-
         data: {
           type: Array,
           value: [],
@@ -64,10 +56,6 @@
 
       _computeIndicatorNamesUrl: function (responsePlanID) {
         return App.Endpoints.clusterIndicatorNames(responsePlanID);
-      },
-
-      _computeLoading: function (data) {
-        return !data.length;
       },
 
       _fetchIndicatorNames: function () {
