@@ -201,10 +201,10 @@ class XLSXWriter:
                     column=5).value = cluster.partner_projects.first().partner.title
                 self.sheet.cell(
                     row=start_row_id,
-                    column=6).value = cluster_objective.title
+                    column=6).value = cluster_objective.title if cluster_objective else ""
                 self.sheet.cell(
                     row=start_row_id,
-                    column=7).value = partner_activity.title
+                    column=7).value = partner_activity.title if partner_activity else ""
                 self.sheet.cell(
                     row=start_row_id,
                     column=8).value = indicator.reportable.blueprint.title
@@ -221,7 +221,7 @@ class XLSXWriter:
 
                 self.sheet.cell(
                     row=start_row_id,
-                    column=12).value = partner_project.title
+                    column=12).value = partner_project.title if partner_project else ""
                 self.sheet.cell(
                     row=start_row_id,
                     column=13).value = partner_project.get_status_display()

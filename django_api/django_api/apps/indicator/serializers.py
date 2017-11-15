@@ -175,6 +175,7 @@ class IndicatorListSerializer(ReportableSimpleSerializer):
             'progress_percentage',
             'content_type_name',
             'content_object_title',
+            'means_of_verification',
             'object_id',
             'disaggregations'
         )
@@ -1045,12 +1046,12 @@ class ClusterIndicatorReportSimpleSerializer(serializers.ModelSerializer):
 
 
 class PMPIndicatorBlueprintSerializer(serializers.ModelSerializer):
-    id = serializers.CharField(source='external_id')
+    blueprint_id = serializers.CharField(source='external_id')
 
     class Meta:
         model = IndicatorBlueprint
         fields = (
-            'id',
+            'blueprint_id',
             'title',
             'disaggregatable',
         )
