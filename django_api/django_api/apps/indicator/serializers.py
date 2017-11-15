@@ -175,6 +175,7 @@ class IndicatorListSerializer(ReportableSimpleSerializer):
             'progress_percentage',
             'content_type_name',
             'content_object_title',
+            'means_of_verification',
             'object_id',
             'disaggregations'
         )
