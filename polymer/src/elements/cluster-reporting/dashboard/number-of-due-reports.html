@@ -2,6 +2,7 @@
 <link rel="import" href="../../../../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../../../../bower_components/etools-loading/etools-loading.html">
 <link rel="import" href="../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../../bower_components/iron-location/iron-query-params.html">
 
 <link rel="import" href="../../../redux/store.html">
 <link rel="import" href="../../../behaviors/routing.html">
@@ -15,6 +16,11 @@
         display: block;
       }
     </style>
+
+    <iron-query-params
+        params-string="{{resultsQuery}}"
+        params-object="{{resultsQueryParams}}">
+    </iron-query-params>
 
     <paper-card class="widget-container layout vertical">
       <h3 class="widget-heading flex">Number of Due / Overdue Reports</h3>
@@ -42,6 +48,8 @@
       ],
 
       properties: {
+        resultsQuery: String,
+
         numberOfReports: {
           type: Number,
           statePath: 'clusterDashboardData.data.num_of_due_overdue_indicator_reports',
@@ -49,17 +57,33 @@
 
         reportsUrl: {
           type: String,
-          computed: '_computeReportsUrl(_baseUrlCluster)',
+          computed: '_computeReportsUrl(_baseUrlCluster, resultsQuery)',
         },
 
         loading: {
           type: Boolean,
           statePath: 'clusterDashboardData.loading',
         },
+
+        partner: {
+          type: Object,
+          statePath: 'partner.current',
+        },
+
+        resultsQueryParams: {
+          type: Object,
+          computed: '_computeResultsQueryParams(partner)',
+        },
       },
 
-      _computeReportsUrl: function (baseUrl) {
-        return this.buildUrl(baseUrl, '/results');
+      _computeReportsUrl: function (baseUrl, query) {
+        return this.buildUrl(baseUrl, '/results?' + query);
+      },
+
+      _computeResultsQueryParams: function (partner) {
+        return {
+          partner: partner.id,
+        };
       },
     });
   </script>
