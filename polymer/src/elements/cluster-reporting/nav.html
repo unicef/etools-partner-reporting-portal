@@ -35,8 +35,8 @@
     <app-route route="{{route}}"></app-route>
 
     <iron-query-params
-        params-string="{{resultsQuery}}"
-        params-object="{{resultsQueryParams}}">
+        params-string="{{partnerQuery}}"
+        params-object="{{partnerQueryParams}}">
     </iron-query-params>
 
 
@@ -83,13 +83,13 @@
         </template>
 
         <paper-item name="results" class="selectable">
-          <a href="[[buildUrl(_baseUrlCluster, '/results')]]?[[resultsQuery]]">
+          <a href="[[buildUrl(_baseUrlCluster, '/results')]]?[[partnerQuery]]">
             <span><iron-icon icon="trending-up" role="presentation"></iron-icon>Results</span>
           </a>
         </paper-item>
 
         <paper-item name="analysis" class="selectable">
-          <a href="[[buildUrl(_baseUrlCluster, '/analysis')]]">
+          <a href="[[buildUrl(_baseUrlCluster, '/analysis')]]?[[partnerQuery]]">
             <span><iron-icon icon="av:equalizer" role="presentation"></iron-icon>Analysis</span>
           </a>
         </paper-item>
@@ -110,16 +110,16 @@
         clustersSelected: String,
         partnersSelected: String,
         permissions: Object,
-        resultsQuery: String,
+        partnerQuery: String,
 
         partner: {
           type: Object,
           statePath: 'partner.current',
         },
 
-        resultsQueryParams: {
+        partnerQueryParams: {
           type: Object,
-          computed: '_computeResultsQueryParams(partner)',
+          computed: '_computePartnerQueryParams(partner)',
         },
       },
 
@@ -138,7 +138,7 @@
         }
       },
 
-      _computeResultsQueryParams: function (partner) {
+      _computePartnerQueryParams: function (partner) {
         return {
           partner: partner.id,
         };
