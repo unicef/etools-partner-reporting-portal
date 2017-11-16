@@ -54,6 +54,10 @@
       .wrapper {
         position: relative;
       }
+
+      etools-data-table-column {
+        display: flex;
+      }
     </style>
 
     <iron-location
@@ -74,22 +78,22 @@
       <etools-content-panel no-header>
         <etools-data-table-header
             label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
-          <etools-data-table-column field="activity">
+          <etools-data-table-column field="title" sortable>
             <div class="table-column">Activity</div>
           </etools-data-table-column>
           <etools-data-table-column field="cluster">
             <div class="table-column">Cluster</div>
           </etools-data-table-column>
           <template is="dom-if" if="[[_equals(page, 'response-parameters')]]">
-            <etools-data-table-column field="partner">
+            <etools-data-table-column field="partner" sortable>
               <div class="table-column">Partner</div>
             </etools-data-table-column>
           </template>
-          <etools-data-table-column field="status">
+          <etools-data-table-column field="status" sortable>
             <div class="table-column">Status</div>
           </etools-data-table-column>
           <template is="dom-if" if="[[!_equals(page, 'response-parameters')]]">
-            <etools-data-table-column field="clusterActivity">
+            <etools-data-table-column field="cluster_activity" sortable>
               <div class="table-column">Cluster Activity</div>
             </etools-data-table-column>
           </template>
@@ -200,6 +204,11 @@
             type: Array,
             value: []
           }
+        },
+
+        _sortableFieldNames: {
+          type: Array,
+          value: ['title', 'partner', 'status', 'cluster_activity']
         },
 
         _openModal: function () {
