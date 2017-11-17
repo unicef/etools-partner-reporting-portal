@@ -98,7 +98,7 @@
         ],
 
         createPartnerEntitiesByResponsePlan: function(params, responsePlanClusters) {
-          return isAuthorizedOfficer(params.groups) && 
+          return isAuthorizedOfficer(params.groups) &&
             responsePlanClusters.some(function (cluster) {
               return params.partner.clusters.indexOf(cluster.id) !== -1;
             });

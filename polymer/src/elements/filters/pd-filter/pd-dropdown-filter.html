@@ -18,15 +18,13 @@
         url="[[programmeDocumentsUrl]]">
     </etools-prp-ajax>
 
-    <template is="dom-if" if="[[!loading]]">
-      <searchable-dropdown-filter
-        class="item"
-        label="PD"
-        name="pds"
-        value="[[value]]"
-        data="[[data]]">
-      </searchable-dropdown-filter>
-    </template>
+    <searchable-dropdown-filter
+      class="item"
+      label="PD"
+      name="pds"
+      value="[[value]]"
+      data="[[data]]">
+    </searchable-dropdown-filter>
   </template>
 
   <script>
@@ -49,12 +47,6 @@
           statePath: 'location.id',
         },
 
-        loading: {
-          type: Boolean,
-          value: true,
-          computed: '_computeLoading(data)',
-        },
-
         data: {
           type: Array,
           value: [],
@@ -65,10 +57,6 @@
 
       _computeProgrammeDocumentsUrl: function (locationId) {
         return locationId ? App.Endpoints.programmeDocuments(locationId) : '';
-      },
-
-      _computeLoading: function (data) {
-        return !data.length;
       },
 
       _fetchPDs: function (url) {

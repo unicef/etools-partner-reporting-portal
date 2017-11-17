@@ -31,14 +31,12 @@
         params="[[params]]">
     </etools-prp-ajax>
 
-    <template is="dom-if" if="[[!loading]]">
-      <dropdown-filter
-          label="Cluster"
-          name="cluster_id"
-          value="[[value]]"
-          data="[[data]]">
-      </dropdown-filter>
-    </template>
+    <dropdown-filter
+        label="Cluster"
+        name="cluster_id"
+        value="[[value]]"
+        data="[[data]]">
+    </dropdown-filter>
   </template>
 
   <script>
@@ -63,12 +61,6 @@
           statePath: 'responsePlans.currentID',
         },
 
-        loading: {
-          type: Boolean,
-          value: true,
-          computed: '_computeLoading(data)',
-        },
-
         data: {
           type: Array,
           value: [],
@@ -83,10 +75,6 @@
 
       _computeClusterNamesUrl: function (responsePlanID) {
         return App.Endpoints.clusterNames(responsePlanID);
-      },
-
-      _computeLoading: function (data) {
-        return !data.length;
       },
 
       _fetchClusterNames: function () {

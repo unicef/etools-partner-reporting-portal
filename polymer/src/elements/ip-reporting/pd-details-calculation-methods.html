@@ -14,6 +14,7 @@
 <link rel="import" href="../../redux/selectors/programmeDocumentsIndicators.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/data-table.html">
+<link rel="import" href="../../behaviors/notifications.html">
 <link rel="import" href="../page-body.html">
 <link rel="import" href="../etools-prp-ajax.html">
 <link rel="import" href="../etools-prp-permissions.html">
@@ -230,6 +231,7 @@
         App.Behaviors.ReduxBehavior,
         App.Behaviors.UtilsBehavior,
         App.Behaviors.DataTableBehavior,
+        App.Behaviors.NotificationsBehavior,
       ],
 
       properties: {
@@ -355,8 +357,9 @@
             .then(function () {
               var updateThunk = self.$.update.thunk();
 
-              self.dispatch(App.Actions.PDIndicators.update(updateThunk, self.pdId));
+              return self.dispatch(App.Actions.PDIndicators.update(updateThunk, self.pdId));
             })
+            .then(this._notifyChangesSaved.bind(this))
             .catch(this._noop);
       },
 

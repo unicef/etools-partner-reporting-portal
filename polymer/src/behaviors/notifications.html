@@ -7,10 +7,18 @@
     App.Behaviors = App.Behaviors || {};
 
     App.Behaviors.NotificationsBehavior = {
-      _notifyChangesSaved: function (options) {
+      _notify: function (type, options) {
         this.fire('notify', Object.assign({
-          type: 'changes-saved',
+          type: type,
         }, options));
+      },
+
+      _notifyChangesSaved: function (options) {
+        this._notify('changes-saved', options);
+      },
+
+      _notifyServerError: function (options) {
+        this._notify('server-error', options);
       },
     };
 

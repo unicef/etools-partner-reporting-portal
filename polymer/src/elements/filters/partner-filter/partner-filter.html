@@ -18,14 +18,12 @@
         url="[[partnerNamesUrl]]">
     </etools-prp-ajax>
 
-    <template is="dom-if" if="[[!loading]]">
-      <searchable-dropdown-filter
-        label="Partner"
-        name="partner"
-        value="[[computedValue]]"
-        data="[[data]]">
-      </searchable-dropdown-filter>
-    </template>
+    <searchable-dropdown-filter
+      label="Partner"
+      name="partner"
+      value="[[computedValue]]"
+      data="[[data]]">
+    </searchable-dropdown-filter>
   </template>
 
   <script>
@@ -52,12 +50,6 @@
           type: String,
           statePath: 'responsePlans.currentID',
         },
-
-        loading: {
-          type: Boolean,
-          value: true,
-          computed: '_computeLoading(data)',
-        },
       },
 
       observers: [
@@ -66,10 +58,6 @@
 
       _computeUrl: function (responsePlanID) {
         return App.Endpoints.clusterPartnerNames(responsePlanID);
-      },
-
-      _computeLoading: function (data) {
-        return !data.length;
       },
 
       _computeValue: function (data, value) {

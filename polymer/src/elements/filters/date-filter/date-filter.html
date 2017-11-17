@@ -69,8 +69,11 @@
           name: this.name,
           value: newValue,
         });
-      }
+      },
 
-      });
+      attached: function () {
+        this._filterReady();
+      },
+    });
   </script>
 </dom-module>

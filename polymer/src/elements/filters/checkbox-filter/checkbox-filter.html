@@ -71,6 +71,10 @@
           this.cancelDebouncer('change');
         }
       },
+
+      attached: function () {
+        this._filterReady();
+      },
     });
   </script>
 </dom-module>

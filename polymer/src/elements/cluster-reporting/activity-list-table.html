@@ -16,6 +16,7 @@
 <link rel="import" href="../project-status.html">
 <link rel="import" href="../page-body.html">
 <link rel="import" href="../etools-prp-data-table-row.html">
+<link rel="import" href="../list-placeholder.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
 <link rel="import" href="../../styles/table-styles.html">
@@ -80,6 +81,15 @@
           <etools-data-table-column field="cluster">
             <div class="table-column">Cluster</div>
           </etools-data-table-column>
+          <etools-data-table-column field="cluster_activity">
+            <div class="table-column">Cluster activity</div>
+          </etools-data-table-column>
+          <etools-data-table-column field="cluster_objective">
+            <div class="table-column">Cluster objective</div>
+          </etools-data-table-column>
+          <etools-data-table-column field="is_custom">
+            <div class="table-column">Custom</div>
+          </etools-data-table-column>
           <template is="dom-if" if="[[_equals(page, 'response-parameters')]]">
             <etools-data-table-column field="partner">
               <div class="table-column">Partner</div>
@@ -88,15 +98,19 @@
           <etools-data-table-column field="status">
             <div class="table-column">Status</div>
           </etools-data-table-column>
-          <template is="dom-if" if="[[!_equals(page, 'response-parameters')]]">
-            <etools-data-table-column field="clusterActivity">
-              <div class="table-column">Cluster Activity</div>
-            </etools-data-table-column>
-          </template>
           <etools-data-table-column field="location">
             <div class="table-column">Location</div>
           </etools-data-table-column>
         </etools-data-table-header>
+
+        <etools-data-table-footer
+            page-size="[[pageSize]]"
+            page-number="[[pageNumber]]"
+            total-results="[[totalResults]]"
+            visible-range="{{visibleRange}}"
+            on-page-size-changed="_pageSizeChanged"
+            on-page-number-changed="_pageNumberChanged">
+        </etools-data-table-footer>
 
         <template
             id="list"
@@ -112,6 +126,20 @@
               <div class="table-cell table-cell--text">
                 [[activity.cluster]]
               </div>
+              <div class="table-cell table-cell--text">
+                [[activity.cluster_activity.title]]
+              </div>
+              <div class="table-cell table-cell--text">
+                [[activity.cluster_objective.title]]
+              </div>
+              <div class="table-cell">
+                <template is="dom-if" if="[[activity.is_custom]]">
+                  <iron-icon icon="check"></iron-icon>
+                </template>
+                <template is="dom-if" if="[[!activity.is_custom]]">
+                  —
+                </template>
+              </div>
               <template is="dom-if" if="[[_equals(page, 'response-parameters')]]">
                 <div class="table-cell table-cell--text">
                   [[activity.partner.title]]
@@ -120,11 +148,6 @@
               <div class="table-cell table-cell--text">
                 <project-status status="[[activity.status]]"></project-status>
               </div>
-              <template is="dom-if" if="[[!_equals(page, 'response-parameters')]]">
-                <div class="table-cell table-cell--text">
-                  [[activity.cluster_activity.title]]
-                </div>
-              </template>
               <div class="table-cell table-cell--text">
                 [[_commaSeparatedDictValues(activity.locations, 'title')]]
               </div>
@@ -143,6 +166,11 @@
             </div>
           </etools-prp-data-table-row>
         </template>
+
+        <list-placeholder
+            data="[[activities]]"
+            loading="[[loading]]">
+        </list-placeholder>
 
         <etools-data-table-footer
             page-size="[[pageSize]]"
