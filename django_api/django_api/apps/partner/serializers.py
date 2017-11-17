@@ -82,6 +82,10 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
     locations = ShortLocationSerializer(many=True, read_only=True, required=False)
     partner = serializers.CharField()
     part_response_plan = serializers.SerializerMethodField()
+    total_budget = serializers.CharField(required=False)
+    funding_source = serializers.CharField(required=False)
+    description = serializers.CharField(required=False)
+    additional_information = serializers.CharField(required=False)
 
     class Meta:
         model = PartnerProject
