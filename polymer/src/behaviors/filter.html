@@ -22,6 +22,12 @@
         return value;
       },
 
+      _filterReady: function () {
+        this.async(function () {
+          this.fire('filter-ready', this.name);
+        });
+      },
+
       attached: function () {
         this.fire('register-filter', this.name);
       },

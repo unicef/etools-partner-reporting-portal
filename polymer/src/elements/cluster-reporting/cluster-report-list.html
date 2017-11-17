@@ -47,6 +47,14 @@
         params-object="{{queryParams}}">
     </iron-query-params>
 
+    <etools-data-table-footer
+        page-size="[[pageSize]]"
+        page-number="[[pageNumber]]"
+        total-results="[[totalResults]]"
+        on-page-size-changed="_pageSizeChanged"
+        on-page-number-changed="_pageNumberChanged">
+    </etools-data-table-footer>
+
     <div class="wrapper">
       <template
           is="dom-repeat"

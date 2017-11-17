@@ -18,14 +18,12 @@
         url="[[locationsUrl]]">
     </etools-prp-ajax>
 
-    <template is="dom-if" if="[[!loading]]">
-      <searchable-dropdown-filter
-          label="Location"
-          name="location"
-          value="[[value]]"
-          data="[[data]]">
-      </searchable-dropdown-filter>
-    </template>
+    <searchable-dropdown-filter
+        label="Location"
+        name="location"
+        value="[[value]]"
+        data="[[data]]">
+    </searchable-dropdown-filter>
   </template>
 
   <script>
@@ -48,12 +46,6 @@
           statePath: 'location.id',
         },
 
-        loading: {
-          type: Boolean,
-          value: true,
-          computed: '_computeLoading(data)',
-        },
-
         data: {
           type: Array,
           value: [],
@@ -66,13 +58,9 @@
         return locationId ? App.Endpoints.locations(locationId) : '';
       },
 
-      _computeLoading: function (data) {
-        return !data.length;
-      },
-
       _fetchLocations: function (url) {
         var self = this;
-        
+
         if (!url) {
           return;
         }

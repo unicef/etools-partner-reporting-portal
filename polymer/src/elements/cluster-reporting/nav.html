@@ -6,6 +6,7 @@
 <link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../../bower_components/iron-icons/av-icons.html">
+<link rel="import" href="../../../bower_components/iron-location/iron-query-params.html">
 
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/page-nav.html">
@@ -32,6 +33,12 @@
     </etools-prp-permissions>
 
     <app-route route="{{route}}"></app-route>
+
+    <iron-query-params
+        params-string="{{partnerQuery}}"
+        params-object="{{partnerQueryParams}}">
+    </iron-query-params>
+
 
     <paper-menu
         id="menu"
@@ -76,13 +83,13 @@
         </template>
 
         <paper-item name="results" class="selectable">
-          <a href="[[buildUrl(_baseUrlCluster, '/results')]]">
+          <a href="[[buildUrl(_baseUrlCluster, '/results')]]?[[partnerQuery]]">
             <span><iron-icon icon="trending-up" role="presentation"></iron-icon>Results</span>
           </a>
         </paper-item>
 
         <paper-item name="analysis" class="selectable">
-          <a href="[[buildUrl(_baseUrlCluster, '/analysis')]]">
+          <a href="[[buildUrl(_baseUrlCluster, '/analysis')]]?[[partnerQuery]]">
             <span><iron-icon icon="av:equalizer" role="presentation"></iron-icon>Analysis</span>
           </a>
         </paper-item>
@@ -103,6 +110,17 @@
         clustersSelected: String,
         partnersSelected: String,
         permissions: Object,
+        partnerQuery: String,
+
+        partner: {
+          type: Object,
+          statePath: 'partner.current',
+        },
+
+        partnerQueryParams: {
+          type: Object,
+          computed: '_computePartnerQueryParams(partner)',
+        },
       },
 
       observers: [
@@ -118,6 +136,12 @@
           this.clustersSelected = 'iron-selected';
           this.partnersSelected = '';
         }
+      },
+
+      _computePartnerQueryParams: function (partner) {
+        return {
+          partner: partner.id,
+        };
       },
     });
   </script>

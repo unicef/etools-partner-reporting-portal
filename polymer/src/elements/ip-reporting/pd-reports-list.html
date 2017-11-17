@@ -82,6 +82,15 @@
         <etools-data-table-column></etools-data-table-column>
       </etools-data-table-header>
 
+      <etools-data-table-footer
+          page-size="[[pageSize]]"
+          page-number="[[pageNumber]]"
+          total-results="[[totalResults]]"
+          visible-range="{{visibleRange}}"
+          on-page-size-changed="_pageSizeChanged"
+          on-page-number-changed="_pageNumberChanged">
+      </etools-data-table-footer>
+
       <template
         id="list"
         is="dom-repeat"
@@ -128,12 +137,12 @@
       </list-placeholder>
 
       <etools-data-table-footer
-        page-size="[[pageSize]]"
-        page-number="[[pageNumber]]"
-        total-results="[[totalResults]]"
-        visible-range="{{visibleRange}}"
-        on-page-size-changed="_pageSizeChanged"
-        on-page-number-changed="_pageNumberChanged">
+          page-size="[[pageSize]]"
+          page-number="[[pageNumber]]"
+          total-results="[[totalResults]]"
+          visible-range="{{visibleRange}}"
+          on-page-size-changed="_pageSizeChanged"
+          on-page-number-changed="_pageNumberChanged">
       </etools-data-table-footer>
 
       <etools-loading active="[[!loaded]]"></etools-loading>
