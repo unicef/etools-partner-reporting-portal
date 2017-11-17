@@ -668,6 +668,8 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         validators=[add_indicator_object_type_validator])
     blueprint = IndicatorBlueprintSerializer()
     locations = IdLocationSerializer(many=True)
+    target = serializers.CharField(required=False)
+    baseline = serializers.CharField(required=False)
 
     class Meta:
         model = Reportable
