@@ -137,7 +137,7 @@
                     is="dom-repeat"
                     items="[[responsePlans]]"
                     as="plan">
-            <etools-prp-data-table-row details-opened="[[detailsOpened]]">
+            <etools-prp-data-table-row no-collapse>
 
               <div slot="row-data">
                 <div class="table-cell" flex-1>
@@ -159,27 +159,6 @@
                  <div class="table-cell" flex-2>
                   [[plan.end]]
                 </div>
-              </div>
-
-              <div slot="row-data-details" class="row-details-expanded-wrapper">
-                <template is="dom-if" if="[[!plan.documents.length]]">
-                  There are no documents for this response plan.
-                </template>
-                <template is="dom-if" if="[[plan.documents.length]]">
-                  <div class="documents">
-                  <h5>Documents:</h5>
-                  <ul>
-                    <template id="documents"
-                              is="dom-repeat"
-                              items="[[plan.documents]]"
-                              as="document">
-                      <li>
-                        <iron-icon id="less" icon="attachment"></iron-icon>
-                        <a href="/">TODO: Link to document.</a>
-                      </li>
-                    </template>
-                  </ul>
-                </template>
               </div>
 
             </etools-data-table-row>
@@ -221,10 +200,6 @@
           value: null
         },
 
-        detailsOpened: {
-          type: Boolean,
-          value: false
-        },
       },
 
       _determineIfChecked: function(selected, id) {
