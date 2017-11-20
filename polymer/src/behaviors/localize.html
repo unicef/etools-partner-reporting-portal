@@ -1,0 +1,27 @@
+<link rel="import" href="../../bower_components/app-localize-behavior/app-localize-behavior.html">
+
+<link rel="import" href="../redux/store.html">
+<link rel="import" href="../polyfills/es6-shim.html">
+<link rel="import" href="../polyfills/intl.html">
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Behaviors = App.Behaviors || {};
+
+    App.Behaviors.LocalizeBehavior = Object.assign(
+      {},
+      Polymer.AppLocalizeBehavior,
+      App.Behaviors.ReduxBehavior,
+      {
+        properties: {
+          language: {
+            type: String,
+            statePath: 'localize.language',
+          },
+        },
+      }
+    );
+  }());
+</script>

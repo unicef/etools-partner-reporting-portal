@@ -1,0 +1,24 @@
+<link rel="import" href="../redux.html">
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Reducers = App.Reducers || {};
+
+    App.Reducers.Localize = Redux.combineReducers({
+      language: languageReducer,
+    });
+
+    function languageReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = 'en';
+      }
+
+      switch (action.type) {
+        default:
+          return state;
+      }
+    }
+  }());
+</script>
