@@ -2,6 +2,7 @@
 <link rel="import" href="../bower_components/app-route/app-location.html">
 <link rel="import" href="../bower_components/app-route/app-route.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/app-localize-behavior/app-localize-behavior.html">
 
 <link rel="import" href="behaviors/localize.html">
 <link rel="import" href="behaviors/utils.html">
@@ -77,7 +78,7 @@
         App.Behaviors.UtilsBehavior,
         App.Behaviors.ErrorHandlerBehavior,
         App.Behaviors.ReduxBehavior,
-        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
@@ -108,15 +109,12 @@
 
       observers: [
         '_routePageChanged(routeData.page)',
+        '_handleResources(resources)',
       ],
 
       listeners: {
         'sign-out': '_onSignOut',
-        'token-error': '_onTokenError'
-      },
-
-      attached: function () {
-        this.listen(this.root, 'error', '_handleError');
+        'token-error': '_onTokenError',
       },
 
       _routePageChanged: function (page) {
@@ -157,6 +155,15 @@
 
       _computeRedirectPath: function (authenticated) {
         return authenticated ? '/app' : '/login';
+      },
+
+      _handleResources: function (resources) {
+        this.dispatch(App.Actions.setL11NResources(resources));
+      },
+
+      attached: function () {
+        this.listen(this.root, 'error', '_handleError');
+        this.loadResources(this.resolveUrl('locales.json'));
       },
     });
   </script>
