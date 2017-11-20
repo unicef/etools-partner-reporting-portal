@@ -1,0 +1,18 @@
+{
+  "en": {
+    "change": "change",
+    "profile": "Profile",
+    "sign_out": "Sign out",
+    "dashboard": "Dashboard",
+    "response_parameters": "Response Parameters",
+    "clusters": "Clusters",
+    "partners": "Partners",
+    "my_planned_action": "My Planned Action",
+    "results": "Results",
+    "analysis": "Analysis",
+    "overview": "Overview",
+    "programme_documents": "Programme Documents",
+    "progress_reports": "Progress Reports",
+    "indicators": "Indicators"
+  }
+}

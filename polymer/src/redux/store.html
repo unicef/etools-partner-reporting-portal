@@ -1,6 +1,7 @@
 <link rel="import" href="../../bower_components/polymer-redux/polymer-redux.html">
 
 <link rel="import" href="redux.html">
+<link rel="import" href="reducers/localize.html">
 <link rel="import" href="reducers/auth.html">
 <link rel="import" href="reducers/workspaces.html">
 <link rel="import" href="reducers/location.html">
@@ -31,6 +32,7 @@
     var composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || Redux.compose;
 
     var rootReducer = Redux.combineReducers({
+      localize: App.Reducers.Localize,
       auth: App.Reducers.Auth,
       workspaces: App.Reducers.Workspaces,
       location: App.Reducers.Location,

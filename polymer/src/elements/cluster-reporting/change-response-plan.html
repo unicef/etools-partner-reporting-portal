@@ -1,9 +1,10 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../../../bower_components/app-localize-behavior/app-localize-behavior.html">
 
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../behaviors/routing.html">
-<link rel="import" href="../../behaviors/routing.html">
+<link rel="import" href="../../behaviors/localize.html">
 <link rel="import" href="../../styles/shared-styles.html">
 
 <dom-module id="change-response-plan">
@@ -35,7 +36,7 @@
       [[currentPlanTitle]]
       <paper-tooltip>[[currentPlanTitle]]</paper-tooltip>
     </span>
-    <a href="[[changePlanUrl]]">change</a>
+    <a href="[[changePlanUrl]]">[[localize('change')]]</a>
   </template>
 
   <script>
@@ -43,12 +44,14 @@
       is: 'change-response-plan',
 
       behaviors: [
-        App.Behaviors.ReduxBehavior,
         App.Behaviors.RoutingBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
-         responsePlans: {
+        responsePlans: {
           type: Array,
           statePath: 'responsePlans.all',
         },
