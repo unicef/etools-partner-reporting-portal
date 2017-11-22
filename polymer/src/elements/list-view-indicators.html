@@ -40,6 +40,10 @@
           <div class="table-column">Indicator</div>
         </etools-data-table-column>
 
+        <etools-data-table-column class="flex-2" field="blueprint.calculation_formula_across_periods">
+          <div class="table-column">Calculation method</div>
+        </etools-data-table-column>
+
         <etools-data-table-column class="flex-2" field="indicator">
           <div class="table-column">Baseline</div>
         </etools-data-table-column>
@@ -52,10 +56,14 @@
             <div class="table-column">Current progress</div>
         </etools-data-table-column>
 
-        <etools-data-table-column  class="flex-1" field="">
+        <template
+            is="dom-if"
+            if="[[canEdit]]"
+            restamp="true">
+          <etools-data-table-column  class="flex-1" field="">
             <div class="table-column">&nbsp;</div>
-        </etools-data-table-column>
-
+          </etools-data-table-column>
+        </template>
       </etools-data-table-header>
 
       <etools-data-table-footer
