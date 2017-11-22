@@ -51,6 +51,10 @@
       .wrapper {
         position: relative;
       }
+
+      etools-data-table-column {
+        display: flex;
+      }
     </style>
 
     <iron-location
@@ -71,18 +75,18 @@
       <etools-content-panel no-header>
         <etools-data-table-header
             label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
-          <etools-data-table-column field="project">
+          <etools-data-table-column field="title" sortable>
             <div class="table-column">Project</div>
           </etools-data-table-column>
-          <etools-data-table-column field="cluster">
+          <etools-data-table-column field="clusters" sortable>
             <div class="table-column">Cluster</div>
           </etools-data-table-column>
           <template is="dom-if" if="[[_equals(page, 'response-parameters')]]">
-            <etools-data-table-column field="status">
+            <etools-data-table-column field="partner" sortable>
               <div class="table-column">Partner</div>
             </etools-data-table-column>
           </template>
-          <etools-data-table-column field="status">
+          <etools-data-table-column field="status" sortable>
             <div class="table-column">Status</div>
           </etools-data-table-column>
           <etools-data-table-column field="Location">
@@ -213,6 +217,11 @@
             type: Object,
             computed: '_withDefaultParams(queryParams)',
           },
+
+          _sortableFieldNames: {
+            type: Array,
+            value: ['title', 'clusters', 'partner', 'status']
+          }
         },
 
         _openModal: function () {

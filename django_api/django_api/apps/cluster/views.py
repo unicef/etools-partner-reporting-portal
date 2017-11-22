@@ -173,8 +173,17 @@ class ClusterObjectiveListCreateAPIView(ListCreateAPIView):
     def get_queryset(self, *args, **kwargs):
         response_plan_id = self.kwargs.get('response_plan_id')
 
-        return ClusterObjective.objects.select_related('cluster').filter(
+        queryset = ClusterObjective.objects.select_related('cluster').filter(
             cluster__response_plan_id=response_plan_id)
+
+        order = self.request.query_params.get('sort', None)
+        if order:
+            order_field = order.split('.')[0]
+            if order_field in ('title', 'cluster'):
+                queryset = queryset.order_by(order_field)
+                if len(order.split('.')) > 1 and order.split('.')[1] == 'desc':
+                    queryset = queryset.order_by('-%s' % order_field)
+        return queryset
 
     def post(self, request, *args, **kwargs):
         """
@@ -281,8 +290,18 @@ class ClusterActivityListAPIView(ListCreateAPIView):
     def get_queryset(self, *args, **kwargs):
         response_plan_id = self.kwargs.get('response_plan_id')
 
-        return ClusterActivity.objects.select_related('cluster_objective__cluster').filter(
+        queryset = ClusterActivity.objects.select_related('cluster_objective__cluster').filter(
             cluster_objective__cluster__response_plan_id=response_plan_id)
+
+        order = self.request.query_params.get('sort', None)
+        if order:
+            order_field = order.split('.')[0]
+            if order_field in ('title', 'cluster_objective'):
+                queryset = queryset.order_by(order_field)
+                if len(order.split('.')) > 1 and order.split('.')[1] == 'desc':
+                    queryset = queryset.order_by('-%s' % order_field)
+
+        return queryset
 
     def post(self, request, *args, **kwargs):
         """
