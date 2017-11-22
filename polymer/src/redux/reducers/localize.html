@@ -1,0 +1,40 @@
+<link rel="import" href="../redux.html">
+<link rel="import" href="../../constants.html">
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Reducers = App.Reducers || {};
+
+    App.Reducers.Localize = Redux.combineReducers({
+      language: languageReducer,
+      resources: resourcesReducer,
+    });
+
+    function languageReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = 'en'; // FIXME
+      }
+
+      switch (action.type) {
+        default:
+          return state;
+      }
+    }
+
+    function resourcesReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = {};
+      }
+
+      switch (action.type) {
+        case App.Constants.SET_L11N_RESOURCES:
+          return action.resources;
+
+        default:
+          return state;
+      }
+    }
+  }());
+</script>

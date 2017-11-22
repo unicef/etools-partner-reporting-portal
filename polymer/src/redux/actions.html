@@ -25,6 +25,14 @@
 
     Object.assign(App.Actions, {
 
+      // L11N
+      setL11NResources: function (resources) {
+        return {
+          type: App.Constants.SET_L11N_RESOURCES,
+          resources: resources,
+        };
+      },
+
       // Auth
       setToken: function (token) {
         return {
