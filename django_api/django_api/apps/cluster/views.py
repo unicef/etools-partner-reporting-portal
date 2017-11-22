@@ -175,14 +175,14 @@ class ClusterObjectiveListCreateAPIView(ListCreateAPIView):
 
         queryset = ClusterObjective.objects.select_related('cluster').filter(
             cluster__response_plan_id=response_plan_id)
+
         order = self.request.query_params.get('sort', None)
         if order:
             order_field = order.split('.')[0]
-        if order and order_field in ('title', 'cluster'):
-            if order.split('.')[1] == 'asc':
+            if order_field in ('title', 'cluster'):
                 queryset = queryset.order_by(order_field)
-            else:
-                queryset = queryset.order_by('-' + order_field)
+                if len(order.split('.')) > 1 and order.split('.')[1] == 'desc':
+                    queryset = queryset.order_by('-%s' % order_field)
         return queryset
 
     def post(self, request, *args, **kwargs):
@@ -292,14 +292,14 @@ class ClusterActivityListAPIView(ListCreateAPIView):
 
         queryset = ClusterActivity.objects.select_related('cluster_objective__cluster').filter(
             cluster_objective__cluster__response_plan_id=response_plan_id)
+
         order = self.request.query_params.get('sort', None)
         if order:
             order_field = order.split('.')[0]
-        if order and order_field in ('title', 'cluster_objective'):
-            if order.split('.')[1] == 'asc':
+            if order_field in ('title', 'cluster_objective'):
                 queryset = queryset.order_by(order_field)
-            else:
-                queryset = queryset.order_by('-' + order_field)
+                if len(order.split('.')) > 1 and order.split('.')[1] == 'desc':
+                    queryset = queryset.order_by('-%s' % order_field)
 
         return queryset
 

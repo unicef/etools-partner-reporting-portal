@@ -52,7 +52,7 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
 
     def get_queryset(self, *args, **kwargs):
         response_plan_id = self.kwargs.get('response_plan_id')
-        
+
         queryset = PartnerProject.objects.select_related(
             'partner').prefetch_related('clusters', 'locations').filter(
                 clusters__response_plan_id=response_plan_id).distinct()
@@ -60,11 +60,12 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
         order = self.request.query_params.get('sort', None)
         if order:
             order_field = order.split('.')[0]
-        if order and order_field in ('title', 'clusters', 'status', 'partner'):
-            if order.split('.')[1] == 'asc':
+            if order_field in ('title', 'clusters', 'status', 'partner'):
+                if order_field == 'clusters':
+                    order_field = 'clusters__type'
                 queryset = queryset.order_by(order_field)
-            else:
-                queryset = queryset.order_by('-' + order_field)
+                if len(order.split('.')) > 1 and order.split('.')[1] == 'desc':
+                    queryset = queryset.order_by('-%s' % order_field)
 
         return queryset
 
@@ -273,11 +274,12 @@ class PartnerActivityListAPIView(ListAPIView):
         order = self.request.query_params.get('sort', None)
         if order:
             order_field = order.split('.')[0]
-        if order and order_field in ('title', 'status', 'partner', 'cluster_activity'):
-            if order.split('.')[1] == 'asc':
+            if order_field in ('title', 'status', 'partner', 'cluster_activity'):
+                if order_field == 'cluster_activity':
+                    order_field = 'cluster_activity__title'
                 queryset = queryset.order_by(order_field)
-            else:
-                queryset = queryset.order_by('-' + order_field)
+                if len(order.split('.')) > 1 and order.split('.')[1] == 'desc':
+                    queryset = queryset.order_by('-%s' % order_field)
 
         return queryset
 
