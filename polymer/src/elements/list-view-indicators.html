@@ -113,8 +113,10 @@
       ],
 
       properties: {
-
-        data: Array,
+        data: {
+          type: Array,
+          observer: '_tableContentChanged',
+        },
 
         loading: Boolean,
 
@@ -135,7 +137,7 @@
       },
 
       listeners: {
-        'page-number-changed': '_pageNumberModified',
+        'page-number-changed': '_tableContentChanged',
         'details-opened-changed': '_detailsChange'
       },
 
