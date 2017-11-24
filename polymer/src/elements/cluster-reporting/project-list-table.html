@@ -189,6 +189,7 @@
           projects: {
             type: Object,
             statePath: 'partnerProjects.all',
+            observer: '_tableContentChanged',
           },
 
           loading: {
@@ -217,11 +218,6 @@
             type: Object,
             computed: '_withDefaultParams(queryParams)',
           },
-
-          _sortableFieldNames: {
-            type: Array,
-            value: ['title', 'clusters', 'partner', 'status']
-          }
         },
 
         _openModal: function () {

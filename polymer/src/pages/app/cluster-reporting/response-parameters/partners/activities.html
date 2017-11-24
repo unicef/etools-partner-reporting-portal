@@ -4,6 +4,7 @@
 
 <link rel="import" href="../../../../../behaviors/routing.html">
 <link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="../../../../../behaviors/sorting.html">
 <link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/partners/activities/filters.html">
 <!-- <link rel="import" href="../../../../../elements/cluster-reporting/planned-action/projects/creation-modal.html"> -->
 <link rel="import" href="../../../../../elements/cluster-reporting/activity-list-table.html">
@@ -52,6 +53,7 @@
         App.Behaviors.ReduxBehavior,
         App.Behaviors.RoutingBehavior,
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.SortingBehavior,
       ],
 
       properties: {
@@ -66,16 +68,6 @@
           type: String,
           computed: '_computeUrl(responsePlanID)'
         },
-      },
-
-      listeners: {
-        'sort-changed': '_sortOrderChanged',
-      },
-
-      _sortOrderChanged: function(event) {
-        var newParams = Object.assign({}, this.queryParams);
-        newParams.sort = event.detail.field + '.' + event.detail.direction;
-        this.set('queryParams', newParams);
       },
 
       _computeUrl: function(responsePlanID) {
