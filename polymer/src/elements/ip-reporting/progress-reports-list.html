@@ -17,6 +17,7 @@
 <link rel="import" href="../../behaviors/pagination.html">
 <link rel="import" href="../../behaviors/routing.html">
 <link rel="import" href="../../behaviors/progressReportUtils.html">
+<link rel="import" href="../../behaviors/sorting.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../styles/table-styles.html">
 
@@ -51,23 +52,22 @@
     </iron-query-params>
 
     <etools-content-panel panel-title="List of Reports">
-
       <etools-data-table-header
           no-collapse
           label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
-        <etools-data-table-column field="">
+        <etools-data-table-column field="reference_number" sortable>
           <div class="table-column">PD/SSFA ToR ref. #</div>
         </etools-data-table-column>
-        <etools-data-table-column field="status">
+        <etools-data-table-column field="status" sortable>
           <div class="table-column">Report Status</div>
         </etools-data-table-column>
-        <etools-data-table-column field="due_date">
+        <etools-data-table-column field="due_date" sortable>
           <div class="table-column">Due date</div>
         </etools-data-table-column>
-        <etools-data-table-column field="date_of_submission">
+        <etools-data-table-column field="date_of_submission" sortable>
           <div class="table-column">Date of submission</div>
         </etools-data-table-column>
-        <etools-data-table-column field="period" flex-2>
+        <etools-data-table-column field="period" flex-2 sortable>
           <div class="table-column">Reporting period</div>
         </etools-data-table-column>
         <etools-data-table-column></etools-data-table-column>
@@ -147,6 +147,7 @@
         App.Behaviors.PaginationBehavior,
         App.Behaviors.UtilsBehavior,
         App.Behaviors.ProgressReportUtilsBehavior,
+        App.Behaviors.SortingBehavior,
       ],
 
       properties: {
