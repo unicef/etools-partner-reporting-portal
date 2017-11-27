@@ -31,11 +31,14 @@ class LocationSerializer(serializers.ModelSerializer):
 class ShortLocationSerializer(serializers.ModelSerializer):
 
     id = serializers.SerializerMethodField()
-    title = serializers.CharField(read_only=True)
+    title = serializers.SerializerMethodField()
 
     class Meta:
         model = Location
         fields = ('id', 'title')
+
+    def get_title(self, obj):
+        return "%s [%s, Lvl: %s]" % (obj.title, obj.p_code if obj.p_code else "n/a", obj.gateway.admin_level)
 
     def get_id(self, obj):
         return str(obj.id)
