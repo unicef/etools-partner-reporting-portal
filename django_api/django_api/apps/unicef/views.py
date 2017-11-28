@@ -264,12 +264,22 @@ class ProgressReportAPIView(ListAPIView):
             programme_document__workspace=workspace_id).distinct()
         filtered = ProgressReportFilter(request.GET, queryset=queryset)
 
-        page = self.paginate_queryset(filtered.qs)
+        qs = filtered.qs
+        order = request.query_params.get('sort', None)
+        if order:
+            order_field = order.split('.')[0]
+            if order_field in ('due_date', 'status', 'programme_document__reference_number', 'submission_date', 'start_date'):
+                print(order_field)
+                qs = qs.order_by(order_field)
+                if len(order.split('.')) > 1 and order.split('.')[1] == 'desc':
+                    qs = qs.order_by('-%s' % order_field)
+
+        page = self.paginate_queryset(qs)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
-        serializer = self.get_serializer(filtered.qs, many=True)
+        serializer = self.get_serializer(qs, many=True)
         return Response(
             serializer.data,
             status=statuses.HTTP_200_OK
