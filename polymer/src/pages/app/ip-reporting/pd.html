@@ -7,6 +7,7 @@
 <link rel="import" href="../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../redux/actions.html">
 <link rel="import" href="../../../behaviors/utils.html">
+<link rel="import" href="../../../behaviors/sorting.html">
 <link rel="import" href="../../../redux/store.html">
 <link rel="import" href="../../../redux/selectors/programmeDocuments.html">
 <link rel="import" href="../../../endpoints.html">
@@ -67,6 +68,7 @@
       behaviors: [
         App.Behaviors.UtilsBehavior,
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.SortingBehavior,
       ],
 
       properties: {
@@ -153,15 +155,23 @@
           return;
         }
 
-        pdThunk = this.$.programmeDocuments.thunk();
+        this.debounce('fetch-pds', function () {
+            pdThunk = this.$.programmeDocuments.thunk();
 
-        // Cancel the pending request, if any
-        this.$.programmeDocuments.abort();
+            // Cancel the pending request, if any
+            this.$.programmeDocuments.abort();
 
-        this.dispatch(App.Actions.PD.fetch(pdThunk))
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-            });
+            this.dispatch(App.Actions.PD.fetch(pdThunk))
+                .catch(function (err) { // jshint ignore:line
+                  // TODO: error handling
+                });
+        }, 100);
+      },
+
+      detached: function () {
+        if (this.isDebouncerActive('fetch-pds')) {
+          this.cancelDebouncer('fetch-pds');
+        }
       },
     });
   </script>
