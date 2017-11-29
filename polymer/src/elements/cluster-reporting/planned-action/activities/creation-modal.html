@@ -186,6 +186,7 @@
                 </div>
                 <div class="item">
                    <etools-prp-date-input
+                      id="startDate"
                       class="validate"
                       label="Start date"
                       value="{{data.cluster.start_date}}"
@@ -198,6 +199,7 @@
                 </div>
                 <div class="item">
                   <etools-prp-date-input
+                      id="endDate"
                       class="validate"
                       label="End date"
                       value="{{data.cluster.end_date}}"
@@ -616,11 +618,18 @@
         );
 
         var self = this;
+        var startDate = this.$$('#startDate');
+        var endDate = this.$$('#endDate');
         var valid;
 
         fields.forEach(function (field) {
           field.validate();
         });
+
+        if (new Date(endDate.value) <= new Date(startDate.value)) {
+          startDate.invalid = true;
+          endDate.invalid = true;
+        }
 
         valid = fields.every(function (field) {
           return !field.invalid;
