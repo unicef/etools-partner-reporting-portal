@@ -249,6 +249,7 @@ def process_programme_documents(fast=False, area=False):
                                         except Reportable.DoesNotExist:
                                             print("Blueprint not exists! Skipping!")
                                             blueprint = None
+                                            continue
                                     else:
                                         # Create IndicatorBlueprint
                                         i['disaggregatable'] = True

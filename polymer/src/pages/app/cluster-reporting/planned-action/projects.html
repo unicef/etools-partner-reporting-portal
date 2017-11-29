@@ -106,6 +106,16 @@
         },
       },
 
+      listeners: {
+        'sort-changed': '_sortOrderChanged',
+      },
+
+      _sortOrderChanged: function(event) {
+        var newParams = Object.assign({}, this.queryParams);
+        newParams.sort = event.detail.field + '.' + event.detail.direction;
+        this.set('queryParams', newParams);
+      },
+
       _computeUrl: function (responsePlanID) {
         return App.Endpoints.plannedActions(responsePlanID);
       },

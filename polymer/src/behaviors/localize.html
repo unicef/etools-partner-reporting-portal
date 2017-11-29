@@ -1,0 +1,24 @@
+<link rel="import" href="../polyfills/intl.html">
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Behaviors = App.Behaviors || {};
+
+    App.Behaviors.LocalizeBehavior = {
+      properties: {
+        language: {
+          type: String,
+          statePath: 'localize.language',
+        },
+
+        resources: {
+          type: Object,
+          statePath: 'localize.resources',
+        },
+      },
+    };
+
+  }());
+</script>

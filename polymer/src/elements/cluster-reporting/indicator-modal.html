@@ -323,22 +323,17 @@
         displayType: String,
 
         baseline: Number,
-        
+
         target: Number,
 
         responsePlanId: {
-         type: String,
-         statePath: 'responsePlans.currentID',
-       },
-
-        locationId: {
           type: String,
-          statePath: 'location.id',
+          statePath: 'responsePlans.currentID',
         },
 
         locationsUrl: {
           type: String,
-          computed: '_computeLocationsUrl(locationId)',
+          computed: '_computeLocationsUrl(responsePlanId)',
         },
 
         disaggregationsUrl: {
@@ -508,8 +503,8 @@
         return frequency && this._equals(frequency, 'Csd');
       },
 
-      _computeLocationsUrl: function (locationId) {
-        return App.Endpoints.childLocations(locationId);
+      _computeLocationsUrl: function (responsePlanId) {
+        return App.Endpoints.clusterLocationNames(responsePlanId);
       },
 
       _computeDisaggregationsUrl: function(responsePlanId) {

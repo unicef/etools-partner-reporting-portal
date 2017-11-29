@@ -7,10 +7,12 @@
 <link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../../bower_components/iron-icons/av-icons.html">
 <link rel="import" href="../../../bower_components/iron-location/iron-query-params.html">
+<link rel="import" href="../../../bower_components/app-localize-behavior/app-localize-behavior.html">
 
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/page-nav.html">
 <link rel="import" href="../../behaviors/routing.html">
+<link rel="import" href="../../behaviors/localize.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../etools-prp-permissions.html">
 
@@ -49,7 +51,7 @@
 
         <paper-item name="dashboard" class="selectable">
           <a href="[[buildUrl(_baseUrlCluster, '/dashboard')]]">
-            <span><iron-icon icon="view-quilt" role="presentation"></iron-icon>Dashboard</span>
+            <span><iron-icon icon="view-quilt" role="presentation"></iron-icon>[[localize('dashboard')]]</span>
           </a>
         </paper-item>
 
@@ -57,15 +59,15 @@
           <paper-submenu>
             <paper-item class="menu-trigger">
               <a href="[[buildUrl(_baseUrlCluster, 'response-parameters')]]">
-              <span><iron-icon icon="compare-arrows" role="presentation"></iron-icon>Response Parameters</span>
+              <span><iron-icon icon="compare-arrows" role="presentation"></iron-icon>[[localize('response_parameters')]]</span>
               </a>
             </paper-item>
             <paper-menu class="menu-content">
               <paper-item name="response-parameters" id="clustersSubmenu" class$="[[clustersSelected]]">
-                <a href="[[buildUrl(_baseUrlCluster, 'response-parameters/clusters')]]">Clusters</a>
+                <a href="[[buildUrl(_baseUrlCluster, 'response-parameters/clusters')]]">[[localize('clusters')]]</a>
               </paper-item>
               <paper-item name="response-parameters" id="partnersSubmenu" class$="[[partnersSelected]]">
-                <a href="[[buildUrl(_baseUrlCluster, 'response-parameters/partners')]]">Partners</a>
+                <a href="[[buildUrl(_baseUrlCluster, 'response-parameters/partners')]]">[[localize('partners')]]</a>
               </a>
             </paper-menu>
           </paper-submenu>
@@ -77,20 +79,20 @@
             restamp="true">
           <paper-item name="planned-action" class="selectable">
             <a href="[[buildUrl(_baseUrlCluster, '/planned-action/')]]">
-              <span><iron-icon icon="av:playlist-add" role="presentation"></iron-icon>My Planned Action</span>
+              <span><iron-icon icon="av:playlist-add" role="presentation"></iron-icon>[[localize('my_planned_action')]]</span>
             </a>
           </paper-item>
         </template>
 
         <paper-item name="results" class="selectable">
           <a href="[[buildUrl(_baseUrlCluster, '/results')]]?[[partnerQuery]]">
-            <span><iron-icon icon="trending-up" role="presentation"></iron-icon>Reporting Results</span>
+            <span><iron-icon icon="trending-up" role="presentation"></iron-icon>[[localize('reporting_results')]]</span>
           </a>
         </paper-item>
 
         <paper-item name="analysis" class="selectable">
           <a href="[[buildUrl(_baseUrlCluster, '/analysis')]]?[[partnerQuery]]">
-            <span><iron-icon icon="av:equalizer" role="presentation"></iron-icon>Analysis</span>
+            <span><iron-icon icon="av:equalizer" role="presentation"></iron-icon>[[localize('analysis')]]</span>
           </a>
         </paper-item>
   </template>
@@ -104,6 +106,8 @@
         App.Behaviors.PageNavBehavior,
         App.Behaviors.ReduxBehavior,
         App.Behaviors.RoutingBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

@@ -58,9 +58,28 @@
         background: var(--paper-grey-300);
       }
 
-      .indicator-header__title h3 {
+      .indicator-header dl {
         margin: 0;
+        text-align: right;
+        font-size: 11px;
+      }
+
+      .indicator-header dt {
+        color: var(--theme-secondary-text-color);
+      }
+
+      .indicator-header dd {
+        margin: 0;
+        font-weight: bold;
+      }
+
+      .indicator-header__title h3 {
+        margin: 0 0 .25em;
         font-size: 14px;
+      }
+
+      .indicator-header__title dt {
+        margin-right: 1em;
       }
 
       .status-badge {
@@ -73,18 +92,7 @@
       }
 
       .indicator-header__target dl {
-        margin: 0;
         text-align: right;
-        font-size: 11px;
-      }
-
-      .indicator-header__target dt {
-        color: var(--theme-secondary-text-color);
-      }
-
-      .indicator-header__target dd {
-        margin: 0;
-        font-weight: bold;
       }
 
       indicator-details {
@@ -145,7 +153,14 @@
                         no-label>
                     </report-status>
                   </div>
-                  <h3>[[indicator.reportable.blueprint.title]]</h3>
+                  <div>
+                    <h3>[[indicator.reportable.blueprint.title]]</h3>
+
+                    <dl class="layout horizontal">
+                      <dt>Calculation method:</dt>
+                      <dd>[[indicator.reportable.blueprint.calculation_formula_across_locations]]</dd>
+                    </dl>
+                  </div>
                 </div>
               </div>
               <div class="indicator-header__target flex-none layout vertical center-justified">
