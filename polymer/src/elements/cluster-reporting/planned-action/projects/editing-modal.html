@@ -128,11 +128,10 @@
 
             <div class="item">
                <etools-prp-date-input
-                  class="validate"
+                  class="start-date"
                   label="Start date"
                   value="{{data.start_date}}"
                   error-message=""
-                  auto-validate
                   required
                   no-init>
                </etools-prp-date-input>
@@ -140,11 +139,10 @@
 
             <div class="item">
               <etools-prp-date-input
-                  class="validate"
+                  class="end-date"
                   label="End date"
                   value="{{data.end_date}}"
                   error-message=""
-                  auto-validate
                   required
                   no-init>
               </etools-prp-date-input>
@@ -340,7 +338,12 @@
       _save: function () {
         var self = this;
 
-        if (!this._fieldsAreValid()) {
+        var valid = [
+          this._fieldsAreValid(),
+          this._dateRangeValid('.start-date', '.end-date'),
+        ].every(Boolean);
+
+        if (!valid) {
           return;
         }
 

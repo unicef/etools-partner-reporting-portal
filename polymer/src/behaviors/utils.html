@@ -138,6 +138,37 @@
         return valid;
       },
 
+      _dateRangeValid: function (start, end) {
+        var startField = this.$$(start);
+        var endField = this.$$(end);
+        var startValue = startField.value;
+        var endValue = endField.value;
+
+        if (!Date.parse(startValue) || !Date.parse(endValue)) {
+          if (startField.required) {
+            startField.invalid = true;
+          }
+
+          if (endField.required) {
+            endField.invalid = true;
+          }
+
+          return false;
+        }
+
+        if (new Date(startField.value) >= new Date(endField.value)) {
+          startField.invalid = true;
+          endField.invalid = true;
+
+          return false;
+        }
+
+        startField.invalid = false;
+        endField.invalid = false;
+
+        return true;
+      },
+
       _noop: function () {},
 
       _withDefaultParams: function (queryParams) {
