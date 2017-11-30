@@ -1,6 +1,8 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/promise-polyfill/promise-polyfill-lite.html">
 
+<link rel="import" href="../polyfills/es6-shim.html">
+
 <script>
   (function () {
     'use strict';
@@ -21,7 +23,7 @@
       },
 
       _withDefault: function (value, defaultValue) {
-        if (!defaultValue) {
+        if (typeof defaultValue === 'undefined') {
           defaultValue = '...';
         }
 
@@ -137,6 +139,13 @@
       },
 
       _noop: function () {},
+
+      _withDefaultParams: function (queryParams) {
+        return Object.assign({}, queryParams, {
+          page: 1,
+          page_size: 10,
+        });
+      },
     };
   }());
 </script>

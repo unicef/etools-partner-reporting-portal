@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 import operator
 import logging
 from django.db.models import Q
@@ -17,7 +17,8 @@ from core.permissions import (
     IsAuthenticated,
     IsPartnerAuthorizedOfficer,
     IsPartnerEditor,
-    IsPartnerEditorOrPartnerAuthorizedOfficer
+    IsPartnerEditorOrPartnerAuthorizedOfficer,
+    IsIMO,
 )
 from core.paginations import SmallPagination
 from core.models import Location
@@ -45,7 +46,9 @@ from .serializers import (
     OverallNarrativeSerializer,
     ClusterIndicatorSerializer,
     ClusterIndicatorDataSerializer,
-    DisaggregationListSerializer
+    DisaggregationListSerializer,
+    IndicatorReportReviewSerializer,
+    IndicatorReportSimpleSerializer
 )
 from .filters import IndicatorFilter, PDReportsFilter
 from .models import (
@@ -468,6 +471,54 @@ class IndicatorReportListAPIView(APIView):
         serializer = IndicatorReportListSerializer(indicator_reports,
                                                    many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class IndicatorReportReviewAPIView(APIView):
+    """
+    Called by IMO to accept or send back a submitted indicator report.
+
+    Only a IMO should be allowed to do this action.
+    """
+    permission_classes = (IsIMO,)
+
+    def get_object(self, pk):
+        try:
+            return IndicatorReport.objects.get(pk=pk)
+        except IndicatorReport.DoesNotExist as exp:
+            logger.exception({
+                "endpoint": "IndicatorReportReviewAPIView",
+                "request.data": self.request.data,
+                "pk": pk,
+                "exception": exp,
+            })
+            raise Http404
+
+    @transaction.atomic
+    def post(self, request, pk, *args, **kwargs):
+        """
+        Only if the indicator report is in submitted state that this POST
+        request will be successful.
+        """
+        indicator_report = self.get_object(pk)
+
+        if indicator_report.report_status != INDICATOR_REPORT_STATUS.submitted:
+            _errors = [{"message": "This report is not in submitted state."}]
+            return Response({"errors": _errors}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = IndicatorReportReviewSerializer(data=request.data)
+        if serializer.is_valid():
+            indicator_report.report_status = serializer.validated_data['status']
+            indicator_report.review_date = datetime.now().date()
+            if indicator_report.report_status == INDICATOR_REPORT_STATUS.sent_back:
+                indicator_report.sent_back_feedback = serializer.validated_data[
+                    'comment']
+
+            indicator_report.save()
+            serializer = IndicatorReportSimpleSerializer(instance=indicator_report)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response({"errors": serializer.errors},
+                        status=status.HTTP_400_BAD_REQUEST)
 
 
 class IndicatorLocationDataUpdateAPIView(APIView):

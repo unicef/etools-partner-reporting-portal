@@ -12,7 +12,7 @@ from unicef.models import LowerLevelOutput
 from partner.models import PartnerProject, PartnerActivity
 from cluster.models import ClusterObjective, ClusterActivity
 
-from core.common import OVERALL_STATUS_DICT
+from core.common import OVERALL_STATUS_DICT, INDICATOR_REPORT_STATUS
 from core.serializers import LocationSerializer, IdLocationSerializer
 from core.models import Location
 from core.validators import add_indicator_object_type_validator
@@ -102,6 +102,8 @@ class IndicatorReportSimpleSerializer(serializers.ModelSerializer):
             'achieved',
             'total',
             'report_status',
+            'review_date',
+            'sent_back_feedback'
         )
 
     def get_indicator_name(self, obj):
@@ -173,6 +175,7 @@ class IndicatorListSerializer(ReportableSimpleSerializer):
             'progress_percentage',
             'content_type_name',
             'content_object_title',
+            'means_of_verification',
             'object_id',
             'disaggregations'
         )
@@ -590,6 +593,7 @@ class PDReportContextIndicatorReportSerializer(serializers.ModelSerializer):
     reportable_object_id = serializers.SerializerMethodField()
     submission_date = serializers.SerializerMethodField()
     due_date = serializers.SerializerMethodField()
+    is_cluster_indicator = serializers.SerializerMethodField()
     reportable = ReportableSimpleSerializer()
     report_status_display = serializers.CharField(
         source='get_report_status_display')
@@ -609,6 +613,7 @@ class PDReportContextIndicatorReportSerializer(serializers.ModelSerializer):
             'report_status_display',
             'submission_date',
             'is_draft',
+            'is_cluster_indicator',
             'due_date',
             'total',
             'overall_status',
@@ -627,6 +632,9 @@ class PDReportContextIndicatorReportSerializer(serializers.ModelSerializer):
 
     def get_reportable_object_id(self, obj):
         return obj.reportable.object_id
+
+    def get_is_cluster_indicator(self, obj):
+        return obj.reportable.is_cluster_indicator
 
     def get_submission_date(self, obj):
         return obj.submission_date and obj.submission_date.strftime(
@@ -851,6 +859,29 @@ class IndicatorReportUpdateSerializer(serializers.ModelSerializer):
         fields = (
             'reporting_period',
         )
+        
+class IndicatorReportReviewSerializer(serializers.Serializer):
+    status = serializers.ChoiceField(choices=[
+        INDICATOR_REPORT_STATUS.sent_back,
+        INDICATOR_REPORT_STATUS.accepted
+    ])
+    comment = serializers.CharField(required=False)
+
+    def validate(self, data):
+        """
+        Make sure status is only accepted or sent back. Also overall_status
+        should be set if accepting
+        """
+        if data['status'] not in [INDICATOR_REPORT_STATUS.sent_back,
+                                  INDICATOR_REPORT_STATUS.accepted]:
+            raise serializers.ValidationError(
+                'Report status should be accepted or sent back')
+        if data.get('status', None) == INDICATOR_REPORT_STATUS.sent_back and data.get(
+                'comment') is None:
+            raise serializers.ValidationError(
+                'Comment required when sending back report')
+
+        return data
 
 
 class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
@@ -885,6 +916,8 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
             'report_status',
             'overall_status',
             'narrative_assessment',
+            'sent_back_feedback',
+            'review_date',
             'cluster',
             'cluster_id',
             'project',
@@ -1013,12 +1046,12 @@ class ClusterIndicatorReportSimpleSerializer(serializers.ModelSerializer):
 
 
 class PMPIndicatorBlueprintSerializer(serializers.ModelSerializer):
-    id = serializers.CharField(source='external_id')
+    blueprint_id = serializers.CharField(source='external_id')
 
     class Meta:
         model = IndicatorBlueprint
         fields = (
-            'id',
+            'blueprint_id',
             'title',
             'disaggregatable',
         )

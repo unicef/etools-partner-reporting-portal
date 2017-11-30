@@ -7,6 +7,10 @@
 <link rel="import" href="../../../bower_components/promise-polyfill/promise-polyfill-lite.html">
 <link rel="import" href="../../../bower_components/iron-location/iron-location.html">
 <link rel="import" href="../../../bower_components/iron-location/iron-query-params.html">
+<link rel="import" href="../../../bower_components/paper-menu-button/paper-menu-button.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../../bower_components/paper-item/paper-icon-item.html">
 
 <link rel="import" href="../../polyfills/es6-shim.html">
 <link rel="import" href="../../endpoints.html">
@@ -14,6 +18,8 @@
 <link rel="import" href="../../behaviors/notifications.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
+<link rel="import" href="send-back-modal.html">
+<link rel="import" href="feedback-modal.html">
 <link rel="import" href="../reportable-meta.html">
 <link rel="import" href="../error-modal.html">
 <link rel="import" href="../report-status.html">
@@ -29,6 +35,8 @@
     <style include="iron-flex iron-flex-alignment iron-flex-factors shared-styles button-styles">
       :host {
         display: block;
+
+        --paper-item-icon-width: auto;
       }
 
       .report {
@@ -36,7 +44,7 @@
       }
 
       .report__meta {
-        padding: 10px 25px 10px 10px;
+        padding: 10px;
         color: var(--paper-grey-600);
       }
 
@@ -147,6 +155,18 @@
       reportable-meta {
         padding: 25px;
       }
+
+      paper-menu {
+        white-space: nowrap;
+      }
+
+      paper-menu a {
+        color: inherit;
+      }
+
+      paper-menu iron-icon {
+        margin-right: .25em;
+      }
     </style>
 
     <etools-prp-permissions
@@ -199,7 +219,7 @@
         <div class="flex layout vertical">
           <div class="report__meta layout horizontal">
             <div class="column flex">
-              <report-status status="[[data.overall_status]]"></report-status>
+              <report-status status="[[data.report_status]]"></report-status>
               <dl>
                 <template
                     is="dom-if"
@@ -219,6 +239,10 @@
               <dl>
                 <dt>Reporting period:</dt>
                 <dd>[[data.reporting_period]]</dd>
+              </dl>
+              <dl>
+                <dt>Calculation method:</dt>
+                <dd>[[data.reportable.blueprint.calculation_formula_across_locations]]</dd>
               </dl>
             </div>
             <div class="column flex">
@@ -256,19 +280,69 @@
                   Submit
                 </paper-button>
               </template>
+
               <template
                   is="dom-if"
                   if="[[_equals(mode, 'view')]]"
                   restamp="true">
-                <a
-                    href="[[exportUrl]]"
-                    target="_blank"
-                    tabindex="-1">
-                  <paper-button class="btn-primary">
-                    <iron-icon icon="icons:file-download"></iron-icon>
-                    Export
-                  </paper-button>
-                </a>
+                <send-back-modal
+                    id="sendBackModal"
+                    report="[[data]]">
+                </send-back-modal>
+
+                <paper-menu-button dynamic-align>
+                  <paper-icon-button icon="icons:more-vert" class="dropdown-trigger"></paper-icon-button>
+                  <paper-menu
+                      id="viewMenu"
+                      class="dropdown-content"
+                      selected="2">
+                    <template
+                        is="dom-if"
+                        if="[[canSendBack]]">
+                      <paper-icon-item on-tap="_sendBack">
+                        <iron-icon icon="icons:reply" item-icon></iron-icon>
+                        Send back to partner
+                      </paper-icon-item>
+                    </template>
+
+                    <a
+                        href="[[exportUrl]]"
+                        target="_blank"
+                        tabindex="-1">
+                      <paper-icon-item>
+                        <iron-icon icon="icons:file-download" item-icon></iron-icon>
+                        Export
+                      </paper-icon-item>
+                    </a>
+
+                    <div></div>
+                  </paper-menu>
+                </paper-menu-button>
+              </template>
+
+              <template
+                  is="dom-if"
+                  if="[[showFeedback]]"
+                  restamp="true">
+
+                <feedback-modal
+                    id="feedbackModal"
+                    report="[[data]]">
+                </feedback-modal>
+                <paper-menu-button dynamic-align>
+                  <paper-icon-button icon="icons:more-vert" class="dropdown-trigger"></paper-icon-button>
+                  <paper-menu
+                      id="nonViewMenu"
+                      class="dropdown-content"
+                      selected="1">
+                    <paper-icon-item on-tap="_viewFeedback">
+                      <iron-icon icon="icons:announcement" item-icon></iron-icon>
+                      View feedback
+                    </paper-icon-item>
+
+                    <div></div>
+                  </paper-menu>
+                </paper-menu-button>
               </template>
             </div>
           </div>
@@ -437,6 +511,16 @@
           type: String,
           computed: '_computeSubmitMode(mode, data, permissions)',
         },
+
+        canSendBack: {
+          type: Boolean,
+          computed: '_computeCanSendBack(data, permissions)',
+        },
+
+        showFeedback: {
+          type: Boolean,
+          computed: '_computeShowFeedback(data, permissions)',
+        },
       },
 
       listeners: {
@@ -593,6 +677,31 @@
         canSubmit = permissions.submitIndicatorReport(data.cluster_id, data.partner_id);
 
         return canSubmit ? mode : 'view';
+      },
+
+      _computeCanSendBack: function (data, permissions) {
+        return data.report_status === 'Sub' && permissions.sendBackIndicatorReport;
+      },
+
+      _computeShowFeedback: function (data, permissions) {
+        return data.report_status === 'Sen' &&
+            permissions.submitIndicatorReport(data.cluster_id, data.partner_id);
+      },
+
+      _sendBack: function () {
+        this.$$('#sendBackModal').open();
+
+        this.async(function () {
+          this.$$('#viewMenu').select(2);
+        });
+      },
+
+      _viewFeedback: function () {
+        this.$$('#feedbackModal').open();
+
+        this.async(function () {
+          this.$$('#nonViewMenu').select(1);
+        });
       },
 
       detached: function () {

@@ -12,15 +12,13 @@
       }
     </style>
 
-    <template is="dom-if" if="[[!loading]]">
-      <searchable-dropdown-filter
-          class="item"
-          label="PD output"
-          name="llo"
-          value="[[value]]"
-          data="[[options]]">
-      </searchable-dropdown-filter>
-    </template>
+    <searchable-dropdown-filter
+        class="item"
+        label="PD output"
+        name="llo"
+        value="[[value]]"
+        data="[[options]]">
+    </searchable-dropdown-filter>
   </template>
 
   <script>
@@ -44,12 +42,6 @@
           value: [],
           computed: '_computeOptions(data)',
         },
-
-        loading: {
-          type: Boolean,
-          value: true,
-          computed: '_computeLoading(options)',
-        },
       },
 
       _computeOptions: function (data) {
@@ -64,10 +56,6 @@
           id: '',
           title: 'All',
         }].concat(other);
-      },
-
-      _computeLoading: function (options) {
-        return !options.length;
       },
     });
   </script>

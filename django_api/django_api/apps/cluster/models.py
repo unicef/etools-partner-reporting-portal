@@ -40,7 +40,7 @@ class Cluster(TimeStampedModel):
         unique_together = ('type', 'response_plan')
 
     def __str__(self):
-        return "<pk: %s> %s" % (self.id, self.type)
+        return "<pk: %s> %s PLAN: %s" % (self.id, self.type, self.response_plan)
 
     @property
     def num_of_partners(self):

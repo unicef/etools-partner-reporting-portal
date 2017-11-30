@@ -57,7 +57,7 @@
 
       <template
           is="dom-if"
-          if="[[_canAddObjective(permissions)]]"
+          if="[[permissions.createClusterEntities]]"
           restamp="true">
         <cluster-objectives-modal id="modal"></cluster-objectives-modal>
 
@@ -101,12 +101,22 @@
         },
       },
 
+      listeners: {
+        'sort-changed': '_sortOrderChanged',
+      },
+
       _openModal: function () {
         this.$$('#modal').open();
       },
 
       _computeUrl: function(responsePlanID) {
         return App.Endpoints.responseParametersClusterObjectives(responsePlanID);
+      },
+
+      _sortOrderChanged: function(event) {
+        var newParams = Object.assign({}, this.queryParams);
+        newParams.sort = event.detail.field + '.' + event.detail.direction;
+        this.set('queryParams', newParams);
       },
 
       _clusterObjectivesAjax: function (queryParams) {
@@ -124,10 +134,6 @@
                 // TODO: error handling.
             });
         }, 300);
-      },
-
-      _canAddObjective: function (permissions) {
-        return permissions.createClusterEntities();
       },
 
       detached: function () {

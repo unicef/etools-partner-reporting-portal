@@ -176,11 +176,18 @@
           type: String,
           observer: '_pageChanged',
         },
+
+        allPlans: {
+          type: Array,
+          statePath: 'responsePlans.all',
+        }
+
       },
 
       observers: [
         '_routePageChanged(routeData.page)',
         '_routePlanChanged(routeData.plan)',
+        '_routeCurrentPlanChanged(routeData.plan, allPlans)',
       ],
 
       _pageChanged: function (page) {
@@ -206,6 +213,15 @@
         this.set('plan', plan);
       },
 
+      _routeCurrentPlanChanged: function(id, allPlans) {
+        var current = allPlans.find(function(plan) {
+          return Number(id) === plan.id;
+        });
+        if (current) {
+          this.dispatch(App.Actions.setCurrentResponsePlan(current));
+        }
+      },
+
       _routePageChanged: function (page) {
         var newPage = page || 'dashboard';
 
@@ -213,10 +229,7 @@
 
         if (newPage !== page) {
           this.async(function () {
-            this.set(
-              'route.path',
-              '/' + this.routeData.plan + '/' + newPage
-            );
+            this.set('routeData.page', newPage);
           });
         }
       },

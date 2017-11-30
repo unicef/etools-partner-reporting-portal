@@ -149,6 +149,14 @@
         '_updateUrlTab(routeData.tab)',
       ],
 
+      listeners: {
+        'activity-edited': '_onSuccess'
+      },
+
+      _onSuccess: function() {
+        this._getActivityAjax();
+      },
+
       _updateTabSelection: function () {
         this.$.tabContent.select(this.tab);
       },
@@ -169,7 +177,7 @@
         return '/response-parameters/clusters/activities' + '?' + query;
       },
 
-      attached: function () {
+      _getActivityAjax: function() {
         var thunk = this.$.activity.thunk();
         var self = this;
 
@@ -182,6 +190,10 @@
             self.updatePending = false;
             // TODO: error handling
           });
+      },
+
+      attached: function () {
+        this._getActivityAjax();
       },
     });
   </script>

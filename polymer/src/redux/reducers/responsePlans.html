@@ -51,7 +51,7 @@
 
     function currentResponsePlanReducer(state, action) {
       if (typeof state === 'undefined') {
-        state = {};
+        state = null;
       }
 
       switch (action.type) {
@@ -59,7 +59,7 @@
           return action.plan;
 
         case App.Constants.RESET:
-          return '';
+          return null;
 
         default:
           return state;

@@ -25,6 +25,10 @@
         return this._buildUrl('/indicator/' + reportableId + '/indicator-reports/');
       },
 
+      indicatorReportReview: function (reportId) {
+        return this._buildUrl('/indicator/indicator-reports/' + reportId + '/review/');
+      },
+
       programmeDocuments: function (locationId) {
         return this._buildUrl('/unicef/' + locationId + '/programme-document/');
       },
@@ -132,7 +136,7 @@
           + '/partner-activity/' + activityId + '/');
       },
 
-      responseParamtersClustersObjectiveDetail: function(objectiveId) {
+      responseParametersClustersObjectiveDetail: function(objectiveId) {
         return this._buildUrl('/cluster/cluster-objective/' + objectiveId + '/');
       },
 

@@ -35,6 +35,11 @@
       properties: {
         permissions: Object,
 
+        partner: {
+          type: Object,
+          statePath: 'partner.current'
+        },
+
         clusterNamesUrl: {
           type: String,
           computed: '_computeClusterNamesUrl(responsePlanID)',
@@ -43,6 +48,11 @@
         responsePlanID: {
           type: String,
           statePath: 'responsePlans.currentID',
+        },
+
+        responsePlanCurrent: {
+          type: Object,
+          statePath: 'responsePlans.current',
         },
 
         clusters: {
@@ -67,9 +77,15 @@
 
         this.$.clusterNames.thunk()()
             .then(function (res) {
-              self.set('clusters', res.data.filter(function (cluster) {
-                return permissions.createClusterEntitiesForCluster(cluster.id);
-              }));
+              if (!self.partner.clusters) {
+                self.set('clusters', res.data.filter(function (cluster) {
+                  return permissions.createClusterEntitiesForCluster(cluster.id);
+                }));
+              } else {
+                self.set('clusters', res.data.filter(function (cluster) {
+                  return self.partner.clusters.indexOf(cluster.id) !== -1;
+                }));
+              }
             })
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling

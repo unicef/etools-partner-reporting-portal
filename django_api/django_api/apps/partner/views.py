@@ -53,9 +53,21 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
     def get_queryset(self, *args, **kwargs):
         response_plan_id = self.kwargs.get('response_plan_id')
 
-        return PartnerProject.objects.select_related(
+        queryset = PartnerProject.objects.select_related(
             'partner').prefetch_related('clusters', 'locations').filter(
                 clusters__response_plan_id=response_plan_id).distinct()
+
+        order = self.request.query_params.get('sort', None)
+        if order:
+            order_field = order.split('.')[0]
+            if order_field in ('title', 'clusters', 'status', 'partner'):
+                if order_field == 'clusters':
+                    order_field = 'clusters__type'
+                queryset = queryset.order_by(order_field)
+                if len(order.split('.')) > 1 and order.split('.')[1] == 'desc':
+                    queryset = queryset.order_by('-%s' % order_field)
+
+        return queryset
 
     def add_many_to_many_relations(self, instance):
         """
@@ -252,11 +264,24 @@ class PartnerActivityListAPIView(ListAPIView):
 
     def get_queryset(self, *args, **kwargs):
         response_plan_id = self.kwargs.get('response_plan_id')
-        return PartnerActivity.objects.select_related(
+
+        queryset = PartnerActivity.objects.select_related(
             'cluster_activity').filter(
                 Q(cluster_activity__cluster_objective__cluster__response_plan_id=response_plan_id) |
                 Q(cluster_objective__cluster__response_plan_id=response_plan_id)
             )
+
+        order = self.request.query_params.get('sort', None)
+        if order:
+            order_field = order.split('.')[0]
+            if order_field in ('title', 'status', 'partner', 'cluster_activity'):
+                if order_field == 'cluster_activity':
+                    order_field = 'cluster_activity__title'
+                queryset = queryset.order_by(order_field)
+                if len(order.split('.')) > 1 and order.split('.')[1] == 'desc':
+                    queryset = queryset.order_by('-%s' % order_field)
+
+        return queryset
 
 
 class PartnerActivityAPIView(RetrieveAPIView):

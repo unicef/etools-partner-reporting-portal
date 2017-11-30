@@ -55,7 +55,7 @@
 
       <template
           is="dom-if"
-          if="[[_canAddActivity(permissions)]]"
+          if="[[permissions.createClusterEntities]]"
           restamp="true">
         <cluster-activities-modal id="modal"></cluster-activities-modal>
 
@@ -114,6 +114,16 @@
         },
       },
 
+      listeners: {
+        'sort-changed': '_sortOrderChanged',
+      },
+
+      _sortOrderChanged: function(event) {
+        var newParams = Object.assign({}, this.queryParams);
+        newParams.sort = event.detail.field + '.' + event.detail.direction;
+        this.set('queryParams', newParams);
+      },
+
       _computeUrl: function(responsePlanID) {
         return App.Endpoints.responseParametersClusterActivities(responsePlanID);
       },
@@ -132,10 +142,6 @@
                 // TODO: error handling.
             });
           }, 300);
-      },
-
-      _canAddActivity: function (permissions) {
-        return permissions.createClusterEntities();
       },
 
       detached: function () {

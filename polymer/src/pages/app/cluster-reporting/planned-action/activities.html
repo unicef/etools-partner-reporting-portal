@@ -70,10 +70,6 @@
         this.$$('#modal').open();
       },
 
-      listeners: {
-        'modal.activity-added': '_onSuccess'
-      },
-
       observers: [
         '_activitiesAjax(queryParams, url)',
       ],
@@ -105,6 +101,17 @@
           type: String,
           computed: '_computeUrl(responsePlanID, queryParams, partnerID)'
         },
+      },
+
+      listeners: {
+        'modal.activity-added': '_onSuccess',
+        'sort-changed': '_sortOrderChanged',
+      },
+
+      _sortOrderChanged: function(event) {
+        var newParams = Object.assign({}, this.queryParams);
+        newParams.sort = event.detail.field + '.' + event.detail.direction;
+        this.set('queryParams', newParams);
       },
 
       _onSuccess: function(e, data) {
