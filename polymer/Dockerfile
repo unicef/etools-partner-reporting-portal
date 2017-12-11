@@ -1,7 +1,22 @@
 FROM mhart/alpine-node:7.8.0
 
 RUN apk update
-RUN apk add git
+RUN apk --update --no-cache \
+		add  \
+    automake \
+		git \
+		alpine-sdk  \
+		nasm  \
+		autoconf  \
+		build-base \
+		zlib \
+		zlib-dev \
+		libpng \
+		libpng-dev\
+		libwebp \
+		libwebp-dev \
+		libjpeg-turbo \
+		libjpeg-turbo-dev
 
 RUN npm install -g bower polymer-cli gulp-cli
 
