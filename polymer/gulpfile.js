@@ -46,7 +46,12 @@ global.config = {
   // Service Worker precache options based on
   // https://github.com/GoogleChrome/sw-precache#options-parameter
   swPrecacheConfig: {
-    navigateFallback: '/index.html'
+    navigateFallback: '/index.html',
+    navigateFallbackWhitelist: [
+      /^\/app\//,
+      /^\/login\//,
+      /^\/not-found\//,
+    ],
   },
   sourceCodeDirectory: './src'
 };

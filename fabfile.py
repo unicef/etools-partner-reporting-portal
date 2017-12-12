@@ -34,6 +34,13 @@ def up(quick=False):
     local(command)
 
 
+def up_with_bundle(quick=True):
+    """
+    Create and start containers with polymer bundle served.
+    """
+    local('docker-compose -f docker-compose.polymer-bundle.yml up %s' % '' if quick else '--build')
+
+
 def down():
     """
     Stop all containers.
