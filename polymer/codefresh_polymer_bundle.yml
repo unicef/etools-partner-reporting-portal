@@ -4,7 +4,7 @@ steps:
 
     build_polymer:
         type: build
-        image_name: unicef/etools-prp-polymer
+        image_name: unicef/etools-prp-polymer-bundle
         dockerfile: Dockerfile-bundle
         working_directory: ${{main_clone}}/polymer
         tag: ${{CF_BRANCH}}
