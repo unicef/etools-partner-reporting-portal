@@ -39,7 +39,5 @@ WORKDIR /code
 
 RUN npm run bundle
 
-RUN mv /code/build/bundled/src /code/build/bundled/app
-
 EXPOSE 8080
 CMD ["npm", "serve_prod"]
