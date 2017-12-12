@@ -5,18 +5,18 @@ steps:
     build_polymer:
         type: build
         image_name: unicef/etools-prp-polymer
-        dockerfile: Dockerfile
+        dockerfile: Dockerfile-bundle
         working_directory: ${{main_clone}}/polymer
         tag: ${{CF_BRANCH}}
-            
+
     push_to_hub:
         type: push
         title: Pushing polymer image to docker hub
         candidate: ${{build_polymer}}
-        tags: 
+        tags:
             - ${{CF_BRANCH}}
             - latest
         when:
             branch:
-                only: 
+                only:
                     - develop
