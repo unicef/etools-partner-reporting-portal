@@ -38,4 +38,4 @@ RUN cp -a /tmp/bower_components /code/bower_components
 WORKDIR /code
 
 EXPOSE 8080
-CMD ["node", "express.js"]
+CMD ["npm", "run", "dev"]

@@ -16,8 +16,6 @@
   "scripts": {
     "dev": "./node_modules/lite-server/bin/lite-server",
     "bundle": "node --max_old_space_size=2048 ./node_modules/gulp/bin/gulp -l",
-    "serve": "./node_modules/lite-server/bin/lite-server --baseDir='./build/bundled'",
-    "serve_prod": "./node_modules/http-server/bin/http-server ./build/bundled -U",
     "test": "wct"
   },
   "private": true,
