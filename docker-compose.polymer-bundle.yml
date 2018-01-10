@@ -50,9 +50,9 @@ services:
     image: unicef/etools-prp-polymer
     build:
       context: ./polymer
-      dockerfile: ./Dockerfile
+      dockerfile: ./Dockerfile-bundle
     volumes:
         - ./polymer/:/code
         - /code/node_modules
         - /code/bower_components
-    command: ash -c "npm run serve_prod"
+    command: ash -c "node express.js"
