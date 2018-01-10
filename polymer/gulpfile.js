@@ -31,7 +31,7 @@ global.config = {
   appName: 'app',
   polymerJsonPath: path.join(process.cwd(), 'polymer.json'),
   build: {
-    rootDirectory: 'build',
+    rootDirectory: 'build/prp',
     bundledDirectory: 'bundled',
     unbundledDirectory: 'unbundled',
     // Accepts either 'bundled', 'unbundled', or 'both'
@@ -46,6 +46,7 @@ global.config = {
   // Service Worker precache options based on
   // https://github.com/GoogleChrome/sw-precache#options-parameter
   swPrecacheConfig: {
+    replacePrefix: '/app/',
     navigateFallback: '/index.html',
     navigateFallbackWhitelist: [
       /^\/app\//,

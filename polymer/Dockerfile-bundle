@@ -40,4 +40,4 @@ WORKDIR /code
 RUN npm run bundle
 
 EXPOSE 8080
-CMD ["npm", "serve_prod"]
+CMD ["node", "express.js"]
