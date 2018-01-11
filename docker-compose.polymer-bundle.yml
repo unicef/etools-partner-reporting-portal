@@ -1,28 +1,6 @@
 version: '2.1'
 
 services:
-  beater-prp:
-    command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 && python manage.py celery beat --loglevel=debug"
-    image: 'unicef/etools-prp'
-    env_file:
-      - .env
-    depends_on:
-      - django_api
-      - redis
-    restart: always
-
-  worker-prp:
-    command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 && python manage.py celery worker -E --loglevel=info"
-    image: 'unicef/etools-prp'
-    env_file:
-      - .env
-    depends_on:
-      - django_api
-      - redis
-    restart: always
-    volumes:
-      - './django_api:/code/'
-
   proxy:
     image: unicef/etools-prp-nginx-proxy
     environment:
@@ -72,9 +50,9 @@ services:
     image: unicef/etools-prp-polymer
     build:
       context: ./polymer
-      dockerfile: ./Dockerfile
+      dockerfile: ./Dockerfile-bundle
     volumes:
         - ./polymer/:/code
         - /code/node_modules
         - /code/bower_components
-    command: ash -c "npm run dev"
+    command: ash -c "node express.js"
