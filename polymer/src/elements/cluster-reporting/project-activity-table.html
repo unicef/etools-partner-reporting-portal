@@ -49,6 +49,11 @@
       params-object="{{queryParams}}">
     </iron-query-params>
 
+    <iron-query-params
+        params-string="{{anchorQuery}}"
+        params-object="{{anchorQueryParams}}">
+    </iron-query-params>
+
     <div class="wrapper">
       <etools-content-panel no-header>
         <etools-data-table-header
@@ -91,7 +96,7 @@
                 <project-status status="[[item.status]]"></project-status>
               </div>
               <div class="table-cell table-cell--text">
-                [[item.title]]
+                <a href="[[_detailUrl(item, anchorQuery)]]">[[item.title]]</a>
               </div>
               <div class="table-cell table-cell--text">
                 <template is="dom-if" if="[[item.cluster_activity]]">
@@ -171,7 +176,12 @@
           openedDetails: {
             type: Array,
             value: []
-          }
+          },
+
+          anchorQueryParams: {
+            type: Object,
+            computed: '_withDefaultParams(queryParams)',
+          },
         },
 
         _openModal: function () {
@@ -189,6 +199,15 @@
 
         _computeCurrentActivities: function(projectId, activitiesDict) {
           return activitiesDict[projectId];
+        },
+
+        _detailUrl: function(activity, query) {
+          var path = '/response-parameters/partners/activity/' + activity.id;
+          if (this.page === 'planned-action') {
+            path = '/planned-action/activity/' + activity.id;
+          }
+          //Query string is passed to construct the back button.
+          return this.buildUrl(this._baseUrlCluster, path) + '?' + query;
         },
 
         detached: function () {

@@ -86,7 +86,7 @@
           if="[[_equals(mode, 'cluster')]]"
           restamp="true">
           <iron-form class="app-grid">
-                
+
                 <div class="item item-wide">
                    <etools-single-selection-menu
                       class="validate"
@@ -103,11 +103,10 @@
                 </div>
                 <div class="item">
                    <etools-prp-date-input
-                      class="validate"
+                      class="start-date"
                       label="Start date"
                       value="{{data.start_date}}"
                       error-message=""
-                      auto-validate
                       required
                       no-init>
                    </etools-prp-date-input>
@@ -115,11 +114,10 @@
                 </div>
                 <div class="item">
                   <etools-prp-date-input
-                      class="validate"
+                      class="end-date"
                       label="End date"
                       value="{{data.end_date}}"
                       error-message=""
-                      auto-validate
                       required
                       no-init>
                   </etools-prp-date-input>
@@ -152,7 +150,7 @@
                 if="[[_equals(mode, 'custom')]]"
                 restamp="true">
               <iron-form class="app-grid">
-                
+
                 <div class="item item-wide">
                   <paper-input
                       class="validate"
@@ -179,11 +177,10 @@
                 </div>
                  <div class="item">
                    <etools-prp-date-input
-                      class="validate"
+                      class="start-date"
                       label="Start date"
                       value="{{data.start_date}}"
                       error-message=""
-                      auto-validate
                       required
                       no-init>
                    </etools-prp-date-input>
@@ -191,11 +188,10 @@
                 </div>
                 <div class="item">
                   <etools-prp-date-input
-                      class="validate"
+                      class="end-date"
                       label="End date"
                       value="{{data.end_date}}"
                       error-message=""
-                      auto-validate
                       required
                       no-init>
                   </etools-prp-date-input>
@@ -332,8 +328,8 @@
       ],
 
       _setDefaults: function () {
-        this.set('data', Object.assign({}, 
-          {id: this.editData.id, 
+        this.set('data', Object.assign({},
+          {id: this.editData.id,
           status: this.editData.status,
           start_date: this.editData.start_date,
           end_date: this.editData.end_date,
@@ -396,20 +392,12 @@
       },
 
       _save: function () {
-        var fields = [].slice.call(
-          Polymer.dom(this.root).querySelectorAll('.validate')
-        );
-
         var self = this;
-        var valid;
 
-        fields.forEach(function (field) {
-          field.validate();
-        });
-
-        valid = fields.every(function (field) {
-          return !field.invalid;
-        });
+        var valid = [
+          this._fieldsAreValid(),
+          this._dateRangeValid('.start-date', '.end-date'),
+        ].every(Boolean);
 
         if (!valid) {
           return;

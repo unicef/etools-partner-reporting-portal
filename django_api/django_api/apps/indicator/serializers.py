@@ -139,6 +139,7 @@ class ReportableSimpleSerializer(serializers.ModelSerializer):
             'id',
             'target',
             'baseline',
+            'in_need',
             'blueprint',
             'ref_num',
             'achieved',
@@ -168,6 +169,7 @@ class IndicatorListSerializer(ReportableSimpleSerializer):
             'id',
             'target',
             'baseline',
+            'in_need',
             'blueprint',
             'pd_id',
             'ref_num',
@@ -668,6 +670,8 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         validators=[add_indicator_object_type_validator])
     blueprint = IndicatorBlueprintSerializer()
     locations = IdLocationSerializer(many=True)
+    target = serializers.CharField(required=False)
+    baseline = serializers.CharField(required=False)
 
     class Meta:
         model = Reportable
@@ -683,6 +687,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             'cs_dates',
             'target',
             'baseline',
+            'in_need',
         )
 
     def get_object_type(self, obj):

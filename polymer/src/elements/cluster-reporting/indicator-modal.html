@@ -242,8 +242,7 @@
                   on-input="_validate"
                   value="{{data.baseline}}"
                   type="number"
-                  always-float-label
-                  required>
+                  always-float-label>
                 </paper-input>
               </div>
 
@@ -254,8 +253,22 @@
                   on-input="_validate"
                   value="{{data.target}}"
                   type="number"
-                  always-float-label
-                  required>
+                  always-float-label>
+                </paper-input>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="app-grid">
+              <div class="item">
+                <paper-input
+                  class="validate"
+                  label="In need"
+                  on-input="_validate"
+                  value="{{data.in_need}}"
+                  type="number"
+                  always-float-label>
                 </paper-input>
               </div>
             </div>

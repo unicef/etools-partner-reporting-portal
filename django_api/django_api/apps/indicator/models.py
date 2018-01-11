@@ -185,6 +185,7 @@ class Reportable(TimeStampedExternalSyncModelMixin):
     """
     target = models.CharField(max_length=255, null=True, blank=True)
     baseline = models.CharField(max_length=255, null=True, blank=True)
+    in_need = models.CharField(max_length=255, null=True, blank=True)
     assumptions = models.TextField(null=True, blank=True)
     means_of_verification = models.CharField(max_length=255,
                                              null=True,

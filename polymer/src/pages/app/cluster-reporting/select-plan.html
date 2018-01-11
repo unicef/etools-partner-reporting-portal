@@ -13,6 +13,7 @@
 <link rel="import" href="../../../behaviors/data-table.html">
 <link rel="import" href="../../../redux/store.html">
 <link rel="import" href="../../../elements/etools-prp-data-table-row.html">
+<link rel="import" href="../../../elements/etools-prp-permissions.html">
 <link rel="import" href="../../../styles/table-styles.html">
 <link rel="import" href="../../../styles/app-theme-cluster.html">
 
@@ -49,6 +50,12 @@
 
       paper-button#confirm[disabled] {
         background-color: var(--paper-grey-400);
+      }
+
+      paper-button#admin {
+        background-color: var(--theme-primary-color);
+        color: white;
+        float: right;
       }
 
       paper-radio-button {
@@ -100,6 +107,15 @@
         margin-right: 5px;
       }
 
+      .response-header {
+        display: inline-block;
+      }
+
+      h2 {
+        display: inline-block;
+        float: left;
+      }
+
     </style>
 
     <iron-location
@@ -112,9 +128,18 @@
         params-object="{{queryParams}}">
     </iron-query-params>
 
+    <etools-prp-permissions
+        permissions="{{permissions}}">
+    </etools-prp-permissions>
+
     <div class="container">
       <div class="container-inner">
-        <h2> Select Response Plan</h2>
+        <div class="response-header">
+        <h2> Select Response Plan [[workspace]]</h2>
+          <template is="dom-if" if="[[permissions.adminResponsePlan]]">
+              <paper-button raised id="admin" on-tap="_redirectToAdmin"><iron-icon icon="icons:settings"></iron-icon>Response Plan Admin</paper-button>
+            </template>
+  </div>
         <paper-card>
           <etools-data-table-header label="">
             <etools-data-table-column field="selected" flex-1>
@@ -137,7 +162,7 @@
                     is="dom-repeat"
                     items="[[responsePlans]]"
                     as="plan">
-            <etools-prp-data-table-row details-opened="[[detailsOpened]]">
+            <etools-prp-data-table-row no-collapse>
 
               <div slot="row-data">
                 <div class="table-cell" flex-1>
@@ -159,27 +184,6 @@
                  <div class="table-cell" flex-2>
                   [[plan.end]]
                 </div>
-              </div>
-
-              <div slot="row-data-details" class="row-details-expanded-wrapper">
-                <template is="dom-if" if="[[!plan.documents.length]]">
-                  There are no documents for this response plan.
-                </template>
-                <template is="dom-if" if="[[plan.documents.length]]">
-                  <div class="documents">
-                  <h5>Documents:</h5>
-                  <ul>
-                    <template id="documents"
-                              is="dom-repeat"
-                              items="[[plan.documents]]"
-                              as="document">
-                      <li>
-                        <iron-icon id="less" icon="attachment"></iron-icon>
-                        <a href="/">TODO: Link to document.</a>
-                      </li>
-                    </template>
-                  </ul>
-                </template>
               </div>
 
             </etools-data-table-row>
@@ -221,10 +225,11 @@
           value: null
         },
 
-        detailsOpened: {
-          type: Boolean,
-          value: false
-        },
+        workspace: {
+          type: String,
+          statePath: 'workspaces.current'
+        }
+
       },
 
       _determineIfChecked: function(selected, id) {
@@ -260,6 +265,10 @@
 
         this.set('queryParams', {});
         this.set('path', newPath);
+      },
+
+      _redirectToAdmin: function () {
+        window.location = '/api/admin/core/responseplan/';
       },
 
       _cancel: function () {

@@ -76,12 +76,6 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
         :return: list of errors or False
         """
         errors = []
-        try:
-            for location in self.request.data['locations']:
-                instance.locations.add(int(location['id']))
-        except Exception as exp:
-            # TODO log
-            errors.append({"locations": "list of dict ids fail."})
 
         try:
             for cluster in self.request.data['clusters']:

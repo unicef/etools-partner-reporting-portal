@@ -17,7 +17,6 @@
 <link rel="import" href="../../../etools-prp-date-input.html">
 <link rel="import" href="../../../form-fields/dropdown-form-input.html">
 <link rel="import" href="../../../form-fields/cluster-dropdown-content.html">
-<link rel="import" href="../../../form-fields/cluster-location-content.html">
 <link rel="import" href="../../../../behaviors/routing.html">
 <link rel="import" href="../../../../behaviors/utils.html">
 <link rel="import" href="../../../../redux/store.html">
@@ -76,7 +75,6 @@
     <iron-location path="{{path}}"></iron-location>
 
     <cluster-dropdown-content clusters="{{clusters}}"></cluster-dropdown-content>
-    <cluster-location-content locations="{{locations}}"></cluster-location-content>
 
     <etools-prp-ajax
         id="createProject"
@@ -119,18 +117,6 @@
             <div class="row">
               <etools-multi-selection-menu
                   class="validate"
-                  label="Locations"
-                  options="[[formattedLocations]]"
-                  selected-values="{{selectedLocations}}"
-                  on-selected-values-changed="_validate"
-                  trigger-value-change-event
-                  required>
-              </etools-multi-selection-menu>
-            </div>
-
-            <div class="row">
-              <etools-multi-selection-menu
-                  class="validate"
                   label="Clusters"
                   options="[[formattedClusters]]"
                   selected-values="{{selectedClusters}}"
@@ -142,11 +128,10 @@
 
             <div class="item">
                <etools-prp-date-input
-                  class="validate"
+                  class="start-date"
                   label="Start date"
                   value="{{data.start_date}}"
                   error-message=""
-                  auto-validate
                   required
                   no-init>
                </etools-prp-date-input>
@@ -155,11 +140,10 @@
 
             <div class="item">
               <etools-prp-date-input
-                  class="validate"
+                  class="end-date"
                   label="End date"
                   value="{{data.end_date}}"
                   error-message=""
-                  auto-validate
                   required
                   no-init>
               </etools-prp-date-input>
@@ -190,7 +174,6 @@
               label="Total Budget"
               value="{{data.total_budget}}"
               type="number"
-              required
               on-input="_validate">
             </paper-input>
 
@@ -200,7 +183,6 @@
               label="Funding Source"
               value="{{data.funding_source}}"
               type="string"
-              required
               on-input="_validate">
             </paper-input>
 
@@ -210,7 +192,6 @@
               label="Description"
               value="{{data.description}}"
               type="string"
-              required
               on-input="_validate">
             </paper-input>
 
@@ -220,7 +201,6 @@
               label="Additional information (e.g. links)"
               value="{{data.additional_information}}"
               type="string"
-              required
               on-input="_validate">
             </paper-input>
           </iron-form>
@@ -286,11 +266,6 @@
           computed: '_computeUrl(responsePlanID)'
         },
 
-        locations: {
-          format: Array,
-          value: []
-        },
-
         clusters: {
           format: Array,
           value: []
@@ -299,11 +274,6 @@
         partnerID: {
           type: String,
           statePath: 'partner.current.id',
-        },
-
-        formattedLocations: {
-          type: Array,
-          computed: '_formatForMultiselect(locations)'
         },
 
         formattedClusters: {
@@ -329,8 +299,6 @@
           ],
         },
 
-        selectedLocations: Array,
-
         selectedClusters: Array,
       },
 
@@ -346,7 +314,6 @@
       open: function () {
         this.data = {};
         this.selectedClusters = [];
-        this.selectedLocations = [];
         this.set('opened', true);
         this.set('refresh', true);
       },
@@ -374,13 +341,14 @@
       _save: function () {
         var self = this;
 
-        if (!this._fieldsAreValid()) {
+        var valid = [
+          this._fieldsAreValid(),
+          this._dateRangeValid('.start-date', '.end-date'),
+        ].every(Boolean);
+
+        if (!valid) {
           return;
         }
-
-        this.data.locations = this.selectedLocations.map(function(item) {
-          return {id: Number(item)};
-        });
 
         this.data.clusters = this.selectedClusters.map(function(item) {
           return {id: Number(item)};
