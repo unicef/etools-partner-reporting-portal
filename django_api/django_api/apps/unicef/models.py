@@ -110,9 +110,6 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
     end_date = models.DateField(
         verbose_name='Due Date',
     )
-    population_focus = models.CharField(
-        max_length=256,
-        verbose_name='Population Focus')
     status = models.CharField(
         choices=PD_STATUS,
         default=PD_STATUS.draft,
