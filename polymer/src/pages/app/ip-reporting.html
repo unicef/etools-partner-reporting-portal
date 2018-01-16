@@ -5,11 +5,14 @@
 <link rel="import" href="../../../bower_components/app-layout/app-header/app-header.html">
 <link rel="import" href="../../../bower_components/app-layout/app-toolbar/app-toolbar.html">
 <link rel="import" href="../../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../../bower_components/app-localize-behavior/app-localize-behavior.html">
 
 <link rel="import" href="../../behaviors/utils.html">
-
+<link rel="import" href="../../behaviors/localize.html">
+<link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../elements/ip-reporting/nav.html">
 <link rel="import" href="../../elements/ip-reporting/app-header.html">
+<link rel="import" href="../../elements/page-title.html">
 <link rel="import" href="../../styles/app-theme-ip.html">
 
 
@@ -39,6 +42,8 @@
         user-select: none;
       }
     </style>
+
+    <page-title title="[[localize('ip_reporting')]]"></page-title>
 
     <app-route
         route="{{route}}"
@@ -107,6 +112,9 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

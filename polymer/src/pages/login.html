@@ -7,10 +7,13 @@
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../bower_components/app-localize-behavior/app-localize-behavior.html">
 
 <link rel="import" href="../elements/etools-logo.html">
 <link rel="import" href="../elements/etools-prp-ajax.html">
+<link rel="import" href="../elements/page-title.html">
 <link rel="import" href="../behaviors/responsive.html">
+<link rel="import" href="../behaviors/localize.html">
 <link rel="import" href="../redux/store.html">
 <link rel="import" href="../settings.html">
 <link rel="import" href="../styles/app-theme-ip.html">
@@ -123,6 +126,8 @@
 
     </style>
 
+    <page-title title="[[localize('sign_in')]]"></page-title>
+
     <iron-media-query
         query="[[desktopLayoutQuery]]"
         query-matches="{{isDesktop}}">
@@ -163,13 +168,13 @@
                 </template>
               <li>
               <iron-form>
-                <paper-input label="Your Email" id="email" required type="email" value="{{data.email}}"> 
+                <paper-input label="Your Email" id="email" required type="email" value="{{data.email}}">
                 </paper-input>
                 <paper-button on-tap="submit">Submit
                 </paper-button>
             </iron-form>
           </li>
- 
+
               <!-- <li>
                 <a href="/todo">
                   <paper-button raised>
@@ -206,6 +211,8 @@
         App.Behaviors.ResponsiveBehavior,
         App.Behaviors.ReduxBehavior,
         Polymer.IronA11yKeysBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
