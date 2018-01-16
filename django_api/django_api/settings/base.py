@@ -49,6 +49,9 @@ MEDIA_ROOT = os.path.join(DATA_VOLUME, '%s' % UPLOADS_DIR_NAME)
 FILE_UPLOAD_MAX_MEMORY_SIZE = 4194304  # 4mb
 MEDIA_ROOT = os.path.join(DATA_VOLUME, '%s' % UPLOADS_DIR_NAME)
 STATIC_ROOT = '%s/staticserve' % DATA_VOLUME
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
 # Sendgrid stuff
 EMAIL_BACKEND = DOMAIN_NAME = os.getenv('DOMAIN_NAME')
@@ -118,7 +121,7 @@ ROOT_URLCONF = 'django_api.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates'), ],
         'APP_DIRS': True,
         'OPTIONS': {
             'debug': DEBUG,
