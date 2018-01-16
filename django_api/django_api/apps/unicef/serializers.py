@@ -123,6 +123,10 @@ class ProgrammeDocumentDetailSerializer(serializers.ModelSerializer):
             # 'status',
             'frequency',
             'sections',
+            'cso_contribution',
+            'total_unicef_cash',
+            'in_kind_amount',
+            'budget',
         )
 
 
