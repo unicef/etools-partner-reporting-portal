@@ -72,7 +72,6 @@ class ProgrammeDocumentFilter(django_filters.FilterSet):
 class ProgressReportFilter(django_filters.FilterSet):
     status = CharFilter(
         name='status',
-        choices=PROGRESS_REPORT_STATUS,
         label='Status')
     pd_ref_title = CharFilter(name='pd ref title', method='get_pd_ref_title',
                               label='PD/Ref # title')
