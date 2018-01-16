@@ -67,9 +67,6 @@
         <etools-data-table-column field="period" flex-2>
           <div class="table-column">Reporting period</div>
         </etools-data-table-column>
-        <etools-data-table-column field="draft" class="cell-icon">
-          <div class="table-column">Draft</div>
-        </etools-data-table-column>
         <etools-data-table-column field="">
           <div class="table-column">PD/SSFA ToR ref. #</div>
         </etools-data-table-column>
@@ -111,14 +108,6 @@
             </div>
             <div class="table-cell table-cell--text" flex-2>
               [[_withDefault(report.reporting_period)]]
-            </div>
-            <div class="table-cell table-cell--text cell-icon">
-              <template is="dom-if" if="[[report.is_draft]]">
-                <iron-icon icon="check"></iron-icon>
-              </template>
-              <template is="dom-if" if="[[!report.is_draft]]">
-                —
-              </template>
             </div>
             <div class="table-cell table-cell--text">
               <a href="[[_getPDLink(report)]]">
