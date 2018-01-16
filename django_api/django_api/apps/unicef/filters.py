@@ -62,7 +62,7 @@ class ProgrammeDocumentFilter(django_filters.FilterSet):
         )
 
     def get_status(self, queryset, name, value):
-        return queryset.filter(status=value)
+        return queryset.filter(status__in=value.split(','))
 
     def get_location(self, queryset, name, value):
         return queryset.filter(
