@@ -53,9 +53,11 @@
     <etools-content-panel panel-title="List of Reports">
 
       <etools-data-table-header
-        no-collapse
-        label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
-        <etools-data-table-column></etools-data-table-column>
+          no-collapse
+          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
+        <etools-data-table-column field="">
+          <div class="table-column">PD/SSFA ToR ref. #</div>
+        </etools-data-table-column>
         <etools-data-table-column field="status">
           <div class="table-column">Report Status</div>
         </etools-data-table-column>
@@ -68,9 +70,7 @@
         <etools-data-table-column field="period" flex-2>
           <div class="table-column">Reporting period</div>
         </etools-data-table-column>
-        <etools-data-table-column field="">
-          <div class="table-column">PD/SSFA ToR ref. #</div>
-        </etools-data-table-column>
+        <etools-data-table-column></etools-data-table-column>
       </etools-data-table-header>
 
       <etools-data-table-footer
@@ -90,13 +90,9 @@
         initial-count="[[pageSize]]">
         <etools-data-table-row no-collapse>
           <div slot="row-data">
-            <div class="table-cell table-cell--text cell-reports">
-              <template
-                  is="dom-if"
-                  if="[[_canNavigateToReport(permissions, report)]]"
-                  restamp="true">
-                <a href="[[_getReportLink(report)]]">[[_getReportLinkText(report)]]</a>
-              </template>
+            <div class="table-cell table-cell--text">
+              [[_withDefault(report.programme_document.reference_number, '-')]]
+              <paper-tooltip>[[report.programme_document.title]]</paper-tooltip>
             </div>
             <div class="table-cell table-cell--text">
               <report-status status="[[report.status]]"></report-status>
@@ -110,11 +106,13 @@
             <div class="table-cell table-cell--text" flex-2>
               [[_withDefault(report.reporting_period)]]
             </div>
-            <div class="table-cell table-cell--text">
-              <a href="[[_getPDLink(report)]]">
-                [[_withDefault(report.programme_document.reference_number, '-')]]
-                <paper-tooltip>[[report.programme_document.title]]</paper-tooltip>
-              </a>
+            <div class="table-cell table-cell--text cell-reports">
+              <template
+                  is="dom-if"
+                  if="[[_canNavigateToReport(permissions, report)]]"
+                  restamp="true">
+                <a href="[[_getReportLink(report)]]">[[_getReportLinkText(report)]]</a>
+              </template>
             </div>
           </div>
         </etools-data-table-row>
@@ -168,13 +166,6 @@
           type: Number,
           statePath: 'progressReports.count',
         },
-      },
-
-      _getPDLink: function (report) {
-        return this.buildUrl(
-          this._baseUrl,
-          '/pd/' + report.programme_document.id + '/view/details'
-        );
       },
 
       _getReportLinkText: function (report) {
