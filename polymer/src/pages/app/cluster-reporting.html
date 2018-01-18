@@ -2,13 +2,16 @@
 <link rel="import" href="../../../bower_components/app-route/app-route.html">
 <link rel="import" href="../../../bower_components/app-route/app-location.html">
 <link rel="import" href="../../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../../bower_components/app-localize-behavior/app-localize-behavior.html">
 
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/localize.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
 <link rel="import" href="../../redux/selectors/workspace.html">
 <link rel="import" href="../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../elements/page-title.html">
 
 <dom-module id="page-cluster-reporting">
   <template>
@@ -17,6 +20,8 @@
         display: block;
       }
     </style>
+
+    <page-title title="[[localize('cluster_reporting')]]"></page-title>
 
     <etools-prp-ajax
         id="responsePlans"
@@ -65,6 +70,8 @@
       behaviors: [
         App.Behaviors.UtilsBehavior,
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {
