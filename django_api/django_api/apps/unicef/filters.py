@@ -1,6 +1,9 @@
+from urllib import parse
+
 from datetime import datetime
 from django.conf import settings
 from django.db.models import Q
+
 import django_filters
 from distutils.util import strtobool
 from django_filters.filters import (
@@ -30,11 +33,11 @@ class ProgrammeDocumentIndicatorFilter(django_filters.FilterSet):
 
     def get_status(self, queryset, name, value):
         return queryset.filter(
-            lower_level_outputs__cp_output__programme_document__status__in=value.split(','))
+            lower_level_outputs__cp_output__programme_document__status__in=parse.unquote(value).split(','))
 
     def get_programme_document(self, queryset, name, value):
         return queryset.filter(
-            lower_level_outputs__cp_output__programme_document_id__in=map(lambda x: int(x), value.split(',')))
+            lower_level_outputs__cp_output__programme_document_id__in=map(lambda x: int(x), parse.unquote(value).split(',')))
 
     def get_locations(self, queryset, name, value):
         return queryset.filter(locations=value)
@@ -57,7 +60,7 @@ class ProgrammeDocumentFilter(django_filters.FilterSet):
         fields = ['ref_title', 'status', 'location']
 
     def get_status(self, queryset, name, value):
-        return queryset.filter(status__in=value.split(','))
+        return queryset.filter(status__in=parse.unquote(value).split(','))
 
     def get_reference_number_title(self, queryset, name, value):
         return queryset.filter(
@@ -92,7 +95,7 @@ class ProgressReportFilter(django_filters.FilterSet):
                   'programme_document__id', 'programme_document__external_id', 'section', 'cp_output']
 
     def get_status(self, queryset, name, value):
-        return queryset.filter(status__in=value.split(','))
+        return queryset.filter(status__in=parse.unquote(value).split(','))
 
     def get_pd_ext(self, queryset, name, value):
         return queryset.filter(programme_document__external_id=value)
