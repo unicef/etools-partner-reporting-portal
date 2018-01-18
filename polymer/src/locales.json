@@ -1,7 +1,10 @@
 {
   "en": {
+    "ip_reporting": "IP Reporting",
+    "cluster_reporting": "Cluster Reporting",
     "change": "change",
     "profile": "Profile",
+    "sign_in": "Sign In",
     "sign_out": "Sign out",
     "dashboard": "Dashboard",
     "response_parameters": "Response Parameters",
