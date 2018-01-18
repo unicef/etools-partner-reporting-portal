@@ -394,6 +394,11 @@ class ProgressReport(TimeStampedModel):
         null=True
     )
     sent_back_feedback = models.TextField(blank=True, null=True)
+    attachment = models.FileField(
+        upload_to="unicef/progress_reports/",
+        blank=True,
+        null=True
+    )
 
     class Meta:
         ordering = ['-due_date', '-id']
