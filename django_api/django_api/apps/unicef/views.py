@@ -700,20 +700,27 @@ class ProgressReportAttachmentAPIView(APIView):
     permission_classes = (IsAuthenticated,)
     parser_classes = (FormParser, MultiPartParser, FileUploadParser)
 
-    def get(self, request, pr_id):
-        pr = get_object_or_404(ProgressReport, id=pr_id)
+    def get(self, request, workspace_id, progress_report_id):
+        pr = get_object_or_404(
+            ProgressReport,
+            id=progress_report_id,
+            programme_document__workspace_id=workspace_id)
         serializer = ProgressReportAttachmentSerializer(instance=pr)
 
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
     @transaction.atomic
-    def post(self, request, pr_id):
-        pr = get_object_or_404(ProgressReport, id=pr_id)
+    def put(self, request, workspace_id, progress_report_id):
+        pr = get_object_or_404(
+            ProgressReport,
+            id=progress_report_id,
+            programme_document__workspace_id=workspace_id)
 
         serializer = ProgressReportAttachmentSerializer(
-            instance=pr,
-            data=request.data
+            instance=pr
         )
+
+        serializer.attachment = request.data.get('attachment')
 
         if serializer.is_valid():
             serializer.save()

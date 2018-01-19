@@ -562,7 +562,7 @@ class ProgressReportAttachmentSerializer(serializers.ModelSerializer):
     url = serializers.SerializerMethodField()
 
     def get_url(self, obj):
-        return obj.attachment.url.decode("utf-8")
+        return obj.attachment.url.decode("utf-8") if obj.attachment else None
 
     class Meta:
         model = ProgressReport
