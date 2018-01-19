@@ -559,14 +559,14 @@ class PMPPDResultLinkSerializer(serializers.ModelSerializer):
 
 
 class ProgressReportAttachmentSerializer(serializers.ModelSerializer):
-    url = serializers.SerializerMethodField()
+    size = serializers.SerializerMethodField()
 
-    def get_url(self, obj):
-        return obj.attachment.url.decode("utf-8") if obj.attachment else None
+    def get_size(self, obj):
+        return obj.attachment.size if obj.attachment else None
 
     class Meta:
         model = ProgressReport
         fields = (
             'attachment',
-            'url'
+            'size'
         )
