@@ -556,3 +556,19 @@ class PMPPDResultLinkSerializer(serializers.ModelSerializer):
             'result_link',
             'programme_document'
         )
+
+
+class ProgressReportAttachmentSerializer(serializers.ModelSerializer):
+    url = serializers.SerializerMethodField()
+
+    def get_url(self, obj):
+        return obj.attachment.url.decode("utf-8")
+
+    class Meta:
+        model = ProgressReport
+        fields = (
+            'id',
+            'status',
+            'attachment',
+            'url'
+        )

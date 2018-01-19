@@ -335,7 +335,8 @@ REST_FRAMEWORK = {
             'rest_framework.authentication.SessionAuthentication',
             'utils.mixins.CustomJSONWebTokenAuthentication',
             'rest_framework.authentication.TokenAuthentication',
-    )
+    ),
+    'DATE_FORMAT': PRINT_DATA_FORMAT,
 }
 
 

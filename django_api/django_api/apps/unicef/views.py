@@ -1,18 +1,18 @@
 import logging
-
 from datetime import datetime
 
-from django.http import Http404
-from django.db.models import Q
-from django.http import HttpResponse
 from django.conf import settings
 from django.db import transaction
+from django.db.models import Q
+from django.http import HttpResponse, Http404
 from django.shortcuts import get_object_or_404
 
-from rest_framework.generics import RetrieveAPIView, ListAPIView, UpdateAPIView
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from rest_framework import status as statuses
+from rest_framework import mixins, viewsets
+from rest_framework.generics import RetrieveAPIView, ListAPIView
+from rest_framework.parsers import FileUploadParser, FormParser, MultiPartParser
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 import django_filters.rest_framework
 from easy_pdf.rendering import render_to_pdf
@@ -27,7 +27,6 @@ from core.paginations import SmallPagination
 from core.permissions import (
     IsAuthenticated,
     IsPartnerAuthorizedOfficer,
-    IsPartnerEditor,
     IsPartnerEditorOrPartnerAuthorizedOfficer
 )
 from core.models import Location
@@ -49,13 +48,16 @@ from .serializers import (
     ProgressReportSerializer,
     ProgressReportReviewSerializer,
     LLOutputSerializer,
-    LLOutputIndicatorsSerializer,
     ProgrammeDocumentCalculationMethodsSerializer,
     ProgrammeDocumentProgressSerializer,
-    ProgressReportUpdateSerializer
+    ProgressReportUpdateSerializer,
+    ProgressReportAttachmentSerializer
 )
 from .models import ProgrammeDocument, ProgressReport
-from .permissions import CanChangePDCalculationMethod, UnicefPartnershipManagerOrRead
+from .permissions import (
+    CanChangePDCalculationMethod,
+    UnicefPartnershipManagerOrRead
+)
 from .filters import (
     ProgrammeDocumentFilter, ProgressReportFilter,
     ProgrammeDocumentIndicatorFilter
@@ -692,3 +694,31 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
 
         return Response({"errors": serializer.errors},
                         status=statuses.HTTP_400_BAD_REQUEST)
+
+
+class ProgressReportAttachmentAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+    parser_classes = (FormParser, MultiPartParser, FileUploadParser)
+
+    def get(self, request, pr_id):
+        pr = get_object_or_404(ProgressReport, id=pr_id)
+        serializer = ProgressReportAttachmentSerializer(instance=pr)
+
+        return Response(serializer.data, status=statuses.HTTP_200_OK)
+
+    @transaction.atomic
+    def post(self, request, pr_id):
+        pr = get_object_or_404(ProgressReport, id=pr_id)
+
+        serializer = ProgressReportAttachmentSerializer(
+            instance=pr,
+            data=request.data
+        )
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=statuses.HTTP_200_OK)
+
+        else:
+            return Response({"errors": serializer.errors},
+                            status=statuses.HTTP_400_BAD_REQUEST)
