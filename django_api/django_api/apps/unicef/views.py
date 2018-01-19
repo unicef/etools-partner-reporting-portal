@@ -716,6 +716,12 @@ class ProgressReportAttachmentAPIView(APIView):
             id=progress_report_id,
             programme_document__workspace_id=workspace_id)
 
+        if pr.attachment:
+            try:
+                pr.attachment.delete()
+            except ValueError:
+                pass
+
         serializer = ProgressReportAttachmentSerializer(
             instance=pr,
             data=request.data
