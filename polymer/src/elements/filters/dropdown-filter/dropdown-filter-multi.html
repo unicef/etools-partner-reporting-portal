@@ -48,9 +48,13 @@
 
         selectedValues: {
           type: Array,
-          computed: '_computeSelectedValues(value)',
+          value: [],
         },
       },
+
+      observers: [
+        '_setSelectedValues(value, data)',
+      ],
 
       _handleChange: function (e, change) {
         var newValue;
@@ -77,8 +81,10 @@
         }
       },
 
-      _computeSelectedValues: function (value) {
-        return value.split(',').filter(Boolean);
+      _setSelectedValues: function (value) {
+        this.async(function () {
+          this.set('selectedValues', value.split(',').filter(Boolean));
+        });
       },
     });
   </script>

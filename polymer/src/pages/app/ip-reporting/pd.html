@@ -99,7 +99,6 @@
         '_handleInputChange(programmeDocumentsUrl, queryParams)',
         '_routePdIdChanged(routeData.pd_id)',
         '_routePathChanged(route.path)',
-        '_computeQueryParams(queryParams, subroute.path)',
       ],
 
       _routePdIdChanged: function (pd_id) {
@@ -134,10 +133,6 @@
 
       _computeProgrammeDocumentsUrl: function (locationId) {
         return locationId ? App.Endpoints.programmeDocuments(locationId) : '';
-      },
-
-      _computeQueryParams: function (queryParams, tail) {
-        return tail ? {} : queryParams;
       },
 
       _handleInputChange: function (programmeDocumentsUrl) {

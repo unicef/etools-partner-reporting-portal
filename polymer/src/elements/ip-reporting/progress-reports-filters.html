@@ -45,41 +45,41 @@
 
     <filter-list filters="{{filters}}" class="app-grid">
 
-        <text-filter
-          class="item"
-          label="PD/SSFA ToR ref. # and Title"
-          name="pd_ref_title"
-          value="[[queryParams.pd_ref_title]]">
-        </text-filter>
+      <text-filter
+        class="item"
+        label="PD/SSFA ToR ref. # and Title"
+        name="pd_ref_title"
+        value="[[queryParams.pd_ref_title]]">
+      </text-filter>
 
-        <location-filter
-          class="item"
-          value="[[_withDefault(queryParams.location, '')]]">
-        </location-filter>
+      <location-filter
+        class="item"
+        value="[[_withDefault(queryParams.location, '')]]">
+      </location-filter>
 
-        <dropdown-filter-multi
-          class="item item-2-col"
-          label="Report status"
-          name="status"
-          value="[[_withDefault(queryParams.status, '')]]"
-          data="[[statuses]]"
-          disabled="[[disableStatus]]"
-          hide-search>
-        </dropdown-filter-multi>
+      <dropdown-filter-multi
+        class="item item-2-col"
+        label="Report status"
+        name="status"
+        value="[[_withDefault(queryParams.status, '')]]"
+        data="[[statuses]]"
+        disabled="[[_equals(queryParams.due, '1')]]"
+        hide-search>
+      </dropdown-filter-multi>
 
-        <date-filter
-          class="item"
-          label="Due date"
-          name="due_date"
-          value="[[_withDefault(queryParams.due_date, '')]]">
-        </date-filter>
+      <date-filter
+        class="item"
+        label="Due date"
+        name="due_date"
+        value="[[_withDefault(queryParams.due_date, '')]]">
+      </date-filter>
 
-        <checkbox-filter
-          class="item item-2-col"
-          name="due"
-          value="[[_withDefault(queryParams.due, '')]]">
-          <span class="checkbox-label">Show only due reports</span>
-        </checkbox-filter>
+      <checkbox-filter
+        class="item item-2-col"
+        name="due"
+        value="[[_withDefault(queryParams.due, '')]]">
+        <span class="checkbox-label">Show only due reports</span>
+      </checkbox-filter>
 
     </filter-list>
 
@@ -87,7 +87,7 @@
 
   <script>
     Polymer({
-      id: 'progress-reports-filters',
+      is: 'progress-reports-filters',
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
@@ -111,19 +111,6 @@
             {title: 'Sent back', id: 'Sen'},
           ],
         },
-
-        disableStatus: {
-          type: Boolean,
-        },
-
-      },
-
-      observers: [
-        '_toggleStatusFilter(queryParams.due)'
-      ],
-
-      _toggleStatusFilter: function(checked) {
-        this.set('disableStatus', !!this._toNumber(checked));
       },
     });
   </script>
