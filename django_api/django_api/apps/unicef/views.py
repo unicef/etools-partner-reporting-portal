@@ -717,10 +717,9 @@ class ProgressReportAttachmentAPIView(APIView):
             programme_document__workspace_id=workspace_id)
 
         serializer = ProgressReportAttachmentSerializer(
-            instance=pr
+            instance=pr,
+            data=request.data
         )
-
-        serializer.attachment = request.data.get('attachment')
 
         if serializer.is_valid():
             serializer.save()

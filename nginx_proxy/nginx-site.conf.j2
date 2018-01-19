@@ -4,6 +4,7 @@ upstream django_api_uwsgi {
 
 server {
     listen      80;
+    client_max_body_size 100m;
 
     location /api/ {
       uwsgi_pass django_api_uwsgi;

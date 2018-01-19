@@ -567,8 +567,6 @@ class ProgressReportAttachmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProgressReport
         fields = (
-            'id',
-            'status',
             'attachment',
             'url'
         )
