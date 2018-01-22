@@ -4,7 +4,7 @@ from datetime import datetime
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Q
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 
 from rest_framework import status as statuses
@@ -705,9 +705,9 @@ class ProgressReportAttachmentAPIView(APIView):
             ProgressReport,
             id=progress_report_id,
             programme_document__workspace_id=workspace_id)
-        serializer = ProgressReportAttachmentSerializer(instance=pr)
 
-        return Response(serializer.data, status=statuses.HTTP_200_OK)
+        response = HttpResponseRedirect(pr.attachment.url)
+        return response
 
     @transaction.atomic
     def put(self, request, workspace_id, progress_report_id):
