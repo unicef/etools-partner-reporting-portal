@@ -4,7 +4,7 @@ from datetime import datetime
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Q
-from django.http import HttpResponse, Http404, HttpResponseRedirect
+from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import get_object_or_404
 
 from rest_framework import status as statuses
@@ -706,8 +706,10 @@ class ProgressReportAttachmentAPIView(APIView):
             id=progress_report_id,
             programme_document__workspace_id=workspace_id)
 
-        response = HttpResponseRedirect(pr.attachment.url)
-        return response
+        if pr.attachment:
+            return HttpResponseRedirect(pr.attachment.url)
+        else:
+            return HttpResponseNotFound()
 
     @transaction.atomic
     def put(self, request, workspace_id, progress_report_id):
