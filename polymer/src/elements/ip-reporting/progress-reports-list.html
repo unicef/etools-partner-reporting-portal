@@ -31,11 +31,6 @@
           padding: 0;
         };
       }
-
-      .cell-reports {
-        text-align: right;
-        text-transform: uppercase;
-      }
     </style>
 
     <etools-prp-permissions
@@ -58,6 +53,9 @@
         <etools-data-table-column field="programme_document__reference_number" sortable>
           <div class="table-column">PD/SSFA ToR ref. #</div>
         </etools-data-table-column>
+        <etools-data-table-column>
+          <div class="table-column">Report name</div>
+        </etools-data-table-column>
         <etools-data-table-column field="status" sortable>
           <div class="table-column">Report Status</div>
         </etools-data-table-column>
@@ -67,10 +65,9 @@
         <etools-data-table-column field="submission_date" sortable>
           <div class="table-column">Date of submission</div>
         </etools-data-table-column>
-        <etools-data-table-column field="start_date" flex-2 sortable>
+        <etools-data-table-column field="start_date" sortable>
           <div class="table-column">Reporting period</div>
         </etools-data-table-column>
-        <etools-data-table-column></etools-data-table-column>
       </etools-data-table-header>
 
       <etools-data-table-footer
@@ -95,6 +92,20 @@
               <paper-tooltip>[[report.programme_document.title]]</paper-tooltip>
             </div>
             <div class="table-cell table-cell--text">
+              <template
+                  is="dom-if"
+                  if="[[_canNavigateToReport(permissions, report)]]"
+                  restamp="true">
+                <a href="[[_getReportLink(report)]]"><!-- TODO --></a>
+              </template>
+              <template
+                  is="dom-if"
+                  if="[[!_canNavigateToReport(permissions, report)]]"
+                  restamp="true">
+                <!-- TODO -->
+              </template>
+            </div>
+            <div class="table-cell table-cell--text">
               <report-status status="[[report.status]]"></report-status>
             </div>
             <div class="table-cell table-cell--text">
@@ -103,16 +114,8 @@
             <div class="table-cell table-cell--text">
               [[_withDefault(report.submission_date)]]
             </div>
-            <div class="table-cell table-cell--text" flex-2>
+            <div class="table-cell table-cell--text">
               [[_withDefault(report.reporting_period)]]
-            </div>
-            <div class="table-cell table-cell--text cell-reports">
-              <template
-                  is="dom-if"
-                  if="[[_canNavigateToReport(permissions, report)]]"
-                  restamp="true">
-                <a href="[[_getReportLink(report)]]">[[_getReportLinkText(report)]]</a>
-              </template>
             </div>
           </div>
         </etools-data-table-row>
@@ -167,21 +170,6 @@
           type: Number,
           statePath: 'progressReports.count',
         },
-      },
-
-      _getReportLinkText: function (report) {
-        var mode = this._getMode(report);
-
-        switch (mode) {
-          case 'draft':
-            return 'Go To Draft';
-
-          case 'view':
-            return 'View Report';
-
-          default:
-            return 'Enter Data';
-        }
       },
 
       _getReportLink: function (report) {

@@ -29,21 +29,6 @@
           padding: 0;
         };
       }
-      .cell-icon {
-        text-align:center;
-      }
-      .cell-icon iron-icon {
-        --iron-icon-width: 20px;
-        --iron-icon-height: 20px;
-        --iron-icon-fill-color: #999;
-      }
-      .cell-reports {
-        text-align: right;
-        text-transform: uppercase;
-      }
-      .cell-reports a {
-        text-decoration: none;
-      }
     </style>
 
     <etools-prp-permissions
@@ -62,8 +47,11 @@
     <etools-content-panel panel-title="List of Reports">
 
       <etools-data-table-header
-        no-collapse
-        label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
+          no-collapse
+          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
+        <etools-data-table-column>
+          <div class="table-column">Report name</div>
+        </etools-data-table-column>
         <etools-data-table-column field="status" sortable>
           <div class="table-column">Report Status</div>
         </etools-data-table-column>
@@ -73,13 +61,9 @@
         <etools-data-table-column field="date_of_submission" sortable>
           <div class="table-column">Date of submission</div>
         </etools-data-table-column>
-        <etools-data-table-column field="reporting_period" flex-2 sortable>
+        <etools-data-table-column field="reporting_period" sortable>
           <div class="table-column">Reporting period</div>
         </etools-data-table-column>
-        <etools-data-table-column field="is_draft" class="cell-icon" sortable>
-          <div class="table-column">Draft</div>
-        </etools-data-table-column>
-        <etools-data-table-column></etools-data-table-column>
       </etools-data-table-header>
 
       <etools-data-table-footer
@@ -99,6 +83,20 @@
         initial-count="[[pageSize]]">
         <etools-data-table-row no-collapse>
           <div slot="row-data">
+          <div class="table-cell table-cell--text cell-reports">
+              <template
+                  is="dom-if"
+                  if="[[_canNavigateToReport(permissions, report)]]"
+                  restamp="true">
+                <a href="[[_getLink(report)]]"><!-- TODO --></a>
+              </template>
+              <template
+                  is="dom-if"
+                  if="[[!_canNavigateToReport(permissions, report)]]"
+                  restamp="true">
+                <!-- TODO -->
+              </template>
+            </div>
             <div class="table-cell table-cell--text">
               <report-status status="[[report.status]]"></report-status>
             </div>
@@ -108,24 +106,8 @@
             <div class="table-cell table-cell--text">
               [[_withDefault(report.submission_date)]]
             </div>
-            <div class="table-cell table-cell--text" flex-2>
+            <div class="table-cell table-cell--text">
               [[_withDefault(report.reporting_period)]]
-            </div>
-            <div class="table-cell table-cell--text cell-icon">
-              <template is="dom-if" if="[[report.is_draft]]">
-                <iron-icon icon="check"></iron-icon>
-              </template>
-              <template is="dom-if" if="[[!report.is_draft]]">
-                —
-              </template>
-            </div>
-            <div class="table-cell table-cell--text cell-reports">
-              <template
-                  is="dom-if"
-                  if="[[_canNavigateToReport(permissions, report)]]"
-                  restamp="true">
-                <a href="[[_getLink(report)]]">[[_getLinkText(report)]]</a>
-              </template>
             </div>
           </div>
         </etools-data-table-row>
@@ -190,21 +172,6 @@
           this._baseUrl,
           '/pd/' + this.pdId + '/report/' + report.id + '/' + suffix
         );
-      },
-
-      _getLinkText: function (report) {
-        var mode = this._getMode(report);
-
-        switch (mode) {
-          case 'draft':
-            return 'Go To Draft';
-
-          case 'view':
-            return 'View Report';
-
-          default:
-            return 'Enter Data';
-        }
       },
     });
   </script>
