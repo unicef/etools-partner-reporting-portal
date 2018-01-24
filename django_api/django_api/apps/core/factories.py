@@ -224,6 +224,7 @@ class WorkspaceFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = Workspace
+        django_get_or_create = ('workspace_code', )
 
 
 class ResponsePlanFactory(factory.django.DjangoModelFactory):
