@@ -1,10 +1,13 @@
+from urllib import parse
+
 from datetime import datetime
 from django.conf import settings
 from django.db.models import Q
+
 import django_filters
 from distutils.util import strtobool
 from django_filters.filters import (
-    ChoiceFilter, CharFilter, DateFilter, TypedChoiceFilter
+    ChoiceFilter, CharFilter, DateFilter, TypedChoiceFilter, CharFilter
 )
 
 from core.common import PD_LIST_REPORT_STATUS, PD_STATUS, PROGRESS_REPORT_STATUS
@@ -16,7 +19,7 @@ BOOLEAN_CHOICES = (('0', 'False'), ('1', 'True'),)
 
 class ProgrammeDocumentIndicatorFilter(django_filters.FilterSet):
 
-    pd_statuses = ChoiceFilter(choices=PD_STATUS, method='get_status')
+    pd_statuses = CharFilter(method='get_status')
     pds = CharFilter(method='get_programme_document')
     location = CharFilter(method='get_locations')
     blueprint__title = CharFilter(method='get_blueprint_title')
@@ -30,11 +33,11 @@ class ProgrammeDocumentIndicatorFilter(django_filters.FilterSet):
 
     def get_status(self, queryset, name, value):
         return queryset.filter(
-            lower_level_outputs__cp_output__programme_document__status=value)
+            lower_level_outputs__cp_output__programme_document__status__in=parse.unquote(value).split(','))
 
     def get_programme_document(self, queryset, name, value):
         return queryset.filter(
-            lower_level_outputs__cp_output__programme_document_id=value)
+            lower_level_outputs__cp_output__programme_document_id__in=map(lambda x: int(x), parse.unquote(value).split(',')))
 
     def get_locations(self, queryset, name, value):
         return queryset.filter(locations=value)
@@ -49,20 +52,20 @@ class ProgrammeDocumentIndicatorFilter(django_filters.FilterSet):
 
 class ProgrammeDocumentFilter(django_filters.FilterSet):
     ref_title = CharFilter(method='get_reference_number_title')
-    status = ChoiceFilter(choices=PD_STATUS)
+    status = CharFilter(method='get_status')
     location = CharFilter(method='get_location')
 
     class Meta:
         model = ProgrammeDocument
         fields = ['ref_title', 'status', 'location']
 
+    def get_status(self, queryset, name, value):
+        return queryset.filter(status__in=parse.unquote(value).split(','))
+
     def get_reference_number_title(self, queryset, name, value):
         return queryset.filter(
             Q(reference_number__icontains=value) | Q(title__icontains=value)
         )
-
-    def get_status(self, queryset, name, value):
-        return queryset.filter(status=value)
 
     def get_location(self, queryset, name, value):
         return queryset.filter(
@@ -70,9 +73,8 @@ class ProgrammeDocumentFilter(django_filters.FilterSet):
 
 
 class ProgressReportFilter(django_filters.FilterSet):
-    status = ChoiceFilter(
+    status = CharFilter(
         name='status',
-        choices=PROGRESS_REPORT_STATUS,
         label='Status')
     pd_ref_title = CharFilter(name='pd ref title', method='get_pd_ref_title',
                               label='PD/Ref # title')
@@ -93,7 +95,7 @@ class ProgressReportFilter(django_filters.FilterSet):
                   'programme_document__id', 'programme_document__external_id', 'section', 'cp_output']
 
     def get_status(self, queryset, name, value):
-        return queryset.filter(status=value)
+        return queryset.filter(status__in=parse.unquote(value).split(','))
 
     def get_pd_ext(self, queryset, name, value):
         return queryset.filter(programme_document__external_id=value)

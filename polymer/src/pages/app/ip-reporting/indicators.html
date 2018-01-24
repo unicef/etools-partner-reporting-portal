@@ -11,6 +11,7 @@
 <link rel="import" href="../../../endpoints.html">
 <link rel="import" href="../../../redux/actions.html">
 <link rel="import" href="../../../redux/store.html">
+<link rel="import" href="../../../behaviors/sorting.html">
 
 <dom-module id="page-ip-reporting-indicators">
   <template>
@@ -52,6 +53,7 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.SortingBehavior,
       ],
 
       properties: {
@@ -98,13 +100,23 @@
           return;
         }
 
-        var indicatorsThunk = this.$.indicators.thunk();
-        this.dispatch(App.Actions.Indicators.fetchIndicators(indicatorsThunk))
-          .catch(function (err) { // jshint ignore:line
-              // TODO: error handling.
-          });
+        this.debounce('fetch-indicators', function () {
+          var indicatorsThunk = this.$.indicators.thunk();
+
+          this.$.indicators.abort();
+
+          this.dispatch(App.Actions.Indicators.fetchIndicators(indicatorsThunk))
+            .catch(function (err) { // jshint ignore:line
+                // TODO: error handling.
+            });
+        }, 100);
       },
 
+      detached: function () {
+        if (this.isDebouncerActive('fetch-indicators')) {
+          this.cancelDebouncer('fetch-indicators');
+        }
+      },
     });
   </script>
 

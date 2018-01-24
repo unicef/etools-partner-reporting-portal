@@ -49,7 +49,7 @@
         method="put">
     </etools-prp-ajax>
 
-    <etools-content-panel panel-title="Narrative">
+    <etools-content-panel panel-title="Other info" no-header="[[noHeader]]">
       <div class="app-grid">
         <div class="row">
           <labelled-item label="Partner contribution to date">
@@ -145,6 +145,7 @@
       properties: {
         localData: Object,
         permissions: Object,
+        noHeader: Boolean,
 
         data: {
           type: Object,

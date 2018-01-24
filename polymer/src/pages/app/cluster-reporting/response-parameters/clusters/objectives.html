@@ -5,6 +5,7 @@
 
 <link rel="import" href="../../../../../behaviors/routing.html">
 <link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="../../../../../behaviors/sorting.html">
 <link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/clusters/objectives/filters.html">
 <link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/clusters/objectives/creation-modal.html">
 <link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/clusters/objectives/objectives-list.html">
@@ -80,6 +81,7 @@
         App.Behaviors.ReduxBehavior,
         App.Behaviors.RoutingBehavior,
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.SortingBehavior,
       ],
 
       observers: [
@@ -101,22 +103,12 @@
         },
       },
 
-      listeners: {
-        'sort-changed': '_sortOrderChanged',
-      },
-
       _openModal: function () {
         this.$$('#modal').open();
       },
 
       _computeUrl: function(responsePlanID) {
         return App.Endpoints.responseParametersClusterObjectives(responsePlanID);
-      },
-
-      _sortOrderChanged: function(event) {
-        var newParams = Object.assign({}, this.queryParams);
-        newParams.sort = event.detail.field + '.' + event.detail.direction;
-        this.set('queryParams', newParams);
       },
 
       _clusterObjectivesAjax: function (queryParams) {

@@ -6,7 +6,7 @@
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../elements/filter-list.html">
 <link rel="import" href="../../elements/filters/text-filter/text-filter.html">
-<link rel="import" href="../../elements/filters/dropdown-filter/dropdown-filter.html">
+<link rel="import" href="../../elements/filters/dropdown-filter/dropdown-filter-multi.html">
 
 <dom-module id="pd-filters">
   <template>
@@ -19,6 +19,11 @@
         --app-grid-columns: 4;
         --app-grid-gutter: 25px;
         --app-grid-item-height: auto;
+        --app-grid-expandible-item-columns: 3;
+      }
+
+      .filter-3-col {
+        @apply --app-grid-expandible-item;
       }
     </style>
 
@@ -41,13 +46,14 @@
           value="[[queryParams.ref_title]]">
       </text-filter>
 
-      <dropdown-filter
-          class="item"
+      <dropdown-filter-multi
+          class="item filter-3-col"
           label="PD/SSFA status"
           name="status"
           value="[[_withDefault(queryParams.status, '')]]"
-          data="[[statuses]]">
-      </dropdown-filter>
+          data="[[statuses]]"
+          hide-search>
+      </dropdown-filter-multi>
     </filter-list>
   </template>
 
@@ -70,7 +76,6 @@
         statuses: {
           type: Array,
           value: [
-            {title: 'All', id: ''},
             {title: 'Draft', id: 'Dra'},
             {title: 'Signed', id: 'Sig'},
             {title: 'Active', id: 'Act'},

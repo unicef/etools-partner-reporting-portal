@@ -79,7 +79,7 @@
         return locationId ? App.Endpoints.progressReports(locationId) : '';
       },
 
-      _handleInputChange: function (queryParams) { // jshint ignore:line
+      _handleInputChange: function (_, queryParams) { // jshint ignore:line
         var progressReportsThunk;
 
         if (!Object.keys(queryParams).length) {

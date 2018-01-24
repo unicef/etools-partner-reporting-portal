@@ -1,18 +1,18 @@
 import logging
-
 from datetime import datetime
 
-from django.http import Http404
-from django.db.models import Q
-from django.http import HttpResponse
 from django.conf import settings
 from django.db import transaction
+from django.db.models import Q
+from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import get_object_or_404
 
-from rest_framework.generics import RetrieveAPIView, ListAPIView, UpdateAPIView
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from rest_framework import status as statuses
+from rest_framework import mixins, viewsets
+from rest_framework.generics import RetrieveAPIView, ListAPIView
+from rest_framework.parsers import FileUploadParser, FormParser, MultiPartParser
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 import django_filters.rest_framework
 from easy_pdf.rendering import render_to_pdf
@@ -27,7 +27,6 @@ from core.paginations import SmallPagination
 from core.permissions import (
     IsAuthenticated,
     IsPartnerAuthorizedOfficer,
-    IsPartnerEditor,
     IsPartnerEditorOrPartnerAuthorizedOfficer
 )
 from core.models import Location
@@ -49,13 +48,16 @@ from .serializers import (
     ProgressReportSerializer,
     ProgressReportReviewSerializer,
     LLOutputSerializer,
-    LLOutputIndicatorsSerializer,
     ProgrammeDocumentCalculationMethodsSerializer,
     ProgrammeDocumentProgressSerializer,
-    ProgressReportUpdateSerializer
+    ProgressReportUpdateSerializer,
+    ProgressReportAttachmentSerializer
 )
 from .models import ProgrammeDocument, ProgressReport
-from .permissions import CanChangePDCalculationMethod, UnicefPartnershipManagerOrRead
+from .permissions import (
+    CanChangePDCalculationMethod,
+    UnicefPartnershipManagerOrRead
+)
 from .filters import (
     ProgrammeDocumentFilter, ProgressReportFilter,
     ProgrammeDocumentIndicatorFilter
@@ -264,12 +266,22 @@ class ProgressReportAPIView(ListAPIView):
             programme_document__workspace=workspace_id).distinct()
         filtered = ProgressReportFilter(request.GET, queryset=queryset)
 
-        page = self.paginate_queryset(filtered.qs)
+        qs = filtered.qs
+        order = request.query_params.get('sort', None)
+        if order:
+            order_field = order.split('.')[0]
+            if order_field in ('due_date', 'status', 'programme_document__reference_number', 'submission_date', 'start_date'):
+                print(order_field)
+                qs = qs.order_by(order_field)
+                if len(order.split('.')) > 1 and order.split('.')[1] == 'desc':
+                    qs = qs.order_by('-%s' % order_field)
+
+        page = self.paginate_queryset(qs)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
-        serializer = self.get_serializer(filtered.qs, many=True)
+        serializer = self.get_serializer(qs, many=True)
         return Response(
             serializer.data,
             status=statuses.HTTP_200_OK
@@ -682,3 +694,45 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
 
         return Response({"errors": serializer.errors},
                         status=statuses.HTTP_400_BAD_REQUEST)
+
+
+class ProgressReportAttachmentAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+    parser_classes = (FormParser, MultiPartParser, FileUploadParser)
+
+    def get(self, request, workspace_id, progress_report_id):
+        pr = get_object_or_404(
+            ProgressReport,
+            id=progress_report_id,
+            programme_document__workspace_id=workspace_id)
+
+        if pr.attachment:
+            return HttpResponseRedirect(pr.attachment.url)
+        else:
+            return HttpResponseNotFound()
+
+    @transaction.atomic
+    def put(self, request, workspace_id, progress_report_id):
+        pr = get_object_or_404(
+            ProgressReport,
+            id=progress_report_id,
+            programme_document__workspace_id=workspace_id)
+
+        if pr.attachment:
+            try:
+                pr.attachment.delete()
+            except ValueError:
+                pass
+
+        serializer = ProgressReportAttachmentSerializer(
+            instance=pr,
+            data=request.data
+        )
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=statuses.HTTP_200_OK)
+
+        else:
+            return Response({"errors": serializer.errors},
+                            status=statuses.HTTP_400_BAD_REQUEST)

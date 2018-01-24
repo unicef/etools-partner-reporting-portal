@@ -1,6 +1,6 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
 
-<link rel="import" href="../dropdown-filter/searchable-dropdown-filter.html">
+<link rel="import" href="../dropdown-filter/dropdown-filter-multi.html">
 <link rel="import" href="../../etools-prp-ajax.html">
 <link rel="import" href="../../../endpoints.html">
 <link rel="import" href="../../../redux/store.html">
@@ -18,13 +18,13 @@
         url="[[programmeDocumentsUrl]]">
     </etools-prp-ajax>
 
-    <searchable-dropdown-filter
+    <dropdown-filter-multi
       class="item"
       label="PD"
       name="pds"
       value="[[value]]"
       data="[[data]]">
-    </searchable-dropdown-filter>
+    </dropdown-filter-multi>
   </template>
 
   <script>
@@ -70,10 +70,7 @@
 
         this.$.programmeDocuments.thunk()()
             .then(function (res) {
-              self.set('data', [{
-                id: '',
-                title: 'All',
-              }].concat(res.data.results));
+              self.set('data', res.data.results);
             })
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling

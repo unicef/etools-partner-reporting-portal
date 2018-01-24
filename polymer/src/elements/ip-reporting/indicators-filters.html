@@ -5,7 +5,7 @@
 
 <link rel="import" href="../filter-list.html">
 <link rel="import" href="../filters/text-filter/text-filter.html">
-<link rel="import" href="../filters/dropdown-filter/dropdown-filter.html">
+<link rel="import" href="../filters/dropdown-filter/dropdown-filter-multi.html">
 <link rel="import" href="../filters/location-filter/location-filter.html">
 <link rel="import" href="../filters/pd-filter/pd-dropdown-filter.html">
 <link rel="import" href="../filters/checkbox-filter/checkbox-filter.html">
@@ -23,11 +23,15 @@
         --app-grid-columns: 4;
         --app-grid-gutter: 25px;
         --app-grid-item-height: auto;
-        --app-grid-expandible-item-columns: 4;
+        --app-grid-expandible-item-columns: 2;
       }
 
-      .incomplete {
+      .item-2-col {
         @apply --app-grid-expandible-item;
+      }
+
+      checkbox-filter {
+        margin-top: 2em;
       }
     </style>
 
@@ -42,16 +46,17 @@
 
     <filter-list filters="{{filters}}" class="app-grid">
 
-      <dropdown-filter
-          class="item"
+      <dropdown-filter-multi
+          class="item item-2-col"
           label="PD status"
           name="pd_statuses"
           value="[[_withDefault(queryParams.pd_statuses, '')]]"
-          data="[[pd_statuses]]">
-      </dropdown-filter>
+          data="[[pd_statuses]]"
+          hide-search>
+      </dropdown-filter-multi>
 
       <pd-dropdown-filter
-        class="item"
+        class="item item-2-col"
         value="[[_withDefault(queryParams.pds, '')]]">
       </pd-dropdown-filter>
 
@@ -68,7 +73,7 @@
       </text-filter>
 
       <checkbox-filter
-        class="incomplete"
+        class="item item-2-col"
         name="activepdsonly"
         value="[[_withDefault(queryParams.activepdsonly, '')]]">
         <span class="checkbox-label">Show for Active PDs only</span>
@@ -92,7 +97,6 @@
         pd_statuses: {
           type: Array,
           value: [
-            {title: 'All', id: ''},
             {title: 'Draft', id: 'Dra'},
             {title: 'Signed', id: 'Sig'},
             {title: 'Active', id: 'Act'},

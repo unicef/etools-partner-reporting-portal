@@ -110,9 +110,6 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
     end_date = models.DateField(
         verbose_name='Due Date',
     )
-    population_focus = models.CharField(
-        max_length=256,
-        verbose_name='Population Focus')
     status = models.CharField(
         choices=PD_STATUS,
         default=PD_STATUS.draft,
@@ -397,6 +394,11 @@ class ProgressReport(TimeStampedModel):
         null=True
     )
     sent_back_feedback = models.TextField(blank=True, null=True)
+    attachment = models.FileField(
+        upload_to="unicef/progress_reports/",
+        blank=True,
+        null=True
+    )
 
     class Meta:
         ordering = ['-due_date', '-id']

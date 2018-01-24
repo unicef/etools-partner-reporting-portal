@@ -6,6 +6,7 @@
 <link rel="import" href="../../../bower_components/etools-data-table/etools-data-table.html">
 <link rel="import" href="../../../bower_components/iron-location/iron-location.html">
 <link rel="import" href="../../../bower_components/iron-location/iron-query-params.html">
+<link rel="import" href="../../../bower_components/paper-tooltip/paper-tooltip.html">
 
 <link rel="import" href="../report-status.html">
 <link rel="import" href="../list-placeholder.html">
@@ -16,6 +17,7 @@
 <link rel="import" href="../../behaviors/pagination.html">
 <link rel="import" href="../../behaviors/routing.html">
 <link rel="import" href="../../behaviors/progressReportUtils.html">
+<link rel="import" href="../../behaviors/sorting.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../styles/table-styles.html">
 
@@ -28,11 +30,6 @@
         --ecp-content: {
           padding: 0;
         };
-      }
-
-      .cell-reports {
-        text-align: right;
-        text-transform: uppercase;
       }
     </style>
 
@@ -50,28 +47,26 @@
     </iron-query-params>
 
     <etools-content-panel panel-title="List of Reports">
-
       <etools-data-table-header
-        no-collapse
-        label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
-        <etools-data-table-column></etools-data-table-column>
-        <etools-data-table-column field="status">
+          no-collapse
+          label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
+        <etools-data-table-column field="programme_document__reference_number" sortable>
+          <div class="table-column">PD/SSFA ToR ref. #</div>
+        </etools-data-table-column>
+        <etools-data-table-column>
+          <div class="table-column">Report name</div>
+        </etools-data-table-column>
+        <etools-data-table-column field="status" sortable>
           <div class="table-column">Report Status</div>
         </etools-data-table-column>
-        <etools-data-table-column field="due_date">
+        <etools-data-table-column field="due_date" sortable>
           <div class="table-column">Due date</div>
         </etools-data-table-column>
-        <etools-data-table-column field="date_of_submission">
+        <etools-data-table-column field="submission_date" sortable>
           <div class="table-column">Date of submission</div>
         </etools-data-table-column>
-        <etools-data-table-column field="period" flex-2>
+        <etools-data-table-column field="start_date" sortable>
           <div class="table-column">Reporting period</div>
-        </etools-data-table-column>
-        <etools-data-table-column field="draft" class="cell-icon">
-          <div class="table-column">Draft</div>
-        </etools-data-table-column>
-        <etools-data-table-column field="">
-          <div class="table-column">PD/SSFA ToR ref. #</div>
         </etools-data-table-column>
       </etools-data-table-header>
 
@@ -92,12 +87,22 @@
         initial-count="[[pageSize]]">
         <etools-data-table-row no-collapse>
           <div slot="row-data">
-            <div class="table-cell table-cell--text cell-reports">
+            <div class="table-cell table-cell--text">
+              [[_withDefault(report.programme_document.reference_number, '-')]]
+              <paper-tooltip>[[report.programme_document.title]]</paper-tooltip>
+            </div>
+            <div class="table-cell table-cell--text">
               <template
                   is="dom-if"
                   if="[[_canNavigateToReport(permissions, report)]]"
                   restamp="true">
-                <a href="[[_getReportLink(report)]]">[[_getReportLinkText(report)]]</a>
+                <a href="[[_getReportLink(report)]]">[TODO: report title]</a>
+              </template>
+              <template
+                  is="dom-if"
+                  if="[[!_canNavigateToReport(permissions, report)]]"
+                  restamp="true">
+                [TODO: report title]
               </template>
             </div>
             <div class="table-cell table-cell--text">
@@ -109,21 +114,8 @@
             <div class="table-cell table-cell--text">
               [[_withDefault(report.submission_date)]]
             </div>
-            <div class="table-cell table-cell--text" flex-2>
-              [[_withDefault(report.reporting_period)]]
-            </div>
-            <div class="table-cell table-cell--text cell-icon">
-              <template is="dom-if" if="[[report.is_draft]]">
-                <iron-icon icon="check"></iron-icon>
-              </template>
-              <template is="dom-if" if="[[!report.is_draft]]">
-                —
-              </template>
-            </div>
             <div class="table-cell table-cell--text">
-              <a href="[[_getPDLink(report)]]">
-                [[_withDefault(report.programme_document.reference_number, '-')]]
-              </a>
+              [[_withDefault(report.reporting_period)]]
             </div>
           </div>
         </etools-data-table-row>
@@ -158,6 +150,7 @@
         App.Behaviors.PaginationBehavior,
         App.Behaviors.UtilsBehavior,
         App.Behaviors.ProgressReportUtilsBehavior,
+        App.Behaviors.SortingBehavior,
       ],
 
       properties: {
@@ -177,28 +170,6 @@
           type: Number,
           statePath: 'progressReports.count',
         },
-      },
-
-      _getPDLink: function (report) {
-        return this.buildUrl(
-          this._baseUrl,
-          '/pd/' + report.programme_document.id + '/view/details'
-        );
-      },
-
-      _getReportLinkText: function (report) {
-        var mode = this._getMode(report);
-
-        switch (mode) {
-          case 'draft':
-            return 'Go To Draft';
-
-          case 'view':
-            return 'View Report';
-
-          default:
-            return 'Enter Data';
-        }
       },
 
       _getReportLink: function (report) {

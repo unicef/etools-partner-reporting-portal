@@ -237,7 +237,7 @@ STATIC_URL = '/api/static/'
 # Authentication settings
 AUTH_USER_MODEL = 'account.User'
 
-PRINT_DATA_FORMAT = "%d %b %Y"
+PRINT_DATA_FORMAT = "%d-%b-%Y"
 
 INPUT_DATA_FORMAT = "%Y-%m-%d"
 
@@ -335,7 +335,8 @@ REST_FRAMEWORK = {
             'rest_framework.authentication.SessionAuthentication',
             'utils.mixins.CustomJSONWebTokenAuthentication',
             'rest_framework.authentication.TokenAuthentication',
-    )
+    ),
+    'DATE_FORMAT': PRINT_DATA_FORMAT,
 }
 
 

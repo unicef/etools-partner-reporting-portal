@@ -52,7 +52,7 @@
           <div class="table-column">Target</div>
         </etools-data-table-column>
 
-        <etools-data-table-column  class="flex-4" field="progress">
+        <etools-data-table-column  class="flex-4" field="progress_percentage" sortable>
             <div class="table-column">Current progress</div>
         </etools-data-table-column>
 
@@ -113,8 +113,10 @@
       ],
 
       properties: {
-
-        data: Array,
+        data: {
+          type: Array,
+          observer: '_tableContentChanged',
+        },
 
         loading: Boolean,
 
@@ -135,7 +137,7 @@
       },
 
       listeners: {
-        'page-number-changed': '_pageNumberModified',
+        'page-number-changed': '_tableContentChanged',
         'details-opened-changed': '_detailsChange'
       },
 

@@ -4,6 +4,7 @@
 
 <link rel="import" href="../../../../behaviors/routing.html">
 <link rel="import" href="../../../../behaviors/utils.html">
+<link rel="import" href="../../../../behaviors/sorting.html">
 <link rel="import" href="../../../../elements/cluster-reporting/planned-action/activities/filters.html">
 <link rel="import" href="../../../../elements/cluster-reporting/planned-action/activities/creation-modal.html">
 <link rel="import" href="../../../../elements/cluster-reporting/activity-list-table.html">
@@ -78,6 +79,7 @@
         App.Behaviors.ReduxBehavior,
         App.Behaviors.RoutingBehavior,
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.SortingBehavior,
       ],
 
       properties: {
@@ -105,13 +107,6 @@
 
       listeners: {
         'modal.activity-added': '_onSuccess',
-        'sort-changed': '_sortOrderChanged',
-      },
-
-      _sortOrderChanged: function(event) {
-        var newParams = Object.assign({}, this.queryParams);
-        newParams.sort = event.detail.field + '.' + event.detail.direction;
-        this.set('queryParams', newParams);
       },
 
       _onSuccess: function(e, data) {

@@ -202,6 +202,7 @@
           activities: {
             type: Object,
             statePath: 'partnerActivities.all',
+            observer: '_tableContentChanged',
           },
 
           loading: {
@@ -230,17 +231,12 @@
           }
         },
 
-        _sortableFieldNames: {
-          type: Array,
-          value: ['title', 'partner', 'status', 'cluster_activity']
-        },
-
         _openModal: function () {
           this.$$('#modal').open();
         },
 
         listeners: {
-          'page-number-changed': '_pageNumberModified',
+          'page-number-changed': '_tableContentChanged',
           'details-opened-changed': '_detailsChange'
         },
 

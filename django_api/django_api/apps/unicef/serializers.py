@@ -49,7 +49,6 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
             'unicef_office',
             'start_date',
             'end_date',
-            'population_focus',
             'status',
             'document_type',
             'document_type_display',
@@ -121,10 +120,13 @@ class ProgrammeDocumentDetailSerializer(serializers.ModelSerializer):
             'partner_focal_point',
             'start_date',
             'end_date',
-            'population_focus',
             # 'status',
             'frequency',
             'sections',
+            'cso_contribution',
+            'total_unicef_cash',
+            'in_kind_amount',
+            'budget',
         )
 
 
@@ -553,4 +555,18 @@ class PMPPDResultLinkSerializer(serializers.ModelSerializer):
             'title',
             'result_link',
             'programme_document'
+        )
+
+
+class ProgressReportAttachmentSerializer(serializers.ModelSerializer):
+    size = serializers.SerializerMethodField()
+
+    def get_size(self, obj):
+        return obj.attachment.size if obj.attachment else None
+
+    class Meta:
+        model = ProgressReport
+        fields = (
+            'attachment',
+            'size'
         )

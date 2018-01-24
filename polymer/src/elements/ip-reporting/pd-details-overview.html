@@ -10,6 +10,8 @@
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/selectors/programmeDocuments.html">
 <link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../elements/etools-prp-currency.html">
+<link rel="import" href="../../elements/etools-prp-progress-bar.html">
 <link rel="import" href="../../elements/labelled-item.html">
 
 <dom-module id="pd-details-overview">
@@ -19,10 +21,10 @@
         display: block;
         margin-bottom: 25px;
 
-        --app-grid-columns: 3;
+        --app-grid-columns: 6;
         --app-grid-gutter: 25px;
         --app-grid-item-height: auto;
-        --app-grid-expandible-item-columns: 3;
+        --app-grid-expandible-item-columns: 2;
       }
 
       :host etools-content-panel {
@@ -35,7 +37,7 @@
         list-style: none;
       }
 
-      .full-width {
+      .item-2-col {
         @apply --app-grid-expandible-item;
       }
 
@@ -60,37 +62,41 @@
       <etools-content-panel panel-title="Partnership Information">
         <etools-loading active="[[!loaded]]"></etools-loading>
         <ul class="app-grid">
-          <li class="item">
+          <li class="item item-2-col">
             <labelled-item label="Agreement">
               <span class="field-value">[[_withDefault(pd.agreement)]]</span>
             </labelled-item>
           </li>
-          <li class="item">
+          <li class="item item-2-col">
             <labelled-item label="Document Type">
               <span class="field-value">[[_withDefault(pd.document_type_display)]]</span>
             </labelled-item>
           </li>
-          <li class="item">
+          <li class="item item-2-col">
             <labelled-item label="Reference Number">
               <span class="field-value">[[_withDefault(pd.reference_number)]]</span>
             </labelled-item>
           </li>
-          <li class="item full-width">
-            <labelled-item label="Title">
-              <span class="field-value">[[_withDefault(pd.title)]]</span>
-            </labelled-item>
-          </li>
-          <li class="item">
+        </ul>
+
+        <labelled-item label="Title">
+          <span class="field-value">[[_withDefault(pd.title)]]</span>
+        </labelled-item>
+
+        <br />
+
+        <ul class="app-grid">
+          <li class="item item-2-col">
             <labelled-item label="UNICEF Office(s)">
               <span class="field-value">[[_withDefault(pd.unicef_office)]]</span>
             </labelled-item>
           </li>
-          <li class="item">
+          <li class="item item-2-col">
             <labelled-item label="UNICEF Focal Point(s)">
               <span class="field-value">[[_formatFocalPoint(pd.unicef_focal_point)]]</span>
             </labelled-item>
           </li>
-          <li class="item">
+          <li class="item item-2-col">
             <labelled-item label="Partner Focal Point(s)">
               <span class="field-value">[[_formatFocalPoint(pd.partner_focal_point)]]</span>
             </labelled-item>
@@ -102,6 +108,11 @@
         <etools-loading active="[[!loaded]]"></etools-loading>
         <ul class="app-grid">
           <li class="item">
+            <labelled-item label="In response to an HRP">
+              - <!-- TODO -->
+            </labelled-item>
+          </li>
+          <li class="item">
             <labelled-item label="Start date">
               <span class="field-value">[[_withDefault(pd.start_date)]]</span>
             </labelled-item>
@@ -112,8 +123,52 @@
             </labelled-item>
           </li>
           <li class="item">
-            <labelled-item label="Population Focus">
-              <span class="field-value">[[_withDefault(pd.population_focus)]]</span>
+            <labelled-item label="CSO contribution">
+              <span class="field-value">
+                <etools-prp-currency
+                    value="[[pd.cso_contribution]]"
+                    currency="[[pd.cso_contribution_currency]]">
+                </etools-prp-currency>
+              </span>
+            </labelled-item>
+          </li>
+          <li class="item">
+            <labelled-item label="Total UNICEF cash">
+              <span class="field-value">
+                <etools-prp-currency
+                    value="[[pd.total_unicef_cash]]"
+                    currency="[[pd.total_unicef_cash_currency]]">
+                </etools-prp-currency>
+              </span>
+            </labelled-item>
+          </li>
+          <li class="item">
+            <labelled-item label="Total UNICEF supplies">
+              <span class="field-value">
+                <etools-prp-currency
+                    value="[[pd.total_unicef_supplies]]"
+                    currency="[[pd.total_unicef_supplies_currency]]">
+                </etools-prp-currency>
+              </span>
+            </labelled-item>
+          </li>
+          <li class="item">
+            <labelled-item label="Total Budget">
+              <span class="field-value">
+                <etools-prp-currency
+                    value="[[pd.budget]]"
+                    currency="[[pd.budget_currency]]">
+                </etools-prp-currency>
+              </span>
+            </labelled-item>
+          </li>
+          <li class="item item-2-col">
+            <labelled-item label="$ disbursements to date (%)">
+              <!-- TODO
+              <etools-prp-progress-bar
+                  number="[[]]">
+              </etools-prp-progress-bar>
+              -->
             </labelled-item>
           </li>
         </ul>

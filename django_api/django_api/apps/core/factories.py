@@ -512,7 +512,6 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     reference_number = factory.Sequence(lambda n: "reference_number_%d" % n)
     start_date = beginning_of_this_year
     end_date = today + datetime.timedelta(days=70)
-    population_focus = factory.Sequence(lambda n: "Population %d" % n)
     status = fuzzy.FuzzyChoice(PD_STATUS_LIST)
     frequency = fuzzy.FuzzyChoice(PD_FREQUENCY_LEVEL_CHOICE_LIST)
     budget = fuzzy.FuzzyDecimal(low=1000.0, high=100000.0, precision=2)
