@@ -96,13 +96,13 @@
                   is="dom-if"
                   if="[[_canNavigateToReport(permissions, report)]]"
                   restamp="true">
-                <a href="[[_getReportLink(report)]]"><!-- TODO --></a>
+                <a href="[[_getReportLink(report)]]">[TODO: report title]</a>
               </template>
               <template
                   is="dom-if"
                   if="[[!_canNavigateToReport(permissions, report)]]"
                   restamp="true">
-                <!-- TODO -->
+                [TODO: report title]
               </template>
             </div>
             <div class="table-cell table-cell--text">
