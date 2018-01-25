@@ -37,6 +37,7 @@ from .serializers import (
     ResponsePlanClusterDashboardSerializer,
     ResponsePlanPartnerDashboardSerializer,
     PartnerAnalysisSummarySerializer,
+    OperationalPresenceLocationListSerializer,
 )
 from .filters import (
     ClusterObjectiveFilter,
