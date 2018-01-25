@@ -5,9 +5,10 @@ from functools import reduce
 from django.db.models import Q, F
 
 from rest_framework import serializers
+from rest_framework_gis.serializers import GeoFeatureModelSerializer
 
 from core.common import OVERALL_STATUS, PARTNER_PROJECT_STATUS, CLUSTER_TYPE_NAME_DICT
-from core.models import ResponsePlan, GatewayType
+from core.models import ResponsePlan, GatewayType, Location
 from indicator.models import Reportable, IndicatorReport, IndicatorLocationData
 from indicator.serializers import (
     ClusterIndicatorReportSerializer,
@@ -356,3 +357,27 @@ class PartnerAnalysisSummarySerializer(serializers.ModelSerializer):
             .values('id', 'title')
 
         return id_list
+
+
+class OperationalPresenceLocationListSerializer(GeoFeatureModelSerializer):
+    partners = serializers.SerializerMethodField()
+
+    def get_partners(self, obj):
+        partners = Partner.objects.filter(
+            clusters__response_plan__workspace__countries__locations=obj) \
+            .distinct() \
+            .values_list('title', flat=True)
+
+        return {len(partners): partners}
+
+    class Meta:
+        model = Location
+        fields = (
+            'id',
+            'title',
+            'latitude',
+            'longitude',
+            'p_code',
+            'geom',
+            'partners',
+        )
