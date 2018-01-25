@@ -88,8 +88,10 @@
         <etools-data-table-row no-collapse>
           <div slot="row-data">
             <div class="table-cell table-cell--text">
-              [[_withDefault(report.programme_document.reference_number, '-')]]
-              <paper-tooltip>[[report.programme_document.title]]</paper-tooltip>
+              <span>
+                [[_withDefault(report.programme_document.reference_number, '-')]]
+                <paper-tooltip>[[report.programme_document.title]]</paper-tooltip>
+              </span>
             </div>
             <div class="table-cell table-cell--text">
               <template

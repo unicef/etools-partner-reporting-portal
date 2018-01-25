@@ -106,15 +106,20 @@
                   is="dom-if"
                   if="[[canViewPdDetails]]"
                   restamp="true">
-                <a href="[[ pd.id ]]/view/details">[[_withDefault(pd.reference_number)]]</a>
+                <a href="[[ pd.id ]]/view/details">
+                  [[_withDefault(pd.reference_number)]]
+                  <paper-tooltip>[[pd.title]]</paper-tooltip>
+                </a>
               </template>
               <template
                   is="dom-if"
                   if="[[!canViewPdDetails]]"
                   restamp="true">
-                <span>[[_withDefault(pd.reference_number)]]</span>
+                <span>
+                  [[_withDefault(pd.reference_number)]]
+                  <paper-tooltip>[[pd.title]]</paper-tooltip>
+                </span>
               </template>
-              <paper-tooltip>[[pd.title]]</paper-tooltip>
             </div>
             <div class="table-cell table-cell--text">
               [[_withDefault(pd.status)]]
