@@ -3,8 +3,10 @@ import operator
 from functools import reduce
 
 from django.db.models import Q, F
+from django.contrib.gis.db.models.functions import AsGeoJSON
 
 from rest_framework import serializers
+from rest_framework_gis.fields import GeometryField, GeoJsonDict
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
 
 from core.common import OVERALL_STATUS, PARTNER_PROJECT_STATUS, CLUSTER_TYPE_NAME_DICT
@@ -359,12 +361,19 @@ class PartnerAnalysisSummarySerializer(serializers.ModelSerializer):
         return id_list
 
 
-class OperationalPresenceLocationListSerializer(GeoFeatureModelSerializer):
+class OperationalPresenceLocationListSerializer(serializers.ModelSerializer):
     partners = serializers.SerializerMethodField()
+    geom = serializers.SerializerMethodField()
+
+    def get_geom(self, obj):
+        if hasattr(obj, 'json'):
+            return GeoJsonDict(obj.json)
+        else:
+            return GeoJsonDict(obj.geojson)
 
     def get_partners(self, obj):
         partners = Partner.objects.filter(
-            clusters__response_plan__workspace__countries__locations=obj) \
+            clusters__response_plan__workspace__countries__gateway_types__locations=obj) \
             .distinct() \
             .values_list('title', flat=True)
 
