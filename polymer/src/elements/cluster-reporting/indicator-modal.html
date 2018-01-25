@@ -89,7 +89,7 @@
         opened="{{opened}}">
 
       <div class="header layout horizontal justified">
-        <h2>Add Indicator</h2>
+        <h2>[[modalTitle]]</h2>
 
         <paper-icon-button
             class="self-center"
@@ -242,6 +242,7 @@
                   on-input="_validate"
                   value="{{data.baseline}}"
                   type="number"
+                  allowed-pattern="[+\-\d]"
                   always-float-label>
                 </paper-input>
               </div>
@@ -253,6 +254,7 @@
                   on-input="_validate"
                   value="{{data.target}}"
                   type="number"
+                  allowed-pattern="[+\-\d]"
                   always-float-label>
                 </paper-input>
               </div>
@@ -268,6 +270,7 @@
                   on-input="_validate"
                   value="{{data.in_need}}"
                   type="number"
+                  allowed-pattern="[+\-\d]"
                   always-float-label>
                 </paper-input>
               </div>
@@ -318,7 +321,7 @@
 
   <script>
     Polymer({
-      id: 'indicator-modal',
+      is: 'indicator-modal',
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
@@ -340,6 +343,8 @@
         baseline: Number,
 
         target: Number,
+
+        modalTitle: String,
 
         responsePlanId: {
           type: String,
