@@ -2,7 +2,6 @@
 <link rel="import" href="../../../bower_components/iron-collapse/iron-collapse.html">
 <link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
-<link rel="import" href="../../../bower_components/etools-content-panel/etools-content-panel.html">
 <link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
 <link rel="import" href="../../polyfills/es6-shim.html">
@@ -25,19 +24,18 @@
     <style include="iron-flex iron-flex-factors">
       :host {
         display: block;
-        margin-bottom: 25px;
-
-        --ecp-content: {
-          padding: 0;
-        };
 
         --paper-icon-button: {
           color: var(--theme-secondary-text-color);
         };
       }
 
-      reportable-meta {
+      .header {
         padding: 25px;
+      }
+
+      labelled-item {
+        margin-bottom: 25px;
       }
 
       .indicator:not(:last-child) {
@@ -112,127 +110,128 @@
         method="patch">
     </etools-prp-ajax>
 
-    <etools-content-panel panel-title="[[data.title]]">
-      <div class="header">
-        <template
-            is="dom-if"
-            if="[[showMeta]]">
-          <reportable-meta
-              data="[[reportableData]]"
-              mode="[[computedMode]]">
-          </reportable-meta>
-        </template>
-      </div>
+    <div class="header">
+      <labelled-item label="Title">[[data.title]]</labelled-item>
 
       <template
-          id="indicators"
-          is="dom-repeat"
-          items="[[data.indicator_reports]]"
-          as="indicator">
-        <div class="indicator">
-          <div class="layout horizontal">
-            <div
-                class="indicator-toggle flex-none layout horizontal center-center"
-                on-tap="_toggle"
-                toggles="[[index]]"
-                role="button"
-                aria-expanded$="[[indicator.opened]]"
-                aria-controls$="collapse-[[index]]"
-                tabindex="-1">
-              <iron-icon
-                  icon="icons:expand-[[_computeIcon(indicator.opened)]]">
-              </iron-icon>
-            </div>
+          is="dom-if"
+          if="[[showMeta]]">
+        <reportable-meta
+            data="[[reportableData]]"
+            mode="[[computedMode]]">
+        </reportable-meta>
+      </template>
+    </div>
 
-            <div class="indicator-header flex layout horizontal">
-              <div class="indicator-header__title flex-3 layout vertical center-justified">
-                <div class="layout horizontal">
-                  <div class="status-badge layout vertical center-justified">
-                    <report-status
-                        status="[[indicator.report_status]]"
-                        no-label>
-                    </report-status>
-                  </div>
-                  <div>
-                    <h3>[[indicator.reportable.blueprint.title]]</h3>
-
-                    <dl class="layout horizontal">
-                      <dt>Calculation method:</dt>
-                      <dd>[[indicator.reportable.blueprint.calculation_formula_across_locations]]</dd>
-                    </dl>
-                  </div>
-                </div>
-              </div>
-              <div class="indicator-header__target flex-none layout vertical center-justified">
-                <dl class="layout horizontal justified">
-                  <dt class="flex-3">Target:</dt>
-                  <dd class="flex">
-                    <template
-                        is="dom-if"
-                        if="[[_equals(indicator.reportable.blueprint.display_type, 'number')]]"
-                        restamp="true">
-                      <etools-prp-number value="[[indicator.reportable.target]]"></etools-prp-number>
-                    </template>
-                    <template
-                        is="dom-if"
-                        if="[[_equals(indicator.reportable.blueprint.display_type, 'percentage')]]"
-                        restamp="true">
-                      [[_toPercentage(indicator.reportable.target)]]
-                    </template>
-                  </dd>
-                </dl>
-                <dl class="layout horizontal justified">
-                  <dt class="flex-3">Total cumulative progress:</dt>
-                  <template
-                      is="dom-if"
-                      if="[[_equals(indicator.reportable.blueprint.display_type, 'number')]]"
-                      restamp="true">
-                    <dd class="flex">
-                      <etools-prp-number value="[[indicator.reportable.achieved.v]]"></etools-prp-number>
-                    </dd>
-                  </template>
-                  <template
-                      is="dom-if"
-                      if="[[_equals(indicator.reportable.blueprint.display_type, 'percentage')]]"
-                      restamp="true">
-                    <dd class="flex">[[_toPercentage(indicator.reportable.achieved.c)]]</dd>
-                  </template>
-                </dl>
-                <dl class="layout horizontal justified">
-                  <dt class="flex-3">Achievement in reporting period:</dt>
-                  <template
-                      is="dom-if"
-                      if="[[_equals(indicator.reportable.blueprint.display_type, 'number')]]"
-                      restamp="true">
-                    <dd class="flex">[[_withDefault(indicator.total.v)]]</dd>
-                  </template>
-                  <template
-                      is="dom-if"
-                      if="[[_equals(indicator.reportable.blueprint.display_type, 'percentage')]]"
-                      restamp="true">
-                    <dd class="flex">[[_toPercentage(indicator.total.c)]]</dd>
-                  </template>
-                </dl>
-              </div>
-            </div>
+    <template
+        id="indicators"
+        is="dom-repeat"
+        items="[[data.indicator_reports]]"
+        as="indicator">
+      <div class="indicator">
+        <div class="layout horizontal">
+          <div
+              class="indicator-toggle flex-none layout horizontal center-center"
+              on-tap="_toggle"
+              toggles="[[index]]"
+              role="button"
+              aria-expanded$="[[indicator.opened]]"
+              aria-controls$="collapse-[[index]]"
+              tabindex="-1">
+            <iron-icon
+                icon="icons:expand-[[_computeIcon(indicator.opened)]]">
+            </iron-icon>
           </div>
 
-          <iron-collapse
-              id="collapse-[[index]]"
-              opened="{{indicator.opened}}"
-              on-opened-changed="_handleOpenedChanged"
-              no-animation>
-            <indicator-details
-                reportable-id="[[data.id]]"
-                indicator-name="[[indicator.reportable.blueprint.title]]"
-                indicator-id="[[indicator.id]]"
-                reporting-period="[[currentReport.reporting_period]]"
-                override-mode="[[computedMode]]">
-            </indicator-details>
-          </iron-collapse>
+          <div class="indicator-header flex layout horizontal">
+            <div class="indicator-header__title flex-3 layout vertical center-justified">
+              <div class="layout horizontal">
+                <div class="status-badge layout vertical center-justified">
+                  <report-status
+                      status="[[indicator.report_status]]"
+                      no-label>
+                  </report-status>
+                </div>
+                <div>
+                  <h3>[[indicator.reportable.blueprint.title]]</h3>
+
+                  <dl class="layout horizontal">
+                    <dt>Calculation method:</dt>
+                    <dd>[[indicator.reportable.blueprint.calculation_formula_across_locations]]</dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+            <div class="indicator-header__target flex-none layout vertical center-justified">
+              <dl class="layout horizontal justified">
+                <dt class="flex-3">Target:</dt>
+                <dd class="flex">
+                  <template
+                      is="dom-if"
+                      if="[[_equals(indicator.reportable.blueprint.display_type, 'number')]]"
+                      restamp="true">
+                    <etools-prp-number value="[[indicator.reportable.target]]"></etools-prp-number>
+                  </template>
+                  <template
+                      is="dom-if"
+                      if="[[_equals(indicator.reportable.blueprint.display_type, 'percentage')]]"
+                      restamp="true">
+                    [[_toPercentage(indicator.reportable.target)]]
+                  </template>
+                </dd>
+              </dl>
+              <dl class="layout horizontal justified">
+                <dt class="flex-3">Total cumulative progress:</dt>
+                <template
+                    is="dom-if"
+                    if="[[_equals(indicator.reportable.blueprint.display_type, 'number')]]"
+                    restamp="true">
+                  <dd class="flex">
+                    <etools-prp-number value="[[indicator.reportable.achieved.v]]"></etools-prp-number>
+                  </dd>
+                </template>
+                <template
+                    is="dom-if"
+                    if="[[_equals(indicator.reportable.blueprint.display_type, 'percentage')]]"
+                    restamp="true">
+                  <dd class="flex">[[_toPercentage(indicator.reportable.achieved.c)]]</dd>
+                </template>
+              </dl>
+              <dl class="layout horizontal justified">
+                <dt class="flex-3">Achievement in reporting period:</dt>
+                <template
+                    is="dom-if"
+                    if="[[_equals(indicator.reportable.blueprint.display_type, 'number')]]"
+                    restamp="true">
+                  <dd class="flex">[[_withDefault(indicator.total.v)]]</dd>
+                </template>
+                <template
+                    is="dom-if"
+                    if="[[_equals(indicator.reportable.blueprint.display_type, 'percentage')]]"
+                    restamp="true">
+                  <dd class="flex">[[_toPercentage(indicator.total.c)]]</dd>
+                </template>
+              </dl>
+            </div>
+          </div>
         </div>
-      </template>
-    </etools-content-panel>
+
+        <iron-collapse
+            id="collapse-[[index]]"
+            opened="{{indicator.opened}}"
+            on-opened-changed="_handleOpenedChanged"
+            no-animation>
+          <indicator-details
+              reportable-id="[[data.id]]"
+              indicator-name="[[indicator.reportable.blueprint.title]]"
+              indicator-id="[[indicator.id]]"
+              reporting-period="[[currentReport.reporting_period]]"
+              override-mode="[[computedMode]]">
+          </indicator-details>
+        </iron-collapse>
+      </div>
+    </template>
+
   </template>
 
   <script>
