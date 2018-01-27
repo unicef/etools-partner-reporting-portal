@@ -692,52 +692,60 @@ class OperationalPresenceLocationListAPIView(ListAPIView):
     lookup_field = lookup_url_kwarg = 'response_plan_id'
 
     def get_queryset(self):
-        # response_plan = get_object_or_404(
-        #     ResponsePlan,
-        #     id=self.kwargs.get(self.lookup_field))
-        #
-        # filter_parameters = {
-        #     'clusters': self.request.GET.get('clusters', None),
-        #     'cluster_objectives': self.request.GET.get('cluster_objectives', None),
-        #     'partner_types': self.request.GET.get('partner_types', None),
-        #     'loc_type': self.request.GET.get('loc_type', '1'),
-        #     'locs': self.request.GET.get('locs', None),
-        # }
-        #
-        # workspace = response_plan.workspace
-        #
-        # clusters = Cluster.objects.filter(response_plan=response_plan)
-        #
-        # if filter_parameters['clusters']:
-        #     clusters = clusters.filter(id__in=map(lambda x: int(x), filter_parameters['clusters'].split(',')))
-        #
-        # objectives = ClusterObjective.objects.filter(cluster__in=clusters)
-        #
-        # if filter_parameters['cluster_objectives']:
-        #     objectives = objectives.filter(id__in=map(lambda x: int(x), filter_parameters['cluster_objectives'].split(',')))
-        #
-        # partner_types = clusters.values_list('partners__partner_type', flat=True).distinct()
-        #
-        # if filter_parameters['partner_types']:
-        #     partner_types = partner_types.filter(id__in=map(lambda x: int(x), filter_parameters['partner_types'].split(',')))
-        #
-        # result = Location.objects.filter(
-        #     Q(gateway__country__workspace__response_plans__clusters=clusters)
-        #     & Q(cluster_objectives=objectives)
-        #     & Q(gateway__country__workspace__response_plans__clusters__partners__partner_type=partner_types)
-        # )
-        #
-        # # if filter_parameters['loc_type'] and filter_parameters['locs']:
-        # #     result.filter(gateway_type__in=workspace)
-        #
-        # result = result.filter(
-        #     Q(gateway__admin_level=int(filter_parameters['loc_type']))
-        #     & Q(gateway__country__workspace=workspace)
-        # )
-        #
-        # if filter_parameters['locs']:
-        #     result = result.filter(id__in=map(lambda x: int(x), filter_parameters['locs'].split(',')))
-        #
-        # return result.distinct()
+        response_plan = get_object_or_404(
+            ResponsePlan,
+            id=self.kwargs.get(self.lookup_field))
 
-        return Location.objects.annotate(json=AsGeoJSON('geom', precision=3)).filter(gateway__admin_level=4, gateway__country__name="Pakistan")
+        filter_parameters = {
+            'clusters': self.request.GET.get('clusters', None),
+            'cluster_objectives': self.request.GET.get('cluster_objectives', None),
+            'partner_types': self.request.GET.get('partner_types', None),
+            'loc_type': self.request.GET.get('loc_type', '1'),
+            'locs': self.request.GET.get('locs', None),
+            'narrow_down_locs': self.request.GET.get('narrow_down_locs', None),
+        }
+
+        workspace = response_plan.workspace
+
+        loc_ids = list()
+
+        clusters = Cluster.objects.filter(response_plan=response_plan)
+
+        if filter_parameters['clusters']:
+            clusters = clusters.filter(id__in=map(lambda x: int(x), filter_parameters['clusters'].split(',')))
+
+        cluster_loc = Location.objects.filter(gateway__country__workspaces__response_plans__clusters__in=clusters).distinct().values_list('id', flat=True)
+
+        objectives = ClusterObjective.objects.filter(cluster__in=clusters)
+
+        if filter_parameters['cluster_objectives']:
+            objectives = objectives.filter(id__in=map(lambda x: int(x), filter_parameters['cluster_objectives'].split(',')))
+
+        cluster_obj_loc = Location.objects.filter(gateway__country__workspaces__response_plans__clusters__cluster_objectives__in=objectives).distinct().values_list('id', flat=True)
+
+        if filter_parameters['partner_types']:
+            partner_types = filter_parameters['partner_types'].split(',')
+
+        else:
+            partner_types = list(clusters.values_list('partners__partner_type', flat=True).distinct())
+
+        partner_types_loc = Location.objects.filter(gateway__country__workspaces__response_plans__clusters__partners__partner_type__in=partner_types).distinct().values_list('id', flat=True)
+
+        loc_ids.extend(list(cluster_loc))
+        loc_ids.extend(list(cluster_obj_loc))
+        loc_ids.extend(list(partner_types_loc))
+        loc_ids = set(loc_ids)
+
+        result = Location.objects.filter(id__in=loc_ids)
+
+        # if filter_parameters['loc_type'] and filter_parameters['locs']:
+        #     result.filter(gateway_type__in=workspace)
+
+        result = result.filter(
+            gateway__admin_level=int(filter_parameters['loc_type'])
+        )
+
+        if filter_parameters['locs']:
+            result = result.filter(id__in=map(lambda x: int(x), filter_parameters['locs'].split(',')))
+
+        return result.annotate(json=AsGeoJSON('geom', precision=3))

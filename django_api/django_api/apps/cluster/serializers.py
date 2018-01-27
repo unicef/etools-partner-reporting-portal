@@ -366,10 +366,21 @@ class OperationalPresenceLocationListSerializer(serializers.ModelSerializer):
     geom = serializers.SerializerMethodField()
 
     def get_geom(self, obj):
+        # Simplified geoJSON data
         if hasattr(obj, 'json'):
-            return GeoJsonDict(obj.json)
+            if obj.json:
+                return GeoJsonDict(obj.json)
+            elif obj.point:
+                # Warning: This object only has point coordinates
+                return GeoJsonDict(obj.point.geojson)
+
+        # Original geoJSON data
         else:
-            return GeoJsonDict(obj.geojson)
+            if obj.geom:
+                return GeoJsonDict(obj.geom.geojson)
+            elif obj.point:
+                # Warning: This object only has point coordinates
+                return GeoJsonDict(obj.point.geojson)
 
     def get_partners(self, obj):
         partners = Partner.objects.filter(
