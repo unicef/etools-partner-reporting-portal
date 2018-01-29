@@ -702,13 +702,11 @@ class OperationalPresenceLocationListAPIView(ListAPIView):
             'partner_types': self.request.GET.get('partner_types', None),
             'loc_type': self.request.GET.get('loc_type', '1'),
             'locs': self.request.GET.get('locs', None),
-            'narrow_down_locs': self.request.GET.get('narrow_down_locs', None),
+            'narrow_loc_type': self.request.GET.get('narrow_loc_type', None),
         }
 
-        workspace = response_plan.workspace
-
         loc_ids = list()
-
+        workspace = response_plan.workspace
         clusters = Cluster.objects.filter(response_plan=response_plan)
 
         if filter_parameters['clusters']:
@@ -738,14 +736,21 @@ class OperationalPresenceLocationListAPIView(ListAPIView):
 
         result = Location.objects.filter(id__in=loc_ids)
 
-        # if filter_parameters['loc_type'] and filter_parameters['locs']:
-        #     result.filter(gateway_type__in=workspace)
+        if filter_parameters['loc_type'] and filter_parameters['locs'] \
+            and filter_parameters['narrow_loc_type']:
+            final_result = Location.objects.filter(
+                Q(parent__id__in=map(lambda x: int(x), filter_parameters['locs'].split(','))),
+                | Q(parent__parent__id__in=map(lambda x: int(x), filter_parameters['locs'].split(',')))
+                | Q(parent__parent__parent__id__in=map(lambda x: int(x), filter_parameters['locs'].split(',')))
+                | Q(gateway__admin_level=int(filter_parameters['narrow_loc_type'])),
+            )
 
-        result = result.filter(
-            gateway__admin_level=int(filter_parameters['loc_type'])
-        )
+        else:
+            final_result = result.filter(
+                gateway__admin_level=int(filter_parameters['loc_type'])
+            )
 
-        if filter_parameters['locs']:
-            result = result.filter(id__in=map(lambda x: int(x), filter_parameters['locs'].split(',')))
+            if filter_parameters['locs']:
+                final_result = final_result.filter(id__in=map(lambda x: int(x), filter_parameters['locs'].split(',')))
 
-        return result.annotate(json=AsGeoJSON('geom', precision=3))
+        return final_result.annotate(json=AsGeoJSON('geom', precision=3))
