@@ -569,6 +569,14 @@ class ProgressReportAttachmentSerializer(serializers.ModelSerializer):
     def get_size(self, obj):
         return obj.attachment.size if obj.attachment else None
 
+    def to_representation(self, instance):
+        representation = super(ProgressReportAttachmentSerializer, self).to_representation(instance)
+
+        if "http" not in instance.attachment.url:
+            representation['path'] = settings.WWW_ROOT[:-1] + instance.attachment.url
+
+        return representation
+
     class Meta:
         model = ProgressReport
         fields = (
