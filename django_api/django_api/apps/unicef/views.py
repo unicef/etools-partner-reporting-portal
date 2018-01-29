@@ -714,7 +714,7 @@ class ProgressReportAttachmentAPIView(APIView):
                 many=True)
             return Response(serializer.data, status=statuses.HTTP_200_OK)
         else:
-            return HttpResponseNotFound()
+            return Response({"message": "Attachment does not exist."}, status=statuses.HTTP_404_NOT_FOUND)
 
     @transaction.atomic
     def delete(self, request, workspace_id, progress_report_id):
@@ -726,10 +726,11 @@ class ProgressReportAttachmentAPIView(APIView):
         if pr.attachment:
             try:
                 pr.attachment.delete()
+                return Response({}, status=statuses.HTTP_204_NO_CONTENT)
             except ValueError:
                 pass
-
-        return Response({}, status=statuses.HTTP_204_NO_CONTENT)
+        else:
+            return Response({"message": "Attachment does not exist."}, status=statuses.HTTP_404_NOT_FOUND)
 
     @transaction.atomic
     def put(self, request, workspace_id, progress_report_id):
