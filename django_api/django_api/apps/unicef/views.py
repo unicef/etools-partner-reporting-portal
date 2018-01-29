@@ -707,7 +707,12 @@ class ProgressReportAttachmentAPIView(APIView):
             programme_document__workspace_id=workspace_id)
 
         if pr.attachment:
-            return HttpResponseRedirect(pr.attachment.url)
+            serializer = ProgressReportAttachmentSerializer(
+                ProgressReport.objects.filter(
+                    id=progress_report_id,
+                    programme_document__workspace_id=workspace_id),
+                many=True)
+            return Response(serializer.data, status=statuses.HTTP_200_OK)
         else:
             return HttpResponseNotFound()
 
@@ -733,20 +738,23 @@ class ProgressReportAttachmentAPIView(APIView):
             id=progress_report_id,
             programme_document__workspace_id=workspace_id)
 
-        if pr.attachment:
-            try:
-                pr.attachment.delete()
-            except ValueError:
-                pass
-
         serializer = ProgressReportAttachmentSerializer(
             instance=pr,
             data=request.data
         )
 
         if serializer.is_valid():
+            if pr.attachment:
+                try:
+                    pr.attachment.delete()
+                except ValueError:
+                    pass
+
             serializer.save()
-            return Response(serializer.data, status=statuses.HTTP_200_OK)
+            return Response(ProgressReportAttachmentSerializer(
+                ProgressReport.objects.filter(id=progress_report_id,
+                programme_document__workspace_id=workspace_id),
+                many=True).data, status=statuses.HTTP_200_OK)
 
         else:
             return Response({"errors": serializer.errors},

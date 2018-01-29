@@ -560,6 +560,10 @@ class PMPPDResultLinkSerializer(serializers.ModelSerializer):
 
 class ProgressReportAttachmentSerializer(serializers.ModelSerializer):
     size = serializers.SerializerMethodField()
+    name = serializers.SerializerMethodField()
+
+    def get_name(self, obj):
+        return obj.attachment.name.split('/')[-1] if obj.attachment else None
 
     def get_size(self, obj):
         return obj.attachment.size if obj.attachment else None
@@ -568,5 +572,6 @@ class ProgressReportAttachmentSerializer(serializers.ModelSerializer):
         model = ProgressReport
         fields = (
             'attachment',
-            'size'
+            'size',
+            'name'
         )
