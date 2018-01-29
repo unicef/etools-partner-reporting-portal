@@ -712,6 +712,21 @@ class ProgressReportAttachmentAPIView(APIView):
             return HttpResponseNotFound()
 
     @transaction.atomic
+    def delete(self, request, workspace_id, progress_report_id):
+        pr = get_object_or_404(
+            ProgressReport,
+            id=progress_report_id,
+            programme_document__workspace_id=workspace_id)
+
+        if pr.attachment:
+            try:
+                pr.attachment.delete()
+            except ValueError:
+                pass
+
+        return Response({}, status=statuses.HTTP_204_NO_CONTENT)
+
+    @transaction.atomic
     def put(self, request, workspace_id, progress_report_id):
         pr = get_object_or_404(
             ProgressReport,
