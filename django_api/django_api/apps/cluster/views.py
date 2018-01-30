@@ -7,7 +7,8 @@ from django.shortcuts import get_object_or_404
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveAPIView
+from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveAPIView, GenericAPIView
+from rest_framework.mixins import ListModelMixin
 from rest_framework import status as statuses, serializers
 
 import django_filters
@@ -674,7 +675,7 @@ class PartnerAnalysisIndicatorResultAPIView(APIView):
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
 
-class OperationalPresenceLocationListAPIView(ListAPIView):
+class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
     """
     Locations for Clusters in a ResponsePlan as geoJSON list - GET
     Authentication required.
@@ -690,6 +691,12 @@ class OperationalPresenceLocationListAPIView(ListAPIView):
     permission_classes = (IsAuthenticated, )
     serializer_class = OperationalPresenceLocationListSerializer
     lookup_field = lookup_url_kwarg = 'response_plan_id'
+
+    def get(self, request, response_plan_id):
+        if request.GET['narrow_loc_type'] and int(request.GET['narrow_loc_type']) < int(request.GET['loc_type']):
+            return Response({"message": "narrow_loc_type cannot be higher than loc_type."}, status=statuses.HTTP_400_BAD_REQUEST)
+
+        return self.list(request, response_plan_id)
 
     def get_queryset(self):
         response_plan = get_object_or_404(
@@ -739,10 +746,10 @@ class OperationalPresenceLocationListAPIView(ListAPIView):
         if filter_parameters['loc_type'] and filter_parameters['locs'] \
             and filter_parameters['narrow_loc_type']:
             final_result = Location.objects.filter(
-                Q(parent__id__in=map(lambda x: int(x), filter_parameters['locs'].split(','))),
+                Q(parent__parent__parent__id__in=map(lambda x: int(x), filter_parameters['locs'].split(',')))
                 | Q(parent__parent__id__in=map(lambda x: int(x), filter_parameters['locs'].split(',')))
-                | Q(parent__parent__parent__id__in=map(lambda x: int(x), filter_parameters['locs'].split(',')))
-                | Q(gateway__admin_level=int(filter_parameters['narrow_loc_type'])),
+                | Q(parent__id__in=map(lambda x: int(x), filter_parameters['locs'].split(',')))
+                | Q(gateway__admin_level=int(filter_parameters['narrow_loc_type']))
             )
 
         else:
