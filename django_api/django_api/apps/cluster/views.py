@@ -675,6 +675,82 @@ class PartnerAnalysisIndicatorResultAPIView(APIView):
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
 
+class OperationalPresenceAggregationDataAPIView(APIView):
+    """
+    Aggregation Data for Clusters in a ResponsePlan - GET
+    Authentication required.
+
+    Can be filtered using Cluster, Cluster objective, Partner type, Location type, and Location IDs
+
+    Parameters:
+    - response_plan_id - Response plan ID
+
+    Returns:
+        - GET method - OperationalPresenceAggregationDataSerializer object.
+    """
+    permission_classes = (IsAuthenticated, )
+
+    def query_data(self, response_plan_id):
+        response_plan = get_object_or_404(
+            ResponsePlan,
+            id=response_plan_id)
+
+        filter_parameters = {
+            'clusters': self.request.GET.get('clusters', None),
+            'cluster_objectives': self.request.GET.get('cluster_objectives', None),
+            'partner_types': self.request.GET.get('partner_types', None),
+            'loc_type': self.request.GET.get('loc_type', '1'),
+            'locs': self.request.GET.get('locs', None),
+            'narrow_loc_type': self.request.GET.get('narrow_loc_type', None),
+        }
+
+        response_data = {
+            "clusters": None,
+            "num_of_clusters": None,
+            "num_of_partners": None,
+            "num_of_partners_per_type": None,
+            "num_of_partners_per_cluster": None,
+            "num_of_partners_per_cluster_objective": None,
+        }
+
+        workspace = response_plan.workspace
+        clusters = Cluster.objects.filter(response_plan=response_plan)
+
+        if filter_parameters['clusters']:
+            clusters = clusters.filter(id__in=map(lambda x: int(x), filter_parameters['clusters'].split(',')))
+
+        response_data["clusters"] = ClusterSimpleSerializer(clusters.distinct(), many=True).data
+
+        objectives = ClusterObjective.objects.filter(cluster__in=clusters)
+
+        if filter_parameters['cluster_objectives']:
+            objectives = objectives.filter(
+                id__in=map(lambda x: int(x), filter_parameters['cluster_objectives'].split(','))
+            )
+
+        if filter_parameters['partner_types']:
+            partner_types = filter_parameters['partner_types'].split(',')
+
+        else:
+            partner_types = list(clusters.values_list('partners__partner_type', flat=True).distinct())
+
+        partners = Partner.objects.filter(partner_type__in=partner_types, clusters=clusters).distinct()
+
+        response_data["num_of_clusters"] = partners.count()
+
+        return response_data
+
+    def get(self, request, response_plan_id):
+        if self.request.GET.get('narrow_loc_type', None):
+            if int(self.request.GET.get('narrow_loc_type', None)) <= int(self.request.GET.get('loc_type', None)):
+                return Response({"message": "narrow_loc_type cannot be equal or higher than loc_type."}, status=statuses.HTTP_400_BAD_REQUEST)
+
+            if int(self.request.GET.get('narrow_loc_type', None)) - 1 != int(self.request.GET.get('loc_type', None)):
+                return Response({"message": "narrow_loc_type can only be looked up one parent level above than loc_type. (e.g loc_type=1 AND narrow_loc_type=2)"}, status=statuses.HTTP_400_BAD_REQUEST)
+
+        return Response(self.query_data(response_plan_id))
+
+
 class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
     """
     Locations for Clusters in a ResponsePlan as geoJSON list - GET
