@@ -14,6 +14,7 @@
 <link rel="import" href="../labelled-item.html">
 <link rel="import" href="../etools-prp-ajax.html">
 <link rel="import" href="../etools-prp-permissions.html">
+<link rel="import" href="../ip-reporting/report-attachments.html">
 
 <dom-module id="pd-report-info">
   <template>
@@ -127,6 +128,12 @@
               </paper-input-container>
             </template>
           </labelled-item>
+        </div>
+
+        <div class="row">
+          <report-attachments
+              readonly="[[_equals(computedMode, 'view')]]">
+          </report-attachments>
         </div>
       </div>
     </etools-content-panel>

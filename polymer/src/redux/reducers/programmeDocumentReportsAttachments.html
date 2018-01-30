@@ -1,0 +1,74 @@
+<link rel="import" href="../redux.html">
+<link rel="import" href="../../constants.html">
+<link rel="import" href="../../polyfills/es6-shim.html">
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Reducers = App.Reducers || {};
+
+    App.Reducers.ProgrammeDocumentReportsAttachments = Redux.combineReducers({
+      byReport: attachmentsByReportReducer,
+      pendingByReport: attachmentsPendingByReportReducer,
+    });
+
+    function attachmentsByReportReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = {};
+      }
+
+      switch (action.type) {
+        case App.Constants.SET_PD_REPORT_ATTACHMENTS:
+          return (function () {
+            var change = {};
+
+            change[action.reportId] = action.data;
+
+            return Object.assign({}, state, change);
+          }());
+
+        case App.Constants.CLEAR_PD_REPORT_ATTACHMENTS:
+          return (function () {
+            var change = {};
+
+            change[action.reportId] = [];
+
+            return Object.assign({}, state, change);
+          }());
+
+        default:
+          return state;
+      }
+    }
+
+    function attachmentsPendingByReportReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = {};
+      }
+
+      switch (action.type) {
+        case App.Constants.PD_REPORT_ATTACHMENTS_LOADING_START:
+          return (function () {
+            var change = {};
+
+            change[action.reportId] = true;
+
+            return Object.assign({}, state, change);
+          }());
+
+        case App.Constants.PD_REPORT_ATTACHMENTS_LOADING_STOP:
+          return (function () {
+            var change = {};
+
+            change[action.reportId] = false;
+
+            return Object.assign({}, state, change);
+          }());
+
+        default:
+          return state;
+      }
+    }
+  }());
+</script>
