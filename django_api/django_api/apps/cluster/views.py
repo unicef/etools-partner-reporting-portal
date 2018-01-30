@@ -693,8 +693,12 @@ class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
     lookup_field = lookup_url_kwarg = 'response_plan_id'
 
     def get(self, request, response_plan_id):
-        if request.GET['narrow_loc_type'] and int(request.GET['narrow_loc_type']) < int(request.GET['loc_type']):
-            return Response({"message": "narrow_loc_type cannot be higher than loc_type."}, status=statuses.HTTP_400_BAD_REQUEST)
+        if self.request.GET.get('narrow_loc_type', None):
+            if int(self.request.GET.get('narrow_loc_type', None)) <= int(self.request.GET.get('loc_type', None)):
+            return Response({"message": "narrow_loc_type cannot be equal or higher than loc_type."}, status=statuses.HTTP_400_BAD_REQUEST)
+
+            if int(self.request.GET.get('narrow_loc_type', None)) - 1 != int(self.request.GET.get('loc_type', None)):
+                return Response({"message": "narrow_loc_type can only be looked up one parent level above than loc_type. (e.g loc_type=1 AND narrow_loc_type=2)"}, status=statuses.HTTP_400_BAD_REQUEST)
 
         return self.list(request, response_plan_id)
 
@@ -719,37 +723,33 @@ class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
         if filter_parameters['clusters']:
             clusters = clusters.filter(id__in=map(lambda x: int(x), filter_parameters['clusters'].split(',')))
 
-        cluster_loc = Location.objects.filter(gateway__country__workspaces__response_plans__clusters__in=clusters).distinct().values_list('id', flat=True)
-
-        loc_ids = list(cluster_loc)
+        objectives = ClusterObjective.objects.filter(cluster__in=clusters)
 
         if filter_parameters['cluster_objectives']:
-            objectives = ClusterObjective.objects.filter(
-                cluster__in=clusters,
+            objectives = objectives.filter(
                 id__in=map(lambda x: int(x), filter_parameters['cluster_objectives'].split(','))
             )
 
-            cluster_obj_loc = Location.objects.filter(gateway__country__workspaces__response_plans__clusters__cluster_objectives__in=objectives).distinct().values_list('id', flat=True)
-
-            loc_ids = list(cluster_obj_loc)
+        cluster_obj_loc = Location.objects.filter(gateway__country__workspaces__response_plans__clusters__cluster_objectives__in=objectives).distinct().values_list('id', flat=True)
 
         if filter_parameters['partner_types']:
             partner_types = filter_parameters['partner_types'].split(',')
 
-            partner_types_loc = cluster_obj_loc.filter(gateway__country__workspaces__response_plans__clusters__partners__partner_type__in=partner_types).distinct().values_list('id', flat=True)
+        else:
+            partner_types = list(cluster_obj_loc.values_list('gateway__country__workspaces__response_plans__clusters__partners__partner_type', flat=True).distinct())
 
-            loc_ids = list(partner_types_loc)
+        partner_types_loc = cluster_obj_loc.filter(gateway__country__workspaces__response_plans__clusters__partners__partner_type__in=partner_types).distinct().values_list('id', flat=True)
 
-        loc_ids = set(loc_ids)
-
+        loc_ids = set(list(partner_types_loc))
         result = Location.objects.filter(id__in=loc_ids)
 
         if filter_parameters['loc_type'] and filter_parameters['locs'] \
             and filter_parameters['narrow_loc_type']:
+            narrow_loc_type = int(filter_parameters['narrow_loc_type'])
+            parent_loc_q = None
+
             final_result = Location.objects.filter(
-                Q(parent__parent__parent__id__in=map(lambda x: int(x), filter_parameters['locs'].split(',')))
-                | Q(parent__parent__id__in=map(lambda x: int(x), filter_parameters['locs'].split(',')))
-                | Q(parent__id__in=map(lambda x: int(x), filter_parameters['locs'].split(',')))
+                Q(parent__id__in=map(lambda x: int(x), filter_parameters['locs'].split(',')))
                 | Q(gateway__admin_level=int(filter_parameters['narrow_loc_type']))
             )
 
