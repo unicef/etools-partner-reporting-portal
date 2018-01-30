@@ -712,7 +712,7 @@ class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
             'narrow_loc_type': self.request.GET.get('narrow_loc_type', None),
         }
 
-        loc_ids = list()
+        loc_ids = None
         workspace = response_plan.workspace
         clusters = Cluster.objects.filter(response_plan=response_plan)
 
@@ -721,24 +721,25 @@ class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
 
         cluster_loc = Location.objects.filter(gateway__country__workspaces__response_plans__clusters__in=clusters).distinct().values_list('id', flat=True)
 
-        objectives = ClusterObjective.objects.filter(cluster__in=clusters)
+        loc_ids = list(cluster_loc)
 
         if filter_parameters['cluster_objectives']:
-            objectives = objectives.filter(id__in=map(lambda x: int(x), filter_parameters['cluster_objectives'].split(',')))
+            objectives = ClusterObjective.objects.filter(
+                cluster__in=clusters,
+                id__in=map(lambda x: int(x), filter_parameters['cluster_objectives'].split(','))
+            )
 
-        cluster_obj_loc = Location.objects.filter(gateway__country__workspaces__response_plans__clusters__cluster_objectives__in=objectives).distinct().values_list('id', flat=True)
+            cluster_obj_loc = Location.objects.filter(gateway__country__workspaces__response_plans__clusters__cluster_objectives__in=objectives).distinct().values_list('id', flat=True)
+
+            loc_ids = list(cluster_obj_loc)
 
         if filter_parameters['partner_types']:
             partner_types = filter_parameters['partner_types'].split(',')
 
-        else:
-            partner_types = list(clusters.values_list('partners__partner_type', flat=True).distinct())
+            partner_types_loc = cluster_obj_loc.filter(gateway__country__workspaces__response_plans__clusters__partners__partner_type__in=partner_types).distinct().values_list('id', flat=True)
 
-        partner_types_loc = Location.objects.filter(gateway__country__workspaces__response_plans__clusters__partners__partner_type__in=partner_types).distinct().values_list('id', flat=True)
+            loc_ids = list(partner_types_loc)
 
-        loc_ids.extend(list(cluster_loc))
-        loc_ids.extend(list(cluster_obj_loc))
-        loc_ids.extend(list(partner_types_loc))
         loc_ids = set(loc_ids)
 
         result = Location.objects.filter(id__in=loc_ids)
