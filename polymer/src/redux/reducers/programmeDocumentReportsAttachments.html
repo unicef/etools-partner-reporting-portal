@@ -13,6 +13,14 @@
       pendingByReport: attachmentsPendingByReportReducer,
     });
 
+    function updateForReport(state, reportId, newValue) {
+      var change = {};
+
+      change[reportId] = newValue;
+
+      return Object.assign({}, state, change);
+    }
+
     function attachmentsByReportReducer(state, action) {
       if (typeof state === 'undefined') {
         state = {};
@@ -20,22 +28,7 @@
 
       switch (action.type) {
         case App.Constants.SET_PD_REPORT_ATTACHMENTS:
-          return (function () {
-            var change = {};
-
-            change[action.reportId] = action.data;
-
-            return Object.assign({}, state, change);
-          }());
-
-        case App.Constants.CLEAR_PD_REPORT_ATTACHMENTS:
-          return (function () {
-            var change = {};
-
-            change[action.reportId] = [];
-
-            return Object.assign({}, state, change);
-          }());
+          return updateForReport(state, action.reportId, action.data);
 
         default:
           return state;
@@ -49,22 +42,10 @@
 
       switch (action.type) {
         case App.Constants.PD_REPORT_ATTACHMENTS_LOADING_START:
-          return (function () {
-            var change = {};
-
-            change[action.reportId] = true;
-
-            return Object.assign({}, state, change);
-          }());
+          return updateForReport(state, action.reportId, true);
 
         case App.Constants.PD_REPORT_ATTACHMENTS_LOADING_STOP:
-          return (function () {
-            var change = {};
-
-            change[action.reportId] = false;
-
-            return Object.assign({}, state, change);
-          }());
+          return updateForReport(state, action.reportId, false);
 
         default:
           return state;

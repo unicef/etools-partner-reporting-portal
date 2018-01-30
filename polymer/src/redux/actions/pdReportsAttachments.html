@@ -9,13 +9,6 @@
     App.Actions = App.Actions || {};
 
     App.Actions.PDReportsAttachments = {
-      clear: function (reportId) {
-        return {
-          type: App.Constants.CLEAR_PD_REPORT_ATTACHMENTS,
-          reportId: reportId,
-        };
-      },
-
       sync: function (attachmentsThunk, reportId) {
         return function (dispatch) {
           dispatch(App.Actions.PDReportsAttachments.loadingStart(reportId));
