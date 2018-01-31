@@ -40,6 +40,7 @@ from indicator.serializers import (
 from indicator.filters import PDReportsFilter
 from indicator.serializers import IndicatorBlueprintSimpleSerializer
 from partner.models import Partner
+from unicef.export_programme_documents import ProgrammeDocumentsXLSXExporter
 
 from .serializers import (
     ProgrammeDocumentSerializer,
@@ -79,22 +80,25 @@ class ProgrammeDocumentAPIView(ListAPIView):
 
     def get_queryset(self):
         return ProgrammeDocument.objects.filter(
-            partner=self.request.user.partner)
-
-    def list(self, request, workspace_id, *args, **kwargs):
-        queryset = self.get_queryset().filter(workspace=workspace_id)
-        filtered = ProgrammeDocumentFilter(request.GET, queryset=queryset)
-
-        page = self.paginate_queryset(filtered.qs)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(filtered.qs, many=True)
-        return Response(
-            serializer.data,
-            status=statuses.HTTP_200_OK
+            partner=self.request.user.partner, workspace=self.kwargs['workspace_id']
         )
+
+    def get(self, request, *args, **kwargs):
+        export = self.request.query_params.get("export")
+        if export == 'xlsx':
+            response = HttpResponse()
+            exporter = ProgrammeDocumentsXLSXExporter(
+                self.filter_queryset(self.get_queryset())
+            )
+            response.content_type = exporter.worksheet.mime_type
+            exporter.fill_worksheet()
+            with open(exporter.file_path, 'rb') as content:
+                response.write(content.read())
+            exporter.cleanup()
+            response['Content-Disposition'] = 'attachment; filename="{}"'.format(exporter.display_name)
+            return response
+
+        return super(ProgrammeDocumentAPIView, self).get(request, *args, **kwargs)
 
 
 class ProgrammeDocumentDetailsAPIView(RetrieveAPIView):

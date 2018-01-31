@@ -295,8 +295,9 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
 
     @property
     def funds_received_to_date_percentage(self):
-        return "%.0f" % (self.funds_received_to_date /
-                         self.budget) if self.budget > 0 else 0
+        return "%.0f" % (
+            self.funds_received_to_date / self.budget
+        ) if self.budget > 0 else 0
 
     @property
     def calculated_budget(self):
@@ -304,7 +305,6 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
             return self.__budget
 
         total = self.budget
-        consumed = None
 
         if not self.reportable_queryset.exists():
             self.__budget = ""
@@ -312,18 +312,6 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
         else:
             consumed = self.reportable_queryset.last().total
             consumed = consumed['c']
-
-        try:
-            percentage = Decimal(consumed) / Decimal(total)
-            percentage = int(percentage * 100)
-        except Exception as exp:
-            logger.exception({
-                "model": "ProgrammeDocument",
-                "def": 'calculated_budget',
-                "pk": self.id,
-                "exception": exp
-            })
-            percentage = 0
 
         self.__budget = "{total} ({consumed}%)".format(total=total,
                                                        consumed=consumed)
