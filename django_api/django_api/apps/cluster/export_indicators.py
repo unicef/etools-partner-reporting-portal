@@ -9,15 +9,16 @@ import itertools
 
 from indicator.models import Disaggregation, DisaggregationValue
 
-PATH = settings.BASE_DIR + "/apps/cluster/templates/excel/export.xlsx"
+PATH = settings.BASE_DIR + "/apps/cluster/templates/excel/indicators_export.xlsx"
 SAVE_PATH = settings.MEDIA_ROOT + '/'
 
 DISAGGREGATION_COLUMN_START = 44
 INDICATOR_DATA_ROW_START = 5
-MAXIMUM_DISSAGREGATIONS_PER_INDICATOR = 3
+MAXIMUM_DISAGGREGATIONS_PER_INDICATOR = 3
 
 
-class XLSXWriter:
+class IndicatorsXLSXExporter:
+
     def __init__(self, indicators, response_plan_id, analysis=False):
 
         self.wb = load_workbook(PATH)
@@ -612,7 +613,7 @@ class XLSXWriter:
         # disaggregation_types_length with r-length tuples and no repeated
         # elements
         disaggregation_types_list = list()
-        for i in range(MAXIMUM_DISSAGREGATIONS_PER_INDICATOR + 1):
+        for i in range(MAXIMUM_DISAGGREGATIONS_PER_INDICATOR + 1):
             disaggregation_types_list += list(
                 itertools.combinations(
                     disaggregation_types_base, i))
