@@ -39,7 +39,9 @@ class User(AbstractUser):
                                           help_text='These are the clusters this user will have IMO privileges over.')
 
     def __str__(self):
-        return "{} - User".format(self.get_fullname())
+        return '[{}] {} ({})'.format(
+            self.pk, self.get_fullname(), self.username
+        )
 
     def get_fullname(self):
         return "%s %s" % (self.first_name, self.last_name)
