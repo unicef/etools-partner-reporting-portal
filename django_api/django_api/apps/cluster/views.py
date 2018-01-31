@@ -734,13 +734,13 @@ class OperationalPresenceAggregationDataAPIView(APIView):
 
         response_data["clusters"] = ClusterSimpleSerializer(clusters.distinct(), many=True).data
         response_data["num_of_clusters"] = clusters.count()
-        response_data["num_of_partners"] = Partner.objects.filter(clusters=clusters).distinct().count()
+        response_data["num_of_partners"] = Partner.objects.filter(clusters__in=clusters).distinct().count()
         response_data["num_of_partners_per_type"] = {}
         response_data["num_of_partners_per_cluster"] = {}
         response_data["num_of_partners_per_cluster_objective"] = {}
 
         for partner_type in partner_types:
-            response_data["num_of_partners_per_type"][partner_type] = Partner.objects.filter(partner_type=partner_type, clusters=clusters).distinct().count()
+            response_data["num_of_partners_per_type"][partner_type] = Partner.objects.filter(partner_type=partner_type, clusters__in=clusters).distinct().count()
 
         for cluster in clusters:
             response_data["num_of_partners_per_cluster"][cluster.type] = cluster.partners.count()
