@@ -733,7 +733,8 @@ class OperationalPresenceAggregationDataAPIView(APIView):
             partner_types = list(clusters.values_list('partners__partner_type', flat=True).distinct())
 
         response_data["clusters"] = ClusterSimpleSerializer(clusters.distinct(), many=True).data
-        response_data["num_of_clusters"] = partners.count()
+        response_data["num_of_clusters"] = clusters.count()
+        response_data["num_of_partners"] = Partner.objects.filter(clusters=clusters).distinct().count()
         response_data["num_of_partners_per_type"] = {}
         response_data["num_of_partners_per_cluster"] = {}
         response_data["num_of_partners_per_cluster_objective"] = {}

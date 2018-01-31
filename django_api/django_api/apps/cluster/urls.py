@@ -16,6 +16,7 @@ from .views import (
     PartnerAnalysisSummaryAPIView,
     PartnerAnalysisIndicatorResultAPIView,
     OperationalPresenceLocationListAPIView,
+    OperationalPresenceAggregationDataAPIView,
 )
 
 
@@ -71,7 +72,11 @@ urlpatterns = [
         PartnerAnalysisIndicatorResultAPIView.as_view(),
         name="partner-analysis-indicator-result"),
 
-    url(r'^cluster-analysis/(?P<response_plan_id>\d+)/operational-presence/$',
+    url(r'^cluster-analysis/(?P<response_plan_id>\d+)/operational-presence/map$',
         OperationalPresenceLocationListAPIView.as_view(),
-        name="cluster-analysis-operational-presence"),
+        name="cluster-analysis-operational-presence-ma"),
+
+    url(r'^cluster-analysis/(?P<response_plan_id>\d+)/operational-presence/data$',
+        OperationalPresenceAggregationDataAPIView.as_view(),
+        name="cluster-analysis-operational-presence-aggregation-data"),
 ]
