@@ -91,6 +91,13 @@ def real_fixtures(area=False):
     local('docker-compose exec django_api python manage.py generate_real_data --clean_before %s' % ("--area %s --fast" % area if area else ""))
 
 
+def tests(test_path=''):
+    """
+    Run django_api tests.
+    """
+    local('docker-compose exec django_api python manage.py test {} --parallel --noinput'.format(test_path))
+
+
 def fake_users(fast=False):
     """
     Uses real sync with PMP API to get all data.
