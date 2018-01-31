@@ -719,8 +719,6 @@ class OperationalPresenceAggregationDataAPIView(APIView):
         if filter_parameters['clusters']:
             clusters = clusters.filter(id__in=map(lambda x: int(x), filter_parameters['clusters'].split(',')))
 
-        response_data["clusters"] = ClusterSimpleSerializer(clusters.distinct(), many=True).data
-
         objectives = ClusterObjective.objects.filter(cluster__in=clusters)
 
         if filter_parameters['cluster_objectives']:
@@ -734,9 +732,20 @@ class OperationalPresenceAggregationDataAPIView(APIView):
         else:
             partner_types = list(clusters.values_list('partners__partner_type', flat=True).distinct())
 
-        partners = Partner.objects.filter(partner_type__in=partner_types, clusters=clusters).distinct()
-
+        response_data["clusters"] = ClusterSimpleSerializer(clusters.distinct(), many=True).data
         response_data["num_of_clusters"] = partners.count()
+        response_data["num_of_partners_per_type"] = {}
+        response_data["num_of_partners_per_cluster"] = {}
+        response_data["num_of_partners_per_cluster_objective"] = {}
+
+        for partner_type in partner_types:
+            response_data["num_of_partners_per_type"][partner_type] = Partner.objects.filter(partner_type=partner_type, clusters=clusters).distinct().count()
+
+        for cluster in clusters:
+            response_data["num_of_partners_per_cluster"][cluster.type] = cluster.partners.count()
+
+        for objective in objectives:
+            response_data["num_of_partners_per_cluster_objective"][objective.title] = Partner.objects.filter(clusters__cluster_objectives=objective).distinct().count()
 
         return response_data
 
