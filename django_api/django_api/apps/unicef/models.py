@@ -336,13 +336,13 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
 
 def find_first_programme_document_id():
     try:
-        import pdb
-        pdb.set_trace()
         pd_id = ProgrammeDocument.objects.first().id
     except AttributeError:
         from core.factories import ProgrammeDocumentFactory
         pd = ProgrammeDocumentFactory()
         pd_id = pd.id
+
+        return pd_id
     else:
         return pd_id
 
