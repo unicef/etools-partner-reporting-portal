@@ -4,6 +4,7 @@ import os
 import tempfile
 
 from babel.numbers import format_currency
+from django.conf import settings
 from django.http import HttpResponse
 from django.utils import timezone
 from django.utils.translation import to_locale, get_language
@@ -144,8 +145,8 @@ class ProgrammeDocumentsPDFExporter:
             data_rows.append([
                 pd.title,
                 pd.get_status_display,
-                pd.start_date,
-                pd.end_date,
+                pd.start_date.strftime(settings.PRINT_DATA_FORMAT),
+                pd.end_date.strftime(settings.PRINT_DATA_FORMAT),
                 format_currency(pd.cso_contribution, pd.cso_contribution_currency, locale=locale),
                 format_currency(pd.total_unicef_cash, pd.total_unicef_cash_currency, locale=locale),
                 format_currency(pd.in_kind_amount, pd.in_kind_amount_currency, locale=locale),
