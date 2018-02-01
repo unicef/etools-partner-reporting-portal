@@ -44,7 +44,7 @@ class User(AbstractUser):
         )
 
     def get_fullname(self):
-        return "%s %s" % (self.first_name, self.last_name)
+        return ' '.join(filter(None, [self.first_name, self.last_name]))
 
     @cached_property
     def is_unicef(self):
