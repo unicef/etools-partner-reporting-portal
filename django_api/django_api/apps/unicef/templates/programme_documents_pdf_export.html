@@ -1,0 +1,58 @@
+{% extends "easy_pdf/base.html" %}
+{% load pdf_extras %}
+
+{% block extra_style %}
+    <style type="text/css">
+        @page {
+            size: a4 landscape;
+            margin: 1cm;
+        }
+
+        #pdf {
+            font-family: "Arial", "sans-serif";
+            font-size: 10px;
+        }
+
+        h1 {
+            font-family: "Arial", "sans-serif";
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        table, td, th {
+            border: 1px solid black;
+        }
+
+        td, th {
+            padding-top: 4px;
+            padding-bottom: 1px;
+            padding-left: 3px;
+        }
+
+        th {
+            background-color: #d9d9d9;
+            font-weight: normal;
+            text-align: left;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div id="pdf">
+        <h1>{{ title }}</h1>
+        <table>
+            <tr>
+                {% for header_text, percentage_width in headers %}
+                    <th width="{{ percentage_width }}%">{{ header_text }}</th>
+                {% endfor %}
+            </tr>
+            {% for row_data in data_rows %}
+                <tr>
+                    {% for cell_data in row_data %}
+                        <td>{{ cell_data }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endblock %}

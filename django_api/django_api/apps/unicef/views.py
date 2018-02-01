@@ -40,7 +40,8 @@ from indicator.serializers import (
 from indicator.filters import PDReportsFilter
 from indicator.serializers import IndicatorBlueprintSimpleSerializer
 from partner.models import Partner
-from unicef.export_programme_documents import ProgrammeDocumentsXLSXExporter
+from unicef.export_programme_documents import ProgrammeDocumentsXLSXExporter, ProgrammeDocumentsPDFExporter
+from utils.mixins import ListExportMixin
 
 from .serializers import (
     ProgrammeDocumentSerializer,
@@ -67,7 +68,7 @@ from .filters import (
 logger = logging.getLogger(__name__)
 
 
-class ProgrammeDocumentAPIView(ListAPIView):
+class ProgrammeDocumentAPIView(ListExportMixin, ListAPIView):
     """
     Endpoint for getting a list of Programme Documents and being able to
     filter by them.
@@ -77,20 +78,15 @@ class ProgrammeDocumentAPIView(ListAPIView):
     pagination_class = SmallPagination
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     filter_class = ProgrammeDocumentFilter
+    exporters = {
+        'xlsx': ProgrammeDocumentsXLSXExporter,
+        'pdf': ProgrammeDocumentsPDFExporter,
+    }
 
     def get_queryset(self):
         return ProgrammeDocument.objects.filter(
             partner=self.request.user.partner, workspace=self.kwargs['workspace_id']
         )
-
-    def get(self, request, *args, **kwargs):
-        export = self.request.query_params.get("export")
-        if export == 'xlsx':
-            return ProgrammeDocumentsXLSXExporter(
-                self.filter_queryset(self.get_queryset())
-            ).get_as_response()
-
-        return super(ProgrammeDocumentAPIView, self).get(request, *args, **kwargs)
 
 
 class ProgrammeDocumentDetailsAPIView(RetrieveAPIView):

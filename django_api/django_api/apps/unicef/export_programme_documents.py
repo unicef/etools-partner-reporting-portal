@@ -1,13 +1,21 @@
 import hashlib
+import logging
 import os
 import tempfile
 
+from babel.numbers import format_currency
 from django.http import HttpResponse
 from django.utils import timezone
+from django.utils.translation import to_locale, get_language
+from easy_pdf.exceptions import PDFRenderingError
+from easy_pdf.rendering import render_to_pdf, make_response
 from openpyxl import Workbook
 from openpyxl.styles import NamedStyle, Font, Alignment, PatternFill
 from openpyxl.styles.numbers import FORMAT_CURRENCY_USD, FORMAT_PERCENTAGE
 from openpyxl.utils import get_column_letter
+
+
+logger = logging.getLogger(__name__)
 
 
 class ProgrammeDocumentsXLSXExporter:
@@ -51,23 +59,22 @@ class ProgrammeDocumentsXLSXExporter:
             self.worksheet.column_dimensions[get_column_letter(column)].width = len(header_text) + 5
         current_row += 1
 
-        for programme_document in self.programme_documents:
-            if programme_document.budget:
-                funds_received_to_date_percentage = programme_document.funds_received_to_date / \
-                                                    programme_document.budget
+        for pd in self.programme_documents:
+            if pd.budget:
+                funds_received_to_date_percentage = pd.funds_received_to_date / pd.budget
             else:
                 funds_received_to_date_percentage = 0
 
             data_row = [
-                (programme_document.title, None),
-                (programme_document.get_status_display(), None),
-                (programme_document.start_date, None),
-                (programme_document.end_date, None),
-                (programme_document.cso_contribution, FORMAT_CURRENCY_USD),
-                (programme_document.total_unicef_cash, FORMAT_CURRENCY_USD),
-                (programme_document.in_kind_amount, FORMAT_CURRENCY_USD),
-                (programme_document.budget, FORMAT_CURRENCY_USD),
-                (programme_document.funds_received_to_date, FORMAT_CURRENCY_USD),
+                (pd.title, None),
+                (pd.get_status_display(), None),
+                (pd.start_date, None),
+                (pd.end_date, None),
+                (pd.cso_contribution, FORMAT_CURRENCY_USD),
+                (pd.total_unicef_cash, FORMAT_CURRENCY_USD),
+                (pd.in_kind_amount, FORMAT_CURRENCY_USD),
+                (pd.budget, FORMAT_CURRENCY_USD),
+                (pd.funds_received_to_date, FORMAT_CURRENCY_USD),
                 (funds_received_to_date_percentage, FORMAT_PERCENTAGE),
             ]
 
@@ -92,3 +99,71 @@ class ProgrammeDocumentsXLSXExporter:
 
     def cleanup(self):
         os.remove(self.file_path)
+
+
+class ProgrammeDocumentsPDFExporter:
+
+    template_name = 'programme_documents_pdf_export.html'
+
+    def __init__(self, programme_documents):
+        self.programme_documents = programme_documents
+        self.display_name = '[{:%a %-d %b %-H-%M-%S %Y}] {} Programme Document(s) Summary.pdf'.format(
+            timezone.now(), programme_documents.count()
+        )
+
+    def get_context(self):
+        context = {
+            'title': 'Programme Document(s) Summary',
+            'headers': [
+                ('PD/SSFA ToR ref. #', 20),
+                ('PD/SSFA status', 10),
+                ('Start date', 10),
+                ('End date', 10),
+                ('CSO contribution', 10),
+                ('UNICEF cash', 10),
+                ('UNICEF supplies', 10),
+                ('Planned Budget', 10),
+                ('Cash Transfers to Date (%)', 10),
+            ]
+        }
+
+        total_percentage_width = sum([h[1] for h in context['headers']])
+        if not total_percentage_width == 100:
+            raise Exception('Percentage widths must add up to 100, currently: {}'.format(total_percentage_width))
+
+        data_rows = []
+
+        locale = to_locale(get_language())
+
+        for pd in self.programme_documents:
+            if pd.budget:
+                funds_received_to_date_percentage = pd.funds_received_to_date / pd.budget
+            else:
+                funds_received_to_date_percentage = 0
+
+            data_rows.append([
+                pd.title,
+                pd.get_status_display,
+                pd.start_date,
+                pd.end_date,
+                format_currency(pd.cso_contribution, pd.cso_contribution_currency, locale=locale),
+                format_currency(pd.total_unicef_cash, pd.total_unicef_cash_currency, locale=locale),
+                format_currency(pd.in_kind_amount, pd.in_kind_amount_currency, locale=locale),
+                format_currency(pd.budget, pd.budget_currency, locale=locale),
+                '{} ({}%)'.format(
+                    format_currency(pd.funds_received_to_date, pd.funds_received_to_date_currency, locale=locale),
+                    int(round(funds_received_to_date_percentage * 100, 0)),
+                ),
+            ])
+
+        context['data_rows'] = data_rows
+
+        return context
+
+    def get_as_response(self):
+        try:
+            pdf = render_to_pdf(self.template_name, self.get_context())
+            return make_response(pdf, self.display_name)
+        except PDFRenderingError:
+            logger.exception('Error trying to render PDF')
+            return HttpResponse('Error trying to render PDF')

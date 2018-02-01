@@ -39,3 +39,18 @@ class CustomJSONWebTokenAuthentication(JSONWebTokenAuthentication):
                 raise PermissionDenied(detail='Authentication Failed')
 
         return user, jwt_value
+
+
+class ListExportMixin(object):
+
+    export_url_kwarg = 'export'
+    exporters = {}
+
+    def get(self, request, *args, **kwargs):
+        exporter_class = self.exporters.get(self.request.query_params.get("export"))
+        if exporter_class:
+            return exporter_class(
+                self.filter_queryset(self.get_queryset())
+            ).get_as_response()
+
+        return super(ListExportMixin, self).get(request, *args, **kwargs)
