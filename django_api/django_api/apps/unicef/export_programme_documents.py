@@ -2,6 +2,7 @@ import hashlib
 import os
 import tempfile
 
+from django.http import HttpResponse
 from django.utils import timezone
 from openpyxl import Workbook
 from openpyxl.styles import NamedStyle, Font, Alignment, PatternFill
@@ -78,6 +79,16 @@ class ProgrammeDocumentsXLSXExporter:
             current_row += 1
 
         self.workbook.save(self.file_path)
+
+    def get_as_response(self):
+        self.fill_worksheet()
+        response = HttpResponse()
+        response.content_type = self.worksheet.mime_type
+        with open(self.file_path, 'rb') as content:
+            response.write(content.read())
+        self.cleanup()
+        response['Content-Disposition'] = 'attachment; filename="{}"'.format(self.display_name)
+        return response
 
     def cleanup(self):
         os.remove(self.file_path)

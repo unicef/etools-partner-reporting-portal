@@ -86,17 +86,9 @@ class ProgrammeDocumentAPIView(ListAPIView):
     def get(self, request, *args, **kwargs):
         export = self.request.query_params.get("export")
         if export == 'xlsx':
-            response = HttpResponse()
-            exporter = ProgrammeDocumentsXLSXExporter(
+            return ProgrammeDocumentsXLSXExporter(
                 self.filter_queryset(self.get_queryset())
-            )
-            response.content_type = exporter.worksheet.mime_type
-            exporter.fill_worksheet()
-            with open(exporter.file_path, 'rb') as content:
-                response.write(content.read())
-            exporter.cleanup()
-            response['Content-Disposition'] = 'attachment; filename="{}"'.format(exporter.display_name)
-            return response
+            ).get_as_response()
 
         return super(ProgrammeDocumentAPIView, self).get(request, *args, **kwargs)
 
