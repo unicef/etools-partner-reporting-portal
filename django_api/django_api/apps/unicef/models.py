@@ -377,8 +377,7 @@ class ProgressReport(TimeStampedModel):
     start_date = models.DateField(verbose_name='Start Date')
     end_date = models.DateField(verbose_name='End Date')
     due_date = models.DateField(verbose_name='Due Date')
-    submission_date = models.DateField(verbose_name='Submission Date',
-                                       blank=True, null=True)
+    submission_date = models.DateField(verbose_name='Submission Date', blank=True, null=True)
     submitted_by = models.ForeignKey('account.User',
                                      blank=True, null=True)
 
@@ -414,12 +413,12 @@ class ProgressReport(TimeStampedModel):
         )
 
     def get_submission_date(self):
-        return self.submission_date.strftime(
-            settings.PRINT_DATA_FORMAT)
+        return self.submission_date.strftime(settings.PRINT_DATA_FORMAT) if self.submission_date else None
 
     def __str__(self):
         return "Progress Report <pk:{}>: {} {} to {}".format(
-            self.id, self.programme_document, self.start_date, self.end_date)
+            self.id, self.programme_document, self.start_date, self.end_date
+        )
 
 
 class ReportingPeriodDates(TimeStampedExternalSyncModelMixin):

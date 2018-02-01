@@ -560,13 +560,27 @@ class PMPPDResultLinkSerializer(serializers.ModelSerializer):
 
 class ProgressReportAttachmentSerializer(serializers.ModelSerializer):
     size = serializers.SerializerMethodField()
+    file_name = serializers.SerializerMethodField()
+    path = serializers.FileField(source='attachment')
+
+    def get_file_name(self, obj):
+        return obj.attachment.name.split('/')[-1] if obj.attachment else None
 
     def get_size(self, obj):
         return obj.attachment.size if obj.attachment else None
 
+    def to_representation(self, instance):
+        representation = super(ProgressReportAttachmentSerializer, self).to_representation(instance)
+
+        if "http" not in instance.attachment.url:
+            representation['path'] = settings.WWW_ROOT[:-1] + instance.attachment.url
+
+        return representation
+
     class Meta:
         model = ProgressReport
         fields = (
-            'attachment',
-            'size'
+            'path',
+            'size',
+            'file_name'
         )

@@ -707,12 +707,17 @@ class ProgressReportAttachmentAPIView(APIView):
             programme_document__workspace_id=workspace_id)
 
         if pr.attachment:
-            return HttpResponseRedirect(pr.attachment.url)
+            serializer = ProgressReportAttachmentSerializer(
+                ProgressReport.objects.filter(
+                    id=progress_report_id,
+                    programme_document__workspace_id=workspace_id),
+                many=True)
+            return Response(serializer.data, status=statuses.HTTP_200_OK)
         else:
-            return HttpResponseNotFound()
+            return Response({"message": "Attachment does not exist."}, status=statuses.HTTP_404_NOT_FOUND)
 
     @transaction.atomic
-    def put(self, request, workspace_id, progress_report_id):
+    def delete(self, request, workspace_id, progress_report_id):
         pr = get_object_or_404(
             ProgressReport,
             id=progress_report_id,
@@ -721,8 +726,18 @@ class ProgressReportAttachmentAPIView(APIView):
         if pr.attachment:
             try:
                 pr.attachment.delete()
+                return Response({}, status=statuses.HTTP_204_NO_CONTENT)
             except ValueError:
                 pass
+        else:
+            return Response({"message": "Attachment does not exist."}, status=statuses.HTTP_404_NOT_FOUND)
+
+    @transaction.atomic
+    def put(self, request, workspace_id, progress_report_id):
+        pr = get_object_or_404(
+            ProgressReport,
+            id=progress_report_id,
+            programme_document__workspace_id=workspace_id)
 
         serializer = ProgressReportAttachmentSerializer(
             instance=pr,
@@ -730,8 +745,17 @@ class ProgressReportAttachmentAPIView(APIView):
         )
 
         if serializer.is_valid():
+            if pr.attachment:
+                try:
+                    pr.attachment.delete()
+                except ValueError:
+                    pass
+
             serializer.save()
-            return Response(serializer.data, status=statuses.HTTP_200_OK)
+            return Response(ProgressReportAttachmentSerializer(
+                ProgressReport.objects.filter(id=progress_report_id,
+                programme_document__workspace_id=workspace_id),
+                many=True).data, status=statuses.HTTP_200_OK)
 
         else:
             return Response({"errors": serializer.errors},
