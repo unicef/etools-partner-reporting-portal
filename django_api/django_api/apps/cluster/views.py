@@ -686,7 +686,7 @@ class OperationalPresenceAggregationDataAPIView(APIView):
     - response_plan_id - Response plan ID
 
     Returns:
-        - GET method - OperationalPresenceAggregationDataSerializer object.
+        - GET method - A JSON object of many aggregations.
     """
     permission_classes = (IsAuthenticated, )
 
@@ -848,3 +848,86 @@ class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
                 final_result = final_result.filter(id__in=map(lambda x: int(x), filter_parameters['locs'].split(',')))
 
         return final_result.annotate(json=AsGeoJSON('geom', precision=3))
+
+
+class ClusterAnalysisIndicatorsAPIView(APIView):
+    """
+    Indicator list data for Clusters in a ResponsePlan - GET
+    Authentication required.
+
+    Can be filtered using Cluster, Cluster objective, Partner type, Location type, and Location IDs
+
+    Parameters:
+    - response_plan_id - Response plan ID
+
+    Returns:
+        - GET method - A JSON object of grouped Indicator report aggregation data.
+    """
+    permission_classes = (IsAuthenticated, )
+
+    def query_data(self, response_plan_id):
+        response_plan = get_object_or_404(
+            ResponsePlan,
+            id=response_plan_id)
+
+        filter_parameters = {
+            'clusters': self.request.GET.get('clusters', None),
+            'cluster_objectives': self.request.GET.get('cluster_objectives', None),
+            'partner_types': self.request.GET.get('partner_types', None),
+            'loc_type': self.request.GET.get('loc_type', '1'),
+            'locs': self.request.GET.get('locs', None),
+            'indicator_type': self.request.GET.get('indicator_type', None),
+        }
+
+        response_data = {
+            "clusters": None,
+            "num_of_clusters": None,
+            "num_of_partners": None,
+            "num_of_partners_per_type": None,
+            "num_of_partners_per_cluster": None,
+            "num_of_partners_per_cluster_objective": None,
+        }
+
+        workspace = response_plan.workspace
+        clusters = Cluster.objects.filter(response_plan=response_plan)
+
+        if filter_parameters['clusters']:
+            clusters = clusters.filter(id__in=map(lambda x: int(x), filter_parameters['clusters'].split(',')))
+
+            # Validate clusters belongs to the response plan
+            if not clusters:
+                raise Exception('Invalid cluster ids')
+
+        objectives = ClusterObjective.objects.filter(cluster__in=clusters)
+
+        if filter_parameters['cluster_objectives']:
+            objectives = objectives.filter(
+                id__in=map(lambda x: int(x), filter_parameters['cluster_objectives'].split(','))
+            )
+
+        if filter_parameters['partner_types']:
+            partner_types = filter_parameters['partner_types'].split(',')
+
+        else:
+            partner_types = list(clusters.values_list('partners__partner_type', flat=True).distinct())
+
+        response_data["clusters"] = ClusterSimpleSerializer(clusters.distinct(), many=True).data
+        response_data["num_of_clusters"] = clusters.count()
+        response_data["num_of_partners"] = Partner.objects.filter(clusters__in=clusters).distinct().count()
+        response_data["num_of_partners_per_type"] = {}
+        response_data["num_of_partners_per_cluster"] = {}
+        response_data["num_of_partners_per_cluster_objective"] = {}
+
+        for partner_type in partner_types:
+            response_data["num_of_partners_per_type"][partner_type] = Partner.objects.filter(partner_type=partner_type, clusters__in=clusters).distinct().count()
+
+        for cluster in clusters:
+            response_data["num_of_partners_per_cluster"][cluster.type] = cluster.partners.count()
+
+        for objective in objectives:
+            response_data["num_of_partners_per_cluster_objective"][objective.title] = Partner.objects.filter(clusters__cluster_objectives=objective).distinct().count()
+
+        return response_data
+
+    def get(self, request, response_plan_id, *args, **kwargs):
+        return Response(self.query_data(response_plan_id), status=statuses.HTTP_200_OK)
