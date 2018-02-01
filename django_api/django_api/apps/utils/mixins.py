@@ -47,7 +47,7 @@ class ListExportMixin(object):
     exporters = {}
 
     def get(self, request, *args, **kwargs):
-        exporter_class = self.exporters.get(self.request.query_params.get("export"))
+        exporter_class = self.exporters.get(self.request.query_params.get(self.export_url_kwarg))
         if exporter_class:
             return exporter_class(
                 self.filter_queryset(self.get_queryset())
