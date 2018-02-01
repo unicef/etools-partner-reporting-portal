@@ -40,7 +40,8 @@ from indicator.serializers import (
 from indicator.filters import PDReportsFilter
 from indicator.serializers import IndicatorBlueprintSimpleSerializer
 from partner.models import Partner
-from unicef.export_programme_documents import ProgrammeDocumentsXLSXExporter, ProgrammeDocumentsPDFExporter
+from unicef.exports.programme_documents import ProgrammeDocumentsXLSXExporter, ProgrammeDocumentsPDFExporter
+from unicef.exports.progress_reports import ProgressReportDetailPDFExporter
 from utils.mixins import ListExportMixin
 
 from .serializers import (
@@ -385,11 +386,15 @@ class ProgressReportDetailsAPIView(RetrieveAPIView):
         """
         Get Progress Report Details by given pk.
         """
-        self.workspace_id = workspace_id
+        progress_report = self.get_object(pk)
+        export = self.request.query_params.get('export')
+        if export == 'pdf':
+            return ProgressReportDetailPDFExporter(progress_report).get_as_response()
+
         serializer = self.get_serializer(
             request.GET.get('llo'),
             request.GET.get('location'),
-            self.get_object(pk)
+            progress_report
         )
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
@@ -398,7 +403,7 @@ class ProgressReportDetailsAPIView(RetrieveAPIView):
         query_params = {}
         if not user_has_global_view:
             query_params["programme_document__partner"] = self.request.user.partner
-        query_params['programme_document__workspace'] = self.workspace_id
+        query_params['programme_document__workspace'] = self.kwargs['workspace_id']
         query_params['pk'] = pk
         try:
             return ProgressReport.objects.get(**query_params)

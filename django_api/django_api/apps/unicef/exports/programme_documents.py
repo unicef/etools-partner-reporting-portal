@@ -108,7 +108,7 @@ class ProgrammeDocumentsPDFExporter:
 
     def __init__(self, programme_documents):
         self.programme_documents = programme_documents
-        self.display_name = '[{:%a %-d %b %-H-%M-%S %Y}] {} Programme Document(s) Summary.pdf'.format(
+        self.file_name = '[{:%a %-d %b %-H-%M-%S %Y}] {} Programme Document(s) Summary.pdf'.format(
             timezone.now(), programme_documents.count()
         )
 
@@ -164,7 +164,9 @@ class ProgrammeDocumentsPDFExporter:
     def get_as_response(self):
         try:
             pdf = render_to_pdf(self.template_name, self.get_context())
-            return make_response(pdf, self.display_name)
+            response = make_response(pdf)
+            response['Content-disposition'] = 'inline; filename="{}"'.format(self.file_name)
+            return response
         except PDFRenderingError:
             logger.exception('Error trying to render PDF')
             return HttpResponse('Error trying to render PDF')

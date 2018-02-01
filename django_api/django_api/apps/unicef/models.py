@@ -395,7 +395,7 @@ class ProgressReport(TimeStampedModel):
         return self.indicator_reports.all().order_by('-created').first()
 
     def get_reporting_period(self):
-        return "%s - %s " % (
+        return "{} - {}".format(
             self.start_date.strftime(settings.PRINT_DATA_FORMAT),
             self.end_date.strftime(settings.PRINT_DATA_FORMAT)
         )
