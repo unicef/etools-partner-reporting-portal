@@ -127,7 +127,7 @@ class IndicatorBlueprint(TimeStampedExternalSyncModelMixin):
                                     default=NUMBER)
 
     # TODO: add:
-    # siblings (similar inidcators to this indicator)
+    # siblings (similar indicators to this indicator)
     # other_representation (exact copies with different names for some random reason)
     # children (indicators that aggregate up to this or contribute to this indicator through a formula)
     # aggregation_types (potential aggregation types: geographic, time-periods ?)
