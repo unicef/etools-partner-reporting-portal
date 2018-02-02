@@ -20,6 +20,14 @@
       _notifyServerError: function (options) {
         this._notify('server-error', options);
       },
+
+      _notifyAttachmentUploaded: function (options) {
+        this._notify('attachment-uploaded', options);
+      },
+
+      _notifyAttachmentDeleted: function (options) {
+        this._notify('attachment-deleted', options);
+      },
     };
 
   }());

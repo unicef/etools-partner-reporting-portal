@@ -360,8 +360,7 @@ class ProgressReport(TimeStampedModel):
     programme_document = models.ForeignKey(ProgrammeDocument,
                                            related_name="progress_reports",
                                            default=-1)
-    # attachements ???
-
+    # attachments ???
     start_date = models.DateField(verbose_name='Start Date')
     end_date = models.DateField(verbose_name='End Date')
     due_date = models.DateField(verbose_name='Due Date')
