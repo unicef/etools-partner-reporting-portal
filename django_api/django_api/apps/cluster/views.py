@@ -850,7 +850,7 @@ class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
         return final_result.annotate(json=AsGeoJSON('geom', precision=3))
 
 
-class ClusterAnalysisIndicatorsAPIView(APIView):
+class ClusterAnalysisIndicatorsListAPIView(GenericAPIView, ListModelMixin):
     """
     Indicator list data for Clusters in a ResponsePlan - GET
     Authentication required.
@@ -861,14 +861,16 @@ class ClusterAnalysisIndicatorsAPIView(APIView):
     - response_plan_id - Response plan ID
 
     Returns:
-        - GET method - A JSON object of grouped Indicator report aggregation data.
+        - GET method - ClusterAnalysisIndicatorsListSerializer object list.
     """
     permission_classes = (IsAuthenticated, )
+    serializer_class = OperationalPresenceLocationListSerializer
+    lookup_field = lookup_url_kwarg = 'response_plan_id'
 
-    def query_data(self, response_plan_id):
+    def get_queryset(self):
         response_plan = get_object_or_404(
             ResponsePlan,
-            id=response_plan_id)
+            id=self.kwargs.get(self.lookup_field))
 
         filter_parameters = {
             'clusters': self.request.GET.get('clusters', None),
@@ -876,16 +878,7 @@ class ClusterAnalysisIndicatorsAPIView(APIView):
             'partner_types': self.request.GET.get('partner_types', None),
             'loc_type': self.request.GET.get('loc_type', '1'),
             'locs': self.request.GET.get('locs', None),
-            'indicator_type': self.request.GET.get('indicator_type', None),
-        }
-
-        response_data = {
-            "clusters": None,
-            "num_of_clusters": None,
-            "num_of_partners": None,
-            "num_of_partners_per_type": None,
-            "num_of_partners_per_cluster": None,
-            "num_of_partners_per_cluster_objective": None,
+            'indicator_type': self.request.GET.get('indicator_type', 'cluster'),
         }
 
         workspace = response_plan.workspace
@@ -894,7 +887,7 @@ class ClusterAnalysisIndicatorsAPIView(APIView):
         if filter_parameters['clusters']:
             clusters = clusters.filter(id__in=map(lambda x: int(x), filter_parameters['clusters'].split(',')))
 
-            # Validate clusters belongs to the response plan
+            # validate this cluster belongs to the response plan
             if not clusters:
                 raise Exception('Invalid cluster ids')
 
@@ -905,29 +898,10 @@ class ClusterAnalysisIndicatorsAPIView(APIView):
                 id__in=map(lambda x: int(x), filter_parameters['cluster_objectives'].split(','))
             )
 
+        indicators = Reportable.objects.filter(cluster_objectives__in=objectives)
+
         if filter_parameters['partner_types']:
             partner_types = filter_parameters['partner_types'].split(',')
+            indicators = indicators.filter(cluster_objectives__cluster__partners__partner_type__in=partner_types)
 
-        else:
-            partner_types = list(clusters.values_list('partners__partner_type', flat=True).distinct())
-
-        response_data["clusters"] = ClusterSimpleSerializer(clusters.distinct(), many=True).data
-        response_data["num_of_clusters"] = clusters.count()
-        response_data["num_of_partners"] = Partner.objects.filter(clusters__in=clusters).distinct().count()
-        response_data["num_of_partners_per_type"] = {}
-        response_data["num_of_partners_per_cluster"] = {}
-        response_data["num_of_partners_per_cluster_objective"] = {}
-
-        for partner_type in partner_types:
-            response_data["num_of_partners_per_type"][partner_type] = Partner.objects.filter(partner_type=partner_type, clusters__in=clusters).distinct().count()
-
-        for cluster in clusters:
-            response_data["num_of_partners_per_cluster"][cluster.type] = cluster.partners.count()
-
-        for objective in objectives:
-            response_data["num_of_partners_per_cluster_objective"][objective.title] = Partner.objects.filter(clusters__cluster_objectives=objective).distinct().count()
-
-        return response_data
-
-    def get(self, request, response_plan_id, *args, **kwargs):
-        return Response(self.query_data(response_plan_id), status=statuses.HTTP_200_OK)
+        return indicators.distinct()
