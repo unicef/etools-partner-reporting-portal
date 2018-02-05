@@ -868,6 +868,9 @@ class ClusterAnalysisIndicatorsListAPIView(GenericAPIView, ListModelMixin):
     serializer_class = ClusterAnalysisIndicatorsListSerializer
     lookup_field = lookup_url_kwarg = 'response_plan_id'
 
+    def get(self, request, response_plan_id):
+        return self.list(request, response_plan_id)
+
     def get_queryset(self):
         response_plan = get_object_or_404(
             ResponsePlan,
@@ -899,7 +902,7 @@ class ClusterAnalysisIndicatorsListAPIView(GenericAPIView, ListModelMixin):
                 id__in=map(lambda x: int(x), filter_parameters['cluster_objectives'].split(','))
             )
 
-        if indicator_type == 'cluster_activity':
+        if filter_parameters['indicator_type'] == 'cluster_activity':
             indicators = Reportable.objects.filter(
                 content_type__model="clusteractivity",
                 cluster_activities__cluster_objective__in=objectives
@@ -909,7 +912,7 @@ class ClusterAnalysisIndicatorsListAPIView(GenericAPIView, ListModelMixin):
                 partner_types = filter_parameters['partner_types'].split(',')
                 indicators = indicators.filter(cluster_objective__cluster__partners__partner_type__in=partner_types)
 
-        elif indicator_type == 'cluster_objective':
+        elif filter_parameters['indicator_type'] == 'cluster_objective':
             indicators = Reportable.objects.filter(
                 content_type__model="clusterobjective",
                 cluster_objectives__in=objectives)
@@ -918,14 +921,14 @@ class ClusterAnalysisIndicatorsListAPIView(GenericAPIView, ListModelMixin):
                 partner_types = filter_parameters['partner_types'].split(',')
                 indicators = indicators.filter(cluster__partners__partner_type__in=partner_types)
 
-        elif indicator_type == 'partner_project':
+        elif filter_parameters['indicator_type'] == 'partner_project':
             indicators = Reportable.objects.filter(content_type__model="partnerproject")
 
             if filter_parameters['partner_types']:
                 partner_types = filter_parameters['partner_types'].split(',')
                 indicators = indicators.filter(partner__partner_type__in=partner_types)
 
-        elif indicator_type == 'partner_activity':
+        elif filter_parameters['indicator_type'] == 'partner_activity':
             indicators = Reportable.objects.filter(content_type__model="partneractivity")
 
             if filter_parameters['partner_types']:
