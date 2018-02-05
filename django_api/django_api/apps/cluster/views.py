@@ -22,7 +22,10 @@ from indicator.serializers import (
     ClusterPartnerAnalysisIndicatorResultSerializer,
 )
 from indicator.models import IndicatorReport, Reportable
-from indicator.serializers import ClusterAnalysisIndicatorsListSerializer
+from indicator.serializers import (
+    ClusterAnalysisIndicatorsListSerializer,
+    ClusterAnalysisIndicatorDetailSerializer,
+)
 from partner.models import (
     Partner,
     PartnerProject,
@@ -856,7 +859,13 @@ class ClusterAnalysisIndicatorsListAPIView(GenericAPIView, ListModelMixin):
     Indicator list data for Clusters in a ResponsePlan - GET
     Authentication required.
 
-    Can be filtered using Cluster, Cluster objective, Partner type, Location type, and Location IDs
+    Can be filtered using Cluster, Cluster objective, Partner type, Location type, Indicator type, and Location IDs
+
+    indicator_type GET parameter values -
+    * cluster_activity
+    * cluster_objective
+    * partner_project
+    * partner_activity
 
     Parameters:
     - response_plan_id - Response plan ID
@@ -936,3 +945,26 @@ class ClusterAnalysisIndicatorsListAPIView(GenericAPIView, ListModelMixin):
                 indicators = indicators.filter(partner__partner_type__in=partner_types)
 
         return indicators.distinct()
+
+
+class ClusterAnalysisIndicatorDetailsAPIView(APIView):
+    """
+    Indicator expansion detail data for Clusters in a ResponsePlan - GET
+    Authentication required.
+
+    Parameters:
+    - response_plan_id - Response plan ID
+    - reportable_id - Reportable ID
+
+    Returns:
+        - GET method - ClusterAnalysisIndicatorDetailSerializer object list.
+    """
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request, response_plan_id, reportable_id, *args, **kwargs):
+        reportable = get_object_or_404(
+            Reportable, id=reportable_id)
+
+        serializer = ClusterAnalysisIndicatorDetailSerializer(reportable)
+
+        return Response(serializer.data, status=statuses.HTTP_200_OK)

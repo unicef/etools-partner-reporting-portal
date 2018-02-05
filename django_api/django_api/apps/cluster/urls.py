@@ -17,7 +17,8 @@ from .views import (
     PartnerAnalysisIndicatorResultAPIView,
     OperationalPresenceLocationListAPIView,
     OperationalPresenceAggregationDataAPIView,
-    ClusterAnalysisIndicatorsListAPIView
+    ClusterAnalysisIndicatorsListAPIView,
+    ClusterAnalysisIndicatorDetailsAPIView,
 )
 
 
@@ -84,4 +85,8 @@ urlpatterns = [
     url(r'^cluster-analysis/(?P<response_plan_id>\d+)/indicators/$',
         ClusterAnalysisIndicatorsListAPIView.as_view(),
         name="cluster-analysis-indicators-list"),
+
+    url(r'^cluster-analysis/(?P<response_plan_id>\d+)/indicators/(?P<reportable_id>\d+)$',
+        ClusterAnalysisIndicatorDetailsAPIView.as_view(),
+        name="cluster-analysis-indicators-detail"),
 ]
