@@ -1193,7 +1193,27 @@ class ClusterPartnerAnalysisIndicatorResultSerializer(serializers.ModelSerialize
         )
 
 
-class ClusterAnalysisIndicatorsListSerializer(ReportableSimpleSerializer):
-    class Meta(ReportableSimpleSerializer.Meta):
-        fields = ReportableSimpleSerializer.Meta.fields + (
+class ClusterAnalysisIndicatorsListSerializer(serializers.ModelSerializer):
+    content_type_name = serializers.SerializerMethodField()
+    content_object_title = serializers.SerializerMethodField()
+
+    def get_content_type_name(self, obj):
+        return obj.content_type.name
+
+    def get_content_object_title(self, obj):
+        return obj.content_object.title
+
+    class Meta:
+        model = Reportable
+        fields = (
+            'id',
+            'target',
+            'baseline',
+            'in_need',
+            'blueprint',
+            'achieved',
+            'progress_percentage',
+            'content_type_name',
+            'content_object_title',
+            'object_id',
         )
