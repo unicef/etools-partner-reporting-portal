@@ -864,7 +864,7 @@ class IndicatorReportUpdateSerializer(serializers.ModelSerializer):
         fields = (
             'reporting_period',
         )
-        
+
 class IndicatorReportReviewSerializer(serializers.Serializer):
     status = serializers.ChoiceField(choices=[
         INDICATOR_REPORT_STATUS.sent_back,
@@ -1190,4 +1190,10 @@ class ClusterPartnerAnalysisIndicatorResultSerializer(serializers.ModelSerialize
             'project',
             'cluster_activity',
             'latest_report_status',
+        )
+
+
+class ClusterAnalysisIndicatorsListSerializer(ReportableSimpleSerializer):
+    class Meta(ReportableSimpleSerializer.Meta):
+        fields = ReportableSimpleSerializer.Meta.fields + (
         )

@@ -22,6 +22,7 @@ from indicator.serializers import (
     ClusterPartnerAnalysisIndicatorResultSerializer,
 )
 from indicator.models import IndicatorReport, Reportable
+from indicator.serializers import ClusterAnalysisIndicatorsListSerializer
 from partner.models import (
     Partner,
     PartnerProject,
@@ -40,7 +41,6 @@ from .serializers import (
     ResponsePlanPartnerDashboardSerializer,
     PartnerAnalysisSummarySerializer,
     OperationalPresenceLocationListSerializer,
-    ClusterAnalysisIndicatorsListSerializer,
 )
 from .filters import (
     ClusterObjectiveFilter,
