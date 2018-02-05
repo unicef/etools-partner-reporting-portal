@@ -604,7 +604,6 @@ class IndicatorsXLSXExporter:
         merged_sheet.freeze_panes = 'A%d' % INDICATOR_DATA_ROW_START
 
     def export_data(self):
-
         # Disaggregation types
         disaggregation_types_base = Disaggregation.objects.filter(
             response_plan__id=self.response_plan_id)

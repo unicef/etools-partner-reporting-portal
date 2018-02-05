@@ -196,8 +196,8 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
         default=CURRENCIES.usd,
         max_length=16,
         verbose_name='Funds received Currency',
-        blank = True,
-        null = True,
+        blank=True,
+        null=True,
     )
 
     # TODO:
@@ -365,8 +365,7 @@ class ProgressReport(TimeStampedModel):
     end_date = models.DateField(verbose_name='End Date')
     due_date = models.DateField(verbose_name='Due Date')
     submission_date = models.DateField(verbose_name='Submission Date', blank=True, null=True)
-    submitted_by = models.ForeignKey('account.User',
-                                     blank=True, null=True)
+    submitted_by = models.ForeignKey('account.User', blank=True, null=True)
 
     # Fields set by PO in PMP when reviewing the progress report
     review_date = models.DateField(verbose_name='Review Date',

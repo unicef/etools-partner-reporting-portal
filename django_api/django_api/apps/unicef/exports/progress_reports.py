@@ -1,12 +1,11 @@
 import logging
+from collections import defaultdict
 
-from babel.numbers import format_currency
-from django.conf import settings
 from django.http import HttpResponse
-from django.utils.translation import to_locale, get_language
 from easy_pdf.exceptions import PDFRenderingError
 from easy_pdf.rendering import render_to_pdf, make_response
 
+from unicef.models import LowerLevelOutput
 
 logger = logging.getLogger(__name__)
 
@@ -22,45 +21,31 @@ class ProgressReportDetailPDFExporter:
         )
         self.file_name = self.display_name + '.pdf'
 
-    def format_indicator_reports(self, indicator_reports):
-        result = list()
-        temp = None
-        d = list()
-        for r in indicator_reports:
-            if not temp:
-                temp = r.reportable.id
-            elif temp != r.reportable.id:
-                result.append(d)
-                temp = None
-                d = list()
-            d.append(r)
-        if d:
-            result.append(d)
-        return result
+    def group_indicator_reports_by_lower_level_output(self, indicator_reports):
+        results = defaultdict(list)
+        for ir in indicator_reports:
+            if type(ir.reportable.content_object) == LowerLevelOutput:
+                results[ir.reportable.content_object.id].append(ir)
+
+        return [
+            results[key] for key in sorted(results.keys())
+        ]
 
     def get_context(self):
-        locale = to_locale(get_language())
         pd = self.progress_report.programme_document
 
         context = {
             'progress_report': self.progress_report,
             'title': self.display_name,
             'programme_document': pd,
-            'start_date': pd.start_date.strftime(settings.PRINT_DATA_FORMAT),
-            'end_date': pd.end_date.strftime(settings.PRINT_DATA_FORMAT),
-            'cso_contribution': pd.cso_contribution,
-            'budget': format_currency(pd.budget, pd.budget_currency, locale=locale),
-            'funds_received_to_date': format_currency(
-                pd.funds_received_to_date, pd.funds_received_to_date_currency, locale=locale
-            ),
-            'submission_date': self.progress_report.get_submission_date(),
-            'reporting_period': self.progress_report.get_reporting_period(),
             'authorized_officer': pd.unicef_officers.first(),
             'focal_point': pd.unicef_focal_point.first(),
-            'outputs': self.format_indicator_reports(
-                self.progress_report.indicator_reports.all().order_by('reportable')
+            'indicator_reports': self.group_indicator_reports_by_lower_level_output(
+                self.progress_report.indicator_reports.all()
             )
         }
+        print(self.progress_report.indicator_reports.first().disaggregations)
+        print(self.progress_report.indicator_reports.first().disaggregation_values())
 
         return context
 

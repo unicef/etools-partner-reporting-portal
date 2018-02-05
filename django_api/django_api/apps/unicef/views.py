@@ -306,33 +306,17 @@ class ProgressReportPDFView(RetrieveAPIView):
         # Render to pdf
         report = ProgressReport.objects.get(id=pk)
 
-        data = dict()
-
-        data['pd'] = report.programme_document
-
-        data['unicef_office'] = report.programme_document.unicef_office
-        data['title'] = report.programme_document.title
-        data['reference_number'] = report.programme_document.reference_number
-        data['start_date'] = report.programme_document.start_date.strftime(
-            settings.PRINT_DATA_FORMAT)
-        data['end_date'] = report.programme_document.end_date.strftime(
-            settings.PRINT_DATA_FORMAT)
-        data['cso_contribution'] = report.programme_document.cso_contribution
-        data['budget'] = report.programme_document.budget
-        data['funds_received_to_date'] = report.programme_document.funds_received_to_date
-        data['challenges_in_the_reporting_period'] = report.challenges_in_the_reporting_period
-        data['proposed_way_forward'] = report.proposed_way_forward
-        data['partner_contribution_to_date'] = report.partner_contribution_to_date
-        data['submission_date'] = report.get_submission_date()
-        data['reporting_period'] = report.get_reporting_period()
-
-        data['partner'] = report.programme_document.partner
-
-        data['authorized_officer'] = report.programme_document.unicef_officers.first()
-        data['focal_point'] = report.programme_document.unicef_focal_point.first()
-
-        data['outputs'] = self.prepare_reportable(
-            report.indicator_reports.all().order_by('reportable'))
+        data = {
+            'report': report,
+            'pd': report.programme_document,
+            'challenges_in_the_reporting_period': report.challenges_in_the_reporting_period,
+            'proposed_way_forward': report.proposed_way_forward,
+            'partner_contribution_to_date': report.partner_contribution_to_date,
+            'submission_date': report.get_submission_date(),
+            'authorized_officer': report.programme_document.unicef_officers.first(),
+            'focal_point': report.programme_document.unicef_focal_point.first(),
+            'outputs': self.prepare_reportable(report.indicator_reports.all().order_by('reportable'))
+        }
 
         pdf = render_to_pdf("report_annex_c_pdf.html", data)
         return HttpResponse(pdf, content_type='application/pdf')

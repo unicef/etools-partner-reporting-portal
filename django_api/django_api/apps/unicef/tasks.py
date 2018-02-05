@@ -333,4 +333,4 @@ def process_programme_documents(fast=False, area=False):
                         break
             except Exception as e:
                 print(e)
-                raise Exception(e)
+                raise
