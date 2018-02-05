@@ -20,22 +20,11 @@ from indicator.models import IndicatorBlueprint, Disaggregation, Reportable, Dis
 from partner.models import Partner
 
 
-def process_model(process_model,
-                  process_serializer, data, filter_dict):
-    try:
-        obj = process_model.objects.get(**filter_dict)
-        serializer = process_serializer(obj, data=data)
-        if serializer.is_valid():
-            serializer.save()
-        else:
-            raise Exception(serializer.errors)
-    except process_model.DoesNotExist:
-        serializer = process_serializer(data=data)
-        if serializer.is_valid():
-            obj = serializer.save()
-        else:
-            raise Exception(serializer.errors)
-    return obj
+def process_model(process_model, process_serializer, data, filter_dict):
+    obj = process_model.objects.filter(**filter_dict).first()
+    serializer = process_serializer(obj, data=data)
+    serializer.is_valid(raise_exception=True)
+    return serializer.save()
 
 
 def create_user(person):
@@ -253,9 +242,13 @@ def process_programme_documents(fast=False, area=False):
                                     else:
                                         # Create IndicatorBlueprint
                                         i['disaggregatable'] = True
-                                        blueprint = process_model(IndicatorBlueprint,
-                                                                       PMPIndicatorBlueprintSerializer, i,
-                                                                       {'external_id': i['blueprint_id']})
+                                        i['title'] = i['title'] or '<EMPTY TITLE PROVIDED BY EXTERNAL SYSTEM>'
+                                        blueprint = process_model(
+                                            IndicatorBlueprint,
+                                            PMPIndicatorBlueprintSerializer,
+                                            i,
+                                            {'external_id': i['blueprint_id']}
+                                        )
 
                                     locations = list()
                                     for l in i['locations']:
@@ -319,8 +312,14 @@ def process_programme_documents(fast=False, area=False):
                                     i['object_id'] = llo.id
                                     i['start_date'] = item['start_date']
                                     i['end_date'] = item['end_date']
-                                    reportable = process_model(Reportable, PMPReportableSerializer, i,
-                                                                    {'external_id': i['id']})
+                                    # TODO: Fix db schema to accommodate larger lengths
+                                    i['title'] = i['title'][:255]
+                                    reportable = process_model(
+                                        Reportable,
+                                        PMPReportableSerializer,
+                                        i,
+                                        {'external_id': i['id']}
+                                    )
                                     reportable.active = True
                                     reportable.save()
 
