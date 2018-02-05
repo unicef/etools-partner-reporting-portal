@@ -44,8 +44,6 @@ class ProgressReportDetailPDFExporter:
                 self.progress_report.indicator_reports.all()
             )
         }
-        print(self.progress_report.indicator_reports.first().disaggregations)
-        print(self.progress_report.indicator_reports.first().disaggregation_values())
 
         return context
 
