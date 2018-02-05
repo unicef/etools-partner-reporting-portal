@@ -40,6 +40,7 @@ from .serializers import (
     ResponsePlanPartnerDashboardSerializer,
     PartnerAnalysisSummarySerializer,
     OperationalPresenceLocationListSerializer,
+    ClusterAnalysisIndicatorsListSerializer,
 )
 from .filters import (
     ClusterObjectiveFilter,
@@ -864,7 +865,7 @@ class ClusterAnalysisIndicatorsListAPIView(GenericAPIView, ListModelMixin):
         - GET method - ClusterAnalysisIndicatorsListSerializer object list.
     """
     permission_classes = (IsAuthenticated, )
-    serializer_class = OperationalPresenceLocationListSerializer
+    serializer_class = ClusterAnalysisIndicatorsListSerializer
     lookup_field = lookup_url_kwarg = 'response_plan_id'
 
     def get_queryset(self):
@@ -878,7 +879,7 @@ class ClusterAnalysisIndicatorsListAPIView(GenericAPIView, ListModelMixin):
             'partner_types': self.request.GET.get('partner_types', None),
             'loc_type': self.request.GET.get('loc_type', '1'),
             'locs': self.request.GET.get('locs', None),
-            'indicator_type': self.request.GET.get('indicator_type', 'cluster'),
+            'indicator_type': self.request.GET.get('indicator_type', 'cluster_activity'),
         }
 
         workspace = response_plan.workspace
@@ -898,10 +899,37 @@ class ClusterAnalysisIndicatorsListAPIView(GenericAPIView, ListModelMixin):
                 id__in=map(lambda x: int(x), filter_parameters['cluster_objectives'].split(','))
             )
 
-        indicators = Reportable.objects.filter(cluster_objectives__in=objectives)
+        if indicator_type == 'cluster_activity':
+            indicators = Reportable.objects.filter(
+                content_type__model="clusteractivity",
+                cluster_activities__cluster_objective__in=objectives
+            )
 
-        if filter_parameters['partner_types']:
-            partner_types = filter_parameters['partner_types'].split(',')
-            indicators = indicators.filter(cluster_objectives__cluster__partners__partner_type__in=partner_types)
+            if filter_parameters['partner_types']:
+                partner_types = filter_parameters['partner_types'].split(',')
+                indicators = indicators.filter(cluster_objective__cluster__partners__partner_type__in=partner_types)
+
+        elif indicator_type == 'cluster_objective':
+            indicators = Reportable.objects.filter(
+                content_type__model="clusterobjective",
+                cluster_objectives__in=objectives)
+
+            if filter_parameters['partner_types']:
+                partner_types = filter_parameters['partner_types'].split(',')
+                indicators = indicators.filter(cluster__partners__partner_type__in=partner_types)
+
+        elif indicator_type == 'partner_project':
+            indicators = Reportable.objects.filter(content_type__model="partnerproject")
+
+            if filter_parameters['partner_types']:
+                partner_types = filter_parameters['partner_types'].split(',')
+                indicators = indicators.filter(partner__partner_type__in=partner_types)
+
+        elif indicator_type == 'partner_activity':
+            indicators = Reportable.objects.filter(content_type__model="partneractivity")
+
+            if filter_parameters['partner_types']:
+                partner_types = filter_parameters['partner_types'].split(',')
+                indicators = indicators.filter(partner__partner_type__in=partner_types)
 
         return indicators.distinct()
