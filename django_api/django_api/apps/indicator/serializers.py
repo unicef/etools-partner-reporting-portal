@@ -1217,3 +1217,53 @@ class ClusterAnalysisIndicatorsListSerializer(serializers.ModelSerializer):
             'content_object_title',
             'object_id',
         )
+
+
+class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
+    content_type_name = serializers.SerializerMethodField()
+    content_object_title = serializers.SerializerMethodField()
+    num_of_partners = serializers.SerializerMethodField()
+    partners_by_status = serializers.SerializerMethodField()
+    progress_over_time = serializers.SerializerMethodField()
+    current_progress_by_partner = serializers.SerializerMethodField()
+    current_progress_by_location = serializers.SerializerMethodField()
+
+    def get_content_type_name(self, obj):
+        return obj.content_type.name
+
+    def get_content_object_title(self, obj):
+        return obj.content_object.title
+
+    def get_num_of_partners(self, obj):
+        return obj.content_object.title
+
+    def get_partners_by_status(self, obj):
+        return {}
+
+    def get_progress_over_time(self, obj):
+        return {}
+
+    def get_current_progress_by_partner(self, obj):
+        return {}
+
+    def get_current_progress_by_location(self, obj):
+        return {}
+
+    class Meta:
+        model = Reportable
+        fields = (
+            'id',
+            'target',
+            'baseline',
+            'in_need',
+            'total',
+            'blueprint',
+            'frequency',
+            'content_type_name',
+            'content_object_title',
+            'num_of_partners',
+            'partners_by_status',
+            'progress_over_time',
+            'current_progress_by_partner',
+            'current_progress_by_location',
+        )
