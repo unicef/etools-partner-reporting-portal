@@ -15,8 +15,7 @@ WWW_ROOT = 'http://%s/' % DOMAIN_NAME
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "*"]
 
 # other
-EMAIL_BACKEND = os.getenv('EMAIL_BACKEND',
-                          'django.core.mail.backends.console.EmailBackend')
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
 
 INSTALLED_APPS += [
     'debug_toolbar',
@@ -27,4 +26,4 @@ MIDDLEWARE_CLASSES = [
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ] + MIDDLEWARE_CLASSES
 
-CORS_ORIGIN_WHITELIST += ('localhost:8082',)
+CORS_ORIGIN_WHITELIST += ('localhost:8082', )
