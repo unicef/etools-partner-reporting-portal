@@ -2,6 +2,7 @@ from collections import defaultdict
 from datetime import date
 
 from django.conf import settings
+from django.utils.html import escape
 
 from unicef.models import LowerLevelOutput
 
@@ -42,7 +43,7 @@ class HTMLTableCell(object):
             return self.value.strftime(settings.PRINT_DATA_FORMAT)
         if self.value in {'', None}:
             return '&nbsp;'  # Rendering empty tags brakes layout in pdf export
-        return self.value
+        return escape(self.value)
 
     def __str__(self):
         return self.render()
