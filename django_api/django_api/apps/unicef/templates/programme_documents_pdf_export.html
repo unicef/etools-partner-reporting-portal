@@ -41,18 +41,15 @@
     <div id="pdf">
         <h1>{{ title }}</h1>
         <table>
-            <tr>
-                {% for header_text, percentage_width in headers %}
-                    <th width="{{ percentage_width }}%">{{ header_text }}</th>
+            {% autoescape off %}
+                {% for row_data in rows %}
+                    <tr>
+                        {% for cell in row_data %}
+                            {{ cell.render }}
+                        {% endfor %}
+                    </tr>
                 {% endfor %}
-            </tr>
-            {% for row_data in data_rows %}
-                <tr>
-                    {% for cell_data in row_data %}
-                        <td>{{ cell_data }}</td>
-                    {% endfor %}
-                </tr>
-            {% endfor %}
+            {% endautoescape %}
         </table>
     </div>
 {% endblock %}
