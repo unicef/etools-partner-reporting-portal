@@ -109,7 +109,7 @@
                 {% for indicator in output %}
                     {% if forloop.counter == 1 %}
                         <tr>
-                            <th rowspan="{{ output|length }}">{{ indicator.reportable.blueprint.title }}</th>
+                            <th rowspan="{{ output|length }}">{{ indicator.reportable.content_object.title }}</th>
                             <th>{{ indicator.title }}</th>
                             <th>{{ indicator.reportable.target }}</th>
                             <td width="100px">{% if indicator.is_number %}{{ indicator.total.v|floatformat:"0" }}{% else %}{{ indicator.total.c|percentage }}{% endif %}</td>

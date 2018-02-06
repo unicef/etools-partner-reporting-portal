@@ -42,6 +42,7 @@ from indicator.serializers import IndicatorBlueprintSimpleSerializer
 from partner.models import Partner
 from unicef.exports.programme_documents import ProgrammeDocumentsXLSXExporter, ProgrammeDocumentsPDFExporter
 from unicef.exports.progress_reports import ProgressReportDetailPDFExporter
+from unicef.exports.utilities import group_indicator_reports_by_lower_level_output
 from utils.mixins import ListExportMixin
 
 from .serializers import (
@@ -285,26 +286,10 @@ class ProgressReportPDFView(RetrieveAPIView):
     """
         Endpoint for getting PDF of Progress Report Annex C.
     """
+    queryset = ProgressReport.objects.all()
 
-    def prepare_reportable(self, indicator_reports):
-        result = list()
-        temp = None
-        d = list()
-        for r in indicator_reports:
-            if not temp:
-                temp = r.reportable.id
-            elif temp != r.reportable.id:
-                result.append(d)
-                temp = None
-                d = list()
-            d.append(r)
-        if d:
-            result.append(d)
-        return result
-
-    def get(self, request, pk, *args, **kwargs):
-        # Render to pdf
-        report = ProgressReport.objects.get(id=pk)
+    def get(self, request, *args, **kwargs):
+        report = self.get_object()
 
         data = {
             'report': report,
@@ -315,7 +300,7 @@ class ProgressReportPDFView(RetrieveAPIView):
             'submission_date': report.get_submission_date(),
             'authorized_officer': report.programme_document.unicef_officers.first(),
             'focal_point': report.programme_document.unicef_focal_point.first(),
-            'outputs': self.prepare_reportable(report.indicator_reports.all().order_by('reportable'))
+            'outputs': group_indicator_reports_by_lower_level_output(report.indicator_reports.all())
         }
 
         pdf = render_to_pdf("report_annex_c_pdf.html", data)
