@@ -24,6 +24,11 @@
         params-object="{{pdQuery}}">
     </iron-query-params>
 
+    <iron-query-params
+      params-string="{{reportsQueryString}}"
+      params-object="{{reportsQuery}}">
+    </iron-query-params>
+
     <paper-menu
         id="menu"
         selected="{{selected}}"
@@ -44,7 +49,7 @@
       </paper-item>
 
       <paper-item name="progress-reports">
-        <a href="[[buildUrl(_baseUrl, '/progress-reports')]]">
+        <a href="[[buildUrl(_baseUrl, '/progress-reports')]]?[[reportsQueryString]]">
           <span><iron-icon icon="assignment" role="presentation"></iron-icon>[[localize('progress_reports')]]</span>
         </a>
       </paper-item>
@@ -75,10 +80,17 @@
         pdQuery: {
           type: Object,
           value: {
-            status: String(['Sig', 'Act', 'Sus']),
+            status: String(['Act']),
+          },
+        },
+        reportsQuery: {
+          type: Object,
+          value: {
+            status: String(['Due', 'Ove', 'Sen']),
           },
         },
       },
+      
     });
   </script>
 </dom-module>
