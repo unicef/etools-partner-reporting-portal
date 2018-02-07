@@ -1232,13 +1232,117 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
         return obj.content_type.name
 
     def get_content_object_title(self, obj):
-        return obj.content_object.title
+        return obj.content_object.title=
 
     def get_num_of_partners(self, obj):
-        return obj.content_object.title
+        num_of_partners = 0
+
+        if isinstance(obj.content_object, (PartnerProject, )):
+            num_of_partners = Partner.objects.filter(
+                partner_projects__reportables=obj).distinct().count()
+
+        elif isinstance(obj.content_object, (PartnerActivity, )):
+            num_of_partners = Partner.objects.filter(
+                partner_activities__reportables=obj).distinct().count()
+
+        elif isinstance(obj.content_object, (ClusterObjective, )):
+            num_of_partners = Partner.objects.filter(
+                partner_activities__cluster_objective__reportables=obj).distinct().count()
+
+        elif isinstance(obj.content_object, (ClusterActivity, )):
+            num_of_partners = Partner.objects.filter(
+                partner_activities__cluster_activity__reportables=obj).distinct().count()
+
+        return num_of_partners
 
     def get_partners_by_status(self, obj):
-        return {}
+        num_of_partners = {}
+
+        if isinstance(obj.content_object, (PartnerProject, )):
+            num_of_partners["met"] = Partner.objects.filter(
+                Q(partner_projects__reportables=obj),
+                Q(partner_projects__reportables__indicator_reports__overall_status="Met").distinct().count()
+
+            num_of_partners["on_track"] = Partner.objects.filter(
+                Q(partner_projects__reportables=obj),
+                Q(partner_projects__reportables__indicator_reports__overall_status="OnT").distinct().count()
+
+            num_of_partners["no_progress"] = Partner.objects.filter(
+                Q(partner_projects__reportables=obj),
+                Q(partner_projects__reportables__indicator_reports__overall_status="NoP").distinct().count()
+
+            num_of_partners["constrained"] = Partner.objects.filter(
+                Q(partner_projects__reportables=obj),
+                Q(partner_projects__reportables__indicator_reports__overall_status="Con").distinct().count()
+
+            num_of_partners["no_status"] = Partner.objects.filter(
+                Q(partner_projects__reportables=obj),
+                Q(partner_projects__reportables__indicator_reports__overall_status="NoS").distinct().count()
+
+        elif isinstance(obj.content_object, (PartnerActivity, )):
+            num_of_partners["met"] = Partner.objects.filter(
+                Q(partner_activities__reportables=obj),
+                Q(partner_activities__reportables__indicator_reports__overall_status="Met").distinct().count()
+
+            num_of_partners["on_track"] = Partner.objects.filter(
+                Q(partner_activities__reportables=obj),
+                Q(partner_activities__reportables__indicator_reports__overall_status="OnT").distinct().count()
+
+            num_of_partners["no_progress"] = Partner.objects.filter(
+                Q(partner_activities__reportables=obj),
+                Q(partner_activities__reportables__indicator_reports__overall_status="NoP").distinct().count()
+
+            num_of_partners["constrained"] = Partner.objects.filter(
+                Q(partner_activities__reportables=obj),
+                Q(partner_activities__reportables__indicator_reports__overall_status="Con").distinct().count()
+
+            num_of_partners["no_status"] = Partner.objects.filter(
+                Q(partner_activities__reportables=obj),
+                Q(partner_activities__reportables__indicator_reports__overall_status="NoS").distinct().count()
+
+        elif isinstance(obj.content_object, (ClusterObjective, )):
+            num_of_partners["met"] = Partner.objects.filter(
+                Q(partner_activities__cluster_objective__reportables=obj),
+                Q(partner_activities__cluster_objective__reportables__indicator_reports__overall_status="Met").distinct().count()
+
+            num_of_partners["on_track"] = Partner.objects.filter(
+                Q(partner_activities__cluster_objective__reportables=obj),
+                Q(partner_activities__cluster_objective__reportables__indicator_reports__overall_status="OnT").distinct().count()
+
+            num_of_partners["no_progress"] = Partner.objects.filter(
+                Q(partner_activities__cluster_objective__reportables=obj),
+                Q(partner_activities__cluster_objective__reportables__indicator_reports__overall_status="NoP").distinct().count()
+
+            num_of_partners["constrained"] = Partner.objects.filter(
+                Q(partner_activities__cluster_objective__reportables=obj),
+                Q(partner_activities__cluster_objective__reportables__indicator_reports__overall_status="Con").distinct().count()
+
+            num_of_partners["no_status"] = Partner.objects.filter(
+                Q(partner_activities__cluster_objective__reportables=obj),
+                Q(partner_activities__cluster_objective__reportables__indicator_reports__overall_status="NoS").distinct().count()
+
+        elif isinstance(obj.content_object, (ClusterActivity, )):
+            num_of_partners["met"] = Partner.objects.filter(
+                Q(partner_activities__cluster_activity__reportables=obj),
+                Q(partner_activities__cluster_activity__reportables__indicator_reports__overall_status="Met").distinct().count()
+
+            num_of_partners["on_track"] = Partner.objects.filter(
+                Q(partner_activities__cluster_activity__reportables=obj),
+                Q(partner_activities__cluster_activity__reportables__indicator_reports__overall_status="OnT").distinct().count()
+
+            num_of_partners["no_progress"] = Partner.objects.filter(
+                Q(partner_activities__cluster_activity__reportables=obj),
+                Q(partner_activities__cluster_activity__reportables__indicator_reports__overall_status="NoP").distinct().count()
+
+            num_of_partners["constrained"] = Partner.objects.filter(
+                Q(partner_activities__cluster_activity__reportables=obj),
+                Q(partner_activities__cluster_activity__reportables__indicator_reports__overall_status="Con").distinct().count()
+
+            num_of_partners["no_status"] = Partner.objects.filter(
+                Q(partner_activities__cluster_activity__reportables=obj),
+                Q(partner_activities__cluster_activity__reportables__indicator_reports__overall_status="NoS").distinct().count()
+
+        return num_of_partners
 
     def get_progress_over_time(self, obj):
         return {}
