@@ -1346,7 +1346,7 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
         return num_of_partners
 
     def get_progress_over_time(self, obj):
-        return {}
+        return list(obj.indicator_reports.order_by('id').values_list('time_period_end', 'total'))
 
     def get_current_progress_by_partner(self, obj):
         return {}
