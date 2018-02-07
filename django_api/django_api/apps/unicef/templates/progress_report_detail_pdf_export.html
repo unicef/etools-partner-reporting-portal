@@ -117,35 +117,43 @@
         </table>
         <br />
 
-        {% for report_list in indicator_reports %}
+        <table>
+            <tr>
+                <th>Programme Outputs*</th>
+                <th>Performance indicator*</th>
+                <th>Targets*</th>
+                <th>Achievement in reporting period**</th>
+                <th>Cumulative progress to date**</th>
+                <th>Overall Status</th>
+                <th>Narrative assessment / summary of progress**</th>
+            </tr>
+            {% for report_list in indicator_reports %}
                 {% for indicator in report_list %}
                     {% if forloop.counter == 1 %}
-                        <table>
-                            <tr>
-                                <th rowspan="2" colspan="2" class="section">
-                                    2.{{ forloop.parentloop.counter }} {{ indicator.reportable.content_object.title }}
-                                </th>
-                                <th>Overall Status</th>
-                                <td class="{{ indicator.overall_status }}">{{ indicator.get_overall_status_display }}</td>
-                            </tr>
-                            <tr>
-                                <th>Narrative Assessment</th>
-                                <td>{{ indicator.narrative_assessment|default:'---' }}</td>
-                            </tr>
-                        </table>
+                        <tr>
+                            <th rowspan="{{ report_list|length }}">{{ indicator.reportable.content_object.title }}</th>
+                            <th>{{ indicator.title }}</th>
+                            <th>{{ indicator.reportable.target }}</th>
+                            <td width="100px">{% if indicator.is_number %}{{ indicator.total.v|floatformat:"0" }}{% else %}{{ indicator.total.c|percentage }}{% endif %}</td>
+                            <td width="100px">{% if indicator.is_number %}{{ indicator.total.v|floatformat:"0" }}{% else %}{{ indicator.total.c|percentage }}{% endif %}</td>
+                            <td rowspan="{{ report_list|length }}" class="{{ indicator.overall_status }}">
+                                {{ indicator.get_overall_status_display }}
+                            </td>
+                            <td rowspan="{{ report_list|length }}">
+                                {{ indicator.narrative_assessment|default:"---" }}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <th>{{ indicator.title }}</th>
+                            <th>{{ indicator.reportable.target }}</th>
+                            <td>{% if indicator.is_number %}{{ indicator.total.v|floatformat:"0" }}{% else %}{{ indicator.total.c|percentage }}{% endif %}</td>
+                            <td>{% if indicator.is_number %}{{ indicator.total.v|floatformat:"0" }}{% else %}{{ indicator.total.c|percentage }}{% endif %}</td>
+                        </tr>
                     {% endif %}
-
-
-
-{#                    <tr>#}
-{#                        <th>{{ indicator.title }}</th>#}
-{#                        <th>{{ indicator.reportable.target }}</th>#}
-{#                        <td>{% if indicator.is_number %}{{ indicator.total.v|floatformat:"0" }}{% else %}{{ indicator.total.c|percentage }}{% endif %}</td>#}
-{#                        <td>{% if indicator.is_number %}{{ indicator.total.v|floatformat:"0" }}{% else %}{{ indicator.total.c|percentage }}{% endif %}</td>#}
-{#                    </tr>#}
                 {% endfor %}
-            <br />
-        {% endfor %}
+            {% endfor %}
+        </table>
 
     </div>
 {% endblock %}

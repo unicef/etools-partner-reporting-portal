@@ -54,3 +54,16 @@ class ListExportMixin(object):
             ).get_as_response()
 
         return super(ListExportMixin, self).get(request, *args, **kwargs)
+
+
+class ObjectExportMixin(object):
+
+    export_url_kwarg = 'export'
+    exporters = {}
+
+    def get(self, request, *args, **kwargs):
+        exporter_class = self.exporters.get(self.request.query_params.get(self.export_url_kwarg))
+        if exporter_class:
+            return exporter_class(self.get_object()).get_as_response()
+
+        return super(ObjectExportMixin, self).get(request, *args, **kwargs)

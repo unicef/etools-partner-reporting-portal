@@ -43,7 +43,7 @@ from partner.models import Partner
 from unicef.exports.programme_documents import ProgrammeDocumentsXLSXExporter, ProgrammeDocumentsPDFExporter
 from unicef.exports.progress_reports import ProgressReportDetailPDFExporter
 from unicef.exports.utilities import group_indicator_reports_by_lower_level_output
-from utils.mixins import ListExportMixin
+from utils.mixins import ListExportMixin, ObjectExportMixin
 
 from .serializers import (
     ProgrammeDocumentSerializer,
@@ -343,31 +343,19 @@ class ProgressReportDetailsUpdateAPIView(APIView):
                             status=statuses.HTTP_400_BAD_REQUEST)
 
 
-class ProgressReportDetailsAPIView(RetrieveAPIView):
+class ProgressReportDetailsAPIView(ObjectExportMixin, RetrieveAPIView):
     """
     Endpoint for getting a single Progress Report
     """
     serializer_class = ProgressReportSerializer
     permission_classes = (IsAuthenticated, )
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
+    exporters = {
+        'pdf': ProgressReportDetailPDFExporter
+    }
 
-    def get(self, request, workspace_id, pk, *args, **kwargs):
-        """
-        Get Progress Report Details by given pk.
-        """
-        progress_report = self.get_object(pk)
-        export = self.request.query_params.get('export')
-        if export == 'pdf':
-            return ProgressReportDetailPDFExporter(progress_report).get_as_response()
-
-        serializer = self.get_serializer(
-            request.GET.get('llo'),
-            request.GET.get('location'),
-            progress_report
-        )
-        return Response(serializer.data, status=statuses.HTTP_200_OK)
-
-    def get_object(self, pk):
+    def get_object(self):
+        pk = self.kwargs['pk']
         user_has_global_view = self.request.user.is_unicef
         query_params = {}
         if not user_has_global_view:
