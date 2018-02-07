@@ -1200,6 +1200,9 @@ class ClusterAnalysisIndicatorsListSerializer(serializers.ModelSerializer):
     total_against_in_need = serializers.SerializerMethodField()
     total_against_target = serializers.SerializerMethodField()
 
+    def get_content_type(self, obj):
+        return obj.content_type.model
+
     def get_total_against_in_need(self, obj):
         # TODO: Stubbed until in_need field is finalized
         return 100
@@ -1207,7 +1210,7 @@ class ClusterAnalysisIndicatorsListSerializer(serializers.ModelSerializer):
     def get_total_against_target(self, obj):
         # TODO: Move this logic to post_save on Reportable in the future
         if obj.children.exists():
-            return sum(map(lambda x: int(x), obj.children.values_list('total', flat=True)))
+            return sum(map(lambda x: int(x['c']), obj.children.values_list('total', flat=True)))
 
         else:
             return obj.total
@@ -1247,19 +1250,12 @@ class ClusterAnalysisIndicatorsListSerializer(serializers.ModelSerializer):
 
 
 class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
-    content_type_name = serializers.SerializerMethodField()
-    content_object_title = serializers.SerializerMethodField()
     num_of_partners = serializers.SerializerMethodField()
     partners_by_status = serializers.SerializerMethodField()
     progress_over_time = serializers.SerializerMethodField()
     current_progress_by_partner = serializers.SerializerMethodField()
     current_progress_by_location = serializers.SerializerMethodField()
-
-    def get_content_type_name(self, obj):
-        return obj.content_type.name
-
-    def get_content_object_title(self, obj):
-        return obj.content_object.title
+    content_type = serializers.SerializerMethodField()
 
     def get_num_of_partners(self, obj):
         num_of_partners = 0
@@ -1389,9 +1385,8 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
             'in_need',
             'total',
             'blueprint',
+            'content_type',
             'frequency',
-            'content_type_name',
-            'content_object_title',
             'num_of_partners',
             'partners_by_status',
             'progress_over_time',
