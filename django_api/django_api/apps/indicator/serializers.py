@@ -1195,14 +1195,39 @@ class ClusterPartnerAnalysisIndicatorResultSerializer(serializers.ModelSerialize
 
 
 class ClusterAnalysisIndicatorsListSerializer(serializers.ModelSerializer):
-    content_type_name = serializers.SerializerMethodField()
-    content_object_title = serializers.SerializerMethodField()
+    content_type = serializers.SerializerMethodField()
+    content_object = serializers.SerializerMethodField()
+    total_against_in_need = serializers.SerializerMethodField()
+    total_against_target = serializers.SerializerMethodField()
 
-    def get_content_type_name(self, obj):
-        return obj.content_type.name
+    def get_total_against_in_need(self, obj):
+        # TODO: Stubbed until in_need field is finalized
+        return 100
 
-    def get_content_object_title(self, obj):
-        return obj.content_object.title
+    def get_total_against_target(self, obj):
+        # TODO: Move this logic to post_save on Reportable in the future
+        if obj.children.exists():
+            return sum(map(lambda x: int(x), obj.children.values_list('total', flat=True)))
+
+        else:
+            return obj.total
+
+    def get_content_object(self, obj):
+        if isinstance(obj.content_object, (PartnerProject, )):
+            from partner.serializers import PartnerProjectSimpleSerializer
+            return PartnerProjectSimpleSerializer(obj.content_object).data
+
+        elif isinstance(obj.content_object, (PartnerActivity, )):
+            from partner.serializers import PartnerActivitySimpleSerializer
+            return PartnerActivitySimpleSerializer(obj.content_object).data
+
+        elif isinstance(obj.content_object, (ClusterObjective, )):
+            from cluster.serializers import ClusterObjectiveSerializer
+            return ClusterObjectiveSerializer(obj.content_object).data
+
+        elif isinstance(obj.content_object, (ClusterActivity, )):
+            from cluster.serializers import ClusterActivitySerializer
+            return ClusterActivitySerializer(obj.content_object).data
 
     class Meta:
         model = Reportable
@@ -1214,9 +1239,10 @@ class ClusterAnalysisIndicatorsListSerializer(serializers.ModelSerializer):
             'blueprint',
             'achieved',
             'progress_percentage',
-            'content_type_name',
-            'content_object_title',
-            'object_id',
+            'content_type',
+            'content_object',
+            'total_against_in_need',
+            'total_against_target',
         )
 
 
