@@ -79,10 +79,12 @@ class ProgressReportDetailPDFExporter:
                     location_progress = format_total_value_to_string(
                         location_data.disaggregation.get('()'), is_percentage=is_percentage
                     )
-                    previous_location_progress = format_total_value_to_string(
-                        getattr(location_data.previous_location_data, 'disaggregation', {}).get('()', {}),
-                        is_percentage=is_percentage
-                    )
+                    if location_data.previous_location_data:
+                        prev_value = location_data.previous_location_data.disaggregation.get('()', {})
+                    else:
+                        prev_value = 0
+                    previous_location_progress = format_total_value_to_string(prev_value, is_percentage=is_percentage)
+
                     location_table = [
                         [
                             HTMLTableCell(location_data.location.title, rowspan=2, colspan=2),

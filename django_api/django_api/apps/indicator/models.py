@@ -548,4 +548,4 @@ class IndicatorLocationData(TimeStampedModel):
 
         previous_report = previous_indicator_reports.last()
         if previous_report:
-            return previous_report.indicator_location_data.filter(id=self.id).first()
+            return previous_report.indicator_location_data.filter(location=self.location).first()
