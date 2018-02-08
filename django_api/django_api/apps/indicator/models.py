@@ -523,21 +523,29 @@ class IndicatorLocationData(TimeStampedModel):
         core.Location (OneToOneField): "location"
     """
     indicator_report = models.ForeignKey(
-        IndicatorReport, related_name="indicator_location_data")
+        IndicatorReport, related_name="indicator_location_data"
+    )
     location = models.ForeignKey(
         'core.Location',
-        related_name="indicator_location_data")
+        related_name="indicator_location_data"
+    )
 
     disaggregation = JSONField(default=dict)
     num_disaggregation = models.IntegerField()
     level_reported = models.IntegerField()
-    disaggregation_reported_on = ArrayField(
-        models.IntegerField(), default=list
-    )
+    disaggregation_reported_on = ArrayField(models.IntegerField(), default=list)
 
     class Meta:
         ordering = ['id']
 
     def __str__(self):
-        return "{} Location Data for {}".format(
-            self.location, self.indicator_report)
+        return "{} Location Data for {}".format(self.location, self.indicator_report)
+
+    @property
+    def previous_location_data(self):
+        current_ir_id = self.indicator_report.id
+        previous_indicator_reports = self.indicator_report.reportable.indicator_reports.filter(id__lt=current_ir_id)
+
+        previous_report = previous_indicator_reports.last()
+        if previous_report:
+            return previous_report.indicator_location_data.filter(id=self.id).first()

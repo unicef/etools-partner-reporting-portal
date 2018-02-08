@@ -4,3 +4,9 @@ class ValueType:
     VALUE = 'v'
     DENOMINATOR = 'd'
     CALCULATED = 'c'
+
+    @classmethod
+    def empty(cls):
+        return {
+
+        }

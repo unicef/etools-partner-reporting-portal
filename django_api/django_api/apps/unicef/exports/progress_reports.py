@@ -11,6 +11,7 @@ from unicef.exports.utilities import group_indicator_reports_by_lower_level_outp
 logger = logging.getLogger(__name__)
 
 
+# TODO: Profiling + optimize, currently takes upwards of 10s to generate the export
 class ProgressReportDetailPDFExporter:
 
     template_name = 'progress_report_detail_pdf_export.html'
@@ -45,12 +46,14 @@ class ProgressReportDetailPDFExporter:
             ])
 
             for indicator in indicators:
+                is_percentage = indicator.is_percentage
+
                 total_cumulative_progress = format_total_value_to_string(
                     indicator.reportable.total,
                     is_percentage=indicator.reportable.blueprint.unit == IndicatorBlueprint.PERCENTAGE
                 )
                 achievement_in_reporting_period = format_total_value_to_string(
-                    indicator.total, is_percentage=indicator.is_percentage
+                    indicator.total, is_percentage=is_percentage
                 )
 
                 indicator_table = [
@@ -70,8 +73,29 @@ class ProgressReportDetailPDFExporter:
                         HTMLTableCell(achievement_in_reporting_period),
                     ],
                 ]
-
                 tables.append(indicator_table)
+
+                for location_data in indicator.indicator_location_data.all():
+                    location_progress = format_total_value_to_string(
+                        location_data.disaggregation.get('()'), is_percentage=is_percentage
+                    )
+                    previous_location_progress = format_total_value_to_string(
+                        getattr(location_data.previous_location_data, 'disaggregation', {}).get('()', {}),
+                        is_percentage=is_percentage
+                    )
+                    location_table = [
+                        [
+                            HTMLTableCell(location_data.location.title, rowspan=2, colspan=2),
+                            HTMLTableHeader('Location Progress'),
+                            HTMLTableCell(location_progress),
+                        ],
+                        [
+                            HTMLTableHeader('Previous Location Progress'),
+                            HTMLTableCell(previous_location_progress),
+                        ],
+                    ]
+
+                    tables.append(location_table)
 
             output.append({
                 'tables': tables
