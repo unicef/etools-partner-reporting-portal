@@ -304,24 +304,10 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
         return obj.disaggregation['()']
 
     def get_previous_location_progress(self, obj):
-        current_ir_id = obj.indicator_report.id
-        previous_indicator_reports = obj.indicator_report \
-            .reportable.indicator_reports.filter(id__lt=current_ir_id)
-
+        previous_location_data = obj.previous_location_data
         empty_progress = {'c': 0, 'd': 0, 'v': 0}
-
-        if not previous_indicator_reports.exists():
-            return empty_progress
-
-        previous_report = previous_indicator_reports.last()
-        previous_indicator_location_data_id_list = previous_report \
-            .indicator_location_data \
-            .values_list('id', flat=True)
-
-        if obj.id in previous_indicator_location_data_id_list:
-            loc_data = previous_report.indicator_location_data.get(id=obj.id)
-            return loc_data.disaggregation['()']
-
+        if previous_location_data:
+            return previous_location_data.disaggregation.get('()', empty_progress)
         else:
             return empty_progress
 
