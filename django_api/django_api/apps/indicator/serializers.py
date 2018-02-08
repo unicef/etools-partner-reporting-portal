@@ -1257,6 +1257,9 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
     current_progress_by_location = serializers.SerializerMethodField()
     content_type = serializers.SerializerMethodField()
 
+    def get_content_type(self, obj):
+        return obj.content_type.model
+
     def get_num_of_partners(self, obj):
         num_of_partners = 0
 
@@ -1290,7 +1293,7 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
             num_of_partners["no_status"] += 1
 
     def _get_progress_by_partner(self, reportable, partner_progresses):
-        partner_progresses[obj.content_object.partner.title] = int(obj.total['c'])
+        partner_progresses[reportable.content_object.partner.title] = int(reportable.total['c'])
 
     def get_partners_by_status(self, obj):
         num_of_partners = {
@@ -1323,7 +1326,7 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
 
         # If the indicator is UNICEF cluster which is linked as Partner, then show its progress only
         else:
-            partner_progresses[obj.content_object.partner.title] = int(obj.total['c'])
+            self._get_progress_by_partner(obj, partner_progresses)
 
         return partner_progresses
 
