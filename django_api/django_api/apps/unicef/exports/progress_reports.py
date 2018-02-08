@@ -23,14 +23,11 @@ class ProgressReportDetailPDFExporter:
         )
         self.file_name = self.display_name + '.pdf'
 
-    def format_indicator_reports(self, indicator_reports):
-        output = []
-
+    def serialize_indicator_reports(self, indicator_reports):
         grouped_indicators = group_indicator_reports_by_lower_level_output(indicator_reports)
 
+        tables = list()
         for indicators in grouped_indicators:
-            tables = list()
-
             tables.append([
                 [
                     HTMLTableHeader(indicators[0].reportable.content_object.title, colspan=2, klass='section'),
@@ -99,11 +96,7 @@ class ProgressReportDetailPDFExporter:
 
                     tables.append(location_table)
 
-            output.append({
-                'tables': tables
-            })
-
-        return output
+        return tables
 
     def get_context(self):
         pd = self.progress_report.programme_document
@@ -114,7 +107,7 @@ class ProgressReportDetailPDFExporter:
             'programme_document': pd,
             'authorized_officer': pd.unicef_officers.first(),
             'focal_point': pd.unicef_focal_point.first(),
-            'sections': self.format_indicator_reports(self.progress_report.indicator_reports.all())
+            'tables': self.serialize_indicator_reports(self.progress_report.indicator_reports.all())
         }
 
         return context
