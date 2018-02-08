@@ -1261,8 +1261,10 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
         num_of_partners = 0
 
         if obj.children.exists() and isinstance(obj.content_object, (ClusterActivity, )):
-                num_of_partners = Partner.objects.filter(
-                    partner_activities__cluster_activity__reportables=obj).distinct().count()
+                num_of_partners = obj.content_object.partner_activities.values_list('partner', flat=True).distinct().count()
+
+        elif isinstance(obj.content_object, PartnerProject) or isinstance(obj.content_object, PartnerActivity):
+            num_of_partners = 1
 
         else:
             num_of_partners = 0
@@ -1287,6 +1289,9 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
         elif overall_status == OVERALL_STATUS.no_status:
             num_of_partners["no_status"] += 1
 
+    def _get_progress_by_partner(self, reportable, partner_progresses):
+        partner_progresses[obj.content_object.partner.title] = int(obj.total['c'])
+
     def get_partners_by_status(self, obj):
         num_of_partners = {
             "met": 0,
@@ -1309,7 +1314,18 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
         return list(obj.indicator_reports.order_by('id').values_list('time_period_end', 'total'))
 
     def get_current_progress_by_partner(self, obj):
-        return {}
+        partner_progresses = {}
+
+        # Only if the indicator is cluster activity, the children (unicef indicators) will exist
+        if obj.children.exists():
+            for child in obj.children.all():
+                self._get_progress_by_partner(child, partner_progresses)
+
+        # If the indicator is UNICEF cluster which is linked as Partner, then show its progress only
+        else:
+            partner_progresses[obj.content_object.partner.title] = int(obj.total['c'])
+
+        return partner_progresses
 
     def get_current_progress_by_location(self, obj):
         return {}
