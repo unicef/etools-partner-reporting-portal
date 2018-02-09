@@ -73,9 +73,7 @@ class ProgrammeDocumentFilter(django_filters.FilterSet):
 
 
 class ProgressReportFilter(django_filters.FilterSet):
-    status = CharFilter(
-        name='status',
-        label='Status')
+    status = CharFilter(method='get_status')
     pd_ref_title = CharFilter(name='pd ref title', method='get_pd_ref_title',
                               label='PD/Ref # title')
     due_date = DateFilter(name='due date', method='get_due_date', label='Due date',

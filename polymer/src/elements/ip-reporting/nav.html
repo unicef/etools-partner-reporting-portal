@@ -24,6 +24,16 @@
         params-object="{{pdQuery}}">
     </iron-query-params>
 
+    <iron-query-params
+      params-string="{{reportsQueryString}}"
+      params-object="{{reportsQuery}}">
+    </iron-query-params>
+
+    <iron-query-params
+    params-string="{{indicatorsQueryString}}"
+    params-object="{{indicatorsQuery}}">
+  </iron-query-params>
+
     <paper-menu
         id="menu"
         selected="{{selected}}"
@@ -44,13 +54,13 @@
       </paper-item>
 
       <paper-item name="progress-reports">
-        <a href="[[buildUrl(_baseUrl, '/progress-reports')]]">
+        <a href="[[buildUrl(_baseUrl, '/progress-reports')]]?[[reportsQueryString]]">
           <span><iron-icon icon="assignment" role="presentation"></iron-icon>[[localize('progress_reports')]]</span>
         </a>
       </paper-item>
 
       <paper-item name="indicators">
-        <a href="[[buildUrl(_baseUrl, '/indicators')]]">
+        <a href="[[buildUrl(_baseUrl, '/indicators')]]?[[indicatorsQueryString]]">
           <span><iron-icon icon="trending-up" role="presentation"></iron-icon>[[localize('indicators')]]</span>
         </a>
       </paper-item>
@@ -78,7 +88,20 @@
             status: String(['Sig', 'Act', 'Sus']),
           },
         },
+        reportsQuery: {
+          type: Object,
+          value: {
+            status: String(['Due', 'Ove', 'Sen']),
+          },
+        },
+        indicatorsQuery: {
+          type: Object,
+          value: {
+            pd_statuses: String(['Act']),
+          },
+        },
       },
+      
     });
   </script>
 </dom-module>
