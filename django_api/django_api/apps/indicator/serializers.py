@@ -1,4 +1,5 @@
 from ast import literal_eval as make_tuple
+from collections import defaultdict
 
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
@@ -1331,7 +1332,24 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
         return partner_progresses
 
     def get_current_progress_by_location(self, obj):
-        return {}
+        location_progresses = defaultdict(int)
+
+        # Only if the indicator is cluster activity, the children (unicef indicators) will exist
+        if obj.children.exists():
+            latest_indicator_reports = map(lambda x: x.indicator_reports.latest('time_period_start'), obj.children.all())
+
+            for ir in latest_indicator_reports:
+                for ild in ir.indicator_location_data.all():
+                    location_progresses[ild.location.title] += ild.disaggregation['()']['c']
+
+        # If the indicator is UNICEF cluster which is linked as Partner, then show its progress only
+        else:
+            indicator_location_data = obj.indicator_reports.latest('time_period_start').indicator_location_data.all()
+
+            for ild in indicator_location_data:
+                location_progresses[ild.location.title] += ild.disaggregation['()']['c']
+
+        return location_progresses
 
     class Meta:
         model = Reportable
