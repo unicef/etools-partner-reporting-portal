@@ -147,7 +147,7 @@ class IndicatorsXLSXExporter:
                 partner_project = partner_activity.project
             elif partner_project:
                 cluster = partner_project.clusters.first()
-                cluster_objective = partner_project.clusters.first().cluster_objectives.first()
+                cluster_objective = cluster.cluster_objectives.first()
                 partner_activity = partner_project.partner.partner_activities.first()
 
             for location_data in locations_data.all():
