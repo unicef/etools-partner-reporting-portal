@@ -398,7 +398,7 @@ class ProgressReport(TimeStampedModel):
         blank=True,
         null=True
     )
-    report_number = models.IntegerField(verbose_name="Report Number", default=1)
+    report_number = models.IntegerField(verbose_name="Report Number")
     report_type = models.CharField(verbose_name="Report type", choices=REPORTING_TYPES, max_length=3)
     is_final = models.BooleanField(verbose_name="Is final report", default=False)
 
