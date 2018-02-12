@@ -91,7 +91,11 @@ from core.factories import (
     CountryFactory,
     ReportingPeriodDatesFactory,
 )
-from core.common import INDICATOR_REPORT_STATUS, OVERALL_STATUS
+from core.common import (
+    INDICATOR_REPORT_STATUS,
+    OVERALL_STATUS,
+    PROGRESS_REPORT_TYPES
+)
 
 from ._generate_disaggregation_fake_data import (
     generate_indicator_report_location_disaggregation_quantity_data,
@@ -109,7 +113,7 @@ from partner.tasks import process_partners
 from unicef.tasks import process_programme_documents
 
 OVERALL_STATUS_LIST = [x[0] for x in OVERALL_STATUS]
-
+PROGRESS_REPORT_TYPE_LIST_WITHOUT_SR = [x[0] for x in PROGRESS_REPORT_TYPES if x != 'SR']
 
 def clean_up_data():
     if settings.ENV == 'dev':
@@ -568,7 +572,9 @@ def generate_fake_data(workspace_quantity=10):
         # reports for each llo and then associating them with a progress
         # report
         for idx in xrange(0, random.randint(2, 8)):
-            progress_report = ProgressReportFactory(programme_document=pd)
+            progress_report_type = PROGRESS_REPORT_TYPE_LIST_WITHOUT_SR[random.randint(0, 1)]
+
+            progress_report = ProgressReportFactory(programme_document=pd, report_type=progress_report_type)
             for cp_output in pd.cp_outputs.all():
                 for llo in cp_output.ll_outputs.all():
                     # All Indicator Reports inside LLO should have same status
