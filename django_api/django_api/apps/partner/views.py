@@ -196,6 +196,7 @@ class PartnerActivityCreateAPIView(APIView):
                     end_date=serializer.validated_data['end_date'],
                     status=serializer.validated_data['status'],
                 )
+                # TODO: Create reportables in the db, cloning this cluster activities indicators?
             except Exception as e:
                 return Response(
                     {'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
