@@ -199,6 +199,9 @@ class ProgressReportSimpleSerializer(serializers.ModelSerializer):
             'review_overall_status_display',
             'sent_back_feedback',
             'programme_document',
+            'report_type',
+            'report_number',
+            'is_final',
         )
 
     def get_reporting_period(self, obj):
