@@ -429,8 +429,9 @@ class ReportingPeriodDates(TimeStampedExternalSyncModelMixin):
     """
     Used for storing start_date, end_date and due_date fields for multiple reports
     """
-    start_date = models.DateField(verbose_name='Start date')
-    end_date = models.DateField(verbose_name='End date')
+    report_type = models.CharField(verbose_name="Report type", choices=PROGRESS_REPORT_TYPES, max_length=3)
+    start_date = models.DateField(verbose_name='Start date', null=True, blank=True)
+    end_date = models.DateField(verbose_name='End date', null=True, blank=True)
     due_date = models.DateField(null=True, blank=True, verbose_name='Due date')
     programme_document = models.ForeignKey(
         ProgrammeDocument, related_name='reporting_periods')
