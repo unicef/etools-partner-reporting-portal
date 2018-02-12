@@ -750,7 +750,7 @@ class OperationalPresenceAggregationDataAPIView(APIView):
             response_data["num_of_partners_per_cluster"][cluster.type] = cluster.partners.count()
 
         for objective in objectives:
-            response_data["num_of_partners_per_cluster_objective"][objective.title] = Partner.objects.filter(clusters__cluster_objectives=objective).distinct().count()
+            response_data["num_of_partners_per_cluster_objective"][objective.title] = Partner.objects.filter(clusters__cluster_objectives=objective).count()
 
         return response_data
 
