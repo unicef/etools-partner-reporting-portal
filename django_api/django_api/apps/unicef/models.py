@@ -19,7 +19,8 @@ from core.common import (
     PROGRESS_REPORT_STATUS,
     PD_STATUS,
     CURRENCIES,
-    OVERALL_STATUS
+    OVERALL_STATUS,
+    PROGRESS_REPORT_TYPES
 )
 from core.models import TimeStampedExternalSyncModelMixin
 from indicator.models import Reportable  # IndicatorReport
@@ -397,9 +398,13 @@ class ProgressReport(TimeStampedModel):
         blank=True,
         null=True
     )
+    report_number = models.IntegerField(verbose_name="Report Number", default=1)
+    report_type = models.CharField(verbose_name="Report type", choices=PROGRESS_REPORT_TYPES, max_length=3)
+    is_final = models.BooleanField(verbose_name="Is final report", default=False)
 
     class Meta:
         ordering = ['-due_date', '-id']
+        unique_together = ('programme_document', 'report_type', 'report_number')
 
     @cached_property
     def latest_indicator_report(self):
