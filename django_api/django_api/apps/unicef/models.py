@@ -20,7 +20,7 @@ from core.common import (
     PD_STATUS,
     CURRENCIES,
     OVERALL_STATUS,
-    PROGRESS_REPORT_TYPES
+    REPORTING_TYPES
 )
 from core.models import TimeStampedExternalSyncModelMixin
 from indicator.models import Reportable  # IndicatorReport
@@ -399,7 +399,7 @@ class ProgressReport(TimeStampedModel):
         null=True
     )
     report_number = models.IntegerField(verbose_name="Report Number", default=1)
-    report_type = models.CharField(verbose_name="Report type", choices=PROGRESS_REPORT_TYPES, max_length=3)
+    report_type = models.CharField(verbose_name="Report type", choices=REPORTING_TYPES, max_length=3)
     is_final = models.BooleanField(verbose_name="Is final report", default=False)
 
     class Meta:
@@ -429,7 +429,7 @@ class ReportingPeriodDates(TimeStampedExternalSyncModelMixin):
     """
     Used for storing start_date, end_date and due_date fields for multiple reports
     """
-    report_type = models.CharField(verbose_name="Report type", choices=PROGRESS_REPORT_TYPES, max_length=3)
+    report_type = models.CharField(verbose_name="Report type", choices=REPORTING_TYPES, max_length=3)
     start_date = models.DateField(verbose_name='Start date', null=True, blank=True)
     end_date = models.DateField(verbose_name='End date', null=True, blank=True)
     due_date = models.DateField(null=True, blank=True, verbose_name='Due date')
