@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
+from rest_framework.exceptions import ValidationError
 
 from core.api import PMP_API
 from core.models import Workspace, GatewayType, Location, PartnerAuthorizedOfficerRole
@@ -52,9 +53,12 @@ def create_user_for_person(person):
 
 
 def save_person_and_user(person_data):
-    person = process_model(
-        Person, PMPPDPersonSerializer, person_data, {'email': person_data['email']}
-    )
+    try:
+        person = process_model(
+            Person, PMPPDPersonSerializer, person_data, {'email': person_data['email']}
+        )
+    except ValidationError:
+        return None, None
 
     user = create_user_for_person(person)
 
@@ -159,6 +163,8 @@ def process_programme_documents(fast=False, area=False):
                         person_data_list = item['unicef_focal_points']
                         for person_data in person_data_list:
                             person, user = save_person_and_user(person_data)
+                            if not person:
+                                continue
 
                             pd.unicef_focal_point.add(person)
 
@@ -166,6 +172,8 @@ def process_programme_documents(fast=False, area=False):
                         person_data_list = item['agreement_auth_officers']
                         for person_data in person_data_list:
                             person, user = save_person_and_user(person_data)
+                            if not person:
+                                continue
 
                             pd.unicef_officers.add(person)
 
@@ -178,6 +186,8 @@ def process_programme_documents(fast=False, area=False):
                         person_data_list = item['focal_points']
                         for person_data in person_data_list:
                             person, user = save_person_and_user(person_data)
+                            if not person:
+                                continue
 
                             pd.partner_focal_point.add(person)
 
