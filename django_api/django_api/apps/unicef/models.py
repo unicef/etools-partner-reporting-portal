@@ -405,6 +405,14 @@ class ProgressReport(TimeStampedModel):
     def latest_indicator_report(self):
         return self.indicator_reports.all().order_by('-created').first()
 
+    @cached_property
+    def is_final(self):
+        last_reporting_period = self.programme_document.reporting_periods.order_by('-end_date').first()
+        if not last_reporting_period:
+            return False
+
+        return last_reporting_period.end_date == self.end_date
+
     def get_reporting_period(self):
         return "%s - %s " % (
             self.start_date.strftime(settings.PRINT_DATA_FORMAT),
@@ -427,8 +435,7 @@ class ReportingPeriodDates(TimeStampedExternalSyncModelMixin):
     start_date = models.DateField(verbose_name='Start date')
     end_date = models.DateField(verbose_name='End date')
     due_date = models.DateField(null=True, blank=True, verbose_name='Due date')
-    programme_document = models.ForeignKey(
-        ProgrammeDocument, related_name='reporting_periods')
+    programme_document = models.ForeignKey(ProgrammeDocument, related_name='reporting_periods')
 
 
 class PDResultLink(TimeStampedExternalSyncModelMixin):
