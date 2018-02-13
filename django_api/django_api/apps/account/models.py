@@ -46,6 +46,11 @@ class User(AbstractUser):
     def get_fullname(self):
         return ' '.join(filter(None, [self.first_name, self.last_name]))
 
+    @property
+    def display_name(self):
+        full_name = self.get_full_name()
+        return full_name + ' ({})'.format(self.email) if full_name else self.email
+
     @cached_property
     def is_unicef(self):
         return self.username == getattr(settings, 'DEFAULT_UNICEF_USER', None)
