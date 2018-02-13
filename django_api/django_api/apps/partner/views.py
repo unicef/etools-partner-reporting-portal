@@ -127,6 +127,7 @@ class PartnerProjectAPIView(APIView):
     """
     PartnerProject CRUD endpoint
     """
+    # TODO: Implement Object-level permission for IMO
     permission_classes = (IsAuthenticated, )
 
     def get_instance(self, request, pk=None):
@@ -151,6 +152,25 @@ class PartnerProjectAPIView(APIView):
         if not serializer.is_valid():
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
+
+        partner_id = self.kwargs.get('partner_id', None)
+        if partner_id:
+            partner = get_object_or_404(Partner, id=int(partner_id))
+
+            # TODO: Check Object-level permission for IMO
+
+            # Make sure the user belongs to IMO group
+            if not request.user.groups.filter(name='IMO').exists():
+                return Response({"message": "user does not belong to IMO"}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Check if incoming partner belongs to IMO's clusters
+            if not partner_id in request.user.imo_clusters.values_list('partners'):
+                return Response({"message": "the partner_id does not belong to your clusters"}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Check if updated partner project belongs to the partner
+            if not pk in partner.partner_projects.values_list('id', flat=True):
+                return Response({"message": "the partner project does not belong to partner's partner projects"}, status=status.HTTP_400_BAD_REQUEST)
+
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
