@@ -30,13 +30,13 @@
 
     <template
       is="dom-if"
-      if="[[_canNavigateToReport(permissions, report)]]"
+      if="[[showLink]]"
       restamp="true">
       <a href="[[_getReportLink(report)]]">[[_getReportTitle(report)]]</a>
     </template>
     <template
       is="dom-if"
-      if="[[!_canNavigateToReport(permissions, report)]]"
+      if="[[!showLink]]"
       restamp="true">
       [[_getReportTitle(report)]]
     </template>
@@ -63,7 +63,22 @@
 
       properties: {
         permissions: Object,
+
         report: Object,
+
+        displayLink: { 
+          type: Boolean,
+          value: false,
+        },
+
+        showLink: {
+          type: Boolean,
+          computed: '_shouldDisplayLink(displayLink, report, permissions)',
+        },
+      },
+
+      _shouldDisplayLink: function(displayLink, report, permissions ) {
+        return displayLink && this._canNavigateToReport(permissions, report);
       },
       
 
@@ -73,7 +88,6 @@
 
       _getReportLink: function (report) {
         var suffix = this._getMode(report);
-
         return this.buildUrl(
           this._baseUrl,
           '/pd/' + report.programme_document.id + '/report/' + report.id + '/' + suffix

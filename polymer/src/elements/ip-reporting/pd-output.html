@@ -18,6 +18,7 @@
 <link rel="import" href="../etools-prp-ajax.html">
 <link rel="import" href="../etools-prp-permissions.html">
 <link rel="import" href="../indicator-details.html">
+<link rel="import" href="../../behaviors/progressReportUtils.html">
 
 <dom-module id="pd-output">
   <template>
@@ -118,7 +119,8 @@
           if="[[showMeta]]">
         <reportable-meta
             data="[[reportableData]]"
-            mode="[[computedMode]]">
+            mode="[[computedMode]]"
+            completed="[[_isFinalReport(currentReport)]]">
         </reportable-meta>
       </template>
     </div>
@@ -242,6 +244,7 @@
         App.Behaviors.UtilsBehavior,
         App.Behaviors.NotificationsBehavior,
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.ProgressReportUtilsBehavior,
       ],
 
       properties: {

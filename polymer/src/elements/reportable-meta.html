@@ -7,6 +7,7 @@
 <link rel="import" href="../behaviors/utils.html">
 <link rel="import" href="report-status.html">
 <link rel="import" href="labelled-item.html">
+<link rel="import" href="../behaviors/progressReportUtils.html">
 
 <dom-module id="reportable-meta">
   <template>
@@ -43,8 +44,13 @@
             selected="[[data.overall_status]]"
             on-selected-changed="_handleInput">
           <paper-radio-button name="Met">Met</paper-radio-button>
-          <paper-radio-button name="OnT">On Track</paper-radio-button>
-          <paper-radio-button name="NoP">No Progress</paper-radio-button>
+          <template
+            is="dom-if"
+            if="[[!completed]]"
+            restamp="true">
+            <paper-radio-button name="OnT">On Track</paper-radio-button>
+            <paper-radio-button name="NoP">No Progress</paper-radio-button>
+          </template>
           <paper-radio-button name="Con">Constrained</paper-radio-button>
           <template
               is="dom-if"
@@ -108,12 +114,17 @@
           value: false,
           reflectToAttribute: true,
         },
+
+        completed: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true,
+        }
       },
 
       _handleInput: function () {
         var field = Polymer.dom(event).rootTarget;
         var id = field.id;
-
         switch (id) {
           case 'overall_status':
             this.set(['localData', id], field.selected);
