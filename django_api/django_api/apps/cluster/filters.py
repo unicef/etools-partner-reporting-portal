@@ -94,8 +94,7 @@ class ClusterIndicatorsFilter(django_filters.FilterSet):
     def get_cluster(self, queryset, name, value):
         return queryset.filter(
             Q(reportable__cluster_objectives__cluster=value) |
-            Q(reportable__cluster_activities__cluster_objective__cluster=value)
-            |
+            Q(reportable__cluster_activities__cluster_objective__cluster=value) |
             Q(reportable__partner_activities__cluster_activity__cluster_objective__cluster=value) |
             Q(reportable__partner_projects__clusters__id__exact=value)
         )
