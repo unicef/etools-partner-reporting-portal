@@ -186,6 +186,9 @@ class ProgressReportSimpleSerializer(serializers.ModelSerializer):
         model = ProgressReport
         fields = (
             'id',
+            'report_type',
+            'report_number',
+            'is_final',
             'partner_contribution_to_date',
             'challenges_in_the_reporting_period',
             'proposed_way_forward',
@@ -199,9 +202,6 @@ class ProgressReportSimpleSerializer(serializers.ModelSerializer):
             'review_overall_status_display',
             'sent_back_feedback',
             'programme_document',
-            'report_type',
-            'report_number',
-            'is_final',
         )
 
     def get_reporting_period(self, obj):
@@ -234,6 +234,9 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
         model = ProgressReport
         fields = (
             'id',
+            'report_type',
+            'report_number',
+            'is_final',
             'partner_contribution_to_date',
             'challenges_in_the_reporting_period',
             'proposed_way_forward',
