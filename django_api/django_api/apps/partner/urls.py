@@ -30,6 +30,8 @@ urlpatterns = [
     url(r'^partner-project-details/(?P<pk>\d+)/$',
         PartnerProjectAPIView.as_view(),
         name="partner-project-details"),
+    url(r'^(?P<response_plan_id>\d+)/partner-project-list/partner/(?P<partner_id>\d+)$',
+        PartnerProjectListCreateAPIView.as_view(), name="imo-partner-project-list-create"),
 
     url(r'^(?P<response_plan_id>\d+)/partner-activity-list/$',
         PartnerActivityListAPIView.as_view(),

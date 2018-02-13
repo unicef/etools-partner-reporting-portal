@@ -97,7 +97,24 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
 
-        serializer.save(partner=request.user.partner)
+        partner_id = self.kwargs.get('partner_id', None)
+        if partner_id:
+            partner = get_object_or_404(Partner, id=int(partner_id))
+
+            # TODO: Check Object-level permission for IMO
+
+            # Make sure the user belongs to IMO group
+            if not request.user.groups.filter(name='IMO').exists():
+                return Response({"message": "user does not belong to IMO"}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Check if incoming partner belongs to IMO's clusters
+            if partner_id in request.user.imo_clusters.values_list('partners'):
+                serializer.save(partner=partner)
+            else:
+                return Response({"message": "the partner_id does not belong to your clusters"}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            serializer.save(partner=request.user.partner)
+
         errors = self.add_many_to_many_relations(serializer.instance)
         if errors:
             return Response(errors, status=status.HTTP_400_BAD_REQUEST)
