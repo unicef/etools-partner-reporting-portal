@@ -514,7 +514,7 @@ class ProgressReportSubmitAPIView(APIView):
         progress_report = self.get_object()
         if not progress_report.programme_document.status == PD_STATUS.active:
             _errors = [{
-                "message": "Updating Progress Report for a Programme Document that is {} is not allowed. Only Active "
+                "message": "Updating Progress Report for a {} Programme Document is not allowed. Only Active "
                            "PDs can be reported on.".format(progress_report.programme_document.get_status_display())
             }]
             return Response({"errors": _errors}, status=statuses.HTTP_400_BAD_REQUEST)
