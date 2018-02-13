@@ -327,6 +327,16 @@ class IndicatorReportsListAPIView(ListCreateAPIView):
     Parameters:
     - response_plan_id - Response plan ID
 
+    GET query parameters:
+    * cluster - Integer ID for cluster
+    * partner - Integer ID for partner
+    * indicator - Integer ID for IndicatorReport
+    * project - Integer ID for project
+    * location - Integer ID for location
+    * cluster_objective - Integer ID for cluster_objective
+    * cluster_activity - Integer ID for cluster_activity
+    * indicator_type - String value of choices: "partner_activity" or "partner_project"
+
     Returns:
         - GET method - ClusterIndicatorReportSerializer object.
         - POST method - ClusterIndicatorReportSerializer object.

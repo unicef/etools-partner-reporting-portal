@@ -67,6 +67,7 @@ class ClusterIndicatorsFilter(django_filters.FilterSet):
     location = CharFilter(method='get_location')
     cluster_objective = CharFilter(method='get_cluster_objective')
     cluster_activity = CharFilter(method='get_cluster_activity')
+    indicator_type = CharFilter(method='get_indicator_type')
 
     class Meta:
         model = IndicatorReport
@@ -78,6 +79,7 @@ class ClusterIndicatorsFilter(django_filters.FilterSet):
             'location',
             'cluster_objective',
             'cluster_activity',
+            'indicator_type',
         ]
 
     def get_submitted(self, queryset, name, value):
@@ -132,3 +134,11 @@ class ClusterIndicatorsFilter(django_filters.FilterSet):
 
     def get_cluster_activity(self, queryset, name, value):
         return queryset.filter(reportable__cluster_activities=value)
+
+    def get_indicator_type(self, queryset, name, value):
+        if value == "partner_activity":
+            return queryset.filter(reportable__partner_activities__isnull=False)
+        elif value == "partner_project":
+            return queryset.filter(reportable__partner_projects__isnull=False)
+        else:
+            return queryset
