@@ -402,6 +402,10 @@ class ProgressReport(TimeStampedModel):
     def get_submission_date(self):
         return self.submission_date.strftime(settings.PRINT_DATA_FORMAT) if self.submission_date else None
 
+    @cached_property
+    def display_name(self):
+        return '{} {}'.format(self.programme_document.title, self.get_reporting_period())
+
     def __str__(self):
         return "Progress Report <pk:{}>: {} {} to {}".format(
             self.id, self.programme_document, self.start_date, self.end_date

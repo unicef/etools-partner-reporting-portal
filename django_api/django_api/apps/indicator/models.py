@@ -22,6 +22,8 @@ from core.common import (
 from core.models import TimeStampedExternalSyncModelMixin
 from functools import reduce
 
+from indicator.constants import ValueType
+
 
 class Disaggregation(TimeStampedExternalSyncModelMixin):
     """
@@ -541,7 +543,7 @@ class IndicatorLocationData(TimeStampedModel):
     def __str__(self):
         return "{} Location Data for {}".format(self.location, self.indicator_report)
 
-    @property
+    @cached_property
     def previous_location_data(self):
         current_ir_id = self.indicator_report.id
         previous_indicator_reports = self.indicator_report.reportable.indicator_reports.filter(id__lt=current_ir_id)
@@ -549,3 +551,14 @@ class IndicatorLocationData(TimeStampedModel):
         previous_report = previous_indicator_reports.last()
         if previous_report:
             return previous_report.indicator_location_data.filter(location=self.location).first()
+
+    @cached_property
+    def previous_location_progress_value(self):
+        if not self.previous_location_data:
+            return 0
+
+        total_disaggregation = self.previous_location_data.disaggregation.get('()', {})
+        if self.indicator_report.is_percentage:
+            return total_disaggregation.get(ValueType.CALCULATED, 0)
+        else:
+            return total_disaggregation.get(ValueType.VALUE, 0)

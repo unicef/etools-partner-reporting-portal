@@ -6,7 +6,7 @@ from django.http import HttpResponse
 from openpyxl import Workbook
 from openpyxl.reader.excel import load_workbook
 from openpyxl.styles import Font, Alignment, NamedStyle
-from openpyxl.styles.numbers import FORMAT_CURRENCY_USD
+from openpyxl.styles.numbers import FORMAT_CURRENCY_USD, FORMAT_PERCENTAGE
 from openpyxl.utils import get_column_letter
 
 from django.conf import settings
@@ -20,9 +20,8 @@ from indicator.models import Disaggregation, DisaggregationValue
 from unicef.exports import programme_documents
 from unicef.exports.utilities import PARTNER_PORTAL_DATE_FORMAT_EXCEL
 
-DISAGGREGATION_COLUMN_START = 44
-INDICATOR_DATA_ROW_START = 5
-MAXIMUM_DISAGGREGATIONS_PER_INDICATOR = 3
+
+MAX_ADMIN_LEVEL = 5
 
 
 class AnnexCXLSXExporter:
@@ -44,6 +43,15 @@ class AnnexCXLSXExporter:
         'Proposed way forward',
         'Submitted by',
         'Attachment',
+        'PD output Title',
+        'PD output progress status',
+        'PD output narrative assessment',
+        'PD Indicator Title',
+        'PD indicator type',
+        'PD UNICEF Indicator Target',
+        'Calculation method across location',
+        'Calculation method across reporting period',
+        'Previous location progress',
     ]
 
     column_widths = []
@@ -58,11 +66,11 @@ class AnnexCXLSXExporter:
 
         self.workbook = Workbook()
 
-        self.sheet = self.workbook.get_active_sheet()
+        self.current_sheet = self.workbook.get_active_sheet()
         self.analysis = analysis
         if include_disaggregation is not None:
             self.include_disaggregation = include_disaggregation
-        self.sheets = [self.sheet, ]
+        self.sheets = [self.current_sheet, ]
         self.disaggregations_start_column = len(self.general_info_headers)
 
         self.bold_center_style = NamedStyle(name="Bold and Center")
@@ -74,6 +82,14 @@ class AnnexCXLSXExporter:
         programme_document = progress_report.programme_document
 
         partner = programme_document.partner
+
+        try:
+            indicator_target = float(indicator_report.reportable.target)
+        except ValueError:
+            indicator_target = indicator_report.reportable.target
+
+        previous_location_progress = location_data.previous_location_progress_value
+        previous_location_progress_format = FORMAT_PERCENTAGE if indicator_report.is_percentage else None
 
         general_info_row = [
             (partner.title, None),
@@ -90,51 +106,79 @@ class AnnexCXLSXExporter:
             (progress_report.proposed_way_forward, None),
             (progress_report.submitted_by.display_name if progress_report.submitted_by else '', None),
             (progress_report.attachment.url if progress_report.attachment else '', None),
+            (indicator_report.reportable.content_object.title, None),
+            (indicator_report.get_overall_status_display(), None),
+            (indicator_report.narrative_assessment, None),
+            (indicator_report.title, None),
+            (indicator_report.display_type, None),
+            (indicator_target, None),
+            (indicator_report.calculation_formula_across_locations, None),
+            (indicator_report.calculation_formula_across_periods, None),
+            (previous_location_progress, previous_location_progress_format),
         ]
+
+        location_info = []
+
+        # Iterate over location admin references:
+        location = location_data.location
+        while True:
+            location_info.append([
+                location.p_code, location.gateway.name
+            ])
+
+            if location.parent:
+                location = location.parent
+            else:
+                break
 
         return general_info_row
 
-    def fill_sheet(self):
-        # Setup a title
-        self.sheet.title = "TEST"
+    def fill_workbook(self):
+        for progress_report in self.progress_reports:
+            if not self.current_sheet.max_row == 1:
+                self.current_sheet = self.workbook.create_sheet('TEMP')
+            self.write_progress_report_to_current_sheet(progress_report)
+
+        self.workbook.save(self.file_path)
+
+    def write_progress_report_to_current_sheet(self, progress_report):
+        # TODO: Better sheet title, unfortunately its charset and length limited
+        self.current_sheet.title = 'PR {}'.format(progress_report.pk)
         current_row = 1
 
         for column, header_text in enumerate(self.general_info_headers):
             self.column_widths.append(len(header_text))
             column += 1  # columns are not 0-indexed...
-            cell = self.sheet.cell(row=current_row, column=column, value=header_text)
+            cell = self.current_sheet.cell(row=current_row, column=column, value=header_text)
             cell.style = self.bold_center_style
         current_row += 1
 
-        for progress_report in self.progress_reports:
-            for indicator_report in progress_report.indicator_reports.all():
-                for location_data in indicator_report.indicator_location_data.all():
-                    general_info_row = self.get_general_info_row(progress_report, location_data)
+        for indicator_report in progress_report.indicator_reports.all():
+            for location_data in indicator_report.indicator_location_data.all():
+                general_info_row = self.get_general_info_row(progress_report, location_data)
 
-                    for column, (cell_data, cell_format) in enumerate(general_info_row):
-                        try:
-                            self.column_widths[column] = max(self.column_widths[column], len(cell_data) + 2)
-                        except TypeError:
-                            self.column_widths[column] = max(self.column_widths[column], len(str(cell_data)) + 2)
-                        column += 1  # columns are not 0-indexed...
-                        cell = self.sheet.cell(row=current_row, column=column, value=cell_data)
-                        if cell_format:
-                            cell.number_format = cell_format
-                    current_row += 1
+                for column, (cell_data, cell_format) in enumerate(general_info_row):
+                    try:
+                        self.column_widths[column] = max(self.column_widths[column], len(cell_data) + 2)
+                    except TypeError:
+                        self.column_widths[column] = max(self.column_widths[column], len(str(cell_data)) + 2)
+                    column += 1  # columns are not 0-indexed...
+                    cell = self.current_sheet.cell(row=current_row, column=column, value=cell_data)
+                    if cell_format:
+                        cell.number_format = cell_format
+                current_row += 1
 
         for column, width in enumerate(self.column_widths):
             column += 1
-            self.sheet.column_dimensions[get_column_letter(column)].width = width
-
-        self.workbook.save(self.file_path)
+            self.current_sheet.column_dimensions[get_column_letter(column)].width = width
 
     def cleanup(self):
         os.remove(self.file_path)
 
     def get_as_response(self):
-        self.fill_sheet()
+        self.fill_workbook()
         response = HttpResponse()
-        response.content_type = self.sheet.mime_type
+        response.content_type = self.current_sheet.mime_type
         with open(self.file_path, 'rb') as content:
             response.write(content.read())
         self.cleanup()
