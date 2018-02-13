@@ -335,7 +335,7 @@ class IndicatorReportsListAPIView(ListCreateAPIView):
     * location - Integer ID for location
     * cluster_objective - Integer ID for cluster_objective
     * cluster_activity - Integer ID for cluster_activity
-    * indicator_type - String value of choices: "partner_activity" or "partner_project"
+    * indicator_type - String value of choices: partner_activity, partner_project, cluster_objective, OR cluster_activity
 
     Returns:
         - GET method - ClusterIndicatorReportSerializer object.
@@ -351,13 +351,13 @@ class IndicatorReportsListAPIView(ListCreateAPIView):
     def get_queryset(self):
         response_plan_id = self.kwargs.get(self.lookup_field)
         queryset = IndicatorReport.objects.filter(
-            # Q(reportable__cluster_objectives__isnull=False)
-            # | Q(reportable__cluster_activities__isnull=False)
+            Q(reportable__cluster_objectives__isnull=False)
+            | Q(reportable__cluster_activities__isnull=False)
             Q(reportable__partner_projects__isnull=False)
             | Q(reportable__partner_activities__isnull=False)
         ).filter(
-            # Q(reportable__cluster_objectives__cluster__response_plan=response_plan_id)
-            # | Q(reportable__cluster_activities__cluster_objective__cluster__response_plan=response_plan_id)
+            Q(reportable__cluster_objectives__cluster__response_plan=response_plan_id)
+            | Q(reportable__cluster_activities__cluster_objective__cluster__response_plan=response_plan_id)
             Q(reportable__partner_projects__clusters__response_plan=response_plan_id)
             | Q(reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)
         )
