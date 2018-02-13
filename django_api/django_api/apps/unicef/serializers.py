@@ -258,10 +258,7 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
         )
 
     def get_submitted_by(self, obj):
-        if obj.submitted_by:
-            return obj.submitted_by.first_name + (" %s" % obj.submitted_by.last_name if obj.submitted_by.last_name else "")
-        else:
-            return None
+        return obj.submitted_by.display_name if obj.submitted_by else None
 
     def get_funds_received_to_date(self, obj):
         return obj.programme_document.funds_received_to_date
