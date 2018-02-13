@@ -1,0 +1,84 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/routing.html">
+<link rel="import" href="../../behaviors/progressReportUtils.html">
+<link rel="import" href="../../behaviors/sorting.html">
+
+<link rel="import" href="../etools-prp-permissions.html">
+
+<dom-module id="pd-reports-report-title">
+  <template>
+    <style>
+      .final-badge {
+        display: inline-block;
+        border-radius: 1px;
+        padding: 1px 6px;
+        font-size: 10px;
+        text-transform: uppercase;
+        background-color: var(--paper-grey-300);
+        margin-left: 5px;
+        font-weight: bold;
+      }
+        
+    </style>
+
+
+    <etools-prp-permissions
+      permissions="{{permissions}}">
+    </etools-prp-permissions>
+
+    <template
+      is="dom-if"
+      if="[[_canNavigateToReport(permissions, report)]]"
+      restamp="true">
+      <a href="[[_getReportLink(report)]]">[[_getReportTitle(report)]]</a>
+    </template>
+    <template
+      is="dom-if"
+      if="[[!_canNavigateToReport(permissions, report)]]"
+      restamp="true">
+      [[_getReportTitle(report)]]
+    </template>
+    <template
+      is="dom-if"
+      if="[[_isFinalReport(report)]]"
+      restamp="true">
+      <div class="final-badge">final</div>
+    </template>
+  
+    
+  </template>
+
+  <script>
+    Polymer({
+      is: 'pd-reports-report-title',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.RoutingBehavior,
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.ProgressReportUtilsBehavior,
+      ],
+
+      properties: {
+        permissions: Object,
+        report: Object,
+      },
+      
+
+      _getReportTitle: function (report) {
+        return report.report_type + report.report_number;
+      },
+
+      _getReportLink: function (report) {
+        var suffix = this._getMode(report);
+
+        return this.buildUrl(
+          this._baseUrl,
+          '/pd/' + report.programme_document.id + '/report/' + report.id + '/' + suffix
+        );
+      },
+    });
+  </script>
+</dom-module>
