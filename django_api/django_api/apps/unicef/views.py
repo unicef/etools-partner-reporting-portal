@@ -40,6 +40,7 @@ from indicator.serializers import (
 from indicator.filters import PDReportsFilter
 from indicator.serializers import IndicatorBlueprintSimpleSerializer
 from partner.models import Partner
+from unicef.exports.annex_c_excel import AnnexCXLSXExporter
 from unicef.exports.programme_documents import ProgrammeDocumentsXLSXExporter, ProgrammeDocumentsPDFExporter
 from unicef.exports.progress_reports import ProgressReportDetailPDFExporter
 from unicef.exports.utilities import group_indicator_reports_by_lower_level_output
@@ -224,7 +225,7 @@ class ProgrammeDocumentIndicatorsAPIView(ListAPIView):
         )
 
 
-class ProgressReportAPIView(ListAPIView):
+class ProgressReportAPIView(ListExportMixin, ListAPIView):
     """
     Endpoint for getting list of all Progress Reports. Supports filtering
     as per ProgressReportFilter by status, pd_ref_title, programme_document
@@ -237,35 +238,34 @@ class ProgressReportAPIView(ListAPIView):
     permission_classes = (IsAuthenticated, )
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     filter_class = ProgressReportFilter
+    exporters = {
+        'xlsx': AnnexCXLSXExporter,
+    }
 
     def get_queryset(self):
         user_has_global_view = self.request.user.is_unicef
 
         external_partner_id = self.request.GET.get('external_partner_id')
         if external_partner_id is not None:
-            qset = Partner.objects.filter(external_id=external_partner_id)
-            return ProgressReport.objects.filter(
-                programme_document__partner__in=qset)
+            partners = Partner.objects.filter(external_id=external_partner_id)
+            queryset = ProgressReport.objects.filter(programme_document__partner__in=partners)
         else:
             # TODO: In case of UNICEF user.. allow for all (maybe create a special group for the unicef api user?)
             # Limit reports to this user's partner only
             if user_has_global_view:
-                return ProgressReport.objects.all()
+                queryset = ProgressReport.objects.all()
             else:
-                return ProgressReport.objects.filter(
-                    programme_document__partner=self.request.user.partner)
+                queryset = ProgressReport.objects.filter(programme_document__partner=self.request.user.partner)
+        return queryset.filter(programme_document__workspace=self.kwargs['workspace_id']).distinct()
 
-    def list(self, request, workspace_id, *args, **kwargs):
-        queryset = self.get_queryset().filter(
-            programme_document__workspace=workspace_id).distinct()
-        filtered = ProgressReportFilter(request.GET, queryset=queryset)
+    def list(self, request, *args, **kwargs):
+        filtered = ProgressReportFilter(request.GET, queryset=self.get_queryset())
 
         qs = filtered.qs
         order = request.query_params.get('sort', None)
         if order:
             order_field = order.split('.')[0]
             if order_field in ('due_date', 'status', 'programme_document__reference_number', 'submission_date', 'start_date'):
-                print(order_field)
                 qs = qs.order_by(order_field)
                 if len(order.split('.')) > 1 and order.split('.')[1] == 'desc':
                     qs = qs.order_by('-%s' % order_field)
