@@ -1,43 +1,64 @@
 from celery import shared_task
+from django.contrib.auth import get_user_model
 
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.auth.models import Group
 from django.db import transaction
 
-from account.models import User
-
 from core.api import PMP_API
-from core.models import Workspace, GatewayType, Location
+from core.models import Workspace, GatewayType, Location, PartnerAuthorizedOfficerRole
 from core.serializers import PMPGatewayTypeSerializer, PMPLocationSerializer
 
 from unicef.serializers import PMPProgrammeDocumentSerializer, PMPPDPartnerSerializer, PMPPDPersonSerializer, \
     PMPLLOSerializer, PMPPDResultLinkSerializer, PMPSectionSerializer, PMPReportingPeriodDatesSerializer
 from unicef.models import ProgrammeDocument, Person, LowerLevelOutput, PDResultLink, Section, ReportingPeriodDates
 
-from indicator.serializers import PMPIndicatorBlueprintSerializer, PMPDisaggregationSerializer, PMPDisaggregationValueSerializer, PMPReportableSerializer
+from indicator.serializers import PMPIndicatorBlueprintSerializer, PMPDisaggregationSerializer, \
+    PMPDisaggregationValueSerializer, PMPReportableSerializer
 from indicator.models import IndicatorBlueprint, Disaggregation, Reportable, DisaggregationValue
 
 from partner.models import Partner
 
 
-def process_model(process_model, process_serializer, data, filter_dict):
-    obj = process_model.objects.filter(**filter_dict).first()
+User = get_user_model()
+FIRST_NAME_MAX_LENGTH = User._meta.get_field('first_name').max_length
+LAST_NAME_MAX_LENGTH = User._meta.get_field('last_name').max_length
+
+
+def process_model(model_to_process, process_serializer, data, filter_dict):
+    obj = model_to_process.objects.filter(**filter_dict).first()
     serializer = process_serializer(obj, data=data)
     serializer.is_valid(raise_exception=True)
     return serializer.save()
 
 
-def create_user(person):
+def create_user_for_person(person):
     # Check if given person already exists in user model (by email)
-
-    user, created = User.objects.get_or_create(
-        email=person.email, username=person.email)
+    user, created = User.objects.get_or_create(email=person.email, defaults={
+        'username': person.email
+    })
     if created:
-        user.set_password("Passw0rd!")
-    # Update credentials
-    user.first_name = person.name
+        user.set_unusable_password()
+
+    if person.name:
+        name_parts = person.name.split()
+        if len(name_parts) == 2:
+            user.first_name = name_parts[0][:FIRST_NAME_MAX_LENGTH]
+            user.last_name = name_parts[1][:LAST_NAME_MAX_LENGTH]
+        else:
+            user.first_name = person.name[:FIRST_NAME_MAX_LENGTH]
+
     user.save()
     return user
+
+
+def save_person_and_user(person_data):
+    person = process_model(
+        Person, PMPPDPersonSerializer, person_data, {'email': person_data['email']}
+    )
+
+    user = create_user_for_person(person)
+
+    return person, user
 
 
 @shared_task
@@ -60,8 +81,7 @@ def process_programme_documents(fast=False, area=False):
     }
     """
     # Get/Create Group that will be assigned to persons
-    group, created = Group.objects.get_or_create(
-        name="IP Authorized Officer")
+    partner_authorized_officer_group = PartnerAuthorizedOfficerRole.as_group()
 
     # Iterate over all workspaces
     if fast:
@@ -77,7 +97,7 @@ def process_programme_documents(fast=False, area=False):
             try:
                 # Iterate over all pages
                 page_url = None
-                while (True):
+                while True:
                     try:
                         api = PMP_API()
                         list_data = api.programme_documents(
@@ -138,52 +158,33 @@ def process_programme_documents(fast=False, area=False):
                         # Create unicef_focal_points
                         person_data_list = item['unicef_focal_points']
                         for person_data in person_data_list:
-                            # Skip entries without unicef_vendor_number
-                            if not person_data['email']:
-                                continue
-                            if not person_data['name']:
-                                continue
-                            person = process_model(Person, PMPPDPersonSerializer, person_data,
-                                                        {'email': person_data['email']})
+                            person, user = save_person_and_user(person_data)
+
                             pd.unicef_focal_point.add(person)
 
                         # Create agreement_auth_officers
                         person_data_list = item['agreement_auth_officers']
                         for person_data in person_data_list:
-                            # Skip entries without unicef_vendor_number
-                            if not person_data['email']:
-                                continue
-                            if not person_data['name']:
-                                continue
-                            person = process_model(Person, PMPPDPersonSerializer, person_data,
-                                                        {'email': person_data['email']})
+                            person, user = save_person_and_user(person_data)
+
                             pd.unicef_officers.add(person)
 
-                            # Create user for this Person
-                            u = create_user(person)
-                            u.partner = partner
-                            u.workspaces.add(workspace)
-                            u.groups.add(group)
-                            u.save()
+                            user.partner = partner
+                            user.workspaces.add(workspace)
+                            user.groups.add(partner_authorized_officer_group)
+                            user.save()
 
-                        # Create agreement_auth_officers
+                        # Create focal_points
                         person_data_list = item['focal_points']
                         for person_data in person_data_list:
-                            # Skip entries without unicef_vendor_number
-                            if not person_data['email']:
-                                continue
-                            if not person_data['name']:
-                                continue
-                            person = process_model(Person, PMPPDPersonSerializer, person_data,
-                                                        {'email': person_data['email']})
+                            person, user = save_person_and_user(person_data)
+
                             pd.partner_focal_point.add(person)
 
-                            # Create user for this Person
-                            u = create_user(person)
-                            u.partner = partner
-                            u.save()
-                            u.workspaces.add(workspace)
-                            u.groups.add(group)
+                            user.partner = partner
+                            user.save()
+                            user.workspaces.add(workspace)
+                            user.groups.add(partner_authorized_officer_group)
 
                         # Create sections
                         section_data_list = item['sections']
@@ -237,7 +238,6 @@ def process_programme_documents(fast=False, area=False):
                                                 id=i['cluster_indicator_id']).blueprint
                                         except Reportable.DoesNotExist:
                                             print("Blueprint not exists! Skipping!")
-                                            blueprint = None
                                             continue
                                     else:
                                         # Create IndicatorBlueprint
@@ -312,6 +312,7 @@ def process_programme_documents(fast=False, area=False):
                                     i['object_id'] = llo.id
                                     i['start_date'] = item['start_date']
                                     i['end_date'] = item['end_date']
+
                                     # TODO: Fix db schema to accommodate larger lengths
                                     i['title'] = i['title'][:255]
                                     reportable = process_model(

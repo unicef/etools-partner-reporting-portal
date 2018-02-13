@@ -425,7 +425,8 @@ class PMPPDPersonSerializer(serializers.ModelSerializer):
         source='phone_number',
         required=False,
         allow_blank=True,
-        allow_null=True)
+        allow_null=True
+    )
 
     class Meta:
         model = Person
@@ -435,6 +436,7 @@ class PMPPDPersonSerializer(serializers.ModelSerializer):
             "phone_num",
             "email",
         )
+        extra_kwargs = {'name': {'required': True}}
 
 
 class PMPPDPartnerSerializer(serializers.ModelSerializer):

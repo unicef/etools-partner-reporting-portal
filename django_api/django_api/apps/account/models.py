@@ -51,7 +51,7 @@ class User(AbstractUser):
         return self.username == getattr(settings, 'DEFAULT_UNICEF_USER', None)
 
     @classmethod
-    def send_random_password(cls, sender, instance, created, **kwargs):
+    def lock_password_if_new(cls, sender, instance, created, **kwargs):
         if created:
             instance.set_unusable_password()
             instance.save()
@@ -79,4 +79,4 @@ class UserProfile(TimeStampedModel):
 
 
 post_save.connect(UserProfile.create_user_profile, sender=User)
-post_save.connect(User.send_random_password, sender=User)
+post_save.connect(User.lock_password_if_new, sender=User)
