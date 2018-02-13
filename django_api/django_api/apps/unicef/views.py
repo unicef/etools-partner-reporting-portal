@@ -494,49 +494,59 @@ class ProgressReportSubmitAPIView(APIView):
     """
     permission_classes = (IsAuthenticated, IsPartnerAuthorizedOfficer)
 
-    def get_object(self, pk):
+    def get_object(self):
         try:
             return ProgressReport.objects.get(
                 programme_document__partner=self.request.user.partner,
-                programme_document__workspace=self.workspace_id,
-                pk=pk)
+                programme_document__workspace=self.kwargs['workspace_id'],
+                pk=self.kwargs['pk'])
         except ProgressReport.DoesNotExist as exp:
             logger.exception({
                 "endpoint": "ProgressReportSubmitAPIView",
                 "request.data": self.request.data,
-                "pk": pk,
+                "pk": self.kwargs['pk'],
                 "exception": exp,
             })
             raise Http404
 
     @transaction.atomic
-    def post(self, request, workspace_id, pk, *args, **kwargs):
-        self.workspace_id = workspace_id
-        progress_report = self.get_object(pk)
+    def post(self, *args, **kwargs):
+        progress_report = self.get_object()
+        if not progress_report.programme_document.status == PD_STATUS.active:
+            _errors = [{
+                "message": "Updating Progress Report for a Programme Document that is {} is not allowed. Only Active "
+                           "PDs can be reported on.".format(progress_report.programme_document.get_status_display())
+            }]
+            return Response({"errors": _errors}, status=statuses.HTTP_400_BAD_REQUEST)
 
         for ir in progress_report.indicator_reports.all():
             # Check if all indicator data is fulfilled for IR status different
             # then Met or No Progress
-            if ir.overall_status not in (
-                    OVERALL_STATUS.met, OVERALL_STATUS.no_progress):
+            if ir.overall_status not in {OVERALL_STATUS.met, OVERALL_STATUS.no_progress}:
                 for data in ir.indicator_location_data.all():
                     for key, vals in data.disaggregation.items():
-                        if ir.is_percentage and (
-                                vals.get('c', None) in [None, '']):
+                        if ir.is_percentage and (vals.get('c', None) in [None, '']):
                             _errors = [{
-                                "message": "You have not completed all required indicators for this progress report. Unless your Output status is Met or has No Progress, all indicator data needs to be completed."}]
-                            return Response({"errors": _errors},
-                                            status=statuses.HTTP_400_BAD_REQUEST)
+                                "message": "You have not completed all required indicators for this progress report. "
+                                           "Unless your Output status is Met or has No Progress, all indicator data "
+                                           "needs to be completed."
+                            }]
+                            return Response({"errors": _errors}, status=statuses.HTTP_400_BAD_REQUEST)
+
                         elif ir.is_number and (vals.get('v', None) in [None, '']):
                             _errors = [{
-                                "message": "You have not completed all required indicators for this progress report. Unless your Output status is Met or has No Progress, all indicator data needs to be completed."}]
-                            return Response({"errors": _errors},
-                                            status=statuses.HTTP_400_BAD_REQUEST)
+                                "message": "You have not completed all required indicators for this progress report. "
+                                           "Unless your Output status is Met or has No Progress, all indicator data "
+                                           "needs to be completed."
+                            }]
+                            return Response({"errors": _errors}, status=statuses.HTTP_400_BAD_REQUEST)
                 if not ir.narrative_assessment:
                     _errors = [{
-                        "message": "You have not completed narrative assessment for one of Outputs (%s). Unless your Output status is Met or has No Progress, all indicator data needs to be completed." % ir.reportable.content_object}]
-                    return Response({"errors": _errors},
-                                    status=statuses.HTTP_400_BAD_REQUEST)
+                        "message": "You have not completed narrative assessment for one of Outputs (%s). Unless your "
+                                   "Output status is Met or has No Progress, all indicator data needs to "
+                                   "be completed." % ir.reportable.content_object
+                    }]
+                    return Response({"errors": _errors}, status=statuses.HTTP_400_BAD_REQUEST)
 
             # Check if indicator was already submitted or SENT BACK
             if ir.submission_date is None or ir.report_status == INDICATOR_REPORT_STATUS.sent_back:
@@ -547,19 +557,20 @@ class ProgressReportSubmitAPIView(APIView):
         # Check if PR other tab is fulfilled
         if not progress_report.partner_contribution_to_date:
             _errors = [{
-                "message": "You have not completed Partner Contribution To Date field on Other Info tab."}]
-            return Response({"errors": _errors},
-                            status=statuses.HTTP_400_BAD_REQUEST)
+                "message": "You have not completed Partner Contribution To Date field on Other Info tab."
+            }]
+            return Response({"errors": _errors}, status=statuses.HTTP_400_BAD_REQUEST)
         if not progress_report.challenges_in_the_reporting_period:
             _errors = [{
-                "message": "You have not completed Challenges/bottlenecks in the reporting period field on Other Info tab."}]
-            return Response({"errors": _errors},
-                            status=statuses.HTTP_400_BAD_REQUEST)
+                "message": "You have not completed Challenges / bottlenecks in the reporting period field on "
+                           "Other Info tab."
+            }]
+            return Response({"errors": _errors}, status=statuses.HTTP_400_BAD_REQUEST)
         if not progress_report.proposed_way_forward:
             _errors = [{
-                "message": "You have not completed Proposed way forward field on Other Info tab."}]
-            return Response({"errors": _errors},
-                            status=statuses.HTTP_400_BAD_REQUEST)
+                "message": "You have not completed Proposed way forward field on Other Info tab."
+            }]
+            return Response({"errors": _errors}, status=statuses.HTTP_400_BAD_REQUEST)
 
         if progress_report.submission_date is None or progress_report.status == PROGRESS_REPORT_STATUS.sent_back:
             progress_report.status = PROGRESS_REPORT_STATUS.submitted
@@ -570,9 +581,10 @@ class ProgressReportSubmitAPIView(APIView):
             return Response(serializer.data, status=statuses.HTTP_200_OK)
         else:
             _errors = [{
-                "message": "Progress report was already submitted. Your IMO will need to send it back for you to edit your submission."}]
-            return Response({"errors": _errors},
-                            status=statuses.HTTP_400_BAD_REQUEST)
+                "message": "Progress report was already submitted. Your IMO will need to send it "
+                           "back for you to edit your submission."
+            }]
+            return Response({"errors": _errors}, status=statuses.HTTP_400_BAD_REQUEST)
 
 
 class ProgressReportReviewAPIView(APIView):
