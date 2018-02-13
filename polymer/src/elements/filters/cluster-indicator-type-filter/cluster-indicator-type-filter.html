@@ -1,0 +1,42 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../dropdown-filter/dropdown-filter.html">
+<link rel="import" href="../../../redux/store.html">
+
+<dom-module id="cluster-indicator-type-filter">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <dropdown-filter
+      label="Indicator Type"
+      name="indicator_type"
+      value="[[_withDefault(value, '')]]"
+      data="[[data]]">
+    </dropdown-filter>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'cluster-indicator-type-filter',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        data: {
+          type: Array,
+          value: [
+            {title: 'All', id: ''},
+          ],
+        },
+
+        value: String,
+      },
+    });
+  </script>
+</dom-module>
