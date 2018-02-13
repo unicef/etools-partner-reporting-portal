@@ -864,7 +864,7 @@ class IndicatorReportUpdateSerializer(serializers.ModelSerializer):
         fields = (
             'reporting_period',
         )
-        
+
 class IndicatorReportReviewSerializer(serializers.Serializer):
     status = serializers.ChoiceField(choices=[
         INDICATOR_REPORT_STATUS.sent_back,
@@ -997,10 +997,14 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
             return None
 
     def get_partner(self, obj):
-        return self._get_partner(obj).title
+        partner = self._get_partner(obj)
+
+        return partner.title if partner else ""
 
     def get_partner_id(self, obj):
-        return self._get_partner(obj).id
+        partner = self._get_partner(obj)
+
+        return partner.id if partner else ""
 
     def get_partner_activity(self, obj):
         if isinstance(obj.reportable.content_object, (PartnerProject, )):
