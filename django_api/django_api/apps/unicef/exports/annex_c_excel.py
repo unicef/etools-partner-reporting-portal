@@ -1,3 +1,4 @@
+import logging
 import random
 import tempfile
 
@@ -17,6 +18,9 @@ from django.utils import timezone
 from indicator.constants import ValueType
 from indicator.models import Disaggregation
 from unicef.exports.utilities import PARTNER_PORTAL_DATE_FORMAT_EXCEL
+
+
+logger = logging.getLogger(__name__)
 
 
 LOCATION_MAX_ADMINISTRATIVE_LEVEL = 5
@@ -295,6 +299,10 @@ class ProgressReportXLSXExporter:
                             self.current_sheet.cell(
                                 row=current_row, column=combination_column, value=total_value.get(ValueType.VALUE)
                             )
+                        else:
+                            logger.exception('Location data {} contains unknown disaggregation: {}'.format(
+                                location_data.id, combination
+                            ))
 
                 current_row += 1
 
