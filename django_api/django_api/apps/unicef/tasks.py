@@ -1,3 +1,5 @@
+import logging
+
 from celery import shared_task
 from django.contrib.auth import get_user_model
 
@@ -18,6 +20,9 @@ from indicator.serializers import PMPIndicatorBlueprintSerializer, PMPDisaggrega
 from indicator.models import IndicatorBlueprint, Disaggregation, Reportable, DisaggregationValue
 
 from partner.models import Partner
+
+
+logger = logging.getLogger(__name__)
 
 
 User = get_user_model()
@@ -58,6 +63,7 @@ def save_person_and_user(person_data):
             Person, PMPPDPersonSerializer, person_data, {'email': person_data['email']}
         )
     except ValidationError:
+        logger.exception('Error trying to save Person model with {}'.format(person_data))
         return None, None
 
     user = create_user_for_person(person)
