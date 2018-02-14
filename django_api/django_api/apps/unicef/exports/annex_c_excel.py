@@ -4,20 +4,13 @@ import os
 
 from django.http import HttpResponse
 from openpyxl import Workbook
-from openpyxl.reader.excel import load_workbook
 from openpyxl.styles import Font, Alignment, NamedStyle
 from openpyxl.styles.numbers import FORMAT_CURRENCY_USD, FORMAT_PERCENTAGE
 from openpyxl.utils import get_column_letter
 
-from django.conf import settings
-from django.db.models import Count
 import hashlib
 from django.utils import timezone
 
-import itertools
-
-from indicator.models import Disaggregation, DisaggregationValue
-from unicef.exports import programme_documents
 from unicef.exports.utilities import PARTNER_PORTAL_DATE_FORMAT_EXCEL
 
 
@@ -52,6 +45,16 @@ class AnnexCXLSXExporter:
         'Calculation method across location',
         'Calculation method across reporting period',
         'Previous location progress',
+        'Location Admin Level 1',
+        'Admin Level 1 PCode',
+        'Location Admin Level 2',
+        'Admin Level 2 PCode',
+        'Location Admin Level 3',
+        'Admin Level 3 PCode',
+        'Location Admin Level 4',
+        'Admin Level 4 PCode',
+        'Location Admin Level 5',
+        'Admin Level 5 PCode',
     ]
 
     column_widths = []
@@ -123,13 +126,21 @@ class AnnexCXLSXExporter:
         location = location_data.location
         while True:
             location_info.append([
-                location.p_code, location.gateway.name
+                location.title, location.p_code
             ])
 
             if location.parent:
                 location = location.parent
             else:
                 break
+
+        for i in range(MAX_ADMIN_LEVEL):
+            try:
+                location_name, location_p_code = location_info[i]
+            except IndexError:
+                location_name, location_p_code = None, None
+            general_info_row.append((location_name, None))
+            general_info_row.append((location_p_code, None))
 
         return general_info_row
 
