@@ -11,6 +11,7 @@
 <link rel="import" href="../../../../../redux/actions.html">
 <link rel="import" href="../../../../../endpoints.html">
 <link rel="import" href="../../../../../styles/buttons.html">
+<link rel="import" href="../../../../../elements/ip-reporting/authorized-officer-modal.html">
 
 <dom-module id="page-ip-reporting-report-submit">
   <template>
@@ -52,6 +53,7 @@
     </div>
 
     <error-modal id="error"></error-modal>
+    <authorized-officer-modal pdId=[[pdId]] data="[[currentReport]]" id=officer-error></authorized-officer-modal>
   </template>
 
   <script>
