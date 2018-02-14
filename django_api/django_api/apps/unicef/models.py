@@ -19,7 +19,8 @@ from core.common import (
     PROGRESS_REPORT_STATUS,
     PD_STATUS,
     CURRENCIES,
-    OVERALL_STATUS
+    OVERALL_STATUS,
+    REPORTING_TYPES
 )
 from core.models import TimeStampedExternalSyncModelMixin
 from indicator.models import Reportable  # IndicatorReport
@@ -397,9 +398,13 @@ class ProgressReport(TimeStampedModel):
         blank=True,
         null=True
     )
+    report_number = models.IntegerField(verbose_name="Report Number")
+    report_type = models.CharField(verbose_name="Report type", choices=REPORTING_TYPES, max_length=3)
+    is_final = models.BooleanField(verbose_name="Is final report", default=False)
 
     class Meta:
         ordering = ['-due_date', '-id']
+        unique_together = ('programme_document', 'report_type', 'report_number')
 
     @cached_property
     def latest_indicator_report(self):
@@ -424,8 +429,9 @@ class ReportingPeriodDates(TimeStampedExternalSyncModelMixin):
     """
     Used for storing start_date, end_date and due_date fields for multiple reports
     """
-    start_date = models.DateField(verbose_name='Start date')
-    end_date = models.DateField(verbose_name='End date')
+    report_type = models.CharField(verbose_name="Report type", choices=REPORTING_TYPES, max_length=3)
+    start_date = models.DateField(verbose_name='Start date', null=True, blank=True)
+    end_date = models.DateField(verbose_name='End date', null=True, blank=True)
     due_date = models.DateField(null=True, blank=True, verbose_name='Due date')
     programme_document = models.ForeignKey(
         ProgrammeDocument, related_name='reporting_periods')
