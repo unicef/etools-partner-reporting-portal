@@ -54,8 +54,7 @@ class Person(TimeStampedExternalSyncModelMixin):
         verbose_name='Phone Number',
         blank=True,
         null=True)
-    # Why is this not an emailfield?
-    email = models.CharField(max_length=255, verbose_name='Email')
+    email = models.EmailField(max_length=255, verbose_name='Email', unique=True)
 
     def __str__(self):
         return self.name
