@@ -263,7 +263,10 @@ class ProgressReportXLSXExporter:
 
             if self.include_disaggregations:
                 self.current_sheet.merge_cells(
-                    start_row=current_row, start_column=column, end_row=current_row + 2, end_column=column
+                    start_row=current_row,
+                    start_column=column,
+                    end_row=current_row + MAX_DISAGGREGATION_DIMENSIONS - 1,
+                    end_column=column
                 )
 
             cell.style = self.bold_center_style
