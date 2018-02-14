@@ -208,6 +208,7 @@ class PartnerActivityCreateAPIView(APIView):
     """
     PartnerActivityCreateAPIView CRUD endpoint
     """
+    # TODO: Implement Object-level permission for IMO
     permission_classes = (IsAuthenticated, )
 
     def post(self, request, create_mode, *args, **kwargs):
@@ -263,6 +264,7 @@ class PartnerActivityCreateAPIView(APIView):
                                 status=status.HTTP_400_BAD_REQUEST)
 
             # Make sure that partner association only happens to Partner user
+            # as this is already checked above
             if not request.user.groups.filter(name='IMO').exists() and serializer.validated_data['partner'] != request.user.partner:
                 return Response({'error': "Partner id did not match this user's partner"}, status=status.HTTP_400_BAD_REQUEST)
 
