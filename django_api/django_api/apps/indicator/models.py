@@ -52,8 +52,7 @@ class DisaggregationValue(TimeStampedExternalSyncModelMixin):
     related models:
         indicator.Disaggregation (ForeignKey): "disaggregation"
     """
-    disaggregation = models.ForeignKey(Disaggregation,
-                                       related_name="disaggregation_values")
+    disaggregation = models.ForeignKey(Disaggregation, related_name="disaggregation_values")
     value = models.CharField(max_length=15)
 
     # TODO: we won't allow these to be edited out anymore, so 'active' might

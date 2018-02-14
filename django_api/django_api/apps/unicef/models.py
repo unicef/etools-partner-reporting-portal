@@ -424,7 +424,7 @@ class ReportingPeriodDates(TimeStampedExternalSyncModelMixin):
 
 class PDResultLink(TimeStampedExternalSyncModelMixin):
     """
-    Represents flattended version of InterventionResultLink in eTools. Instead
+    Represents flattened version of InterventionResultLink in eTools. Instead
     of having 2 models for CP output and result link we have this here.
 
     external_id - field on this model will be the result link id in eTools.

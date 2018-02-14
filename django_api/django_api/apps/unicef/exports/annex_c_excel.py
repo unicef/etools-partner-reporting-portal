@@ -1,6 +1,9 @@
+import random
 import tempfile
 
 import os
+
+import itertools
 
 from django.http import HttpResponse
 from openpyxl import Workbook
@@ -8,19 +11,21 @@ from openpyxl.styles import Font, Alignment, NamedStyle
 from openpyxl.styles.numbers import FORMAT_CURRENCY_USD, FORMAT_PERCENTAGE
 from openpyxl.utils import get_column_letter
 
-import hashlib
+import time
 from django.utils import timezone
 
 from indicator.constants import ValueType
+from indicator.models import Disaggregation
 from unicef.exports.utilities import PARTNER_PORTAL_DATE_FORMAT_EXCEL
 
 
 MAX_ADMIN_LEVEL = 5
+MAX_DISAGGREGATION_DIMENSIONS = 3
 
 
-class AnnexCXLSXExporter:
+class ProgressReportXLSXExporter:
 
-    include_disaggregation = False
+    include_disaggregations = False
 
     general_info_headers = [
         'Partner Name',
@@ -62,9 +67,11 @@ class AnnexCXLSXExporter:
 
     column_widths = []
 
-    def __init__(self, progress_reports, include_disaggregation=None, analysis=False):
+    def __init__(self, progress_reports, include_disaggregations=None, analysis=False):
         self.progress_reports = progress_reports
-        filename = hashlib.sha256(';'.join([str(pr.pk) for pr in progress_reports]).encode('utf-8')).hexdigest()
+        filename = ''.join([
+            str(time.time()) + str(random.randint(10000000, 100000000))
+        ])
         self.file_path = os.path.join(tempfile.gettempdir(), filename + '.xlsx')
         self.display_name = '[{:%a %-d %b %-H-%M-%S %Y}] Progress Report(s) Summary.xlsx'.format(
             timezone.now()
@@ -74,14 +81,14 @@ class AnnexCXLSXExporter:
 
         self.current_sheet = self.workbook.get_active_sheet()
         self.analysis = analysis
-        if include_disaggregation is not None:
-            self.include_disaggregation = include_disaggregation
+        if include_disaggregations is not None:
+            self.include_disaggregations = include_disaggregations
         self.sheets = [self.current_sheet, ]
         self.disaggregations_start_column = len(self.general_info_headers)
 
         self.bold_center_style = NamedStyle(name="Bold and Center")
         self.bold_center_style.font = Font(bold=True)
-        self.bold_center_style.alignment = Alignment(horizontal='center')
+        self.bold_center_style.alignment = Alignment(horizontal='center', vertical='center')
 
     def get_general_info_row(self, progress_report, location_data):
         indicator_report = location_data.indicator_report
@@ -165,12 +172,72 @@ class AnnexCXLSXExporter:
         return general_info_row
 
     def fill_workbook(self):
-        for progress_report in self.progress_reports:
+        for progress_report in self.progress_reports.select_related(
+            'programme_document'
+        ).prefetch_related('indicator_reports'):
             if not self.current_sheet.max_row == 1:
                 self.current_sheet = self.workbook.create_sheet('TEMP')
             self.write_progress_report_to_current_sheet(progress_report)
 
         self.workbook.save(self.file_path)
+
+    def write_disaggregation_headers_get_column_map(self, progress_report):
+        disaggregations = Disaggregation.objects.filter(
+            reportable__indicator_reports__progress_report=progress_report
+        ).distinct()
+
+        disaggregation_id_to_options = {}
+        disaggregation_value_id_to_name = {}
+        disaggregation_value_id_to_type = {}
+
+        for disaggregation in disaggregations:
+            ids_to_values = dict(disaggregation.disaggregation_values.values_list('id', 'value'))
+            disaggregation_value_id_to_name.update(ids_to_values)
+            disaggregation_id_to_options[disaggregation.id] = ids_to_values.keys()
+            disaggregation_value_id_to_type.update({
+                value_id: disaggregation.name for value_id in ids_to_values.keys()
+            })
+
+        disaggregation_value_combinations = []
+
+        for dimensions_limit in range(1, MAX_DISAGGREGATION_DIMENSIONS + 1):
+            for combinations in itertools.combinations(disaggregation_id_to_options.values(), dimensions_limit):
+                disaggregation_value_combinations += list(itertools.product(*combinations))
+
+        disaggregation_value_combinations = map(tuple, map(sorted, disaggregation_value_combinations))
+
+        disaggregation_value_combinations = sorted(disaggregation_value_combinations, key=lambda l: (len(l), l))
+
+        combination_to_column = {}
+
+        for column, combination in enumerate(disaggregation_value_combinations):
+            column = column + self.disaggregations_start_column + 1
+
+            headers = [
+                '{}: {}'.format(
+                    disaggregation_value_id_to_type[_id], disaggregation_value_id_to_name[_id]
+                ) for _id in combination
+            ]
+            for row, header_text in enumerate(headers):
+                cell = self.current_sheet.cell(row=row + 1, column=column, value=header_text)
+                cell.style = self.bold_center_style
+
+            column_width = max(map(len, headers)) + 2
+            self.current_sheet.column_dimensions[get_column_letter(column)].width = column_width
+
+            # Combinations retrieved from DB are saved as string
+            combination_to_column[str(combination)] = column
+
+        # Totals column - add, style and save to mapping
+        totals_column = max(combination_to_column.values()) + 1
+        cell = self.current_sheet.cell(row=1, column=totals_column, value='Total')
+        cell.style = self.bold_center_style
+        combination_to_column['()'] = totals_column
+        self.current_sheet.merge_cells(
+            start_row=1, start_column=totals_column, end_row=MAX_DISAGGREGATION_DIMENSIONS, end_column=totals_column
+        )
+
+        return combination_to_column
 
     def write_progress_report_to_current_sheet(self, progress_report):
         # TODO: Better sheet title, unfortunately its charset and length limited
@@ -181,8 +248,16 @@ class AnnexCXLSXExporter:
             self.column_widths.append(len(header_text))
             column += 1  # columns are not 0-indexed...
             cell = self.current_sheet.cell(row=current_row, column=column, value=header_text)
+
+            if self.include_disaggregations:
+                self.current_sheet.merge_cells(
+                    start_row=current_row, start_column=column, end_row=current_row + 2, end_column=column
+                )
+
             cell.style = self.bold_center_style
         current_row += 1
+
+        combination_to_column = self.write_disaggregation_headers_get_column_map(progress_report)
 
         for indicator_report in progress_report.indicator_reports.all():
             for location_data in indicator_report.indicator_location_data.all():
@@ -197,6 +272,13 @@ class AnnexCXLSXExporter:
                     cell = self.current_sheet.cell(row=current_row, column=column, value=cell_data)
                     if cell_format:
                         cell.number_format = cell_format
+                for combination, total_value in location_data.disaggregation.items():
+                    combination_column = combination_to_column.get(combination)
+                    if combination_column:
+                        self.current_sheet.cell(
+                            row=current_row, column=combination_column, value=total_value.get(ValueType.VALUE)
+                        )
+
                 current_row += 1
 
         for column, width in enumerate(self.column_widths):
@@ -215,3 +297,8 @@ class AnnexCXLSXExporter:
         self.cleanup()
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(self.display_name)
         return response
+
+
+class AnnexCXLSXExporter(ProgressReportXLSXExporter):
+
+    include_disaggregations = True
