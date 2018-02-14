@@ -91,7 +91,7 @@ class ProgressReportXLSXExporter:
 
         self.bold_center_style = NamedStyle(name="Bold and Center")
         self.bold_center_style.font = Font(bold=True)
-        self.bold_center_style.alignment = Alignment(horizontal='center', vertical='center')
+        self.bold_center_style.alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
 
     def get_general_info_row(self, progress_report, location_data):
         indicator_report = location_data.indicator_report
@@ -215,25 +215,29 @@ class ProgressReportXLSXExporter:
                 disaggregation_value_combinations += list(itertools.product(*combinations))
 
         disaggregation_value_combinations = map(tuple, map(sorted, disaggregation_value_combinations))
-
-        disaggregation_value_combinations = sorted(disaggregation_value_combinations, key=lambda l: (len(l), l))
+        disaggregation_value_combinations = sorted(
+            disaggregation_value_combinations,
+            key=lambda l: (len(l), [disaggregation_value_id_to_type[value_id] for value_id in l])
+        )
 
         combination_to_column = {}
 
         for column, combination in enumerate(disaggregation_value_combinations):
             column = column + self.disaggregations_start_column + 1
 
-            headers = [
+            headers = sorted([
                 '{}: {}'.format(
                     disaggregation_value_id_to_type[_id], disaggregation_value_id_to_name[_id]
                 ) for _id in combination
-            ]
-            for row, header_text in enumerate(headers):
-                cell = self.current_sheet.cell(row=row + 1, column=column, value=header_text)
-                cell.style = self.bold_center_style
+            ])
 
-            column_width = max(map(len, headers)) + 2
-            self.current_sheet.column_dimensions[get_column_letter(column)].width = column_width
+            cell = self.current_sheet.cell(row=1, column=column, value='\n'.join(headers))
+            cell.style = self.bold_center_style
+
+            self.current_sheet.merge_cells(
+                start_row=1, start_column=column, end_row=MAX_DISAGGREGATION_DIMENSIONS, end_column=column
+            )
+            self.current_sheet.column_dimensions[get_column_letter(column)].width = max(map(len, headers)) + 2
 
             # Combinations retrieved from DB are identified by tuple cast to string
             combination_to_column[str(combination)] = column
@@ -284,6 +288,7 @@ class ProgressReportXLSXExporter:
                         cell = self.current_sheet.cell(row=current_row, column=column, value=cell_data)
                         if cell_format:
                             cell.number_format = cell_format
+
                     for combination, total_value in location_data.disaggregation.items():
                         combination_column = combination_to_column.get(combination)
                         if combination_column:
