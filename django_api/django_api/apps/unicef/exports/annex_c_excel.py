@@ -52,16 +52,12 @@ class ProgressReportXLSXExporter:
         'Calculation method across location',
         'Calculation method across reporting period',
         'Previous location progress',
-        'Location Admin Level 1',
-        'Admin Level 1 PCode',
-        'Location Admin Level 2',
-        'Admin Level 2 PCode',
-        'Location Admin Level 3',
-        'Admin Level 3 PCode',
-        'Location Admin Level 4',
-        'Admin Level 4 PCode',
-        'Location Admin Level 5',
-        'Admin Level 5 PCode',
+    ] + list(itertools.chain(*[
+        (
+            'Location Admin Level {}'.format(level),
+            'Admin Level {} PCode'.format(level)
+        ) for level in range(1, LOCATION_MAX_ADMINISTRATIVE_LEVEL + 1)
+    ])) + [
         'Achievement in reporting period (total across all locations)',
         'Total cumulative progress',
     ]
