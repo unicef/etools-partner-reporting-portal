@@ -11,6 +11,7 @@ from openpyxl.utils import get_column_letter
 import hashlib
 from django.utils import timezone
 
+from indicator.constants import ValueType
 from unicef.exports.utilities import PARTNER_PORTAL_DATE_FORMAT_EXCEL
 
 
@@ -55,6 +56,8 @@ class AnnexCXLSXExporter:
         'Admin Level 4 PCode',
         'Location Admin Level 5',
         'Admin Level 5 PCode',
+        'Achievement in reporting period (total across all locations)',
+        'Total cumulative progress',
     ]
 
     column_widths = []
@@ -92,7 +95,19 @@ class AnnexCXLSXExporter:
             indicator_target = indicator_report.reportable.target
 
         previous_location_progress = location_data.previous_location_progress_value
-        previous_location_progress_format = FORMAT_PERCENTAGE if indicator_report.is_percentage else None
+
+        if indicator_report.is_percentage:
+            indicator_report_value_format = FORMAT_PERCENTAGE
+            achievement_in_reporting_period = indicator_report.total.get(ValueType.CALCULATED, 0)
+            total_cumulative_progress = indicator_report.reportable.achieved.get(
+                ValueType.CALCULATED, 0
+            )
+        else:
+            indicator_report_value_format = None
+            achievement_in_reporting_period = indicator_report.total.get(ValueType.VALUE, 0)
+            total_cumulative_progress = indicator_report.reportable.achieved.get(
+                ValueType.VALUE, 0
+            )
 
         general_info_row = [
             (partner.title, None),
@@ -117,7 +132,7 @@ class AnnexCXLSXExporter:
             (indicator_target, None),
             (indicator_report.calculation_formula_across_locations, None),
             (indicator_report.calculation_formula_across_periods, None),
-            (previous_location_progress, previous_location_progress_format),
+            (previous_location_progress, indicator_report_value_format),
         ]
 
         location_info = []
@@ -141,6 +156,11 @@ class AnnexCXLSXExporter:
                 location_name, location_p_code = None, None
             general_info_row.append((location_name, None))
             general_info_row.append((location_p_code, None))
+
+        general_info_row += [
+            (achievement_in_reporting_period, indicator_report_value_format),
+            (total_cumulative_progress, indicator_report_value_format),
+        ]
 
         return general_info_row
 
