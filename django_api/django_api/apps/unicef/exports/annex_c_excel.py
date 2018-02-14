@@ -19,13 +19,14 @@ from indicator.models import Disaggregation
 from unicef.exports.utilities import PARTNER_PORTAL_DATE_FORMAT_EXCEL
 
 
-MAX_ADMIN_LEVEL = 5
+LOCATION_MAX_ADMINISTRATIVE_LEVEL = 5
 MAX_DISAGGREGATION_DIMENSIONS = 3
 
 
 class ProgressReportXLSXExporter:
 
     include_disaggregations = False
+    export_to_single_sheet = True
 
     general_info_headers = [
         'Partner Name',
@@ -67,7 +68,12 @@ class ProgressReportXLSXExporter:
 
     column_widths = []
 
-    def __init__(self, progress_reports, include_disaggregations=None, analysis=False):
+    def __init__(
+            self,
+            progress_reports,
+            include_disaggregations=None,
+            export_to_single_sheet=None,
+    ):
         self.progress_reports = progress_reports
         filename = ''.join([
             str(time.time()) + str(random.randint(10000000, 100000000))
@@ -80,9 +86,10 @@ class ProgressReportXLSXExporter:
         self.workbook = Workbook()
 
         self.current_sheet = self.workbook.get_active_sheet()
-        self.analysis = analysis
         if include_disaggregations is not None:
             self.include_disaggregations = include_disaggregations
+        if export_to_single_sheet is not None:
+            self.export_to_single_sheet = export_to_single_sheet
         self.sheets = [self.current_sheet, ]
         self.disaggregations_start_column = len(self.general_info_headers)
 
@@ -156,7 +163,7 @@ class ProgressReportXLSXExporter:
             else:
                 break
 
-        for i in range(MAX_ADMIN_LEVEL):
+        for i in range(LOCATION_MAX_ADMINISTRATIVE_LEVEL):
             try:
                 location_name, location_p_code = location_info[i]
             except IndexError:
@@ -172,18 +179,25 @@ class ProgressReportXLSXExporter:
         return general_info_row
 
     def fill_workbook(self):
-        for progress_report in self.progress_reports.select_related(
+        progress_reports = self.progress_reports.select_related(
             'programme_document'
-        ).prefetch_related('indicator_reports'):
-            if not self.current_sheet.max_row == 1:
-                self.current_sheet = self.workbook.create_sheet('TEMP')
-            self.write_progress_report_to_current_sheet(progress_report)
+        ).prefetch_related('indicator_reports')
+
+        if self.export_to_single_sheet:
+            self.current_sheet.title = 'PRs Export'
+            self.write_progress_reports_to_current_sheet(progress_reports)
+        else:
+            for progress_report in progress_reports:
+                if not self.current_sheet.max_row == 1:
+                    self.current_sheet = self.workbook.create_sheet()
+                self.current_sheet.title = 'PR{} Export'.format(progress_report.pk)
+                self.write_progress_reports_to_current_sheet([progress_report])
 
         self.workbook.save(self.file_path)
 
-    def write_disaggregation_headers_get_column_map(self, progress_report):
+    def write_disaggregation_headers_get_column_map(self, progress_reports):
         disaggregations = Disaggregation.objects.filter(
-            reportable__indicator_reports__progress_report=progress_report
+            reportable__indicator_reports__progress_report__in=progress_reports
         ).distinct()
 
         disaggregation_id_to_options = {}
@@ -225,7 +239,7 @@ class ProgressReportXLSXExporter:
             column_width = max(map(len, headers)) + 2
             self.current_sheet.column_dimensions[get_column_letter(column)].width = column_width
 
-            # Combinations retrieved from DB are saved as string
+            # Combinations retrieved from DB are identified by tuple cast to string
             combination_to_column[str(combination)] = column
 
         # Totals column - add, style and save to mapping
@@ -239,9 +253,7 @@ class ProgressReportXLSXExporter:
 
         return combination_to_column
 
-    def write_progress_report_to_current_sheet(self, progress_report):
-        # TODO: Better sheet title, unfortunately its charset and length limited
-        self.current_sheet.title = 'PR {}'.format(progress_report.pk)
+    def write_progress_reports_to_current_sheet(self, progress_reports):
         current_row = 1
 
         for column, header_text in enumerate(self.general_info_headers):
@@ -257,27 +269,28 @@ class ProgressReportXLSXExporter:
             cell.style = self.bold_center_style
         current_row += 1
 
-        combination_to_column = self.write_disaggregation_headers_get_column_map(progress_report)
+        combination_to_column = self.write_disaggregation_headers_get_column_map(progress_reports)
 
-        for indicator_report in progress_report.indicator_reports.all():
-            for location_data in indicator_report.indicator_location_data.all():
-                general_info_row = self.get_general_info_row(progress_report, location_data)
+        for progress_report in progress_reports:
+            for indicator_report in progress_report.indicator_reports.all():
+                for location_data in indicator_report.indicator_location_data.all():
+                    general_info_row = self.get_general_info_row(progress_report, location_data)
 
-                for column, (cell_data, cell_format) in enumerate(general_info_row):
-                    try:
-                        self.column_widths[column] = max(self.column_widths[column], len(cell_data) + 2)
-                    except TypeError:
-                        self.column_widths[column] = max(self.column_widths[column], len(str(cell_data)) + 2)
-                    column += 1  # columns are not 0-indexed...
-                    cell = self.current_sheet.cell(row=current_row, column=column, value=cell_data)
-                    if cell_format:
-                        cell.number_format = cell_format
-                for combination, total_value in location_data.disaggregation.items():
-                    combination_column = combination_to_column.get(combination)
-                    if combination_column:
-                        self.current_sheet.cell(
-                            row=current_row, column=combination_column, value=total_value.get(ValueType.VALUE)
-                        )
+                    for column, (cell_data, cell_format) in enumerate(general_info_row):
+                        try:
+                            self.column_widths[column] = max(self.column_widths[column], len(cell_data) + 2)
+                        except TypeError:
+                            self.column_widths[column] = max(self.column_widths[column], len(str(cell_data)) + 2)
+                        column += 1  # columns are not 0-indexed...
+                        cell = self.current_sheet.cell(row=current_row, column=column, value=cell_data)
+                        if cell_format:
+                            cell.number_format = cell_format
+                    for combination, total_value in location_data.disaggregation.items():
+                        combination_column = combination_to_column.get(combination)
+                        if combination_column:
+                            self.current_sheet.cell(
+                                row=current_row, column=combination_column, value=total_value.get(ValueType.VALUE)
+                            )
 
                 current_row += 1
 
