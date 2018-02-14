@@ -43,7 +43,7 @@
             id="overall_status"
             selected="[[data.overall_status]]"
             on-selected-changed="_handleInput">
-          <paper-radio-button name="Met">Met</paper-radio-button>
+          <paper-radio-button name="Met">[[_computeMetLabel(completed)]]</paper-radio-button>
           <template
             is="dom-if"
             if="[[!completed]]"
@@ -51,7 +51,7 @@
             <paper-radio-button name="OnT">On Track</paper-radio-button>
             <paper-radio-button name="NoP">No Progress</paper-radio-button>
           </template>
-          <paper-radio-button name="Con">Constrained</paper-radio-button>
+          <paper-radio-button name="Con">[[_computeConstrainedLabel(completed)]]</paper-radio-button>
           <template
               is="dom-if"
               if="[[allowNoStatus]]"
@@ -119,7 +119,7 @@
           type: Boolean,
           value: false,
           reflectToAttribute: true,
-        }
+        },
       },
 
       _handleInput: function () {
@@ -137,8 +137,18 @@
       },
 
       observers: [
-        '_localDataChanged(localData.*)'
+        '_localDataChanged(localData.*)',
       ],
+
+      _computeMetLabel: function(completed) {
+        if (completed) return 'Met results as planned';
+        return 'Met';
+      },
+
+      _computeConstrainedLabel: function(completed) {
+        if (completed) return 'Constrained (partially met result)';
+        return 'Constrained';
+      },
 
       _localDataChanged: function (change) {
         if (change.path.split('.').length < 2) {
