@@ -85,6 +85,7 @@ INSTALLED_APPS = [
     'suit',
     'easy_pdf',
     'django_cron',
+    'guardian',
 
     'account',
     'cluster',
@@ -391,3 +392,9 @@ if not DISABLE_JWT_AUTH:
         'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=3000),  # noqa: F405
         'JWT_AUDIENCE': 'https://etools.unicef.org/',
     })
+
+# Django-Guardian
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend', # this is default
+    'guardian.backends.ObjectPermissionBackend',
+)
