@@ -679,6 +679,7 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
             data=request.data)
         if serializer.is_valid():
             notify_email_flag = False
+            pd_to_notify = None
 
             for llo_and_indicators in serializer.validated_data[
                     'll_outputs_and_indicators']:
@@ -696,6 +697,7 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
                     if not notify_email_flag and submitted_progress_reports.exists():
                         if old_calculation_formula_across_locations != indicator_blueprint['calculation_formula_across_locations'] or old_calculation_formula_across_periods != indicator_blueprint['calculation_formula_across_periods']:
                             notify_email_flag = True
+                            pd_to_notify = pd
 
                     instance.calculation_formula_across_periods = \
                         indicator_blueprint[
@@ -705,6 +707,15 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
                             'calculation_formula_across_locations']
                     instance.clean()
                     instance.save()
+
+            to_email_list = list(pd_to_notify.unicef_focal_point.values_list('email', flat=True))
+            send_email_from_template(
+                      'email/notify_partner_on_calculation_method_change_subject.txt',
+                      'email/notify_partner_on_calculation_method_change.txt',
+                      {'pd': pd_to_notify},
+                      settings.EMAIL_FROM_ADDRESS,
+                      to_email_list,
+                      fail_silently=True)
             return Response(serializer.data, status=statuses.HTTP_200_OK)
 
         return Response({"errors": serializer.errors},
