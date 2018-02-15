@@ -7,6 +7,7 @@
 <link rel="import" href="../behaviors/utils.html">
 <link rel="import" href="report-status.html">
 <link rel="import" href="labelled-item.html">
+<link rel="import" href="../behaviors/progressReportUtils.html">
 
 <dom-module id="reportable-meta">
   <template>
@@ -42,10 +43,15 @@
             id="overall_status"
             selected="[[data.overall_status]]"
             on-selected-changed="_handleInput">
-          <paper-radio-button name="Met">Met</paper-radio-button>
-          <paper-radio-button name="OnT">On Track</paper-radio-button>
-          <paper-radio-button name="NoP">No Progress</paper-radio-button>
-          <paper-radio-button name="Con">Constrained</paper-radio-button>
+          <paper-radio-button name="Met">[[_computeMetLabel(completed)]]</paper-radio-button>
+          <template
+            is="dom-if"
+            if="[[!completed]]"
+            restamp="true">
+            <paper-radio-button name="OnT">On Track</paper-radio-button>
+            <paper-radio-button name="NoP">No Progress</paper-radio-button>
+          </template>
+          <paper-radio-button name="Con">[[_computeConstrainedLabel(completed)]]</paper-radio-button>
           <template
               is="dom-if"
               if="[[allowNoStatus]]"
@@ -108,12 +114,17 @@
           value: false,
           reflectToAttribute: true,
         },
+
+        completed: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true,
+        },
       },
 
       _handleInput: function () {
         var field = Polymer.dom(event).rootTarget;
         var id = field.id;
-
         switch (id) {
           case 'overall_status':
             this.set(['localData', id], field.selected);
@@ -126,8 +137,18 @@
       },
 
       observers: [
-        '_localDataChanged(localData.*)'
+        '_localDataChanged(localData.*)',
       ],
+
+      _computeMetLabel: function(completed) {
+        if (completed) return 'Met results as planned';
+        return 'Met';
+      },
+
+      _computeConstrainedLabel: function(completed) {
+        if (completed) return 'Constrained (partially met result)';
+        return 'Constrained';
+      },
 
       _localDataChanged: function (change) {
         if (change.path.split('.').length < 2) {
