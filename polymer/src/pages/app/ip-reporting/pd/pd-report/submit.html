@@ -53,7 +53,13 @@
     </div>
 
     <error-modal id="error"></error-modal>
-    <authorized-officer-modal pdId=[[pdId]] data="[[currentReport]]" id=officer-error></authorized-officer-modal>
+    <authorized-officer-modal
+      pd-id=[[pdId]]
+      report-id=[[reportId]]
+      data="[[currentReport]]"
+      id=officer
+      submit-url="[[submitUrl]]">
+    </authorized-officer-modal>
   </template>
 
   <script>
@@ -126,7 +132,12 @@
             })
             .catch(function (res) {
               var errors = res.data.errors;
-
+              var authorizedError = errors.filter(function (error) {
+                return error.code === "PR_SUBMISSION_FAILED_USER_NOT_AUTHORIZED_OFFICER"
+              })
+              if (authorizedError.length > 0) {
+                return self.$.officer.open();
+              }
               return self.$.error.open(errors);
             })
             .then(function () {
@@ -136,6 +147,7 @@
 
       detached: function () {
         this.$.error.close();
+        this.$.officer.close();
       },
     });
   </script>

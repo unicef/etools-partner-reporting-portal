@@ -15,23 +15,6 @@
           return typeof currentPDDetails.id === 'undefined';
         }
       ),
-
-      currentFocalPoints: Reselect.createSelector(
-        function (state) {
-          return state.programmeDocuments.all;
-        },
-        function (state) {
-          return state.programmeDocuments.current;
-        },
-        function (allPDs, pdId) {
-          return ((allPDs.filter(function (PD) {
-            return Number(PD.id) === Number(pdId);
-          })[0]
-            || {}).partner_focal_point || []).map(function (focalPoint) {
-              return { value: focalPoint.email, title: focalPoint.title + ' ' + focalPoint.name }
-          })
-        }
-      ),
     };
 
   }());
