@@ -18,7 +18,7 @@ from django.utils import timezone
 from indicator.constants import ValueType
 from indicator.models import Disaggregation
 from unicef.exports.utilities import PARTNER_PORTAL_DATE_FORMAT_EXCEL
-
+from unicef.models import ProgressReport
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ LOCATION_MAX_ADMINISTRATIVE_LEVEL = 5
 MAX_DISAGGREGATION_DIMENSIONS = 3
 
 
-class ProgressReportXLSXExporter:
+class ProgressReportsXLSXExporter:
 
     include_disaggregations = False
     export_to_single_sheet = True
@@ -324,6 +324,15 @@ class ProgressReportXLSXExporter:
         return response
 
 
-class AnnexCXLSXExporter(ProgressReportXLSXExporter):
+class AnnexCXLSXExporter(ProgressReportsXLSXExporter):
 
     include_disaggregations = True
+
+
+class SingleProgressReportsXLSXExporter(ProgressReportsXLSXExporter):
+
+    include_disaggregations = True
+
+    def __init__(self, progress_report, **kwargs):
+        progress_reports = ProgressReport.objects.filter(id=progress_report.id)
+        super(SingleProgressReportsXLSXExporter, self).__init__(progress_reports, **kwargs)

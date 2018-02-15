@@ -34,7 +34,16 @@
           target="_blank">
         <paper-button class="btn-primary">
           <iron-icon icon="icons:file-download"></iron-icon>
-          PDF
+            PDF
+        </paper-button>
+      </a>
+      <a
+          href="[[xlsExportUrl]]"
+          tabindex="-1"
+          target="_blank">
+        <paper-button class="btn-primary">
+          <iron-icon icon="icons:file-download"></iron-icon>
+            XLS
         </paper-button>
       </a>
   </template>
@@ -63,6 +72,11 @@
         pdfExportUrl: {
           type: String,
           computed: '_computeExportUrl(locationId, reportId, query, "pdf")',
+        },
+
+        xlsExportUrl: {
+          type: String,
+          computed: '_computeExportUrl(locationId, reportId, query, "xlsx")',
         },
 
       },

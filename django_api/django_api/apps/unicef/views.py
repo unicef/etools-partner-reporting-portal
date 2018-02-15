@@ -40,7 +40,7 @@ from indicator.serializers import (
 from indicator.filters import PDReportsFilter
 from indicator.serializers import IndicatorBlueprintSimpleSerializer
 from partner.models import Partner
-from unicef.exports.annex_c_excel import AnnexCXLSXExporter
+from unicef.exports.annex_c_excel import AnnexCXLSXExporter, SingleProgressReportsXLSXExporter
 from unicef.exports.programme_documents import ProgrammeDocumentsXLSXExporter, ProgrammeDocumentsPDFExporter
 from unicef.exports.progress_reports import ProgressReportDetailPDFExporter
 from unicef.exports.utilities import group_indicator_reports_by_lower_level_output
@@ -351,7 +351,8 @@ class ProgressReportDetailsAPIView(ObjectExportMixin, RetrieveAPIView):
     permission_classes = (IsAuthenticated, )
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     exporters = {
-        'pdf': ProgressReportDetailPDFExporter
+        'pdf': ProgressReportDetailPDFExporter,
+        'xlsx': SingleProgressReportsXLSXExporter,
     }
 
     def get_object(self):
