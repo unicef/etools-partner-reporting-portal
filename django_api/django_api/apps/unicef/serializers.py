@@ -223,7 +223,6 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
     funds_received_to_date_currency = serializers.SerializerMethodField()
     funds_received_to_date_percentage = serializers.SerializerMethodField()
     submitted_by = serializers.SerializerMethodField()
-    is_final = serializers.BooleanField(read_only=True)
 
     def __init__(self, llo_id=None, location_id=None, *args, **kwargs):
         self.llo_id = llo_id
