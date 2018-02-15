@@ -186,6 +186,9 @@ class ProgressReportSimpleSerializer(serializers.ModelSerializer):
         model = ProgressReport
         fields = (
             'id',
+            'report_type',
+            'report_number',
+            'is_final',
             'partner_contribution_to_date',
             'challenges_in_the_reporting_period',
             'proposed_way_forward',
@@ -232,6 +235,9 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
         model = ProgressReport
         fields = (
             'id',
+            'report_type',
+            'report_number',
+            'is_final',
             'partner_contribution_to_date',
             'challenges_in_the_reporting_period',
             'proposed_way_forward',
