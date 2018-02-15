@@ -92,15 +92,15 @@ var log = function (message) {
 function source() {
   return project.splitSource()
   // Add your own build tasks here!
-    // .pipe(gulpif('**/*.html', html.lint())).on('end', log('Linted HTML'))
-    // .pipe(gulpif('**/*.html', html.minify())).on('end', log('Minified HTML'))
+    .pipe(gulpif('**/*.html', html.lint())).on('end', log('Linted HTML'))
+    .pipe(gulpif('**/*.html', html.minify())).on('end', log('Minified HTML'))
 
     // lint CSS not working correctly. Not seeing temporary css files
     // .pipe(gulpif('**/*.{css,html}', css.lint()))              .on('end', log('Linted CSS'))
     .pipe(gulpif('**/*.{html,css}', css.minify())).on('end', log('Minified CSS'))
 
-    // .pipe(gulpif('**/*.js', javascript.lint())).on('end', log('Linted Javascript'))
-    // .pipe(gulpif('**/*.js', javascript.minify())).on('end', log('Minified Javascript'))
+    .pipe(gulpif('**/*.js', javascript.lint())).on('end', log('Linted Javascript'))
+    .pipe(gulpif('**/*.js', javascript.minify())).on('end', log('Minified Javascript'))
 
     .pipe(gulpif('**/*.{png,gif,jpg,svg}', images.minify())).on('end', log('Minified Images'))
 
