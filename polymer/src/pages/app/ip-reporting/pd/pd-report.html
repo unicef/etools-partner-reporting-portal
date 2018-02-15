@@ -19,6 +19,7 @@
 <link rel="import" href="../../../../elements/etools-prp-permissions.html">
 <link rel="import" href="../../../../elements/ip-reporting/pd-report-export-button.html">
 <link rel="import" href="../../../../elements/ip-reporting/pd-modal.html">
+<link rel="import" href="../../../../elements/ip-reporting/pd-reports-report-title.html">
 <link rel="import" href="../../../../endpoints.html">
 <link rel="import" href="../../../../behaviors/utils.html">
 <link rel="import" href="../../../../behaviors/progressReportUtils.html">
@@ -39,6 +40,12 @@
           left: 0;
           top: -23px;
         };
+      }
+
+      pd-reports-report-title {
+        margin-left: 5px;
+        font-size: 10px;
+        padding: 1px 3px;
       }
 
       .toolbar report-status {
@@ -86,6 +93,11 @@
           class="above-title"
           range="[[currentReport.reporting_period]]">
       </reporting-period>
+      <pd-reports-report-title
+        class="above-title"
+        report=[[currentReport]]>
+      </pd-reports-report-title>
+
 
       <div class="toolbar">
         <report-status status="[[currentReport.status]]"></report-status>

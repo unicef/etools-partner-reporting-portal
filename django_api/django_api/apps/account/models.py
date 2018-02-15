@@ -46,12 +46,17 @@ class User(AbstractUser):
     def get_fullname(self):
         return ' '.join(filter(None, [self.first_name, self.last_name]))
 
+    @property
+    def display_name(self):
+        full_name = self.get_fullname()
+        return full_name + ' ({})'.format(self.email) if full_name else self.email
+
     @cached_property
     def is_unicef(self):
         return self.username == getattr(settings, 'DEFAULT_UNICEF_USER', None)
 
     @classmethod
-    def send_random_password(cls, sender, instance, created, **kwargs):
+    def lock_password_if_new(cls, sender, instance, created, **kwargs):
         if created:
             instance.set_unusable_password()
             instance.save()
@@ -79,4 +84,4 @@ class UserProfile(TimeStampedModel):
 
 
 post_save.connect(UserProfile.create_user_profile, sender=User)
-post_save.connect(User.send_random_password, sender=User)
+post_save.connect(User.lock_password_if_new, sender=User)
