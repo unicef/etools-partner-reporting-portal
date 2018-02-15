@@ -677,11 +677,25 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
         serializer = ProgrammeDocumentCalculationMethodsSerializer(
             data=request.data)
         if serializer.is_valid():
+            notify_email_flag = False
+
             for llo_and_indicators in serializer.validated_data[
                     'll_outputs_and_indicators']:
                 for indicator_blueprint in llo_and_indicators['indicators']:
                     instance = get_object_or_404(IndicatorBlueprint,
                                                  id=indicator_blueprint['id'])
+
+                    old_calculation_formula_across_periods = instance.calculation_formula_across_periods
+                    old_calculation_formula_across_locations = instance.calculation_formula_across_locations
+
+                    llo = instance.reportables.first().content_object
+                    pd = llo.cp_output.programme_document
+                    submitted_progress_reports = pd.progress_reports.filter(status=PROGRESS_REPORT_STATUS.susubmitted)
+
+                    if not notify_email_flag and submitted_progress_reports.exists():
+                        if old_calculation_formula_across_locations != indicator_blueprint['calculation_formula_across_locations'] or old_calculation_formula_across_periods != indicator_blueprint['calculation_formula_across_periods']:
+                            notify_email_flag = True
+
                     instance.calculation_formula_across_periods = \
                         indicator_blueprint[
                             'calculation_formula_across_periods']

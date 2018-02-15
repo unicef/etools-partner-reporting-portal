@@ -254,7 +254,9 @@ class PartnerActivityFromClusterActivitySerializer(
             data['partner'] = Partner.objects.get(
                 id=data['partner'])
 
-             if PartnerActivity.objects.filter(project=data['project'], partner=data['partner'], cluster_activity=data['cluster_activity']).exists():
+            if PartnerActivity.objects.filter(project=data['project'],
+                partner=data['partner'],
+                cluster_activity=data['cluster_activity']).exists():
                 raise serializers.ValidationError(
                     'The activity for given partner already exist in ClusterActivity ID {}.'.format(data['cluster_activity']))
 
