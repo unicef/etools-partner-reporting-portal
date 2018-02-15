@@ -67,6 +67,14 @@
         hide-search>
       </dropdown-filter-multi>
 
+      <dropdown-filter-multi
+        label="Report Type"
+        name="report_type"
+        value="[[_withDefault(queryParams.report_type, '')]]"
+        data="[[types]]"
+        hide-search>
+      </dropdown-filter-multi>
+
       <date-filter
         class="item"
         label="Due date"
@@ -109,6 +117,15 @@
             {title: 'Submitted', id: 'Sub'},
             {title: 'Accepted', id: 'Acc'},
             {title: 'Sent back', id: 'Sen'},
+          ],
+        },
+
+        types: {
+          type: Array,
+          value: [
+            { title: 'QPR', id: 'QPR'},
+            { title: 'HR', id: 'HR'},
+            { title: 'SR', id: 'SR'},
           ],
         },
       },
