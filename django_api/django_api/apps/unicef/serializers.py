@@ -186,6 +186,9 @@ class ProgressReportSimpleSerializer(serializers.ModelSerializer):
         model = ProgressReport
         fields = (
             'id',
+            'report_type',
+            'report_number',
+            'is_final',
             'partner_contribution_to_date',
             'challenges_in_the_reporting_period',
             'proposed_way_forward',
@@ -232,6 +235,9 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
         model = ProgressReport
         fields = (
             'id',
+            'report_type',
+            'report_number',
+            'is_final',
             'partner_contribution_to_date',
             'challenges_in_the_reporting_period',
             'proposed_way_forward',
@@ -254,10 +260,7 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
         )
 
     def get_submitted_by(self, obj):
-        if obj.submitted_by:
-            return obj.submitted_by.first_name + (" %s" % obj.submitted_by.last_name if obj.submitted_by.last_name else "")
-        else:
-            return None
+        return obj.submitted_by.display_name if obj.submitted_by else None
 
     def get_funds_received_to_date(self, obj):
         return obj.programme_document.funds_received_to_date
@@ -427,7 +430,8 @@ class PMPPDPersonSerializer(serializers.ModelSerializer):
         source='phone_number',
         required=False,
         allow_blank=True,
-        allow_null=True)
+        allow_null=True
+    )
 
     class Meta:
         model = Person
@@ -437,6 +441,7 @@ class PMPPDPersonSerializer(serializers.ModelSerializer):
             "phone_num",
             "email",
         )
+        extra_kwargs = {'name': {'required': True}}
 
 
 class PMPPDPartnerSerializer(serializers.ModelSerializer):

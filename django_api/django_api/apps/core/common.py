@@ -9,6 +9,12 @@ REPORTABLE_CA_CONTENT_OBJECT = 'ca'
 REPORTABLE_PP_CONTENT_OBJECT = 'pp'
 REPORTABLE_PA_CONTENT_OBJECT = 'pa'
 
+REPORTING_TYPES = Choices(
+    ('QPR', 'Quarterly Progress Report'),
+    ('HR', 'Humanitarian Report'),
+    ('SR', 'Special Report'),
+)
+
 CLUSTER_TYPES = Choices(
     ('cccm', 'CCCM'),
     ('early_recovery', 'Early Recovery'),
