@@ -2,6 +2,7 @@ import logging
 from datetime import datetime
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpResponseNotFound
@@ -17,6 +18,7 @@ from rest_framework.views import APIView
 import django_filters.rest_framework
 from easy_pdf.rendering import render_to_pdf
 
+from core.api_error_codes import APIErrorCode
 from core.common import (
     PROGRESS_REPORT_STATUS,
     INDICATOR_REPORT_STATUS,
@@ -562,10 +564,40 @@ class ProgressReportSubmitAPIView(APIView):
                             status=statuses.HTTP_400_BAD_REQUEST)
 
         if progress_report.submission_date is None or progress_report.status == PROGRESS_REPORT_STATUS.sent_back:
+            provided_email = request.POST.get('submitted_by_email')
+
+            if not progress_report.programme_document.partner_focal_point.filter(
+                    email=provided_email or self.request.user.email
+            ).exists():
+                if provided_email:
+                    _error_message = 'Report could not be submitted, because you {} is not the authorized ' \
+                                     'officer assigned to the PCA that is connected to that PD.'.format(provided_email)
+                else:
+                    _error_message = 'Your report could not be submitted, because you are not the authorized ' \
+                                     'officer assigned to the PCA that is connected to that PD.'
+
+                _errors = [{
+                    "message": _error_message,
+                    "code": APIErrorCode.PR_SUBMISSION_FAILED_USER_NOT_AUTHORIZED_OFFICER,
+                }]
+                return Response({"errors": _errors}, status=statuses.HTTP_400_BAD_REQUEST)
+
+            if provided_email:
+                authorized_officer_user = get_user_model().objects.filter(email=provided_email).first()
+                if not authorized_officer_user:
+                    _errors = [{
+                        "message": 'User for {} not found in the system.'.format(provided_email),
+                    }]
+                    return Response({"errors": _errors}, status=statuses.HTTP_400_BAD_REQUEST)
+            else:
+                authorized_officer_user = self.request.user
+
             progress_report.status = PROGRESS_REPORT_STATUS.submitted
             progress_report.submission_date = datetime.now().date()
-            progress_report.submitted_by = self.request.user
+            progress_report.submitted_by = authorized_officer_user
+            progress_report.submitting_user = self.request.user
             progress_report.save()
+
             serializer = ProgressReportSerializer(instance=progress_report)
             return Response(serializer.data, status=statuses.HTTP_200_OK)
         else:
