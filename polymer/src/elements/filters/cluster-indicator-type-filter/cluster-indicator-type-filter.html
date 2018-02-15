@@ -1,5 +1,6 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
 
+<link rel="import" href="../../../behaviors/utils.html">
 <link rel="import" href="../dropdown-filter/dropdown-filter.html">
 <link rel="import" href="../../../redux/store.html">
 
@@ -25,6 +26,7 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.UtilsBehavior,
       ],
 
       properties: {
@@ -32,9 +34,12 @@
           type: Array,
           value: [
             {title: 'All', id: ''},
+            {title: 'Partner Activity', id: 'partner_activity'},
+            {title: 'Partner Project', id: 'partner_project'},
+            {title: 'Cluster Objective', id: 'cluster_objective'},
+            {title: 'Cluster Activity', id: 'cluster_activity'},
           ],
         },
-
         value: String,
       },
     });
