@@ -16,6 +16,7 @@
 <link rel="import" href="../../behaviors/routing.html">
 <link rel="import" href="../../behaviors/progressReportUtils.html">
 <link rel="import" href="../etools-prp-permissions.html">
+<link rel="import" href="./pd-reports-report-title.html">
 
 <link rel="import" href="../../styles/table-styles.html">
 
@@ -50,7 +51,7 @@
           no-collapse
           label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
         <etools-data-table-column>
-          <div class="table-column">Report name</div>
+          <div class="table-column">Report #</div>
         </etools-data-table-column>
         <etools-data-table-column field="status" sortable>
           <div class="table-column">Report Status</div>
@@ -83,19 +84,8 @@
         initial-count="[[pageSize]]">
         <etools-data-table-row no-collapse>
           <div slot="row-data">
-          <div class="table-cell table-cell--text cell-reports">
-              <template
-                  is="dom-if"
-                  if="[[_canNavigateToReport(permissions, report)]]"
-                  restamp="true">
-                <a href="[[_getLink(report)]]">[TODO: report title]</a>
-              </template>
-              <template
-                  is="dom-if"
-                  if="[[!_canNavigateToReport(permissions, report)]]"
-                  restamp="true">
-                [TODO: report title]
-              </template>
+            <div class="table-cell table-cell--text cell-reports">
+              <pd-reports-report-title display-link report="[[report]]"></pd-reports-report-title>
             </div>
             <div class="table-cell table-cell--text">
               <report-status status="[[report.status]]"></report-status>
