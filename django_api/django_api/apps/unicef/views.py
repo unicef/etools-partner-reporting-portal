@@ -692,7 +692,7 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
 
                     llo = instance.reportables.first().content_object
                     pd = llo.cp_output.programme_document
-                    submitted_progress_reports = pd.progress_reports.filter(status=PROGRESS_REPORT_STATUS.susubmitted)
+                    submitted_progress_reports = pd.progress_reports.filter(status=PROGRESS_REPORT_STATUS.submitted)
 
                     if not notify_email_flag and submitted_progress_reports.exists():
                         if old_calculation_formula_across_locations != indicator_blueprint['calculation_formula_across_locations'] or old_calculation_formula_across_periods != indicator_blueprint['calculation_formula_across_periods']:
