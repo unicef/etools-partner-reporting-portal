@@ -18,6 +18,7 @@ from rest_framework.views import APIView
 import django_filters.rest_framework
 from easy_pdf.rendering import render_to_pdf
 
+from core.api_error_codes import APIErrorCode
 from core.common import (
     PROGRESS_REPORT_STATUS,
     INDICATOR_REPORT_STATUS,
@@ -576,7 +577,8 @@ class ProgressReportSubmitAPIView(APIView):
                                      'officer assigned to the PCA that is connected to that PD.'
 
                 _errors = [{
-                    "message": _error_message
+                    "message": _error_message,
+                    "code": APIErrorCode.PR_SUBMISSION_FAILED_USER_NOT_AUTHORIZED_OFFICER,
                 }]
                 return Response({"errors": _errors}, status=statuses.HTTP_400_BAD_REQUEST)
 
