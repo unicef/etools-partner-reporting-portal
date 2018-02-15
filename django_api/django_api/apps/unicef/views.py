@@ -708,14 +708,15 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
                     instance.clean()
                     instance.save()
 
-            to_email_list = list(pd_to_notify.unicef_focal_point.values_list('email', flat=True))
-            send_email_from_template(
-                      'email/notify_partner_on_calculation_method_change_subject.txt',
-                      'email/notify_partner_on_calculation_method_change.txt',
-                      {'pd': pd_to_notify},
-                      settings.EMAIL_FROM_ADDRESS,
-                      to_email_list,
-                      fail_silently=True)
+            if notify_email_flag:
+                to_email_list = list(pd_to_notify.unicef_focal_point.values_list('email', flat=True))
+                send_email_from_template(
+                          'email/notify_partner_on_calculation_method_change_subject.txt',
+                          'email/notify_partner_on_calculation_method_change.txt',
+                          {'pd': pd_to_notify},
+                          settings.EMAIL_FROM_ADDRESS,
+                          to_email_list,
+                          fail_silently=True)
             return Response(serializer.data, status=statuses.HTTP_200_OK)
 
         return Response({"errors": serializer.errors},
