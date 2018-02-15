@@ -569,7 +569,7 @@ class ProgressReportSubmitAPIView(APIView):
                     email=provided_email or self.request.user.email
             ).exists():
                 if provided_email:
-                    _error_message = 'Report could not be submitted, because you {} is not the authorized ' \
+                    _error_message = 'Report could not be submitted, because {} is not the authorized ' \
                                      'officer assigned to the PCA that is connected to that PD.'.format(provided_email)
                 else:
                     _error_message = 'Your report could not be submitted, because you are not the authorized ' \
