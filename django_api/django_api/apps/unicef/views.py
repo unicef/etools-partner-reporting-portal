@@ -40,6 +40,7 @@ from indicator.serializers import (
 from indicator.filters import PDReportsFilter
 from indicator.serializers import IndicatorBlueprintSimpleSerializer
 from partner.models import Partner
+from utils.emails import send_email_from_template
 
 from .serializers import (
     ProgrammeDocumentSerializer,
