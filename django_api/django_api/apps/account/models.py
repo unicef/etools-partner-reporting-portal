@@ -48,7 +48,7 @@ class User(AbstractUser):
 
     @property
     def display_name(self):
-        full_name = self.get_full_name()
+        full_name = self.get_fullname()
         return full_name + ' ({})'.format(self.email) if full_name else self.email
 
     @cached_property
