@@ -42,6 +42,7 @@ from indicator.serializers import (
 from indicator.filters import PDReportsFilter
 from indicator.serializers import IndicatorBlueprintSimpleSerializer
 from partner.models import Partner
+from unicef.tasks import create_user_for_person
 
 from .serializers import (
     ProgrammeDocumentSerializer,
@@ -564,11 +565,12 @@ class ProgressReportSubmitAPIView(APIView):
                             status=statuses.HTTP_400_BAD_REQUEST)
 
         if progress_report.submission_date is None or progress_report.status == PROGRESS_REPORT_STATUS.sent_back:
-            provided_email = request.POST.get('submitted_by_email')
+            provided_email = request.data.get('submitted_by_email')
 
-            if not progress_report.programme_document.partner_focal_point.filter(
+            authorized_officer_person = progress_report.programme_document.partner_focal_point.filter(
                     email=provided_email or self.request.user.email
-            ).exists():
+            ).first()
+            if not authorized_officer_person:
                 if provided_email:
                     _error_message = 'Report could not be submitted, because {} is not the authorized ' \
                                      'officer assigned to the PCA that is connected to that PD.'.format(provided_email)
@@ -585,10 +587,7 @@ class ProgressReportSubmitAPIView(APIView):
             if provided_email:
                 authorized_officer_user = get_user_model().objects.filter(email=provided_email).first()
                 if not authorized_officer_user:
-                    _errors = [{
-                        "message": 'User for {} not found in the system.'.format(provided_email),
-                    }]
-                    return Response({"errors": _errors}, status=statuses.HTTP_400_BAD_REQUEST)
+                    authorized_officer_user = create_user_for_person(authorized_officer_person)
             else:
                 authorized_officer_user = self.request.user
 
