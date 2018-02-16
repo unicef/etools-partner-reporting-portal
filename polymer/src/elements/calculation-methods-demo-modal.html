@@ -66,9 +66,15 @@
 
       <paper-dialog-scrollable>
         <div class="content-box">
-          <labelled-item label="Demo indicator">
+          <labelled-item label="Sample indicator">
             <span class="bold-text">
-              # of events launched for policy advocacy and dissimination on New-born health
+              # of children aged 6-59 months affected by severe acute malnutrition who are admitted into treatment.
+            </span>
+          </labelled-item>
+
+          <labelled-item label="Guidance on measurement (for each reporting period)">
+            <span>
+              Quality standard: requires agreed treatment protocol and duration (usually 2 mo); Measurement/reporting clarification: measures newly admitted cases for an ongoing service, therefore requires agreement to consistently report NEW admissions for an agreed reporting period (set dates) to avoid double counting.
             </span>
           </labelled-item>
         </div>
@@ -77,9 +83,9 @@
 
         <labelled-item label="Choose calculation method to read description and observe the impact on data presented below:">
           <paper-radio-group on-paper-radio-group-changed="_onRadioChange" selected=[[selectedType]]>
-            <paper-radio-button name="sum">sum</paper-radio-button>
-            <paper-radio-button name="max">max</paper-radio-button>
-            <paper-radio-button name="avg">avg</paper-radio-button>
+            <paper-radio-button name="sum">SUM</paper-radio-button>
+            <paper-radio-button name="max">MAX</paper-radio-button>
+            <paper-radio-button name="avg">AVG</paper-radio-button>
           </paper-radio-group>
           <div>[[description]]</div>
         </labelled-item>
@@ -148,18 +154,27 @@
           computed: '_computeFinalTotal(selectedType, locationTotals)',
         },
 
-        descriptions: {
+        descriptionsLocations: {
           type: Object,
           value: {
-            sum: 'Sum is a calculation',
-            max: 'Max is a calculation',
-            avg: 'Avg is a calculation',
+            sum: 'Adds values as cumulative results for all locations.  Answers the question, what is total coverage for reporting period across locations. Requires that indicator definition does not count same case or event twice across locations,i.e. reported values covering overlapping populations (e.g. for estimated catchment population for mass dissemination by radio, total coverage must be calculated manually discounting overlap).',
+            max: 'Takes the top value for all locations. Answers the question, where is the  highest number of "x" reached at any one time. Useful for identification of pattern of demand.  Not generally a useful measure of overall performance of programme across locations.',
+            avg: 'Provides a measure of the typical value across the locations.  Answers the question, how many people does a programme or service usually reach at any given location.  Does not reflect the best or worst or total picture.',
+          }
+        },
+
+        descriptionsReportingPeriods: {
+          type: Object,
+          value: {
+            sum: 'Sum adds all results for all reporting periods.  Answers the question: what is total coverage over time?  Only valid if indicator counts the same case or event only once over time; e.g. sum of children admitted to SAM treatment (each child registered once at programme start) is valid.  Not valid to aggregate sum of children participating in ongoing learning programme each month as this counts each child multiple times.',
+            max: 'Max takes the top value for all reporting intervals.  Answers the question: what was the peak case load or highest coverage at any one time?',
+            avg: 'Average provides a measure of the typical value across reporting periods. Answers the question: what is the usual reach/coverage in ongoing programme.',
           }
         },
 
         description: {
           type: String,
-          computed: '_computeDescription(selectedType, descriptions)',
+          computed: '_computeDescription(selectedType, domain, descriptionsLocations, descriptionsReportingPeriods)',
         },
       },
 
@@ -181,8 +196,8 @@
         return totals.slice(0, items);
       },
 
-      _computeDescription: function (selectedType, descriptions) {
-        return descriptions[selectedType];
+      _computeDescription: function (selectedType, domain, descriptionsLocations, descriptionsReportingPeriods) {
+        return domain == 'locations' ? descriptionsLocations[selectedType] : descriptionsReportingPeriods[selectedType];
       },
 
       _onRadioChange: function (e) {
