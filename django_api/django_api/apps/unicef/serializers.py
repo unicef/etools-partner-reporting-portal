@@ -172,6 +172,7 @@ class ProgrammeDocumentOutputSerializer(serializers.ModelSerializer):
             'title',
             'reference_number',
             'cp_outputs',
+            'status',
         )
 
 
