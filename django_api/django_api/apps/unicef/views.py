@@ -692,9 +692,9 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
 
                     llo = instance.reportables.first().content_object
                     pd = llo.cp_output.programme_document
-                    submitted_progress_reports = pd.progress_reports.filter(status=PROGRESS_REPORT_STATUS.submitted)
+                    accepted_progress_reports = pd.progress_reports.filter(status=PROGRESS_REPORT_STATUS.accepted)
 
-                    if not notify_email_flag and submitted_progress_reports.exists():
+                    if not notify_email_flag and accepted_progress_reports.exists():
                         if old_calculation_formula_across_locations != indicator_blueprint['calculation_formula_across_locations'] or old_calculation_formula_across_periods != indicator_blueprint['calculation_formula_across_periods']:
                             notify_email_flag = True
                             pd_to_notify = pd
@@ -710,13 +710,16 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
 
             if notify_email_flag:
                 to_email_list = list(pd_to_notify.unicef_focal_point.values_list('email', flat=True))
+                template_data = dict()
+                template_data['pd'] = pd_to_notify
+
                 send_email_from_template(
                           'email/notify_partner_on_calculation_method_change_subject.txt',
                           'email/notify_partner_on_calculation_method_change.txt',
-                          {'pd': pd_to_notify},
+                          template_data,
                           settings.EMAIL_FROM_ADDRESS,
                           to_email_list,
-                          fail_silently=True)
+                          fail_silently=False)
             return Response(serializer.data, status=statuses.HTTP_200_OK)
 
         return Response({"errors": serializer.errors},
