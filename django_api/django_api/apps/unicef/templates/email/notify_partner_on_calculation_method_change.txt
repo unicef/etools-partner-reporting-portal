@@ -1,5 +1,5 @@
-Hello,
+Dear,
 
 This is to inform you that the Calculation Method for indicators in PD {{pd.title}} have changed.
 
-Please click on the link to review the changes.
+-- {{pd.partner.title}}
