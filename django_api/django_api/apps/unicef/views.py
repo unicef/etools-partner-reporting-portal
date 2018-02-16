@@ -40,6 +40,11 @@ from indicator.serializers import (
 from indicator.filters import PDReportsFilter
 from indicator.serializers import IndicatorBlueprintSimpleSerializer
 from partner.models import Partner
+from unicef.exports.annex_c_excel import AnnexCXLSXExporter, SingleProgressReportsXLSXExporter
+from unicef.exports.programme_documents import ProgrammeDocumentsXLSXExporter, ProgrammeDocumentsPDFExporter
+from unicef.exports.progress_reports import ProgressReportDetailPDFExporter
+from unicef.exports.utilities import group_indicator_reports_by_lower_level_output
+from utils.mixins import ListExportMixin, ObjectExportMixin
 
 from .serializers import (
     ProgrammeDocumentSerializer,
@@ -66,7 +71,7 @@ from .filters import (
 logger = logging.getLogger(__name__)
 
 
-class ProgrammeDocumentAPIView(ListAPIView):
+class ProgrammeDocumentAPIView(ListExportMixin, ListAPIView):
     """
     Endpoint for getting a list of Programme Documents and being able to
     filter by them.
@@ -76,24 +81,14 @@ class ProgrammeDocumentAPIView(ListAPIView):
     pagination_class = SmallPagination
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     filter_class = ProgrammeDocumentFilter
+    exporters = {
+        'xlsx': ProgrammeDocumentsXLSXExporter,
+        'pdf': ProgrammeDocumentsPDFExporter,
+    }
 
     def get_queryset(self):
         return ProgrammeDocument.objects.filter(
-            partner=self.request.user.partner)
-
-    def list(self, request, workspace_id, *args, **kwargs):
-        queryset = self.get_queryset().filter(workspace=workspace_id)
-        filtered = ProgrammeDocumentFilter(request.GET, queryset=queryset)
-
-        page = self.paginate_queryset(filtered.qs)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(filtered.qs, many=True)
-        return Response(
-            serializer.data,
-            status=statuses.HTTP_200_OK
+            partner=self.request.user.partner, workspace=self.kwargs['workspace_id']
         )
 
 
@@ -230,7 +225,7 @@ class ProgrammeDocumentIndicatorsAPIView(ListAPIView):
         )
 
 
-class ProgressReportAPIView(ListAPIView):
+class ProgressReportAPIView(ListExportMixin, ListAPIView):
     """
     Endpoint for getting list of all Progress Reports. Supports filtering
     as per ProgressReportFilter by status, pd_ref_title, programme_document
@@ -243,35 +238,34 @@ class ProgressReportAPIView(ListAPIView):
     permission_classes = (IsAuthenticated, )
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     filter_class = ProgressReportFilter
+    exporters = {
+        'xlsx': AnnexCXLSXExporter,
+    }
 
     def get_queryset(self):
         user_has_global_view = self.request.user.is_unicef
 
         external_partner_id = self.request.GET.get('external_partner_id')
         if external_partner_id is not None:
-            qset = Partner.objects.filter(external_id=external_partner_id)
-            return ProgressReport.objects.filter(
-                programme_document__partner__in=qset)
+            partners = Partner.objects.filter(external_id=external_partner_id)
+            queryset = ProgressReport.objects.filter(programme_document__partner__in=partners)
         else:
             # TODO: In case of UNICEF user.. allow for all (maybe create a special group for the unicef api user?)
             # Limit reports to this user's partner only
             if user_has_global_view:
-                return ProgressReport.objects.all()
+                queryset = ProgressReport.objects.all()
             else:
-                return ProgressReport.objects.filter(
-                    programme_document__partner=self.request.user.partner)
+                queryset = ProgressReport.objects.filter(programme_document__partner=self.request.user.partner)
+        return queryset.filter(programme_document__workspace=self.kwargs['workspace_id']).distinct()
 
-    def list(self, request, workspace_id, *args, **kwargs):
-        queryset = self.get_queryset().filter(
-            programme_document__workspace=workspace_id).distinct()
-        filtered = ProgressReportFilter(request.GET, queryset=queryset)
+    def list(self, request, *args, **kwargs):
+        filtered = ProgressReportFilter(request.GET, queryset=self.get_queryset())
 
         qs = filtered.qs
         order = request.query_params.get('sort', None)
         if order:
             order_field = order.split('.')[0]
             if order_field in ('due_date', 'status', 'programme_document__reference_number', 'submission_date', 'start_date'):
-                print(order_field)
                 qs = qs.order_by(order_field)
                 if len(order.split('.')) > 1 and order.split('.')[1] == 'desc':
                     qs = qs.order_by('-%s' % order_field)
@@ -292,54 +286,22 @@ class ProgressReportPDFView(RetrieveAPIView):
     """
         Endpoint for getting PDF of Progress Report Annex C.
     """
+    queryset = ProgressReport.objects.all()
 
-    def prepare_reportable(self, indicator_reports):
-        result = list()
-        temp = None
-        d = list()
-        for r in indicator_reports:
-            if not temp:
-                temp = r.reportable.id
-            elif temp != r.reportable.id:
-                result.append(d)
-                temp = None
-                d = list()
-            d.append(r)
-        if d:
-            result.append(d)
-        return result
+    def get(self, request, *args, **kwargs):
+        report = self.get_object()
 
-    def get(self, request, pk, *args, **kwargs):
-        # Render to pdf
-        report = ProgressReport.objects.get(id=pk)
-
-        data = dict()
-
-        data['pd'] = report.programme_document
-
-        data['unicef_office'] = report.programme_document.unicef_office
-        data['title'] = report.programme_document.title
-        data['reference_number'] = report.programme_document.reference_number
-        data['start_date'] = report.programme_document.start_date.strftime(
-            settings.PRINT_DATA_FORMAT)
-        data['end_date'] = report.programme_document.end_date.strftime(
-            settings.PRINT_DATA_FORMAT)
-        data['cso_contribution'] = report.programme_document.cso_contribution
-        data['budget'] = report.programme_document.budget
-        data['funds_received_to_date'] = report.programme_document.funds_received_to_date
-        data['challenges_in_the_reporting_period'] = report.challenges_in_the_reporting_period
-        data['proposed_way_forward'] = report.proposed_way_forward
-        data['partner_contribution_to_date'] = report.partner_contribution_to_date
-        data['submission_date'] = report.get_submission_date()
-        data['reporting_period'] = report.get_reporting_period()
-
-        data['partner'] = report.programme_document.partner
-
-        data['authorized_officer'] = report.programme_document.unicef_officers.first()
-        data['focal_point'] = report.programme_document.unicef_focal_point.first()
-
-        data['outputs'] = self.prepare_reportable(
-            report.indicator_reports.all().order_by('reportable'))
+        data = {
+            'report': report,
+            'pd': report.programme_document,
+            'challenges_in_the_reporting_period': report.challenges_in_the_reporting_period,
+            'proposed_way_forward': report.proposed_way_forward,
+            'partner_contribution_to_date': report.partner_contribution_to_date,
+            'submission_date': report.get_submission_date(),
+            'authorized_officer': report.programme_document.unicef_officers.first(),
+            'focal_point': report.programme_document.unicef_focal_point.first(),
+            'outputs': group_indicator_reports_by_lower_level_output(report.indicator_reports.all())
+        }
 
         pdf = render_to_pdf("report_annex_c_pdf.html", data)
         return HttpResponse(pdf, content_type='application/pdf')
@@ -381,32 +343,25 @@ class ProgressReportDetailsUpdateAPIView(APIView):
                             status=statuses.HTTP_400_BAD_REQUEST)
 
 
-class ProgressReportDetailsAPIView(RetrieveAPIView):
+class ProgressReportDetailsAPIView(ObjectExportMixin, RetrieveAPIView):
     """
     Endpoint for getting a single Progress Report
     """
     serializer_class = ProgressReportSerializer
     permission_classes = (IsAuthenticated, )
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
+    exporters = {
+        'pdf': ProgressReportDetailPDFExporter,
+        'xlsx': SingleProgressReportsXLSXExporter,
+    }
 
-    def get(self, request, workspace_id, pk, *args, **kwargs):
-        """
-        Get Progress Report Details by given pk.
-        """
-        self.workspace_id = workspace_id
-        serializer = self.get_serializer(
-            request.GET.get('llo'),
-            request.GET.get('location'),
-            self.get_object(pk)
-        )
-        return Response(serializer.data, status=statuses.HTTP_200_OK)
-
-    def get_object(self, pk):
+    def get_object(self):
+        pk = self.kwargs['pk']
         user_has_global_view = self.request.user.is_unicef
         query_params = {}
         if not user_has_global_view:
             query_params["programme_document__partner"] = self.request.user.partner
-        query_params['programme_document__workspace'] = self.workspace_id
+        query_params['programme_document__workspace'] = self.kwargs['workspace_id']
         query_params['pk'] = pk
         try:
             return ProgressReport.objects.get(**query_params)
