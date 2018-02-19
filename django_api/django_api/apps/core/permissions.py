@@ -44,6 +44,7 @@ class IsPartnerEditorOrPartnerAuthorizedOfficer(BasePermission):
                 name=PartnerAuthorizedOfficerRole.as_group().name).exists()
         )
 
+
 class IsIMO(BasePermission):
     def has_permission(self, request, view):
         user = request.user

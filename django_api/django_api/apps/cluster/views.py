@@ -26,9 +26,9 @@ from partner.models import (
     PartnerActivity,
 )
 
-from .export import XLSXWriter
-from .models import ClusterObjective, ClusterActivity, Cluster
-from .serializers import (
+from cluster.export_indicators import IndicatorsXLSXExporter
+from cluster.models import ClusterObjective, ClusterActivity, Cluster
+from cluster.serializers import (
     ClusterSimpleSerializer,
     ClusterObjectiveSerializer,
     ClusterObjectivePatchSerializer,
@@ -38,7 +38,7 @@ from .serializers import (
     ResponsePlanPartnerDashboardSerializer,
     PartnerAnalysisSummarySerializer,
 )
-from .filters import (
+from cluster.filters import (
     ClusterObjectiveFilter,
     ClusterActivityFilter,
     ClusterIndicatorsFilter,
@@ -496,9 +496,6 @@ class ClusterIndicatorsListExcelExportView(ListAPIView):
 
     def generate_excel(self, writer):
         import os.path
-        import mimetypes
-
-        mimetypes.init()
         file_path = writer.export_data()
         file_name = os.path.basename(file_path)
         file_content = open(file_path, 'rb').read()
@@ -510,7 +507,7 @@ class ClusterIndicatorsListExcelExportView(ListAPIView):
     def list(self, request, response_plan_id, *args, **kwargs):
         # Render to excel
         indicators = self.filter_queryset(self.get_queryset())
-        writer = XLSXWriter(indicators, response_plan_id)
+        writer = IndicatorsXLSXExporter(indicators, response_plan_id)
         return self.generate_excel(writer)
 
 
@@ -532,7 +529,7 @@ class ClusterIndicatorsListExcelExportForAnalysisView(
     def list(self, request, response_plan_id, *args, **kwargs):
         # Render to excel
         indicators = self.filter_queryset(self.get_queryset())
-        writer = XLSXWriter(indicators, response_plan_id, analysis=True)
+        writer = IndicatorsXLSXExporter(indicators, response_plan_id, analysis=True)
         return self.generate_excel(writer)
 
 

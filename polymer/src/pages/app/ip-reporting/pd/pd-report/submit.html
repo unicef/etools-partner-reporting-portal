@@ -11,6 +11,7 @@
 <link rel="import" href="../../../../../redux/actions.html">
 <link rel="import" href="../../../../../endpoints.html">
 <link rel="import" href="../../../../../styles/buttons.html">
+<link rel="import" href="../../../../../elements/ip-reporting/authorized-officer-modal.html">
 
 <dom-module id="page-ip-reporting-report-submit">
   <template>
@@ -52,6 +53,13 @@
     </div>
 
     <error-modal id="error"></error-modal>
+    <authorized-officer-modal
+      pd-id=[[pdId]]
+      report-id=[[reportId]]
+      data="[[currentReport]]"
+      id=officer
+      submit-url="[[submitUrl]]">
+    </authorized-officer-modal>
   </template>
 
   <script>
@@ -124,7 +132,12 @@
             })
             .catch(function (res) {
               var errors = res.data.errors;
-
+              var authorizedError = errors.filter(function (error) {
+                return error.code === "PR_SUBMISSION_FAILED_USER_NOT_AUTHORIZED_OFFICER"
+              })
+              if (authorizedError.length > 0) {
+                return self.$.officer.open();
+              }
               return self.$.error.open(errors);
             })
             .then(function () {
@@ -134,6 +147,7 @@
 
       detached: function () {
         this.$.error.close();
+        this.$.officer.close();
       },
     });
   </script>
