@@ -73,9 +73,7 @@ class ProgrammeDocumentFilter(django_filters.FilterSet):
 
 
 class ProgressReportFilter(django_filters.FilterSet):
-    status = CharFilter(
-        name='status',
-        label='Status')
+    status = CharFilter(method='get_status')
     pd_ref_title = CharFilter(name='pd ref title', method='get_pd_ref_title',
                               label='PD/Ref # title')
     due_date = DateFilter(name='due date', method='get_due_date', label='Due date',
@@ -88,11 +86,14 @@ class ProgressReportFilter(django_filters.FilterSet):
                                         label='programme_document_ext')
     section = CharFilter(name='section', method='get_section')
     cp_output = CharFilter(name='cp_output', method='get_cp_output')
+    report_type = CharFilter(method='get_report_type')
 
     class Meta:
         model = ProgressReport
-        fields = ['status', 'pd_ref_title', 'due_date', 'programme_document',
-                  'programme_document__id', 'programme_document__external_id', 'section', 'cp_output']
+        fields = [
+            'status', 'pd_ref_title', 'due_date', 'programme_document', 'programme_document__id',
+            'programme_document__external_id', 'section', 'cp_output', 'report_type'
+        ]
 
     def get_status(self, queryset, name, value):
         return queryset.filter(status__in=parse.unquote(value).split(','))
@@ -105,7 +106,6 @@ class ProgressReportFilter(django_filters.FilterSet):
 
     def get_cp_output(self, queryset, name, value):
         return queryset.filter(programme_document__cp_outputs__external_cp_output_id=value)
-
 
     def get_due_overdue_status(self, queryset, name, value):
         if value:
@@ -125,3 +125,6 @@ class ProgressReportFilter(django_filters.FilterSet):
     def get_location(self, queryset, name, value):
         return queryset.filter(
             indicator_reports__indicator_location_data__location=value)
+
+    def get_report_type(self, queryset, name, value):
+        return queryset.filter(report_type__in=parse.unquote(value).split(','))

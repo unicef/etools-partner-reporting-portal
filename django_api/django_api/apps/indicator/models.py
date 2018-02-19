@@ -22,6 +22,8 @@ from core.common import (
 from core.models import TimeStampedExternalSyncModelMixin
 from functools import reduce
 
+from indicator.constants import ValueType
+
 
 class Disaggregation(TimeStampedExternalSyncModelMixin):
     """
@@ -50,8 +52,7 @@ class DisaggregationValue(TimeStampedExternalSyncModelMixin):
     related models:
         indicator.Disaggregation (ForeignKey): "disaggregation"
     """
-    disaggregation = models.ForeignKey(Disaggregation,
-                                       related_name="disaggregation_values")
+    disaggregation = models.ForeignKey(Disaggregation, related_name="disaggregation_values")
     value = models.CharField(max_length=15)
 
     # TODO: we won't allow these to be edited out anymore, so 'active' might
@@ -523,26 +524,25 @@ class IndicatorLocationData(TimeStampedModel):
         core.Location (OneToOneField): "location"
     """
     indicator_report = models.ForeignKey(
-        IndicatorReport, related_name="indicator_location_data")
+        IndicatorReport, related_name="indicator_location_data"
+    )
     location = models.ForeignKey(
         'core.Location',
-        related_name="indicator_location_data")
+        related_name="indicator_location_data"
+    )
 
     disaggregation = JSONField(default=dict)
     num_disaggregation = models.IntegerField()
     level_reported = models.IntegerField()
-    disaggregation_reported_on = ArrayField(
-        models.IntegerField(), default=list
-    )
+    disaggregation_reported_on = ArrayField(models.IntegerField(), default=list)
 
     class Meta:
         ordering = ['id']
 
     def __str__(self):
-        return "{} Location Data for {}".format(
-            self.location, self.indicator_report)
+        return "{} Location Data for {}".format(self.location, self.indicator_report)
 
-    @property
+    @cached_property
     def previous_location_data(self):
         current_ir_id = self.indicator_report.id
         previous_indicator_reports = self.indicator_report.reportable.indicator_reports.filter(id__lt=current_ir_id)
@@ -550,3 +550,14 @@ class IndicatorLocationData(TimeStampedModel):
         previous_report = previous_indicator_reports.last()
         if previous_report:
             return previous_report.indicator_location_data.filter(location=self.location).first()
+
+    @cached_property
+    def previous_location_progress_value(self):
+        if not self.previous_location_data:
+            return 0
+
+        total_disaggregation = self.previous_location_data.disaggregation.get('()', {})
+        if self.indicator_report.is_percentage:
+            return total_disaggregation.get(ValueType.CALCULATED, 0)
+        else:
+            return total_disaggregation.get(ValueType.VALUE, 0)

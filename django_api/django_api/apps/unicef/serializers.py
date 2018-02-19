@@ -172,6 +172,7 @@ class ProgrammeDocumentOutputSerializer(serializers.ModelSerializer):
             'title',
             'reference_number',
             'cp_outputs',
+            'status',
         )
 
 
@@ -186,6 +187,9 @@ class ProgressReportSimpleSerializer(serializers.ModelSerializer):
         model = ProgressReport
         fields = (
             'id',
+            'report_type',
+            'report_number',
+            'is_final',
             'partner_contribution_to_date',
             'challenges_in_the_reporting_period',
             'proposed_way_forward',
@@ -221,9 +225,10 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
     funds_received_to_date_percentage = serializers.SerializerMethodField()
     submitted_by = serializers.SerializerMethodField()
 
-    def __init__(self, llo_id=None, location_id=None, *args, **kwargs):
-        self.llo_id = llo_id
-        self.location_id = location_id
+    def __init__(self, *args, **kwargs):
+        request = kwargs.get('context', {}).get('request')
+        self.llo_id = kwargs.get('llo_id') or request and request.GET.get('llo')
+        self.location_id = kwargs.get('location_id') or request and request.GET.get('location')
 
         super(ProgressReportSerializer, self).__init__(*args, **kwargs)
 
@@ -231,6 +236,9 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
         model = ProgressReport
         fields = (
             'id',
+            'report_type',
+            'report_number',
+            'is_final',
             'partner_contribution_to_date',
             'challenges_in_the_reporting_period',
             'proposed_way_forward',
@@ -252,10 +260,7 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
         )
 
     def get_submitted_by(self, obj):
-        if obj.submitted_by:
-            return obj.submitted_by.first_name + (" %s" % obj.submitted_by.last_name if obj.submitted_by.last_name else "")
-        else:
-            return None
+        return obj.submitted_by.display_name if obj.submitted_by else None
 
     def get_funds_received_to_date(self, obj):
         return obj.programme_document.funds_received_to_date
@@ -425,7 +430,8 @@ class PMPPDPersonSerializer(serializers.ModelSerializer):
         source='phone_number',
         required=False,
         allow_blank=True,
-        allow_null=True)
+        allow_null=True
+    )
 
     class Meta:
         model = Person
@@ -435,6 +441,7 @@ class PMPPDPersonSerializer(serializers.ModelSerializer):
             "phone_num",
             "email",
         )
+        extra_kwargs = {'name': {'required': True}}
 
 
 class PMPPDPartnerSerializer(serializers.ModelSerializer):

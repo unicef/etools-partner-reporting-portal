@@ -308,8 +308,6 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
         empty_progress = {'c': 0, 'd': 0, 'v': 0}
         if previous_location_data:
             return previous_location_data.disaggregation.get('()', empty_progress)
-        else:
-            return empty_progress
 
     class Meta:
         model = IndicatorLocationData
@@ -489,8 +487,7 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
 
 
 class IndicatorReportListSerializer(serializers.ModelSerializer):
-    indicator_location_data = \
-        SimpleIndicatorLocationDataListSerializer(many=True, read_only=True)
+    indicator_location_data = SimpleIndicatorLocationDataListSerializer(many=True, read_only=True)
     disagg_lookup_map = serializers.SerializerMethodField()
     disagg_choice_lookup_map = serializers.SerializerMethodField()
     total = serializers.JSONField()
@@ -522,8 +519,7 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
         return obj.display_type
 
     def get_disagg_lookup_map(self, obj):
-        serializer = DisaggregationListSerializer(
-            obj.disaggregations, many=True)
+        serializer = DisaggregationListSerializer(obj.disaggregations, many=True)
 
         disagg_lookup_list = serializer.data
         disagg_lookup_list.sort(key=lambda item: len(item['choices']))
