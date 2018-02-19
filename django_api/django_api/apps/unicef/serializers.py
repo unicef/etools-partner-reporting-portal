@@ -172,6 +172,7 @@ class ProgrammeDocumentOutputSerializer(serializers.ModelSerializer):
             'title',
             'reference_number',
             'cp_outputs',
+            'status',
         )
 
 
@@ -224,9 +225,10 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
     funds_received_to_date_percentage = serializers.SerializerMethodField()
     submitted_by = serializers.SerializerMethodField()
 
-    def __init__(self, llo_id=None, location_id=None, *args, **kwargs):
-        self.llo_id = llo_id
-        self.location_id = location_id
+    def __init__(self, *args, **kwargs):
+        request = kwargs.get('context', {}).get('request')
+        self.llo_id = kwargs.get('llo_id') or request and request.GET.get('llo')
+        self.location_id = kwargs.get('location_id') or request and request.GET.get('location')
 
         super(ProgressReportSerializer, self).__init__(*args, **kwargs)
 
