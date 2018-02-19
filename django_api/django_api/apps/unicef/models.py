@@ -197,8 +197,8 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
         default=CURRENCIES.usd,
         max_length=16,
         verbose_name='Funds received Currency',
-        blank = True,
-        null = True,
+        blank=True,
+        null=True,
     )
 
     # TODO:
@@ -296,8 +296,9 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
 
     @property
     def funds_received_to_date_percentage(self):
-        return "%.0f" % (self.funds_received_to_date /
-                         self.budget) if self.budget > 0 else 0
+        return "%.0f" % (
+            self.funds_received_to_date / self.budget
+        ) if self.budget > 0 else 0
 
     @property
     def calculated_budget(self):
@@ -305,7 +306,6 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
             return self.__budget
 
         total = self.budget
-        consumed = None
 
         if not self.reportable_queryset.exists():
             self.__budget = ""
@@ -313,18 +313,6 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
         else:
             consumed = self.reportable_queryset.last().total
             consumed = consumed['c']
-
-        try:
-            percentage = Decimal(consumed) / Decimal(total)
-            percentage = int(percentage * 100)
-        except Exception as exp:
-            logger.exception({
-                "model": "ProgrammeDocument",
-                "def": 'calculated_budget',
-                "pk": self.id,
-                "exception": exp
-            })
-            percentage = 0
 
         self.__budget = "{total} ({consumed}%)".format(total=total,
                                                        consumed=consumed)
@@ -378,8 +366,12 @@ class ProgressReport(TimeStampedModel):
     end_date = models.DateField(verbose_name='End Date')
     due_date = models.DateField(verbose_name='Due Date')
     submission_date = models.DateField(verbose_name='Submission Date', blank=True, null=True)
-    submitted_by = models.ForeignKey('account.User',
-                                     blank=True, null=True)
+    # User should match by email to Person in programme_document.partner_focal_point list
+    submitted_by = models.ForeignKey('account.User', verbose_name='Submitted by / on behalf on', blank=True, null=True)
+    # Keep track of the user that triggered the submission
+    submitting_user = models.ForeignKey(
+        'account.User', verbose_name='Submitted by', blank=True, null=True, related_name='submitted_reports'
+    )
 
     # Fields set by PO in PMP when reviewing the progress report
     review_date = models.DateField(verbose_name='Review Date',
@@ -411,13 +403,17 @@ class ProgressReport(TimeStampedModel):
         return self.indicator_reports.all().order_by('-created').first()
 
     def get_reporting_period(self):
-        return "%s - %s " % (
+        return "{} - {}".format(
             self.start_date.strftime(settings.PRINT_DATA_FORMAT),
             self.end_date.strftime(settings.PRINT_DATA_FORMAT)
         )
 
     def get_submission_date(self):
         return self.submission_date.strftime(settings.PRINT_DATA_FORMAT) if self.submission_date else None
+
+    @cached_property
+    def display_name(self):
+        return '{} {}'.format(self.programme_document.title, self.get_reporting_period())
 
     def __str__(self):
         return "Progress Report <pk:{}>: {} {} to {}".format(
@@ -438,7 +434,7 @@ class ReportingPeriodDates(TimeStampedExternalSyncModelMixin):
 
 class PDResultLink(TimeStampedExternalSyncModelMixin):
     """
-    Represents flattended version of InterventionResultLink in eTools. Instead
+    Represents flattened version of InterventionResultLink in eTools. Instead
     of having 2 models for CP output and result link we have this here.
 
     external_id - field on this model will be the result link id in eTools.

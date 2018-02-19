@@ -141,12 +141,16 @@
       ],
 
       _computeMetLabel: function(completed) {
-        if (completed) return 'Met results as planned';
+        if (completed) {
+          return 'Met results as planned';
+        }
         return 'Met';
       },
 
       _computeConstrainedLabel: function(completed) {
-        if (completed) return 'Constrained (partially met result)';
+        if (completed) {
+          return 'Constrained (partially met result)';
+        }
         return 'Constrained';
       },
 
