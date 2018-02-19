@@ -1,17 +1,16 @@
 from urllib import parse
 
-from datetime import datetime
 from django.conf import settings
 from django.db.models import Q
 
 import django_filters
 from distutils.util import strtobool
 from django_filters.filters import (
-    ChoiceFilter, CharFilter, DateFilter, TypedChoiceFilter, CharFilter
+    DateFilter, TypedChoiceFilter, CharFilter
 )
 
-from core.common import PD_LIST_REPORT_STATUS, PD_STATUS, PROGRESS_REPORT_STATUS
-from core.filter_fields import CommaSeparatedListFilter
+from core.common import PROGRESS_REPORT_STATUS
+from utils.filter_fields import CommaSeparatedListFilter
 from indicator.models import Reportable
 from .models import ProgrammeDocument, ProgressReport
 
