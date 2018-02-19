@@ -470,7 +470,7 @@ class ProgressReportSubmitAPIView(APIView):
             raise Http404
 
     @transaction.atomic
-    def post(self, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         progress_report = self.get_object()
         if not progress_report.programme_document.status == PD_STATUS.active:
             _errors = [{
