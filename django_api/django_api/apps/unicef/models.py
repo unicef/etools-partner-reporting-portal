@@ -356,8 +356,7 @@ class ProgressReport(TimeStampedModel):
     partner_contribution_to_date = models.CharField(max_length=256)
     challenges_in_the_reporting_period = models.CharField(max_length=256)
     proposed_way_forward = models.CharField(max_length=256)
-    status = models.CharField(max_length=3, choices=PROGRESS_REPORT_STATUS,
-                              default=PROGRESS_REPORT_STATUS.due)
+    status = models.CharField(max_length=3, choices=PROGRESS_REPORT_STATUS, default=PROGRESS_REPORT_STATUS.due)
     programme_document = models.ForeignKey(ProgrammeDocument,
                                            related_name="progress_reports",
                                            default=-1)
@@ -429,8 +428,7 @@ class ReportingPeriodDates(TimeStampedExternalSyncModelMixin):
     start_date = models.DateField(verbose_name='Start date', null=True, blank=True)
     end_date = models.DateField(verbose_name='End date', null=True, blank=True)
     due_date = models.DateField(null=True, blank=True, verbose_name='Due date')
-    programme_document = models.ForeignKey(
-        ProgrammeDocument, related_name='reporting_periods')
+    programme_document = models.ForeignKey(ProgrammeDocument, related_name='reporting_periods')
 
 
 class PDResultLink(TimeStampedExternalSyncModelMixin):

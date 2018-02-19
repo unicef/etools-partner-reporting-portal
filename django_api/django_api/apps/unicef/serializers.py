@@ -267,6 +267,7 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
             'funds_received_to_date_percentage',
             'indicator_reports',
             'submitted_by',
+            'is_final',
         )
 
     def get_submitted_by(self, obj):
