@@ -7,7 +7,7 @@
 <link rel="import" href="../../elements/filter-list.html">
 <link rel="import" href="../../elements/filters/text-filter/text-filter.html">
 <link rel="import" href="../../elements/filters/dropdown-filter/dropdown-filter-multi.html">
-<link rel="import" href="../../elements/filters/report-location-filter/report-location-filter.html">
+<link rel="import" href="../../elements/filters/location-filter/location-filter.html">
 
 <dom-module id="pd-filters">
   <template>
@@ -56,10 +56,10 @@
           hide-search>
       </dropdown-filter-multi>
 
-      <report-location-filter
+      <location-filter
         class="item filter-2-col"
         value="[[_withDefault(queryParams.location, '')]]">
-      </report-location-filter>
+      </location-filter>
     </filter-list>
   </template>
 
