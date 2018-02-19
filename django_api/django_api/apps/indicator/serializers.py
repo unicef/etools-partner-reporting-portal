@@ -274,18 +274,17 @@ class OverallNarrativeSerializer(serializers.ModelSerializer):
             'narrative_assessment',
         )
 
-    def validate(self, data):
-        data = super(OverallNarrativeSerializer, self).validate(data)
+    def validate_overall_status(self, overall_status):
         if self.instance and self.instance.progress_report and self.instance.progress_report.is_final:
             valid_statuses_for_final_report = {OVERALL_STATUS.met, OVERALL_STATUS.constrained}
 
-            if data['overall_status'] not in valid_statuses_for_final_report:
+            if overall_status not in valid_statuses_for_final_report:
                 error_msg = 'Only {} statuses are allowed for indicators within a final Progress Report.'.format(
                     ', '.join([OVERALL_STATUS[s] for s in valid_statuses_for_final_report])
                 )
-                raise ValidationError({'overall_status': error_msg})
+                raise ValidationError(error_msg)
 
-        return data
+        return overall_status
 
 
 class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
