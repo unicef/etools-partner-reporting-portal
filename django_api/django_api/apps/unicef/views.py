@@ -46,7 +46,7 @@ from unicef.tasks import create_user_for_person
 
 from unicef.exports.annex_c_excel import AnnexCXLSXExporter, SingleProgressReportsXLSXExporter
 from unicef.exports.programme_documents import ProgrammeDocumentsXLSXExporter, ProgrammeDocumentsPDFExporter
-from unicef.exports.progress_reports import ProgressReportDetailPDFExporter
+from unicef.exports.progress_reports import ProgressReportDetailPDFExporter, ProgressReportListPDFExporter
 from unicef.exports.utilities import group_indicator_reports_by_lower_level_output
 from utils.mixins import ListExportMixin, ObjectExportMixin
 
@@ -245,6 +245,7 @@ class ProgressReportAPIView(ListExportMixin, ListAPIView):
     filter_class = ProgressReportFilter
     exporters = {
         'xlsx': AnnexCXLSXExporter,
+        'pdf': ProgressReportListPDFExporter,
     }
 
     def get_queryset(self):

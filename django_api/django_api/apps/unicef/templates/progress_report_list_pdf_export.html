@@ -1,0 +1,121 @@
+§{% extends "easy_pdf/base.html" %}
+{% load pdf_extras %}
+
+{% block extra_style %}
+    <style type="text/css">
+        @page {
+            size: a4 landscape;
+            margin: 1cm;
+        }
+
+        #pdf {
+            font-family: "Arial", "sans-serif";
+            font-size: 10px;
+        }
+        table, td, th {
+            border: 1px solid black;
+        }
+        td, th {
+            padding-top: 4px;
+            padding-bottom: 1px;
+            padding-left: 3px;
+        }
+        th {
+            background-color: #d9d9d9;
+            font-weight: normal;
+            text-align: left;
+        }
+
+        td.signature {
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        td.Met, td.OnT {
+            background-color: #92D050;
+        }
+
+        td.NoP {
+            background-color: #E93F33;
+        }
+
+        td.Con {
+            background-color: #B2A1C7;
+        }
+
+        th.section {
+            background-color: #2498FA;
+            font-weight: bold;
+            color: #ffffff;
+            text-align: center;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div id="pdf">
+        {% if same_pd_across_all_reports %}
+            <h1>1. Programme & Report overview</h1>
+
+            <table>
+                {% render_base_programme_info_for_report sections.0.progress_report %}
+
+                <tr>
+                    <th rowspan="8">
+                        1.3 Progress Report Information
+                    </th>
+                    <th>Status</th>
+                    <td colspan="2">{{ progress_report.get_status_display }}</td>
+                </tr>
+                <tr>
+                    <th>Due Date</th>
+                    <td colspan="2">{{ progress_report.due_date }}</td>
+                </tr>
+                <tr>
+                    <th>Submission Date</th>
+                    <td colspan="2">{{ progress_report.submission_date|default:"---" }}</td>
+                </tr>
+                <tr>
+                    <th>Submitted By</th>
+                    <td colspan="2">{{ progress_report.submitted_by.display_name|default:"---" }}</td>
+                </tr>
+                <tr>
+                    <th>Partner Contribution to Date</th>
+                    <td colspan="2">{{ progress_report.partner_contribution_to_date|default:"---" }}</td>
+                </tr>
+                <tr>
+                    <th>Challenges / Bottlenecks in the Reporting Period</th>
+                    <td colspan="2">{{ progress_report.challenges_in_the_reporting_period|default:"---" }}</td>
+                </tr>
+                <tr>
+                    <th>Proposed Way Forward</th>
+                    <td colspan="2">{{ progress_report.proposed_way_forward|default:"---" }}</td>
+                </tr>
+                <tr>
+                    <th>Attachment</th>
+                    <td colspan="2">{% get_absolute_file_url progress_report.attachment %}</td>
+                </tr>
+            </table>
+
+            <div>
+                <pdf:nextpage />
+            </div>
+        {% endif %}
+
+{#        <h1>2. PD Outputs / SSFA Expected Results</h1>#}
+{#        {% for table in tables %}#}
+{#            <table>#}
+{#                {% autoescape off %}#}
+{#                    {% for row_data in table %}#}
+{#                        <tr>#}
+{#                            {% for cell in row_data %}#}
+{#                                {{ cell.render }}#}
+{#                            {% endfor %}#}
+{#                        </tr>#}
+{#                    {% endfor %}#}
+{#                {% endautoescape %}#}
+{#            </table>#}
+{#            <br/>#}
+{#        {% endfor %}#}
+    </div>
+{% endblock %}

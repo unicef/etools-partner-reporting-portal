@@ -1,6 +1,7 @@
 import logging
 
 from django.http import HttpResponse
+from django.utils import timezone
 from easy_pdf.exceptions import PDFRenderingError
 from easy_pdf.rendering import render_to_pdf, make_response
 
@@ -23,7 +24,7 @@ class ProgressReportDetailPDFExporter:
         )
         self.file_name = self.display_name + '.pdf'
 
-    def serialize_indicator_reports(self, indicator_reports):
+    def create_tables_for_indicator_reports(self, indicator_reports):
         grouped_indicators = group_indicator_reports_by_lower_level_output(indicator_reports)
 
         tables = list()
@@ -79,7 +80,7 @@ class ProgressReportDetailPDFExporter:
                     if location_data.previous_location_data:
                         prev_value = location_data.previous_location_data.disaggregation.get('()', {})
                     else:
-                        prev_value = 0
+                        prev_value = {}
                     previous_location_progress = format_total_value_to_string(prev_value, is_percentage=is_percentage)
 
                     location_table = [
@@ -99,15 +100,10 @@ class ProgressReportDetailPDFExporter:
         return tables
 
     def get_context(self):
-        pd = self.progress_report.programme_document
-
         context = {
             'progress_report': self.progress_report,
             'title': self.display_name,
-            'programme_document': pd,
-            'authorized_officer': pd.unicef_officers.first(),
-            'focal_point': pd.unicef_focal_point.first(),
-            'tables': self.serialize_indicator_reports(self.progress_report.indicator_reports.all())
+            'tables': self.create_tables_for_indicator_reports(self.progress_report.indicator_reports.all())
         }
 
         return context
@@ -122,3 +118,36 @@ class ProgressReportDetailPDFExporter:
             error_message = 'Error trying to render PDF'
             logger.exception(error_message)
             return HttpResponse(error_message)
+
+
+class ProgressReportListPDFExporter(ProgressReportDetailPDFExporter):
+
+    template_name = 'progress_report_list_pdf_export.html'
+
+    def __init__(self, progress_reports):
+        self.progress_reports = progress_reports
+        super(ProgressReportListPDFExporter, self).__init__(progress_reports.first())
+        self.display_name = '[{:%a %-d %b %-H-%M-%S %Y}] {} Progress Reports Summary'.format(
+            timezone.now(), progress_reports.count()
+        )
+        self.file_name = self.display_name + '.pdf'
+
+    def get_context(self):
+        section_list = []
+        same_pd_across_all_reports = self.progress_reports.values_list('programme_document').distinct().count() == 1
+
+        context = {
+            'same_pd_across_all_reports': same_pd_across_all_reports,
+        }
+
+        for progress_report in self.progress_reports:
+            section_data = {
+                'progress_report': progress_report,
+                'tables': self.create_tables_for_indicator_reports(progress_report.indicator_reports.all())
+            }
+
+            section_list.append(section_data)
+
+        context['sections'] = section_list
+
+        return context
