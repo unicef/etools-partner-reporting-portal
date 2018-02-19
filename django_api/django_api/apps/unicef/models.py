@@ -356,8 +356,7 @@ class ProgressReport(TimeStampedModel):
     partner_contribution_to_date = models.CharField(max_length=256)
     challenges_in_the_reporting_period = models.CharField(max_length=256)
     proposed_way_forward = models.CharField(max_length=256)
-    status = models.CharField(max_length=3, choices=PROGRESS_REPORT_STATUS,
-                              default=PROGRESS_REPORT_STATUS.due)
+    status = models.CharField(max_length=3, choices=PROGRESS_REPORT_STATUS, default=PROGRESS_REPORT_STATUS.due)
     programme_document = models.ForeignKey(ProgrammeDocument,
                                            related_name="progress_reports",
                                            default=-1)
