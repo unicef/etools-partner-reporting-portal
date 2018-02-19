@@ -18,7 +18,7 @@ from core.common import (
     REPORTABLE_FREQUENCY_LEVEL,
     PROGRESS_REPORT_STATUS,
     OVERALL_STATUS,
-)
+    FINAL_OVERALL_STATUS)
 from core.models import TimeStampedExternalSyncModelMixin
 from functools import reduce
 
@@ -360,6 +360,13 @@ class IndicatorReport(TimeStampedModel):
 
     def __str__(self):
         return self.title
+
+    def get_overall_status_display(self):
+        if self.progress_report and self.progress_report.is_final and self.overall_status in FINAL_OVERALL_STATUS:
+            return dict(FINAL_OVERALL_STATUS).get(self.overall_status)
+        else:
+            field_object = self._meta.get_field('overall_status')
+            return self._get_FIELD_display(field_object)
 
     @property
     def is_draft(self):
