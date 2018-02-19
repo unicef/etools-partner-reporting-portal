@@ -55,67 +55,65 @@
 {% block content %}
     <div id="pdf">
         {% if same_pd_across_all_reports %}
-            <h1>1. Programme & Report overview</h1>
-
+            <h1>1. Programme overview</h1>
             <table>
                 {% render_base_programme_info_for_report sections.0.progress_report %}
+            </table>
+        {% endif %}
+
+        {% for section in sections %}
+            {% if not same_pd_across_all_reports %}
+                <h1>1. Programme & Report overview</h1>
+            {% else %}
+                <h1>1. Report overview</h1>
+            {% endif %}
+
+            <table>
+                {% if not same_pd_across_all_reports %}
+                    {% render_base_programme_info_for_report section.progress_report %}
+                {% endif %}
 
                 <tr>
                     <th rowspan="8">
-                        1.3 Progress Report Information
+                        1.5 Progress Report Information
                     </th>
                     <th>Status</th>
-                    <td colspan="2">{{ progress_report.get_status_display }}</td>
+                    <td colspan="2">{{ section.progress_report.get_status_display }}</td>
                 </tr>
                 <tr>
                     <th>Due Date</th>
-                    <td colspan="2">{{ progress_report.due_date }}</td>
+                    <td colspan="2">{{ section.progress_report.due_date }}</td>
                 </tr>
                 <tr>
                     <th>Submission Date</th>
-                    <td colspan="2">{{ progress_report.submission_date|default:"---" }}</td>
+                    <td colspan="2">{{ section.progress_report.submission_date|default:"---" }}</td>
                 </tr>
                 <tr>
                     <th>Submitted By</th>
-                    <td colspan="2">{{ progress_report.submitted_by.display_name|default:"---" }}</td>
+                    <td colspan="2">{{ section.progress_report.submitted_by.display_name|default:"---" }}</td>
                 </tr>
                 <tr>
                     <th>Partner Contribution to Date</th>
-                    <td colspan="2">{{ progress_report.partner_contribution_to_date|default:"---" }}</td>
+                    <td colspan="2">{{ section.progress_report.partner_contribution_to_date|default:"---" }}</td>
                 </tr>
                 <tr>
                     <th>Challenges / Bottlenecks in the Reporting Period</th>
-                    <td colspan="2">{{ progress_report.challenges_in_the_reporting_period|default:"---" }}</td>
+                    <td colspan="2">{{ section.progress_report.challenges_in_the_reporting_period|default:"---" }}</td>
                 </tr>
                 <tr>
                     <th>Proposed Way Forward</th>
-                    <td colspan="2">{{ progress_report.proposed_way_forward|default:"---" }}</td>
+                    <td colspan="2">{{ section.progress_report.proposed_way_forward|default:"---" }}</td>
                 </tr>
                 <tr>
                     <th>Attachment</th>
-                    <td colspan="2">{% get_absolute_file_url progress_report.attachment %}</td>
+                    <td colspan="2">{% get_absolute_file_url section.progress_report.attachment %}</td>
                 </tr>
             </table>
-
+            <h1>2. PD Outputs / SSFA Expected Results</h1>
+            {% include 'fragments/tables.html' with tables=section.tables %}
             <div>
                 <pdf:nextpage />
             </div>
-        {% endif %}
-
-{#        <h1>2. PD Outputs / SSFA Expected Results</h1>#}
-{#        {% for table in tables %}#}
-{#            <table>#}
-{#                {% autoescape off %}#}
-{#                    {% for row_data in table %}#}
-{#                        <tr>#}
-{#                            {% for cell in row_data %}#}
-{#                                {{ cell.render }}#}
-{#                            {% endfor %}#}
-{#                        </tr>#}
-{#                    {% endfor %}#}
-{#                {% endautoescape %}#}
-{#            </table>#}
-{#            <br/>#}
-{#        {% endfor %}#}
+        {% endfor %}
     </div>
 {% endblock %}
