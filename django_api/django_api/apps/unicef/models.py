@@ -366,7 +366,12 @@ class ProgressReport(TimeStampedModel):
     end_date = models.DateField(verbose_name='End Date')
     due_date = models.DateField(verbose_name='Due Date')
     submission_date = models.DateField(verbose_name='Submission Date', blank=True, null=True)
-    submitted_by = models.ForeignKey('account.User', blank=True, null=True)
+    # User should match by email to Person in programme_document.partner_focal_point list
+    submitted_by = models.ForeignKey('account.User', verbose_name='Submitted by / on behalf on', blank=True, null=True)
+    # Keep track of the user that triggered the submission
+    submitting_user = models.ForeignKey(
+        'account.User', verbose_name='Submitted by', blank=True, null=True, related_name='submitted_reports'
+    )
 
     # Fields set by PO in PMP when reviewing the progress report
     review_date = models.DateField(verbose_name='Review Date',
