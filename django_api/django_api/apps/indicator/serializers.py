@@ -12,7 +12,7 @@ from unicef.models import LowerLevelOutput
 from partner.models import PartnerProject, PartnerActivity
 from cluster.models import ClusterObjective, ClusterActivity
 
-from core.common import OVERALL_STATUS_DICT, INDICATOR_REPORT_STATUS
+from core.common import INDICATOR_REPORT_STATUS, OVERALL_STATUS
 from core.serializers import LocationSerializer, IdLocationSerializer
 from core.models import Location
 from core.validators import add_indicator_object_type_validator
@@ -273,6 +273,18 @@ class OverallNarrativeSerializer(serializers.ModelSerializer):
             'overall_status',
             'narrative_assessment',
         )
+
+    def validate_overall_status(self, overall_status):
+        if self.instance and self.instance.progress_report and self.instance.progress_report.is_final:
+            valid_statuses_for_final_report = {OVERALL_STATUS.met, OVERALL_STATUS.constrained}
+
+            if overall_status not in valid_statuses_for_final_report:
+                error_msg = 'Only {} statuses are allowed for indicators within a final Progress Report.'.format(
+                    ', '.join([OVERALL_STATUS[s] for s in valid_statuses_for_final_report])
+                )
+                raise ValidationError(error_msg)
+
+        return overall_status
 
 
 class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):

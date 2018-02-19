@@ -429,8 +429,7 @@ class ReportingPeriodDates(TimeStampedExternalSyncModelMixin):
     start_date = models.DateField(verbose_name='Start date', null=True, blank=True)
     end_date = models.DateField(verbose_name='End date', null=True, blank=True)
     due_date = models.DateField(null=True, blank=True, verbose_name='Due date')
-    programme_document = models.ForeignKey(
-        ProgrammeDocument, related_name='reporting_periods')
+    programme_document = models.ForeignKey(ProgrammeDocument, related_name='reporting_periods')
 
 
 class PDResultLink(TimeStampedExternalSyncModelMixin):
