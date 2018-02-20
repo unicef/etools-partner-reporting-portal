@@ -8,7 +8,6 @@ import datetime
 import random
 
 from django.conf import settings
-from django.core.management import call_command
 
 from account.models import (
     User,
@@ -91,17 +90,16 @@ from core.factories import (
     CountryFactory,
     ReportingPeriodDatesFactory,
 )
-from core.common import INDICATOR_REPORT_STATUS, OVERALL_STATUS
+from core.common import (
+    INDICATOR_REPORT_STATUS,
+    OVERALL_STATUS,
+    REPORTING_TYPES
+)
 
 from ._generate_disaggregation_fake_data import (
     generate_indicator_report_location_disaggregation_quantity_data,
     generate_indicator_report_location_disaggregation_ratio_data,
 )
-
-from core.cron import WorkspaceCronJob
-from partner.cron import PartnerCronJob
-from unicef.cron import ProgrammeDocumentCronJob
-from indicator.cron import IndicatorReportOverDueCronJob
 
 from core.tasks import process_workspaces, process_period_reports
 from indicator.tasks import process_due_reports
@@ -109,6 +107,7 @@ from partner.tasks import process_partners
 from unicef.tasks import process_programme_documents
 
 OVERALL_STATUS_LIST = [x[0] for x in OVERALL_STATUS]
+REPORTING_TYPE_LIST_WITHOUT_SR = [x[0] for x in REPORTING_TYPES if x != 'SR']
 
 
 def clean_up_data():
@@ -151,38 +150,23 @@ def generate_fake_users():
         ('admin_pv', 'admin_pv@notanemail.com', PartnerViewerRole),
     ]
     users_created = []
-    for u in users_to_create:
-        admin, created = User.objects.get_or_create(username=u[0], defaults={
-            'email': u[1],
+    for username, email, group_wrapper in users_to_create:
+        admin, created = User.objects.get_or_create(username=username, defaults={
+            'email': email,
             'is_superuser': True,
             'is_staff': True,
         })
         admin.set_password('Passw0rd!')
         admin.save()
-        admin.groups.add(u[2].as_group())
+        admin.groups.add(group_wrapper.as_group())
         users_created.append(admin)
+
+    return users_created
 
 
 def generate_real_data(fast=False, area=None, update=False):
-
     if not update:
-        users_to_create = [
-            ('admin_imo', 'admin_imo@notanemail.com', IMORole),
-            ('admin_ao', 'admin_ao@notanemail.com', PartnerAuthorizedOfficerRole),
-            ('admin_pe', 'admin_pe@notanemail.com', PartnerEditorRole),
-            ('admin_pv', 'admin_pv@notanemail.com', PartnerViewerRole),
-        ]
-        users_created = []
-        for u in users_to_create:
-            admin, created = User.objects.get_or_create(username=u[0], defaults={
-                'email': u[1],
-                'is_superuser': True,
-                'is_staff': True,
-            })
-            admin.set_password('Passw0rd!')
-            admin.save()
-            admin.groups.add(u[2].as_group())
-            users_created.append(admin)
+        generate_fake_users()
 
         # Generate workspaces
         process_workspaces()
@@ -201,32 +185,17 @@ def generate_real_data(fast=False, area=None, update=False):
 
 
 def generate_fake_data(workspace_quantity=10):
-
     if not settings.IS_TEST and workspace_quantity < 1:
         workspace_quantity = 5
+        print('Workspace quantity reset to {}'.format(workspace_quantity))
 
     if workspace_quantity >= 30:
         workspace_quantity = 30
+        print('Workspace quantity reset to {}'.format(workspace_quantity))
 
     today = datetime.date.today()
 
-    users_to_create = [
-        ('admin_imo', 'admin_imo@notanemail.com', IMORole),
-        ('admin_ao', 'admin_ao@notanemail.com', PartnerAuthorizedOfficerRole),
-        ('admin_pe', 'admin_pe@notanemail.com', PartnerEditorRole),
-        ('admin_pv', 'admin_pv@notanemail.com', PartnerViewerRole),
-    ]
-    users_created = []
-    for u in users_to_create:
-        admin, created = User.objects.get_or_create(username=u[0], defaults={
-            'email': u[1],
-            'is_superuser': True,
-            'is_staff': True,
-        })
-        admin.set_password('Passw0rd!')
-        admin.save()
-        admin.groups.add(u[2].as_group())
-        users_created.append(admin)
+    users_created = generate_fake_users()
 
     print("Users created: {}/{}\n".format(users_created, 'Passw0rd!'))
 
@@ -511,8 +480,11 @@ def generate_fake_data(workspace_quantity=10):
                 partner=first_partner, workspace=workspace)
             for ir in range(3):
                 d = datetime.datetime.now() + datetime.timedelta(days=ir * 30)
+                report_type = REPORTING_TYPE_LIST_WITHOUT_SR[random.randint(0, 1)]
+
                 ReportingPeriodDatesFactory.create(
                     programme_document=pd,
+                    report_type=report_type,
                     start_date=d,
                     end_date=d + datetime.timedelta(days=30),
                     due_date=d + datetime.timedelta(days=45),
@@ -564,29 +536,46 @@ def generate_fake_data(workspace_quantity=10):
                     llo
                 ))
 
-        # Generate 2-8 progress reports per pd. Requires creating indicator
+        # Generate progress reports per pd based on its reporting period dates. Requires creating indicator
         # reports for each llo and then associating them with a progress
         # report
-        for idx in xrange(0, random.randint(2, 8)):
-            progress_report = ProgressReportFactory(programme_document=pd)
-            for cp_output in pd.cp_outputs.all():
-                for llo in cp_output.ll_outputs.all():
-                    # All Indicator Reports inside LLO should have same status
-                    # We should skip "No status"
-                    status = OVERALL_STATUS_LIST[random.randint(0, 4)]
-                    for reportable in llo.reportables.all():
-                        if reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
-                            QuantityIndicatorReportFactory(
-                                reportable=reportable,
-                                progress_report=progress_report,
-                                overall_status=status,
-                            )
-                        elif reportable.blueprint.unit == IndicatorBlueprint.PERCENTAGE:
-                            RatioIndicatorReportFactory(
-                                reportable=reportable,
-                                progress_report=progress_report,
-                                overall_status=status,
-                            )
+        def generate_initial_progress_reports(report_type):
+            queryset = pd.reporting_periods.filter(report_type=report_type)
+
+            for idx, rpd in enumerate(queryset):
+                progress_report = ProgressReportFactory(
+                    programme_document=pd,
+                    report_type=report_type,
+                    report_number=idx + 1)
+
+                if idx == queryset.count() - 1:
+                    progress_report.is_final = True
+                    progress_report.save()
+
+                for cp_output in pd.cp_outputs.all():
+                    for llo in cp_output.ll_outputs.all():
+                        # All Indicator Reports inside LLO should have same status
+                        # We should skip "No status"
+                        status = OVERALL_STATUS_LIST[random.randint(0, 4)]
+                        for reportable in llo.reportables.all():
+                            if reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
+                                QuantityIndicatorReportFactory(
+                                    reportable=reportable,
+                                    progress_report=progress_report,
+                                    overall_status=status,
+                                )
+                            elif reportable.blueprint.unit == IndicatorBlueprint.PERCENTAGE:
+                                RatioIndicatorReportFactory(
+                                    reportable=reportable,
+                                    progress_report=progress_report,
+                                    overall_status=status,
+                                )
+
+        # QPR generation
+        generate_initial_progress_reports("QPR")
+
+        # HR generation
+        generate_initial_progress_reports("HR")
 
         print("{} Progress Reports generated for {}".format(
             ProgressReport.objects.filter(programme_document=pd).count(),

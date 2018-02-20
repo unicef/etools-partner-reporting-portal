@@ -12,7 +12,7 @@ from unicef.models import LowerLevelOutput
 from partner.models import PartnerProject, PartnerActivity
 from cluster.models import ClusterObjective, ClusterActivity
 
-from core.common import OVERALL_STATUS_DICT, INDICATOR_REPORT_STATUS
+from core.common import INDICATOR_REPORT_STATUS, FINAL_OVERALL_STATUS
 from core.serializers import LocationSerializer, IdLocationSerializer
 from core.models import Location
 from core.validators import add_indicator_object_type_validator
@@ -264,8 +264,7 @@ class IndicatorLLoutputsSerializer(serializers.ModelSerializer):
 
 class OverallNarrativeSerializer(serializers.ModelSerializer):
     """
-    Sets the overall status and narrative assessment on an IndicatorReport
-    instance.
+    Sets the overall status and narrative assessment on an IndicatorReport instance.
     """
     class Meta:
         model = IndicatorReport
@@ -273,6 +272,16 @@ class OverallNarrativeSerializer(serializers.ModelSerializer):
             'overall_status',
             'narrative_assessment',
         )
+
+    def validate_overall_status(self, overall_status):
+        if self.instance and self.instance.progress_report and self.instance.progress_report.is_final:
+            if overall_status not in FINAL_OVERALL_STATUS:
+                error_msg = 'Only {} statuses are allowed for indicators within a final Progress Report.'.format(
+                    ', '.join([v[1] for v in FINAL_OVERALL_STATUS])
+                )
+                raise ValidationError(error_msg)
+
+        return overall_status
 
 
 class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
@@ -304,26 +313,10 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
         return obj.disaggregation['()']
 
     def get_previous_location_progress(self, obj):
-        current_ir_id = obj.indicator_report.id
-        previous_indicator_reports = obj.indicator_report \
-            .reportable.indicator_reports.filter(id__lt=current_ir_id)
-
+        previous_location_data = obj.previous_location_data
         empty_progress = {'c': 0, 'd': 0, 'v': 0}
-
-        if not previous_indicator_reports.exists():
-            return empty_progress
-
-        previous_report = previous_indicator_reports.last()
-        previous_indicator_location_data_id_list = previous_report \
-            .indicator_location_data \
-            .values_list('id', flat=True)
-
-        if obj.id in previous_indicator_location_data_id_list:
-            loc_data = previous_report.indicator_location_data.get(id=obj.id)
-            return loc_data.disaggregation['()']
-
-        else:
-            return empty_progress
+        if previous_location_data:
+            return previous_location_data.disaggregation.get('()', empty_progress)
 
     class Meta:
         model = IndicatorLocationData
@@ -503,8 +496,7 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
 
 
 class IndicatorReportListSerializer(serializers.ModelSerializer):
-    indicator_location_data = \
-        SimpleIndicatorLocationDataListSerializer(many=True, read_only=True)
+    indicator_location_data = SimpleIndicatorLocationDataListSerializer(many=True, read_only=True)
     disagg_lookup_map = serializers.SerializerMethodField()
     disagg_choice_lookup_map = serializers.SerializerMethodField()
     total = serializers.JSONField()
@@ -536,8 +528,7 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
         return obj.display_type
 
     def get_disagg_lookup_map(self, obj):
-        serializer = DisaggregationListSerializer(
-            obj.disaggregations, many=True)
+        serializer = DisaggregationListSerializer(obj.disaggregations, many=True)
 
         disagg_lookup_list = serializer.data
         disagg_lookup_list.sort(key=lambda item: len(item['choices']))

@@ -10,7 +10,7 @@
 
 <link rel="import" href="../report-status.html">
 <link rel="import" href="../list-placeholder.html">
-<link rel="import" href="../etools-prp-permissions.html">
+<link rel="import" href="pd-reports-report-title.html">
 
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/data-table.html">
@@ -30,12 +30,7 @@
         --ecp-content: {
           padding: 0;
         };
-      }
     </style>
-
-    <etools-prp-permissions
-        permissions="{{permissions}}">
-    </etools-prp-permissions>
 
     <iron-location
         query="{{query}}">
@@ -54,7 +49,7 @@
           <div class="table-column">PD/SSFA ToR ref. #</div>
         </etools-data-table-column>
         <etools-data-table-column>
-          <div class="table-column">Report name</div>
+          <div class="table-column">Report #</div>
         </etools-data-table-column>
         <etools-data-table-column field="status" sortable>
           <div class="table-column">Report Status</div>
@@ -94,18 +89,7 @@
               </span>
             </div>
             <div class="table-cell table-cell--text">
-              <template
-                  is="dom-if"
-                  if="[[_canNavigateToReport(permissions, report)]]"
-                  restamp="true">
-                <a href="[[_getReportLink(report)]]">[TODO: report title]</a>
-              </template>
-              <template
-                  is="dom-if"
-                  if="[[!_canNavigateToReport(permissions, report)]]"
-                  restamp="true">
-                [TODO: report title]
-              </template>
+              <pd-reports-report-title display-link report="[[report]]"></pd-reports-report-title>
             </div>
             <div class="table-cell table-cell--text">
               <report-status status="[[report.status]]"></report-status>
@@ -147,7 +131,6 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
-        App.Behaviors.RoutingBehavior,
         App.Behaviors.DataTableBehavior,
         App.Behaviors.PaginationBehavior,
         App.Behaviors.UtilsBehavior,
@@ -156,8 +139,6 @@
       ],
 
       properties: {
-        permissions: Object,
-
         loading: {
           type: Boolean,
           statePath: 'progressReports.loading',
@@ -174,13 +155,8 @@
         },
       },
 
-      _getReportLink: function (report) {
-        var suffix = this._getMode(report);
-
-        return this.buildUrl(
-          this._baseUrl,
-          '/pd/' + report.programme_document.id + '/report/' + report.id + '/' + suffix
-        );
+      _getReportTitle: function (report) {
+        return report.report_type + report.report_number;
       },
     });
   </script>

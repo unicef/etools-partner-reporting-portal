@@ -31,9 +31,13 @@
     "src/pages/app/cluster-reporting/response-parameters/partners/partners.html",
     "src/pages/app/cluster-reporting/response-parameters/partners/project.html",
     "src/pages/app/cluster-reporting/response-parameters/partners/projects.html",
+    "src/pages/app/cluster-reporting/response-parameters/partners/activities.html",
+    "src/pages/app/cluster-reporting/response-parameters/partners/activity.html",
     "src/pages/app/cluster-reporting/planned-action.html",
     "src/pages/app/cluster-reporting/planned-action/project.html",
     "src/pages/app/cluster-reporting/planned-action/projects.html",
+    "src/pages/app/cluster-reporting/planned-action/activity.html",
+    "src/pages/app/cluster-reporting/planned-action/activities.html",
     "src/pages/app/cluster-reporting/results.html",
     "src/pages/app/cluster-reporting/analysis.html"
   ],

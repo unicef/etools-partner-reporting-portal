@@ -18,9 +18,11 @@ from core.common import (
     REPORTABLE_FREQUENCY_LEVEL,
     PROGRESS_REPORT_STATUS,
     OVERALL_STATUS,
-)
+    FINAL_OVERALL_STATUS)
 from core.models import TimeStampedExternalSyncModelMixin
 from functools import reduce
+
+from indicator.constants import ValueType
 
 
 class Disaggregation(TimeStampedExternalSyncModelMixin):
@@ -50,8 +52,7 @@ class DisaggregationValue(TimeStampedExternalSyncModelMixin):
     related models:
         indicator.Disaggregation (ForeignKey): "disaggregation"
     """
-    disaggregation = models.ForeignKey(Disaggregation,
-                                       related_name="disaggregation_values")
+    disaggregation = models.ForeignKey(Disaggregation, related_name="disaggregation_values")
     value = models.CharField(max_length=15)
 
     # TODO: we won't allow these to be edited out anymore, so 'active' might
@@ -360,6 +361,13 @@ class IndicatorReport(TimeStampedModel):
     def __str__(self):
         return self.title
 
+    def get_overall_status_display(self):
+        if self.progress_report and self.progress_report.is_final and self.overall_status in FINAL_OVERALL_STATUS:
+            return dict(FINAL_OVERALL_STATUS).get(self.overall_status)
+        else:
+            field_object = self._meta.get_field('overall_status')
+            return self._get_FIELD_display(field_object)
+
     @property
     def is_draft(self):
         if self.submission_date is None and IndicatorLocationData.objects.filter(
@@ -523,21 +531,40 @@ class IndicatorLocationData(TimeStampedModel):
         core.Location (OneToOneField): "location"
     """
     indicator_report = models.ForeignKey(
-        IndicatorReport, related_name="indicator_location_data")
+        IndicatorReport, related_name="indicator_location_data"
+    )
     location = models.ForeignKey(
         'core.Location',
-        related_name="indicator_location_data")
+        related_name="indicator_location_data"
+    )
 
     disaggregation = JSONField(default=dict)
     num_disaggregation = models.IntegerField()
     level_reported = models.IntegerField()
-    disaggregation_reported_on = ArrayField(
-        models.IntegerField(), default=list
-    )
+    disaggregation_reported_on = ArrayField(models.IntegerField(), default=list)
 
     class Meta:
         ordering = ['id']
 
     def __str__(self):
-        return "{} Location Data for {}".format(
-            self.location, self.indicator_report)
+        return "{} Location Data for {}".format(self.location, self.indicator_report)
+
+    @cached_property
+    def previous_location_data(self):
+        current_ir_id = self.indicator_report.id
+        previous_indicator_reports = self.indicator_report.reportable.indicator_reports.filter(id__lt=current_ir_id)
+
+        previous_report = previous_indicator_reports.last()
+        if previous_report:
+            return previous_report.indicator_location_data.filter(location=self.location).first()
+
+    @cached_property
+    def previous_location_progress_value(self):
+        if not self.previous_location_data:
+            return 0
+
+        total_disaggregation = self.previous_location_data.disaggregation.get('()', {})
+        if self.indicator_report.is_percentage:
+            return total_disaggregation.get(ValueType.CALCULATED, 0)
+        else:
+            return total_disaggregation.get(ValueType.VALUE, 0)

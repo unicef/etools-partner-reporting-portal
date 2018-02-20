@@ -60,10 +60,9 @@ def process_workspaces():
         raise Exception(e)
 
 
-
 @shared_task
 def process_period_reports():
-    for pd in ProgrammeDocument.objects.filter(status__in=(PD_STATUS.active, )):
+    for pd in ProgrammeDocument.objects.filter(status=PD_STATUS.active):
         print("\nProcessing ProgrammeDocument {}".format(
            pd.id))
         print(10*"****")
@@ -86,6 +85,7 @@ def process_period_reports():
                 if reporting_period.start_date > datetime.now().date():
                     print("No new reports to generate")
                     continue
+
                 # If PR was already generated, skip!
                 if generate_from_date and reporting_period.start_date <= generate_from_date:
                     print("No new reports to generate")
@@ -94,7 +94,7 @@ def process_period_reports():
                 end_date = reporting_period.end_date
                 due_date = reporting_period.due_date
                 start_date = reporting_period.start_date
-    #
+
                 # Create ProgressReport first
                 print(
                     "Creating ProgressReport for {} - {}".format(start_date, end_date))

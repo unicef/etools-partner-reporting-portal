@@ -29,4 +29,4 @@ def process_partners():
                 raise Exception(serializer.errors)
     except Exception as e:
         print(e)
-        raise Exception(e)
+        raise
