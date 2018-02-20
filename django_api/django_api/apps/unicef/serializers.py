@@ -1,11 +1,12 @@
 from django.conf import settings
 from rest_framework import serializers
 
+from core.serializers import ShortLocationSerializer
 from .models import ProgrammeDocument, Section, ProgressReport, Person, \
     LowerLevelOutput, PDResultLink, ReportingPeriodDates
 
 from core.common import PROGRESS_REPORT_STATUS, OVERALL_STATUS, CURRENCIES, PD_STATUS
-from core.models import Workspace
+from core.models import Workspace, Location
 
 from indicator.serializers import (
     PDReportContextIndicatorReportSerializer,
@@ -35,8 +36,8 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
     unicef_officers = PersonSerializer(read_only=True, many=True)
     unicef_focal_point = PersonSerializer(read_only=True, many=True)
     partner_focal_point = PersonSerializer(read_only=True, many=True)
-    document_type_display = serializers.CharField(
-        source='get_document_type_display')
+    document_type_display = serializers.CharField(source='get_document_type_display')
+    locations = serializers.SerializerMethodField(allow_null=True)
 
     class Meta:
         model = ProgrammeDocument
@@ -66,7 +67,8 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
             'total_unicef_supplies_currency',
             'partner_focal_point',
             'unicef_focal_point',
-            'unicef_officers'
+            'unicef_officers',
+            'locations',
         )
 
     def get_id(self, obj):
@@ -86,6 +88,14 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
 
     def get_funds_received_to_date_currency(self, obj):
         return obj.funds_received_to_date_currency
+
+    def get_locations(self, obj):
+        return ShortLocationSerializer(
+            Location.objects.filter(
+                indicator_location_data__indicator_report__progress_report__programme_document=obj
+            ).distinct(),
+            many=True
+        ).data
 
 
 class SectionSerializer(serializers.ModelSerializer):

@@ -130,7 +130,7 @@ class ReportableSimpleSerializer(serializers.ModelSerializer):
     ref_num = serializers.CharField()
     achieved = serializers.JSONField()
     progress_percentage = serializers.FloatField()
-    content_type_name = serializers.SerializerMethodField()
+    content_type_key = serializers.SerializerMethodField()
     content_object_title = serializers.SerializerMethodField()
 
     class Meta:
@@ -144,13 +144,13 @@ class ReportableSimpleSerializer(serializers.ModelSerializer):
             'ref_num',
             'achieved',
             'progress_percentage',
-            'content_type_name',
+            'content_type_key',
             'content_object_title',
             'object_id',
         )
 
-    def get_content_type_name(self, obj):
-        return obj.content_type.name
+    def get_content_type_key(self, obj):
+        return '.'.join(obj.content_type.natural_key())
 
     def get_content_object_title(self, obj):
         return obj.content_object.title
@@ -165,20 +165,9 @@ class IndicatorListSerializer(ReportableSimpleSerializer):
 
     class Meta:
         model = Reportable
-        fields = (
-            'id',
-            'target',
-            'baseline',
-            'in_need',
-            'blueprint',
-            'pd_id',
-            'ref_num',
-            'achieved',
-            'progress_percentage',
-            'content_type_name',
-            'content_object_title',
+        fields = ReportableSimpleSerializer.Meta.fields + (
             'means_of_verification',
-            'object_id',
+            'pd_id',
             'disaggregations'
         )
 
@@ -657,8 +646,7 @@ class IndicatorBlueprintSerializer(serializers.ModelSerializer):
 class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
     disaggregations = IdDisaggregationSerializer(many=True)
-    object_type = serializers.CharField(
-        validators=[add_indicator_object_type_validator])
+    object_type = serializers.CharField(validators=[add_indicator_object_type_validator])
     blueprint = IndicatorBlueprintSerializer()
     locations = IdLocationSerializer(many=True)
     target = serializers.CharField(required=False)
@@ -682,80 +670,74 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         )
 
     def get_object_type(self, obj):
-        return obj.content_type
+        return '.'.join(obj.content_type.natural_key())
 
-    def check_location(self, locations):
-        if not isinstance(locations, (list, dict)) or\
-                False in [loc.get('id', False) for loc in locations]:
-            raise ValidationError(
-                {"locations": "List of dict location or one dict location expected"})
+    def check_locations_merge_to_list(self, locations):
+        if isinstance(locations, dict) and 'id' in locations:
+            return [locations]
+
+        if isinstance(locations, list) and all([loc.get('id', None) for loc in locations]):
+            return locations
+
+        raise ValidationError({
+            "locations": "List of dict location or one dict location expected"
+        })
 
     def check_disaggregation(self, disaggregations):
-        if not isinstance(disaggregations, list) or\
-            False in [dis.get('id', False) for dis in disaggregations]:
+        if not isinstance(disaggregations, list) or False in [dis.get('id', False) for dis in disaggregations]:
             raise ValidationError(
-                {"disaggregations": "List of dict disaggregation expected"})
+                {"disaggregations": "List of dict disaggregation expected"}
+            )
 
     @transaction.atomic
     def create(self, validated_data):
-
         self.check_location(self.initial_data.get('locations'))
         self.check_disaggregation(self.initial_data.get('disaggregations'))
 
-        validated_data['blueprint']['unit'] = validated_data[
-            'blueprint']['display_type']
+        validated_data['blueprint']['unit'] = validated_data['blueprint']['display_type']
         validated_data['blueprint']['disaggregatable'] = True
-        blueprint = IndicatorBlueprintSerializer(
-            data=validated_data['blueprint'])
-        if blueprint.is_valid():
+        blueprint = IndicatorBlueprintSerializer(data=validated_data['blueprint'])
+        if blueprint.is_valid(raise_exception=True):
             blueprint.save()
-        else:
-            raise ValidationError(blueprint.errors)
 
         validated_data['blueprint'] = blueprint.instance
 
-        if validated_data['object_type'] == 'ClusterObjective':
-            validated_data['content_type'] = ContentType.objects.get_for_model(
-                ClusterObjective)
-            cluster_objective = get_object_or_404(
-                ClusterObjective, pk=validated_data['object_id'])
-            validated_data[
-                'start_date'] = cluster_objective.cluster.response_plan.start
-            validated_data[
-                'end_date'] = cluster_objective.cluster.response_plan.end
+        reportable_object_content_type = ContentType.objects.get_by_natural_key(
+            *validated_data['object_type'].split('.')
+        )
+        reportable_object_content_model = reportable_object_content_type.model_class()
+
+        if reportable_object_content_model == ClusterObjective:
+            cluster_objective = get_object_or_404(ClusterObjective, pk=validated_data['object_id'])
+
+            validated_data['start_date'] = cluster_objective.cluster.response_plan.start
+            validated_data['end_date'] = cluster_objective.cluster.response_plan.end
             validated_data['is_cluster_indicator'] = True
-        elif validated_data['object_type'] == 'ClusterActivity':
-            validated_data['content_type'] = ContentType.objects.get_for_model(
-                ClusterActivity)
-            cluster_activity = get_object_or_404(
-                ClusterActivity, pk=validated_data['object_id'])
-            validated_data[
-                'start_date'] = cluster_activity.cluster_objective.cluster.response_plan.start
-            validated_data[
-                'end_date'] = cluster_activity.cluster_objective.cluster.response_plan.end
+        elif reportable_object_content_model == ClusterActivity:
+            cluster_activity = get_object_or_404(ClusterActivity, pk=validated_data['object_id'])
+
+            validated_data['start_date'] = cluster_activity.cluster_objective.cluster.response_plan.start
+            validated_data['end_date'] = cluster_activity.cluster_objective.cluster.response_plan.end
             validated_data['is_cluster_indicator'] = True
-        elif validated_data['object_type'] == 'PartnerProject':
-            validated_data['content_type'] = ContentType.objects.get_for_model(
-                PartnerProject)
-            partner_project = get_object_or_404(
-                PartnerProject, pk=validated_data['object_id'])
+        elif reportable_object_content_model == PartnerProject:
+            partner_project = get_object_or_404(PartnerProject, pk=validated_data['object_id'])
+
             validated_data['start_date'] = partner_project.start_date
             validated_data['end_date'] = partner_project.end_date
             validated_data['is_cluster_indicator'] = False
-        elif validated_data['object_type'] == 'PartnerActivity':
-            validated_data['content_type'] = ContentType.objects.get_for_model(
-                PartnerActivity)
-            partner_activity = get_object_or_404(
-                PartnerActivity, pk=validated_data['object_id'])
+        elif reportable_object_content_model == PartnerActivity:
+            partner_activity = get_object_or_404(PartnerActivity, pk=validated_data['object_id'])
+
             validated_data['start_date'] = partner_activity.project.start_date
             validated_data['end_date'] = partner_activity.project.end_date
             validated_data['is_cluster_indicator'] = False
         else:
             raise NotImplemented()
 
+        validated_data['content_type'] = reportable_object_content_type
+
         del validated_data['object_type']
         del validated_data['locations']
-        disaggregations = validated_data['disaggregations']
         del validated_data['disaggregations']
 
         self.instance = Reportable.objects.create(**validated_data)
@@ -770,42 +752,22 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
         return self.instance
 
-    def update(self, instance, validated_data):
-        # cluster_objective_id should not be changed in this endpoint !
-        self.check_location(self.initial_data.get('locations'))
+    def update(self, reportable, validated_data):
+        locations = self.check_locations_merge_to_list(self.initial_data.get('locations'))
+        blueprint_data = validated_data.get('blueprint', {})
 
-        instance.means_of_verification = validated_data.get(
-            'means_of_verification', instance.means_of_verification)
-        instance.blueprint.title = \
-            validated_data.get('blueprint', {}).get(
-                'title', instance.blueprint.title)
+        reportable.means_of_verification = validated_data.get('means_of_verification', reportable.means_of_verification)
+        reportable.blueprint.title = blueprint_data.get('title', reportable.blueprint.title)
 
-        _errors = []
-        if validated_data.get('blueprint', {}).get(
-                'calculation_formula_across_periods'):
-            _errors.append(
-                "Modify or change the `calculation_formula_across_periods` is not allowed.")
-        if validated_data.get('blueprint', {}).get(
-                'calculation_formula_across_locations'):
-            _errors.append(
-                "Modify or change the `calculation_formula_across_locations` is not allowed.")
-        if validated_data.get('blueprint', {}).get('display_type'):
-            _errors.append(
-                "Modify or change the `display_type` is not allowed.")
-        if _errors:
-            raise ValidationError({"errors": _errors})
+        locations_ids = [l['id'] for l in locations]
 
-        exclude_ids = [loc['id'] for loc in self.initial_data.get('locations')]
-        Location.objects.filter(reportable_id=instance.id).exclude(
-            id__in=exclude_ids).update(reportable=None)
+        reportable.locations.through.objects.exclude(location_id__in=locations_ids).delete()
+        reportable.locations.add(*Location.objects.filter(id__in=locations_ids))
 
-        for location in self.initial_data.get('locations'):
-            instance.locations.add(Location.objects.get(id=location.get('id')))
+        reportable.blueprint.save()
+        reportable.save()
 
-        instance.blueprint.save()
-        instance.save()
-
-        return instance
+        return reportable
 
 
 class ClusterIndicatorDataSerializer(serializers.ModelSerializer):
@@ -855,7 +817,7 @@ class IndicatorReportUpdateSerializer(serializers.ModelSerializer):
         fields = (
             'reporting_period',
         )
-        
+
 class IndicatorReportReviewSerializer(serializers.Serializer):
     status = serializers.ChoiceField(choices=[
         INDICATOR_REPORT_STATUS.sent_back,
@@ -988,10 +950,14 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
             return None
 
     def get_partner(self, obj):
-        return self._get_partner(obj).title
+        partner = self._get_partner(obj)
+
+        return partner.title if partner else ""
 
     def get_partner_id(self, obj):
-        return self._get_partner(obj).id
+        partner = self._get_partner(obj)
+
+        return partner.id if partner else ""
 
     def get_partner_activity(self, obj):
         if isinstance(obj.reportable.content_object, (PartnerProject, )):

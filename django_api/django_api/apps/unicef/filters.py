@@ -1,16 +1,16 @@
 from urllib import parse
 
-from datetime import datetime
 from django.conf import settings
 from django.db.models import Q
 
 import django_filters
 from distutils.util import strtobool
 from django_filters.filters import (
-    ChoiceFilter, CharFilter, DateFilter, TypedChoiceFilter, CharFilter
+    DateFilter, TypedChoiceFilter, CharFilter
 )
 
-from core.common import PD_LIST_REPORT_STATUS, PD_STATUS, PROGRESS_REPORT_STATUS
+from core.common import PROGRESS_REPORT_STATUS
+from utils.filter_fields import CommaSeparatedListFilter
 from indicator.models import Reportable
 from .models import ProgrammeDocument, ProgressReport
 
@@ -67,24 +67,17 @@ class ProgrammeDocumentIndicatorFilter(django_filters.FilterSet):
 
 class ProgrammeDocumentFilter(django_filters.FilterSet):
     ref_title = CharFilter(method='get_reference_number_title')
-    status = CharFilter(method='get_status')
-    location = CharFilter(method='get_location')
+    status = CommaSeparatedListFilter(name='status')
+    location = CommaSeparatedListFilter(name='progress_reports__indicator_reports__indicator_location_data__location')
 
     class Meta:
         model = ProgrammeDocument
         fields = ['ref_title', 'status', 'location']
 
-    def get_status(self, queryset, name, value):
-        return queryset.filter(status__in=parse.unquote(value).split(','))
-
     def get_reference_number_title(self, queryset, name, value):
         return queryset.filter(
             Q(reference_number__icontains=value) | Q(title__icontains=value)
         )
-
-    def get_location(self, queryset, name, value):
-        return queryset.filter(
-            progress_reports__indicator_reports__indicator_location_data__location=value)
 
 
 class ProgressReportFilter(django_filters.FilterSet):

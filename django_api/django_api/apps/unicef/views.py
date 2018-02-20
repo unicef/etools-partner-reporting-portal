@@ -50,7 +50,7 @@ from unicef.exports.programme_documents import ProgrammeDocumentsXLSXExporter, P
 from unicef.exports.progress_reports import ProgressReportDetailPDFExporter, ProgressReportListPDFExporter
 from unicef.exports.utilities import group_indicator_reports_by_lower_level_output
 from utils.mixins import ListExportMixin, ObjectExportMixin
-
+from utils.emails import send_email_from_template
 
 from .serializers import (
     ProgrammeDocumentSerializer,
@@ -173,24 +173,14 @@ class ProgrammeDocumentLocationsAPIView(ListAPIView):
     serializer_class = ShortLocationSerializer
     permission_classes = (IsAuthenticated,)
 
-    def list(self, request, workspace_id, *args, **kwargs):
-        pd = ProgrammeDocument.objects.filter(
+    def get_queryset(self):
+        programme_documents = ProgrammeDocument.objects.filter(
             partner=self.request.user.partner,
-            workspace=workspace_id)
-        queryset = self.get_queryset().filter(
-            indicator_location_data__indicator_report__progress_report__programme_document__in=pd).distinct()
-        filtered = ProgressReportFilter(request.GET, queryset=queryset)
-
-        page = self.paginate_queryset(filtered.qs)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(filtered.qs, many=True)
-        return Response(
-            serializer.data,
-            status=statuses.HTTP_200_OK
+            workspace=self.kwargs['workspace_id']
         )
+        return super(ProgrammeDocumentLocationsAPIView, self).get_queryset().filter(
+            indicator_location_data__indicator_report__progress_report__programme_document__in=programme_documents
+        ).distinct()
 
 
 class ProgrammeDocumentIndicatorsAPIView(ListExportMixin, ListAPIView):
@@ -655,19 +645,40 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
             data).data)
 
     @transaction.atomic
-    def post(self, request, workspace_id, pd_id, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         """
         The goal of this is to set the calculation methods for the indicators
         associated with lower level outputs of this PD.
         """
-        serializer = ProgrammeDocumentCalculationMethodsSerializer(
-            data=request.data)
+        serializer = ProgrammeDocumentCalculationMethodsSerializer(data=request.data)
         if serializer.is_valid():
+            notify_email_flag = False
+            pd_to_notify = None
+
             for llo_and_indicators in serializer.validated_data[
                     'll_outputs_and_indicators']:
                 for indicator_blueprint in llo_and_indicators['indicators']:
-                    instance = get_object_or_404(IndicatorBlueprint,
-                                                 id=indicator_blueprint['id'])
+                    instance = get_object_or_404(IndicatorBlueprint, id=indicator_blueprint['id'])
+
+                    old_formulas = {
+                        instance.calculation_formula_across_periods,
+                        instance.calculation_formula_across_locations
+                    }
+
+                    new_formulas = {
+                        indicator_blueprint['calculation_formula_across_locations'],
+                        indicator_blueprint['calculation_formula_across_periods']
+                    }
+
+                    llo = instance.reportables.first().content_object
+                    pd = llo.cp_output.programme_document
+                    accepted_progress_reports = pd.progress_reports.filter(status=PROGRESS_REPORT_STATUS.accepted)
+
+                    if not notify_email_flag and accepted_progress_reports.exists():
+                        if not old_formulas == new_formulas:
+                            notify_email_flag = True
+                            pd_to_notify = pd
+
                     instance.calculation_formula_across_periods = \
                         indicator_blueprint[
                             'calculation_formula_across_periods']
@@ -676,6 +687,22 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
                             'calculation_formula_across_locations']
                     instance.clean()
                     instance.save()
+
+            if notify_email_flag:
+                focal_points = list(pd_to_notify.unicef_focal_point.values('name', 'email'))
+                template_data = dict()
+                template_data['pd'] = pd_to_notify
+
+                for focal_point in focal_points:
+                    template_data['focal_point_name'] = focal_point['name']
+                    send_email_from_template(
+                              'email/notify_partner_on_calculation_method_change_subject.txt',
+                              'email/notify_partner_on_calculation_method_change.txt',
+                              template_data,
+                              settings.DEFAULT_FROM_EMAIL,
+                              [focal_point['email'],],
+                              fail_silently=False)
+
             return Response(serializer.data, status=statuses.HTTP_200_OK)
 
         return Response({"errors": serializer.errors},

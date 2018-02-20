@@ -213,8 +213,7 @@ class Reportable(TimeStampedExternalSyncModelMixin):
     parent_indicator = models.ForeignKey('self', null=True, blank=True,
                                          related_name='children',
                                          db_index=True)
-    locations = models.ManyToManyField(
-        'core.Location', related_name="reportables")
+    locations = models.ManyToManyField('core.Location', related_name="reportables")
 
     frequency = models.CharField(
         max_length=3,
