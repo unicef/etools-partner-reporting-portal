@@ -444,7 +444,7 @@
           delete this.data.cs_dates;
         }
 
-        this.set('data.object_type', this.editData.content_type_name);
+        this.set('data.object_type', this.editData.content_type_key);
 
         this.$.editIndicator.thunk()()
             .then(function (res) {
