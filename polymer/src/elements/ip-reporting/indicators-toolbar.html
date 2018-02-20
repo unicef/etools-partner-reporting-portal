@@ -9,7 +9,7 @@
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../styles/buttons.html">
 
-<dom-module id="progress-reports-toolbar">
+<dom-module id="indicators-toolbar">
   <template>
     <style include="iron-flex iron-flex-reverse button-styles">
       :host {
@@ -37,12 +37,21 @@
           XLS
         </paper-button>
       </a>
+      <a
+          href="[[pdfExportUrl]]"
+          tabindex="-1"
+          target="_blank">
+        <paper-button class="btn-primary">
+          <iron-icon icon="icons:file-download"></iron-icon>
+          PDF
+        </paper-button>
+      </a>
     </div>
   </template>
 
   <script>
     Polymer({
-      is: 'progress-reports-toolbar',
+      is: 'indicators-toolbar',
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
@@ -51,21 +60,35 @@
       properties: {
         query: String,
 
-        locationId: {
+        workspaceId: {
           type: String,
           statePath: 'location.id',
         },
 
+        indicatorsUrl: {
+          type: String,
+          computed: '_computeIndicatorsUrl(workspaceId)',
+        },
+
         xlsExportUrl: {
           type: String,
-          computed: '_computeExportUrl(locationId, query, "xlsx")',
+          computed: '_computeExportUrl(indicatorsUrl, query, "xlsx")',
+        },
+
+        pdfExportUrl: {
+          type: String,
+          computed: '_computeExportUrl(indicatorsUrl, query, "pdf")',
         },
 
       },
 
-      _computeExportUrl: function (locationId, query, filetype) {
+      _computeIndicatorsUrl: function (workspaceId) {
+        return App.Endpoints.allPDIndicators(workspaceId);
+      },
+
+      _computeExportUrl: function (indicatorsUrl, query, filetype) {
         return [
-          App.Endpoints.programmeDocumentReports(locationId),
+          indicatorsUrl,
           '?',
           query,
           '&export=',

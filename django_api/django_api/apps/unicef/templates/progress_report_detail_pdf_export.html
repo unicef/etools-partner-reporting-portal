@@ -100,20 +100,7 @@
             <pdf:nextpage />
         </div>
 
-        <h1>2. Lower Level Outputs</h1>
-        {% for table in tables %}
-            <table>
-                {% autoescape off %}
-                    {% for row_data in table %}
-                        <tr>
-                            {% for cell in row_data %}
-                                {{ cell.render }}
-                            {% endfor %}
-                        </tr>
-                    {% endfor %}
-                {% endautoescape %}
-            </table>
-            <br/>
-        {% endfor %}
+        <h1>2. PD Outputs / SSFA Expected Results</h1>
+        {% include 'fragments/tables.html' %}
     </div>
 {% endblock %}

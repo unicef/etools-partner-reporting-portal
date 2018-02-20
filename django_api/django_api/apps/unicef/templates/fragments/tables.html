@@ -1,0 +1,14 @@
+{% for table in tables %}
+    <table>
+        {% autoescape off %}
+            {% for row_data in table %}
+                <tr>
+                    {% for cell in row_data %}
+                        {{ cell.render }}
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        {% endautoescape %}
+    </table>
+    <br/>
+{% endfor %}

@@ -289,9 +289,9 @@ class Reportable(TimeStampedExternalSyncModelMixin):
         }
 
     def __str__(self):
-        return "Reportable <pk:%s> %s on %s" % (self.id,
-                                                self.blueprint.title,
-                                                self.content_object)
+        return "Reportable #{} {} on {}".format(
+            self.id, self.blueprint.title, self.content_object
+        )
 
 
 class IndicatorReportManager(models.Manager):
