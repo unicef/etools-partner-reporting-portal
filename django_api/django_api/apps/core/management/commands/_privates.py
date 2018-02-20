@@ -244,7 +244,7 @@ def generate_fake_data(workspace_quantity=10):
                     parent=None if idx == 0 else (
                         locations[idx - 1] if idx < 6 else locations[4]),
                     carto_db_table=carto_db_table,
-                    pcode=generate_random_character_sequence() + "-" + str(idx)
+                    p_code=generate_random_character_sequence() + "-" + str(idx)
                 )
             )
 
