@@ -726,7 +726,7 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
                               'email/notify_partner_on_calculation_method_change_subject.txt',
                               'email/notify_partner_on_calculation_method_change.txt',
                               template_data,
-                              settings.EMAIL_FROM_ADDRESS,
+                              settings.DEFAULT_FROM_EMAIL,
                               [focal_point['email'],],
                               fail_silently=False)
 
