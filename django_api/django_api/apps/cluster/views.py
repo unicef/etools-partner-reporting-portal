@@ -327,6 +327,16 @@ class IndicatorReportsListAPIView(ListCreateAPIView):
     Parameters:
     - response_plan_id - Response plan ID
 
+    GET query parameters:
+    * cluster - Integer ID for cluster
+    * partner - Integer ID for partner
+    * indicator - Integer ID for IndicatorReport
+    * project - Integer ID for project
+    * location - Integer ID for location
+    * cluster_objective - Integer ID for cluster_objective
+    * cluster_activity - Integer ID for cluster_activity
+    * indicator_type - String value of choices: partner_activity, partner_project, cluster_objective, OR cluster_activity
+
     Returns:
         - GET method - ClusterIndicatorReportSerializer object.
         - POST method - ClusterIndicatorReportSerializer object.
@@ -341,14 +351,14 @@ class IndicatorReportsListAPIView(ListCreateAPIView):
     def get_queryset(self):
         response_plan_id = self.kwargs.get(self.lookup_field)
         queryset = IndicatorReport.objects.filter(
-            # Q(reportable__cluster_objectives__isnull=False)
-            # | Q(reportable__cluster_activities__isnull=False)
-            Q(reportable__partner_projects__isnull=False)
+            Q(reportable__cluster_objectives__isnull=False)
+            | Q(reportable__cluster_activities__isnull=False)
+            | Q(reportable__partner_projects__isnull=False)
             | Q(reportable__partner_activities__isnull=False)
         ).filter(
-            # Q(reportable__cluster_objectives__cluster__response_plan=response_plan_id)
-            # | Q(reportable__cluster_activities__cluster_objective__cluster__response_plan=response_plan_id)
-            Q(reportable__partner_projects__clusters__response_plan=response_plan_id)
+            Q(reportable__cluster_objectives__cluster__response_plan=response_plan_id)
+            | Q(reportable__cluster_activities__cluster_objective__cluster__response_plan=response_plan_id)
+            | Q(reportable__partner_projects__clusters__response_plan=response_plan_id)
             | Q(reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)
         )
         return queryset
