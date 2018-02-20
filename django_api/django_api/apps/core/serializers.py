@@ -38,7 +38,7 @@ class ShortLocationSerializer(serializers.ModelSerializer):
         fields = ('id', 'title')
 
     def get_title(self, obj):
-        return "%s [%s, Lvl: %s]" % (obj.title, obj.gateway.name, obj.p_code if obj.p_code else "n/a")
+        return "%s [%s, %s]" % (obj.title, obj.gateway.name, obj.p_code if obj.p_code else "n/a")
 
     def get_id(self, obj):
         return str(obj.id)
