@@ -1,0 +1,91 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../bower_components/iron-location/iron-location.html">
+
+<link rel="import" href="../../endpoints.html">
+<link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../styles/buttons.html">
+
+<dom-module id="indicators-toolbar">
+  <template>
+    <style include="iron-flex iron-flex-reverse button-styles">
+      :host {
+        display: block;
+        margin: 1em 0;
+      }
+
+      a {
+        text-decoration: none;
+        color: var(--theme-primary-color);
+      }
+    </style>
+
+    <iron-location
+      query="{{query}}">
+    </iron-location>
+
+    <div class="layout horizontal-reverse">
+      <a
+          href="[[xlsExportUrl]]"
+          tabindex="-1"
+          target="_blank">
+        <paper-button class="btn-primary">
+          <iron-icon icon="icons:file-download"></iron-icon>
+          XLS
+        </paper-button>
+      </a>
+    </div>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'indicators-toolbar',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        query: String,
+
+        workspaceId: {
+          type: String,
+          statePath: 'location.id',
+        },
+
+        indicatorsUrl: {
+          type: String,
+          computed: '_computeIndicatorsUrl(workspaceId)',
+        },
+
+        xlsExportUrl: {
+          type: String,
+          computed: '_computeExportUrl(indicatorsUrl, query, "xlsx")',
+        },
+
+        pdfExportUrl: {
+          type: String,
+          computed: '_computeExportUrl(indicatorsUrl, query, "pdf")',
+        },
+
+      },
+
+      _computeIndicatorsUrl: function (workspaceId) {
+        return App.Endpoints.allPDIndicators(workspaceId);
+      },
+
+      _computeExportUrl: function (indicatorsUrl, query, filetype) {
+        return [
+          indicatorsUrl,
+          '?',
+          query,
+          '&export=',
+          filetype
+        ].join('');
+      },
+    });
+  </script>
+</dom-module>
