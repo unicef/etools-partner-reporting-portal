@@ -19,12 +19,15 @@ MAXIMUM_DISAGGREGATIONS_PER_INDICATOR = 3
 
 class IndicatorsXLSXExporter:
 
-    def __init__(self, indicators, response_plan_id, analysis=False):
+    analysis = False
+
+    def __init__(self, indicators, response_plan_id, analysis=None):
         self.wb = load_workbook(PATH)
         self.sheet = self.wb.get_active_sheet()
         self.indicators = indicators
         self.response_plan_id = response_plan_id
-        self.analysis = analysis
+        if analysis is not None:
+            self.analysis = analysis
         self.sheets = [self.sheet, ]
         self.disaggregations_start_column = DISAGGREGATION_COLUMN_START
 

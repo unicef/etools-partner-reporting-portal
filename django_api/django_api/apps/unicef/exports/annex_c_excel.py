@@ -195,10 +195,13 @@ class ProgressReportsXLSXExporter:
 
         self.workbook.save(self.file_path)
 
-    def write_disaggregation_headers_get_column_map(self, progress_reports):
-        disaggregations = Disaggregation.objects.filter(
-            reportable__indicator_reports__progress_report__in=progress_reports
+    def get_disaggregations(self, progress_reports=None):
+        return Disaggregation.objects.filter(
+            reportable__indicator_reports__progress_report__in=progress_reports or self.progress_reports
         ).distinct()
+
+    def write_disaggregation_headers_get_column_map(self, progress_reports=None):
+        disaggregations = self.get_disaggregations(progress_reports)
 
         disaggregation_id_to_options = {}
         disaggregation_value_id_to_name = {}
@@ -257,9 +260,8 @@ class ProgressReportsXLSXExporter:
 
         return combination_to_column
 
-    def write_progress_reports_to_current_sheet(self, progress_reports):
+    def write_header_to_current_sheet(self):
         current_row = 1
-
         for column, header_text in enumerate(self.general_info_headers):
             self.column_widths.append(len(header_text))
             column += 1  # columns are not 0-indexed...
@@ -274,41 +276,51 @@ class ProgressReportsXLSXExporter:
                 )
 
             cell.style = self.bold_center_style
-        current_row += 1
+        return current_row + 1
 
-        combination_to_column = self.write_disaggregation_headers_get_column_map(progress_reports)
+    def write_progress_reports_to_current_sheet(self, progress_reports):
+        current_row = self.write_header_to_current_sheet()
+
+        disaggregation_column_map = self.write_disaggregation_headers_get_column_map(progress_reports)
 
         for progress_report in progress_reports:
-            for indicator_report in progress_report.indicator_reports.all():
-                for location_data in indicator_report.indicator_location_data.all():
-                    general_info_row = self.get_general_info_row(progress_report, location_data)
-
-                    for column, (cell_data, cell_format) in enumerate(general_info_row):
-                        try:
-                            self.column_widths[column] = max(self.column_widths[column], len(cell_data) + 2)
-                        except TypeError:
-                            self.column_widths[column] = max(self.column_widths[column], len(str(cell_data)) + 2)
-                        column += 1  # columns are not 0-indexed...
-                        cell = self.current_sheet.cell(row=current_row, column=column, value=cell_data)
-                        if cell_format:
-                            cell.number_format = cell_format
-
-                    for combination, total_value in location_data.disaggregation.items():
-                        combination_column = combination_to_column.get(combination)
-                        if combination_column:
-                            self.current_sheet.cell(
-                                row=current_row, column=combination_column, value=total_value.get(ValueType.VALUE)
-                            )
-                        else:
-                            logger.exception('Location data {} contains unknown disaggregation: {}'.format(
-                                location_data.id, combination
-                            ))
-
-                current_row += 1
+            current_row = self.write_indicator_reports_to_current_sheet(
+                current_row, progress_report.indicator_reports.all(), disaggregation_column_map
+            )
 
         for column, width in enumerate(self.column_widths):
             column += 1
             self.current_sheet.column_dimensions[get_column_letter(column)].width = width
+
+    def write_indicator_reports_to_current_sheet(self, current_row, indicator_reports, disaggregation_column_map):
+        for indicator_report in indicator_reports:
+            for location_data in indicator_report.indicator_location_data.all():
+                general_info_row = self.get_general_info_row(indicator_report.progress_report, location_data)
+
+                for column, (cell_data, cell_format) in enumerate(general_info_row):
+                    try:
+                        self.column_widths[column] = max(self.column_widths[column], len(cell_data) + 2)
+                    except TypeError:
+                        self.column_widths[column] = max(self.column_widths[column], len(str(cell_data)) + 2)
+                    column += 1  # columns are not 0-indexed...
+                    cell = self.current_sheet.cell(row=current_row, column=column, value=cell_data)
+                    if cell_format:
+                        cell.number_format = cell_format
+
+                for disaggregation, total_value in location_data.disaggregation.items():
+                    combination_column = disaggregation_column_map.get(disaggregation)
+                    if combination_column:
+                        self.current_sheet.cell(
+                            row=current_row, column=combination_column, value=total_value.get(ValueType.VALUE)
+                        )
+                    else:
+                        logger.exception('Location data {} contains unknown disaggregation: {}'.format(
+                            location_data.id, disaggregation
+                        ))
+
+            current_row += 1
+
+        return current_row
 
     def cleanup(self):
         os.remove(self.file_path)
