@@ -172,24 +172,14 @@ class ProgrammeDocumentLocationsAPIView(ListAPIView):
     serializer_class = ShortLocationSerializer
     permission_classes = (IsAuthenticated,)
 
-    def list(self, request, workspace_id, *args, **kwargs):
-        pd = ProgrammeDocument.objects.filter(
+    def get_queryset(self):
+        programme_documents = ProgrammeDocument.objects.filter(
             partner=self.request.user.partner,
-            workspace=workspace_id)
-        queryset = self.get_queryset().filter(
-            indicator_location_data__indicator_report__progress_report__programme_document__in=pd).distinct()
-        filtered = ProgressReportFilter(request.GET, queryset=queryset)
-
-        page = self.paginate_queryset(filtered.qs)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(filtered.qs, many=True)
-        return Response(
-            serializer.data,
-            status=statuses.HTTP_200_OK
+            workspace=self.kwargs['workspace_id']
         )
+        return super(ProgrammeDocumentLocationsAPIView, self).get_queryset().filter(
+            indicator_location_data__indicator_report__progress_report__programme_document__in=programme_documents
+        ).distinct()
 
 
 class ProgrammeDocumentIndicatorsAPIView(ListAPIView):
