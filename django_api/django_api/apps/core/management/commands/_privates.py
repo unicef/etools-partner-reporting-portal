@@ -106,6 +106,8 @@ from indicator.tasks import process_due_reports
 from partner.tasks import process_partners
 from unicef.tasks import process_programme_documents
 
+from utils.helpers import generate_random_character_sequence
+
 OVERALL_STATUS_LIST = [x[0] for x in OVERALL_STATUS]
 REPORTING_TYPE_LIST_WITHOUT_SR = [x[0] for x in REPORTING_TYPES if x != 'SR']
 
@@ -242,6 +244,7 @@ def generate_fake_data(workspace_quantity=10):
                     parent=None if idx == 0 else (
                         locations[idx - 1] if idx < 6 else locations[4]),
                     carto_db_table=carto_db_table,
+                    pcode=generate_random_character_sequence() + "-" + str(idx)
                 )
             )
 
