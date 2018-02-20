@@ -14,7 +14,13 @@ from core.common import PD_LIST_REPORT_STATUS, PD_STATUS, PROGRESS_REPORT_STATUS
 from indicator.models import Reportable
 from .models import ProgrammeDocument, ProgressReport
 
-BOOLEAN_CHOICES = (('0', 'False'), ('1', 'True'),)
+
+BOOLEAN_TRUE = '1'
+BOOLEAN_FALSE = '0'
+BOOLEAN_CHOICES = (
+    (BOOLEAN_FALSE, 'False'),
+    (BOOLEAN_TRUE, 'True'),
+)
 
 
 class ProgrammeDocumentIndicatorFilter(django_filters.FilterSet):
@@ -24,6 +30,10 @@ class ProgrammeDocumentIndicatorFilter(django_filters.FilterSet):
     location = CharFilter(method='get_locations')
     blueprint__title = CharFilter(method='get_blueprint_title')
     incomplete = CharFilter(method='get_incomplete')
+    activepdsonly = TypedChoiceFilter(
+        name='activepdsonly', choices=BOOLEAN_CHOICES,
+        method='get_activepdsonly', label='Show for Active PDs only'
+    )
 
     class Meta:
         model = Reportable
@@ -48,6 +58,11 @@ class ProgrammeDocumentIndicatorFilter(django_filters.FilterSet):
     def get_incomplete(self, queryset, name, value):
         return queryset.filter(
             lower_level_outputs__cp_output__programme_document__progress_reports__indicator_reports__submission_date__isnull=True) if value == "1" else queryset
+
+    def get_activepdsonly(self, queryset, name, value):
+        if value == BOOLEAN_TRUE:
+            return queryset.filter(lower_level_outputs__cp_output__programme_document__status=PD_STATUS.active)
+        return queryset
 
 
 class ProgrammeDocumentFilter(django_filters.FilterSet):

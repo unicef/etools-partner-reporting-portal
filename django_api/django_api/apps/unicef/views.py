@@ -42,6 +42,7 @@ from indicator.serializers import (
 from indicator.filters import PDReportsFilter
 from indicator.serializers import IndicatorBlueprintSimpleSerializer
 from partner.models import Partner
+from unicef.exports.reportables import ReportableListXLSXExporter
 from unicef.tasks import create_user_for_person
 
 from unicef.exports.annex_c_excel import AnnexCXLSXExporter, SingleProgressReportsXLSXExporter
@@ -192,42 +193,25 @@ class ProgrammeDocumentLocationsAPIView(ListAPIView):
         )
 
 
-class ProgrammeDocumentIndicatorsAPIView(ListAPIView):
+class ProgrammeDocumentIndicatorsAPIView(ListExportMixin, ListAPIView):
 
     queryset = Reportable.objects.filter(lower_level_outputs__isnull=False)
     serializer_class = IndicatorListSerializer
     pagination_class = SmallPagination
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
+    filter_class = ProgrammeDocumentIndicatorFilter
+    exporters = {
+        'xlsx': ReportableListXLSXExporter,
+    }
 
-    def list(self, request, workspace_id, *args, **kwargs):
-        """
-        Return list of Reportable objects that are associated with LLO's
-        of the PD's that this users partner belongs to.
-        """
-        pds = ProgrammeDocument.objects.filter(
-            partner=self.request.user.partner, workspace=workspace_id)
-        queryset = self.get_queryset().filter(
-            indicator_reports__progress_report__programme_document__in=pds).distinct()
-
-        # filter for checkbox
-        active_pds_only = self.request.query_params.get(
-            'activepdsonly', None)
-        if active_pds_only is not None and active_pds_only == '1':
-            queryset = queryset.filter(
-                lower_level_outputs__cp_output__programme_document__status=PD_STATUS.active)
-
-        filtered = ProgrammeDocumentIndicatorFilter(request.GET,
-                                                    queryset=queryset)
-        page = self.paginate_queryset(filtered.qs)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(filtered.qs, many=True)
-        return Response(
-            serializer.data,
-            status=statuses.HTTP_200_OK
+    def get_queryset(self):
+        programme_documents = ProgrammeDocument.objects.filter(
+            partner=self.request.user.partner,
+            workspace=self.kwargs['workspace_id']
         )
+        return super(ProgrammeDocumentIndicatorsAPIView, self).get_queryset().filter(
+            indicator_reports__progress_report__programme_document__in=programme_documents
+        ).distinct()
 
 
 class ProgressReportAPIView(ListExportMixin, ListAPIView):
