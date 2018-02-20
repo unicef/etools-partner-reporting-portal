@@ -1,0 +1,5 @@
+Dear {{focal_point_name}},
+
+This is to inform you that the Calculation Method for indicators in PD {{pd.title}} have changed.
+
+-- {{pd.partner.title}}

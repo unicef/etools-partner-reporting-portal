@@ -42,6 +42,9 @@ from indicator.serializers import (
 from indicator.filters import PDReportsFilter
 from indicator.serializers import IndicatorBlueprintSimpleSerializer
 from partner.models import Partner
+
+from utils.emails import send_email_from_template
+
 from unicef.tasks import create_user_for_person
 
 from unicef.exports.annex_c_excel import AnnexCXLSXExporter, SingleProgressReportsXLSXExporter
@@ -659,19 +662,40 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
             data).data)
 
     @transaction.atomic
-    def post(self, request, workspace_id, pd_id, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         """
         The goal of this is to set the calculation methods for the indicators
         associated with lower level outputs of this PD.
         """
-        serializer = ProgrammeDocumentCalculationMethodsSerializer(
-            data=request.data)
+        serializer = ProgrammeDocumentCalculationMethodsSerializer(data=request.data)
         if serializer.is_valid():
+            notify_email_flag = False
+            pd_to_notify = None
+
             for llo_and_indicators in serializer.validated_data[
                     'll_outputs_and_indicators']:
                 for indicator_blueprint in llo_and_indicators['indicators']:
-                    instance = get_object_or_404(IndicatorBlueprint,
-                                                 id=indicator_blueprint['id'])
+                    instance = get_object_or_404(IndicatorBlueprint, id=indicator_blueprint['id'])
+
+                    old_formulas = {
+                        instance.calculation_formula_across_periods,
+                        instance.calculation_formula_across_locations
+                    }
+
+                    new_formulas = {
+                        indicator_blueprint['calculation_formula_across_locations'],
+                        indicator_blueprint['calculation_formula_across_periods']
+                    }
+
+                    llo = instance.reportables.first().content_object
+                    pd = llo.cp_output.programme_document
+                    accepted_progress_reports = pd.progress_reports.filter(status=PROGRESS_REPORT_STATUS.accepted)
+
+                    if not notify_email_flag and accepted_progress_reports.exists():
+                        if not old_formulas == new_formulas:
+                            notify_email_flag = True
+                            pd_to_notify = pd
+
                     instance.calculation_formula_across_periods = \
                         indicator_blueprint[
                             'calculation_formula_across_periods']
@@ -680,6 +704,22 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
                             'calculation_formula_across_locations']
                     instance.clean()
                     instance.save()
+
+            if notify_email_flag:
+                focal_points = list(pd_to_notify.unicef_focal_point.values('name', 'email'))
+                template_data = dict()
+                template_data['pd'] = pd_to_notify
+
+                for focal_point in focal_points:
+                    template_data['focal_point_name'] = focal_point['name']
+                    send_email_from_template(
+                              'email/notify_partner_on_calculation_method_change_subject.txt',
+                              'email/notify_partner_on_calculation_method_change.txt',
+                              template_data,
+                              settings.DEFAULT_FROM_EMAIL,
+                              [focal_point['email'],],
+                              fail_silently=False)
+
             return Response(serializer.data, status=statuses.HTTP_200_OK)
 
         return Response({"errors": serializer.errors},
