@@ -119,9 +119,8 @@ def remove_untagged_images():
     local('docker rmi $(docker images | grep "^<none>" | awk "{print $3}")')
 
 
-def autopep8():
+def backend_lint():
     """
-    Format all Python files to pep8-compliant
+    Run python code linter
     """
-    local('docker-compose exec django_api find . -name \*.py -not -path "./django_api/apps/**/migrations/*.py" -exec '
-          'autopep8 --in-place --aggressive --recursive --jobs 2 --ignore=E402 {} +')
+    local('docker-compose exec django_api flake8 ./ --count')

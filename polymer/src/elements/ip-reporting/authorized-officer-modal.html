@@ -47,7 +47,7 @@
       method="post">
     </etools-prp-ajax>
 
-    <paper-dialog id="authorized-officer-modal" with-backdrop opened=[[opened]]>
+    <paper-dialog with-backdrop opened=[[opened]]>
       <div class="header layout horizontal justified">
         <h2>Select Authorized Officer</h2>
 
@@ -103,7 +103,7 @@
 
   <script>
     Polymer({
-      id: 'authorized-officer-modal',
+      is: 'authorized-officer-modal',
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
@@ -135,12 +135,14 @@
 
         postBody: {
           type: Object,
-          computed: "_computePostBody(selectedFocalPoint)"
+          computed: '_computePostBody(selectedFocalPoint)'
         }
       },
 
       _computePostBody: function (selectedFocalPoint) {
-        return ({ submitted_by_email: selectedFocalPoint })
+        return {
+          submitted_by_email: selectedFocalPoint,
+        };
       },
 
       _validate: function (e) {
