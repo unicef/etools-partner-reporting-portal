@@ -42,7 +42,7 @@ from indicator.serializers import (
 from indicator.filters import PDReportsFilter
 from indicator.serializers import IndicatorBlueprintSimpleSerializer
 from partner.models import Partner
-from unicef.exports.reportables import ReportableListXLSXExporter
+from unicef.exports.reportables import ReportableListXLSXExporter, ReportableListPDFExporter
 from unicef.tasks import create_user_for_person
 
 from unicef.exports.annex_c_excel import AnnexCXLSXExporter, SingleProgressReportsXLSXExporter
@@ -202,6 +202,7 @@ class ProgrammeDocumentIndicatorsAPIView(ListExportMixin, ListAPIView):
     filter_class = ProgrammeDocumentIndicatorFilter
     exporters = {
         'xlsx': ReportableListXLSXExporter,
+        'pdf': ReportableListPDFExporter,
     }
 
     def get_queryset(self):

@@ -1,8 +1,13 @@
+import logging
+
 from django.utils import timezone
 from openpyxl.utils import get_column_letter
 
 from indicator.models import Disaggregation
 from unicef.exports.annex_c_excel import ProgressReportsXLSXExporter
+from unicef.exports.progress_reports import ProgressReportDetailPDFExporter
+
+logger = logging.getLogger(__name__)
 
 
 class ReportableListXLSXExporter(ProgressReportsXLSXExporter):
@@ -50,3 +55,33 @@ class ReportableListXLSXExporter(ProgressReportsXLSXExporter):
                 self.write_reportables_to_current_sheet([reportable])
 
         self.workbook.save(self.file_path)
+
+
+class ReportableListPDFExporter(ProgressReportDetailPDFExporter):
+
+    template_name = 'reportable_list_pdf_export.html'
+
+    def __init__(self, reportables):
+        self.reportables = reportables
+        self.display_name = '[{:%a %-d %b %-H-%M-%S %Y}] List of Indicators'.format(
+            timezone.now()
+        )
+        self.file_name = self.display_name + '.pdf'
+
+    def get_context(self):
+        section_list = []
+
+        for reportable in self.reportables:
+            section_data = {
+                'reportable': reportable,
+                'tables': self.create_tables_for_indicator_reports(reportable.indicator_reports.all())
+            }
+
+            section_list.append(section_data)
+
+        context = {
+            'title': self.display_name,
+            'sections': section_list
+        }
+
+        return context
