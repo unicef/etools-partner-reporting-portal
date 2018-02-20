@@ -2,6 +2,7 @@ import logging
 from datetime import datetime
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpResponseNotFound
@@ -17,6 +18,7 @@ from rest_framework.views import APIView
 import django_filters.rest_framework
 from easy_pdf.rendering import render_to_pdf
 
+from core.api_error_codes import APIErrorCode
 from core.common import (
     PROGRESS_REPORT_STATUS,
     INDICATOR_REPORT_STATUS,
@@ -40,12 +42,17 @@ from indicator.serializers import (
 from indicator.filters import PDReportsFilter
 from indicator.serializers import IndicatorBlueprintSimpleSerializer
 from partner.models import Partner
+
 from utils.emails import send_email_from_template
+
+from unicef.tasks import create_user_for_person
+
 from unicef.exports.annex_c_excel import AnnexCXLSXExporter, SingleProgressReportsXLSXExporter
 from unicef.exports.programme_documents import ProgrammeDocumentsXLSXExporter, ProgrammeDocumentsPDFExporter
 from unicef.exports.progress_reports import ProgressReportDetailPDFExporter
 from unicef.exports.utilities import group_indicator_reports_by_lower_level_output
 from utils.mixins import ListExportMixin, ObjectExportMixin
+
 
 from .serializers import (
     ProgrammeDocumentSerializer,
@@ -466,7 +473,7 @@ class ProgressReportSubmitAPIView(APIView):
             raise Http404
 
     @transaction.atomic
-    def post(self, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         progress_report = self.get_object()
         if not progress_report.programme_document.status == PD_STATUS.active:
             _errors = [{
@@ -529,10 +536,38 @@ class ProgressReportSubmitAPIView(APIView):
             return Response({"errors": _errors}, status=statuses.HTTP_400_BAD_REQUEST)
 
         if progress_report.submission_date is None or progress_report.status == PROGRESS_REPORT_STATUS.sent_back:
+            provided_email = request.data.get('submitted_by_email')
+
+            authorized_officer_person = progress_report.programme_document.partner_focal_point.filter(
+                    email=provided_email or self.request.user.email
+            ).first()
+            if not authorized_officer_person:
+                if provided_email:
+                    _error_message = 'Report could not be submitted, because {} is not the authorized ' \
+                                     'officer assigned to the PCA that is connected to that PD.'.format(provided_email)
+                else:
+                    _error_message = 'Your report could not be submitted, because you are not the authorized ' \
+                                     'officer assigned to the PCA that is connected to that PD.'
+
+                _errors = [{
+                    "message": _error_message,
+                    "code": APIErrorCode.PR_SUBMISSION_FAILED_USER_NOT_AUTHORIZED_OFFICER,
+                }]
+                return Response({"errors": _errors}, status=statuses.HTTP_400_BAD_REQUEST)
+
+            if provided_email:
+                authorized_officer_user = get_user_model().objects.filter(email=provided_email).first()
+                if not authorized_officer_user:
+                    authorized_officer_user = create_user_for_person(authorized_officer_person)
+            else:
+                authorized_officer_user = self.request.user
+
             progress_report.status = PROGRESS_REPORT_STATUS.submitted
             progress_report.submission_date = datetime.now().date()
-            progress_report.submitted_by = self.request.user
+            progress_report.submitted_by = authorized_officer_user
+            progress_report.submitting_user = self.request.user
             progress_report.save()
+
             serializer = ProgressReportSerializer(instance=progress_report)
             return Response(serializer.data, status=statuses.HTTP_200_OK)
         else:
