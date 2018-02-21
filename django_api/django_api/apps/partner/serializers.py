@@ -25,10 +25,8 @@ from .models import (
 
 class PartnerDetailsSerializer(serializers.ModelSerializer):
 
-    partner_type_long = serializers.CharField(
-        source='get_partner_type_display')
-    shared_partner_long = serializers.CharField(
-        source='get_shared_partner_display')
+    partner_type_long = serializers.CharField(source='get_partner_type_display')
+    shared_partner_long = serializers.CharField(source='get_shared_partner_display')
     partner_type_display = serializers.SerializerMethodField()
     cso_type_display = serializers.SerializerMethodField()
     shared_partner_display = serializers.SerializerMethodField()
@@ -205,70 +203,68 @@ class PartnerActivityBaseCreateSerializer(serializers.Serializer):
     status = serializers.ChoiceField(choices=PARTNER_PROJECT_STATUS)
 
     def validate(self, data):
-        try:
-            data['cluster'] = Cluster.objects.get(id=data['cluster'])
-        except Cluster.DoesNotExist as e:
-            raise serializers.ValidationError(
-                'Cluster ID {} does not exist.'.format(data['cluster']))
+        cluster = Cluster.objects.filter(id=data['cluster']).first()
+        if not cluster:
+            raise serializers.ValidationError({
+                'cluster': 'Cluster ID {} does not exist.'.format(data['cluster'])
+            })
 
-        try:
-            data['partner'] = Partner.objects.get(id=data['partner'])
-        except Partner.DoesNotExist as e:
-            raise serializers.ValidationError(
-                'Partner ID {} does not exist.'.format(data['partner']))
+        partner = Partner.objects.filter(id=data['partner']).first()
+        if not partner:
+            raise serializers.ValidationError({
+                'partner': 'Partner ID {} does not exist.'.format(data['partner'])
+            })
 
-        try:
-            data['project'] = PartnerProject.objects.get(id=data['project'])
-
-            if data['project'].partner.id != self.initial_data['partner']:
-                raise serializers.ValidationError(
-                    'PartnerProject does not belong to Partner {}.'.format(self.initial_data['partner']))
-        except PartnerProject.DoesNotExist as e:
-            raise serializers.ValidationError(
-                'PartnerProject ID {} does not exist.'.format(data['project']))
+        project = PartnerProject.objects.filter(id=data['project']).first()
+        if not project:
+            raise serializers.ValidationError({
+                'project': 'PartnerProject ID {} does not exist.'.format(data['project'])
+            })
+        elif not project.partner_id == partner.id:
+            raise serializers.ValidationError({
+                'partner': 'PartnerProject does not belong to Partner {}.'.format(self.initial_data['partner'])
+            })
 
         if data['start_date'] > data['end_date']:
-            raise serializers.ValidationError(
-                "start_date should come before end_date")
+            raise serializers.ValidationError("start_date should come before end_date")
+
+        data['cluster'] = cluster
+        data['partner'] = partner
+        data['project'] = project
 
         return data
 
 
-class PartnerActivityFromClusterActivitySerializer(
-        PartnerActivityBaseCreateSerializer):
+class PartnerActivityFromClusterActivitySerializer(PartnerActivityBaseCreateSerializer):
     cluster_activity = serializers.IntegerField()
 
     def validate(self, data):
-        data = super(
-            PartnerActivityFromClusterActivitySerializer,
-            self).validate(data)
+        data = super(PartnerActivityFromClusterActivitySerializer, self).validate(data)
+        cluster_activity = ClusterActivity.objects.filter(id=data['cluster_activity']).first()
+        if not cluster_activity:
+            raise serializers.ValidationError({
+                'cluster_activity': 'ClusterActivity ID {} does not exist.'.format(data['cluster_activity'])
+            })
+        elif not cluster_activity.cluster_objective.cluster_id == data['cluster'].id:
+            raise serializers.ValidationError({
+                'cluster_activity': 'ClusterActivity does not belong to Cluster {}.'.format(
+                    self.initial_data['cluster']
+                )
+            })
+        elif PartnerActivity.objects.filter(
+                project=data['project'], partner=data['partner'], cluster_activity=cluster_activity
+        ).exists():
+            raise serializers.ValidationError({
+                'cluster_activity': 'The activity for given partner already exist in ClusterActivity ID {}.'.format(
+                    data['cluster_activity']
+                )
+            })
 
-        try:
-            data['cluster_activity'] = ClusterActivity.objects.get(
-                id=data['cluster_activity'])
-
-            if data['cluster_activity'].cluster_objective.cluster.id != self.initial_data['cluster']:
-                raise serializers.ValidationError(
-                    'ClusterActivity does not belong to Cluster {}.'.format(self.initial_data['cluster']))
-
-            data['partner'] = Partner.objects.get(
-                id=data['partner'])
-
-            if PartnerActivity.objects.filter(project=data['project'],
-                partner=data['partner'],
-                cluster_activity=data['cluster_activity']).exists():
-                raise serializers.ValidationError(
-                    'The activity for given partner already exist in ClusterActivity ID {}.'.format(data['cluster_activity']))
-
-        except ClusterActivity.DoesNotExist as e:
-            raise serializers.ValidationError(
-                'ClusterActivity ID {} does not exist.'.format(data['cluster_activity']))
-
+        data['cluster_activity'] = cluster_activity
         return data
 
 
-class PartnerActivityFromCustomActivitySerializer(
-        PartnerActivityBaseCreateSerializer):
+class PartnerActivityFromCustomActivitySerializer(PartnerActivityBaseCreateSerializer):
     cluster_objective = serializers.IntegerField()
     title = serializers.CharField(max_length=255)
 

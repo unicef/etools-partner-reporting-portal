@@ -341,6 +341,7 @@ REST_FRAMEWORK = {
             'rest_framework.authentication.TokenAuthentication',
     ),
     'DATE_FORMAT': PRINT_DATA_FORMAT,
+    'DATE_INPUT_FORMATS': ['iso-8601', PRINT_DATA_FORMAT],
 }
 
 

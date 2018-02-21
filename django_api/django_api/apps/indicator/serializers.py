@@ -13,7 +13,7 @@ from partner.models import PartnerProject, PartnerActivity
 from cluster.models import ClusterObjective, ClusterActivity
 
 from core.common import INDICATOR_REPORT_STATUS, FINAL_OVERALL_STATUS
-from core.serializers import LocationSerializer, IdLocationSerializer
+from core.serializers import LocationSerializer, IdLocationSerializer, ShortLocationSerializer
 from core.models import Location
 from core.validators import add_indicator_object_type_validator
 from core.helpers import (
@@ -162,13 +162,16 @@ class IndicatorListSerializer(ReportableSimpleSerializer):
     amount of data.
     """
     disaggregations = DisaggregationListSerializer(many=True, read_only=True)
+    locations = ShortLocationSerializer(many=True, read_only=True)
 
     class Meta:
         model = Reportable
         fields = ReportableSimpleSerializer.Meta.fields + (
             'means_of_verification',
+            'frequency',
             'pd_id',
-            'disaggregations'
+            'disaggregations',
+            'locations',
         )
 
 
@@ -645,10 +648,10 @@ class IndicatorBlueprintSerializer(serializers.ModelSerializer):
 
 class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
-    disaggregations = IdDisaggregationSerializer(many=True)
+    disaggregations = IdDisaggregationSerializer(many=True, read_only=True)
     object_type = serializers.CharField(validators=[add_indicator_object_type_validator])
     blueprint = IndicatorBlueprintSerializer()
-    locations = IdLocationSerializer(many=True)
+    locations = IdLocationSerializer(many=True, read_only=True)
     target = serializers.CharField(required=False)
     baseline = serializers.CharField(required=False)
 
@@ -691,7 +694,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
-        self.check_location(self.initial_data.get('locations'))
+        locations = self.check_locations_merge_to_list(self.initial_data.get('locations'))
         self.check_disaggregation(self.initial_data.get('disaggregations'))
 
         validated_data['blueprint']['unit'] = validated_data['blueprint']['display_type']
@@ -703,7 +706,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         validated_data['blueprint'] = blueprint.instance
 
         reportable_object_content_type = ContentType.objects.get_by_natural_key(
-            *validated_data['object_type'].split('.')
+            *validated_data.pop('object_type').split('.')
         )
         reportable_object_content_model = reportable_object_content_type.model_class()
 
@@ -736,27 +739,20 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
         validated_data['content_type'] = reportable_object_content_type
 
-        del validated_data['object_type']
-        del validated_data['locations']
-        del validated_data['disaggregations']
-
         self.instance = Reportable.objects.create(**validated_data)
 
-        for location in self.initial_data.get('locations'):
-            self.instance.locations.add(
-                Location.objects.get(id=location.get('id')))
+        self.instance.locations.add(*Location.objects.filter(id__in=[l['id'] for l in locations]))
 
-        for dis in self.initial_data.get('disaggregations'):
-            self.instance.disaggregations.add(
-                Disaggregation.objects.get(id=dis.get('id')))
+        disaggregations = self.initial_data.get('disaggregations')
+        self.instance.disaggregations.add(*Disaggregation.objects.filter(id__in=[d['id'] for d in disaggregations]))
 
         return self.instance
 
     def update(self, reportable, validated_data):
         locations = self.check_locations_merge_to_list(self.initial_data.get('locations'))
-        blueprint_data = validated_data.get('blueprint', {})
+        blueprint_data = validated_data.pop('blueprint', {})
+        super(ClusterIndicatorSerializer, self).update(reportable, validated_data)
 
-        reportable.means_of_verification = validated_data.get('means_of_verification', reportable.means_of_verification)
         reportable.blueprint.title = blueprint_data.get('title', reportable.blueprint.title)
 
         locations_ids = [l['id'] for l in locations]
@@ -765,7 +761,6 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         reportable.locations.add(*Location.objects.filter(id__in=locations_ids))
 
         reportable.blueprint.save()
-        reportable.save()
 
         return reportable
 
@@ -817,6 +812,7 @@ class IndicatorReportUpdateSerializer(serializers.ModelSerializer):
         fields = (
             'reporting_period',
         )
+
 
 class IndicatorReportReviewSerializer(serializers.Serializer):
     status = serializers.ChoiceField(choices=[
