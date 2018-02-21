@@ -269,14 +269,14 @@ class Reportable(TimeStampedExternalSyncModelMixin):
 
     @property
     def progress_percentage(self):
-        # if self.blueprint.unit == IndicatorBlueprint.NUMBER:
-            # pass
         percentage = 0.0
 
         if self.achieved and self.baseline is not None and self.target is not None:
-            percentage = (self.achieved['c'] - float(self.baseline)) / \
-                (float(self.target) - float(self.baseline))
-            percentage = round(percentage, 2)
+            baseline = float(self.baseline)
+            dividend = self.achieved['c'] - baseline
+            divisor = float(self.target) - baseline
+            if divisor:
+                percentage = round(dividend / divisor, 2)
         return percentage
 
     @classmethod
