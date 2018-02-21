@@ -177,6 +177,27 @@
           page_size: 10,
         });
       },
+
+      _appendQuery: function (url) {
+        return url + '?' + buildQuery([].slice.call(arguments, 1));
+      },
     };
+
+    function buildQuery(chunks) {
+      return chunks.map(function (chunk) {
+        switch (typeof chunk) {
+          case 'string':
+            return chunk;
+
+          case 'object':
+            return buildQuery(Object.keys(chunk).map(function (key) {
+              return [
+                encodeURIComponent(key),
+                encodeURIComponent(chunk[key]),
+              ].join('=');
+            }));
+        }
+      }).join('&');
+    }
   }());
 </script>

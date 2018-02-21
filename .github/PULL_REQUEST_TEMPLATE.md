@@ -1,4 +1,4 @@
-### This PR resolves #ISSUE_NUMBER.
+### This PR completes #ISSUE_NUMBER.
 
 ##### Feature list
 * _Describe the list of features from Django_

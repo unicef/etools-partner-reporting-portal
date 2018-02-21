@@ -60,6 +60,7 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'no-reply@etools.unicef.org'
 
 ALLOWED_HOSTS = []
 
@@ -241,6 +242,7 @@ STATIC_URL = '/api/static/'
 AUTH_USER_MODEL = 'account.User'
 
 PRINT_DATA_FORMAT = "%d-%b-%Y"
+DATE_FORMAT = PRINT_DATA_FORMAT
 
 INPUT_DATA_FORMAT = "%Y-%m-%d"
 
@@ -340,6 +342,7 @@ REST_FRAMEWORK = {
             'rest_framework.authentication.TokenAuthentication',
     ),
     'DATE_FORMAT': PRINT_DATA_FORMAT,
+    'DATE_INPUT_FORMATS': ['iso-8601', PRINT_DATA_FORMAT],
 }
 
 

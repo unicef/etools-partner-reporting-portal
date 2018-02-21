@@ -1,0 +1,64 @@
+§{% extends "easy_pdf/base.html" %}
+{% load pdf_extras %}
+
+{% block extra_style %}
+    <style type="text/css">
+        @page {
+            size: a4 landscape;
+            margin: 1cm;
+        }
+
+        #pdf {
+            font-family: "Arial", "sans-serif";
+            font-size: 10px;
+        }
+        table, td, th {
+            border: 1px solid black;
+        }
+        td, th {
+            padding-top: 4px;
+            padding-bottom: 1px;
+            padding-left: 3px;
+        }
+        th {
+            background-color: #d9d9d9;
+            font-weight: normal;
+            text-align: left;
+        }
+
+        td.signature {
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        td.Met, td.OnT {
+            background-color: #92D050;
+        }
+
+        td.NoP {
+            background-color: #E93F33;
+        }
+
+        td.Con {
+            background-color: #B2A1C7;
+        }
+
+        th.section {
+            background-color: #2498FA;
+            font-weight: bold;
+            color: #ffffff;
+            text-align: center;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div id="pdf">
+        <h5>{{ title }}</h5>
+
+        {% for section in sections %}
+            <h1>{{ section.reportable }}</h1>
+            {% include 'fragments/tables.html' with tables=section.tables %}
+        {% endfor %}
+    </div>
+{% endblock %}

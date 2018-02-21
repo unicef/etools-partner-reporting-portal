@@ -10,3 +10,5 @@ IS_STAGING = True
 DOMAIN_NAME = 'staging.etools-prp.com'
 WWW_ROOT = 'http://%s/' % DOMAIN_NAME
 ALLOWED_HOSTS = [DOMAIN_NAME, "*"]
+
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')

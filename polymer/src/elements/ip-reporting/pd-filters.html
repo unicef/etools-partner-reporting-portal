@@ -7,6 +7,7 @@
 <link rel="import" href="../../elements/filter-list.html">
 <link rel="import" href="../../elements/filters/text-filter/text-filter.html">
 <link rel="import" href="../../elements/filters/dropdown-filter/dropdown-filter-multi.html">
+<link rel="import" href="../../elements/filters/location-filter-multi/location-filter-multi.html">
 
 <dom-module id="pd-filters">
   <template>
@@ -16,13 +17,13 @@
         margin-bottom: 25px;
         background: white;
 
-        --app-grid-columns: 4;
+        --app-grid-columns: 5;
         --app-grid-gutter: 25px;
         --app-grid-item-height: auto;
-        --app-grid-expandible-item-columns: 3;
+        --app-grid-expandible-item-columns: 2;
       }
 
-      .filter-3-col {
+      .filter-2-col {
         @apply --app-grid-expandible-item;
       }
     </style>
@@ -47,13 +48,18 @@
       </text-filter>
 
       <dropdown-filter-multi
-          class="item filter-3-col"
+          class="item filter-2-col"
           label="PD/SSFA status"
           name="status"
           value="[[_withDefault(queryParams.status, '')]]"
           data="[[statuses]]"
           hide-search>
       </dropdown-filter-multi>
+
+      <location-filter-multi
+        class="item filter-2-col"
+        value="[[_withDefault(queryParams.location, '')]]">
+      </location-filter-multi>
     </filter-list>
   </template>
 

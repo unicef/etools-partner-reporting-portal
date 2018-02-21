@@ -396,7 +396,8 @@ class PDLowerLevelOutputStatusAPIView(APIView):
     serializer_class = OverallNarrativeSerializer
     permission_classes = (
         IsAuthenticated,
-        IsPartnerEditorOrPartnerAuthorizedOfficer)
+        IsPartnerEditorOrPartnerAuthorizedOfficer,
+    )
 
     def patch(self, request, pd_progress_report_id, llo_id, *args, **kwargs):
         """
@@ -414,7 +415,8 @@ class PDLowerLevelOutputStatusAPIView(APIView):
             for indicator_report in ir_qset.all():
                 serializer = OverallNarrativeSerializer(
                     data=request.data,
-                    instance=indicator_report)
+                    instance=indicator_report
+                )
                 if serializer.is_valid():
                     serializer.save()
                 else:

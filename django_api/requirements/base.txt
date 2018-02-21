@@ -21,7 +21,7 @@ django-easy-pdf==0.1.1
 xhtml2pdf==0.1b3
 azure-storage==0.20.0
 git+https://github.com/robertavram/django-storages.git#egg=django-storages
-
+Babel==2.5.3
 
 # Testing
 astroid==1.5.2

@@ -1,0 +1,56 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../endpoints.html">
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../etools-prp-toolbar.html">
+<link rel="import" href="../download-button.html">
+
+<dom-module id="pd-output-list-toolbar">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <etools-prp-toolbar
+      query="{{query}}"
+      report-id="{{reportId}}"
+      location-id="{{locationId}}"
+    >
+      <download-button url="[[pdfExportUrl]]">PDF</download-button>
+      <download-button url="[[xlsExportUrl]]">XLS</download-button>
+    </etools-prp-toolbar>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'pd-output-list-toolbar',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+      ],
+
+      properties: {
+        pdReportUrl: {
+          type: String,
+          computed: '_computePdReportUrl(locationId, reportId)',
+        },
+
+        pdfExportUrl: {
+          type: String,
+          computed: '_appendQuery(pdReportUrl, query, \'export=pdf\')',
+        },
+
+        xlsExportUrl: {
+          type: String,
+          computed: '_appendQuery(pdReportUrl, query, \'export=xlsx\')',
+        },
+      },
+
+      _computePdReportUrl: function (locationId, reportId) {
+        return App.Endpoints.programmeDocumentReport(locationId, reportId);
+      },
+    });
+  </script>
+</dom-module>
