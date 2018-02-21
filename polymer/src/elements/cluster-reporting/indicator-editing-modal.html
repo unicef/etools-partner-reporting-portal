@@ -14,6 +14,8 @@
 <link rel="import" href="../../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-multi-selection-menu.html">
+<link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html">
+
 
 <link rel="import" href="../../polyfills/es6-shim.html">
 <link rel="import" href="disaggregations-dropdown-widget.html">
@@ -125,6 +127,8 @@
               <div class="item">
                 <paper-dropdown-menu
                     class="validate"
+                    value=""
+                    selected="1"
                     label="Frequency of reporting"
                     on-value-changed="_validate"
                     on-selected-item-changed="_setFrequency"
@@ -325,6 +329,7 @@
         },
 
         editData: Object,
+
       },
 
       observers: [
@@ -337,6 +342,7 @@
         if (!freq) {
           return;
         }
+        if (freq === 'Csd') this.set('data.cs_dates', []);
         this.set('data.frequency', freq.id);
       },
 
@@ -373,7 +379,8 @@
         }
 
         this.set('data', Object.assign({}, this.editData));
-
+        if (!this.editData.cs_dates)
+        this.set('data.cs_dates', [])
         this._fetchLocations();
       },
 

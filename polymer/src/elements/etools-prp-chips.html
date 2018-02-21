@@ -109,7 +109,7 @@
 
       _onChipAdd: function (e, chip) {
         e.stopPropagation();
-
+        if (!this.value) return;
         if (this.value.indexOf(chip) === -1) {
           this.set('value', this.value.concat(chip));
           this.fire('selected-chips-updated');
