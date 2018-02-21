@@ -276,7 +276,7 @@
 
         activityUrl: {
           type: String,
-          computed: '_computeActivityUrl(responsePlanId, mode)',
+          computed: '_computeActivityUrl(responsePlanId, data.id)',
         },
 
         activitiesParams: {
@@ -357,8 +357,8 @@
         e.target.validate();
       },
 
-      _computeActivityUrl: function (responsePlanId, mode) {
-        return App.Endpoints.partnerActivity(responsePlanId, mode);
+      _computeActivityUrl: function (responsePlanId, activityId) {
+        return App.Endpoints.partnerActivityUpdate(responsePlanId, activityId);
       },
 
       _computeProjectsUrl: function (responsePlanId) {
