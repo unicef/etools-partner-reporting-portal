@@ -1,51 +1,26 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
-<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
-<link rel="import" href="../../../bower_components/iron-location/iron-location.html">
 
 <link rel="import" href="../../endpoints.html">
-<link rel="import" href="../../redux/store.html">
-<link rel="import" href="../../styles/buttons.html">
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../etools-prp-toolbar.html">
+<link rel="import" href="../download-button.html">
 
 <dom-module id="pd-output-list-toolbar">
   <template>
-    <style include="iron-flex iron-flex-reverse button-styles">
+    <style>
       :host {
         display: block;
-        margin: 1em 0;
-      }
-
-      a {
-        text-decoration: none;
-        color: var(--theme-primary-color);
       }
     </style>
 
-    <iron-location
-      query="{{query}}">
-    </iron-location>
-
-    <div class="layout horizontal-reverse">
-      <a
-          href="[[pdfExportUrl]]"
-          tabindex="-1"
-          target="_blank">
-        <paper-button class="btn-primary">
-          <iron-icon icon="icons:file-download"></iron-icon>
-            PDF
-        </paper-button>
-      </a>
-      <a
-          href="[[xlsExportUrl]]"
-          tabindex="-1"
-          target="_blank">
-        <paper-button class="btn-primary">
-          <iron-icon icon="icons:file-download"></iron-icon>
-            XLS
-        </paper-button>
-      </a>
+    <etools-prp-toolbar
+      query="{{query}}"
+      report-id="{{reportId}}"
+      location-id="{{locationId}}"
+    >
+      <download-button url="[[pdfExportUrl]]">PDF</download-button>
+      <download-button url="[[xlsExportUrl]]">XLS</download-button>
+    </etools-prp-toolbar>
   </template>
 
   <script>
@@ -53,42 +28,28 @@
       is: 'pd-output-list-toolbar',
 
       behaviors: [
-        App.Behaviors.ReduxBehavior,
+        App.Behaviors.UtilsBehavior,
       ],
 
       properties: {
-        query: String,
-
-        locationId: {
+        pdReportUrl: {
           type: String,
-          statePath: 'location.id',
-        },
-
-        reportId: {
-          type: String,
-          statePath: 'programmeDocumentReports.current.id',
+          computed: '_computePdReportUrl(locationId, reportId)',
         },
 
         pdfExportUrl: {
           type: String,
-          computed: '_computeExportUrl(locationId, reportId, query, "pdf")',
+          computed: '_appendQuery(pdReportUrl, query, \'export=pdf\')',
         },
 
         xlsExportUrl: {
           type: String,
-          computed: '_computeExportUrl(locationId, reportId, query, "xlsx")',
+          computed: '_appendQuery(pdReportUrl, query, \'export=xlsx\')',
         },
-
       },
 
-      _computeExportUrl: function (locationId, reportId, query, filetype) {
-        return [
-          App.Endpoints.programmeDocumentReport(locationId, reportId),
-          '?',
-          query,
-          '&export=',
-          filetype
-        ].join('');
+      _computePdReportUrl: function (locationId, reportId) {
+        return App.Endpoints.programmeDocumentReport(locationId, reportId);
       },
     });
   </script>
