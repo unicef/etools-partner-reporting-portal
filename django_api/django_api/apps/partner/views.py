@@ -173,11 +173,6 @@ class PartnerActivityCreateAPIView(CreateAPIView):
     """
     permission_classes = (IsAuthenticated, )
 
-    def get_queryset(self):
-        return PartnerActivity.objects.filter(
-            project__clusters__response_plan_id=self.kwargs['response_plan_id']
-        )
-
     def get_serializer_class(self):
         choices = {
             'cluster': PartnerActivityFromClusterActivitySerializer,
