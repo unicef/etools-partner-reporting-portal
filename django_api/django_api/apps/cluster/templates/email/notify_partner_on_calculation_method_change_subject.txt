@@ -1,1 +1,0 @@
-Calculation Method for indicators in PD {{pd.name}} have changed

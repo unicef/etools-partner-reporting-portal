@@ -26,9 +26,9 @@ from partner.models import (
     PartnerActivity,
 )
 
-from .export import XLSXWriter
-from .models import ClusterObjective, ClusterActivity, Cluster
-from .serializers import (
+from cluster.export_indicators import IndicatorsXLSXExporter
+from cluster.models import ClusterObjective, ClusterActivity, Cluster
+from cluster.serializers import (
     ClusterSimpleSerializer,
     ClusterObjectiveSerializer,
     ClusterObjectivePatchSerializer,
@@ -38,7 +38,7 @@ from .serializers import (
     ResponsePlanPartnerDashboardSerializer,
     PartnerAnalysisSummarySerializer,
 )
-from .filters import (
+from cluster.filters import (
     ClusterObjectiveFilter,
     ClusterActivityFilter,
     ClusterIndicatorsFilter,
@@ -327,6 +327,16 @@ class IndicatorReportsListAPIView(ListCreateAPIView):
     Parameters:
     - response_plan_id - Response plan ID
 
+    GET query parameters:
+    * cluster - Integer ID for cluster
+    * partner - Integer ID for partner
+    * indicator - Integer ID for IndicatorReport
+    * project - Integer ID for project
+    * location - Integer ID for location
+    * cluster_objective - Integer ID for cluster_objective
+    * cluster_activity - Integer ID for cluster_activity
+    * indicator_type - String value of choices: partner_activity, partner_project, cluster_objective, OR cluster_activity
+
     Returns:
         - GET method - ClusterIndicatorReportSerializer object.
         - POST method - ClusterIndicatorReportSerializer object.
@@ -341,14 +351,14 @@ class IndicatorReportsListAPIView(ListCreateAPIView):
     def get_queryset(self):
         response_plan_id = self.kwargs.get(self.lookup_field)
         queryset = IndicatorReport.objects.filter(
-            # Q(reportable__cluster_objectives__isnull=False)
-            # | Q(reportable__cluster_activities__isnull=False)
-            Q(reportable__partner_projects__isnull=False)
+            Q(reportable__cluster_objectives__isnull=False)
+            | Q(reportable__cluster_activities__isnull=False)
+            | Q(reportable__partner_projects__isnull=False)
             | Q(reportable__partner_activities__isnull=False)
         ).filter(
-            # Q(reportable__cluster_objectives__cluster__response_plan=response_plan_id)
-            # | Q(reportable__cluster_activities__cluster_objective__cluster__response_plan=response_plan_id)
-            Q(reportable__partner_projects__clusters__response_plan=response_plan_id)
+            Q(reportable__cluster_objectives__cluster__response_plan=response_plan_id)
+            | Q(reportable__cluster_activities__cluster_objective__cluster__response_plan=response_plan_id)
+            | Q(reportable__partner_projects__clusters__response_plan=response_plan_id)
             | Q(reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)
         )
         return queryset
@@ -496,9 +506,6 @@ class ClusterIndicatorsListExcelExportView(ListAPIView):
 
     def generate_excel(self, writer):
         import os.path
-        import mimetypes
-
-        mimetypes.init()
         file_path = writer.export_data()
         file_name = os.path.basename(file_path)
         file_content = open(file_path, 'rb').read()
@@ -510,7 +517,7 @@ class ClusterIndicatorsListExcelExportView(ListAPIView):
     def list(self, request, response_plan_id, *args, **kwargs):
         # Render to excel
         indicators = self.filter_queryset(self.get_queryset())
-        writer = XLSXWriter(indicators, response_plan_id)
+        writer = IndicatorsXLSXExporter(indicators, response_plan_id)
         return self.generate_excel(writer)
 
 
@@ -532,7 +539,7 @@ class ClusterIndicatorsListExcelExportForAnalysisView(
     def list(self, request, response_plan_id, *args, **kwargs):
         # Render to excel
         indicators = self.filter_queryset(self.get_queryset())
-        writer = XLSXWriter(indicators, response_plan_id, analysis=True)
+        writer = IndicatorsXLSXExporter(indicators, response_plan_id, analysis=True)
         return self.generate_excel(writer)
 
 

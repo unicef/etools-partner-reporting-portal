@@ -1,5 +1,0 @@
-Hello,
-
-This is to inform you that the Calculation Method for indicators in PD {{pd.name}} have changed.
-
-Please click on the link to review the changes.

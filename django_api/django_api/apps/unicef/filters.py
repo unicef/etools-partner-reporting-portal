@@ -1,20 +1,26 @@
 from urllib import parse
 
-from datetime import datetime
 from django.conf import settings
 from django.db.models import Q
 
 import django_filters
 from distutils.util import strtobool
 from django_filters.filters import (
-    ChoiceFilter, CharFilter, DateFilter, TypedChoiceFilter, CharFilter
+    DateFilter, TypedChoiceFilter, CharFilter
 )
 
-from core.common import PD_LIST_REPORT_STATUS, PD_STATUS, PROGRESS_REPORT_STATUS
+from core.common import PROGRESS_REPORT_STATUS
+from utils.filter_fields import CommaSeparatedListFilter
 from indicator.models import Reportable
 from .models import ProgrammeDocument, ProgressReport
 
-BOOLEAN_CHOICES = (('0', 'False'), ('1', 'True'),)
+
+BOOLEAN_TRUE = '1'
+BOOLEAN_FALSE = '0'
+BOOLEAN_CHOICES = (
+    (BOOLEAN_FALSE, 'False'),
+    (BOOLEAN_TRUE, 'True'),
+)
 
 
 class ProgrammeDocumentIndicatorFilter(django_filters.FilterSet):
@@ -24,6 +30,10 @@ class ProgrammeDocumentIndicatorFilter(django_filters.FilterSet):
     location = CharFilter(method='get_locations')
     blueprint__title = CharFilter(method='get_blueprint_title')
     incomplete = CharFilter(method='get_incomplete')
+    activepdsonly = TypedChoiceFilter(
+        name='activepdsonly', choices=BOOLEAN_CHOICES,
+        method='get_activepdsonly', label='Show for Active PDs only'
+    )
 
     class Meta:
         model = Reportable
@@ -49,27 +59,25 @@ class ProgrammeDocumentIndicatorFilter(django_filters.FilterSet):
         return queryset.filter(
             lower_level_outputs__cp_output__programme_document__progress_reports__indicator_reports__submission_date__isnull=True) if value == "1" else queryset
 
+    def get_activepdsonly(self, queryset, name, value):
+        if value == BOOLEAN_TRUE:
+            return queryset.filter(lower_level_outputs__cp_output__programme_document__status=PD_STATUS.active)
+        return queryset
+
 
 class ProgrammeDocumentFilter(django_filters.FilterSet):
     ref_title = CharFilter(method='get_reference_number_title')
-    status = CharFilter(method='get_status')
-    location = CharFilter(method='get_location')
+    status = CommaSeparatedListFilter(name='status')
+    location = CommaSeparatedListFilter(name='progress_reports__indicator_reports__indicator_location_data__location')
 
     class Meta:
         model = ProgrammeDocument
         fields = ['ref_title', 'status', 'location']
 
-    def get_status(self, queryset, name, value):
-        return queryset.filter(status__in=parse.unquote(value).split(','))
-
     def get_reference_number_title(self, queryset, name, value):
         return queryset.filter(
             Q(reference_number__icontains=value) | Q(title__icontains=value)
         )
-
-    def get_location(self, queryset, name, value):
-        return queryset.filter(
-            progress_reports__indicator_reports__indicator_location_data__location=value)
 
 
 class ProgressReportFilter(django_filters.FilterSet):
@@ -86,11 +94,14 @@ class ProgressReportFilter(django_filters.FilterSet):
                                         label='programme_document_ext')
     section = CharFilter(name='section', method='get_section')
     cp_output = CharFilter(name='cp_output', method='get_cp_output')
+    report_type = CharFilter(method='get_report_type')
 
     class Meta:
         model = ProgressReport
-        fields = ['status', 'pd_ref_title', 'due_date', 'programme_document',
-                  'programme_document__id', 'programme_document__external_id', 'section', 'cp_output']
+        fields = [
+            'status', 'pd_ref_title', 'due_date', 'programme_document', 'programme_document__id',
+            'programme_document__external_id', 'section', 'cp_output', 'report_type'
+        ]
 
     def get_status(self, queryset, name, value):
         return queryset.filter(status__in=parse.unquote(value).split(','))
@@ -103,7 +114,6 @@ class ProgressReportFilter(django_filters.FilterSet):
 
     def get_cp_output(self, queryset, name, value):
         return queryset.filter(programme_document__cp_outputs__external_cp_output_id=value)
-
 
     def get_due_overdue_status(self, queryset, name, value):
         if value:
@@ -123,3 +133,6 @@ class ProgressReportFilter(django_filters.FilterSet):
     def get_location(self, queryset, name, value):
         return queryset.filter(
             indicator_reports__indicator_location_data__location=value)
+
+    def get_report_type(self, queryset, name, value):
+        return queryset.filter(report_type__in=parse.unquote(value).split(','))

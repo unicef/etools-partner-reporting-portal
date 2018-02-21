@@ -7,7 +7,7 @@
 
 
 <link rel="import" href="../../behaviors/modal.html">
-<link rel="import" href="../../behaviors/modal.html">
+<link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../elements/etools-prp-currency.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/selectors/programmeDocuments.html">
@@ -174,6 +174,9 @@
             </labelled-item>
           </li>
         </ul>
+        <labelled-item label="Location(s)">
+          <span class="field-value">[[_commaSeparatedDictValues(pd.locations, 'title')]]</span>
+        </labelled-item>
       </paper-dialog-scrollable>
 
       <div class="buttons layout horizontal-reverse">

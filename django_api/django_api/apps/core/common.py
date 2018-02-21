@@ -150,13 +150,10 @@ OVERALL_STATUS = Choices(
     ('NoS', 'no_status', 'No Status'),
 )
 
-OVERALL_STATUS_DICT = {
-    "Met": "Met",
-    "OnT": "On Track",
-    "NoP": "No Progress",
-    'Con': 'Constrained',
-    'NoS': 'No Status',
-}
+FINAL_OVERALL_STATUS = Choices(
+    (OVERALL_STATUS.met, "met", "Met results as planned"),
+    (OVERALL_STATUS.constrained, 'constrained', 'Constrained (partially met result)'),
+)
 
 PARTNER_PROJECT_STATUS = Choices(
     ("Ong", "ongoing", "Ongoing"),

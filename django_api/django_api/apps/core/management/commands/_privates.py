@@ -8,7 +8,6 @@ import datetime
 import random
 
 from django.conf import settings
-from django.core.management import call_command
 
 from account.models import (
     User,
@@ -102,18 +101,16 @@ from ._generate_disaggregation_fake_data import (
     generate_indicator_report_location_disaggregation_ratio_data,
 )
 
-from core.cron import WorkspaceCronJob
-from partner.cron import PartnerCronJob
-from unicef.cron import ProgrammeDocumentCronJob
-from indicator.cron import IndicatorReportOverDueCronJob
-
 from core.tasks import process_workspaces, process_period_reports
 from indicator.tasks import process_due_reports
 from partner.tasks import process_partners
 from unicef.tasks import process_programme_documents
 
+from utils.helpers import generate_random_character_sequence
+
 OVERALL_STATUS_LIST = [x[0] for x in OVERALL_STATUS]
 REPORTING_TYPE_LIST_WITHOUT_SR = [x[0] for x in REPORTING_TYPES if x != 'SR']
+
 
 def clean_up_data():
     if settings.ENV == 'dev':
@@ -155,38 +152,23 @@ def generate_fake_users():
         ('admin_pv', 'admin_pv@notanemail.com', PartnerViewerRole),
     ]
     users_created = []
-    for u in users_to_create:
-        admin, created = User.objects.get_or_create(username=u[0], defaults={
-            'email': u[1],
+    for username, email, group_wrapper in users_to_create:
+        admin, created = User.objects.get_or_create(username=username, defaults={
+            'email': email,
             'is_superuser': True,
             'is_staff': True,
         })
         admin.set_password('Passw0rd!')
         admin.save()
-        admin.groups.add(u[2].as_group())
+        admin.groups.add(group_wrapper.as_group())
         users_created.append(admin)
+
+    return users_created
 
 
 def generate_real_data(fast=False, area=None, update=False):
-
     if not update:
-        users_to_create = [
-            ('admin_imo', 'admin_imo@notanemail.com', IMORole),
-            ('admin_ao', 'admin_ao@notanemail.com', PartnerAuthorizedOfficerRole),
-            ('admin_pe', 'admin_pe@notanemail.com', PartnerEditorRole),
-            ('admin_pv', 'admin_pv@notanemail.com', PartnerViewerRole),
-        ]
-        users_created = []
-        for u in users_to_create:
-            admin, created = User.objects.get_or_create(username=u[0], defaults={
-                'email': u[1],
-                'is_superuser': True,
-                'is_staff': True,
-            })
-            admin.set_password('Passw0rd!')
-            admin.save()
-            admin.groups.add(u[2].as_group())
-            users_created.append(admin)
+        generate_fake_users()
 
         # Generate workspaces
         process_workspaces()
@@ -205,32 +187,17 @@ def generate_real_data(fast=False, area=None, update=False):
 
 
 def generate_fake_data(workspace_quantity=10):
-
     if not settings.IS_TEST and workspace_quantity < 1:
         workspace_quantity = 5
+        print('Workspace quantity reset to {}'.format(workspace_quantity))
 
     if workspace_quantity >= 30:
         workspace_quantity = 30
+        print('Workspace quantity reset to {}'.format(workspace_quantity))
 
     today = datetime.date.today()
 
-    users_to_create = [
-        ('admin_imo', 'admin_imo@notanemail.com', IMORole),
-        ('admin_ao', 'admin_ao@notanemail.com', PartnerAuthorizedOfficerRole),
-        ('admin_pe', 'admin_pe@notanemail.com', PartnerEditorRole),
-        ('admin_pv', 'admin_pv@notanemail.com', PartnerViewerRole),
-    ]
-    users_created = []
-    for u in users_to_create:
-        admin, created = User.objects.get_or_create(username=u[0], defaults={
-            'email': u[1],
-            'is_superuser': True,
-            'is_staff': True,
-        })
-        admin.set_password('Passw0rd!')
-        admin.save()
-        admin.groups.add(u[2].as_group())
-        users_created.append(admin)
+    users_created = generate_fake_users()
 
     print("Users created: {}/{}\n".format(users_created, 'Passw0rd!'))
 
@@ -277,6 +244,7 @@ def generate_fake_data(workspace_quantity=10):
                     parent=None if idx == 0 else (
                         locations[idx - 1] if idx < 6 else locations[4]),
                     carto_db_table=carto_db_table,
+                    p_code=generate_random_character_sequence() + "-" + str(idx)
                 )
             )
 
