@@ -364,6 +364,7 @@ class IndicatorReport(TimeStampedModel):
         if self.progress_report and self.progress_report.is_final and self.overall_status in FINAL_OVERALL_STATUS:
             return dict(FINAL_OVERALL_STATUS).get(self.overall_status)
         else:
+            # This is one of the "magical" django methods and cannot be called directly using super call
             field_object = self._meta.get_field('overall_status')
             return self._get_FIELD_display(field_object)
 
