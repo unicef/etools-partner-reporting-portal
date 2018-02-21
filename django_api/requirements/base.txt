@@ -1,9 +1,6 @@
 # Django packages
 Django==1.11.5
 
-#apm
-elastic-apm==2.0.0
-
 # REST framework
 djangorestframework==3.6.4
 djangorestframework-jwt==1.11.0
