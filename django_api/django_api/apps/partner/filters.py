@@ -6,6 +6,7 @@ from django_filters.filters import ChoiceFilter, CharFilter, DateFilter, TypedCh
 from distutils.util import strtobool
 
 from core.common import PARTNER_PROJECT_STATUS, PARTNER_ACTIVITY_STATUS
+from utils.filter_fields import CommaSeparatedListFilter
 
 from .models import PartnerProject, Partner, PartnerActivity
 
@@ -94,3 +95,12 @@ class PartnerActivityFilter(django_filters.FilterSet):
 
     def get_location(self, queryset, name, value):
         return queryset.filter(locations__id=value)
+
+
+class PartnerFilter(django_filters.FilterSet):
+
+    clusters = CommaSeparatedListFilter(name='clusters__id')
+
+    class Meta:
+        model = Partner
+        fields = ['clusters']

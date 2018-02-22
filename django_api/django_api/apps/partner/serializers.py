@@ -150,6 +150,16 @@ class PartnerProjectSimpleSerializer(serializers.ModelSerializer):
         )
 
 
+class PartnerSimpleSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Partner
+        fields = (
+            'id',
+            'title',
+        )
+
+
 class PartnerActivitySimpleSerializer(serializers.ModelSerializer):
 
     class Meta:
