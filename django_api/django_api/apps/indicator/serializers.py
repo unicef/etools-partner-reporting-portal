@@ -168,6 +168,7 @@ class IndicatorListSerializer(ReportableSimpleSerializer):
         model = Reportable
         fields = ReportableSimpleSerializer.Meta.fields + (
             'means_of_verification',
+            'cs_dates',
             'frequency',
             'pd_id',
             'disaggregations',
@@ -649,7 +650,7 @@ class IndicatorBlueprintSerializer(serializers.ModelSerializer):
 class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
     disaggregations = IdDisaggregationSerializer(many=True, read_only=True)
-    object_type = serializers.CharField(validators=[add_indicator_object_type_validator])
+    object_type = serializers.CharField(validators=[add_indicator_object_type_validator], write_only=True)
     blueprint = IndicatorBlueprintSerializer()
     locations = IdLocationSerializer(many=True, read_only=True)
     target = serializers.CharField(required=False)
@@ -671,9 +672,6 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             'baseline',
             'in_need',
         )
-
-    def get_object_type(self, obj):
-        return '.'.join(obj.content_type.natural_key())
 
     def check_locations_merge_to_list(self, locations):
         if isinstance(locations, dict) and 'id' in locations:
