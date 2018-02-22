@@ -68,6 +68,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'elasticapm.contrib.django',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -96,6 +97,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE_CLASSES = [
+    'elasticapm.contrib.django.middleware.TracingMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -268,12 +270,21 @@ LOGGING = {
             'backupCount': 5,
             'formatter': 'standard'
         },
+        'elasticapm': {
+            'level': 'ERROR',
+            'class': 'elasticapm.contrib.django.handlers.LoggingHandler',
+        },
     },
     'loggers': {
         '': {
             'handlers': ['default'],
             'level': 'INFO',
             'propagate': True},
+        'elasticapm.errors': {
+            'level': 'ERROR',
+            'handlers': ['default'],
+            'propagate': False,
+        },
     }
 }
 
@@ -341,6 +352,7 @@ REST_FRAMEWORK = {
             'rest_framework.authentication.TokenAuthentication',
     ),
     'DATE_FORMAT': PRINT_DATA_FORMAT,
+    'DATE_INPUT_FORMATS': ['iso-8601', PRINT_DATA_FORMAT],
 }
 
 
@@ -393,3 +405,11 @@ if not DISABLE_JWT_AUTH:
         'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=3000),  # noqa: F405
         'JWT_AUDIENCE': 'https://etools.unicef.org/',
     })
+
+# apm related - it's enough to set those as env variables, here just for documentation
+# by default logging and apm is off, so below envs needs to be set per environment
+
+# ELASTIC_APM_SERVICE_NAME=<app-name> # set app name visible on dashboard
+# ELASTIC_APM_SECRET_TOKEN=<app-token> #secret token - needs to be exact same as on apm-server
+# ELASTIC_APM_SERVER_URL=http://elastic.tivixlabs.com:8200 # apm-server url
+

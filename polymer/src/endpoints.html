@@ -192,6 +192,10 @@
         return this._buildUrl('/partner/' + responsePlanId + '/create-partner-activity/' + mode);
       },
 
+      partnerActivityUpdate: function (responsePlanId, activityId) {
+        return this._buildUrl('/partner/' + responsePlanId + '/update-partner-activity/' + activityId + '/');
+      },
+
       partnersByClusterActivityId: function (clusterActivityId) {
         return this._buildUrl('/partner/cluster-activity/' + clusterActivityId + '/partners/');
       },

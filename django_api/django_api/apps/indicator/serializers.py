@@ -920,21 +920,8 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
         if isinstance(obj.reportable.content_object, (PartnerProject, )):
             return obj.reportable.content_object.title
         elif isinstance(obj.reportable.content_object, (PartnerActivity, )):
-            return obj.reportable.content_object.partner.title
-        elif isinstance(obj.reportable.content_object, (ClusterObjective, )):
-            if obj.reportable.content_object.partner_activities.first():
-                return obj.reportable.content_object.partner_activities.first().partner.title
-            elif obj.reportable.content_object.cluster:
-                return obj.reportable.content_object.cluster.partner_projects.first().title
-            else:
-                return ''
-        elif isinstance(obj.reportable.content_object, (ClusterActivity, )):
-            if obj.reportable.content_object.partner_activities.first():
-                return obj.reportable.content_object.partner_activities.first().partner.title
-            elif obj.reportable.content_object.cluster_objective.cluster:
-                return obj.reportable.content_object.cluster_objective.cluster.partner_projects.first().title
-            else:
-                return ''
+            if obj.reportable.content_object.project:
+                return obj.reportable.content_object.project.title
         else:
             return ''
 
@@ -956,26 +943,8 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
         return partner.id if partner else ""
 
     def get_partner_activity(self, obj):
-        if isinstance(obj.reportable.content_object, (PartnerProject, )):
-            return obj.reportable.content_object.partner_activities.first().title
-        elif isinstance(obj.reportable.content_object, (PartnerActivity, )):
+        if isinstance(obj.reportable.content_object, (PartnerActivity, )):
             return obj.reportable.content_object.title
-        elif isinstance(obj.reportable.content_object, (ClusterObjective, )):
-            if obj.reportable.content_object.partner_activities.first():
-                return obj.reportable.content_object.partner_activities.first().title
-            elif obj.reportable.content_object.cluster:
-                return obj.reportable.content_object.cluster.partner_projects.first(
-                ).partner_activities.first().title
-            else:
-                return ''
-        elif isinstance(obj.reportable.content_object, (ClusterActivity, )):
-            if obj.reportable.content_object.partner_activities.first():
-                return obj.reportable.content_object.partner_activities.first().title
-            elif obj.reportable.content_object.cluster_objective.cluster:
-                return obj.reportable.content_object.cluster_objective.cluster.partner_projects.first(
-                ).partner_activities.first().title
-            else:
-                return ''
         else:
             return ''
 

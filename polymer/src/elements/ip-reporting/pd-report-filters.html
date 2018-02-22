@@ -30,18 +30,16 @@
         params-object="{{queryParams}}">
     </iron-query-params>
 
-    <filter-list
-        filters="{{filters}}"
-        class="app-grid">
-
-      <dropdown-filter
-          class="item"
-          label="Status"
-          name="status"
-          value="[[_withDefault(queryParams.status, '')]]"
-          data="[[statuses]]">
-      </dropdown-filter>
-
+    <filter-list filters="{{filters}}">
+      <div class="app-grid">
+        <dropdown-filter
+            class="item"
+            label="Status"
+            name="status"
+            value="[[_withDefault(queryParams.status, '')]]"
+            data="[[statuses]]">
+        </dropdown-filter>
+      </div>
     </filter-list>
   </template>
 
