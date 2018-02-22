@@ -34,7 +34,7 @@ urlpatterns = [
     url(r'^(?P<response_plan_id>\d+)/cluster-activity-list/$',
         ClusterActivityListAPIView.as_view(),
         name="cluster-activity-list"),
-    url(r'^(?P<response_plan_id>\d+)/cluster-indicator-reports-list/$',
+    url(r'^(?P<response_plan_id>\d+)/cluster-indicator-reports/$',
         IndicatorReportsListAPIView.as_view(),
         name="cluster-indicator-reports-list"),
     url(r'^(?P<response_plan_id>\d+)/cluster-indicator-reports/(?P<pk>\d+)/$',
@@ -54,11 +54,11 @@ urlpatterns = [
         ResponsePlanPartnerDashboardAPIView.as_view(),
         name="response-plan-partner-dashboard"),
 
-    url(r'^(?P<response_plan_id>\d+)/cluster-indicator-reports-list/export/$',
+    url(r'^(?P<response_plan_id>\d+)/cluster-indicator-reports/export/$',
         ClusterIndicatorsListExcelExportView.as_view(),
         name="cluster-indicators-list-excel"),
 
-    url(r'^(?P<response_plan_id>\d+)/cluster-indicator-reports-list/export-for-analysis/$',
+    url(r'^(?P<response_plan_id>\d+)/cluster-indicator-reports/export-for-analysis/$',
         ClusterIndicatorsListExcelExportForAnalysisView.as_view(),
         name="cluster-indicators-list-excel"),
 
