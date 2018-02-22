@@ -21,9 +21,9 @@ from .serializers import (
     PartnerActivitySerializer,
     PartnerActivityFromClusterActivitySerializer,
     PartnerActivityFromCustomActivitySerializer,
-    PartnerActivityUpdateSerializer)
+    PartnerSimpleSerializer)
 from .models import PartnerProject, PartnerActivity, Partner
-from .filters import PartnerProjectFilter, ClusterActivityPartnersFilter, PartnerActivityFilter
+from .filters import PartnerProjectFilter, ClusterActivityPartnersFilter, PartnerActivityFilter, PartnerFilter
 
 
 class PartnerDetailsAPIView(RetrieveAPIView):
@@ -158,9 +158,11 @@ class PartnerProjectSimpleListAPIView(ListAPIView):
 
 
 class PartnerSimpleListAPIView(ListAPIView):
-    serializer_class = PartnerProjectSimpleSerializer
+    serializer_class = PartnerSimpleSerializer
     permission_classes = (IsAuthenticated, )
     lookup_field = lookup_url_kwarg = 'response_plan_id'
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
+    filter_class = PartnerFilter
 
     def get_queryset(self):
         response_plan_id = self.kwargs.get(self.lookup_field)
