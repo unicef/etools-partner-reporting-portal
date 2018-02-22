@@ -227,9 +227,7 @@ class PartnerActivityCreateAPIView(APIView):
                 return Response({"message": "user does not belong to IMO"}, status=status.HTTP_400_BAD_REQUEST)
 
             # Check if incoming partner belongs to IMO's clusters
-            if partner_id in request.user.imo_clusters.values_list('partners'):
-                serializer.save(partner=partner)
-            else:
+            if partner_id not in request.user.imo_clusters.values_list('partners'):
                 return Response({"message": "the partner_id does not belong to your clusters"}, status=status.HTTP_400_BAD_REQUEST)
 
         if create_mode == 'cluster':
