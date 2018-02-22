@@ -37,29 +37,29 @@
         params-object="{{queryParams}}">
     </iron-query-params>
 
-    <filter-list
-        filters="{{filters}}"
-        class="app-grid">
-      <text-filter
-          class="item"
-          label="PD/SSFA ToR ref. # and Title"
-          name="ref_title"
-          value="[[queryParams.ref_title]]">
-      </text-filter>
+    <filter-list filters="{{filters}}">
+      <div class="app-grid">
+        <text-filter
+            class="item"
+            label="PD/SSFA ToR ref. # and Title"
+            name="ref_title"
+            value="[[queryParams.ref_title]]">
+        </text-filter>
 
-      <dropdown-filter-multi
+        <dropdown-filter-multi
+            class="item filter-2-col"
+            label="PD/SSFA status"
+            name="status"
+            value="[[_withDefault(queryParams.status, '')]]"
+            data="[[statuses]]"
+            hide-search>
+        </dropdown-filter-multi>
+
+        <location-filter-multi
           class="item filter-2-col"
-          label="PD/SSFA status"
-          name="status"
-          value="[[_withDefault(queryParams.status, '')]]"
-          data="[[statuses]]"
-          hide-search>
-      </dropdown-filter-multi>
-
-      <location-filter-multi
-        class="item filter-2-col"
-        value="[[_withDefault(queryParams.location, '')]]">
-      </location-filter-multi>
+          value="[[_withDefault(queryParams.location, '')]]">
+        </location-filter-multi>
+      </div>
     </filter-list>
   </template>
 
