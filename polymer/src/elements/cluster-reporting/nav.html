@@ -186,9 +186,11 @@
       },
 
       _computePartnerQuery: function (partner) {
-        return {
-          partner: partner.id,
-        };
+        var query = {};
+        if (partner && partner.id) {
+          query.partner = partner.id;
+        }
+        return query;
       },
 
       _computeClusterQuery: function (queryParams) {

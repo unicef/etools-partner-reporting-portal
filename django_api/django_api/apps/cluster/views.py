@@ -319,7 +319,7 @@ class ClusterActivityListAPIView(ListCreateAPIView):
                         status=statuses.HTTP_201_CREATED)
 
 
-class IndicatorReportsListAPIView(ListCreateAPIView):
+class IndicatorReportsListAPIView(ListCreateAPIView, RetrieveAPIView):
     """
     Cluster IndicatorReport object list API - GET/POST
     Authentication required.
@@ -346,10 +346,9 @@ class IndicatorReportsListAPIView(ListCreateAPIView):
     pagination_class = SmallPagination
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     filter_class = ClusterIndicatorsFilter
-    lookup_field = lookup_url_kwarg = 'response_plan_id'
 
     def get_queryset(self):
-        response_plan_id = self.kwargs.get(self.lookup_field)
+        response_plan_id = self.kwargs['response_plan_id']
         queryset = IndicatorReport.objects.filter(
             Q(reportable__cluster_objectives__isnull=False)
             | Q(reportable__cluster_activities__isnull=False)
@@ -362,6 +361,13 @@ class IndicatorReportsListAPIView(ListCreateAPIView):
             | Q(reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)
         )
         return queryset
+
+
+class IndicatorReportDetailAPIView(RetrieveAPIView):
+
+    permission_classes = (IsAuthenticated, )
+    serializer_class = ClusterIndicatorReportSerializer
+    get_queryset = IndicatorReportsListAPIView.get_queryset
 
 
 class IndicatorReportsSimpleListAPIView(IndicatorReportsListAPIView):

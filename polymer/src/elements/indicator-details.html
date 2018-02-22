@@ -433,6 +433,8 @@
       _onLocationUpdated: function (e) {
         e.stopPropagation();
 
+        this.fire('refresh-report', this.indicatorId);
+
         var allComplete = this.disaggregations.indicator_location_data
             .every(function (location) {
               return location.is_complete;
