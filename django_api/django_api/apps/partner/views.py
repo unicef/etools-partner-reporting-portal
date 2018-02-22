@@ -150,31 +150,10 @@ class PartnerProjectAPIView(APIView):
             instance=self.get_instance(self.request, pk),
             data=self.request.data
         )
+
         if not serializer.is_valid():
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
-
-        partner_id = self.kwargs.get('partner_id', None)
-        if partner_id:
-            partner_id = int(partner_id)
-            partner = get_object_or_404(Partner, id=partner_id)
-
-            # TODO: Check Object-level permission for IMO
-
-            # Make sure the user belongs to IMO group
-            if not request.user.groups.filter(name='IMO').exists():
-                return Response({"message": "user does not belong to IMO"}, status=status.HTTP_400_BAD_REQUEST)
-
-            # Check if updated partner project belongs to the partner
-            if not pk in partner.partner_projects.values_list('id', flat=True):
-                return Response({"message": "the partner project does not belong to partner's partner projects"}, status=status.HTTP_400_BAD_REQUEST)
-
-            # Check if incoming partner belongs to IMO's clusters
-            if not partner_id in request.user.imo_clusters.values_list('partners', flat=True):
-                return Response({"message": "the partner_id does not belong to your clusters"}, status=status.HTTP_400_BAD_REQUEST)
-            else:
-                serializer.save(partner=partner)
-                return Response(serializer.data, status=status.HTTP_200_OK)
 
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -221,25 +200,6 @@ class PartnerActivityCreateAPIView(APIView):
         Create on PartnerActivity model
         :return: serialized PartnerActivity object
         """
-        partner_id = self.kwargs.get('partner_id', None)
-        partner = None
-        imo_flag = False
-
-        if partner_id:
-            partner_id = int(partner_id)
-            partner = get_object_or_404(Partner, id=partner_id)
-
-            # TODO: Check Object-level permission for IMO
-
-            # Make sure the user belongs to IMO group
-            if not request.user.groups.filter(name='IMO').exists():
-                return Response({"message": "user does not belong to IMO"}, status=status.HTTP_400_BAD_REQUEST)
-
-            # Check if incoming partner belongs to IMO's clusters
-            if partner_id not in request.user.imo_clusters.values_list('partners', flat=True):
-                return Response({"message": "the partner_id does not belong to your clusters"}, status=status.HTTP_400_BAD_REQUEST)
-
-            imo_flag = True
 
         if create_mode == 'cluster':
             serializer = PartnerActivityFromClusterActivitySerializer(
@@ -249,8 +209,16 @@ class PartnerActivityCreateAPIView(APIView):
                 return Response(
                     serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-            if imo_flag:
-                serializer.validated_data['partner'] = partner
+            partner = serializer.validated_data['partner']
+
+            # If user is IMO
+            # Check if incoming partner belongs to IMO's clusters
+            if request.user.groups.filter(name='IMO').exists() \
+                and partner.id not in request.user.imo_clusters.values_list('partners', flat=True):
+                return Response(
+                    {"message": "the partner_id does not belong to your clusters"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
             try:
                 pa = PartnerActivity.objects.create(
@@ -277,11 +245,20 @@ class PartnerActivityCreateAPIView(APIView):
 
             # Make sure that partner association only happens to Partner user
             # as this is already checked above
-            if not imo_flag and serializer.validated_data['partner'] != request.user.partner:
+            if not request.user.groups.filter(name='IMO').exists() \
+                and serializer.validated_data['partner'] != request.user.partner:
                 return Response({'error': "Partner id did not match this user's partner"}, status=status.HTTP_400_BAD_REQUEST)
 
-            if imo_flag:
-                serializer.validated_data['partner'] = partner
+            partner = serializer.validated_data['partner']
+
+            # If user is IMO
+            # Check if incoming partner belongs to IMO's clusters
+            if request.user.groups.filter(name='IMO').exists() \
+                and partner.id not in request.user.imo_clusters.values_list('partners', flat=True):
+                return Response(
+                    {"message": "the partner_id does not belong to your clusters"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
             try:
                 pa = PartnerActivity.objects.create(
