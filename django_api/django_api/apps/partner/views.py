@@ -21,7 +21,9 @@ from .serializers import (
     PartnerActivitySerializer,
     PartnerActivityFromClusterActivitySerializer,
     PartnerActivityFromCustomActivitySerializer,
-    PartnerSimpleSerializer)
+    PartnerSimpleSerializer,
+    PartnerActivityUpdateSerializer,
+)
 from .models import PartnerProject, PartnerActivity, Partner
 from .filters import PartnerProjectFilter, ClusterActivityPartnersFilter, PartnerActivityFilter, PartnerFilter
 
