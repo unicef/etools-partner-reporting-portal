@@ -74,11 +74,6 @@
       }
     </style>
 
-    <etools-prp-ajax
-      id="partnerNames"
-      url="[[partnerNamesUrl]]">
-    </etools-prp-ajax>
-
     <etools-prp-permissions
       permissions="{{permissions}}">
     </etools-prp-permissions>
@@ -86,22 +81,26 @@
     <iron-location path="{{path}}"></iron-location>
 
     <cluster-dropdown-content clusters="{{clusters}}"></cluster-dropdown-content>
-    <partner-dropdown-content partners="{{partners}}"></partner-dropdown-content>
+    <partner-dropdown-content
+      partners="{{partners}}"
+      clusters="[[imoClusters]]">
+    </partner-dropdown-content>
 
     <etools-prp-ajax
-        id="createProject"
-        url="[[url]]"
-        body="[[data]]"
-        content-type="application/json"
-        method="post">
+      id="projectAjax"
+      url="[[url]]"
+      body="[[data]]"
+      content-type="application/json"
+      method="[[_computeAjaxMethod(edit)]]">
     </etools-prp-ajax>
+
 
     <paper-dialog
         id="dialog"
         with-backdrop
         opened="{{opened}}">
       <div class="header layout horizontal justified">
-        <h2>Add Project</h2>
+        <h2>[[_computeTitle(edit)]]</h2>
           <paper-icon-button
               class="self-center"
               on-tap="close"
@@ -335,7 +334,22 @@
           value: '',
         },
 
+        profile: {
+          type: Object,
+          statePath: 'userProfile.profile',
+        },
+
+        imoClusters: {
+          type: Array,
+          computed: '_computeImoClusters(profile)',
+        },
+
         selectedClusters: Array,
+
+        edit: {
+          type: Boolean,
+          value: false,
+        },
       },
 
       observers: [
@@ -349,15 +363,38 @@
       },
 
       close: function () {
+        this.set('data', {});
         this.set('opened', false);
         this.set('refresh', false);
       },
 
       open: function () {
-        this.data = {};
-        this.selectedClusters = [];
+        if (this.edit && this.editData) {
+          this.set('data', Object.assign({}, this.editData));
+          this.selectedClusters = this.editData.clusters.map(function(item) {
+            return item.id;
+          });
+        } else {
+          this.data = {};
+          this.selectedClusters = [];
+        }
+      
         this.set('opened', true);
         this.set('refresh', true);
+      },
+
+      _computeTitle: function(edit) {
+        return (edit ? 'Edit' : 'Add') + ' Project';
+      },
+
+      _computeAjaxMethod: function(edit) {
+        return edit ? 'patch' : 'post';
+      },
+
+      _computeImoClusters: function (profile) {
+        return profile.imo_clusters.map(function(cluster) {
+          return cluster.id
+        }) || [];
       },
 
       _savePartner: function(partner) {
@@ -374,7 +411,7 @@
 
       _redirectToDetail: function(id) {
         var path = this.permissions.addPartnerToProject 
-          ? 'response-parameters/partner/project/' + String(id)
+          ? 'response-parameters/partners/project/' + String(id)
           : '/planned-action/project/' + String(id);
         var url = this.buildUrl(this._baseUrlCluster, path);
         this.set('path', url);
@@ -411,11 +448,16 @@
         }
 
         this.updatePending = true;
-        var thunk = this.$.createProject.thunk();
+        debugger
+        var thunk = this.$.projectAjax.thunk();
         thunk()
           .then(function (res) {
             self.updatePending = false;
-            self._redirectToDetail(res.data.id);
+            if (self.edit) {
+              self.close();
+            } else {
+              self._redirectToDetail(res.data.id);
+            }
           })
           .catch(function (err) { // jshint ignore:line
             self.updatePending = false;

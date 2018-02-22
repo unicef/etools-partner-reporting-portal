@@ -16,7 +16,9 @@
 
     <etools-prp-ajax
         id="partnerNames"
-        url="[[partnerNamesUrl]]">
+        url="[[partnerNamesUrl]]"
+        params="[[params]]"
+        >
     </etools-prp-ajax>
 
     <etools-prp-permissions
@@ -50,14 +52,26 @@
           value: [],
           notify: true
         },
+
+        params: {
+          type: Object,
+          computed: '_computeParams(clusters)',
+        }
       },
 
       observers: [
-        '_fetchPartnerNames(partnerNamesUrl)',
+        '_fetchPartnerNames(partnerNamesUrl, params)',
       ],
 
       _computePartnerNamesUrl: function (responsePlanID) {
         return App.Endpoints.clusterPartnerNames(responsePlanID);
+      },
+
+      _computeParams: function(clusters) {
+        if (clusters) {
+          return {clusters: clusters.join(',')}
+        };
+        return {};
       },
 
       _fetchPartnerNames: function () {
@@ -67,7 +81,6 @@
 
         this.$.partnerNames.thunk()()
             .then(function (res) {
-              debugger
               self.set('partners', res.data);
             })
             .catch(function (err) { // jshint ignore:line
