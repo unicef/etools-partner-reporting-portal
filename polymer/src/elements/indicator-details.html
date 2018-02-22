@@ -12,6 +12,7 @@
 <link rel="import" href="etools-prp-ajax.html">
 <link rel="import" href="etools-prp-number.html">
 <link rel="import" href="status-badge.html">
+<link rel="import" href="print-test.html">
 <link rel="import" href="disaggregations/disaggregation-table.html">
 <link rel="import" href="disaggregations/disaggregation-modal.html">
 <link rel="import" href="../endpoints.html">
@@ -197,7 +198,30 @@
 
             <div class="table-container app-grid">
               <div class="item">
+                <print-test selector=".printme">
+                  <paper-icon-button
+                      class="print-btn"
+                      icon="icons:print">
+                  </paper-icon-button>
+                </print-test>
+
+                <div hidden>
+                  <dl class="printme">
+                    <dt style="display: inline;">Programme Document:</dt>
+                    <dd style="display: inline; margin: 0;">[[currentPD.title]]</dd>
+                  </dl>
+                  <dl class="printme">
+                    <dt style="display: inline;">Report Number:</dt>
+                    <dd style="display: inline; margin: 0;">[[currentReport.report_number]]</dd>
+                  </dl>
+                  <dl class="printme">
+                    <dt style="display: inline;">Reporting Period:</dt>
+                    <dd style="display: inline; margin: 0;">[[currentReport.reporting_period]]</dd>
+                  </dl>
+                </div>
+
                 <disaggregation-table
+                    class="printme"
                     data="[[location]]"
                     mapping="[[disaggregations.disagg_lookup_map]]">
                 </disaggregation-table>
@@ -306,6 +330,11 @@
         currentPD: {
           type: Object,
           statePath: App.Selectors.ProgrammeDocuments.current,
+        },
+
+        currentReport: {
+          type: Object,
+          statePath: App.Selectors.ProgrammeDocumentReports.current,
         },
 
         hasPD: {
