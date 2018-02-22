@@ -104,6 +104,16 @@
             });
         },
 
+        createPartnerEntitiesByResponsePlanAsIMO: function(params, responsePlanClusters) {
+          debugger
+          return isIMO(params.groups) &&
+            responsePlanClusters.some(function (cluster) {
+              return params.imoClusters.some(function (imoCluster) {
+                return imoCluster.id === cluster.id;
+              })
+            });
+        },
+
         editPartnerEntities: function(params, entityPartnerId) {
           return isAuthorizedOfficer(params.groups) && entityPartnerId === params.partner.id;
         },
@@ -116,6 +126,10 @@
 
         adminResponsePlan: [
         App.Constants.GROUP_IMO,
+        ],
+
+        addPartnerToProject: [
+          App.Constants.GROUP_IMO,
         ],
         
       };

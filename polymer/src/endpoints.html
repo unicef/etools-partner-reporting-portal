@@ -127,6 +127,11 @@
         return this._buildUrl('/partner/' + responsePlanId + '/partner-project-list/');
       },
 
+      plannedActionsIMO: function(responsePlanId, partnerId) {
+        return this._buildUrl('/partner/' + responsePlanId + '/partner-project-list/partner/'
+          + partnerId + '/');
+      },
+
       plannedActionsProjectOverview: function(projectId) {
         return this._buildUrl('/partner/partner-project-details/' + projectId + '/');
       },

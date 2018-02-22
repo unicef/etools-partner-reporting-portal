@@ -14,9 +14,11 @@
 <link rel="import" href="../../../../../bower_components/etools-searchable-multiselection-menu/etools-multi-selection-menu.html">
 
 <link rel="import" href="../../../etools-prp-ajax.html">
+<link rel="import" href="../../../../elements/etools-prp-permissions.html">
 <link rel="import" href="../../../etools-prp-date-input.html">
 <link rel="import" href="../../../form-fields/dropdown-form-input.html">
 <link rel="import" href="../../../form-fields/cluster-dropdown-content.html">
+<link rel="import" href="../../../form-fields/partner-dropdown-content.html">
 <link rel="import" href="../../../../behaviors/routing.html">
 <link rel="import" href="../../../../behaviors/utils.html">
 <link rel="import" href="../../../../redux/store.html">
@@ -72,9 +74,19 @@
       }
     </style>
 
+    <etools-prp-ajax
+      id="partnerNames"
+      url="[[partnerNamesUrl]]">
+    </etools-prp-ajax>
+
+    <etools-prp-permissions
+      permissions="{{permissions}}">
+    </etools-prp-permissions>
+
     <iron-location path="{{path}}"></iron-location>
 
     <cluster-dropdown-content clusters="{{clusters}}"></cluster-dropdown-content>
+    <partner-dropdown-content partners="{{partners}}"></partner-dropdown-content>
 
     <etools-prp-ajax
         id="createProject"
@@ -104,6 +116,24 @@
             if="[[refresh]]"
             restamp="true">
           <iron-form class="app-grid">
+
+            <template
+              is="dom-if"
+              if="[[_displayPartner(permissions)]]"
+              restamp="true">
+              <etools-single-selection-menu
+                class="item validate full-width"
+                label="Partner"
+                options="[[partners]]"
+                option-value="id"
+                option-label="title"
+                selected="{{selectedPartner}}"
+                on-iron-activate="_validate"
+                trigger-value-change-event
+                required>
+              </etools-single-selection-menu>
+            </template>
+
             <paper-input
               class="item validate full-width"
               id="title"
@@ -264,7 +294,7 @@
 
         url: {
           type: String,
-          computed: '_computeUrl(responsePlanID)'
+          computed: '_computeUrl(responsePlanID, selectedPartner)'
         },
 
         clusters: {
@@ -300,11 +330,22 @@
           ],
         },
 
+        selectedPartner: {
+          type: String,
+          value: '',
+        },
+
         selectedClusters: Array,
       },
 
-      _computeUrl: function(responsePlanID) {
-        return App.Endpoints.plannedActions(responsePlanID);
+      observers: [
+        '_savePartner(selectedPartner)',
+      ],
+
+      _computeUrl: function(responsePlanID, selectedPartner) {
+        return this.permissions.addPartnerToProject
+          ? App.Endpoints.plannedActionsIMO(responsePlanID, selectedPartner)
+          : App.Endpoints.plannedActions(responsePlanID);
       },
 
       close: function () {
@@ -319,12 +360,22 @@
         this.set('refresh', true);
       },
 
+      _savePartner: function(partner) {
+        this.set('data.partner', partner);
+      },
+
+      _displayPartner: function (permissions) {
+        return permissions.addPartnerToProject;
+      },
+
       _validate: function (e) {
         e.target.validate();
       },
 
       _redirectToDetail: function(id) {
-        var path = '/planned-action/project/' + String(id);
+        var path = this.permissions.addPartnerToProject 
+          ? 'response-parameters/partner/project/' + String(id)
+          : '/planned-action/project/' + String(id);
         var url = this.buildUrl(this._baseUrlCluster, path);
         this.set('path', url);
       },
@@ -355,7 +406,9 @@
           return {id: Number(item)};
         });
 
-        this.data.partner = this.partnerID;
+        if (!this.data.partner) {
+          this.data.partner = this.partnerID;
+        }
 
         this.updatePending = true;
         var thunk = this.$.createProject.thunk();
@@ -369,6 +422,7 @@
             // TODO: error handling
           });
       },
+
     });
   </script>
 </dom-module>
