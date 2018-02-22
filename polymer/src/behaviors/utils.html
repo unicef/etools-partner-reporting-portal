@@ -181,6 +181,22 @@
       _appendQuery: function (url) {
         return url + '?' + buildQuery([].slice.call(arguments, 1));
       },
+
+      _cloneNode: function (node) {
+        var newNode = node.cloneNode(true);
+
+        for (var prop in node.properties) {
+          try {
+            newNode[prop] = node[prop];
+          } catch (err) {}
+        }
+
+        return newNode;
+      },
+
+      _identity: function (arg) {
+        return arg;
+      },
     };
 
     function buildQuery(chunks) {
