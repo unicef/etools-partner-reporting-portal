@@ -80,6 +80,7 @@
       listeners: {
         'report-submitted': '_onContentsChanged',
         'report-reviewed': '_onContentsChanged',
+        'refresh-report': '_onRefreshReport',
       },
 
       _computeParams: function (queryParams) {
@@ -115,6 +116,21 @@
         e.stopPropagation();
 
         this._fetchData();
+      },
+
+      _onRefreshReport: function (e, reportId) {
+        e.stopPropagation();
+
+        var ajax = document.createElement('etools-prp-ajax');
+
+        ajax.url = App.Endpoints.clusterIndicatorReport(this.responsePlanId, reportId);
+
+        this.dispatch(
+          App.Actions.ClusterIndicatorReports.fetchSingle(ajax.thunk(), reportId)
+        )
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
       },
 
       detached: function () {
