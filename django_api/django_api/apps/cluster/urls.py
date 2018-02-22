@@ -15,6 +15,7 @@ from .views import (
     ResponsePlanPartnerDashboardAPIView,
     PartnerAnalysisSummaryAPIView,
     PartnerAnalysisIndicatorResultAPIView,
+    IndicatorReportDetailAPIView,
 )
 
 
@@ -36,6 +37,9 @@ urlpatterns = [
     url(r'^(?P<response_plan_id>\d+)/cluster-indicator-reports-list/$',
         IndicatorReportsListAPIView.as_view(),
         name="cluster-indicator-reports-list"),
+    url(r'^(?P<response_plan_id>\d+)/cluster-indicator-reports/(?P<pk>\d+)/$',
+        IndicatorReportDetailAPIView.as_view(),
+        name="cluster-indicator-reports-detail"),
     url(r'^(?P<response_plan_id>\d+)/cluster-indicator-reports-simple-list/$',
         IndicatorReportsSimpleListAPIView.as_view(),
         name="cluster-indicator-reports-simple-list"),
