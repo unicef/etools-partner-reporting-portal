@@ -146,14 +146,32 @@ class PartnerProjectAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def patch(self, request, pk, *args, **kwargs):
+        instance = self.get_instance(self.request, pk)
         serializer = PartnerProjectPatchSerializer(
-            instance=self.get_instance(self.request, pk),
+            instance=instance,
             data=self.request.data
         )
 
         if not serializer.is_valid():
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
+
+        partner_id = self.kwargs.get('partner_id', None)
+
+        if partner_id:
+            partner_id = int(partner_id)
+            partner = get_object_or_404(Partner, id=partner_id)
+
+            if instance.partner != partner:
+                return Response({"message": "Editing partner for this project is not allowed"}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Make sure the user belongs to IMO group
+            if not request.user.groups.filter(name='IMO').exists():
+                return Response({"message": "user does not belong to IMO"}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Check if incoming partner belongs to IMO's clusters
+            if not partner_id in request.user.imo_clusters.values_list('partners', flat=True):
+                return Response({"message": "the partner_id does not belong to your clusters"}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
