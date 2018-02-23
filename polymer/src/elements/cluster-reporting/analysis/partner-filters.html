@@ -39,41 +39,41 @@
         params-object="{{queryParams}}">
     </iron-query-params>
 
-    <filter-list
-        class="app-grid"
-        ignore="partner">
-      <partner-filter
-          id="partner"
-          class="item"
-          value="[[_withDefaultFrom(queryParams, 'partner', '')]]"
-          required>
-      </partner-filter>
+    <filter-list ignore="partner">
+      <div class="app-grid">
+        <partner-filter
+            id="partner"
+            class="item"
+            value="[[_withDefaultFrom(queryParams, 'partner', '')]]"
+            required>
+        </partner-filter>
 
-      <cluster-project-filter
-          class="item"
-          value="[[_withDefault(queryParams.project, '')]]"
-          dependencies="partner">
-      </cluster-project-filter>
+        <cluster-project-filter
+            class="item"
+            value="[[_withDefault(queryParams.project, '')]]"
+            dependencies="partner">
+        </cluster-project-filter>
 
-      <cluster-activity-filter
-          class="item filter-2-col"
-          value="[[_withDefault(queryParams.activity, '')]]"
-          dependencies="partner">
-      </cluster-activity-filter>
+        <cluster-activity-filter
+            class="item filter-2-col"
+            value="[[_withDefault(queryParams.activity, '')]]"
+            dependencies="partner">
+        </cluster-activity-filter>
 
-      <cluster-filter
-          class="item"
-          value="[[_withDefault(queryParams.cluster_id, '')]]"
-          dependencies="partner">
-      </cluster-filter>
+        <cluster-filter
+            class="item"
+            value="[[_withDefault(queryParams.cluster_id, '')]]"
+            dependencies="partner">
+        </cluster-filter>
 
-      <dropdown-filter
-          class="item"
-          label="Report Status"
-          name="report_status"
-          value="[[_withDefault(queryParams.report_status, '')]]"
-          data="[[statuses]]">
-      </dropdown-filter>
+        <dropdown-filter
+            class="item"
+            label="Report Status"
+            name="report_status"
+            value="[[_withDefault(queryParams.report_status, '')]]"
+            data="[[statuses]]">
+        </dropdown-filter>
+      </div>
     </filter-list>
   </template>
 

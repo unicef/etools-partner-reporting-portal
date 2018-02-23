@@ -1,9 +1,10 @@
 from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from rest_framework.exceptions import ValidationError
 
 from rest_framework.views import APIView
-from rest_framework.generics import RetrieveAPIView, ListCreateAPIView, ListAPIView
+from rest_framework.generics import RetrieveAPIView, ListCreateAPIView, ListAPIView, UpdateAPIView, CreateAPIView
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -20,7 +21,9 @@ from .serializers import (
     PartnerActivitySerializer,
     PartnerActivityFromClusterActivitySerializer,
     PartnerActivityFromCustomActivitySerializer,
-    PartnerSimpleSerializer)
+    PartnerSimpleSerializer,
+    PartnerActivityUpdateSerializer,
+)
 from .models import PartnerProject, PartnerActivity, Partner
 from .filters import PartnerProjectFilter, ClusterActivityPartnersFilter, PartnerActivityFilter, PartnerFilter
 
@@ -207,7 +210,7 @@ class PartnerSimpleListAPIView(ListAPIView):
         return Partner.objects.filter(clusters__response_plan_id=response_plan_id)
 
 
-class PartnerActivityCreateAPIView(APIView):
+class PartnerActivityCreateAPIView(CreateAPIView):
     """
     PartnerActivityCreateAPIView CRUD endpoint
     """
@@ -296,8 +299,29 @@ class PartnerActivityCreateAPIView(APIView):
         else:
             return Response({'error': "Wrong create mode flag"},
                             status=status.HTTP_400_BAD_REQUEST)
+    def get_serializer_class(self):
+        choices = {
+            'cluster': PartnerActivityFromClusterActivitySerializer,
+            'custom': PartnerActivityFromCustomActivitySerializer,
+        }
 
-        return Response({'id': pa.id}, status=status.HTTP_201_CREATED)
+        klass = choices.get(self.kwargs['create_mode'])
+        if not klass:
+            raise ValidationError('Wrong create mode flag')
+        return klass
+
+
+class PartnerActivityUpdateAPIView(UpdateAPIView):
+    """
+    PartnerActivityUpdateAPIView CRUD endpoint
+    """
+    permission_classes = (IsAuthenticated, )
+    serializer_class = PartnerActivityUpdateSerializer
+
+    def get_queryset(self):
+        return PartnerActivity.objects.filter(
+            project__clusters__response_plan_id=self.kwargs['response_plan_id']
+        )
 
     def patch(self, request, *args, **kwargs):
         if 'id' not in self.request.data:

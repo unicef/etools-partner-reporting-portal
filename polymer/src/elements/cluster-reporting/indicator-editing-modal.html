@@ -14,6 +14,8 @@
 <link rel="import" href="../../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-multi-selection-menu.html">
+<link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html">
+
 
 <link rel="import" href="../../polyfills/es6-shim.html">
 <link rel="import" href="disaggregations-dropdown-widget.html">
@@ -123,29 +125,24 @@
           <div class="row">
             <div class="app-grid">
               <div class="item">
-                <paper-dropdown-menu
+                <etools-single-selection-menu
                     class="validate"
                     label="Frequency of reporting"
-                    on-value-changed="_validate"
-                    on-selected-item-changed="_setFrequency"
-                    always-float-label
+                    options="[[frequencies]]"
+                    option-value="id"
+                    option-label="title"
+                    selected="{{data.frequency}}"
+                    on-iron-activate="_validate"
+                    trigger-value-change-event
+                    hide-search
                     required>
-                  <paper-listbox
-                      slot="dropdown-content"
-                      class="dropdown-content">
-                    <template
-                        id="frequencies"
-                        is="dom-repeat"
-                        items="[[frequencies]]">
-                      <paper-item>[[item.title]]</paper-item>
-                    </template>
-                  </paper-listbox>
-                </paper-dropdown-menu>
+                </etools-single-selection-menu>
               </div>
 
               <template
                   is="dom-if"
-                  if="[[_showCSD(data.frequency)]]">
+                  if="[[_showCSD(data.frequency)]]"
+                  restamp="true">
                 <div class="item">
                   <etools-prp-chips
                       value="{{data.cs_dates}}"
@@ -209,6 +206,8 @@
                 class="validate"
                 label="Location"
                 options="[[locations]]"
+                option-value="id"
+                option-label="title"
                 selected-values="{{selectedLocations}}"
                 on-selected-values-changed="_validate"
                 trigger-value-change-event
@@ -325,6 +324,7 @@
         },
 
         editData: Object,
+
       },
 
       observers: [
@@ -332,23 +332,16 @@
         '_setLocations(selectedLocations.splices)',
       ],
 
-      _setFrequency: function (e, data) {
-        var freq = this.$$('#frequencies').itemForElement(data.value);
-        if (!freq) {
-          return;
-        }
-        this.set('data.frequency', freq.id);
-      },
-
       _setLocations: function () {
         var selected = this.selectedLocations ?
             this.locations
                 .filter(function (location) {
-                  return this.selectedLocations.indexOf(location.value) !== -1;
+                  return this.selectedLocations.indexOf(location.id) !== -1;
                 }, this)
                 .map(function (location) {
                   return {
                     id: location.id,
+                    title: location.title,
                   };
                 }) :
             [];
@@ -373,7 +366,9 @@
         }
 
         this.set('data', Object.assign({}, this.editData));
-
+        if (!this.editData.cs_dates) { 
+          this.set('data.cs_dates', []);
+        }
         this._fetchLocations();
       },
 
@@ -394,16 +389,8 @@
 
         this.$.locations.thunk()()
             .then(function (res) {
-              self.set('locations', res.data.map(self._formatLocation));
+              self.set('locations', res.data);
             });
-      },
-
-      _formatLocation: function (data) {
-        return {
-          id: data.id,
-          value: data.title,
-          label: data.title,
-        };
       },
 
       _save: function () {
