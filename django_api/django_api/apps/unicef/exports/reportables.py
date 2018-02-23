@@ -37,8 +37,10 @@ class ReportableListXLSXExporter(ProgressReportsXLSXExporter):
         disaggregation_column_map = self.write_disaggregation_headers_get_column_map()
 
         for reportable in reportables:
+            reports = reportable.indicator_reports.order_by('-time_period_start')[:2]
+
             current_row = self.write_indicator_reports_to_current_sheet(
-                current_row, reportable.indicator_reports.all()[:2], disaggregation_column_map
+                current_row, reports, disaggregation_column_map
             )
 
         for column, width in enumerate(self.column_widths):
