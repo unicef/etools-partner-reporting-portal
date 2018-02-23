@@ -299,6 +299,33 @@ class PartnerActivityCreateAPIView(APIView):
 
         return Response({'id': pa.id}, status=status.HTTP_201_CREATED)
 
+    def patch(self, request, *args, **kwargs):
+        if 'id' not in self.request.data:
+            return Response({"message": "id field is required to update PartnerActivity"}, status=status.HTTP_400_BAD_REQUEST)
+
+        pk = self.request.data['id']
+        instance = get_object_or_404(PartnerActivity, id=pk)
+        serializer = PartnerActivitySerializer(
+            instance=instance,
+            data=self.request.data
+        )
+
+        if not serializer.is_valid():
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        if instance.partner != serializer.validated_data['partner']:
+            return Response({"message": "Editing partner for this project is not allowed"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # If user is IMO
+        # Check if incoming partner belongs to IMO's clusters
+        if request.user.groups.filter(name='IMO').exists() \
+            and not serializer.validated_data['partner'].id in request.user.imo_clusters.values_list('partners', flat=True):
+            return Response({"message": "the partner_id does not belong to your clusters"}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class ClusterActivityPartnersAPIView(ListAPIView):
 
