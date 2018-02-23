@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 from itertools import combinations
 
+from django.conf import settings
 from django.utils.functional import cached_property
 from django.contrib.postgres.fields import JSONField, ArrayField
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -422,6 +423,13 @@ class IndicatorReport(TimeStampedModel):
     @cached_property
     def display_type(self):
         return self.reportable.blueprint.display_type
+
+    @cached_property
+    def display_time_period(self):
+        return '{} - {}'.format(
+            self.time_period_start.strftime(settings.PRINT_DATA_FORMAT),
+            self.time_period_end.strftime(settings.PRINT_DATA_FORMAT),
+        )
 
     @cached_property
     def calculation_formula_across_periods(self):
