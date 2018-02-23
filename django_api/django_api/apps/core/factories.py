@@ -2,6 +2,7 @@ import datetime
 import json
 import random
 
+from dateutil.relativedelta import relativedelta
 from django.contrib.auth.models import Group
 from django.db.models.signals import post_save
 from django.contrib.contenttypes.models import ContentType
@@ -67,14 +68,16 @@ RATIO_CALC_CHOICES_LIST = [x[0] for x in IndicatorBlueprint.RATIO_CALC_CHOICES]
 RATIO_DISPLAY_TYPE_CHOICES_LIST = [
     x[0] for x in IndicatorBlueprint.RATIO_DISPLAY_TYPE_CHOICES]
 PD_FREQUENCY_LEVEL_CHOICE_LIST = [x[0] for x in PD_FREQUENCY_LEVEL]
-REPORTABLE_FREQUENCY_LEVEL_CHOICE_LIST = [
-    x[0] for x in REPORTABLE_FREQUENCY_LEVEL]
+REPORTABLE_FREQUENCY_LEVEL_CHOICE_LIST = [x[0] for x in REPORTABLE_FREQUENCY_LEVEL]
 OVERALL_STATUS_LIST = [x[0] for x in OVERALL_STATUS]
 REPORT_STATUS_LIST = [x[0] for x in INDICATOR_REPORT_STATUS]
 CLUSTER_TYPES_LIST = [x[0] for x in CLUSTER_TYPES]
 
 today = datetime.date.today()
 beginning_of_this_year = datetime.date(today.year, 1, 1)
+
+START_CHOICES = [beginning_of_this_year - relativedelta(months=n) for n in range(12)]
+END_CHOICES = [beginning_of_this_year - relativedelta(months=n - 1) for n in range(12)]
 
 cs_date_1 = datetime.date(today.year, 1, 1)
 
@@ -532,8 +535,6 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
         'programme_document')
     workspace = factory.Iterator(Workspace.objects.all())
 
-    #cs_dates = [cs_date_1, cs_date_2, cs_date_3]
-
     class Meta:
         model = ProgrammeDocument
 
@@ -551,9 +552,6 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
 class DisaggregationFactory(factory.django.DjangoModelFactory):
     active = True
 
-    # Commented out so that we can create Disaggregation and DisaggregationValue objects manually
-    # disaggregation_value = factory.RelatedFactory('core.factories.DisaggregationValueFactory', 'disaggregation')
-
     class Meta:
         model = Disaggregation
 
@@ -566,33 +564,23 @@ class DisaggregationValueFactory(factory.django.DjangoModelFactory):
 
 
 class QuantityIndicatorReportFactory(factory.django.DjangoModelFactory):
+
     title = factory.Sequence(lambda n: "quantity_indicator_report_%d" % n)
-    time_period_start = beginning_of_this_year
-    time_period_end = beginning_of_this_year + datetime.timedelta(days=30)
-    due_date = beginning_of_this_year + datetime.timedelta(days=30)
-    total = dict(
-        [('c', 0), ('d', 0), ('v', random.randint(0, 3000))])
+    time_period_start = factory.Iterator(START_CHOICES)
+    time_period_end = factory.Iterator(END_CHOICES)
+    due_date = factory.LazyAttribute(lambda o: o.time_period_end + relativedelta(days=random.randint(2, 10)))
+    total = dict([('c', 0), ('d', 0), ('v', random.randint(0, 3000))])
     overall_status = fuzzy.FuzzyChoice(OVERALL_STATUS_LIST)
     report_status = fuzzy.FuzzyChoice(REPORT_STATUS_LIST)
-    submission_date = beginning_of_this_year + datetime.timedelta(days=10)
+    submission_date = factory.LazyAttribute(lambda o: o.time_period_end + relativedelta(days=random.randint(2, 10)))
 
     class Meta:
         model = IndicatorReport
 
 
-class RatioIndicatorReportFactory(factory.django.DjangoModelFactory):
+class RatioIndicatorReportFactory(QuantityIndicatorReportFactory):
     title = factory.Sequence(lambda n: "ratio_indicator_report_%d" % n)
-    time_period_start = beginning_of_this_year
-    time_period_end = beginning_of_this_year + datetime.timedelta(days=30)
-    due_date = beginning_of_this_year + datetime.timedelta(days=30)
-    total = dict(
-        [('c', 0), ('d', random.randint(3000, 6000)), ('v', random.randint(0, 3000))])
-    overall_status = fuzzy.FuzzyChoice(OVERALL_STATUS_LIST)
-    report_status = fuzzy.FuzzyChoice(REPORT_STATUS_LIST)
-    submission_date = beginning_of_this_year + datetime.timedelta(days=10)
-
-    class Meta:
-        model = IndicatorReport
+    total = dict([('c', 0), ('d', random.randint(3000, 6000)), ('v', random.randint(0, 3000))])
 
 
 class PDResultLinkFactory(factory.django.DjangoModelFactory):

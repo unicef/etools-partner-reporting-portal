@@ -492,8 +492,7 @@ def generate_fake_data(workspace_quantity=10):
                     end_date=d + datetime.timedelta(days=30),
                     due_date=d + datetime.timedelta(days=45),
                 )
-    print("{} ProgrammeDocument objects created".format(
-        min(4, workspace_quantity * 2)))
+    print("{} ProgrammeDocument objects created".format(min(4, workspace_quantity * 2)))
 
     # Linking the followings:
     # ProgressReport - ProgrammeDocument
@@ -506,8 +505,7 @@ def generate_fake_data(workspace_quantity=10):
 
         pd.sections.add(Section.objects.order_by('?').first())
         pd.unicef_focal_point.add(Person.objects.order_by('?').first())
-        pd.partner_focal_point.add(
-            Person.objects.order_by('?').first())
+        pd.partner_focal_point.add(Person.objects.order_by('?').first())
         pd.unicef_officers.add(Person.objects.order_by('?').first())
 
         # generate reportables for this PD
@@ -549,7 +547,8 @@ def generate_fake_data(workspace_quantity=10):
                 progress_report = ProgressReportFactory(
                     programme_document=pd,
                     report_type=report_type,
-                    report_number=idx + 1)
+                    report_number=idx + 1
+                )
 
                 if idx == queryset.count() - 1:
                     progress_report.is_final = True
@@ -585,7 +584,7 @@ def generate_fake_data(workspace_quantity=10):
             pd
         ))
 
-    print("ProgrammeDocument <-> QuantityReportableToLowerLevelOutput <-> IndicatorReport objects linked".format(workspace_quantity))
+    print("ProgrammeDocument <-> QuantityReportableToLowerLevelOutput <-> IndicatorReport objects linked")
 
     print("Generating IndicatorLocationData for Quantity type")
     generate_indicator_report_location_disaggregation_quantity_data()

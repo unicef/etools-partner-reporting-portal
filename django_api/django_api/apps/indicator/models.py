@@ -357,6 +357,8 @@ class IndicatorReport(TimeStampedModel):
 
     class Meta:
         ordering = ['-due_date', '-id']
+        # TODO: Enable this
+        # unique_together = ('reportable', 'time_period_start', 'time_period_end')
 
     def __str__(self):
         return self.title
