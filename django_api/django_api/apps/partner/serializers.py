@@ -79,6 +79,7 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
     clusters = ClusterSimpleSerializer(many=True, read_only=True)
     locations = ShortLocationSerializer(many=True, read_only=True, required=False)
     partner = serializers.CharField(required=False)
+    partner_id = serializers.IntegerField(read_only=True)
     part_response_plan = serializers.SerializerMethodField()
     total_budget = serializers.CharField(required=False)
     funding_source = serializers.CharField(required=False)
@@ -100,6 +101,7 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
             'clusters',
             'locations',
             'partner',
+            'partner_id',
             'part_response_plan',
         )
 
