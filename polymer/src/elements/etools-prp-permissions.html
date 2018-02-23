@@ -105,7 +105,6 @@
         },
 
         createPartnerEntitiesByResponsePlanAsIMO: function(params, responsePlanClusters) {
-          debugger
           return isIMO(params.groups) &&
             responsePlanClusters.some(function (cluster) {
               return params.imoClusters.some(function (imoCluster) {
@@ -131,7 +130,7 @@
         addPartnerToProject: [
           App.Constants.GROUP_IMO,
         ],
-        
+
       };
 
       function isMember(groupName, groups) {
