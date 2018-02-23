@@ -2,6 +2,7 @@ import datetime
 import json
 import random
 
+from collections import defaultdict
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.models import Group
 from django.db.models.signals import post_save
@@ -76,8 +77,24 @@ CLUSTER_TYPES_LIST = [x[0] for x in CLUSTER_TYPES]
 today = datetime.date.today()
 beginning_of_this_year = datetime.date(today.year, 1, 1)
 
-START_CHOICES = [beginning_of_this_year - relativedelta(months=n) for n in range(12)]
-END_CHOICES = [beginning_of_this_year - relativedelta(months=n - 1) for n in range(12)]
+
+class RangeGenerator:
+
+    def __init__(self):
+        self.start = beginning_of_this_year
+        self.end = beginning_of_this_year + relativedelta(months=1)
+
+    def __next__(self):
+        return_value = self.start, self.end
+        self.start -= relativedelta(months=1)
+        self.end -= relativedelta(months=1)
+        return return_value
+
+    def __iter__(self):
+        return self
+
+
+REPORTABLE_RANGE_GENERATORS = defaultdict(lambda: iter(RangeGenerator()))
 
 cs_date_1 = datetime.date(today.year, 1, 1)
 
@@ -566,16 +583,21 @@ class DisaggregationValueFactory(factory.django.DjangoModelFactory):
 class QuantityIndicatorReportFactory(factory.django.DjangoModelFactory):
 
     title = factory.Sequence(lambda n: "quantity_indicator_report_%d" % n)
-    time_period_start = factory.Iterator(START_CHOICES)
-    time_period_end = factory.Iterator(END_CHOICES)
-    due_date = factory.LazyAttribute(lambda o: o.time_period_end + relativedelta(days=random.randint(2, 10)))
+    time_period_start = factory.LazyAttribute(lambda o: o.time_period[0])
+    time_period_end = factory.LazyAttribute(lambda o: o.time_period[1])
+    due_date = factory.LazyAttribute(lambda o: o.time_period[1] + relativedelta(days=random.randint(2, 10)))
     total = dict([('c', 0), ('d', 0), ('v', random.randint(0, 3000))])
     overall_status = fuzzy.FuzzyChoice(OVERALL_STATUS_LIST)
     report_status = fuzzy.FuzzyChoice(REPORT_STATUS_LIST)
-    submission_date = factory.LazyAttribute(lambda o: o.time_period_end + relativedelta(days=random.randint(2, 10)))
+    submission_date = factory.LazyAttribute(lambda o: o.time_period[1] + relativedelta(days=random.randint(2, 10)))
+
+    @factory.lazy_attribute
+    def time_period(self):
+        return next(REPORTABLE_RANGE_GENERATORS[self.reportable.id])
 
     class Meta:
         model = IndicatorReport
+        exclude = ('time_period', )
 
 
 class RatioIndicatorReportFactory(QuantityIndicatorReportFactory):
@@ -586,12 +608,8 @@ class RatioIndicatorReportFactory(QuantityIndicatorReportFactory):
 class PDResultLinkFactory(factory.django.DjangoModelFactory):
     external_id = factory.Sequence(lambda n: "%d" % n)
     external_cp_output_id = factory.Sequence(lambda n: "%d" % (n % 4))
-    title = factory.Sequence(
-        lambda n: "result link to country_programme_%d" %
-        (n %
-         4))
-    lower_level_output = factory.RelatedFactory(
-        'core.factories.LowerLevelOutputFactory', 'cp_output')
+    title = factory.Sequence(lambda n: "result link to country_programme_{}".format(n % 4))
+    lower_level_output = factory.RelatedFactory('core.factories.LowerLevelOutputFactory', 'cp_output')
 
     class Meta:
         model = PDResultLink
