@@ -538,8 +538,7 @@ def generate_fake_data(workspace_quantity=10):
                 ))
 
         # Generate progress reports per pd based on its reporting period dates. Requires creating indicator
-        # reports for each llo and then associating them with a progress
-        # report
+        # reports for each llo and then associating them with a progress report
         def generate_initial_progress_reports(report_type):
             queryset = pd.reporting_periods.filter(report_type=report_type)
 
