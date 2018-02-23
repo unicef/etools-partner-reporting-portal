@@ -257,7 +257,7 @@ def process_period_reports():
                         reportable=indicator,
                         time_period_start=start_date,
                         time_period_end=end_date,
-                        due_date=end_date + relativedelta(days=relativedelta(days=random.randint(2, 15)))
+                        due_date=end_date + relativedelta(days=random.randint(2, 15)))
                     )
 
                     for location in indicator.locations.all():
@@ -285,7 +285,7 @@ def process_period_reports():
                         reportable=indicator,
                         time_period_start=start_date,
                         time_period_end=end_date,
-                        due_date=end_date + relativedelta(days=relativedelta(days=random.randint(2, 15)))
+                        due_date=end_date + relativedelta(days=random.randint(2, 15)))
                     )
 
                     for location in indicator.locations.all():
