@@ -1,4 +1,6 @@
+import random
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 
 from celery import shared_task
 from django.db import transaction
@@ -255,6 +257,7 @@ def process_period_reports():
                         reportable=indicator,
                         time_period_start=start_date,
                         time_period_end=end_date,
+                        due_date=end_date + relativedelta(days=relativedelta(days=random.randint(2, 15)))
                     )
 
                     for location in indicator.locations.all():
@@ -282,6 +285,7 @@ def process_period_reports():
                         reportable=indicator,
                         time_period_start=start_date,
                         time_period_end=end_date,
+                        due_date=end_date + relativedelta(days=relativedelta(days=random.randint(2, 15)))
                     )
 
                     for location in indicator.locations.all():
