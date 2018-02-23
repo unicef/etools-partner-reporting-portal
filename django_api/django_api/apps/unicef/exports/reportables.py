@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 class ReportableListXLSXExporter(ProgressReportsXLSXExporter):
 
     include_disaggregations = True
+    export_to_single_sheet = True
 
     def __init__(self, reportables, **kwargs):
         self.reportables = reportables
@@ -37,7 +38,7 @@ class ReportableListXLSXExporter(ProgressReportsXLSXExporter):
 
         for reportable in reportables:
             current_row = self.write_indicator_reports_to_current_sheet(
-                current_row, reportable.indicator_reports.all(), disaggregation_column_map
+                current_row, reportable.indicator_reports.all()[:2], disaggregation_column_map
             )
 
         for column, width in enumerate(self.column_widths):
@@ -96,7 +97,8 @@ class ReportableListPDFExporter(ProgressReportDetailPDFExporter):
             ],
         ]
 
-    def get_current_previous_location_data_table(self, current_data, previous_data=None):
+    def get_current_previous_location_data_table(self, current_data):
+        previous_data = current_data.previous_location_data
         current_location_progress = format_total_value_to_string(
             current_data.disaggregation.get('()'),
             is_percentage=current_data.indicator_report.is_percentage
@@ -104,10 +106,10 @@ class ReportableListPDFExporter(ProgressReportDetailPDFExporter):
         previous_location_progress = format_total_value_to_string(
             previous_data.disaggregation.get('()'),
             is_percentage=previous_data.indicator_report.is_percentage
-        ) if previous_data else None
+        ) if previous_data else ''
 
-        previous_time_period = previous_data.indicator_report.display_time_period if previous_data else None
-        previous_submission_date = previous_data.indicator_report.submission_date if previous_data else None
+        previous_time_period = previous_data.indicator_report.display_time_period if previous_data else ''
+        previous_submission_date = previous_data.indicator_report.submission_date if previous_data else ''
 
         return [
             [
@@ -137,22 +139,15 @@ class ReportableListPDFExporter(ProgressReportDetailPDFExporter):
             tables = [
                 self.get_reportable_header_table(reportable)
             ]
-            indicator_reports = list(reportable.indicator_reports.all()[:2])
-            current_indicator_report = indicator_reports[0] if indicator_reports else None
-            previous_indicator_report = indicator_reports[1] if len(indicator_reports) > 1 else None
+
+            current_indicator_report = reportable.indicator_reports.order_by('-time_period_start').first()
 
             if not current_indicator_report:
                 continue
 
             for location_data in current_indicator_report.indicator_location_data.all():
-                if previous_indicator_report:
-                    previous_location_data = previous_indicator_report.indicator_location_data.filter(
-                        location=location_data.location
-                    ).first()
-                else:
-                    previous_location_data = None
                 tables.append(self.get_current_previous_location_data_table(
-                    location_data, previous_location_data
+                    location_data
                 ))
 
             section_data = {
