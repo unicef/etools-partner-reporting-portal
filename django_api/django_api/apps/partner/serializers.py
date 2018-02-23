@@ -403,7 +403,6 @@ class PartnerActivityUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = PartnerActivity
         fields = (
-            'id',
             'title',
             'status',
             'project',
@@ -434,6 +433,16 @@ class PartnerActivityUpdateSerializer(serializers.ModelSerializer):
                 'partner': 'PartnerProject does not belong to Partner {}.'.format(self.initial_data['partner'])
             })
         return super(PartnerActivityUpdateSerializer, self).validate(data)
+
+    def update(self, instance, validated_data):
+        instance.title = validated_data.get('title', instance.title)
+        instance.project = validated_data.get('project', instance.project)
+        instance.start_date = validated_data.get('start_date', instance.start_date)
+        instance.end_date = validated_data.get('end_date', instance.end_date)
+        instance.status = validated_data.get('status', instance.status)
+        instance.save()
+        
+        return instance
 
 
 class PMPPartnerSerializer(serializers.ModelSerializer):

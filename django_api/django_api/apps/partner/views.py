@@ -288,27 +288,17 @@ class PartnerActivityUpdateAPIView(UpdateAPIView):
             return Response(
                 serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        partner = serializer.validated_data['partner']
-
         # If user is IMO
         # Check if incoming partner belongs to IMO's clusters
         if request.user.groups.filter(name='IMO').exists() \
-            and partner.id not in request.user.imo_clusters.values_list('partners', flat=True):
+            and instance.partner.id not in request.user.imo_clusters.values_list('partners', flat=True):
             return Response(
-                {"message": "the partner_id does not belong to your clusters"},
+                {"message": "the partner id for this activity does not belong to your clusters"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        if instance.partner != serializer.validated_data['partner']:
-            return Response({"message": "Editing partner for this project is not allowed"}, status=status.HTTP_400_BAD_REQUEST)
-
         serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def get_serializer_class(self):
-        return PartnerActivityFromClusterActivitySerializer \
-            if self.get_object(self.kwargs.get("pk")).cluster_activity \
-            else PartnerActivityFromCustomActivitySerializer
+        return Response(PartnerActivitySerializer(instance=instance).data, status=status.HTTP_200_OK)
 
     def get_serializer_context(self):
         return {
