@@ -615,7 +615,6 @@ class LowerLevelOutputFactory(factory.django.DjangoModelFactory):
 
 
 class IndicatorLocationDataFactory(factory.django.DjangoModelFactory):
-    # disaggregation = JSONFactory()
     disaggregation = dict()
     num_disaggregation = 3
     level_reported = 3
@@ -623,6 +622,7 @@ class IndicatorLocationDataFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = IndicatorLocationData
+        django_get_or_create = ('indicator_report', 'location')
 
 
 class GatewayTypeFactory(factory.django.DjangoModelFactory):
