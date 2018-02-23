@@ -547,6 +547,8 @@ class IndicatorLocationData(TimeStampedModel):
 
     class Meta:
         ordering = ['id']
+        # TODO: enable
+        # unique_together = ('indicator_report', 'location')
 
     def __str__(self):
         return "{} Location Data for {}".format(self.location, self.indicator_report)
