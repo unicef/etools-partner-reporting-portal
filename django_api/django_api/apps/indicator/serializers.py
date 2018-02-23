@@ -505,6 +505,7 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
             'indicator_location_data',
             'time_period_start',
             'time_period_end',
+            'due_date',
             'display_type',
             'submission_date',
             'total',

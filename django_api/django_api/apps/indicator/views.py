@@ -445,8 +445,6 @@ class IndicatorReportListAPIView(APIView):
     """
 
     def get_queryset(self, *args, **kwargs):
-        indicator_reports = None
-
         pks = self.request.query_params.get('pks', None)
         reportable_id = self.kwargs.get('reportable_id', None)
 
@@ -459,8 +457,7 @@ class IndicatorReportListAPIView(APIView):
             indicator_reports = IndicatorReport.objects.filter(id__in=pk_list)
         else:
             reportable = get_object_or_404(Reportable, pk=reportable_id)
-            indicator_reports = reportable.indicator_reports.all().order_by(
-                '-time_period_start')
+            indicator_reports = reportable.indicator_reports.all().order_by('-time_period_start')
 
         if 'limit' in self.request.query_params:
             limit = int(self.request.query_params.get('limit', '2'))
@@ -470,8 +467,7 @@ class IndicatorReportListAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
         indicator_reports = self.get_queryset()
-        serializer = IndicatorReportListSerializer(indicator_reports,
-                                                   many=True)
+        serializer = IndicatorReportListSerializer(indicator_reports, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
