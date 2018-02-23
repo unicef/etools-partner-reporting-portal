@@ -203,7 +203,8 @@
               label="Total Budget"
               value="{{data.total_budget}}"
               type="number"
-              allowed-pattern="[+\-\d]"
+              allowed-pattern="[+\-\d.]"
+              step="0.01"
               on-input="_validate">
             </paper-input>
 

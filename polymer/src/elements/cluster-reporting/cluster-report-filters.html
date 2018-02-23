@@ -40,38 +40,38 @@
         params-object="{{queryParams}}">
     </iron-query-params>
 
-    <filter-list
-        filters="{{filters}}"
-        class="app-grid">
-      <cluster-filter
-          class="item"
-          value="[[_withDefault(queryParams.cluster_id, '')]]">
-      </cluster-filter>
+    <filter-list filters="{{filters}}">
+      <div class="app-grid">
+        <cluster-filter
+            class="item"
+            value="[[_withDefault(queryParams.cluster_id, '')]]">
+        </cluster-filter>
 
-      <cluster-partner-filter
-          class="item"
-          value="[[_withDefault(queryParams.partner, '')]]">
-      </cluster-partner-filter>
+        <cluster-partner-filter
+            class="item"
+            value="[[_withDefault(queryParams.partner, '')]]">
+        </cluster-partner-filter>
 
-      <cluster-indicator-type-filter
+        <cluster-indicator-type-filter
+            class="item filter-col"
+            value="[[_withDefault(queryParams.indicator_type, '')]]">
+        </cluster-indicator-type-filter>
+
+        <cluster-indicator-filter
           class="item filter-col"
-          value="[[_withDefault(queryParams.indicator_type, '')]]">
-      </cluster-indicator-type-filter>
+          value="[[_withDefault(queryParams.indicator, '')]]">
+        </cluster-indicator-filter>
 
-      <cluster-indicator-filter
-        class="item filter-col"
-        value="[[_withDefault(queryParams.indicator, '')]]">
-      </cluster-indicator-filter>
+        <cluster-project-filter
+            class="item filter-2-col"
+            value="[[_withDefault(queryParams.project, '')]]">
+        </cluster-project-filter>
 
-      <cluster-project-filter
-          class="item filter-2-col"
-          value="[[_withDefault(queryParams.project, '')]]">
-      </cluster-project-filter>
-
-      <indicator-location-filter
-          class="item filter-2-col"
-          value="[[_withDefault(queryParams.location, '')]]">
-      </indicator-location-filter>
+        <indicator-location-filter
+            class="item filter-2-col"
+            value="[[_withDefault(queryParams.location, '')]]">
+        </indicator-location-filter>
+      </div>
     </filter-list>
   </template>
 

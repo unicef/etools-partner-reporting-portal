@@ -168,6 +168,7 @@ class IndicatorListSerializer(ReportableSimpleSerializer):
         model = Reportable
         fields = ReportableSimpleSerializer.Meta.fields + (
             'means_of_verification',
+            'cs_dates',
             'frequency',
             'pd_id',
             'disaggregations',
@@ -649,7 +650,7 @@ class IndicatorBlueprintSerializer(serializers.ModelSerializer):
 class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
     disaggregations = IdDisaggregationSerializer(many=True, read_only=True)
-    object_type = serializers.CharField(validators=[add_indicator_object_type_validator])
+    object_type = serializers.CharField(validators=[add_indicator_object_type_validator], write_only=True)
     blueprint = IndicatorBlueprintSerializer()
     locations = IdLocationSerializer(many=True, read_only=True)
     target = serializers.CharField(required=False)
@@ -671,9 +672,6 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             'baseline',
             'in_need',
         )
-
-    def get_object_type(self, obj):
-        return '.'.join(obj.content_type.natural_key())
 
     def check_locations_merge_to_list(self, locations):
         if isinstance(locations, dict) and 'id' in locations:
@@ -920,21 +918,8 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
         if isinstance(obj.reportable.content_object, (PartnerProject, )):
             return obj.reportable.content_object.title
         elif isinstance(obj.reportable.content_object, (PartnerActivity, )):
-            return obj.reportable.content_object.partner.title
-        elif isinstance(obj.reportable.content_object, (ClusterObjective, )):
-            if obj.reportable.content_object.partner_activities.first():
-                return obj.reportable.content_object.partner_activities.first().partner.title
-            elif obj.reportable.content_object.cluster:
-                return obj.reportable.content_object.cluster.partner_projects.first().title
-            else:
-                return ''
-        elif isinstance(obj.reportable.content_object, (ClusterActivity, )):
-            if obj.reportable.content_object.partner_activities.first():
-                return obj.reportable.content_object.partner_activities.first().partner.title
-            elif obj.reportable.content_object.cluster_objective.cluster:
-                return obj.reportable.content_object.cluster_objective.cluster.partner_projects.first().title
-            else:
-                return ''
+            if obj.reportable.content_object.project:
+                return obj.reportable.content_object.project.title
         else:
             return ''
 
@@ -956,26 +941,8 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
         return partner.id if partner else ""
 
     def get_partner_activity(self, obj):
-        if isinstance(obj.reportable.content_object, (PartnerProject, )):
-            return obj.reportable.content_object.partner_activities.first().title
-        elif isinstance(obj.reportable.content_object, (PartnerActivity, )):
+        if isinstance(obj.reportable.content_object, (PartnerActivity, )):
             return obj.reportable.content_object.title
-        elif isinstance(obj.reportable.content_object, (ClusterObjective, )):
-            if obj.reportable.content_object.partner_activities.first():
-                return obj.reportable.content_object.partner_activities.first().title
-            elif obj.reportable.content_object.cluster:
-                return obj.reportable.content_object.cluster.partner_projects.first(
-                ).partner_activities.first().title
-            else:
-                return ''
-        elif isinstance(obj.reportable.content_object, (ClusterActivity, )):
-            if obj.reportable.content_object.partner_activities.first():
-                return obj.reportable.content_object.partner_activities.first().title
-            elif obj.reportable.content_object.cluster_objective.cluster:
-                return obj.reportable.content_object.cluster_objective.cluster.partner_projects.first(
-                ).partner_activities.first().title
-            else:
-                return ''
         else:
             return ''
 

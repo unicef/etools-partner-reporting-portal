@@ -150,7 +150,11 @@
       },
 
       clusterIndicatorReports: function (responsePlanId) {
-        return this._buildUrl('/cluster/' + responsePlanId + '/cluster-indicator-reports-list/');
+        return this._buildUrl('/cluster/' + responsePlanId + '/cluster-indicator-reports/');
+      },
+
+      clusterIndicatorReport: function (responsePlanId, reportId) {
+        return this.clusterIndicatorReports(responsePlanId) + reportId + '/';
       },
 
       clusterIndicatorReportsImportTemplate: function (responsePlanId) {
@@ -191,6 +195,12 @@
 
       partnerActivity: function (responsePlanId, mode) {
         return this._buildUrl('/partner/' + responsePlanId + '/create-partner-activity/' + mode);
+      },
+
+      partnerActivityUpdate: function (responsePlanId, activityId) {
+        return this._buildUrl(
+          '/partner/' + responsePlanId + '/update-partner-activity/' + activityId + '/'
+        );
       },
 
       partnersByClusterActivityId: function (clusterActivityId) {

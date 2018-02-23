@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404
 from django.http import Http404
 
 from rest_framework import status
-from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveAPIView
+from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveAPIView, CreateAPIView, UpdateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -564,52 +564,17 @@ class IndicatorLocationDataUpdateAPIView(APIView):
                             status=status.HTTP_400_BAD_REQUEST)
 
 
-class ClusterIndicatorAPIView(APIView):
+class ClusterIndicatorAPIView(CreateAPIView, UpdateAPIView):
     """
     Add and Update Indicator on cluster reporting screen.
     """
 
     serializer_class = ClusterIndicatorSerializer
     permission_classes = (IsAuthenticated, )
-
-    # Naming this to get_serializer_instance in order to avoid colision in
-    # Swagger schema generation
-    def get_serializer_instance(
-            self, data, instance=None, many=False, read_only=False):
-        return self.serializer_class(
-            data=data,
-            instance=instance,
-            many=many,
-            read_only=read_only,
-        )
-
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer_instance(request.data)
-        if not serializer.is_valid():
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
-
-        serializer.save()
-        return Response(
-            ClusterIndicatorDataSerializer(instance=serializer.instance).data,
-            status=status.HTTP_201_CREATED
-        )
+    queryset = Reportable.objects.all()
 
     def get_object(self):
-        return get_object_or_404(Reportable, pk=self.request.data.get("id"))
-
-    def put(self, request, *args, **kwargs):
-        serializer = self.get_serializer_instance(
-            instance=self.get_object(),
-            data=request.data
-        )
-        if not serializer.is_valid():
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
-
-        serializer.save()
-        return Response({'id': serializer.instance.id},
-                        status=status.HTTP_200_OK)
+        return get_object_or_404(self.get_queryset(), pk=self.request.data.get("id"))
 
 
 class IndicatorDataLocationAPIView(ListAPIView):
