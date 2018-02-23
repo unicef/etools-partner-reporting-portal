@@ -240,36 +240,8 @@ class PartnerActivityCreateAPIView(CreateAPIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        if create_mode == 'cluster':
-            try:
-                pa = PartnerActivity.objects.create(
-                    title=serializer.validated_data['cluster_activity'].title,
-                    project=serializer.validated_data['project'],
-                    partner=serializer.validated_data['partner'],
-                    cluster_activity=serializer.validated_data['cluster_activity'],
-                    start_date=serializer.validated_data['start_date'],
-                    end_date=serializer.validated_data['end_date'],
-                    status=serializer.validated_data['status'],
-                )
-            # TODO: Create reportables in the db, cloning this cluster activities indicators?
-            except Exception as e:
-                return Response(
-                    {'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
-
-        elif create_mode == 'custom':
-            try:
-                pa = PartnerActivity.objects.create(
-                    title=serializer.validated_data['title'],
-                    project=serializer.validated_data['project'],
-                    partner=serializer.validated_data['partner'],
-                    cluster_objective=serializer.validated_data['cluster_objective'],
-                    start_date=serializer.validated_data['start_date'],
-                    end_date=serializer.validated_data['end_date'],
-                    status=serializer.validated_data['status'],
-                )
-            except Exception as e:
-                return Response(
-                    {'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def get_serializer_class(self):
         choices = {
@@ -280,7 +252,14 @@ class PartnerActivityCreateAPIView(CreateAPIView):
         klass = choices.get(self.kwargs['create_mode'])
         if not klass:
             raise ValidationError('Wrong create mode flag')
+
         return klass
+
+    def get_serializer_context(self):
+        return {
+            'request': self.request,
+            'imo': self.request.user.groups.filter(name='IMO').exists(),
+        }
 
 
 class PartnerActivityUpdateAPIView(UpdateAPIView):
@@ -295,57 +274,47 @@ class PartnerActivityUpdateAPIView(UpdateAPIView):
             project__clusters__response_plan_id=self.kwargs['response_plan_id']
         )
 
-    def patch(self, request, create_mode, *args, **kwargs):
-        if 'id' not in self.request.data:
-            return Response({"message": "id field is required to update PartnerActivity"}, status=status.HTTP_400_BAD_REQUEST)
+    def get_object(self, pk):
+        return get_object_or_404(self.get_queryset(), pk=pk)
 
-        pk = self.request.data['id']
-        instance = get_object_or_404(PartnerActivity, id=pk)
-
-        if create_mode == 'cluster':
-            serializer = PartnerActivityFromClusterActivitySerializer(
-                instance=instance,
-                data=self.request.data
-            )
-
-        elif create_mode == 'custom':
-            serializer = PartnerActivityFromCustomActivitySerializer(
-                instance=instance,
-                data=self.request.data
-            )
-
-        else:
-            return Response({'error': "Wrong create mode flag"},
-                            status=status.HTTP_400_BAD_REQUEST)
+    def patch(self, request, pk, *args, **kwargs):
+        instance = self.get_object(pk)
+        serializer = self.get_serializer(
+            instance=instance,
+            data=self.request.data
+        )
 
         if not serializer.is_valid():
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        if instance.partner != serializer.validated_data['partner']:
-            return Response({"message": "Editing partner for this project is not allowed"}, status=status.HTTP_400_BAD_REQUEST)
+        partner = serializer.validated_data['partner']
 
         # If user is IMO
         # Check if incoming partner belongs to IMO's clusters
         if request.user.groups.filter(name='IMO').exists() \
-            and not serializer.validated_data['partner'].id in request.user.imo_clusters.values_list('partners', flat=True):
-            return Response({"message": "the partner_id does not belong to your clusters"}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            instance.title = serializer.validated_data['title']
-            instance.project = serializer.validated_data['project']
-            instance.partner = serializer.validated_data['partner']
-            instance.cluster_objective = serializer.validated_data['cluster_objective']
-            instance.start_date = serializer.validated_data['start_date']
-            instance.end_date = serializer.validated_data['end_date']
-            instance.status = serializer.validated_data['status']
-
-            instance.save()
-        except Exception as e:
+            and partner.id not in request.user.imo_clusters.values_list('partners', flat=True):
             return Response(
-                {'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
+                {"message": "the partner_id does not belong to your clusters"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
+        if instance.partner != serializer.validated_data['partner']:
+            return Response({"message": "Editing partner for this project is not allowed"}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def get_serializer_class(self):
+        return PartnerActivityFromClusterActivitySerializer \
+            if self.get_object(self.kwargs.get("pk")).cluster_activity \
+            else PartnerActivityFromCustomActivitySerializer
+
+    def get_serializer_context(self):
+        return {
+            'request': self.request,
+            'imo': self.request.user.groups.filter(name='IMO').exists(),
+        }
 
 
 class ClusterActivityPartnersAPIView(ListAPIView):

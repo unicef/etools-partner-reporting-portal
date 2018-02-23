@@ -298,6 +298,7 @@ class PartnerActivityFromCustomActivitySerializer(PartnerActivityBaseCreateSeria
     def validate(self, data):
         data = super(PartnerActivityFromCustomActivitySerializer, self).validate(data)
         cluster_objective = ClusterObjective.objects.filter(id=data['cluster_objective']).first()
+
         if not cluster_objective:
             raise serializers.ValidationError({
                 'cluster_objective': 'ClusterObjective ID {} does not exist.'.format(data['cluster_objective'])
@@ -309,9 +310,16 @@ class PartnerActivityFromCustomActivitySerializer(PartnerActivityBaseCreateSeria
                 )
             })
 
-        if 'request' in self.context and not data['partner'] == self.context['request'].user.partner:
+        if 'request' in self.context \
+            and not self.context['imo'] \
+            and not data['partner'] == self.context['request'].user.partner:
             raise serializers.ValidationError({
                 'partner': "Partner id did not match this user's partner"
+            })
+
+        if data['project'].partner != data['partner']:
+            return serializers.ValidationError({
+                "project": "Project does not belong to Partner {}".format(data['partner']),
             })
 
         data['cluster_objective'] = cluster_objective
@@ -332,6 +340,16 @@ class PartnerActivityFromCustomActivitySerializer(PartnerActivityBaseCreateSeria
         except Exception as e:
             raise serializers.ValidationError(e.message)
         return partner_activity
+    
+    def update(self, instance, validated_data):
+        instance.title = validated_data.get('title', instance.title)
+        instance.project = validated_data.get('project', instance.project)
+        instance.partner = validated_data.get('partner', instance.partner)
+        instance.cluster_objective = validated_data.get('cluster_objective', instance.cluster_objective)
+        instance.start_date = validated_data.get('start_date', instance.start_date)
+        instance.end_date = validated_data.get('end_date', instance.end_date)
+        instance.status = validated_data.get('status', instance.status)
+        return instance
 
 
 class PartnerActivitySerializer(serializers.ModelSerializer):
