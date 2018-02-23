@@ -365,8 +365,7 @@ class ProgressReportIndicatorsAPIView(ListAPIView):
 
     def get_queryset(self):
         # Limit reports to partner only
-        return IndicatorReport.objects.filter(
-            progress_report__programme_document__partner=self.request.user.partner)
+        return IndicatorReport.objects.filter(progress_report__programme_document__partner=self.request.user.partner)
 
     def list(self, request, workspace_id, progress_report_id, *args, **kwargs):
         """
@@ -395,7 +394,10 @@ class ProgressReportLocationsAPIView(ListAPIView):
     def get_object(self, pk):
         try:
             return ProgressReport.objects.get(
-                programme_document__partner=self.request.user.partner, programme_document__workspace=self.workspace_id, pk=pk)
+                programme_document__partner=self.request.user.partner,
+                programme_document__workspace=self.workspace_id,
+                pk=pk
+            )
         except ProgressReport.DoesNotExist as exp:
             logger.exception({
                 "endpoint": "ProgressReportLocationsAPIView",
