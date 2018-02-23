@@ -272,7 +272,7 @@
 
         locationsUrl: {
           type: String,
-          computed: '_computeLocationsUrl(locationId)',
+          computed: '_computeLocationsUrl(responsePlanId)',
         },
 
         indicatorsUrl: {
@@ -366,7 +366,7 @@
         }
 
         this.set('data', Object.assign({}, this.editData));
-        if (!this.editData.cs_dates) { 
+        if (!this.editData.cs_dates) {
           this.set('data.cs_dates', []);
         }
         this._fetchLocations();
@@ -380,8 +380,8 @@
         return frequency && this._equals(frequency, 'Csd');
       },
 
-      _computeLocationsUrl: function (locationId) {
-        return App.Endpoints.childLocations(locationId);
+      _computeLocationsUrl: function (responsePlanId) {
+        return App.Endpoints.clusterLocationNames(responsePlanId);
       },
 
       _fetchLocations: function () {
