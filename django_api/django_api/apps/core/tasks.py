@@ -133,6 +133,11 @@ def process_period_reports():
                             time_period_start=start_date,
                             time_period_end=end_date,
                             due_date=due_date,
+                            title=reportable.blueprint.title,
+                            total={'c': 0, 'd': 0, 'v': 0},
+                            overall_status="NoS",
+                            report_status="Due",
+                            submission_date=None,
                         )
 
                         for location in reportable.locations.all():
@@ -159,6 +164,11 @@ def process_period_reports():
                             time_period_start=start_date,
                             time_period_end=end_date,
                             due_date=due_date,
+                            title=reportable.blueprint.title,
+                            total={'c': 0, 'd': 0, 'v': 0},
+                            overall_status="NoS",
+                            report_status="Due",
+                            submission_date=None,
                         )
 
                         for location in reportable.locations.all():
@@ -258,6 +268,11 @@ def process_period_reports():
                         time_period_start=start_date,
                         time_period_end=end_date,
                         due_date=end_date + relativedelta(days=random.randint(2, 15)),
+                        title=reportable.blueprint.title,
+                        total={'c': 0, 'd': 0, 'v': 0},
+                        overall_status="NoS",
+                        report_status="Due",
+                        submission_date=None,
                     )
 
                     for location in indicator.locations.all():
@@ -286,6 +301,11 @@ def process_period_reports():
                         time_period_start=start_date,
                         time_period_end=end_date,
                         due_date=end_date + relativedelta(days=random.randint(2, 15)),
+                        title=reportable.blueprint.title,
+                        total={'c': 0, 'd': 0, 'v': 0},
+                        overall_status="NoS",
+                        report_status="Due",
+                        submission_date=None,
                     )
 
                     for location in indicator.locations.all():
