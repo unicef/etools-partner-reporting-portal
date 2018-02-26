@@ -11,8 +11,6 @@ from core.models import ResponsePlan, GatewayType
 from indicator.models import Reportable, IndicatorReport, IndicatorLocationData
 from indicator.serializers import (
     ClusterIndicatorReportSerializer,
-    ClusterIndicatorReportListSerializer,
-    ReportableSimpleSerializer,
 )
 from partner.models import Partner
 from .models import ClusterObjective, ClusterActivity, Cluster
@@ -313,7 +311,9 @@ class PartnerAnalysisSummarySerializer(serializers.ModelSerializer):
         num_of_reports_by_location_type = {}
 
         for location_type in location_types:
-            num_of_reports_by_location_type[str(location_type)] = location_data.filter(location__gateway=location_type).count()
+            num_of_reports_by_location_type[
+                str(location_type)
+            ] = location_data.filter(location__gateway=location_type).count()
 
         return {
             'num_of_activities': {
@@ -350,7 +350,9 @@ class PartnerAnalysisSummarySerializer(serializers.ModelSerializer):
             q_list.append(Q(partner_activities__cluster_activity__reportables=self.context['ca_indicator']))
 
         if 'report_status' in self.context:
-            q_list.append(Q(partner_activities__reportables__indicator_reports__overall_status__iexact=self.context['report_status']))
+            q_list.append(Q(
+                partner_activities__reportables__indicator_reports__overall_status__iexact=self.context['report_status']
+            ))
 
         id_list = Reportable.objects.annotate(title=F('blueprint__title')).filter(reduce(operator.and_, q_list)) \
             .values('id', 'title')

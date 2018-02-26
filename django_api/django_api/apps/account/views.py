@@ -1,4 +1,4 @@
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import login, logout
 
 from rest_framework import status as statuses
 from rest_framework.generics import RetrieveAPIView

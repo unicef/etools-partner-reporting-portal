@@ -5,12 +5,11 @@ from django_filters import rest_framework as filters
 from django_filters.filters import ChoiceFilter, CharFilter, DateFilter, TypedChoiceFilter
 from distutils.util import strtobool
 
-from core.common import PARTNER_PROJECT_STATUS, PARTNER_ACTIVITY_STATUS
-from utils.filter_fields import CommaSeparatedListFilter
+from core.common import PARTNER_PROJECT_STATUS
+from utils.filters.constants import Boolean
+from utils.filters.fields import CommaSeparatedListFilter
 
 from .models import PartnerProject, Partner, PartnerActivity
-
-BOOLEAN_CHOICES = (('0', 'False'), ('1', 'True'),)
 
 
 class PartnerProjectFilter(filters.FilterSet):
@@ -63,8 +62,10 @@ class PartnerActivityFilter(django_filters.FilterSet):
     project = CharFilter(method='get_project')
     cluster_id = CharFilter(method='get_cluster_id')
     activity = CharFilter(method='get_activity')
-    custom = TypedChoiceFilter(name='custom', choices=BOOLEAN_CHOICES, coerce=strtobool,
-                            method='get_custom', label='Show only custom activities')
+    custom = TypedChoiceFilter(
+        name='custom', choices=Boolean.CHOICES, coerce=strtobool,
+        method='get_custom', label='Show only custom activities'
+    )
     status = ChoiceFilter(choices=PARTNER_PROJECT_STATUS)
     location = CharFilter(method='get_location')
 

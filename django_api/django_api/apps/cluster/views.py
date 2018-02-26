@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveAPIView
-from rest_framework import status as statuses, serializers
+from rest_framework import status as statuses
 
 import django_filters
 
@@ -335,7 +335,7 @@ class IndicatorReportsListAPIView(ListCreateAPIView, RetrieveAPIView):
     * location - Integer ID for location
     * cluster_objective - Integer ID for cluster_objective
     * cluster_activity - Integer ID for cluster_activity
-    * indicator_type - String value of choices: partner_activity, partner_project, cluster_objective, OR cluster_activity
+    * indicator_type - String value of choices: partner_activity, partner_project, cluster_objective, cluster_activity
 
     Returns:
         - GET method - ClusterIndicatorReportSerializer object.
@@ -358,7 +358,7 @@ class IndicatorReportsListAPIView(ListCreateAPIView, RetrieveAPIView):
             Q(reportable__cluster_objectives__cluster__response_plan=response_plan_id)
             | Q(reportable__cluster_activities__cluster_objective__cluster__response_plan=response_plan_id)
             | Q(reportable__partner_projects__clusters__response_plan=response_plan_id)
-            | Q(reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)
+            | Q(reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)  # noqa: E501
         )
         return queryset
 
@@ -505,8 +505,7 @@ class ClusterIndicatorsListExcelExportView(ListAPIView):
             Q(reportable__cluster_objectives__cluster__response_plan=response_plan_id)
             | Q(reportable__cluster_activities__cluster_objective__cluster__response_plan=response_plan_id)
             | Q(reportable__partner_projects__clusters__response_plan=response_plan_id)
-            | Q(
-                reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)
+            | Q(reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)  # noqa: E501
         )
         return queryset
 
@@ -569,15 +568,11 @@ class ClusterIndicatorsLocationListAPIView(ListAPIView):
     def get_queryset(self):
         response_plan_id = self.kwargs.get(self.lookup_field)
         result = IndicatorReport.objects.filter(
-            # Q(reportable__cluster_objectives__isnull=False)
-            # | Q(reportable__cluster_activities__isnull=False)
             Q(reportable__partner_projects__isnull=False)
             | Q(reportable__partner_activities__isnull=False)
         ).filter(
-            # Q(reportable__cluster_objectives__cluster__response_plan=response_plan_id)
-            # | Q(reportable__cluster_activities__cluster_objective__cluster__response_plan=response_plan_id)
             Q(reportable__partner_projects__clusters__response_plan=response_plan_id)
-            | Q(reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)
+            | Q(reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)  # noqa: E501
         ).values_list('reportable__indicator_reports__indicator_location_data__location', flat=True).distinct()
         return Location.objects.filter(pk__in=result)
 
@@ -618,7 +613,9 @@ class PartnerAnalysisSummaryAPIView(APIView):
                     PartnerProject, id=request.query_params.get('project'))
 
                 if project.partner.id != partner.id:
-                    return Response({'message': "project does not belong to partner."}, status=statuses.HTTP_400_BAD_REQUEST)
+                    return Response(
+                        {'message': "project does not belong to partner."}, status=statuses.HTTP_400_BAD_REQUEST
+                    )
 
                 serializer_context['project'] = project
 
@@ -628,7 +625,9 @@ class PartnerAnalysisSummaryAPIView(APIView):
                     PartnerActivity, id=request.query_params.get('activity'))
 
                 if activity.partner.id != partner.id:
-                    return Response({'message': "activity does not belong to partner."}, status=statuses.HTTP_400_BAD_REQUEST)
+                    return Response(
+                        {'message': "activity does not belong to partner."}, status=statuses.HTTP_400_BAD_REQUEST
+                    )
 
                 serializer_context['activity'] = activity
 
@@ -646,7 +645,9 @@ class PartnerAnalysisSummaryAPIView(APIView):
                     Cluster, id=request.query_params.get('cluster_id'))
 
                 if not partner.clusters.filter(id=cluster.id).exists():
-                    return Response({'message': "cluster does not belong to partner."}, status=statuses.HTTP_400_BAD_REQUEST)
+                    return Response(
+                        {'message': "cluster does not belong to partner."}, status=statuses.HTTP_400_BAD_REQUEST
+                    )
 
                 serializer_context['cluster'] = cluster
 
@@ -677,8 +678,7 @@ class PartnerAnalysisIndicatorResultAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def get(self, request, response_plan_id, reportable_id, *args, **kwargs):
-        reportable = get_object_or_404(
-            Reportable, id=reportable_id)
+        reportable = get_object_or_404(Reportable, id=reportable_id)
 
         serializer = ClusterPartnerAnalysisIndicatorResultSerializer(reportable)
 

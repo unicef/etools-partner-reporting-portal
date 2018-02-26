@@ -36,7 +36,7 @@ from unicef.models import (
     ReportingPeriodDates,
 )
 from core.common import (
-    FREQUENCY_LEVEL, PD_STATUS,
+    PD_STATUS,
     PD_FREQUENCY_LEVEL,
     REPORTABLE_FREQUENCY_LEVEL,
     INDICATOR_REPORT_STATUS,

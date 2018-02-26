@@ -11,12 +11,9 @@ from core.factories import PartnerProjectFactory, PartnerFactory, ClusterObjecti
 
 from cluster.models import (
     Cluster,
-    ClusterActivity,
-    ClusterObjective,
 )
 
 from partner.models import (
-    Partner,
     PartnerProject,
     PartnerActivity,
 )
@@ -96,7 +93,6 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
         create unit test for ClusterObjectiveAPIView
         """
         base_count = PartnerProject.objects.all().count()
-        last = PartnerProject.objects.last()
 
         # test for creating object
         url = reverse(
@@ -157,7 +153,6 @@ class TestPartnerProjectAPIView(BaseAPITestCase):
         self.assertEquals(response.data['title'], first.title)
 
     def test_get_non_existent_instance(self):
-        last = PartnerProject.objects.last()
         url = reverse('partner-project-details', kwargs={"pk": 9999999})
         response = self.client.get(url, format='json')
 
@@ -184,8 +179,6 @@ class TestPartnerProjectAPIView(BaseAPITestCase):
         """
         patch object unit test for PartnerProjectAPIView
         """
-        last = PartnerProject.objects.last()
-
         data = dict(id=9999999, title='new updated title')
         url = reverse('partner-project-details', kwargs={"pk": 9999999})
         response = self.client.patch(url, data=data, format='json')
@@ -262,7 +255,6 @@ class TestPartnerActivityAPIView(BaseAPITestCase):
 
     def test_create_activity_from_custom_activity(self):
         base_count = PartnerActivity.objects.all().count()
-        last = PartnerActivity.objects.last()
 
         self.data['cluster_objective'] = self.cluster.cluster_objectives.first().id
 
@@ -284,4 +276,5 @@ class TestPartnerActivityAPIView(BaseAPITestCase):
         self.assertEquals(created_obj.title, self.data['title'])
         self.assertEquals(
             PartnerActivity.objects.all().count(),
-            base_count + 1)
+            base_count + 1
+        )

@@ -9,29 +9,22 @@ from django_filters.filters import (
     DateFilter, TypedChoiceFilter, CharFilter
 )
 
-from core.common import PROGRESS_REPORT_STATUS
-from utils.filter_fields import CommaSeparatedListFilter
+from core.common import PROGRESS_REPORT_STATUS, PD_STATUS
+from utils.filters.fields import CommaSeparatedListFilter
+from utils.filters.constants import Boolean
 from indicator.models import Reportable
 from .models import ProgrammeDocument, ProgressReport
 
 
-BOOLEAN_TRUE = '1'
-BOOLEAN_FALSE = '0'
-BOOLEAN_CHOICES = (
-    (BOOLEAN_FALSE, 'False'),
-    (BOOLEAN_TRUE, 'True'),
-)
-
-
 class ProgrammeDocumentIndicatorFilter(django_filters.FilterSet):
 
-    pd_statuses = CharFilter(method='get_status')
-    pds = CharFilter(method='get_programme_document')
+    pd_statuses = CommaSeparatedListFilter(name='lower_level_outputs__cp_output__programme_document__status')
+    pds = CommaSeparatedListFilter(name='lower_level_outputs__cp_output__programme_document_id')
     location = CharFilter(method='get_locations')
     blueprint__title = CharFilter(method='get_blueprint_title')
     incomplete = CharFilter(method='get_incomplete')
     activepdsonly = TypedChoiceFilter(
-        name='activepdsonly', choices=BOOLEAN_CHOICES,
+        name='activepdsonly', choices=Boolean.CHOICES,
         method='get_activepdsonly', label='Show for Active PDs only'
     )
 
@@ -41,14 +34,6 @@ class ProgrammeDocumentIndicatorFilter(django_filters.FilterSet):
             'id', 'blueprint__title',
         )
 
-    def get_status(self, queryset, name, value):
-        return queryset.filter(
-            lower_level_outputs__cp_output__programme_document__status__in=parse.unquote(value).split(','))
-
-    def get_programme_document(self, queryset, name, value):
-        return queryset.filter(
-            lower_level_outputs__cp_output__programme_document_id__in=map(lambda x: int(x), parse.unquote(value).split(',')))
-
     def get_locations(self, queryset, name, value):
         return queryset.filter(locations=value)
 
@@ -56,11 +41,14 @@ class ProgrammeDocumentIndicatorFilter(django_filters.FilterSet):
         return queryset.filter(blueprint__title__contains=value)
 
     def get_incomplete(self, queryset, name, value):
-        return queryset.filter(
-            lower_level_outputs__cp_output__programme_document__progress_reports__indicator_reports__submission_date__isnull=True) if value == "1" else queryset
+        if value == Boolean.TRUE:
+            return queryset.filter(
+                lower_level_outputs__cp_output__programme_document__progress_reports__indicator_reports__submission_date__isnull=True  # noqa: E501
+            )
+        return queryset
 
     def get_activepdsonly(self, queryset, name, value):
-        if value == BOOLEAN_TRUE:
+        if value == Boolean.TRUE:
             return queryset.filter(lower_level_outputs__cp_output__programme_document__status=PD_STATUS.active)
         return queryset
 
@@ -86,7 +74,7 @@ class ProgressReportFilter(django_filters.FilterSet):
                               label='PD/Ref # title')
     due_date = DateFilter(name='due date', method='get_due_date', label='Due date',
                           input_formats=[settings.PRINT_DATA_FORMAT])
-    due = TypedChoiceFilter(name='due', choices=BOOLEAN_CHOICES, coerce=strtobool,
+    due = TypedChoiceFilter(name='due', choices=Boolean.CHOICES, coerce=strtobool,
                             method='get_due_overdue_status', label='Show only due or overdue')
     location = CharFilter(name='location', method='get_location',
                           label='Location')

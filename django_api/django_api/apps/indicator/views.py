@@ -15,8 +15,6 @@ import django_filters.rest_framework
 
 from core.permissions import (
     IsAuthenticated,
-    IsPartnerAuthorizedOfficer,
-    IsPartnerEditor,
     IsPartnerEditorOrPartnerAuthorizedOfficer,
     IsIMO,
 )
@@ -45,7 +43,6 @@ from .serializers import (
     IndicatorLLoutputsSerializer, IndicatorLocationDataUpdateSerializer,
     OverallNarrativeSerializer,
     ClusterIndicatorSerializer,
-    ClusterIndicatorDataSerializer,
     DisaggregationListSerializer,
     IndicatorReportReviewSerializer,
     IndicatorReportSimpleSerializer
@@ -334,17 +331,20 @@ class IndicatorDataAPIView(APIView):
                 OVERALL_STATUS.met, OVERALL_STATUS.no_progress):
             for data in ir.indicator_location_data.all():
                 for key, vals in data.disaggregation.items():
-                    if ir.is_percentage and (
-                            vals.get('c', None) in [None, '']):
+                    if ir.is_percentage and (vals.get('c', None) in [None, '']):
                         _errors = [{
-                            "message": "You have not completed all required indicators for this progress report. Unless your Output status is Met or has No Progress, all indicator data needs to be completed."}]
-                        return Response({"errors": _errors},
-                                        status=status.HTTP_400_BAD_REQUEST)
+                            "message": "You have not completed all required indicators for this progress report. "
+                                       "Unless your Output status is Met or has No Progress, all indicator data "
+                                       "needs to be completed."
+                        }]
+                        return Response({"errors": _errors}, status=status.HTTP_400_BAD_REQUEST)
                     elif ir.is_number and (vals.get('v', None) in [None, '']):
                         _errors = [{
-                            "message": "You have not completed all required indicators for this progress report. Unless your Output status is Met or has No Progress, all indicator data needs to be completed."}]
-                        return Response({"errors": _errors},
-                                        status=status.HTTP_400_BAD_REQUEST)
+                            "message": "You have not completed all required indicators for this progress report. "
+                                       "Unless your Output status is Met or has No Progress, all indicator "
+                                       "data needs to be completed."
+                        }]
+                        return Response({"errors": _errors}, status=status.HTTP_400_BAD_REQUEST)
 
         # Check if indicator was already submitted or SENT BACK
         if ir.submission_date is None or ir.report_status == INDICATOR_REPORT_STATUS.sent_back:
@@ -364,10 +364,11 @@ class IndicatorDataAPIView(APIView):
             serializer = PDReportContextIndicatorReportSerializer(instance=ir)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            _errors = [
-                {"message": "Indicator was already submitted. Your IMO will need to send it back for you to edit your submission."}]
-            return Response({"errors": _errors},
-                            status=status.HTTP_400_BAD_REQUEST)
+            _errors = [{
+                "message": "Indicator was already submitted. "
+                           "Your IMO will need to send it back for you to edit your submission."
+             }]
+            return Response({"errors": _errors}, status=status.HTTP_400_BAD_REQUEST)
 
     def patch(self, request, ir_id, *args, **kwargs):
         """
@@ -384,8 +385,7 @@ class IndicatorDataAPIView(APIView):
                 return Response(serializer.errors,
                                 status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({"errors": "Indicator Report not found."},
-                        status=status.HTTP_400_BAD_REQUEST)
+        return Response({"errors": "Indicator Report not found."}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PDLowerLevelOutputStatusAPIView(APIView):
