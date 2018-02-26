@@ -339,7 +339,7 @@ def process_programme_documents(fast=False, area=False):
                                     i['end_date'] = item['end_date']
 
                                     # TODO: Fix db schema to accommodate larger lengths
-                                    i['title'] = i['title'][:255]
+                                    i['title'] = i['title'][:255] if i['title'] else "unknown"
                                     reportable = process_model(
                                         Reportable,
                                         PMPReportableSerializer,
