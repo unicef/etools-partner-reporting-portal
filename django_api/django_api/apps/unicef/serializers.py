@@ -11,8 +11,6 @@ from core.models import Workspace, Location
 from indicator.serializers import (
     PDReportContextIndicatorReportSerializer,
     IndicatorBlueprintSimpleSerializer,
-    IndicatorLLoutputsSerializer,
-    ReportableSimpleSerializer
 )
 
 from partner.models import Partner
@@ -541,6 +539,7 @@ class PMPSectionSerializer(serializers.ModelSerializer):
             'name',
         )
 
+
 class PMPReportingPeriodDatesSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='external_id')
     programme_document = serializers.PrimaryKeyRelatedField(
@@ -555,8 +554,6 @@ class PMPReportingPeriodDatesSerializer(serializers.ModelSerializer):
             'due_date',
             'programme_document',
         )
-
-
 
 
 class PMPPDResultLinkSerializer(serializers.ModelSerializer):

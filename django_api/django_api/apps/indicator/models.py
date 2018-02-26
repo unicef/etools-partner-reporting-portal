@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
-from itertools import combinations
 
+from django.conf import settings
 from django.utils.functional import cached_property
 from django.contrib.postgres.fields import JSONField, ArrayField
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -424,6 +424,13 @@ class IndicatorReport(TimeStampedModel):
         return self.reportable.blueprint.display_type
 
     @cached_property
+    def display_time_period(self):
+        return '{} - {}'.format(
+            self.time_period_start.strftime(settings.PRINT_DATA_FORMAT),
+            self.time_period_end.strftime(settings.PRINT_DATA_FORMAT),
+        )
+
+    @cached_property
     def calculation_formula_across_periods(self):
         return self.reportable.blueprint.calculation_formula_across_periods
 
@@ -508,9 +515,9 @@ def recalculate_reportable_total(sender, instance, **kwargs):
                             (ir_count * 1.0)
                         reportable_total['c'] = reportable_total['c'] / \
                             (ir_count * 1.0)
-                
-                elif blueprint.calculation_formula_across_periods == IndicatorBlueprint.SUM \
-                    and reportable_total['c'] == 0:
+
+                elif blueprint.calculation_formula_across_periods == IndicatorBlueprint.SUM and \
+                        reportable_total['c'] == 0:
                     reportable_total['c'] = reportable_total['v']
 
         # if unit is PERCENTAGE, doesn't matter if calc choice was percent or
@@ -559,10 +566,11 @@ class IndicatorLocationData(TimeStampedModel):
 
     @cached_property
     def previous_location_data(self):
-        current_ir_id = self.indicator_report.id
-        previous_indicator_reports = self.indicator_report.reportable.indicator_reports.filter(id__lt=current_ir_id)
+        previous_indicator_reports = self.indicator_report.reportable.indicator_reports.exclude(
+            id=self.indicator_report.id
+        ).filter(time_period_start__lt=self.indicator_report.time_period_start)
 
-        previous_report = previous_indicator_reports.last()
+        previous_report = previous_indicator_reports.order_by('-time_period_start').first()
         if previous_report:
             return previous_report.indicator_location_data.filter(location=self.location).first()
 

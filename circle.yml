@@ -1,0 +1,10 @@
+dependencies:
+  pre:
+    - pip install -r django_api/requirements/dev.txt
+
+test:
+  override:
+# TODO: Enable django tests
+#    - cd backend && python manage.py test --noinput
+    - cd django_api && flake8
+# TODO: Polymer linting, etc

@@ -4,16 +4,10 @@ from django.db import transaction
 from django.core.management.base import BaseCommand
 
 from core.common import (
-    FREQUENCY_LEVEL,
     PD_FREQUENCY_LEVEL,
-    REPORTABLE_FREQUENCY_LEVEL,
     PD_STATUS,
 )
 from core.helpers import (
-    get_num_of_days_in_a_month,
-    get_current_quarter_for_a_month,
-    get_first_date_of_a_quarter,
-    get_last_date_of_a_quarter,
     calculate_end_date_given_start_date,
     find_missing_frequency_period_dates,
 )
@@ -23,11 +17,11 @@ from core.factories import (
     RatioIndicatorReportFactory,
     IndicatorLocationDataFactory,
 )
-from unicef.models import ProgressReport, ProgrammeDocument
-from indicator.models import IndicatorReport, Reportable, IndicatorBlueprint
+from unicef.models import ProgrammeDocument
+from indicator.models import Reportable, IndicatorBlueprint
 
 
-DUE_DATE_DAYS_TIMEDELTA = 15
+DUE_DATE_DAYS = 15
 
 
 class Command(BaseCommand):
@@ -69,9 +63,7 @@ class Command(BaseCommand):
 
             reportable_queryset = pd.reportable_queryset
             frequency = pd.frequency
-            latest_progress_report = pd.progress_reports.order_by(
-                'end_date').last()
-            date_list = []
+            latest_progress_report = pd.progress_reports.order_by('end_date').last()
 
             if frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
                 print("PD {} frequency is custom specific dates".format(
@@ -109,7 +101,7 @@ class Command(BaseCommand):
                         end_date = calculate_end_date_given_start_date(
                             missing_date, frequency)
                         due_date = end_date + \
-                            timedelta(days=DUE_DATE_DAYS_TIMEDELTA)
+                            timedelta(days=DUE_DATE_DAYS)
                     else:
                         end_date = missing_date.end_date
                         due_date = missing_date.due_date
@@ -180,7 +172,6 @@ class Command(BaseCommand):
 
                         indicator_report.progress_report = next_progress_report
                         indicator_report.save()
-
 
         for indicator in Reportable.objects.filter(
             content_type__model__in=[
@@ -265,7 +256,7 @@ class Command(BaseCommand):
                             print("Creating IndicatorReport {} IndicatorLocationData object {} - {}".format(
                                 indicator_report, missing_date, end_date))
 
-                            location_data = IndicatorLocationDataFactory(
+                            IndicatorLocationDataFactory(
                                 indicator_report=indicator_report,
                                 location=location,
                                 num_disaggregation=indicator_report.disaggregations.count(),
@@ -292,7 +283,7 @@ class Command(BaseCommand):
                             print("Creating IndicatorReport {} IndicatorLocationData object {} - {}".format(
                                 indicator_report, missing_date, end_date))
 
-                            location_data = IndicatorLocationDataFactory(
+                            IndicatorLocationDataFactory(
                                 indicator_report=indicator_report,
                                 location=location,
                                 num_disaggregation=indicator_report.disaggregations.count(),

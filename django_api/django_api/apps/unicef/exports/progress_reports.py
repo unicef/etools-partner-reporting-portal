@@ -86,12 +86,12 @@ class ProgressReportDetailPDFExporter:
                     location_table = [
                         [
                             HTMLTableCell(location_data.location.title, rowspan=2, colspan=2),
-                            HTMLTableHeader('Location Progress'),
-                            HTMLTableCell(location_progress),
-                        ],
-                        [
                             HTMLTableHeader('Previous Location Progress'),
                             HTMLTableCell(previous_location_progress),
+                        ],
+                        [
+                            HTMLTableHeader('Location Progress'),
+                            HTMLTableCell(location_progress),
                         ],
                     ]
 

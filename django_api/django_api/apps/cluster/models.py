@@ -9,7 +9,6 @@ from django.contrib.contenttypes.fields import GenericRelation
 from model_utils.models import TimeStampedModel
 
 from core.common import (
-    FREQUENCY_LEVEL,
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
     CLUSTER_TYPES,
