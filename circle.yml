@@ -1,11 +1,11 @@
 dependencies:
   pre:
     - pip install -r django_api/requirements/dev.txt
-    - npm install -g bower polymer-cli gulp-cli
+    - npm install -g bower polymer-cli gulp-cli --no-optional
 
 test:
   override:
 # TODO: Enable django tests
 #    - cd backend && python manage.py test --noinput
     - cd django_api && flake8
-    - cd polymer && npm install --no-optional && npm run bundle
+    - cd polymer && npm install && npm run bundle
