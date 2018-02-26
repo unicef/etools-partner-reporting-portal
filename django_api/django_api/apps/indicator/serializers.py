@@ -63,14 +63,15 @@ class DisaggregationListSerializer(serializers.ModelSerializer):
             'choices',
         )
 
+
 class IdDisaggregationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Disaggregation
         fields = ('id',)
 
+
 class IndicatorBlueprintSimpleSerializer(serializers.ModelSerializer):
-    # id added explicitely here since it gets stripped out from validated_dat
-    # as its read_only.
+    # id added explicitly here since it gets stripped out from validated_data as its read_only.
     # https://stackoverflow.com/questions/36473795/django-rest-framework-model-id-field-in-nested-relationship-serializer
     id = serializers.IntegerField()
 
@@ -78,7 +79,6 @@ class IndicatorBlueprintSimpleSerializer(serializers.ModelSerializer):
         model = IndicatorBlueprint
         fields = (
             'id',
-            # 'indicator_id',
             'title',
             'unit',
             'display_type',
@@ -505,6 +505,7 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
             'indicator_location_data',
             'time_period_start',
             'time_period_end',
+            'due_date',
             'display_type',
             'submission_date',
             'total',
@@ -993,6 +994,7 @@ class PMPDisaggregationSerializer(serializers.ModelSerializer):
             'active',
         )
 
+
 class PMPDisaggregationValueSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='external_id')
     disaggregation = serializers.PrimaryKeyRelatedField(queryset=Disaggregation.objects.all())
@@ -1036,6 +1038,7 @@ class PMPReportableSerializer(serializers.ModelSerializer):
             'start_date',
             'end_date'
         )
+
 
 class ClusterPartnerAnalysisIndicatorResultSerializer(serializers.ModelSerializer):
     blueprint = IndicatorBlueprintSimpleSerializer()

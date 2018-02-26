@@ -6,14 +6,8 @@ from rest_framework import status
 from core.common import PROGRESS_REPORT_STATUS
 from core.tests.base import BaseAPITestCase
 from core.models import Workspace, Location
-from core.factories import (
-    QuantityReportableToLowerLevelOutputFactory,
-    ProgrammeDocumentFactory,
-    ProgressReportFactory,
-    IndicatorLocationDataFactory,
-)
 from indicator.models import IndicatorReport
-from unicef.models import LowerLevelOutput, Section, ProgrammeDocument, ProgressReport
+from unicef.models import ProgrammeDocument, ProgressReport
 
 
 class TestProgrammeDocumentAPIView25(BaseAPITestCase):

@@ -8,10 +8,8 @@ from django.conf import settings
 
 from rest_framework import status
 
-from core.tests.base import BaseAPITestCase
 from core.models import Location
 from core.helpers import (
-    suppress_stdout,
     get_cast_dictionary_keys_as_tuple,
 )
 from core.common import OVERALL_STATUS, PROGRESS_REPORT_STATUS, REPORTABLE_FREQUENCY_LEVEL, INDICATOR_REPORT_STATUS
@@ -20,8 +18,6 @@ from core.tests.base import BaseAPITestCase
 from cluster.models import ClusterObjective, ClusterActivity
 from partner.models import PartnerProject, PartnerActivity
 from unicef.models import (
-    LowerLevelOutput,
-    Section,
     ProgrammeDocument
 )
 from indicator.serializers import (
