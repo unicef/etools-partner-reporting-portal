@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404
 from django.http import Http404
 
 from rest_framework import status
-from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveAPIView
+from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveAPIView, CreateAPIView, UpdateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -15,8 +15,6 @@ import django_filters.rest_framework
 
 from core.permissions import (
     IsAuthenticated,
-    IsPartnerAuthorizedOfficer,
-    IsPartnerEditor,
     IsPartnerEditorOrPartnerAuthorizedOfficer,
     IsIMO,
 )
@@ -45,7 +43,6 @@ from .serializers import (
     IndicatorLLoutputsSerializer, IndicatorLocationDataUpdateSerializer,
     OverallNarrativeSerializer,
     ClusterIndicatorSerializer,
-    ClusterIndicatorDataSerializer,
     DisaggregationListSerializer,
     IndicatorReportReviewSerializer,
     IndicatorReportSimpleSerializer
@@ -334,17 +331,20 @@ class IndicatorDataAPIView(APIView):
                 OVERALL_STATUS.met, OVERALL_STATUS.no_progress):
             for data in ir.indicator_location_data.all():
                 for key, vals in data.disaggregation.items():
-                    if ir.is_percentage and (
-                            vals.get('c', None) in [None, '']):
+                    if ir.is_percentage and (vals.get('c', None) in [None, '']):
                         _errors = [{
-                            "message": "You have not completed all required indicators for this progress report. Unless your Output status is Met or has No Progress, all indicator data needs to be completed."}]
-                        return Response({"errors": _errors},
-                                        status=status.HTTP_400_BAD_REQUEST)
+                            "message": "You have not completed all required indicators for this progress report. "
+                                       "Unless your Output status is Met or has No Progress, all indicator data "
+                                       "needs to be completed."
+                        }]
+                        return Response({"errors": _errors}, status=status.HTTP_400_BAD_REQUEST)
                     elif ir.is_number and (vals.get('v', None) in [None, '']):
                         _errors = [{
-                            "message": "You have not completed all required indicators for this progress report. Unless your Output status is Met or has No Progress, all indicator data needs to be completed."}]
-                        return Response({"errors": _errors},
-                                        status=status.HTTP_400_BAD_REQUEST)
+                            "message": "You have not completed all required indicators for this progress report. "
+                                       "Unless your Output status is Met or has No Progress, all indicator "
+                                       "data needs to be completed."
+                        }]
+                        return Response({"errors": _errors}, status=status.HTTP_400_BAD_REQUEST)
 
         # Check if indicator was already submitted or SENT BACK
         if ir.submission_date is None or ir.report_status == INDICATOR_REPORT_STATUS.sent_back:
@@ -364,10 +364,11 @@ class IndicatorDataAPIView(APIView):
             serializer = PDReportContextIndicatorReportSerializer(instance=ir)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            _errors = [
-                {"message": "Indicator was already submitted. Your IMO will need to send it back for you to edit your submission."}]
-            return Response({"errors": _errors},
-                            status=status.HTTP_400_BAD_REQUEST)
+            _errors = [{
+                "message": "Indicator was already submitted. "
+                           "Your IMO will need to send it back for you to edit your submission."
+             }]
+            return Response({"errors": _errors}, status=status.HTTP_400_BAD_REQUEST)
 
     def patch(self, request, ir_id, *args, **kwargs):
         """
@@ -384,8 +385,7 @@ class IndicatorDataAPIView(APIView):
                 return Response(serializer.errors,
                                 status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({"errors": "Indicator Report not found."},
-                        status=status.HTTP_400_BAD_REQUEST)
+        return Response({"errors": "Indicator Report not found."}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PDLowerLevelOutputStatusAPIView(APIView):
@@ -445,8 +445,6 @@ class IndicatorReportListAPIView(APIView):
     """
 
     def get_queryset(self, *args, **kwargs):
-        indicator_reports = None
-
         pks = self.request.query_params.get('pks', None)
         reportable_id = self.kwargs.get('reportable_id', None)
 
@@ -459,8 +457,7 @@ class IndicatorReportListAPIView(APIView):
             indicator_reports = IndicatorReport.objects.filter(id__in=pk_list)
         else:
             reportable = get_object_or_404(Reportable, pk=reportable_id)
-            indicator_reports = reportable.indicator_reports.all().order_by(
-                '-time_period_start')
+            indicator_reports = reportable.indicator_reports.all().order_by('-time_period_start')
 
         if 'limit' in self.request.query_params:
             limit = int(self.request.query_params.get('limit', '2'))
@@ -470,8 +467,7 @@ class IndicatorReportListAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
         indicator_reports = self.get_queryset()
-        serializer = IndicatorReportListSerializer(indicator_reports,
-                                                   many=True)
+        serializer = IndicatorReportListSerializer(indicator_reports, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -564,52 +560,17 @@ class IndicatorLocationDataUpdateAPIView(APIView):
                             status=status.HTTP_400_BAD_REQUEST)
 
 
-class ClusterIndicatorAPIView(APIView):
+class ClusterIndicatorAPIView(CreateAPIView, UpdateAPIView):
     """
     Add and Update Indicator on cluster reporting screen.
     """
 
     serializer_class = ClusterIndicatorSerializer
     permission_classes = (IsAuthenticated, )
-
-    # Naming this to get_serializer_instance in order to avoid colision in
-    # Swagger schema generation
-    def get_serializer_instance(
-            self, data, instance=None, many=False, read_only=False):
-        return self.serializer_class(
-            data=data,
-            instance=instance,
-            many=many,
-            read_only=read_only,
-        )
-
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer_instance(request.data)
-        if not serializer.is_valid():
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
-
-        serializer.save()
-        return Response(
-            ClusterIndicatorDataSerializer(instance=serializer.instance).data,
-            status=status.HTTP_201_CREATED
-        )
+    queryset = Reportable.objects.all()
 
     def get_object(self):
-        return get_object_or_404(Reportable, pk=self.request.data.get("id"))
-
-    def put(self, request, *args, **kwargs):
-        serializer = self.get_serializer_instance(
-            instance=self.get_object(),
-            data=request.data
-        )
-        if not serializer.is_valid():
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
-
-        serializer.save()
-        return Response({'id': serializer.instance.id},
-                        status=status.HTTP_200_OK)
+        return get_object_or_404(self.get_queryset(), pk=self.request.data.get("id"))
 
 
 class IndicatorDataLocationAPIView(ListAPIView):

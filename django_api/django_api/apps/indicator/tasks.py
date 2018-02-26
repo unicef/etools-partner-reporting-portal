@@ -8,22 +8,23 @@ from datetime import datetime, timedelta
 
 OVERDUE_DAYS = 15
 
+
 @shared_task
 def process_due_reports():
     updates = list()
+    today = datetime.now().date()
     print("Create due/overdue indicator reports")
     # Get all open (without submission date) indicator reports
     reports = IndicatorReport.objects.filter(submission_date__isnull=True)
     # Iterate and set proper status
     for report in reports:
         print("Indicator Report: %s" % report.id)
-        due_date = report.due_date or report.time_period_end + \
-                                      timedelta(days=self.OVERDUE_DAYS)
-        if due_date < datetime.now().date() and report.report_status != INDICATOR_REPORT_STATUS.overdue:
+        due_date = report.due_date or report.time_period_end + timedelta(days=OVERDUE_DAYS)
+        if due_date < today and report.report_status != INDICATOR_REPORT_STATUS.overdue:
             report.report_status = INDICATOR_REPORT_STATUS.overdue
             report.save()
             updates.append(['Overdue', report])
-        elif due_date > datetime.now().date() > report.time_period_start and report.report_status != INDICATOR_REPORT_STATUS.due:
+        elif due_date > today > report.time_period_start and report.report_status != INDICATOR_REPORT_STATUS.due:
             report.report_status = INDICATOR_REPORT_STATUS.due
             report.save()
             updates.append(['Due', report])
@@ -32,13 +33,12 @@ def process_due_reports():
     # Iterate and set proper status
     for report in reports:
         print("Progress Report: %s" % report.id)
-        due_date = report.due_date or report.end_date + \
-                                      timedelta(days=self.OVERDUE_DAYS)
-        if due_date < datetime.now().date() and report.status != PROGRESS_REPORT_STATUS.overdue:
+        due_date = report.due_date or report.end_date + timedelta(days=OVERDUE_DAYS)
+        if due_date < today and report.status != PROGRESS_REPORT_STATUS.overdue:
             report.status = PROGRESS_REPORT_STATUS.overdue
             report.save()
             updates.append(['Overdue', report])
-        elif due_date > datetime.now().date() > report.start_date and report.status != PROGRESS_REPORT_STATUS.due:
+        elif due_date > today > report.start_date and report.status != PROGRESS_REPORT_STATUS.due:
             report.status = PROGRESS_REPORT_STATUS.due
             report.save()
             updates.append(['Due', report])

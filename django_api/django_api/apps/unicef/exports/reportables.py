@@ -1,11 +1,15 @@
 import logging
 
+from babel.numbers import format_percent
 from django.utils import timezone
 from openpyxl.utils import get_column_letter
+from django.utils.translation import to_locale, get_language
 
 from indicator.models import Disaggregation
+from indicator.utilities import format_total_value_to_string
 from unicef.exports.annex_c_excel import ProgressReportsXLSXExporter
 from unicef.exports.progress_reports import ProgressReportDetailPDFExporter
+from unicef.exports.utilities import HTMLTableCell, HTMLTableHeader
 
 logger = logging.getLogger(__name__)
 
@@ -13,6 +17,7 @@ logger = logging.getLogger(__name__)
 class ReportableListXLSXExporter(ProgressReportsXLSXExporter):
 
     include_disaggregations = True
+    export_to_single_sheet = True
 
     def __init__(self, reportables, **kwargs):
         self.reportables = reportables
@@ -32,8 +37,10 @@ class ReportableListXLSXExporter(ProgressReportsXLSXExporter):
         disaggregation_column_map = self.write_disaggregation_headers_get_column_map()
 
         for reportable in reportables:
+            reports = reportable.indicator_reports.order_by('-time_period_start')[:2]
+
             current_row = self.write_indicator_reports_to_current_sheet(
-                current_row, reportable.indicator_reports.all(), disaggregation_column_map
+                current_row, reports, disaggregation_column_map
             )
 
         for column, width in enumerate(self.column_widths):
@@ -67,14 +74,86 @@ class ReportableListPDFExporter(ProgressReportDetailPDFExporter):
             timezone.now()
         )
         self.file_name = self.display_name + '.pdf'
+        self.locale = to_locale(get_language())
+
+    def get_reportable_header_table(self, reportable):
+        return [
+            [
+                HTMLTableHeader(reportable.blueprint.title, colspan=3, klass='section'),
+            ],
+            [
+                HTMLTableHeader('Calculation method'),
+                HTMLTableCell(reportable.blueprint.display_type, colspan=2),
+            ],
+            [
+                HTMLTableHeader('Baseline'),
+                HTMLTableCell(reportable.baseline, colspan=2),
+            ],
+            [
+                HTMLTableHeader('Target'),
+                HTMLTableCell(reportable.target, colspan=2),
+            ],
+            [
+                HTMLTableHeader('Current Progress'),
+                HTMLTableCell(format_percent(reportable.progress_percentage, locale=self.locale), colspan=2),
+            ],
+        ]
+
+    def get_current_previous_location_data_table(self, current_data):
+        previous_data = current_data.previous_location_data
+        current_location_progress = format_total_value_to_string(
+            current_data.disaggregation.get('()'),
+            is_percentage=current_data.indicator_report.is_percentage
+        )
+        previous_location_progress = format_total_value_to_string(
+            previous_data.disaggregation.get('()'),
+            is_percentage=previous_data.indicator_report.is_percentage
+        ) if previous_data else ''
+
+        previous_time_period = previous_data.indicator_report.display_time_period if previous_data else ''
+        previous_submission_date = previous_data.indicator_report.submission_date if previous_data else ''
+
+        return [
+            [
+                HTMLTableHeader(current_data.location.title, colspan=3, klass='subsection'),
+            ],
+            [
+                HTMLTableHeader('Reporting period'),
+                HTMLTableHeader('Current {}'.format(current_data.indicator_report.display_time_period)),
+                HTMLTableHeader('Previous {}'.format(previous_time_period)),
+            ],
+            [
+                HTMLTableHeader('Total Progress'),
+                HTMLTableCell(current_location_progress),
+                HTMLTableCell(previous_location_progress),
+            ],
+            [
+                HTMLTableHeader('Report submitted'),
+                HTMLTableCell(current_data.indicator_report.submission_date),
+                HTMLTableCell(previous_submission_date),
+            ],
+        ]
 
     def get_context(self):
         section_list = []
 
         for reportable in self.reportables:
+            tables = [
+                self.get_reportable_header_table(reportable)
+            ]
+
+            current_indicator_report = reportable.indicator_reports.order_by('-time_period_start').first()
+
+            if not current_indicator_report:
+                continue
+
+            for location_data in current_indicator_report.indicator_location_data.all():
+                tables.append(self.get_current_previous_location_data_table(
+                    location_data
+                ))
+
             section_data = {
-                'reportable': reportable,
-                'tables': self.create_tables_for_indicator_reports(reportable.indicator_reports.all())
+                'tables': tables
             }
 
             section_list.append(section_data)

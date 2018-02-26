@@ -233,11 +233,15 @@ class PartnerActivity(TimeStampedModel):
 
     @property
     def clusters(self):
-        return self.projects.clusters.all()
+        return self.project.clusters.all()
 
     @property
     def response_plan(self):
         return self.project.clusters.all()[0].response_plan
+
+    @property
+    def is_custom(self):
+        return self.cluster_activity is None
 
     def __str__(self):
         return self.title

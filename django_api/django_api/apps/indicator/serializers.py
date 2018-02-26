@@ -63,14 +63,15 @@ class DisaggregationListSerializer(serializers.ModelSerializer):
             'choices',
         )
 
+
 class IdDisaggregationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Disaggregation
         fields = ('id',)
 
+
 class IndicatorBlueprintSimpleSerializer(serializers.ModelSerializer):
-    # id added explicitely here since it gets stripped out from validated_dat
-    # as its read_only.
+    # id added explicitly here since it gets stripped out from validated_data as its read_only.
     # https://stackoverflow.com/questions/36473795/django-rest-framework-model-id-field-in-nested-relationship-serializer
     id = serializers.IntegerField()
 
@@ -78,7 +79,6 @@ class IndicatorBlueprintSimpleSerializer(serializers.ModelSerializer):
         model = IndicatorBlueprint
         fields = (
             'id',
-            # 'indicator_id',
             'title',
             'unit',
             'display_type',
@@ -168,6 +168,7 @@ class IndicatorListSerializer(ReportableSimpleSerializer):
         model = Reportable
         fields = ReportableSimpleSerializer.Meta.fields + (
             'means_of_verification',
+            'cs_dates',
             'frequency',
             'pd_id',
             'disaggregations',
@@ -504,6 +505,7 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
             'indicator_location_data',
             'time_period_start',
             'time_period_end',
+            'due_date',
             'display_type',
             'submission_date',
             'total',
@@ -649,7 +651,7 @@ class IndicatorBlueprintSerializer(serializers.ModelSerializer):
 class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
     disaggregations = IdDisaggregationSerializer(many=True, read_only=True)
-    object_type = serializers.CharField(validators=[add_indicator_object_type_validator])
+    object_type = serializers.CharField(validators=[add_indicator_object_type_validator], write_only=True)
     blueprint = IndicatorBlueprintSerializer()
     locations = IdLocationSerializer(many=True, read_only=True)
     target = serializers.CharField(required=False)
@@ -671,9 +673,6 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             'baseline',
             'in_need',
         )
-
-    def get_object_type(self, obj):
-        return '.'.join(obj.content_type.natural_key())
 
     def check_locations_merge_to_list(self, locations):
         if isinstance(locations, dict) and 'id' in locations:
@@ -995,6 +994,7 @@ class PMPDisaggregationSerializer(serializers.ModelSerializer):
             'active',
         )
 
+
 class PMPDisaggregationValueSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='external_id')
     disaggregation = serializers.PrimaryKeyRelatedField(queryset=Disaggregation.objects.all())
@@ -1038,6 +1038,7 @@ class PMPReportableSerializer(serializers.ModelSerializer):
             'start_date',
             'end_date'
         )
+
 
 class ClusterPartnerAnalysisIndicatorResultSerializer(serializers.ModelSerializer):
     blueprint = IndicatorBlueprintSimpleSerializer()

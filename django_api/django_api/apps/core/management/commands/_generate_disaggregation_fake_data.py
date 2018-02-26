@@ -26,7 +26,6 @@ from core.factories import (
     LocationFactory,
     QuantityIndicatorReportFactory,
     RatioIndicatorReportFactory,
-    QuantityReportableToClusterObjectiveFactory,
     DisaggregationFactory,
     DisaggregationValueFactory,
 )
@@ -38,14 +37,13 @@ def generate_0_num_disagg_data(reportable, indicator_type="quantity"):
     if reportable.locations.count() == 0:
         table = CartoDBTable.objects.first()
 
-        l = LocationFactory(
+        location = LocationFactory(
             gateway=table.location_type,
             carto_db_table=table,
         )
-        reportable.locations.add(l)
+        reportable.locations.add(location)
 
     location = reportable.locations.first()
-    disagg_idx = 0
 
     for idx, indicator_report_from_reportable in enumerate(
             reportable.indicator_reports.all()):
@@ -68,7 +66,7 @@ def generate_0_num_disagg_data(reportable, indicator_type="quantity"):
             }
 
         # 0 num_disaggregation & 0 level_reported
-        location_data = IndicatorLocationDataFactory(
+        IndicatorLocationDataFactory(
             indicator_report=indicator_report_from_reportable,
             location=location,
             num_disaggregation=0,
@@ -419,8 +417,6 @@ def add_disaggregations_to_reportable(reportable, disaggregation_targets):
 
 def generate_indicator_report_location_disaggregation_quantity_data():
     # Adding extra IndicatorReport to each QuantityReportable object
-    locations = Location.objects.all()
-
     sample_disaggregation_value_map = {
         "height": ["tall", "medium", "short", "extrashort"],
         "age": ["1-2m", "3-4m", "5-6m", '7-10m', '11-13m', '14-16m'],
@@ -463,7 +459,10 @@ def generate_indicator_report_location_disaggregation_quantity_data():
         # -- 0 num_disaggregation generation for 3 entries --
         if idx % 8 == 0:
             print(
-                "NO Disaggregation (and DisaggregationValue) objects for QuantityReportable object {} created".format(idx))
+                "NO Disaggregation (and DisaggregationValue) objects for QuantityReportable object {} created".format(
+                    idx
+                )
+            )
 
         # -- 1 num_disaggregation generation for 3 entries --
         elif idx % 8 == 1:
@@ -557,7 +556,9 @@ def generate_indicator_report_location_disaggregation_quantity_data():
                     reportable.locations.add(
                         Location.objects.get(id=location_id))
 
-        print("IndicatorReport and its Disaggregation data entries for QuantityReportable object {} created".format(idx))
+        print(
+            "IndicatorReport and its Disaggregation data entries for QuantityReportable object {} created".format(idx)
+        )
 
     # Making the rest of IndicatorReport objects not latest so that
     # IndicatorReport objects with location data are guaranteed to show up
@@ -577,15 +578,6 @@ def generate_indicator_report_location_disaggregation_quantity_data():
 
 def generate_indicator_report_location_disaggregation_ratio_data():
     # Adding extra IndicatorReport to each QuantityReportable object
-    locations = Location.objects.all()
-
-    # sample_disaggregation_value_map = {
-    #     "height": ["tall", "medium", "short", "extrashort"],
-    #     "age": ["1-2m", "3-4m", "5-6m", '7-10m', '11-13m', '14-16m'],
-    #     "gender": ["male", "female", "other"],
-    # }
-
-    idx_offset = 20
 
     queryset = Reportable.objects.filter(
         blueprint__unit=IndicatorBlueprint.PERCENTAGE).order_by('id')
