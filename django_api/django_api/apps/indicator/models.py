@@ -516,6 +516,10 @@ def recalculate_reportable_total(sender, instance, **kwargs):
                             (ir_count * 1.0)
                         reportable_total['c'] = reportable_total['c'] / \
                             (ir_count * 1.0)
+                
+                elif blueprint.calculation_formula_across_periods == IndicatorBlueprint.SUM \
+                    and reportable_total['c'] == 0:
+                    reportable_total['c'] = reportable_total['v']
 
         # if unit is PERCENTAGE, doesn't matter if calc choice was percent or
         # ratio

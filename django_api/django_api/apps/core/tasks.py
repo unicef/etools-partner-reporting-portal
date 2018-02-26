@@ -1,4 +1,6 @@
+import random
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 
 from celery import shared_task
 from django.db import transaction
@@ -68,8 +70,7 @@ def process_period_reports():
         print(10*"****")
 
         reportable_queryset = pd.reportable_queryset
-        latest_progress_report = pd.progress_reports.order_by(
-            'end_date').last()
+        latest_progress_report = pd.progress_reports.order_by('report_type', 'report_number', 'is_final', 'end_date').last()
 
         generate_from_date = None
 
@@ -80,7 +81,7 @@ def process_period_reports():
         print("Last report: %s" % generate_from_date)
 
         with transaction.atomic():
-            for reporting_period in pd.reporting_periods.all():
+            for idx, reporting_period in enumerate(pd.reporting_periods.all()):
                 # If PR start date is greater than now, skip!
                 if reporting_period.start_date > datetime.now().date():
                     print("No new reports to generate")
@@ -98,11 +99,28 @@ def process_period_reports():
                 # Create ProgressReport first
                 print(
                     "Creating ProgressReport for {} - {}".format(start_date, end_date))
+
+                if latest_progress_report:
+                    report_type = latest_progress_report.report_type
+                    report_number = latest_progress_report.report_number + 1
+
+                    if idx == pd.reporting_periods.count() - 1:
+                        is_final = True
+                    else:
+                        is_final = False
+                else:
+                    report_number = 1
+                    report_type = "QPR"
+                    is_final = False
+             
                 next_progress_report = ProgressReportFactory(
                     start_date=start_date,
                     end_date=end_date,
                     due_date=due_date,
                     programme_document=pd,
+                    report_type=report_type,
+                    report_number=report_number,
+                    is_final=is_final,
                 )
 
                 for reportable in reportable_queryset:
@@ -115,6 +133,11 @@ def process_period_reports():
                             time_period_start=start_date,
                             time_period_end=end_date,
                             due_date=due_date,
+                            title=reportable.blueprint.title,
+                            total={'c': 0, 'd': 0, 'v': 0},
+                            overall_status="NoS",
+                            report_status="Due",
+                            submission_date=None,
                         )
 
                         for location in reportable.locations.all():
@@ -141,6 +164,11 @@ def process_period_reports():
                             time_period_start=start_date,
                             time_period_end=end_date,
                             due_date=due_date,
+                            title=reportable.blueprint.title,
+                            total={'c': 0, 'd': 0, 'v': 0},
+                            overall_status="NoS",
+                            report_status="Due",
+                            submission_date=None,
                         )
 
                         for location in reportable.locations.all():
@@ -239,6 +267,12 @@ def process_period_reports():
                         reportable=indicator,
                         time_period_start=start_date,
                         time_period_end=end_date,
+                        due_date=end_date + relativedelta(days=random.randint(2, 15)),
+                        title=reportable.blueprint.title,
+                        total={'c': 0, 'd': 0, 'v': 0},
+                        overall_status="NoS",
+                        report_status="Due",
+                        submission_date=None,
                     )
 
                     for location in indicator.locations.all():
@@ -266,6 +300,12 @@ def process_period_reports():
                         reportable=indicator,
                         time_period_start=start_date,
                         time_period_end=end_date,
+                        due_date=end_date + relativedelta(days=random.randint(2, 15)),
+                        title=reportable.blueprint.title,
+                        total={'c': 0, 'd': 0, 'v': 0},
+                        overall_status="NoS",
+                        report_status="Due",
+                        submission_date=None,
                     )
 
                     for location in indicator.locations.all():
