@@ -13,10 +13,10 @@
         display: block;
       }
       div#action {
-          margin: 25px 0;
-          @apply(--layout-horizontal);
-          @apply(--layout-end-justified);
-        }
+        margin: 25px 0;
+        @apply(--layout-horizontal);
+        @apply(--layout-end-justified);
+      }
     </style>
 
     <etools-prp-permissions
@@ -26,22 +26,21 @@
     <page-body>
       <template
         is="dom-if"
-        if="[[_canAddProject(permissions, responsePlanCurrent)]]"
+        if="[[_canEditProject(permissions, responsePlanCurrent)]]"
         restamp="true">
         <div id="action">
           <paper-button id="edit" on-tap="_openModal" class="btn-primary" raised>
             Edit Project
           </paper-button>
         </div>
+        <planned-action-projects-modal
+          id="modal"
+          edit-data=[[projectData]]
+          edit>
+        </planned-action-projects-modal>
       </template>
 
       <project-details-display project-data=[[projectData]]></project-details-display>
-
-      <planned-action-projects-modal
-        id="modal"
-        edit-data=[[projectData]]
-        edit>
-      </planned-action-projects-modal>
     </page-body>
   </template>
 
@@ -66,7 +65,7 @@
         this.$$('#modal').open();
       },
 
-      _canAddProject: function(permissions, responsePlanCurrent) {
+      _canEditProject: function(permissions, responsePlanCurrent) {
         if (responsePlanCurrent) {
           return permissions.createPartnerEntitiesByResponsePlanAsIMO(responsePlanCurrent.clusters);
         }

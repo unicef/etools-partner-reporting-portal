@@ -15,6 +15,7 @@
 <link rel="import" href="../../../../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../../../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html">
+<link rel="import" href="../../../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html">
 
 <link rel="import" href="../../../../polyfills/es6-shim.html">
 <link rel="import" href="../../../../endpoints.html">
@@ -24,7 +25,9 @@
 <link rel="import" href="../../../../styles/buttons.html">
 <link rel="import" href="../../../../styles/modal.html">
 <link rel="import" href="../../../etools-prp-ajax.html">
+<link rel="import" href="../../../etools-prp-permissions.html">
 <link rel="import" href="../../../etools-prp-date-input.html">
+<link rel="import" href="../../../form-fields/partner-dropdown-content.html">
 
 <dom-module id="planned-action-activity-modal">
   <template>
@@ -76,10 +79,15 @@
       }
     </style>
 
+    <etools-prp-permissions
+      permissions="{{permissions}}">
+    </etools-prp-permissions>
+
     <etools-prp-ajax
         id="activity"
         url="[[activityUrl]]"
         method="post"
+        body="[[data]]"
         content-type="application/json">
     </etools-prp-ajax>
 
@@ -106,6 +114,11 @@
         url="[[objectivesUrl]]">
     </etools-prp-ajax>
 
+    <partner-dropdown-content
+      partners="{{partners}}"
+      clusters="[[imoClusters]]">
+    </partner-dropdown-content>
+
     <paper-dialog
         id="dialog"
         with-backdrop
@@ -121,13 +134,29 @@
       </div>
 
       <paper-dialog-scrollable>
+        <template
+          is="dom-if"
+          if="[[_displayPartner(permissions)]]"
+          restamp="true">
+          <etools-single-selection-menu
+            class="item validate full-width"
+            label="Partner"
+            options="[[partners]]"
+            option-value="id"
+            option-label="title"
+            selected="{{selectedPartner}}"
+            on-iron-activate="_validate"
+            trigger-value-change-event
+            required>
+          </etools-single-selection-menu>
+        </template>
+        
         <paper-radio-group
             id="mode"
             selected="{{mode}}">
           <paper-radio-button name="cluster">
             <strong>Add from Cluster Activities</strong>
           </paper-radio-button>
-
           <div
               class="fields"
               empty$="[[!_equals(mode, 'cluster')]]">
@@ -470,6 +499,11 @@
           },
         },
 
+        selectedPartner: {
+          type: String,
+          value: '',
+        },
+
         objectivesUrl: {
           type: String,
           computed: '_computeObjectivesUrl(responsePlanId)',
@@ -477,8 +511,24 @@
 
         partner: {
           type: Object,
+          computed: '_computePartner(storePartner, selectedPartner)'
+        },
+
+        storePartner: {
+          type: Object,
           statePath: 'partner.current',
         },
+
+        profile: {
+          type: Object,
+          statePath: 'userProfile.profile',
+        },
+
+        imoClusters: {
+          type: Array,
+          computed: '_computeImoClusters(profile)',
+        },
+        
       },
 
       listeners: {
@@ -486,17 +536,23 @@
       },
 
       observers: [
-        '_fetchProjects(partner.id)',
+        '_fetchProjects(partner)',
         '_fetchActivities(data.cluster.cluster)',
         '_fetchObjectives(data.custom.cluster)',
       ],
+
+      _computeImoClusters: function (profile) {
+        // if user is not imo admin this should give empty array so no filtering by cluster
+        return profile.imo_clusters.map(function(cluster) {
+          return cluster.id
+        }) || [];
+      },
 
       _setDefaults: function () {
         this.set('data', {
           cluster: {},
           custom: {},
         });
-
         this.set('activities', []);
         this.set('objectives', []);
       },
@@ -513,6 +569,14 @@
 
       _validate: function (e) {
         e.target.validate();
+      },
+
+      _computePartner: function(storePartner, selectedPartner) {
+        return storePartner.id || selectedPartner || undefined;
+      },
+
+      _displayPartner: function (permissions) {
+        return permissions.addPartnerToProject;
       },
 
       _computeActivityUrl: function (responsePlanId, mode) {
@@ -621,7 +685,7 @@
         this.set('updatePending', true);
 
         this.$.activity.body = Object.assign({
-          partner: this.partner.id,
+          partner: this.partner,
         }, this.data[this.mode]);
         this.$.activity.thunk()()
             .then(function (res) {

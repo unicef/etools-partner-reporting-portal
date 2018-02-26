@@ -12,6 +12,7 @@
 <link rel="import" href="../../../../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
 <link rel="import" href="../../../../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../../../../../bower_components/etools-searchable-multiselection-menu/etools-multi-selection-menu.html">
+<link rel="import" href="../../../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html">
 
 <link rel="import" href="../../../etools-prp-ajax.html">
 <link rel="import" href="../../../../elements/etools-prp-permissions.html">
@@ -24,6 +25,7 @@
 <link rel="import" href="../../../../redux/store.html">
 <link rel="import" href="../../../../redux/actions.html">
 <link rel="import" href="../../../../styles/buttons.html">
+<link rel="import" href="../../../labelled-item.html">
 
 <dom-module id="planned-action-projects-modal">
   <template>
@@ -59,7 +61,6 @@
 
       .header h2 {
         @apply(--paper-font-title);
-
         margin: 0;
         line-height: 48px;
       }
@@ -118,7 +119,7 @@
 
             <template
               is="dom-if"
-              if="[[_displayPartner(permissions)]]"
+              if="[[_displayPartner(permissions, edit)]]"
               restamp="true">
               <etools-single-selection-menu
                 class="item validate full-width"
@@ -133,6 +134,15 @@
               </etools-single-selection-menu>
             </template>
 
+            <template
+              is="dom-if"
+              if="[[_displayPartner(permissions, edit)]]"
+              restamp="true">
+              <labelled-item class="item full-width" label="Partner">
+                <span>[[data.partner]]</span>
+              </labelled-item>
+            </template>
+
             <paper-input
               class="item validate full-width"
               id="title"
@@ -145,24 +155,24 @@
 
             <div class="row">
               <etools-multi-selection-menu
-                  class="validate"
-                  label="Clusters"
-                  options="[[formattedClusters]]"
-                  selected-values="{{selectedClusters}}"
-                  on-selected-values-changed="_validate"
-                  trigger-value-change-event
+                class="validate"
+                label="Clusters"
+                options="[[formattedClusters]]"
+                selected-values="{{selectedClusters}}"
+                on-selected-values-changed="_validate"
+                trigger-value-change-event
                   required>
               </etools-multi-selection-menu>
             </div>
 
             <div class="item">
-               <etools-prp-date-input
-                  class="start-date"
-                  label="Start date"
-                  value="{{data.start_date}}"
-                  error-message=""
-                  required
-                  no-init>
+              <etools-prp-date-input
+                class="start-date"
+                label="Start date"
+                value="{{data.start_date}}"
+                error-message=""
+                required
+                no-init>
                </etools-prp-date-input>
               </etools-date-input>
             </div>
@@ -294,7 +304,7 @@
 
         url: {
           type: String,
-          computed: '_computeUrl(responsePlanID, selectedPartner)'
+          computed: '_computeUrl(responsePlanID, selectedPartner, data, edit)'
         },
 
         clusters: {
@@ -357,10 +367,18 @@
         '_savePartner(selectedPartner)',
       ],
 
-      _computeUrl: function(responsePlanID, selectedPartner) {
-        return this.permissions.addPartnerToProject
-          ? App.Endpoints.plannedActionsIMO(responsePlanID, selectedPartner)
-          : App.Endpoints.plannedActions(responsePlanID);
+      _computeUrl: function(responsePlanID, selectedPartner, data, edit) {
+        if (edit) {
+          if (this.permissions.addPartnerToProject) {
+            var partnerId = data.partner_id;
+            return App.Endpoints.plannedActionsIMOEdit(responsePlanID, partnerId, data.id)
+          }
+          return App.Endpoints.plannedActionsProjectOverview(data.id);
+        } else {
+          return this.permissions.addPartnerToProject
+            ? App.Endpoints.plannedActionsIMO(responsePlanID, selectedPartner)
+            : App.Endpoints.plannedActions(responsePlanID);
+        }
       },
 
       close: function () {
@@ -372,8 +390,8 @@
       open: function () {
         if (this.edit && this.editData) {
           this.set('data', Object.assign({}, this.editData));
-          this.selectedClusters = this.editData.clusters.map(function(item) {
-            return item.id;
+          this.selectedClusters = this.editData.clusters.map(function(cluster) {
+            return cluster.id;
           });
         } else {
           this.data = {};
@@ -402,8 +420,8 @@
         this.set('data.partner', partner);
       },
 
-      _displayPartner: function (permissions) {
-        return permissions.addPartnerToProject;
+      _displayPartner: function (permissions, edit) {
+        return permissions.addPartnerToProject && !edit;
       },
 
       _validate: function (e) {
@@ -439,7 +457,6 @@
         if (!valid) {
           return;
         }
-
         this.data.clusters = this.selectedClusters.map(function(item) {
           return {id: Number(item)};
         });
@@ -447,14 +464,13 @@
         if (!this.data.partner) {
           this.data.partner = this.partnerID;
         }
-
         this.updatePending = true;
-        debugger
         var thunk = this.$.projectAjax.thunk();
         thunk()
           .then(function (res) {
             self.updatePending = false;
             if (self.edit) {
+              self.fire('project-edited', res.data);
               self.close();
             } else {
               self._redirectToDetail(res.data.id);
