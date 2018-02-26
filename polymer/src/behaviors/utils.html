@@ -181,6 +181,10 @@
       _appendQuery: function (url) {
         return url + '?' + buildQuery([].slice.call(arguments, 1));
       },
+
+      _identity: function (arg) {
+        return arg;
+      },
     };
 
     function buildQuery(chunks) {

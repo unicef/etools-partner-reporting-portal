@@ -4,6 +4,7 @@
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
 <link rel="import" href="../redux/store.html">
+<link rel="import" href="../behaviors/utils.html">
 <link rel="import" href="../styles/buttons.html">
 
 <dom-module id="etools-prp-toolbar">
@@ -35,6 +36,7 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.UtilsBehavior,
       ],
 
       properties: {
@@ -43,27 +45,49 @@
           notify: true,
         },
 
-        responsePlanId: {
+        _responsePlanId: {
           type: String,
           statePath: 'responsePlans.currentID',
+        },
+
+        _locationId: {
+          type: String,
+          statePath: 'location.id',
+        },
+
+        _pdId: {
+          type: String,
+          statePath: 'programmeDocuments.current',
+        },
+
+        _reportId: {
+          type: String,
+          statePath: 'programmeDocumentReports.current.id',
+        },
+
+        // Redux-connected properties can't/shouldn't be 2-way bound:
+
+        responsePlanId: {
+          type: String,
+          computed: '_identity(_responsePlanId)',
           notify: true,
         },
 
         locationId: {
           type: String,
-          statePath: 'location.id',
+          computed: '_identity(_locationId)',
           notify: true,
         },
 
         pdId: {
           type: String,
-          statePath: 'programmeDocuments.current',
+          computed: '_identity(_pdId)',
           notify: true,
         },
 
         reportId: {
           type: String,
-          statePath: 'programmeDocumentReports.current.id',
+          computed: '_identity(_reportId)',
           notify: true,
         },
       },
