@@ -1,6 +1,7 @@
 dependencies:
   pre:
     - pip install -r django_api/requirements/dev.txt
+    - npm install -g npm
     - npm install -g bower polymer-cli gulp-cli --no-optional
 
 test:
