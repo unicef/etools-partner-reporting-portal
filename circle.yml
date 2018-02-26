@@ -8,4 +8,4 @@ test:
 # TODO: Enable django tests
 #    - cd backend && python manage.py test --noinput
     - cd django_api && flake8
-    - cd polymer && npm install && npm run test
+    - cd polymer && npm install --no-optional && npm run bundle
