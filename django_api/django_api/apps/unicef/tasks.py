@@ -138,9 +138,13 @@ def process_programme_documents(fast=False, area=False):
                         if not partner_data['name']:
                             print("No partner name - skipping!")
                             continue
-                        partner = process_model(
-                            Partner, PMPPDPartnerSerializer, partner_data, {
-                                'vendor_number': partner_data['unicef_vendor_number']})
+
+                        try:
+                            partner = process_model(
+                                Partner, PMPPDPartnerSerializer, partner_data, {
+                                    'vendor_number': partner_data['unicef_vendor_number']})
+                        except ValidationError:
+                            logger.exception('Error trying to save Partner model with {}'.format(partner_data))
 
                         # Assign partner
                         item['partner'] = partner.id
@@ -162,10 +166,15 @@ def process_programme_documents(fast=False, area=False):
 
                         # Create PD
                         item['status'] = item['status'].title()[:3]
-                        pd = process_model(
-                            ProgrammeDocument, PMPProgrammeDocumentSerializer, item,
-                            {'external_id': item['id'], 'workspace': workspace}
-                        )
+
+                        try:
+                            pd = process_model(
+                                ProgrammeDocument, PMPProgrammeDocumentSerializer, item,
+                                {'external_id': item['id'], 'workspace': workspace}
+                            )
+                        except ValidationError:
+                            logger.exception('Error trying to save ProgrammeDocument model with {}'.format(item))
+                            continue
 
                         # Create unicef_focal_points
                         person_data_list = item['unicef_focal_points']
