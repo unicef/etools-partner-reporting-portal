@@ -83,7 +83,7 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
         try:
             for cluster in self.request.data['clusters']:
                 instance.clusters.add(int(cluster['id']))
-        except Exception as exp:
+        except Exception:
             # TODO log
             errors.append({"clusters": "list of dict ids fail."})
 
