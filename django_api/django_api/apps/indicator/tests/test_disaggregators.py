@@ -1,13 +1,6 @@
-from itertools import combinations
-
 from core.tests.base import BaseAPITestCase
-from core.helpers import (
-    generate_data_combination_entries,
-    get_cast_dictionary_keys_as_tuple,
-    get_cast_dictionary_keys_as_string,
-)
 
-from indicator.models import Reportable, IndicatorReport, IndicatorBlueprint
+from indicator.models import Reportable, IndicatorBlueprint
 from indicator.disaggregators import (
     QuantityIndicatorDisaggregator,
     RatioIndicatorDisaggregator
@@ -154,7 +147,6 @@ class TestRatioIndicatorDisaggregator(BaseAPITestCase):
         indicator_report = indicator.indicator_reports.first()
         v_total = 0
         d_total = 0
-        ratio_value = 0
 
         for loc_data in indicator_report.indicator_location_data.all():
             RatioIndicatorDisaggregator.post_process(loc_data)
@@ -177,7 +169,6 @@ class TestRatioIndicatorDisaggregator(BaseAPITestCase):
         indicator_report = indicator.indicator_reports.first()
         v_total = 0
         d_total = 0
-        ratio_value = 0
 
         for loc_data in indicator_report.indicator_location_data.all():
             RatioIndicatorDisaggregator.post_process(loc_data)

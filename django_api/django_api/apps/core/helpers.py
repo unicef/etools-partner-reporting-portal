@@ -11,7 +11,6 @@ from itertools import combinations, product
 
 from core.common import (
     PD_FREQUENCY_LEVEL,
-    REPORTABLE_FREQUENCY_LEVEL,
 )
 
 
@@ -52,7 +51,7 @@ def generate_data_combination_entries(
     else:
         output = {}
 
-    for idx in xrange(r):
+    for idx in range(r):
         id_pairs = []
 
         if idx == 0:

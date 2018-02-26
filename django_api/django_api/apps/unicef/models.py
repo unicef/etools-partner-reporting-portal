@@ -1,12 +1,10 @@
 from __future__ import unicode_literals
-from decimal import Decimal
 from datetime import date
 import logging
 
 from django.db import models
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
-from django.contrib.postgres.fields import ArrayField
 from django.utils.functional import cached_property
 
 from model_utils.models import TimeStampedModel

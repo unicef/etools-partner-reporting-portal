@@ -454,16 +454,24 @@ class IndicatorsXLSXExporter:
                     else:
                         # Total has None value as a type
                         if sheet.cell(column=column, row=4).value is None:
-                            merged_sheet.cell(column=self.disaggregations_start_column + len(merged_disaggregations) + len(merged_disaggregation_values),
-                                              row=merged_row).value = sheet.cell(column=column, row=sheet_row).value
+                            col = self.disaggregations_start_column + \
+                                  len(merged_disaggregations) + \
+                                  len(merged_disaggregation_values)
+                            merged_sheet.cell(
+                                column=col, row=merged_row
+                            ).value = sheet.cell(column=column, row=sheet_row).value
                         # If column is disaggregation type
                         elif sheet.cell(column=column, row=4).value.find("#indicator+type+") > -1:
-                            merged_sheet.cell(column=merged_disaggregations_map[sheet.cell(
-                                column=column, row=2).value], row=merged_row).value = sheet.cell(column=column, row=sheet_row).value
+                            merged_sheet.cell(
+                                column=merged_disaggregations_map[sheet.cell(column=column, row=2).value],
+                                row=merged_row
+                            ).value = sheet.cell(column=column, row=sheet_row).value
                         # If column is disaggregation value
                         elif sheet.cell(column=column, row=4).value.find("#indicator+value+") > -1:
-                            merged_sheet.cell(column=merged_disaggregation_values_map[sheet.cell(
-                                column=column, row=2).value], row=merged_row).value = sheet.cell(column=column, row=sheet_row).value
+                            merged_sheet.cell(
+                                column=merged_disaggregation_values_map[sheet.cell(column=column, row=2).value],
+                                row=merged_row
+                            ).value = sheet.cell(column=column, row=sheet_row).value
 
                 merged_row += 1
                 sheet_row += 1
