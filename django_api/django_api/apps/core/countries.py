@@ -211,6 +211,7 @@ COUNTRIES_ALPHA2_CODE = (
     ('ZA', 'South Africa'),
     ('GS', 'South Georgia and the South Sandwich Islands'),
     ('SS', 'South Sudan'),
+    ('SS', 'South Sudan Pound'),
     ('ES', 'Spain'),
     ('LK', 'Sri Lanka'),
     ('SD', 'Sudan'),
