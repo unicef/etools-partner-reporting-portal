@@ -26,7 +26,7 @@
     <page-body>
       <template
         is="dom-if"
-        if="[[_canEditProject(permissions, responsePlanCurrent)]]"
+        if="[[_canEditProject(permissions, projectData.clusters)]]"
         restamp="true">
         <div id="action">
           <paper-button id="edit" on-tap="_openModal" class="btn-primary" raised>
@@ -65,9 +65,9 @@
         this.$$('#modal').open();
       },
 
-      _canEditProject: function(permissions, responsePlanCurrent) {
-        if (responsePlanCurrent) {
-          return permissions.createPartnerEntitiesByResponsePlanAsIMO(responsePlanCurrent.clusters);
+      _canEditProject: function(permissions, projectClusters) {
+        if (projectClusters) {
+          return permissions.editPartnerEntitiesAsIMO(projectClusters);
         }
       },
     });
