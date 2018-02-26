@@ -2,14 +2,14 @@
 
 <link rel="import" href="../behaviors/utils.html">
 
-<dom-module id="print-test">
+<dom-module id="etools-prp-printer">
   <template>
     <content select=".print-btn"></content>
   </template>
 
   <script>
     Polymer({
-      is: 'print-test',
+      is: 'etools-prp-printer',
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
@@ -32,15 +32,15 @@
         style.innerHTML = 'body { color: #212121; font: 14px/1.5 Roboto, Noto, sans-serif; }';
 
         if (this.printWindow) {
-          this.printWindow.close();
+          return this.printWindow.focus();
         }
 
-        this.printWindow = window.open('', '', [
+        this.set('printWindow', window.open('', '', [
           'width=640',
           'height=480',
           'left=0',
           'top=0',
-        ].join());
+        ].join()));
 
         this.printWindow.document.head.appendChild(style);
 
@@ -48,10 +48,11 @@
           this.printWindow.document.body.appendChild(this._cloneNode(node));
         }, this);
 
-        setTimeout(function () {
+        this.async(function () {
           this.printWindow.print();
           this.printWindow.close();
-        }.bind(this), 100);
+          this.set('printWindow', null);
+        }, 100);
       },
     });
   </script>
