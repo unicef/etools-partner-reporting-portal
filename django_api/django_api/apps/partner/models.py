@@ -12,7 +12,8 @@ from core.common import (
     SHARED_PARTNER_TYPE,
     CSO_TYPES,
     PARTNER_PROJECT_STATUS,
-    CURRENCIES, EXTERNAL_DATA_SOURCES)
+    EXTERNAL_DATA_SOURCES,
+)
 from core.models import TimeStampedExternalSyncModelMixin
 
 from core.countries import COUNTRIES_ALPHA2_CODE_DICT, COUNTRIES_ALPHA2_CODE

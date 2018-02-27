@@ -95,6 +95,7 @@ INSTALLED_APPS = [
     'indicator',
     'partner',
     'unicef',
+    'ocha',
 ]
 
 MIDDLEWARE_CLASSES = [
