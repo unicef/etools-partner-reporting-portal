@@ -691,10 +691,25 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 {"disaggregations": "List of dict disaggregation expected"}
             )
 
+    def check_progress_values(self, validated_data):
+        """
+        Validates baseline, target, in-need
+        """
+        if validated_data['baseline'] > validated_data['target']:
+            raise ValidationError(
+                {"baseline": "Baseline cannot be greater than target"}
+            )
+
+        if validated_data['target'] > validated_data['in_need']:
+            raise ValidationError(
+                {"target": "Target cannot be greater than In Need"}
+            )
+
     @transaction.atomic
     def create(self, validated_data):
         locations = self.check_locations_merge_to_list(self.initial_data.get('locations'))
         self.check_disaggregation(self.initial_data.get('disaggregations'))
+        self.check_progress_values(validated_data)
 
         validated_data['blueprint']['unit'] = validated_data['blueprint']['display_type']
         validated_data['blueprint']['disaggregatable'] = True
