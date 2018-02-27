@@ -16,7 +16,8 @@ from core.paginations import SmallPagination
 from core.serializers import ShortLocationSerializer
 from core.models import Location, ResponsePlan
 from indicator.serializers import (
-    ClusterIndicatorReportSerializer, ClusterIndicatorReportSimpleSerializer,
+    ClusterIndicatorReportSerializer,
+    ReportableSimpleSerializer,
     ClusterPartnerAnalysisIndicatorResultSerializer,
 )
 from indicator.models import IndicatorReport, Reportable
@@ -370,7 +371,7 @@ class IndicatorReportDetailAPIView(RetrieveAPIView):
     get_queryset = IndicatorReportsListAPIView.get_queryset
 
 
-class IndicatorReportsSimpleListAPIView(IndicatorReportsListAPIView):
+class ReportablesSimpleListAPIView(ListAPIView):
     """
     Cluster IndicatorReportsListAPIView simplified API - GET/POST
     Authentication required.
@@ -379,11 +380,26 @@ class IndicatorReportsSimpleListAPIView(IndicatorReportsListAPIView):
     - response_plan_id - Response plan ID
 
     Returns:
-        - GET method - ClusterIndicatorReportSimpleSerializer object.
-        - POST method - ClusterIndicatorReportSimpleSerializer object.
+        - GET method - ReportableSimpleSerializer object.
+        - POST method - ReportableSimpleSerializer object.
     """
-    serializer_class = ClusterIndicatorReportSimpleSerializer
+    serializer_class = ReportableSimpleSerializer
     pagination_class = filter_class = None
+
+    def get_queryset(self):
+        response_plan_id = self.kwargs['response_plan_id']
+        queryset = Reportable.objects.filter(
+            Q(cluster_objectives__isnull=False)
+            | Q(cluster_activities__isnull=False)
+            | Q(partner_projects__isnull=False)
+            | Q(partner_activities__isnull=False)
+        ).filter(
+            Q(cluster_objectives__cluster__response_plan=response_plan_id)
+            | Q(cluster_activities__cluster_objective__cluster__response_plan=response_plan_id)
+            | Q(partner_projects__clusters__response_plan=response_plan_id)
+            | Q(partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)  # noqa: E501
+        ).distinct()
+        return queryset
 
 
 class ResponsePlanClusterDashboardAPIView(APIView):

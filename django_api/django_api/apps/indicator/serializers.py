@@ -954,19 +954,19 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
         return obj.can_submit
 
 
-class ClusterIndicatorReportSimpleSerializer(serializers.ModelSerializer):
+class ReportableSimpleSerializer(serializers.ModelSerializer):
 
     title = serializers.SerializerMethodField()
 
     class Meta:
-        model = IndicatorReport
+        model = Reportable
         fields = (
             'id',
             'title',
         )
 
     def get_title(self, obj):
-        return obj.reportable.blueprint.title
+        return obj.blueprint.title
 
 # PMP API Serializers
 
