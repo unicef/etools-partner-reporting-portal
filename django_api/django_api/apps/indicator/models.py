@@ -229,7 +229,9 @@ class Reportable(TimeStampedExternalSyncModelMixin):
         verbose_name='End Date',
     )
 
-    cs_dates = ArrayField(models.DateField(), default=list)
+    cs_dates = ArrayField(
+        models.DateField(), default=list, null=True, blank=True
+    )
     location_admin_refs = ArrayField(JSONField(), default=list, null=True,
                                      blank=True)
     disaggregations = models.ManyToManyField(Disaggregation, blank=True)
@@ -273,7 +275,9 @@ class Reportable(TimeStampedExternalSyncModelMixin):
 
         if self.achieved and self.baseline is not None and self.target is not None:
             baseline = float(self.baseline)
-            dividend = self.achieved['c'] - baseline
+            dividend = 0    # default progress is 0
+            if self.achieved['c'] > baseline:
+                dividend = self.achieved['c'] - baseline
             divisor = float(self.target) - baseline
             if divisor:
                 percentage = round(dividend / divisor, 2)
@@ -395,11 +399,9 @@ class IndicatorReport(TimeStampedModel):
             return False
 
         for data in self.indicator_location_data.all():
-            for key, vals in data.disaggregation.items():
-                if self.is_percentage and (vals.get('c', None) in [None, '']):
-                    return False
-                elif self.is_number and (vals.get('v', None) in [None, '']):
-                    return False
+            if not data.is_complete:
+                return False
+
         return True
 
     @property
@@ -563,6 +565,14 @@ class IndicatorLocationData(TimeStampedModel):
 
     def __str__(self):
         return "{} Location Data for {}".format(self.location, self.indicator_report)
+
+    @cached_property
+    def is_complete(self):
+        """
+        Returns if this indicator location data has had some data entered for
+        it, and is compelte.
+        """
+        return self.disaggregation != {"()": {"c": 0, "d": 0, "v": 0}}
 
     @cached_property
     def previous_location_data(self):

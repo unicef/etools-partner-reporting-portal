@@ -40,7 +40,7 @@
         function (allPDs, pdId) {
           return (getCurrentPD(allPDs, pdId).partner_focal_point || []).map(function (focalPoint) {
             return {
-              value: focalPoint.email, title: focalPoint.title + ' ' + focalPoint.name,
+              value: focalPoint.email, title: focalPoint.name + ' ' + focalPoint.title,
             };
           });
         }

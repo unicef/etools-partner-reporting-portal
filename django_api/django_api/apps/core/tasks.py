@@ -14,7 +14,7 @@ from core.common import (
 )
 from core.helpers import (
     calculate_end_date_given_start_date,
-    find_missing_frequency_period_dates,
+    find_missing_frequency_period_dates_for_indicator_report,
 )
 from core.factories import (
     ProgressReportFactory,
@@ -222,8 +222,8 @@ def process_period_reports():
                     latest_indicator_report.time_period_start,
                     latest_indicator_report.time_period_end))
 
-                date_list = find_missing_frequency_period_dates(
-                    indicator.start_date,
+                date_list = find_missing_frequency_period_dates_for_indicator_report(
+                    indicator,
                     latest_indicator_report.time_period_end,
                     frequency,
                 )
@@ -232,8 +232,8 @@ def process_period_reports():
                 print("Indicator {} IndicatorReport Not Found".format(
                     indicator))
 
-                date_list = find_missing_frequency_period_dates(
-                    indicator.start_date, None, frequency)
+                date_list = find_missing_frequency_period_dates_for_indicator_report(
+                    indicator, None, frequency)
 
         print("Missing dates: {}".format(date_list))
 

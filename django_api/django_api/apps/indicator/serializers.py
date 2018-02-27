@@ -287,7 +287,7 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
     is_complete = serializers.SerializerMethodField()
 
     def get_is_complete(self, obj):
-        return True if obj.disaggregation else False
+        return obj.is_complete
 
     def get_display_type(self, obj):
         return obj.indicator_report.display_type
@@ -346,7 +346,7 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
         )
 
     def get_is_complete(self, obj):
-        return True if obj.disaggregation else False
+        return obj.is_complete
 
     def validate(self, data):
         """
@@ -691,10 +691,25 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 {"disaggregations": "List of dict disaggregation expected"}
             )
 
+    def check_progress_values(self, validated_data):
+        """
+        Validates baseline, target, in-need
+        """
+        if validated_data['baseline'] > validated_data['target']:
+            raise ValidationError(
+                {"baseline": "Baseline cannot be greater than target"}
+            )
+
+        if validated_data['target'] > validated_data['in_need']:
+            raise ValidationError(
+                {"target": "Target cannot be greater than In Need"}
+            )
+
     @transaction.atomic
     def create(self, validated_data):
         locations = self.check_locations_merge_to_list(self.initial_data.get('locations'))
         self.check_disaggregation(self.initial_data.get('disaggregations'))
+        self.check_progress_values(validated_data)
 
         validated_data['blueprint']['unit'] = validated_data['blueprint']['display_type']
         validated_data['blueprint']['disaggregatable'] = True
@@ -954,19 +969,19 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
         return obj.can_submit
 
 
-class ClusterIndicatorReportSimpleSerializer(serializers.ModelSerializer):
+class ReportableSimpleSerializer(serializers.ModelSerializer):
 
     title = serializers.SerializerMethodField()
 
     class Meta:
-        model = IndicatorReport
+        model = Reportable
         fields = (
             'id',
             'title',
         )
 
     def get_title(self, obj):
-        return obj.reportable.blueprint.title
+        return obj.blueprint.title
 
 # PMP API Serializers
 

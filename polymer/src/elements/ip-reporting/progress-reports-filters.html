@@ -74,20 +74,6 @@
           data="[[types]]"
           hide-search>
         </dropdown-filter-multi>
-
-        <date-filter
-          class="item"
-          label="Due date"
-          name="due_date"
-          value="[[_withDefault(queryParams.due_date, '')]]">
-        </date-filter>
-
-        <checkbox-filter
-          class="item item-2-col"
-          name="due"
-          value="[[_withDefault(queryParams.due, '')]]">
-          <span class="checkbox-label">Show only due reports</span>
-        </checkbox-filter>
       </div>
     </filter-list>
 
