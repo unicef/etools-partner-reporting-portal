@@ -572,7 +572,8 @@ class ClusterIndicatorsLocationListAPIView(ListAPIView):
             | Q(reportable__partner_projects__isnull=False)
             | Q(reportable__partner_activities__isnull=False)
         ).filter(
-            Q(reportable__partner_projects__clusters__response_plan=response_plan_id)
+            Q(reportable__cluster_objectives__cluster__response_plan=response_plan_id)
+            | Q(reportable__partner_projects__clusters__response_plan=response_plan_id)
             | Q(reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)  # noqa: E501
         ).values_list('reportable__indicator_reports__indicator_location_data__location', flat=True).distinct()
         return Location.objects.filter(pk__in=result)
