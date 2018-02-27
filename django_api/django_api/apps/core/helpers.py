@@ -222,7 +222,7 @@ def calculate_end_date_given_start_date(start_date, frequency, cs_dates=None):
 
 def find_missing_frequency_period_dates_for_indicator_report(indicator, latest_indicator_report_date, frequency):
     # PD_FREQUENCY_LEVEL can be used interchangeably
-    today = date.today()
+    date_to_subtract_from = today = date.today()
     date_to_compare = latest_indicator_report_date if latest_indicator_report_date else indicator.start_date
     date_list = []
 
@@ -237,8 +237,10 @@ def find_missing_frequency_period_dates_for_indicator_report(indicator, latest_i
         # day_delta_counter as a date day integer to indicate next date
         if today > indicator.end_date:
             day_delta = (indicator.end_date - date_to_compare).days
+            date_to_subtract_from = indicator.end_date
         else:
             day_delta = (today - date_to_compare).days
+            date_to_subtract_from = today
 
         day_delta_counter = day_delta
 
@@ -246,7 +248,7 @@ def find_missing_frequency_period_dates_for_indicator_report(indicator, latest_i
         while day_delta_counter > 0:
             can_add = True
 
-            missing_date = today - timedelta(day_delta_counter)
+            missing_date = date_to_subtract_from - timedelta(day_delta_counter)
 
             if frequency == PD_FREQUENCY_LEVEL.weekly:
                 # Check if we should proceed to next date
