@@ -85,6 +85,7 @@ from core.common import (
     OVERALL_STATUS,
     REPORTING_TYPES
 )
+from core.countries import COUNTRIES_ALPHA2_CODE
 
 from ._generate_disaggregation_fake_data import (
     generate_indicator_report_location_disaggregation_quantity_data,
@@ -178,11 +179,11 @@ def generate_real_data(fast=False, area=None, update=False):
 
 def generate_fake_data(workspace_quantity=10):
     if not settings.IS_TEST and workspace_quantity < 1:
-        workspace_quantity = 5
+        workspace_quantity = 1
         print('Workspace quantity reset to {}'.format(workspace_quantity))
 
-    if workspace_quantity >= 30:
-        workspace_quantity = 30
+    if workspace_quantity >= 5:
+        workspace_quantity = 5
         print('Workspace quantity reset to {}'.format(workspace_quantity))
 
     today = datetime.date.today()
@@ -197,12 +198,20 @@ def generate_fake_data(workspace_quantity=10):
     CountryFactory.create_batch(workspace_quantity)
     print("{} Country objects created".format(workspace_quantity))
 
-    WorkspaceFactory.create_batch(workspace_quantity)
-    print("{} Workspace objects created".format(workspace_quantity))
+    ws_list = list()
+
+    for i in random.sample(range(0, len(COUNTRIES_ALPHA2_CODE) - 1), workspace_quantity):
+        ws = WorkspaceFactory(
+            title=COUNTRIES_ALPHA2_CODE[i][1],
+            workspace_code=COUNTRIES_ALPHA2_CODE[i][0]
+        )
+        ws_list.append(ws)
+
+        print("{} Workspace created".format(ws))
 
     beginning_of_this_year = datetime.date(today.year, 1, 1)
 
-    for workspace in Workspace.objects.all():
+    for workspace in ws_list:
         country = Country.objects.order_by('?').first()
         workspace.countries.add(country)
         for idx in range(0, 3):
