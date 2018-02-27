@@ -220,22 +220,26 @@ def calculate_end_date_given_start_date(start_date, frequency, cs_dates=None):
     return end_date
 
 
-def find_missing_frequency_period_dates(start_date, last_date, frequency):
+def find_missing_frequency_period_dates_for_indicator_report(indicator, latest_indicator_report_date, frequency):
     # PD_FREQUENCY_LEVEL can be used interchangeably
     today = date.today()
-    date_to_compare = last_date if last_date else start_date
+    date_to_compare = latest_indicator_report_date if latest_indicator_report_date else indicator.start_date
     date_list = []
 
-    # Only add 1 day to date_to_compare if it came from last_date
+    # Only add 1 day to date_to_compare if it came from latest_indicator_report_date
     # in order to set next date period correctly
-    if last_date:
+    if latest_indicator_report_date:
         date_to_compare += timedelta(1)
 
     # For now, we only generate missing dates for the past.
-    if today > date_to_compare:
+    if today > date_to_compare and indicator.end_date > date_to_compare:
         # day_delta as a flag to decrement day_delta_counter for next date
         # day_delta_counter as a date day integer to indicate next date
-        day_delta = (today - date_to_compare).days
+        if today > indicator.end_date:
+            day_delta = (indicator.end_date - date_to_compare).days
+        else:
+            day_delta = (today - date_to_compare).days
+
         day_delta_counter = day_delta
 
         # Keep adding missing date until we get caught up with day_delta
@@ -310,7 +314,7 @@ def find_missing_frequency_period_dates(start_date, last_date, frequency):
                     break
 
             # Only add new date if it's later than start date
-            if start_date <= missing_date and can_add:
+            if indicator.start_date <= missing_date and can_add:
                 date_list.append(missing_date)
 
     return date_list
