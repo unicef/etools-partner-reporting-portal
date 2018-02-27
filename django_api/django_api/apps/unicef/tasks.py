@@ -171,7 +171,7 @@ def process_programme_documents(fast=False, area=False):
                             # TODO: Temp fix for these fields
                             item['funds_received'] = "0.0"
                             item['funds_received_currency'] = ""
-                            
+
                             pd = process_model(
                                 ProgrammeDocument, PMPProgrammeDocumentSerializer, item,
                                 {'external_id': item['id'], 'workspace': workspace}
