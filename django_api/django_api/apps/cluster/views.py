@@ -568,7 +568,8 @@ class ClusterIndicatorsLocationListAPIView(ListAPIView):
     def get_queryset(self):
         response_plan_id = self.kwargs.get(self.lookup_field)
         result = IndicatorReport.objects.filter(
-            Q(reportable__partner_projects__isnull=False)
+            Q(reportable__cluster_objectives__isnull=False)
+            | Q(reportable__partner_projects__isnull=False)
             | Q(reportable__partner_activities__isnull=False)
         ).filter(
             Q(reportable__partner_projects__clusters__response_plan=response_plan_id)
