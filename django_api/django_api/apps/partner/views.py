@@ -156,7 +156,7 @@ class PartnerProjectSimpleListAPIView(ListAPIView):
     def get_queryset(self):
         response_plan_id = self.kwargs.get(self.lookup_field)
         return PartnerProject.objects.filter(
-            partner__clusters__response_plan_id=response_plan_id)
+            partner__clusters__response_plan_id=response_plan_id).distinct()
 
 
 class PartnerSimpleListAPIView(ListAPIView):
