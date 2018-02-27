@@ -287,7 +287,7 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
     is_complete = serializers.SerializerMethodField()
 
     def get_is_complete(self, obj):
-        return True if obj.disaggregation else False
+        return obj.is_complete
 
     def get_display_type(self, obj):
         return obj.indicator_report.display_type
@@ -346,7 +346,7 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
         )
 
     def get_is_complete(self, obj):
-        return True if obj.disaggregation else False
+        return obj.is_complete
 
     def validate(self, data):
         """

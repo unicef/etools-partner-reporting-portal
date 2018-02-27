@@ -273,7 +273,9 @@ class Reportable(TimeStampedExternalSyncModelMixin):
 
         if self.achieved and self.baseline is not None and self.target is not None:
             baseline = float(self.baseline)
-            dividend = self.achieved['c'] - baseline
+            dividend = 0    # default progress is 0
+            if self.achieved['c'] > baseline:
+                dividend = self.achieved['c'] - baseline
             divisor = float(self.target) - baseline
             if divisor:
                 percentage = round(dividend / divisor, 2)
@@ -563,6 +565,14 @@ class IndicatorLocationData(TimeStampedModel):
 
     def __str__(self):
         return "{} Location Data for {}".format(self.location, self.indicator_report)
+
+    @cached_property
+    def is_complete(self):
+        """
+        Returns if this indicator location data has had some data entered for
+        it, and is compelte.
+        """
+        return self.disaggregation != {"()": {"c": 0, "d": 0, "v": 0}}
 
     @cached_property
     def previous_location_data(self):
