@@ -168,11 +168,22 @@ def process_programme_documents(fast=False, area=False):
                         item['status'] = item['status'].title()[:3]
 
                         try:
+                            # TODO: Temp fix for these fields
+                            item['funds_received'] = "0.0"
+                            item['funds_received_currency'] = ""
+                            
                             pd = process_model(
                                 ProgrammeDocument, PMPProgrammeDocumentSerializer, item,
                                 {'external_id': item['id'], 'workspace': workspace}
                             )
-                        except ValidationError:
+                        except Exception as e:
+                            print(item)
+
+                            if e.message:
+                                print(e.message)
+                            else:
+                                print(e)
+
                             logger.exception('Error trying to save ProgrammeDocument model with {}'.format(item))
                             continue
 
