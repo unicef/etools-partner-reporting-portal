@@ -397,11 +397,9 @@ class IndicatorReport(TimeStampedModel):
             return False
 
         for data in self.indicator_location_data.all():
-            for key, vals in data.disaggregation.items():
-                if self.is_percentage and (vals.get('c', None) in [None, '']):
-                    return False
-                elif self.is_number and (vals.get('v', None) in [None, '']):
-                    return False
+            if not data.is_complete:
+                return False
+
         return True
 
     @property

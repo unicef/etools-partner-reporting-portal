@@ -303,6 +303,7 @@ class IndicatorDataAPIView(APIView):
         )
 
     def put(self, request, ir_id, *args, **kwargs):
+        """TODO: check usage of this"""
         if 'progress_report' not in request.data:
             _errors = ["No progress_report found in PUT request data."]
             return Response({"errors": _errors},
@@ -324,6 +325,12 @@ class IndicatorDataAPIView(APIView):
     @transaction.atomic
     def post(self, request, ir_id, *args, **kwargs):
         ir = self.get_indicator_report(ir_id)
+
+        if not ir.can_submit:
+            _errors = [{
+                "message": "Please check that data for all locations has been entered."
+            }]
+            return Response({"errors": _errors}, status=status.HTTP_400_BAD_REQUEST)
 
         # Check if all indicator data is fulfilled for IR status different then
         # Met or No Progress
