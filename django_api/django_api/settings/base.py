@@ -20,7 +20,8 @@ from cryptography.x509 import load_pem_x509_certificate
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(os.path.join(BASE_DIR, 'apps/'))
+APPS_DIR = os.path.join(BASE_DIR, 'apps/')
+sys.path.append(APPS_DIR)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/

@@ -167,6 +167,10 @@ PARTNER_ACTIVITY_STATUS = Choices(
     ("Com", "completed", "Completed"),
 )
 
+EXTERNAL_DATA_SOURCES = Choices(
+    ("RPM", "RPM"),
+)
+
 CURRENCIES = Choices(
     ("AED", "aed", "aed"),
     ("AFN", "afn", "afn"),

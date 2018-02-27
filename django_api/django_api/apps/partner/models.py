@@ -12,7 +12,7 @@ from core.common import (
     SHARED_PARTNER_TYPE,
     CSO_TYPES,
     PARTNER_PROJECT_STATUS,
-)
+    CURRENCIES, EXTERNAL_DATA_SOURCES)
 from core.models import TimeStampedExternalSyncModelMixin
 
 from core.countries import COUNTRIES_ALPHA2_CODE_DICT, COUNTRIES_ALPHA2_CODE
@@ -151,8 +151,9 @@ class Partner(TimeStampedExternalSyncModelMixin):
 
     @property
     def address(self):
-        return ", ".join([self.street_address, self.city, self.postal_code,
-                          self.country])
+        return ", ".join(
+            [self.street_address, self.city, self.postal_code, self.country]
+        )
 
 
 class PartnerProject(TimeStampedModel):
@@ -164,35 +165,64 @@ class PartnerProject(TimeStampedModel):
         cluster.Cluster (ManyToManyField): "clusters"
         core.Location (ManyToManyField): "locations"
         partner.Partner (ForeignKey): "partner"
+        partner.FundingSource (ForeignKey): "funding_sources"
         indicator.Reportable (GenericRelation): "reportables"
     """
+    external_source = models.TextField(choices=EXTERNAL_DATA_SOURCES, blank=True, null=True)
+    external_id = models.PositiveIntegerField(db_index=True, unique=True, null=True)
+
     title = models.CharField(max_length=255)
     description = models.CharField(max_length=255)
-    additional_information = models.CharField(max_length=255,
-                                              verbose_name="Additional information (e.g. links)")
+    additional_information = models.CharField(
+        max_length=255, verbose_name="Additional information (e.g. links)"
+    )
     start_date = models.DateField()
     end_date = models.DateField()
-    status = models.CharField(max_length=3, choices=PARTNER_PROJECT_STATUS,
-                              default=PARTNER_PROJECT_STATUS.ongoing)
-    total_budget = models.DecimalField(null=True, decimal_places=2,
-                                       help_text='Total Budget', max_digits=12)
-    funding_source = models.CharField(max_length=255)
+    status = models.CharField(
+        max_length=3, choices=PARTNER_PROJECT_STATUS, default=PARTNER_PROJECT_STATUS.ongoing
+    )
+    total_budget = models.DecimalField(
+        null=True, decimal_places=2, help_text='Total Budget', max_digits=12
+    )
 
-    clusters = models.ManyToManyField('cluster.Cluster',
-                                      related_name="partner_projects")
-    locations = models.ManyToManyField('core.Location',
-                                       related_name="partner_projects")
-    partner = models.ForeignKey(Partner,
-                                related_name="partner_projects")
-    reportables = GenericRelation('indicator.Reportable',
-                                  related_query_name='partner_projects')
+    clusters = models.ManyToManyField(
+        'cluster.Cluster', related_name="partner_projects"
+    )
+    locations = models.ManyToManyField(
+        'core.Location', related_name="partner_projects"
+    )
+    partner = models.ForeignKey(
+        Partner, related_name="partner_projects"
+    )
+    reportables = GenericRelation(
+        'indicator.Reportable', related_query_name='partner_projects'
+    )
 
     class Meta:
         ordering = ['-id']
 
+    def __str__(self):
+        return '{} #{} {}'.format(
+            self.__class__.__name__, self.id, self.title
+        )
+
     @property
     def response_plan(self):
         return self.clusters.all()[0].response_plan
+
+
+# class FundingSource(models.Model):
+#     partner_project = models.ForeignKey(PartnerProject, related_name="funding_sources")
+#     name = models.TextField(max_length=255)
+#     external_id = models.IntegerField()
+#     type = models.CharField(max_length=255)
+#     original_amount = models.DecimalField(decimal_places=2, max_digits=12)
+#     original_currency = models.CharField(
+#         choices=CURRENCIES,
+#         default=CURRENCIES.usd,
+#         max_length=16,
+#     )
+#     exchange_rate = models.DecimalField(decimal_places=3, max_digits=8, default=1)
 
 
 class PartnerActivity(TimeStampedModel):
