@@ -1,21 +1,8 @@
 from django.urls import reverse
 
 from rest_framework import status
-from rest_framework.test import APIClient, APITestCase
 
-from account.models import User
-
-from core.factories import (
-    ProgrammeDocumentFactory,
-    QuantityReportableToLowerLevelOutputFactory,
-    ProgressReportFactory,
-    IndicatorLocationDataFactory,
-    SectionFactory,
-    WorkspaceFactory,
-    ResponsePlanFactory,
-)
-
-from core.models import Location, Workspace, ResponsePlan
+from core.models import ResponsePlan
 from core.models import Location, Workspace
 from .base import BaseAPITestCase
 

@@ -1,5 +1,3 @@
-import hashlib
-
 from rest_framework import serializers
 
 from .models import Workspace, Location, ResponsePlan, Country, GatewayType

@@ -56,33 +56,23 @@ from core.models import (
 from core.factories import (
     QuantityReportableToLowerLevelOutputFactory,
     RatioReportableToLowerLevelOutputFactory,
-    RatioReportableToClusterObjectiveFactory,
     QuantityReportableToPartnerProjectFactory,
     QuantityReportableToClusterObjectiveFactory,
     QuantityReportableToPartnerActivityFactory,
     QuantityReportableToClusterActivityFactory,
     QuantityIndicatorReportFactory,
     RatioIndicatorReportFactory,
-    QuantityTypeIndicatorBlueprintFactory,
-    RatioTypeIndicatorBlueprintFactory,
     UserFactory,
-    UserProfileFactory,
     ClusterFactory,
     ClusterObjectiveFactory,
     ClusterActivityFactory,
     PartnerFactory,
     PartnerProjectFactory,
     PartnerActivityFactory,
-    IndicatorLocationDataFactory,
-    DisaggregationFactory,
-    DisaggregationValueFactory,
     SectionFactory,
     ProgrammeDocumentFactory,
     ProgressReportFactory,
-    PDResultLinkFactory,
-    LowerLevelOutputFactory,
     WorkspaceFactory,
-    ResponsePlanFactory,
     LocationFactory,
     PersonFactory,
     GatewayTypeFactory,
@@ -95,6 +85,7 @@ from core.common import (
     OVERALL_STATUS,
     REPORTING_TYPES
 )
+from core.countries import COUNTRIES_ALPHA2_CODE
 
 from ._generate_disaggregation_fake_data import (
     generate_indicator_report_location_disaggregation_quantity_data,
@@ -188,11 +179,11 @@ def generate_real_data(fast=False, area=None, update=False):
 
 def generate_fake_data(workspace_quantity=10):
     if not settings.IS_TEST and workspace_quantity < 1:
-        workspace_quantity = 5
+        workspace_quantity = 1
         print('Workspace quantity reset to {}'.format(workspace_quantity))
 
-    if workspace_quantity >= 30:
-        workspace_quantity = 30
+    if workspace_quantity >= 5:
+        workspace_quantity = 5
         print('Workspace quantity reset to {}'.format(workspace_quantity))
 
     today = datetime.date.today()
@@ -207,15 +198,23 @@ def generate_fake_data(workspace_quantity=10):
     CountryFactory.create_batch(workspace_quantity)
     print("{} Country objects created".format(workspace_quantity))
 
-    WorkspaceFactory.create_batch(workspace_quantity)
-    print("{} Workspace objects created".format(workspace_quantity))
+    ws_list = list()
+
+    for i in random.sample(range(0, len(COUNTRIES_ALPHA2_CODE) - 1), workspace_quantity):
+        ws = WorkspaceFactory(
+            title=COUNTRIES_ALPHA2_CODE[i][1],
+            workspace_code=COUNTRIES_ALPHA2_CODE[i][0]
+        )
+        ws_list.append(ws)
+
+        print("{} Workspace created".format(ws))
 
     beginning_of_this_year = datetime.date(today.year, 1, 1)
 
-    for workspace in Workspace.objects.all():
+    for workspace in ws_list:
         country = Country.objects.order_by('?').first()
         workspace.countries.add(country)
-        for idx in xrange(0, 3):
+        for idx in range(0, 3):
             year = today.year - idx
             # TODO: use ResponsePlanFactory
             ResponsePlan.objects.create(
@@ -253,25 +252,25 @@ def generate_fake_data(workspace_quantity=10):
     for response_plan in ResponsePlan.objects.all():
         country = response_plan.workspace.countries.first()
         locations = list(Location.objects.filter(gateway__country=country))
-        table = response_plan.workspace.countries.first().carto_db_tables.first()
 
-        user = UserFactory(
+        UserFactory(
             first_name="WASH",
-            last_name="IMO")
+            last_name="IMO"
+        )
 
         cluster = ClusterFactory(
             response_plan=response_plan,
             type="wash"
         )
 
-        for idx in xrange(2, 0, -1):
+        for idx in range(2, 0, -1):
             co = ClusterObjectiveFactory(
                 title="{} - {} - {} CO".format(
                     idx, cluster.response_plan.title, cluster.type.upper()),
                 cluster=cluster,
             )
 
-            reportable_to_co = QuantityReportableToClusterObjectiveFactory(
+            QuantityReportableToClusterObjectiveFactory(
                 content_object=co, indicator_report__progress_report=None,
                 locations=locations,
             )
@@ -291,23 +290,24 @@ def generate_fake_data(workspace_quantity=10):
         )
         partner.clusters.add(cluster)
 
-        user = UserFactory(
+        UserFactory(
             first_name="Nutrition",
-            last_name="IMO")
+            last_name="IMO"
+        )
 
         cluster = ClusterFactory(
             response_plan=response_plan,
             type="nutrition",
         )
 
-        for idx in xrange(2, 0, -1):
+        for idx in range(2, 0, -1):
             co = ClusterObjectiveFactory(
                 title="{} - {} Cluster Objective".format(
                     cluster.response_plan.title, cluster.type.upper()),
                 cluster=cluster,
             )
 
-            reportable_to_co = QuantityReportableToClusterObjectiveFactory(
+            QuantityReportableToClusterObjectiveFactory(
                 content_object=co, indicator_report__progress_report=None,
                 locations=locations,
             )
@@ -327,23 +327,24 @@ def generate_fake_data(workspace_quantity=10):
         )
         partner.clusters.add(cluster)
 
-        user = UserFactory(
+        UserFactory(
             first_name="Education",
-            last_name="IMO")
+            last_name="IMO"
+        )
 
         cluster = ClusterFactory(
             response_plan=response_plan,
             type="education",
         )
 
-        for idx in xrange(2, 0, -1):
+        for idx in range(2, 0, -1):
             co = ClusterObjectiveFactory(
                 title="{} - {} Cluster Objective".format(
                     cluster.response_plan.title, cluster.type.upper()),
                 cluster=cluster,
             )
 
-            reportable_to_co = QuantityReportableToClusterObjectiveFactory(
+            QuantityReportableToClusterObjectiveFactory(
                 content_object=co, indicator_report__progress_report=None,
                 locations=locations,
             )
@@ -394,13 +395,13 @@ def generate_fake_data(workspace_quantity=10):
         u.save()
 
     for cluster_objective in ClusterObjective.objects.all():
-        for idx in xrange(2, 0, -1):
+        for idx in range(2, 0, -1):
             ca = ClusterActivityFactory(
                 title="{} Cluster Activity".format(cluster_objective.title),
                 cluster_objective=cluster_objective,
             )
 
-            reportable_to_ca = QuantityReportableToClusterActivityFactory(
+            QuantityReportableToClusterActivityFactory(
                 content_object=ca, indicator_report__progress_report=None,
                 locations=locations,
             )
@@ -411,7 +412,7 @@ def generate_fake_data(workspace_quantity=10):
                 2, cluster_objective.title))
 
     for partner in Partner.objects.all():
-        for idx in xrange(2, 0, -1):
+        for idx in range(2, 0, -1):
             first_cluster = partner.clusters.first()
             pp = PartnerProjectFactory(
                 partner=partner,
@@ -420,7 +421,7 @@ def generate_fake_data(workspace_quantity=10):
 
             pp.clusters.add(first_cluster)
 
-            reportable_to_pp = QuantityReportableToPartnerProjectFactory(
+            QuantityReportableToPartnerProjectFactory(
                 content_object=pp, indicator_report__progress_report=None,
                 locations=locations,
             )
@@ -435,7 +436,7 @@ def generate_fake_data(workspace_quantity=10):
         partner = cluster_activity.cluster_objective.cluster.partners.first()
 
         for project in partner.partner_projects.all():
-            for idx in xrange(2, 0, -1):
+            for idx in range(2, 0, -1):
                 pa = PartnerActivityFactory(
                     partner=project.partner,
                     project=project,
@@ -492,8 +493,7 @@ def generate_fake_data(workspace_quantity=10):
                     end_date=d + datetime.timedelta(days=30),
                     due_date=d + datetime.timedelta(days=45),
                 )
-    print("{} ProgrammeDocument objects created".format(
-        min(4, workspace_quantity * 2)))
+    print("{} ProgrammeDocument objects created".format(min(4, workspace_quantity * 2)))
 
     # Linking the followings:
     # ProgressReport - ProgrammeDocument
@@ -506,8 +506,7 @@ def generate_fake_data(workspace_quantity=10):
 
         pd.sections.add(Section.objects.order_by('?').first())
         pd.unicef_focal_point.add(Person.objects.order_by('?').first())
-        pd.partner_focal_point.add(
-            Person.objects.order_by('?').first())
+        pd.partner_focal_point.add(Person.objects.order_by('?').first())
         pd.unicef_officers.add(Person.objects.order_by('?').first())
 
         # generate reportables for this PD
@@ -540,8 +539,7 @@ def generate_fake_data(workspace_quantity=10):
                 ))
 
         # Generate progress reports per pd based on its reporting period dates. Requires creating indicator
-        # reports for each llo and then associating them with a progress
-        # report
+        # reports for each llo and then associating them with a progress report
         def generate_initial_progress_reports(report_type):
             queryset = pd.reporting_periods.filter(report_type=report_type)
 
@@ -549,7 +547,8 @@ def generate_fake_data(workspace_quantity=10):
                 progress_report = ProgressReportFactory(
                     programme_document=pd,
                     report_type=report_type,
-                    report_number=idx + 1)
+                    report_number=idx + 1
+                )
 
                 if idx == queryset.count() - 1:
                     progress_report.is_final = True
@@ -585,7 +584,7 @@ def generate_fake_data(workspace_quantity=10):
             pd
         ))
 
-    print("ProgrammeDocument <-> QuantityReportableToLowerLevelOutput <-> IndicatorReport objects linked".format(workspace_quantity))
+    print("ProgrammeDocument <-> QuantityReportableToLowerLevelOutput <-> IndicatorReport objects linked")
 
     print("Generating IndicatorLocationData for Quantity type")
     generate_indicator_report_location_disaggregation_quantity_data()

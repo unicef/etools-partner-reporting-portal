@@ -28,6 +28,20 @@
         };
       },
 
+      fetchSingle: function (reportThunk, reportId) {
+        return function (dispatch) {
+          return reportThunk()
+              .then(function (res) {
+                dispatch(
+                  App.Actions.ClusterIndicatorReports.updateSingle(
+                    reportId,
+                    res.data
+                  )
+                );
+              });
+        };
+      },
+
       set: function (data) {
         return {
           type: App.Constants.SET_CLUSTER_INDICATOR_REPORTS,

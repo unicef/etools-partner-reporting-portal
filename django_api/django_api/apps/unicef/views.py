@@ -4,12 +4,10 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import transaction
-from django.db.models import Q
-from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpResponseNotFound
+from django.http import HttpResponse, Http404
 from django.shortcuts import get_object_or_404
 
 from rest_framework import status as statuses
-from rest_framework import mixins, viewsets
 from rest_framework.generics import RetrieveAPIView, ListAPIView
 from rest_framework.parsers import FileUploadParser, FormParser, MultiPartParser
 from rest_framework.response import Response
@@ -222,6 +220,10 @@ class ProgressReportAPIView(ListExportMixin, ListAPIView):
         'xlsx': AnnexCXLSXExporter,
         'pdf': ProgressReportListPDFExporter,
     }
+    # TODO: use django filter for ordering
+    order_options = {
+        'due_date', 'status', 'programme_document__reference_number', 'submission_date', 'start_date'
+    }
 
     def get_queryset(self):
         user_has_global_view = self.request.user.is_unicef
@@ -246,7 +248,7 @@ class ProgressReportAPIView(ListExportMixin, ListAPIView):
         order = request.query_params.get('sort', None)
         if order:
             order_field = order.split('.')[0]
-            if order_field in ('due_date', 'status', 'programme_document__reference_number', 'submission_date', 'start_date'):
+            if order_field in self.order_options:
                 qs = qs.order_by(order_field)
                 if len(order.split('.')) > 1 and order.split('.')[1] == 'desc':
                     qs = qs.order_by('-%s' % order_field)
@@ -365,8 +367,7 @@ class ProgressReportIndicatorsAPIView(ListAPIView):
 
     def get_queryset(self):
         # Limit reports to partner only
-        return IndicatorReport.objects.filter(
-            progress_report__programme_document__partner=self.request.user.partner)
+        return IndicatorReport.objects.filter(progress_report__programme_document__partner=self.request.user.partner)
 
     def list(self, request, workspace_id, progress_report_id, *args, **kwargs):
         """
@@ -395,7 +396,10 @@ class ProgressReportLocationsAPIView(ListAPIView):
     def get_object(self, pk):
         try:
             return ProgressReport.objects.get(
-                programme_document__partner=self.request.user.partner, programme_document__workspace=self.workspace_id, pk=pk)
+                programme_document__partner=self.request.user.partner,
+                programme_document__workspace=self.workspace_id,
+                pk=pk
+            )
         except ProgressReport.DoesNotExist as exp:
             logger.exception({
                 "endpoint": "ProgressReportLocationsAPIView",
@@ -696,12 +700,13 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
                 for focal_point in focal_points:
                     template_data['focal_point_name'] = focal_point['name']
                     send_email_from_template(
-                              'email/notify_partner_on_calculation_method_change_subject.txt',
-                              'email/notify_partner_on_calculation_method_change.txt',
-                              template_data,
-                              settings.DEFAULT_FROM_EMAIL,
-                              [focal_point['email'],],
-                              fail_silently=False)
+                        'email/notify_partner_on_calculation_method_change_subject.txt',
+                        'email/notify_partner_on_calculation_method_change.txt',
+                        template_data,
+                        settings.DEFAULT_FROM_EMAIL,
+                        [focal_point['email']],
+                        fail_silently=False
+                    )
 
             return Response(serializer.data, status=statuses.HTTP_200_OK)
 
@@ -765,11 +770,13 @@ class ProgressReportAttachmentAPIView(APIView):
                     pass
 
             serializer.save()
-            return Response(ProgressReportAttachmentSerializer(
-                ProgressReport.objects.filter(id=progress_report_id,
-                programme_document__workspace_id=workspace_id),
-                many=True).data, status=statuses.HTTP_200_OK)
+
+            progress_reports = ProgressReport.objects.filter(
+                id=progress_report_id, programme_document__workspace_id=workspace_id
+            )
+            return Response(
+                ProgressReportAttachmentSerializer(progress_reports, many=True).data, status=statuses.HTTP_200_OK
+            )
 
         else:
-            return Response({"errors": serializer.errors},
-                            status=statuses.HTTP_400_BAD_REQUEST)
+            return Response({"errors": serializer.errors}, status=statuses.HTTP_400_BAD_REQUEST)

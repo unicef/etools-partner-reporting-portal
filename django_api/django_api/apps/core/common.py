@@ -327,9 +327,9 @@ CURRENCIES = Choices(
     ("XOF", "xof", "xof"),
     ("XPF", "xpf", "xpf"),
     ("YER", "yer", "yer"),
-    ("YER1", "yer1", "yer1"), # Temporary due API issue
+    ("YER1", "yer1", "yer1"),  # Temporary due API issue
     ("ZAR", "zar", "zar"),
     ("ZMW", "zmw", "zmw"),
     ("ZWD", "zwd", "zwd"),
-    ("ZWL", "zwl", "zwl"), # Temporary due API issue
+    ("ZWL", "zwl", "zwl"),  # Temporary due API issue
 )

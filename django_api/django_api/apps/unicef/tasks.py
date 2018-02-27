@@ -138,9 +138,13 @@ def process_programme_documents(fast=False, area=False):
                         if not partner_data['name']:
                             print("No partner name - skipping!")
                             continue
-                        partner = process_model(
-                            Partner, PMPPDPartnerSerializer, partner_data, {
-                                'vendor_number': partner_data['unicef_vendor_number']})
+
+                        try:
+                            partner = process_model(
+                                Partner, PMPPDPartnerSerializer, partner_data, {
+                                    'vendor_number': partner_data['unicef_vendor_number']})
+                        except ValidationError:
+                            logger.exception('Error trying to save Partner model with {}'.format(partner_data))
 
                         # Assign partner
                         item['partner'] = partner.id
@@ -162,8 +166,26 @@ def process_programme_documents(fast=False, area=False):
 
                         # Create PD
                         item['status'] = item['status'].title()[:3]
-                        pd = process_model(ProgrammeDocument, PMPProgrammeDocumentSerializer, item,
-                                                {'external_id': item['id'], 'workspace': workspace})
+
+                        try:
+                            # TODO: Temp fix for these fields
+                            item['funds_received'] = "0.0"
+                            item['funds_received_currency'] = ""
+
+                            pd = process_model(
+                                ProgrammeDocument, PMPProgrammeDocumentSerializer, item,
+                                {'external_id': item['id'], 'workspace': workspace}
+                            )
+                        except Exception as e:
+                            print(item)
+
+                            if e.message:
+                                print(e.message)
+                            else:
+                                print(e)
+
+                            logger.exception('Error trying to save ProgrammeDocument model with {}'.format(item))
+                            continue
 
                         # Create unicef_focal_points
                         person_data_list = item['unicef_focal_points']
@@ -205,16 +227,19 @@ def process_programme_documents(fast=False, area=False):
                         # Create sections
                         section_data_list = item['sections']
                         for section_data in section_data_list:
-                            section = process_model(Section, PMPSectionSerializer, section_data,
-                                                   {'external_id': section_data['id']}) # Is section unique globally or per workspace?
+                            section = process_model(
+                                Section, PMPSectionSerializer, section_data, {'external_id': section_data['id']}
+                            )  # Is section unique globally or per workspace?
                             pd.sections.add(section)
 
                         # Create Reporting Date Periods
                         reporting_periods = item['reporting_periods']
                         for reporting_period in reporting_periods:
                             reporting_period['programme_document'] = pd.id
-                            process_model(ReportingPeriodDates, PMPReportingPeriodDatesSerializer, reporting_period,
-                                                    {'external_id': reporting_period['id']})
+                            process_model(
+                                ReportingPeriodDates, PMPReportingPeriodDatesSerializer,
+                                reporting_period, {'external_id': reporting_period['id']}
+                            )
 
                         if item['status'] not in ("draft, signed",):
                             # Mark all LLO/reportables assigned to this PD as inactive
@@ -228,14 +253,16 @@ def process_programme_documents(fast=False, area=False):
                                 rl = d['cp_output']
                                 rl['programme_document'] = pd.id
                                 rl['result_link'] = d['result_link']
-                                pdresultlink = process_model(PDResultLink, PMPPDResultLinkSerializer, rl,
-                                                                  {'external_id': rl['result_link'],
-                                                                   'external_cp_output_id': rl['id']})
+                                pdresultlink = process_model(
+                                    PDResultLink, PMPPDResultLinkSerializer,
+                                    rl, {'external_id': rl['result_link'], 'external_cp_output_id': rl['id']}
+                                )
 
                                 # Create LLO
                                 d['cp_output'] = pdresultlink.id
-                                llo = process_model(LowerLevelOutput, PMPLLOSerializer, d,
-                                                         {'external_id': d['id']})
+                                llo = process_model(
+                                    LowerLevelOutput, PMPLLOSerializer, d, {'external_id': d['id']}
+                                )
                                 # Mark LLO as active
                                 llo.active = True
                                 llo.save()
@@ -305,17 +332,19 @@ def process_programme_documents(fast=False, area=False):
                                         # Create Disaggregation
                                         for dis in i['disaggregation']:
                                             dis['active'] = True
-                                            disaggregation = process_model(Disaggregation,
-                                                                                PMPDisaggregationSerializer, dis,
-                                                                                {'name': dis['name']})
+                                            disaggregation = process_model(
+                                                Disaggregation, PMPDisaggregationSerializer,
+                                                dis, {'name': dis['name']}
+                                            )
                                             disaggregations.append(disaggregation)
 
                                             # Create Disaggregation Values
                                             for dv in dis['disaggregation_values']:
                                                 dv['disaggregation'] = disaggregation.id
-                                                process_model(DisaggregationValue,
-                                                                   PMPDisaggregationValueSerializer, dv,
-                                                                   {'external_id': dv['id']})
+                                                process_model(
+                                                    DisaggregationValue, PMPDisaggregationValueSerializer,
+                                                    dv, {'external_id': dv['id']}
+                                                )
 
                                     # Create Reportable
                                     i['blueprint_id'] = blueprint.id if blueprint else None
@@ -330,7 +359,7 @@ def process_programme_documents(fast=False, area=False):
                                     i['end_date'] = item['end_date']
 
                                     # TODO: Fix db schema to accommodate larger lengths
-                                    i['title'] = i['title'][:255]
+                                    i['title'] = i['title'][:255] if i['title'] else "unknown"
                                     reportable = process_model(
                                         Reportable,
                                         PMPReportableSerializer,

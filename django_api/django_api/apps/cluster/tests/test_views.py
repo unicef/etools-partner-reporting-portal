@@ -37,10 +37,11 @@ class TestClusterObjectiveAPIView(BaseAPITestCase):
         response = self.client.post(url, data=self.data, format='json')
 
         self.assertTrue(status.is_success(response.status_code))
-        created_obj = ClusterObjective.objects.get(id=response.data['id'])
+        ClusterObjective.objects.get(id=response.data['id'])
         self.assertEquals(
             ClusterObjective.objects.all().count(),
-            base_count + 1)
+            base_count + 1
+        )
 
     def test_update_put_cluster_objective(self):
         """
@@ -65,7 +66,6 @@ class TestClusterObjectiveAPIView(BaseAPITestCase):
             data['title'])
 
     def test_update_put_non_existent_cluster_objective(self):
-        last = ClusterObjective.objects.last()
         data = self.data
         data.update(dict(id=9999999, title='new updated title'))
         url = reverse('cluster-objective')
@@ -91,7 +91,6 @@ class TestClusterObjectiveAPIView(BaseAPITestCase):
             data['title'])
 
     def test_update_patch_non_existent_cluster_objective(self):
-        last = ClusterObjective.objects.last()
         data = dict(id=9999999, title='new updated title')
         url = reverse('cluster-objective')
         response = self.client.patch(url, data=data, format='json')
@@ -113,7 +112,6 @@ class TestClusterObjectiveAPIView(BaseAPITestCase):
             base_count - 1)
 
     def test_delete_non_existent_cluster_objective(self):
-        last = ClusterObjective.objects.last()
         url = reverse('cluster-objective')
         response = self.client.delete(url, data={"id": 9999999}, format='json')
 
@@ -140,8 +138,7 @@ class TestClusterObjectiveAPIView(BaseAPITestCase):
         self.assertEquals(response.data['count'], ClusterObjective.objects.filter(
             cluster__response_plan_id=last.cluster.response_plan_id).count())
 
-        # test for getting objects by given filter parameter title or reference
-        # number
+        # test for getting objects by given filter parameter title or reference number
         response = self.client.get(url +
                                    "?ref_title=%s" %
                                    last.title[10:], format='json')
@@ -162,7 +159,6 @@ class TestClusterObjectiveAPIView(BaseAPITestCase):
         """
         read object unit test for ClusterObjectiveAPIView
         """
-        last = ClusterObjective.objects.last()
         url = reverse('cluster-objective', kwargs={"pk": 9999999})
         response = self.client.get(url, format='json')
 
@@ -249,7 +245,6 @@ class TestClusterActivityAPIView(BaseAPITestCase):
         """
         get obj unit test for ClusterActivityAPIView
         """
-        last = ClusterActivity.objects.last()
         url = reverse('cluster-activity', kwargs={"pk": 9999999})
         response = self.client.get(url, format='json')
 
