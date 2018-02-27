@@ -50,7 +50,7 @@
         partners: {
           type: Array,
           value: [],
-          notify: true
+          notify: true,
         },
 
         params: {
@@ -69,8 +69,8 @@
 
       _computeParams: function(clusters) {
         if (clusters) {
-          return {clusters: clusters.join(',')}
-        };
+          return {clusters: clusters.join(',')};
+        }
         return {};
       },
 

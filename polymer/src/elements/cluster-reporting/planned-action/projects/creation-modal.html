@@ -371,7 +371,7 @@
         if (edit) {
           if (this.permissions.addPartnerToProject) {
             var partnerId = data.partner_id;
-            return App.Endpoints.plannedActionsIMOEdit(responsePlanID, partnerId, data.id)
+            return App.Endpoints.plannedActionsIMOEdit(responsePlanID, partnerId, data.id);
           }
           return App.Endpoints.plannedActionsProjectOverview(data.id);
         } else {
@@ -412,7 +412,7 @@
 
       _computeImoClusters: function (profile) {
         return profile.imo_clusters.map(function(cluster) {
-          return cluster.id
+          return cluster.id;
         }) || [];
       },
 
