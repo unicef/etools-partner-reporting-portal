@@ -229,8 +229,9 @@ class Reportable(TimeStampedExternalSyncModelMixin):
         verbose_name='End Date',
     )
 
-    cs_dates = ArrayField(models.DateField(), default=list, null=True,
-                                     blank=True)
+    cs_dates = ArrayField(
+        models.DateField(), default=list, null=True, blank=True
+    )
     location_admin_refs = ArrayField(JSONField(), default=list, null=True,
                                      blank=True)
     disaggregations = models.ManyToManyField(Disaggregation, blank=True)
