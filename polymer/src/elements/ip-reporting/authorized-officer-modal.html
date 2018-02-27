@@ -92,7 +92,7 @@
         </paper-button>
         <paper-button
           class="btn-primary"
-          dialog-dismiss
+          on-tap="_cancel"
           disabled="[[busy]]">
           Cancel
         </paper-button>
@@ -179,7 +179,11 @@
             .then(function () {
               self.set('busy', false);
             });
-      }
+      },
+
+      _cancel: function() {
+        this.close()
+      },
     });
   </script>
 </dom-module>
