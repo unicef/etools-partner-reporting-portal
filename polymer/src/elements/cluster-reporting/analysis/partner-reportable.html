@@ -18,6 +18,7 @@
 <link rel="import" href="../../labelled-item.html">
 <link rel="import" href="../../report-status.html">
 <link rel="import" href="../../disaggregations/disaggregation-table.html">
+<link rel="import" href="../../../elements/list-placeholder.html">
 <link rel="import" href="progress-by-location.html">
 
 <dom-module id="partner-analysis-reportable">
@@ -115,7 +116,7 @@
       <div class="wrapper">
         <template
             is="dom-if"
-            if="[[!loading]]">
+            if="[[_computeHidden(details.indicator_reports, loading)]]">
           <div class="app-grid reportable-meta">
             <div class="item"></div>
             <div class="item">
@@ -369,6 +370,11 @@
             </template>
           </iron-pages>
         </template>
+        <list-placeholder
+          data="[[details.indicator_reports]]"
+          loading="[[loading]]"
+          message="No report data associated with this indicator has been submitted yet">
+        </list-placeholder>
         <etools-loading active="[[loading]]"></etools-loading>
       </div>
     </etools-content-panel>
@@ -460,6 +466,10 @@
           responsePlanId,
           data.id
         );
+      },
+
+      _computeHidden: function (data, loading) {
+        return !(loading || !data.length);
       },
 
       _computeFormattedDetails: function (details) {
