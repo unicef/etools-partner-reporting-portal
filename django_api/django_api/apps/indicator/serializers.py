@@ -695,12 +695,12 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         """
         Validates baseline, target, in-need
         """
-        if validated_data['baseline'] > validated_data['target']:
+        if float(validated_data['baseline']) > float(validated_data['target']):
             raise ValidationError(
                 {"baseline": "Baseline cannot be greater than target"}
             )
 
-        if validated_data['target'] > validated_data['in_need']:
+        if float(validated_data['target']) > float(validated_data['in_need']):
             raise ValidationError(
                 {"target": "Target cannot be greater than In Need"}
             )
@@ -711,7 +711,10 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         self.check_disaggregation(self.initial_data.get('disaggregations'))
         self.check_progress_values(validated_data)
 
-        validated_data['blueprint']['unit'] = validated_data['blueprint']['display_type']
+        if validated_data['blueprint']['display_type'] == IndicatorBlueprint.RATIO:
+            validated_data['blueprint']['unit'] = IndicatorBlueprint.PERCENTAGE
+        else:
+            validated_data['blueprint']['unit'] = validated_data['blueprint']['display_type']
         validated_data['blueprint']['disaggregatable'] = True
         blueprint = IndicatorBlueprintSerializer(data=validated_data['blueprint'])
         if blueprint.is_valid(raise_exception=True):

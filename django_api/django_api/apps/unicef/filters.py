@@ -23,10 +23,6 @@ class ProgrammeDocumentIndicatorFilter(django_filters.FilterSet):
     location = CharFilter(method='get_locations')
     blueprint__title = CharFilter(method='get_blueprint_title')
     incomplete = CharFilter(method='get_incomplete')
-    activepdsonly = TypedChoiceFilter(
-        name='activepdsonly', choices=Boolean.CHOICES,
-        method='get_activepdsonly', label='Show for Active PDs only'
-    )
 
     class Meta:
         model = Reportable
@@ -38,7 +34,7 @@ class ProgrammeDocumentIndicatorFilter(django_filters.FilterSet):
         return queryset.filter(locations=value)
 
     def get_blueprint_title(self, queryset, name, value):
-        return queryset.filter(blueprint__title__contains=value)
+        return queryset.filter(blueprint__title__icontains=value)
 
     def get_incomplete(self, queryset, name, value):
         if value == Boolean.TRUE:
