@@ -1,0 +1,213 @@
+<link rel="import" href="../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../bower_components/etools-content-panel/etools-content-panel.html">
+<link rel="import" href="../../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../../../bower_components/app-layout/app-grid/app-grid-style.html">
+
+<link rel="import" href="../../../../redux/store.html">
+<link rel="import" href="../../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../../elements/cluster-reporting/analysis/partners-per-type.html">
+<link rel="import" href="../../../../elements/cluster-reporting/analysis/partners-per-cluster.html">
+<link rel="import" href="../../../../elements/cluster-reporting/analysis/partners-per-cluster-objective.html">
+<link rel="import" href="../../../../elements/cluster-reporting/analysis/operational-presence-map.html">
+<link rel="import" href="../../../../endpoints.html">
+
+<dom-module id="page-analysis-operational-presence">
+  <template>
+    <style include="iron-flex iron-flex-alignment app-grid-style">
+      :host {
+        display: block;
+
+        --app-grid-columns: 2;
+        --app-grid-gutter: 25px;
+        --app-grid-item-height: auto;
+        --app-grid-expandible-item-columns: 2;
+
+        --ecp-content: {
+          padding: 0;
+          background: #fff;
+        };
+      }
+
+      .full-width {
+        @apply --app-grid-expandible-item;
+      }
+
+      .header {
+        padding: 0 25px;
+        background: var(--paper-grey-300);
+      }
+
+      .header h2,
+      .header dl {
+        margin: 0;
+        font-size: 18px;
+        line-height: 48px;
+        font-weight: normal;
+        color: var(--paper-grey-600);
+      }
+
+      .header dt,
+      .header dd {
+        display: inline;
+      }
+
+      .header dd {
+        margin-left: .5em;
+        color: var(--theme-primary-color);
+      }
+
+      .clusters {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+      }
+
+      .clusters li:not(:first-child) {
+        padding-left: .75em;
+        margin-left: .75em;
+        border-left: 1px solid var(--paper-grey-300);
+      }
+
+      hr {
+        border-top: 0;
+        border-bottom: 1px solid var(--paper-grey-200);
+      }
+    </style>
+
+    <etools-prp-ajax
+        id="data"
+        url="[[dataUrl]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
+        id="map"
+        url="[[mapUrl]]">
+    </etools-prp-ajax>
+
+    <etools-content-panel no-header>
+      <header class="header layout horizontal justified">
+        <h2>Clusters</h2>
+        <dl>
+          <dt>Number of Clusters:</dt>
+          <dd>[[numberOfClusters]]</dd>
+        </dl>
+      </header>
+
+      <div class="app-grid">
+        <div class="item full-width">
+          <ul class="clusters layout horizontal wrap">
+            <template
+                is="dom-repeat"
+                items="[[clusters]]"
+                as="cluster">
+              <li>[[cluster.title]]</li>
+            </template>
+          </ul>
+        </div>
+      </div>
+
+      <header class="header layout horizontal justified">
+        <h2>Partners</h2>
+        <dl>
+          <dt>Number of Partners:</dt>
+          <dd>[[numberOfPartners]]</dd>
+        </dl>
+      </header>
+
+      <div class="app-grid">
+        <div class="item">
+          <partners-per-type></partners-per-type>
+        </div>
+        <div class="item">
+          <partners-per-cluster></partners-per-cluster>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="app-grid">
+        <div class="item full-width">
+          <partners-per-cluster-objective></partners-per-cluster-objective>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="app-grid">
+        <div class="item full-width">
+          <operational-presence-map></operational-presence-map>
+        </div>
+      </div>
+    </etools-content-panel>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'page-analysis-operational-presence',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        responsePlanId: {
+          type: String,
+          statePath: 'responsePlans.currentID',
+        },
+
+        numberOfClusters: {
+          type: Number,
+          statePath: 'analysis.operationalPresence.data.num_of_clusters',
+        },
+
+        numberOfPartners: {
+          type: Number,
+          statePath: 'analysis.operationalPresence.data.num_of_partners',
+        },
+
+        clusters: {
+          type: Array,
+          statePath: 'analysis.operationalPresence.data.clusters',
+        },
+
+        dataUrl: {
+          type: String,
+          computed: '_computeApiUrl(responsePlanId, \'data\')',
+          observer: '_fetchData',
+        },
+
+        mapUrl: {
+          type: String,
+          computed: '_computeApiUrl(responsePlanId, \'map\')',
+          observer: '_fetchMap',
+        },
+      },
+
+      _computeApiUrl: function (responsePlanId, type) {
+        return App.Endpoints.operationalPresence(responsePlanId, type);
+      },
+
+      _fetchData: function () {
+        var dataThunk = this.$.data.thunk();
+
+        this.$.data.abort();
+
+        this.dispatch(App.Actions.Analysis.OperationalPresence.fetchData(dataThunk))
+            .catch(function (err) { //jshint ignore:line
+              // TODO: error handling
+            });
+      },
+
+      _fetchMap: function () {
+        var mapThunk = this.$.map.thunk();
+
+        this.$.map.abort();
+
+        this.dispatch(App.Actions.Analysis.OperationalPresence.fetchMap(mapThunk))
+            .catch(function (err) { //jshint ignore:line
+              // TODO: error handling
+            });
+      },
+    });
+  </script>
+</dom-module>
