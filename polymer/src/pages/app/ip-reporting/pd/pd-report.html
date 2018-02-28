@@ -121,6 +121,15 @@
         </template>
       </div>
 
+      <div class="toolbar">
+        <template
+            is="dom-if"
+            if="[[canSubmittedOnBehalf]]"
+            restamp="true">
+          <p>Submitted by / On behalf: [[currentReport.submitting_user]]</p>
+        </template>
+      </div>
+
       <div class="tabs">
         <paper-tabs
             selected="{{selectedTab}}"
@@ -251,6 +260,11 @@
           type: Boolean,
           computed: '_computeCanSubmit(loading, mode, currentReport, permissions)',
         },
+
+        canSubmittedOnBehalf: {
+          type: Boolean,
+          computed: '_computeSubmittedOnBehalf(currentReport)',
+        },
       },
 
       observers: [
@@ -363,6 +377,15 @@
 
           default:
             return true;
+        }
+      },
+
+      _computeSubmittedOnBehalf: function(currentReport) {
+        if (currentReport.submitted_by !== currentReport.submitting_user) {
+          return true;
+        }
+        else {
+          return false;
         }
       },
 
