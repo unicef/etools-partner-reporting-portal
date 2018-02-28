@@ -281,7 +281,13 @@ LOGGING = {
         '': {
             'handlers': ['default'],
             'level': 'INFO',
-            'propagate': True},
+            'propagate': True
+        },
+        'ocha-sync': {
+            'handlers': ['default'],
+            'level': 'INFO',
+            'propagate': True
+        },
         'elasticapm.errors': {
             'level': 'ERROR',
             'handlers': ['default'],

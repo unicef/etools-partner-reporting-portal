@@ -168,7 +168,6 @@ class PartnerProjectFactory(factory.django.DjangoModelFactory):
     additional_information = factory.Sequence(
         lambda n: "additional_information %d" % n)
     total_budget = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
-    funding_source = factory.Sequence(lambda n: "funding_source %d" % n)
 
     @factory.post_generation
     def clusters(self, create, extracted, **kwargs):

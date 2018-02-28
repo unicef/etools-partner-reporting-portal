@@ -59,7 +59,15 @@ class TimeStampedExternalSyncModelMixin(TimeStampedModel):
         help_text='An ID representing this instance in an external system',
         blank=True,
         null=True,
-        max_length=32)
+        max_length=32
+    )
+
+    class Meta:
+        abstract = True
+
+
+class TimeStampedExternalURLSyncModel(TimeStampedExternalSyncModelMixin):
+    external_url = models.URLField(null=True, blank=True)
 
     class Meta:
         abstract = True
