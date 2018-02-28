@@ -2,7 +2,7 @@ version: '2.1'
 
 services:
   beater-prp:
-    command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 && python manage.py celery beat --loglevel=debug"
+    command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 && python manage.py celery beat --loglevel=${CELERY_LOG_LEVEL:-debug}"
     image: 'unicef/etools-prp'
     env_file:
       - .env
@@ -12,7 +12,7 @@ services:
     restart: always
 
   worker-prp:
-    command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 && python manage.py celery worker -E --loglevel=info"
+    command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 && python manage.py celery worker -E --loglevel=${CELERY_LOG_LEVEL:-info}"
     image: 'unicef/etools-prp'
     env_file:
       - .env

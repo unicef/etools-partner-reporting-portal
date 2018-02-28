@@ -12,7 +12,7 @@ from core.helpers import (
     get_cast_dictionary_keys_as_string,
 )
 
-from indicator.models import Reportable, IndicatorReport, IndicatorBlueprint
+from indicator.models import IndicatorBlueprint
 
 
 class BaseDisaggregator(object):
@@ -100,12 +100,7 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
         indicator_location_data.save()
 
         # Reset the IndicatorReport total
-        ir_total = {
-            'c': 0,
-            'd': 0,
-            'v': 0,
-        }
-        ir_total['d'] = 1
+        ir_total = {'c': 0, 'd': 1, 'v': 0}
 
         indicator_report = indicator_location_data.indicator_report
 

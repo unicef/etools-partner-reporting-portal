@@ -6,7 +6,6 @@ from django.db import transaction
 
 from account.models import User
 
-from core.common import PD_STATUS
 from core.api import PMP_API
 from core.models import Workspace, GatewayType, Location
 from core.serializers import PMPGatewayTypeSerializer, PMPLocationSerializer
@@ -15,10 +14,16 @@ from unicef.serializers import PMPProgrammeDocumentSerializer, PMPPDPartnerSeria
     PMPLLOSerializer, PMPPDResultLinkSerializer
 from unicef.models import ProgrammeDocument, Person, LowerLevelOutput, PDResultLink
 
-from indicator.serializers import PMPIndicatorBlueprintSerializer, PMPDisaggregationSerializer, PMPDisaggregationValueSerializer, PMPReportableSerializer
+from indicator.serializers import (
+    PMPIndicatorBlueprintSerializer,
+    PMPReportableSerializer,
+    PMPDisaggregationSerializer,
+    PMPDisaggregationValueSerializer
+)
 from indicator.models import IndicatorBlueprint, Disaggregation, Reportable, DisaggregationValue
 
 from partner.models import Partner
+from unicef.tasks import process_model
 
 
 class ProgrammeDocumentCronJob(CronJobBase):
@@ -26,23 +31,6 @@ class ProgrammeDocumentCronJob(CronJobBase):
 
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
     code = 'partner.ProgrammeDocumentCronJob'    # a unique code
-
-    def process_model(self, process_model,
-                      process_serializer, data, filter_dict):
-        try:
-            obj = process_model.objects.get(**filter_dict)
-            serializer = process_serializer(obj, data=data)
-            if serializer.is_valid():
-                serializer.save()
-            else:
-                raise Exception(serializer.errors)
-        except process_model.DoesNotExist:
-            serializer = process_serializer(data=data)
-            if serializer.is_valid():
-                obj = serializer.save()
-            else:
-                raise Exception(serializer.errors)
-        return obj
 
     def create_user(self, person):
         # Check if given person already exists in user model (by email)
@@ -80,7 +68,7 @@ class ProgrammeDocumentCronJob(CronJobBase):
 
         # Iterate over all workspaces
         if fast:
-            workspaces = Workspace.objects.filter(business_area_code=area)  #2130 for Iraq
+            workspaces = Workspace.objects.filter(business_area_code=area)  # 2130 for Iraq
         else:
             workspaces = Workspace.objects.all()
 
@@ -92,7 +80,7 @@ class ProgrammeDocumentCronJob(CronJobBase):
                 try:
                     # Iterate over all pages
                     page_url = None
-                    while(True):
+                    while True:
                         try:
                             api = PMP_API()
                             list_data = api.programme_documents(
@@ -123,7 +111,7 @@ class ProgrammeDocumentCronJob(CronJobBase):
                             if not partner_data['name']:
                                 print("No partner name - skipping!")
                                 continue
-                            partner = self.process_model(
+                            partner = process_model(
                                 Partner, PMPPDPartnerSerializer, partner_data, {
                                     'vendor_number': partner_data['unicef_vendor_number']})
 
@@ -147,8 +135,10 @@ class ProgrammeDocumentCronJob(CronJobBase):
 
                             # Create PD
                             item['status'] = item['status'].title()[:3]
-                            pd = self.process_model(ProgrammeDocument, PMPProgrammeDocumentSerializer, item,
-                                                    {'external_id': item['id'], 'workspace': workspace})
+                            pd = process_model(
+                                ProgrammeDocument, PMPProgrammeDocumentSerializer, item,
+                                {'external_id': item['id'], 'workspace': workspace}
+                            )
 
                             # Create unicef_focal_points
                             person_data_list = item['unicef_focal_points']
@@ -158,8 +148,9 @@ class ProgrammeDocumentCronJob(CronJobBase):
                                     continue
                                 if not person_data['name']:
                                     continue
-                                person = self.process_model(Person, PMPPDPersonSerializer, person_data,
-                                                            {'email': person_data['email']})
+                                person = process_model(
+                                    Person, PMPPDPersonSerializer, person_data, {'email': person_data['email']}
+                                )
                                 pd.unicef_focal_point.add(person)
 
                             # Create agreement_auth_officers
@@ -170,8 +161,9 @@ class ProgrammeDocumentCronJob(CronJobBase):
                                     continue
                                 if not person_data['name']:
                                     continue
-                                person = self.process_model(Person, PMPPDPersonSerializer, person_data,
-                                                            {'email': person_data['email']})
+                                person = process_model(
+                                    Person, PMPPDPersonSerializer, person_data, {'email': person_data['email']}
+                                )
                                 pd.unicef_officers.add(person)
 
                                 # Create user for this Person
@@ -189,8 +181,9 @@ class ProgrammeDocumentCronJob(CronJobBase):
                                     continue
                                 if not person_data['name']:
                                     continue
-                                person = self.process_model(Person, PMPPDPersonSerializer, person_data,
-                                                            {'email': person_data['email']})
+                                person = process_model(
+                                    Person, PMPPDPersonSerializer, person_data, {'email': person_data['email']}
+                                )
                                 pd.partner_focal_point.add(person)
 
                                 # Create user for this Person
@@ -212,15 +205,18 @@ class ProgrammeDocumentCronJob(CronJobBase):
 
                                     # Create PDResultLink
                                     d['programme_document'] = pd.id
-                                    pdresultlink = self.process_model(PDResultLink, PMPPDResultLinkSerializer, d,
-                                                                      {'external_id': d['result_link'], 'external_cp_output_id': d['id']})
+                                    pdresultlink = process_model(
+                                        PDResultLink, PMPPDResultLinkSerializer, d,
+                                        {'external_id': d['result_link'], 'external_cp_output_id': d['id']}
+                                    )
 
                                     # Create LLO
                                     d['cp_output'] = pdresultlink.id
-                                    llo = self.process_model(LowerLevelOutput, PMPLLOSerializer, d,
-                                                             {'external_id': d['id']})
+                                    llo = process_model(
+                                        LowerLevelOutput, PMPLLOSerializer, d, {'external_id': d['id']}
+                                    )
                                     # Mark LLO as active
-                                    llo.active=True
+                                    llo.active = True
                                     llo.save()
 
                                     # Iterate over indicators
@@ -240,8 +236,10 @@ class ProgrammeDocumentCronJob(CronJobBase):
                                         else:
                                             # Create IndicatorBlueprint
                                             i['disaggregatable'] = True
-                                            blueprint = self.process_model(IndicatorBlueprint, PMPIndicatorBlueprintSerializer, i,
-                                                                           {'external_id': i['id']})
+                                            blueprint = process_model(
+                                                IndicatorBlueprint, PMPIndicatorBlueprintSerializer,
+                                                i, {'external_id': i['id']}
+                                            )
 
                                         locations = list()
                                         for l in i['locations']:
@@ -254,13 +252,13 @@ class ProgrammeDocumentCronJob(CronJobBase):
                                             if not l['pcode']:
                                                 print("Location code empty! Skipping!")
                                                 continue
-                                            gateway = self.process_model(
+                                            gateway = process_model(
                                                 GatewayType, PMPGatewayTypeSerializer, l, {
                                                     'name': l['pcode']})
 
                                             # Create location
                                             l['gateway'] = gateway.id
-                                            location = self.process_model(
+                                            location = process_model(
                                                 Location, PMPLocationSerializer, l, {
                                                     'p_code': l['pcode']})
                                             locations.append(location)
@@ -281,30 +279,32 @@ class ProgrammeDocumentCronJob(CronJobBase):
                                             # Create Disaggregation
                                             for dis in i['disaggregation']:
                                                 dis['active'] = True
-                                                disaggregation = self.process_model(Disaggregation, PMPDisaggregationSerializer, dis,
-                                                                                    {'name': dis['name']})
+                                                disaggregation = process_model(
+                                                    Disaggregation, PMPDisaggregationSerializer,
+                                                    dis, {'name': dis['name']}
+                                                )
                                                 disaggregations.append(disaggregation)
 
                                                 # Create Disaggregation Values
                                                 for dv in dis['disaggregation_values']:
                                                     dv['disaggregation'] = disaggregation.id
-                                                    self.process_model(DisaggregationValue, PMPDisaggregationValueSerializer, dv,
-                                                                   {'external_id': dv['id']})
-
+                                                    process_model(
+                                                        DisaggregationValue, PMPDisaggregationValueSerializer,
+                                                        dv, {'external_id': dv['id']}
+                                                    )
 
                                         # Create Reportable
                                         i['blueprint_id'] = blueprint.id if blueprint else None
                                         i['location_ids'] = [l.id for l in locations]
-                                        i['disaggregation_ids'] = [
-                                            ds.id for ds in disaggregations]
+                                        i['disaggregation_ids'] = [ds.id for ds in disaggregations]
 
-                                        i['content_type'] = ContentType.objects.get_for_model(
-                                            llo).id
+                                        i['content_type'] = ContentType.objects.get_for_model(llo).id
                                         i['object_id'] = llo.id
                                         i['start_date'] = item['start_date']
                                         i['end_date'] = item['end_date']
-                                        reportable = self.process_model(Reportable, PMPReportableSerializer, i,
-                                                           {'external_id': i['id']})
+                                        reportable = process_model(
+                                            Reportable, PMPReportableSerializer, i, {'external_id': i['id']}
+                                        )
                                         reportable.active = True
                                         reportable.save()
 
@@ -317,4 +317,4 @@ class ProgrammeDocumentCronJob(CronJobBase):
                             break
                 except Exception as e:
                     print(e)
-                    raise Exception(e)
+                    raise

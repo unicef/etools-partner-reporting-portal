@@ -111,7 +111,7 @@ class ClusterIndicatorsFilter(django_filters.FilterSet):
         ).distinct()
 
     def get_indicator(self, queryset, name, value):
-        return queryset.filter(reportable__indicator_reports=value)
+        return queryset.filter(reportable=value)
 
     def get_project(self, queryset, name, value):
         return queryset.filter(

@@ -11,8 +11,6 @@ from core.models import Workspace, Location
 from indicator.serializers import (
     PDReportContextIndicatorReportSerializer,
     IndicatorBlueprintSimpleSerializer,
-    IndicatorLLoutputsSerializer,
-    ReportableSimpleSerializer
 )
 
 from partner.models import Partner
@@ -239,6 +237,7 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
         request = kwargs.get('context', {}).get('request')
         self.llo_id = kwargs.get('llo_id') or request and request.GET.get('llo')
         self.location_id = kwargs.get('location_id') or request and request.GET.get('location')
+        self.show_incomplete = kwargs.get('incomplete') or request and request.GET.get('incomplete')
 
         super(ProgressReportSerializer, self).__init__(*args, **kwargs)
 
@@ -288,6 +287,7 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
             qset = qset.filter(reportable__object_id=self.llo_id)
         if self.location_id and self.llo_id is not None:
             qset = qset.filter(reportable__locations__id=self.location_id)
+        # TODO: use incomplete flag
         return PDReportContextIndicatorReportSerializer(
             instance=qset, read_only=True, many=True).data
 
@@ -479,11 +479,11 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
     unicef_budget = serializers.CharField(source='total_unicef_cash')
     funds_received = serializers.CharField(source='funds_received_to_date')
     cso_budget_currency = serializers.ChoiceField(
-        choices=CURRENCIES, allow_null=True, source="budget_currency")
+        choices=CURRENCIES, allow_blank=True, allow_null=True, source="budget_currency")
     funds_received_currency = serializers.ChoiceField(
-        choices=CURRENCIES, allow_null=True, source="funds_received_to_date_currency")
+        choices=CURRENCIES, allow_blank=True, allow_null=True, source="funds_received_to_date_currency")
     unicef_budget_currency = serializers.ChoiceField(
-        choices=CURRENCIES, allow_null=True, source="total_unicef_cash_currency")
+        choices=CURRENCIES, allow_blank=True, allow_null=True, source="total_unicef_cash_currency")
     status = serializers.ChoiceField(choices=PD_STATUS)
     start_date = serializers.DateField(required=False, allow_null=True)
     end_date = serializers.DateField(required=False, allow_null=True)
@@ -541,6 +541,7 @@ class PMPSectionSerializer(serializers.ModelSerializer):
             'name',
         )
 
+
 class PMPReportingPeriodDatesSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='external_id')
     programme_document = serializers.PrimaryKeyRelatedField(
@@ -555,8 +556,6 @@ class PMPReportingPeriodDatesSerializer(serializers.ModelSerializer):
             'due_date',
             'programme_document',
         )
-
-
 
 
 class PMPPDResultLinkSerializer(serializers.ModelSerializer):

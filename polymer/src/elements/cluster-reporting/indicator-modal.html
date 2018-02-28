@@ -185,24 +185,18 @@
           <div class="row">
             <div class="app-grid">
               <div class="item">
-                <paper-dropdown-menu
-                    class="validate"
-                    label="Frequency of reporting"
-                    on-value-changed="_validate"
-                    on-selected-item-changed="_setFrequency"
-                    always-float-label
-                    required>
-                  <paper-listbox
-                      slot="dropdown-content"
-                      class="dropdown-content">
-                    <template
-                        id="frequencies"
-                        is="dom-repeat"
-                        items="[[frequencies]]">
-                      <paper-item>[[item.title]]</paper-item>
-                    </template>
-                  </paper-listbox>
-                </paper-dropdown-menu>
+                <etools-single-selection-menu
+                  class="validate"
+                  label="Frequency of reporting"
+                  options="[[frequencies]]"
+                  option-value="id"
+                  option-label="title"
+                  selected="{{data.frequency}}"
+                  on-iron-activate="_validate"
+                  trigger-value-change-event
+                  hide-search
+                  required>
+                </etools-single-selection-menu>
               </div>
 
               <template
@@ -490,7 +484,8 @@
         }
         this.set('selectedLocations', []);
         this.set('selectedDisaggregations', []);
-
+        this.set('displayType', '');
+        this.set('type', '');
         this.set('data', {
           cs_dates: [],
           locations: [],
@@ -499,7 +494,6 @@
         });
 
         this._forEach('paper-radio-group', this._updateValue);
-
         this._fetchLocations();
         this._fetchDisaggregations();
       },

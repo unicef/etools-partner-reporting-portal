@@ -44,41 +44,34 @@
         params-object="{{queryParams}}">
     </iron-query-params>
 
-    <filter-list filters="{{filters}}" class="app-grid">
+    <filter-list filters="{{filters}}">
+      <div class="app-grid">
+        <dropdown-filter-multi
+            class="item item-2-col"
+            label="PD status"
+            name="pd_statuses"
+            value="[[_withDefault(queryParams.pd_statuses, '')]]"
+            data="[[pd_statuses]]"
+            hide-search>
+        </dropdown-filter-multi>
 
-      <dropdown-filter-multi
+        <pd-dropdown-filter
           class="item item-2-col"
-          label="PD status"
-          name="pd_statuses"
-          value="[[_withDefault(queryParams.pd_statuses, '')]]"
-          data="[[pd_statuses]]"
-          hide-search>
-      </dropdown-filter-multi>
+          value="[[_withDefault(queryParams.pds, '')]]">
+        </pd-dropdown-filter>
 
-      <pd-dropdown-filter
-        class="item item-2-col"
-        value="[[_withDefault(queryParams.pds, '')]]">
-      </pd-dropdown-filter>
+        <location-filter
+            class="item"
+            value="[[_withDefault(queryParams.location, '')]]">
+        </location-filter>
 
-      <location-filter
-          class="item"
-          value="[[_withDefault(queryParams.location, '')]]">
-      </location-filter>
-
-      <text-filter
-          class="item"
-          label="Indicator Title"
-          name="blueprint__title"
-          value="[[queryParams.blueprint__title]]">
-      </text-filter>
-
-      <checkbox-filter
-        class="item item-2-col"
-        name="activepdsonly"
-        value="[[_withDefault(queryParams.activepdsonly, '')]]">
-        <span class="checkbox-label">Show for Active PDs only</span>
-      </checkbox-filter>
-
+        <text-filter
+            class="item"
+            label="Indicator Title"
+            name="blueprint__title"
+            value="[[queryParams.blueprint__title]]">
+        </text-filter>
+      </div>
     </filter-list>
   </template>
 

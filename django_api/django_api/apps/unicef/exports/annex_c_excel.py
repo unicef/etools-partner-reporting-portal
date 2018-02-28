@@ -141,7 +141,7 @@ class ProgressReportsXLSXExporter:
             (indicator_report.reportable.content_object.title, None),
             (indicator_report.get_overall_status_display(), None),
             (indicator_report.narrative_assessment, None),
-            (indicator_report.title, None),
+            (indicator_report.reportable.blueprint.title, None),
             (indicator_report.display_type, None),
             (indicator_target, None),
             (indicator_report.calculation_formula_across_locations, None),
@@ -276,7 +276,7 @@ class ProgressReportsXLSXExporter:
                 )
 
             cell.style = self.bold_center_style
-        return current_row + 1
+        return current_row + (MAX_DISAGGREGATION_DIMENSIONS if self.include_disaggregations else 1)
 
     def write_progress_reports_to_current_sheet(self, progress_reports):
         current_row = self.write_header_to_current_sheet()
@@ -318,7 +318,7 @@ class ProgressReportsXLSXExporter:
                             location_data.id, disaggregation
                         ))
 
-            current_row += 1
+                current_row += 1
 
         return current_row
 
