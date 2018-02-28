@@ -237,6 +237,7 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
         request = kwargs.get('context', {}).get('request')
         self.llo_id = kwargs.get('llo_id') or request and request.GET.get('llo')
         self.location_id = kwargs.get('location_id') or request and request.GET.get('location')
+        self.show_incomplete = kwargs.get('incomplete') or request and request.GET.get('incomplete')
 
         super(ProgressReportSerializer, self).__init__(*args, **kwargs)
 
@@ -286,6 +287,7 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
             qset = qset.filter(reportable__object_id=self.llo_id)
         if self.location_id and self.llo_id is not None:
             qset = qset.filter(reportable__locations__id=self.location_id)
+        # TODO: use incomplete flag
         return PDReportContextIndicatorReportSerializer(
             instance=qset, read_only=True, many=True).data
 
