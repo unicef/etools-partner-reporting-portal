@@ -76,7 +76,7 @@ class TimeStampedExternalURLSyncModel(TimeStampedExternalSyncModelMixin):
         unique_together = ('external_id', 'external_source')
 
 
-class Country(TimeStampedExternalSyncModelMixin):
+class Country(TimeStampedExternalURLSyncModel):
     """
     Represents a country which has many offices and sections.
     Taken from https://github.com/unicef/etools/blob/master/EquiTrack/users/models.py
@@ -93,7 +93,7 @@ class Country(TimeStampedExternalSyncModelMixin):
         return self.name
 
 
-class Workspace(TimeStampedExternalSyncModelMixin):
+class Workspace(TimeStampedExternalURLSyncModel):
     """
     Workspace (previously called Workspace, also synonym was
     emergency/country) model.
@@ -114,14 +114,18 @@ class Workspace(TimeStampedExternalSyncModelMixin):
     latitude = models.DecimalField(
         null=True, blank=True,
         max_digits=8, decimal_places=5,
-        validators=[MinValueValidator(
-            Decimal(-90)), MaxValueValidator(Decimal(90))]
+        validators=[
+            MinValueValidator(Decimal(-90)),
+            MaxValueValidator(Decimal(90))
+        ]
     )
     longitude = models.DecimalField(
         null=True, blank=True,
         max_digits=8, decimal_places=5,
-        validators=[MinValueValidator(
-            Decimal(-180)), MaxValueValidator(Decimal(180))]
+        validators=[
+            MinValueValidator(Decimal(-180)),
+            MaxValueValidator(Decimal(180))
+        ]
     )
     initial_zoom = models.IntegerField(default=8)
 
@@ -144,7 +148,7 @@ class Workspace(TimeStampedExternalSyncModelMixin):
         return Location.objects.filter(pk__in=pks)
 
 
-class ResponsePlan(TimeStampedModel):
+class ResponsePlan(TimeStampedExternalURLSyncModel):
     """
     ResponsePlan model present response of workspace (intervention).
 
@@ -168,8 +172,7 @@ class ResponsePlan(TimeStampedModel):
         blank=True,
         verbose_name='End date'
     )
-    workspace = models.ForeignKey('core.Workspace',
-                                  related_name="response_plans")
+    workspace = models.ForeignKey('core.Workspace', related_name="response_plans")
 
     class Meta:
         unique_together = ('title', 'plan_type', 'workspace')

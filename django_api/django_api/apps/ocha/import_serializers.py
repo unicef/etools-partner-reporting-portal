@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from core.common import EXTERNAL_DATA_SOURCES
+from core.models import Country, ResponsePlan, Workspace
 from partner.models import PartnerProject, Partner, FundingSource
 
 
@@ -146,3 +147,100 @@ class V1FundingSourceImportSerializer(serializers.ModelSerializer):
             sources.append(source)
 
         return sources
+
+
+class V1ResponsePlanLocationImportSerializer(serializers.ModelSerializer):
+    external_source = serializers.CharField(default=EXTERNAL_DATA_SOURCES.HPC)
+    id = serializers.IntegerField(source='external_id')
+    name = serializers.CharField()
+    iso3 = serializers.CharField(source='country_short_code')
+
+    class Meta:
+        model = Country
+        fields = (
+            'external_source',
+            'id',
+            'name',
+            'long_name',
+            'iso3',
+        )
+
+    def create(self, validated_data):
+        update_or_create_kwargs = {
+            'external_source': validated_data.pop('external_source'),
+            'external_id': validated_data.pop('external_id')
+        }
+
+        # TODO: Retrieve country.long_name from some library based on iso code?
+
+        return Country.objects.update_or_create(
+            defaults=validated_data, **update_or_create_kwargs
+        )[0]
+
+
+class V1ResponsePlanImportSerializer(serializers.ModelSerializer):
+    external_source = serializers.CharField(default=EXTERNAL_DATA_SOURCES.HPC)
+    id = serializers.IntegerField(source='external_id')
+    name = serializers.CharField(source='title')
+    startDate = serializers.DateTimeField(source='start')
+    endDate = serializers.DateTimeField(source='end')
+    locations = V1ResponsePlanLocationImportSerializer(many=True)
+    emergencies = serializers.ListField()
+
+    class Meta:
+        model = ResponsePlan
+        fields = (
+            'external_source',
+            'name',
+            'id',
+            'startDate',
+            'endDate',
+            'locations',
+            'emergencies',
+        )
+
+    def get_workspace(self, emergencies, locations):
+        if emergencies:
+            workspace_id = emergencies[0]['id']
+            workspace_title = emergencies[0]['name']
+            # TODO: How do we generate workspace code for emergency
+            workspace_code = 'EM{}'.format(emergencies[0]['id'])
+        elif len(locations) == 1:
+            workspace_id = None
+            workspace_title = locations[0]['name']
+            workspace_code = locations[0]['country_short_code']
+        else:
+            raise serializers.ValidationError('No overall emergency named for multi country plan')
+        # TODO: Handling of duplicate workspace codes
+
+        update_or_create_kwargs = {
+            'external_source': EXTERNAL_DATA_SOURCES.HPC,
+            'external_id': workspace_id
+        }
+
+        workspace, _ = Workspace.objects.update_or_create(
+            defaults={
+                'title': workspace_title,
+                'workspace_code': workspace_code,
+            },
+            **update_or_create_kwargs
+        )
+
+        location_serializer = V1ResponsePlanLocationImportSerializer(
+            data=self.initial_data['locations'], many=True
+        )
+        location_serializer.is_valid(raise_exception=True)
+
+        workspace.countries.add(*location_serializer.save())
+
+        return workspace
+
+    def create(self, validated_data):
+        workspace = self.get_workspace(
+            validated_data.pop('emergencies'),
+            validated_data.pop('locations'),
+        )
+
+        validated_data['workspace'] = workspace
+
+        return super(V1ResponsePlanImportSerializer, self).create(validated_data)
