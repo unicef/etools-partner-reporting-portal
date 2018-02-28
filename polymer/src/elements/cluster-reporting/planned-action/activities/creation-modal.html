@@ -28,6 +28,7 @@
 <link rel="import" href="../../../etools-prp-permissions.html">
 <link rel="import" href="../../../etools-prp-date-input.html">
 <link rel="import" href="../../../form-fields/partner-dropdown-content.html">
+<link rel="import" href="../../../form-fields/cluster-dropdown-content.html">
 
 <dom-module id="planned-action-activity-modal">
   <template>
@@ -92,11 +93,6 @@
     </etools-prp-ajax>
 
     <etools-prp-ajax
-        id="clusters"
-        url="[[clustersUrl]]">
-    </etools-prp-ajax>
-
-    <etools-prp-ajax
         id="activities"
         params="[[activitiesParams]]"
         url="[[activitiesUrl]]">
@@ -114,6 +110,7 @@
         url="[[objectivesUrl]]">
     </etools-prp-ajax>
 
+    <cluster-dropdown-content clusters="{{clusters}}"></cluster-dropdown-content>
     <partner-dropdown-content
       partners="{{partners}}"
       clusters="[[imoClusters]]">
@@ -440,12 +437,6 @@
           },
         },
 
-        clustersUrl: {
-          type: String,
-          computed: '_computeClustersUrl(responsePlanId)',
-          observer: '_fetchClusters',
-        },
-
         clusters: {
           type: Array,
           value: [],
@@ -583,29 +574,12 @@
         return App.Endpoints.partnerActivity(responsePlanId, mode);
       },
 
-      _computeClustersUrl: function (responsePlanId) {
-        return App.Endpoints.clusterNames(responsePlanId);
-      },
-
       _computeProjectsUrl: function (responsePlanId) {
         return App.Endpoints.plannedActions(responsePlanId);
       },
 
       _computeObjectivesUrl: function (responsePlanId) {
         return App.Endpoints.responseParametersClusterObjectives(responsePlanId);
-      },
-
-      _fetchClusters: function () {
-        var self = this;
-        this.$.clusters.abort();
-
-        this.$.clusters.thunk()()
-            .then(function (res) {
-              self.set('clusters', res.data);
-            })
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-            });
       },
 
       _fetchActivities: function (clusterId) {

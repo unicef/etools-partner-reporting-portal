@@ -27,7 +27,7 @@
     <page-body>
       <template
         is="dom-if"
-        if="[[_canEditActivity(permissions, responsePlanCurrent)]]"
+        if="[[_canEditActivity(permissions, activityData)]]"
         restamp="true">
         <div id="action">
           <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
@@ -65,9 +65,9 @@
 
       },
 
-      _canEditActivity: function(permissions, responsePlanCurrent) {
-        if (responsePlanCurrent) {
-          return permissions.createPartnerEntitiesByResponsePlanAsIMO(responsePlanCurrent.clusters);
+      _canEditActivity: function(permissions, activityData) {
+        if (activityData.cluster) {
+          return permissions.createPartnerEntitiesByResponsePlanAsIMO([activityData.cluster]);
         }
       },
 
