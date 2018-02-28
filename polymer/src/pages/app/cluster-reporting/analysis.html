@@ -7,12 +7,20 @@
 <link rel="import" href="../../../behaviors/utils.html">
 <link rel="import" href="../../../elements/page-header.html">
 <link rel="import" href="../../../elements/page-body.html">
+<link rel="import" href="../../../elements/cluster-reporting/analysis/analysis-filters.html">
+<link rel="import" href="analysis/operational-presence.html">
+<link rel="import" href="analysis/indicators.html">
 
 <dom-module id="page-cluster-reporting-analysis">
   <template>
     <style>
       :host {
         display: block;
+      }
+
+      paper-tabs {
+        margin-bottom: 25px;
+        border-bottom: 1px solid var(--paper-grey-300);
       }
     </style>
 
@@ -22,20 +30,20 @@
         data="{{routeData}}">
     </app-route>
 
-    <page-header title="Analysis">
-      <div class="tabs">
-        <paper-tabs
-            selected="{{tab}}"
-            attr-for-selected="name"
-            scrollable
-            hide-scroll-buttons>
-          <paper-tab name="operational-presence">Operational presence</paper-tab>
-          <paper-tab name="indicators">Indicators</paper-tab>
-        </paper-tabs>
-      </div>
-    </page-header>
+    <page-header title="Analysis"></page-header>
 
     <page-body>
+      <analysis-filters></analysis-filters>
+
+      <paper-tabs
+          selected="{{tab}}"
+          attr-for-selected="name"
+          scrollable
+          hide-scroll-buttons>
+        <paper-tab name="operational-presence">Operational presence</paper-tab>
+        <paper-tab name="indicators">Indicators</paper-tab>
+      </paper-tabs>
+
       <iron-pages
           selected="[[tab]]"
           attr-for-selected="name">
@@ -43,13 +51,17 @@
             is="dom-if"
             if="[[_equals(tab, 'operational-presence')]]"
             restamp="true">
-          <h1 name="operational-presence">Operational presence</h1>
+          <page-analysis-operational-presence
+              name="operational-presence">
+          </page-analysis-operational-presence>
         </template>
         <template
             is="dom-if"
             if="[[_equals(tab, 'indicators')]]"
             restamp="true">
-          <h1 name="indicators">Indicators</h1>
+          <page-analysis-indicators
+              name="indicators">
+          </page-analysis-indicators>
         </template>
       </iron-pages>
     </page-body>

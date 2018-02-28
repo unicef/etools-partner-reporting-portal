@@ -1,0 +1,22 @@
+<link rel="import" href="../polyfills/es6-shim.html">
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Behaviors = App.Behaviors || {};
+
+    App.Behaviors.AnalysisChart = {
+      _baseOptions: {
+        bar: {
+          groupWidth: 20,
+        },
+        chartArea: {
+          top: 0,
+        },
+        legend: 'none',
+      },
+    };
+
+  }());
+</script>

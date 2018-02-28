@@ -1,0 +1,30 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/etools-loading/etools-loading.html">
+
+<link rel="import" href="../../../styles/analysis-widget.html">
+
+<dom-module id="analysis-widget">
+  <template>
+    <style include="analysis-widget-styles"></style>
+
+    <div class="analysis-widget">
+      <h3 class="analysis-widget__header">[[widgetTitle]]</h3>
+      <div class="analysis-widget__body">
+        <content></content>
+      </div>
+    </div>
+
+    <etools-loading active="[[loading]]"></etools-loading>
+  </template>
+
+  <script>
+    Polymer({
+      id: 'pd-filters',
+
+      properties: {
+        widgetTitle: String,
+        loading: Boolean,
+      },
+    });
+  </script>
+</dom-module>

@@ -1,0 +1,81 @@
+<link rel="import" href="../redux.html">
+<link rel="import" href="../../constants.html">
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Reducers = App.Reducers || {};
+
+    App.Reducers.Analysis = Redux.combineReducers({
+      operationalPresence: Redux.combineReducers({
+        data: operationalPresenceDataReducer,
+        dataLoading: operationalPresenceDataLoadingReducer,
+        map: operationalPresenceMapReducer,
+        mapLoading: operationalPresenceMapLoadingReducer,
+      }),
+    });
+
+    function operationalPresenceDataReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = {};
+      }
+
+      switch (action.type) {
+        case App.Constants.SET_OPERATIONAL_PRESENCE_DATA:
+          return action.data;
+
+        default:
+          return state;
+      }
+    }
+
+    function operationalPresenceDataLoadingReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = false;
+      }
+
+      switch (action.type) {
+        case App.Constants.OPERATIONAL_PRESENCE_DATA_LOADING_START:
+          return true;
+
+        case App.Constants.OPERATIONAL_PRESENCE_DATA_LOADING_STOP:
+          return false;
+
+        default:
+          return state;
+      }
+    }
+
+    function operationalPresenceMapReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = {};
+      }
+
+      switch (action.type) {
+        case App.Constants.SET_OPERATIONAL_PRESENCE_MAP:
+          return action.map;
+
+        default:
+          return state;
+      }
+    }
+
+    function operationalPresenceMapLoadingReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = false;
+      }
+
+      switch (action.type) {
+        case App.Constants.OPERATIONAL_PRESENCE_MAP_LOADING_START:
+          return true;
+
+        case App.Constants.OPERATIONAL_PRESENCE_MAP_LOADING_STOP:
+          return false;
+
+        default:
+          return state;
+      }
+    }
+  }());
+</script>
