@@ -5,7 +5,7 @@ from partner.models import PartnerProject, Partner, FundingSource
 
 
 class PartnerImportSerializer(serializers.ModelSerializer):
-    external_source = serializers.CharField(default=EXTERNAL_DATA_SOURCES.RPM)
+    external_source = serializers.CharField(default=EXTERNAL_DATA_SOURCES.HPC)
     id = serializers.IntegerField(source='external_id')
     name = serializers.CharField(source='title')
     abbreviation = serializers.CharField(source='short_title')
@@ -23,7 +23,7 @@ class PartnerImportSerializer(serializers.ModelSerializer):
 
 
 class V2PartnerProjectImportSerializer(serializers.ModelSerializer):
-    external_source = serializers.CharField(default=EXTERNAL_DATA_SOURCES.RPM)
+    external_source = serializers.CharField(default=EXTERNAL_DATA_SOURCES.HPC)
     id = serializers.IntegerField(source='external_id')
     name = serializers.CharField(source='title')
     startDate = serializers.DateTimeField(source='start_date')
@@ -124,6 +124,7 @@ class V1FundingSourceImportSerializer(serializers.ModelSerializer):
 
             get_or_crete_kwargs = {
                 'external_id': flow['id'],
+                'external_source': EXTERNAL_DATA_SOURCES.HPC,
                 'partner_project_id': project.id,
             }
 

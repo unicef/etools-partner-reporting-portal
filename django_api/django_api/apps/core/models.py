@@ -20,7 +20,8 @@ from mptt.models import MPTTModel, TreeForeignKey
 from .common import (
     RESPONSE_PLAN_TYPE,
     INDICATOR_REPORT_STATUS,
-    OVERALL_STATUS
+    OVERALL_STATUS,
+    EXTERNAL_DATA_SOURCES,
 )
 from utils.groups.wrappers import GroupWrapper
 
@@ -67,10 +68,12 @@ class TimeStampedExternalSyncModelMixin(TimeStampedModel):
 
 
 class TimeStampedExternalURLSyncModel(TimeStampedExternalSyncModelMixin):
+    external_source = models.TextField(choices=EXTERNAL_DATA_SOURCES, blank=True, null=True)
     external_url = models.URLField(null=True, blank=True)
 
     class Meta:
         abstract = True
+        unique_together = ('external_id', 'external_source')
 
 
 class Country(TimeStampedExternalSyncModelMixin):

@@ -40,7 +40,10 @@ def import_project(external_project_id):
     try:
         funding_serializer = V1FundingSourceImportSerializer(data=funding_data['data'])
         funding_serializer.is_valid(raise_exception=True)
-        funding_serializer.save()
+        funding_sources = funding_serializer.save()
+        for fs in funding_sources:
+            fs.external_url = funding_url
+            fs.save()
     except Exception:
         logger.exception('No funding data found for project_id: {}'.format(external_project_id))
 

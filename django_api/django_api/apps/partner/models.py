@@ -12,15 +12,14 @@ from core.common import (
     SHARED_PARTNER_TYPE,
     CSO_TYPES,
     PARTNER_PROJECT_STATUS,
-    EXTERNAL_DATA_SOURCES,
     CURRENCIES,
 )
-from core.models import TimeStampedExternalSyncModelMixin, TimeStampedExternalURLSyncModel
+from core.models import TimeStampedExternalURLSyncModel
 
 from core.countries import COUNTRIES_ALPHA2_CODE_DICT, COUNTRIES_ALPHA2_CODE
 
 
-class Partner(TimeStampedExternalSyncModelMixin):
+class Partner(TimeStampedExternalURLSyncModel):
     """
     Partner model describe in details who is it and their activity humanitarian
     goals (clusters).
@@ -28,7 +27,6 @@ class Partner(TimeStampedExternalSyncModelMixin):
     related models:
         cluster.Cluster (ManyToManyField): "clusters"
     """
-    external_source = models.TextField(choices=EXTERNAL_DATA_SOURCES, blank=True, null=True)
     title = models.CharField(
         max_length=255,
         verbose_name='Full Name',
@@ -145,7 +143,6 @@ class Partner(TimeStampedExternalSyncModelMixin):
         ordering = ['title']
         unique_together = (
             ('title', 'vendor_number'),
-            ('external_id', 'external_source'),
         )
 
     def __str__(self):
@@ -174,7 +171,6 @@ class PartnerProject(TimeStampedExternalURLSyncModel):
         partner.FundingSource (ForeignKey): "funding_sources"
         indicator.Reportable (GenericRelation): "reportables"
     """
-    external_source = models.TextField(choices=EXTERNAL_DATA_SOURCES, blank=True, null=True)
     code = models.TextField(null=True, blank=True, unique=True)
 
     title = models.CharField(max_length=255)
@@ -206,9 +202,7 @@ class PartnerProject(TimeStampedExternalURLSyncModel):
 
     class Meta:
         ordering = ['-id']
-        unique_together = (
-            ('external_id', 'external_source'),
-        )
+        unique_together = TimeStampedExternalURLSyncModel.Meta.unique_together
 
     def __str__(self):
         return '{} #{} {}'.format(

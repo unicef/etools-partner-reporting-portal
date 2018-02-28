@@ -168,7 +168,8 @@ PARTNER_ACTIVITY_STATUS = Choices(
 )
 
 EXTERNAL_DATA_SOURCES = Choices(
-    ("RPM", "RPM"),
+    ("HPC", "HPC"),
+    ("OPS", "OPS"),
 )
 
 CURRENCIES = Choices(
