@@ -228,6 +228,11 @@ class PartnerActivityBaseCreateSerializer(serializers.Serializer):
                 'partner': 'Partner ID {} does not exist.'.format(data['partner'])
             })
 
+        if partner not in cluster.partners.all():
+            raise serializers.ValidationError({
+                'partner': 'Partner does not belong to Cluster {}.'.format(data['cluster'])
+            })
+
         project = PartnerProject.objects.filter(id=data['project']).first()
         if not project:
             raise serializers.ValidationError({
