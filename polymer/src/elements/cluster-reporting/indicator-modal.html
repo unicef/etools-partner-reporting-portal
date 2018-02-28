@@ -594,10 +594,8 @@
               self.set('errors', {});
               self.close();
             })
-            .catch(function (err) { // jshint ignore:line
-              self.set('errors', err.data)
-              // TODO: error handling
-
+            .catch(function (err) {
+              self.set('errors', err.data);
               self.set('updatePending', false);
             });
       },
