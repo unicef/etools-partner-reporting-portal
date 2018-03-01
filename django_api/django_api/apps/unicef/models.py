@@ -429,7 +429,10 @@ def synchronize_ir_status_from_pr(sender, instance, **kwargs):
     linked to this ProgressReport should all be updated for its report status.
     """
     # Update its Indicator Report status according to new Progress Report status
-    instance.indicator_reports.all().update(report_status=instance.status)
+    # Looping here as .update() on queryset does not invoke signals
+    for ir in instance.indicator_reports.all():
+        ir.report_status = instance.status
+        ir.save()
 
 
 class ReportingPeriodDates(TimeStampedExternalSyncModelMixin):
