@@ -55,9 +55,11 @@
         <span class="col-data flex-4">
           <etools-prp-progress-bar number="[[indicator.progress_percentage]]">
         </span>
-        <span class="col-data flex-1">
-          <a href="[[indicatorReportsUrl]]">REPORTS</a>
-        </span>
+        <template is="dom-if" if="[[isClusterApp]]">
+          <span class="col-data flex-1">
+            <a href="[[indicatorReportsUrl]]">REPORTS</a>
+          </span>
+        </template>
         <template is="dom-if" if="[[canEdit]]">
           <span class="col-data flex-1">
             <a href="#" on-tap="_openModal">EDIT</a>
@@ -101,10 +103,24 @@
           computed: '_computeIndicatorReportsUrl(_baseUrlCluster, indicator)',
         },
 
+        isClusterApp: {
+          type: Boolean,
+          computed: '_computeIsClusterApp()',
+        },
+
+        appName: {
+          type: String,
+          statePath: 'app.current',
+        },
+
       },
 
       _openModal: function() {
         this.$$('#modal').open();
+      },
+
+      _computeIsClusterApp: function() {
+        return this.appName === "cluster-reporting";
       },
 
       _computeIndicatorReportsUrl: function(baseUrl, indicator) {
