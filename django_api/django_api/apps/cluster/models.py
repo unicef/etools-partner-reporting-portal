@@ -6,8 +6,6 @@ from django.db.models import Q
 from django.utils.functional import cached_property
 from django.contrib.contenttypes.fields import GenericRelation
 
-from model_utils.models import TimeStampedModel
-
 from core.common import (
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
@@ -29,6 +27,7 @@ class Cluster(TimeStampedExternalURLSyncModel):
         core.Workspace (ForeignKey): "intervention"
 
     """
+    # TODO handle serializers etc where this is still treated as choice field
     type = models.TextField(max_length=512)
     response_plan = models.ForeignKey(
         'core.ResponsePlan', null=True, related_name="clusters"
@@ -36,8 +35,10 @@ class Cluster(TimeStampedExternalURLSyncModel):
 
     class Meta:
         """One response plan can only have a cluster of one type."""
-        # Additional case-insensitive unique index is present in DB
-        unique_together = ('type', 'response_plan')
+        unique_together = (
+            ('type', 'response_plan'),
+            TimeStampedExternalURLSyncModel.Meta.unique_together
+        )
 
     def __str__(self):
         return "<pk: {}> `{}` PLAN: `{}`".format(
@@ -216,7 +217,7 @@ class Cluster(TimeStampedExternalURLSyncModel):
         )
 
 
-class ClusterObjective(TimeStampedModel):
+class ClusterObjective(TimeStampedExternalURLSyncModel):
     """
     ClusterObjective model is goal of cluster. This goal should be reached via
     whole cluster aspect.
@@ -226,16 +227,22 @@ class ClusterObjective(TimeStampedModel):
         cluster.Cluster (ForeignKey): "cluster"
         indicator.Reportable (GenericRelation): "reportables"
     """
-    title = models.CharField(max_length=255,
-                             verbose_name='Cluster Objective Title')
+    title = models.TextField(
+        max_length=2048, verbose_name='Cluster Objective Title'
+    )
     cluster = models.ForeignKey(Cluster, related_name="cluster_objectives")
-    locations = models.ManyToManyField('core.Location',
-                                       related_name="cluster_objectives")
-    reportables = GenericRelation('indicator.Reportable',
-                                  related_query_name='cluster_objectives')
+    locations = models.ManyToManyField(
+        'core.Location', related_name="cluster_objectives"
+    )
+    reportables = GenericRelation(
+        'indicator.Reportable', related_query_name='cluster_objectives'
+    )
 
     class Meta:
         ordering = ['-id']
+        unique_together = (
+            TimeStampedExternalURLSyncModel.Meta.unique_together
+        )
 
     @property
     def response_plan(self):
@@ -245,7 +252,7 @@ class ClusterObjective(TimeStampedModel):
         return "<pk: %s> %s" % (self.id, self.title)
 
 
-class ClusterActivity(TimeStampedModel):
+class ClusterActivity(TimeStampedExternalURLSyncModel):
     """
     ClusterActivity models is an action, which one to take, to reach the goal
     (that is defined in ClusterObjective). These activities are decided by
@@ -256,16 +263,22 @@ class ClusterActivity(TimeStampedModel):
         cluster.ClusterObjective (ForeignKey): "cluster_objective"
         indicator.Reportable (GenericRelation): "reportables"
     """
-    title = models.CharField(max_length=255)
-    cluster_objective = models.ForeignKey(ClusterObjective,
-                                          related_name="cluster_activities")
-    locations = models.ManyToManyField('core.Location',
-                                       related_name="cluster_activities")
-    reportables = GenericRelation('indicator.Reportable',
-                                  related_query_name='cluster_activities')
+    title = models.TextField(max_length=2048)
+    cluster_objective = models.ForeignKey(
+        ClusterObjective, related_name="cluster_activities"
+    )
+    locations = models.ManyToManyField(
+        'core.Location', related_name="cluster_activities"
+    )
+    reportables = GenericRelation(
+        'indicator.Reportable', related_query_name='cluster_activities'
+    )
 
     class Meta:
         ordering = ['-id']
+        unique_together = (
+            TimeStampedExternalURLSyncModel.Meta.unique_together
+        )
 
     @property
     def cluster(self):

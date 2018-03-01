@@ -1,9 +1,20 @@
+import logging
+
 from rest_framework import serializers
 
 from cluster.models import Cluster
 from core.common import EXTERNAL_DATA_SOURCES
 from core.models import Country, ResponsePlan, Workspace
 from partner.models import PartnerProject, Partner, FundingSource
+
+
+logger = logging.getLogger('ocha-sync')
+
+
+class DiscardUniqueTogetherValidationMixin(object):
+
+    def get_unique_together_validators(self):
+        return []
 
 
 class PartnerImportSerializer(serializers.ModelSerializer):
@@ -150,7 +161,7 @@ class V1FundingSourceImportSerializer(serializers.ModelSerializer):
         return sources
 
 
-class V1ResponsePlanLocationImportSerializer(serializers.ModelSerializer):
+class V1ResponsePlanLocationImportSerializer(DiscardUniqueTogetherValidationMixin, serializers.ModelSerializer):
     external_source = serializers.CharField(default=EXTERNAL_DATA_SOURCES.HPC)
     id = serializers.IntegerField(source='external_id')
     name = serializers.CharField()
@@ -179,7 +190,8 @@ class V1ResponsePlanLocationImportSerializer(serializers.ModelSerializer):
         )[0]
 
 
-class V1ResponsePlanImportSerializer(serializers.ModelSerializer):
+class V1ResponsePlanImportSerializer(DiscardUniqueTogetherValidationMixin, serializers.ModelSerializer):
+    workspace_id = serializers.IntegerField(required=False)
     external_source = serializers.CharField(default=EXTERNAL_DATA_SOURCES.HPC)
     id = serializers.IntegerField(source='external_id')
     name = serializers.CharField(source='title')
@@ -192,6 +204,7 @@ class V1ResponsePlanImportSerializer(serializers.ModelSerializer):
     class Meta:
         model = ResponsePlan
         fields = (
+            'workspace_id',
             'external_source',
             'name',
             'id',
@@ -203,6 +216,9 @@ class V1ResponsePlanImportSerializer(serializers.ModelSerializer):
         )
 
     def get_workspace(self, emergencies, locations):
+        if 'workspace_id' in self.validated_data:
+            return Workspace.objects.get(id=self.validated_data['workspace_id'])
+
         if emergencies:
             workspace_id = emergencies[0]['id']
             workspace_title = emergencies[0]['name']
@@ -238,6 +254,20 @@ class V1ResponsePlanImportSerializer(serializers.ModelSerializer):
 
         return workspace
 
+    def save_clusters(self, response_plan, clusters_data):
+        for cluster_data in clusters_data:
+            if not cluster_data['entityPrototype']['value']['name']['en']['singular'] == 'Cluster':
+                continue
+
+            Cluster.objects.update_or_create(
+                external_id=cluster_data['id'],
+                external_source=self.validated_data['external_source'],
+                response_plan=response_plan,
+                defaults={
+                    'type': cluster_data['name']
+                }
+            )
+
     def create(self, validated_data):
         workspace = self.get_workspace(
             validated_data.pop('emergencies'),
@@ -247,15 +277,14 @@ class V1ResponsePlanImportSerializer(serializers.ModelSerializer):
         validated_data['workspace'] = workspace
         clusters_data = validated_data.pop('governingEntities')
 
-        response_plan = super(V1ResponsePlanImportSerializer, self).create(validated_data)
-        for cluster_data in clusters_data:
-            Cluster.objects.update_or_create(
-                external_id=cluster_data['id'],
-                external_source=validated_data['external_source'],
-                response_plan=response_plan,
-                defaults={
-                    'type': cluster_data['name']
-                }
-            )
+        update_or_create_kwargs = {
+            'external_source': validated_data.pop('external_source'),
+            'external_id': validated_data.pop('external_id')
+        }
+
+        response_plan, _ = ResponsePlan.objects.update_or_create(
+            defaults=validated_data, **update_or_create_kwargs
+        )
+        self.save_clusters(response_plan, clusters_data)
 
         return response_plan

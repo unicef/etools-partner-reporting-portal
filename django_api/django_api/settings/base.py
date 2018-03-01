@@ -265,6 +265,11 @@ LOGGING = {
         },
     },
     'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'stream': sys.stdout,
+        },
         'default': {
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',
@@ -285,7 +290,7 @@ LOGGING = {
             'propagate': True
         },
         'ocha-sync': {
-            'handlers': ['default'],
+            'handlers': ['default', 'console'],
             'level': 'INFO',
             'propagate': True
         },

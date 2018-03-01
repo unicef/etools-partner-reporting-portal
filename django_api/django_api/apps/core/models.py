@@ -178,7 +178,7 @@ class ResponsePlan(TimeStampedExternalURLSyncModel):
         unique_together = ('title', 'plan_type', 'workspace')
 
     def __str__(self):
-        return self.title
+        return '#{} {}'.format(self.id, self.title)
 
     @property
     def documents(self):

@@ -61,12 +61,12 @@ class V1ResponsePlanImportSerializerTest(TestCase):
         serializer = V1ResponsePlanImportSerializer(data=response_plan_data)
         self.assertTrue(serializer.is_valid(raise_exception=True))
         response_plan = serializer.save()
-        self.assertEqual(response_plan.title, 'Iraq 2015')
+        self.assertEqual(response_plan.title, 'occupied Palestinian territory 2016')
         self.assertEqual(
             len(response_plan_data['locations']),
             response_plan.workspace.countries.count()
         )
-        self.assertEqual(response_plan.workspace.title, 'Iraq')
+        self.assertEqual(response_plan.workspace.title, 'occupied Palestinian territory')
         self.assertEqual(
             len(response_plan_data['governingEntities']),
             response_plan.clusters.count()
