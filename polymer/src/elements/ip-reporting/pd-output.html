@@ -8,6 +8,7 @@
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/notifications.html">
+<link rel="import" href="../../behaviors/routing.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
 <link rel="import" href="../../redux/selectors/programmeDocuments.html">
@@ -158,8 +159,8 @@
                   <h3>[[indicator.reportable.blueprint.title]]</h3>
 
                   <dl class="layout horizontal">
-                    <dt><a>Calculation methods</a>:</dt>
-                    <dt>[[indicator.reportable.blueprint.calculation_formula_across_locations]] (across locations), [[indicator.reportable.blueprint.calculation_formula_across_periods]] (across reporting periods)</dt>
+                    <dt><a href="[[calculationMethodUrl]]">Calculation methods</a>:</dt>
+                    <dt><b>[[indicator.reportable.blueprint.calculation_formula_across_locations]]</b> (across locations), <b>[[indicator.reportable.blueprint.calculation_formula_across_periods]]</b> (across reporting periods)</dt>
                   </dl>
                 </div>
               </div>
@@ -245,6 +246,7 @@
         App.Behaviors.NotificationsBehavior,
         App.Behaviors.ReduxBehavior,
         App.Behaviors.ProgressReportUtilsBehavior,
+        App.Behaviors.RoutingBehavior,
       ],
 
       properties: {
@@ -287,6 +289,11 @@
           computed: '_computeReportableUrl(reportId, data)',
         },
 
+        calculationMethodUrl: {
+          type: String,
+          computed: '_computeCalculationMethodUrl(_baseUrl, pdId)',
+        },
+
         currentReport: {
           type: Object,
           statePath: App.Selectors.ProgrammeDocumentReports.current,
@@ -319,6 +326,13 @@
 
       _computeReportableUrl: function (reportId, data) {
         return App.Endpoints.reportable(reportId, data.id);
+      },
+
+      _computeCalculationMethodUrl: function (baseUrl, pdId) {
+        return this.buildUrl(
+                baseUrl,
+                'pd/' + pdId + '/view/calculation-methods'
+              );
       },
 
       _computeShowMeta: function () {
