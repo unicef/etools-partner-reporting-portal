@@ -942,7 +942,10 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
             return {"id": obj.reportable.content_object.id, "title": obj.reportable.content_object.title}
         elif isinstance(obj.reportable.content_object, (PartnerActivity, )):
             if obj.reportable.content_object.project:
-                return {"id": obj.reportable.content_object.project.id, "title": obj.reportable.content_object.project.title}
+                return {
+                    "id": obj.reportable.content_object.project.id,
+                    "title": obj.reportable.content_object.project.title
+                }
         else:
             return None
 
