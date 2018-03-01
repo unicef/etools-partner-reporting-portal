@@ -608,19 +608,31 @@
       },
 
       _computeClusterObjectiveDetailUrl: function (baseUrl, coId) {
-        return this.buildUrl(baseUrl, 'response-parameters/clusters/objective/' + coId.toString() + '/overview');
+        return this.buildUrl(
+          baseUrl,
+          'response-parameters/clusters/objective/' + coId.toString() + '/overview'
+        );
       },
 
       _computeClusterActivityDetailUrl: function (baseUrl, caId) {
-        return this.buildUrl(baseUrl, 'response-parameters/clusters/activity/' + caId.toString() + '/overview');
+        return this.buildUrl(
+          baseUrl,
+          'response-parameters/clusters/activity/' + caId.toString() + '/overview'
+        );
       },
 
       _computePartnerProjectDetailUrl: function (baseUrl, paId) {
-        return this.buildUrl(baseUrl, 'response-parameters/partner/project/' + paId.toString() + '/overview');
+        return this.buildUrl(
+          baseUrl,
+          'response-parameters/partner/project/' + paId.toString() + '/overview'
+        );
       },
 
       _computePartnerActivityDetailUrl: function (baseUrl, paId) {
-        return this.buildUrl(baseUrl, 'response-parameters/partner/activity/' + paId.toString() + '/overview');
+        return this.buildUrl(
+          baseUrl,
+          'response-parameters/partner/activity/' + paId.toString() + '/overview'
+        );
       },
 
       _computeReportUrl: function (data) {
