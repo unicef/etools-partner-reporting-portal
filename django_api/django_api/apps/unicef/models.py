@@ -6,6 +6,8 @@ from django.db import models
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 from django.utils.functional import cached_property
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from model_utils.models import TimeStampedModel
 
@@ -416,6 +418,18 @@ class ProgressReport(TimeStampedModel):
         return "Progress Report <pk:{}>: {} {} to {}".format(
             self.id, self.programme_document, self.start_date, self.end_date
         )
+
+
+@receiver(post_save,
+          sender=ProgressReport,
+          dispatch_uid="synchronize_ir_status_from_pr")
+def synchronize_ir_status_from_pr(sender, instance, **kwargs):
+    """
+    Whenever an ProgressReport is saved, IndicatorReport objects
+    linked to this ProgressReport should all be updated for its report status.
+    """
+    # Update its Indicator Report status according to new Progress Report status
+    instance.indicator_reports.all().update(report_status=instance.status)
 
 
 class ReportingPeriodDates(TimeStampedExternalSyncModelMixin):
