@@ -18,6 +18,7 @@ from django.conf import settings
 from django.conf.urls import url, include
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.conf.urls.static import static
 
 from rest_framework_swagger.views import get_swagger_view
 
@@ -43,3 +44,4 @@ if settings.DEBUG:
 
 # Serving staticserve files for both dev and remote environments
 urlpatterns += staticfiles_urlpatterns('/api/static/')
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

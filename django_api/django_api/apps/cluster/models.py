@@ -9,7 +9,6 @@ from django.contrib.contenttypes.fields import GenericRelation
 from model_utils.models import TimeStampedModel
 
 from core.common import (
-    FREQUENCY_LEVEL,
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
     CLUSTER_TYPES,
@@ -40,7 +39,7 @@ class Cluster(TimeStampedModel):
         unique_together = ('type', 'response_plan')
 
     def __str__(self):
-        return "<pk: %s> %s" % (self.id, self.type)
+        return "<pk: %s> %s PLAN: %s" % (self.id, self.type, self.response_plan)
 
     @property
     def num_of_partners(self):

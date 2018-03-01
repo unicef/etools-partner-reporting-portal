@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
-from fabric.api import local, env, settings
-from fabric.operations import run
+from fabric.api import local
 
 
 def ssh(service):
@@ -34,6 +33,22 @@ def up(quick=False):
     local(command)
 
 
+def up_with_bundle(quick=True):
+    """
+    Create and start containers with polymer bundle served.
+    """
+    local('docker-compose -f docker-compose.polymer-bundle.yml up %s' % '' if quick else '--build')
+
+
+def restart(service):
+    """
+    restart a service container
+    :param service: ['django_api', 'polymer', 'proxy', 'db']
+    """
+    assert service in ['django_api', 'polymer', 'proxy', 'db'], "%s is unrecognized service"
+    local('docker-compose restart %s' % service)
+
+
 def down():
     """
     Stop all containers.
@@ -62,7 +77,7 @@ def stop():
     local('docker-compose stop')
 
 
-def fixtures(quantity=40):
+def fixtures(quantity=2):
     """
     Load example data from generate_fake_data management command.
     """
@@ -74,6 +89,13 @@ def real_fixtures(area=False):
     Uses real sync with PMP API to get all data.
     """
     local('docker-compose exec django_api python manage.py generate_real_data --clean_before %s' % ("--area %s --fast" % area if area else ""))
+
+
+def tests(test_path=''):
+    """
+    Run django_api tests.
+    """
+    local('docker-compose exec django_api python manage.py test {} --parallel --noinput'.format(test_path))
 
 
 def fake_users(fast=False):
@@ -96,8 +118,9 @@ def remove_untagged_images():
     """
     local('docker rmi $(docker images | grep "^<none>" | awk "{print $3}")')
 
-def autopep8():
+
+def backend_lint():
     """
-    Format all Python files to pep8-compliant
+    Run python code linter
     """
-    local('docker-compose exec django_api find . -name \*.py -not -path "./django_api/apps/**/migrations/*.py" -exec autopep8 --in-place --aggressive --recursive --jobs 2 --ignore=E402 {} +')
+    local('docker-compose exec django_api flake8 ./ --count')

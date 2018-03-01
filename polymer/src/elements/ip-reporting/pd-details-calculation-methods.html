@@ -14,12 +14,14 @@
 <link rel="import" href="../../redux/selectors/programmeDocumentsIndicators.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/data-table.html">
+<link rel="import" href="../../behaviors/notifications.html">
 <link rel="import" href="../page-body.html">
 <link rel="import" href="../etools-prp-ajax.html">
 <link rel="import" href="../etools-prp-permissions.html">
 <link rel="import" href="../confirm-box.html">
 <link rel="import" href="../../styles/table-styles.html">
 <link rel="import" href="../../styles/buttons.html">
+<link rel="import" href="../calculation-methods-info-bar.html">
 
 <dom-module id="pd-details-calculation-methods">
   <template>
@@ -78,6 +80,7 @@
     </etools-prp-ajax>
 
     <page-body>
+      <calculation-methods-info-bar></calculation-methods-info-bar>
       <etools-data-table-header no-collapse>
         <etools-data-table-column>
           <div class="table-column">Indicators for this PD/SSFA</div>
@@ -129,9 +132,9 @@
                           data-scope="calculation_formula_across_locations"
                           on-paper-radio-group-changed="_onValueChanged"
                           selected="[[_computeSelected(item.data, 'calculation_formula_across_locations')]]">
-                        <paper-radio-button name="sum">sum</paper-radio-button>
-                        <paper-radio-button name="max">max</paper-radio-button>
-                        <paper-radio-button name="avg">avg</paper-radio-button>
+                        <paper-radio-button name="sum">SUM</paper-radio-button>
+                        <paper-radio-button name="max">MAX</paper-radio-button>
+                        <paper-radio-button name="avg">AVG</paper-radio-button>
                       </paper-radio-group>
                     </template>
                     <template
@@ -144,8 +147,8 @@
                           data-scope="calculation_formula_across_locations"
                           on-paper-radio-group-changed="_onValueChanged"
                           selected="[[_computeSelected(item.data, 'calculation_formula_across_locations')]]">
-                        <paper-radio-button name="percentage">percentage</paper-radio-button>
-                        <paper-radio-button name="ratio">ratio</paper-radio-button>
+                        <paper-radio-button name="percentage">PERCENTAGE</paper-radio-button>
+                        <paper-radio-button name="ratio">RATIO</paper-radio-button>
                       </paper-radio-group>
                     </template>
                   </template>
@@ -169,9 +172,9 @@
                           data-scope="calculation_formula_across_periods"
                           on-paper-radio-group-changed="_onValueChanged"
                           selected="[[_computeSelected(item.data, 'calculation_formula_across_periods')]]">
-                        <paper-radio-button name="sum">sum</paper-radio-button>
-                        <paper-radio-button name="max">max</paper-radio-button>
-                        <paper-radio-button name="avg">avg</paper-radio-button>
+                        <paper-radio-button name="sum">SUM</paper-radio-button>
+                        <paper-radio-button name="max">MAX</paper-radio-button>
+                        <paper-radio-button name="avg">AVG</paper-radio-button>
                       </paper-radio-group>
                     </template>
                     <template
@@ -184,8 +187,8 @@
                           data-scope="calculation_formula_across_periods"
                           on-paper-radio-group-changed="_onValueChanged"
                           selected="[[_computeSelected(item.data, 'calculation_formula_across_periods')]]">
-                        <paper-radio-button name="percentage">percentage</paper-radio-button>
-                        <paper-radio-button name="ratio">ratio</paper-radio-button>
+                        <paper-radio-button name="percentage">PERCENTAGE</paper-radio-button>
+                        <paper-radio-button name="ratio">RATIO</paper-radio-button>
                       </paper-radio-group>
                     </template>
                   </template>
@@ -230,6 +233,7 @@
         App.Behaviors.ReduxBehavior,
         App.Behaviors.UtilsBehavior,
         App.Behaviors.DataTableBehavior,
+        App.Behaviors.NotificationsBehavior,
       ],
 
       properties: {
@@ -355,8 +359,9 @@
             .then(function () {
               var updateThunk = self.$.update.thunk();
 
-              self.dispatch(App.Actions.PDIndicators.update(updateThunk, self.pdId));
+              return self.dispatch(App.Actions.PDIndicators.update(updateThunk, self.pdId));
             })
+            .then(this._notifyChangesSaved.bind(this))
             .catch(this._noop);
       },
 

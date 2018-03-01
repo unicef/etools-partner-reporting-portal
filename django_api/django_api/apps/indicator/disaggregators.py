@@ -105,15 +105,9 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
     @staticmethod
     def calculate_indicator_report_total(indicator_report):
         # Importing here to avoid circular dependencies
-        from indicator.models import IndicatorBlueprint
-
+    
         # Reset the IndicatorReport total
-        ir_total = {
-            'c': 0,
-            'd': 0,
-            'v': 0,
-        }
-        ir_total['d'] = 1
+        ir_total = {'c': 0, 'd': 1, 'v': 0}
 
         # IndicatorReport total calculation
         if indicator_report.calculation_formula_across_locations == IndicatorBlueprint.MAX:

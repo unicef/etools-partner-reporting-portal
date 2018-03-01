@@ -1,0 +1,55 @@
+<link rel="import" href="../redux.html">
+<link rel="import" href="../../constants.html">
+<link rel="import" href="../../polyfills/es6-shim.html">
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Reducers = App.Reducers || {};
+
+    App.Reducers.ProgrammeDocumentReportsAttachments = Redux.combineReducers({
+      byReport: attachmentsByReportReducer,
+      pendingByReport: attachmentsPendingByReportReducer,
+    });
+
+    function updateForReport(state, reportId, newValue) {
+      var change = {};
+
+      change[reportId] = newValue;
+
+      return Object.assign({}, state, change);
+    }
+
+    function attachmentsByReportReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = {};
+      }
+
+      switch (action.type) {
+        case App.Constants.SET_PD_REPORT_ATTACHMENTS:
+          return updateForReport(state, action.reportId, action.data);
+
+        default:
+          return state;
+      }
+    }
+
+    function attachmentsPendingByReportReducer(state, action) {
+      if (typeof state === 'undefined') {
+        state = {};
+      }
+
+      switch (action.type) {
+        case App.Constants.PD_REPORT_ATTACHMENTS_LOADING_START:
+          return updateForReport(state, action.reportId, true);
+
+        case App.Constants.PD_REPORT_ATTACHMENTS_LOADING_STOP:
+          return updateForReport(state, action.reportId, false);
+
+        default:
+          return state;
+      }
+    }
+  }());
+</script>

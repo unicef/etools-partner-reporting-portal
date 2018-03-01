@@ -1,0 +1,188 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/etools-file/etools-file.html">
+
+<link rel="import" href="../../endpoints.html">
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/notifications.html">
+<link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../redux/actions/pdReportsAttachments.html">
+<link rel="import" href="../../redux/selectors/programmeDocumentReportsAttachments.html">
+<link rel="import" href="../etools-prp-ajax.html">
+
+<dom-module id="report-attachments">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <etools-prp-ajax
+        id="upload"
+        method="put"
+        url="[[attachmentsUrl]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
+        id="download"
+        method="get"
+        url="[[attachmentsUrl]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
+        id="delete"
+        method="delete"
+        url="[[attachmentsUrl]]">
+    </etools-prp-ajax>
+
+    <etools-file
+        files="{{files}}"
+        label="Attachment"
+        disabled="[[pending]]"
+        readonly="[[readonly]]"
+        use-delete-events>
+    </etools-file>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'report-attachments',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.NotificationsBehavior,
+      ],
+
+      listeners: {
+        'delete-file': '_onDeleteFile',
+      },
+
+      properties: {
+        files: Array,
+        readonly: Boolean,
+
+        pending: {
+          type: Boolean,
+          statePath: App.Selectors.ProgrammeDocumentReportsAttachments.pending,
+        },
+
+        attachments: {
+          type: Array,
+          statePath: App.Selectors.ProgrammeDocumentReportsAttachments.current,
+          observer: '_setFiles',
+        },
+
+        attachmentsUrl: {
+          type: String,
+          computed: '_computeAttachmentsUrl(locationId, reportId)',
+        },
+
+        locationId: {
+          type: String,
+          statePath: 'location.id',
+        },
+
+        reportId: {
+          type: String,
+          statePath: 'programmeDocumentReports.current.id',
+        },
+      },
+
+      observers: [
+        '_filesChanged(files.*)',
+      ],
+
+      _computeAttachmentsUrl: function (locationId, reportId) {
+        return App.Endpoints.progressReportAttachment(locationId, reportId);
+      },
+
+      _onDeleteFile: function (e) {
+        var self = this;
+        var deleteThunk;
+
+        e.stopPropagation();
+
+        deleteThunk = this.$.delete.thunk();
+
+        this.$.delete.abort();
+
+        this.dispatch(
+          App.Actions.PDReportsAttachments.sync(deleteThunk, this.reportId)
+        )
+            .then(function () {
+              self._notifyAttachmentDeleted();
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
+      },
+
+      _setFiles: function (attachments) {
+        this.set('files', attachments);
+      },
+
+      _filesChanged: function (change) {
+        this.debounce('files-changed', function () {
+          var file = this.files[0];
+          var self = this;
+          var uploadThunk;
+          var data;
+
+          if (change.path.split('.').length < 2 || !file) {
+            return;
+          }
+
+          uploadThunk = this.$.upload.thunk();
+
+          this.$.upload.abort();
+
+          data = new FormData();
+
+          if (file) {
+            data.append('path', file.raw, file.file_name);
+          }
+
+          this.$.upload.body = data;
+
+          this.dispatch(
+            App.Actions.PDReportsAttachments.sync(uploadThunk, this.reportId)
+          )
+              .then(function () {
+                self._notifyAttachmentUploaded();
+              })
+              .catch(function (err) { // jshint ignore:line
+                // TODO: error handling
+              });
+        });
+      },
+
+      attached: function () {
+        var downloadThunk = this.$.download.thunk();
+
+        this.$.download.abort();
+
+        this.dispatch(
+          App.Actions.PDReportsAttachments.sync(downloadThunk, this.reportId)
+        )
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
+      },
+
+      detached: function () {
+        [
+          this.$.download,
+          this.$.upload,
+          this.$.delete,
+        ].forEach(function (req) {
+          req.abort();
+        });
+
+        if (this.isDebouncerActive('files-changed')) {
+          this.cancelDebouncer('files-changed');
+        }
+      },
+    });
+  </script>
+</dom-module>

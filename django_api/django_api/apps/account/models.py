@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.core.exceptions import ValidationError
 from django.db.models.signals import post_save
 from django.utils.functional import cached_property
 
@@ -39,17 +38,24 @@ class User(AbstractUser):
                                           help_text='These are the clusters this user will have IMO privileges over.')
 
     def __str__(self):
-        return "{} - User".format(self.get_fullname())
+        return '[{}] {} ({})'.format(
+            self.pk, self.get_fullname(), self.username
+        )
 
     def get_fullname(self):
-        return "%s %s" % (self.first_name, self.last_name)
+        return ' '.join(filter(None, [self.first_name, self.last_name]))
+
+    @property
+    def display_name(self):
+        full_name = self.get_fullname()
+        return full_name + ' ({})'.format(self.email) if full_name else self.email
 
     @cached_property
     def is_unicef(self):
         return self.username == getattr(settings, 'DEFAULT_UNICEF_USER', None)
 
     @classmethod
-    def send_random_password(cls, sender, instance, created, **kwargs):
+    def lock_password_if_new(cls, sender, instance, created, **kwargs):
         if created:
             instance.set_unusable_password()
             instance.save()
@@ -77,4 +83,4 @@ class UserProfile(TimeStampedModel):
 
 
 post_save.connect(UserProfile.create_user_profile, sender=User)
-post_save.connect(User.send_random_password, sender=User)
+post_save.connect(User.lock_password_if_new, sender=User)

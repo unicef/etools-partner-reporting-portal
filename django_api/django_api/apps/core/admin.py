@@ -25,6 +25,7 @@ class LocationAdmin(LeafletGeoAdmin, admin.ModelAdmin):
         'title',
         'gateway',
         'p_code',
+        'parent',
         'geom',
         'point',
     ]
@@ -33,25 +34,11 @@ class LocationAdmin(LeafletGeoAdmin, admin.ModelAdmin):
         'parent',
     )
     list_display = ('title', 'parent', 'gateway', 'p_code', 'external_id')
-    search_fields = ('carto_db_table', 'gateway')
     search_fields = ('title', 'p_code',)
 
     def get_form(self, request, obj=None, **kwargs):
-        self.readonly_fields = [] if request.user.is_superuser else [
-            'p_code', 'geom', 'point', 'gateway']
-
+        self.readonly_fields = [] if request.user.is_superuser else ['p_code', 'geom', 'point', 'gateway']
         return super(LocationAdmin, self).get_form(request, obj, **kwargs)
-
-    # def get_fields(self, request, obj=None):
-    #
-    #     fields = super(LocationAdmin, self).get_fields(request, obj)
-    #     if obj:
-    #         if obj.point:
-    #             fields.append('point')
-    #         if obj.geom:
-    #             fields.append('geom')
-    #
-    #     return fields
 
 
 class GatewayTypeAdmin(admin.ModelAdmin):

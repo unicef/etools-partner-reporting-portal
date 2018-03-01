@@ -15,6 +15,7 @@
 <link rel="import" href="../../../../../behaviors/utils.html">
 <link rel="import" href="../../../../etools-prp-ajax.html">
 <link rel="import" href="../../../../labelled-item.html">
+<link rel="import" href="../../../../list-placeholder.html">
 <link rel="import" href="../../../../project-status.html">
 <link rel="import" href="../../../../page-body.html">
 <link rel="import" href="../../../../../redux/store.html">
@@ -112,6 +113,15 @@
           </etools-data-table-column>
         </etools-data-table-header>
 
+        <etools-data-table-footer
+            page-size="[[pageSize]]"
+            page-number="[[pageNumber]]"
+            total-results="[[totalResults]]"
+            visible-range="{{visibleRange}}"
+            on-page-size-changed="_pageSizeChanged"
+            on-page-number-changed="_pageNumberChanged">
+        </etools-data-table-footer>
+
         <template
             id="list"
             is="dom-repeat"
@@ -181,6 +191,11 @@
           </etools-data-table-row>
         </template>
 
+        <list-placeholder
+            data="[[data]]"
+            loading="[[loading]]">
+        </list-placeholder>
+
         <etools-data-table-footer
             page-size="[[pageSize]]"
             page-number="[[pageNumber]]"
@@ -247,7 +262,7 @@
         },
 
         listeners: {
-          'page-number-changed': '_pageNumberModified',
+          'page-number-changed': '_tableContentChanged',
           'details-opened-changed': '_detailsChange'
         },
 

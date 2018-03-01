@@ -39,6 +39,7 @@
         data: {
           type: Array,
           value: [],
+          observer: '_handleData'
         },
 
         value: {
@@ -58,6 +59,12 @@
             value: String(this.selectedItem.id),
           });
         });
+      },
+
+      _handleData: function (data) {
+        if (data.length) {
+          this._filterReady();
+        }
       },
     });
   </script>

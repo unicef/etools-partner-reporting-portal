@@ -59,12 +59,14 @@
       <indicator-modal
         id="indicatorModal"
         object-id="[[projectId]]"
-        object-type="PartnerProject">
+        object-type="partner.partnerproject"
+        modal-title="Add Project Indicator">
       </indicator-modal>
 
       <list-view-indicators
           data="[[data]]"
-          total-results="[[totalResults]]">
+          total-results="[[totalResults]]"
+          can-edit="[[permissions.createPartnerEntities]]">
       </list-view-indicators>
     </page-body>
   </template>
@@ -113,6 +115,7 @@
 
       listeners: {
         'indicatorModal.indicator-added': '_onSuccess',
+        'indicator-edited': '_onSuccess',
       },
 
       observers: [

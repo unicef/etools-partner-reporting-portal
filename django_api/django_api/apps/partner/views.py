@@ -1,9 +1,10 @@
 from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from rest_framework.exceptions import ValidationError
 
 from rest_framework.views import APIView
-from rest_framework.generics import RetrieveAPIView, ListCreateAPIView, ListAPIView
+from rest_framework.generics import RetrieveAPIView, ListCreateAPIView, ListAPIView, UpdateAPIView, CreateAPIView
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -20,9 +21,11 @@ from .serializers import (
     PartnerActivitySerializer,
     PartnerActivityFromClusterActivitySerializer,
     PartnerActivityFromCustomActivitySerializer,
+    PartnerSimpleSerializer,
+    PartnerActivityUpdateSerializer,
 )
 from .models import PartnerProject, PartnerActivity, Partner
-from .filters import PartnerProjectFilter, ClusterActivityPartnersFilter, PartnerActivityFilter
+from .filters import PartnerProjectFilter, ClusterActivityPartnersFilter, PartnerActivityFilter, PartnerFilter
 
 
 class PartnerDetailsAPIView(RetrieveAPIView):
@@ -53,9 +56,21 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
     def get_queryset(self, *args, **kwargs):
         response_plan_id = self.kwargs.get('response_plan_id')
 
-        return PartnerProject.objects.select_related(
+        queryset = PartnerProject.objects.select_related(
             'partner').prefetch_related('clusters', 'locations').filter(
                 clusters__response_plan_id=response_plan_id).distinct()
+
+        order = self.request.query_params.get('sort', None)
+        if order:
+            order_field = order.split('.')[0]
+            if order_field in ('title', 'clusters', 'status', 'partner'):
+                if order_field == 'clusters':
+                    order_field = 'clusters__type'
+                queryset = queryset.order_by(order_field)
+                if len(order.split('.')) > 1 and order.split('.')[1] == 'desc':
+                    queryset = queryset.order_by('-%s' % order_field)
+
+        return queryset
 
     def add_many_to_many_relations(self, instance):
         """
@@ -64,17 +79,11 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
         :return: list of errors or False
         """
         errors = []
-        try:
-            for location in self.request.data['locations']:
-                instance.locations.add(int(location['id']))
-        except Exception as exp:
-            # TODO log
-            errors.append({"locations": "list of dict ids fail."})
 
         try:
             for cluster in self.request.data['clusters']:
                 instance.clusters.add(int(cluster['id']))
-        except Exception as exp:
+        except Exception:
             # TODO log
             errors.append({"clusters": "list of dict ids fail."})
 
@@ -147,84 +156,50 @@ class PartnerProjectSimpleListAPIView(ListAPIView):
     def get_queryset(self):
         response_plan_id = self.kwargs.get(self.lookup_field)
         return PartnerProject.objects.filter(
-            partner__clusters__response_plan_id=response_plan_id)
+            partner__clusters__response_plan_id=response_plan_id).distinct()
 
 
 class PartnerSimpleListAPIView(ListAPIView):
-    serializer_class = PartnerProjectSimpleSerializer
+    serializer_class = PartnerSimpleSerializer
     permission_classes = (IsAuthenticated, )
     lookup_field = lookup_url_kwarg = 'response_plan_id'
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
+    filter_class = PartnerFilter
 
     def get_queryset(self):
         response_plan_id = self.kwargs.get(self.lookup_field)
-        return Partner.objects.filter(
-            clusters__response_plan_id=response_plan_id)
+        return Partner.objects.filter(clusters__response_plan_id=response_plan_id)
 
 
-class PartnerActivityCreateAPIView(APIView):
+class PartnerActivityCreateAPIView(CreateAPIView):
     """
     PartnerActivityCreateAPIView CRUD endpoint
     """
     permission_classes = (IsAuthenticated, )
 
-    def post(self, request, create_mode, *args, **kwargs):
-        """
-        Create on PartnerActivity model
-        :return: serialized PartnerActivity object
-        """
-        if create_mode == 'cluster':
-            serializer = PartnerActivityFromClusterActivitySerializer(
-                data=self.request.data)
+    def get_serializer_class(self):
+        choices = {
+            'cluster': PartnerActivityFromClusterActivitySerializer,
+            'custom': PartnerActivityFromCustomActivitySerializer,
+        }
 
-            if not serializer.is_valid():
-                return Response(
-                    serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        klass = choices.get(self.kwargs['create_mode'])
+        if not klass:
+            raise ValidationError('Wrong create mode flag')
+        return klass
 
-            try:
-                pa = PartnerActivity.objects.create(
-                    title=serializer.validated_data['cluster_activity'].title,
-                    project=serializer.validated_data['project'],
-                    partner=serializer.validated_data['partner'],
-                    cluster_activity=serializer.validated_data['cluster_activity'],
-                    start_date=serializer.validated_data['start_date'],
-                    end_date=serializer.validated_data['end_date'],
-                    status=serializer.validated_data['status'],
-                )
-            except Exception as e:
-                return Response(
-                    {'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
-        elif create_mode == 'custom':
-            serializer = PartnerActivityFromCustomActivitySerializer(
-                data=self.request.data)
+class PartnerActivityUpdateAPIView(UpdateAPIView):
+    """
+    PartnerActivityUpdateAPIView CRUD endpoint
+    """
+    permission_classes = (IsAuthenticated, )
+    serializer_class = PartnerActivityUpdateSerializer
 
-            if not serializer.is_valid():
-                return Response(serializer.errors,
-                                status=status.HTTP_400_BAD_REQUEST)
-
-            if serializer.validated_data['partner'] != request.user.partner:
-                return Response({'error': "Partner id did not match this user's partner"},
-                                status=status.HTTP_400_BAD_REQUEST)
-
-            try:
-                pa = PartnerActivity.objects.create(
-                    title=serializer.validated_data['title'],
-                    project=serializer.validated_data['project'],
-                    partner=serializer.validated_data['partner'],
-                    cluster_objective=serializer.validated_data['cluster_objective'],
-                    start_date=serializer.validated_data['start_date'],
-                    end_date=serializer.validated_data['end_date'],
-                    status=serializer.validated_data['status'],
-                )
-            except Exception as e:
-                return Response(
-                    {'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
-
-        else:
-            return Response({'error': "Wrong create mode flag"},
-                            status=status.HTTP_400_BAD_REQUEST)
-
-        return Response({'id': pa.id}, status=status.HTTP_201_CREATED)
+    def get_queryset(self):
+        return PartnerActivity.objects.filter(
+            project__clusters__response_plan_id=self.kwargs['response_plan_id']
+        )
 
 
 class ClusterActivityPartnersAPIView(ListAPIView):
@@ -252,11 +227,24 @@ class PartnerActivityListAPIView(ListAPIView):
 
     def get_queryset(self, *args, **kwargs):
         response_plan_id = self.kwargs.get('response_plan_id')
-        return PartnerActivity.objects.select_related(
+
+        queryset = PartnerActivity.objects.select_related(
             'cluster_activity').filter(
                 Q(cluster_activity__cluster_objective__cluster__response_plan_id=response_plan_id) |
                 Q(cluster_objective__cluster__response_plan_id=response_plan_id)
             )
+
+        order = self.request.query_params.get('sort', None)
+        if order:
+            order_field = order.split('.')[0]
+            if order_field in ('title', 'status', 'partner', 'cluster_activity'):
+                if order_field == 'cluster_activity':
+                    order_field = 'cluster_activity__title'
+                queryset = queryset.order_by(order_field)
+                if len(order.split('.')) > 1 and order.split('.')[1] == 'desc':
+                    queryset = queryset.order_by('-%s' % order_field)
+
+        return queryset
 
 
 class PartnerActivityAPIView(RetrieveAPIView):

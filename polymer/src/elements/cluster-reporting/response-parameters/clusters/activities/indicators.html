@@ -59,12 +59,14 @@
       <indicator-modal
         id="indicatorModal"
         object-id="[[activityId]]"
-        object-type="ClusterActivity">
+        object-type="cluster.clusteractivity"
+        modal-title="Add Cluster Activity Indicator">
       </indicator-modal>
 
       <list-view-indicators
           data="[[data]]"
-          total-results="[[totalResults]]">
+          total-results="[[totalResults]]"
+          can-edit="[[canAddIndicator]]">
       </list-view-indicators>
     </page-body>
   </template>
@@ -120,6 +122,7 @@
 
       listeners: {
         'indicatorModal.indicator-added': '_onSuccess',
+        'indicator-edited': '_onSuccess',
       },
 
       observers: [
@@ -161,7 +164,7 @@
       },
 
       _computeCanAddIndicator: function (permissions, clusterId) {
-        return permissions.createClusterEntities() &&
+        return permissions.createClusterEntities &&
             permissions.createClusterEntitiesForCluster(clusterId);
       },
     });

@@ -7,7 +7,7 @@
 <link rel="import" href="../../elements/filter-list.html">
 <link rel="import" href="../../elements/filters/text-filter/text-filter.html">
 <link rel="import" href="../../elements/filters/checkbox-filter/checkbox-filter.html">
-<link rel="import" href="../../elements/filters/dropdown-filter/dropdown-filter.html">
+<link rel="import" href="../../elements/filters/dropdown-filter/dropdown-filter-multi.html">
 <link rel="import" href="../../elements/filters/location-filter/location-filter.html">
 <link rel="import" href="../../elements/filters/date-filter/date-filter.html">
 
@@ -22,11 +22,15 @@
         --app-grid-columns: 4;
         --app-grid-gutter: 25px;
         --app-grid-item-height: auto;
-        --app-grid-expandible-item-columns: 4;
+        --app-grid-expandible-item-columns: 2;
       }
 
-      .due {
+      .item-2-col {
         @apply --app-grid-expandible-item;
+      }
+
+      checkbox-filter {
+        margin-top: 2em;
       }
     </style>
 
@@ -39,8 +43,8 @@
         params-object="{{queryParams}}">
     </iron-query-params>
 
-    <filter-list filters="{{filters}}" class="app-grid">
-
+    <filter-list filters="{{filters}}">
+      <div class="app-grid">
         <text-filter
           class="item"
           label="PD/SSFA ToR ref. # and Title"
@@ -48,42 +52,36 @@
           value="[[queryParams.pd_ref_title]]">
         </text-filter>
 
-        <dropdown-filter
-          class="item"
-          label="Report status"
-          name="status"
-          value="[[_withDefault(queryParams.status, '')]]"
-          data="[[statuses]]"
-          disabled="[[disableStatus]]">
-        </dropdown-filter>
-
         <location-filter
           class="item"
           value="[[_withDefault(queryParams.location, '')]]">
         </location-filter>
 
-        <date-filter
-          class="item"
-          label="Due date"
-          name="due_date"
-          value="[[_withDefault(queryParams.due_date, '')]]">
-        </date-filter>
+        <dropdown-filter-multi
+          class="item item-2-col"
+          label="Report status"
+          name="status"
+          value="[[_withDefault(queryParams.status, '')]]"
+          data="[[statuses]]"
+          disabled="[[_equals(queryParams.due, '1')]]"
+          hide-search>
+        </dropdown-filter-multi>
 
-        <checkbox-filter
-          class="due"
-          name="due"
-          value="[[_withDefault(queryParams.due, '')]]">
-          <span class="checkbox-label">Show only due reports</span>
-
-        </checkbox-filter>
-
+        <dropdown-filter-multi
+          label="Report Type"
+          name="report_type"
+          value="[[_withDefault(queryParams.report_type, '')]]"
+          data="[[types]]"
+          hide-search>
+        </dropdown-filter-multi>
+      </div>
     </filter-list>
 
   </template>
 
   <script>
     Polymer({
-      id: 'progress-reports-filters',
+      is: 'progress-reports-filters',
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
@@ -100,29 +98,23 @@
         statuses: {
           type: Array,
           value: [
-            {title: 'All', id: ''},
-            {title: 'Due', id: 'Due'},
             {title: 'Overdue', id: 'Ove'},
+            {title: 'Sent back', id: 'Sen'},
+            {title: 'Due', id: 'Due'},
             {title: 'Submitted', id: 'Sub'},
             {title: 'Accepted', id: 'Acc'},
-            {title: 'Sent back', id: 'Sen'},
           ],
         },
 
-        disableStatus: {
-          type: Boolean,
+        types: {
+          type: Array,
+          value: [
+            {title: 'QPR', id: 'QPR'},
+            {title: 'HR', id: 'HR'},
+            {title: 'SR', id: 'SR'},
+          ],
         },
-
       },
-
-      observers: [
-        '_toggleStatusFilter(queryParams.due)'
-      ],
-
-      _toggleStatusFilter: function(checked) {
-        this.set('disableStatus', !!this._toNumber(checked));
-      },
-
     });
   </script>
 </dom-module>

@@ -11,7 +11,8 @@ from .views import (
     PDLowerLevelOutputStatusAPIView,
     IndicatorDataLocationAPIView,
     DisaggregationListCreateAPIView,
-    ReportableDetailAPIView
+    ReportableDetailAPIView,
+    IndicatorReportReviewAPIView
 )
 
 
@@ -45,11 +46,17 @@ urlpatterns = [
     url(r'^indicator-location-data-entries/$',
         IndicatorLocationDataUpdateAPIView.as_view(),
         name='indicator-location-data-entries-put-api'),
+
     url(r'^indicator-reports/$',
         IndicatorReportListAPIView.as_view(),
         name='indicator-report-direct-list-api'),
-    url(r'^cluster-indicator/$', ClusterIndicatorAPIView.as_view(),
-        name='cluster-indicator'),
+
+    url(r'^indicator-reports/(?P<pk>\d+)/review/$',
+        IndicatorReportReviewAPIView.as_view(),
+        name='indicator-report-review'),
+
+
+    url(r'^cluster-indicator/$', ClusterIndicatorAPIView.as_view(), name='cluster-indicator'),
 
     url(r'^response-plan/(?P<response_plan_id>\d+)/disaggregations/$',
         DisaggregationListCreateAPIView.as_view(),

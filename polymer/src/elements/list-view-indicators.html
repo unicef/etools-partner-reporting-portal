@@ -40,19 +40,48 @@
           <div class="table-column">Indicator</div>
         </etools-data-table-column>
 
-        <etools-data-table-column class="flex-3" field="indicator">
+        <etools-data-table-column class="flex-3" field="blueprint.calculation_formula_across_locations">
+          <div class="table-column">Calculation (across locations)</div>
+        </etools-data-table-column>
+
+        <etools-data-table-column class="flex-3" field="blueprint.calculation_formula_across_periods">
+          <div class="table-column">Calculation (across reporting periods)</div>
+        </etools-data-table-column>
+
+        <etools-data-table-column class="flex-2" field="indicator">
           <div class="table-column">Baseline</div>
         </etools-data-table-column>
 
-        <etools-data-table-column class="flex-3" field="indicator">
+        <etools-data-table-column class="flex-2" field="indicator">
           <div class="table-column">Target</div>
         </etools-data-table-column>
 
-        <etools-data-table-column  class="flex-3" field="progress">
+        <etools-data-table-column class="flex-2" field="indicator">
+          <div class="table-column">Achieved</div>
+        </etools-data-table-column>
+
+        <etools-data-table-column  class="flex-4" field="progress_percentage" sortable>
             <div class="table-column">Current progress</div>
         </etools-data-table-column>
 
+        <template
+            is="dom-if"
+            if="[[canEdit]]"
+            restamp="true">
+          <etools-data-table-column  class="flex-1" field="">
+            <div class="table-column">&nbsp;</div>
+          </etools-data-table-column>
+        </template>
       </etools-data-table-header>
+
+      <etools-data-table-footer
+          page-size="[[pageSize]]"
+          page-number="[[pageNumber]]"
+          total-results="[[totalResults]]"
+          visible-range="{{visibleRange}}"
+          on-page-size-changed="_pageSizeChanged"
+          on-page-number-changed="_pageNumberChanged">
+      </etools-data-table-footer>
 
       <template id="list"
                 is="dom-repeat"
@@ -61,7 +90,8 @@
                 as="indicator">
         <list-view-single-indicator
           indicator="{{indicator}}"
-          is-custom="[[isCustom]]">
+          is-custom="[[isCustom]]"
+          can-edit="[[canEdit]]">
         </list-view-single-indicator>
       </template>
 
@@ -91,8 +121,10 @@
       ],
 
       properties: {
-
-        data: Array,
+        data: {
+          type: Array,
+          observer: '_tableContentChanged',
+        },
 
         loading: Boolean,
 
@@ -113,7 +145,7 @@
       },
 
       listeners: {
-        'page-number-changed': '_pageNumberModified',
+        'page-number-changed': '_tableContentChanged',
         'details-opened-changed': '_detailsChange'
       },
 

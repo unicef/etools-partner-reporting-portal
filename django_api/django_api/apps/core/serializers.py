@@ -1,5 +1,3 @@
-import hashlib
-
 from rest_framework import serializers
 
 from .models import Workspace, Location, ResponsePlan, Country, GatewayType
@@ -31,11 +29,14 @@ class LocationSerializer(serializers.ModelSerializer):
 class ShortLocationSerializer(serializers.ModelSerializer):
 
     id = serializers.SerializerMethodField()
-    title = serializers.CharField(read_only=True)
+    title = serializers.SerializerMethodField()
 
     class Meta:
         model = Location
         fields = ('id', 'title')
+
+    def get_title(self, obj):
+        return "%s [%s - %s]" % (obj.title, obj.gateway.name, obj.p_code if obj.p_code else "n/a")
 
     def get_id(self, obj):
         return str(obj.id)

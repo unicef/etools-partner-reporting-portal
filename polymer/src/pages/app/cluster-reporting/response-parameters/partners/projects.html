@@ -4,6 +4,7 @@
 
 <link rel="import" href="../../../../../behaviors/routing.html">
 <link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="../../../../../behaviors/sorting.html">
 <link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/partners/projects/filters.html">
 <link rel="import" href="../../../../../elements/cluster-reporting/planned-action/projects/creation-modal.html">
 <link rel="import" href="../../../../../elements/cluster-reporting/project-list-table.html">
@@ -38,7 +39,7 @@
 
       <project-list-table page="response-parameters"></project-list-table>
 
-    <page-body>
+    </page-body>
   </template>
 
   <script>
@@ -53,6 +54,7 @@
         App.Behaviors.ReduxBehavior,
         App.Behaviors.RoutingBehavior,
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.SortingBehavior,
       ],
 
       properties: {

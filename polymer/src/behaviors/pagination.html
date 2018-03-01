@@ -56,11 +56,19 @@
         }
       },
 
-      _pageNumberModified: function () {
-        var tempList = this.openedDetails.slice();
-        tempList.forEach(function (details) {
-          details.detailsOpened = false;
-        });
+      _tableContentChanged: function () {
+        this.debounce('table-content-changed', function () {
+          var tempList = this.openedDetails.slice();
+          tempList.forEach(function (details) {
+            details.detailsOpened = false;
+          });
+        }, 100);
+      },
+
+      detached: function () {
+        if (this.isDebouncerActive('table-content-changed')) {
+          this.cancelDebouncer('table-content-changed');
+        }
       },
     };
 

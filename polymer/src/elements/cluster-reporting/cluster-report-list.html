@@ -47,6 +47,14 @@
         params-object="{{queryParams}}">
     </iron-query-params>
 
+    <etools-data-table-footer
+        page-size="[[pageSize]]"
+        page-number="[[pageNumber]]"
+        total-results="[[totalResults]]"
+        on-page-size-changed="_pageSizeChanged"
+        on-page-number-changed="_pageNumberChanged">
+    </etools-data-table-footer>
+
     <div class="wrapper">
       <template
           is="dom-repeat"
@@ -113,7 +121,8 @@
 
       listeners: {
         'report-submit-confirm': '_onConfirm',
-        'report-submitted': '_onReportSubmitted',
+        'report-submitted': '_onContentsChanged',
+        'report-reviewed': '_onContentsChanged',
       },
 
       _onConfirm: function (e, result) {
@@ -130,7 +139,7 @@
         });
       },
 
-      _onReportSubmitted: function (e) {
+      _onContentsChanged: function (e) {
         var tail = this.totalResults % this.pageSize;
         var last = Math.ceil(this.totalResults / this.pageSize);
 

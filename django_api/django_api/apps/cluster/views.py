@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveAPIView
-from rest_framework import status as statuses, serializers
+from rest_framework import status as statuses
 
 import django_filters
 
@@ -16,7 +16,8 @@ from core.paginations import SmallPagination
 from core.serializers import ShortLocationSerializer
 from core.models import Location, ResponsePlan
 from indicator.serializers import (
-    ClusterIndicatorReportSerializer, ClusterIndicatorReportSimpleSerializer,
+    ClusterIndicatorReportSerializer,
+    ReportableSimpleSerializer,
     ClusterPartnerAnalysisIndicatorResultSerializer,
 )
 from indicator.models import IndicatorReport, Reportable
@@ -26,9 +27,9 @@ from partner.models import (
     PartnerActivity,
 )
 
-from .export import XLSXWriter
-from .models import ClusterObjective, ClusterActivity, Cluster
-from .serializers import (
+from cluster.export_indicators import IndicatorsXLSXExporter
+from cluster.models import ClusterObjective, ClusterActivity, Cluster
+from cluster.serializers import (
     ClusterSimpleSerializer,
     ClusterObjectiveSerializer,
     ClusterObjectivePatchSerializer,
@@ -38,7 +39,7 @@ from .serializers import (
     ResponsePlanPartnerDashboardSerializer,
     PartnerAnalysisSummarySerializer,
 )
-from .filters import (
+from cluster.filters import (
     ClusterObjectiveFilter,
     ClusterActivityFilter,
     ClusterIndicatorsFilter,
@@ -109,9 +110,9 @@ class ClusterObjectiveAPIView(APIView):
         serializer = ClusterObjectiveSerializer(instance=instance)
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
-    def patch(self, request, *args, **kwargs):
+    def patch(self, request, pk, *args, **kwargs):
         serializer = ClusterObjectivePatchSerializer(
-            instance=self.get_instance(self.request),
+            instance=self.get_instance(self.request, pk=pk),
             data=self.request.data
         )
         if not serializer.is_valid():
@@ -173,8 +174,17 @@ class ClusterObjectiveListCreateAPIView(ListCreateAPIView):
     def get_queryset(self, *args, **kwargs):
         response_plan_id = self.kwargs.get('response_plan_id')
 
-        return ClusterObjective.objects.select_related('cluster').filter(
+        queryset = ClusterObjective.objects.select_related('cluster').filter(
             cluster__response_plan_id=response_plan_id)
+
+        order = self.request.query_params.get('sort', None)
+        if order:
+            order_field = order.split('.')[0]
+            if order_field in ('title', 'cluster'):
+                queryset = queryset.order_by(order_field)
+                if len(order.split('.')) > 1 and order.split('.')[1] == 'desc':
+                    queryset = queryset.order_by('-%s' % order_field)
+        return queryset
 
     def post(self, request, *args, **kwargs):
         """
@@ -281,8 +291,18 @@ class ClusterActivityListAPIView(ListCreateAPIView):
     def get_queryset(self, *args, **kwargs):
         response_plan_id = self.kwargs.get('response_plan_id')
 
-        return ClusterActivity.objects.select_related('cluster_objective__cluster').filter(
+        queryset = ClusterActivity.objects.select_related('cluster_objective__cluster').filter(
             cluster_objective__cluster__response_plan_id=response_plan_id)
+
+        order = self.request.query_params.get('sort', None)
+        if order:
+            order_field = order.split('.')[0]
+            if order_field in ('title', 'cluster_objective'):
+                queryset = queryset.order_by(order_field)
+                if len(order.split('.')) > 1 and order.split('.')[1] == 'desc':
+                    queryset = queryset.order_by('-%s' % order_field)
+
+        return queryset
 
     def post(self, request, *args, **kwargs):
         """
@@ -300,13 +320,23 @@ class ClusterActivityListAPIView(ListCreateAPIView):
                         status=statuses.HTTP_201_CREATED)
 
 
-class IndicatorReportsListAPIView(ListCreateAPIView):
+class IndicatorReportsListAPIView(ListCreateAPIView, RetrieveAPIView):
     """
     Cluster IndicatorReport object list API - GET/POST
     Authentication required.
 
     Parameters:
     - response_plan_id - Response plan ID
+
+    GET query parameters:
+    * cluster - Integer ID for cluster
+    * partner - Integer ID for partner
+    * indicator - Integer ID for IndicatorReport
+    * project - Integer ID for project
+    * location - Integer ID for location
+    * cluster_objective - Integer ID for cluster_objective
+    * cluster_activity - Integer ID for cluster_activity
+    * indicator_type - String value of choices: partner_activity, partner_project, cluster_objective, cluster_activity
 
     Returns:
         - GET method - ClusterIndicatorReportSerializer object.
@@ -317,25 +347,31 @@ class IndicatorReportsListAPIView(ListCreateAPIView):
     pagination_class = SmallPagination
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     filter_class = ClusterIndicatorsFilter
-    lookup_field = lookup_url_kwarg = 'response_plan_id'
 
     def get_queryset(self):
-        response_plan_id = self.kwargs.get(self.lookup_field)
+        response_plan_id = self.kwargs['response_plan_id']
         queryset = IndicatorReport.objects.filter(
-            # Q(reportable__cluster_objectives__isnull=False)
-            # | Q(reportable__cluster_activities__isnull=False)
-            Q(reportable__partner_projects__isnull=False)
+            Q(reportable__cluster_objectives__isnull=False)
+            | Q(reportable__cluster_activities__isnull=False)
+            | Q(reportable__partner_projects__isnull=False)
             | Q(reportable__partner_activities__isnull=False)
         ).filter(
-            # Q(reportable__cluster_objectives__cluster__response_plan=response_plan_id)
-            # | Q(reportable__cluster_activities__cluster_objective__cluster__response_plan=response_plan_id)
-            Q(reportable__partner_projects__clusters__response_plan=response_plan_id)
-            | Q(reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)
+            Q(reportable__cluster_objectives__cluster__response_plan=response_plan_id)
+            | Q(reportable__cluster_activities__cluster_objective__cluster__response_plan=response_plan_id)
+            | Q(reportable__partner_projects__clusters__response_plan=response_plan_id)
+            | Q(reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)  # noqa: E501
         )
         return queryset
 
 
-class IndicatorReportsSimpleListAPIView(IndicatorReportsListAPIView):
+class IndicatorReportDetailAPIView(RetrieveAPIView):
+
+    permission_classes = (IsAuthenticated, )
+    serializer_class = ClusterIndicatorReportSerializer
+    get_queryset = IndicatorReportsListAPIView.get_queryset
+
+
+class ReportablesSimpleListAPIView(ListAPIView):
     """
     Cluster IndicatorReportsListAPIView simplified API - GET/POST
     Authentication required.
@@ -344,11 +380,26 @@ class IndicatorReportsSimpleListAPIView(IndicatorReportsListAPIView):
     - response_plan_id - Response plan ID
 
     Returns:
-        - GET method - ClusterIndicatorReportSimpleSerializer object.
-        - POST method - ClusterIndicatorReportSimpleSerializer object.
+        - GET method - ReportableSimpleSerializer object.
+        - POST method - ReportableSimpleSerializer object.
     """
-    serializer_class = ClusterIndicatorReportSimpleSerializer
+    serializer_class = ReportableSimpleSerializer
     pagination_class = filter_class = None
+
+    def get_queryset(self):
+        response_plan_id = self.kwargs['response_plan_id']
+        queryset = Reportable.objects.filter(
+            Q(cluster_objectives__isnull=False)
+            | Q(cluster_activities__isnull=False)
+            | Q(partner_projects__isnull=False)
+            | Q(partner_activities__isnull=False)
+        ).filter(
+            Q(cluster_objectives__cluster__response_plan=response_plan_id)
+            | Q(cluster_activities__cluster_objective__cluster__response_plan=response_plan_id)
+            | Q(partner_projects__clusters__response_plan=response_plan_id)
+            | Q(partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)  # noqa: E501
+        ).distinct()
+        return queryset
 
 
 class ResponsePlanClusterDashboardAPIView(APIView):
@@ -470,16 +521,12 @@ class ClusterIndicatorsListExcelExportView(ListAPIView):
             Q(reportable__cluster_objectives__cluster__response_plan=response_plan_id)
             | Q(reportable__cluster_activities__cluster_objective__cluster__response_plan=response_plan_id)
             | Q(reportable__partner_projects__clusters__response_plan=response_plan_id)
-            | Q(
-                reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)
+            | Q(reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)  # noqa: E501
         )
         return queryset
 
     def generate_excel(self, writer):
         import os.path
-        import mimetypes
-
-        mimetypes.init()
         file_path = writer.export_data()
         file_name = os.path.basename(file_path)
         file_content = open(file_path, 'rb').read()
@@ -491,7 +538,7 @@ class ClusterIndicatorsListExcelExportView(ListAPIView):
     def list(self, request, response_plan_id, *args, **kwargs):
         # Render to excel
         indicators = self.filter_queryset(self.get_queryset())
-        writer = XLSXWriter(indicators, response_plan_id)
+        writer = IndicatorsXLSXExporter(indicators, response_plan_id)
         return self.generate_excel(writer)
 
 
@@ -513,7 +560,7 @@ class ClusterIndicatorsListExcelExportForAnalysisView(
     def list(self, request, response_plan_id, *args, **kwargs):
         # Render to excel
         indicators = self.filter_queryset(self.get_queryset())
-        writer = XLSXWriter(indicators, response_plan_id, analysis=True)
+        writer = IndicatorsXLSXExporter(indicators, response_plan_id, analysis=True)
         return self.generate_excel(writer)
 
 
@@ -537,15 +584,13 @@ class ClusterIndicatorsLocationListAPIView(ListAPIView):
     def get_queryset(self):
         response_plan_id = self.kwargs.get(self.lookup_field)
         result = IndicatorReport.objects.filter(
-            # Q(reportable__cluster_objectives__isnull=False)
-            # | Q(reportable__cluster_activities__isnull=False)
-            Q(reportable__partner_projects__isnull=False)
+            Q(reportable__cluster_objectives__isnull=False)
+            | Q(reportable__partner_projects__isnull=False)
             | Q(reportable__partner_activities__isnull=False)
         ).filter(
-            # Q(reportable__cluster_objectives__cluster__response_plan=response_plan_id)
-            # | Q(reportable__cluster_activities__cluster_objective__cluster__response_plan=response_plan_id)
-            Q(reportable__partner_projects__clusters__response_plan=response_plan_id)
-            | Q(reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)
+            Q(reportable__cluster_objectives__cluster__response_plan=response_plan_id)
+            | Q(reportable__partner_projects__clusters__response_plan=response_plan_id)
+            | Q(reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)  # noqa: E501
         ).values_list('reportable__indicator_reports__indicator_location_data__location', flat=True).distinct()
         return Location.objects.filter(pk__in=result)
 
@@ -586,7 +631,9 @@ class PartnerAnalysisSummaryAPIView(APIView):
                     PartnerProject, id=request.query_params.get('project'))
 
                 if project.partner.id != partner.id:
-                    return Response({'message': "project does not belong to partner."}, status=statuses.HTTP_400_BAD_REQUEST)
+                    return Response(
+                        {'message': "project does not belong to partner."}, status=statuses.HTTP_400_BAD_REQUEST
+                    )
 
                 serializer_context['project'] = project
 
@@ -596,7 +643,9 @@ class PartnerAnalysisSummaryAPIView(APIView):
                     PartnerActivity, id=request.query_params.get('activity'))
 
                 if activity.partner.id != partner.id:
-                    return Response({'message': "activity does not belong to partner."}, status=statuses.HTTP_400_BAD_REQUEST)
+                    return Response(
+                        {'message': "activity does not belong to partner."}, status=statuses.HTTP_400_BAD_REQUEST
+                    )
 
                 serializer_context['activity'] = activity
 
@@ -614,7 +663,9 @@ class PartnerAnalysisSummaryAPIView(APIView):
                     Cluster, id=request.query_params.get('cluster_id'))
 
                 if not partner.clusters.filter(id=cluster.id).exists():
-                    return Response({'message': "cluster does not belong to partner."}, status=statuses.HTTP_400_BAD_REQUEST)
+                    return Response(
+                        {'message': "cluster does not belong to partner."}, status=statuses.HTTP_400_BAD_REQUEST
+                    )
 
                 serializer_context['cluster'] = cluster
 
@@ -645,8 +696,7 @@ class PartnerAnalysisIndicatorResultAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def get(self, request, response_plan_id, reportable_id, *args, **kwargs):
-        reportable = get_object_or_404(
-            Reportable, id=reportable_id)
+        reportable = get_object_or_404(Reportable, id=reportable_id)
 
         serializer = ClusterPartnerAnalysisIndicatorResultSerializer(reportable)
 

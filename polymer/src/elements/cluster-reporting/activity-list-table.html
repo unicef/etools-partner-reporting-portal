@@ -16,6 +16,7 @@
 <link rel="import" href="../project-status.html">
 <link rel="import" href="../page-body.html">
 <link rel="import" href="../etools-prp-data-table-row.html">
+<link rel="import" href="../list-placeholder.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
 <link rel="import" href="../../styles/table-styles.html">
@@ -50,6 +51,10 @@
       .wrapper {
         position: relative;
       }
+
+      etools-data-table-column {
+        display: flex;
+      }
     </style>
 
     <iron-location
@@ -57,37 +62,55 @@
     </iron-location>
 
     <iron-query-params
-      params-string="{{query}}"
-      params-object="{{queryParams}}">
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
+    </iron-query-params>
+
+    <iron-query-params
+        params-string="{{anchorQuery}}"
+        params-object="{{anchorQueryParams}}">
     </iron-query-params>
 
     <div class="wrapper">
       <etools-content-panel no-header>
         <etools-data-table-header
             label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
-          <etools-data-table-column field="activity">
+          <etools-data-table-column field="title" sortable>
             <div class="table-column">Activity</div>
           </etools-data-table-column>
           <etools-data-table-column field="cluster">
             <div class="table-column">Cluster</div>
           </etools-data-table-column>
+          <etools-data-table-column field="cluster_activity" sortable>
+            <div class="table-column">Cluster activity</div>
+          </etools-data-table-column>
+          <etools-data-table-column field="cluster_objective">
+            <div class="table-column">Cluster objective</div>
+          </etools-data-table-column>
+          <etools-data-table-column field="is_custom">
+            <div class="table-column">Custom</div>
+          </etools-data-table-column>
           <template is="dom-if" if="[[_equals(page, 'response-parameters')]]">
-            <etools-data-table-column field="partner">
+            <etools-data-table-column field="partner" sortable>
               <div class="table-column">Partner</div>
             </etools-data-table-column>
           </template>
-          <etools-data-table-column field="status">
+          <etools-data-table-column field="status" sortable>
             <div class="table-column">Status</div>
           </etools-data-table-column>
-          <template is="dom-if" if="[[!_equals(page, 'response-parameters')]]">
-            <etools-data-table-column field="clusterActivity">
-              <div class="table-column">Cluster Activity</div>
-            </etools-data-table-column>
-          </template>
           <etools-data-table-column field="location">
             <div class="table-column">Location</div>
           </etools-data-table-column>
         </etools-data-table-header>
+
+        <etools-data-table-footer
+            page-size="[[pageSize]]"
+            page-number="[[pageNumber]]"
+            total-results="[[totalResults]]"
+            visible-range="{{visibleRange}}"
+            on-page-size-changed="_pageSizeChanged"
+            on-page-number-changed="_pageNumberChanged">
+        </etools-data-table-footer>
 
         <template
             id="list"
@@ -98,10 +121,24 @@
           <etools-prp-data-table-row details-opened="[[detailsOpened]]">
             <div slot="row-data">
               <div class="table-cell table-cell--text">
-                <a href="[[_detailUrl(activity)]]">[[activity.title]]</a>
+                <a href="[[_detailUrl(activity, anchorQuery)]]">[[activity.title]]</a>
               </div>
               <div class="table-cell table-cell--text">
                 [[activity.cluster]]
+              </div>
+              <div class="table-cell table-cell--text">
+                [[activity.cluster_activity.title]]
+              </div>
+              <div class="table-cell table-cell--text">
+                [[activity.cluster_objective.title]]
+              </div>
+              <div class="table-cell">
+                <template is="dom-if" if="[[activity.is_custom]]">
+                  <iron-icon icon="check"></iron-icon>
+                </template>
+                <template is="dom-if" if="[[!activity.is_custom]]">
+                  —
+                </template>
               </div>
               <template is="dom-if" if="[[_equals(page, 'response-parameters')]]">
                 <div class="table-cell table-cell--text">
@@ -111,11 +148,6 @@
               <div class="table-cell table-cell--text">
                 <project-status status="[[activity.status]]"></project-status>
               </div>
-              <template is="dom-if" if="[[!_equals(page, 'response-parameters')]]">
-                <div class="table-cell table-cell--text">
-                  [[activity.cluster_activity.title]]
-                </div>
-              </template>
               <div class="table-cell table-cell--text">
                 [[_commaSeparatedDictValues(activity.locations, 'title')]]
               </div>
@@ -134,6 +166,11 @@
             </div>
           </etools-prp-data-table-row>
         </template>
+
+        <list-placeholder
+            data="[[activities]]"
+            loading="[[loading]]">
+        </list-placeholder>
 
         <etools-data-table-footer
             page-size="[[pageSize]]"
@@ -165,6 +202,7 @@
           activities: {
             type: Object,
             statePath: 'partnerActivities.all',
+            observer: '_tableContentChanged',
           },
 
           loading: {
@@ -175,6 +213,11 @@
           totalResults: {
             type: Number,
             statePath: 'partnerActivities.count',
+          },
+
+          anchorQueryParams: {
+            type: Object,
+            computed: '_withDefaultParams(queryParams)',
           },
 
           detailsOpened: {
@@ -193,23 +236,22 @@
         },
 
         listeners: {
-          'page-number-changed': '_pageNumberModified',
+          'page-number-changed': '_tableContentChanged',
           'details-opened-changed': '_detailsChange'
         },
 
-        _detailUrl: function(activity) {
+        _detailUrl: function(activity, query) {
           var path = '/response-parameters/partners/activity/' + activity.id;
           if (this.page === 'planned-action') {
             path = '/planned-action/activity/' + activity.id;
           }
           //Query string is passed to construct the back button.
-          return this.buildUrl(this._baseUrlCluster, path) + '?' + this.query;
+          return this.buildUrl(this._baseUrlCluster, path) + '?' + query;
         },
 
         detached: function () {
           this.openedDetails.length = 0;
-        }
-
+        },
       });
     </script>
   </dom-module>

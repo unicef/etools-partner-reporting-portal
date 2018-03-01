@@ -5,9 +5,6 @@
 <link rel="import" href="../../../../../../bower_components/iron-pages/iron-pages.html">
 
 <link rel="import" href="../../../../../behaviors/utils.html">
-<link rel="import" href="projects.html">
-<link rel="import" href="activities.html">
-<link rel="import" href="contacts.html">
 
 <dom-module id="response-parameters-partners-router">
   <template>
@@ -29,13 +26,6 @@
     <iron-pages
         selected="[[page]]"
         attr-for-selected="name">
-
-<!--       <template is="dom-if" if="[[_equals(page, 'contacts')]]" restamp="true">
-        <rp-partners-contacts
-          name="contacts"
-          route="{{subroute}}">
-        </rp-partners-contacts>
-      </template> -->
 
       <template is="dom-if" if="[[_equals(page, 'projects')]]" restamp="true">
         <rp-partners-projects
@@ -84,6 +74,10 @@
       ],
 
       properties: {
+        visible: Boolean,
+
+        id: String,
+
         page: {
           type: String,
           observer: '_pageChanged',
@@ -93,8 +87,6 @@
           type: String,
           statePath: 'responsePlans.currentID',
         },
-
-        id: String,
       },
 
       _routeChanged: function (id) {
@@ -108,10 +100,24 @@
           return;
         }
 
-        resolvedPageUrl = this.resolveUrl(page + '.html');
-        this.importHref(resolvedPageUrl, null, this._notFound, true);
-      }
+        this.async(function () {
+          if (!this.visible) {
+            return;
+          }
 
+          resolvedPageUrl = this.resolveUrl(page + '.html');
+
+          this.importHref(resolvedPageUrl, null, this._notFound, true);
+        });
+      },
+
+      attached: function () {
+        this.set('visible', true);
+      },
+
+      detached: function () {
+        this.set('visible', false);
+      },
     });
   </script>
 </dom-module>

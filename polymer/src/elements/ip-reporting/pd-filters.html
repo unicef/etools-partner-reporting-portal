@@ -6,7 +6,8 @@
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../elements/filter-list.html">
 <link rel="import" href="../../elements/filters/text-filter/text-filter.html">
-<link rel="import" href="../../elements/filters/dropdown-filter/dropdown-filter.html">
+<link rel="import" href="../../elements/filters/dropdown-filter/dropdown-filter-multi.html">
+<link rel="import" href="../../elements/filters/location-filter-multi/location-filter-multi.html">
 
 <dom-module id="pd-filters">
   <template>
@@ -16,9 +17,14 @@
         margin-bottom: 25px;
         background: white;
 
-        --app-grid-columns: 4;
+        --app-grid-columns: 5;
         --app-grid-gutter: 25px;
         --app-grid-item-height: auto;
+        --app-grid-expandible-item-columns: 2;
+      }
+
+      .filter-2-col {
+        @apply --app-grid-expandible-item;
       }
     </style>
 
@@ -31,23 +37,29 @@
         params-object="{{queryParams}}">
     </iron-query-params>
 
-    <filter-list
-        filters="{{filters}}"
-        class="app-grid">
-      <text-filter
-          class="item"
-          label="PD/SSFA ToR ref. # and Title"
-          name="ref_title"
-          value="[[queryParams.ref_title]]">
-      </text-filter>
+    <filter-list filters="{{filters}}">
+      <div class="app-grid">
+        <text-filter
+            class="item"
+            label="PD/SSFA ToR ref. # and Title"
+            name="ref_title"
+            value="[[queryParams.ref_title]]">
+        </text-filter>
 
-      <dropdown-filter
-          class="item"
-          label="PD/SSFA status"
-          name="status"
-          value="[[_withDefault(queryParams.status, '')]]"
-          data="[[statuses]]">
-      </dropdown-filter>
+        <dropdown-filter-multi
+            class="item filter-2-col"
+            label="PD/SSFA status"
+            name="status"
+            value="[[_withDefault(queryParams.status, '')]]"
+            data="[[statuses]]"
+            hide-search>
+        </dropdown-filter-multi>
+
+        <location-filter-multi
+          class="item filter-2-col"
+          value="[[_withDefault(queryParams.location, '')]]">
+        </location-filter-multi>
+      </div>
     </filter-list>
   </template>
 
@@ -70,7 +82,6 @@
         statuses: {
           type: Array,
           value: [
-            {title: 'All', id: ''},
             {title: 'Draft', id: 'Dra'},
             {title: 'Signed', id: 'Sig'},
             {title: 'Active', id: 'Act'},

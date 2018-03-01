@@ -19,6 +19,7 @@
 <link rel="import" href="../../../../elements/etools-prp-permissions.html">
 <link rel="import" href="../../../../elements/ip-reporting/pd-report-export-button.html">
 <link rel="import" href="../../../../elements/ip-reporting/pd-modal.html">
+<link rel="import" href="../../../../elements/ip-reporting/pd-reports-report-title.html">
 <link rel="import" href="../../../../endpoints.html">
 <link rel="import" href="../../../../behaviors/utils.html">
 <link rel="import" href="../../../../behaviors/progressReportUtils.html">
@@ -39,6 +40,12 @@
           left: 0;
           top: -23px;
         };
+      }
+
+      pd-reports-report-title {
+        margin-left: 5px;
+        font-size: 10px;
+        padding: 1px 3px;
       }
 
       .toolbar report-status {
@@ -86,6 +93,11 @@
           class="above-title"
           range="[[currentReport.reporting_period]]">
       </reporting-period>
+      <pd-reports-report-title
+        class="above-title"
+        report=[[currentReport]]>
+      </pd-reports-report-title>
+
 
       <div class="toolbar">
         <report-status status="[[currentReport.status]]"></report-status>
@@ -106,6 +118,15 @@
               raised>
             Show PD/SSFA ToR Details
           </paper-button>
+        </template>
+      </div>
+
+      <div class="toolbar">
+        <template
+            is="dom-if"
+            if="[[canSubmittedOnBehalf]]"
+            restamp="true">
+          <p>Submitted by / On behalf: [[currentReport.submitting_user]]</p>
         </template>
       </div>
 
@@ -239,6 +260,11 @@
           type: Boolean,
           computed: '_computeCanSubmit(loading, mode, currentReport, permissions)',
         },
+
+        canSubmittedOnBehalf: {
+          type: Boolean,
+          computed: '_computeSubmittedOnBehalf(currentReport)',
+        },
       },
 
       observers: [
@@ -346,10 +372,20 @@
           case !!loading:
           case report.status === 'Sen' && !permissions.submitDraftProgressReport:
           case report.is_draft && !permissions.submitDraftProgressReport:
+          case report.programme_document && report.programme_document.status !== 'Act':
             return false;
 
           default:
             return true;
+        }
+      },
+
+      _computeSubmittedOnBehalf: function(currentReport) {
+        if (currentReport.submitted_by !== currentReport.submitting_user) {
+          return true;
+        }
+        else {
+          return false;
         }
       },
 

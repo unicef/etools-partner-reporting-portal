@@ -1,0 +1,439 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../../../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../../../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
+<link rel="import" href="../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-multi-selection-menu.html">
+<link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html">
+
+
+<link rel="import" href="../../polyfills/es6-shim.html">
+<link rel="import" href="disaggregations-dropdown-widget.html">
+<link rel="import" href="chip-date-of-report.html">
+<link rel="import" href="../labelled-item.html">
+<link rel="import" href="../etools-prp-chips.html">
+<link rel="import" href="../etools-prp-ajax.html">
+<link rel="import" href="../../endpoints.html">
+<link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/modal.html">
+<link rel="import" href="../../styles/buttons.html">
+<link rel="import" href="../../styles/modal.html">
+
+<dom-module id="indicator-edit-modal">
+  <template>
+    <style include="button-styles modal-styles app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
+      :host {
+        display: block;
+
+        --app-grid-columns: 2;
+        --app-grid-gutter: 24px;
+        --app-grid-item-height: auto;
+
+        --paper-dialog: {
+          width: 600px;
+
+          & > * {
+            margin: 0;
+          }
+        };
+      }
+
+      .row {
+        margin: 16px 0;
+      }
+
+      .app-grid {
+         margin: -var(--app-grid-gutter);
+      }
+
+      paper-radio-group {
+        margin-left: -12px;
+      }
+
+      paper-dropdown-menu {
+        width: 100%;
+      }
+    </style>
+
+    <etools-prp-ajax
+        id="locations"
+        url="[[locationsUrl]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
+        id="editIndicator"
+        url="[[indicatorsUrl]]"
+        method="put"
+        body="[[data]]"
+        content-type="application/json">
+    </etools-prp-ajax>
+
+    <paper-dialog
+        id="dialog"
+        with-backdrop
+        opened="{{opened}}">
+
+      <div class="header layout horizontal justified">
+        <h2>Edit Indicator</h2>
+
+        <paper-icon-button
+            class="self-center"
+            on-tap="close"
+            icon="icons:close">
+        </paper-icon-button>
+      </div>
+
+      <paper-dialog-scrollable>
+
+        <template
+            is="dom-if"
+            if="[[opened]]"
+            restamp="true">
+          <div class="row">
+            <paper-input
+                class="validate"
+                label="Title"
+                on-input="_validate"
+                value="{{data.blueprint.title::change}}"
+                always-float-label
+                required>
+            </paper-input>
+          </div>
+
+          <div class="row">
+            <paper-input
+                class="validate"
+                label="Means of verification"
+                on-input="_validate"
+                value="{{data.means_of_verification::change}}"
+                always-float-label
+                required>
+            </paper-input>
+          </div>
+
+          <div class="row">
+            <div class="app-grid">
+              <div class="item">
+                <etools-single-selection-menu
+                    class="validate"
+                    label="Frequency of reporting"
+                    options="[[frequencies]]"
+                    option-value="id"
+                    option-label="title"
+                    selected="{{data.frequency}}"
+                    on-iron-activate="_validate"
+                    trigger-value-change-event
+                    hide-search
+                    required>
+                </etools-single-selection-menu>
+              </div>
+
+              <template
+                  is="dom-if"
+                  if="[[_showCSD(data.frequency)]]"
+                  restamp="true">
+                <div class="item">
+                  <etools-prp-chips
+                      value="{{data.cs_dates}}"
+                      class="validate"
+                      label="Date of report"
+                      on-selected-chips-updated="_validate"
+                      required>
+                    <chip-date-of-report></chip-date-of-report>
+                  </etools-prp-chips>
+                </div>
+              </template>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="app-grid">
+              <div class="item">
+                <paper-input
+                  class="validate"
+                  label="Baseline"
+                  on-input="_validate"
+                  value="{{data.baseline}}"
+                  type="number"
+                  allowed-pattern="[+\-\d]"
+                  always-float-label>
+                </paper-input>
+              </div>
+
+              <div class="item">
+                <paper-input
+                  class="validate"
+                  label="Target"
+                  on-input="_validate"
+                  value="{{data.target}}"
+                  type="number"
+                  allowed-pattern="[+\-\d]"
+                  always-float-label>
+                </paper-input>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="app-grid">
+              <div class="item">
+                <paper-input
+                  class="validate"
+                  label="In need"
+                  on-input="_validate"
+                  value="{{data.in_need}}"
+                  type="number"
+                  allowed-pattern="[+\-\d]"
+                  always-float-label>
+                </paper-input>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <etools-multi-selection-menu
+                class="validate"
+                label="Location"
+                options="[[locations]]"
+                option-value="id"
+                option-label="title"
+                selected-values="{{selectedLocations}}"
+                on-selected-values-changed="_validate"
+                trigger-value-change-event
+                required>
+            </etools-multi-selection-menu>
+          </div>
+
+        </template>
+
+      </paper-dialog-scrollable>
+
+      <div class="buttons layout horizontal-reverse">
+        <paper-button
+            on-tap="_save"
+            class="btn-primary"
+            raised>
+          Save
+        </paper-button>
+
+        <paper-button
+            on-tap="close">
+          Cancel
+        </paper-button>
+      </div>
+
+      <etools-loading active="[[updatePending]]"></etools-loading>
+    </paper-dialog>
+  </template>
+
+  <script>
+    Polymer({
+      id: 'indicator-edit-modal',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.ModalBehavior,
+      ],
+
+      properties: {
+        data: Object,
+
+        type: String,
+
+        objectId: Number,
+
+        objectType: String,
+
+        baseline: Number,
+
+        target: Number,
+
+        responsePlanId: {
+         type: String,
+         statePath: 'responsePlans.currentID',
+       },
+
+        locationId: {
+          type: String,
+          statePath: 'location.id',
+        },
+
+        locationsUrl: {
+          type: String,
+          computed: '_computeLocationsUrl(responsePlanId)',
+        },
+
+        indicatorsUrl: {
+          type: String,
+          value: App.Endpoints.clusterIndicators(),
+        },
+
+        updatePending: {
+          type: Boolean,
+          value: false,
+        },
+
+        locations: {
+          type: Array,
+          value: [],
+        },
+
+        invalid: {
+          type: Boolean,
+          notify: true,
+          value: true,
+        },
+
+        selectedLocations: {
+          type: Array,
+          value: [],
+        },
+
+        frequencies: {
+          type: Array,
+          value: [
+            {
+              id: 'Wee',
+              title: 'Weekly',
+            },
+            {
+              id: 'Mon',
+              title: 'Monthly',
+            },
+            {
+              id: 'Qua',
+              title: 'Quarterly',
+            },
+            {
+              id: 'Csd',
+              title: 'Custom specific dates',
+            },
+          ],
+        },
+
+        editData: Object,
+
+      },
+
+      observers: [
+        '_setDefaults(opened)',
+        '_setLocations(selectedLocations.splices)',
+      ],
+
+      _setLocations: function () {
+        var selected = this.selectedLocations ?
+            this.locations
+                .filter(function (location) {
+                  return this.selectedLocations.indexOf(location.id) !== -1;
+                }, this)
+                .map(function (location) {
+                  return {
+                    id: location.id,
+                    title: location.title,
+                  };
+                }) :
+            [];
+
+        this.set('data.locations', selected);
+      },
+
+      _onValueChanged: function (e) {
+        this._updateValue(e.target);
+      },
+
+      _setDefaults: function (opened) {
+        if (!opened) {
+          return;
+        }
+        if (this.editData.locations) {
+          this.set('selectedLocations', this.editData.locations.map(function(item) {
+            return item.id;
+          }));
+        } else {
+          this.set('selectedLocations', []);
+        }
+
+        this.set('data', Object.assign({}, this.editData));
+        if (!this.editData.cs_dates) {
+          this.set('data.cs_dates', []);
+        }
+        this._fetchLocations();
+      },
+
+      _validate: function (e) {
+        e.target.validate();
+      },
+
+      _showCSD: function (frequency) {
+        return frequency && this._equals(frequency, 'Csd');
+      },
+
+      _computeLocationsUrl: function (responsePlanId) {
+        return App.Endpoints.clusterLocationNames(responsePlanId);
+      },
+
+      _fetchLocations: function () {
+        var self = this;
+
+        this.$.locations.thunk()()
+            .then(function (res) {
+              self.set('locations', res.data);
+            });
+      },
+
+      _save: function () {
+
+        var fields = [].slice.call(
+          Polymer.dom(this.root).querySelectorAll('.validate')
+        );
+
+        var self = this;
+        var valid;
+
+        fields.forEach(function (field) {
+          field.validate();
+        });
+
+        valid = fields.every(function (field) {
+          return !field.invalid;
+        });
+
+        if (!valid) {
+          return;
+        }
+
+        this.set('updatePending', true);
+
+        if (this.data.frequency !== 'Csd') {
+          delete this.data.cs_dates;
+        }
+
+        this.set('data.object_type', this.editData.content_type_key);
+
+        this.$.editIndicator.thunk()()
+            .then(function (res) {
+              self.fire('indicator-edited', res.data);
+              self.set('updatePending', false);
+              self.close();
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+
+              self.set('updatePending', false);
+            });
+      },
+    });
+  </script>
+</dom-module>

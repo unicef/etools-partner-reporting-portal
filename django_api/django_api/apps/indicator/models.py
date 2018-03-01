@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
-from itertools import combinations
 
+from django.conf import settings
 from django.utils.functional import cached_property
 from django.contrib.postgres.fields import JSONField, ArrayField
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -18,7 +18,7 @@ from core.common import (
     REPORTABLE_FREQUENCY_LEVEL,
     PROGRESS_REPORT_STATUS,
     OVERALL_STATUS,
-)
+    FINAL_OVERALL_STATUS)
 from core.models import TimeStampedExternalSyncModelMixin
 from functools import reduce
 
@@ -26,6 +26,7 @@ from indicator.disaggregators import (
     QuantityIndicatorDisaggregator,
     RatioIndicatorDisaggregator
 )
+from indicator.constants import ValueType
 
 
 class Disaggregation(TimeStampedExternalSyncModelMixin):
@@ -55,8 +56,7 @@ class DisaggregationValue(TimeStampedExternalSyncModelMixin):
     related models:
         indicator.Disaggregation (ForeignKey): "disaggregation"
     """
-    disaggregation = models.ForeignKey(Disaggregation,
-                                       related_name="disaggregation_values")
+    disaggregation = models.ForeignKey(Disaggregation, related_name="disaggregation_values")
     value = models.CharField(max_length=15)
 
     # TODO: we won't allow these to be edited out anymore, so 'active' might
@@ -143,7 +143,7 @@ class IndicatorBlueprint(TimeStampedExternalSyncModelMixin):
                                     default=NUMBER)
 
     # TODO: add:
-    # siblings (similar inidcators to this indicator)
+    # siblings (similar indicators to this indicator)
     # other_representation (exact copies with different names for some random reason)
     # children (indicators that aggregate up to this or contribute to this indicator through a formula)
     # aggregation_types (potential aggregation types: geographic, time-periods ?)
@@ -221,6 +221,7 @@ class Reportable(TimeStampedExternalSyncModelMixin):
     """
     target = models.CharField(max_length=255, null=True, blank=True)
     baseline = models.CharField(max_length=255, null=True, blank=True)
+    in_need = models.CharField(max_length=255, null=True, blank=True)
     assumptions = models.TextField(null=True, blank=True)
     means_of_verification = models.CharField(max_length=255,
                                              null=True,
@@ -247,8 +248,7 @@ class Reportable(TimeStampedExternalSyncModelMixin):
     parent_indicator = models.ForeignKey('self', null=True, blank=True,
                                          related_name='children',
                                          db_index=True)
-    locations = models.ManyToManyField(
-        'core.Location', related_name="reportables")
+    locations = models.ManyToManyField('core.Location', related_name="reportables")
 
     frequency = models.CharField(
         max_length=3,
@@ -264,7 +264,9 @@ class Reportable(TimeStampedExternalSyncModelMixin):
         verbose_name='End Date',
     )
 
-    cs_dates = ArrayField(models.DateField(), default=list)
+    cs_dates = ArrayField(
+        models.DateField(), default=list, null=True, blank=True
+    )
     location_admin_refs = ArrayField(JSONField(), default=list, null=True,
                                      blank=True)
     disaggregations = models.ManyToManyField(Disaggregation, blank=True)
@@ -304,14 +306,16 @@ class Reportable(TimeStampedExternalSyncModelMixin):
 
     @property
     def progress_percentage(self):
-        # if self.blueprint.unit == IndicatorBlueprint.NUMBER:
-            # pass
         percentage = 0.0
 
         if self.achieved and self.baseline is not None and self.target is not None:
-            percentage = (self.achieved['c'] - float(self.baseline)) / \
-                (float(self.target) - float(self.baseline))
-            percentage = round(percentage, 2)
+            baseline = float(self.baseline)
+            dividend = 0    # default progress is 0
+            if self.achieved['c'] > baseline:
+                dividend = self.achieved['c'] - baseline
+            divisor = float(self.target) - baseline
+            if divisor:
+                percentage = round(dividend / divisor, 2)
         return percentage
 
     @classmethod
@@ -324,9 +328,9 @@ class Reportable(TimeStampedExternalSyncModelMixin):
         }
 
     def __str__(self):
-        return "Reportable <pk:%s> %s on %s" % (self.id,
-                                                self.blueprint.title,
-                                                self.content_object)
+        return "Reportable #{} {} on {}".format(
+            self.id, self.blueprint.title, self.content_object
+        )
 
 
 class IndicatorReportManager(models.Manager):
@@ -382,13 +386,28 @@ class IndicatorReport(TimeStampedModel):
                                             null=True,
                                             blank=True)
 
+    review_date = models.DateField(verbose_name='Review Date',
+                                   blank=True,
+                                   null=True)
+    sent_back_feedback = models.TextField(blank=True, null=True)
+
     objects = IndicatorReportManager()
 
     class Meta:
         ordering = ['-due_date', '-id']
+        # TODO: Enable this
+        # unique_together = ('reportable', 'time_period_start', 'time_period_end')
 
     def __str__(self):
         return self.title
+
+    def get_overall_status_display(self):
+        if self.progress_report and self.progress_report.is_final and self.overall_status in FINAL_OVERALL_STATUS:
+            return dict(FINAL_OVERALL_STATUS).get(self.overall_status)
+        else:
+            # This is one of the "magical" django methods and cannot be called directly using super call
+            field_object = self._meta.get_field('overall_status')
+            return self._get_FIELD_display(field_object)
 
     @property
     def is_draft(self):
@@ -415,11 +434,9 @@ class IndicatorReport(TimeStampedModel):
             return False
 
         for data in self.indicator_location_data.all():
-            for key, vals in data.disaggregation.items():
-                if self.is_percentage and (vals.get('c', None) in [None, '']):
-                    return False
-                elif self.is_number and (vals.get('v', None) in [None, '']):
-                    return False
+            if not data.is_complete:
+                return False
+
         return True
 
     @property
@@ -442,6 +459,13 @@ class IndicatorReport(TimeStampedModel):
     @cached_property
     def display_type(self):
         return self.reportable.blueprint.display_type
+
+    @cached_property
+    def display_time_period(self):
+        return '{} - {}'.format(
+            self.time_period_start.strftime(settings.PRINT_DATA_FORMAT),
+            self.time_period_end.strftime(settings.PRINT_DATA_FORMAT),
+        )
 
     @cached_property
     def calculation_formula_across_periods(self):
@@ -529,6 +553,10 @@ def recalculate_reportable_total(sender, instance, **kwargs):
                         reportable_total['c'] = reportable_total['c'] / \
                             (ir_count * 1.0)
 
+                elif blueprint.calculation_formula_across_periods == IndicatorBlueprint.SUM and \
+                        reportable_total['c'] == 0:
+                    reportable_total['c'] = reportable_total['v']
+
         # if unit is PERCENTAGE, doesn't matter if calc choice was percent or
         # ratio
         elif blueprint.unit == IndicatorBlueprint.PERCENTAGE:
@@ -553,21 +581,51 @@ class IndicatorLocationData(TimeStampedModel):
         core.Location (OneToOneField): "location"
     """
     indicator_report = models.ForeignKey(
-        IndicatorReport, related_name="indicator_location_data")
+        IndicatorReport, related_name="indicator_location_data"
+    )
     location = models.ForeignKey(
         'core.Location',
-        related_name="indicator_location_data")
+        related_name="indicator_location_data"
+    )
 
     disaggregation = JSONField(default=dict)
     num_disaggregation = models.IntegerField()
     level_reported = models.IntegerField()
-    disaggregation_reported_on = ArrayField(
-        models.IntegerField(), default=list
-    )
+    disaggregation_reported_on = ArrayField(models.IntegerField(), default=list)
 
     class Meta:
         ordering = ['id']
+        # TODO: enable
+        # unique_together = ('indicator_report', 'location')
 
     def __str__(self):
-        return "{} Location Data for {}".format(
-            self.location, self.indicator_report)
+        return "{} Location Data for {}".format(self.location, self.indicator_report)
+
+    @cached_property
+    def is_complete(self):
+        """
+        Returns if this indicator location data has had some data entered for
+        it, and is compelte.
+        """
+        return self.disaggregation != {"()": {"c": 0, "d": 0, "v": 0}}
+
+    @cached_property
+    def previous_location_data(self):
+        previous_indicator_reports = self.indicator_report.reportable.indicator_reports.exclude(
+            id=self.indicator_report.id
+        ).filter(time_period_start__lt=self.indicator_report.time_period_start)
+
+        previous_report = previous_indicator_reports.order_by('-time_period_start').first()
+        if previous_report:
+            return previous_report.indicator_location_data.filter(location=self.location).first()
+
+    @cached_property
+    def previous_location_progress_value(self):
+        if not self.previous_location_data:
+            return 0
+
+        total_disaggregation = self.previous_location_data.disaggregation.get('()', {})
+        if self.indicator_report.is_percentage:
+            return total_disaggregation.get(ValueType.CALCULATED, 0)
+        else:
+            return total_disaggregation.get(ValueType.VALUE, 0)

@@ -2,6 +2,7 @@
 <link rel="import" href="../../../../bower_components/etools-content-panel/etools-content-panel.html">
 <link rel="import" href="../../../../bower_components/etools-data-table/etools-data-table.html">
 <link rel="import" href="../../../../bower_components/etools-loading/etools-loading.html">
+<link rel="import" href="../../../../bower_components/iron-location/iron-query-params.html">
 
 <link rel="import" href="../../../redux/store.html">
 <link rel="import" href="../../../behaviors/routing.html">
@@ -11,7 +12,7 @@
 
 <dom-module id="constrained-reports-list">
   <template>
-      <style include="data-table-styles table-styles">
+    <style include="data-table-styles table-styles">
       :host {
         display: block;
 
@@ -31,6 +32,12 @@
         text-transform: uppercase;
       }
     </style>
+
+    <iron-query-params
+        id="queryParams"
+        params-string="{{resultsQuery}}"
+        params-object="{{resultsQueryParams}}">
+    </iron-query-params>
 
     <etools-content-panel panel-title="List of constrained indicators">
       <etools-data-table-header
@@ -62,7 +69,7 @@
               [[item.cluster]]
             </div>
             <div class="table-cell table-cell--text" flex-2>
-              <a href="[[_getReportUrl(_baseUrlCluster, item.id)]]">[[item.title]]</a>
+              <a href="[[_getReportUrl(_baseUrlCluster, item.id, resultsQueryParams)]]">[[item.title]]</a>
             </div>
             <div class="table-cell table-cell--text">
               [[item.partner]]
@@ -102,6 +109,8 @@
       ],
 
       properties: {
+        resultsQuery: String,
+
         data: {
           type: Array,
           statePath: 'clusterDashboardData.data.constrained_indicator_reports',
@@ -109,21 +118,50 @@
 
         reportsUrl: {
           type: String,
-          computed: '_computeReportsUrl(_baseUrlCluster)',
+          computed: '_computeReportsUrl(_baseUrlCluster, resultsQuery)',
         },
 
         loading: {
           type: Boolean,
           statePath: 'clusterDashboardData.loading',
         },
+
+        partner: {
+          type: Object,
+          statePath: 'partner.current',
+        },
+
+        resultsQueryParams: {
+          type: Object,
+          computed: '_computeResultsQueryParams(partner)',
+        },
       },
 
-      _computeReportsUrl: function (baseUrl) {
-        return this.buildUrl(baseUrl, '/results/submitted');
+      _computeReportsUrl: function (baseUrl, query) {
+        return this.buildUrl(baseUrl, '/results/submitted?' + query);
       },
 
-      _getReportUrl: function (baseUrl, id) {
-        return this.buildUrl(baseUrl, '/results/submitted?indicator=' + id);
+      _getReportUrl: function (baseUrl, id, query) {
+        var queryWithIndicator = Object.assign({}, query, {
+          indicator: id,
+        });
+
+        var base = this.buildUrl(baseUrl, '/results/submitted');
+        var search;
+
+        try {
+          search = '?' + this.$.queryParams._encodeParams(queryWithIndicator);
+        } catch (err) {
+          search = '';
+        }
+
+        return base + search;
+      },
+
+      _computeResultsQueryParams: function (partner) {
+        return {
+          partner: partner.id,
+        };
       },
     });
   </script>

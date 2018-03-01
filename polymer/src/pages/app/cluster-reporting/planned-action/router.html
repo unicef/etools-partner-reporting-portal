@@ -5,9 +5,6 @@
 
 <link rel="import" href="../../../../behaviors/utils.html">
 
-<link rel="import" href="project.html">
-<link rel="import" href="projects.html">
-
 <dom-module id="planned-action-projects-router">
   <template>
     <style>
@@ -71,12 +68,13 @@
       ],
 
       properties: {
+        id: String,
+        visible: Boolean,
+
         page: {
           type: String,
           observer: '_pageChanged',
         },
-
-        id: String,
       },
 
       _routeChanged: function (id) {
@@ -90,10 +88,24 @@
           return;
         }
 
-        resolvedPageUrl = this.resolveUrl(page + '.html');
-        this.importHref(resolvedPageUrl, null, this._notFound, true);
-      }
+        this.async(function () {
+          if (!this.visible) {
+            return;
+          }
 
+          resolvedPageUrl = this.resolveUrl(page + '.html');
+
+          this.importHref(resolvedPageUrl, null, this._notFound, true);
+        });
+      },
+
+      attached: function () {
+        this.set('visible', true);
+      },
+
+      detached: function () {
+        this.set('visible', false);
+      },
     });
   </script>
 </dom-module>

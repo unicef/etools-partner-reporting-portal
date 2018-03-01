@@ -1,10 +1,14 @@
 <link rel="import" href="../../../../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../../../../bower_components/etools-content-panel/etools-content-panel.html">
 <link rel="import" href="../../../../../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../../../../../styles/buttons.html">
+
+<link rel="import" href="editing-modal.html">
 
 <link rel="import" href="../../../../../elements/page-body.html">
 <link rel="import" href="../../../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../../../elements/page-body.html">
+<link rel="import" href="../../../../../elements/etools-prp-permissions.html">
 <link rel="import" href="../../../../../behaviors/utils.html">
 <link rel="import" href="../../../../../endpoints.html">
 <link rel="import" href="../../../../../redux/actions.html">
@@ -13,7 +17,7 @@
 
 <dom-module id="rp-clusters-activity-overview">
   <template>
-    <style include="app-grid-style">
+    <style include="app-grid-style button-styles">
       :host {
         display: block;
         --app-grid-columns:4;
@@ -39,7 +43,17 @@
       li {
         list-style-type: none;
       }
+
+      div#action {
+        margin: 25px 0;
+        @apply(--layout-horizontal);
+        @apply(--layout-end-justified)
+      }
     </style>
+
+    <etools-prp-permissions
+        permissions="{{permissions}}">
+    </etools-prp-permissions>
 
     <etools-prp-ajax
         id="overview"
@@ -47,6 +61,19 @@
     </etools-prp-ajax>
 
     <page-body>
+
+      <template is="dom-if"
+        if="[[_canEditActivity(permissions, data.co_cluster_id)]]"
+        restamp="true">
+        <cluster-activities-editing-modal id="modal" edit-data="[[data]]">
+        </cluster-activities-editing-modal>
+        <div id="action">
+          <paper-button id="edit" on-tap="_openModal" class="btn-primary" raised>
+            Edit Activity
+          </paper-button>
+        </div>
+      </template>
+
       <etools-content-panel panel-title="Activity Details">
         <div class="row">
           <ul class="app-grid">
@@ -76,6 +103,16 @@
 
       properties: {
         data: Object,
+        permissions: Object,
+      },
+
+      _openModal: function() {
+        this.$$('#modal').open();
+      },
+
+      _canEditActivity: function(permissions, clusterId) {
+        return permissions.createClusterEntities
+          && permissions.createClusterEntitiesForCluster(clusterId);
       },
 
     });

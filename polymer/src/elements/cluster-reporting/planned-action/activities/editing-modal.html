@@ -1,0 +1,422 @@
+<link rel="import" href="../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../../../../../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../../../../../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../../../../../bower_components/etools-loading/etools-loading.html">
+<link rel="import" href="../../../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../../../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../../../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html">
+
+<link rel="import" href="../../../../polyfills/es6-shim.html">
+<link rel="import" href="../../../../endpoints.html">
+<link rel="import" href="../../../../redux/store.html">
+<link rel="import" href="../../../../behaviors/utils.html">
+<link rel="import" href="../../../../behaviors/modal.html">
+<link rel="import" href="../../../../styles/buttons.html">
+<link rel="import" href="../../../../styles/modal.html">
+<link rel="import" href="../../../etools-prp-ajax.html">
+<link rel="import" href="../../../etools-prp-date-input.html">
+
+<dom-module id="planned-action-activity-editing-modal">
+  <template>
+    <style include="button-styles modal-styles app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
+      :host {
+        display: block;
+
+        --app-grid-columns: 2;
+        --app-grid-gutter: 24px;
+        --app-grid-item-height: auto;
+        --app-grid-expandible-item-columns: 2;
+
+        --paper-dialog: {
+          width: 600px;
+
+          & > * {
+            margin: 0;
+          }
+        };
+      }
+
+      .item-wide {
+        @apply --app-grid-expandible-item;
+      }
+
+    </style>
+
+    <etools-prp-ajax
+        id="editActivity"
+        url="[[activityUrl]]"
+        method="patch"
+        body="[[data]]"
+        content-type="application/json">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
+        id="projects"
+        params="[[projectsParams]]"
+        url="[[projectsUrl]]">
+    </etools-prp-ajax>
+
+    <paper-dialog
+        id="dialog"
+        with-backdrop
+        opened="{{opened}}">
+      <div class="header layout horizontal justified">
+        <h2>Edit activity</h2>
+
+        <paper-icon-button
+            class="self-center"
+            on-tap="close"
+            icon="icons:close">
+        </paper-icon-button>
+      </div>
+
+      <paper-dialog-scrollable>
+        <template
+          is="dom-if"
+          if="[[_equals(mode, 'cluster')]]"
+          restamp="true">
+          <iron-form class="app-grid">
+
+                <div class="item item-wide">
+                   <etools-single-selection-menu
+                      class="validate"
+                      label="Partner Project"
+                      options="[[projects]]"
+                      option-value="id"
+                      option-label="title"
+                      selected="{{data.project}}"
+                      on-iron-activate="_validate"
+                      disabled="[[_equals(projects.length, 0)]]"
+                      trigger-value-change-event
+                      required>
+                  </etools-single-selection-menu>
+                </div>
+                <div class="item">
+                   <etools-prp-date-input
+                      class="start-date"
+                      label="Start date"
+                      value="{{data.start_date}}"
+                      error-message=""
+                      required
+                      no-init>
+                   </etools-prp-date-input>
+                  </etools-date-input>
+                </div>
+                <div class="item">
+                  <etools-prp-date-input
+                      class="end-date"
+                      label="End date"
+                      value="{{data.end_date}}"
+                      error-message=""
+                      required
+                      no-init>
+                  </etools-prp-date-input>
+                </div>
+                <div class="item">
+                  <paper-dropdown-menu
+                      class="validate"
+                      label="Status"
+                      on-value-changed="_validate"
+                      always-float-label
+                      required>
+                    <paper-listbox
+                        selected="{{data.status}}"
+                        attr-for-selected="value"
+                        slot="dropdown-content"
+                        class="dropdown-content">
+                      <template
+                          is="dom-repeat"
+                          items="[[statuses]]">
+                        <paper-item value="[[item.id]]">[[item.title]]</paper-item>
+                      </template>
+                    </paper-listbox>
+                  </paper-dropdown-menu>
+                </div>
+              </iron-form>
+            </template>
+
+            <template
+                is="dom-if"
+                if="[[_equals(mode, 'custom')]]"
+                restamp="true">
+              <iron-form class="app-grid">
+
+                <div class="item item-wide">
+                  <paper-input
+                      class="validate"
+                      label="Title"
+                      value="{{data.title}}"
+                      on-input="_validate"
+                      always-float-label
+                      required>
+                  </paper-input>
+                </div>
+                <div class="item item-wide">
+                  <etools-single-selection-menu
+                      class="validate"
+                      label="Partner Project"
+                      options="[[projects]]"
+                      option-value="id"
+                      option-label="title"
+                      selected="{{data.project}}"
+                      on-iron-activate="_validate"
+                      disabled="[[_equals(projects.length, 0)]]"
+                      trigger-value-change-event
+                      required>
+                  </etools-single-selection-menu>
+                </div>
+                 <div class="item">
+                   <etools-prp-date-input
+                      class="start-date"
+                      label="Start date"
+                      value="{{data.start_date}}"
+                      error-message=""
+                      required
+                      no-init>
+                   </etools-prp-date-input>
+                  </etools-date-input>
+                </div>
+                <div class="item">
+                  <etools-prp-date-input
+                      class="end-date"
+                      label="End date"
+                      value="{{data.end_date}}"
+                      error-message=""
+                      required
+                      no-init>
+                  </etools-prp-date-input>
+                </div>
+                <div class="item">
+                  <paper-dropdown-menu
+                      class="validate"
+                      label="Status"
+                      on-value-changed="_validate"
+                      always-float-label
+                      required>
+                    <paper-listbox
+                        selected="{{data.status}}"
+                        attr-for-selected="value"
+                        slot="dropdown-content"
+                        class="dropdown-content">
+                      <template
+                          is="dom-repeat"
+                          items="[[statuses]]">
+                        <paper-item value="[[item.id]]">[[item.title]]</paper-item>
+                      </template>
+                    </paper-listbox>
+                  </paper-dropdown-menu>
+                </div>
+              </iron-form>
+            </template>
+      </paper-dialog-scrollable>
+
+      <div class="buttons layout horizontal-reverse">
+        <paper-button
+            on-tap="_save"
+            class="btn-primary"
+            raised>
+          Save
+        </paper-button>
+
+        <paper-button
+            on-tap="close">
+          Cancel
+        </paper-button>
+      </div>
+
+      <etools-loading active="[[updatePending]]"></etools-loading>
+    </paper-dialog>
+  </template>
+
+  <script>
+    Polymer({
+      id: 'planned-action-activity-editing-modal',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.ModalBehavior,
+      ],
+
+      properties: {
+        data: Object,
+
+        activitiesUrl: String,
+        editData: Object,
+
+        updatePending: {
+          type: Boolean,
+          value: false,
+        },
+
+        mode: {
+          type: String,
+          computed: '_setMode(editData)'
+        },
+
+        opened: {
+          type: Boolean,
+          observer: false,
+        },
+
+        responsePlanId: {
+          type: String,
+          statePath: 'responsePlans.currentID',
+        },
+
+        activityUrl: {
+          type: String,
+          computed: '_computeActivityUrl(responsePlanId, data.id)',
+        },
+
+        activitiesParams: {
+          type: Object,
+          value: {
+            page_size: 99999,
+          },
+        },
+
+        statuses: {
+          type: Array,
+          value: [
+            {title: 'Ongoing', id: 'Ong'},
+            {title: 'Planned', id: 'Pla'},
+            {title: 'Completed', id: 'Com'},
+          ],
+        },
+
+        locationId: {
+          type: String,
+          statePath: 'location.id',
+        },
+
+        projects: {
+          type: Array,
+          value: [],
+        },
+
+        projectsParams: {
+          type: Object,
+          value: {
+            page_size: 99999,
+          },
+        },
+
+        projectsUrl: {
+          type: String,
+          computed: '_computeProjectsUrl(responsePlanId)',
+        },
+
+        partner: {
+          type: Object,
+          statePath: 'partner.current',
+        },
+      },
+
+      observers: [
+        '_fetchProjects(partner.id)',
+      ],
+
+      _setDefaults: function () {
+        this.set('data', Object.assign({},
+          {id: this.editData.id,
+          status: this.editData.status,
+          start_date: this.editData.start_date,
+          end_date: this.editData.end_date,
+          project: this.editData.project.id}));
+
+        if (this.editData.is_custom) {
+          this.set('data.title', this.editData.title);
+        }
+
+      },
+
+      open: function () {
+        this.set('opened', true);
+        this.set('refresh', true);
+        this._setDefaults();
+      },
+
+      close: function () {
+        this.set('data', {});
+        this.set('opened', false);
+        this.set('refresh', false);
+      },
+
+      _validate: function (e) {
+        e.target.validate();
+      },
+
+      _computeActivityUrl: function (responsePlanId, activityId) {
+        return App.Endpoints.partnerActivityUpdate(responsePlanId, activityId);
+      },
+
+      _computeProjectsUrl: function (responsePlanId) {
+        return App.Endpoints.plannedActions(responsePlanId);
+      },
+
+      _setMode: function(editActivityData) {
+        if (editActivityData.is_custom) {
+          return 'custom';
+        } else {
+          return 'cluster';
+        }
+      },
+
+      _fetchProjects: function (partnerId) {
+        var self = this;
+
+        if (typeof partnerId === 'undefined') {
+          return;
+        }
+
+        this.set('projectsParams.partner', partnerId);
+
+        this.$.projects.thunk()()
+            .then(function (res) {
+              self.set('projects', res.data.results);
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
+      },
+
+      _save: function () {
+        var self = this;
+
+        var valid = [
+          this._fieldsAreValid(),
+          this._dateRangeValid('.start-date', '.end-date'),
+        ].every(Boolean);
+
+        if (!valid) {
+          return;
+        }
+
+        this.set('updatePending', true);
+
+        this.$.editActivity.thunk()()
+            .then(function (res) {
+              self.fire('pa-activity-edited', res.data);
+              self.set('updatePending', false);
+              self.close();
+            })
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+
+              self.set('updatePending', false);
+            });
+      },
+    });
+  </script>
+</dom-module>

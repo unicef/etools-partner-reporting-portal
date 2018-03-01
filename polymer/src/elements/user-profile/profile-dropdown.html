@@ -4,10 +4,12 @@
 <link rel="import" href="../../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../../../bower_components/iron-collapse/iron-collapse.html">
 <link rel="import" href="../../../bower_components/iron-icons/social-icons.html">
+<link rel="import" href="../../../bower_components/app-localize-behavior/app-localize-behavior.html">
 
 <link rel="import" href="user-profile-dialog.html">
 
 <link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/localize.html">
 
 <dom-module id="profile-dropdown">
   <template>
@@ -58,11 +60,11 @@
       <paper-material elevation="5" class="dropdown-content" id="user-dropdown">
         <div class="item" on-tap="_openModal">
           <paper-icon-button id="accountProfile" icon="account-circle"></paper-icon-button>
-          Profile
+          [[localize('profile')]]
         </div>
         <div class="item" on-tap="_logout">
           <paper-icon-button id="powerSettings" icon="power-settings-new"></paper-icon-button>
-          Sign out
+          [[localize('sign_out')]]
         </div>
       </paper-material>
     </iron-collapse>
@@ -75,6 +77,8 @@
       behaviors: [
         App.Behaviors.ReduxBehavior,
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.LocalizeBehavior,
+        Polymer.AppLocalizeBehavior,
       ],
 
       properties: {

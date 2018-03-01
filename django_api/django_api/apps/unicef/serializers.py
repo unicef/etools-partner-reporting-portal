@@ -1,17 +1,16 @@
 from django.conf import settings
 from rest_framework import serializers
 
+from core.serializers import ShortLocationSerializer
 from .models import ProgrammeDocument, Section, ProgressReport, Person, \
     LowerLevelOutput, PDResultLink, ReportingPeriodDates
 
 from core.common import PROGRESS_REPORT_STATUS, OVERALL_STATUS, CURRENCIES, PD_STATUS
-from core.models import Workspace
+from core.models import Workspace, Location
 
 from indicator.serializers import (
     PDReportContextIndicatorReportSerializer,
     IndicatorBlueprintSimpleSerializer,
-    IndicatorLLoutputsSerializer,
-    ReportableSimpleSerializer
 )
 
 from partner.models import Partner
@@ -35,8 +34,8 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
     unicef_officers = PersonSerializer(read_only=True, many=True)
     unicef_focal_point = PersonSerializer(read_only=True, many=True)
     partner_focal_point = PersonSerializer(read_only=True, many=True)
-    document_type_display = serializers.CharField(
-        source='get_document_type_display')
+    document_type_display = serializers.CharField(source='get_document_type_display')
+    locations = serializers.SerializerMethodField(allow_null=True)
 
     class Meta:
         model = ProgrammeDocument
@@ -49,7 +48,6 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
             'unicef_office',
             'start_date',
             'end_date',
-            'population_focus',
             'status',
             'document_type',
             'document_type_display',
@@ -67,7 +65,8 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
             'total_unicef_supplies_currency',
             'partner_focal_point',
             'unicef_focal_point',
-            'unicef_officers'
+            'unicef_officers',
+            'locations',
         )
 
     def get_id(self, obj):
@@ -87,6 +86,14 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
 
     def get_funds_received_to_date_currency(self, obj):
         return obj.funds_received_to_date_currency
+
+    def get_locations(self, obj):
+        return ShortLocationSerializer(
+            Location.objects.filter(
+                indicator_location_data__indicator_report__progress_report__programme_document=obj
+            ).distinct(),
+            many=True
+        ).data
 
 
 class SectionSerializer(serializers.ModelSerializer):
@@ -121,10 +128,13 @@ class ProgrammeDocumentDetailSerializer(serializers.ModelSerializer):
             'partner_focal_point',
             'start_date',
             'end_date',
-            'population_focus',
             # 'status',
             'frequency',
             'sections',
+            'cso_contribution',
+            'total_unicef_cash',
+            'in_kind_amount',
+            'budget',
         )
 
 
@@ -170,6 +180,7 @@ class ProgrammeDocumentOutputSerializer(serializers.ModelSerializer):
             'title',
             'reference_number',
             'cp_outputs',
+            'status',
         )
 
 
@@ -184,6 +195,9 @@ class ProgressReportSimpleSerializer(serializers.ModelSerializer):
         model = ProgressReport
         fields = (
             'id',
+            'report_type',
+            'report_number',
+            'is_final',
             'partner_contribution_to_date',
             'challenges_in_the_reporting_period',
             'proposed_way_forward',
@@ -214,10 +228,17 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
     indicator_reports = serializers.SerializerMethodField()
     review_overall_status_display = serializers.CharField(
         source='get_review_overall_status_display')
+    funds_received_to_date = serializers.SerializerMethodField()
+    funds_received_to_date_currency = serializers.SerializerMethodField()
+    funds_received_to_date_percentage = serializers.SerializerMethodField()
+    submitted_by = serializers.SerializerMethodField()
+    submitting_user = serializers.SerializerMethodField()
 
-    def __init__(self, llo_id=None, location_id=None, *args, **kwargs):
-        self.llo_id = llo_id
-        self.location_id = location_id
+    def __init__(self, *args, **kwargs):
+        request = kwargs.get('context', {}).get('request')
+        self.llo_id = kwargs.get('llo_id') or request and request.GET.get('llo')
+        self.location_id = kwargs.get('location_id') or request and request.GET.get('location')
+        self.show_incomplete = kwargs.get('incomplete') or request and request.GET.get('incomplete')
 
         super(ProgressReportSerializer, self).__init__(*args, **kwargs)
 
@@ -225,6 +246,9 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
         model = ProgressReport
         fields = (
             'id',
+            'report_type',
+            'report_number',
+            'is_final',
             'partner_contribution_to_date',
             'challenges_in_the_reporting_period',
             'proposed_way_forward',
@@ -238,8 +262,29 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
             'review_overall_status_display',
             'sent_back_feedback',
             'programme_document',
-            'indicator_reports'
+            'funds_received_to_date',
+            'funds_received_to_date_currency',
+            'funds_received_to_date_percentage',
+            'indicator_reports',
+            'submitted_by',
+            'submitting_user',
+            'is_final',
         )
+
+    def get_submitted_by(self, obj):
+        return obj.submitted_by.display_name if obj.submitted_by else None
+
+    def get_submitting_user(self, obj):
+        return obj.submitting_user.display_name if obj.submitting_user else None
+
+    def get_funds_received_to_date(self, obj):
+        return obj.programme_document.funds_received_to_date
+
+    def get_funds_received_to_date_currency(self, obj):
+        return obj.programme_document.funds_received_to_date_currency
+
+    def get_funds_received_to_date_percentage(self, obj):
+        return obj.programme_document.funds_received_to_date_percentage
 
     def get_indicator_reports(self, obj):
         qset = obj.indicator_reports.all()
@@ -247,6 +292,7 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
             qset = qset.filter(reportable__object_id=self.llo_id)
         if self.location_id and self.llo_id is not None:
             qset = qset.filter(reportable__locations__id=self.location_id)
+        # TODO: use incomplete flag
         return PDReportContextIndicatorReportSerializer(
             instance=qset, read_only=True, many=True).data
 
@@ -400,7 +446,8 @@ class PMPPDPersonSerializer(serializers.ModelSerializer):
         source='phone_number',
         required=False,
         allow_blank=True,
-        allow_null=True)
+        allow_null=True
+    )
 
     class Meta:
         model = Person
@@ -410,6 +457,7 @@ class PMPPDPersonSerializer(serializers.ModelSerializer):
             "phone_num",
             "email",
         )
+        extra_kwargs = {'name': {'required': True}}
 
 
 class PMPPDPartnerSerializer(serializers.ModelSerializer):
@@ -436,11 +484,11 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
     unicef_budget = serializers.CharField(source='total_unicef_cash')
     funds_received = serializers.CharField(source='funds_received_to_date')
     cso_budget_currency = serializers.ChoiceField(
-        choices=CURRENCIES, allow_null=True, source="budget_currency")
+        choices=CURRENCIES, allow_blank=True, allow_null=True, source="budget_currency")
     funds_received_currency = serializers.ChoiceField(
-        choices=CURRENCIES, allow_null=True, source="funds_received_to_date_currency")
+        choices=CURRENCIES, allow_blank=True, allow_null=True, source="funds_received_to_date_currency")
     unicef_budget_currency = serializers.ChoiceField(
-        choices=CURRENCIES, allow_null=True, source="total_unicef_cash_currency")
+        choices=CURRENCIES, allow_blank=True, allow_null=True, source="total_unicef_cash_currency")
     status = serializers.ChoiceField(choices=PD_STATUS)
     start_date = serializers.DateField(required=False, allow_null=True)
     end_date = serializers.DateField(required=False, allow_null=True)
@@ -498,6 +546,7 @@ class PMPSectionSerializer(serializers.ModelSerializer):
             'name',
         )
 
+
 class PMPReportingPeriodDatesSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='external_id')
     programme_document = serializers.PrimaryKeyRelatedField(
@@ -514,8 +563,6 @@ class PMPReportingPeriodDatesSerializer(serializers.ModelSerializer):
         )
 
 
-
-
 class PMPPDResultLinkSerializer(serializers.ModelSerializer):
     result_link = serializers.CharField(source='external_id')
     id = serializers.CharField(source='external_cp_output_id')
@@ -530,4 +577,32 @@ class PMPPDResultLinkSerializer(serializers.ModelSerializer):
             'title',
             'result_link',
             'programme_document'
+        )
+
+
+class ProgressReportAttachmentSerializer(serializers.ModelSerializer):
+    size = serializers.SerializerMethodField()
+    file_name = serializers.SerializerMethodField()
+    path = serializers.FileField(source='attachment')
+
+    def get_file_name(self, obj):
+        return obj.attachment.name.split('/')[-1] if obj.attachment else None
+
+    def get_size(self, obj):
+        return obj.attachment.size if obj.attachment else None
+
+    def to_representation(self, instance):
+        representation = super(ProgressReportAttachmentSerializer, self).to_representation(instance)
+
+        if "http" not in instance.attachment.url:
+            representation['path'] = settings.WWW_ROOT[:-1] + instance.attachment.url
+
+        return representation
+
+    class Meta:
+        model = ProgressReport
+        fields = (
+            'path',
+            'size',
+            'file_name'
         )

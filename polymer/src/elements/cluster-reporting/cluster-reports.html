@@ -35,7 +35,7 @@
     </etools-prp-ajax>
 
     <cluster-report-toolbar
-        params="[[params]]">
+        submitted="[[submitted]]">
     </cluster-report-toolbar>
 
     <cluster-report-list mode="[[mode]]"></cluster-report-list>
@@ -78,7 +78,9 @@
       ],
 
       listeners: {
-        'report-submitted': '_onReportSubmitted',
+        'report-submitted': '_onContentsChanged',
+        'report-reviewed': '_onContentsChanged',
+        'refresh-report': '_onRefreshReport',
       },
 
       _computeParams: function (queryParams) {
@@ -110,10 +112,25 @@
         });
       },
 
-      _onReportSubmitted: function (e, id) { // jshint ignore:line
+      _onContentsChanged: function (e, id) { // jshint ignore:line
         e.stopPropagation();
 
         this._fetchData();
+      },
+
+      _onRefreshReport: function (e, reportId) {
+        e.stopPropagation();
+
+        var ajax = document.createElement('etools-prp-ajax');
+
+        ajax.url = App.Endpoints.clusterIndicatorReport(this.responsePlanId, reportId);
+
+        this.dispatch(
+          App.Actions.ClusterIndicatorReports.fetchSingle(ajax.thunk(), reportId)
+        )
+            .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+            });
       },
 
       detached: function () {

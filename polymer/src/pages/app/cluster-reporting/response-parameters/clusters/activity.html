@@ -7,12 +7,9 @@
 
 <link rel="import" href="../../../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../../../elements/page-header.html">
-<link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/clusters/activities/
-overview.html">
-<link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/clusters/activities/
-indicators.html">
-<link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/clusters/activities/
-contributing-partners.html">
+<link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/clusters/activities/overview.html">
+<link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/clusters/activities/indicators.html">
+<link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/clusters/activities/contributing-partners.html">
 <link rel="import" href="../../../../../elements/project-status.html">
 <link rel="import" href="../../../../../elements/page-badge.html">
 <link rel="import" href="../../../../../endpoints.html">
@@ -152,6 +149,14 @@ contributing-partners.html">
         '_updateUrlTab(routeData.tab)',
       ],
 
+      listeners: {
+        'activity-edited': '_onSuccess'
+      },
+
+      _onSuccess: function() {
+        this._getActivityAjax();
+      },
+
       _updateTabSelection: function () {
         this.$.tabContent.select(this.tab);
       },
@@ -172,7 +177,7 @@ contributing-partners.html">
         return '/response-parameters/clusters/activities' + '?' + query;
       },
 
-      attached: function () {
+      _getActivityAjax: function() {
         var thunk = this.$.activity.thunk();
         var self = this;
 
@@ -185,6 +190,10 @@ contributing-partners.html">
             self.updatePending = false;
             // TODO: error handling
           });
+      },
+
+      attached: function () {
+        this._getActivityAjax();
       },
     });
   </script>

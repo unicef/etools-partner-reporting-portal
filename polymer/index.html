@@ -14,35 +14,35 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
 
-    <title>etools-partner-reporting-portal</title>
-    <meta name="description" content="">
+    <title>PRP</title>
+    <meta name="description" content="Partner Reporting Portal">
 
-    <link rel="icon" href="/images/favicon.ico">
+    <link rel="icon" href="images/favicon.ico">
 
     <!-- See https://goo.gl/OOhYW5 -->
-    <link rel="manifest" href="/manifest.json">
+    <link rel="manifest" href="manifest.json">
 
     <!-- See https://goo.gl/qRE0vM -->
     <meta name="theme-color" content="#2E3AA1">
 
     <!-- Add to homescreen for Chrome on Android. Fallback for manifest.json -->
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="">
+    <meta name="application-name" content="eTools - Partner Reporting Portal">
 
     <!-- Add to homescreen for Safari on iOS -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="">
+    <meta name="apple-mobile-web-app-title" content="eTools - Partner Reporting Portal">
 
     <!-- Homescreen icons -->
-    <link rel="apple-touch-icon" href="/images/manifest/icon-48x48.png">
-    <link rel="apple-touch-icon" sizes="72x72" href="/images/manifest/icon-72x72.png">
-    <link rel="apple-touch-icon" sizes="96x96" href="/images/manifest/icon-96x96.png">
-    <link rel="apple-touch-icon" sizes="144x144" href="/images/manifest/icon-144x144.png">
-    <link rel="apple-touch-icon" sizes="192x192" href="/images/manifest/icon-192x192.png">
+    <link rel="apple-touch-icon" href="images/manifest/icon-48x48.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="images/manifest/icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="96x96" href="images/manifest/icon-96x96.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="images/manifest/icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="images/manifest/icon-192x192.png">
 
     <!-- Tile icon for Windows 8 (144x144 + tile color) -->
-    <meta name="msapplication-TileImage" content="/images/manifest/icon-144x144.png">
+    <meta name="msapplication-TileImage" content="images/manifest/icon-144x144.png">
     <meta name="msapplication-TileColor" content="#3f51b5">
     <meta name="msapplication-tap-highlight" content="no">
 
@@ -54,6 +54,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       };
 
       window.App = {};
+      var serverBackend = (window.location.port !== '8080');
+      var baseUrl = serverBackend ? '/app/' : '/';
 
       // Load webcomponentsjs polyfill if browser does not support native Web Components
       (function() {
@@ -92,6 +94,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           navigator.serviceWorker.register('/service-worker.js');
         });
       }
+
+      // set app shell import path based on baseUrl
+      var appShellImport = document.createElement('link');
+      appShellImport.rel = 'import';
+      appShellImport.href = baseUrl + 'src/app-shell.html';
+      document.head.appendChild(appShellImport);
     </script>
 
     <style>
@@ -107,8 +115,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         background-color: #f3f3f3;
       }
     </style>
-
-    <link rel="import" href="/src/app-shell.html">
   </head>
   <body unresolved>
     <app-shell></app-shell>

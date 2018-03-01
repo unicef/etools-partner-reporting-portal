@@ -186,11 +186,10 @@
                 </div>
                 <div class="item">
                    <etools-prp-date-input
-                      class="validate"
+                      class="start-date"
                       label="Start date"
                       value="{{data.cluster.start_date}}"
                       error-message=""
-                      auto-validate
                       required
                       no-init>
                    </etools-prp-date-input>
@@ -198,11 +197,10 @@
                 </div>
                 <div class="item">
                   <etools-prp-date-input
-                      class="validate"
+                      class="end-date"
                       label="End date"
                       value="{{data.cluster.end_date}}"
                       error-message=""
-                      auto-validate
                       required
                       no-init>
                   </etools-prp-date-input>
@@ -303,11 +301,10 @@
                 </div>
                  <div class="item">
                    <etools-prp-date-input
-                      class="validate"
+                      class="start-date"
                       label="Start date"
                       value="{{data.custom.start_date}}"
                       error-message=""
-                      auto-validate
                       required
                       no-init>
                    </etools-prp-date-input>
@@ -315,11 +312,10 @@
                 </div>
                 <div class="item">
                   <etools-prp-date-input
-                      class="validate"
+                      class="end-date"
                       label="End date"
                       value="{{data.custom.end_date}}"
                       error-message=""
-                      auto-validate
                       required
                       no-init>
                   </etools-prp-date-input>
@@ -611,20 +607,12 @@
       },
 
       _save: function () {
-        var fields = [].slice.call(
-          Polymer.dom(this.root).querySelectorAll('.validate')
-        );
-
         var self = this;
-        var valid;
 
-        fields.forEach(function (field) {
-          field.validate();
-        });
-
-        valid = fields.every(function (field) {
-          return !field.invalid;
-        });
+        var valid = [
+          this._fieldsAreValid(),
+          this._dateRangeValid('.start-date', '.end-date'),
+        ].every(Boolean);
 
         if (!valid) {
           return;

@@ -1,0 +1,49 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../endpoints.html">
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../etools-prp-toolbar.html">
+<link rel="import" href="../download-button.html">
+
+<dom-module id="progress-reports-toolbar">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <etools-prp-toolbar
+      query="{{query}}"
+      location-id="{{locationId}}"
+    >
+      <download-button url="[[xlsExportUrl]]">XLS</download-button>
+    </etools-prp-toolbar>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'progress-reports-toolbar',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+      ],
+
+      properties: {
+        pdReportsUrl: {
+          type: String,
+          computed: '_computePdReportsUrl(locationId)',
+        },
+
+        xlsExportUrl: {
+          type: String,
+          computed: '_appendQuery(pdReportsUrl, query, \'export=xlsx\')',
+        },
+      },
+
+      _computePdReportsUrl: function (locationId) {
+        return App.Endpoints.programmeDocumentReports(locationId);
+      },
+    });
+  </script>
+</dom-module>

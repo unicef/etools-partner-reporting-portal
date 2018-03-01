@@ -1,6 +1,7 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
+<link rel="import" href="../../../bower_components/etools-content-panel/etools-content-panel.html">
 
 <link rel="import" href="../list-placeholder.html">
 <link rel="import" href="../ip-reporting/pd-output.html">
@@ -12,45 +13,55 @@
     <style include="iron-flex iron-flex-alignment">
       :host {
         display: block;
+
+        --ecp-content: {
+          padding: 0;
+        };
       }
 
       .loader {
-        margin: 2em 0;
+        padding: 2em 0;
       }
 
       pd-output {
         margin-bottom: 25px;
       }
+
+      pd-output:not(:first-of-type) {
+        border-top: 1px solid var(--paper-grey-300);
+      }
     </style>
 
-    <template
-        is="dom-if"
-        if="[[loading]]"
-        restamp="true">
-      <div class="loader layout horizontal center-center">
-        <div>
-          <etools-loading no-overlay active></etools-loading>
-        </div>
-      </div>
-    </template>
-
-    <template
-        is="dom-if"
-        if="[[!loading]]">
+    <etools-content-panel panel-title="PD Output/ SSFA Expected Results">
       <template
-          is="dom-repeat"
-          items="[[viewData]]">
-        <pd-output
-            data="[[item]]"
-            override-mode="[[overrideMode]]">
-        </pd-output>
+          is="dom-if"
+          if="[[loading]]"
+          restamp="true">
+        <div class="loader layout horizontal center-center">
+          <div>
+            <etools-loading no-overlay active></etools-loading>
+          </div>
+        </div>
       </template>
 
-      <list-placeholder
-          data="[[viewData]]"
-          loading="[[loading]]">
-      </list-placeholder>
-    </template>
+      <template
+          is="dom-if"
+          if="[[!loading]]">
+        <template
+            is="dom-repeat"
+            items="[[viewData]]">
+          <pd-output
+              data="[[item]]"
+              override-mode="[[overrideMode]]">
+          </pd-output>
+        </template>
+
+        <list-placeholder
+            data="[[viewData]]"
+            loading="[[loading]]">
+        </list-placeholder>
+      </template>
+    </etools-content-panel>
   </template>
 
   <script>

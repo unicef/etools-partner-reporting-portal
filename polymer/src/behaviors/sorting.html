@@ -1,0 +1,33 @@
+<link rel="import" href="../polyfills/es6-shim.html">"
+
+<script>
+  (function () {
+    'use strict';
+
+    App.Behaviors = App.Behaviors || {};
+
+    App.Behaviors.SortingBehavior = {
+      listeners: {
+        'sort-changed': '_sortOrderChanged',
+      },
+
+      _sortOrderChanged: function (e, data) {
+        this.debounce('sort-order-changed', function () {
+          var newParams = Object.assign({}, this.queryParams, {
+            sort: data.field + '.' + data.direction,
+          });
+
+          e.stopPropagation();
+
+          this.set('queryParams', newParams);
+        }, 100);
+      },
+
+      detached: function () {
+        if (this.isDebouncerActive('sort-order-changed')) {
+          this.cancelDebouncer('sort-order-changed');
+        }
+      },
+    };
+  }());
+</script>

@@ -1,7 +1,22 @@
 FROM mhart/alpine-node:7.8.0
 
 RUN apk update
-RUN apk add git
+RUN apk --update --no-cache \
+		add  \
+    automake \
+		git \
+		alpine-sdk  \
+		nasm  \
+		autoconf  \
+		build-base \
+		zlib \
+		zlib-dev \
+		libpng \
+		libpng-dev\
+		libwebp \
+		libwebp-dev \
+		libjpeg-turbo \
+		libjpeg-turbo-dev
 
 RUN npm install -g bower polymer-cli gulp-cli
 
@@ -23,4 +38,4 @@ RUN cp -a /tmp/bower_components /code/bower_components
 WORKDIR /code
 
 EXPOSE 8080
-CMD ["gulp", "node", "express.js"]
+CMD ["npm", "run", "dev"]

@@ -4,6 +4,7 @@
 <link rel="import" href="../../../../../bower_components/iron-location/iron-query-params.html">
 
 <link rel="import" href="../../../etools-prp-ajax.html">
+<link rel="import" href="../../../etools-prp-permissions.html">
 <link rel="import" href="../../../page-body.html">
 <link rel="import" href="../../indicator-modal.html">
 <link rel="import" href="../../../../behaviors/utils.html">
@@ -26,6 +27,10 @@
       }
     </style>
 
+    <etools-prp-permissions
+        permissions="{{permissions}}">
+    </etools-prp-permissions>
+
     <iron-location query="{{query}}"></iron-location>
 
     <iron-query-params
@@ -44,7 +49,7 @@
       <template is="dom-if" if="[[isCustom]]">
         <div id="action">
           <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
-            Add Indicator
+            Add Activity Indicator
           </paper-button>
         </div>
       </template>
@@ -52,13 +57,15 @@
       <indicator-modal
         id="indicatorModal"
         object-id="[[activityId]]"
-        object-type="PartnerActivity">
+        object-type="partner.partneractivity"
+        modal-title="Add Activity Indicator">
       </indicator-modal>
 
       <list-view-indicators
           data="[[data]]"
           total-results="[[totalResults]]"
-          is-custom="[[isCustom]]">
+          is-custom="[[isCustom]]"
+          can-edit="[[isCustom]]">
       </list-view-indicators>
     </page-body>
   </template>
@@ -105,6 +112,7 @@
 
       listeners: {
         'indicatorModal.indicator-added': '_onSuccess',
+        'indicator-edited': '_onSuccess',
       },
 
       observers: [
@@ -130,7 +138,7 @@
       _computeUrl: function () {
         //Make sure the queryParams are updated before the thunk is created:
         this.set('queryParams.object_id', this.activityId);
-        
+
         return App.Endpoints.indicators('pa');
       },
 

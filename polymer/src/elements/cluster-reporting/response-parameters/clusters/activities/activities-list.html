@@ -13,7 +13,7 @@
 <link rel="import" href="../../../../../styles/shared-styles.html">
 
 <dom-module id="clusters-activities-list">
-    <template>
+  <template>
     <style include="data-table-styles table-styles iron-flex">
       :host {
         display: block;
@@ -32,6 +32,10 @@
       .wrapper {
         position: relative;
       }
+
+      etools-data-table-column {
+        display: flex;
+      }
     </style>
 
     <iron-location query="{{query}}"></iron-location>
@@ -41,22 +45,36 @@
         params-object="{{queryParams}}">
     </iron-query-params>
 
+    <iron-query-params
+        params-string="{{anchorQuery}}"
+        params-object="{{anchorQueryParams}}">
+    </iron-query-params>
+
     <div class="wrapper">
       <etools-data-table-header
           no-collapse
           label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
         <template is="dom-if" if="[[!isMinimalList]]" restamp="true">
-          <etools-data-table-column field="activity">
+          <etools-data-table-column field="title" flex-3 sortable>
             <div class="table-column">Cluster Activity Title</div>
           </etools-data-table-column>
           <etools-data-table-column field="cluster">
             <div class="table-column">Cluster</div>
           </etools-data-table-column>
-          <etools-data-table-column field="cluster">
+          <etools-data-table-column field="cluster_objective" sortable>
              <div class="table-column">Cluster Objective Title</div>
           </etools-data-table-column>
         </template>
       </etools-data-table-header>
+
+      <etools-data-table-footer
+          page-size="[[pageSize]]"
+          page-number="[[pageNumber]]"
+          total-results="[[totalResults]]"
+          visible-range="{{visibleRange}}"
+          on-page-size-changed="_pageSizeChanged"
+          on-page-number-changed="_pageNumberChanged">
+      </etools-data-table-footer>
 
       <template
           id="list"
@@ -66,8 +84,8 @@
           initial-count="[[pageSize]]">
         <etools-data-table-row no-collapse>
           <div slot="row-data">
-            <div class="table-cell table-cell--text">
-              <a href="[[_detailUrl(activity.id)]]">[[activity.title]]</a>
+            <div class="table-cell table-cell--text" flex-3>
+              <a href="[[_detailUrl(activity.id, anchorQuery)]]">[[activity.title]]</a>
             </div>
             <template is="dom-if" if="[[!isMinimalList]]" restamp="true">
               <div class="table-cell table-cell--text">
@@ -76,7 +94,6 @@
               <div class="table-cell table-cell--text">
                 [[activity.co_title]]
              </div>
-
             </template>
           </div>
         </etools-data-table-row>
@@ -108,6 +125,8 @@
       ],
 
       properties: {
+        queryParams: Object,
+
         loading: {
           type: Boolean,
           statePath: 'clusterActivities.loading'
@@ -126,16 +145,21 @@
         isMinimalList: {
           type: Boolean,
           value: false
-        }
+        },
+
+        anchorQueryParams: {
+          type: Object,
+          computed: '_withDefaultParams(queryParams)',
+        },
       },
 
       _openModal: function () {
         this.$$('#modal').open();
       },
 
-      _detailUrl: function(id) {
+      _detailUrl: function (id, query) {
         var path = '/response-parameters/clusters/activity/' + id;
-        return this.buildUrl(this._baseUrlCluster, path) + '?' + this.query;
+        return this.buildUrl(this._baseUrlCluster, path) + '?' + query;
       },
 
     });

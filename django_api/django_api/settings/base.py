@@ -44,11 +44,13 @@ DATA_VOLUME = '/data'
 
 UPLOADS_DIR_NAME = 'uploads'
 MEDIA_URL = '/%s/' % UPLOADS_DIR_NAME
-MEDIA_ROOT = os.path.join(DATA_VOLUME, '%s' % UPLOADS_DIR_NAME)
 
 FILE_UPLOAD_MAX_MEMORY_SIZE = 4194304  # 4mb
 MEDIA_ROOT = os.path.join(DATA_VOLUME, '%s' % UPLOADS_DIR_NAME)
 STATIC_ROOT = '%s/staticserve' % DATA_VOLUME
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
 # Sendgrid stuff
 EMAIL_BACKEND = DOMAIN_NAME = os.getenv('DOMAIN_NAME')
@@ -58,6 +60,7 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'no-reply@etools.unicef.org'
 
 ALLOWED_HOSTS = []
 
@@ -65,6 +68,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'elasticapm.contrib.django',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -93,6 +97,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE_CLASSES = [
+    'elasticapm.contrib.django.middleware.TracingMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -118,8 +123,7 @@ ROOT_URLCONF = 'django_api.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
+        'DIRS': [os.path.join(BASE_DIR, 'templates'), ],
         'OPTIONS': {
             'debug': DEBUG,
             'context_processors': [
@@ -127,6 +131,10 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+            ],
+            'loaders': [
+              'django.template.loaders.filesystem.Loader',
+              'django.template.loaders.app_directories.Loader',
             ],
         },
     },
@@ -234,7 +242,8 @@ STATIC_URL = '/api/static/'
 # Authentication settings
 AUTH_USER_MODEL = 'account.User'
 
-PRINT_DATA_FORMAT = "%d %b %Y"
+PRINT_DATA_FORMAT = "%d-%b-%Y"
+DATE_FORMAT = PRINT_DATA_FORMAT
 
 INPUT_DATA_FORMAT = "%Y-%m-%d"
 
@@ -261,12 +270,21 @@ LOGGING = {
             'backupCount': 5,
             'formatter': 'standard'
         },
+        'elasticapm': {
+            'level': 'ERROR',
+            'class': 'elasticapm.contrib.django.handlers.LoggingHandler',
+        },
     },
     'loggers': {
         '': {
             'handlers': ['default'],
             'level': 'INFO',
             'propagate': True},
+        'elasticapm.errors': {
+            'level': 'ERROR',
+            'handlers': ['default'],
+            'propagate': False,
+        },
     }
 }
 
@@ -332,7 +350,9 @@ REST_FRAMEWORK = {
             'rest_framework.authentication.SessionAuthentication',
             'utils.mixins.CustomJSONWebTokenAuthentication',
             'rest_framework.authentication.TokenAuthentication',
-    )
+    ),
+    'DATE_FORMAT': PRINT_DATA_FORMAT,
+    'DATE_INPUT_FORMATS': ['iso-8601', PRINT_DATA_FORMAT],
 }
 
 
@@ -385,3 +405,11 @@ if not DISABLE_JWT_AUTH:
         'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=3000),  # noqa: F405
         'JWT_AUDIENCE': 'https://etools.unicef.org/',
     })
+
+# apm related - it's enough to set those as env variables, here just for documentation
+# by default logging and apm is off, so below envs needs to be set per environment
+
+# ELASTIC_APM_SERVICE_NAME=<app-name> # set app name visible on dashboard
+# ELASTIC_APM_SECRET_TOKEN=<app-token> #secret token - needs to be exact same as on apm-server
+# ELASTIC_APM_SERVER_URL=http://elastic.tivixlabs.com:8200 # apm-server url
+

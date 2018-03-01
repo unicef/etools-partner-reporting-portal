@@ -1,6 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/iron-localstorage/iron-localstorage.html">
 
+<link rel="import" href="../behaviors/utils.html">
 <link rel="import" href="../redux/store.html">
 <link rel="import" href="../redux/actions.html">
 
@@ -19,6 +20,7 @@
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.UtilsBehavior,
       ],
 
       properties: {
@@ -35,7 +37,7 @@
         accountType: {
           type: String,
           notify: true,
-          computed: '_computeAccountType(_accountType)',
+          computed: '_identity(_accountType)',
         },
 
         authenticated: {
@@ -52,10 +54,6 @@
         if (savedToken && !this.token) {
           this.dispatch(App.Actions.setToken(savedToken));
         }
-      },
-
-      _computeAccountType: function (_accountType) {
-        return _accountType;
       },
 
       _computeAuthenticated: function (token) {

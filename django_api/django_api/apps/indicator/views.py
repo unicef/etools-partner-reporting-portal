@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 import operator
 import logging
 from django.db.models import Q
@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404
 from django.http import Http404
 
 from rest_framework import status
-from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveAPIView
+from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveAPIView, CreateAPIView, UpdateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -15,9 +15,8 @@ import django_filters.rest_framework
 
 from core.permissions import (
     IsAuthenticated,
-    IsPartnerAuthorizedOfficer,
-    IsPartnerEditor,
-    IsPartnerEditorOrPartnerAuthorizedOfficer
+    IsPartnerEditorOrPartnerAuthorizedOfficer,
+    IsIMO,
 )
 from core.paginations import SmallPagination
 from core.models import Location
@@ -44,8 +43,9 @@ from .serializers import (
     IndicatorLLoutputsSerializer, IndicatorLocationDataUpdateSerializer,
     OverallNarrativeSerializer,
     ClusterIndicatorSerializer,
-    ClusterIndicatorDataSerializer,
-    DisaggregationListSerializer
+    DisaggregationListSerializer,
+    IndicatorReportReviewSerializer,
+    IndicatorReportSimpleSerializer
 )
 from .filters import IndicatorFilter, PDReportsFilter
 from .models import (
@@ -303,6 +303,7 @@ class IndicatorDataAPIView(APIView):
         )
 
     def put(self, request, ir_id, *args, **kwargs):
+        """TODO: check usage of this"""
         if 'progress_report' not in request.data:
             _errors = ["No progress_report found in PUT request data."]
             return Response({"errors": _errors},
@@ -325,23 +326,32 @@ class IndicatorDataAPIView(APIView):
     def post(self, request, ir_id, *args, **kwargs):
         ir = self.get_indicator_report(ir_id)
 
+        if not ir.can_submit:
+            _errors = [{
+                "message": "Please check that data for all locations has been entered."
+            }]
+            return Response({"errors": _errors}, status=status.HTTP_400_BAD_REQUEST)
+
         # Check if all indicator data is fulfilled for IR status different then
         # Met or No Progress
         if ir.overall_status not in (
                 OVERALL_STATUS.met, OVERALL_STATUS.no_progress):
             for data in ir.indicator_location_data.all():
                 for key, vals in data.disaggregation.items():
-                    if ir.is_percentage and (
-                            vals.get('c', None) in [None, '']):
+                    if ir.is_percentage and (vals.get('c', None) in [None, '']):
                         _errors = [{
-                            "message": "You have not completed all required indicators for this progress report. Unless your Output status is Met or has No Progress, all indicator data needs to be completed."}]
-                        return Response({"errors": _errors},
-                                        status=status.HTTP_400_BAD_REQUEST)
+                            "message": "You have not completed all required indicators for this progress report. "
+                                       "Unless your Output status is Met or has No Progress, all indicator data "
+                                       "needs to be completed."
+                        }]
+                        return Response({"errors": _errors}, status=status.HTTP_400_BAD_REQUEST)
                     elif ir.is_number and (vals.get('v', None) in [None, '']):
                         _errors = [{
-                            "message": "You have not completed all required indicators for this progress report. Unless your Output status is Met or has No Progress, all indicator data needs to be completed."}]
-                        return Response({"errors": _errors},
-                                        status=status.HTTP_400_BAD_REQUEST)
+                            "message": "You have not completed all required indicators for this progress report. "
+                                       "Unless your Output status is Met or has No Progress, all indicator "
+                                       "data needs to be completed."
+                        }]
+                        return Response({"errors": _errors}, status=status.HTTP_400_BAD_REQUEST)
 
         # Check if indicator was already submitted or SENT BACK
         if ir.submission_date is None or ir.report_status == INDICATOR_REPORT_STATUS.sent_back:
@@ -361,10 +371,11 @@ class IndicatorDataAPIView(APIView):
             serializer = PDReportContextIndicatorReportSerializer(instance=ir)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            _errors = [
-                {"message": "Indicator was already submitted. Your IMO will need to send it back for you to edit your submission."}]
-            return Response({"errors": _errors},
-                            status=status.HTTP_400_BAD_REQUEST)
+            _errors = [{
+                "message": "Indicator was already submitted. "
+                           "Your IMO will need to send it back for you to edit your submission."
+             }]
+            return Response({"errors": _errors}, status=status.HTTP_400_BAD_REQUEST)
 
     def patch(self, request, ir_id, *args, **kwargs):
         """
@@ -381,8 +392,7 @@ class IndicatorDataAPIView(APIView):
                 return Response(serializer.errors,
                                 status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({"errors": "Indicator Report not found."},
-                        status=status.HTTP_400_BAD_REQUEST)
+        return Response({"errors": "Indicator Report not found."}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PDLowerLevelOutputStatusAPIView(APIView):
@@ -393,7 +403,8 @@ class PDLowerLevelOutputStatusAPIView(APIView):
     serializer_class = OverallNarrativeSerializer
     permission_classes = (
         IsAuthenticated,
-        IsPartnerEditorOrPartnerAuthorizedOfficer)
+        IsPartnerEditorOrPartnerAuthorizedOfficer,
+    )
 
     def patch(self, request, pd_progress_report_id, llo_id, *args, **kwargs):
         """
@@ -411,7 +422,8 @@ class PDLowerLevelOutputStatusAPIView(APIView):
             for indicator_report in ir_qset.all():
                 serializer = OverallNarrativeSerializer(
                     data=request.data,
-                    instance=indicator_report)
+                    instance=indicator_report
+                )
                 if serializer.is_valid():
                     serializer.save()
                 else:
@@ -440,8 +452,6 @@ class IndicatorReportListAPIView(APIView):
     """
 
     def get_queryset(self, *args, **kwargs):
-        indicator_reports = None
-
         pks = self.request.query_params.get('pks', None)
         reportable_id = self.kwargs.get('reportable_id', None)
 
@@ -454,8 +464,7 @@ class IndicatorReportListAPIView(APIView):
             indicator_reports = IndicatorReport.objects.filter(id__in=pk_list)
         else:
             reportable = get_object_or_404(Reportable, pk=reportable_id)
-            indicator_reports = reportable.indicator_reports.all().order_by(
-                '-time_period_start')
+            indicator_reports = reportable.indicator_reports.all().order_by('-time_period_start')
 
         if 'limit' in self.request.query_params:
             limit = int(self.request.query_params.get('limit', '2'))
@@ -465,9 +474,56 @@ class IndicatorReportListAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
         indicator_reports = self.get_queryset()
-        serializer = IndicatorReportListSerializer(indicator_reports,
-                                                   many=True)
+        serializer = IndicatorReportListSerializer(indicator_reports, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class IndicatorReportReviewAPIView(APIView):
+    """
+    Called by IMO to accept or send back a submitted indicator report.
+
+    Only a IMO should be allowed to do this action.
+    """
+    permission_classes = (IsIMO,)
+
+    def get_object(self, pk):
+        try:
+            return IndicatorReport.objects.get(pk=pk)
+        except IndicatorReport.DoesNotExist as exp:
+            logger.exception({
+                "endpoint": "IndicatorReportReviewAPIView",
+                "request.data": self.request.data,
+                "pk": pk,
+                "exception": exp,
+            })
+            raise Http404
+
+    @transaction.atomic
+    def post(self, request, pk, *args, **kwargs):
+        """
+        Only if the indicator report is in submitted state that this POST
+        request will be successful.
+        """
+        indicator_report = self.get_object(pk)
+
+        if indicator_report.report_status != INDICATOR_REPORT_STATUS.submitted:
+            _errors = [{"message": "This report is not in submitted state."}]
+            return Response({"errors": _errors}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = IndicatorReportReviewSerializer(data=request.data)
+        if serializer.is_valid():
+            indicator_report.report_status = serializer.validated_data['status']
+            indicator_report.review_date = datetime.now().date()
+            if indicator_report.report_status == INDICATOR_REPORT_STATUS.sent_back:
+                indicator_report.sent_back_feedback = serializer.validated_data[
+                    'comment']
+
+            indicator_report.save()
+            serializer = IndicatorReportSimpleSerializer(instance=indicator_report)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response({"errors": serializer.errors},
+                        status=status.HTTP_400_BAD_REQUEST)
 
 
 class IndicatorLocationDataUpdateAPIView(APIView):
@@ -511,52 +567,17 @@ class IndicatorLocationDataUpdateAPIView(APIView):
                             status=status.HTTP_400_BAD_REQUEST)
 
 
-class ClusterIndicatorAPIView(APIView):
+class ClusterIndicatorAPIView(CreateAPIView, UpdateAPIView):
     """
     Add and Update Indicator on cluster reporting screen.
     """
 
     serializer_class = ClusterIndicatorSerializer
     permission_classes = (IsAuthenticated, )
-
-    # Naming this to get_serializer_instance in order to avoid colision in
-    # Swagger schema generation
-    def get_serializer_instance(
-            self, data, instance=None, many=False, read_only=False):
-        return self.serializer_class(
-            data=data,
-            instance=instance,
-            many=many,
-            read_only=read_only,
-        )
-
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer_instance(request.data)
-        if not serializer.is_valid():
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
-
-        serializer.save()
-        return Response(
-            ClusterIndicatorDataSerializer(instance=serializer.instance).data,
-            status=status.HTTP_201_CREATED
-        )
+    queryset = Reportable.objects.all()
 
     def get_object(self):
-        return get_object_or_404(Reportable, pk=self.request.data.get("id"))
-
-    def put(self, request, *args, **kwargs):
-        serializer = self.get_serializer_instance(
-            instance=self.get_object(),
-            data=request.data
-        )
-        if not serializer.is_valid():
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
-
-        serializer.save()
-        return Response({'id': serializer.instance.id},
-                        status=status.HTTP_200_OK)
+        return get_object_or_404(self.get_queryset(), pk=self.request.data.get("id"))
 
 
 class IndicatorDataLocationAPIView(ListAPIView):

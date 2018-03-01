@@ -11,25 +11,25 @@ steps:
         build_arguments:
             - env=$ENV
 
-    composition_step:
-        type: composition
-        composition: 'unicef-prp'
-        composition_candidates:
-            test:
-                image: ${{build_django}}
-                depends_on:
-                    - proxy
-                    - django_api
-                    - db
-                command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 -timeout=30 -- python /code/manage.py test --settings=django_api.settings.test --parallel --failfast"
-        composition_variables:
-            - POSTGRES_DB=postgres
-            - POSTGRES_USER=postgres
-            - POSTGRES_PASSWORD=
-            - POSTGRES_HOST=db
-            - SECRET_KEY=asdfqwef124rf
-            - ENV=dev
-            - DJANGO_ALLOWED_HOST="*"        
+    # composition_step:
+    #     type: composition
+    #     composition: 'unicef-prp'
+    #     composition_candidates:
+    #         test:
+    #             image: ${{build_django}}
+    #             depends_on:
+    #                 - proxy
+    #                 - django_api
+    #                 - db
+    #             command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 -timeout=30 -- python /code/manage.py test --settings=django_api.settings.test --parallel --failfast"
+    #     composition_variables:
+    #         - POSTGRES_DB=postgres
+    #         - POSTGRES_USER=postgres
+    #         - POSTGRES_PASSWORD=
+    #         - POSTGRES_HOST=db
+    #         - SECRET_KEY=asdfqwef124rf
+    #         - ENV=dev
+    #         - DJANGO_ALLOWED_HOST="*"
 
     push_to_hub:
         type: push

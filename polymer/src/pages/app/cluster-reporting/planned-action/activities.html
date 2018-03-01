@@ -4,6 +4,7 @@
 
 <link rel="import" href="../../../../behaviors/routing.html">
 <link rel="import" href="../../../../behaviors/utils.html">
+<link rel="import" href="../../../../behaviors/sorting.html">
 <link rel="import" href="../../../../elements/cluster-reporting/planned-action/activities/filters.html">
 <link rel="import" href="../../../../elements/cluster-reporting/planned-action/activities/creation-modal.html">
 <link rel="import" href="../../../../elements/cluster-reporting/activity-list-table.html">
@@ -70,10 +71,6 @@
         this.$$('#modal').open();
       },
 
-      listeners: {
-        'modal.activity-added': '_onSuccess'
-      },
-
       observers: [
         '_activitiesAjax(queryParams, url)',
       ],
@@ -82,6 +79,7 @@
         App.Behaviors.ReduxBehavior,
         App.Behaviors.RoutingBehavior,
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.SortingBehavior,
       ],
 
       properties: {
@@ -105,6 +103,10 @@
           type: String,
           computed: '_computeUrl(responsePlanID, queryParams, partnerID)'
         },
+      },
+
+      listeners: {
+        'modal.activity-added': '_onSuccess',
       },
 
       _onSuccess: function(e, data) {

@@ -86,7 +86,7 @@
     <template is="dom-if" if="[[loading]]">
       <div class="loading-wrapper">
         <etools-loading no-overlay></etools-loading>
-      <div>
+      </div>
     </template>
 
     <template
@@ -119,14 +119,6 @@
                 </template>
               </dd>
             </dl>
-
-            <labelled-item label="Overall status">
-              <report-status status="[[report.overall_status]]"></report-status>
-            </labelled-item>
-
-            <labelled-item label="Narrative assessment">
-              [[_withDefault(report.narrative_assessment)]]
-            </labelled-item>
           </div>
         </template>
       </div>
