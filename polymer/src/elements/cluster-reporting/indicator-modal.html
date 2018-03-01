@@ -484,7 +484,8 @@
         }
         this.set('selectedLocations', []);
         this.set('selectedDisaggregations', []);
-
+        this.set('displayType', '');
+        this.set('type', '');
         this.set('data', {
           cs_dates: [],
           locations: [],
@@ -493,7 +494,6 @@
         });
 
         this._forEach('paper-radio-group', this._updateValue);
-
         this._fetchLocations();
         this._fetchDisaggregations();
       },

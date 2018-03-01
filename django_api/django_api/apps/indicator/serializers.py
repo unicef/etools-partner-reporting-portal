@@ -868,6 +868,8 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
     partner = serializers.SerializerMethodField()
     partner_id = serializers.SerializerMethodField()
     partner_activity = serializers.SerializerMethodField()
+    cluster_objective = serializers.SerializerMethodField()
+    cluster_activity = serializers.SerializerMethodField()
     is_draft = serializers.SerializerMethodField()
     can_submit = serializers.SerializerMethodField()
 
@@ -895,6 +897,8 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
             'partner',
             'partner_id',
             'partner_activity',
+            'cluster_objective',
+            'cluster_activity',
             'is_draft',
             'can_submit',
             'time_period_start',
@@ -927,20 +931,23 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
 
     def get_cluster(self, obj):
         cluster = self._get_cluster(obj)
-        return cluster.get_type_display() if cluster else ""
+        return {"id": cluster.id, "title": cluster.get_type_display()} if cluster else None
 
     def get_cluster_id(self, obj):
         cluster = self._get_cluster(obj)
-        return cluster.id if cluster else ""
+        return cluster.id if cluster else None
 
     def get_project(self, obj):
         if isinstance(obj.reportable.content_object, (PartnerProject, )):
-            return obj.reportable.content_object.title
+            return {"id": obj.reportable.content_object.id, "title": obj.reportable.content_object.title}
         elif isinstance(obj.reportable.content_object, (PartnerActivity, )):
             if obj.reportable.content_object.project:
-                return obj.reportable.content_object.project.title
+                return {
+                    "id": obj.reportable.content_object.project.id,
+                    "title": obj.reportable.content_object.project.title
+                }
         else:
-            return ''
+            return None
 
     def _get_partner(self, obj):
         if isinstance(obj.reportable.content_object,
@@ -952,18 +959,30 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
     def get_partner(self, obj):
         partner = self._get_partner(obj)
 
-        return partner.title if partner else ""
+        return {"id": partner.id, "title": partner.title} if partner else None
 
     def get_partner_id(self, obj):
         partner = self._get_partner(obj)
 
-        return partner.id if partner else ""
+        return partner.id if partner else None
 
     def get_partner_activity(self, obj):
         if isinstance(obj.reportable.content_object, (PartnerActivity, )):
-            return obj.reportable.content_object.title
+            return {"id": obj.reportable.content_object.id, "title": obj.reportable.content_object.title}
         else:
-            return ''
+            return None
+
+    def get_cluster_objective(self, obj):
+        if isinstance(obj.reportable.content_object, (ClusterObjective, )):
+            return {"id": obj.reportable.content_object.id, "title": obj.reportable.content_object.title}
+        else:
+            return None
+
+    def get_cluster_activity(self, obj):
+        if isinstance(obj.reportable.content_object, (ClusterActivity, )):
+            return {"id": obj.reportable.content_object.id, "title": obj.reportable.content_object.title}
+        else:
+            return None
 
     def get_is_draft(self, obj):
         return obj.is_draft

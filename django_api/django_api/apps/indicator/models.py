@@ -22,6 +22,10 @@ from core.common import (
 from core.models import TimeStampedExternalSyncModelMixin
 from functools import reduce
 
+from indicator.disaggregators import (
+    QuantityIndicatorDisaggregator,
+    RatioIndicatorDisaggregator
+)
 from indicator.constants import ValueType
 
 
@@ -84,6 +88,17 @@ class IndicatorBlueprint(TimeStampedExternalSyncModelMixin):
     MAX = 'max'
     AVG = 'avg'
     RATIO = 'ratio'
+
+    QUANTITY_CALC_CHOICE_LIST = (
+        SUM,
+        MAX,
+        AVG,
+    )
+
+    RATIO_CALC_CHOICE_LIST = (
+        PERCENTAGE,
+        RATIO,
+    )
 
     QUANTITY_CALC_CHOICES = (
         (SUM, SUM),
@@ -170,6 +185,26 @@ class IndicatorBlueprint(TimeStampedExternalSyncModelMixin):
 
     class Meta:
         ordering = ['-id']
+
+
+@receiver(post_save,
+          sender=IndicatorBlueprint,
+          dispatch_uid="trigger_indicator_report_recalculation")
+def trigger_indicator_report_recalculation(sender, instance, **kwargs):
+    """
+    Whenever an indicator blueprint is saved, IndicatorReport objects
+    linked to this IndicatorBlueprint via its Reportable should all be
+    recalculated for its total.
+    """
+    irs = IndicatorReport.objects.filter(reportable=instance.reportables.all())
+
+    if instance.calculation_formula_across_locations in IndicatorBlueprint.QUANTITY_CALC_CHOICE_LIST:
+        for ir in irs:
+            QuantityIndicatorDisaggregator.calculate_indicator_report_total(ir)
+
+    elif instance.calculation_formula_across_locations in IndicatorBlueprint.RATIO_CALC_CHOICE_LIST:
+        for ir in irs:
+            RatioIndicatorDisaggregator.calculate_indicator_report_total(ir)
 
 
 class Reportable(TimeStampedExternalSyncModelMixin):

@@ -19,66 +19,66 @@ const argv = require('yargs').argv;
 // Got problems? Try logging 'em
 // use -l to activate plylogs
 if (argv.l) {
-  const logging = require('plylog');
-  logging.setVerbose();
+    const logging = require('plylog');
+    logging.setVerbose();
 }
 
 
 // !!! IMPORTANT !!! //
 // Keep the global.config above any of the gulp-tasks that depend on it
 global.config = {
-  // Name of your app
-  appName: 'app',
-  polymerJsonPath: path.join(process.cwd(), 'polymer.json'),
-  build: {
-    rootDirectory: 'build/prp',
-    bundledDirectory: 'bundled',
-    unbundledDirectory: 'unbundled',
-    // Accepts either 'bundled', 'unbundled', or 'both'
-    // A bundled version will be vulcanized and sharded. An unbundled version
-    // will not have its files combined (this is for projects using HTTP/2
-    // server push). Using the 'both' option will create two output projects,
-    // one for bundled and one for unbundled
-    bundleType: 'bundled' // We will only be using a bundled build
-  },
-  // Path to your service worker, relative to the build root directory
-  serviceWorkerPath: 'service-worker.js',
-  // Service Worker precache options based on
-  // https://github.com/GoogleChrome/sw-precache#options-parameter
-  swPrecacheConfig: {
-    replacePrefix: '/app/',
-    navigateFallback: '/index.html',
-    navigateFallbackWhitelist: [
-      /^\/app\//,
-      /^\/login\//,
-      /^\/not-found\//,
-    ],
-  },
-  sourceCodeDirectory: './src'
+    // Name of your app
+    appName: 'app',
+    polymerJsonPath: path.join(process.cwd(), 'polymer.json'),
+    build: {
+        rootDirectory: 'build/prp',
+        bundledDirectory: 'bundled',
+        unbundledDirectory: 'unbundled',
+        // Accepts either 'bundled', 'unbundled', or 'both'
+        // A bundled version will be vulcanized and sharded. An unbundled version
+        // will not have its files combined (this is for projects using HTTP/2
+        // server push). Using the 'both' option will create two output projects,
+        // one for bundled and one for unbundled
+        bundleType: 'bundled' // We will only be using a bundled build
+    },
+    // Path to your service worker, relative to the build root directory
+    serviceWorkerPath: 'service-worker.js',
+    // Service Worker precache options based on
+    // https://github.com/GoogleChrome/sw-precache#options-parameter
+    swPrecacheConfig: {
+        replacePrefix: '/app/',
+        navigateFallback: '/index.html',
+        navigateFallbackWhitelist: [
+            /^\/app\//,
+            /^\/login\//,
+            /^\/not-found\//,
+        ],
+    },
+    sourceCodeDirectory: './src'
 };
 
 // Change global config if building into eTools
 const etoolsBuild = require('./gulp-tasks/etoolsBuild.js');
 if (argv._[0] === 'fullBuild') {
-  etoolsBuild.config();
+    etoolsBuild.config();
 }
 
 // Add your own custom gulp tasks to the gulp-tasks directory
 // A few sample tasks are provided for you
 // A task should return either a WriteableStream or a Promise
 const clean = require('./gulp-tasks/clean.js');
-const images = require('./gulp-tasks/images.js');         //Any processing on images
+const images = require('./gulp-tasks/images.js'); //Any processing on images
 const javascript = require('./gulp-tasks/javascript.js'); //Any processing on javascript
-const html = require('./gulp-tasks/html.js');             //Any processing on html
-const css = require('./gulp-tasks/css.js');               //Any processing on css
+const html = require('./gulp-tasks/html.js'); //Any processing on html
+const css = require('./gulp-tasks/css.js'); //Any processing on css
 const project = require('./gulp-tasks/project.js');
 
 
 // Log task end messages
-var log = function (message) {
-  return function () {
-    gutil.log(message);
-  }
+var log = function(message) {
+    return function() {
+        gutil.log(message);
+    }
 }
 
 // The source task will split all of your source files into one
@@ -90,19 +90,19 @@ var log = function (message) {
 // which filters all images and runs them through imagemin
 
 function source() {
-  return project.splitSource()
-  // Add your own build tasks here!
-    .pipe(gulpif('**/*.html', html.lint())).on('end', log('Linted HTML'))
-    .pipe(gulpif('**/*.html', html.minify())).on('end', log('Minified HTML'))
+    return project.splitSource()
+        // Add your own build tasks here!
+        .pipe(gulpif('**/*.html', html.lint())).on('end', log('Linted HTML'))
+        .pipe(gulpif('**/*.html', html.minify())).on('end', log('Minified HTML'))
 
     // lint CSS not working correctly. Not seeing temporary css files
     // .pipe(gulpif('**/*.{css,html}', css.lint()))              .on('end', log('Linted CSS'))
     .pipe(gulpif('**/*.{html,css}', css.minify())).on('end', log('Minified CSS'))
 
     .pipe(gulpif('**/*.js', javascript.lint())).on('end', log('Linted Javascript'))
-    .pipe(gulpif('**/*.js', javascript.minify())).on('end', log('Minified Javascript'))
+        .pipe(gulpif('**/*.js', javascript.minify())).on('end', log('Minified Javascript'))
 
-    .pipe(gulpif('**/*.{png,gif,jpg,svg}', images.minify())).on('end', log('Minified Images'))
+    // .pipe(gulpif('**/*.{png,gif,jpg,svg}', images.minify())).on('end', log('Minified Images'))
 
     .pipe(project.rejoin()); // Call rejoin when you're finished
 }
@@ -112,8 +112,8 @@ function source() {
 // You probably don't need to do anything to your dependencies but it's here in
 // case you need it :)
 function dependencies() {
-  return project.splitDependencies()
-    .pipe(project.rejoin());
+    return project.splitDependencies()
+        .pipe(project.rejoin());
 }
 
 // Clean the build directory, split all source and dependency files into streams
@@ -124,9 +124,9 @@ function dependencies() {
 // No building into eTools
 // hint: good for testing build efficiency
 gulp.task('default', gulp.series([
-  clean.build,
-  project.merge(source, dependencies),
-  project.serviceWorker
+    clean.build,
+    project.merge(source, dependencies),
+    project.serviceWorker
 ]));
 
 
@@ -135,8 +135,8 @@ gulp.task('default', gulp.series([
 // Minifying, linting, and building into eTools
 // TODO: This task is on hold
 gulp.task('fullBuild', gulp.series([
-  clean.fullBuild,
-  project.merge(source, dependencies),
-  project.serviceWorker,
-  etoolsBuild.buildTemplate
+    clean.fullBuild,
+    project.merge(source, dependencies),
+    project.serviceWorker,
+    etoolsBuild.buildTemplate
 ]));
