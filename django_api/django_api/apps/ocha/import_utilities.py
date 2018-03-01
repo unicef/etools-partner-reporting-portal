@@ -48,3 +48,11 @@ def import_project(external_project_id):
         logger.exception('No funding data found for project_id: {}'.format(external_project_id))
 
     return project
+
+
+def get_plan_list_for_country(country_iso3):
+    source_url = HPC_V1_ROOT_URL + 'plan/country/{}'.format(country_iso3)
+    try:
+        get_json_from_url(source_url)['data']
+    except Exception:
+        logger.exception('Error trying to list plans for country')

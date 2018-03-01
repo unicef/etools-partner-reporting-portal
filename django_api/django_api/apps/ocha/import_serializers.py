@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from cluster.models import Cluster
 from core.common import EXTERNAL_DATA_SOURCES
 from core.models import Country, ResponsePlan, Workspace
 from partner.models import PartnerProject, Partner, FundingSource
@@ -186,6 +187,7 @@ class V1ResponsePlanImportSerializer(serializers.ModelSerializer):
     endDate = serializers.DateTimeField(source='end')
     locations = V1ResponsePlanLocationImportSerializer(many=True)
     emergencies = serializers.ListField()
+    governingEntities = serializers.ListField(allow_empty=False)  # Clusters
 
     class Meta:
         model = ResponsePlan
@@ -197,6 +199,7 @@ class V1ResponsePlanImportSerializer(serializers.ModelSerializer):
             'endDate',
             'locations',
             'emergencies',
+            'governingEntities',
         )
 
     def get_workspace(self, emergencies, locations):
@@ -242,5 +245,17 @@ class V1ResponsePlanImportSerializer(serializers.ModelSerializer):
         )
 
         validated_data['workspace'] = workspace
+        clusters_data = validated_data.pop('governingEntities')
 
-        return super(V1ResponsePlanImportSerializer, self).create(validated_data)
+        response_plan = super(V1ResponsePlanImportSerializer, self).create(validated_data)
+        for cluster_data in clusters_data:
+            Cluster.objects.update_or_create(
+                external_id=cluster_data['id'],
+                external_source=validated_data['external_source'],
+                response_plan=response_plan,
+                defaults={
+                    'type': cluster_data['name']
+                }
+            )
+
+        return response_plan

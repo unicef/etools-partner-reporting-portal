@@ -50,6 +50,10 @@ class V1ResponsePlanImportSerializerTest(TestCase):
             response_plan.workspace.countries.count()
         )
         self.assertEqual(response_plan.workspace.title, 'Syrian Arab Republic - Civil Unrest (from 2012)')
+        self.assertEqual(
+            len(response_plan_data['governingEntities']),
+            response_plan.clusters.count()
+        )
 
     def test_single_country_emergency_data(self):
         with open(os.path.join(SAMPLES_DIR, 'V1_response_plan_single_country.json')) as sample_file:
@@ -63,3 +67,7 @@ class V1ResponsePlanImportSerializerTest(TestCase):
             response_plan.workspace.countries.count()
         )
         self.assertEqual(response_plan.workspace.title, 'Iraq')
+        self.assertEqual(
+            len(response_plan_data['governingEntities']),
+            response_plan.clusters.count()
+        )

@@ -11,14 +11,14 @@ from model_utils.models import TimeStampedModel
 from core.common import (
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
-    CLUSTER_TYPES,
 )
+from core.models import TimeStampedExternalURLSyncModel
 
 from indicator.models import Reportable, IndicatorReport
 from partner.models import PartnerActivity
 
 
-class Cluster(TimeStampedModel):
+class Cluster(TimeStampedExternalURLSyncModel):
     """
     Cluster model it is a group of partners that cooperate to reach the same
     goal (Removal of the humanitarian crisis). We can divide clusters to few
@@ -29,17 +29,22 @@ class Cluster(TimeStampedModel):
         core.Workspace (ForeignKey): "intervention"
 
     """
-    type = models.CharField(max_length=32, choices=CLUSTER_TYPES)
-    response_plan = models.ForeignKey('core.ResponsePlan', null=True,
-                                      related_name="clusters")
+    type = models.TextField(max_length=512)
+    response_plan = models.ForeignKey(
+        'core.ResponsePlan', null=True, related_name="clusters"
+    )
 
     class Meta:
         """One response plan can only have a cluster of one type."""
-
+        # Additional case-insensitive unique index is present in DB
         unique_together = ('type', 'response_plan')
 
     def __str__(self):
-        return "<pk: %s> %s PLAN: %s" % (self.id, self.type, self.response_plan)
+        return "<pk: {}> `{}` PLAN: `{}`".format(
+            self.id,
+            self.type,
+            self.response_plan
+        )
 
     @property
     def num_of_partners(self):
@@ -84,8 +89,7 @@ class Cluster(TimeStampedModel):
 
     @cached_property
     def partner_activities(self):
-        id_list = self.partners.values_list(
-            'partner_activities', flat=True).distinct()
+        id_list = self.partners.values_list('partner_activities', flat=True).distinct()
 
         return PartnerActivity.objects.filter(
             id__in=id_list

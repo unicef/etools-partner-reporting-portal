@@ -88,6 +88,7 @@ INSTALLED_APPS = [
     'suit',
     'easy_pdf',
     'django_cron',
+    'fixture_magic',
 
     'account',
     'cluster',
