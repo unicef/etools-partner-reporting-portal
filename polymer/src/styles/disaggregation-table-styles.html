@@ -1,25 +1,29 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/app-layout/app-grid/app-grid-style.html">
 
 <dom-module id="disaggregation-table-styles">
   <template>
-    <style include="iron-flex iron-flex-alignment">
+    <style include="iron-flex iron-flex-alignment app-grid-style">
         :host {
           display: block;
+
+          --app-grid-columns: 2;
+          --app-grid-gutter: 25px;
+          --app-grid-item-height: auto;
         }
 
-        .container {
-          width: 100%;
-          display: flex;
-          flex-wrap: wrap;
+        .app-grid {
+          margin: -var(--app-grid-gutter);
         }
-        .item {
-          padding: 10px;
+
+        .table-container {
+          padding: 25px;
+          overflow: auto;
         }
 
         table {
-          text-align: center;
-          font-size: 13px;
+          width: 100%;
         }
 
         /*  Text above the table  */
@@ -70,6 +74,8 @@
         td, th {
           min-width: 40px;
           min-height: 25px;
+          font-size: 13px;
+          text-align: center;
           word-wrap: break-word;
           hyphens: auto;
           @apply(--layout-flex);

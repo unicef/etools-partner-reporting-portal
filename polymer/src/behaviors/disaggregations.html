@@ -10,22 +10,22 @@
 
       //Used to display rows for two and three disaggregations.
       //It will NOT work for one and zero disaggregations.
-      _determineRows: function(self, rows, columns) {
+      _determineRows: function(rows, columns, data) {
         var rowsForDisplay = [];
 
         rows.forEach(function(x) {
           var formatted = '';
 
           var rowData = columns.map(function(z) {
-            formatted = self._formatDisaggregationIds([x.id, z.id]);
+            formatted = this._formatDisaggregationIds([x.id, z.id]);
 
             return {
               key: formatted,
-              data: self.data.disaggregation[formatted],
+              data: data[formatted],
             };
-          });
+          }, this);
 
-          formatted = self._formatDisaggregationIds([x.id]);
+          formatted = this._formatDisaggregationIds([x.id]);
 
           rowsForDisplay.push({
             title: x.value,
@@ -33,10 +33,10 @@
             id: x.id,
             total: {
               key: formatted,
-              data: self.data.disaggregation[formatted],
+              data: data[formatted],
             },
           });
-        });
+        }, this);
 
         return rowsForDisplay;
       },
@@ -55,6 +55,10 @@
         }
 
         return '(' + sortedString + ')';
+      },
+
+      _hasDisaggregationData: function (disaggregation, index) {
+        return typeof disaggregation[index] !== 'undefined';
       },
     };
 

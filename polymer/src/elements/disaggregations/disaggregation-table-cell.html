@@ -18,7 +18,8 @@
       <disaggregation-field
           key="v"
           value="[[data.v]]"
-          coords="[[coords]]">
+          coords="[[coords]]"
+          disagg-index="[[disaggIndex]]">
       </disaggregation-field>
     </template>
 
@@ -39,6 +40,7 @@
         data: Object,
         coords: String,
         editable: Number,
+        disaggIndex: Number,
 
         editableBool: {
           type: Boolean,

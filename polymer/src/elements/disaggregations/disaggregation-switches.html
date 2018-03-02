@@ -16,7 +16,6 @@
 
       .container {
         padding: 10px 24px;
-        margin: 0 -24px;
         background: var(--paper-grey-100);
       }
 
@@ -151,7 +150,9 @@
 
       _commit: function () {
         this.set('formattedData', Object.assign({}, this.formattedData, {
-          disaggregation: {},
+          disaggregation: this.formattedData.disaggregation.map(function () {
+            return {};
+          }),
           level_reported: this.reportedOn.length,
           disaggregation_reported_on: this.reportedOn,
         }));

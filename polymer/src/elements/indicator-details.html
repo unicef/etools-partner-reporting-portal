@@ -6,7 +6,6 @@
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../bower_components/iron-icons/maps-icons.html">
-<link rel="import" href="../../bower_components/app-layout/app-grid/app-grid-style.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 
 <link rel="import" href="etools-prp-ajax.html">
@@ -23,18 +22,18 @@
 <link rel="import" href="../polyfills/es6-shim.html">
 <link rel="import" href="../styles/buttons.html">
 
+<!-- FIXME -->
+<link rel="import" href="disaggregation-helper.html">
+<!-- FIXME -->
+
 <dom-module id="indicator-details">
   <template>
-    <style include="button-styles iron-flex iron-flex-alignment app-grid-style">
+    <style include="button-styles iron-flex iron-flex-alignment">
       :host {
         display: block;
         width: 100%;
         min-height: 150px;
         position: relative;
-
-        --app-grid-columns: 2;
-        --app-grid-gutter: 25px;
-        --app-grid-item-height: auto;
 
         --paper-tabs: {
           padding-left: 13px;
@@ -80,11 +79,6 @@
 	      white-space: pre;
       }
 
-      .table-container {
-        max-height: 500px;
-        overflow: auto;
-      }
-
       .location {
         margin: 0;
         font-weight: bold;
@@ -115,10 +109,6 @@
       .location-progress dt {
         font-weight: bold;
       }
-
-      disaggregation-modal disaggregation-table {
-        margin-top: 1em;
-      }
     </style>
 
     <etools-prp-ajax
@@ -130,15 +120,22 @@
     <template is="dom-if" if="[[!loading]]">
       <h3 class="locations-heading">Data for locations</h3>
 
+      <!-- FIXME -->
+      <disaggregation-helper
+          input="[[disaggregations]]"
+          output="{{__disaggregations__}}">
+      </disaggregation-helper>
+      <!-- FIXME -->
+
       <paper-tabs
           selected="{{selected}}"
-          fallback-selection="location-[[disaggregations.indicator_location_data.0.location.id]]"
+          fallback-selection="location-[[__disaggregations__.indicator_location_data.0.location.id]]"
           attr-for-selected="name"
           scrollable
           hide-scroll-buttons>
         <template
             is="dom-repeat"
-            items="[[disaggregations.indicator_location_data]]"
+            items="[[__disaggregations__.indicator_location_data]]"
             as="location">
           <paper-tab name="location-[[location.location.id]]">
             <status-badge type="[[_computeLocationStatus(location)]]"></status-badge>
@@ -152,7 +149,7 @@
           selected="{{selected}}">
         <template
             is="dom-repeat"
-            items="[[disaggregations.indicator_location_data]]"
+            items="[[__disaggregations__.indicator_location_data]]"
             as="location">
           <div name="location-[[location.location.id]]">
             <div class="tab-header layout horizontal justified">
@@ -195,71 +192,67 @@
               </div>
             </div>
 
-            <div class="table-container app-grid">
-              <div class="item">
-                <disaggregation-table
-                    data="[[location]]"
-                    mapping="[[disaggregations.disagg_lookup_map]]">
-                </disaggregation-table>
+            <disaggregation-table
+                data="[[location]]"
+                mapping="[[__disaggregations__.disagg_lookup_map]]">
+            </disaggregation-table>
 
-                <template
-                    is="dom-if"
-                    if="[[!_equals(computedMode, 'view')]]">
-                  <disaggregation-modal
-                      id="modal-[[index]]"
-                      reporting-period="[[reportingPeriod]]"
-                      on-opened-changed="_updateModals">
-                    <div class="meta layout horizontal justified">
-                      <div>
-                        <h3>[[indicatorName]]</h3>
-                        <p class="location">
-                          <iron-icon icon="maps:place"></iron-icon>
-                          [[location.location.title]]
-                        </p>
-                        <template
-                            is="dom-if"
-                            if="[[hasPD]]"
-                            restamp="true">
-                          <p class="current-pd">
-                            [[currentPD.agreement]] | [[currentPD.title]]
-                          </p>
-                        </template>
-                      </div>
-                      <div class="layout vertical end-justified">
-                        <dl class="location-progress">
-                          <dt>Location progress</dt>
-                          <dd>
-                            <template
-                                is="dom-if"
-                                if="[[_equals(location.display_type, 'number')]]"
-                                restamp="true">
-                              <etools-prp-number value="[[location.location_progress.v]]"></etools-prp-number>
-                            </template>
-                            <template
-                                is="dom-if"
-                                if="[[_equals(location.display_type, 'percentage')]]"
-                                restamp="true">
-                              <span>[[_toPercentage(location.location_progress.c)]]</span>
-                            </template>
-                          </dd>
-                        </dl>
-                      </div>
-                    </div>
+            <template
+                is="dom-if"
+                if="[[!_equals(computedMode, 'view')]]">
+              <disaggregation-modal
+                  id="modal-[[index]]"
+                  reporting-period="[[reportingPeriod]]"
+                  on-opened-changed="_updateModals">
+                <div class="meta layout horizontal justified">
+                  <div>
+                    <h3>[[indicatorName]]</h3>
+                    <p class="location">
+                      <iron-icon icon="maps:place"></iron-icon>
+                      [[location.location.title]]
+                    </p>
                     <template
                         is="dom-if"
-                        if="[[_computeTableVisibility(opened, index)]]"
+                        if="[[hasPD]]"
                         restamp="true">
-                      <disaggregation-table
-                          data="[[location]]"
-                          mapping="[[disaggregations.disagg_lookup_map]]"
-                          indicator-id="[[indicatorId]]"
-                          editable="1">
-                      </disaggregation-table>
+                      <p class="current-pd">
+                        [[currentPD.agreement]] | [[currentPD.title]]
+                      </p>
                     </template>
-                  </disaggregation-modal>
+                  </div>
+                  <div class="layout vertical end-justified">
+                    <dl class="location-progress">
+                      <dt>Location progress</dt>
+                      <dd>
+                        <template
+                            is="dom-if"
+                            if="[[_equals(location.display_type, 'number')]]"
+                            restamp="true">
+                          <etools-prp-number value="[[location.location_progress.v]]"></etools-prp-number>
+                        </template>
+                        <template
+                            is="dom-if"
+                            if="[[_equals(location.display_type, 'percentage')]]"
+                            restamp="true">
+                          <span>[[_toPercentage(location.location_progress.c)]]</span>
+                        </template>
+                      </dd>
+                    </dl>
+                  </div>
+                </div>
+                <template
+                    is="dom-if"
+                    if="[[_computeTableVisibility(opened, index)]]"
+                    restamp="true">
+                  <disaggregation-table
+                      data="[[location]]"
+                      mapping="[[__disaggregations__.disagg_lookup_map]]"
+                      indicator-id="[[indicatorId]]"
+                      editable="1">
+                  </disaggregation-table>
                 </template>
-              </div>
-            </div>
+              </disaggregation-modal>
+            </template>
           </div>
         </template>
       </iron-pages>

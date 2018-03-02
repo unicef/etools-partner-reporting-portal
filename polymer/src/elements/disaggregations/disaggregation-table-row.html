@@ -25,7 +25,8 @@
             <disaggregation-table-cell
                 coords="[[item.key]]"
                 data="[[item.data]]"
-                editable="[[editable]]">
+                editable="[[editable]]"
+                disagg-index="[[disaggIndex]]">
             </disaggregation-table-cell>
           </template>
 
@@ -36,7 +37,8 @@
             <disaggregation-table-multi-cell
                 coords="[[item.key]]"
                 data="[[item.data]]"
-                editable="[[editable]]">
+                editable="[[editable]]"
+                disagg-index="[[disaggIndex]]">
             </disaggregation-table-multi-cell>
           </template>
         </td>
@@ -53,7 +55,8 @@
             <disaggregation-table-cell
                 coords="[[data.total.key]]"
                 data="[[data.total.data]]"
-                editable="[[totalEditable]]">
+                editable="[[totalEditable]]"
+                disagg-index="[[disaggIndex]]">
             </disaggregation-table-cell>
           </template>
 
@@ -64,7 +67,8 @@
             <disaggregation-table-multi-cell
                 coords="[[data.total.key]]"
                 data="[[data.total.data]]"
-                editable="[[totalEditable]]">
+                editable="[[totalEditable]]"
+                disagg-index="[[disaggIndex]]">
             </disaggregation-table-multi-cell>
           </template>
         </td>
@@ -88,6 +92,8 @@
         indicatorType: String,
 
         rowType: String,
+
+        disaggIndex: Number,
 
         editable: {
           type: Number,

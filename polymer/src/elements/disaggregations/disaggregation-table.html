@@ -17,11 +17,7 @@
 
 <dom-module id="disaggregation-table">
   <template>
-    <style include="disaggregation-table-styles">
-      disaggregation-switches {
-        margin-bottom: 1em;
-      }
-    </style>
+    <style include="disaggregation-table-styles"></style>
 
     <etools-prp-ajax
         id="update"
@@ -31,62 +27,59 @@
         method="put">
     </etools-prp-ajax>
 
-    <div>
-      <disaggregation-switches
-          data="[[data]]"
-          mapping="[[mapping]]"
-          editable="[[editable]]"
-          formatted-data="{{formattedData}}"
-          on-formatted-data-changed="_triggerModalRefit">
-      </disaggregation-switches>
+    <disaggregation-switches
+        data="[[data]]"
+        mapping="[[mapping]]"
+        editable="[[editable]]"
+        formatted-data="{{formattedData}}"
+        on-formatted-data-changed="_triggerModalRefit">
+    </disaggregation-switches>
 
-      <table class="vertical layout">
-        <template
-            is="dom-if"
-            if="[[_equals(formattedMapping.length, 0)]]"
-            restamp="true">
-          <zero-disaggregations
-              data="[[viewData]]"
-              mapping="[[formattedMapping]]"
-              editable="[[editable]]">
-          </zero-disaggregations>
-        </template>
+    <div class="table-container">
+      <template
+          is="dom-if"
+          if="[[_equals(formattedMapping.length, 0)]]"
+          restamp="true">
+        <zero-disaggregations
+            data="[[viewData]]"
+            mapping="[[formattedMapping]]"
+            editable="[[editable]]">
+        </zero-disaggregations>
+      </template>
 
-        <template
-            is="dom-if"
-            if="[[_equals(formattedMapping.length, 1)]]"
-            restamp="true">
-          <one-disaggregation
-              data="[[viewData]]"
-              mapping="[[formattedMapping]]"
-              editable="[[editable]]">
-          </one-disaggregation>
-        </template>
+      <template
+          is="dom-if"
+          if="[[_equals(formattedMapping.length, 1)]]"
+          restamp="true">
+        <one-disaggregation
+            data="[[viewData]]"
+            mapping="[[formattedMapping]]"
+            editable="[[editable]]">
+        </one-disaggregation>
+      </template>
 
-        <template
-            is="dom-if"
-            if="[[_equals(formattedMapping.length, 2)]]"
-            restamp="true">
-          <two-disaggregations
-              data="[[viewData]]"
-              mapping="[[formattedMapping]]"
-              editable="[[editable]]">
-          </two-disaggregations>
-        </template>
+      <template
+          is="dom-if"
+          if="[[_equals(formattedMapping.length, 2)]]"
+          restamp="true">
+        <two-disaggregations
+            data="[[viewData]]"
+            mapping="[[formattedMapping]]"
+            editable="[[editable]]">
+        </two-disaggregations>
+      </template>
 
-        <template
-            is="dom-if"
-            if="[[_equals(formattedMapping.length, 3)]]"
-            restamp="true">
-          <three-disaggregations
-              data="[[viewData]]"
-              mapping="[[formattedMapping]]"
-              editable="[[editable]]">
-          </three-disaggregations>
-        </template>
-      </table>
+      <template
+          is="dom-if"
+          if="[[_equals(formattedMapping.length, 3)]]"
+          restamp="true">
+        <three-disaggregations
+            data="[[viewData]]"
+            mapping="[[formattedMapping]]"
+            editable="[[editable]]">
+        </three-disaggregations>
+      </template>
     </div>
-
   </template>
 
   <script>
@@ -108,7 +101,7 @@
 
         data: Object,
 
-        totals: Object,
+        totals: Array,
 
         formattedData: {
           type: Object,
@@ -169,6 +162,7 @@
       _fieldValueChanged: function (e, change) {
         var key = change.key;
         var value = change.value;
+        var index = change.index;
         var totals;
 
         var newValue = Object.assign(
@@ -177,14 +171,14 @@
             d: null,
             v: null,
           },
-          this.get(['localData.disaggregation', key]),
+          this.get(['localData.disaggregation', index, key]),
           value
         );
 
         e.stopPropagation();
 
-        this.set(['localData.disaggregation', key], newValue);
-        this.set(['totals', key], newValue);
+        this.set(['localData.disaggregation', index, key], newValue);
+        this.set(['totals', index, key], newValue);
 
         switch (this.formattedData.level_reported) {
           case 1:
@@ -192,8 +186,8 @@
           case 3:
             totals = Object.assign(
               {},
-              this.totals,
-              this['_calculateLevel' + this.formattedData.level_reported](key, this.totals)
+              this.totals[index],
+              this['_calculateLevel' + this.formattedData.level_reported](key, this.totals[index])
             );
             break;
 
@@ -202,9 +196,17 @@
             break;
         }
 
-        if (totals) {
-          this.set('totals', totals);
+        if (!totals) {
+          return;
         }
+
+        (function (self) {
+          var _totals = self.totals.slice();
+
+          _totals[index] = totals;
+
+          self.set('totals', _totals);
+        }(this));
       },
 
       _cloneData: function (formattedData) {
@@ -287,13 +289,15 @@
 
       _computeViewData: function (data, totals) {
         return Object.assign({}, data, {
-          disaggregation: Object.assign({}, data.disaggregation, totals),
+          disaggregation: data.disaggregation.map(function (disagg, index) {
+            return Object.assign({}, disagg, totals[index]);
+          }),
         });
       },
 
       attached: function () {
         if (!this.totals) {
-          this.set('totals', {});
+          this.set('totals', []);
         }
       },
     });
