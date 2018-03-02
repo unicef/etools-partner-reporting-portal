@@ -369,7 +369,7 @@ class OperationalPresenceLocationListSerializer(GeoFeatureModelSerializer):
     point = GeometrySerializerMethodField()
 
     def get_point(self, obj):
-        return obj.geo_point
+        return obj.geo_point or None
 
     def get_partners(self, obj):
         partners = Partner.objects.filter(
