@@ -164,8 +164,6 @@
           var filtersCount = this.filters.length;
           var readyCount = Object.keys(this.filtersReady).length;
 
-
-          console.log(filtersCount, readyCount);
           this.set('loading', readyCount < filtersCount);
         });
       },

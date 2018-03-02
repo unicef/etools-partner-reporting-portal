@@ -103,12 +103,16 @@
         return false;
       },
 
+      _commaSeparated: function (items) {
+        return items.join(', ');
+      },
+
       _commaSeparatedDictValues: function (items, key) {
         var newList = (items || []).map(function(item) {
           return item[key];
         });
 
-        return newList.join(', ');
+        return this._commaSeparated(newList);
       },
 
       _formatAddress: function (street, city, zip) {

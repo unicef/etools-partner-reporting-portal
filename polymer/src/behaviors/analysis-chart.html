@@ -4,6 +4,23 @@
   (function () {
     'use strict';
 
+    var tooltipStyles = [
+      '.google-visualization-tooltip {',
+        'padding: 10px;',
+        'position: absolute;',
+        'border-radius: 3px;',
+        'font: 11px/1.5 Roboto, Noto, sans-serif;',
+        'color: rgba(255, 255, 255, .9);',
+        'background: #424242;',
+        'box-shadow: 0 3px 14px rgba(0, 0, 0, .4);',
+      '}',
+      '.number-of-partners {',
+        'font-size: 2.5em;',
+        'line-height: 2;',
+        'color: #fff;',
+      '}',
+    ].join('\n');
+
     App.Behaviors = App.Behaviors || {};
 
     App.Behaviors.AnalysisChart = {
@@ -15,6 +32,25 @@
           top: 0,
         },
         legend: 'none',
+        tooltip: {
+          isHtml: true,
+        },
+      },
+
+      _buildTooltipContent: function () {
+        return [
+          '<div>Lorem ipsum</div>',
+          '<div class="number-of-partners">' + Math.floor(Math.random() * 10) + '</div>',
+          '<div>Lorem, ipsum, dolor, sit, amet</div>',
+        ].join('\n');
+      },
+
+      attached: function () {
+        var style = document.createElement('style');
+
+        style.innerHTML = tooltipStyles;
+
+        this.$$('google-chart').shadowRoot.appendChild(style);
       },
     };
 

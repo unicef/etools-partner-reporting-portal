@@ -49,7 +49,10 @@
 
     function operationalPresenceMapReducer(state, action) {
       if (typeof state === 'undefined') {
-        state = {};
+        state = {
+          type: 'FeatureCollection',
+          features: [],
+        };
       }
 
       switch (action.type) {

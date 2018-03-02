@@ -67,6 +67,13 @@ a
               label: 'Count',
               type: 'number',
             },
+            {
+              type: 'string',
+              role: 'tooltip',
+              p: {
+                html: true,
+              },
+            },
           ],
         },
 
@@ -92,8 +99,12 @@ a
 
       _computeRows: function (data) {
         return Object.keys(data).map(function (key) {
-          return [key, data[key]];
-        });
+          return [
+            key,
+            data[key],
+            this._buildTooltipContent(),
+          ];
+        }, this);
       },
     });
   </script>
