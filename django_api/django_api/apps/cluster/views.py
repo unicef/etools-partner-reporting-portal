@@ -13,6 +13,7 @@ from rest_framework import status as statuses, serializers
 
 import django_filters
 
+from core.common import PARTNER_TYPE
 from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
 from core.serializers import ShortLocationSerializer
@@ -775,10 +776,10 @@ class OperationalPresenceAggregationDataAPIView(APIView):
         response_data["num_of_partners_per_cluster_objective"] = {}
 
         for partner_type in partner_types:
-            response_data["num_of_partners_per_type"][partner_type] = Partner.objects.filter(partner_type=partner_type, clusters__in=clusters).distinct().count()
+            response_data["num_of_partners_per_type"][PARTNER_TYPE[partner_type]] = Partner.objects.filter(partner_type=partner_type, clusters__in=clusters).distinct().count()
 
         for cluster in clusters:
-            response_data["num_of_partners_per_cluster"][cluster.type] = cluster.partners.count()
+            response_data["num_of_partners_per_cluster"][cluster.type.capitalize()] = cluster.partners.count()
 
         for objective in objectives:
             response_data["num_of_partners_per_cluster_objective"][objective.title] = Partner.objects.filter(clusters__cluster_objectives=objective).count()
