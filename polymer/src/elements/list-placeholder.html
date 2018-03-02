@@ -8,7 +8,7 @@
       }
     </style>
 
-    <p class="msg">No results found</p>
+    <p class="msg">[[message]]</p>
   </template>
 
   <script>
@@ -24,6 +24,11 @@
         loading: {
           type: Boolean,
           value: false,
+        },
+
+        message: {
+          type: String,
+          value: 'No results found'
         },
 
         hidden: {
