@@ -34,11 +34,13 @@
         getCurrentPD
       ),
 
-      currentFocalPoints: Reselect.createSelector(
+      currentAuthorizedPartners: Reselect.createSelector(
         getAllPD,
         getCurrentPDId,
         function (allPDs, pdId) {
-          return (getCurrentPD(allPDs, pdId).unicef_focal_point || []).map(function (focalPoint) {
+          return (getCurrentPD(allPDs, pdId).partner_focal_point || []).filter(function(focalPoint) {
+            return focalPoint.is_authorized_officer;
+          }).map(function (focalPoint) {
             return {
               value: focalPoint.email, title: focalPoint.name + ' ' + focalPoint.title,
             };

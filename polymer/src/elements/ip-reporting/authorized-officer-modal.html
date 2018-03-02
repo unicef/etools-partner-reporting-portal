@@ -74,7 +74,7 @@
             attr-for-selected="value"
             slot="dropdown-content"
             class="dropdown-content">
-            <template is="dom-repeat" items="[[currentFocalPoints]]">
+            <template is="dom-repeat" items="[[currentAuthorizedPartners]]">
               <paper-item value="[[item.value]]">[[item.title]]</paper-item>
             </template>
           </paper-listbox>
@@ -128,9 +128,9 @@
           type: String,
         },
 
-        currentFocalPoints: {
+        currentAuthorizedPartners: {
           type: Array,
-          statePath: App.Selectors.ProgrammeDocuments.currentFocalPoints,
+          statePath: App.Selectors.ProgrammeDocuments.currentAuthorizedPartners,
         },
 
         postBody: {
