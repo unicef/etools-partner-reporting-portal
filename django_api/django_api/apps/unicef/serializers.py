@@ -19,7 +19,7 @@ from partner.models import Partner
 class PersonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Person
-        fields = ('name', 'title', 'email', 'phone_number')
+        fields = ('name', 'title', 'email', 'phone_number', 'is_authorized_officer')
 
 
 class ProgrammeDocumentSerializer(serializers.ModelSerializer):
