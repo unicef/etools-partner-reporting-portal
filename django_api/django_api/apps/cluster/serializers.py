@@ -1,6 +1,6 @@
 import operator
 
-from collections import Counter
+from collections import Counter, OrderedDict
 from functools import reduce
 
 from django.db.models import Q, F
@@ -8,7 +8,7 @@ from django.contrib.gis.db.models.functions import AsGeoJSON
 
 from rest_framework import serializers
 from rest_framework_gis.fields import GeometryField, GeoJsonDict
-from rest_framework_gis.serializers import GeoFeatureModelSerializer
+from rest_framework_gis.serializers import GeoFeatureModelSerializer, GeometrySerializerMethodField
 
 from core.common import OVERALL_STATUS, PARTNER_PROJECT_STATUS, CLUSTER_TYPE_NAME_DICT
 from core.models import ResponsePlan, GatewayType, Location
@@ -364,26 +364,12 @@ class PartnerAnalysisSummarySerializer(serializers.ModelSerializer):
         return id_list
 
 
-class OperationalPresenceLocationListSerializer(serializers.ModelSerializer):
+class OperationalPresenceLocationListSerializer(GeoFeatureModelSerializer):
     partners = serializers.SerializerMethodField()
-    geom = serializers.SerializerMethodField()
+    point = GeometrySerializerMethodField()
 
-    def get_geom(self, obj):
-        # Simplified geoJSON data
-        if hasattr(obj, 'json'):
-            if obj.json:
-                return GeoJsonDict(obj.json)
-            elif obj.point:
-                # Warning: This object only has point coordinates
-                return GeoJsonDict(obj.point.geojson)
-
-        # Original geoJSON data
-        else:
-            if obj.geom:
-                return GeoJsonDict(obj.geom.geojson)
-            elif obj.point:
-                # Warning: This object only has point coordinates
-                return GeoJsonDict(obj.point.geojson)
+    def get_point(self, obj):
+        return obj.geo_point
 
     def get_partners(self, obj):
         partners = Partner.objects.filter(
@@ -401,6 +387,7 @@ class OperationalPresenceLocationListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Location
+        geo_field = 'geom'
         fields = (
             'id',
             'title',
@@ -408,5 +395,6 @@ class OperationalPresenceLocationListSerializer(serializers.ModelSerializer):
             'longitude',
             'p_code',
             'geom',
+            'point',
             'partners',
         )
