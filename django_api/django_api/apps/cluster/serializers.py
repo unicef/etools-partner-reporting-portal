@@ -1,5 +1,6 @@
 import operator
 
+from collections import Counter
 from functools import reduce
 
 from django.db.models import Q, F
@@ -390,7 +391,13 @@ class OperationalPresenceLocationListSerializer(serializers.ModelSerializer):
             .distinct() \
             .values_list('title', flat=True)
 
-        return {len(partners): partners}
+        partner_data = {
+            cluster: partners.filter(clusters__type=cluster) \
+                for cluster in set(partners.values_list('clusters__type', flat=True))
+        }
+        partner_data["all"] = partners
+
+        return partner_data
 
     class Meta:
         model = Location
