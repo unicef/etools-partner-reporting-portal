@@ -336,7 +336,7 @@
       },
 
       _computeHidden: function (data, loading) {
-        return !(loading || !data.length);
+        return !loading || data.length;
       },
 
       _openChanged: function() {
