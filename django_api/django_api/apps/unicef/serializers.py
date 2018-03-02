@@ -19,7 +19,7 @@ from partner.models import Partner
 class PersonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Person
-        fields = ('name', 'title', 'email', 'phone_number')
+        fields = ('name', 'title', 'email', 'phone_number', 'is_authorized_officer')
 
 
 class ProgrammeDocumentSerializer(serializers.ModelSerializer):
@@ -232,6 +232,7 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
     funds_received_to_date_currency = serializers.SerializerMethodField()
     funds_received_to_date_percentage = serializers.SerializerMethodField()
     submitted_by = serializers.SerializerMethodField()
+    submitting_user = serializers.SerializerMethodField()
 
     def __init__(self, *args, **kwargs):
         request = kwargs.get('context', {}).get('request')
@@ -266,11 +267,15 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
             'funds_received_to_date_percentage',
             'indicator_reports',
             'submitted_by',
+            'submitting_user',
             'is_final',
         )
 
     def get_submitted_by(self, obj):
         return obj.submitted_by.display_name if obj.submitted_by else None
+
+    def get_submitting_user(self, obj):
+        return obj.submitting_user.display_name if obj.submitting_user else None
 
     def get_funds_received_to_date(self, obj):
         return obj.programme_document.funds_received_to_date

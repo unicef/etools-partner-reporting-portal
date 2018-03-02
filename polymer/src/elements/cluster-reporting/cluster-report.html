@@ -16,6 +16,7 @@
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/notifications.html">
+<link rel="import" href="../../behaviors/routing.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
 <link rel="import" href="send-back-modal.html">
@@ -242,22 +243,74 @@
               </dl>
               <dl>
                 <dt>Calculation method:</dt>
-                <dd>[[data.reportable.blueprint.calculation_formula_across_locations]] (across locations), [[data.reportable.blueprint.calculation_formula_across_periods]] (across reporting periods)</dd>
+                <dd>
+                  [[data.reportable.blueprint.calculation_formula_across_locations]] (across locations),
+                  [[data.reportable.blueprint.calculation_formula_across_periods]] (across reporting periods)
+                </dd>
               </dl>
             </div>
             <div class="column flex">
-              <dl>
-                <dt>Project:</dt>
-                <dd>[[_withDefault(data.project)]]</dd>
-              </dl>
-              <dl>
-                <dt>Partner:</dt>
-                <dd>[[_withDefault(data.partner)]]</dd>
-              </dl>
-              <dl>
-                <dt>Activity:</dt>
-                <dd>[[_withDefault(data.partner_activity)]]</dd>
-              </dl>
+              <template
+                  is="dom-if"
+                  if="[[data.partner]]"
+                  restamp="true">
+                <dl>
+                  <dt>Partner:</dt>
+                  <dd>[[_withDefault(data.partner.title)]]</dd>
+                </dl>
+              </template>
+              <template
+                is="dom-if"
+                if="[[data.project]]"
+                restamp="true">
+                <dl>
+                  <dt>Project:</dt>
+                  <dd>
+                    <a href="[[partnerProjectDetailUrl]]">
+                      [[_withDefault(data.project.title)]]
+                    </a>
+                  </dd>
+                </dl>
+              </template>
+              <template
+                  is="dom-if"
+                  if="[[data.partner_activity]]"
+                  restamp="true">
+                <dl>
+                  <dt>Activity:</dt>
+                  <dd>
+                    <a href="[[partnerActivityDetailUrl]]">
+                      [[_withDefault(data.partner_activity.title)]]
+                    </a>
+                  </dd>
+                </dl>
+              </template>
+              <template
+                  is="dom-if"
+                  if="[[data.cluster_objective]]"
+                  restamp="true">
+                <dl>
+                  <dt>Cluster Objective:</dt>
+                  <dd>
+                    <a href="[[clusterObjectiveDetailUrl]]">
+                      [[_withDefault(data.cluster_objective.title)]]
+                    </a>
+                  </dd>
+                </dl>
+              </template>
+              <template
+                  is="dom-if"
+                  if="[[data.cluster_activity]]"
+                  restamp="true">
+                <dl>
+                  <dt>Cluster Activity:</dt>
+                  <dd>
+                    <a href="[[clusterActivityDetailUrl]]">
+                      [[_withDefault(data.cluster_activity.title)]]
+                    </a>
+                  </dd>
+                </dl>
+              </template>
             </div>
             <template
                 is="dom-if"
@@ -454,6 +507,7 @@
         App.Behaviors.UtilsBehavior,
         App.Behaviors.NotificationsBehavior,
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.RoutingBehavior,
       ],
 
       properties: {
@@ -485,6 +539,23 @@
         canSubmit: {
           type: Boolean,
           computed: '_computeCanSubmit(data, busy)',
+        },
+
+        clusterObjectiveDetailUrl: {
+          type: String,
+          computed: '_computeClusterObjectiveDetailUrl(_baseUrlCluster, data.cluster_objective.id)',
+        },
+        clusterActivityDetailUrl: {
+          type: String,
+          computed: '_computeClusterActivityDetailUrl(_baseUrlCluster, data.cluster_activity.id)',
+        },
+        partnerProjectDetailUrl: {
+          type: String,
+          computed: '_computePartnerProjectDetailUrl(_baseUrlCluster, data.project.id)',
+        },
+        partnerActivityDetailUrl: {
+          type: String,
+          computed: '_computePartnerActivityDetailUrl(_baseUrlCluster, data.partner_activity.id)',
         },
 
         reportUrl: {
@@ -534,6 +605,34 @@
 
       _computeCanSubmit: function (data, busy) {
         return data.can_submit && !busy;
+      },
+
+      _computeClusterObjectiveDetailUrl: function (baseUrl, coId) {
+        return this.buildUrl(
+          baseUrl,
+          'response-parameters/clusters/objective/' + coId.toString() + '/overview'
+        );
+      },
+
+      _computeClusterActivityDetailUrl: function (baseUrl, caId) {
+        return this.buildUrl(
+          baseUrl,
+          'response-parameters/clusters/activity/' + caId.toString() + '/overview'
+        );
+      },
+
+      _computePartnerProjectDetailUrl: function (baseUrl, paId) {
+        return this.buildUrl(
+          baseUrl,
+          'response-parameters/partners/project/' + paId.toString() + '/overview'
+        );
+      },
+
+      _computePartnerActivityDetailUrl: function (baseUrl, paId) {
+        return this.buildUrl(
+          baseUrl,
+          'response-parameters/partners/activity/' + paId.toString() + '/overview'
+        );
       },
 
       _computeReportUrl: function (data) {
