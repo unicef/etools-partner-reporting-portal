@@ -308,7 +308,7 @@
               toUpdate.reportInfo[timeframe] = report;
               locations[locationReport.location.id] = toUpdate;
             } else {
-              var newDict = { reportInfo: {}};
+              var newDict = {reportInfo: {}};
               newDict[timeframe] = locationReport;
               newDict.name = locationReport.location.title;
               newDict.reportInfo[timeframe] = report;
@@ -322,7 +322,6 @@
         Object.keys(locations).forEach(function(i) {
           locationList.push(locations[i]);
         });
-        debugger
 
         return locationList;
       },
