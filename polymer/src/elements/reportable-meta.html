@@ -65,7 +65,7 @@
           is="dom-if"
           if="[[_equals(mode, 'view')]]"
           restamp="true">
-          <report-status status="[[data.overall_status]]"></report-status>
+          <report-status final="[[completed]]" status="[[data.overall_status]]"></report-status>
       </template>
     </labelled-item>
 

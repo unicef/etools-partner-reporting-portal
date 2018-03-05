@@ -55,6 +55,11 @@
         <span class="col-data flex-4">
           <etools-prp-progress-bar number="[[indicator.progress_percentage]]">
         </span>
+        <template is="dom-if" if="[[isClusterApp]]">
+          <span class="col-data flex-1">
+            <a href="[[indicatorReportsUrl]]">REPORTS</a>
+          </span>
+        </template>
         <template is="dom-if" if="[[canEdit]]">
           <span class="col-data flex-1">
             <a href="#" on-tap="_openModal">EDIT</a>
@@ -93,10 +98,48 @@
           value: false
         },
 
+        indicatorReportsUrl: {
+          type: String,
+          computed: '_computeIndicatorReportsUrl(_baseUrlCluster, indicator)',
+        },
+
+        isClusterApp: {
+          type: Boolean,
+          computed: '_computeIsClusterApp(appName)',
+        },
+
+        appName: {
+          type: String,
+          statePath: 'app.current',
+        },
+
       },
-        _openModal: function() {
-          this.$$('#modal').open();
+
+      _openModal: function() {
+        this.$$('#modal').open();
+      },
+
+      _computeIsClusterApp: function(appName) {
+        return appName === 'cluster-reporting';
+      },
+
+      _computeIndicatorReportsUrl: function(baseUrl, indicator) {
+        var query_params = 'results/draft?page_size=10&page=1&indicator_type=';
+
+        if (indicator.content_type_key === 'cluster.clusterobjective') {
+          query_params += 'cluster_objective';
+        } else if (indicator.content_type_key === 'cluster.clusteractivity') {
+          query_params += 'cluster_activity';
+        } else if (indicator.content_type_key === 'partner.partnerproject') {
+          query_params += 'partner_project';
+        } else if (indicator.content_type_key === 'partner.partneractivity') {
+          query_params += 'partner_activity';
         }
+
+        query_params += '&indicator=' + indicator.id.toString();
+
+        return this.buildUrl(baseUrl, query_params);
+      },
     });
   </script>
 </dom-module>

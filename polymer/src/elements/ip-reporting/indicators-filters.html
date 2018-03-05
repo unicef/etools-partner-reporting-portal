@@ -10,18 +10,17 @@
 <link rel="import" href="../filters/pd-filter/pd-dropdown-filter.html">
 <link rel="import" href="../filters/checkbox-filter/checkbox-filter.html">
 <link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../styles/filter-styles.html">
 
 
 <dom-module id="indicators-filters">
   <template>
-    <style include="app-grid-style">
+    <style include="app-grid-style filter-styles">
       :host {
         display: block;
-        margin-bottom: 25px;
         background: white;
 
         --app-grid-columns: 4;
-        --app-grid-gutter: 25px;
         --app-grid-item-height: auto;
         --app-grid-expandible-item-columns: 2;
       }
@@ -71,13 +70,6 @@
             name="blueprint__title"
             value="[[queryParams.blueprint__title]]">
         </text-filter>
-
-        <checkbox-filter
-          class="item item-2-col"
-          name="activepdsonly"
-          value="[[_withDefault(queryParams.activepdsonly, '')]]">
-          <span class="checkbox-label">Show for Active PDs only</span>
-        </checkbox-filter>
       </div>
     </filter-list>
   </template>

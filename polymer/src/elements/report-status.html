@@ -9,8 +9,10 @@
       }
 
       status-badge {
+        display: inline-block;
+        vertical-align: middle;
         position: relative;
-        top: -2px;
+        top: -3px;
       }
     </style>
 
@@ -27,7 +29,7 @@
       is: 'report-status',
 
       properties: {
-        status: Number,
+        status: String,
 
         noLabel: {
           type: Boolean,
@@ -40,24 +42,29 @@
         },
         label: {
           type: String,
-          computed: '_computeLabel(status)',
+          computed: '_computeLabel(status, final)',
+        },
+
+        final: {
+          type: Boolean,
+          value: false,
         },
       },
 
       _computeType: function(status) {
         switch (status) {
-          case 1:
+          case '1':
           case 'Sub':
           case 'Met':
           case 'OnT':
           case 'Com':
           case 'Acc':
             return 'success';
-          case 2:
+          case '2':
           case 'Ove':
           case 'Sen':
             return 'error';
-          case 3:
+          case '3':
           case 'Due':
           case 'NoP':
           case 'Ong':
@@ -71,14 +78,14 @@
         }
       },
 
-      _computeLabel: function (status) {
+      _computeLabel: function (status, final) {
         switch (status) {
-          case 1:
+          case '1':
             return 'Nothing due';
-          case 2:
+          case '2':
           case 'Ove':
             return 'Overdue';
-          case 3:
+          case '3':
           case 'Due':
             return 'Due';
           case 'Sub':
@@ -86,13 +93,13 @@
           case 'Rej':
             return 'Rejected';
           case 'Met':
-            return 'Met';
+            return final ? 'Met results as planned' : 'Met';
           case 'OnT':
             return 'On Track';
           case 'NoP':
             return 'No Progress';
           case 'Con':
-            return 'Constrained';
+            return final ? 'Constrained (partially met result)' : 'Constrained';
           case 'Ong':
             return 'Ongoing';
           case 'Pla':
