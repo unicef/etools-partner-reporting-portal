@@ -378,7 +378,7 @@ class LocationManager(models.GeoManager):
 
 
 @python_2_unicode_compatible
-class Location(TimeStampedExternalSyncModelMixin):
+class Location(TimeStampedExternalSourceModel):
     """
     Location model define place where agents are working.
     The background of the location can be:
@@ -394,8 +394,9 @@ class Location(TimeStampedExternalSyncModelMixin):
     """
     title = models.CharField(max_length=255)
 
-    gateway = models.ForeignKey(GatewayType, verbose_name='Location Type',
-                                related_name='locations')
+    gateway = models.ForeignKey(
+        GatewayType, verbose_name='Location Type', related_name='locations'
+    )
     carto_db_table = models.ForeignKey(
         'core.CartoDBTable',
         related_name="locations",
@@ -418,10 +419,11 @@ class Location(TimeStampedExternalSyncModelMixin):
         validators=[MinValueValidator(
             Decimal(-180)), MaxValueValidator(Decimal(180))]
     )
-    p_code = models.CharField(max_length=32, blank=True, null=True)
+    p_code = models.CharField(max_length=32, blank=True, null=True, verbose_name='Postal Code')
 
     parent = models.ForeignKey(
-        'self', null=True, blank=True, related_name='children', db_index=True)
+        'self', null=True, blank=True, related_name='children', db_index=True
+    )
 
     geom = models.MultiPolygonField(null=True, blank=True)
     point = models.PointField(null=True, blank=True)

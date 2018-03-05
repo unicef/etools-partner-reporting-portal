@@ -73,5 +73,5 @@ class V1ResponsePlanImportSerializerTest(TestCase):
         )
 
     def test_my_import(self):
-        from ocha.import_utilities import import_response_plan
-        print(import_response_plan(504))
+        from ocha.import_utilities import import_project
+        print(import_project(52716))

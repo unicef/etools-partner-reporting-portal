@@ -4,7 +4,7 @@ from rest_framework import serializers
 
 from cluster.models import Cluster
 from core.common import EXTERNAL_DATA_SOURCES
-from core.models import Country, ResponsePlan, Workspace
+from core.models import Country, ResponsePlan, Workspace, Location, GatewayType
 from partner.models import PartnerProject, Partner, FundingSource
 
 
@@ -35,6 +35,29 @@ class PartnerImportSerializer(serializers.ModelSerializer):
         )
 
 
+class V2PartnerProjectLocationImportSerializer(serializers.ModelSerializer):
+    external_source = serializers.CharField(default=EXTERNAL_DATA_SOURCES.HPC)
+    id = serializers.IntegerField(source='external_id')
+
+    name = serializers.CharField(source='title')
+    iso3 = serializers.CharField(allow_null=True)
+    parentId = serializers.IntegerField(allow_null=True)
+    latitude = serializers.FloatField()
+    longitude = serializers.FloatField()
+
+    class Meta:
+        model = Location
+        fields = (
+            'external_source',
+            'id',
+            'name',
+            'iso3',
+            'parentId',
+            'latitude',
+            'longitude',
+        )
+
+
 class V2PartnerProjectImportSerializer(serializers.ModelSerializer):
     external_source = serializers.CharField(default=EXTERNAL_DATA_SOURCES.HPC)
     id = serializers.IntegerField(source='external_id')
@@ -43,6 +66,7 @@ class V2PartnerProjectImportSerializer(serializers.ModelSerializer):
     endDate = serializers.DateTimeField(source='end_date')
     organizations = PartnerImportSerializer(many=True)
     code = serializers.CharField()
+    locations = V2PartnerProjectLocationImportSerializer(many=True)
 
     class Meta:
         model = PartnerProject
@@ -54,6 +78,7 @@ class V2PartnerProjectImportSerializer(serializers.ModelSerializer):
             'organizations',
             'external_source',
             'code',
+            'locations',
         )
 
     def create(self, validated_data):
@@ -75,12 +100,51 @@ class V2PartnerProjectImportSerializer(serializers.ModelSerializer):
             })
 
         validated_data['partner'] = partners[0]
+        locations = validated_data.pop('locations')
 
         instance = PartnerProject.objects.filter(code=validated_data['code']).first()
         if instance:
-            return super(V2PartnerProjectImportSerializer, self).update(instance, validated_data)
+            instance = super(V2PartnerProjectImportSerializer, self).update(instance, validated_data)
         else:
-            return super(V2PartnerProjectImportSerializer, self).create(validated_data)
+            instance = super(V2PartnerProjectImportSerializer, self).create(validated_data)
+
+        for location_data in sorted(locations, key=lambda x: x['external_id']):
+            print(location_data['external_id'])
+            if not location_data['parentId'] and location_data['iso3']:
+                parent = None
+                country, _ = Country.objects.get_or_create(
+                    country_short_code=location_data['iso3'],
+                    defaults={
+                        'name': location_data['title']
+                    }
+                )
+            else:
+                parent = Location.objects.filter(
+                    external_source=location_data['external_source'],
+                    external_id=location_data['parentId']
+                ).first()
+
+            # TODO: proper gateway handling with cartodb(?)
+            gateway, _ = GatewayType.objects.get_or_create(
+                country=country,
+                admin_level=0,
+                defaults={
+                    'name': location_data['title']
+                }
+            )
+            location_data.pop('parentId')
+            location_data.pop('iso3')
+            location_data['gateway'] = gateway
+            location_data['parent'] = parent
+
+            location, _ = Location.objects.update_or_create(
+                external_source=location_data.pop('external_source'),
+                external_id=location_data.pop('external_id'),
+                defaults=location_data
+            )
+
+            print(parent, location)
+        return instance
 
 
 class V1FundingSourceImportSerializer(serializers.ModelSerializer):

@@ -52,18 +52,13 @@ def import_project(external_project_id):
     serializer = V2PartnerProjectImportSerializer(data=project_data['data'])
     serializer.is_valid(raise_exception=True)
     project = serializer.save()
-    project.external_url = source_url
-    project.save()
 
     funding_url = HPC_V1_ROOT_URL + 'fts/flow?projectId={}'.format(external_project_id)
     funding_data = get_json_from_url(funding_url)
     try:
         funding_serializer = V1FundingSourceImportSerializer(data=funding_data['data'])
         funding_serializer.is_valid(raise_exception=True)
-        funding_sources = funding_serializer.save()
-        for fs in funding_sources:
-            fs.external_url = funding_url
-            fs.save()
+        funding_serializer.save()
     except Exception:
         logger.exception('No funding data found for project_id: {}'.format(external_project_id))
 
