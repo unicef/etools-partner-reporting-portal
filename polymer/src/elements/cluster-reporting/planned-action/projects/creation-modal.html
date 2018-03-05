@@ -14,6 +14,7 @@
 <link rel="import" href="../../../../../bower_components/etools-searchable-multiselection-menu/etools-multi-selection-menu.html">
 <link rel="import" href="../../../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html">
 
+<link rel="import" href="../../../../polyfills/es6-shim.html">
 <link rel="import" href="../../../etools-prp-ajax.html">
 <link rel="import" href="../../../../elements/etools-prp-permissions.html">
 <link rel="import" href="../../../etools-prp-date-input.html">
@@ -343,6 +344,7 @@
         selectedPartner: {
           type: String,
           value: '',
+          observer: '_savePartner',
         },
 
         profile: {
@@ -363,10 +365,6 @@
         },
       },
 
-      observers: [
-        '_savePartner(selectedPartner)',
-      ],
-
       _computeUrl: function(responsePlanID, selectedPartner, data, edit) {
         if (edit) {
           if (this.permissions.addPartnerToProject) {
@@ -374,11 +372,10 @@
             return App.Endpoints.plannedActionsIMOEdit(responsePlanID, partnerId, data.id);
           }
           return App.Endpoints.plannedActionsProjectOverview(data.id);
-        } else {
-          return this.permissions.addPartnerToProject
-            ? App.Endpoints.plannedActionsIMO(responsePlanID, selectedPartner)
-            : App.Endpoints.plannedActions(responsePlanID);
         }
+        return this.permissions.addPartnerToProject
+          ? App.Endpoints.plannedActionsIMO(responsePlanID, selectedPartner)
+          : App.Endpoints.plannedActions(responsePlanID);
       },
 
       close: function () {
@@ -411,9 +408,9 @@
       },
 
       _computeImoClusters: function (profile) {
-        return profile.imo_clusters.map(function(cluster) {
+        return (profile.imo_clusters || []).map(function(cluster) {
           return cluster.id;
-        }) || [];
+        });
       },
 
       _savePartner: function(partner) {

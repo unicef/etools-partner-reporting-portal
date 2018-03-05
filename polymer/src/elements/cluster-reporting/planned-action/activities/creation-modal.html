@@ -534,9 +534,9 @@
 
       _computeImoClusters: function (profile) {
         // if user is not imo admin this should give empty array so no filtering by cluster
-        return profile.imo_clusters.map(function(cluster) {
+        return (profile.imo_clusters || []).map(function(cluster) {
           return cluster.id;
-        }) || [];
+        });
       },
 
       _setDefaults: function () {
