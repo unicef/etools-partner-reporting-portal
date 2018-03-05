@@ -15,7 +15,42 @@
 
       leaflet-map {
         height: 400px;
+        width: calc(100% - 180px);
       }
+
+      .legend {
+        width: 150px;
+        position: absolute;
+        right: 0;
+        top: 0;
+      }
+
+      .legend h4 {
+        margin: 0 0 1em;
+        font-weight: normal;
+      }
+
+      .legend ol {
+        display: table;
+        table-layout: fixed;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        text-align: center;
+        font-size: 11px;
+        line-height: 1.75em;
+        opacity: .7;
+      }
+
+      .legend li {
+        display: table-cell;
+      }
+
+      .legend span {
+        position: relative;
+        top: 2em;
+      }
+
     </style>
 
     <analysis-widget
@@ -47,7 +82,11 @@
                   is="dom-repeat"
                   items="[[coords_lvl1]]"
                   as="coords_lvl2">
-                <leaflet-polygon color="#f00">
+                <leaflet-polygon
+                    color="#fff"
+                    fill-color="[[_computePolygonColor(feature.properties, legend)]]"
+                    fill-opacity="0.7"
+                    weight="2">
                   <template
                       is="dom-repeat"
                       items="[[coords_lvl2]]"
@@ -67,6 +106,21 @@
           </template>
         </template>
       </leaflet-map>
+
+      <div class="legend">
+        <h4>Number of partners:</h4>
+        <ol>
+          <template
+              is="dom-repeat"
+              items="[[legend]]">
+            <li style="background: [[item.color]];">
+              <span>[[item.threshold]]<template
+                  is="dom-if"
+                  if="[[_equals(index, 4)]]">+</template></span>
+            </li>
+          </template>
+        </ol>
+      </div>
     </analysis-widget>
   </template>
 
@@ -112,7 +166,7 @@
           computed: '_computeCenter(map)',
         },
 
-        tooltipStyles: {
+        mapStyles: {
           type: String,
           value: [
             '.leaflet-popup-content-wrapper {',
@@ -121,6 +175,7 @@
               'font: 11px/1.5 Roboto, Noto, sans-serif;',
               'color: rgba(255, 255, 255, .9);',
               'background: #424242;',
+              'opacity: .7;',
             '}',
             '.leaflet-popup-content {',
               'margin: 0;',
@@ -137,6 +192,32 @@
             '}',
           ].join('\n'),
         },
+
+        legend: {
+          type: Array,
+          value: [
+            {
+              threshold: 0,
+              color: '#e7f2fd',
+            },
+            {
+              threshold: 5,
+              color: '#93b6e6',
+            },
+            {
+              threshold: 10,
+              color: '#5e84d0',
+            },
+            {
+              threshold: 15,
+              color: '#355ab8',
+            },
+            {
+              threshold: 20,
+              color: '#123666',
+            },
+          ],
+        },
       },
 
       _computeTileUrl: function (accessToken) {
@@ -145,6 +226,18 @@
           '?access_token=',
           accessToken,
         ].join('');
+      },
+
+      _computePolygonColor: function (properties, legend) {
+        var partnersCount = properties.partners.all.length;
+        var i = 0;
+        var color = legend[i].color;
+
+        while (partnersCount >= legend[++i].threshold) {
+          color = legend[i].color;
+        }
+
+        return color;
       },
 
       _isPoint: function (node) {
@@ -194,7 +287,7 @@
       attached: function () {
         var style = document.createElement('style');
 
-        style.innerHTML = this.tooltipStyles;
+        style.innerHTML = this.mapStyles;
 
         this.$$('leaflet-map').shadowRoot.appendChild(style);
       },

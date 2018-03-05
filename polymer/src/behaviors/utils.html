@@ -189,6 +189,10 @@
       _identity: function (arg) {
         return arg;
       },
+
+      _truncate: function (str, len) {
+        return str.slice(0, len) + (str.length > len ? '…' : '');
+      },
     };
 
     function buildQuery(chunks) {
