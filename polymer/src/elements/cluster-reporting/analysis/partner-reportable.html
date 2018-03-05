@@ -1,0 +1,498 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../../../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../../../bower_components/etools-content-panel/etools-content-panel.html">
+<link rel="import" href="../../../../bower_components/etools-loading/etools-loading.html">
+<link rel="import" href="../../../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../../bower_components/paper-styles/typography.html">
+
+<link rel="import" href="../../../polyfills/es6-shim.html">
+<link rel="import" href="../../../endpoints.html">
+<link rel="import" href="../../../redux/store.html">
+<link rel="import" href="../../../behaviors/utils.html">
+<link rel="import" href="../../etools-prp-ajax.html">
+<link rel="import" href="../../etools-prp-number.html">
+<link rel="import" href="../../etools-prp-progress-bar.html">
+<link rel="import" href="../../labelled-item.html">
+<link rel="import" href="../../report-status.html">
+<link rel="import" href="../../disaggregations/disaggregation-table.html">
+<link rel="import" href="../../../elements/list-placeholder.html">
+<link rel="import" href="progress-by-location.html">
+
+<dom-module id="partner-analysis-reportable">
+  <template>
+    <style include="app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
+      :host {
+        display: block;
+        margin-bottom: 25px;
+
+        --app-grid-columns: 2;
+        --app-grid-gutter: 15px;
+        --app-grid-item-height: auto;
+
+        --ecp-content: {
+          padding: 0;
+        };
+      }
+
+      .wrapper {
+        min-height: 130px;
+        position: relative;
+      }
+
+      .reportable-meta,
+      .report-meta {
+        background: var(--paper-grey-100);
+        font-size: 12px;
+      }
+
+      .reportable-meta dl,
+      .reportable-meta dt,
+      .reportable-meta dd {
+        margin: 0;
+      }
+
+      .reportable-meta dt {
+        width: 120px;
+        color: var(--paper-grey-400);
+      }
+
+      .report-heading {
+        margin: 0;
+
+        @apply(--paper-font-body1);
+      }
+
+      .table-heading {
+        margin: 0 0 1em;
+        font-size: 12px;
+        font-weight: normal;
+      }
+
+      .table-heading > :last-child {
+        padding-left: 10px;
+        text-align: right;
+      }
+
+      .reporting-period {
+        color: var(--theme-primary-text-color-medium);
+      }
+
+      .report-meta dt,
+      .report-meta dd {
+        display: inline;
+        margin: 0;
+      }
+
+      .report-meta dt {
+        font-weight: bold;
+      }
+
+      .report-meta dd {
+        color: var(--paper-grey-600);
+      }
+
+      .report-meta labelled-item {
+        margin: 1em 0;
+      }
+
+      paper-tabs {
+        padding-left: 15px;
+        border-bottom: 1px solid var(--paper-grey-300);
+      }
+    </style>
+
+    <etools-prp-ajax
+        id="details"
+        url="[[detailsUrl]]">
+    </etools-prp-ajax>
+
+    <etools-content-panel
+        panel-title="[[data.title]]"
+        open="{{open}}"
+        show-expand-btn>
+      <div class="wrapper">
+        <template
+            is="dom-if"
+            if="[[_computeHidden(details.indicator_reports, loading)]]">
+          <div class="app-grid reportable-meta">
+            <div class="item"></div>
+            <div class="item">
+              <div class="layout horizontal-reverse">
+                <etools-prp-progress-bar number="[[formattedDetails.progress_percentage]]">
+              </div>
+            </div>
+            <div class="item">
+              <dl class="layout horizontal">
+                <dt class="flex-none">Project</dt>
+                <dd>[[_withDefault(formattedDetails.project)]]</dd>
+              </dl>
+              <dl class="layout horizontal">
+                <dt class="flex-none">Cluster Activity</dt>
+                <dd>[[_withDefault(formattedDetails.cluster_activity)]]</dd>
+              </dl>
+              <dl class="layout horizontal">
+                <dt class="flex-none">Latest report status</dt>
+                <dd>
+                  <report-status status="[[formattedDetails.latest_report_status]]"></report-status>
+                </dd>
+              </dl>
+            </div>
+            <div class="item">
+              <div class="layout horizontal-reverse">
+                <div>
+                  <dl class="layout horizontal">
+                    <dt class="flex-none">Target</dt>
+                    <dd>
+                      <template
+                          is="dom-if"
+                          if="[[_equals(formattedDetails.indicator_reports.0.display_type, 'number')]]"
+                          restamp="true">
+                        <etools-prp-number value="[[formattedDetails.target]]"></etools-prp-number>
+                      </template>
+                      <template
+                          is="dom-if"
+                          if="[[_equals(formattedDetails.indicator_reports.0.display_type, 'percentage')]]"
+                          restamp="true">
+                        [[_toPercentage(formattedDetails.target)]]
+                      </template>
+                    </dd>
+                  </dl>
+                  <dl class="layout horizontal">
+                    <dt class="flex-none">Baseline</dt>
+                    <dd>
+                      <template
+                          is="dom-if"
+                          if="[[_equals(formattedDetails.indicator_reports.0.display_type, 'number')]]"
+                          restamp="true">
+                        <etools-prp-number value="[[formattedDetails.baseline]]"></etools-prp-number>
+                      </template>
+                      <template
+                          is="dom-if"
+                          if="[[_equals(formattedDetails.indicator_reports.0.display_type, 'percentage')]]"
+                          restamp="true">
+                          [[_toPercentage(formattedDetails.baseline)]]
+                      </template>
+                    </dd>
+                  </dl>
+                  <dl class="layout horizontal">
+                    <dt class="flex-none">Reached</dt>
+                    <dd>
+                      <template
+                          is="dom-if"
+                          if="[[_equals(formattedDetails.indicator_reports.0.display_type, 'number')]]"
+                          restamp="true">
+                        <etools-prp-number value="[[formattedDetails.achieved.v]]"></etools-prp-number>
+                      </template>
+                      <template
+                          is="dom-if"
+                          if="[[_equals(formattedDetails.indicator_reports.0.display_type, 'percentage')]]"
+                          restamp="true">
+                          [[_toPercentage(formattedDetails.achieved.c)]]
+                      </template>
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="app-grid">
+            <div class="item">
+              <analysis-progress-by-location
+                  data="[[formattedDetails.progress_by_location]]"
+                  indicator-type="[[formattedDetails.indicator_reports.0.display_type]]">
+              </analysis-progress-by-location>
+            </div>
+          </div>
+
+          <div class="app-grid">
+            <template
+                is="dom-if"
+                if="[[formattedDetails.indicator_reports.0]]"
+                restamp="true">
+              <div class="item">
+                <h3 class="report-heading">Latest Report</h3>
+              </div>
+            </template>
+
+            <template
+                is="dom-if"
+                if="[[formattedDetails.indicator_reports.1]]"
+                restamp="true">
+              <div class="item">
+                <h3 class="report-heading">Previous Report</h3>
+              </div>
+            </template>
+          </div>
+
+          <div class="report-meta app-grid">
+            <template
+                is="dom-repeat"
+                items="[[formattedDetails.indicator_reports]]"
+                as="report">
+              <div class="item">
+                <dl>
+                  <dt>Report submitted:</dt>
+                  <dd>[[report.submission_date]]</dd>
+                </dl>
+                <dl>
+                  <dt>Total progress:</dt>
+                  <dd>
+                    <template
+                        is="dom-if"
+                        if="[[_equals(report.display_type, 'number')]]"
+                        restamp="true">
+                      <etools-prp-number value="[[report.total.v]]"></etools-prp-number>
+                    </template>
+                    <template
+                        is="dom-if"
+                        if="[[_equals(report.display_type, 'percentage')]]"
+                        restamp="true">
+                      [[_toPercentage(report.total.c)]]
+                    </template>
+                  </dd>
+                </dl>
+
+                <labelled-item label="Overall status">
+                  <report-status status="[[report.overall_status]]"></report-status>
+                </labelled-item>
+
+                <labelled-item label="Narrative assessment">
+                  [[_withDefault(report.narrative_assessment)]]
+                </labelled-item>
+              </div>
+            </template>
+          </div>
+
+
+          <paper-tabs
+              selected="{{selected}}"
+              fallback-selection="location-[[formattedDetails.merged_location_data.0.0.location.id]]"
+              attr-for-selected="name"
+              scrollable
+              hide-scroll-buttons>
+            <template
+                is="dom-repeat"
+                items="[[formattedDetails.merged_location_data]]"
+                as="locations">
+              <paper-tab name="location-[[locations.0.location.id]]">
+                [[locations.0.location.title]]
+              </paper-tab>
+            </template>
+          </paper-tabs>
+
+          <iron-pages
+              attr-for-selected="name"
+              selected="{{selected}}">
+            <template
+                is="dom-repeat"
+                items="[[formattedDetails.merged_location_data]]"
+                as="locations">
+              <div class="app-grid" name="location-[[locations.0.location.id]]">
+                <template
+                    is="dom-if"
+                    if="[[locations.0]]"
+                    restamp="true">
+                  <div class="item">
+                    <h4 class="table-heading layout horizontal justified">
+                      <span>
+                        Progress in current reporting period:
+                        <span class="reporting-period">
+                          [[formattedDetails.indicator_reports.0.time_period_start]]
+                          -
+                          [[formattedDetails.indicator_reports.0.time_period_end]]
+                        </span>
+                      </span>
+                      <span>
+                        Total:
+                        <template
+                            is="dom-if"
+                            if="[[_equals(formattedDetails.indicator_reports.0.display_type, 'number')]]"
+                            restamp="true">
+                          <etools-prp-number value="[[formattedDetails.indicator_reports.0.total.v]]"></etools-prp-number>
+                        </template>
+                        <template
+                            is="dom-if"
+                            if="[[_equals(formattedDetails.indicator_reports.0.display_type, 'percentage')]]"
+                            restamp="true">
+                          [[_toPercentage(formattedDetails.indicator_reports.0.total.c)]]
+                        </template>
+                      </span>
+                    </h4>
+
+                    <disaggregation-table
+                        data="[[locations.0]]"
+                        mapping="[[formattedDetails.indicator_reports.0.disagg_lookup_map]]">
+                    </disaggregation-table>
+                  </div>
+                </template>
+                <template
+                    is="dom-if"
+                    if="[[locations.1]]"
+                    restamp="true">
+                  <div class="item">
+                    <h4 class="table-heading layout horizontal justified">
+                      <span>
+                        Progress in previous reporting period:
+                        <span class="reporting-period">
+                          [[formattedDetails.indicator_reports.1.time_period_start]]
+                          -
+                          [[formattedDetails.indicator_reports.1.time_period_end]]
+                        </span>
+                      </span>
+                      <span>
+                        Total:
+                        <template
+                            is="dom-if"
+                            if="[[_equals(formattedDetails.indicator_reports.1.display_type, 'number')]]"
+                            restamp="true">
+                          <etools-prp-number value="[[formattedDetails.indicator_reports.1.total.v]]"></etools-prp-number>
+                        </template>
+                        <template
+                            is="dom-if"
+                            if="[[_equals(formattedDetails.indicator_reports.1.display_type, 'percentage')]]"
+                            restamp="true">
+                          [[_toPercentage(formattedDetails.indicator_reports.1.total.c)]]
+                        </template>
+                      </span>
+                    </h4>
+
+                    <disaggregation-table
+                        data="[[locations.1]]"
+                        mapping="[[formattedDetails.indicator_reports.1.disagg_lookup_map]]">
+                    </disaggregation-table>
+                  </div>
+                </template>
+              </div>
+            </template>
+          </iron-pages>
+        </template>
+        <list-placeholder
+          data="[[details.indicator_reports]]"
+          loading="[[loading]]"
+          message="No report data associated with this indicator has been submitted yet">
+        </list-placeholder>
+        <etools-loading active="[[loading]]"></etools-loading>
+      </div>
+    </etools-content-panel>
+  </template>
+
+  <script>
+    Polymer({
+      id: 'partner-analysis-reportable',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        data: Object,
+
+        details: Object,
+
+        open: {
+          type: Boolean,
+          value: false,
+          observer: '_init',
+        },
+
+        initialized: {
+          type: Boolean,
+          value: false,
+        },
+
+        responsePlanId: {
+          type: String,
+          statePath: 'responsePlans.currentID',
+        },
+
+        detailsUrl: {
+          type: String,
+          computed: '_computeDetailsUrl(responsePlanId, data)',
+        },
+
+        loading: {
+          type: Boolean,
+          value: false,
+        },
+
+        selected: {
+          type: Number,
+          value: 0,
+        },
+
+        formattedDetails: {
+          type: Object,
+          computed: '_computeFormattedDetails(details)',
+        },
+      },
+
+      observers: [
+        '_init(open, initialized)',
+      ],
+
+      _init: function (open) {
+        var self = this;
+        var thunk;
+
+        if (!open || this.initialized) {
+          return;
+        }
+
+        this.set('initialized', true);
+
+        thunk = this.$.details.thunk();
+
+        this.set('loading', true);
+
+        thunk()
+            .then(function (res) {
+              self.set('loading', false);
+              self.set('details', res.data);
+            })
+            .catch(function (err) { // jshint ignore:line
+              self.set('loading', false);
+
+              // TODO: error handling
+            });
+      },
+
+      _computeDetailsUrl: function (responsePlanId, data) {
+        return App.Endpoints.partnerAnalysisReportableDetails(
+          responsePlanId,
+          data.id
+        );
+      },
+
+      _computeHidden: function (data, loading) {
+        return !loading || data.length;
+      },
+
+      _computeFormattedDetails: function (details) {
+        var currentReport = details.indicator_reports[0];
+        var previousReport = details.indicator_reports[1];
+
+        return Object.assign({}, details, {
+          merged_location_data:
+              currentReport.indicator_location_data.map(function (location, index) {
+                var locationData = [location];
+
+                if (previousReport) {
+                  locationData.push(previousReport.indicator_location_data[index]);
+                }
+
+                return locationData;
+              }),
+        });
+      },
+
+      detached: function () {
+        this.$.details.abort();
+      },
+    });
+  </script>
+</dom-module>
