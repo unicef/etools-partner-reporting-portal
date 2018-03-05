@@ -347,16 +347,6 @@ class PartnerActivityFromCustomActivitySerializer(PartnerActivityBaseCreateSeria
         except Exception as e:
             raise serializers.ValidationError(e.message)
         return partner_activity
-    
-    def update(self, instance, validated_data):
-        instance.title = validated_data.get('title', instance.title)
-        instance.project = validated_data.get('project', instance.project)
-        instance.partner = validated_data.get('partner', instance.partner)
-        instance.cluster_objective = validated_data.get('cluster_objective', instance.cluster_objective)
-        instance.start_date = validated_data.get('start_date', instance.start_date)
-        instance.end_date = validated_data.get('end_date', instance.end_date)
-        instance.status = validated_data.get('status', instance.status)
-        return instance
 
 
 class PartnerActivitySerializer(serializers.ModelSerializer):
