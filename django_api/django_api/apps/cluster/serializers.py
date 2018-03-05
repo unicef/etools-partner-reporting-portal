@@ -364,9 +364,27 @@ class PartnerAnalysisSummarySerializer(serializers.ModelSerializer):
         return id_list
 
 
+class AnnotatedGeometryField(GeometryField):
+    """
+    GeometryField to handle annotated geoJSON from ORM
+    """
+    type_name = 'AnnotatedGeometryField'
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def to_representation(self, value):
+        if isinstance(value, dict) or value is None:
+            return value
+
+        # we expect value to be a GEOSGeometry instance
+        return GeoJsonDict(value)
+
+
 class OperationalPresenceLocationListSerializer(GeoFeatureModelSerializer):
     partners = serializers.SerializerMethodField()
     point = GeometrySerializerMethodField()
+    geom = AnnotatedGeometryField(source="processed_json")
 
     def get_point(self, obj):
         return obj.geo_point or None
