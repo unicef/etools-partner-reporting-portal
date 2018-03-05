@@ -12,13 +12,14 @@
 <link rel="import" href="etools-prp-ajax.html">
 <link rel="import" href="etools-prp-number.html">
 <link rel="import" href="status-badge.html">
+<link rel="import" href="etools-prp-printer.html">
 <link rel="import" href="disaggregations/disaggregation-table.html">
 <link rel="import" href="disaggregations/disaggregation-modal.html">
+<link rel="import" href="report-status.html">
 <link rel="import" href="../endpoints.html">
 <link rel="import" href="../behaviors/utils.html">
 <link rel="import" href="../redux/store.html">
 <link rel="import" href="../redux/actions.html">
-<link rel="import" href="../redux/selectors/programmeDocumentReports.html">
 <link rel="import" href="../redux/selectors/programmeDocuments.html">
 <link rel="import" href="../polyfills/es6-shim.html">
 <link rel="import" href="../styles/buttons.html">
@@ -43,8 +44,14 @@
       }
 
       .locations-heading {
-        margin: 0 25px;
+        margin: 0 75px 0 25px;
         font-size: 12px;
+      }
+
+      etools-prp-printer {
+        position: absolute;
+        top: 5px;
+        right: 15px;
       }
 
       .tab-header {
@@ -130,6 +137,42 @@
     <template is="dom-if" if="[[!loading]]">
       <h3 class="locations-heading">Data for locations</h3>
 
+      <etools-prp-printer selector=".printme">
+        <paper-icon-button
+            class="print-btn"
+            icon="icons:print">
+        </paper-icon-button>
+      </etools-prp-printer>
+
+      <div hidden aria-hidden="true">
+        <template
+            is="dom-if"
+            if="[[currentPD.title]]">
+          <dl class="printme" style="margin: 0;">
+            <dt style="display: inline;">Programme document:</dt>
+            <dd style="display: inline; margin: 0;">[[currentPD.title]]</dd>
+          </dl>
+        </template>
+
+        <template
+            is="dom-if"
+            if="[[indicatorName]]">
+          <dl class="printme" style="margin: 0;">
+            <dt style="display: inline;">Indicator:</dt>
+            <dd style="display: inline; margin: 0;">[[indicatorName]]</dd>
+          </dl>
+        </template>
+
+        <template
+            is="dom-if"
+            if="[[indicatorStatus]]">
+          <span class="printme" style="margin-right: .5em;">Indicator status:</span>
+          <report-status class="printme" status="[[indicatorStatus]]"></report-status>
+        </template>
+
+        <div class="printme" style="margin-bottom: 2em;"></div>
+      </div>
+
       <paper-tabs
           selected="{{selected}}"
           fallback-selection="location-[[disaggregations.indicator_location_data.0.location.id]]"
@@ -197,7 +240,15 @@
 
             <div class="table-container app-grid">
               <div class="item">
+                <div hidden aria-hidden="true">
+                  <dl class="printme">
+                    <dt style="display: inline;">Location:</dt>
+                    <dd style="display: inline; margin: 0;">[[location.location.title]]</dd>
+                  </dl>
+                </div>
+
                 <disaggregation-table
+                    class="printme"
                     data="[[location]]"
                     mapping="[[disaggregations.disagg_lookup_map]]">
                 </disaggregation-table>
@@ -281,6 +332,8 @@
         indicatorId: Number,
 
         indicatorName: String,
+
+        indicatorStatus: String,
 
         reportableId: Number,
 
