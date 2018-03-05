@@ -12,8 +12,6 @@ from core.helpers import (
     get_cast_dictionary_keys_as_string,
 )
 
-from indicator.models import IndicatorBlueprint
-
 
 class BaseDisaggregator(object):
     """
@@ -99,10 +97,18 @@ class QuantityIndicatorDisaggregator(BaseDisaggregator):
         indicator_location_data.disaggregation = ordered_dict
         indicator_location_data.save()
 
+        indicator_report = indicator_location_data.indicator_report
+
+        QuantityIndicatorDisaggregator.calculate_indicator_report_total(
+            indicator_report)
+
+    @staticmethod
+    def calculate_indicator_report_total(indicator_report):
+        # Importing here to avoid circular dependencies
+        from indicator.models import IndicatorBlueprint
+
         # Reset the IndicatorReport total
         ir_total = {'c': 0, 'd': 1, 'v': 0}
-
-        indicator_report = indicator_location_data.indicator_report
 
         # IndicatorReport total calculation
         if indicator_report.calculation_formula_across_locations == IndicatorBlueprint.MAX:
@@ -203,14 +209,22 @@ class RatioIndicatorDisaggregator(BaseDisaggregator):
         indicator_location_data.disaggregation = ordered_dict
         indicator_location_data.save()
 
+        indicator_report = indicator_location_data.indicator_report
+
+        RatioIndicatorDisaggregator.calculate_indicator_report_total(
+            indicator_report)
+
+    @staticmethod
+    def calculate_indicator_report_total(indicator_report):
+        # Importing here to avoid circular dependencies
+        from indicator.models import IndicatorBlueprint
+
         # Reset the IndicatorReport total
         ir_total = {
             'c': 0,
             'd': 0,
             'v': 0,
         }
-
-        indicator_report = indicator_location_data.indicator_report
 
         for loc_data in indicator_report.indicator_location_data.all():
             loc_total = loc_data.disaggregation['()']
@@ -220,35 +234,8 @@ class RatioIndicatorDisaggregator(BaseDisaggregator):
 
         ir_total["c"] = ir_total["v"] / (ir_total["d"] * 1.0)
 
+        if indicator_report.calculation_formula_across_locations == IndicatorBlueprint.PERCENTAGE:
+            ir_total["c"] *= 100
+
         indicator_report.total = ir_total
         indicator_report.save()
-
-
-class LikertScaleIndicatorDisaggregator(BaseDisaggregator):
-    """
-    A class for Likert scale indicator type disaggregation processing.
-    """
-
-    """
-    post_process will perform the followings:
-    1. Calculate N - 1 level_reported subtotals
-    2. Calculate c value from v and d.
-    """
-    @staticmethod
-    def post_process(data_dict):
-        return data_dict
-
-
-class YesNoIndicatorDisaggregator(BaseDisaggregator):
-    """
-    A class for Yes/No indicator type disaggregation processing.
-    """
-
-    """
-    post_process will perform the followings:
-    1. Calculate N - 1 level_reported subtotals
-    2. Calculate c value from v and d.
-    """
-    @staticmethod
-    def post_process(data_dict):
-        return data_dict
