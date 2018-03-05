@@ -744,9 +744,9 @@ class OperationalPresenceAggregationDataAPIView(APIView):
             "clusters": None,
             "num_of_clusters": None,
             "num_of_partners": None,
-            "num_of_partners_per_type": None,
-            "num_of_partners_per_cluster": None,
-            "num_of_partners_per_cluster_objective": None,
+            "partners_per_type": None,
+            "partners_per_cluster": None,
+            "partners_per_cluster_objective": None,
         }
 
         workspace = response_plan.workspace
