@@ -120,6 +120,12 @@
                 </template>
               </dd>
             </dl>
+            <dl>
+              <dt>Progress in reporting period:</dt>
+              <dd class="reporting-period">
+                [[report.time_period_start]] - [[report.time_period_end]]
+              </dd>
+            </dl>
           </div>
         </template>
       </div>
@@ -162,30 +168,6 @@
           <div class="app-grid">
             <template is="dom-if" if="[[location.current]]">
               <div class="item">
-                <h4 class="layout horizontal justified">
-                  <span>
-                    Progress in current reporting period:
-                    <span class="reporting-period">
-                      [[location.reportInfo.current.time_period_start]] - [[location.reportInfo.current.time_period_end]]
-                    </span>
-                  </span>
-                  <span>
-                    Total:
-                    <template
-                        is="dom-if"
-                        if="[[_equals(location.current.display_type, 'number')]]"
-                        restamp="true">
-                      <etools-prp-number value="[[location.reportInfo.current.total.v]]"></etools-prp-number>
-                    </template>
-                    <template
-                        is="dom-if"
-                        if="[[_equals(location.current.display_type, 'percentage')]]"
-                        restamp="true">
-                      [[_toPercentage(location.reportInfo.current.total.c)]]
-                    </template>
-                  </span>
-                </h4>
-                <!-- TODO: check - wrong use of total? -->
                 <disaggregation-table
                   data=[[location.current]]
                   mapping=[[location.reportInfo.current.disagg_lookup_map]]>
@@ -195,29 +177,6 @@
 
             <template is="dom-if" if="[[location.previous]]">
               <div class="item">
-                <h4 class="layout horizontal justified">
-                  <span>
-                    Progress in previous reporting period:
-                    <span class="reporting-period">
-                      [[location.reportInfo.previous.time_period_start]] - [[location.reportInfo.previous.time_period_end]]
-                    </span>
-                  </span>
-                  <span>
-                    Total:
-                    <template
-                        is="dom-if"
-                        if="[[_equals(location.previous.display_type, 'number')]]"
-                        restamp="true">
-                      <etools-prp-number value="[[location.reportInfo.previous.total.v]]"></etools-prp-number>
-                    </template>
-                    <template
-                        is="dom-if"
-                        if="[[_equals(location.previous.display_type, 'percentage')]]"
-                        restamp="true">
-                      [[_toPercentage(location.reportInfo.previous.total.c)]]
-                    </template>
-                  </span>
-                </h4>
                 <disaggregation-table
                   data=[[location.previous]]
                   mapping=[[location.reportInfo.previous.disagg_lookup_map]]>

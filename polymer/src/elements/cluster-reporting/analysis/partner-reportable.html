@@ -255,6 +255,12 @@
                     </template>
                   </dd>
                 </dl>
+                <dl>
+                  <dt>Progress in reporting period:</dt>
+                  <dd class="reporting-period">
+                    [[report.time_period_start]] - [[report.time_period_end]]
+                  </dd>
+                </dl>
 
                 <labelled-item label="Overall status">
                   <report-status status="[[report.overall_status]]"></report-status>
@@ -297,32 +303,6 @@
                     if="[[locations.0]]"
                     restamp="true">
                   <div class="item">
-                    <h4 class="table-heading layout horizontal justified">
-                      <span>
-                        Progress in current reporting period:
-                        <span class="reporting-period">
-                          [[formattedDetails.indicator_reports.0.time_period_start]]
-                          -
-                          [[formattedDetails.indicator_reports.0.time_period_end]]
-                        </span>
-                      </span>
-                      <span>
-                        Total:
-                        <template
-                            is="dom-if"
-                            if="[[_equals(formattedDetails.indicator_reports.0.display_type, 'number')]]"
-                            restamp="true">
-                          <etools-prp-number value="[[formattedDetails.indicator_reports.0.total.v]]"></etools-prp-number>
-                        </template>
-                        <template
-                            is="dom-if"
-                            if="[[_equals(formattedDetails.indicator_reports.0.display_type, 'percentage')]]"
-                            restamp="true">
-                          [[_toPercentage(formattedDetails.indicator_reports.0.total.c)]]
-                        </template>
-                      </span>
-                    </h4>
-
                     <disaggregation-table
                         data="[[locations.0]]"
                         mapping="[[formattedDetails.indicator_reports.0.disagg_lookup_map]]">
@@ -334,32 +314,6 @@
                     if="[[locations.1]]"
                     restamp="true">
                   <div class="item">
-                    <h4 class="table-heading layout horizontal justified">
-                      <span>
-                        Progress in previous reporting period:
-                        <span class="reporting-period">
-                          [[formattedDetails.indicator_reports.1.time_period_start]]
-                          -
-                          [[formattedDetails.indicator_reports.1.time_period_end]]
-                        </span>
-                      </span>
-                      <span>
-                        Total:
-                        <template
-                            is="dom-if"
-                            if="[[_equals(formattedDetails.indicator_reports.1.display_type, 'number')]]"
-                            restamp="true">
-                          <etools-prp-number value="[[formattedDetails.indicator_reports.1.total.v]]"></etools-prp-number>
-                        </template>
-                        <template
-                            is="dom-if"
-                            if="[[_equals(formattedDetails.indicator_reports.1.display_type, 'percentage')]]"
-                            restamp="true">
-                          [[_toPercentage(formattedDetails.indicator_reports.1.total.c)]]
-                        </template>
-                      </span>
-                    </h4>
-
                     <disaggregation-table
                         data="[[locations.1]]"
                         mapping="[[formattedDetails.indicator_reports.1.disagg_lookup_map]]">
