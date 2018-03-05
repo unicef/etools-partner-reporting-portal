@@ -71,3 +71,7 @@ class V1ResponsePlanImportSerializerTest(TestCase):
             len(response_plan_data['governingEntities']),
             response_plan.clusters.count()
         )
+
+    def test_my_import(self):
+        from ocha.import_utilities import import_response_plan
+        print(import_response_plan(504))

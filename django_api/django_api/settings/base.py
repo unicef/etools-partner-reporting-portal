@@ -291,7 +291,7 @@ LOGGING = {
         },
         'ocha-sync': {
             'handlers': ['default', 'console'],
-            'level': 'INFO',
+            'level': 'DEBUG',
             'propagate': True
         },
         'elasticapm.errors': {

@@ -19,7 +19,7 @@ from core.common import (
     PROGRESS_REPORT_STATUS,
     OVERALL_STATUS,
     FINAL_OVERALL_STATUS)
-from core.models import TimeStampedExternalSyncModelMixin
+from core.models import TimeStampedExternalSyncModelMixin, TimeStampedExternalSourceModel
 from functools import reduce
 
 from indicator.disaggregators import (
@@ -68,7 +68,7 @@ class DisaggregationValue(TimeStampedExternalSyncModelMixin):
         return "Disaggregation Value <pk:%s> %s" % (self.id, self.value)
 
 
-class IndicatorBlueprint(TimeStampedExternalSyncModelMixin):
+class IndicatorBlueprint(TimeStampedExternalSourceModel):
     """
     IndicatorBlueprint module is a pattern for indicator
     (here we setup basic parameter).
@@ -125,7 +125,7 @@ class IndicatorBlueprint(TimeStampedExternalSyncModelMixin):
     DISPLAY_TYPE_CHOICES = QUANTITY_DISPLAY_TYPE_CHOICES + \
         RATIO_DISPLAY_TYPE_CHOICES
 
-    title = models.CharField(max_length=1024, db_index=True)
+    title = models.TextField(max_length=2048, db_index=True)
     unit = models.CharField(max_length=10, choices=UNIT_CHOICES,
                             default=NUMBER)
     description = models.CharField(max_length=3072, null=True, blank=True)
@@ -207,7 +207,7 @@ def trigger_indicator_report_recalculation(sender, instance, **kwargs):
             RatioIndicatorDisaggregator.calculate_indicator_report_total(ir)
 
 
-class Reportable(TimeStampedExternalSyncModelMixin):
+class Reportable(TimeStampedExternalSourceModel):
     """
     Reportable / Applied Indicator model.
 
@@ -241,6 +241,7 @@ class Reportable(TimeStampedExternalSyncModelMixin):
 
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
+    # One of ClusterObjective, ClusterActivity, PartnerProject, PartnerActivity
     content_object = GenericForeignKey('content_type', 'object_id')
     blueprint = models.ForeignKey(IndicatorBlueprint,
                                   null=True,
@@ -257,12 +258,8 @@ class Reportable(TimeStampedExternalSyncModelMixin):
         verbose_name='Frequency of reporting'
     )
 
-    start_date = models.DateField(
-        verbose_name='Start Date',
-    )
-    end_date = models.DateField(
-        verbose_name='End Date',
-    )
+    start_date = models.DateField()
+    end_date = models.DateField()
 
     cs_dates = ArrayField(
         models.DateField(), default=list, null=True, blank=True
@@ -329,7 +326,7 @@ class Reportable(TimeStampedExternalSyncModelMixin):
 
     def __str__(self):
         return "Reportable #{} {} on {}".format(
-            self.id, self.blueprint.title, self.content_object
+            self.id, self.blueprint and self.blueprint.title, self.content_object
         )
 
 

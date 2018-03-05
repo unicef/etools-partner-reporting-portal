@@ -147,13 +147,16 @@ class V1FundingSourceImportSerializer(serializers.ModelSerializer):
 
             funding_source = {
                 'usd_amount': flow['amountUSD'],
-                'original_amount': flow['originalAmount'],
-                'original_currency': flow['originalCurrency'],
-                'exchange_rate': flow['exchangeRate'],
                 'name': organization_info['name'],
                 'organization_type': organization_type,
                 'usage_year': self.get_usage_year_for_flow(flow),
             }
+            if 'originalAmount' in flow:
+                funding_source.update({
+                    'original_amount': flow['originalAmount'],
+                    'original_currency': flow['originalCurrency'],
+                    'exchange_rate': flow['exchangeRate'],
+                })
 
             source, _ = FundingSource.objects.update_or_create(defaults=funding_source, **get_or_crete_kwargs)
             sources.append(source)

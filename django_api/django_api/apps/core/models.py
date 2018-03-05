@@ -67,16 +67,15 @@ class TimeStampedExternalSyncModelMixin(TimeStampedModel):
         abstract = True
 
 
-class TimeStampedExternalURLSyncModel(TimeStampedExternalSyncModelMixin):
+class TimeStampedExternalSourceModel(TimeStampedExternalSyncModelMixin):
     external_source = models.TextField(choices=EXTERNAL_DATA_SOURCES, blank=True, null=True)
-    external_url = models.URLField(null=True, blank=True)
 
     class Meta:
         abstract = True
         unique_together = ('external_id', 'external_source')
 
 
-class Country(TimeStampedExternalURLSyncModel):
+class Country(TimeStampedExternalSourceModel):
     """
     Represents a country which has many offices and sections.
     Taken from https://github.com/unicef/etools/blob/master/EquiTrack/users/models.py
@@ -93,7 +92,7 @@ class Country(TimeStampedExternalURLSyncModel):
         return self.name
 
 
-class Workspace(TimeStampedExternalURLSyncModel):
+class Workspace(TimeStampedExternalSourceModel):
     """
     Workspace (previously called Workspace, also synonym was
     emergency/country) model.
@@ -148,7 +147,7 @@ class Workspace(TimeStampedExternalURLSyncModel):
         return Location.objects.filter(pk__in=pks)
 
 
-class ResponsePlan(TimeStampedExternalURLSyncModel):
+class ResponsePlan(TimeStampedExternalSourceModel):
     """
     ResponsePlan model present response of workspace (intervention).
 

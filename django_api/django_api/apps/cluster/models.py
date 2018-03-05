@@ -10,13 +10,13 @@ from core.common import (
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
 )
-from core.models import TimeStampedExternalURLSyncModel
+from core.models import TimeStampedExternalSourceModel
 
 from indicator.models import Reportable, IndicatorReport
 from partner.models import PartnerActivity
 
 
-class Cluster(TimeStampedExternalURLSyncModel):
+class Cluster(TimeStampedExternalSourceModel):
     """
     Cluster model it is a group of partners that cooperate to reach the same
     goal (Removal of the humanitarian crisis). We can divide clusters to few
@@ -37,7 +37,7 @@ class Cluster(TimeStampedExternalURLSyncModel):
         """One response plan can only have a cluster of one type."""
         unique_together = (
             ('type', 'response_plan'),
-            TimeStampedExternalURLSyncModel.Meta.unique_together
+            TimeStampedExternalSourceModel.Meta.unique_together
         )
 
     def __str__(self):
@@ -217,7 +217,7 @@ class Cluster(TimeStampedExternalURLSyncModel):
         )
 
 
-class ClusterObjective(TimeStampedExternalURLSyncModel):
+class ClusterObjective(TimeStampedExternalSourceModel):
     """
     ClusterObjective model is goal of cluster. This goal should be reached via
     whole cluster aspect.
@@ -241,7 +241,7 @@ class ClusterObjective(TimeStampedExternalURLSyncModel):
     class Meta:
         ordering = ['-id']
         unique_together = (
-            TimeStampedExternalURLSyncModel.Meta.unique_together
+            TimeStampedExternalSourceModel.Meta.unique_together
         )
 
     @property
@@ -252,7 +252,7 @@ class ClusterObjective(TimeStampedExternalURLSyncModel):
         return "<pk: %s> %s" % (self.id, self.title)
 
 
-class ClusterActivity(TimeStampedExternalURLSyncModel):
+class ClusterActivity(TimeStampedExternalSourceModel):
     """
     ClusterActivity models is an action, which one to take, to reach the goal
     (that is defined in ClusterObjective). These activities are decided by
@@ -277,7 +277,7 @@ class ClusterActivity(TimeStampedExternalURLSyncModel):
     class Meta:
         ordering = ['-id']
         unique_together = (
-            TimeStampedExternalURLSyncModel.Meta.unique_together
+            TimeStampedExternalSourceModel.Meta.unique_together
         )
 
     @property

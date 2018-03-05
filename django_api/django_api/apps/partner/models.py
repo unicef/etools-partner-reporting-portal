@@ -14,12 +14,12 @@ from core.common import (
     PARTNER_PROJECT_STATUS,
     CURRENCIES,
 )
-from core.models import TimeStampedExternalURLSyncModel
+from core.models import TimeStampedExternalSourceModel
 
 from core.countries import COUNTRIES_ALPHA2_CODE_DICT, COUNTRIES_ALPHA2_CODE
 
 
-class Partner(TimeStampedExternalURLSyncModel):
+class Partner(TimeStampedExternalSourceModel):
     """
     Partner model describe in details who is it and their activity humanitarian
     goals (clusters).
@@ -159,7 +159,7 @@ class Partner(TimeStampedExternalURLSyncModel):
         )
 
 
-class PartnerProject(TimeStampedExternalURLSyncModel):
+class PartnerProject(TimeStampedExternalSourceModel):
     """
     PartnerProject model is a container for defined group of PartnerActivities
     model.
@@ -202,7 +202,7 @@ class PartnerProject(TimeStampedExternalURLSyncModel):
 
     class Meta:
         ordering = ['-id']
-        unique_together = TimeStampedExternalURLSyncModel.Meta.unique_together
+        unique_together = TimeStampedExternalSourceModel.Meta.unique_together
 
     def __str__(self):
         return '{} #{} {}'.format(
@@ -214,13 +214,13 @@ class PartnerProject(TimeStampedExternalURLSyncModel):
         return self.clusters.all()[0].response_plan
 
 
-class FundingSource(TimeStampedExternalURLSyncModel):
+class FundingSource(TimeStampedExternalSourceModel):
     partner_project = models.ForeignKey(PartnerProject, related_name="funding_sources")
     name = models.TextField(max_length=255)
     organization_type = models.TextField(max_length=255)
     usage_year = models.PositiveIntegerField(null=True, blank=True)
     usd_amount = models.DecimalField(decimal_places=2, max_digits=12)
-    original_amount = models.DecimalField(decimal_places=2, max_digits=12)
+    original_amount = models.DecimalField(decimal_places=2, max_digits=12, null=True, blank=True)
     original_currency = models.CharField(
         choices=CURRENCIES,
         default=CURRENCIES.usd,
