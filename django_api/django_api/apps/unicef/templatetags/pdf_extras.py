@@ -43,3 +43,4 @@ def format_currency(amount, currency='USD'):
     locale = to_locale(get_language())
     if amount:
         return babel_currency_format(amount, currency, locale=locale)
+    return '0'
