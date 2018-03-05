@@ -42,7 +42,12 @@
         },
         label: {
           type: String,
-          computed: '_computeLabel(status)',
+          computed: '_computeLabel(status, final)',
+        },
+
+        final: {
+          type: Boolean,
+          value: false,
         },
       },
 
@@ -73,7 +78,7 @@
         }
       },
 
-      _computeLabel: function (status) {
+      _computeLabel: function (status, final) {
         switch (status) {
           case '1':
             return 'Nothing due';
@@ -88,13 +93,13 @@
           case 'Rej':
             return 'Rejected';
           case 'Met':
-            return 'Met';
+            return final ? 'Met results as planned' : 'Met';
           case 'OnT':
             return 'On Track';
           case 'NoP':
             return 'No Progress';
           case 'Con':
-            return 'Constrained';
+            return final ? 'Constrained (partially met result)' : 'Constrained';
           case 'Ong':
             return 'Ongoing';
           case 'Pla':
