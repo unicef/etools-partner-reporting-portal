@@ -4,6 +4,7 @@
 <link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
 
 <link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../styles/filter-styles.html">
 <link rel="import" href="../filter-list.html">
 <link rel="import" href="../filters/cluster-indicator-filter/cluster-indicator-filter.html">
 <link rel="import" href="../filters/cluster-project-filter/cluster-project-filter.html">
@@ -12,16 +13,15 @@
 <link rel="import" href="../filters/cluster-filter/cluster-filter.html">
 <link rel="import" href="../filters/cluster-indicator-type-filter/cluster-indicator-type-filter.html">
 
+
 <dom-module id="cluster-report-filters">
   <template>
-    <style include="app-grid-style">
+    <style include="app-grid-style filter-styles">
       :host {
         display: block;
-        margin-bottom: 25px;
         background: white;
 
         --app-grid-columns: 4;
-        --app-grid-gutter: 25px;
         --app-grid-item-height: auto;
         --app-grid-expandible-item-columns: 2;
       }
