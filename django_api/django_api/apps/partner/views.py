@@ -115,7 +115,8 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
             if partner_id in request.user.imo_clusters.values_list('partners', flat=True):
                 serializer.save(partner=partner)
             else:
-                return Response({"message": "the partner_id does not belong to your clusters"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"message": "the partner_id does not belong to your clusters"},
+                                status=status.HTTP_400_BAD_REQUEST)
         else:
             serializer.save(partner=request.user.partner)
 
@@ -166,15 +167,21 @@ class PartnerProjectAPIView(APIView):
             partner = get_object_or_404(Partner, id=partner_id)
 
             if instance.partner != partner:
-                return Response({"message": "Editing partner for this project is not allowed"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                  {"message": "Editing partner for this project is not allowed"},
+                  status=status.HTTP_400_BAD_REQUEST)
 
             # Make sure the user belongs to IMO group
             if not request.user.groups.filter(name='IMO').exists():
-                return Response({"message": "user does not belong to IMO"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                  {"message": "user does not belong to IMO"},
+                  status=status.HTTP_400_BAD_REQUEST)
 
             # Check if incoming partner belongs to IMO's clusters
-            if not partner_id in request.user.imo_clusters.values_list('partners', flat=True):
-                return Response({"message": "the partner_id does not belong to your clusters"}, status=status.HTTP_400_BAD_REQUEST)
+            if partner_id not in request.user.imo_clusters.values_list('partners', flat=True):
+                return Response(
+                  {"message": "the partner_id does not belong to your clusters"},
+                  status=status.HTTP_400_BAD_REQUEST)
 
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -234,11 +241,11 @@ class PartnerActivityCreateAPIView(CreateAPIView):
         # If user is IMO
         # Check if incoming partner belongs to IMO's clusters
         if request.user.groups.filter(name='IMO').exists() \
-            and partner.id not in request.user.imo_clusters.values_list('partners', flat=True):
-            return Response(
-                {"message": "the partner_id does not belong to your clusters"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+                and partner.id not in request.user.imo_clusters.values_list('partners', flat=True):
+                    return Response(
+                        {"message": "the partner_id does not belong to your clusters"},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
 
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -291,11 +298,11 @@ class PartnerActivityUpdateAPIView(UpdateAPIView):
         # If user is IMO
         # Check if incoming partner belongs to IMO's clusters
         if request.user.groups.filter(name='IMO').exists() \
-            and instance.partner.id not in request.user.imo_clusters.values_list('partners', flat=True):
-            return Response(
-                {"message": "the partner id for this activity does not belong to your clusters"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+                and instance.partner.id not in request.user.imo_clusters.values_list('partners', flat=True):
+                    return Response(
+                        {"message": "the partner id for this activity does not belong to your clusters"},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
 
         serializer.save()
         return Response(PartnerActivitySerializer(instance=instance).data, status=status.HTTP_200_OK)
