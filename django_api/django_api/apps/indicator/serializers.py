@@ -705,6 +705,10 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 {"target": "Target cannot be greater than In Need"}
             )
 
+    def check_location_admin_levels(self, location_queryset):
+        if location_queryset.values_list('gateway__admin_level', flat=True).distinct().count() != 1:
+            raise ValidationError({"locations": "Selected locations should share same admin level"})
+
     @transaction.atomic
     def create(self, validated_data):
         locations = self.check_locations_merge_to_list(self.initial_data.get('locations'))
@@ -758,7 +762,10 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
         self.instance = Reportable.objects.create(**validated_data)
 
-        self.instance.locations.add(*Location.objects.filter(id__in=[l['id'] for l in locations]))
+        location_queryset = Location.objects.filter(id__in=[l['id'] for l in locations])
+        self.check_location_admin_levels(location_queryset)
+
+        self.instance.locations.add(*location_queryset)
 
         disaggregations = self.initial_data.get('disaggregations')
         self.instance.disaggregations.add(*Disaggregation.objects.filter(id__in=[d['id'] for d in disaggregations]))
@@ -767,6 +774,9 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
     def update(self, reportable, validated_data):
         locations = self.check_locations_merge_to_list(self.initial_data.get('locations'))
+        location_queryset = Location.objects.filter(id__in=[l['id'] for l in locations])
+        self.check_location_admin_levels(location_queryset)
+
         blueprint_data = validated_data.pop('blueprint', {})
         super(ClusterIndicatorSerializer, self).update(reportable, validated_data)
 

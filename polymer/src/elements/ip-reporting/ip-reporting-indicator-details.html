@@ -166,7 +166,7 @@
                   <span>
                     Progress in current reporting period:
                     <span class="reporting-period">
-                      [[location.reportInfo.time_period_start]] - [[location.reportInfo.time_period_end]]
+                      [[location.reportInfo.current.time_period_start]] - [[location.reportInfo.current.time_period_end]]
                     </span>
                   </span>
                   <span>
@@ -175,20 +175,20 @@
                         is="dom-if"
                         if="[[_equals(location.current.display_type, 'number')]]"
                         restamp="true">
-                      <etools-prp-number value="[[location.reportInfo.total.v]]"></etools-prp-number>
+                      <etools-prp-number value="[[location.reportInfo.current.total.v]]"></etools-prp-number>
                     </template>
                     <template
                         is="dom-if"
                         if="[[_equals(location.current.display_type, 'percentage')]]"
                         restamp="true">
-                      [[_toPercentage(location.reportInfo.total.c)]]
+                      [[_toPercentage(location.reportInfo.current.total.c)]]
                     </template>
                   </span>
                 </h4>
                 <!-- TODO: check - wrong use of total? -->
                 <disaggregation-table
                   data=[[location.current]]
-                  mapping=[[location.reportInfo.disagg_lookup_map]]>
+                  mapping=[[location.reportInfo.current.disagg_lookup_map]]>
                 </disaggregation-table>
               </div>
             </template>
@@ -199,7 +199,7 @@
                   <span>
                     Progress in previous reporting period:
                     <span class="reporting-period">
-                      [[location.reportInfo.time_period_start]] - [[location.reportInfo.time_period_end]]
+                      [[location.reportInfo.previous.time_period_start]] - [[location.reportInfo.previous.time_period_end]]
                     </span>
                   </span>
                   <span>
@@ -208,19 +208,19 @@
                         is="dom-if"
                         if="[[_equals(location.previous.display_type, 'number')]]"
                         restamp="true">
-                      <etools-prp-number value="[[location.reportInfo.total.v]]"></etools-prp-number>
+                      <etools-prp-number value="[[location.reportInfo.previous.total.v]]"></etools-prp-number>
                     </template>
                     <template
                         is="dom-if"
                         if="[[_equals(location.previous.display_type, 'percentage')]]"
                         restamp="true">
-                      [[_toPercentage(location.reportInfo.total.c)]]
+                      [[_toPercentage(location.reportInfo.previous.total.c)]]
                     </template>
                   </span>
                 </h4>
                 <disaggregation-table
                   data=[[location.previous]]
-                  mapping=[[location.reportInfo.disagg_lookup_map]]>
+                  mapping=[[location.reportInfo.previous.disagg_lookup_map]]>
                 </disaggregation-table>
               </div>
             </template>
@@ -305,12 +305,13 @@
             if (locations[locationReport.location.id]) {
               var toUpdate = locations[locationReport.location.id];
               toUpdate[timeframe] = locationReport;
+              toUpdate.reportInfo[timeframe] = report;
               locations[locationReport.location.id] = toUpdate;
             } else {
-              var newDict = {};
+              var newDict = {reportInfo: {}};
               newDict[timeframe] = locationReport;
               newDict.name = locationReport.location.title;
-              newDict.reportInfo = report;
+              newDict.reportInfo[timeframe] = report;
               locations[locationReport.location.id] = newDict;
             }
           });
