@@ -49,6 +49,10 @@
         color: var(--paper-grey-600);
       }
 
+      .report__meta .first-column {
+        flex-basis: 40%;
+      }
+
       .report__meta .column {
         box-sizing: border-box;
         min-width: 0;
@@ -79,7 +83,6 @@
       }
 
       .report__meta dl {
-
         margin: 0;
         font-size: 11px;
       }
@@ -223,7 +226,7 @@
 
         <div class="flex layout vertical">
           <div class="report__meta layout horizontal">
-            <div class="column flex">
+            <div class="first-column column flex-none">
               <report-status status="[[data.report_status]]"></report-status>
               <dl>
                 <template
