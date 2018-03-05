@@ -4,6 +4,7 @@
 <link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
 
 <link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../styles/filter-styles.html">
 <link rel="import" href="../../elements/filter-list.html">
 <link rel="import" href="../../elements/filters/reportable-filter/reportable-filter.html">
 <link rel="import" href="../../elements/filters/checkbox-filter/checkbox-filter.html">
@@ -11,14 +12,12 @@
 
 <dom-module id="report-filters">
   <template>
-    <style include="app-grid-style">
+    <style include="app-grid-style filter-styles">
       :host {
         display: block;
-        margin-bottom: 25px;
         background: white;
 
         --app-grid-columns: 4;
-        --app-grid-gutter: 25px;
         --app-grid-item-height: auto;
         --app-grid-expandible-item-columns: 4;
       }

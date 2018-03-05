@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 from datetime import date
 import logging
 
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
@@ -22,7 +23,7 @@ from core.common import (
     OVERALL_STATUS,
     REPORTING_TYPES
 )
-from core.models import TimeStampedExternalSyncModelMixin
+from core.models import TimeStampedExternalSyncModelMixin, PartnerAuthorizedOfficerRole
 from indicator.models import Reportable  # IndicatorReport
 
 
@@ -59,6 +60,12 @@ class Person(TimeStampedExternalSyncModelMixin):
 
     def __str__(self):
         return self.name
+
+    @property
+    def is_authorized_officer(self):
+        return get_user_model().objects.filter(
+            email=self.email, groups=PartnerAuthorizedOfficerRole.as_group()
+        ).exists()
 
 
 class ProgrammeDocument(TimeStampedExternalSyncModelMixin):

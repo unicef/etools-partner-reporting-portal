@@ -105,7 +105,7 @@
 
         isClusterApp: {
           type: Boolean,
-          computed: '_computeIsClusterApp()',
+          computed: '_computeIsClusterApp(appName)',
         },
 
         appName: {
@@ -119,8 +119,8 @@
         this.$$('#modal').open();
       },
 
-      _computeIsClusterApp: function() {
-        return this.appName === 'cluster-reporting';
+      _computeIsClusterApp: function(appName) {
+        return appName === 'cluster-reporting';
       },
 
       _computeIndicatorReportsUrl: function(baseUrl, indicator) {
