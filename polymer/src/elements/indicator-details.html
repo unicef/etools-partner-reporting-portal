@@ -145,16 +145,31 @@
       </etools-prp-printer>
 
       <div hidden aria-hidden="true">
-        <dl class="printme" style="margin: 0;">
-          <dt style="display: inline;">Programme document:</dt>
-          <dd style="display: inline; margin: 0;">[[currentPD.title]]</dd>
-        </dl>
-        <dl class="printme" style="margin: 0;">
-          <dt style="display: inline;">Indicator:</dt>
-          <dd style="display: inline; margin: 0;">[[indicatorName]]</dd>
-        </dl>
-        <span class="printme" style="margin-right: .5em;">Indicator status:</span>
-        <report-status class="printme" status="[[indicatorStatus]]"></report-status>
+        <template
+            is="dom-if"
+            if="[[currentPD.title]]">
+          <dl class="printme" style="margin: 0;">
+            <dt style="display: inline;">Programme document:</dt>
+            <dd style="display: inline; margin: 0;">[[currentPD.title]]</dd>
+          </dl>
+        </template>
+
+        <template
+            is="dom-if"
+            if="[[indicatorName]]">
+          <dl class="printme" style="margin: 0;">
+            <dt style="display: inline;">Indicator:</dt>
+            <dd style="display: inline; margin: 0;">[[indicatorName]]</dd>
+          </dl>
+        </template>
+
+        <template
+            is="dom-if"
+            if="[[indicatorStatus]]">
+          <span class="printme" style="margin-right: .5em;">Indicator status:</span>
+          <report-status class="printme" status="[[indicatorStatus]]"></report-status>
+        </template>
+
         <div class="printme" style="margin-bottom: 2em;"></div>
       </div>
 
