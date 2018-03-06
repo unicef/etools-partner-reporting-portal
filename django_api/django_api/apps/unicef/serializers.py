@@ -22,7 +22,6 @@ class PersonSerializer(serializers.ModelSerializer):
         fields = ('name', 'title', 'email', 'phone_number', 'is_authorized_officer')
 
 
-
 class ReportingPeriodDatesSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='external_id')
     programme_document = serializers.PrimaryKeyRelatedField(
