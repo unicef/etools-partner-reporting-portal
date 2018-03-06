@@ -60,7 +60,7 @@ def import_project(external_project_id):
         funding_serializer.is_valid(raise_exception=True)
         funding_serializer.save()
     except Exception:
-        logger.exception('No funding data found for project_id: {}'.format(external_project_id))
+        logger.warning('No funding data found for project_id: {}'.format(external_project_id))
 
     return project
 
@@ -94,6 +94,11 @@ def save_cluster_objective(objective, child_activity):
         external_source=EXTERNAL_DATA_SOURCES.HPC,
         external_id=cluster_id,
     ).first()
+    if not cluster:
+        logger.error('Cluster #{} not found, skipping objective #{}'.format(
+            cluster_id, objective['id']
+        ))
+        return None
 
     cluster_objective, _ = ClusterObjective.objects.update_or_create(
         external_id=objective['id'],
@@ -135,7 +140,7 @@ def save_reportables_for_cluster_objective_or_activity(objective_or_activity, at
                 'in_need': get_dict_from_list_by_key(values, 'inNeed').get('value', 0),
                 'content_object': objective_or_activity,
                 'blueprint': blueprint,
-                # TODO: resolve what should actually be saved in those fields
+                # TODO: those fields will be removed, remove here once done
                 'start_date': date.today(),
                 'end_date': date.today() - relativedelta(months=1),
             }
@@ -163,6 +168,7 @@ def save_activities_and_objectives_for_response_plan(entities_response={}, measu
             plan_entity_id = activity['value']['support'][0]['planEntityIds'][0]
         except (KeyError, IndexError):
             logger.warning('Activity #{} has no objective info'.format(activity['id']))
+            continue
 
         parent_objective = list(filter(
             lambda obj: obj['id'] == plan_entity_id,
@@ -170,16 +176,16 @@ def save_activities_and_objectives_for_response_plan(entities_response={}, measu
         ))[0]
 
         cluster_objective = save_cluster_objective(parent_objective, activity)
-
-        cluster_activity, _ = ClusterActivity.objects.update_or_create(
-            external_id=activity['id'],
-            external_source=EXTERNAL_DATA_SOURCES.HPC,
-            cluster_objective=cluster_objective,
-            defaults={
-                'title': activity['value']['description'][:2048]
-            }
-        )
-        save_reportables_for_cluster_objective_or_activity(cluster_activity, activity['attachments'])
+        if cluster_objective:
+            cluster_activity, _ = ClusterActivity.objects.update_or_create(
+                external_id=activity['id'],
+                external_source=EXTERNAL_DATA_SOURCES.HPC,
+                cluster_objective=cluster_objective,
+                defaults={
+                    'title': activity['value']['description'][:2048]
+                }
+            )
+            save_reportables_for_cluster_objective_or_activity(cluster_activity, activity['attachments'])
 
 
 def get_plan_list_for_country(country_iso3):

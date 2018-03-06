@@ -269,6 +269,7 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
             'stream': sys.stdout,
+            'formatter': 'standard',
         },
         'default': {
             'level': 'INFO',

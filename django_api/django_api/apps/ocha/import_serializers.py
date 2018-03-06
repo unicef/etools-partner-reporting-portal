@@ -44,6 +44,7 @@ class V2PartnerProjectLocationImportSerializer(serializers.ModelSerializer):
     parentId = serializers.IntegerField(allow_null=True)
     latitude = serializers.FloatField()
     longitude = serializers.FloatField()
+    adminLevel = serializers.IntegerField()
 
     class Meta:
         model = Location
@@ -55,10 +56,11 @@ class V2PartnerProjectLocationImportSerializer(serializers.ModelSerializer):
             'parentId',
             'latitude',
             'longitude',
+            'adminLevel',
         )
 
 
-class V2PartnerProjectImportSerializer(serializers.ModelSerializer):
+class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, serializers.ModelSerializer):
     external_source = serializers.CharField(default=EXTERNAL_DATA_SOURCES.HPC)
     id = serializers.IntegerField(source='external_id')
     name = serializers.CharField(source='title')
@@ -109,7 +111,6 @@ class V2PartnerProjectImportSerializer(serializers.ModelSerializer):
             instance = super(V2PartnerProjectImportSerializer, self).create(validated_data)
 
         for location_data in sorted(locations, key=lambda x: x['external_id']):
-            print(location_data['external_id'])
             if not location_data['parentId'] and location_data['iso3']:
                 parent = None
                 country, _ = Country.objects.get_or_create(
@@ -124,16 +125,17 @@ class V2PartnerProjectImportSerializer(serializers.ModelSerializer):
                     external_id=location_data['parentId']
                 ).first()
 
-            # TODO: proper gateway handling with cartodb(?)
+            gateway_name = '{} - L{}'.format(country.country_short_code, location_data['adminLevel'])
             gateway, _ = GatewayType.objects.get_or_create(
                 country=country,
-                admin_level=0,
+                admin_level=location_data['adminLevel'],
                 defaults={
-                    'name': location_data['title']
+                    'name': gateway_name
                 }
             )
             location_data.pop('parentId')
             location_data.pop('iso3')
+            location_data.pop('adminLevel')
             location_data['gateway'] = gateway
             location_data['parent'] = parent
 
@@ -143,7 +145,6 @@ class V2PartnerProjectImportSerializer(serializers.ModelSerializer):
                 defaults=location_data
             )
 
-            print(parent, location)
         return instance
 
 
