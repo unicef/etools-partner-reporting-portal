@@ -35,6 +35,12 @@ from indicator.models import (
 
 class TestPDReportsAPIView(BaseAPITestCase):
 
+    def setUp(self):
+        super().setUp()
+        
+        # Logging in as Partner AO
+        self.client.login(username='admin_ao', password='Passw0rd!')
+
     def test_list_api(self):
         pd = ProgrammeDocument.objects.first()
         url = reverse('programme-document-reports', kwargs={'pd_id': pd.pk})
@@ -67,7 +73,13 @@ class TestPDReportsAPIView(BaseAPITestCase):
 
 
 class TestIndicatorDataAPIView(BaseAPITestCase):
-    generate_fake_data_quantity = 30
+    generate_fake_data_quantity = 3
+
+    def setUp(self):
+        super().setUp()
+        
+        # Logging in as Partner AO
+        self.client.login(username='admin_ao', password='Passw0rd!')
 
     def test_list_api(self):
         ir = IndicatorReport.objects.filter(
@@ -174,8 +186,14 @@ class TestIndicatorDataAPIView(BaseAPITestCase):
             PROGRESS_REPORT_STATUS.submitted)
 
 
-class TestIndicatorListAPIView30(BaseAPITestCase):
-    generate_fake_data_quantity = 30
+class TestIndicatorListAPIView(BaseAPITestCase):
+    generate_fake_data_quantity = 3
+
+    def setUp(self):
+        super().setUp()
+        
+        # Logging in as Partner AO
+        self.client.login(username='admin_ao', password='Passw0rd!')
 
     def test_list_api_filter_by_locations(self):
         self.reports = Reportable.objects.filter(
@@ -215,6 +233,12 @@ class TestIndicatorListAPIView30(BaseAPITestCase):
 
 class TestIndicatorDataReportableAPIView(BaseAPITestCase):
 
+    def setUp(self):
+        super().setUp()
+        
+        # Logging in as Partner AO
+        self.client.login(username='admin_ao', password='Passw0rd!')
+
     def test_overall_narrative(self):
         ir = IndicatorReport.objects.first()
         url = reverse(
@@ -243,6 +267,12 @@ class TestIndicatorDataReportableAPIView(BaseAPITestCase):
 
 
 class TestIndicatorReportListAPIView(BaseAPITestCase):
+
+    def setUp(self):
+        super().setUp()
+        
+        # Logging in as Partner AO
+        self.client.login(username='admin_ao', password='Passw0rd!')
 
     def test_list_api_with_reportable_id(self):
         indicator_report = IndicatorReport.objects.last()
@@ -495,7 +525,7 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
 
 
 class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
-    generate_fake_data_quantity = 20
+    generate_fake_data_quantity = 3
 
     def test_update_level_reported_0(self):
         indicator_location_data = IndicatorLocationData.objects.filter(

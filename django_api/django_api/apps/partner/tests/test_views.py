@@ -56,6 +56,9 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
             'total_budget': 100000,
             'funding_source': "UNICEF",
         }
+        
+        # Logging in as Partner AO
+        self.client.login(username='admin_ao', password='Passw0rd!')
 
     def test_list_partner_project(self):
         """
@@ -144,6 +147,12 @@ class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
 
 class TestPartnerProjectAPIView(BaseAPITestCase):
 
+    def setUp(self):
+        super().setUp()
+        
+        # Logging in as Partner AO
+        self.client.login(username='admin_ao', password='Passw0rd!')
+
     def test_get_instance(self):
         first = PartnerProject.objects.first()
         url = reverse('partner-project-details', kwargs={"pk": first.id})
@@ -227,6 +236,9 @@ class TestPartnerActivityAPIView(BaseAPITestCase):
             "end_date": "2017-05-31",
             "status": "Ong"
         }
+        
+        # Logging in as Partner AO
+        self.client.login(username='admin_ao', password='Passw0rd!')
 
     def test_create_activity_from_cluster_activity(self):
         base_count = PartnerActivity.objects.all().count()

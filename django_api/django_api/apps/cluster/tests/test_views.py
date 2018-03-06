@@ -15,11 +15,14 @@ class TestClusterObjectiveAPIView(BaseAPITestCase):
     reference_number = "ref no 123"
 
     def setUp(self):
-        super(TestClusterObjectiveAPIView, self).setUp()
+        super().setUp()
         self.data = {
             "cluster": Cluster.objects.first().id,
             "title": self.title,
         }
+
+        # Logging in as IMO admin
+        self.client.login(username='admin_imo', password='Passw0rd!')
 
     def test_create_cluster_objective(self):
         """
@@ -166,6 +169,12 @@ class TestClusterObjectiveAPIView(BaseAPITestCase):
 
 
 class TestClusterActivityAPIView(BaseAPITestCase):
+
+    def setUp(self):
+        super().setUp()
+
+        # Logging in as IMO admin
+        self.client.login(username='admin_imo', password='Passw0rd!')
 
     @property
     def data(self):
@@ -386,8 +395,6 @@ class TestClusterPartnerDashboardAPIView(BaseAPITestCase):
 
         user.set_password('Passw0rd!')
         user.save()
-
-        self.client.login(username=user.username, password='Passw0rd!')
 
         url = reverse('cluster-partner-dashboard', kwargs={
             'response_plan_id': first_cluster.response_plan_id,

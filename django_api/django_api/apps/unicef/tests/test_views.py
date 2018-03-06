@@ -10,9 +10,15 @@ from indicator.models import IndicatorReport
 from unicef.models import ProgrammeDocument, ProgressReport
 
 
-class TestProgrammeDocumentAPIView25(BaseAPITestCase):
+class TestProgrammeDocumentAPIView(BaseAPITestCase):
 
-    generate_fake_data_quantity = 25
+    generate_fake_data_quantity = 3
+
+    def setUp(self):
+        super().setUp()
+        
+        # Logging in as Partner AO
+        self.client.login(username='admin_ao', password='Passw0rd!')
 
     def test_list_api(self):
         intervention = Workspace.objects.filter(
@@ -83,6 +89,12 @@ class TestProgrammeDocumentAPIView25(BaseAPITestCase):
 
 class TestProgrammeDocumentAPIView(BaseAPITestCase):
 
+    def setUp(self):
+        super().setUp()
+        
+        # Logging in as Partner AO
+        self.client.login(username='admin_ao', password='Passw0rd!')
+
     def test_detail_api(self):
         pd = ProgrammeDocument.objects.first()
         # location_id is redundantly!
@@ -107,6 +119,9 @@ class TestProgressReportAPIView(BaseAPITestCase):
         self.location_id = Workspace.objects.filter(
             locations__isnull=False).first().locations.first().id
         self.queryset = self.get_queryset()
+
+        # Logging in as Partner AO
+        self.client.login(username='admin_ao', password='Passw0rd!')
 
     def get_queryset(self):
         pd_ids = Location.objects.filter(
