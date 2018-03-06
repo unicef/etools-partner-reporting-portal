@@ -343,8 +343,6 @@ class ReportableFactory(factory.django.DjangoModelFactory):
 
     cs_dates = [cs_date_1, cs_date_2, cs_date_3]
     frequency = fuzzy.FuzzyChoice(REPORTABLE_FREQUENCY_LEVEL_CHOICE_LIST)
-    start_date = beginning_of_this_year
-    end_date = today + datetime.timedelta(days=70)
 
     @factory.post_generation
     def locations(self, create, extracted, **kwargs):

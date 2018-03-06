@@ -86,7 +86,6 @@
           if="[[_equals(mode, 'cluster')]]"
           restamp="true">
           <iron-form class="app-grid">
-
                 <div class="item item-wide">
                    <etools-single-selection-menu
                       class="validate"
@@ -252,7 +251,10 @@
         data: Object,
 
         activitiesUrl: String,
-        editData: Object,
+        editData: {
+          type: Object,
+          value: {},
+        },
 
         updatePending: {
           type: Boolean,
@@ -321,10 +323,15 @@
           type: Object,
           statePath: 'partner.current',
         },
+
+        partnerId: {
+          type: Number,
+          computed: '_computePartnerId(partner, editData.partner)',
+        },
       },
 
       observers: [
-        '_fetchProjects(partner.id)',
+        '_fetchProjects(partnerId)',
       ],
 
       _setDefaults: function () {
@@ -355,6 +362,10 @@
 
       _validate: function (e) {
         e.target.validate();
+      },
+
+      _computePartnerId: function(partner, editPartner) {
+        return partner.id || editPartner.id;
       },
 
       _computeActivityUrl: function (responsePlanId, activityId) {

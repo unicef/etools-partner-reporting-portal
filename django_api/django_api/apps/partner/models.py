@@ -203,9 +203,13 @@ class PartnerProject(TimeStampedExternalSourceModel):
     class Meta:
         ordering = ['-id']
         unique_together = TimeStampedExternalSourceModel.Meta.unique_together
+        permissions = (
+            ('imo_object', 'IMO Object'),
+            ('partner_object', 'Partner Object'),
+        )
 
     def __str__(self):
-        return '{} #{} {}'.format(
+        return '{} <PK:{}> {}'.format(
             self.__class__.__name__, self.id, self.title
         )
 
@@ -274,6 +278,10 @@ class PartnerActivity(TimeStampedModel):
 
     class Meta:
         ordering = ['-id']
+        permissions = (
+            ('imo_object', 'IMO Object'),
+            ('partner_object', 'Partner Object'),
+        )
 
     @property
     def clusters(self):

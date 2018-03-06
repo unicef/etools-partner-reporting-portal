@@ -119,6 +119,10 @@
         },
       },
 
+      listeners: {
+        'project-edited': '_onSuccess',
+      },
+
       _computeBackLink: function(query) {
         return '/response-parameters/partners/projects' + '?' + query;
       },
@@ -140,7 +144,11 @@
         this.set('route.path', '/' + this.tab);
       },
 
-      attached: function () {
+      _onSuccess: function() {
+        this._getProjectAjax();
+      },
+
+      _getProjectAjax: function () {
         var thunk = this.$.project.thunk();
         var self = this;
         thunk()
@@ -152,6 +160,10 @@
             self.updatePending = false;
             // TODO: error handling
           });
+      },
+
+      attached: function () {
+        this._getProjectAjax();
       },
 
     });

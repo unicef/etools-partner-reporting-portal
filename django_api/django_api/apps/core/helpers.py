@@ -222,7 +222,7 @@ def calculate_end_date_given_start_date(start_date, frequency, cs_dates=None):
 
 def find_missing_frequency_period_dates_for_indicator_report(indicator, latest_indicator_report_date, frequency):
     # PD_FREQUENCY_LEVEL can be used interchangeably
-    date_to_subtract_from = today = date.today()
+    today = date.today()
     date_to_compare = latest_indicator_report_date if latest_indicator_report_date else indicator.start_date
     date_list = []
 
