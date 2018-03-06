@@ -19,7 +19,7 @@ from .models import ClusterObjective, ClusterActivity, Cluster
 class ClusterSimpleSerializer(serializers.ModelSerializer):
 
     type = serializers.CharField(read_only=True)
-    title = serializers.CharField(read_only=True, source='get_type_display')
+    title = serializers.CharField(read_only=True)
 
     class Meta:
         model = Cluster
@@ -32,7 +32,7 @@ class ClusterSimpleSerializer(serializers.ModelSerializer):
 
 
 class ClusterObjectiveSerializer(serializers.ModelSerializer):
-    cluster_title = serializers.SerializerMethodField()
+    cluster_title = serializers.CharField(source='cluster.title')
 
     class Meta:
         model = ClusterObjective
@@ -42,9 +42,6 @@ class ClusterObjectiveSerializer(serializers.ModelSerializer):
             'cluster',
             'cluster_title',
         )
-
-    def get_cluster_title(self, obj):
-        return obj.cluster.get_type_display()
 
 
 class ClusterObjectivePatchSerializer(ClusterObjectiveSerializer):
@@ -60,9 +57,9 @@ class ClusterObjectivePatchSerializer(ClusterObjectiveSerializer):
 
 class ClusterActivitySerializer(serializers.ModelSerializer):
 
-    co_cluster_title = serializers.SerializerMethodField()
-    co_cluster_id = serializers.SerializerMethodField()
-    co_title = serializers.SerializerMethodField()
+    co_cluster_title = serializers.CharField(source='cluster_objective.cluster.title')
+    co_cluster_id = serializers.IntegerField(source='cluster_objective.cluster.id')
+    co_title = serializers.CharField(source='cluster_objective.title')
 
     class Meta:
         model = ClusterActivity
@@ -74,15 +71,6 @@ class ClusterActivitySerializer(serializers.ModelSerializer):
             'co_title',
             'cluster_objective',
         )
-
-    def get_co_cluster_id(self, obj):
-        return obj.cluster_objective.cluster.id
-
-    def get_co_cluster_title(self, obj):
-        return obj.cluster_objective.cluster.get_type_display()
-
-    def get_co_title(self, obj):
-        return obj.cluster_objective.title
 
 
 class ClusterActivityPatchSerializer(serializers.ModelSerializer):
@@ -234,7 +222,6 @@ class PartnerAnalysisSummarySerializer(serializers.ModelSerializer):
         )
 
     def get_summary(self, obj):
-        pa_list = None
         projects = {
             'ongoing': [],
             'planned': [],

@@ -45,9 +45,13 @@ class Cluster(TimeStampedExternalSourceModel):
     def __str__(self):
         return "<pk: {}> `{}` PLAN: `{}`".format(
             self.id,
-            self.imported_type or self.type,
+            self.title,
             self.response_plan
         )
+
+    @property
+    def title(self):
+        return self.imported_type or self.get_type_display()
 
     @property
     def num_of_partners(self):

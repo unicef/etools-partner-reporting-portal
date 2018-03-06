@@ -14,7 +14,6 @@ class Command(BaseCommand):
             action='store',
             dest='country',
             help='ISO 3 country code',
-            required=True,
         )
 
     def handle(self, *args, **options):
