@@ -744,9 +744,9 @@ class OperationalPresenceAggregationDataAPIView(APIView):
             "clusters": None,
             "num_of_clusters": None,
             "num_of_partners": None,
-            "num_of_partners_per_type": None,
-            "num_of_partners_per_cluster": None,
-            "num_of_partners_per_cluster_objective": None,
+            "partners_per_type": None,
+            "partners_per_cluster": None,
+            "partners_per_cluster_objective": None,
         }
 
         workspace = response_plan.workspace
@@ -771,18 +771,20 @@ class OperationalPresenceAggregationDataAPIView(APIView):
         response_data["clusters"] = ClusterSimpleSerializer(clusters.distinct(), many=True).data
         response_data["num_of_clusters"] = clusters.count()
         response_data["num_of_partners"] = Partner.objects.filter(clusters__in=clusters).distinct().count()
-        response_data["num_of_partners_per_type"] = {}
-        response_data["num_of_partners_per_cluster"] = {}
-        response_data["num_of_partners_per_cluster_objective"] = {}
+        response_data["partners_per_type"] = {}
+        response_data["partners_per_cluster"] = {}
+        response_data["partners_per_cluster_objective"] = {}
 
         for partner_type in partner_types:
-            response_data["num_of_partners_per_type"][PARTNER_TYPE[partner_type]] = Partner.objects.filter(partner_type=partner_type, clusters__in=clusters).distinct().count()
+            response_data["partners_per_type"][PARTNER_TYPE[partner_type]] = Partner.objects.filter(
+                partner_type=partner_type, clusters__in=clusters
+            ).distinct().values_list('title', flat=True)
 
         for cluster in clusters:
-            response_data["num_of_partners_per_cluster"][cluster.type.capitalize()] = cluster.partners.count()
+            response_data["partners_per_cluster"][cluster.type.capitalize()] = cluster.partners.values_list('title', flat=True)
 
         for objective in objectives:
-            response_data["num_of_partners_per_cluster_objective"][objective.title + " (" + objective.cluster.type.capitalize() + ")"] = Partner.objects.filter(clusters__cluster_objectives=objective).count()
+            response_data["partners_per_cluster_objective"][objective.title + " (" + objective.cluster.type.capitalize() + ")"] = Partner.objects.filter(clusters__cluster_objectives=objective).values_list('title', flat=True)
 
         return response_data
 
@@ -883,7 +885,7 @@ class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
             if filter_parameters['locs']:
                 final_result = final_result.filter(id__in=map(lambda x: int(x), filter_parameters['locs'].split(',')))
 
-        return final_result.annotate(json=AsGeoJSON('geom', precision=3))
+        return final_result.annotate(processed_json=AsGeoJSON('geom', precision=3))
 
 
 class ClusterAnalysisIndicatorsListAPIView(GenericAPIView, ListModelMixin):

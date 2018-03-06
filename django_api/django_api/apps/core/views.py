@@ -6,6 +6,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework import status as statuses
 
+from .filters import LocationFilter
 from .permissions import IsAuthenticated
 from .models import Workspace, Location, ResponsePlan
 from .serializers import (
@@ -46,6 +47,8 @@ class LocationListAPIView(ListAPIView):
     permission_classes = (IsAuthenticated, )
     serializer_class = ShortLocationSerializer
     lookup_field = lookup_url_kwarg = 'response_plan_id'
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
+    filter_class = LocationFilter
 
     def get_queryset(self):
         """
