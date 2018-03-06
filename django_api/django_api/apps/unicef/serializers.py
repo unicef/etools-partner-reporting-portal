@@ -496,6 +496,7 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
         queryset=Partner.objects.all())
     workspace = serializers.PrimaryKeyRelatedField(
         queryset=Workspace.objects.all())
+    amendments = serializers.JSONField(allow_null=True, allow_blank=True)
 
     def create(self, validated_data):
         return ProgrammeDocument.objects.create(**validated_data)
@@ -519,6 +520,7 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
             "funds_received",
             "funds_received_currency",
             "workspace",
+            "amendments",
         )
 
 
