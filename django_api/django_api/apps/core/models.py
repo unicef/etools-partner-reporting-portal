@@ -157,8 +157,9 @@ class ResponsePlan(TimeStampedModel):
         blank=True,
         verbose_name='End date'
     )
-    workspace = models.ForeignKey('core.Workspace',
-                                  related_name="response_plans")
+    workspace = models.ForeignKey(
+        'core.Workspace', related_name="response_plans"
+    )
 
     class Meta:
         unique_together = ('title', 'plan_type', 'workspace')

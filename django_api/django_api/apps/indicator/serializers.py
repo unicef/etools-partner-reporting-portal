@@ -824,8 +824,6 @@ class ClusterIndicatorForPartnerActivitySerializer(
             'locations',
             'frequency',
             'cs_dates',
-            'start_date',
-            'end_date',
         )
 
 
@@ -1082,8 +1080,6 @@ class PMPReportableSerializer(serializers.ModelSerializer):
             'disaggregation_ids',
             'content_type',
             'object_id',
-            'start_date',
-            'end_date'
         )
 
 

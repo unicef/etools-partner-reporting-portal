@@ -257,13 +257,6 @@ class Reportable(TimeStampedExternalSyncModelMixin):
         verbose_name='Frequency of reporting'
     )
 
-    start_date = models.DateField(
-        verbose_name='Start Date',
-    )
-    end_date = models.DateField(
-        verbose_name='End Date',
-    )
-
     cs_dates = ArrayField(
         models.DateField(), default=list, null=True, blank=True
     )
@@ -342,7 +335,7 @@ class IndicatorReportManager(models.Manager):
 class IndicatorReport(TimeStampedModel):
     """
     IndicatorReport module is a result of partner staff activity (what they
-    done in defined frequency scope).
+    did in defined frequency scope).
 
     related models:
         indicator.Reportable (ForeignKey): "indicator"
@@ -350,11 +343,10 @@ class IndicatorReport(TimeStampedModel):
         core.Location (OneToOneField): "location"
     """
     title = models.CharField(max_length=255)
-    reportable = models.ForeignKey(Reportable,
-                                   related_name="indicator_reports")
-    progress_report = models.ForeignKey('unicef.ProgressReport',
-                                        related_name="indicator_reports",
-                                        null=True, blank=True)
+    reportable = models.ForeignKey(Reportable, related_name="indicator_reports")
+    progress_report = models.ForeignKey(
+        'unicef.ProgressReport', related_name="indicator_reports", null=True, blank=True
+    )
     time_period_start = models.DateField()  # first day of defined frequency mode
     time_period_end = models.DateField()  # last day of defined frequency mode
     due_date = models.DateField()  # can be few days/weeks out of the "end date"

@@ -24,8 +24,7 @@ class ReportableAdmin(admin.ModelAdmin):
     list_display = ('blueprint', 'active', 'target', 'baseline', 'total',
                     'parent_indicator', 'frequency', 'assumptions',
                     'means_of_verification', 'is_cluster_indicator',
-                    'start_date', 'end_date', 'cs_dates', 'content_object',
-                    'content_type', 'external_id')
+                    'cs_dates', 'content_object', 'content_type', 'external_id')
     list_filter = ('is_cluster_indicator', 'content_type')
     search_fields = ('context_code', 'means_of_verification', 'target',
                      'baseline', 'object_id', 'blueprint__title')
