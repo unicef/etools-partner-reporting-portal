@@ -2,8 +2,6 @@ import logging
 from time import sleep
 
 import requests
-from datetime import date
-from dateutil.relativedelta import relativedelta
 from requests.status_codes import codes
 
 from cluster.models import Cluster, ClusterObjective, ClusterActivity
@@ -140,9 +138,6 @@ def save_reportables_for_cluster_objective_or_activity(objective_or_activity, at
                 'in_need': get_dict_from_list_by_key(values, 'inNeed').get('value', 0),
                 'content_object': objective_or_activity,
                 'blueprint': blueprint,
-                # TODO: those fields will be removed, remove here once done
-                'start_date': date.today(),
-                'end_date': date.today() - relativedelta(months=1),
             }
         )
 

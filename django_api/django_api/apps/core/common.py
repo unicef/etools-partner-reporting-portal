@@ -27,6 +27,7 @@ CLUSTER_TYPES = Choices(
     ('protection', 'Protection'),
     ('shelter', 'Shelter'),
     ('wash', 'WASH'),
+    ('imported', 'Imported'),
 )
 
 CLUSTER_TYPE_NAME_DICT = {

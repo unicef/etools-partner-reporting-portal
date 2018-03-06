@@ -9,7 +9,7 @@ from django.contrib.contenttypes.fields import GenericRelation
 from core.common import (
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
-)
+    CLUSTER_TYPES)
 from core.models import TimeStampedExternalSourceModel
 
 from indicator.models import Reportable, IndicatorReport
@@ -27,8 +27,10 @@ class Cluster(TimeStampedExternalSourceModel):
         core.Workspace (ForeignKey): "intervention"
 
     """
-    # TODO handle serializers etc where this is still treated as choice field
-    type = models.TextField(max_length=512)
+    type = models.CharField(max_length=32, choices=CLUSTER_TYPES)
+    imported_type = models.TextField(
+        max_length=1024, null=True, blank=True, help_text='Type as specified in the external system'
+    )
     response_plan = models.ForeignKey(
         'core.ResponsePlan', null=True, related_name="clusters"
     )
@@ -43,7 +45,7 @@ class Cluster(TimeStampedExternalSourceModel):
     def __str__(self):
         return "<pk: {}> `{}` PLAN: `{}`".format(
             self.id,
-            self.type,
+            self.imported_type or self.type,
             self.response_plan
         )
 

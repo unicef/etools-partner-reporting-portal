@@ -19,13 +19,14 @@ from .models import ClusterObjective, ClusterActivity, Cluster
 class ClusterSimpleSerializer(serializers.ModelSerializer):
 
     type = serializers.CharField(read_only=True)
-    title = serializers.CharField(read_only=True, source='type')
+    title = serializers.CharField(read_only=True, source='get_type_display')
 
     class Meta:
         model = Cluster
         fields = (
             'id',
             'type',
+            'imported_type',
             'title',
         )
 
@@ -43,7 +44,7 @@ class ClusterObjectiveSerializer(serializers.ModelSerializer):
         )
 
     def get_cluster_title(self, obj):
-        return obj.cluster.type
+        return obj.cluster.get_type_display()
 
 
 class ClusterObjectivePatchSerializer(ClusterObjectiveSerializer):
@@ -78,7 +79,7 @@ class ClusterActivitySerializer(serializers.ModelSerializer):
         return obj.cluster_objective.cluster.id
 
     def get_co_cluster_title(self, obj):
-        return obj.cluster_objective.cluster.type
+        return obj.cluster_objective.cluster.get_type_display()
 
     def get_co_title(self, obj):
         return obj.cluster_objective.title

@@ -8,13 +8,14 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('indicator', '0006_auto_20180302_1308'),
+        ('indicator', '0006_auto_20180305_2154'),
     ]
 
     operations = [
-        migrations.RemoveField(
+        migrations.AddField(
             model_name='reportable',
-            name='external_url',
+            name='external_source',
+            field=models.TextField(blank=True, choices=[('HPC', 'HPC'), ('OPS', 'OPS')], null=True),
         ),
         migrations.AddField(
             model_name='indicatorblueprint',

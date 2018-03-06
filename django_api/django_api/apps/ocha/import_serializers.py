@@ -3,7 +3,7 @@ import logging
 from rest_framework import serializers
 
 from cluster.models import Cluster
-from core.common import EXTERNAL_DATA_SOURCES
+from core.common import EXTERNAL_DATA_SOURCES, CLUSTER_TYPES
 from core.models import Country, ResponsePlan, Workspace, Location, GatewayType
 from partner.models import PartnerProject, Partner, FundingSource
 
@@ -332,7 +332,8 @@ class V1ResponsePlanImportSerializer(DiscardUniqueTogetherValidationMixin, seria
                 external_source=self.validated_data['external_source'],
                 response_plan=response_plan,
                 defaults={
-                    'type': cluster_data['name']
+                    'type': CLUSTER_TYPES.imported,
+                    'imported_type': cluster_data['name'],
                 }
             )
 
