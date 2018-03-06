@@ -28,7 +28,7 @@ MAX_URL_RETRIES = 2
 
 
 def get_json_from_url(url, retry_counter=MAX_URL_RETRIES):
-    logger.debug('Getting {}, try: {}'.format(url, MAX_URL_RETRIES - retry_counter + 1))
+    logger.debug('Getting {}, attempt: {}'.format(url, MAX_URL_RETRIES - retry_counter + 1))
     response = requests.get(url)
 
     if response.status_code in RETRY_ON_STATUS_CODES and retry_counter > 0:
@@ -44,7 +44,7 @@ def get_json_from_url(url, retry_counter=MAX_URL_RETRIES):
     return response_json
 
 
-def import_project(external_project_id):
+def import_project(external_project_id, workspace_id=None):
     source_url = HPC_V2_ROOT_URL + 'project/{}'.format(external_project_id)
     project_data = get_json_from_url(source_url)
     serializer = V2PartnerProjectImportSerializer(data=project_data['data'])
@@ -59,6 +59,18 @@ def import_project(external_project_id):
         funding_serializer.save()
     except Exception:
         logger.warning('No funding data found for project_id: {}'.format(external_project_id))
+
+    for plan in project_data['data']['plans']:
+        import_response_plan(plan['id'], workspace_id=workspace_id)
+
+    project_cluster_ids = [c['id'] for c in project_data['data']['governingEntities']]
+
+    # After importing all response plans above we assume clusters are already in DB
+    clusters = Cluster.objects.filter(
+        external_source=EXTERNAL_DATA_SOURCES.HPC,
+        external_id__in=project_cluster_ids,
+    )
+    project.clusters.add(*clusters)
 
     return project
 
