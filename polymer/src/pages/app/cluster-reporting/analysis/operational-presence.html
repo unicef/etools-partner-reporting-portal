@@ -2,6 +2,8 @@
 <link rel="import" href="../../../../../bower_components/etools-content-panel/etools-content-panel.html">
 <link rel="import" href="../../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../../../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../../../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../../../bower_components/iron-location/iron-query-params.html">
 
 <link rel="import" href="../../../../redux/store.html">
 <link rel="import" href="../../../../elements/etools-prp-ajax.html">
@@ -75,14 +77,25 @@
       }
     </style>
 
+    <iron-location
+        query="{{query}}">
+    </iron-location>
+
+    <iron-query-params
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
+    </iron-query-params>
+
     <etools-prp-ajax
         id="data"
-        url="[[dataUrl]]">
+        url="[[dataUrl]]"
+        params="[[queryParams]]">
     </etools-prp-ajax>
 
     <etools-prp-ajax
         id="map"
-        url="[[mapUrl]]">
+        url="[[mapUrl]]"
+        params="[[queryParams]]">
     </etools-prp-ajax>
 
     <etools-content-panel no-header>
@@ -182,40 +195,57 @@
         dataUrl: {
           type: String,
           computed: '_computeApiUrl(responsePlanId, \'data\')',
-          observer: '_fetchData',
         },
 
         mapUrl: {
           type: String,
           computed: '_computeApiUrl(responsePlanId, \'map\')',
-          observer: '_fetchMap',
         },
       },
+
+      observers: [
+        '_fetchData(dataUrl, queryParams)',
+        '_fetchMap(mapUrl, queryParams)',
+      ],
 
       _computeApiUrl: function (responsePlanId, type) {
         return App.Endpoints.operationalPresence(responsePlanId, type);
       },
 
       _fetchData: function () {
-        var dataThunk = this.$.data.thunk();
+        this.debounce('fetch-data', function () {
+          var dataThunk = this.$.data.thunk();
 
-        this.$.data.abort();
+          this.$.data.abort();
 
-        this.dispatch(App.Actions.Analysis.OperationalPresence.fetchData(dataThunk))
-            .catch(function (err) { //jshint ignore:line
-              // TODO: error handling
-            });
+          this.dispatch(App.Actions.Analysis.OperationalPresence.fetchData(dataThunk))
+              .catch(function (err) { //jshint ignore:line
+                // TODO: error handling
+              });
+        }, 100);
       },
 
       _fetchMap: function () {
-        var mapThunk = this.$.map.thunk();
+        this.debounce('fetch-map', function () {
+          var mapThunk = this.$.map.thunk();
 
-        this.$.map.abort();
+          this.$.map.abort();
 
-        this.dispatch(App.Actions.Analysis.OperationalPresence.fetchMap(mapThunk))
-            .catch(function (err) { //jshint ignore:line
-              // TODO: error handling
-            });
+          this.dispatch(App.Actions.Analysis.OperationalPresence.fetchMap(mapThunk))
+              .catch(function (err) { //jshint ignore:line
+                // TODO: error handling
+              });
+        }, 100);
+      },
+
+      detached: function () {
+        if (this.isDebouncerActive('fetch-data')) {
+          this.cancelDebouncer('fetch-data');
+        }
+
+        if (this.isDebouncerActive('fetch-map')) {
+          this.cancelDebouncer('fetch-map');
+        }
       },
     });
   </script>
