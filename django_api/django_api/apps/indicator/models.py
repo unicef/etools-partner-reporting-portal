@@ -196,7 +196,7 @@ def trigger_indicator_report_recalculation(sender, instance, **kwargs):
     linked to this IndicatorBlueprint via its Reportable should all be
     recalculated for its total.
     """
-    irs = IndicatorReport.objects.filter(reportable=instance.reportables.all())
+    irs = IndicatorReport.objects.filter(reportable__in=instance.reportables.all())
 
     if instance.calculation_formula_across_locations in IndicatorBlueprint.QUANTITY_CALC_CHOICE_LIST:
         for ir in irs:
