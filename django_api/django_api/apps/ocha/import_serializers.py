@@ -22,7 +22,7 @@ class PartnerImportSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source='external_id')
     name = serializers.CharField(source='title')
     abbreviation = serializers.CharField(source='short_title')
-    nativeName = serializers.CharField(source='alternate_title')
+    nativeName = serializers.CharField(source='alternate_title', allow_null=True)
 
     class Meta:
         model = Partner
@@ -104,11 +104,13 @@ class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, ser
         validated_data['partner'] = partners[0]
         locations = validated_data.pop('locations')
 
-        instance = PartnerProject.objects.filter(code=validated_data['code']).first()
-        if instance:
-            instance = super(V2PartnerProjectImportSerializer, self).update(instance, validated_data)
+        partner_project = PartnerProject.objects.filter(code=validated_data['code']).first()
+        if partner_project:
+            partner_project = super(V2PartnerProjectImportSerializer, self).update(partner_project, validated_data)
         else:
-            instance = super(V2PartnerProjectImportSerializer, self).create(validated_data)
+            partner_project = super(V2PartnerProjectImportSerializer, self).create(validated_data)
+
+        location_objects = []
 
         for location_data in sorted(locations, key=lambda x: x['external_id']):
             if not location_data['parentId'] and location_data['iso3']:
@@ -144,8 +146,10 @@ class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, ser
                 external_id=location_data.pop('external_id'),
                 defaults=location_data
             )
+            location_objects.append(location)
 
-        return instance
+        partner_project.locations.add(*location_objects)
+        return partner_project
 
 
 class V1FundingSourceImportSerializer(serializers.ModelSerializer):

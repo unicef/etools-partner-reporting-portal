@@ -38,7 +38,7 @@ class Cluster(TimeStampedExternalSourceModel):
     class Meta:
         """One response plan can only have a cluster of one type."""
         unique_together = (
-            ('type', 'response_plan'),
+            ('type', 'imported_type', 'response_plan'),
             TimeStampedExternalSourceModel.Meta.unique_together
         )
 

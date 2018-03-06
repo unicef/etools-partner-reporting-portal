@@ -27,14 +27,4 @@ class Migration(migrations.Migration):
             name='title',
             field=models.TextField(db_index=True, max_length=2048),
         ),
-        migrations.AlterField(
-            model_name='reportable',
-            name='end_date',
-            field=models.DateField(),
-        ),
-        migrations.AlterField(
-            model_name='reportable',
-            name='start_date',
-            field=models.DateField(),
-        ),
     ]

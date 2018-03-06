@@ -38,7 +38,10 @@ class Command(BaseCommand):
             except (ValueError, KeyError):
                 self.stderr.write('Invalid bulk format')
                 return
-            for project_id in range(start_id, end_id):
-                import_project(project_id)
+            for project_id in range(start_id, end_id + 1):
+                try:
+                    import_project(project_id)
+                except Exception as e:
+                    self.stderr.write('Error getting {}: {}'.format(project_id, e))
         else:
             self.stderr.write('Either bulk range or id is required.')

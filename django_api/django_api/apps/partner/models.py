@@ -173,8 +173,8 @@ class PartnerProject(TimeStampedExternalSourceModel):
     """
     code = models.TextField(null=True, blank=True, unique=True)
 
-    title = models.CharField(max_length=255)
-    description = models.CharField(max_length=255)
+    title = models.CharField(max_length=1024)
+    description = models.CharField(max_length=2048)
     additional_information = models.CharField(
         max_length=255, verbose_name="Additional information (e.g. links)"
     )
