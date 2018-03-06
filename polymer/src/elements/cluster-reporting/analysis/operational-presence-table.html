@@ -74,6 +74,7 @@ a
                   as="column">
                 <div class="table-cell">
                   <span>
+                    <strong>[[_computeNumberOfPartners(column, feature)]]</strong>:
                     [[_computeExcerpt(column, feature, excerptLength)]]
                     <paper-tooltip offset="5">
                       <div class="tooltip-content">
@@ -139,10 +140,8 @@ a
       },
 
       _computeExcerpt: function (column, feature, excerptLength) {
-        var partners = this._getPartners(column, feature);
-
         return this._truncate(
-          partners.length + ': ' + partners.join(', '),
+          this._getFormattedPartners(column, feature),
           excerptLength
         );
       },

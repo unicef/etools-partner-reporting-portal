@@ -3,6 +3,7 @@
 
 <link rel="import" href="analysis-widget.html">
 <link rel="import" href="../../../redux/store.html">
+<link rel="import" href="../../../behaviors/utils.html">
 <link rel="import" href="../../../behaviors/analysis-chart.html">
 <link rel="import" href="../../../polyfills/es6-shim.html">
 a
@@ -37,6 +38,7 @@ a
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
+        App.Behaviors.UtilsBehavior,
         App.Behaviors.AnalysisChart,
       ],
 
@@ -48,7 +50,7 @@ a
 
         data: {
           type: Object,
-          statePath: 'analysis.operationalPresence.data.num_of_partners_per_type',
+          statePath: 'analysis.operationalPresence.data.partners_per_type',
         },
 
         options: {
@@ -90,16 +92,6 @@ a
             return '#88c245';
           }),
         });
-      },
-
-      _computeRows: function (data) {
-        return Object.keys(data).map(function (key) {
-          return [
-            key,
-            data[key],
-            this._buildTooltipContent(),
-          ];
-        }, this);
       },
     });
   </script>
