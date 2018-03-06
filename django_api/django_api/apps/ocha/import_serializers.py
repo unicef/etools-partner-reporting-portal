@@ -127,7 +127,7 @@ class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, ser
                     external_id=location_data['parentId']
                 ).first()
 
-            gateway_name = '{} - L{}'.format(country.country_short_code, location_data['adminLevel'])
+            gateway_name = '{} - Admin Level {}'.format(country.country_short_code, location_data['adminLevel'])
             gateway, _ = GatewayType.objects.get_or_create(
                 country=country,
                 admin_level=location_data['adminLevel'],

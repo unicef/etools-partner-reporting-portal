@@ -113,6 +113,7 @@ def save_cluster_objective(objective, child_activity):
 
 def save_reportables_for_cluster_objective_or_activity(objective_or_activity, attachments):
     logger.debug('Saving {} reportables for {}'.format(len(attachments), objective_or_activity))
+    reportables = []
     for attachment in attachments:
         if not attachment['type'] == 'indicator':
             continue
@@ -129,7 +130,7 @@ def save_reportables_for_cluster_objective_or_activity(objective_or_activity, at
             }
         )
 
-        Reportable.objects.update_or_create(
+        reportable, _ = Reportable.objects.update_or_create(
             external_id=attachment['id'],
             external_source=EXTERNAL_DATA_SOURCES.HPC,
             defaults={
@@ -140,6 +141,8 @@ def save_reportables_for_cluster_objective_or_activity(objective_or_activity, at
                 'blueprint': blueprint,
             }
         )
+        reportables.append(reportable)
+    objective_or_activity.reportables.add(*reportables)
 
 
 def save_activities_and_objectives_for_response_plan(entities_response={}, measurements_response={}):
