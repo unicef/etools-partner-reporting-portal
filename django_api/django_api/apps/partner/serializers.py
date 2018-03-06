@@ -78,7 +78,8 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
     id = serializers.SerializerMethodField()
     clusters = ClusterSimpleSerializer(many=True, read_only=True)
     locations = ShortLocationSerializer(many=True, read_only=True, required=False)
-    partner = serializers.CharField()
+    partner = serializers.CharField(required=False)
+    partner_id = serializers.IntegerField(read_only=True)
     part_response_plan = serializers.SerializerMethodField()
     total_budget = serializers.CharField(required=False)
     funding_source = serializers.CharField(required=False)
@@ -100,6 +101,7 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
             'clusters',
             'locations',
             'partner',
+            'partner_id',
             'part_response_plan',
         )
 
@@ -226,6 +228,11 @@ class PartnerActivityBaseCreateSerializer(serializers.Serializer):
                 'partner': 'Partner ID {} does not exist.'.format(data['partner'])
             })
 
+        if partner not in cluster.partners.all():
+            raise serializers.ValidationError({
+                'partner': 'Partner does not belong to Cluster {}.'.format(data['cluster'])
+            })
+
         project = PartnerProject.objects.filter(id=data['project']).first()
         if not project:
             raise serializers.ValidationError({
@@ -298,6 +305,7 @@ class PartnerActivityFromCustomActivitySerializer(PartnerActivityBaseCreateSeria
     def validate(self, data):
         data = super(PartnerActivityFromCustomActivitySerializer, self).validate(data)
         cluster_objective = ClusterObjective.objects.filter(id=data['cluster_objective']).first()
+
         if not cluster_objective:
             raise serializers.ValidationError({
                 'cluster_objective': 'ClusterObjective ID {} does not exist.'.format(data['cluster_objective'])
@@ -309,9 +317,16 @@ class PartnerActivityFromCustomActivitySerializer(PartnerActivityBaseCreateSeria
                 )
             })
 
-        if 'request' in self.context and not data['partner'] == self.context['request'].user.partner:
-            raise serializers.ValidationError({
-                'partner': "Partner id did not match this user's partner"
+        if 'request' in self.context \
+            and not self.context['imo'] \
+                and not data['partner'] == self.context['request'].user.partner:
+                    raise serializers.ValidationError({
+                        'partner': "Partner id did not match this user's partner"
+                    })
+
+        if data['project'].partner != data['partner']:
+            return serializers.ValidationError({
+                "project": "Project does not belong to Partner {}".format(data['partner']),
             })
 
         data['cluster_objective'] = cluster_objective
@@ -363,9 +378,15 @@ class PartnerActivitySerializer(serializers.ModelSerializer):
 
     def get_cluster(self, obj):
         if obj.cluster_activity:
-            return obj.cluster_activity.cluster_objective.cluster.get_type_display()
+            return {
+                "id": obj.cluster_activity.cluster_objective.cluster.id,
+                "name": obj.cluster_activity.cluster_objective.cluster.get_type_display(),
+            }
         elif obj.cluster_objective:
-            return obj.cluster_objective.cluster.get_type_display()
+            return {
+                "id": obj.cluster_objective.cluster.id,
+                "name": obj.cluster_objective.cluster.get_type_display(),
+            }
         else:
             return None
 
@@ -385,7 +406,6 @@ class PartnerActivityUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = PartnerActivity
         fields = (
-            'id',
             'title',
             'status',
             'project',
@@ -416,6 +436,16 @@ class PartnerActivityUpdateSerializer(serializers.ModelSerializer):
                 'partner': 'PartnerProject does not belong to Partner {}.'.format(self.initial_data['partner'])
             })
         return super(PartnerActivityUpdateSerializer, self).validate(data)
+
+    def update(self, instance, validated_data):
+        instance.title = validated_data.get('title', instance.title)
+        instance.project = validated_data.get('project', instance.project)
+        instance.start_date = validated_data.get('start_date', instance.start_date)
+        instance.end_date = validated_data.get('end_date', instance.end_date)
+        instance.status = validated_data.get('status', instance.status)
+        instance.save()
+
+        return instance
 
 
 class PMPPartnerSerializer(serializers.ModelSerializer):

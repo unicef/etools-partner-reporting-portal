@@ -9,16 +9,26 @@
 <link rel="import" href="../../../../../elements/cluster-reporting/planned-action/projects/creation-modal.html">
 <link rel="import" href="../../../../../elements/cluster-reporting/project-list-table.html">
 <link rel="import" href="../../../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../../../elements/etools-prp-permissions.html">
 <link rel="import" href="../../../../../styles/shared-styles.html">
-
+<link rel="import" href="../../../../../styles/buttons.html">
 
 <dom-module id="rp-partners-projects">
     <template>
-      <style include="shared-styles">
+      <style include="shared-styles button-styles">
         :host {
           display: block;
         }
+        div#action {
+          margin: 25px 0;
+          @apply(--layout-horizontal);
+          @apply(--layout-end-justified);
+        }
       </style>
+
+    <etools-prp-permissions
+      permissions="{{permissions}}">
+    </etools-prp-permissions>
 
     <iron-location query="{{query}}"></iron-location>
 
@@ -36,6 +46,18 @@
     <page-body>
 
       <partner-projects-filters></partner-projects-filters>
+
+      <template
+        is="dom-if"
+        if="[[_canAddProject(permissions, responsePlanCurrent)]]"
+        restamp="true">
+        <div id="action">
+          <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
+            Add Project
+          </paper-button>
+        </div>
+        <planned-action-projects-modal id="modal"></planned-action-projects-modal>
+      </template>
 
       <project-list-table page="response-parameters"></project-list-table>
 
@@ -69,10 +91,26 @@
           type: String,
           computed: '_computeUrl(responsePlanID)'
         },
+
+        responsePlanCurrent: {
+          type: Object,
+          statePath: 'responsePlans.current',
+        },
+      },
+
+      _openModal: function () {
+        this.$$('#modal').open();
       },
 
       _computeUrl: function(responsePlanID) {
         return App.Endpoints.plannedActions(responsePlanID);
+      },
+
+      _canAddProject: function(permissions, responsePlanCurrent) {
+        if (responsePlanCurrent) {
+          return permissions.createPartnerEntitiesByResponsePlanAsIMO(responsePlanCurrent.clusters);
+        }
+        return false;
       },
 
       _projectsAjax: function (queryParams) {

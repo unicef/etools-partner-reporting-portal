@@ -189,6 +189,10 @@ class PartnerProject(TimeStampedModel):
 
     class Meta:
         ordering = ['-id']
+        permissions = (
+            ('imo_object', 'IMO Object'),
+            ('partner_object', 'Partner Object'),
+        )
 
     @property
     def response_plan(self):
@@ -230,6 +234,10 @@ class PartnerActivity(TimeStampedModel):
 
     class Meta:
         ordering = ['-id']
+        permissions = (
+            ('imo_object', 'IMO Object'),
+            ('partner_object', 'Partner Object'),
+        )
 
     @property
     def clusters(self):

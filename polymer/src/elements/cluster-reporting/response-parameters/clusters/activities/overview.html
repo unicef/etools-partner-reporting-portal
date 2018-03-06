@@ -111,8 +111,10 @@
       },
 
       _canEditActivity: function(permissions, clusterId) {
-        return permissions.createClusterEntities
-          && permissions.createClusterEntitiesForCluster(clusterId);
+        if (permissions.createClusterEntities) {
+          return permissions.createClusterEntitiesForCluster(clusterId);
+        }
+        return false;
       },
 
     });

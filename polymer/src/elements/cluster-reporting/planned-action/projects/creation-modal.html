@@ -12,16 +12,21 @@
 <link rel="import" href="../../../../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
 <link rel="import" href="../../../../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../../../../../bower_components/etools-searchable-multiselection-menu/etools-multi-selection-menu.html">
+<link rel="import" href="../../../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html">
 
+<link rel="import" href="../../../../polyfills/es6-shim.html">
 <link rel="import" href="../../../etools-prp-ajax.html">
+<link rel="import" href="../../../../elements/etools-prp-permissions.html">
 <link rel="import" href="../../../etools-prp-date-input.html">
 <link rel="import" href="../../../form-fields/dropdown-form-input.html">
 <link rel="import" href="../../../form-fields/cluster-dropdown-content.html">
+<link rel="import" href="../../../form-fields/partner-dropdown-content.html">
 <link rel="import" href="../../../../behaviors/routing.html">
 <link rel="import" href="../../../../behaviors/utils.html">
 <link rel="import" href="../../../../redux/store.html">
 <link rel="import" href="../../../../redux/actions.html">
 <link rel="import" href="../../../../styles/buttons.html">
+<link rel="import" href="../../../labelled-item.html">
 
 <dom-module id="planned-action-projects-modal">
   <template>
@@ -57,7 +62,6 @@
 
       .header h2 {
         @apply(--paper-font-title);
-
         margin: 0;
         line-height: 48px;
       }
@@ -72,24 +76,33 @@
       }
     </style>
 
+    <etools-prp-permissions
+      permissions="{{permissions}}">
+    </etools-prp-permissions>
+
     <iron-location path="{{path}}"></iron-location>
 
     <cluster-dropdown-content clusters="{{clusters}}"></cluster-dropdown-content>
+    <partner-dropdown-content
+      partners="{{partners}}"
+      clusters="[[imoClusters]]">
+    </partner-dropdown-content>
 
     <etools-prp-ajax
-        id="createProject"
-        url="[[url]]"
-        body="[[data]]"
-        content-type="application/json"
-        method="post">
+      id="projectAjax"
+      url="[[url]]"
+      body="[[data]]"
+      content-type="application/json"
+      method="[[_computeAjaxMethod(edit)]]">
     </etools-prp-ajax>
+
 
     <paper-dialog
         id="dialog"
         with-backdrop
         opened="{{opened}}">
       <div class="header layout horizontal justified">
-        <h2>Add Project</h2>
+        <h2>[[_computeTitle(edit)]]</h2>
           <paper-icon-button
               class="self-center"
               on-tap="close"
@@ -104,6 +117,33 @@
             if="[[refresh]]"
             restamp="true">
           <iron-form class="app-grid">
+
+            <template
+              is="dom-if"
+              if="[[_displayPartner(permissions, edit)]]"
+              restamp="true">
+              <etools-single-selection-menu
+                class="item validate full-width"
+                label="Partner"
+                options="[[partners]]"
+                option-value="id"
+                option-label="title"
+                selected="{{selectedPartner}}"
+                on-iron-activate="_validate"
+                trigger-value-change-event
+                required>
+              </etools-single-selection-menu>
+            </template>
+
+            <template
+              is="dom-if"
+              if="[[_displayPartner(permissions, edit)]]"
+              restamp="true">
+              <labelled-item class="item full-width" label="Partner">
+                <span>[[data.partner]]</span>
+              </labelled-item>
+            </template>
+
             <paper-input
               class="item validate full-width"
               id="title"
@@ -116,24 +156,24 @@
 
             <div class="row">
               <etools-multi-selection-menu
-                  class="validate"
-                  label="Clusters"
-                  options="[[formattedClusters]]"
-                  selected-values="{{selectedClusters}}"
-                  on-selected-values-changed="_validate"
-                  trigger-value-change-event
+                class="validate"
+                label="Clusters"
+                options="[[formattedClusters]]"
+                selected-values="{{selectedClusters}}"
+                on-selected-values-changed="_validate"
+                trigger-value-change-event
                   required>
               </etools-multi-selection-menu>
             </div>
 
             <div class="item">
-               <etools-prp-date-input
-                  class="start-date"
-                  label="Start date"
-                  value="{{data.start_date}}"
-                  error-message=""
-                  required
-                  no-init>
+              <etools-prp-date-input
+                class="start-date"
+                label="Start date"
+                value="{{data.start_date}}"
+                error-message=""
+                required
+                no-init>
                </etools-prp-date-input>
               </etools-date-input>
             </div>
@@ -265,7 +305,7 @@
 
         url: {
           type: String,
-          computed: '_computeUrl(responsePlanID)'
+          computed: '_computeUrl(responsePlanID, selectedPartner, data, edit)'
         },
 
         clusters: {
@@ -301,23 +341,84 @@
           ],
         },
 
+        selectedPartner: {
+          type: String,
+          value: '',
+          observer: '_savePartner',
+        },
+
+        profile: {
+          type: Object,
+          statePath: 'userProfile.profile',
+        },
+
+        imoClusters: {
+          type: Array,
+          computed: '_computeImoClusters(profile)',
+        },
+
         selectedClusters: Array,
+
+        edit: {
+          type: Boolean,
+          value: false,
+        },
       },
 
-      _computeUrl: function(responsePlanID) {
-        return App.Endpoints.plannedActions(responsePlanID);
+      _computeUrl: function(responsePlanID, selectedPartner, data, edit) {
+        if (edit) {
+          if (this.permissions.addPartnerToProject) {
+            var partnerId = data.partner_id;
+            return App.Endpoints.plannedActionsIMOEdit(responsePlanID, partnerId, data.id);
+          }
+          return App.Endpoints.plannedActionsProjectOverview(data.id);
+        }
+        return this.permissions.addPartnerToProject
+          ? App.Endpoints.plannedActionsIMO(responsePlanID, selectedPartner)
+          : App.Endpoints.plannedActions(responsePlanID);
       },
 
       close: function () {
+        this.set('data', {});
         this.set('opened', false);
         this.set('refresh', false);
       },
 
       open: function () {
-        this.data = {};
-        this.selectedClusters = [];
+        if (this.edit && this.editData) {
+          this.set('data', Object.assign({}, this.editData));
+          this.selectedClusters = this.editData.clusters.map(function(cluster) {
+            return cluster.id;
+          });
+        } else {
+          this.data = {};
+          this.selectedClusters = [];
+        }
+      
         this.set('opened', true);
         this.set('refresh', true);
+      },
+
+      _computeTitle: function(edit) {
+        return (edit ? 'Edit' : 'Add') + ' Project';
+      },
+
+      _computeAjaxMethod: function(edit) {
+        return edit ? 'patch' : 'post';
+      },
+
+      _computeImoClusters: function (profile) {
+        return (profile.imo_clusters || []).map(function(cluster) {
+          return cluster.id;
+        });
+      },
+
+      _savePartner: function(partner) {
+        this.set('data.partner', partner);
+      },
+
+      _displayPartner: function (permissions, edit) {
+        return permissions.addPartnerToProject && !edit;
       },
 
       _validate: function (e) {
@@ -325,7 +426,9 @@
       },
 
       _redirectToDetail: function(id) {
-        var path = '/planned-action/project/' + String(id);
+        var path = this.permissions.addPartnerToProject 
+          ? 'response-parameters/partners/project/' + String(id)
+          : '/planned-action/project/' + String(id);
         var url = this.buildUrl(this._baseUrlCluster, path);
         this.set('path', url);
       },
@@ -351,25 +454,31 @@
         if (!valid) {
           return;
         }
-
         this.data.clusters = this.selectedClusters.map(function(item) {
           return {id: Number(item)};
         });
 
-        this.data.partner = this.partnerID;
-
+        if (!this.data.partner) {
+          this.data.partner = this.partnerID;
+        }
         this.updatePending = true;
-        var thunk = this.$.createProject.thunk();
+        var thunk = this.$.projectAjax.thunk();
         thunk()
           .then(function (res) {
             self.updatePending = false;
-            self._redirectToDetail(res.data.id);
+            if (self.edit) {
+              self.fire('project-edited', res.data);
+              self.close();
+            } else {
+              self._redirectToDetail(res.data.id);
+            }
           })
           .catch(function (err) { // jshint ignore:line
             self.updatePending = false;
             // TODO: error handling
           });
       },
+
     });
   </script>
 </dom-module>
