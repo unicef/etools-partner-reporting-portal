@@ -31,10 +31,6 @@ steps:
                     - ENV=dev
                     - DJANGO_ALLOWED_HOST="*"
                     - DJANGO_SETTINGS_MODULE=django_api.settings.dev
-                    - CARTODB_USERNAME=eTools
-                    - CARTODB_APIKEY=965fc4960ed7be7669d86411a663dacc6995a057
-                    - PMP_API_USER=aldoapi
-                    - PMP_API_PASSWORD=halibuttableshiny
                     - C_FORCE_ROOT=1
                     - CELERY_LOG_LEVEL=info
 
@@ -47,10 +43,6 @@ steps:
             - ENV=dev
             - DJANGO_ALLOWED_HOST="*"
             - DJANGO_SETTINGS_MODULE=django_api.settings.dev
-            - CARTODB_USERNAME=eTools
-            - CARTODB_APIKEY=965fc4960ed7be7669d86411a663dacc6995a057
-            - PMP_API_USER=aldoapi
-            - PMP_API_PASSWORD=halibuttableshiny
             - C_FORCE_ROOT=1
             - CELERY_LOG_LEVEL=info
 
