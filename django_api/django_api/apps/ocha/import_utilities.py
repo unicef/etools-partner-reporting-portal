@@ -1,6 +1,7 @@
 import logging
 from time import sleep
 
+import itertools
 import requests
 from requests.status_codes import codes
 
@@ -159,12 +160,12 @@ def save_reportables_for_cluster_objective_or_activity(objective_or_activity, at
 
 def save_activities_and_objectives_for_response_plan(entities_response={}, measurements_response={}):
     activities = []
-    objectives = []
+    objectives = {}
 
     plan_entity_list = entities_response['planEntities'] + measurements_response['planEntities']
     for entity in plan_entity_list:
         if entity['value']['type']['en']['singular'] in {'Strategic Objective', 'Cluster Objective'}:
-            objectives.append(entity)
+            objectives[entity['id']] = entity
         elif entity['value']['type']['en']['singular'] == 'Cluster Activity':
             activities.append(entity)
     logger.debug('Found {} objectives and {} activities'.format(
@@ -173,25 +174,29 @@ def save_activities_and_objectives_for_response_plan(entities_response={}, measu
 
     for activity in activities:
         try:
-            # Current schema limitation is that activity can only have one parent objective
-            # TODO: Either schema change or some data duplication
-            plan_entity_id = activity['value']['support'][0]['planEntityIds'][0]
+            parent_objective_ids = list(itertools.chain(*[
+                s['planEntityIds'] for s in activity['value']['support']
+            ]))
+
+            if len(parent_objective_ids) > 1:
+                logger.warning(
+                    'Activity \n`{}` supports \n{} \nobjectives. Only 1st one will be saved.'.format(
+                        activity['value']['description'],
+                        [objectives[obj_id]['value']['description'] for obj_id in parent_objective_ids]
+                    )
+                )
+            parent_objective = objectives[parent_objective_ids[0]]
         except (KeyError, IndexError):
             logger.warning('Activity #{} has no objective info'.format(activity['id']))
             continue
-
-        parent_objective = list(filter(
-            lambda obj: obj['id'] == plan_entity_id,
-            objectives
-        ))[0]
 
         cluster_objective = save_cluster_objective(parent_objective, activity)
         if cluster_objective:
             cluster_activity, _ = ClusterActivity.objects.update_or_create(
                 external_id=activity['id'],
                 external_source=EXTERNAL_DATA_SOURCES.HPC,
-                cluster_objective=cluster_objective,
                 defaults={
+                    'cluster_objective': cluster_objective,
                     'title': activity['value']['description'][:2048]
                 }
             )
