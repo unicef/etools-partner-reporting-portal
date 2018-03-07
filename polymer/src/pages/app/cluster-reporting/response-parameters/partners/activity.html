@@ -116,6 +116,14 @@
         },
       },
 
+      listeners: {
+        'pa-activity-edited': '_onSuccess',
+      },
+
+      _onSuccess: function() {
+        this._getActivityAjax();
+      },
+
       _computeBackLink: function(query) {
         return '/response-parameters/partners/activities' + '?' + query;
       },
@@ -136,8 +144,8 @@
         this.set('queryParams.page', 1);
         this.set('route.path', '/' + this.tab);
       },
-
-      attached: function () {
+      
+      _getActivityAjax: function () {
         var thunk = this.$.activity.thunk();
         var self = this;
         thunk()
@@ -149,6 +157,10 @@
             self.updatePending = false;
             // TODO: error handling
           });
+      },
+
+      attached: function () {
+        this._getActivityAjax();
       },
 
     });

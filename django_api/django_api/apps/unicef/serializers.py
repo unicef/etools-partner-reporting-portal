@@ -22,6 +22,22 @@ class PersonSerializer(serializers.ModelSerializer):
         fields = ('name', 'title', 'email', 'phone_number', 'is_authorized_officer')
 
 
+class ReportingPeriodDatesSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='external_id')
+    programme_document = serializers.PrimaryKeyRelatedField(
+        queryset=ProgrammeDocument.objects.all())
+
+    class Meta:
+        model = ReportingPeriodDates
+        fields = (
+            'id',
+            'start_date',
+            'end_date',
+            'due_date',
+            'programme_document',
+        )
+
+
 class ProgrammeDocumentSerializer(serializers.ModelSerializer):
 
     id = serializers.SerializerMethodField()
@@ -36,6 +52,8 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
     partner_focal_point = PersonSerializer(read_only=True, many=True)
     document_type_display = serializers.CharField(source='get_document_type_display')
     locations = serializers.SerializerMethodField(allow_null=True)
+    amendments = serializers.JSONField(read_only=True)
+    reporting_periods = ReportingPeriodDatesSerializer(many=True)
 
     class Meta:
         model = ProgrammeDocument
@@ -67,6 +85,8 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
             'unicef_focal_point',
             'unicef_officers',
             'locations',
+            'amendments',
+            'reporting_periods',
         )
 
     def get_id(self, obj):
@@ -496,6 +516,7 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
         queryset=Partner.objects.all())
     workspace = serializers.PrimaryKeyRelatedField(
         queryset=Workspace.objects.all())
+    amendments = serializers.JSONField(allow_null=True)
 
     def create(self, validated_data):
         return ProgrammeDocument.objects.create(**validated_data)
@@ -519,6 +540,7 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
             "funds_received",
             "funds_received_currency",
             "workspace",
+            "amendments",
         )
 
 

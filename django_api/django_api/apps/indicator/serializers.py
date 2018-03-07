@@ -723,10 +723,9 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             validated_data['blueprint']['unit'] = validated_data['blueprint']['display_type']
         validated_data['blueprint']['disaggregatable'] = True
         blueprint = IndicatorBlueprintSerializer(data=validated_data['blueprint'])
-        if blueprint.is_valid(raise_exception=True):
-            blueprint.save()
+        blueprint.is_valid(raise_exception=True)
 
-        validated_data['blueprint'] = blueprint.instance
+        validated_data['blueprint'] = blueprint.save()
 
         reportable_object_content_type = ContentType.objects.get_by_natural_key(
             *validated_data.pop('object_type').split('.')
@@ -734,28 +733,16 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         reportable_object_content_model = reportable_object_content_type.model_class()
 
         if reportable_object_content_model == ClusterObjective:
-            cluster_objective = get_object_or_404(ClusterObjective, pk=validated_data['object_id'])
-
-            validated_data['start_date'] = cluster_objective.cluster.response_plan.start
-            validated_data['end_date'] = cluster_objective.cluster.response_plan.end
+            get_object_or_404(ClusterObjective, pk=validated_data['object_id'])
             validated_data['is_cluster_indicator'] = True
         elif reportable_object_content_model == ClusterActivity:
-            cluster_activity = get_object_or_404(ClusterActivity, pk=validated_data['object_id'])
-
-            validated_data['start_date'] = cluster_activity.cluster_objective.cluster.response_plan.start
-            validated_data['end_date'] = cluster_activity.cluster_objective.cluster.response_plan.end
+            get_object_or_404(ClusterActivity, pk=validated_data['object_id'])
             validated_data['is_cluster_indicator'] = True
         elif reportable_object_content_model == PartnerProject:
-            partner_project = get_object_or_404(PartnerProject, pk=validated_data['object_id'])
-
-            validated_data['start_date'] = partner_project.start_date
-            validated_data['end_date'] = partner_project.end_date
+            get_object_or_404(PartnerProject, pk=validated_data['object_id'])
             validated_data['is_cluster_indicator'] = False
         elif reportable_object_content_model == PartnerActivity:
-            partner_activity = get_object_or_404(PartnerActivity, pk=validated_data['object_id'])
-
-            validated_data['start_date'] = partner_activity.project.start_date
-            validated_data['end_date'] = partner_activity.project.end_date
+            get_object_or_404(PartnerActivity, pk=validated_data['object_id'])
             validated_data['is_cluster_indicator'] = False
         else:
             raise NotImplemented()
@@ -826,8 +813,6 @@ class ClusterIndicatorForPartnerActivitySerializer(
             'locations',
             'frequency',
             'cs_dates',
-            'start_date',
-            'end_date',
         )
 
 
@@ -1084,8 +1069,6 @@ class PMPReportableSerializer(serializers.ModelSerializer):
             'disaggregation_ids',
             'content_type',
             'object_id',
-            'start_date',
-            'end_date'
         )
 
 

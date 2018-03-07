@@ -6,21 +6,32 @@
 <link rel="import" href="../../../../../behaviors/utils.html">
 <link rel="import" href="../../../../../behaviors/sorting.html">
 <link rel="import" href="../../../../../elements/cluster-reporting/response-parameters/partners/activities/filters.html">
-<!-- <link rel="import" href="../../../../../elements/cluster-reporting/planned-action/projects/creation-modal.html"> -->
+<link rel="import" href="../../../../../elements/cluster-reporting/planned-action/activities/creation-modal.html">
 <link rel="import" href="../../../../../elements/cluster-reporting/activity-list-table.html">
 <link rel="import" href="../../../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../../../elements/etools-prp-permissions.html">
 <link rel="import" href="../../../../../styles/shared-styles.html">
+<link rel="import" href="../../../../../styles/buttons.html">
 
 
 <dom-module id="rp-partners-activities">
     <template>
-      <style include="shared-styles">
+      <style include="shared-styles button-styles">
         :host {
           display: block;
         }
+        div#action {
+          margin: 25px 0;
+          @apply(--layout-horizontal);
+          @apply(--layout-end-justified);
+        }
       </style>
 
-    <iron-location query="{{query}}"></iron-location>
+    <etools-prp-permissions
+      permissions="{{permissions}}">
+    </etools-prp-permissions>
+
+    <iron-location query="{{query}}" path="{{path}}"></iron-location>
 
     <iron-query-params
         params-string="{{query}}"
@@ -36,6 +47,18 @@
     <page-body>
 
       <partner-activities-filters></partner-activities-filters>
+      <template
+        is="dom-if"
+        if="[[_canAddActivity(permissions, responsePlanCurrent)]]"
+        restamp="true">
+        <div id="action">
+          <paper-button id="add" on-tap="_openModal" class="btn-primary" raised>
+            Add Activity
+          </paper-button>
+        </div>
+        <planned-action-activity-modal id="modal"></planned-action-activity-modal>
+      </template>
+
       <activity-list-table page="response-parameters"></activity-list-table>
 
     </page-body>
@@ -44,6 +67,10 @@
   <script>
     Polymer({
       is: 'rp-partners-activities',
+
+      _openModal: function () {
+        this.$$('#modal').open();
+      },
 
       observers: [
         '_activitiesAjax(queryParams, url)',
@@ -68,10 +95,31 @@
           type: String,
           computed: '_computeUrl(responsePlanID)'
         },
+
+        responsePlanCurrent: {
+          type: Object,
+          statePath: 'responsePlans.current',
+        },
+      },
+
+      listeners: {
+        'activity-added': '_onSuccess',
       },
 
       _computeUrl: function(responsePlanID) {
         return App.Endpoints.partnerActivityList(responsePlanID);
+      },
+
+      _onSuccess: function(e, data) {
+        var path = '/response-parameters/partners/activity/' + String(data.id);
+        var url = this.buildUrl(this._baseUrlCluster, path);
+        this.set('path', url);
+      },
+
+      _canAddActivity: function(permissions, responsePlanCurrent) {
+        if (responsePlanCurrent) {
+          return permissions.createPartnerEntitiesByResponsePlanAsIMO(responsePlanCurrent.clusters);
+        }
       },
 
       _activitiesAjax: function (queryParams) {
