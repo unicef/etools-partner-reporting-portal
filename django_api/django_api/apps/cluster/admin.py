@@ -8,7 +8,7 @@ from .models import (
 
 
 class ClusterAdmin(admin.ModelAdmin):
-    list_display = ('type', 'response_plan')
+    list_display = ('type', 'title', 'response_plan')
     list_filter = ('type', 'response_plan', 'response_plan__workspace')
 
 

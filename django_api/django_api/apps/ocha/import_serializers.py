@@ -1,5 +1,6 @@
 import logging
 
+from django.core.exceptions import MultipleObjectsReturned
 from rest_framework import serializers
 
 from cluster.models import Cluster
@@ -115,12 +116,15 @@ class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, ser
         for location_data in sorted(locations, key=lambda x: x['external_id']):
             if not location_data['parentId'] and location_data['iso3']:
                 parent = None
-                country, _ = Country.objects.get_or_create(
-                    country_short_code=location_data['iso3'],
-                    defaults={
-                        'name': location_data['title']
-                    }
-                )
+                try:
+                    country, _ = Country.objects.get_or_create(
+                        country_short_code=location_data['iso3'],
+                        defaults={
+                            'name': location_data['title']
+                        }
+                    )
+                except MultipleObjectsReturned:
+                    country = Country.objects.filter(country_short_code=location_data['iso3']).first()
             else:
                 parent = Location.objects.filter(
                     external_source=location_data['external_source'],

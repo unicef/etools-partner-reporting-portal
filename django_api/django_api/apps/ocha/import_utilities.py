@@ -7,6 +7,7 @@ from requests.status_codes import codes
 
 from cluster.models import Cluster, ClusterObjective, ClusterActivity
 from core.common import EXTERNAL_DATA_SOURCES
+from core.models import ResponsePlan
 from indicator.models import Reportable, IndicatorBlueprint
 from ocha.constants import HPC_V2_ROOT_URL, HPC_V1_ROOT_URL
 from ocha.import_serializers import V2PartnerProjectImportSerializer, V1FundingSourceImportSerializer, \
@@ -62,7 +63,8 @@ def import_project(external_project_id, workspace_id=None):
         logger.warning('No funding data found for project_id: {}'.format(external_project_id))
 
     for plan in project_data['data']['plans']:
-        import_response_plan(plan['id'], workspace_id=workspace_id)
+        if not ResponsePlan.objects.filter(external_source=EXTERNAL_DATA_SOURCES.HPC, external_id=plan['id']).exists():
+            import_response_plan(plan['id'], workspace_id=workspace_id)
 
     project_cluster_ids = [c['id'] for c in project_data['data']['governingEntities']]
 
