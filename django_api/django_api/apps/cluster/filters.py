@@ -23,16 +23,16 @@ class ClusterFilter(django_filters.FilterSet):
 
 class ClusterObjectiveFilter(django_filters.FilterSet):
     ref_title = CharFilter(method='get_reference_number_title')
-    cluster_ids = CharFilter(method='get_cluster_ids')
+    clusters = CharFilter(method='get_clusters')
 
     class Meta:
         model = ClusterObjective
-        fields = ['ref_title', 'cluster_ids']
+        fields = ['ref_title', 'clusters']
 
     def get_reference_number_title(self, queryset, name, value):
         return queryset.filter(title__icontains=value)
 
-    def get_cluster_ids(self, queryset, name, value):
+    def get_clusters(self, queryset, name, value):
         return queryset.filter(cluster_id__in=value.split(','))
 
 
