@@ -37,11 +37,10 @@
       }
 
       .above-title {
-        @apply --page-header-above-title;
+        margin-left: 40px;
       }
 
       .back-button {
-        margin-right: .5em;
         text-decoration: none;
       }
 
@@ -54,18 +53,20 @@
       }
     </style>
 
-    <div class="layout horizontal center">
-      <template is="dom-if" if="[[back]]">
-        <a href="[[backUrl]]" class="back-button">
-          <paper-icon-button icon="chevron-left"></paper-icon-button>
-        </a>
-      </template>
-
-      <div class="title flex">
+    <div class="layout horizontal baseline">
+   
+      <div class="title flex ">
         <div class="above-title">
           <content select=".above-title"></content>
         </div>
+        <div class="layout horizontal center">
+          <template is="dom-if" if="[[back]]">
+            <a href="[[backUrl]]" class="back-button">
+              <paper-icon-button icon="chevron-left"></paper-icon-button>
+            </a>
+          </template>
         <h1>[[title]]</h1>
+        </div>
       </div>
 
       <div class="toolbar flex">
