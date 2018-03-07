@@ -10,13 +10,13 @@ from indicator.models import IndicatorReport
 from unicef.models import ProgrammeDocument, ProgressReport
 
 
-class TestProgrammeDocumentAPIView(BaseAPITestCase):
+class TestProgrammeDocumentListAPIView(BaseAPITestCase):
 
     generate_fake_data_quantity = 3
 
     def setUp(self):
         super().setUp()
-        
+
         # Logging in as Partner AO
         self.client.login(username='admin_ao', password='Passw0rd!')
 
@@ -87,11 +87,11 @@ class TestProgrammeDocumentAPIView(BaseAPITestCase):
             self.assertEquals(result['title'], document['title'])
 
 
-class TestProgrammeDocumentAPIView(BaseAPITestCase):
+class TestProgrammeDocumentDetailAPIView(BaseAPITestCase):
 
     def setUp(self):
         super().setUp()
-        
+
         # Logging in as Partner AO
         self.client.login(username='admin_ao', password='Passw0rd!')
 

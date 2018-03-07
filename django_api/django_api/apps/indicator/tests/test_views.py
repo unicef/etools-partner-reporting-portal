@@ -37,7 +37,7 @@ class TestPDReportsAPIView(BaseAPITestCase):
 
     def setUp(self):
         super().setUp()
-        
+
         # Logging in as Partner AO
         self.client.login(username='admin_ao', password='Passw0rd!')
 
@@ -77,7 +77,7 @@ class TestIndicatorDataAPIView(BaseAPITestCase):
 
     def setUp(self):
         super().setUp()
-        
+
         # Logging in as Partner AO
         self.client.login(username='admin_ao', password='Passw0rd!')
 
@@ -191,7 +191,7 @@ class TestIndicatorListAPIView(BaseAPITestCase):
 
     def setUp(self):
         super().setUp()
-        
+
         # Logging in as Partner AO
         self.client.login(username='admin_ao', password='Passw0rd!')
 
@@ -235,7 +235,7 @@ class TestIndicatorDataReportableAPIView(BaseAPITestCase):
 
     def setUp(self):
         super().setUp()
-        
+
         # Logging in as Partner AO
         self.client.login(username='admin_ao', password='Passw0rd!')
 
@@ -270,7 +270,7 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
 
     def setUp(self):
         super().setUp()
-        
+
         # Logging in as Partner AO
         self.client.login(username='admin_ao', password='Passw0rd!')
 
