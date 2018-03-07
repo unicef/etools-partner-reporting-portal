@@ -11,14 +11,14 @@
       <h3 class="analysis-widget__header">[[widgetTitle]]</h3>
       <div class="analysis-widget__body">
         <content></content>
-        <etools-loading active="[[loading]]"></etools-loading>
       </div>
+      <etools-loading active="[[loading]]"></etools-loading>
     </div>
   </template>
 
   <script>
     Polymer({
-      id: 'pd-filters',
+      is: 'analysis-widget',
 
       properties: {
         widgetTitle: String,
