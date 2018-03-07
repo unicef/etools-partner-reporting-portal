@@ -20,7 +20,7 @@ class Command(BaseCommand):
             action='store',
             type=int,
             dest='id',
-            help='Range of ids to pull, eg 50000-51000',
+            help='ID to pull',
         )
 
     def handle(self, *args, **options):

@@ -2,7 +2,7 @@
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from ocha.import_utilities import import_plans_for_country
+from ocha.import_utilities import import_plans_for_country, import_response_plan
 
 
 class Command(BaseCommand):
@@ -15,10 +15,25 @@ class Command(BaseCommand):
             dest='country',
             help='ISO 3 country code',
         )
+        parser.add_argument(
+            '--id',
+            action='store',
+            type=int,
+            dest='id',
+            help='ID to pull',
+        )
 
     def handle(self, *args, **options):
         if settings.IS_PROD:
             self.stderr.write('This is a debug / testing script only. Don\'t run in production environments.')
             return
 
-        import_plans_for_country(options['country'])
+        country = options.get('country')
+        _id = options.get('id')
+
+        if country:
+            import_plans_for_country(country)
+        elif _id:
+            import_response_plan(_id)
+        else:
+            self.stderr.write('Either country or id needs to be provided')
