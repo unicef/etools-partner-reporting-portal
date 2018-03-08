@@ -92,7 +92,13 @@
             </tr>
             <tr>
                 <th>Attachment</th>
-                <td colspan="2">{% get_absolute_file_url progress_report.attachment %}</td>
+                <td colspan="2">
+                    {% if progress_report.attachment %}
+                        &#10003;
+                    {% else %}
+                        &#10007;
+                    {% endif %}
+                </td>
             </tr>
         </table>
 
