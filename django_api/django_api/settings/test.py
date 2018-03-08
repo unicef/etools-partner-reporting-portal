@@ -14,6 +14,7 @@ MIGRATION_MODULES = {
     'partner': None,
     'sessions': None,
     'unicef': None,
+    'guardian': None,
 }
 
 # DATABASES['default'] = {
