@@ -106,7 +106,13 @@
                 </tr>
                 <tr>
                     <th>Attachment</th>
-                    <td colspan="2">{% get_absolute_file_url section.progress_report.attachment %}</td>
+                    <td colspan="2">
+                        {% if section.progress_report.attachment %}
+                            &#10003;
+                        {% else %}
+                            &#10007;
+                        {% endiof %}
+                    </td>
                 </tr>
             </table>
             <h1>2. PD Outputs / SSFA Expected Results</h1>
