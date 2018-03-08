@@ -222,7 +222,7 @@
               .catch(function (err) { //jshint ignore:line
                 // TODO: error handling
               });
-        }, 100);
+        }, 300);
       },
 
       _fetchMap: function () {
@@ -235,17 +235,18 @@
               .catch(function (err) { //jshint ignore:line
                 // TODO: error handling
               });
-        }, 100);
+        }, 300);
       },
 
       detached: function () {
-        if (this.isDebouncerActive('fetch-data')) {
-          this.cancelDebouncer('fetch-data');
-        }
-
-        if (this.isDebouncerActive('fetch-map')) {
-          this.cancelDebouncer('fetch-map');
-        }
+        [
+          'fetch-data',
+          'fetch-map',
+        ].forEach(function (debouncer) {
+          if (this.isDebouncerActive(debouncer)) {
+            this.cancelDebouncer(debouncer);
+          }
+        }, this);
       },
     });
   </script>
