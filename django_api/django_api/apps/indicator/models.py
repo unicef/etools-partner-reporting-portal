@@ -329,10 +329,10 @@ class Reportable(TimeStampedExternalSyncModelMixin):
 def get_blueprint_data_to_clone(instance):
     """
     get_blueprint_data_to_clone returns a map of field name and its value
-    to clone a new IndicatorBlueprint instance
+    to clone a new IndicatorBlueprint instance from its Reportable instance
     
     Arguments:
-        instance {indicator.models.IndicatorBlueprint} -- IndicatorBlueprint model instance
+        instance {indicator.models.Reportable} -- Reportable model instance
     """
     return {
         "title": instance.blueprint.title,
