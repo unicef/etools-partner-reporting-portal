@@ -326,6 +326,57 @@ class Reportable(TimeStampedExternalSyncModelMixin):
         )
 
 
+@receiver(post_save,
+          sender=Reportable,
+          dispatch_uid="clone_new_ca_reportable_to_pa")
+def clone_new_ca_reportable_to_pa(sender, instance, created, **kwargs):
+    """
+    Whenever a new Reportable is created and is found to be
+    Cluster Activity Indicator, clone new Reportable instance data to
+    its Cluster Activity's Partner Activity instances.
+    """
+
+    if created and instance.content_type.model == "clusteractivity":
+        blueprint_data_to_sync = {
+            "title": instance.blueprint.title,
+            "unit": instance.blueprint.unit,
+            "description": instance.blueprint.description,
+            "code": instance.blueprint.code,
+            "subdomain": instance.blueprint.subdomain,
+            "disaggregatable": instance.blueprint.disaggregatable,
+            "calculation_formula_across_periods": instance.blueprint.calculation_formula_across_periods,
+            "calculation_formula_across_locations": instance.blueprint.calculation_formula_across_locations,
+            "display_type": instance.blueprint.display_type,
+        }
+
+        reportable_data_to_sync = {
+            'active': instance.active,
+            'assumptions': instance.assumptions,
+            'baseline': instance.baseline,
+            'context_code': instance.context_code,
+            'created': instance.created,
+            'cs_dates': instance.cs_dates,
+            'disaggregations': instance.disaggregations,
+            'external_id': instance.external_id,
+            'frequency': instance.frequency,
+            'in_need': instance.in_need,
+            'is_cluster_indicator': instance.is_cluster_indicator,
+            'location_admin_refs': instance.location_admin_refs,
+            'locations': instance.locations,
+            'means_of_verification': instance.means_of_verification,
+            'modified': instance.modified,
+            'target': instance.target,
+            'total': instance.total,
+        }
+
+        for pa in instance.content_object.partner_activities.all():
+            blueprint = IndicatorBlueprint.objects.create(**blueprint_data_to_sync)
+
+            reportable_data_to_sync["content_object"] = pa
+            reportable_data_to_sync["blueprint"] = blueprint
+            Reportable.objects.create(**reportable_data_to_sync)
+
+
 class IndicatorReportManager(models.Manager):
     def active_reports(self):
         return self.objects.filter(
