@@ -250,7 +250,7 @@ class ProgressReportsXLSXExporter:
             combination_to_column[str(combination)] = column
 
         # Totals column - add, style and save to mapping
-        totals_column = max(combination_to_column.values()) + 1
+        totals_column = max(combination_to_column.values() or [0]) + 1
         cell = self.current_sheet.cell(row=1, column=totals_column, value='Total')
         cell.style = self.bold_center_style
         combination_to_column['()'] = totals_column
