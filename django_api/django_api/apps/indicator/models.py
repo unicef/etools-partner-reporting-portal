@@ -362,13 +362,11 @@ def get_reportable_data_to_clone(instance):
         'context_code': instance.context_code,
         'created': instance.created,
         'cs_dates': instance.cs_dates,
-        'disaggregations': instance.disaggregations,
         'external_id': instance.external_id,
         'frequency': instance.frequency,
         'in_need': instance.in_need,
         'is_cluster_indicator': instance.is_cluster_indicator,
         'location_admin_refs': instance.location_admin_refs,
-        'locations': instance.locations,
         'means_of_verification': instance.means_of_verification,
         'modified': instance.modified,
         'target': instance.target,
@@ -400,12 +398,22 @@ def clone_new_ca_reportable_to_pa(sender, instance, created, **kwargs):
                 reportable_data_to_sync["content_object"] = pa
                 reportable_data_to_sync["blueprint"] = blueprint
                 reportable_data_to_sync["parent_indicator"] = instance
-                Reportable.objects.create(**reportable_data_to_sync)
+                reportable = Reportable.objects.create(**reportable_data_to_sync)
+
+                reportable.disaggregations.add(*instance.disaggregations.all())
+                reportable.locations.add(*instance.locations.all())
 
         else:
-            IndicatorBlueprint.objects.filter(reportable__in=instance.children.all()) \
+            IndicatorBlueprint.objects.filter(id__in=instance.children.values_list('blueprint_id', flat=True)) \
                 .update(**blueprint_data_to_sync)
             instance.children.update(**reportable_data_to_sync)
+
+            for child in instance.children.all():
+                child.disaggregations.clear()
+                child.locations.clear()
+
+                child.disaggregations.add(*instance.disaggregations.all())
+                child.locations.add(*instance.locations.all())
 
 
 class IndicatorReportManager(models.Manager):
