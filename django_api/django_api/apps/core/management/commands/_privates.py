@@ -210,19 +210,20 @@ def generate_fake_data(workspace_quantity=10):
         print("{} Workspace created".format(ws))
 
     beginning_of_this_year = datetime.date(today.year, 1, 1)
+    end_of_this_year = datetime.date(today.year, 12, 31)
 
     for workspace in ws_list:
         country = Country.objects.order_by('?').first()
         workspace.countries.add(country)
-        for idx in range(0, 3):
+        for idx in range(0, 2):
             year = today.year - idx
             # TODO: use ResponsePlanFactory
             ResponsePlan.objects.create(
                 workspace=workspace,
-                title="{} {} Humanitarian Response Plan".format(
+                title="{} {} HR".format(
                     workspace.title, year),
                 start=beginning_of_this_year,
-                end=beginning_of_this_year + datetime.timedelta(days=30)
+                end=end_of_this_year
             )
 
         gateways = list()
@@ -263,19 +264,18 @@ def generate_fake_data(workspace_quantity=10):
             type="wash"
         )
 
-        for idx in range(2, 0, -1):
-            co = ClusterObjectiveFactory(
-                title="{} - {} - {} CO".format(
-                    idx, cluster.response_plan.title, cluster.type.upper()),
-                cluster=cluster,
-            )
+        co = ClusterObjectiveFactory(
+            title="{} - {} - {} CO".format(
+                idx, cluster.response_plan.title, cluster.type.upper()),
+            cluster=cluster,
+        )
 
-            QuantityReportableToClusterObjectiveFactory(
-                content_object=co, indicator_report__progress_report=None,
-                locations=locations,
-            )
+        QuantityReportableToClusterObjectiveFactory(
+            content_object=co, indicator_report__progress_report=None,
+            locations=locations,
+        )
 
-            co.locations.add(*locations)
+        co.locations.add(*locations)
 
         user = UserFactory(
             first_name="{} Cluster".format(cluster.type.upper()[:20]),
@@ -290,91 +290,18 @@ def generate_fake_data(workspace_quantity=10):
         )
         partner.clusters.add(cluster)
 
-        UserFactory(
-            first_name="Nutrition",
-            last_name="IMO"
-        )
-
-        cluster = ClusterFactory(
-            response_plan=response_plan,
-            type="nutrition",
-        )
-
-        for idx in range(2, 0, -1):
-            co = ClusterObjectiveFactory(
-                title="{} - {} Cluster Objective".format(
-                    cluster.response_plan.title, cluster.type.upper()),
-                cluster=cluster,
-            )
-
-            QuantityReportableToClusterObjectiveFactory(
-                content_object=co, indicator_report__progress_report=None,
-                locations=locations,
-            )
-
-            co.locations.add(*locations)
-
-        user = UserFactory(
-            first_name="{} Cluster".format(cluster.type.upper()),
-            last_name="Partner")
-
-        partner = PartnerFactory(
-            title="{} - {} Cluster Partner".format(
-                cluster.response_plan.title, cluster.type.upper()),
-            partner_activity=None,
-            partner_project=None,
-            user=user,
-        )
-        partner.clusters.add(cluster)
-
-        UserFactory(
-            first_name="Education",
-            last_name="IMO"
-        )
-
-        cluster = ClusterFactory(
-            response_plan=response_plan,
-            type="education",
-        )
-
-        for idx in range(2, 0, -1):
-            co = ClusterObjectiveFactory(
-                title="{} - {} Cluster Objective".format(
-                    cluster.response_plan.title, cluster.type.upper()),
-                cluster=cluster,
-            )
-
-            QuantityReportableToClusterObjectiveFactory(
-                content_object=co, indicator_report__progress_report=None,
-                locations=locations,
-            )
-            co.locations.add(*locations)
-
-        user = UserFactory(
-            first_name="{} Cluster".format(cluster.type.upper()),
-            last_name="Partner")
-
-        partner = PartnerFactory(
-            title="{} - {} Cluster Partner".format(
-                cluster.response_plan.title, cluster.type.upper()),
-            partner_activity=None,
-            partner_project=None,
-            user=user,
-        )
-        partner.clusters.add(cluster)
-
         print(
             "{} Cluster & Cluster user objects created for {}".format(
-                3, response_plan.title))
+                1, response_plan.title))
 
         print(
             "{} Partner objects & Partner user objects created for {}".format(
-                3,
+                1,
                 cluster))
 
         print(
             "{} Cluster Objective objects created for {}".format(
-                2 * 3, cluster))
+                1, cluster))
 
     table = CartoDBTable.objects.first()
     locations = list(
@@ -397,7 +324,7 @@ def generate_fake_data(workspace_quantity=10):
     for cluster_objective in ClusterObjective.objects.all():
         for idx in range(2, 0, -1):
             ca = ClusterActivityFactory(
-                title="{} Cluster Activity".format(cluster_objective.title),
+                title="{} CA".format(cluster_objective.title),
                 cluster_objective=cluster_objective,
             )
 
@@ -412,64 +339,62 @@ def generate_fake_data(workspace_quantity=10):
                 2, cluster_objective.title))
 
     for partner in Partner.objects.all():
-        for idx in range(2, 0, -1):
-            first_cluster = partner.clusters.first()
-            pp = PartnerProjectFactory(
-                partner=partner,
-                title="{} Partner Project".format(partner.title)
-            )
+        first_cluster = partner.clusters.first()
+        pp = PartnerProjectFactory(
+            partner=partner,
+            title="{} PP".format(partner.title)
+        )
 
-            pp.clusters.add(first_cluster)
+        pp.clusters.add(first_cluster)
 
-            QuantityReportableToPartnerProjectFactory(
-                content_object=pp, indicator_report__progress_report=None,
-                locations=locations,
-            )
-            pp.locations.add(*locations)
+        QuantityReportableToPartnerProjectFactory(
+            content_object=pp, indicator_report__progress_report=None,
+            locations=locations,
+        )
+        pp.locations.add(*locations)
 
         print(
             "{} PartnerProject objects created for {} under {} Cluster".format(
-                2, partner, first_cluster.type.upper()))
+                1, partner, first_cluster.type.upper()))
 
     # ClusterActivity <-> PartnerActivity link
     for cluster_activity in ClusterActivity.objects.all():
         partner = cluster_activity.cluster_objective.cluster.partners.first()
 
         for project in partner.partner_projects.all():
-            for idx in range(2, 0, -1):
-                pa = PartnerActivityFactory(
-                    partner=project.partner,
-                    project=project,
-                    cluster_activity=cluster_activity,
-                    title="{} Partner Activity from CA".format(project.title)
-                )
+            pa = PartnerActivityFactory(
+                partner=project.partner,
+                project=project,
+                cluster_activity=cluster_activity,
+                title="{} Partner Activity from CA".format(project.title)
+            )
 
-                reportable_to_pa = QuantityReportableToPartnerActivityFactory(
-                    content_object=pa, indicator_report__progress_report=None,
-                    locations=locations,
-                )
-                reportable_to_pa.parent_indicator = cluster_activity.reportables.first()
-                reportable_to_pa.save()
+            reportable_to_pa = QuantityReportableToPartnerActivityFactory(
+                content_object=pa, indicator_report__progress_report=None,
+                locations=locations,
+            )
+            reportable_to_pa.parent_indicator = cluster_activity.reportables.first()
+            reportable_to_pa.save()
 
-                pa.locations.add(*locations)
+            pa.locations.add(*locations)
 
-                pa = PartnerActivityFactory(
-                    partner=project.partner,
-                    project=project,
-                    cluster_activity=None,
-                    cluster_objective=cluster_activity.cluster_objective,
-                    title="{} Partner Activity".format(project.title)
-                )
+            pa = PartnerActivityFactory(
+                partner=project.partner,
+                project=project,
+                cluster_activity=None,
+                cluster_objective=cluster_activity.cluster_objective,
+                title="{} Partner Activity".format(project.title)
+            )
 
-                reportable_to_pa = QuantityReportableToPartnerActivityFactory(
-                    content_object=pa, indicator_report__progress_report=None,
-                    locations=locations,
-                )
-                pa.locations.add(*locations)
+            reportable_to_pa = QuantityReportableToPartnerActivityFactory(
+                content_object=pa, indicator_report__progress_report=None,
+                locations=locations,
+            )
+            pa.locations.add(*locations)
 
             print(
                 "{} PartnerActivity objects created for {} under {} Cluster Activity and Custom Activity".format(
-                    4,
+                    2,
                     partner,
                     cluster_activity.title))
 
@@ -479,7 +404,7 @@ def generate_fake_data(workspace_quantity=10):
     # only create PD's for the partner being used above
     # for partner in Partner.objects.all():
     for workspace in Workspace.objects.all():
-        for i in range(workspace_quantity * 5):
+        for i in range(workspace_quantity * 2):
             pd = ProgrammeDocumentFactory.create(
                 partner=first_partner, workspace=workspace)
             for ir in range(3):
@@ -513,10 +438,10 @@ def generate_fake_data(workspace_quantity=10):
         for cp_output in pd.cp_outputs.all():
             for llo in cp_output.ll_outputs.all():
 
-                # generate 2 to 10 reportable (indicators) per llo
-                num_reportables_range = range(random.randint(2, 10))
+                # generate 2 reportable (indicators) per llo
+                num_reportables_range = range(2)
                 for i in num_reportables_range:
-                    if i % 3 != 0:
+                    if i % 2 != 0:
                         reportable = QuantityReportableToLowerLevelOutputFactory(
                             content_object=llo,
                             indicator_report__progress_report=None,
