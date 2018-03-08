@@ -1,3 +1,7 @@
+machine:
+  python:
+    version: 3.6
+
 dependencies:
   pre:
     - pip install -r django_api/requirements/dev.txt
