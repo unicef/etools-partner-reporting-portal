@@ -1,22 +1,22 @@
-import datetime
+# import datetime
 
-from django.urls import reverse
-from django.conf import settings
+# from django.urls import reverse
+# from django.conf import settings
 
-from rest_framework import status
+# from rest_framework import status
 
-from core.tests.base import BaseAPITestCase
-from core.models import Location
-from core.factories import PartnerProjectFactory, PartnerFactory, ClusterObjectiveFactory
+# from core.tests.base import BaseAPITestCase
+# from core.models import Location
+# from core.factories import PartnerProjectFactory, PartnerFactory, ClusterObjectiveFactory
 
-from cluster.models import (
-    Cluster,
-)
+# from cluster.models import (
+#     Cluster,
+# )
 
-from partner.models import (
-    PartnerProject,
-    PartnerActivity,
-)
+# from partner.models import (
+#     PartnerProject,
+#     PartnerActivity,
+# )
 
 
 # class TestPartnerProjectListCreateAPIView(BaseAPITestCase):

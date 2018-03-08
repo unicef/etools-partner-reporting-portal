@@ -1,36 +1,36 @@
-from ast import literal_eval as make_tuple
-from datetime import date, timedelta
-import random
-import string
+# from ast import literal_eval as make_tuple
+# from datetime import date, timedelta
+# import random
+# import string
 
-from django.urls import reverse
-from django.conf import settings
+# from django.urls import reverse
+# from django.conf import settings
 
-from rest_framework import status
+# from rest_framework import status
 
-from core.models import Location
-from core.helpers import (
-    get_cast_dictionary_keys_as_tuple,
-)
-from core.common import OVERALL_STATUS, PROGRESS_REPORT_STATUS, REPORTABLE_FREQUENCY_LEVEL, INDICATOR_REPORT_STATUS
-from core.factories import ProgressReportFactory
-from core.tests.base import BaseAPITestCase
-from cluster.models import ClusterObjective, ClusterActivity
-from partner.models import PartnerProject, PartnerActivity
-from unicef.models import (
-    ProgrammeDocument
-)
-from indicator.serializers import (
-    IndicatorLocationDataUpdateSerializer
-)
-from indicator.models import (
-    Reportable,
-    IndicatorReport,
-    IndicatorLocationData,
-    Disaggregation,
-    DisaggregationValue,
-    IndicatorBlueprint,
-)
+# from core.models import Location
+# from core.helpers import (
+#     get_cast_dictionary_keys_as_tuple,
+# )
+# from core.common import OVERALL_STATUS, PROGRESS_REPORT_STATUS, REPORTABLE_FREQUENCY_LEVEL, INDICATOR_REPORT_STATUS
+# from core.factories import ProgressReportFactory
+# from core.tests.base import BaseAPITestCase
+# from cluster.models import ClusterObjective, ClusterActivity
+# from partner.models import PartnerProject, PartnerActivity
+# from unicef.models import (
+#     ProgrammeDocument
+# )
+# from indicator.serializers import (
+#     IndicatorLocationDataUpdateSerializer
+# )
+# from indicator.models import (
+#     Reportable,
+#     IndicatorReport,
+#     IndicatorLocationData,
+#     Disaggregation,
+#     DisaggregationValue,
+#     IndicatorBlueprint,
+# )
 
 
 # class TestPDReportsAPIView(BaseAPITestCase):
