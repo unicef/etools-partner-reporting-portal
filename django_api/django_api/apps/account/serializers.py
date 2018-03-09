@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from cluster.models import Cluster
+from partner.serializers import PartnerDetailsSerializer
 from .models import User
 
 
@@ -24,6 +25,7 @@ class ClusterResponsePlanSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     imo_clusters = ClusterResponsePlanSerializer(read_only=True,
                                                  many=True)
+    partner = PartnerDetailsSerializer(read_only=True)
 
     class Meta:
         model = User

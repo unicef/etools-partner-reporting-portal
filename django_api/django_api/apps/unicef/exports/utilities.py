@@ -1,10 +1,8 @@
 from collections import defaultdict
 from datetime import date
 
-from babel.numbers import format_number
 from django.conf import settings
 from django.utils.html import escape
-from django.utils.translation import to_locale, get_language
 
 from unicef.models import LowerLevelOutput
 
@@ -49,9 +47,6 @@ class HTMLTableCell(object):
     def render_value(self):
         if type(self.value) == date:
             return self.value.strftime(settings.PRINT_DATA_FORMAT)
-        if type(self.value) in {int, float}:
-            locale = to_locale(get_language())
-            return format_number(self.value, locale=locale)
         if self.value in {'', None}:
             return '&nbsp;'  # Rendering empty tags brakes layout in pdf export
         return escape(self.value)
