@@ -26,7 +26,7 @@
     <dropdown-filter
         label="Narrow Location Type"
         name="narrow_loc_type"
-        value="[[value]]"
+        value="[[fieldValue]]"
         data="[[data]]"
         disabled="[[disabled]]">
     </dropdown-filter>
@@ -56,6 +56,11 @@
           computed: '_computeDisabled(data)',
         },
 
+        fieldValue: {
+          type: String,
+          computed: '_computeFieldValue(data, params.loc_type, maxLocType)',
+        },
+
         value: String,
       },
 
@@ -77,6 +82,21 @@
 
       _computeDisabled: function (data) {
         return data && !data.length;
+      },
+
+      _computeFieldValue: function (data, locType, maxLocType) {
+        var value = this.get('value');
+
+        switch (true) {
+          case !value:
+            return (data[0] || {}).id;
+
+          case !data.length:
+            return null;
+
+          default:
+            return Math.min(Math.max(Number(value), Number(locType) + 1), maxLocType);
+        }
       },
     });
   </script>
