@@ -391,13 +391,9 @@ def clone_new_ca_reportable_to_pa(sender, instance, created, **kwargs):
         reportable_data_to_sync = get_reportable_data_to_clone(instance)
 
         if created:
-            blueprint_data_to_sync = get_blueprint_data_to_clone(instance.blueprint)
-
             for pa in instance.content_object.partner_activities.all():
-                blueprint = IndicatorBlueprint.objects.create(**blueprint_data_to_sync)
-
                 reportable_data_to_sync["content_object"] = pa
-                reportable_data_to_sync["blueprint"] = blueprint
+                reportable_data_to_sync["blueprint"] = instance.blueprint
                 reportable_data_to_sync["parent_indicator"] = instance
                 reportable = Reportable.objects.create(**reportable_data_to_sync)
 
@@ -405,12 +401,6 @@ def clone_new_ca_reportable_to_pa(sender, instance, created, **kwargs):
                 reportable.locations.add(*instance.locations.all())
 
         else:
-            blueprint_data_to_sync = get_blueprint_data_to_clone(
-                IndicatorBlueprint.objects.get(id=instance.blueprint.id)
-            )
-
-            IndicatorBlueprint.objects.filter(id__in=instance.children.values_list('blueprint_id', flat=True)) \
-                .update(**blueprint_data_to_sync)
             instance.children.update(**reportable_data_to_sync)
 
             for child in instance.children.all():
