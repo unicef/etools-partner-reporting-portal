@@ -60,7 +60,8 @@ class PartnerDetailsSerializer(serializers.ModelSerializer):
             # Risk Rating part
             'last_assessment_date',
             'type_of_assessment',
-            'rating'
+            'rating',
+            'basis_for_risk_rating',
         )
 
     def get_partner_type_display(self, obj):
