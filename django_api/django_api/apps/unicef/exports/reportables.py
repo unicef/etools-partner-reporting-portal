@@ -3,7 +3,6 @@ import logging
 from babel.numbers import format_percent
 from django.utils import timezone
 from openpyxl.utils import get_column_letter
-from django.utils.translation import to_locale, get_language
 
 from indicator.models import Disaggregation
 from indicator.utilities import format_total_value_to_string
@@ -74,7 +73,6 @@ class ReportableListPDFExporter(ProgressReportDetailPDFExporter):
             timezone.now()
         )
         self.file_name = self.display_name + '.pdf'
-        self.locale = to_locale(get_language())
 
     def get_reportable_header_table(self, reportable):
         return [
@@ -95,7 +93,7 @@ class ReportableListPDFExporter(ProgressReportDetailPDFExporter):
             ],
             [
                 HTMLTableHeader('Current Progress'),
-                HTMLTableCell(format_percent(reportable.progress_percentage, locale=self.locale), colspan=2),
+                HTMLTableCell(format_percent(reportable.progress_percentage, '#%'), colspan=2),
             ],
         ]
 
