@@ -466,8 +466,8 @@ class PMPPartnerSerializer(serializers.ModelSerializer):
              x[0]) for x in CSO_TYPES],
         allow_blank=True,
         allow_null=True)
-    address = serializers.CharField(source='street_address', allow_blank=True)
-    basis_for_risk_rating = serializers.CharField(allow_blank=True)
+    address = serializers.CharField(source='street_address', allow_blank=True, allow_null=True)
+    basis_for_risk_rating = serializers.CharField(allow_blank=True, allow_null=True)
 
     def fix_choices(self, validated_data):
         for pt in [(x[1], x[0]) for x in PARTNER_TYPE]:
