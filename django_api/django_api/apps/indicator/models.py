@@ -326,32 +326,11 @@ class Reportable(TimeStampedExternalSyncModelMixin):
         )
 
 
-def get_blueprint_data_to_clone(instance):
-    """
-    get_blueprint_data_to_clone returns a map of field name and its value
-    to clone a new IndicatorBlueprint instance from its Reportable instance
-    
-    Arguments:
-        instance {indicator.models.IndicatorBlueprint} -- IndicatorBlueprint model instance
-    """
-    return {
-        "title": instance.title,
-        "unit": instance.unit,
-        "description": instance.description,
-        "code": instance.code,
-        "subdomain": instance.subdomain,
-        "disaggregatable": instance.disaggregatable,
-        "calculation_formula_across_periods": instance.calculation_formula_across_periods,
-        "calculation_formula_across_locations": instance.calculation_formula_across_locations,
-        "display_type": instance.display_type,
-    }
-
-
 def get_reportable_data_to_clone(instance):
     """
     get_reportable_data_to_clone returns a map of field name and its value
     to clone a new Reportable instance
-    
+
     Arguments:
         instance {indicator.models.Reportable} -- Reportable model instance
     """
@@ -374,10 +353,7 @@ def get_reportable_data_to_clone(instance):
     }
 
 
-@receiver(post_save,
-          sender=Reportable,
-          dispatch_uid="clone_new_ca_reportable_to_pa")
-def clone_new_ca_reportable_to_pa(sender, instance, created, **kwargs):
+def clone_ca_reportable_to_pa(instance, created):
     """
     Whenever a new Reportable is created and is found to be
     Cluster Activity Indicator, clone new Reportable instance data to
@@ -385,6 +361,10 @@ def clone_new_ca_reportable_to_pa(sender, instance, created, **kwargs):
 
     Otherwise, update each cloned Reportable instance
     from its Cluster Activity's Partner Activity instances.
+
+    Arguments:
+        instance {indicator.models.Reportable} -- Reportable model instance
+        created {boolean} -- created flag from Django post_save signal
     """
 
     if instance.content_type.model == "clusteractivity":
@@ -409,6 +389,13 @@ def clone_new_ca_reportable_to_pa(sender, instance, created, **kwargs):
 
                 child.disaggregations.add(*instance.disaggregations.all())
                 child.locations.add(*instance.locations.all())
+
+
+@receiver(post_save,
+          sender=Reportable,
+          dispatch_uid="clone_ca_reportable_to_pa")
+def clone_ca_reportable_to_pa_signal(sender, instance, created, **kwargs):
+    clone_ca_reportable_to_pa(instance, created)
 
 
 class IndicatorReportManager(models.Manager):

@@ -14,6 +14,7 @@ from cluster.serializers import (
     ClusterObjectiveSerializer
 )
 
+from indicator.models import clone_ca_reportable_to_pa
 from indicator.serializers import ClusterIndicatorForPartnerActivitySerializer
 
 from .models import (
@@ -296,6 +297,12 @@ class PartnerActivityFromClusterActivitySerializer(PartnerActivityBaseCreateSeri
             )
         except Exception as e:
             raise serializers.ValidationError(e.message)
+
+        cluster_activity = validated_data['cluster_activity']
+
+        for reportable in cluster_activity.reportables.all():
+            clone_ca_reportable_to_pa(reportable, True)
+
         return partner_activity
 
 
