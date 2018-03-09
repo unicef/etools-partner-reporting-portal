@@ -332,18 +332,18 @@ def get_blueprint_data_to_clone(instance):
     to clone a new IndicatorBlueprint instance from its Reportable instance
     
     Arguments:
-        instance {indicator.models.Reportable} -- Reportable model instance
+        instance {indicator.models.IndicatorBlueprint} -- IndicatorBlueprint model instance
     """
     return {
-        "title": instance.blueprint.title,
-        "unit": instance.blueprint.unit,
-        "description": instance.blueprint.description,
-        "code": instance.blueprint.code,
-        "subdomain": instance.blueprint.subdomain,
-        "disaggregatable": instance.blueprint.disaggregatable,
-        "calculation_formula_across_periods": instance.blueprint.calculation_formula_across_periods,
-        "calculation_formula_across_locations": instance.blueprint.calculation_formula_across_locations,
-        "display_type": instance.blueprint.display_type,
+        "title": instance.title,
+        "unit": instance.unit,
+        "description": instance.description,
+        "code": instance.code,
+        "subdomain": instance.subdomain,
+        "disaggregatable": instance.disaggregatable,
+        "calculation_formula_across_periods": instance.calculation_formula_across_periods,
+        "calculation_formula_across_locations": instance.calculation_formula_across_locations,
+        "display_type": instance.display_type,
     }
 
 
@@ -388,10 +388,11 @@ def clone_new_ca_reportable_to_pa(sender, instance, created, **kwargs):
     """
 
     if instance.content_type.model == "clusteractivity":
-        blueprint_data_to_sync = get_blueprint_data_to_clone(instance)
         reportable_data_to_sync = get_reportable_data_to_clone(instance)
 
         if created:
+            blueprint_data_to_sync = get_blueprint_data_to_clone(instance.blueprint)
+
             for pa in instance.content_object.partner_activities.all():
                 blueprint = IndicatorBlueprint.objects.create(**blueprint_data_to_sync)
 
@@ -404,6 +405,10 @@ def clone_new_ca_reportable_to_pa(sender, instance, created, **kwargs):
                 reportable.locations.add(*instance.locations.all())
 
         else:
+            blueprint_data_to_sync = get_blueprint_data_to_clone(
+                IndicatorBlueprint.objects.get(id=instance.blueprint.id)
+            )
+
             IndicatorBlueprint.objects.filter(id__in=instance.children.values_list('blueprint_id', flat=True)) \
                 .update(**blueprint_data_to_sync)
             instance.children.update(**reportable_data_to_sync)
