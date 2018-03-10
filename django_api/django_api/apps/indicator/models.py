@@ -630,8 +630,20 @@ def recalculate_reportable_total(sender, instance, **kwargs):
     reportable.total = reportable_total
     reportable.save()
 
+    # Triggering total recalculation on parent Reportable from its children
     if reportable.parent_indicator:
-        reportable.parent_indicator.total = reportable.total
+        new_parent_total = {
+            'c': 0,
+            'd': 1,
+            'v': 0,
+        }
+        child_totals = reportable.children.values_list('total', flat=True)
+
+        for total in child_totals:
+            new_parent_total['v'] += child_totals['v']
+            new_parent_total['c'] += child_totals['c']
+
+        reportable.parent_indicator.total = new_parent_total
         reportable.parent_indicator.save()
 
 
