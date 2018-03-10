@@ -187,6 +187,9 @@ def process_period_reports():
     ):
         print("Processing Reportable {}".format(reportable))
 
+        if reportable.locations.count() == 0:
+            continue
+
         frequency = reportable.frequency
         latest_indicator_report = reportable.indicator_reports.order_by('time_period_end').last()
 
