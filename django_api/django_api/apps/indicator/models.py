@@ -355,9 +355,12 @@ def get_reportable_data_to_clone(instance):
 
 def clone_ca_reportable_to_pa(instance, created):
     """
-    Whenever a new Reportable is created and is found to be
-    Cluster Activity Indicator, clone new Reportable instance data to
+    Whenever a Cluster Activity Reportable is created or is updated,
+    clone_ca_reportable_to_pa handles a Reportable instance data to
     its Cluster Activity's Partner Activity instances.
+
+    Under create flag, Partner Activity will get a new Reportable instance
+    from Cluster Activity Reportable instance.
 
     Otherwise, update each cloned Reportable instance
     from its Cluster Activity's Partner Activity instances.
@@ -378,17 +381,9 @@ def clone_ca_reportable_to_pa(instance, created):
                 reportable = Reportable.objects.create(**reportable_data_to_sync)
 
                 reportable.disaggregations.add(*instance.disaggregations.all())
-                reportable.locations.add(*instance.locations.all())
 
         else:
             instance.children.update(**reportable_data_to_sync)
-
-            for child in instance.children.all():
-                child.disaggregations.clear()
-                child.locations.clear()
-
-                child.disaggregations.add(*instance.disaggregations.all())
-                child.locations.add(*instance.locations.all())
 
 
 @receiver(post_save,

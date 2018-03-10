@@ -155,15 +155,15 @@ class Partner(TimeStampedExternalSyncModelMixin):
 
     @property
     def address(self):
-        if not self.street_address and not self.city and not self.postal_code and not self.country:
-            return ""
+        if all([self.street_address, self.city, self.postal_code, self.country]):
+            return ", ".join([self.street_address, self.city, self.postal_code,
+                              self.country])
 
         elif self.street_address and not self.city and not self.postal_code and not self.country:
             return self.street_address
 
-        elif all([self.street_address, self.city, self.postal_code, self.country]):
-            return ", ".join([self.street_address, self.city, self.postal_code,
-                              self.country])
+        else:
+            return ""
 
 
 class PartnerProject(TimeStampedModel):

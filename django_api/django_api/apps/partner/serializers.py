@@ -298,9 +298,13 @@ class PartnerActivityFromClusterActivitySerializer(PartnerActivityBaseCreateSeri
         except Exception as e:
             raise serializers.ValidationError(e.message)
 
+        # Grab Cluster Activity instance from this newly created Partner Activity instance
         cluster_activity = validated_data['cluster_activity']
 
+        # For each existing Reportable instance in Cluster Activity instance
         for reportable in cluster_activity.reportables.all():
+            # Create a cloned Reportable instance to
+            # its Cluster Activity's Partner Activity instances
             clone_ca_reportable_to_pa(reportable, True)
 
         return partner_activity

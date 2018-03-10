@@ -297,7 +297,7 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
         )
 
     def get_partner_org_id(self, obj):
-        return obj.programme_document.partner.id
+        return obj.programme_document.partner.external_id
 
     def get_partner_org_name(self, obj):
         return obj.programme_document.partner.title
