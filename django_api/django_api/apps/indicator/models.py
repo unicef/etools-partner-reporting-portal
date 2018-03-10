@@ -630,6 +630,10 @@ def recalculate_reportable_total(sender, instance, **kwargs):
     reportable.total = reportable_total
     reportable.save()
 
+    if reportable.parent_indicator:
+        reportable.parent_indicator.total = reportable.total
+        reportable.parent_indicator.save()
+
 
 class IndicatorLocationData(TimeStampedModel):
     """
