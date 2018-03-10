@@ -349,7 +349,8 @@ def get_reportable_data_to_clone(instance):
         'means_of_verification': instance.means_of_verification,
         'modified': instance.modified,
         'target': instance.target,
-        'total': instance.total,
+        # This is for new Reportable instance hence defaulting to zero progress
+        'total': dict([('c', 0), ('d', 0), ('v', 0)]),
     }
 
 
@@ -373,16 +374,7 @@ def clone_ca_reportable_to_pa(instance, created):
     if instance.content_type.model == "clusteractivity":
         reportable_data_to_sync = get_reportable_data_to_clone(instance)
 
-        if created:
-            for pa in instance.content_object.partner_activities.all():
-                reportable_data_to_sync["content_object"] = pa
-                reportable_data_to_sync["blueprint"] = instance.blueprint
-                reportable_data_to_sync["parent_indicator"] = instance
-                reportable = Reportable.objects.create(**reportable_data_to_sync)
-
-                reportable.disaggregations.add(*instance.disaggregations.all())
-
-        else:
+        if not created:
             instance.children.update(**reportable_data_to_sync)
 
 

@@ -27,6 +27,7 @@ from .models import (
     Reportable, IndicatorBlueprint,
     IndicatorReport, IndicatorLocationData,
     Disaggregation, DisaggregationValue,
+    get_reportable_data_to_clone,
 )
 
 
@@ -756,6 +757,16 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
         disaggregations = self.initial_data.get('disaggregations')
         self.instance.disaggregations.add(*Disaggregation.objects.filter(id__in=[d['id'] for d in disaggregations]))
+
+        reportable_data_to_sync = get_reportable_data_to_clone(self.instance)
+
+        for pa in self.instance.content_object.partner_activities.all():
+            reportable_data_to_sync["content_object"] = pa
+            reportable_data_to_sync["blueprint"] = self.instance.blueprint
+            reportable_data_to_sync["parent_indicator"] = self.instance
+            reportable = Reportable.objects.create(**reportable_data_to_sync)
+
+            reportable.disaggregations.add(*self.instance.disaggregations.all())
 
         return self.instance
 
