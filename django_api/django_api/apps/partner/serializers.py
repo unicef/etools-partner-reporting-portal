@@ -58,6 +58,7 @@ class PartnerDetailsSerializer(serializers.ModelSerializer):
             'country_code',
             'email',
             'phone_number',
+            'clusters',
             # Risk Rating part
             'last_assessment_date',
             'type_of_assessment',

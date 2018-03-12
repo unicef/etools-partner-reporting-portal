@@ -117,7 +117,7 @@
             items="[[activities]]"
             as="activity"
             initial-count="[[pageSize]]">
-          <etools-data-table-row>
+          <etools-data-table-row details-opened="[[detailsOpened]]">
             <div slot="row-data">
               <div class="table-cell table-cell--text">
                 <a href="[[_detailUrl(activity, anchorQuery)]]">[[activity.title]]</a>
@@ -217,6 +217,11 @@
           anchorQueryParams: {
             type: Object,
             computed: '_withDefaultParams(queryParams)',
+          },
+
+          openedDetails: {
+            type: Array,
+            value: []
           },
         },
 

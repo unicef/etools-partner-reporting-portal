@@ -111,10 +111,15 @@
     </etools-prp-ajax>
 
     <cluster-dropdown-content clusters="{{clusters}}"></cluster-dropdown-content>
-    <partner-dropdown-content
-      partners="{{partners}}"
-      clusters="[[imoClusters]]">
-    </partner-dropdown-content>
+    <template
+    is="dom-if"
+    if="[[_displayPartner(permissions)]]"
+    restamp="true">
+      <partner-dropdown-content
+        partners="{{partners}}"
+        clusters="[[imoClusters]]">
+      </partner-dropdown-content>
+    </template>
 
     <paper-dialog
         id="dialog"
