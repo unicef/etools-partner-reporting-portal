@@ -83,10 +83,15 @@
     <iron-location path="{{path}}"></iron-location>
 
     <cluster-dropdown-content clusters="{{clusters}}"></cluster-dropdown-content>
-    <partner-dropdown-content
-      partners="{{partners}}"
-      clusters="[[imoClusters]]">
-    </partner-dropdown-content>
+    <template
+    is="dom-if"
+    if="[[_displayPartner(permissions, edit)]]"
+    restamp="true">
+      <partner-dropdown-content
+        partners="{{partners}}"
+        clusters="[[imoClusters]]">
+      </partner-dropdown-content>
+    </template>
 
     <etools-prp-ajax
       id="projectAjax"

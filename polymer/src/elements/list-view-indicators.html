@@ -167,6 +167,10 @@
         'details-opened-changed': '_detailsChange'
       },
 
+      detached: function () {
+          this.openedDetails.length = 0;
+      },
+
       _computeIsClusterApp: function(appName) {
         return appName === 'cluster-reporting';
       },
