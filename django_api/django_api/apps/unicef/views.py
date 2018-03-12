@@ -751,4 +751,3 @@ class ProgressReportAttachmentAPIView(APIView):
         return Response(
             ProgressReportAttachmentSerializer(progress_reports, many=True).data, status=statuses.HTTP_200_OK
         )
-
