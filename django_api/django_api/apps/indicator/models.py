@@ -353,18 +353,19 @@ def get_reportable_data_to_clone(instance):
 
 
 def create_reportable_for_pa_from_ca_reportable(pa, ca_reportable):
-    """Copies one CA reportable instance to a partner activity.
-    
+    """
+    Copies one CA reportable instance to a partner activity.
+
     Arguments:
-        pa {[type]} -- [description]
-        reportable {[type]} -- [description]
-    
+        pa {partner.models.PartnerActivity} -- PartnerActivity to copy to
+        reportable {indicator.models.Reportable} -- ClusterActivity Reportable
+
     Raises:
-        ValidationError -- [description]
+        ValidationError -- Django Exception
     """
 
     if ca_reportable.content_object != pa.cluster_activity:
-        raise ValidationError("Error")
+        raise ValidationError("The Parent-child relationship is not valid")
 
     reportable_data_to_sync = get_reportable_data_to_clone(ca_reportable)
     reportable_data_to_sync['total'] = dict([('c', 0), ('d', 0), ('v', 0)])
@@ -377,18 +378,29 @@ def create_reportable_for_pa_from_ca_reportable(pa, ca_reportable):
 
 
 def create_pa_reportables_from_ca(pa, ca):
+    """
+    Creates a set of PartnerActivity Reportable instances from
+    ClusterActivity instance to target PartnerActivity instance
+
+    Arguments:
+        pa {partner.models.PartnerActivity} -- Target PartnerActivity instance
+        ca {cluster.models.ClusterActivity} -- ClusterActivity to copy from
+    """
+
     if pa.reportables.count() > 0:
         return
-    
+
     for reportable in ca.reportables.all():
         create_reportable_for_pa_from_ca_reportable(pa, reportable)
 
 
 def create_pa_reportables_for_new_ca_reportable(instance):
-    """Useful when creating a new CA reportable.
-    
+    """
+    Useful when creating a new CA reportable to create
+    a set of PartnerActivity Reportable instances.
+
     Arguments:
-        instance {[type]} -- [description]
+        instance {indicator.models.Reportable} -- Cluster Activity Reportable to copy from
     """
     for pa in instance.content_object.partner_activities.all():
         create_reportable_for_pa_from_ca_reportable(pa, instance)
@@ -668,7 +680,15 @@ def recalculate_reportable_total(sender, instance, **kwargs):
 
         for total in child_totals:
             new_parent_total['v'] += total['v']
-            new_parent_total['c'] += total['c']
+            new_parent_total['d'] += total['d']
+
+        if reportable.parent_indicator.blueprint.unit == IndicatorBlueprint.NUMBER:
+            new_parent_total['d'] = 1
+            new_parent_total['c'] = new_parent_total['v']
+
+        else:
+            new_parent_total['c'] = new_parent_total['v'] / \
+                    (new_parent_total['d'] * 1.0)
 
         reportable.parent_indicator.total = new_parent_total
         reportable.parent_indicator.save()
