@@ -255,10 +255,18 @@
         return this.progressReports(locationId) + reportId + '/attachment/';
       },
 
-      operationalPresence: function (responsePlanId, type) {
+      analysisOperationalPresence: function (responsePlanId, type) {
         return this._buildUrl(
           '/cluster/cluster-analysis/' + responsePlanId + '/operational-presence/' + type
         );
+      },
+
+      analysisIndicators: function (responsePlanId) {
+        return this._buildUrl('/cluster/cluster-analysis/' + responsePlanId + '/indicators/');
+      },
+
+      analysisIndicator: function (responsePlanId, indicatorId) {
+        return this.analysisIndicators(responsePlanId) + indicatorId;
       },
     };
   }());

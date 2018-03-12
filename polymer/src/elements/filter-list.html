@@ -38,9 +38,15 @@
     </iron-query-params>
 
     <content></content>
-    <div id="action">
-      <paper-button id="clear">Clear</paper-button>
-    </div>
+
+    <template
+        is="dom-if"
+        if="[[!hideClear]]"
+        restamp="true">
+      <div id="action">
+        <paper-button on-tap="_clearFilters">Clear</paper-button>
+      </div>
+    </template>
 
     <etools-loading active="[[loading]]"></etools-loading>
   </template>
@@ -68,6 +74,11 @@
           type: Boolean,
           value: false,
         },
+
+        hideClear: {
+          type: Boolean,
+          value: false,
+        },
       },
 
       observers: [
@@ -79,7 +90,6 @@
         'register-filter': '_registerFilter',
         'filter-ready': '_filterReady',
         'deregister-filter': '_deregisterFilter',
-        'clear.tap': '_clearFilters',
       },
 
       _onFilterChanged: function (e, change) {
@@ -90,17 +100,19 @@
          * here's the place to put the logic for it.
          */
 
-        var newParams = Object.assign({}, this.queryParams);
+        this.async(function () {
+          var newParams = Object.assign({}, this.queryParams);
 
-        if (change.value && change.value.length) {
-          newParams[change.name] = change.value;
-        } else {
-          delete newParams[change.name];
-        }
+          if (change.value && change.value.length) {
+            newParams[change.name] = change.value;
+          } else {
+            delete newParams[change.name];
+          }
 
-        this.set('queryParams', newParams);
+          this.set('queryParams', newParams);
 
-        this._resetPageNumber();
+          this._resetPageNumber();
+        });
       },
 
       _registerFilter: function (e, name) {

@@ -1,4 +1,13 @@
 <link rel="import" href="../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../bower_components/iron-location/iron-location.html">
+<link rel="import" href="../../../../../bower_components/iron-location/iron-query-params.html">
+
+<link rel="import" href="../../../../endpoints.html">
+<link rel="import" href="../../../../redux/store.html">
+<link rel="import" href="../../../../behaviors/utils.html">
+<link rel="import" href="../../../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../../../elements/cluster-reporting/analysis/indicators-filters.html">
+<link rel="import" href="../../../../elements/cluster-reporting/analysis/cluster-activities.html">
 
 <dom-module id="page-analysis-indicators">
   <template>
@@ -8,14 +17,71 @@
       }
     </style>
 
-    <h1>Indicators</h1>
+    <iron-location
+        query="{{query}}">
+    </iron-location>
+
+    <iron-query-params
+        params-string="{{query}}"
+        params-object="{{queryParams}}">
+    </iron-query-params>
+
+    <etools-prp-ajax
+        id="data"
+        url="[[dataUrl]]"
+        params="[[queryParams]]">
+    </etools-prp-ajax>
+
+    <analysis-indicators-filters></analysis-indicators-filters>
+    <analysis-cluster-activities></analysis-cluster-activities>
   </template>
 
   <script>
     Polymer({
       is: 'page-analysis-indicators',
 
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.UtilsBehavior,
+      ],
+
       properties: {
+        responsePlanId: {
+          type: String,
+          statePath: 'responsePlans.currentID',
+        },
+
+        dataUrl: {
+          type: String,
+          computed: '_computeDataUrl(responsePlanId)',
+        },
+      },
+
+      observers: [
+        '_fetchData(dataUrl, queryParams)',
+      ],
+
+      _computeDataUrl: function (responsePlanId) {
+        return App.Endpoints.analysisIndicators(responsePlanId);
+      },
+
+      _fetchData: function () {
+        this.debounce('fetch-data', function () {
+          var dataThunk = this.$.data.thunk();
+
+          this.$.data.abort();
+
+          this.dispatch(App.Actions.Analysis.Indicators.fetchData(dataThunk))
+              .catch(function (err) { //jshint ignore:line
+                // TODO: error handling
+              });
+        }, 300);
+      },
+
+      detached: function () {
+        this._cancelDebouncers([
+          'fetch-data',
+        ]);
       },
     });
   </script>

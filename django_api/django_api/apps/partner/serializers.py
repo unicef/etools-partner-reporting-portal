@@ -60,7 +60,8 @@ class PartnerDetailsSerializer(serializers.ModelSerializer):
             # Risk Rating part
             'last_assessment_date',
             'type_of_assessment',
-            'rating'
+            'rating',
+            'basis_for_risk_rating',
         )
 
     def get_partner_type_display(self, obj):
@@ -465,6 +466,8 @@ class PMPPartnerSerializer(serializers.ModelSerializer):
              x[0]) for x in CSO_TYPES],
         allow_blank=True,
         allow_null=True)
+    address = serializers.CharField(source='street_address', allow_blank=True, allow_null=True)
+    basis_for_risk_rating = serializers.CharField(allow_blank=True, allow_null=True)
 
     def fix_choices(self, validated_data):
         for pt in [(x[1], x[0]) for x in PARTNER_TYPE]:
@@ -499,4 +502,7 @@ class PMPPartnerSerializer(serializers.ModelSerializer):
             "phone_number",
             "total_ct_cp",
             "total_ct_cy",
+            "address",
+            "city",
+            "basis_for_risk_rating",
         )

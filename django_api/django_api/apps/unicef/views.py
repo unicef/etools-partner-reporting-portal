@@ -714,27 +714,29 @@ class ProgressReportAttachmentAPIView(APIView):
     parser_classes = (FormParser, MultiPartParser, FileUploadParser)
 
     def get(self, request, workspace_id, progress_report_id):
-        pr = get_object_or_404(
+        progress_report = get_object_or_404(
             ProgressReport,
             id=progress_report_id,
-            programme_document__workspace_id=workspace_id)
+            programme_document__workspace_id=workspace_id
+        )
 
-        if pr.attachment:
-            serializer = ProgressReportAttachmentSerializer(
-                ProgressReport.objects.filter(
-                    id=progress_report_id,
-                    programme_document__workspace_id=workspace_id),
-                many=True)
-            return Response(serializer.data, status=statuses.HTTP_200_OK)
-        else:
-            return Response({"message": "Attachment does not exist."}, status=statuses.HTTP_404_NOT_FOUND)
+        try:
+            # lookup just so the possible FileNotFoundError can be triggered
+            progress_report.attachment
+            serializer = ProgressReportAttachmentSerializer(progress_report)
+            return Response([serializer.data], status=statuses.HTTP_200_OK)
+        except FileNotFoundError:
+            pass
+
+        return Response({"message": "Attachment does not exist."}, status=statuses.HTTP_404_NOT_FOUND)
 
     @transaction.atomic
     def delete(self, request, workspace_id, progress_report_id):
         pr = get_object_or_404(
             ProgressReport,
             id=progress_report_id,
-            programme_document__workspace_id=workspace_id)
+            programme_document__workspace_id=workspace_id
+        )
 
         if pr.attachment:
             try:

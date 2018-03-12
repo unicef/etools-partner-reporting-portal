@@ -8,7 +8,7 @@
 <link rel="import" href="../../../redux/store.html">
 <link rel="import" href="../../../behaviors/filter-dependencies.html">
 
-<dom-module id="cluster-objective-filter-multi">
+<dom-module id="location-filter-multi-narrowed">
   <template>
     <style>
       :host {
@@ -26,14 +26,14 @@
     </iron-query-params>
 
     <etools-prp-ajax
-        id="objectives"
-        url="[[objectivesUrl]]"
-        params="[[objectivesParams]]">
+        id="locations"
+        url="[[locationsUrl]]"
+        params="[[params]]">
     </etools-prp-ajax>
 
     <dropdown-filter-multi
-        label="Cluster Objective"
-        name="cluster_objectives"
+        label="Location"
+        name="locs"
         value="[[value]]"
         data="[[data]]"
         disabled="[[pending]]">
@@ -42,7 +42,7 @@
 
   <script>
     Polymer({
-      is: 'cluster-objective-filter-multi',
+      is: 'location-filter-multi-narrowed',
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
@@ -50,25 +50,19 @@
       ],
 
       properties: {
-        objectivesUrl: {
+        locationsUrl: {
           type: String,
-          computed: '_computeObjectivesUrl(responsePlanId)',
+          computed: '_computeLocationsUrl(locationId)',
         },
 
-        responsePlanId: {
+        locationId: {
           type: String,
-          statePath: 'responsePlans.currentID',
+          statePath: 'location.id',
         },
 
         data: {
           type: Array,
           value: [],
-        },
-
-        objectivesParams: {
-          type: Object,
-          computed: '_computeObjectivesParams(params)',
-          observer: '_fetchObjectives',
         },
 
         pending: {
@@ -79,34 +73,30 @@
         value: String,
       },
 
-      _computeObjectivesUrl: function (responsePlanId) {
-        return App.Endpoints.responseParametersClusterObjectives(responsePlanId);
+      observers: [
+        '_fetchLocations(locationsUrl, params)',
+      ],
+
+      _computeLocationsUrl: function (locationId) {
+        return locationId ? App.Endpoints.clusterLocationNames(locationId) : '';
       },
 
-      _computeObjectivesParams: function (params) {
-        var objectivesParams = {
-          page_size: 99999,
-        };
-
-        if (params.clusters) {
-          objectivesParams.cluster_ids = params.clusters;
-        }
-
-        return objectivesParams;
-      },
-
-      _fetchObjectives: function () {
-        this.debounce('fetch-objectives', function () {
+      _fetchLocations: function (url) {
+        this.debounce('fetch-locations', function () {
           var self = this;
+
+          if (!url) {
+            return;
+          }
 
           this.set('pending', true);
 
-          this.$.objectives.abort();
+          this.$.locations.abort();
 
-          this.$.objectives.thunk()()
+          this.$.locations.thunk()()
               .then(function (res) {
                 self.set('pending', false);
-                self.set('data', res.data.results);
+                self.set('data', res.data);
               })
               .catch(function (err) { // jshint ignore:line
                 // TODO: error handling
@@ -116,8 +106,8 @@
       },
 
       detached: function () {
-        if (this.isDebouncerActive('fetch-objectives')) {
-          this.cancelDebouncer('fetch-objectives');
+        if (this.isDebouncerActive('fetch-locations')) {
+          this.cancelDebouncer('fetch-locations');
         }
       },
     });

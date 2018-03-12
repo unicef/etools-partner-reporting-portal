@@ -4,11 +4,15 @@
 <link rel="import" href="../../../../bower_components/app-layout/app-grid/app-grid-style.html">
 
 <link rel="import" href="../../../styles/filter-styles.html">
+<link rel="import" href="../../../settings.html">
 <link rel="import" href="../../../behaviors/utils.html">
 <link rel="import" href="../../filter-list.html">
 <link rel="import" href="../../filters/cluster-filter-multi/cluster-filter-multi.html">
 <link rel="import" href="../../filters/partner-type-filter-multi/partner-type-filter-multi.html">
 <link rel="import" href="../../filters/cluster-objective-filter-multi/cluster-objective-filter-multi.html">
+<link rel="import" href="../../filters/location-type-filter/location-type-filter.html">
+<link rel="import" href="../../filters/narrow-location-type-filter/narrow-location-type-filter.html">
+<link rel="import" href="../../filters/location-filter-multi/location-filter-multi-narrowed.html">
 
 <dom-module id="analysis-filters">
   <template>
@@ -36,7 +40,9 @@
         params-object="{{queryParams}}">
     </iron-query-params>
 
-    <filter-list filters="{{filters}}">
+    <filter-list
+        filters="{{filters}}"
+        ignore="loc_type,narrow_loc_type">
       <div class="app-grid">
         <cluster-filter-multi
             id="clusters"
@@ -50,10 +56,29 @@
         </partner-type-filter-multi>
 
         <cluster-objective-filter-multi
+            id="clusterObjective"
             class="item filter-2-col"
             value="[[_withDefault(queryParams.cluster_objectives, '')]]"
             dependencies="clusters">
         </cluster-objective-filter-multi>
+
+        <location-type-filter
+            id="locationType"
+            class="item"
+            value="[[_withDefault(queryParams.loc_type, '')]]">
+        </location-type-filter>
+
+        <location-filter-multi-narrowed
+            class="item filter-2-col"
+            value="[[_withDefault(queryParams.locs, '')]]"
+            dependencies="loc_type">
+        </location-filter-multi-narrowed>
+
+        <narrow-location-type-filter
+            class="item"
+            value="[[_withDefault(queryParams.narrow_loc_type, '')]]"
+            dependencies="loc_type">
+        </narrow-location-type-filter>
       </div>
     </filter-list>
   </template>
@@ -75,24 +100,42 @@
         },
       },
 
+      observers: [
+        '_resetNarrowLocType(queryParams.loc_type)',
+      ],
+
       listeners: {
-        'clusters.selected-values-changed': '_onClustersChanged',
+        'clusters.selected-values-changed': '_resetClusterObjectives',
+        'clusterObjective.selected-values-changed': '_resetLocations',
+        'locationType.iron-select': '_resetLocations',
       },
 
-      _onClustersChanged: function () {
-        this.debounce('clusters-changed', function () {
-          Object.keys(this.queryParams).forEach(function (key) {
-            if (['cluster_objectives'].indexOf(key) !== -1) {
-              this.set(['queryParams', key], null);
-            }
-          }, this);
+      _resetClusterObjectives: function () {
+        this.debounce('reset-cluster-objectives', function () {
+          this.set('queryParams.cluster_objectives', null);
+        });
+      },
+
+      _resetLocations: function () {
+        this.debounce('reset-locations', function () {
+          this.set('queryParams.locs', null);
+        });
+      },
+
+      _resetNarrowLocType: function (locType) {
+        this.debounce('reset-narrow-loc-type', function () {
+          if (locType === String(App.Settings.cluster.maxLocType)) {
+            this.set('queryParams.narrow_loc_type', null);
+          }
         });
       },
 
       detached: function () {
-        if (this.isDebouncerActive('clusters-changed')) {
-          this.cancelDebouncer('clusters-changed');
-        }
+        this._cancelDebouncers([
+          'reset-narrow-loc-type',
+          'reset-cluster-objectives',
+          'reset-locations',
+        ]);
       },
     });
   </script>

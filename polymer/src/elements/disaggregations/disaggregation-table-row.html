@@ -39,6 +39,16 @@
                 editable="[[editable]]">
             </disaggregation-table-multi-cell>
           </template>
+          <template
+            is="dom-if"
+            if="[[_equals(indicatorType, 'ratio')]]"
+            restamp="true">
+            <disaggregation-table-multi-cell
+              coords="[[item.key]]"
+              data="[[item.data]]"
+              editable="[[editable]]">
+            </disaggregation-table-multi-cell>
+          </template>
         </td>
       </template>
 
@@ -65,6 +75,16 @@
                 coords="[[data.total.key]]"
                 data="[[data.total.data]]"
                 editable="[[totalEditable]]">
+            </disaggregation-table-multi-cell>
+          </template>
+          <template
+            is="dom-if"
+            if="[[_equals(indicatorType, 'ratio')]]"
+            restamp="true">
+            <disaggregation-table-multi-cell
+              coords="[[item.key]]"
+              data="[[item.data]]"
+              editable="[[editable]]">
             </disaggregation-table-multi-cell>
           </template>
         </td>

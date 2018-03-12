@@ -95,7 +95,7 @@
         </paper-item>
 
         <paper-item name="analysis" class="selectable">
-          <a href="[[_appendQuery(analysisUrl, clusterQuery, partnerQuery)]]">
+          <a href="[[_appendQuery(analysisUrl, clusterQuery, analysisQuery, partnerQuery)]]">
             <span><iron-icon icon="av:equalizer" role="presentation"></iron-icon>[[localize('analysis')]]</span>
           </a>
         </paper-item>
@@ -132,6 +132,13 @@
         clusterQuery: {
           type: Object,
           computed: '_computeClusterQuery(queryParams)',
+        },
+
+        analysisQuery: {
+          type: Object,
+          value: {
+            loc_type: 1,
+          },
         },
 
         dashboardUrl: {
