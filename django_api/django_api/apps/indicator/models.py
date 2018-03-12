@@ -349,12 +349,52 @@ def get_reportable_data_to_clone(instance):
         'means_of_verification': instance.means_of_verification,
         'modified': instance.modified,
         'target': instance.target,
-        # This is for new Reportable instance hence defaulting to zero progress
-        'total': dict([('c', 0), ('d', 0), ('v', 0)]),
     }
 
 
-def clone_ca_reportable_to_pa(instance, created):
+def create_reportable_for_pa_from_ca_reportable(pa, ca_reportable):
+    """Copies one CA reportable instance to a partner activity.
+    
+    Arguments:
+        pa {[type]} -- [description]
+        reportable {[type]} -- [description]
+    
+    Raises:
+        ValidationError -- [description]
+    """
+
+    if ca_reportable.content_object != pa.cluster_activity:
+        raise ValidationError("Error")
+
+    reportable_data_to_sync = get_reportable_data_to_clone(ca_reportable)
+    reportable_data_to_sync['total'] = dict([('c', 0), ('d', 0), ('v', 0)])
+    reportable_data_to_sync["content_object"] = pa
+    reportable_data_to_sync["blueprint"] = ca_reportable.blueprint
+    reportable_data_to_sync["parent_indicator"] = ca_reportable
+    pa_reportable = Reportable.objects.create(**reportable_data_to_sync)
+
+    pa_reportable.disaggregations.add(*ca_reportable.disaggregations.all())
+
+
+def create_pa_reportables_from_ca(pa, ca):
+    if pa.reportables.count() > 0:
+        return
+    
+    for reportable in ca.reportables.all():
+        create_reportable_for_pa_from_ca_reportable(pa, reportable)
+
+
+def create_pa_reportables_for_new_ca_reportable(instance):
+    """Useful when creating a new CA reportable.
+    
+    Arguments:
+        instance {[type]} -- [description]
+    """
+    for pa in instance.content_object.partner_activities.all():
+        create_reportable_for_pa_from_ca_reportable(pa, instance)
+
+
+def sync_ca_reportable_update_to_pa_reportables(instance, created):
     """
     Whenever a Cluster Activity Reportable is created or is updated,
     clone_ca_reportable_to_pa handles a Reportable instance data to
@@ -382,7 +422,7 @@ def clone_ca_reportable_to_pa(instance, created):
           sender=Reportable,
           dispatch_uid="clone_ca_reportable_to_pa")
 def clone_ca_reportable_to_pa_signal(sender, instance, created, **kwargs):
-    clone_ca_reportable_to_pa(instance, created)
+    sync_ca_reportable_update_to_pa_reportables(instance, created)
 
 
 class IndicatorReportManager(models.Manager):
@@ -574,14 +614,14 @@ def recalculate_reportable_total(sender, instance, **kwargs):
     accepted_indicator_reports = reportable.indicator_reports.all().filter(
         report_status=INDICATOR_REPORT_STATUS.accepted)
 
-    if accepted_indicator_reports.count() > 0:
-        # Reset the reportable total
-        reportable_total = {
-            'c': 0,
-            'd': 0,
-            'v': 0,
-        }
+    # Reset the reportable total
+    reportable_total = {
+        'c': 0,
+        'd': 0,
+        'v': 0,
+    }
 
+    if accepted_indicator_reports.count() > 0:
         # If unit choice is NUMBER then have to handle sum, avg, max
         if blueprint.unit == IndicatorBlueprint.NUMBER:
             reportable_total['d'] = 1
@@ -594,19 +634,14 @@ def recalculate_reportable_total(sender, instance, **kwargs):
             else:   # if its SUM or avg then add data up
                 for indicator_report in accepted_indicator_reports:
                     reportable_total['v'] += indicator_report.total['v']
-                    reportable_total['c'] += indicator_report.total['c']
 
                 if blueprint.calculation_formula_across_periods == IndicatorBlueprint.AVG:
                     ir_count = accepted_indicator_reports.count()
                     if ir_count > 0:
                         reportable_total['v'] = reportable_total['v'] / \
                             (ir_count * 1.0)
-                        reportable_total['c'] = reportable_total['c'] / \
-                            (ir_count * 1.0)
 
-                elif blueprint.calculation_formula_across_periods == IndicatorBlueprint.SUM and \
-                        reportable_total['c'] == 0:
-                    reportable_total['c'] = reportable_total['v']
+                reportable_total['c'] = reportable_total['v']
 
         # if unit is PERCENTAGE, doesn't matter if calc choice was percent or
         # ratio
@@ -619,8 +654,8 @@ def recalculate_reportable_total(sender, instance, **kwargs):
                 reportable_total['c'] = reportable_total['v'] / \
                     (reportable_total['d'] * 1.0)
 
-        reportable.total = reportable_total
-        reportable.save()
+    reportable.total = reportable_total
+    reportable.save()
 
     # Triggering total recalculation on parent Reportable from its children
     if reportable.parent_indicator:

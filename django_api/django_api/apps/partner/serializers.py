@@ -14,7 +14,7 @@ from cluster.serializers import (
     ClusterObjectiveSerializer
 )
 
-from indicator.models import clone_ca_reportable_to_pa
+from indicator.models import create_pa_reportables_from_ca
 from indicator.serializers import ClusterIndicatorForPartnerActivitySerializer
 
 from .models import (
@@ -302,11 +302,7 @@ class PartnerActivityFromClusterActivitySerializer(PartnerActivityBaseCreateSeri
         # Grab Cluster Activity instance from this newly created Partner Activity instance
         cluster_activity = validated_data['cluster_activity']
 
-        # For each existing Reportable instance in Cluster Activity instance
-        for reportable in cluster_activity.reportables.all():
-            # Create a cloned Reportable instance to
-            # its Cluster Activity's Partner Activity instances
-            clone_ca_reportable_to_pa(reportable, True)
+        create_pa_reportables_from_ca(partner_activity, cluster_activity)
 
         return partner_activity
 
