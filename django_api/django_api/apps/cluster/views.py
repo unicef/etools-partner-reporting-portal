@@ -3,6 +3,7 @@ import logging
 from django.db.models import Q
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
+from rest_framework.exceptions import ValidationError
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -115,9 +116,7 @@ class ClusterObjectiveAPIView(APIView):
             instance=self.get_instance(self.request, pk=pk),
             data=self.request.data
         )
-        if not serializer.is_valid():
-            return Response(serializer.errors,
-                            status=statuses.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
@@ -132,13 +131,9 @@ class ClusterObjectiveAPIView(APIView):
                 data=self.request.data
             )
         else:
-            return Response({"id": "This field is required!"},
-                            status=statuses.HTTP_400_BAD_REQUEST)
+            raise ValidationError({"id": "This field is required!"})
 
-        if not serializer.is_valid():
-            return Response(serializer.errors,
-                            status=statuses.HTTP_400_BAD_REQUEST)
-
+        serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
@@ -167,10 +162,6 @@ class ClusterObjectiveListCreateAPIView(ListCreateAPIView):
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     filter_class = ClusterObjectiveFilter
 
-    #
-    # def get_queryset(self, *args, **kwargs):
-    #     return ClusterObjective.objects.select_related('cluster').all()
-
     def get_queryset(self, *args, **kwargs):
         response_plan_id = self.kwargs.get('response_plan_id')
 
@@ -192,14 +183,11 @@ class ClusterObjectiveListCreateAPIView(ListCreateAPIView):
         :return: ClusterObjective object id
         """
         serializer = ClusterObjectiveSerializer(data=self.request.data)
-
-        if not serializer.is_valid():
-            return Response(serializer.errors,
-                            status=statuses.HTTP_400_BAD_REQUEST)
-
+        serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response({'id': serializer.instance.id},
-                        status=statuses.HTTP_201_CREATED)
+        return Response(
+            {'id': serializer.instance.id}, status=statuses.HTTP_201_CREATED
+        )
 
 
 class ClusterActivityAPIView(APIView):
@@ -237,9 +225,7 @@ class ClusterActivityAPIView(APIView):
             instance=self.get_instance(self.request, pk),
             data=self.request.data
         )
-        if not serializer.is_valid():
-            return Response(serializer.errors,
-                            status=statuses.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
@@ -254,13 +240,9 @@ class ClusterActivityAPIView(APIView):
                 data=self.request.data
             )
         else:
-            return Response({"id": "This field is required!"},
-                            status=statuses.HTTP_400_BAD_REQUEST)
+            raise ValidationError({"id": "This field is required!"})
 
-        if not serializer.is_valid():
-            return Response(serializer.errors,
-                            status=statuses.HTTP_400_BAD_REQUEST)
-
+        serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
@@ -310,11 +292,7 @@ class ClusterActivityListAPIView(ListCreateAPIView):
         :return: ClusterActivity object id
         """
         serializer = ClusterActivitySerializer(data=self.request.data)
-
-        if not serializer.is_valid():
-            return Response(serializer.errors,
-                            status=statuses.HTTP_400_BAD_REQUEST)
-
+        serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({'id': serializer.instance.id},
                         status=statuses.HTTP_201_CREATED)
@@ -618,12 +596,11 @@ class PartnerAnalysisSummaryAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
         if 'partner' not in request.query_params:
-            return Response({'message': "partner GET parameter is required."}, status=statuses.HTTP_400_BAD_REQUEST)
+            raise ValidationError("partner GET parameter is required.")
 
         serializer_context = {}
 
-        partner = get_object_or_404(
-            Partner, id=request.query_params.get('partner'))
+        partner = get_object_or_404(Partner, id=request.query_params.get('partner'))
 
         if 'project' in request.query_params:
             if request.query_params.get('project'):
@@ -631,9 +608,9 @@ class PartnerAnalysisSummaryAPIView(APIView):
                     PartnerProject, id=request.query_params.get('project'))
 
                 if project.partner.id != partner.id:
-                    return Response(
-                        {'message': "project does not belong to partner."}, status=statuses.HTTP_400_BAD_REQUEST
-                    )
+                    raise ValidationError({
+                        'project': "project does not belong to partner."
+                    })
 
                 serializer_context['project'] = project
 
@@ -643,17 +620,15 @@ class PartnerAnalysisSummaryAPIView(APIView):
                     PartnerActivity, id=request.query_params.get('activity'))
 
                 if activity.partner.id != partner.id:
-                    return Response(
-                        {'message': "activity does not belong to partner."}, status=statuses.HTTP_400_BAD_REQUEST
-                    )
+                    raise ValidationError({
+                        'activity': 'activity does not belong to partner.'
+                    })
 
                 serializer_context['activity'] = activity
 
         if 'ca_indicator' in request.query_params:
             if request.query_params.get('ca_indicator'):
-                ca_indicator = get_object_or_404(
-                    Reportable,
-                    id=request.query_params.get('ca_indicator'))
+                ca_indicator = get_object_or_404(Reportable, id=request.query_params.get('ca_indicator'))
 
                 serializer_context['ca_indicator'] = ca_indicator
 
@@ -663,9 +638,9 @@ class PartnerAnalysisSummaryAPIView(APIView):
                     Cluster, id=request.query_params.get('cluster_id'))
 
                 if not partner.clusters.filter(id=cluster.id).exists():
-                    return Response(
-                        {'message': "cluster does not belong to partner."}, status=statuses.HTTP_400_BAD_REQUEST
-                    )
+                    raise ValidationError({
+                        'cluster_id': "cluster does not belong to partner."
+                    })
 
                 serializer_context['cluster'] = cluster
 

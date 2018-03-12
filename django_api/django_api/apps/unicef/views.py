@@ -8,6 +8,7 @@ from django.http import HttpResponse, Http404
 from django.shortcuts import get_object_or_404
 
 from rest_framework import status as statuses
+from rest_framework.exceptions import ValidationError
 from rest_framework.generics import RetrieveAPIView, ListAPIView
 from rest_framework.parsers import FileUploadParser, FormParser, MultiPartParser
 from rest_framework.response import Response
@@ -294,15 +295,18 @@ class ProgressReportDetailsUpdateAPIView(APIView):
     """
         Endpoint for updating Progress Report narrative fields
     """
-    permission_classes = (IsAuthenticated,
-                          IsPartnerEditorOrPartnerAuthorizedOfficer)
+    permission_classes = (
+        IsAuthenticated,
+        IsPartnerEditorOrPartnerAuthorizedOfficer,
+    )
 
     def get_object(self, pk):
         try:
             return ProgressReport.objects.get(
                 programme_document__partner=self.request.user.partner,  # TODO: check if needed?
                 programme_document__workspace=self.workspace_id,
-                pk=pk)
+                pk=pk
+            )
         except ProgressReport.DoesNotExist as exp:
             logger.exception({
                 "endpoint": "ProgressReportDetailsUpdateAPIView",
@@ -315,15 +319,10 @@ class ProgressReportDetailsUpdateAPIView(APIView):
     def put(self, request, workspace_id, pk, *args, **kwargs):
         self.workspace_id = workspace_id
         pr = self.get_object(pk)
-        serializer = ProgressReportUpdateSerializer(
-            instance=pr, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=statuses.HTTP_200_OK)
-
-        else:
-            return Response(serializer.errors,
-                            status=statuses.HTTP_400_BAD_REQUEST)
+        serializer = ProgressReportUpdateSerializer(instance=pr, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=statuses.HTTP_200_OK)
 
 
 class ProgressReportDetailsAPIView(ObjectExportMixin, RetrieveAPIView):
@@ -453,11 +452,10 @@ class ProgressReportSubmitAPIView(APIView):
     def post(self, request, *args, **kwargs):
         progress_report = self.get_object()
         if not progress_report.programme_document.status == PD_STATUS.active:
-            _errors = [{
-                "message": "Updating Progress Report for a {} Programme Document is not allowed. Only Active "
-                           "PDs can be reported on.".format(progress_report.programme_document.get_status_display())
-            }]
-            return Response({"errors": _errors}, status=statuses.HTTP_400_BAD_REQUEST)
+            raise ValidationError(
+                "Updating Progress Report for a {} Programme Document is not allowed. Only Active "
+                "PDs can be reported on.".format(progress_report.programme_document.get_status_display())
+            )
 
         for ir in progress_report.indicator_reports.all():
             # Check if all indicator data is fulfilled for IR status different
@@ -466,27 +464,23 @@ class ProgressReportSubmitAPIView(APIView):
                 for data in ir.indicator_location_data.all():
                     for key, vals in data.disaggregation.items():
                         if ir.is_percentage and (vals.get('c', None) in [None, '']):
-                            _errors = [{
-                                "message": "You have not completed all required indicators for this progress report. "
-                                           "Unless your Output status is Met or has No Progress, all indicator data "
-                                           "needs to be completed."
-                            }]
-                            return Response({"errors": _errors}, status=statuses.HTTP_400_BAD_REQUEST)
+                            raise ValidationError(
+                                "You have not completed all required indicators for this progress report. Unless your "
+                                "Output status is Met or has No Progress, all indicator data needs to be completed."
+                            )
 
                         elif ir.is_number and (vals.get('v', None) in [None, '']):
-                            _errors = [{
-                                "message": "You have not completed all required indicators for this progress report. "
-                                           "Unless your Output status is Met or has No Progress, all indicator data "
-                                           "needs to be completed."
-                            }]
-                            return Response({"errors": _errors}, status=statuses.HTTP_400_BAD_REQUEST)
+                            raise ValidationError(
+                                "You have not completed all required indicators for this progress report. Unless your "
+                                "Output status is Met or has No Progress, all indicator data needs to be completed."
+                            )
                 if not ir.narrative_assessment:
-                    _errors = [{
-                        "message": "You have not completed narrative assessment for one of Outputs (%s). Unless your "
-                                   "Output status is Met or has No Progress, all indicator data needs to "
-                                   "be completed." % ir.reportable.content_object
-                    }]
-                    return Response({"errors": _errors}, status=statuses.HTTP_400_BAD_REQUEST)
+                    raise ValidationError(
+                        "You have not completed narrative assessment for one of Outputs ({}). Unless your Output "
+                        "status is Met or has No Progress, all indicator data needs to be completed.".format(
+                            ir.reportable.content_object
+                        )
+                    )
 
             # Check if indicator was already submitted or SENT BACK
             if ir.submission_date is None or ir.report_status == INDICATOR_REPORT_STATUS.sent_back:
@@ -495,22 +489,18 @@ class ProgressReportSubmitAPIView(APIView):
                 ir.save()
 
         # Check if PR other tab is fulfilled
+        other_tab_errors = []
         if not progress_report.partner_contribution_to_date:
-            _errors = [{
-                "message": "You have not completed Partner Contribution To Date field on Other Info tab."
-            }]
-            return Response({"errors": _errors}, status=statuses.HTTP_400_BAD_REQUEST)
+            other_tab_errors.append("You have not completed Partner Contribution To Date field on Other Info tab.")
         if not progress_report.challenges_in_the_reporting_period:
-            _errors = [{
-                "message": "You have not completed Challenges / bottlenecks in the reporting period field on "
-                           "Other Info tab."
-            }]
-            return Response({"errors": _errors}, status=statuses.HTTP_400_BAD_REQUEST)
+            other_tab_errors.append(
+                "You have not completed Challenges / bottlenecks in the reporting period field on Other Info tab."
+            )
         if not progress_report.proposed_way_forward:
-            _errors = [{
-                "message": "You have not completed Proposed way forward field on Other Info tab."
-            }]
-            return Response({"errors": _errors}, status=statuses.HTTP_400_BAD_REQUEST)
+            other_tab_errors.append("You have not completed Proposed way forward field on Other Info tab.")
+
+        if other_tab_errors:
+            raise ValidationError(other_tab_errors)
 
         if progress_report.submission_date is None or progress_report.status == PROGRESS_REPORT_STATUS.sent_back:
             provided_email = request.data.get('submitted_by_email')
@@ -525,12 +515,9 @@ class ProgressReportSubmitAPIView(APIView):
                 else:
                     _error_message = 'Your report could not be submitted, because you are not the authorized ' \
                                      'officer assigned to the PCA that is connected to that PD.'
-
-                _errors = [{
-                    "message": _error_message,
-                    "code": APIErrorCode.PR_SUBMISSION_FAILED_USER_NOT_AUTHORIZED_OFFICER,
-                }]
-                return Response({"errors": _errors}, status=statuses.HTTP_400_BAD_REQUEST)
+                raise ValidationError(
+                    _error_message, code=APIErrorCode.PR_SUBMISSION_FAILED_USER_NOT_AUTHORIZED_OFFICER
+                )
 
             if provided_email:
                 authorized_officer_user = get_user_model().objects.filter(email=provided_email).first()
@@ -548,11 +535,10 @@ class ProgressReportSubmitAPIView(APIView):
             serializer = ProgressReportSerializer(instance=progress_report)
             return Response(serializer.data, status=statuses.HTTP_200_OK)
         else:
-            _errors = [{
-                "message": "Progress report was already submitted. Your IMO will need to send it "
-                           "back for you to edit your submission."
-            }]
-            return Response({"errors": _errors}, status=statuses.HTTP_400_BAD_REQUEST)
+            raise ValidationError(
+                "Progress report was already submitted. Your IMO will need to send it "
+                "back for you to edit your submission."
+            )
 
 
 class ProgressReportReviewAPIView(APIView):
@@ -588,27 +574,20 @@ class ProgressReportReviewAPIView(APIView):
         progress_report = self.get_object(pk)
 
         if progress_report.status != PROGRESS_REPORT_STATUS.submitted:
-            _errors = [{"message": "This report is not in submitted state."}]
-            return Response({"errors": _errors},
-                            status=statuses.HTTP_400_BAD_REQUEST)
+            raise ValidationError("This report is not in submitted state.")
 
         serializer = ProgressReportReviewSerializer(data=request.data)
-        if serializer.is_valid():
-            progress_report.status = serializer.validated_data['status']
-            progress_report.review_date = datetime.now().date()
-            if progress_report.status == PROGRESS_REPORT_STATUS.sent_back:
-                progress_report.sent_back_feedback = serializer.validated_data[
-                    'comment']
-            elif progress_report.status == PROGRESS_REPORT_STATUS.accepted:
-                progress_report.review_overall_status = serializer.validated_data[
-                    'overall_status']
+        serializer.is_valid(raise_exception=True)
+        progress_report.status = serializer.validated_data['status']
+        progress_report.review_date = datetime.now().date()
+        if progress_report.status == PROGRESS_REPORT_STATUS.sent_back:
+            progress_report.sent_back_feedback = serializer.validated_data['comment']
+        elif progress_report.status == PROGRESS_REPORT_STATUS.accepted:
+            progress_report.review_overall_status = serializer.validated_data['overall_status']
 
-            progress_report.save()
-            serializer = ProgressReportSerializer(instance=progress_report)
-            return Response(serializer.data, status=statuses.HTTP_200_OK)
-
-        return Response({"errors": serializer.errors},
-                        status=statuses.HTTP_400_BAD_REQUEST)
+        progress_report.save()
+        serializer = ProgressReportSerializer(instance=progress_report)
+        return Response(serializer.data, status=statuses.HTTP_200_OK)
 
 
 class ProgrammeDocumentCalculationMethodsAPIView(APIView):
@@ -628,9 +607,9 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
         Construct the input data to the serializer for the LLO and its
         associated indicators.
         """
-        pd = get_object_or_404(ProgrammeDocument,
-                               id=pd_id,
-                               workspace__id=workspace_id)
+        pd = get_object_or_404(
+            ProgrammeDocument, id=pd_id, workspace__id=workspace_id
+        )
 
         data = {'ll_outputs_and_indicators': []}
         for llo in pd.lower_level_outputs:
@@ -638,10 +617,10 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
             for reportable in llo.reportables.all():
                 indicator_blueprints.append(reportable.blueprint)
 
-            inner_data = {}
-            inner_data['ll_output'] = LLOutputSerializer(instance=llo).data
-            inner_data['indicators'] = IndicatorBlueprintSimpleSerializer(
-                indicator_blueprints, many=True).data
+            inner_data = {
+                'll_output': LLOutputSerializer(instance=llo).data,
+                'indicators': IndicatorBlueprintSimpleSerializer(indicator_blueprints, many=True).data
+            }
 
             data['ll_outputs_and_indicators'].append(inner_data)
 
@@ -655,63 +634,58 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
         associated with lower level outputs of this PD.
         """
         serializer = ProgrammeDocumentCalculationMethodsSerializer(data=request.data)
-        if serializer.is_valid():
-            notify_email_flag = False
-            pd_to_notify = None
+        serializer.is_valid(raise_exception=True)
+        notify_email_flag = False
+        pd_to_notify = None
 
-            for llo_and_indicators in serializer.validated_data[
-                    'll_outputs_and_indicators']:
-                for indicator_blueprint in llo_and_indicators['indicators']:
-                    instance = get_object_or_404(IndicatorBlueprint, id=indicator_blueprint['id'])
+        for llo_and_indicators in serializer.validated_data[
+                'll_outputs_and_indicators']:
+            for indicator_blueprint in llo_and_indicators['indicators']:
+                instance = get_object_or_404(IndicatorBlueprint, id=indicator_blueprint['id'])
 
-                    old_formulas = {
-                        instance.calculation_formula_across_periods,
-                        instance.calculation_formula_across_locations
-                    }
+                old_formulas = {
+                    instance.calculation_formula_across_periods,
+                    instance.calculation_formula_across_locations
+                }
 
-                    new_formulas = {
-                        indicator_blueprint['calculation_formula_across_locations'],
-                        indicator_blueprint['calculation_formula_across_periods']
-                    }
+                new_formulas = {
+                    indicator_blueprint['calculation_formula_across_locations'],
+                    indicator_blueprint['calculation_formula_across_periods']
+                }
 
-                    llo = instance.reportables.first().content_object
-                    pd = llo.cp_output.programme_document
-                    accepted_progress_reports = pd.progress_reports.filter(status=PROGRESS_REPORT_STATUS.accepted)
+                llo = instance.reportables.first().content_object
+                pd = llo.cp_output.programme_document
+                accepted_progress_reports = pd.progress_reports.filter(status=PROGRESS_REPORT_STATUS.accepted)
 
-                    if not notify_email_flag and accepted_progress_reports.exists():
-                        if not old_formulas == new_formulas:
-                            notify_email_flag = True
-                            pd_to_notify = pd
+                if not notify_email_flag and accepted_progress_reports.exists():
+                    if not old_formulas == new_formulas:
+                        notify_email_flag = True
+                        pd_to_notify = pd
 
-                    instance.calculation_formula_across_periods = \
-                        indicator_blueprint[
-                            'calculation_formula_across_periods']
-                    instance.calculation_formula_across_locations = \
-                        indicator_blueprint[
-                            'calculation_formula_across_locations']
-                    instance.clean()
-                    instance.save()
+                instance.calculation_formula_across_periods = indicator_blueprint['calculation_formula_across_periods']
+                instance.calculation_formula_across_locations = indicator_blueprint[
+                    'calculation_formula_across_locations'
+                ]
+                instance.clean()
+                instance.save()
 
-            if notify_email_flag:
-                focal_points = list(pd_to_notify.unicef_focal_point.values('name', 'email'))
-                template_data = dict()
-                template_data['pd'] = pd_to_notify
+        if notify_email_flag:
+            focal_points = list(pd_to_notify.unicef_focal_point.values('name', 'email'))
+            template_data = dict()
+            template_data['pd'] = pd_to_notify
 
-                for focal_point in focal_points:
-                    template_data['focal_point_name'] = focal_point['name']
-                    send_email_from_template(
-                        'email/notify_partner_on_calculation_method_change_subject.txt',
-                        'email/notify_partner_on_calculation_method_change.txt',
-                        template_data,
-                        settings.DEFAULT_FROM_EMAIL,
-                        [focal_point['email']],
-                        fail_silently=False
-                    )
+            for focal_point in focal_points:
+                template_data['focal_point_name'] = focal_point['name']
+                send_email_from_template(
+                    'email/notify_partner_on_calculation_method_change_subject.txt',
+                    'email/notify_partner_on_calculation_method_change.txt',
+                    template_data,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [focal_point['email']],
+                    fail_silently=False
+                )
 
-            return Response(serializer.data, status=statuses.HTTP_200_OK)
-
-        return Response({"errors": serializer.errors},
-                        status=statuses.HTTP_400_BAD_REQUEST)
+        return Response(serializer.data, status=statuses.HTTP_200_OK)
 
 
 class ProgressReportAttachmentAPIView(APIView):
@@ -762,21 +736,19 @@ class ProgressReportAttachmentAPIView(APIView):
             data=request.data
         )
 
-        if serializer.is_valid():
-            if pr.attachment:
-                try:
-                    pr.attachment.delete()
-                except ValueError:
-                    pass
+        serializer.is_valid(raise_exception=True)
+        if pr.attachment:
+            try:
+                pr.attachment.delete()
+            except ValueError:
+                pass
 
-            serializer.save()
+        serializer.save()
 
-            progress_reports = ProgressReport.objects.filter(
-                id=progress_report_id, programme_document__workspace_id=workspace_id
-            )
-            return Response(
-                ProgressReportAttachmentSerializer(progress_reports, many=True).data, status=statuses.HTTP_200_OK
-            )
+        progress_reports = ProgressReport.objects.filter(
+            id=progress_report_id, programme_document__workspace_id=workspace_id
+        )
+        return Response(
+            ProgressReportAttachmentSerializer(progress_reports, many=True).data, status=statuses.HTTP_200_OK
+        )
 
-        else:
-            return Response({"errors": serializer.errors}, status=statuses.HTTP_400_BAD_REQUEST)

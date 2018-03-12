@@ -76,18 +76,16 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
         """
         Adding other many to many relations that can be posted like clusters and locations.
         :param instance:
-        :return: list of errors or False
         """
-        errors = []
 
         try:
             for cluster in self.request.data['clusters']:
                 instance.clusters.add(int(cluster['id']))
         except Exception:
             # TODO log
-            errors.append({"clusters": "list of dict ids fail."})
-
-        return errors or False
+            raise ValidationError({
+                'clusters': "list of dict ids fail."
+            })
 
     def post(self, request, *args, **kwargs):
         """
@@ -95,18 +93,12 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
         :return: PartnerProject object id
         """
         serializer = self.get_serializer(data=self.request.data)
-
-        if not serializer.is_valid():
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
-
+        serializer.is_valid(raise_exception=True)
         serializer.save(partner=request.user.partner)
-        errors = self.add_many_to_many_relations(serializer.instance)
-        if errors:
-            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({'id': serializer.instance.id},
-                        status=status.HTTP_201_CREATED)
+        self.add_many_to_many_relations(serializer.instance)
+
+        return Response({'id': serializer.instance.id}, status=status.HTTP_201_CREATED)
 
 
 class PartnerProjectAPIView(APIView):
@@ -134,9 +126,7 @@ class PartnerProjectAPIView(APIView):
             instance=self.get_instance(self.request, pk),
             data=self.request.data
         )
-        if not serializer.is_valid():
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
 

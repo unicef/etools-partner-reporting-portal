@@ -323,28 +323,34 @@ class ProgressReportReviewSerializer(serializers.Serializer):
         PROGRESS_REPORT_STATUS.accepted
     ])
     comment = serializers.CharField(required=False)
-    overall_status = serializers.ChoiceField(required=False,
-                                             choices=OVERALL_STATUS)
+    overall_status = serializers.ChoiceField(required=False, choices=OVERALL_STATUS)
 
     def validate(self, data):
         """
         Make sure status is only accepted or sent back. Also overall_status
         should be set if accepting
         """
-        if data['status'] not in [PROGRESS_REPORT_STATUS.sent_back,
-                                  PROGRESS_REPORT_STATUS.accepted]:
-            raise serializers.ValidationError(
-                'Report status should be accepted or sent back')
-        if data.get('overall_status', None) == OVERALL_STATUS.no_status:
-            raise serializers.ValidationError('Invalid overall status')
-        if data.get('status', None) == PROGRESS_REPORT_STATUS.accepted and data.get(
-                'overall_status', None) is None:
-            raise serializers.ValidationError(
-                'Overall status required when accepting a report')
-        if data.get('status', None) == PROGRESS_REPORT_STATUS.sent_back and data.get(
-                'comment') is None:
-            raise serializers.ValidationError(
-                'Comment required when sending back report')
+        status = data['status']
+        overall_status = data.get('overall_status', None)
+
+        if status not in {
+            PROGRESS_REPORT_STATUS.sent_back, PROGRESS_REPORT_STATUS.accepted
+        }:
+            raise serializers.ValidationError({
+                'status': 'Report status should be accepted or sent back'
+            })
+        if overall_status == OVERALL_STATUS.no_status:
+            raise serializers.ValidationError({
+                'overall_status': 'Invalid overall status'
+            })
+        if status == PROGRESS_REPORT_STATUS.accepted and overall_status is None:
+            raise serializers.ValidationError({
+                'overall_status': 'Overall status required when accepting a report'
+            })
+        if status == PROGRESS_REPORT_STATUS.sent_back and not data.get('comment'):
+            raise serializers.ValidationError({
+                'comment': 'Comment required when sending back report'
+            })
 
         return data
 
