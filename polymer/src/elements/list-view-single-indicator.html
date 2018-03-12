@@ -59,12 +59,12 @@
         <span class="table-cell table-cell--text">
           <etools-prp-progress-bar number="[[indicator.progress_percentage]]">
         </span>
-        <template is="dom-if" if="[[isClusterApp]]">
+        <template is="dom-if" if="[[isClusterApp]]" restamp="true">
           <span class="table-cell table-cell--text">
             <a href="[[indicatorReportsUrl]]">REPORTS</a>
           </span>
         </template>
-        <template is="dom-if" if="[[canEdit]]">
+        <template is="dom-if" if="[[canEdit]]" restamp="true">
           <span class="table-cell table-cell--text">
             <a href="#" on-tap="_openModal">EDIT</a>
           </span>
