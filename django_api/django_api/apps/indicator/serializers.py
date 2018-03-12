@@ -1153,21 +1153,18 @@ class ClusterAnalysisIndicatorsListSerializer(serializers.ModelSerializer):
     content_object = serializers.SerializerMethodField()
     total_against_in_need = serializers.SerializerMethodField()
     total_against_target = serializers.SerializerMethodField()
+    blueprint = IndicatorBlueprintSimpleSerializer(read_only=True)
 
     def get_content_type(self, obj):
         return obj.content_type.model
 
     def get_total_against_in_need(self, obj):
-        # TODO: Stubbed until in_need field is finalized
-        return 100
+        target = float(obj.target) if obj.target else 0.0
+        return 100 / target
 
     def get_total_against_target(self, obj):
-        # TODO: Move this logic to post_save on Reportable in the future
-        if obj.children.exists():
-            return sum(map(lambda x: int(x['c']), obj.children.values_list('total', flat=True)))
-
-        else:
-            return obj.total
+        target = float(obj.target) if obj.target else 0.0
+        return obj.total['c'] / target
 
     def get_content_object(self, obj):
         if isinstance(obj.content_object, (PartnerProject, )):
