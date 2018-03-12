@@ -223,7 +223,18 @@ def calculate_end_date_given_start_date(start_date, frequency, cs_dates=None):
 def find_missing_frequency_period_dates_for_indicator_report(indicator, latest_indicator_report_date, frequency):
     # PD_FREQUENCY_LEVEL can be used interchangeably
     today = date.today()
-    date_to_compare = latest_indicator_report_date if latest_indicator_report_date else indicator.start_date
+    indicator_start_date = None
+    indicator_end_date = None
+
+    if indicator.content_type.model in ["clusterobjective", "clusteractivity"]:
+        indicator_start_date = indicator.content_object.cluster.response_plan.start
+        indicator_end_date = indicator.content_object.cluster.response_plan.end
+
+    if indicator.content_type.model in ["partnerproject", "partneractivity", "lowerleveloutput"]:
+        indicator_start_date = indicator.content_object.start_date
+        indicator_end_date = indicator.content_object.end_date
+
+    date_to_compare = latest_indicator_report_date if latest_indicator_report_date else indicator_start_date
     date_list = []
 
     # Only add 1 day to date_to_compare if it came from latest_indicator_report_date
@@ -232,12 +243,12 @@ def find_missing_frequency_period_dates_for_indicator_report(indicator, latest_i
         date_to_compare += timedelta(1)
 
     # For now, we only generate missing dates for the past.
-    if today > date_to_compare and indicator.end_date > date_to_compare:
+    if today > date_to_compare and indicator_end_date > date_to_compare:
         # day_delta as a flag to decrement day_delta_counter for next date
         # day_delta_counter as a date day integer to indicate next date
-        if today > indicator.end_date:
-            day_delta = (indicator.end_date - date_to_compare).days
-            date_to_subtract_from = indicator.end_date
+        if today > indicator_end_date:
+            day_delta = (indicator_end_date - date_to_compare).days
+            date_to_subtract_from = indicator_end_date
         else:
             day_delta = (today - date_to_compare).days
             date_to_subtract_from = today
@@ -316,7 +327,7 @@ def find_missing_frequency_period_dates_for_indicator_report(indicator, latest_i
                     break
 
             # Only add new date if it's later than start date
-            if indicator.start_date <= missing_date and can_add:
+            if indicator_start_date <= missing_date and can_add:
                 date_list.append(missing_date)
 
     return date_list

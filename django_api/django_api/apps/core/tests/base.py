@@ -24,4 +24,4 @@ class BaseAPITestCase(APITestCase):
         # creating a session (login already created user in generate_fake_data)
         if self.with_session_login:
             self.client = self.client_class()
-            self.client.login(username='admin', password='Passw0rd!')
+            self.client.login(username='admin_imo', password='Passw0rd!')

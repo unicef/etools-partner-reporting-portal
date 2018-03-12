@@ -135,6 +135,10 @@ class Partner(TimeStampedExternalSourceModel):
         max_length=50,
         null=True,
     )
+    basis_for_risk_rating = models.CharField(
+        max_length=50,
+        null=True,
+    )
 
     clusters = models.ManyToManyField('cluster.Cluster',
                                       related_name="partners")

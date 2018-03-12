@@ -15,7 +15,6 @@
 <link rel="import" href="../etools-prp-ajax.html">
 <link rel="import" href="../project-status.html">
 <link rel="import" href="../page-body.html">
-<link rel="import" href="../etools-prp-data-table-row.html">
 <link rel="import" href="../list-placeholder.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
@@ -118,7 +117,7 @@
             items="[[activities]]"
             as="activity"
             initial-count="[[pageSize]]">
-          <etools-prp-data-table-row details-opened="[[detailsOpened]]">
+          <etools-data-table-row details-opened="[[detailsOpened]]">
             <div slot="row-data">
               <div class="table-cell table-cell--text">
                 <a href="[[_detailUrl(activity, anchorQuery)]]">[[activity.title]]</a>
@@ -152,7 +151,7 @@
                 [[_commaSeparatedDictValues(activity.locations, 'title')]]
               </div>
             </div>
-            <div slot="row-data-details" class="row-details-expanded-wrapper">
+            <div slot="row-data-details">
                 <div slot="row-data">
                   <div class="table-cell table-cell--text">
                     <span class="label">Start Date</span>
@@ -164,7 +163,7 @@
                   </div>
                 </div>
             </div>
-          </etools-prp-data-table-row>
+          </etools-data-table-row>
         </template>
 
         <list-placeholder
@@ -220,15 +219,10 @@
             computed: '_withDefaultParams(queryParams)',
           },
 
-          detailsOpened: {
-            type: Boolean,
-            value: false
-          },
-
           openedDetails: {
             type: Array,
             value: []
-          }
+          },
         },
 
         _openModal: function () {

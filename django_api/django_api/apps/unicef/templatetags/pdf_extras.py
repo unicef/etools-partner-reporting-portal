@@ -18,6 +18,8 @@ def get_absolute_file_url(context, django_file, default='---'):
     request = context.get('request')
     if request and django_file:
         return request.build_absolute_uri(django_file.url)
+    elif django_file:
+        return django_file.url
     return default
 
 

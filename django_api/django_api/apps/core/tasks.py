@@ -93,6 +93,11 @@ def process_period_reports():
                 # Create ProgressReport first
                 print("Creating ProgressReport for {} - {}".format(start_date, end_date))
 
+                # Re-query latest ProgressReport
+                latest_progress_report = pd.progress_reports.order_by(
+                    'report_type', 'report_number', 'is_final', 'end_date'
+                ).last()
+
                 if latest_progress_report:
                     report_type = latest_progress_report.report_type
                     report_number = latest_progress_report.report_number + 1

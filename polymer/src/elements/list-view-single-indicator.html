@@ -1,8 +1,8 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/etools-data-table/etools-data-table.html">
 
 <link rel="import" href="ip-reporting/ip-reporting-indicator-details.html">
-<link rel="import" href="etools-prp-data-table-row.html">
 <link rel="import" href="etools-prp-progress-bar.html">
 <link rel="import" href="../styles/table-styles.html">
 <link rel="import" href="../redux/store.html">
@@ -18,6 +18,10 @@
     <style include="iron-flex iron-flex-factors data-table-styles table-styles">
       :host {
         display: block;
+        --list-row-collapse-wrapper: {
+          padding: 0;
+          background: white;
+        }
       }
       a {
         text-decoration: none;
@@ -29,39 +33,39 @@
     the indicator belongs to is needed. -->
     <indicator-edit-modal id="modal" edit-data="[[indicator]]"></indicator-edit-modal>
 
-    <etools-prp-data-table-row details-opened="{{detailsOpened}}">
+    <etools-data-table-row on-opened-changed="_handleOpenedChanged">
       <div slot="row-data">
-        <span class="col-data flex-3">
+        <span class="table-cell table-cell--text">
           <template is="dom-if" if="[[_flagIndicator(indicator.target, indicator.baseline, isCustom)]]">
             <status-badge type="error"></status-badge>
           </template>
             [[indicator.blueprint.title]]
         </span>
-        <span class="col-data flex-2">
+        <span class="table-cell table-cell--text">
           [[indicator.blueprint.calculation_formula_across_locations]]
         </span>
-        <span class="col-data flex-2">
+        <span class="table-cell table-cell--text">
           [[indicator.blueprint.calculation_formula_across_periods]]
         </span>
-        <span class="col-data flex-2">
+        <span class="table-cell table-cell--text">
           [[_withDefault(indicator.baseline)]]
          </span>
-        <span class="col-data flex-2">
+        <span class="table-cell table-cell--text">
           [[_withDefault(indicator.target)]]
         </span>
-        <span class="col-data flex-2">
+        <span class="table-cell table-cell--text">
           [[indicator.achieved.c]]
         </span>
-        <span class="col-data flex-4">
+        <span class="table-cell table-cell--text">
           <etools-prp-progress-bar number="[[indicator.progress_percentage]]">
         </span>
-        <template is="dom-if" if="[[isClusterApp]]">
-          <span class="col-data flex-1">
+        <template is="dom-if" if="[[isClusterApp]]" restamp="true">
+          <span class="table-cell table-cell--text">
             <a href="[[indicatorReportsUrl]]">REPORTS</a>
           </span>
         </template>
-        <template is="dom-if" if="[[canEdit]]">
-          <span class="col-data flex-1">
+        <template is="dom-if" if="[[canEdit]]" restamp="true">
+          <span class="table-cell table-cell--text">
             <a href="#" on-tap="_openModal">EDIT</a>
           </span>
         </template>
@@ -71,7 +75,7 @@
                                         is-open="[[detailsOpened]]">
         </ip-reporting-indicator-details>
       </div>
-    </etools-prp-data-table-row>
+    </etools-data-table-row>
 
   </template>
 
@@ -121,6 +125,10 @@
 
       _computeIsClusterApp: function(appName) {
         return appName === 'cluster-reporting';
+      },
+
+      _handleOpenedChanged: function() {
+        this.detailsOpened = !this.detailsOpened;
       },
 
       _computeIndicatorReportsUrl: function(baseUrl, indicator) {
