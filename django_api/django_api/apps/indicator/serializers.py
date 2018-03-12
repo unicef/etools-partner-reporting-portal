@@ -1159,11 +1159,11 @@ class ClusterAnalysisIndicatorsListSerializer(serializers.ModelSerializer):
         return obj.content_type.model
 
     def get_total_against_in_need(self, obj):
-        target = float(obj.target) if obj.target else 0.0
-        return 100 / target
+        target = float(obj.target) if obj.target else 1.0
+        return float(obj.in_need) / target if obj.in_need else 0
 
     def get_total_against_target(self, obj):
-        target = float(obj.target) if obj.target else 0.0
+        target = float(obj.target) if obj.target else 1.0
         return obj.total['c'] / target
 
     def get_content_object(self, obj):
@@ -1206,10 +1206,27 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
     progress_over_time = serializers.SerializerMethodField()
     current_progress_by_partner = serializers.SerializerMethodField()
     current_progress_by_location = serializers.SerializerMethodField()
-    content_type = serializers.SerializerMethodField()
+    indicator_type = serializers.SerializerMethodField()
+    display_type = serializers.SerializerMethodField()
 
-    def get_content_type(self, obj):
-        return obj.content_type.model
+    def get_indicator_type(self, obj):
+        if obj.content_type.model == "clusteractivity":
+            return "Cluster Activity Indicator"
+
+        elif obj.content_type.model == "clusterobjective":
+            return "Cluster Objective Indicator"
+
+        elif obj.content_type.model == "partneractivity":
+            return "Partner Activity Indicator"
+
+        elif obj.content_type.model == "partnerproject":
+            return "Partner Project Indicator"
+
+        else:
+            return "Lower Level Output Indicator"
+
+    def get_display_type(self, obj):
+        return obj.blueprint.display_type
 
     def get_num_of_partners(self, obj):
         num_of_partners = 0
@@ -1310,7 +1327,8 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
             'in_need',
             'total',
             'blueprint',
-            'content_type',
+            'indicator_type',
+            'display_type',
             'frequency',
             'num_of_partners',
             'partners_by_status',
