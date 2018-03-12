@@ -574,14 +574,14 @@ def recalculate_reportable_total(sender, instance, **kwargs):
     accepted_indicator_reports = reportable.indicator_reports.all().filter(
         report_status=INDICATOR_REPORT_STATUS.accepted)
 
-    # Reset the reportable total
-    reportable_total = {
-        'c': 0,
-        'd': 0,
-        'v': 0,
-    }
-
     if accepted_indicator_reports.count() > 0:
+        # Reset the reportable total
+        reportable_total = {
+            'c': 0,
+            'd': 0,
+            'v': 0,
+        }
+
         # If unit choice is NUMBER then have to handle sum, avg, max
         if blueprint.unit == IndicatorBlueprint.NUMBER:
             reportable_total['d'] = 1
@@ -619,8 +619,8 @@ def recalculate_reportable_total(sender, instance, **kwargs):
                 reportable_total['c'] = reportable_total['v'] / \
                     (reportable_total['d'] * 1.0)
 
-    reportable.total = reportable_total
-    reportable.save()
+        reportable.total = reportable_total
+        reportable.save()
 
     # Triggering total recalculation on parent Reportable from its children
     if reportable.parent_indicator:
@@ -629,11 +629,11 @@ def recalculate_reportable_total(sender, instance, **kwargs):
             'd': 1,
             'v': 0,
         }
-        child_totals = reportable.children.values_list('total', flat=True)
+        child_totals = reportable.parent_indicator.children.values_list('total', flat=True)
 
         for total in child_totals:
-            new_parent_total['v'] += child_totals['v']
-            new_parent_total['c'] += child_totals['c']
+            new_parent_total['v'] += total['v']
+            new_parent_total['c'] += total['c']
 
         reportable.parent_indicator.total = new_parent_total
         reportable.parent_indicator.save()
