@@ -131,15 +131,11 @@
       },
 
       detached: function () {
-        [
+        this._cancelDebouncers([
           'reset-narrow-loc-type',
           'reset-cluster-objectives',
           'reset-locations',
-        ].forEach(function (debouncer) {
-          if (this.isDebouncerActive(debouncer)) {
-            this.cancelDebouncer(debouncer);
-          }
-        }, this);
+        ]);
       },
     });
   </script>

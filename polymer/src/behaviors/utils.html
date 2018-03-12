@@ -205,6 +205,14 @@
       _truncate: function (str, len) {
         return str.slice(0, len) + (str.length > len ? '…' : '');
       },
+
+      _cancelDebouncers: function (debouncers) {
+        debouncers.forEach(function (debouncer) {
+          if (this.isDebouncerActive(debouncer)) {
+            this.cancelDebouncer(debouncer);
+          }
+        }, this);
+      },
     };
 
     function buildQuery(chunks) {

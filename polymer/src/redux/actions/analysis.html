@@ -85,9 +85,81 @@
       },
 
       Indicators: {
+        fetchData: function (dataThunk) {
+          return function (dispatch) {
+            dispatch(App.Actions.Analysis.Indicators.dataLoadingStart());
 
+            return dataThunk()
+                .then(function (res) {
+                  dispatch(App.Actions.Analysis.Indicators.dataLoadingStop());
+                  dispatch(App.Actions.Analysis.Indicators.setData(res.data));
+                })
+                .catch(function (err) {
+                  dispatch(App.Actions.Analysis.Indicators.dataLoadingStop());
+
+                  return Promise.reject(err);
+                });
+          };
+        },
+
+        dataLoadingStart: function () {
+          return {
+            type: App.Constants.ANALYSIS_INDICATORS_DATA_LOADING_START,
+          };
+        },
+
+        dataLoadingStop: function () {
+          return {
+            type: App.Constants.ANALYSIS_INDICATORS_DATA_LOADING_STOP,
+          };
+        },
+
+        setData: function (data) {
+          return {
+            type: App.Constants.SET_ANALYSIS_INDICATORS_DATA,
+            data: data,
+          };
+        },
+
+        fetchSingle: function (indicatorThunk, indicatorId) {
+          return function (dispatch) {
+            dispatch(App.Actions.Analysis.Indicators.singleLoadingStart(indicatorId));
+
+            return indicatorThunk()
+                .then(function (res) {
+                  dispatch(App.Actions.Analysis.Indicators.singleLoadingStop(indicatorId));
+                  dispatch(App.Actions.Analysis.Indicators.setSingle(indicatorId, res.data));
+                })
+                .catch(function (err) {
+                  dispatch(App.Actions.Analysis.Indicators.singleLoadingStop(indicatorId));
+
+                  return Promise.reject(err);
+                });
+          };
+        },
+
+        singleLoadingStart: function (indicatorId) {
+          return {
+            type: App.Constants.ANALYSIS_INDICATOR_DATA_LOADING_START,
+            indicatorId: indicatorId,
+          };
+        },
+
+        singleLoadingStop: function (indicatorId) {
+          return {
+            type: App.Constants.ANALYSIS_INDICATOR_DATA_LOADING_STOP,
+            indicatorId: indicatorId,
+          };
+        },
+
+        setSingle: function (indicatorId, data) {
+          return {
+            type: App.Constants.SET_ANALYSIS_INDICATOR_DATA,
+            indicatorId: indicatorId,
+            data: data,
+          };
+        },
       },
-
     };
   }());
 </script>
