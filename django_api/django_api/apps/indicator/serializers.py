@@ -29,6 +29,8 @@ from .models import (
     Reportable, IndicatorBlueprint,
     IndicatorReport, IndicatorLocationData,
     Disaggregation, DisaggregationValue,
+    get_reportable_data_to_clone,
+    create_pa_reportables_for_new_ca_reportable,
 )
 
 
@@ -758,6 +760,8 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
         disaggregations = self.initial_data.get('disaggregations')
         self.instance.disaggregations.add(*Disaggregation.objects.filter(id__in=[d['id'] for d in disaggregations]))
+
+        create_pa_reportables_for_new_ca_reportable(self.instance)
 
         return self.instance
 

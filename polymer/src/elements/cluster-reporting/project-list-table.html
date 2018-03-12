@@ -203,6 +203,11 @@
 
           projectId: String,
 
+          openedDetails: {
+            type: Array,
+            value: []
+          },
+
           anchorQueryParams: {
             type: Object,
             computed: '_withDefaultParams(queryParams)',
@@ -225,6 +230,10 @@
           }
           //Query string is passed to construct the back button.
           return this.buildUrl(this._baseUrlCluster, path) + '?' + query;
+        },
+
+        detached: function () {
+          this.openedDetails.length = 0;
         },
 
       });

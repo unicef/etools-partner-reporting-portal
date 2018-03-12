@@ -14,6 +14,7 @@ from cluster.serializers import (
     ClusterObjectiveSerializer
 )
 
+from indicator.models import create_pa_reportables_from_ca
 from indicator.serializers import ClusterIndicatorForPartnerActivitySerializer
 
 from .models import (
@@ -57,6 +58,7 @@ class PartnerDetailsSerializer(serializers.ModelSerializer):
             'country_code',
             'email',
             'phone_number',
+            'clusters',
             # Risk Rating part
             'last_assessment_date',
             'type_of_assessment',
@@ -296,6 +298,12 @@ class PartnerActivityFromClusterActivitySerializer(PartnerActivityBaseCreateSeri
             )
         except Exception as e:
             raise serializers.ValidationError(e.message)
+
+        # Grab Cluster Activity instance from this newly created Partner Activity instance
+        cluster_activity = validated_data['cluster_activity']
+
+        create_pa_reportables_from_ca(partner_activity, cluster_activity)
+
         return partner_activity
 
 
