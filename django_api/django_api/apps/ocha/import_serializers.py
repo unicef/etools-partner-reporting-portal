@@ -244,8 +244,6 @@ class V1ResponsePlanLocationImportSerializer(DiscardUniqueTogetherValidationMixi
     class Meta:
         model = Country
         fields = (
-            'external_source',
-            'id',
             'name',
             'long_name',
             'iso3',
