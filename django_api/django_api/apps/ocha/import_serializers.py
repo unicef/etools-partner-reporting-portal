@@ -284,8 +284,8 @@ class V1ResponsePlanImportSerializer(DiscardUniqueTogetherValidationMixin, seria
         )
 
     def get_workspace(self, emergencies, locations):
-        if 'workspace_id' in self.validated_data:
-            return Workspace.objects.get(id=self.validated_data['workspace_id'])
+        if 'workspace' in self.validated_data:
+            return self.validated_data['workspace']
 
         if emergencies:
             workspace_id = emergencies[0]['id']
