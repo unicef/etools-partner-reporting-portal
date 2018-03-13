@@ -1,19 +1,19 @@
 # import datetime
 
-# from django.urls import reverse
-# from django.conf import settings
+# from django.urls imports reverse
+# from django.conf imports settings
 
-# from rest_framework import status
+# from rest_framework imports status
 
-# from core.tests.base import BaseAPITestCase
-# from core.models import Location
-# from core.factories import PartnerProjectFactory, PartnerFactory, ClusterObjectiveFactory
+# from core.tests.base imports BaseAPITestCase
+# from core.models imports Location
+# from core.factories imports PartnerProjectFactory, PartnerFactory, ClusterObjectiveFactory
 
-# from cluster.models import (
+# from cluster.models imports (
 #     Cluster,
 # )
 
-# from partner.models import (
+# from partner.models imports (
 #     PartnerProject,
 #     PartnerActivity,
 # )
