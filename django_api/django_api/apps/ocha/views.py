@@ -15,7 +15,7 @@ from ocha.imports.bulk import fill_cluster_names_for_plan_list
 class RPMWorkspaceResponsePlanAPIView(APIView):
 
     permission_classes = (
-        # IsAuthenticated,
+        IsAuthenticated,
     )
 
     def get_workspace(self):
