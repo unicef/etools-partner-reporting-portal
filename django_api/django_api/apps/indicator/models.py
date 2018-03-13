@@ -227,6 +227,7 @@ class Reportable(TimeStampedExternalSourceModel):
                                              null=True,
                                              blank=True)
     is_cluster_indicator = models.BooleanField(default=False)
+    contributes_to_partner = models.BooleanField(default=False)
 
     # Current total, transactional and dynamically calculated based on
     # IndicatorReports
@@ -249,7 +250,11 @@ class Reportable(TimeStampedExternalSourceModel):
     parent_indicator = models.ForeignKey('self', null=True, blank=True,
                                          related_name='children',
                                          db_index=True)
-    locations = models.ManyToManyField('core.Location', related_name="reportables")
+    locations = models.ManyToManyField(
+        'core.Location',
+        related_name="reportables",
+        through="ReportableLocationGoal"
+    )
 
     frequency = models.CharField(
         max_length=3,
@@ -436,6 +441,14 @@ def sync_ca_reportable_update_to_pa_reportables(instance, created):
           dispatch_uid="clone_ca_reportable_to_pa")
 def clone_ca_reportable_to_pa_signal(sender, instance, created, **kwargs):
     sync_ca_reportable_update_to_pa_reportables(instance, created)
+
+
+class ReportableLocationGoal(TimeStampedModel):
+    reportable = models.ForeignKey(Reportable, on_delete=models.CASCADE)
+    location = models.ForeignKey("core.Location", on_delete=models.CASCADE)
+    target = JSONField(default=dict([('c', 0), ('d', 0), ('v', 0)]))
+    baseline = JSONField(default=dict([('c', 0), ('d', 0), ('v', 0)]))
+    in_need = JSONField(default=dict([('c', 0), ('d', 0), ('v', 0)]))
 
 
 class IndicatorReportManager(models.Manager):
