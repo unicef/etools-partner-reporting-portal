@@ -749,7 +749,6 @@ class OperationalPresenceAggregationDataAPIView(APIView):
             "partners_per_cluster_objective": None,
         }
 
-        workspace = response_plan.workspace
         clusters = Cluster.objects.filter(response_plan=response_plan)
 
         if filter_parameters['clusters']:
@@ -793,9 +792,6 @@ class OperationalPresenceAggregationDataAPIView(APIView):
             if int(self.request.GET.get('narrow_loc_type', None)) <= int(self.request.GET.get('loc_type', None)):
                 return Response({"message": "narrow_loc_type cannot be equal or higher than loc_type."}, status=statuses.HTTP_400_BAD_REQUEST)
 
-            if int(self.request.GET.get('narrow_loc_type', None)) - 1 != int(self.request.GET.get('loc_type', None)):
-                return Response({"message": "narrow_loc_type can only be looked up one parent level above than loc_type. (e.g loc_type=1 AND narrow_loc_type=2)"}, status=statuses.HTTP_400_BAD_REQUEST)
-
         return Response(self.query_data(response_plan_id))
 
 
@@ -821,9 +817,6 @@ class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
             if int(self.request.GET.get('narrow_loc_type', None)) <= int(self.request.GET.get('loc_type', None)):
                 return Response({"message": "narrow_loc_type cannot be equal or higher than loc_type."}, status=statuses.HTTP_400_BAD_REQUEST)
 
-            if int(self.request.GET.get('narrow_loc_type', None)) - 1 != int(self.request.GET.get('loc_type', None)):
-                return Response({"message": "narrow_loc_type can only be looked up one parent level above than loc_type. (e.g loc_type=1 AND narrow_loc_type=2)"}, status=statuses.HTTP_400_BAD_REQUEST)
-
         return self.list(request, response_plan_id)
 
     def get_queryset(self):
@@ -841,7 +834,6 @@ class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
         }
 
         loc_ids = None
-        workspace = response_plan.workspace
         clusters = Cluster.objects.filter(response_plan=response_plan)
 
         if filter_parameters['clusters']:
