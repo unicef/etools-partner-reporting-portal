@@ -5,12 +5,12 @@ from django.utils.functional import cached_property
 from django.contrib.postgres.fields import JSONField, ArrayField
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from model_utils.models import TimeStampedModel
+from rest_framework import serializers
 
 from core.common import (
     INDICATOR_REPORT_STATUS,
@@ -168,8 +168,7 @@ class IndicatorBlueprint(TimeStampedExternalSyncModelMixin):
         }
         if self.calculation_formula_across_periods not in unit_to_valid_calc_values.get(self.unit, []) or \
                 self.calculation_formula_across_locations not in unit_to_valid_calc_values.get(self.unit, []):
-            raise ValidationError(
-                'Calculation methods not supported by selected unit')
+            raise serializers.ValidationError('Calculation methods not supported by selected unit')
 
         unit_to_valid_display_type_values = {
             self.NUMBER: map(lambda x: x[0], self.QUANTITY_DISPLAY_TYPE_CHOICES),
@@ -177,8 +176,7 @@ class IndicatorBlueprint(TimeStampedExternalSyncModelMixin):
         }
         if self.display_type not in unit_to_valid_display_type_values.get(self.unit, [
         ]):
-            raise ValidationError(
-                'Display type is not supported by selected unit')
+            raise serializers.ValidationError('Display type is not supported by selected unit')
 
     def __str__(self):
         return self.title
@@ -365,7 +363,7 @@ def create_reportable_for_pa_from_ca_reportable(pa, ca_reportable):
     """
 
     if ca_reportable.content_object != pa.cluster_activity:
-        raise ValidationError("The Parent-child relationship is not valid")
+        raise serializers.ValidationError("The Parent-child relationship is not valid")
 
     reportable_data_to_sync = get_reportable_data_to_clone(ca_reportable)
     reportable_data_to_sync['total'] = dict([('c', 0), ('d', 0), ('v', 0)])
