@@ -2,7 +2,7 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
 import django_filters
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework.response import Response
 from rest_framework import status as statuses
 
@@ -13,7 +13,7 @@ from .serializers import (
     ShortLocationSerializer,
     ChildrenLocationSerializer,
     ResponsePlanSerializer,
-)
+    CreateResponsePlanSerializer)
 
 
 class WorkspaceAPIView(ListAPIView):
@@ -96,3 +96,12 @@ class ResponsePlanAPIView(ListAPIView):
     def get_queryset(self):
         workspace_id = self.kwargs.get('workspace_id')
         return ResponsePlan.objects.filter(workspace_id=workspace_id)
+
+
+class ResponsePlanCreateAPIView(CreateAPIView):
+    """
+    REST API endpoint to create Response Plan
+    """
+
+    serializer_class = CreateResponsePlanSerializer
+    permission_classes = (IsAuthenticated, )
