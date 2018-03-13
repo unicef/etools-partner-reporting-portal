@@ -71,10 +71,7 @@
 
               return {
                 id: String(id),
-
-                title: id === maxLocType ?
-                    'Admin' + id :
-                    ['Admin' + id, 'Admin' + maxLocType].join(' - '),
+                title: 'Admin' + id,
               };
             })
             .slice(Number(params.loc_type));

@@ -8,10 +8,11 @@
 <link rel="import" href="../../etools-prp-progress-bar.html">
 <link rel="import" href="../../etools-prp-progress-bar-alt.html">
 <link rel="import" href="indicator-details.html">
+<link rel="import" href="../../../styles/shared-styles.html">
 
 <dom-module id="analysis-cluster-activity">
   <template>
-    <style include="iron-flex iron-flex-alignment">
+    <style include="iron-flex iron-flex-alignment shared-styles">
       :host {
         display: block;
         margin-bottom: 25px;
@@ -23,7 +24,7 @@
         --etools-prp-progress-bar: {
           display: block;
           width: 120px;
-          margin-right: 40px;
+          margin-right: 10px;
         };
 
         --etools-prp-progress-bar-height: 14px;
@@ -48,7 +49,7 @@
       }
 
       .indicator {
-        padding: 5px;
+        padding: 5px 12px;
         background: var(--paper-grey-300);
       }
 
@@ -63,6 +64,8 @@
       .indicator-title {
         margin: 0;
         font-size: 14px;
+
+        @apply(--truncate);
       }
 
       .indicator-progress {

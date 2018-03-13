@@ -2,12 +2,11 @@
 <link rel="import" href="../../../../bower_components/google-chart/google-chart.html">
 
 <link rel="import" href="analysis-widget.html">
-<link rel="import" href="../../../redux/store.html">
 <link rel="import" href="../../../behaviors/utils.html">
 <link rel="import" href="../../../behaviors/analysis-chart.html">
 <link rel="import" href="../../../polyfills/es6-shim.html">
-a
-<dom-module id="partners-per-cluster-objective">
+
+<dom-module id="current-progress-by-partner">
   <template>
     <style>
       :host {
@@ -20,9 +19,7 @@ a
       }
     </style>
 
-    <analysis-widget
-        widget-title="Partners per Cluster Objective"
-        loading="[[loading]]">
+    <analysis-widget widget-title="Current progress by Partner">
       <google-chart
           type="bar"
           options="[[options]]"
@@ -34,42 +31,26 @@ a
 
   <script>
     Polymer({
-      is: 'partners-per-cluster-objective',
+      is: 'current-progress-by-partner',
 
       behaviors: [
-        App.Behaviors.ReduxBehavior,
         App.Behaviors.UtilsBehavior,
         App.Behaviors.AnalysisChart,
       ],
 
       properties: {
-        loading: {
-          type: Boolean,
-          statePath: 'analysis.operationalPresence.dataLoading',
-        },
-
-        data: {
-          type: Object,
-          statePath: 'analysis.operationalPresence.data.partners_per_cluster_objective',
-        },
+        data: Object,
 
         cols: {
           type: Array,
           value: [
             {
-              label: 'Cluster Objective',
+              label: 'Partner',
               type: 'string',
             },
             {
-              label: 'Count',
+              label: 'Progress',
               type: 'number',
-            },
-            {
-              type: 'string',
-              role: 'tooltip',
-              p: {
-                html: true,
-              },
             },
           ],
         },
@@ -82,15 +63,28 @@ a
 
       _computeOptions: function (rows) {
         return Object.assign({}, this._baseOptions, {
-          chartArea: {
-            // top: 0,
-            left: '40%',
-            width: '40%',
-          },
           height: rows.length * 45 + 30,
           colors: rows.map(function () {
             return '#88c245';
           }),
+          chartArea: {
+            top: 0,
+            left: '30%',
+            width: '50%',
+          },
+
+          // TODO: tooltips
+          enableInteractivity: false,
+          tooltip: null,
+        });
+      },
+
+      _computeRows: function (data) {
+        return Object.keys(data).map(function (key) {
+          return [
+            key,
+            data[key],
+          ];
         });
       },
     });

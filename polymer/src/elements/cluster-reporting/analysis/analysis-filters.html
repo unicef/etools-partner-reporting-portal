@@ -56,7 +56,6 @@
         </partner-type-filter-multi>
 
         <cluster-objective-filter-multi
-            id="clusterObjective"
             class="item filter-2-col"
             value="[[_withDefault(queryParams.cluster_objectives, '')]]"
             dependencies="clusters">
@@ -106,7 +105,6 @@
 
       listeners: {
         'clusters.selected-values-changed': '_resetClusterObjectives',
-        'clusterObjective.selected-values-changed': '_resetLocations',
         'locationType.iron-select': '_resetLocations',
       },
 

@@ -28,6 +28,13 @@
     App.Behaviors = App.Behaviors || {};
 
     App.Behaviors.AnalysisChart = {
+      properties: {
+        options: {
+          type: Object,
+          computed: '_computeOptions(rows)',
+        },
+      },
+
       _baseOptions: {
         bar: {
           groupWidth: 20,
@@ -38,6 +45,7 @@
         legend: 'none',
         tooltip: {
           isHtml: true,
+          ignoreBounds: true,
         },
       },
 

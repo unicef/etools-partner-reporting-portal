@@ -6,6 +6,7 @@
 <link rel="import" href="../../../styles/filter-styles.html">
 <link rel="import" href="../../../behaviors/utils.html">
 <link rel="import" href="../../filter-list.html">
+<link rel="import" href="../../filters/cluster-indicator-type-filter/cluster-indicator-type-filter.html">
 
 
 <dom-module id="analysis-indicators-filters">
@@ -34,7 +35,10 @@
         filters="{{filters}}"
         hide-clear>
       <div class="app-grid">
-        <div class="item">TODO</div>
+        <cluster-indicator-type-filter
+            class="item"
+            value="[[_withDefault(queryParams.indicator_type, '')]]">
+        </cluster-indicator-type-filter>
       </div>
     </filter-list>
   </template>

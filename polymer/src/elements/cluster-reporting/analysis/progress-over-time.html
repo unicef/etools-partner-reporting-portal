@@ -2,12 +2,11 @@
 <link rel="import" href="../../../../bower_components/google-chart/google-chart.html">
 
 <link rel="import" href="analysis-widget.html">
-<link rel="import" href="../../../redux/store.html">
 <link rel="import" href="../../../behaviors/utils.html">
 <link rel="import" href="../../../behaviors/analysis-chart.html">
 <link rel="import" href="../../../polyfills/es6-shim.html">
-a
-<dom-module id="partners-per-cluster-objective">
+
+<dom-module id="progress-over-time">
   <template>
     <style>
       :host {
@@ -20,11 +19,9 @@ a
       }
     </style>
 
-    <analysis-widget
-        widget-title="Partners per Cluster Objective"
-        loading="[[loading]]">
+    <analysis-widget widget-title="Progress over time">
       <google-chart
-          type="bar"
+          type="line"
           options="[[options]]"
           cols="[[cols]]"
           rows="[[rows]]">
@@ -34,42 +31,34 @@ a
 
   <script>
     Polymer({
-      is: 'partners-per-cluster-objective',
+      is: 'progress-over-time',
 
       behaviors: [
-        App.Behaviors.ReduxBehavior,
         App.Behaviors.UtilsBehavior,
         App.Behaviors.AnalysisChart,
       ],
 
       properties: {
-        loading: {
-          type: Boolean,
-          statePath: 'analysis.operationalPresence.dataLoading',
-        },
-
-        data: {
-          type: Object,
-          statePath: 'analysis.operationalPresence.data.partners_per_cluster_objective',
-        },
+        data: Object,
 
         cols: {
           type: Array,
           value: [
             {
-              label: 'Cluster Objective',
+              label: 'Time',
               type: 'string',
             },
             {
-              label: 'Count',
+              label: 'Progress',
               type: 'number',
             },
             {
-              type: 'string',
-              role: 'tooltip',
-              p: {
-                html: true,
-              },
+              label: 'Target',
+              type: 'number',
+            },
+            {
+              label: 'In need',
+              type: 'number',
             },
           ],
         },
@@ -80,18 +69,30 @@ a
         },
       },
 
-      _computeOptions: function (rows) {
+      _computeOptions: function () {
         return Object.assign({}, this._baseOptions, {
+          colors: ['#88c245', '#4069c5', '#f19e3a'],
           chartArea: {
-            // top: 0,
-            left: '40%',
-            width: '40%',
+            top: 20,
           },
-          height: rows.length * 45 + 30,
-          colors: rows.map(function () {
-            return '#88c245';
-          }),
+          legend: {
+            position: 'bottom',
+          },
+
+          // TODO: tooltips
+          enableInteractivity: false,
+          tooltip: null,
         });
+      },
+
+      _computeRows: function (/* data */) {
+        // Dummy data
+        return [
+          ['Jan', 1000, 2000, 3000],
+          ['Feb', 2000, 1750, 1000],
+          ['Mar', 2100, 2750, 2500],
+          ['Apr', 2500, 3100, 4000],
+        ];
       },
     });
   </script>
