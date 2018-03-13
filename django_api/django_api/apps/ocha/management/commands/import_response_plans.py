@@ -24,7 +24,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        if settings.IS_PROD:
+        if not settings.DEBUG:
             self.stderr.write('This is a debug / testing script only. Don\'t run in production environments.')
             return
 
