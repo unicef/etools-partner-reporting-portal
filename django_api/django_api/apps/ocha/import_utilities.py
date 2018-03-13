@@ -211,6 +211,7 @@ def get_plan_list_for_country(country_iso3):
         return get_json_from_url(source_url)['data']
     except Exception:
         logger.exception('Error trying to list plans for country')
+        return []
 
 
 def import_plans_for_country(country_iso3):

@@ -238,8 +238,6 @@ class V1FundingSourceImportSerializer(serializers.ModelSerializer):
 
 
 class V1ResponsePlanLocationImportSerializer(DiscardUniqueTogetherValidationMixin, serializers.ModelSerializer):
-    external_source = serializers.CharField(default=EXTERNAL_DATA_SOURCES.HPC)
-    id = serializers.IntegerField(source='external_id')
     name = serializers.CharField()
     iso3 = serializers.CharField(source='country_short_code')
 
@@ -254,15 +252,10 @@ class V1ResponsePlanLocationImportSerializer(DiscardUniqueTogetherValidationMixi
         )
 
     def create(self, validated_data):
-        update_or_create_kwargs = {
-            'external_source': validated_data.pop('external_source'),
-            'external_id': validated_data.pop('external_id')
-        }
-
-        # TODO: Retrieve country.long_name from some library based on iso code?
+        country_short_code = validated_data.pop('country_short_code')
 
         return Country.objects.update_or_create(
-            defaults=validated_data, **update_or_create_kwargs
+            country_short_code=country_short_code,  defaults=validated_data,
         )[0]
 
 

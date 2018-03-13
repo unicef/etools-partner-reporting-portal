@@ -11,7 +11,7 @@ import model_utils.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('partner', '0005_auto_20180306_2206'),
+        ('partner', '0006_partner_basis_for_risk_rating'),
     ]
 
     operations = [

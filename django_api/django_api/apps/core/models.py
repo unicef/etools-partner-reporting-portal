@@ -75,7 +75,7 @@ class TimeStampedExternalSourceModel(TimeStampedExternalSyncModelMixin):
         unique_together = ('external_id', 'external_source')
 
 
-class Country(TimeStampedExternalSourceModel):
+class Country(TimeStampedModel):
     """
     Represents a country which has many offices and sections.
     Taken from https://github.com/unicef/etools/blob/master/EquiTrack/users/models.py
