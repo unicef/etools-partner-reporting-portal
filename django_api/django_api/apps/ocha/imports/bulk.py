@@ -1,6 +1,5 @@
 import aiohttp
 import asyncio
-import json
 
 from ocha.constants import HPC_V1_ROOT_URL
 
@@ -11,7 +10,7 @@ def fill_cluster_names_for_plan_list(plan_list):
 
     async def get_json(client, url):
         async with client.get(url) as response:
-            return await response.read()
+            return await response.json()
 
     urls_to_retrieve = [
         HPC_V1_ROOT_URL + 'rpm/plan/id/{}?content=entities'.format(plan['id']) for plan in plan_list
@@ -23,9 +22,9 @@ def fill_cluster_names_for_plan_list(plan_list):
         )
     )
     plan_details = {}
+
     for result in results:
-        parsed = json.loads(result)['data']
-        plan_details[parsed['id']] = parsed
+        plan_details[result['data']['id']] = result['data']
 
     for plan in plan_list:
         details = plan_details[plan['id']]
