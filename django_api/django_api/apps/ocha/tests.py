@@ -3,7 +3,7 @@ import os
 from django.test import TestCase
 from django.conf import settings
 
-from ocha.import_serializers import V2PartnerProjectImportSerializer, V1FundingSourceImportSerializer, \
+from ocha.imports.serializers import V2PartnerProjectImportSerializer, V1FundingSourceImportSerializer, \
     V1ResponsePlanImportSerializer
 
 SAMPLES_DIR = os.path.join(settings.APPS_DIR, 'ocha', 'samples')

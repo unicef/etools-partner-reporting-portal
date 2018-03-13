@@ -10,7 +10,7 @@ from core.common import EXTERNAL_DATA_SOURCES
 from core.models import ResponsePlan
 from indicator.models import Reportable, IndicatorBlueprint
 from ocha.constants import HPC_V2_ROOT_URL, HPC_V1_ROOT_URL
-from ocha.import_serializers import V2PartnerProjectImportSerializer, V1FundingSourceImportSerializer, \
+from ocha.imports.serializers import V2PartnerProjectImportSerializer, V1FundingSourceImportSerializer, \
     V1ResponsePlanImportSerializer
 from ocha.utilities import get_dict_from_list_by_key
 
