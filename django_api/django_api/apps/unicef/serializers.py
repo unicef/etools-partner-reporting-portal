@@ -19,7 +19,23 @@ from partner.models import Partner
 class PersonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Person
-        fields = ('name', 'title', 'email', 'phone_number')
+        fields = ('name', 'title', 'email', 'phone_number', 'is_authorized_officer')
+
+
+class ReportingPeriodDatesSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='external_id')
+    programme_document = serializers.PrimaryKeyRelatedField(
+        queryset=ProgrammeDocument.objects.all())
+
+    class Meta:
+        model = ReportingPeriodDates
+        fields = (
+            'id',
+            'start_date',
+            'end_date',
+            'due_date',
+            'programme_document',
+        )
 
 
 class ProgrammeDocumentSerializer(serializers.ModelSerializer):
@@ -36,6 +52,8 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
     partner_focal_point = PersonSerializer(read_only=True, many=True)
     document_type_display = serializers.CharField(source='get_document_type_display')
     locations = serializers.SerializerMethodField(allow_null=True)
+    amendments = serializers.JSONField(read_only=True)
+    reporting_periods = ReportingPeriodDatesSerializer(many=True)
 
     class Meta:
         model = ProgrammeDocument
@@ -67,6 +85,8 @@ class ProgrammeDocumentSerializer(serializers.ModelSerializer):
             'unicef_focal_point',
             'unicef_officers',
             'locations',
+            'amendments',
+            'reporting_periods',
         )
 
     def get_id(self, obj):
@@ -181,6 +201,7 @@ class ProgrammeDocumentOutputSerializer(serializers.ModelSerializer):
             'reference_number',
             'cp_outputs',
             'status',
+            'external_id',
         )
 
 
@@ -232,6 +253,9 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
     funds_received_to_date_currency = serializers.SerializerMethodField()
     funds_received_to_date_percentage = serializers.SerializerMethodField()
     submitted_by = serializers.SerializerMethodField()
+    submitting_user = serializers.SerializerMethodField()
+    partner_org_id = serializers.SerializerMethodField()
+    partner_org_name = serializers.SerializerMethodField()
 
     def __init__(self, *args, **kwargs):
         request = kwargs.get('context', {}).get('request')
@@ -249,6 +273,8 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
             'report_number',
             'is_final',
             'partner_contribution_to_date',
+            'partner_org_id',
+            'partner_org_name',
             'challenges_in_the_reporting_period',
             'proposed_way_forward',
             'status',
@@ -266,11 +292,21 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
             'funds_received_to_date_percentage',
             'indicator_reports',
             'submitted_by',
+            'submitting_user',
             'is_final',
         )
 
+    def get_partner_org_id(self, obj):
+        return obj.programme_document.partner.external_id
+
+    def get_partner_org_name(self, obj):
+        return obj.programme_document.partner.title
+
     def get_submitted_by(self, obj):
         return obj.submitted_by.display_name if obj.submitted_by else None
+
+    def get_submitting_user(self, obj):
+        return obj.submitting_user.display_name if obj.submitting_user else None
 
     def get_funds_received_to_date(self, obj):
         return obj.programme_document.funds_received_to_date
@@ -497,6 +533,7 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
         queryset=Partner.objects.all())
     workspace = serializers.PrimaryKeyRelatedField(
         queryset=Workspace.objects.all())
+    amendments = serializers.JSONField(allow_null=True)
 
     def create(self, validated_data):
         return ProgrammeDocument.objects.create(**validated_data)
@@ -520,6 +557,7 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
             "funds_received",
             "funds_received_currency",
             "workspace",
+            "amendments",
         )
 
 

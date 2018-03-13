@@ -104,6 +104,24 @@
             });
         },
 
+        createPartnerEntitiesByResponsePlanAsIMO: function(params, responsePlanClusters) {
+          return isIMO(params.groups) &&
+            responsePlanClusters.some(function (cluster) {
+              return params.imoClusters.some(function (imoCluster) {
+                return imoCluster.id === cluster.id;
+              });
+            });
+        },
+
+        editPartnerEntitiesAsIMO: function(params, entityClusters) {
+          return isIMO(params.groups) &&
+            entityClusters.some(function (cluster) {
+              return params.imoClusters.some(function (imoCluster) {
+                return imoCluster.id === cluster.id;
+              });
+            });
+        },
+
         editPartnerEntities: function(params, entityPartnerId) {
           return isAuthorizedOfficer(params.groups) && entityPartnerId === params.partner.id;
         },
@@ -117,7 +135,19 @@
         adminResponsePlan: [
         App.Constants.GROUP_IMO,
         ],
-        
+
+        addPartnerToProject: [
+          App.Constants.GROUP_IMO,
+        ],
+
+        createPartnerEntitiesAsImo: [
+          App.Constants.GROUP_IMO,
+        ],
+
+        addPartnerToActivity: [
+          App.Constants.GROUP_IMO,
+        ],
+
       };
 
       function isMember(groupName, groups) {

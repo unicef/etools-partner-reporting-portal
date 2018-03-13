@@ -15,7 +15,6 @@
 <link rel="import" href="../etools-prp-ajax.html">
 <link rel="import" href="../project-status.html">
 <link rel="import" href="../page-body.html">
-<link rel="import" href="../etools-prp-data-table-row.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
 <link rel="import" href="../../styles/table-styles.html">
@@ -87,10 +86,10 @@
             is="dom-repeat"
             items="[[data]]"
             initial-count="[[pageSize]]">
-          <etools-prp-data-table-row no-collapse details-opened="[[detailsOpened]]">
+          <etools-data-table-row no-collapse>
             <div slot="row-data">
               <div class="table-cell table-cell--text">
-                [[item.cluster]]
+                [[item.cluster.name]]
               </div>
               <div class="table-cell table-cell--text">
                 <project-status status="[[item.status]]"></project-status>
@@ -107,7 +106,7 @@
                 </template>
               </div>
             </div>
-          </etools-prp-data-table-row>
+          </etools-data-table-row>
         </template>
 
         <etools-data-table-footer
@@ -168,16 +167,6 @@
             computed: '_computeCurrentActivitiesCount(projectId, activitiesCountDict)'
           },
 
-          detailsOpened: {
-            type: Boolean,
-            value: false
-          },
-
-          openedDetails: {
-            type: Array,
-            value: []
-          },
-
           anchorQueryParams: {
             type: Object,
             computed: '_withDefaultParams(queryParams)',
@@ -209,11 +198,6 @@
           //Query string is passed to construct the back button.
           return this.buildUrl(this._baseUrlCluster, path) + '?' + query;
         },
-
-        detached: function () {
-          this.openedDetails.length = 0;
-        }
-
       });
     </script>
   </dom-module>

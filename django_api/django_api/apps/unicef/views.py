@@ -30,7 +30,7 @@ from core.permissions import (
     IsPartnerAuthorizedOfficer,
     IsPartnerEditorOrPartnerAuthorizedOfficer
 )
-from core.models import Location
+from core.models import Location, PartnerAuthorizedOfficerRole
 from core.serializers import ShortLocationSerializer
 
 from indicator.models import Reportable, IndicatorReport, IndicatorBlueprint
@@ -42,7 +42,6 @@ from indicator.filters import PDReportsFilter
 from indicator.serializers import IndicatorBlueprintSimpleSerializer
 from partner.models import Partner
 from unicef.exports.reportables import ReportableListXLSXExporter, ReportableListPDFExporter
-from unicef.tasks import create_user_for_person
 
 from unicef.exports.annex_c_excel import AnnexCXLSXExporter, SingleProgressReportsXLSXExporter
 from unicef.exports.programme_documents import ProgrammeDocumentsXLSXExporter, ProgrammeDocumentsPDFExporter
@@ -505,10 +504,13 @@ class ProgressReportSubmitAPIView(APIView):
         if progress_report.submission_date is None or progress_report.status == PROGRESS_REPORT_STATUS.sent_back:
             provided_email = request.data.get('submitted_by_email')
 
-            authorized_officer_person = progress_report.programme_document.partner_focal_point.filter(
-                    email=provided_email or self.request.user.email
+            authorized_officer_user = get_user_model().objects.filter(
+                email=provided_email or self.request.user.email,
+                groups=PartnerAuthorizedOfficerRole.as_group(),
+                email__in=progress_report.programme_document.partner_focal_point.values_list('email', flat=True)
             ).first()
-            if not authorized_officer_person:
+
+            if not authorized_officer_user:
                 if provided_email:
                     _error_message = 'Report could not be submitted, because {} is not the authorized ' \
                                      'officer assigned to the PCA that is connected to that PD.'.format(provided_email)
@@ -518,13 +520,6 @@ class ProgressReportSubmitAPIView(APIView):
                 raise ValidationError(
                     _error_message, code=APIErrorCode.PR_SUBMISSION_FAILED_USER_NOT_AUTHORIZED_OFFICER
                 )
-
-            if provided_email:
-                authorized_officer_user = get_user_model().objects.filter(email=provided_email).first()
-                if not authorized_officer_user:
-                    authorized_officer_user = create_user_for_person(authorized_officer_person)
-            else:
-                authorized_officer_user = self.request.user
 
             progress_report.status = PROGRESS_REPORT_STATUS.submitted
             progress_report.submission_date = datetime.now().date()
@@ -693,27 +688,29 @@ class ProgressReportAttachmentAPIView(APIView):
     parser_classes = (FormParser, MultiPartParser, FileUploadParser)
 
     def get(self, request, workspace_id, progress_report_id):
-        pr = get_object_or_404(
+        progress_report = get_object_or_404(
             ProgressReport,
             id=progress_report_id,
-            programme_document__workspace_id=workspace_id)
+            programme_document__workspace_id=workspace_id
+        )
 
-        if pr.attachment:
-            serializer = ProgressReportAttachmentSerializer(
-                ProgressReport.objects.filter(
-                    id=progress_report_id,
-                    programme_document__workspace_id=workspace_id),
-                many=True)
-            return Response(serializer.data, status=statuses.HTTP_200_OK)
-        else:
-            return Response({"message": "Attachment does not exist."}, status=statuses.HTTP_404_NOT_FOUND)
+        try:
+            # lookup just so the possible FileNotFoundError can be triggered
+            progress_report.attachment
+            serializer = ProgressReportAttachmentSerializer(progress_report)
+            return Response([serializer.data], status=statuses.HTTP_200_OK)
+        except FileNotFoundError:
+            pass
+
+        return Response({"message": "Attachment does not exist."}, status=statuses.HTTP_404_NOT_FOUND)
 
     @transaction.atomic
     def delete(self, request, workspace_id, progress_report_id):
         pr = get_object_or_404(
             ProgressReport,
             id=progress_report_id,
-            programme_document__workspace_id=workspace_id)
+            programme_document__workspace_id=workspace_id
+        )
 
         if pr.attachment:
             try:

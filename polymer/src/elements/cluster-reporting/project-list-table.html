@@ -15,7 +15,6 @@
 <link rel="import" href="../etools-prp-ajax.html">
 <link rel="import" href="../project-status.html">
 <link rel="import" href="../page-body.html">
-<link rel="import" href="../etools-prp-data-table-row.html">
 <link rel="import" href="../list-placeholder.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
@@ -109,7 +108,7 @@
             items="[[projects]]"
             as="project"
             initial-count="[[pageSize]]">
-          <etools-prp-data-table-row details-opened="[[detailsOpened]]">
+          <etools-data-table-row>
             <div slot="row-data">
               <div class="table-cell table-cell--text">
                 <a href="[[_detailUrl(project, anchorQuery)]]">[[project.title]]</a>
@@ -129,7 +128,7 @@
                 [[_commaSeparatedDictValues(project.locations, 'title')]]
               </div>
             </div>
-            <div slot="row-data-details" class="row-details-expanded-wrapper">
+            <div slot="row-data-details">
               <div slot="row-data">
                 <div class="table-cell table-cell--text">
                   <span class="label">Start Date</span>
@@ -149,7 +148,7 @@
                 </div>
               </div>
             </div>
-          </etools-prp-data-table-row>
+          </etools-data-table-row>
         </template>
 
         <list-placeholder
@@ -204,11 +203,6 @@
 
           projectId: String,
 
-          detailsOpened: {
-            type: Boolean,
-            value: false
-          },
-
           openedDetails: {
             type: Array,
             value: []
@@ -241,6 +235,7 @@
         detached: function () {
           this.openedDetails.length = 0;
         },
+
       });
     </script>
   </dom-module>

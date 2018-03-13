@@ -3,11 +3,13 @@
 <link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../bower_components/paper-tooltip/paper-tooltip.html">
 
 <link rel="import" href="../../polyfills/es6-shim.html">
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/notifications.html">
+<link rel="import" href="../../behaviors/routing.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
 <link rel="import" href="../../redux/selectors/programmeDocuments.html">
@@ -33,6 +35,10 @@
 
       .header {
         padding: 25px;
+      }
+
+      a {
+        color: var(--theme-primary-color);
       }
 
       labelled-item {
@@ -158,8 +164,8 @@
                   <h3>[[indicator.reportable.blueprint.title]]</h3>
 
                   <dl class="layout horizontal">
-                    <dt><a>Calculation methods</a>:</dt>
-                    <dt>[[indicator.reportable.blueprint.calculation_formula_across_locations]] (across locations), [[indicator.reportable.blueprint.calculation_formula_across_periods]] (across reporting periods)</dt>
+                    <dt><a href="[[calculationMethodUrl]]">Calculation methods <paper-tooltip>To learn more about or to change calculation methods, click the link above</paper-tooltip></a>:</dt>
+                    <dt><b>[[indicator.reportable.blueprint.calculation_formula_across_locations]]</b> (across locations), <b>[[indicator.reportable.blueprint.calculation_formula_across_periods]]</b> (across reporting periods)</dt>
                   </dl>
                 </div>
               </div>
@@ -227,6 +233,7 @@
               reportable-id="[[data.id]]"
               indicator-name="[[indicator.reportable.blueprint.title]]"
               indicator-id="[[indicator.id]]"
+              indicator-status="[[indicator.report_status]]"
               reporting-period="[[currentReport.reporting_period]]"
               override-mode="[[computedMode]]">
           </indicator-details>
@@ -245,6 +252,7 @@
         App.Behaviors.NotificationsBehavior,
         App.Behaviors.ReduxBehavior,
         App.Behaviors.ProgressReportUtilsBehavior,
+        App.Behaviors.RoutingBehavior,
       ],
 
       properties: {
@@ -287,6 +295,11 @@
           computed: '_computeReportableUrl(reportId, data)',
         },
 
+        calculationMethodUrl: {
+          type: String,
+          computed: '_computeCalculationMethodUrl(_baseUrl, pdId)',
+        },
+
         currentReport: {
           type: Object,
           statePath: App.Selectors.ProgrammeDocumentReports.current,
@@ -319,6 +332,13 @@
 
       _computeReportableUrl: function (reportId, data) {
         return App.Endpoints.reportable(reportId, data.id);
+      },
+
+      _computeCalculationMethodUrl: function (baseUrl, pdId) {
+        return this.buildUrl(
+                baseUrl,
+                'pd/' + pdId + '/view/calculation-methods'
+              );
       },
 
       _computeShowMeta: function () {

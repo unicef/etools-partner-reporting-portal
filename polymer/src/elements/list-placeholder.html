@@ -5,10 +5,11 @@
     <style>
       .msg {
         text-align: center;
+        padding: 1em 0;
       }
     </style>
 
-    <p class="msg">No results found</p>
+    <div class="msg">[[message]]</div>
   </template>
 
   <script>
@@ -24,6 +25,11 @@
         loading: {
           type: Boolean,
           value: false,
+        },
+
+        message: {
+          type: String,
+          value: 'No results found'
         },
 
         hidden: {

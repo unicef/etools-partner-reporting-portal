@@ -3,10 +3,8 @@ import logging
 import os
 import tempfile
 
-from babel.numbers import format_currency
 from django.http import HttpResponse
 from django.utils import timezone
-from django.utils.translation import to_locale, get_language
 from easy_pdf.exceptions import PDFRenderingError
 from easy_pdf.rendering import render_to_pdf, make_response
 from openpyxl import Workbook
@@ -15,6 +13,7 @@ from openpyxl.styles.numbers import FORMAT_CURRENCY_USD, FORMAT_PERCENTAGE
 from openpyxl.utils import get_column_letter
 
 from unicef.exports.utilities import PARTNER_PORTAL_DATE_FORMAT_EXCEL, HTMLTableCell
+from unicef.templatetags.pdf_extras import format_currency
 
 logger = logging.getLogger(__name__)
 
@@ -141,7 +140,6 @@ class ProgrammeDocumentsPDFExporter:
         )
 
     def get_context(self):
-        locale = to_locale(get_language())
         context = {
             'title': 'Programme Document(s) Summary',
         }
@@ -165,7 +163,7 @@ class ProgrammeDocumentsPDFExporter:
                 HTMLTableCell('UNICEF Office(s)', element='th'),
                 HTMLTableCell(pd.unicef_office),
                 HTMLTableCell('CSO contribution', element='th'),
-                HTMLTableCell(format_currency(pd.cso_contribution, pd.cso_contribution_currency, locale=locale)),
+                HTMLTableCell(format_currency(pd.cso_contribution, pd.cso_contribution_currency)),
             ])
 
             rows.append([
@@ -174,7 +172,7 @@ class ProgrammeDocumentsPDFExporter:
                 HTMLTableCell('UNICEF Focal Point(s)', element='th'),
                 HTMLTableCell(', '.join([person.name for person in pd.unicef_focal_point.all()])),
                 HTMLTableCell('Total UNICEF cash', element='th'),
-                HTMLTableCell(format_currency(pd.total_unicef_cash, pd.total_unicef_cash_currency, locale=locale))
+                HTMLTableCell(format_currency(pd.total_unicef_cash, pd.total_unicef_cash_currency))
             ])
             rows.append([
                 HTMLTableCell('Reference Number', element='th'),
@@ -182,7 +180,7 @@ class ProgrammeDocumentsPDFExporter:
                 HTMLTableCell('Partner Focal Point(s)', element='th'),
                 HTMLTableCell(', '.join([person.name for person in pd.partner_focal_point.all()])),
                 HTMLTableCell('Total UNICEF supplies', element='th'),
-                HTMLTableCell(format_currency(pd.in_kind_amount, pd.in_kind_amount_currency, locale=locale))
+                HTMLTableCell(format_currency(pd.in_kind_amount, pd.in_kind_amount_currency))
             ])
             rows.append([
                 HTMLTableCell('PD/SSFA status', element='th'),
@@ -190,7 +188,7 @@ class ProgrammeDocumentsPDFExporter:
                 HTMLTableCell('Start Date', element='th'),
                 HTMLTableCell(pd.start_date),
                 HTMLTableCell('Total Budget', element='th'),
-                HTMLTableCell(format_currency(pd.budget, pd.budget_currency, locale=locale))
+                HTMLTableCell(format_currency(pd.budget, pd.budget_currency))
             ])
             rows.append([
                 HTMLTableCell('In response to an HRP', element='th'),
@@ -199,7 +197,7 @@ class ProgrammeDocumentsPDFExporter:
                 HTMLTableCell(pd.end_date),
                 HTMLTableCell('Cash Transfers to Date', element='th'),
                 HTMLTableCell('{} ({}%)'.format(
-                    format_currency(pd.funds_received_to_date, pd.funds_received_to_date_currency, locale=locale),
+                    format_currency(pd.funds_received_to_date, pd.funds_received_to_date_currency),
                     funds_received_to_date_percentage
                 ))
             ])

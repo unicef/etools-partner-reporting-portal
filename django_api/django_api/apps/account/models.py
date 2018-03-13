@@ -28,14 +28,14 @@ class User(AbstractUser):
         unique=True,
         db_index=True
     )
-    workspaces = models.ManyToManyField('core.Workspace',
-                                        related_name='users',
-                                        null=True, blank=True,
-                                        help_text='These are workspaces that the user will be able to access.')
-    imo_clusters = models.ManyToManyField('cluster.Cluster',
-                                          related_name='users',
-                                          null=True, blank=True,
-                                          help_text='These are the clusters this user will have IMO privileges over.')
+    workspaces = models.ManyToManyField(
+        'core.Workspace', related_name='users', blank=True,
+        help_text='These are workspaces that the user will be able to access.'
+    )
+    imo_clusters = models.ManyToManyField(
+        'cluster.Cluster', related_name='users', blank=True,
+        help_text='These are the clusters this user will have IMO privileges over.'
+    )
 
     def __str__(self):
         return '[{}] {} ({})'.format(

@@ -134,6 +134,10 @@ class Partner(TimeStampedExternalSyncModelMixin):
         max_length=50,
         null=True,
     )
+    basis_for_risk_rating = models.CharField(
+        max_length=50,
+        null=True,
+    )
 
     clusters = models.ManyToManyField('cluster.Cluster',
                                       related_name="partners")
@@ -151,8 +155,17 @@ class Partner(TimeStampedExternalSyncModelMixin):
 
     @property
     def address(self):
-        return ", ".join([self.street_address, self.city, self.postal_code,
-                          self.country])
+        address_lines = [
+            self.street_address,
+            self.city,
+            self.postal_code,
+            self.country,
+        ]
+
+        if all(address_lines):
+            return ", ".join(address_lines)
+        else:
+            return self.street_address or ''
 
 
 class PartnerProject(TimeStampedModel):
@@ -189,6 +202,10 @@ class PartnerProject(TimeStampedModel):
 
     class Meta:
         ordering = ['-id']
+        permissions = (
+            ('imo_object', 'IMO Object'),
+            ('partner_object', 'Partner Object'),
+        )
 
     @property
     def response_plan(self):
@@ -230,6 +247,10 @@ class PartnerActivity(TimeStampedModel):
 
     class Meta:
         ordering = ['-id']
+        permissions = (
+            ('imo_object', 'IMO Object'),
+            ('partner_object', 'Partner Object'),
+        )
 
     @property
     def clusters(self):

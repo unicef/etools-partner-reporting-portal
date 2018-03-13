@@ -18,6 +18,7 @@
 <link rel="import" href="../../labelled-item.html">
 <link rel="import" href="../../report-status.html">
 <link rel="import" href="../../disaggregations/disaggregation-table.html">
+<link rel="import" href="../../../elements/list-placeholder.html">
 <link rel="import" href="progress-by-location.html">
 
 <dom-module id="partner-analysis-reportable">
@@ -115,7 +116,7 @@
       <div class="wrapper">
         <template
             is="dom-if"
-            if="[[!loading]]">
+            if="[[_computeHidden(details.indicator_reports, loading)]]">
           <div class="app-grid reportable-meta">
             <div class="item"></div>
             <div class="item">
@@ -254,6 +255,12 @@
                     </template>
                   </dd>
                 </dl>
+                <dl>
+                  <dt>Progress in reporting period:</dt>
+                  <dd class="reporting-period">
+                    [[report.time_period_start]] - [[report.time_period_end]]
+                  </dd>
+                </dl>
 
                 <labelled-item label="Overall status">
                   <report-status status="[[report.overall_status]]"></report-status>
@@ -296,32 +303,6 @@
                     if="[[locations.0]]"
                     restamp="true">
                   <div class="item">
-                    <h4 class="table-heading layout horizontal justified">
-                      <span>
-                        Progress in current reporting period:
-                        <span class="reporting-period">
-                          [[formattedDetails.indicator_reports.0.time_period_start]]
-                          -
-                          [[formattedDetails.indicator_reports.0.time_period_end]]
-                        </span>
-                      </span>
-                      <span>
-                        Total:
-                        <template
-                            is="dom-if"
-                            if="[[_equals(formattedDetails.indicator_reports.0.display_type, 'number')]]"
-                            restamp="true">
-                          <etools-prp-number value="[[formattedDetails.indicator_reports.0.total.v]]"></etools-prp-number>
-                        </template>
-                        <template
-                            is="dom-if"
-                            if="[[_equals(formattedDetails.indicator_reports.0.display_type, 'percentage')]]"
-                            restamp="true">
-                          [[_toPercentage(formattedDetails.indicator_reports.0.total.c)]]
-                        </template>
-                      </span>
-                    </h4>
-
                     <disaggregation-table
                         data="[[locations.0]]"
                         mapping="[[formattedDetails.indicator_reports.0.disagg_lookup_map]]">
@@ -333,32 +314,6 @@
                     if="[[locations.1]]"
                     restamp="true">
                   <div class="item">
-                    <h4 class="table-heading layout horizontal justified">
-                      <span>
-                        Progress in previous reporting period:
-                        <span class="reporting-period">
-                          [[formattedDetails.indicator_reports.1.time_period_start]]
-                          -
-                          [[formattedDetails.indicator_reports.1.time_period_end]]
-                        </span>
-                      </span>
-                      <span>
-                        Total:
-                        <template
-                            is="dom-if"
-                            if="[[_equals(formattedDetails.indicator_reports.1.display_type, 'number')]]"
-                            restamp="true">
-                          <etools-prp-number value="[[formattedDetails.indicator_reports.1.total.v]]"></etools-prp-number>
-                        </template>
-                        <template
-                            is="dom-if"
-                            if="[[_equals(formattedDetails.indicator_reports.1.display_type, 'percentage')]]"
-                            restamp="true">
-                          [[_toPercentage(formattedDetails.indicator_reports.1.total.c)]]
-                        </template>
-                      </span>
-                    </h4>
-
                     <disaggregation-table
                         data="[[locations.1]]"
                         mapping="[[formattedDetails.indicator_reports.1.disagg_lookup_map]]">
@@ -369,6 +324,11 @@
             </template>
           </iron-pages>
         </template>
+        <list-placeholder
+          data="[[details.indicator_reports]]"
+          loading="[[loading]]"
+          message="No report data associated with this indicator has been submitted yet">
+        </list-placeholder>
         <etools-loading active="[[loading]]"></etools-loading>
       </div>
     </etools-content-panel>
@@ -460,6 +420,10 @@
           responsePlanId,
           data.id
         );
+      },
+
+      _computeHidden: function (data, loading) {
+        return !loading || data.length;
       },
 
       _computeFormattedDetails: function (details) {

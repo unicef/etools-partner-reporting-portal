@@ -27,6 +27,7 @@ from .models import (
     Reportable, IndicatorBlueprint,
     IndicatorReport, IndicatorLocationData,
     Disaggregation, DisaggregationValue,
+    create_pa_reportables_for_new_ca_reportable,
 )
 
 
@@ -697,6 +698,10 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 {"target": "Target cannot be greater than In Need"}
             )
 
+    def check_location_admin_levels(self, location_queryset):
+        if location_queryset.values_list('gateway__admin_level', flat=True).distinct().count() != 1:
+            raise ValidationError({"locations": "Selected locations should share same admin level"})
+
     @transaction.atomic
     def create(self, validated_data):
         locations = self.check_locations_merge_to_list(self.initial_data.get('locations'))
@@ -709,10 +714,9 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             validated_data['blueprint']['unit'] = validated_data['blueprint']['display_type']
         validated_data['blueprint']['disaggregatable'] = True
         blueprint = IndicatorBlueprintSerializer(data=validated_data['blueprint'])
-        if blueprint.is_valid(raise_exception=True):
-            blueprint.save()
+        blueprint.is_valid(raise_exception=True)
 
-        validated_data['blueprint'] = blueprint.instance
+        validated_data['blueprint'] = blueprint.save()
 
         reportable_object_content_type = ContentType.objects.get_by_natural_key(
             *validated_data.pop('object_type').split('.')
@@ -720,28 +724,16 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         reportable_object_content_model = reportable_object_content_type.model_class()
 
         if reportable_object_content_model == ClusterObjective:
-            cluster_objective = get_object_or_404(ClusterObjective, pk=validated_data['object_id'])
-
-            validated_data['start_date'] = cluster_objective.cluster.response_plan.start
-            validated_data['end_date'] = cluster_objective.cluster.response_plan.end
+            get_object_or_404(ClusterObjective, pk=validated_data['object_id'])
             validated_data['is_cluster_indicator'] = True
         elif reportable_object_content_model == ClusterActivity:
-            cluster_activity = get_object_or_404(ClusterActivity, pk=validated_data['object_id'])
-
-            validated_data['start_date'] = cluster_activity.cluster_objective.cluster.response_plan.start
-            validated_data['end_date'] = cluster_activity.cluster_objective.cluster.response_plan.end
+            get_object_or_404(ClusterActivity, pk=validated_data['object_id'])
             validated_data['is_cluster_indicator'] = True
         elif reportable_object_content_model == PartnerProject:
-            partner_project = get_object_or_404(PartnerProject, pk=validated_data['object_id'])
-
-            validated_data['start_date'] = partner_project.start_date
-            validated_data['end_date'] = partner_project.end_date
+            get_object_or_404(PartnerProject, pk=validated_data['object_id'])
             validated_data['is_cluster_indicator'] = False
         elif reportable_object_content_model == PartnerActivity:
-            partner_activity = get_object_or_404(PartnerActivity, pk=validated_data['object_id'])
-
-            validated_data['start_date'] = partner_activity.project.start_date
-            validated_data['end_date'] = partner_activity.project.end_date
+            get_object_or_404(PartnerActivity, pk=validated_data['object_id'])
             validated_data['is_cluster_indicator'] = False
         else:
             raise NotImplemented()
@@ -750,28 +742,32 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
         self.instance = Reportable.objects.create(**validated_data)
 
-        self.instance.locations.add(*Location.objects.filter(id__in=[l['id'] for l in locations]))
+        location_queryset = Location.objects.filter(id__in=[l['id'] for l in locations])
+        self.check_location_admin_levels(location_queryset)
+
+        self.instance.locations.add(*location_queryset)
 
         disaggregations = self.initial_data.get('disaggregations')
         self.instance.disaggregations.add(*Disaggregation.objects.filter(id__in=[d['id'] for d in disaggregations]))
+
+        create_pa_reportables_for_new_ca_reportable(self.instance)
 
         return self.instance
 
     def update(self, reportable, validated_data):
         locations = self.check_locations_merge_to_list(self.initial_data.get('locations'))
-        blueprint_data = validated_data.pop('blueprint', {})
-        super(ClusterIndicatorSerializer, self).update(reportable, validated_data)
-
-        reportable.blueprint.title = blueprint_data.get('title', reportable.blueprint.title)
-
         locations_ids = [l['id'] for l in locations]
+        location_queryset = Location.objects.filter(id__in=locations_ids)
+        self.check_location_admin_levels(location_queryset)
 
-        reportable.locations.through.objects.exclude(location_id__in=locations_ids).delete()
-        reportable.locations.add(*Location.objects.filter(id__in=locations_ids))
-
+        blueprint_data = validated_data.pop('blueprint', {})
+        reportable.blueprint.title = blueprint_data.get('title', reportable.blueprint.title)
         reportable.blueprint.save()
 
-        return reportable
+        reportable.locations.through.objects.exclude(location_id__in=locations_ids).delete()
+        reportable.locations.add(*location_queryset)
+
+        return super(ClusterIndicatorSerializer, self).update(reportable, validated_data)
 
 
 class ClusterIndicatorDataSerializer(serializers.ModelSerializer):
@@ -806,8 +802,6 @@ class ClusterIndicatorForPartnerActivitySerializer(
             'locations',
             'frequency',
             'cs_dates',
-            'start_date',
-            'end_date',
         )
 
 
@@ -863,6 +857,8 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
     partner = serializers.SerializerMethodField()
     partner_id = serializers.SerializerMethodField()
     partner_activity = serializers.SerializerMethodField()
+    cluster_objective = serializers.SerializerMethodField()
+    cluster_activity = serializers.SerializerMethodField()
     is_draft = serializers.SerializerMethodField()
     can_submit = serializers.SerializerMethodField()
 
@@ -890,6 +886,8 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
             'partner',
             'partner_id',
             'partner_activity',
+            'cluster_objective',
+            'cluster_activity',
             'is_draft',
             'can_submit',
             'time_period_start',
@@ -922,20 +920,23 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
 
     def get_cluster(self, obj):
         cluster = self._get_cluster(obj)
-        return cluster.get_type_display() if cluster else ""
+        return {"id": cluster.id, "title": cluster.get_type_display()} if cluster else None
 
     def get_cluster_id(self, obj):
         cluster = self._get_cluster(obj)
-        return cluster.id if cluster else ""
+        return cluster.id if cluster else None
 
     def get_project(self, obj):
         if isinstance(obj.reportable.content_object, (PartnerProject, )):
-            return obj.reportable.content_object.title
+            return {"id": obj.reportable.content_object.id, "title": obj.reportable.content_object.title}
         elif isinstance(obj.reportable.content_object, (PartnerActivity, )):
             if obj.reportable.content_object.project:
-                return obj.reportable.content_object.project.title
+                return {
+                    "id": obj.reportable.content_object.project.id,
+                    "title": obj.reportable.content_object.project.title
+                }
         else:
-            return ''
+            return None
 
     def _get_partner(self, obj):
         if isinstance(obj.reportable.content_object,
@@ -947,18 +948,30 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
     def get_partner(self, obj):
         partner = self._get_partner(obj)
 
-        return partner.title if partner else ""
+        return {"id": partner.id, "title": partner.title} if partner else None
 
     def get_partner_id(self, obj):
         partner = self._get_partner(obj)
 
-        return partner.id if partner else ""
+        return partner.id if partner else None
 
     def get_partner_activity(self, obj):
         if isinstance(obj.reportable.content_object, (PartnerActivity, )):
-            return obj.reportable.content_object.title
+            return {"id": obj.reportable.content_object.id, "title": obj.reportable.content_object.title}
         else:
-            return ''
+            return None
+
+    def get_cluster_objective(self, obj):
+        if isinstance(obj.reportable.content_object, (ClusterObjective, )):
+            return {"id": obj.reportable.content_object.id, "title": obj.reportable.content_object.title}
+        else:
+            return None
+
+    def get_cluster_activity(self, obj):
+        if isinstance(obj.reportable.content_object, (ClusterActivity, )):
+            return {"id": obj.reportable.content_object.id, "title": obj.reportable.content_object.title}
+        else:
+            return None
 
     def get_is_draft(self, obj):
         return obj.is_draft
@@ -1048,8 +1061,6 @@ class PMPReportableSerializer(serializers.ModelSerializer):
             'disaggregation_ids',
             'content_type',
             'object_id',
-            'start_date',
-            'end_date'
         )
 
 

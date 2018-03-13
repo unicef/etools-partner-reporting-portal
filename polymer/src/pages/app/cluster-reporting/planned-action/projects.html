@@ -116,6 +116,7 @@
         if (responsePlanCurrent) {
           return permissions.createPartnerEntitiesByResponsePlan(responsePlanCurrent.clusters);
         }
+        return false;
       },
 
       _projectsAjax: function (queryParams) {

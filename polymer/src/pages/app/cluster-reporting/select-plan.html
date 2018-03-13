@@ -12,7 +12,6 @@
 <link rel="import" href="../../../behaviors/routing.html">
 <link rel="import" href="../../../behaviors/data-table.html">
 <link rel="import" href="../../../redux/store.html">
-<link rel="import" href="../../../elements/etools-prp-data-table-row.html">
 <link rel="import" href="../../../elements/etools-prp-permissions.html">
 <link rel="import" href="../../../styles/table-styles.html">
 <link rel="import" href="../../../styles/app-theme-cluster.html">
@@ -162,7 +161,7 @@
                     is="dom-repeat"
                     items="[[responsePlans]]"
                     as="plan">
-            <etools-prp-data-table-row no-collapse>
+            <etools-data-table-row no-collapse>
 
               <div slot="row-data">
                 <div class="table-cell" flex-1>

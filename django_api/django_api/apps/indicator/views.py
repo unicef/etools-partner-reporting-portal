@@ -207,9 +207,9 @@ class IndicatorListAPIView(ListAPIView):
                 Q(lower_level_outputs__cp_output__programme_document__id__in=pd_list))
 
         if clusters:
-            cluster_list = map(lambda item: int(item), filter(
+            cluster_list = list(map(lambda item: int(item), filter(
                 lambda item: item != '' and item.isdigit(), clusters.split(
-                    ',')))
+                    ','))))
             q_list.append(Q(cluster_objectives__cluster__id__in=cluster_list))
             q_list.append(Q(
                 cluster_activities__cluster_objective__cluster__id__in=cluster_list))

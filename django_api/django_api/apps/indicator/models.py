@@ -22,6 +22,10 @@ from core.common import (
 from core.models import TimeStampedExternalSyncModelMixin
 from functools import reduce
 
+from indicator.disaggregators import (
+    QuantityIndicatorDisaggregator,
+    RatioIndicatorDisaggregator
+)
 from indicator.constants import ValueType
 
 
@@ -84,6 +88,17 @@ class IndicatorBlueprint(TimeStampedExternalSyncModelMixin):
     MAX = 'max'
     AVG = 'avg'
     RATIO = 'ratio'
+
+    QUANTITY_CALC_CHOICE_LIST = (
+        SUM,
+        MAX,
+        AVG,
+    )
+
+    RATIO_CALC_CHOICE_LIST = (
+        PERCENTAGE,
+        RATIO,
+    )
 
     QUANTITY_CALC_CHOICES = (
         (SUM, SUM),
@@ -172,6 +187,26 @@ class IndicatorBlueprint(TimeStampedExternalSyncModelMixin):
         ordering = ['-id']
 
 
+@receiver(post_save,
+          sender=IndicatorBlueprint,
+          dispatch_uid="trigger_indicator_report_recalculation")
+def trigger_indicator_report_recalculation(sender, instance, **kwargs):
+    """
+    Whenever an indicator blueprint is saved, IndicatorReport objects
+    linked to this IndicatorBlueprint via its Reportable should all be
+    recalculated for its total.
+    """
+    irs = IndicatorReport.objects.filter(reportable__in=instance.reportables.all())
+
+    if instance.calculation_formula_across_locations in IndicatorBlueprint.QUANTITY_CALC_CHOICE_LIST:
+        for ir in irs:
+            QuantityIndicatorDisaggregator.calculate_indicator_report_total(ir)
+
+    elif instance.calculation_formula_across_locations in IndicatorBlueprint.RATIO_CALC_CHOICE_LIST:
+        for ir in irs:
+            RatioIndicatorDisaggregator.calculate_indicator_report_total(ir)
+
+
 class Reportable(TimeStampedExternalSyncModelMixin):
     """
     Reportable / Applied Indicator model.
@@ -220,13 +255,6 @@ class Reportable(TimeStampedExternalSyncModelMixin):
         choices=REPORTABLE_FREQUENCY_LEVEL,
         default=REPORTABLE_FREQUENCY_LEVEL.monthly,
         verbose_name='Frequency of reporting'
-    )
-
-    start_date = models.DateField(
-        verbose_name='Start Date',
-    )
-    end_date = models.DateField(
-        verbose_name='End Date',
     )
 
     cs_dates = ArrayField(
@@ -298,6 +326,117 @@ class Reportable(TimeStampedExternalSyncModelMixin):
         )
 
 
+def get_reportable_data_to_clone(instance):
+    """
+    get_reportable_data_to_clone returns a map of field name and its value
+    to clone a new Reportable instance
+
+    Arguments:
+        instance {indicator.models.Reportable} -- Reportable model instance
+    """
+    return {
+        'active': instance.active,
+        'assumptions': instance.assumptions,
+        'baseline': instance.baseline,
+        'context_code': instance.context_code,
+        'created': instance.created,
+        'cs_dates': instance.cs_dates,
+        'external_id': instance.external_id,
+        'frequency': instance.frequency,
+        'in_need': instance.in_need,
+        'is_cluster_indicator': instance.is_cluster_indicator,
+        'location_admin_refs': instance.location_admin_refs,
+        'means_of_verification': instance.means_of_verification,
+        'modified': instance.modified,
+        'target': instance.target,
+    }
+
+
+def create_reportable_for_pa_from_ca_reportable(pa, ca_reportable):
+    """
+    Copies one CA reportable instance to a partner activity.
+
+    Arguments:
+        pa {partner.models.PartnerActivity} -- PartnerActivity to copy to
+        reportable {indicator.models.Reportable} -- ClusterActivity Reportable
+
+    Raises:
+        ValidationError -- Django Exception
+    """
+
+    if ca_reportable.content_object != pa.cluster_activity:
+        raise ValidationError("The Parent-child relationship is not valid")
+
+    reportable_data_to_sync = get_reportable_data_to_clone(ca_reportable)
+    reportable_data_to_sync['total'] = dict([('c', 0), ('d', 0), ('v', 0)])
+    reportable_data_to_sync["content_object"] = pa
+    reportable_data_to_sync["blueprint"] = ca_reportable.blueprint
+    reportable_data_to_sync["parent_indicator"] = ca_reportable
+    pa_reportable = Reportable.objects.create(**reportable_data_to_sync)
+
+    pa_reportable.disaggregations.add(*ca_reportable.disaggregations.all())
+
+
+def create_pa_reportables_from_ca(pa, ca):
+    """
+    Creates a set of PartnerActivity Reportable instances from
+    ClusterActivity instance to target PartnerActivity instance
+
+    Arguments:
+        pa {partner.models.PartnerActivity} -- Target PartnerActivity instance
+        ca {cluster.models.ClusterActivity} -- ClusterActivity to copy from
+    """
+
+    if pa.reportables.count() > 0:
+        return
+
+    for reportable in ca.reportables.all():
+        create_reportable_for_pa_from_ca_reportable(pa, reportable)
+
+
+def create_pa_reportables_for_new_ca_reportable(instance):
+    """
+    Useful when creating a new CA reportable to create
+    a set of PartnerActivity Reportable instances.
+
+    Arguments:
+        instance {indicator.models.Reportable} -- Cluster Activity Reportable to copy from
+    """
+    for pa in instance.content_object.partner_activities.all():
+        create_reportable_for_pa_from_ca_reportable(pa, instance)
+
+
+def sync_ca_reportable_update_to_pa_reportables(instance, created):
+    """
+    Whenever a Cluster Activity Reportable is created or is updated,
+    clone_ca_reportable_to_pa handles a Reportable instance data to
+    its Cluster Activity's Partner Activity instances.
+
+    Under create flag, Partner Activity will get a new Reportable instance
+    from Cluster Activity Reportable instance.
+
+    Otherwise, update each cloned Reportable instance
+    from its Cluster Activity's Partner Activity instances.
+
+    Arguments:
+        instance {indicator.models.Reportable} -- Reportable model instance
+        created {boolean} -- created flag from Django post_save signal
+    """
+
+    if instance.content_type.model == "clusteractivity":
+        reportable_data_to_sync = get_reportable_data_to_clone(instance)
+
+        if not created:
+            instance.children.update(**reportable_data_to_sync)
+
+
+@receiver(post_save,
+          sender=Reportable,
+          dispatch_uid="clone_ca_reportable_to_pa")
+def clone_ca_reportable_to_pa_signal(sender, instance, created, **kwargs):
+    sync_ca_reportable_update_to_pa_reportables(instance, created)
+
+
 class IndicatorReportManager(models.Manager):
     def active_reports(self):
         return self.objects.filter(
@@ -307,7 +446,7 @@ class IndicatorReportManager(models.Manager):
 class IndicatorReport(TimeStampedModel):
     """
     IndicatorReport module is a result of partner staff activity (what they
-    done in defined frequency scope).
+    did in defined frequency scope).
 
     related models:
         indicator.Reportable (ForeignKey): "indicator"
@@ -315,11 +454,10 @@ class IndicatorReport(TimeStampedModel):
         core.Location (OneToOneField): "location"
     """
     title = models.CharField(max_length=255)
-    reportable = models.ForeignKey(Reportable,
-                                   related_name="indicator_reports")
-    progress_report = models.ForeignKey('unicef.ProgressReport',
-                                        related_name="indicator_reports",
-                                        null=True, blank=True)
+    reportable = models.ForeignKey(Reportable, related_name="indicator_reports")
+    progress_report = models.ForeignKey(
+        'unicef.ProgressReport', related_name="indicator_reports", null=True, blank=True
+    )
     time_period_start = models.DateField()  # first day of defined frequency mode
     time_period_end = models.DateField()  # last day of defined frequency mode
     due_date = models.DateField()  # can be few days/weeks out of the "end date"
@@ -508,19 +646,14 @@ def recalculate_reportable_total(sender, instance, **kwargs):
             else:   # if its SUM or avg then add data up
                 for indicator_report in accepted_indicator_reports:
                     reportable_total['v'] += indicator_report.total['v']
-                    reportable_total['c'] += indicator_report.total['c']
 
                 if blueprint.calculation_formula_across_periods == IndicatorBlueprint.AVG:
                     ir_count = accepted_indicator_reports.count()
                     if ir_count > 0:
                         reportable_total['v'] = reportable_total['v'] / \
                             (ir_count * 1.0)
-                        reportable_total['c'] = reportable_total['c'] / \
-                            (ir_count * 1.0)
 
-                elif blueprint.calculation_formula_across_periods == IndicatorBlueprint.SUM and \
-                        reportable_total['c'] == 0:
-                    reportable_total['c'] = reportable_total['v']
+                reportable_total['c'] = reportable_total['v']
 
         # if unit is PERCENTAGE, doesn't matter if calc choice was percent or
         # ratio
@@ -535,6 +668,30 @@ def recalculate_reportable_total(sender, instance, **kwargs):
 
     reportable.total = reportable_total
     reportable.save()
+
+    # Triggering total recalculation on parent Reportable from its children
+    if reportable.parent_indicator:
+        new_parent_total = {
+            'c': 0,
+            'd': 1,
+            'v': 0,
+        }
+        child_totals = reportable.parent_indicator.children.values_list('total', flat=True)
+
+        for total in child_totals:
+            new_parent_total['v'] += total['v']
+            new_parent_total['d'] += total['d']
+
+        if reportable.parent_indicator.blueprint.unit == IndicatorBlueprint.NUMBER:
+            new_parent_total['d'] = 1
+            new_parent_total['c'] = new_parent_total['v']
+
+        else:
+            new_parent_total['c'] = new_parent_total['v'] / \
+                    (new_parent_total['d'] * 1.0)
+
+        reportable.parent_indicator.total = new_parent_total
+        reportable.parent_indicator.save()
 
 
 class IndicatorLocationData(TimeStampedModel):

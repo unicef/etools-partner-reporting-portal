@@ -2,10 +2,14 @@ from __future__ import unicode_literals
 from datetime import date
 import logging
 
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.postgres.fields import JSONField
 from django.utils.functional import cached_property
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from model_utils.models import TimeStampedModel
 
@@ -20,7 +24,7 @@ from core.common import (
     OVERALL_STATUS,
     REPORTING_TYPES
 )
-from core.models import TimeStampedExternalSyncModelMixin
+from core.models import TimeStampedExternalSyncModelMixin, PartnerAuthorizedOfficerRole
 from indicator.models import Reportable  # IndicatorReport
 
 
@@ -57,6 +61,12 @@ class Person(TimeStampedExternalSyncModelMixin):
 
     def __str__(self):
         return self.name
+
+    @property
+    def is_authorized_officer(self):
+        return get_user_model().objects.filter(
+            email=self.email, groups=PartnerAuthorizedOfficerRole.as_group()
+        ).exists()
 
 
 class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
@@ -198,6 +208,8 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
         blank=True,
         null=True,
     )
+
+    amendments = JSONField(default=list())
 
     # TODO:
     # cron job will create new report with due period !!!
@@ -416,6 +428,21 @@ class ProgressReport(TimeStampedModel):
         return "Progress Report <pk:{}>: {} {} to {}".format(
             self.id, self.programme_document, self.start_date, self.end_date
         )
+
+
+@receiver(post_save,
+          sender=ProgressReport,
+          dispatch_uid="synchronize_ir_status_from_pr")
+def synchronize_ir_status_from_pr(sender, instance, **kwargs):
+    """
+    Whenever an ProgressReport is saved, IndicatorReport objects
+    linked to this ProgressReport should all be updated for its report status.
+    """
+    # Update its Indicator Report status according to new Progress Report status
+    # Looping here as .update() on queryset does not invoke signals
+    for ir in instance.indicator_reports.all():
+        ir.report_status = instance.status
+        ir.save()
 
 
 class ReportingPeriodDates(TimeStampedExternalSyncModelMixin):
