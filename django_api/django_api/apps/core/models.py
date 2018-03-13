@@ -462,7 +462,7 @@ class Location(TimeStampedExternalSourceModel):
 
 class CartoDBTable(MPTTModel):
     """
-    Represents a table in CartoDB, it is used to import locations
+    Represents a table in CartoDB, it is used to imports locations
     related models:
         core.GatewayType: 'gateway'
         core.Country: 'country'

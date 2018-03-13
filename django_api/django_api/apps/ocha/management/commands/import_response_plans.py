@@ -2,7 +2,7 @@
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from ocha.import_utilities import import_plans_for_country, import_response_plan
+from ocha.imports.utilities import import_plans_for_country, import_response_plan
 
 
 class Command(BaseCommand):

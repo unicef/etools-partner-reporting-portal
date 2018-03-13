@@ -2,7 +2,7 @@
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from ocha.import_utilities import import_project
+from ocha.imports.utilities import import_project
 
 
 class Command(BaseCommand):
