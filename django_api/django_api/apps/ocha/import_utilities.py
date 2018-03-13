@@ -46,7 +46,7 @@ def get_json_from_url(url, retry_counter=MAX_URL_RETRIES):
     return response_json
 
 
-def import_project(external_project_id, workspace_id=None):
+def import_project(external_project_id, workspace=None):
     source_url = HPC_V2_ROOT_URL + 'project/{}'.format(external_project_id)
     project_data = get_json_from_url(source_url)
     serializer = V2PartnerProjectImportSerializer(data=project_data['data'])
@@ -64,7 +64,7 @@ def import_project(external_project_id, workspace_id=None):
 
     for plan in project_data['data']['plans']:
         if not ResponsePlan.objects.filter(external_source=EXTERNAL_DATA_SOURCES.HPC, external_id=plan['id']).exists():
-            import_response_plan(plan['id'], workspace_id=workspace_id)
+            import_response_plan(plan['id'], workspace=workspace)
 
     project_cluster_ids = [c['id'] for c in project_data['data']['governingEntities']]
 
@@ -78,12 +78,12 @@ def import_project(external_project_id, workspace_id=None):
     return project
 
 
-def import_response_plan(external_plan_id, workspace_id=None):
+def import_response_plan(external_plan_id, workspace=None):
     logger.debug('Importing Response Plan #{}'.format(external_plan_id))
     source_url = HPC_V1_ROOT_URL + 'rpm/plan/id/{}?format=json&content=entities'.format(external_plan_id)
     plan_data = get_json_from_url(source_url)['data']
-    if workspace_id:
-        plan_data['workspace_id'] = workspace_id
+    if workspace:
+        plan_data['workspace_id'] = workspace.id
     plan_serializer = V1ResponsePlanImportSerializer(data=plan_data)
     plan_serializer.is_valid(raise_exception=True)
     response_plan = plan_serializer.save()
