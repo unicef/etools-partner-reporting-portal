@@ -8,13 +8,14 @@ from core.models import Workspace
 from core.permissions import IsAuthenticated
 from core.serializers import ResponsePlanSerializer
 
-from ocha.import_utilities import get_plan_list_for_country, import_response_plan
+from ocha.imports.utilities import get_plan_list_for_country, import_response_plan
+from ocha.imports.bulk import fill_cluster_names_for_plan_list
 
 
 class RPMWorkspaceResponsePlanAPIView(APIView):
 
     permission_classes = (
-        IsAuthenticated,
+        # IsAuthenticated,
     )
 
     def get_workspace(self):
@@ -54,9 +55,9 @@ class RPMWorkspaceResponsePlanAPIView(APIView):
         return plans
 
     def get(self, request, *args, **kwargs):
-        response_plans = self.get_response_plans()
         # TODO: Sort?
-        # TODO: Add cluster info
+        response_plans = self.get_response_plans()
+        fill_cluster_names_for_plan_list(response_plans)
 
         return Response(response_plans)
 

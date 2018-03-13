@@ -26,6 +26,7 @@ git+https://github.com/robertavram/django-storages.git#egg=django-storages
 django-guardian==1.4.9
 Babel==2.5.3
 pycountry==18.2.23
+aiohttp==3.0.8
 
 # Testing
 astroid==1.5.2
