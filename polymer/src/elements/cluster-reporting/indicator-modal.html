@@ -27,7 +27,7 @@
 <link rel="import" href="../../behaviors/modal.html">
 <link rel="import" href="../../styles/buttons.html">
 <link rel="import" href="../../styles/modal.html">
-<link rel="import" href="../../elements/error-box.html">
+<link rel="import" href="../error-box.html">
 
 <dom-module id="indicator-modal">
   <template>
@@ -228,7 +228,8 @@
                   value="{{data.baseline}}"
                   type="number"
                   allowed-pattern="[+\-\d]"
-                  always-float-label>
+                  always-float-label
+                  required>
                 </paper-input>
               </div>
 
@@ -240,7 +241,8 @@
                   value="{{data.target}}"
                   type="number"
                   allowed-pattern="[+\-\d]"
-                  always-float-label>
+                  always-float-label
+                  required>
                 </paper-input>
               </div>
             </div>
