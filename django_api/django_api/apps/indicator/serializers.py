@@ -27,7 +27,6 @@ from .models import (
     Reportable, IndicatorBlueprint,
     IndicatorReport, IndicatorLocationData,
     Disaggregation, DisaggregationValue,
-    get_reportable_data_to_clone,
     create_pa_reportables_for_new_ca_reportable,
 )
 
