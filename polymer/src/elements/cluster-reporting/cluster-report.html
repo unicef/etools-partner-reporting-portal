@@ -791,7 +791,7 @@
       },
 
       _computeCanSendBack: function (data, permissions) {
-        return data.report_status === 'Sub' && permissions.sendBackIndicatorReport;
+        return (data.report_status === 'Sub' || data.report_status === 'Acc') && permissions.sendBackIndicatorReport;
       },
 
       _computeShowFeedback: function (data, permissions) {
