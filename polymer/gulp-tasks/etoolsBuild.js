@@ -28,7 +28,7 @@ function config() {
 var moveToTemplate = function() {
   return new Promise(resolve => {
     gulp.src([indexPath, bowerPath])
-      .pipe(useref({ //replace import paths
+      .pipe(useref({ //replace imports paths
         etools: function (content, target) {
           //console.log(content.match(/href="(.*?)"/g));
         }

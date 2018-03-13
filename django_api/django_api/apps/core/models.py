@@ -20,7 +20,8 @@ from mptt.models import MPTTModel, TreeForeignKey
 from .common import (
     RESPONSE_PLAN_TYPE,
     INDICATOR_REPORT_STATUS,
-    OVERALL_STATUS
+    OVERALL_STATUS,
+    EXTERNAL_DATA_SOURCES,
 )
 from utils.groups.wrappers import GroupWrapper
 
@@ -59,13 +60,22 @@ class TimeStampedExternalSyncModelMixin(TimeStampedModel):
         help_text='An ID representing this instance in an external system',
         blank=True,
         null=True,
-        max_length=32)
+        max_length=32
+    )
 
     class Meta:
         abstract = True
 
 
-class Country(TimeStampedExternalSyncModelMixin):
+class TimeStampedExternalSourceModel(TimeStampedExternalSyncModelMixin):
+    external_source = models.TextField(choices=EXTERNAL_DATA_SOURCES, blank=True, null=True)
+
+    class Meta:
+        abstract = True
+        unique_together = ('external_id', 'external_source')
+
+
+class Country(TimeStampedModel):
     """
     Represents a country which has many offices and sections.
     Taken from https://github.com/unicef/etools/blob/master/EquiTrack/users/models.py
@@ -82,7 +92,7 @@ class Country(TimeStampedExternalSyncModelMixin):
         return self.name
 
 
-class Workspace(TimeStampedExternalSyncModelMixin):
+class Workspace(TimeStampedExternalSourceModel):
     """
     Workspace (previously called Workspace, also synonym was
     emergency/country) model.
@@ -103,14 +113,18 @@ class Workspace(TimeStampedExternalSyncModelMixin):
     latitude = models.DecimalField(
         null=True, blank=True,
         max_digits=8, decimal_places=5,
-        validators=[MinValueValidator(
-            Decimal(-90)), MaxValueValidator(Decimal(90))]
+        validators=[
+            MinValueValidator(Decimal(-90)),
+            MaxValueValidator(Decimal(90))
+        ]
     )
     longitude = models.DecimalField(
         null=True, blank=True,
         max_digits=8, decimal_places=5,
-        validators=[MinValueValidator(
-            Decimal(-180)), MaxValueValidator(Decimal(180))]
+        validators=[
+            MinValueValidator(Decimal(-180)),
+            MaxValueValidator(Decimal(180))
+        ]
     )
     initial_zoom = models.IntegerField(default=8)
 
@@ -133,7 +147,7 @@ class Workspace(TimeStampedExternalSyncModelMixin):
         return Location.objects.filter(pk__in=pks)
 
 
-class ResponsePlan(TimeStampedModel):
+class ResponsePlan(TimeStampedExternalSourceModel):
     """
     ResponsePlan model present response of workspace (intervention).
 
@@ -165,7 +179,7 @@ class ResponsePlan(TimeStampedModel):
         unique_together = ('title', 'plan_type', 'workspace')
 
     def __str__(self):
-        return self.title
+        return '#{} {}'.format(self.id, self.title)
 
     @property
     def documents(self):
@@ -366,7 +380,7 @@ class LocationManager(models.GeoManager):
 
 
 @python_2_unicode_compatible
-class Location(TimeStampedExternalSyncModelMixin):
+class Location(TimeStampedExternalSourceModel):
     """
     Location model define place where agents are working.
     The background of the location can be:
@@ -382,8 +396,9 @@ class Location(TimeStampedExternalSyncModelMixin):
     """
     title = models.CharField(max_length=255)
 
-    gateway = models.ForeignKey(GatewayType, verbose_name='Location Type',
-                                related_name='locations')
+    gateway = models.ForeignKey(
+        GatewayType, verbose_name='Location Type', related_name='locations'
+    )
     carto_db_table = models.ForeignKey(
         'core.CartoDBTable',
         related_name="locations",
@@ -406,10 +421,11 @@ class Location(TimeStampedExternalSyncModelMixin):
         validators=[MinValueValidator(
             Decimal(-180)), MaxValueValidator(Decimal(180))]
     )
-    p_code = models.CharField(max_length=32, blank=True, null=True)
+    p_code = models.CharField(max_length=32, blank=True, null=True, verbose_name='Postal Code')
 
     parent = models.ForeignKey(
-        'self', null=True, blank=True, related_name='children', db_index=True)
+        'self', null=True, blank=True, related_name='children', db_index=True
+    )
 
     geom = models.MultiPolygonField(null=True, blank=True)
     point = models.PointField(null=True, blank=True)
@@ -446,7 +462,7 @@ class Location(TimeStampedExternalSyncModelMixin):
 
 class CartoDBTable(MPTTModel):
     """
-    Represents a table in CartoDB, it is used to import locations
+    Represents a table in CartoDB, it is used to imports locations
     related models:
         core.GatewayType: 'gateway'
         core.Country: 'country'
