@@ -4,7 +4,7 @@ from django.core.exceptions import MultipleObjectsReturned
 from rest_framework import serializers
 
 from cluster.models import Cluster
-from core.common import EXTERNAL_DATA_SOURCES, CLUSTER_TYPES
+from core.common import EXTERNAL_DATA_SOURCES, CLUSTER_TYPES, RESPONSE_PLAN_TYPE
 from core.models import Country, ResponsePlan, Workspace, Location, GatewayType
 from partner.models import PartnerProject, Partner, FundingSource
 
@@ -245,7 +245,6 @@ class V1ResponsePlanLocationImportSerializer(DiscardUniqueTogetherValidationMixi
         model = Country
         fields = (
             'name',
-            'long_name',
             'iso3',
         )
 
@@ -266,6 +265,7 @@ class V1ResponsePlanImportSerializer(DiscardUniqueTogetherValidationMixin, seria
     endDate = serializers.DateTimeField(source='end')
     locations = V1ResponsePlanLocationImportSerializer(many=True)
     emergencies = serializers.ListField()
+    categories = serializers.ListField()
     governingEntities = serializers.ListField(allow_empty=False)  # Clusters
 
     class Meta:
@@ -278,6 +278,7 @@ class V1ResponsePlanImportSerializer(DiscardUniqueTogetherValidationMixin, seria
             'startDate',
             'endDate',
             'locations',
+            'categories',
             'emergencies',
             'governingEntities',
         )
@@ -344,6 +345,14 @@ class V1ResponsePlanImportSerializer(DiscardUniqueTogetherValidationMixin, seria
 
         validated_data['workspace'] = workspace
         clusters_data = validated_data.pop('governingEntities')
+
+        categories = validated_data.pop('categories')
+        try:
+            if categories[0]['id'] == 5:
+                validated_data['plan_type'] = RESPONSE_PLAN_TYPE.fa
+            # TODO: Other plan types?
+        except (IndexError, KeyError):
+            pass  # Default is fine
 
         update_or_create_kwargs = {
             'external_source': validated_data.pop('external_source'),
