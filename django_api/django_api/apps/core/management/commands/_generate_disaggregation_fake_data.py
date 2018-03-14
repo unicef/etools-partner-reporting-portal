@@ -6,7 +6,8 @@ from indicator.models import (
     IndicatorBlueprint,
     Reportable,
     IndicatorReport,
-    Disaggregation
+    Disaggregation,
+    ReportableLocationGoal,
 )
 from indicator.disaggregators import (
     QuantityIndicatorDisaggregator,

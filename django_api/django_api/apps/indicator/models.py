@@ -220,8 +220,8 @@ class Reportable(TimeStampedExternalSourceModel):
         self (ForeignKey): "parent_indicator"
     """
     target = models.CharField(max_length=255, null=True, blank=True)
-    baseline = models.CharField(max_length=255, null=True, blank=True)
-    in_need = models.CharField(max_length=255, null=True, blank=True)
+    baseline = JSONField(default=dict([('d', 0), ('v', 0)]))
+    in_need = JSONField(default=dict([('d', 0), ('v', 0)]))
     assumptions = models.TextField(null=True, blank=True)
     means_of_verification = models.CharField(max_length=255,
                                              null=True,
@@ -446,9 +446,9 @@ def clone_ca_reportable_to_pa_signal(sender, instance, created, **kwargs):
 class ReportableLocationGoal(TimeStampedModel):
     reportable = models.ForeignKey(Reportable, on_delete=models.CASCADE)
     location = models.ForeignKey("core.Location", on_delete=models.CASCADE)
-    target = JSONField(default=dict([('c', 0), ('d', 0), ('v', 0)]))
-    baseline = JSONField(default=dict([('c', 0), ('d', 0), ('v', 0)]))
-    in_need = JSONField(default=dict([('c', 0), ('d', 0), ('v', 0)]))
+    target = JSONField(default=dict([('d', 0), ('v', 0)]))
+    baseline = JSONField(default=dict([('d', 0), ('v', 0)]))
+    in_need = JSONField(default=dict([('d', 0), ('v', 0)]))
 
 
 class IndicatorReportManager(models.Manager):
