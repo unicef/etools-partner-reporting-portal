@@ -20,7 +20,8 @@ from cryptography.x509 import load_pem_x509_certificate
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(os.path.join(BASE_DIR, 'apps/'))
+APPS_DIR = os.path.join(BASE_DIR, 'apps/')
+sys.path.append(APPS_DIR)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
@@ -88,6 +89,7 @@ INSTALLED_APPS = [
     'suit',
     'easy_pdf',
     'django_cron',
+    'fixture_magic',
     'guardian',
 
     'account',
@@ -96,6 +98,7 @@ INSTALLED_APPS = [
     'indicator',
     'partner',
     'unicef',
+    'ocha',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -264,6 +267,12 @@ LOGGING = {
         },
     },
     'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'stream': sys.stdout,
+            'formatter': 'standard',
+        },
         'default': {
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',
@@ -281,7 +290,13 @@ LOGGING = {
         '': {
             'handlers': ['default'],
             'level': 'INFO',
-            'propagate': True},
+            'propagate': True
+        },
+        'ocha-sync': {
+            'handlers': ['default', 'console'],
+            'level': 'DEBUG',
+            'propagate': True
+        },
         'elasticapm.errors': {
             'level': 'ERROR',
             'handlers': ['default'],

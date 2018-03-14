@@ -27,6 +27,7 @@ CLUSTER_TYPES = Choices(
     ('protection', 'Protection'),
     ('shelter', 'Shelter'),
     ('wash', 'WASH'),
+    ('imported', 'Imported'),
 )
 
 CLUSTER_TYPE_NAME_DICT = {
@@ -165,6 +166,11 @@ PARTNER_ACTIVITY_STATUS = Choices(
     ("Ong", "ongoing", "Ongoing"),
     ("Pla", "planned", "Planned"),
     ("Com", "completed", "Completed"),
+)
+
+EXTERNAL_DATA_SOURCES = Choices(
+    ("HPC", "HPC"),
+    ("OPS", "OPS"),
 )
 
 CURRENCIES = Choices(

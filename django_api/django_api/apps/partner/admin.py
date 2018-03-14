@@ -4,6 +4,7 @@ from .models import (
     Partner,
     PartnerProject,
     PartnerActivity,
+    FundingSource,
 )
 
 
@@ -28,6 +29,14 @@ class PartnerActivityAdmin(admin.ModelAdmin):
     search_fields = ('title', )
 
 
+class FundingSourceAdmin(admin.ModelAdmin):
+    list_display = ('name', 'partner_project', 'organization_type', 'usd_amount',
+                    'original_amount', 'original_currency', 'exchange_rate')
+    list_filter = ('usage_year', )
+    search_fields = ('name', 'partner_project__title')
+
+
 admin.site.register(Partner, PartnerAdmin)
 admin.site.register(PartnerProject, PartnerProjectAdmin)
 admin.site.register(PartnerActivity, PartnerActivityAdmin)
+admin.site.register(FundingSource, FundingSourceAdmin)

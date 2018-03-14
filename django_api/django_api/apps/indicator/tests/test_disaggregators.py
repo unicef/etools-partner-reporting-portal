@@ -1,7 +1,7 @@
 # from core.tests.base import BaseAPITestCase
 
-# from indicator.models import Reportable, IndicatorBlueprint
-# from indicator.disaggregators import (
+# from indicator.models imports Reportable, IndicatorBlueprint
+# from indicator.disaggregators imports (
 #     QuantityIndicatorDisaggregator,
 #     RatioIndicatorDisaggregator
 # )

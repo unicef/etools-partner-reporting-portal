@@ -12,13 +12,14 @@ from core.common import (
     SHARED_PARTNER_TYPE,
     CSO_TYPES,
     PARTNER_PROJECT_STATUS,
+    CURRENCIES,
 )
-from core.models import TimeStampedExternalSyncModelMixin
+from core.models import TimeStampedExternalSourceModel
 
 from core.countries import COUNTRIES_ALPHA2_CODE_DICT, COUNTRIES_ALPHA2_CODE
 
 
-class Partner(TimeStampedExternalSyncModelMixin):
+class Partner(TimeStampedExternalSourceModel):
     """
     Partner model describe in details who is it and their activity humanitarian
     goals (clusters).
@@ -144,7 +145,9 @@ class Partner(TimeStampedExternalSyncModelMixin):
 
     class Meta:
         ordering = ['title']
-        unique_together = ('title', 'vendor_number')
+        unique_together = (
+            ('title', 'vendor_number'),
+        )
 
     def __str__(self):
         return self.title
@@ -168,7 +171,7 @@ class Partner(TimeStampedExternalSyncModelMixin):
             return self.street_address or ''
 
 
-class PartnerProject(TimeStampedModel):
+class PartnerProject(TimeStampedExternalSourceModel):
     """
     PartnerProject model is a container for defined group of PartnerActivities
     model.
@@ -177,39 +180,79 @@ class PartnerProject(TimeStampedModel):
         cluster.Cluster (ManyToManyField): "clusters"
         core.Location (ManyToManyField): "locations"
         partner.Partner (ForeignKey): "partner"
+        partner.FundingSource (ForeignKey): "funding_sources"
         indicator.Reportable (GenericRelation): "reportables"
     """
-    title = models.CharField(max_length=255)
-    description = models.CharField(max_length=255)
-    additional_information = models.CharField(max_length=255,
-                                              verbose_name="Additional information (e.g. links)")
+    code = models.TextField(null=True, blank=True, unique=True)
+
+    title = models.CharField(max_length=1024)
+    description = models.CharField(max_length=2048)
+    additional_information = models.CharField(
+        max_length=255, verbose_name="Additional information (e.g. links)"
+    )
     start_date = models.DateField()
     end_date = models.DateField()
-    status = models.CharField(max_length=3, choices=PARTNER_PROJECT_STATUS,
-                              default=PARTNER_PROJECT_STATUS.ongoing)
-    total_budget = models.DecimalField(null=True, decimal_places=2,
-                                       help_text='Total Budget', max_digits=12)
-    funding_source = models.CharField(max_length=255)
+    status = models.CharField(
+        max_length=3, choices=PARTNER_PROJECT_STATUS, default=PARTNER_PROJECT_STATUS.ongoing
+    )
+    total_budget = models.DecimalField(
+        null=True, decimal_places=2, help_text='Total Budget', max_digits=12
+    )
 
-    clusters = models.ManyToManyField('cluster.Cluster',
-                                      related_name="partner_projects")
-    locations = models.ManyToManyField('core.Location',
-                                       related_name="partner_projects")
-    partner = models.ForeignKey(Partner,
-                                related_name="partner_projects")
-    reportables = GenericRelation('indicator.Reportable',
-                                  related_query_name='partner_projects')
+    clusters = models.ManyToManyField(
+        'cluster.Cluster', related_name="partner_projects"
+    )
+    locations = models.ManyToManyField(
+        'core.Location', related_name="partner_projects"
+    )
+    partner = models.ForeignKey(
+        Partner, related_name="partner_projects"
+    )
+    reportables = GenericRelation(
+        'indicator.Reportable', related_query_name='partner_projects'
+    )
 
     class Meta:
         ordering = ['-id']
+        unique_together = TimeStampedExternalSourceModel.Meta.unique_together
         permissions = (
             ('imo_object', 'IMO Object'),
             ('partner_object', 'Partner Object'),
         )
 
+    def __str__(self):
+        return '{} <PK:{}> {}'.format(
+            self.__class__.__name__, self.id, self.title
+        )
+
     @property
     def response_plan(self):
         return self.clusters.all()[0].response_plan
+
+
+class FundingSource(TimeStampedExternalSourceModel):
+    partner_project = models.ForeignKey(PartnerProject, related_name="funding_sources")
+    name = models.TextField(max_length=255)
+    organization_type = models.TextField(max_length=255)
+    usage_year = models.PositiveIntegerField(null=True, blank=True)
+    usd_amount = models.DecimalField(decimal_places=2, max_digits=12, verbose_name='USD Amount')
+    original_amount = models.DecimalField(decimal_places=2, max_digits=12, null=True, blank=True)
+    original_currency = models.CharField(
+        choices=CURRENCIES,
+        default=CURRENCIES.usd,
+        max_length=16,
+    )
+    exchange_rate = models.DecimalField(decimal_places=3, max_digits=8, default=1)
+
+    def __str__(self):
+        return '{} {} ({} USD) for {} from {} ({})'.format(
+            self.original_amount,
+            self.original_currency,
+            self.usd_amount,
+            self.partner_project,
+            self.name,
+            self.organization_type,
+        )
 
 
 class PartnerActivity(TimeStampedModel):
