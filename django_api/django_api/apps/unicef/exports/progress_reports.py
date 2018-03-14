@@ -58,7 +58,7 @@ class ProgressReportDetailPDFExporter:
                     [
                         HTMLTableCell(indicator.reportable.blueprint.title, rowspan=2, colspan=2),
                         HTMLTableHeader('Target'),
-                        HTMLTableCell(indicator.reportable.target),
+                        HTMLTableCell(indicator.reportable.target['v']),
                     ],
                     [
                         HTMLTableHeader('Total cumulative progress'),

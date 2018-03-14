@@ -202,9 +202,10 @@ class IndicatorsXLSXExporter:
 
                 self.sheet.cell(
                     row=start_row_id,
-                    column=16).value = indicator.reportable.baseline
+                    column=16).value = indicator.reportable.baseline['v']
+
                 self.sheet.cell(row=start_row_id,
-                                column=17).value = indicator.reportable.target
+                                column=17).value = indicator.reportable.target['v']
                 self.sheet.cell(
                     row=start_row_id,
                     column=18).value = indicator.reportable.total['c']

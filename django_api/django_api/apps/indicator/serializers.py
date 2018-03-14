@@ -115,7 +115,7 @@ class IndicatorReportSimpleSerializer(serializers.ModelSerializer):
         return obj.reportable.blueprint.title
 
     def get_target(self, obj):
-        return obj.reportable and obj.reportable.target
+        return obj.reportable and obj.reportable.target['v']
 
 
 class IndicatorReportStatusSerializer(serializers.ModelSerializer):
@@ -132,6 +132,9 @@ class ReportableSimpleSerializer(serializers.ModelSerializer):
     blueprint = IndicatorBlueprintSimpleSerializer()
     ref_num = serializers.CharField()
     achieved = serializers.JSONField()
+    baseline = serializers.JSONField()
+    target = serializers.JSONField()
+    in_need = serializers.JSONField()
     progress_percentage = serializers.FloatField()
     content_type_key = serializers.SerializerMethodField()
     content_object_title = serializers.SerializerMethodField()
@@ -657,8 +660,9 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
     object_type = serializers.CharField(validators=[add_indicator_object_type_validator], write_only=True)
     blueprint = IndicatorBlueprintSerializer()
     locations = IdLocationSerializer(many=True, read_only=True)
-    target = serializers.CharField(required=False)
-    baseline = serializers.CharField(required=False)
+    target = baseline = serializers.JSONField()
+    baseline = serializers.JSONField()
+    in_need = serializers.JSONField()
 
     class Meta:
         model = Reportable
@@ -698,12 +702,12 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         """
         Validates baseline, target, in-need
         """
-        if float(validated_data['baseline']) > float(validated_data['target']):
+        if float(validated_data['baseline']['v']) > float(validated_data['target']['v']):
             raise ValidationError(
                 {"baseline": "Baseline cannot be greater than target"}
             )
 
-        if float(validated_data['target']) > float(validated_data['in_need']):
+        if float(validated_data['target']['v']) > float(validated_data['in_need']['v']):
             raise ValidationError(
                 {"target": "Target cannot be greater than In Need"}
             )
@@ -1056,6 +1060,8 @@ class PMPReportableSerializer(serializers.ModelSerializer):
         many=True,
         allow_null=True,
         source="disaggregations")
+    baseline = serializers.IntegerField(source='baseline__v')
+    target = serializers.IntegerField(source='target__v')
 
     class Meta:
         model = Reportable
@@ -1076,6 +1082,8 @@ class PMPReportableSerializer(serializers.ModelSerializer):
 class ClusterPartnerAnalysisIndicatorResultSerializer(serializers.ModelSerializer):
     blueprint = IndicatorBlueprintSimpleSerializer()
     achieved = serializers.JSONField()
+    baseline = serializers.JSONField()
+    target = serializers.JSONField()
     progress_percentage = serializers.FloatField()
     progress_by_location = serializers.SerializerMethodField()
     indicator_reports = serializers.SerializerMethodField()
@@ -1155,16 +1163,18 @@ class ClusterAnalysisIndicatorsListSerializer(serializers.ModelSerializer):
     total_against_in_need = serializers.SerializerMethodField()
     total_against_target = serializers.SerializerMethodField()
     blueprint = IndicatorBlueprintSimpleSerializer(read_only=True)
+    baseline = serializers.JSONField()
+    target = serializers.JSONField()
 
     def get_content_type(self, obj):
         return obj.content_type.model
 
     def get_total_against_in_need(self, obj):
-        target = float(obj.target) if obj.target else 1.0
-        return float(obj.in_need) / target if obj.in_need else 0
+        target = float(obj.target['v']) if obj.target['v'] else 1.0
+        return float(obj.in_need['v']) / target if obj.in_need else 0
 
     def get_total_against_target(self, obj):
-        target = float(obj.target) if obj.target else 1.0
+        target = float(obj.target['v']) if obj.target['v'] else 1.0
         return obj.total['c'] / target
 
     def get_content_object(self, obj):
@@ -1209,6 +1219,9 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
     current_progress_by_location = serializers.SerializerMethodField()
     indicator_type = serializers.SerializerMethodField()
     display_type = serializers.SerializerMethodField()
+    baseline = serializers.JSONField()
+    target = serializers.JSONField()
+    in_need = serializers.JSONField()
 
     def get_indicator_type(self, obj):
         if obj.content_type.model == "clusteractivity":

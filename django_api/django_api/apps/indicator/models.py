@@ -302,11 +302,13 @@ class Reportable(TimeStampedExternalSourceModel):
         percentage = 0.0
 
         if self.achieved and self.baseline is not None and self.target is not None:
-            baseline = float(self.baseline)
+            baseline = float(self.baseline['v'])
+            target = float(self.target['v'])
+
             dividend = 0    # default progress is 0
             if self.achieved['c'] > baseline:
                 dividend = self.achieved['c'] - baseline
-            divisor = float(self.target) - baseline
+            divisor = float(target) - baseline
             if divisor:
                 percentage = round(dividend / divisor, 2)
         return percentage
