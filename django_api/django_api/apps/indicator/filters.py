@@ -11,6 +11,13 @@ class IndicatorFilter(filters.FilterSet):
         method="get_baseline",
         label="Baseline")
 
+    target = NumberFilter(
+        method="get_target",
+        label="Target")
+
+    def get_target(self, queryset, name, value):
+        return queryset.filter(target__v=value)
+
     def get_baseline(self, queryset, name, value):
         return queryset.filter(baseline__v=value)
 

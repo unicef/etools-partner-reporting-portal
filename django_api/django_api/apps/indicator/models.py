@@ -75,13 +75,9 @@ class IndicatorBlueprint(TimeStampedExternalSourceModel):
     """
     NUMBER = 'number'
     PERCENTAGE = 'percentage'
-    LIKERT = 'likert'
-    YESNO = 'yesno'
     UNIT_CHOICES = (
         (NUMBER, NUMBER),
         (PERCENTAGE, PERCENTAGE),
-        # (LIKERT, LIKERT),
-        # (YESNO, YESNO),
     )
 
     SUM = 'sum'
@@ -96,19 +92,17 @@ class IndicatorBlueprint(TimeStampedExternalSourceModel):
     )
 
     RATIO_CALC_CHOICE_LIST = (
-        PERCENTAGE,
-        RATIO,
+        SUM,
     )
 
     QUANTITY_CALC_CHOICES = (
         (SUM, SUM),
         (MAX, MAX),
-        (AVG, AVG)
+        (AVG, AVG),
     )
 
     RATIO_CALC_CHOICES = (
-        (PERCENTAGE, PERCENTAGE),
-        (RATIO, RATIO)
+        (SUM, SUM),
     )
 
     CALC_CHOICES = QUANTITY_CALC_CHOICES + RATIO_CALC_CHOICES
@@ -219,9 +213,9 @@ class Reportable(TimeStampedExternalSourceModel):
         cluster.ClusterObjective (ForeignKey): "content_object"
         self (ForeignKey): "parent_indicator"
     """
-    target = models.CharField(max_length=255, null=True, blank=True)
-    baseline = JSONField(default=dict([('d', 0), ('v', 0)]))
-    in_need = JSONField(default=dict([('d', 0), ('v', 0)]))
+    target = JSONField(default=dict([('d', 1), ('v', 0)]))
+    baseline = JSONField(default=dict([('d', 1), ('v', 0)]))
+    in_need = JSONField(default=dict([('d', 1), ('v', 0)]))
     assumptions = models.TextField(null=True, blank=True)
     means_of_verification = models.CharField(max_length=255,
                                              null=True,
@@ -231,7 +225,7 @@ class Reportable(TimeStampedExternalSourceModel):
 
     # Current total, transactional and dynamically calculated based on
     # IndicatorReports
-    total = JSONField(default=dict([('c', 0), ('d', 0), ('v', 0)]))
+    total = JSONField(default=dict([('c', 0), ('d', 1), ('v', 0)]))
 
     # unique code for this indicator within the current context
     # eg: (1.1) result code 1 - indicator code 1
@@ -374,7 +368,7 @@ def create_reportable_for_pa_from_ca_reportable(pa, ca_reportable):
         raise ValidationError("The Parent-child relationship is not valid")
 
     reportable_data_to_sync = get_reportable_data_to_clone(ca_reportable)
-    reportable_data_to_sync['total'] = dict([('c', 0), ('d', 0), ('v', 0)])
+    reportable_data_to_sync['total'] = dict([('c', 0), ('d', 1), ('v', 0)])
     reportable_data_to_sync["content_object"] = pa
     reportable_data_to_sync["blueprint"] = ca_reportable.blueprint
     reportable_data_to_sync["parent_indicator"] = ca_reportable
@@ -446,9 +440,9 @@ def clone_ca_reportable_to_pa_signal(sender, instance, created, **kwargs):
 class ReportableLocationGoal(TimeStampedModel):
     reportable = models.ForeignKey(Reportable, on_delete=models.CASCADE)
     location = models.ForeignKey("core.Location", on_delete=models.CASCADE)
-    target = JSONField(default=dict([('d', 0), ('v', 0)]))
-    baseline = JSONField(default=dict([('d', 0), ('v', 0)]))
-    in_need = JSONField(default=dict([('d', 0), ('v', 0)]))
+    target = JSONField(default=dict([('d', 1), ('v', 0)]))
+    baseline = JSONField(default=dict([('d', 1), ('v', 0)]))
+    in_need = JSONField(default=dict([('d', 1), ('v', 0)]))
 
 
 class IndicatorReportManager(models.Manager):
@@ -485,7 +479,7 @@ class IndicatorReport(TimeStampedModel):
         verbose_name='Frequency of reporting'
     )
 
-    total = JSONField(default=dict([('c', 0), ('d', 0), ('v', 0)]))
+    total = JSONField(default=dict([('c', 0), ('d', 1), ('v', 0)]))
 
     remarks = models.TextField(blank=True, null=True)
     report_status = models.CharField(

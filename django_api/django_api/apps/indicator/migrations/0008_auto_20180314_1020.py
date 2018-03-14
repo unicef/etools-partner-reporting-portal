@@ -23,9 +23,9 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, editable=False, verbose_name='created')),
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, editable=False, verbose_name='modified')),
-                ('target', django.contrib.postgres.fields.jsonb.JSONField(default={'d': 0, 'v': 0})),
-                ('baseline', django.contrib.postgres.fields.jsonb.JSONField(default={'d': 0, 'v': 0})),
-                ('in_need', django.contrib.postgres.fields.jsonb.JSONField(default={'d': 0, 'v': 0})),
+                ('target', django.contrib.postgres.fields.jsonb.JSONField(default={'d': 1, 'v': 0})),
+                ('baseline', django.contrib.postgres.fields.jsonb.JSONField(default={'d': 1, 'v': 0})),
+                ('in_need', django.contrib.postgres.fields.jsonb.JSONField(default={'d': 1, 'v': 0})),
                 ('location', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.Location')),
             ],
             options={
@@ -44,7 +44,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='reportable',
             name='baseline',
-            field=django.contrib.postgres.fields.jsonb.JSONField(default={'d': 0, 'v': 0}),
+            field=django.contrib.postgres.fields.jsonb.JSONField(default={'d': 1, 'v': 0}),
         ),
         migrations.RemoveField(
             model_name='reportable',
@@ -53,7 +53,26 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='reportable',
             name='in_need',
-            field=django.contrib.postgres.fields.jsonb.JSONField(default={'d': 0, 'v': 0}),
+            field=django.contrib.postgres.fields.jsonb.JSONField(default={'d': 1, 'v': 0}),
+        ),
+        migrations.RemoveField(
+            model_name='reportable',
+            name='target',
+        ),
+        migrations.AddField(
+            model_name='reportable',
+            name='target',
+            field=django.contrib.postgres.fields.jsonb.JSONField(default={'d': 1, 'v': 0}),
+        ),
+        migrations.AlterField(
+            model_name='indicatorreport',
+            name='total',
+            field=django.contrib.postgres.fields.jsonb.JSONField(default={'c': 0, 'd': 1, 'v': 0}),
+        ),
+        migrations.AlterField(
+            model_name='reportable',
+            name='total',
+            field=django.contrib.postgres.fields.jsonb.JSONField(default={'c': 0, 'd': 1, 'v': 0}),
         ),
         migrations.RemoveField(
             model_name='reportable',
