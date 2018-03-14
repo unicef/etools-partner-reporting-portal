@@ -14,7 +14,7 @@ If the response plan the IMO would like to work on, is not there, they can add a
 
 ![](https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-KzwqgC7O0kW5EDlHvvK%2F-L5KvdeY883ZOwpUJtKI%2F-L5KwDPgZ58RnxKKRS7K%2FScreen%20Shot%202018-02-14%20at%2012.10.41%20PM.png?alt=media&token=a735e5b5-8fc2-4921-97e0-28bc78f9903f)
 
-\(**TBD Maciej: After selecting a response plan, we may need to allow IMO to select/edit the clusters because the names incoming from OCHA are not standard\)**
+
 
 ![](../../.gitbook/assets/screen-shot-2018-03-12-at-11.14.30-am.png)
 
