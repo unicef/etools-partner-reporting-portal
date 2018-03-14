@@ -56,7 +56,7 @@ from core.countries import COUNTRIES_ALPHA2_CODE
 
 PARTNER_PROJECT_STATUS_LIST = [x[0] for x in PARTNER_PROJECT_STATUS]
 PD_STATUS_LIST = [x[0] for x in PD_STATUS]
-COUNTRIES_LIST = [x[0] for x in COUNTRIES_ALPHA2_CODE]
+COUNTRY_CODES_LIST = [x[0] for x in COUNTRIES_ALPHA2_CODE]
 COUNTRY_NAMES_LIST = [x[1] for x in COUNTRIES_ALPHA2_CODE]
 CALC_CHOICES_LIST = [x[0] for x in IndicatorBlueprint.CALC_CHOICES]
 DISPLAY_TYPE_CHOICES_LIST = [x[0]
@@ -231,7 +231,8 @@ class UserFactory(factory.django.DjangoModelFactory):
 
 
 class CountryFactory(factory.django.DjangoModelFactory):
-    name = fuzzy.FuzzyChoice(COUNTRY_NAMES_LIST)
+    country_short_code = fuzzy.FuzzyChoice(COUNTRY_CODES_LIST)
+    name = factory.LazyAttribute(lambda o: dict(COUNTRIES_ALPHA2_CODE)[o.country_short_code])
 
     class Meta:
         model = Country
@@ -239,7 +240,7 @@ class CountryFactory(factory.django.DjangoModelFactory):
 
 class WorkspaceFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "workspace_%d" % n)
-    workspace_code = fuzzy.FuzzyChoice(COUNTRIES_LIST)
+    workspace_code = fuzzy.FuzzyChoice(COUNTRY_CODES_LIST)
 
     class Meta:
         model = Workspace
