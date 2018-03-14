@@ -25,7 +25,7 @@
   * [Overview](product-end-user-documentation/cluster-reporting/overview.md)
   * [User Authentication, Roles and permissions](product-end-user-documentation/cluster-reporting/roles-and-permissions.md)
   * [AD Integration](product-end-user-documentation/cluster-reporting/ad-integration.md)
-  * [Response Plans](product-end-user-documentation/cluster-reporting/untitled.md)
+  * [Response Plans](product-end-user-documentation/cluster-reporting/response-plans.md)
   * [Cluster Indicators](product-end-user-documentation/cluster-reporting/cluster-indicators.md)
   * [Response Plan Dashboard](product-end-user-documentation/cluster-reporting/dashboard.md)
   * [Response Parameters setup](product-end-user-documentation/cluster-reporting/response-parameters-setup.md)
