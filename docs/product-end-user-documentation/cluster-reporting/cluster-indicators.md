@@ -15,7 +15,7 @@ Indicators in a cluster can belong to following entities:
 
 IMOs and partners can create their own indicators. They can choose the type of indicator \(quantity, percent, ratio\) and calculation method for reporting periods/locations.
 
-IMO's set baseline, target at the indicator level. If this is a Partner Activity Indicator, they can set these too. In-need is optional. If baseline is not set, it default's to 0.
+IMO's set baseline, target at the indicator level. If this is a Partner indicator, they can set these too. In-need is optional. If baseline is not set, it default's to 0.
 
 At the location level, IMO can set the admin level and specific location pertaining to the level. In-need is optional to set here. IMOs can add multiple locations and disaggregations too.
 

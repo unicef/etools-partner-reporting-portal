@@ -43,5 +43,6 @@
 * [API Documentation](technical-documentation/api-documentation/README.md)
   * [Error Handling](technical-documentation/api-documentation/error-handling.md)
 * [CartoDB location sync](technical-documentation/cartodb-location-sync.md)
-* [OCHA Integration - API and Model Documentation](technical-documentation/ocha-integration-technical-specification.md)
+* [OCHA Integration - API and Model Documentation](technical-documentation/ocha-integration-technical-specification/README.md)
+  * [Response Plan Import](technical-documentation/ocha-integration-technical-specification/response-plan-import.md)
 
