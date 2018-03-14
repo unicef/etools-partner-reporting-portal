@@ -18,7 +18,7 @@ from django.utils.functional import cached_property
 from model_utils.models import TimeStampedModel
 from mptt.models import MPTTModel, TreeForeignKey
 
-from core.countries import COUNTRY_NAME_TO_CODE
+from core.countries import COUNTRY_NAME_TO_ALPHA2_CODE
 from .common import (
     RESPONSE_PLAN_TYPE,
     INDICATOR_REPORT_STATUS,
@@ -95,7 +95,7 @@ class Country(TimeStampedModel):
         return self.name
 
     @property
-    def country_object(self):
+    def details(self):
         """
         Tries to retrieve a usable country reference
         :return: pycountry Country object or None
@@ -103,7 +103,7 @@ class Country(TimeStampedModel):
         lookup = None
 
         if not self.country_short_code:
-            lookup = {'alpha_2': COUNTRY_NAME_TO_CODE.get(self.name, None)}
+            lookup = {'alpha_2': COUNTRY_NAME_TO_ALPHA2_CODE.get(self.name, None)}
         elif len(self.country_short_code) == 3:
             lookup = {'alpha_3': self.country_short_code}
         elif len(self.country_short_code) == 2:
