@@ -5,7 +5,9 @@ import django_filters
 from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework.response import Response
 from rest_framework import status as statuses
+from rest_framework.views import APIView
 
+from core.common import DISPLAY_CLUSTER_TYPES
 from .permissions import IsAuthenticated
 from .models import Workspace, Location, ResponsePlan
 from .serializers import (
@@ -13,7 +15,8 @@ from .serializers import (
     ShortLocationSerializer,
     ChildrenLocationSerializer,
     ResponsePlanSerializer,
-    CreateResponsePlanSerializer)
+    CreateResponsePlanSerializer,
+)
 
 
 class WorkspaceAPIView(ListAPIView):
@@ -105,3 +108,14 @@ class ResponsePlanCreateAPIView(CreateAPIView):
 
     serializer_class = CreateResponsePlanSerializer
     permission_classes = (IsAuthenticated, )
+
+
+class ConfigurationAPIView(APIView):
+
+    # kept public on purpose
+    permission_classes = ()
+
+    def get(self, request):
+        return Response({
+            'CLUSTER_TYPE_CHOICES': list(DISPLAY_CLUSTER_TYPES)
+        })

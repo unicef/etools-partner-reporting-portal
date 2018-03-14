@@ -6,10 +6,12 @@ from .views import (
     ChildrenLocationAPIView,
     ResponsePlanAPIView,
     ResponsePlanCreateAPIView,
+    ConfigurationAPIView,
 )
 
 
 urlpatterns = [
+    url(r'^configuration/$', ConfigurationAPIView.as_view(), name="configuration"),
     url(r'^workspace/$', WorkspaceAPIView.as_view(), name="workspace"),
     url(r'^workspace/(?P<workspace_id>\d+)/response-plan/$',
         ResponsePlanAPIView.as_view(), name="response-plan"),
