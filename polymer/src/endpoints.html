@@ -9,6 +9,10 @@
         return BASE_URL + tail;
       },
 
+      config: function () {
+        return this._buildUrl('/core/configuration/');
+      },
+
       interventions: function () {
         return this._buildUrl('/core/workspace/');
       },

@@ -14,7 +14,7 @@
 <link rel="import" href="../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../../bower_components/paper-item/paper-item.html">
-<link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html">
+<link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-multi-selection-menu.html">
 <link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html">
 
 <link rel="import" href="../../polyfills/es6-shim.html">
@@ -27,8 +27,10 @@
 <link rel="import" href="../etools-prp-ajax.html">
 <link rel="import" href="../etools-prp-permissions.html">
 <link rel="import" href="../etools-prp-date-input.html">
-<link rel="import" href="../form-fields/partner-dropdown-content.html">
-<link rel="import" href="../form-fields/cluster-dropdown-content.html">
+<link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../redux/actions.html">
+<link rel="import" href="../../redux/selectors/config.html">
+<link rel="import" href="../../redux/selectors/workspace.html">
 
 <dom-module id="add-response-plan-modal">
   <template>
@@ -39,7 +41,7 @@
         --app-grid-columns: 3;
         --app-grid-gutter: 24px;
         --app-grid-item-height: auto;
-        --app-grid-expandible-item-columns: 1;
+        --app-grid-expandible-item-columns: 3;
 
         --paper-dialog: {
           width: 600px;
@@ -96,6 +98,12 @@
         url="[[ochaPlansUrl]]">
     </etools-prp-ajax>
 
+    <etools-prp-ajax
+      id="config"
+      url="[[configUrl]]">
+    </etools-prp-ajax>
+
+
     <paper-dialog
         id="dialog"
         with-backdrop
@@ -151,104 +159,62 @@
                 if="[[_equals(mode, 'custom')]]"
                 restamp="true">
               <div class="app-grid">
-                <div class="item">
-                  <paper-dropdown-menu
-                      class="validate"
-                      label="Cluster"
-                      on-value-changed="_validate"
-                      always-float-label
-                      required>
-                    <paper-listbox
-                        selected="{{data.custom.cluster}}"
-                        attr-for-selected="value"
-                        slot="dropdown-content"
-                        class="dropdown-content">
-                      <template
-                          is="dom-repeat"
-                          items="[[clusters]]">
-                        <paper-item value="[[item.id]]">[[item.title]]</paper-item>
-                      </template>
-                    </paper-listbox>
-                  </paper-dropdown-menu>
-                </div>
-                <div class="item">
-                  <etools-single-selection-menu
-                      class="validate"
-                      label="Cluster Objective"
-                      options="[[objectives]]"
-                      option-value="id"
-                      option-label="title"
-                      selected="{{data.custom.cluster_objective}}"
-                      on-iron-activate="_validate"
-                      disabled="[[_equals(objectives.length, 0)]]"
-                      trigger-value-change-event
-                      required>
-                  </etools-single-selection-menu>
-                </div>
-                <div class="item item-wide">
+                <div class="item full-width">
                   <paper-input
-                      class="validate"
-                      label="Title"
-                      value="{{data.custom.title}}"
-                      on-input="_validate"
-                      always-float-label
-                      required>
+                    class="validate item full-width"
+                    label="Response Plan"
+                    value="{{data.title}}"
+                    on-input="_validate"
+                    always-float-label
+                    required>
                   </paper-input>
                 </div>
-                <div class="item item-wide">
+                <div class="item">
                   <etools-single-selection-menu
-                      class="validate"
-                      label="Partner Project"
-                      options="[[projects]]"
-                      option-value="id"
-                      option-label="title"
-                      selected="{{data.custom.project}}"
-                      on-iron-activate="_validate"
-                      disabled="[[_equals(projects.length, 0)]]"
-                      trigger-value-change-event
-                      required>
+                    class="validate"
+                    label="Plan Type"
+                    options="[[types]]"
+                    option-value="id"
+                    option-label="title"
+                    selected="{{data.plan_type}}"
+                    on-iron-activate="_validate"
+                    trigger-value-change-event
+                    hide-search
+                    required>
                   </etools-single-selection-menu>
-                </div>
-                 <div class="item">
-                   <etools-prp-date-input
-                      class="start-date"
-                      label="Start date"
-                      value="{{data.custom.start_date}}"
-                      error-message=""
-                      required
-                      no-init>
-                   </etools-prp-date-input>
-                  </etools-date-input>
                 </div>
                 <div class="item">
                   <etools-prp-date-input
-                      class="end-date"
-                      label="End date"
-                      value="{{data.custom.end_date}}"
-                      error-message=""
-                      required
-                      no-init>
+                    class="start-date"
+                    label="Start date"
+                    value="{{data.start}}"
+                    error-message=""
+                    required
+                    no-init>
                   </etools-prp-date-input>
                 </div>
                 <div class="item">
-                  <paper-dropdown-menu
-                      class="validate"
-                      label="Status"
-                      on-value-changed="_validate"
-                      always-float-label
-                      required>
-                    <paper-listbox
-                        selected="{{data.custom.status}}"
-                        attr-for-selected="value"
-                        slot="dropdown-content"
-                        class="dropdown-content">
-                      <template
-                          is="dom-repeat"
-                          items="[[statuses]]">
-                        <paper-item value="[[item.id]]">[[item.title]]</paper-item>
-                      </template>
-                    </paper-listbox>
-                  </paper-dropdown-menu>
+                  <etools-prp-date-input
+                    class="end-date"
+                    label="End date"
+                    value="{{data.end}}"
+                    error-message=""
+                    required
+                    no-init>
+                  </etools-prp-date-input>
+                </div>
+                <div class="item full-width">
+                  <etools-multi-selection-menu
+                    class="validate"
+                    label="Clusters"
+                    options="[[clusters]]"
+                    option-value="value"
+                    option-label="label"
+                    selected-values="{{data.clusters}}"
+                    on-selected-values-changed="_validate"
+                    trigger-value-change-event
+                    required>
+                  </etools-multi-selection-menu>
                 </div>
               </div>
             </template>
@@ -307,6 +273,11 @@
           statePath: App.Selectors.Workspace.id,
         },
 
+        configUrl: {
+          type: String,
+          value: App.Endpoints.config(),
+        },
+
         ochaPlansUrl: {
           type: String,
           computed: '_computeOchaPlansUrl(workspaceId)',
@@ -330,8 +301,8 @@
         types: {
           type: Array,
           value: [
-            {title: 'HRP', id: 'hrp'},
-            {title: 'FA', id: 'fa'},
+            {title: 'HRP', id: 'HRP'},
+            {title: 'FA', id: 'FA'},
           ],
         },
 
@@ -345,6 +316,11 @@
           value: '',
         },
 
+        clusters: {
+          type: Array,
+          statePath: App.Selectors.Config.clusterTypes,
+        },
+
       },
 
       listeners: {
@@ -353,6 +329,7 @@
 
       observers: [
         '_fetchPlans(opened, ochaPlansUrl)',
+        '_fetchConfig(opened, configUrl)',
       ],
 
       _computeCreatePlanUrl: function (workspaceId, mode) {
@@ -417,6 +394,23 @@
             });
       },
 
+      _fetchConfig: function (opened) {
+        if (!opened) {
+          return;
+        }
+
+        var configThunk = this.$.config.thunk();
+
+        this.$.config.abort();
+
+        this.dispatch(
+          App.Actions.Config.fetchConfig(configThunk, App.Selectors.Config.clusterTypes)
+        )
+          .catch(function (err) { // jshint ignore:line
+            // TODO: error handling
+          });
+      },
+
       _savePlan: function () {
         var self = this;
 
@@ -432,6 +426,8 @@
         this.set('updatePending', true);
         if (this.mode === 'ocha') {
           this.$.plan.body = {plan: this.selectedPlan};
+        } else {
+          this.$.plan.body = Object.assign({}, this.data);
         }
        
         this.$.plan.thunk()()
