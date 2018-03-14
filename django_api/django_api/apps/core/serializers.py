@@ -18,8 +18,14 @@ class WorkspaceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Workspace
-        fields = ('id', 'title', 'workspace_code', 'countries',
-                  'business_area_code')
+        fields = (
+            'id',
+            'title',
+            'workspace_code',
+            'countries',
+            'business_area_code',
+            'can_import_ocha_response_plans',
+        )
 
 
 class LocationSerializer(serializers.ModelSerializer):

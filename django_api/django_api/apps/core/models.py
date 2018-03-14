@@ -5,6 +5,7 @@ import logging
 from datetime import datetime, timedelta
 from decimal import Decimal
 
+import pycountry
 from django.contrib.gis.db import models
 from django.core.validators import (
     MinValueValidator,
@@ -17,6 +18,7 @@ from django.utils.functional import cached_property
 from model_utils.models import TimeStampedModel
 from mptt.models import MPTTModel, TreeForeignKey
 
+from core.countries import COUNTRY_NAME_TO_ALPHA2_CODE
 from .common import (
     RESPONSE_PLAN_TYPE,
     INDICATOR_REPORT_STATUS,
@@ -84,12 +86,34 @@ class Country(TimeStampedModel):
     name = models.CharField(max_length=100)
     country_short_code = models.CharField(
         max_length=10,
-        null=True, blank=True
+        null=True,
+        blank=True
     )
     long_name = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return self.name
+
+    @property
+    def details(self):
+        """
+        Tries to retrieve a usable country reference
+        :return: pycountry Country object or None
+        """
+        lookup = None
+
+        if not self.country_short_code:
+            lookup = {'alpha_2': COUNTRY_NAME_TO_ALPHA2_CODE.get(self.name, None)}
+        elif len(self.country_short_code) == 3:
+            lookup = {'alpha_3': self.country_short_code}
+        elif len(self.country_short_code) == 2:
+            lookup = {'alpha_2': self.country_short_code}
+
+        if lookup:
+            try:
+                return pycountry.countries.get(**lookup)
+            except KeyError:
+                pass
 
 
 class Workspace(TimeStampedExternalSourceModel):
@@ -145,6 +169,12 @@ class Workspace(TimeStampedExternalSourceModel):
         pks = []
         [pks.extend(filter(lambda x: x is not None, part)) for part in result]
         return Location.objects.filter(pk__in=pks)
+
+    @property
+    def can_import_ocha_response_plans(self):
+        return any([
+            c.details for c in self.countries.all()
+        ])
 
 
 class ResponsePlan(TimeStampedExternalSourceModel):
