@@ -1,18 +1,20 @@
 from ast import literal_eval as make_tuple
+from collections import defaultdict
 
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from unicef.models import LowerLevelOutput
-from partner.models import PartnerProject, PartnerActivity
+from partner.models import PartnerProject, PartnerActivity, Partner
 from cluster.models import ClusterObjective, ClusterActivity
 
-from core.common import INDICATOR_REPORT_STATUS, FINAL_OVERALL_STATUS
+from core.common import OVERALL_STATUS, INDICATOR_REPORT_STATUS, FINAL_OVERALL_STATUS
 from core.serializers import LocationSerializer, IdLocationSerializer, ShortLocationSerializer
 from core.models import Location
 from core.validators import add_indicator_object_type_validator
@@ -1144,4 +1146,194 @@ class ClusterPartnerAnalysisIndicatorResultSerializer(serializers.ModelSerialize
             'project',
             'cluster_activity',
             'latest_report_status',
+        )
+
+
+class ClusterAnalysisIndicatorsListSerializer(serializers.ModelSerializer):
+    content_type = serializers.SerializerMethodField()
+    content_object = serializers.SerializerMethodField()
+    total_against_in_need = serializers.SerializerMethodField()
+    total_against_target = serializers.SerializerMethodField()
+    blueprint = IndicatorBlueprintSimpleSerializer(read_only=True)
+
+    def get_content_type(self, obj):
+        return obj.content_type.model
+
+    def get_total_against_in_need(self, obj):
+        target = float(obj.target) if obj.target else 1.0
+        return float(obj.in_need) / target if obj.in_need else 0
+
+    def get_total_against_target(self, obj):
+        target = float(obj.target) if obj.target else 1.0
+        return obj.total['c'] / target
+
+    def get_content_object(self, obj):
+        if isinstance(obj.content_object, (PartnerProject, )):
+            from partner.serializers import PartnerProjectSimpleSerializer
+            return PartnerProjectSimpleSerializer(obj.content_object).data
+
+        elif isinstance(obj.content_object, (PartnerActivity, )):
+            from partner.serializers import PartnerActivitySimpleSerializer
+            return PartnerActivitySimpleSerializer(obj.content_object).data
+
+        elif isinstance(obj.content_object, (ClusterObjective, )):
+            from cluster.serializers import ClusterObjectiveSerializer
+            return ClusterObjectiveSerializer(obj.content_object).data
+
+        elif isinstance(obj.content_object, (ClusterActivity, )):
+            from cluster.serializers import ClusterActivitySerializer
+            return ClusterActivitySerializer(obj.content_object).data
+
+    class Meta:
+        model = Reportable
+        fields = (
+            'id',
+            'target',
+            'baseline',
+            'in_need',
+            'blueprint',
+            'achieved',
+            'progress_percentage',
+            'content_type',
+            'content_object',
+            'total_against_in_need',
+            'total_against_target',
+        )
+
+
+class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
+    num_of_partners = serializers.SerializerMethodField()
+    partners_by_status = serializers.SerializerMethodField()
+    progress_over_time = serializers.SerializerMethodField()
+    current_progress_by_partner = serializers.SerializerMethodField()
+    current_progress_by_location = serializers.SerializerMethodField()
+    indicator_type = serializers.SerializerMethodField()
+    display_type = serializers.SerializerMethodField()
+
+    def get_indicator_type(self, obj):
+        if obj.content_type.model == "clusteractivity":
+            return "Cluster Activity Indicator"
+
+        elif obj.content_type.model == "clusterobjective":
+            return "Cluster Objective Indicator"
+
+        elif obj.content_type.model == "partneractivity":
+            return "Partner Activity Indicator"
+
+        elif obj.content_type.model == "partnerproject":
+            return "Partner Project Indicator"
+
+        else:
+            return "Lower Level Output Indicator"
+
+    def get_display_type(self, obj):
+        return obj.blueprint.display_type
+
+    def get_num_of_partners(self, obj):
+        num_of_partners = 0
+
+        if obj.children.exists() and isinstance(obj.content_object, (ClusterActivity, )):
+                num_of_partners = obj.content_object.partner_activities.values_list('partner', flat=True).distinct().count()
+
+        elif isinstance(obj.content_object, PartnerProject) or isinstance(obj.content_object, PartnerActivity):
+            num_of_partners = 1
+
+        else:
+            num_of_partners = 0
+
+        return num_of_partners
+
+    def _increment_partner_by_status(self, reportable, num_of_partners):
+        overall_status = reportable.indicator_reports.latest('time_period_start').overall_status
+
+        if overall_status == OVERALL_STATUS.met:
+            num_of_partners["met"] += 1
+
+        elif overall_status == OVERALL_STATUS.on_track:
+            num_of_partners["on_track"] += 1
+
+        elif overall_status == OVERALL_STATUS.no_progress:
+            num_of_partners["no_progress"] += 1
+
+        elif overall_status == OVERALL_STATUS.constrained:
+            num_of_partners["constrained"] += 1
+
+        elif overall_status == OVERALL_STATUS.no_status:
+            num_of_partners["no_status"] += 1
+
+    def _get_progress_by_partner(self, reportable, partner_progresses):
+        partner_progresses[reportable.content_object.partner.title] = int(reportable.total['c'])
+
+    def get_partners_by_status(self, obj):
+        num_of_partners = {
+            "met": 0,
+            "on_track": 0,
+            "no_progress": 0,
+            "constrained": 0,
+            "no_status": 0,
+        }
+
+        if obj.children.exists():
+            for child in obj.children.all():
+                self._increment_partner_by_status(child, num_of_partners)
+
+        else:
+            self._increment_partner_by_status(obj, num_of_partners)
+
+        return num_of_partners
+
+    def get_progress_over_time(self, obj):
+        return list(obj.indicator_reports.order_by('id').values_list('time_period_end', 'total'))
+
+    def get_current_progress_by_partner(self, obj):
+        partner_progresses = {}
+
+        # Only if the indicator is cluster activity, the children (unicef indicators) will exist
+        if obj.children.exists():
+            for child in obj.children.all():
+                self._get_progress_by_partner(child, partner_progresses)
+
+        # If the indicator is UNICEF cluster which is linked as Partner, then show its progress only
+        else:
+            self._get_progress_by_partner(obj, partner_progresses)
+
+        return partner_progresses
+
+    def get_current_progress_by_location(self, obj):
+        location_progresses = defaultdict(int)
+
+        # Only if the indicator is cluster activity, the children (unicef indicators) will exist
+        if obj.children.exists():
+            latest_indicator_reports = map(lambda x: x.indicator_reports.latest('time_period_start'), obj.children.all())
+
+            for ir in latest_indicator_reports:
+                for ild in ir.indicator_location_data.all():
+                    location_progresses[ild.location.title] += ild.disaggregation['()']['c']
+
+        # If the indicator is UNICEF cluster which is linked as Partner, then show its progress only
+        else:
+            indicator_location_data = obj.indicator_reports.latest('time_period_start').indicator_location_data.all()
+
+            for ild in indicator_location_data:
+                location_progresses[ild.location.title] += ild.disaggregation['()']['c']
+
+        return location_progresses
+
+    class Meta:
+        model = Reportable
+        fields = (
+            'id',
+            'target',
+            'baseline',
+            'in_need',
+            'total',
+            'blueprint',
+            'indicator_type',
+            'display_type',
+            'frequency',
+            'num_of_partners',
+            'partners_by_status',
+            'progress_over_time',
+            'current_progress_by_partner',
+            'current_progress_by_location',
         )

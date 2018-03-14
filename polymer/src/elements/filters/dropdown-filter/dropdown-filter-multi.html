@@ -42,14 +42,10 @@
 
         data: {
           type: Array,
-          value: [],
           observer: '_handleData',
         },
 
-        selectedValues: {
-          type: Array,
-          value: [],
-        },
+        selectedValues: Array,
       },
 
       observers: [
@@ -85,6 +81,11 @@
         this.async(function () {
           this.set('selectedValues', value.split(',').filter(Boolean));
         });
+      },
+
+      attached: function () {
+        this.set('selectedValues', []);
+        this.set('data', []);
       },
     });
   </script>

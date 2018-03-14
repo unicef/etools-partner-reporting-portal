@@ -1,13 +1,17 @@
 import operator
 
+from collections import Counter, OrderedDict
 from functools import reduce
 
 from django.db.models import Q, F
+from django.contrib.gis.db.models.functions import AsGeoJSON
 
 from rest_framework import serializers
+from rest_framework_gis.fields import GeometryField, GeoJsonDict
+from rest_framework_gis.serializers import GeoFeatureModelSerializer, GeometrySerializerMethodField
 
 from core.common import OVERALL_STATUS, PARTNER_PROJECT_STATUS, CLUSTER_TYPE_NAME_DICT
-from core.models import ResponsePlan, GatewayType
+from core.models import ResponsePlan, GatewayType, Location
 from indicator.models import Reportable, IndicatorReport, IndicatorLocationData
 from indicator.serializers import (
     ClusterIndicatorReportSerializer,
@@ -344,3 +348,57 @@ class PartnerAnalysisSummarySerializer(serializers.ModelSerializer):
             .values('id', 'title')
 
         return id_list
+
+
+class AnnotatedGeometryField(GeometryField):
+    """
+    GeometryField to handle annotated geoJSON from ORM
+    """
+    type_name = 'AnnotatedGeometryField'
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def to_representation(self, value):
+        if isinstance(value, dict) or value is None:
+            return value
+
+        # we expect value to be a GEOSGeometry instance
+        return GeoJsonDict(value)
+
+
+class OperationalPresenceLocationListSerializer(GeoFeatureModelSerializer):
+    partners = serializers.SerializerMethodField()
+    point = GeometrySerializerMethodField()
+    geom = AnnotatedGeometryField(source="processed_json")
+
+    def get_point(self, obj):
+        return obj.geo_point or None
+
+    def get_partners(self, obj):
+        partners = Partner.objects.filter(
+            clusters__response_plan__workspace__countries__gateway_types__locations=obj) \
+            .distinct() \
+            .values_list('title', flat=True)
+
+        partner_data = {
+            cluster: partners.filter(clusters__type=cluster) \
+                for cluster in set(partners.values_list('clusters__type', flat=True))
+        }
+        partner_data["all"] = partners
+
+        return partner_data
+
+    class Meta:
+        model = Location
+        geo_field = 'geom'
+        fields = (
+            'id',
+            'title',
+            'latitude',
+            'longitude',
+            'p_code',
+            'geom',
+            'point',
+            'partners',
+        )

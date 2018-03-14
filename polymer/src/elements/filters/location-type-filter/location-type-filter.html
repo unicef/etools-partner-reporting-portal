@@ -1,0 +1,53 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../../settings.html">
+<link rel="import" href="../dropdown-filter/dropdown-filter.html">
+
+<dom-module id="location-type-filter">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <dropdown-filter
+      label="Location Type"
+      name="loc_type"
+      value="[[value]]"
+      data="[[data]]">
+    </dropdown-filter>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'location-type-filter',
+
+      properties: {
+        maxLocType: {
+          type: Number,
+          value: App.Settings.cluster.maxLocType,
+        },
+
+        data: {
+          type: Array,
+          computed: '_computeData(maxLocType)',
+        },
+
+        value: String,
+      },
+
+      _computeData: function (maxLocType) {
+        return Array.apply(null, Array(maxLocType))
+            .map(function (_, index) {
+              var id = index + 1;
+
+              return {
+                id: String(id),
+                title: 'Admin' + id,
+              };
+            });
+      },
+    });
+  </script>
+</dom-module>
