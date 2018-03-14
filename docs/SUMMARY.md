@@ -32,8 +32,7 @@
   * [Planning your action as a Partner](product-end-user-documentation/cluster-reporting/planning-your-action-as-a-partner.md)
   * [Reporting on results](product-end-user-documentation/cluster-reporting/reporting-on-results.md)
   * [Analysis of results](product-end-user-documentation/cluster-reporting/analysis-of-results.md)
-  * [OCHA Integration](product-end-user-documentation/cluster-reporting/ocha-integration/README.md)
-    * [OCHA Integration - technical specification](product-end-user-documentation/cluster-reporting/ocha-integration/ocha-integration-technical-specification.md)
+  * [OCHA Integration](product-end-user-documentation/cluster-reporting/ocha-integration.md)
 
 ## Technical Documentation
 
@@ -44,4 +43,5 @@
 * [API Documentation](technical-documentation/api-documentation/README.md)
   * [Error Handling](technical-documentation/api-documentation/error-handling.md)
 * [CartoDB location sync](technical-documentation/cartodb-location-sync.md)
+* [OCHA Integration - API and Model Documentation](technical-documentation/ocha-integration-technical-specification.md)
 
