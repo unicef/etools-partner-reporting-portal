@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveAPIView, GenericAPIView
 from rest_framework.mixins import ListModelMixin
-from rest_framework import status as statuses, serializers
+from rest_framework import status as statuses
 
 import django_filters
 
@@ -780,17 +780,24 @@ class OperationalPresenceAggregationDataAPIView(APIView):
             ).distinct().values_list('title', flat=True)
 
         for cluster in clusters:
-            response_data["partners_per_cluster"][cluster.type.capitalize()] = cluster.partners.values_list('title', flat=True)
+            cluster_type = cluster.type.capitalize()
+            response_data["partners_per_cluster"][cluster_type] = cluster.partners.values_list('title', flat=True)
 
         for objective in objectives:
-            response_data["partners_per_cluster_objective"][objective.title + " (" + objective.cluster.type.capitalize() + ")"] = Partner.objects.filter(clusters__cluster_objectives=objective).values_list('title', flat=True)
+            cluster_type = objective.cluster.type.capitalize()
+            objective_title = objective.title + " (" + cluster_type + ")"
+            response_data["partners_per_cluster_objective"][objective_title] = \
+                Partner.objects.filter(clusters__cluster_objectives=objective).values_list('title', flat=True)
 
         return response_data
 
     def get(self, request, response_plan_id):
         if self.request.GET.get('narrow_loc_type', None):
             if int(self.request.GET.get('narrow_loc_type', None)) <= int(self.request.GET.get('loc_type', None)):
-                return Response({"message": "narrow_loc_type cannot be equal or higher than loc_type."}, status=statuses.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"message": "narrow_loc_type cannot be equal or higher than loc_type."},
+                    status=statuses.HTTP_400_BAD_REQUEST
+                )
 
         return Response(self.query_data(response_plan_id))
 
@@ -815,7 +822,10 @@ class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
     def get(self, request, response_plan_id):
         if self.request.GET.get('narrow_loc_type', None):
             if int(self.request.GET.get('narrow_loc_type', None)) <= int(self.request.GET.get('loc_type', None)):
-                return Response({"message": "narrow_loc_type cannot be equal or higher than loc_type."}, status=statuses.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"message": "narrow_loc_type cannot be equal or higher than loc_type."},
+                    status=statuses.HTTP_400_BAD_REQUEST
+                )
 
         return self.list(request, response_plan_id)
 
@@ -846,24 +856,28 @@ class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
                 id__in=map(lambda x: int(x), filter_parameters['cluster_objectives'].split(','))
             )
 
-        cluster_obj_loc = Location.objects.filter(gateway__country__workspaces__response_plans__clusters__cluster_objectives__in=objectives).distinct().values_list('id', flat=True)
+        cluster_obj_loc = Location.objects.filter(
+            gateway__country__workspaces__response_plans__clusters__cluster_objectives__in=objectives
+        ).distinct().values_list('id', flat=True)
 
         if filter_parameters['partner_types']:
             partner_types = filter_parameters['partner_types'].split(',')
 
         else:
-            partner_types = list(cluster_obj_loc.values_list('gateway__country__workspaces__response_plans__clusters__partners__partner_type', flat=True).distinct())
+            partner_types = list(
+                cluster_obj_loc.values_list(
+                    'gateway__country__workspaces__response_plans__clusters__partners__partner_type', flat=True)
+                .distinct()
+            )
 
-        partner_types_loc = cluster_obj_loc.filter(gateway__country__workspaces__response_plans__clusters__partners__partner_type__in=partner_types).distinct().values_list('id', flat=True)
+        partner_types_loc = cluster_obj_loc.filter(
+            gateway__country__workspaces__response_plans__clusters__partners__partner_type__in=partner_types
+        ).distinct().values_list('id', flat=True)
 
         loc_ids = set(list(partner_types_loc))
         result = Location.objects.filter(id__in=loc_ids)
 
-        if filter_parameters['loc_type'] and filter_parameters['locs'] \
-            and filter_parameters['narrow_loc_type']:
-            narrow_loc_type = int(filter_parameters['narrow_loc_type'])
-            parent_loc_q = None
-
+        if filter_parameters['loc_type'] and filter_parameters['locs'] and filter_parameters['narrow_loc_type']:
             final_result = Location.objects.filter(
                 Q(parent__id__in=map(lambda x: int(x), filter_parameters['locs'].split(',')))
                 | Q(gateway__admin_level=int(filter_parameters['narrow_loc_type']))
@@ -920,7 +934,6 @@ class ClusterAnalysisIndicatorsListAPIView(GenericAPIView, ListModelMixin):
             'indicator_type': self.request.GET.get('indicator_type', 'cluster_activity'),
         }
 
-        workspace = response_plan.workspace
         clusters = Cluster.objects.filter(response_plan=response_plan)
 
         if filter_parameters['clusters']:

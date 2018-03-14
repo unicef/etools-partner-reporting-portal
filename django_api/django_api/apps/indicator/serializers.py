@@ -4,14 +4,13 @@ from collections import defaultdict
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
-from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from unicef.models import LowerLevelOutput
-from partner.models import PartnerProject, PartnerActivity, Partner
+from partner.models import PartnerProject, PartnerActivity
 from cluster.models import ClusterObjective, ClusterActivity
 
 from core.common import OVERALL_STATUS, INDICATOR_REPORT_STATUS, FINAL_OVERALL_STATUS
@@ -1233,7 +1232,9 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
         num_of_partners = 0
 
         if obj.children.exists() and isinstance(obj.content_object, (ClusterActivity, )):
-                num_of_partners = obj.content_object.partner_activities.values_list('partner', flat=True).distinct().count()
+                num_of_partners = obj.content_object.partner_activities.values_list(
+                    'partner', flat=True
+                ).distinct().count()
 
         elif isinstance(obj.content_object, PartnerProject) or isinstance(obj.content_object, PartnerActivity):
             num_of_partners = 1
@@ -1304,7 +1305,9 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
 
         # Only if the indicator is cluster activity, the children (unicef indicators) will exist
         if obj.children.exists():
-            latest_indicator_reports = map(lambda x: x.indicator_reports.latest('time_period_start'), obj.children.all())
+            latest_indicator_reports = map(
+                lambda x: x.indicator_reports.latest('time_period_start'), obj.children.all()
+            )
 
             for ir in latest_indicator_reports:
                 for ild in ir.indicator_location_data.all():
