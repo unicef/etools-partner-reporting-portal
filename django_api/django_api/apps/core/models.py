@@ -172,8 +172,9 @@ class Workspace(TimeStampedExternalSourceModel):
 
     @property
     def can_import_ocha_response_plans(self):
-        # Import is done based on country code, so without them nothing can be imported
-        return self.countries.exclude(country_short_code=None).exclude(country_short_code='').exists()
+        return any([
+            c.details for c in self.countries.all()
+        ])
 
 
 class ResponsePlan(TimeStampedExternalSourceModel):

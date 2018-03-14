@@ -26,7 +26,6 @@ class RPMWorkspaceResponsePlanAPIView(APIView):
         )
 
     def get_country_iso3_codes(self):
-        errors = []
         iso3_codes = []
 
         countries = self.get_workspace().countries.all()
@@ -36,16 +35,13 @@ class RPMWorkspaceResponsePlanAPIView(APIView):
             )
 
         for country in countries:
-            try:
-                pycountry.countries.get(alpha_3=country.country_short_code)
-                iso3_codes.append(country.country_short_code)
-            except KeyError:
-                errors.append(
-                    '{} is not a valid ISO3 country code, invalid workspace setup.'.format(country.country_short_code)
-                )
+            if country.details:
+                iso3_codes.append(country.details.alpha_3)
 
         if not iso3_codes:
-            raise serializers.ValidationError(errors)
+            raise serializers.ValidationError(
+                'Countries in the workspace have invalid setup, cannot proceed.'
+            )
 
         return iso3_codes
 
