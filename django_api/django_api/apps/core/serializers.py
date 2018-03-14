@@ -123,12 +123,15 @@ class CreateResponsePlanSerializer(serializers.ModelSerializer):
         return validated_data
 
     def create(self, validated_data):
-        clusters = validated_data.pop('clusters')
+        clusters_data = validated_data.pop('clusters')
         response_plan = ResponsePlan.objects.create(**validated_data)
-        for cluster in clusters:
-            Cluster.objects.create(
+        clusters = []
+        for cluster in clusters_data:
+            clusters.append(Cluster.objects.create(
                 type=cluster, response_plan=response_plan
-            )
+            ))
+        if 'request' in self.context:
+            self.context['request'].user.imo_clusters.add(*clusters)
         return response_plan
 
 
