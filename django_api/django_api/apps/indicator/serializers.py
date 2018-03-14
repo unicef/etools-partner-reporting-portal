@@ -724,8 +724,17 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
         if validated_data['blueprint']['display_type'] == IndicatorBlueprint.RATIO:
             validated_data['blueprint']['unit'] = IndicatorBlueprint.PERCENTAGE
+
         else:
             validated_data['blueprint']['unit'] = validated_data['blueprint']['display_type']
+
+        if validated_data['blueprint']['unit'] == IndicatorBlueprint.PERCENTAGE:
+            if validated_data['blueprint']['calculation_formula_across_periods'] != IndicatorBlueprint.SUM:
+                raise ValidationError("calculation_formula_across_periods must be sum for Ratio Indicator type")
+
+            if validated_data['blueprint']['calculation_formula_across_locations'] != IndicatorBlueprint.SUM:
+                raise ValidationError("calculation_formula_across_locations must be sum for Ratio Indicator type")
+
         validated_data['blueprint']['disaggregatable'] = True
         blueprint = IndicatorBlueprintSerializer(data=validated_data['blueprint'])
         blueprint.is_valid(raise_exception=True)
