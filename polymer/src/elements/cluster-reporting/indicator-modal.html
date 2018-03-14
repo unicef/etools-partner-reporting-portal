@@ -10,9 +10,6 @@
 <link rel="import" href="../../../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../../../bower_components/paper-radio-button/paper-radio-button.html">
 <link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
-<link rel="import" href="../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
-<link rel="import" href="../../../bower_components/paper-listbox/paper-listbox.html">
-<link rel="import" href="../../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-multi-selection-menu.html">
 
 <link rel="import" href="../../polyfills/es6-shim.html">
@@ -59,9 +56,6 @@
         margin-left: -12px;
       }
 
-      paper-dropdown-menu {
-        width: 100%;
-      }
     </style>
 
     <etools-prp-ajax
@@ -99,63 +93,6 @@
       </div>
 
       <paper-dialog-scrollable>
-        <div class="row">
-          <labelled-item label="Type">
-            <paper-radio-group
-                data-path="type"
-                on-paper-radio-group-changed="_onValueChanged"
-                selected="number">
-              <paper-radio-button name="number">Quantity (#)</paper-radio-button>
-              <paper-radio-button name="percentage_ratio">Percent/Ratio</paper-radio-button>
-            </paper-radio-group>
-          </labelled-item>
-        </div>
-
-        <div
-            class="row"
-            hidden$="[[!_equals(computedType, 'number')]]">
-          <div class="app-grid">
-            <div class="item">
-              <labelled-item label="Calculation method across locations">
-                <paper-radio-group
-                    data-path="data.blueprint.calculation_formula_across_locations"
-                    on-paper-radio-group-changed="_onValueChanged"
-                    selected="sum">
-                  <paper-radio-button name="sum">sum</paper-radio-button>
-                  <paper-radio-button name="max">max</paper-radio-button>
-                  <paper-radio-button name="avg">avg</paper-radio-button>
-                </paper-radio-group>
-              </labelled-item>
-            </div>
-            <div class="item">
-              <labelled-item label="Calculation method across reporting periods">
-                <paper-radio-group
-                    data-path="data.blueprint.calculation_formula_across_periods"
-                    on-paper-radio-group-changed="_onValueChanged"
-                    selected="sum">
-                  <paper-radio-button name="sum">sum</paper-radio-button>
-                  <paper-radio-button name="max">max</paper-radio-button>
-                  <paper-radio-button name="avg">avg</paper-radio-button>
-                </paper-radio-group>
-              </labelled-item>
-            </div>
-          </div>
-        </div>
-
-        <div
-            class="row"
-            hidden$="[[_equals(computedType, 'number')]]">
-          <labelled-item label="Display type">
-            <paper-radio-group
-                data-path="displayType"
-                on-paper-radio-group-changed="_onValueChanged"
-                selected="percentage">
-              <paper-radio-button name="percentage">Percentage</paper-radio-button>
-              <paper-radio-button name="ratio">Ratio</paper-radio-button>
-            </paper-radio-group>
-          </labelled-item>
-        </div>
-
         <template
             is="dom-if"
             if="[[opened]]"
@@ -169,6 +106,66 @@
                 always-float-label
                 required>
             </paper-input>
+          </div>
+
+          <div class="row">
+            <labelled-item label="Type">
+              <paper-radio-group
+                  selected="{{data.blueprint.display_type}}">
+                <paper-radio-button name="number">Quantity (#)</paper-radio-button>
+                <paper-radio-button name="percentage">Percent</paper-radio-button>
+                <paper-radio-button name="ratio">Ratio</paper-radio-button>
+              </paper-radio-group>
+            </labelled-item>
+          </div>
+
+          <div class="row">
+            <div class="app-grid">
+              <div class="item">
+                <labelled-item label="Calculation method across locations">
+                  <paper-radio-group
+                      selected="{{data.blueprint.calculation_formula_across_locations}}">
+                    <paper-radio-button
+                        name="sum"
+                        disabled="[[isPercentageRatio]]">
+                      SUM
+                    </paper-radio-button>
+                    <paper-radio-button
+                        name="max"
+                        disabled="[[isPercentageRatio]]">
+                      MAX
+                    </paper-radio-button>
+                    <paper-radio-button
+                        name="avg"
+                        disabled="[[isPercentageRatio]]">
+                      AVG
+                    </paper-radio-button>
+                  </paper-radio-group>
+                </labelled-item>
+              </div>
+              <div class="item">
+                <labelled-item label="Calculation method across reporting periods">
+                  <paper-radio-group
+                      selected="{{data.blueprint.calculation_formula_across_periods}}">
+                    <paper-radio-button
+                        name="sum"
+                        disabled="[[isPercentageRatio]]">
+                      SUM
+                    </paper-radio-button>
+                    <paper-radio-button
+                        name="max"
+                        disabled="[[isPercentageRatio]]">
+                      MAX
+                    </paper-radio-button>
+                    <paper-radio-button
+                        name="avg"
+                        disabled="[[isPercentageRatio]]">
+                      AVG
+                    </paper-radio-button>
+                  </paper-radio-group>
+                </labelled-item>
+              </div>
+            </div>
           </div>
 
           <div class="row">
@@ -238,7 +235,8 @@
                   value="{{data.target}}"
                   type="number"
                   allowed-pattern="[+\-\d]"
-                  always-float-label>
+                  always-float-label
+                  required>
                 </paper-input>
               </div>
             </div>
@@ -314,20 +312,15 @@
 
       properties: {
         data: Object,
-
-        type: String,
-
         objectId: Number,
-
         objectType: String,
-
-        displayType: String,
-
-        baseline: Number,
-
-        target: Number,
-
         modalTitle: String,
+
+        isPercentageRatio: {
+          type: Boolean,
+          computed: '_computeIsPercentageRatio(data.blueprint.display_type)',
+          observer: '_resetCalculationFormulas',
+        },
 
         responsePlanId: {
           type: String,
@@ -349,12 +342,6 @@
           value: App.Endpoints.clusterIndicators(),
         },
 
-        computedType: {
-          type: String,
-          computed: '_computeType(type, displayType)',
-          observer: '_setDisplayType',
-        },
-
         updatePending: {
           type: Boolean,
           value: false,
@@ -363,12 +350,6 @@
         locations: {
           type: Array,
           value: [],
-        },
-
-        invalid: {
-          type: Boolean,
-          notify: true,
-          value: true,
         },
 
         disaggregationsParams: {
@@ -410,11 +391,11 @@
             },
           ],
         },
-      },
 
-      disaggregations: {
-        type: Array,
-        value: [],
+        disaggregations: {
+          type: Array,
+          value: [],
+        },
       },
 
       observers: [
@@ -422,18 +403,19 @@
         '_setLocations(selectedLocations.splices)',
       ],
 
-      _computeType: function (type, displayType) {
-        switch (type) {
-          case 'number':
-            return type;
-
-          case 'percentage_ratio':
-            return displayType;
-        }
+      _computeIsPercentageRatio: function (type) {
+        return ['percentage', 'ratio'].indexOf(type) !== -1;
       },
 
-      _setDisplayType: function (type) {
-        this.set('data.blueprint.display_type', type);
+      _resetCalculationFormulas: function (isPercentageRatio) {
+        if (!isPercentageRatio) {
+          return;
+        }
+
+        var formula = 'sum';
+
+        this.set('data.blueprint.calculation_formula_across_locations', formula);
+        this.set('data.blueprint.calculation_formula_across_periods', formula);
       },
 
       _setFrequency: function (e, data) {
@@ -470,30 +452,24 @@
         this.set('data.disaggregations', selected);
       },
 
-      _onValueChanged: function (e) {
-        this._updateValue(e.target);
-      },
-
-      _updateValue: function (el) {
-        this.set(el.dataset.path, el.selected);
-      },
-
       _setDefaults: function (opened) {
         if (!opened) {
           return;
         }
+
         this.set('selectedLocations', []);
         this.set('selectedDisaggregations', []);
-        this.set('displayType', '');
-        this.set('type', '');
         this.set('data', {
           cs_dates: [],
           locations: [],
-          blueprint: {},
+          blueprint: {
+            display_type: 'number',
+            calculation_formula_across_locations: 'sum',
+            calculation_formula_across_periods: 'sum',
+          },
           disaggregations: [],
         });
 
-        this._forEach('paper-radio-group', this._updateValue);
         this._fetchLocations();
         this._fetchDisaggregations();
       },
@@ -525,10 +501,11 @@
 
       _fetchDisaggregations: function() {
         var self = this;
+
         this.$.disaggregations.thunk()()
-          .then(function(res) {
-            self.set('disaggregations', res.data.results);
-          });
+            .then(function(res) {
+              self.set('disaggregations', res.data.results);
+            });
       },
 
       _formatLocation: function (data) {
@@ -542,11 +519,6 @@
       _processData: function (rawData) {
         var data = this._clone(rawData);
 
-        if (['percentage', 'ratio'].indexOf(data.blueprint.display_type) !== -1) {
-          delete data.blueprint.calculation_formula_across_locations;
-          delete data.blueprint.calculation_formula_across_periods;
-        }
-
         if (data.frequency !== 'Csd') {
           delete data.cs_dates;
         }
@@ -558,23 +530,9 @@
       },
 
       _save: function () {
-
-        var fields = [].slice.call(
-          Polymer.dom(this.root).querySelectorAll('.validate')
-        );
-
         var self = this;
-        var valid;
 
-        fields.forEach(function (field) {
-          field.validate();
-        });
-
-        valid = fields.every(function (field) {
-          return !field.invalid;
-        });
-
-        if (!valid) {
+        if (!this._fieldsAreValid()) {
           return;
         }
 
@@ -586,8 +544,6 @@
             .then(function (res) {
               self.fire('indicator-added', res.data);
               self.set('updatePending', false);
-              self.set('type', '');
-              self.set('displayType', '');
               self.close();
             })
             .catch(function (err) { // jshint ignore:line
