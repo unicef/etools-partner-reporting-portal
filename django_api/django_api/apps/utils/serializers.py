@@ -14,3 +14,12 @@ class CurrentWorkspaceDefault(object):
 
     def __repr__(self):
         return unicode_to_repr('%s()' % self.__class__.__name__)
+
+
+def serialize_choices(choices):
+    return [
+        {
+            'value': value,
+            'label': label,
+        } for value, label in choices
+    ]
