@@ -115,7 +115,7 @@ class IndicatorReportSimpleSerializer(serializers.ModelSerializer):
         return obj.reportable.blueprint.title
 
     def get_target(self, obj):
-        return obj.reportable and obj.reportable.target['v']
+        return obj.reportable and obj.reportable.calculated_target
 
 
 class IndicatorReportStatusSerializer(serializers.ModelSerializer):
@@ -660,7 +660,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
     object_type = serializers.CharField(validators=[add_indicator_object_type_validator], write_only=True)
     blueprint = IndicatorBlueprintSerializer()
     locations = IdLocationSerializer(many=True, read_only=True)
-    target = baseline = serializers.JSONField()
+    target = serializers.JSONField()
     baseline = serializers.JSONField()
     in_need = serializers.JSONField()
 
@@ -1170,11 +1170,11 @@ class ClusterAnalysisIndicatorsListSerializer(serializers.ModelSerializer):
         return obj.content_type.model
 
     def get_total_against_in_need(self, obj):
-        target = float(obj.target['v']) if obj.target['v'] else 1.0
-        return float(obj.in_need['v']) / target if obj.in_need else 0
+        target = float(obj.calculated_target) if obj.calculated_target else 1.0
+        return float(obj.calculated_in_need) / target if obj.in_need else 0
 
     def get_total_against_target(self, obj):
-        target = float(obj.target['v']) if obj.target['v'] else 1.0
+        target = float(obj.calculated_target) if obj.calculated_target else 1.0
         return obj.total['c'] / target
 
     def get_content_object(self, obj):

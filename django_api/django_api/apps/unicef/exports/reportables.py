@@ -85,11 +85,11 @@ class ReportableListPDFExporter(ProgressReportDetailPDFExporter):
             ],
             [
                 HTMLTableHeader('Baseline'),
-                HTMLTableCell(reportable.baseline['v'], colspan=2),
+                HTMLTableCell(reportable.calculated_baseline, colspan=2),
             ],
             [
                 HTMLTableHeader('Target'),
-                HTMLTableCell(reportable.target['v'], colspan=2),
+                HTMLTableCell(reportable.calculated_target, colspan=2),
             ],
             [
                 HTMLTableHeader('Current Progress'),

@@ -298,12 +298,33 @@ class Reportable(TimeStampedExternalSourceModel):
         return self.total
 
     @property
+    def calculated_target(self):
+        if self.blueprint.unit == IndicatorBlueprint.NUMBER:
+            return self.target['v']
+        else:
+            return self.target['v'] / self.target['d']
+
+    @property
+    def calculated_baseline(self):
+        if self.blueprint.unit == IndicatorBlueprint.NUMBER:
+            return self.baseline['v']
+        else:
+            return self.baseline['v'] / self.baseline['d']
+
+    @property
+    def calculated_in_need(self):
+        if self.blueprint.unit == IndicatorBlueprint.NUMBER:
+            return self.in_need['v']
+        else:
+            return self.in_need['v'] / self.in_need['d']
+
+    @property
     def progress_percentage(self):
         percentage = 0.0
 
         if self.achieved and self.baseline is not None and self.target is not None:
-            baseline = float(self.baseline['v'])
-            target = float(self.target['v'])
+            baseline = float(self.calculated_baseline)
+            target = float(self.calculated_target)
 
             dividend = 0    # default progress is 0
             if self.achieved['c'] > baseline:
