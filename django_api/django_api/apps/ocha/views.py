@@ -8,8 +8,8 @@ from core.models import Workspace
 from core.permissions import IsAuthenticated
 from core.serializers import ResponsePlanSerializer
 
-from ocha.imports.utilities import get_plan_list_for_country, import_response_plan
-from ocha.imports.bulk import fill_cluster_names_for_plan_list
+from ocha.imports.utilities import import_response_plan
+from ocha.imports.bulk import get_response_plans_for_countries
 
 
 class RPMWorkspaceResponsePlanAPIView(APIView):
@@ -47,19 +47,21 @@ class RPMWorkspaceResponsePlanAPIView(APIView):
 
         return iso3_codes
 
-    def get_response_plans(self):
-        plans = []
+    def trim_plans_list(self, response_plans):
+        return [{
+            'id': rp['id'],
+            'name': rp['name'],
+        } for rp in response_plans]
 
-        for iso3_code in self.get_country_iso3_codes():
-            plans.extend(get_plan_list_for_country(iso3_code))
-        return plans
+    def get_response_plans(self):
+        return get_response_plans_for_countries(self.get_country_iso3_codes())
 
     def get(self, request, *args, **kwargs):
-        # TODO: Sort?
         response_plans = self.get_response_plans()
-        fill_cluster_names_for_plan_list(response_plans)
 
-        return Response(response_plans)
+        return Response(
+            self.trim_plans_list(response_plans)
+        )
 
     def post(self, request, *args, **kwargs):
         plan_id = request.data.get('plan')
