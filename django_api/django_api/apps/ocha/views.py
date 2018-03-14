@@ -4,11 +4,13 @@ from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from core.common import RESPONSE_PLAN_TYPE
 from core.models import Workspace
 from core.permissions import IsAuthenticated
 from core.serializers import ResponsePlanSerializer
+from ocha.constants import HPC_V1_ROOT_URL
 
-from ocha.imports.utilities import import_response_plan
+from ocha.imports.utilities import import_response_plan, get_json_from_url
 from ocha.imports.bulk import get_response_plans_for_countries
 
 
@@ -73,3 +75,30 @@ class RPMWorkspaceResponsePlanAPIView(APIView):
         response_plan = import_response_plan(plan_id, workspace=self.get_workspace())
         response_plan.refresh_from_db()
         return Response(ResponsePlanSerializer(response_plan).data, status=status.HTTP_201_CREATED)
+
+
+class RPMWorkspaceResponsePlanDetailAPIView(APIView):
+
+    permission_classes = (
+        IsAuthenticated,
+    )
+
+    def get(self, request, *args, **kwargs):
+        source_url = HPC_V1_ROOT_URL + 'rpm/plan/id/{}?format=json&content=entities'.format(self.kwargs['id'])
+        plan_data = get_json_from_url(source_url)['data']
+        out_data = {
+            k: v for k, v in plan_data.items() if type(v) not in {list, dict}
+        }
+        if 'governingEntities' in plan_data:
+            cluster_names = [
+                ge['name'] for ge in plan_data['governingEntities'] if ge['entityPrototype']['refCode'] == 'CL'
+            ]
+        else:
+            cluster_names = []
+        out_data['clusterNames'] = cluster_names
+        if plan_data['categories'] and plan_data['categories'][0]['id'] == 5:
+            out_data['planType'] = RESPONSE_PLAN_TYPE.fa
+        else:
+            out_data['planType'] = RESPONSE_PLAN_TYPE.hrp
+
+        return Response(out_data)
