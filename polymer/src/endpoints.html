@@ -267,6 +267,14 @@
       progressReportAttachment: function (locationId, reportId) {
         return this.progressReports(locationId) + reportId + '/attachment/';
       },
+
+      ochaResponsePlans: function (workspaceId) {
+        return this._buildUrl('/ocha/response-plans/workspace/' + workspaceId + '/');
+      },
+
+      customResponsePlan: function (workspaceId) {
+        return this._buildUrl('/core/workspace/' + workspaceId + '/response-plan/create/');
+      }
     };
   }());
 </script>

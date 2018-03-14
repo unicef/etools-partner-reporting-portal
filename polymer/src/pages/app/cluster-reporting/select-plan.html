@@ -15,6 +15,7 @@
 <link rel="import" href="../../../elements/etools-prp-permissions.html">
 <link rel="import" href="../../../styles/table-styles.html">
 <link rel="import" href="../../../styles/app-theme-cluster.html">
+<link rel="import" href="../../../elements/cluster-reporting/add-plan-panel.html">
 
 <dom-module id="page-cluster-reporting-select-plan">
   <template>
@@ -137,8 +138,11 @@
         <h2> Select Response Plan [[workspace]]</h2>
           <template is="dom-if" if="[[permissions.adminResponsePlan]]">
               <paper-button raised id="admin" on-tap="_redirectToAdmin"><iron-icon icon="icons:settings"></iron-icon>Response Plan Admin</paper-button>
-            </template>
+          </template>
   </div>
+        <template is="dom-if" if="[[permissions.adminResponsePlan]]">
+          <add-plan-panel></add-plan-panel>
+        </template>
         <paper-card>
           <etools-data-table-header label="">
             <etools-data-table-column field="selected" flex-1>

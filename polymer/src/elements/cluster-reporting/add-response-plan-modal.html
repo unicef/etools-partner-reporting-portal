@@ -1,0 +1,451 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../../../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../../../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
+<link rel="import" href="../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html">
+<link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html">
+
+<link rel="import" href="../../polyfills/es6-shim.html">
+<link rel="import" href="../../endpoints.html">
+<link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/modal.html">
+<link rel="import" href="../../styles/buttons.html">
+<link rel="import" href="../../styles/modal.html">
+<link rel="import" href="../etools-prp-ajax.html">
+<link rel="import" href="../etools-prp-permissions.html">
+<link rel="import" href="../etools-prp-date-input.html">
+<link rel="import" href="../form-fields/partner-dropdown-content.html">
+<link rel="import" href="../form-fields/cluster-dropdown-content.html">
+
+<dom-module id="add-response-plan-modal">
+  <template>
+    <style include="button-styles modal-styles app-grid-style iron-flex iron-flex-alignment iron-flex-reverse">
+      :host {
+        display: block;
+
+        --app-grid-columns: 3;
+        --app-grid-gutter: 24px;
+        --app-grid-item-height: auto;
+        --app-grid-expandible-item-columns: 1;
+
+        --paper-dialog: {
+          width: 600px;
+
+          & > * {
+            margin: 0;
+          }
+        };
+      }
+
+      .full-width {
+        @apply --app-grid-expandible-item;
+      }
+
+      paper-radio-group {
+        display: block;
+        padding-top: 16px;
+      }
+
+      paper-radio-group > .fields {
+        padding: calc(var(--app-grid-gutter) / 2) 0;
+      }
+
+      paper-radio-group > .fields[empty] {
+        padding: 0;
+      }
+
+      paper-radio-group .app-grid {
+        margin: -var(--app-grid-gutter);
+      }
+
+      paper-radio-button {
+        margin-left: -12px;
+      }
+
+      paper-dropdown-menu {
+        width: 100%;
+      }
+    </style>
+
+    <etools-prp-permissions
+      permissions="{{permissions}}">
+    </etools-prp-permissions>
+
+    <etools-prp-ajax
+        id="plan"
+        url="[[createPlanUrl]]"
+        method="post"
+        content-type="application/json">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
+        id="plans"
+        url="[[ochaPlansUrl]]">
+    </etools-prp-ajax>
+
+    <paper-dialog
+        id="dialog"
+        with-backdrop
+        opened="{{opened}}">
+      <div class="header layout horizontal justified">
+        <h2>Add activity</h2>
+
+        <paper-icon-button
+            class="self-center"
+            on-tap="close"
+            icon="icons:close">
+        </paper-icon-button>
+      </div>
+
+      <paper-dialog-scrollable>
+        <paper-radio-group
+            id="mode"
+            selected="{{mode}}">
+          <paper-radio-button name="ocha">
+            <strong>From OCHA</strong>
+          </paper-radio-button>
+          <div
+              class="fields"
+              empty$="[[!_equals(mode, 'ocha')]]">
+            <template
+              is="dom-if"
+              if="[[_equals(mode, 'ocha')]]"
+              restamp="true">
+              <etools-single-selection-menu
+                class="item validate full-width"
+                label="Response Plan"
+                options="[[formattedPlans]]"
+                option-value="id"
+                option-label="title"
+                selected="{{selectedPlan}}"
+                on-iron-activate="_validate"
+                disabled="[[plansLoading]]"
+                trigger-value-change-event
+                required>
+              </etools-single-selection-menu>
+            </template>
+          </div>
+
+          <paper-radio-button name="custom">
+            <strong>Custom</strong>
+          </paper-radio-button>
+
+          <div
+              class="fields"
+              empty$="[[!_equals(mode, 'custom')]]">
+            <template
+                is="dom-if"
+                if="[[_equals(mode, 'custom')]]"
+                restamp="true">
+              <div class="app-grid">
+                <div class="item">
+                  <paper-dropdown-menu
+                      class="validate"
+                      label="Cluster"
+                      on-value-changed="_validate"
+                      always-float-label
+                      required>
+                    <paper-listbox
+                        selected="{{data.custom.cluster}}"
+                        attr-for-selected="value"
+                        slot="dropdown-content"
+                        class="dropdown-content">
+                      <template
+                          is="dom-repeat"
+                          items="[[clusters]]">
+                        <paper-item value="[[item.id]]">[[item.title]]</paper-item>
+                      </template>
+                    </paper-listbox>
+                  </paper-dropdown-menu>
+                </div>
+                <div class="item">
+                  <etools-single-selection-menu
+                      class="validate"
+                      label="Cluster Objective"
+                      options="[[objectives]]"
+                      option-value="id"
+                      option-label="title"
+                      selected="{{data.custom.cluster_objective}}"
+                      on-iron-activate="_validate"
+                      disabled="[[_equals(objectives.length, 0)]]"
+                      trigger-value-change-event
+                      required>
+                  </etools-single-selection-menu>
+                </div>
+                <div class="item item-wide">
+                  <paper-input
+                      class="validate"
+                      label="Title"
+                      value="{{data.custom.title}}"
+                      on-input="_validate"
+                      always-float-label
+                      required>
+                  </paper-input>
+                </div>
+                <div class="item item-wide">
+                  <etools-single-selection-menu
+                      class="validate"
+                      label="Partner Project"
+                      options="[[projects]]"
+                      option-value="id"
+                      option-label="title"
+                      selected="{{data.custom.project}}"
+                      on-iron-activate="_validate"
+                      disabled="[[_equals(projects.length, 0)]]"
+                      trigger-value-change-event
+                      required>
+                  </etools-single-selection-menu>
+                </div>
+                 <div class="item">
+                   <etools-prp-date-input
+                      class="start-date"
+                      label="Start date"
+                      value="{{data.custom.start_date}}"
+                      error-message=""
+                      required
+                      no-init>
+                   </etools-prp-date-input>
+                  </etools-date-input>
+                </div>
+                <div class="item">
+                  <etools-prp-date-input
+                      class="end-date"
+                      label="End date"
+                      value="{{data.custom.end_date}}"
+                      error-message=""
+                      required
+                      no-init>
+                  </etools-prp-date-input>
+                </div>
+                <div class="item">
+                  <paper-dropdown-menu
+                      class="validate"
+                      label="Status"
+                      on-value-changed="_validate"
+                      always-float-label
+                      required>
+                    <paper-listbox
+                        selected="{{data.custom.status}}"
+                        attr-for-selected="value"
+                        slot="dropdown-content"
+                        class="dropdown-content">
+                      <template
+                          is="dom-repeat"
+                          items="[[statuses]]">
+                        <paper-item value="[[item.id]]">[[item.title]]</paper-item>
+                      </template>
+                    </paper-listbox>
+                  </paper-dropdown-menu>
+                </div>
+              </div>
+            </template>
+          </div>
+        </paper-radio-group>
+      </paper-dialog-scrollable>
+
+      <div class="buttons layout horizontal-reverse">
+        <paper-button
+            on-tap="_savePlan"
+            class="btn-primary"
+            raised>
+          Save
+        </paper-button>
+
+        <paper-button
+            on-tap="close">
+          Cancel
+        </paper-button>
+      </div>
+
+      <etools-loading active="[[updatePending]]"></etools-loading>
+    </paper-dialog>
+  </template>
+
+  <script>
+    Polymer({
+      id: 'add-response-plan-modal',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.ModalBehavior,
+      ],
+
+      properties: {
+        data: Object,
+
+        updatePending: {
+          type: Boolean,
+          value: false,
+        },
+
+        mode: {
+          type: String,
+          observer: '_setDefaults',
+        },
+
+        opened: {
+          type: Boolean,
+          observer: '_onOpenedChanged',
+        },
+
+        workspaceId: {
+          type: String,
+          statePath: App.Selectors.Workspace.id,
+        },
+
+        ochaPlansUrl: {
+          type: String,
+          computed: '_computeOchaPlansUrl(workspaceId)',
+        },
+
+        createPlanUrl: {
+          type: String,
+          computed: '_computeCreatePlanUrl(workspaceId, mode)',
+        },
+
+        formattedPlans: {
+          type: String,
+          computed: '_computeFormattedPlans(plans)',
+        },
+
+        currentPlan: {
+          type: String,
+          computed: '_computeCurrentPlan(plans, selectedPlan)',
+        },
+
+        types: {
+          type: Array,
+          value: [
+            {title: 'HRP', id: 'hrp'},
+            {title: 'FA', id: 'fa'},
+          ],
+        },
+
+        plans: {
+          type: Array,
+          value: [],
+        },
+
+        selectedPlan: {
+          type: String,
+          value: '',
+        },
+
+      },
+
+      listeners: {
+        'mode.selected-changed': 'adjustPosition',
+      },
+
+      observers: [
+        '_fetchPlans(opened, ochaPlansUrl)',
+      ],
+
+      _computeCreatePlanUrl: function (workspaceId, mode) {
+        if (mode === 'ocha') {
+          return App.Endpoints.ochaResponsePlans(workspaceId);
+        }
+        return App.Endpoints.customResponsePlan(workspaceId);
+      },
+
+      _computeOchaPlansUrl: function (workspaceId) {
+        return App.Endpoints.ochaResponsePlans(workspaceId);
+      },
+
+      _setDefaults: function () {
+        this.set('data', {
+          custom: {},
+        });
+      },
+
+      _onOpenedChanged: function (opened) {
+        if (opened) {
+          this.set('mode', '');
+
+          this.async(function () {
+            this.set('mode', 'ocha');
+          });
+        }
+      },
+
+      _validate: function (e) {
+        e.target.validate();
+      },
+
+      _computeFormattedPlans: function(plans) {
+        return plans.map(function(plan) {
+          return {id: plan.id, title: plan.name};
+        });
+      },
+
+      _computeCurrentPlan: function(plans, selectedPlan) {
+        return plans.filter(function(plan) {
+          return plan.id === selectedPlan;
+        })[0];
+      },
+
+      _fetchPlans: function (opened) {
+        if (!opened) {
+          return;
+        }
+        this.set('plansLoading', true);
+        var self = this;
+        this.$.plans.abort();
+
+        this.$.plans.thunk()()
+            .then(function (res) {
+              self.set('plansLoading', false);
+              self.set('plans', res.data);
+            })
+            .catch(function (err) { // jshint ignore:line
+              self.set('plansLoading', false);
+              // TODO: error handling
+            });
+      },
+
+      _savePlan: function () {
+        var self = this;
+
+        // var valid = [
+        //   this._fieldsAreValid(),
+        //   this._dateRangeValid('.start-date', '.end-date'),
+        // ].every(Boolean);
+
+        // if (!valid) {
+        //   return;
+        // }
+
+        this.set('updatePending', true);
+        if (this.mode === 'ocha') {
+          this.$.plan.body = {plan: this.selectedPlan};
+        }
+       
+        this.$.plan.thunk()()
+          .then(function (res) {
+            // self.fire('activity-added', res.data);
+            self.set('updatePending', false);
+            self.close();
+            self.dispatch(App.Actions.addResponsePlan(res.data));
+          })
+          .catch(function (err) { // jshint ignore:line
+            // TODO: error handling
+            self.set('updatePending', false);
+          });
+      },
+    });
+  </script>
+</dom-module>

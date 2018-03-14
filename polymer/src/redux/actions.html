@@ -151,6 +151,13 @@
         };
       },
 
+      addResponsePlan: function (newPlan) {
+        return {
+          type: App.Constants.ADD_RESPONSE_PLAN,
+          plan: newPlan,
+        };
+      },
+
       setApp: function (app) {
         return {
           type: App.Constants.SET_APP,
