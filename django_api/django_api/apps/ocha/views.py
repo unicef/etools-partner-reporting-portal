@@ -69,6 +69,7 @@ class RPMWorkspaceResponsePlanAPIView(APIView):
 
         response_plan = import_response_plan(plan_id, workspace=self.get_workspace())
         response_plan.refresh_from_db()
+        request.user.imo_clusters.add(*response_plan.all_clusters)
         return Response(ResponsePlanSerializer(response_plan).data, status=status.HTTP_201_CREATED)
 
 
