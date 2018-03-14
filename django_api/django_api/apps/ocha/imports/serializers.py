@@ -283,9 +283,9 @@ class V1ResponsePlanImportSerializer(DiscardUniqueTogetherValidationMixin, seria
             'governingEntities',
         )
 
-    def get_workspace(self, emergencies, locations):
-        if 'workspace' in self.validated_data:
-            return self.validated_data['workspace']
+    def get_workspace_id(self, emergencies, locations):
+        if 'workspace_id' in self.validated_data:
+            return self.validated_data['workspace_id']
 
         if emergencies:
             workspace_id = emergencies[0]['id']
@@ -320,7 +320,7 @@ class V1ResponsePlanImportSerializer(DiscardUniqueTogetherValidationMixin, seria
 
         workspace.countries.add(*location_serializer.save())
 
-        return workspace
+        return workspace.id
 
     def save_clusters(self, response_plan, clusters_data):
         for cluster_data in clusters_data:
@@ -338,12 +338,12 @@ class V1ResponsePlanImportSerializer(DiscardUniqueTogetherValidationMixin, seria
             )
 
     def create(self, validated_data):
-        workspace = self.get_workspace(
+        workspace_id = self.get_workspace_id(
             validated_data.pop('emergencies'),
             validated_data.pop('locations'),
         )
 
-        validated_data['workspace'] = workspace
+        validated_data['workspace_id'] = workspace_id
         clusters_data = validated_data.pop('governingEntities')
 
         categories = validated_data.pop('categories')
