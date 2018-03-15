@@ -4,14 +4,13 @@ from collections import defaultdict
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
-from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from unicef.models import LowerLevelOutput
-from partner.models import PartnerProject, PartnerActivity, Partner
+from partner.models import PartnerProject, PartnerActivity
 from cluster.models import ClusterObjective, ClusterActivity
 
 from core.common import OVERALL_STATUS, INDICATOR_REPORT_STATUS, FINAL_OVERALL_STATUS
@@ -363,42 +362,36 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
         # level_reported and num_disaggregation validation
         if data['level_reported'] > data['num_disaggregation']:
             raise serializers.ValidationError(
-                "level_reported cannot be higher than "
-                + "its num_disaggregation"
+                "level_reported cannot be higher than its num_disaggregation"
             )
 
         # level_reported and disaggregation_reported_on validation
         if data['level_reported'] != len(data['disaggregation_reported_on']):
             raise serializers.ValidationError(
-                "disaggregation_reported_on list must have "
-                + "level_reported # of elements"
+                "disaggregation_reported_on list must have level_reported # of elements"
             )
 
-        disaggregation_id_list = data[
-            'indicator_report'].disaggregations.values_list('id', flat=True)
+        disaggregation_id_list = data['indicator_report'].disaggregations.values_list('id', flat=True)
 
         # num_disaggregation validation with actual Disaggregation count
         # from Reportable
         if data['num_disaggregation'] != len(disaggregation_id_list):
             raise serializers.ValidationError(
-                "num_disaggregation is not matched with "
-                + "its IndicatorReport's Reportable disaggregation counts"
+                "num_disaggregation is not matched with its IndicatorReport's Reportable disaggregation counts"
             )
 
         # IndicatorReport membership validation
         if self.instance.id not in data['indicator_report'] \
                 .indicator_location_data.values_list('id', flat=True):
             raise serializers.ValidationError(
-                "IndicatorLocationData does not belong to "
-                + "this {}".format(data['indicator_report'])
+                "IndicatorLocationData does not belong to this {}".format(data['indicator_report'])
             )
 
         # disaggregation_reported_on element-wise assertion
         for disagg_id in data['disaggregation_reported_on']:
             if disagg_id not in disaggregation_id_list:
                 raise serializers.ValidationError(
-                    "disaggregation_reported_on list must have "
-                    + "all its elements mapped to disaggregation ids"
+                    "disaggregation_reported_on list must have all its elements mapped to disaggregation ids"
                 )
 
         # Filter disaggregation option IDs
@@ -425,8 +418,7 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
         # level_reported against submitted disaggregation data
         if valid_entry_count < disaggregation_data_key_count:
             raise serializers.ValidationError(
-                "Submitted disaggregation data entries contains "
-                + "extra combination pair keys"
+                "Submitted disaggregation data entries contains extra combination pair keys"
             )
 
         valid_level_reported_key_count = len(list(filter(
@@ -500,8 +492,7 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
     disagg_choice_lookup_map = serializers.SerializerMethodField()
     total = serializers.JSONField()
     display_type = serializers.SerializerMethodField()
-    overall_status_display = serializers.CharField(
-        source='get_overall_status_display')
+    overall_status_display = serializers.CharField(source='get_overall_status_display')
 
     class Meta:
         model = IndicatorReport
@@ -854,14 +845,17 @@ class IndicatorReportReviewSerializer(serializers.Serializer):
         Make sure status is only accepted or sent back. Also overall_status
         should be set if accepting
         """
-        if data['status'] not in [INDICATOR_REPORT_STATUS.sent_back,
-                                  INDICATOR_REPORT_STATUS.accepted]:
-            raise serializers.ValidationError(
-                'Report status should be accepted or sent back')
-        if data.get('status', None) == INDICATOR_REPORT_STATUS.sent_back and data.get(
-                'comment') is None:
-            raise serializers.ValidationError(
-                'Comment required when sending back report')
+        if data['status'] not in {
+            INDICATOR_REPORT_STATUS.sent_back, INDICATOR_REPORT_STATUS.accepted
+        }:
+            raise serializers.ValidationError({
+                'status': 'Report status should be accepted or sent back'
+            })
+
+        if data['status'] == INDICATOR_REPORT_STATUS.sent_back and not data.get('comment'):
+            raise serializers.ValidationError({
+                'comment': 'Comment required when sending back report'
+            })
 
         return data
 
@@ -1255,7 +1249,9 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
         num_of_partners = 0
 
         if obj.children.exists() and isinstance(obj.content_object, (ClusterActivity, )):
-                num_of_partners = obj.content_object.partner_activities.values_list('partner', flat=True).distinct().count()
+                num_of_partners = obj.content_object.partner_activities.values_list(
+                    'partner', flat=True
+                ).distinct().count()
 
         elif isinstance(obj.content_object, PartnerProject) or isinstance(obj.content_object, PartnerActivity):
             num_of_partners = 1
@@ -1326,7 +1322,9 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
 
         # Only if the indicator is cluster activity, the children (unicef indicators) will exist
         if obj.children.exists():
-            latest_indicator_reports = map(lambda x: x.indicator_reports.latest('time_period_start'), obj.children.all())
+            latest_indicator_reports = map(
+                lambda x: x.indicator_reports.latest('time_period_start'), obj.children.all()
+            )
 
             for ir in latest_indicator_reports:
                 for ild in ir.indicator_location_data.all():

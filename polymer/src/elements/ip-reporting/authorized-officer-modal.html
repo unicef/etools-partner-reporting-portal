@@ -172,7 +172,7 @@
               self.set('path', newPath);
             })
             .catch(function (res) {
-              var errors = res.data.errors;
+              var errors = res.data.non_field_errors;
               self.close();
               return self.$.error.open(errors);
             })

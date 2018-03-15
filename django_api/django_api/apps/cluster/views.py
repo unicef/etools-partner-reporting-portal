@@ -4,12 +4,13 @@ from django.db.models import Q
 from django.contrib.gis.db.models.functions import AsGeoJSON
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
+from rest_framework.exceptions import ValidationError
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveAPIView, GenericAPIView
 from rest_framework.mixins import ListModelMixin
-from rest_framework import status as statuses, serializers
+from rest_framework import status as statuses
 
 import django_filters
 
@@ -123,9 +124,7 @@ class ClusterObjectiveAPIView(APIView):
             instance=self.get_instance(self.request, pk=pk),
             data=self.request.data
         )
-        if not serializer.is_valid():
-            return Response(serializer.errors,
-                            status=statuses.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
@@ -140,13 +139,9 @@ class ClusterObjectiveAPIView(APIView):
                 data=self.request.data
             )
         else:
-            return Response({"id": "This field is required!"},
-                            status=statuses.HTTP_400_BAD_REQUEST)
+            raise ValidationError({"id": "This field is required!"})
 
-        if not serializer.is_valid():
-            return Response(serializer.errors,
-                            status=statuses.HTTP_400_BAD_REQUEST)
-
+        serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
@@ -175,10 +170,6 @@ class ClusterObjectiveListCreateAPIView(ListCreateAPIView):
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     filter_class = ClusterObjectiveFilter
 
-    #
-    # def get_queryset(self, *args, **kwargs):
-    #     return ClusterObjective.objects.select_related('cluster').all()
-
     def get_queryset(self, *args, **kwargs):
         response_plan_id = self.kwargs.get('response_plan_id')
 
@@ -200,14 +191,11 @@ class ClusterObjectiveListCreateAPIView(ListCreateAPIView):
         :return: ClusterObjective object id
         """
         serializer = ClusterObjectiveSerializer(data=self.request.data)
-
-        if not serializer.is_valid():
-            return Response(serializer.errors,
-                            status=statuses.HTTP_400_BAD_REQUEST)
-
+        serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response({'id': serializer.instance.id},
-                        status=statuses.HTTP_201_CREATED)
+        return Response(
+            {'id': serializer.instance.id}, status=statuses.HTTP_201_CREATED
+        )
 
 
 class ClusterActivityAPIView(APIView):
@@ -245,9 +233,7 @@ class ClusterActivityAPIView(APIView):
             instance=self.get_instance(self.request, pk),
             data=self.request.data
         )
-        if not serializer.is_valid():
-            return Response(serializer.errors,
-                            status=statuses.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
@@ -262,13 +248,9 @@ class ClusterActivityAPIView(APIView):
                 data=self.request.data
             )
         else:
-            return Response({"id": "This field is required!"},
-                            status=statuses.HTTP_400_BAD_REQUEST)
+            raise ValidationError({"id": "This field is required!"})
 
-        if not serializer.is_valid():
-            return Response(serializer.errors,
-                            status=statuses.HTTP_400_BAD_REQUEST)
-
+        serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
@@ -318,11 +300,7 @@ class ClusterActivityListAPIView(ListCreateAPIView):
         :return: ClusterActivity object id
         """
         serializer = ClusterActivitySerializer(data=self.request.data)
-
-        if not serializer.is_valid():
-            return Response(serializer.errors,
-                            status=statuses.HTTP_400_BAD_REQUEST)
-
+        serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({'id': serializer.instance.id},
                         status=statuses.HTTP_201_CREATED)
@@ -626,12 +604,11 @@ class PartnerAnalysisSummaryAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
         if 'partner' not in request.query_params:
-            return Response({'message': "partner GET parameter is required."}, status=statuses.HTTP_400_BAD_REQUEST)
+            raise ValidationError("partner GET parameter is required.")
 
         serializer_context = {}
 
-        partner = get_object_or_404(
-            Partner, id=request.query_params.get('partner'))
+        partner = get_object_or_404(Partner, id=request.query_params.get('partner'))
 
         if 'project' in request.query_params:
             if request.query_params.get('project'):
@@ -639,9 +616,9 @@ class PartnerAnalysisSummaryAPIView(APIView):
                     PartnerProject, id=request.query_params.get('project'))
 
                 if project.partner.id != partner.id:
-                    return Response(
-                        {'message': "project does not belong to partner."}, status=statuses.HTTP_400_BAD_REQUEST
-                    )
+                    raise ValidationError({
+                        'project': "project does not belong to partner."
+                    })
 
                 serializer_context['project'] = project
 
@@ -651,17 +628,15 @@ class PartnerAnalysisSummaryAPIView(APIView):
                     PartnerActivity, id=request.query_params.get('activity'))
 
                 if activity.partner.id != partner.id:
-                    return Response(
-                        {'message': "activity does not belong to partner."}, status=statuses.HTTP_400_BAD_REQUEST
-                    )
+                    raise ValidationError({
+                        'activity': 'activity does not belong to partner.'
+                    })
 
                 serializer_context['activity'] = activity
 
         if 'ca_indicator' in request.query_params:
             if request.query_params.get('ca_indicator'):
-                ca_indicator = get_object_or_404(
-                    Reportable,
-                    id=request.query_params.get('ca_indicator'))
+                ca_indicator = get_object_or_404(Reportable, id=request.query_params.get('ca_indicator'))
 
                 serializer_context['ca_indicator'] = ca_indicator
 
@@ -671,9 +646,9 @@ class PartnerAnalysisSummaryAPIView(APIView):
                     Cluster, id=request.query_params.get('cluster_id'))
 
                 if not partner.clusters.filter(id=cluster.id).exists():
-                    return Response(
-                        {'message': "cluster does not belong to partner."}, status=statuses.HTTP_400_BAD_REQUEST
-                    )
+                    raise ValidationError({
+                        'cluster_id': "cluster does not belong to partner."
+                    })
 
                 serializer_context['cluster'] = cluster
 
@@ -780,17 +755,24 @@ class OperationalPresenceAggregationDataAPIView(APIView):
             ).distinct().values_list('title', flat=True)
 
         for cluster in clusters:
-            response_data["partners_per_cluster"][cluster.type.capitalize()] = cluster.partners.values_list('title', flat=True)
+            cluster_type = cluster.type.capitalize()
+            response_data["partners_per_cluster"][cluster_type] = cluster.partners.values_list('title', flat=True)
 
         for objective in objectives:
-            response_data["partners_per_cluster_objective"][objective.title + " (" + objective.cluster.type.capitalize() + ")"] = Partner.objects.filter(clusters__cluster_objectives=objective).values_list('title', flat=True)
+            cluster_type = objective.cluster.type.capitalize()
+            objective_title = objective.title + " (" + cluster_type + ")"
+            response_data["partners_per_cluster_objective"][objective_title] = \
+                Partner.objects.filter(clusters__cluster_objectives=objective).values_list('title', flat=True)
 
         return response_data
 
     def get(self, request, response_plan_id):
         if self.request.GET.get('narrow_loc_type', None):
             if int(self.request.GET.get('narrow_loc_type', None)) <= int(self.request.GET.get('loc_type', None)):
-                return Response({"message": "narrow_loc_type cannot be equal or higher than loc_type."}, status=statuses.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"message": "narrow_loc_type cannot be equal or higher than loc_type."},
+                    status=statuses.HTTP_400_BAD_REQUEST
+                )
 
         return Response(self.query_data(response_plan_id))
 
@@ -815,7 +797,10 @@ class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
     def get(self, request, response_plan_id):
         if self.request.GET.get('narrow_loc_type', None):
             if int(self.request.GET.get('narrow_loc_type', None)) <= int(self.request.GET.get('loc_type', None)):
-                return Response({"message": "narrow_loc_type cannot be equal or higher than loc_type."}, status=statuses.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"message": "narrow_loc_type cannot be equal or higher than loc_type."},
+                    status=statuses.HTTP_400_BAD_REQUEST
+                )
 
         return self.list(request, response_plan_id)
 
@@ -846,24 +831,28 @@ class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
                 id__in=map(lambda x: int(x), filter_parameters['cluster_objectives'].split(','))
             )
 
-        cluster_obj_loc = Location.objects.filter(gateway__country__workspaces__response_plans__clusters__cluster_objectives__in=objectives).distinct().values_list('id', flat=True)
+        cluster_obj_loc = Location.objects.filter(
+            gateway__country__workspaces__response_plans__clusters__cluster_objectives__in=objectives
+        ).distinct().values_list('id', flat=True)
 
         if filter_parameters['partner_types']:
             partner_types = filter_parameters['partner_types'].split(',')
 
         else:
-            partner_types = list(cluster_obj_loc.values_list('gateway__country__workspaces__response_plans__clusters__partners__partner_type', flat=True).distinct())
+            partner_types = list(
+                cluster_obj_loc.values_list(
+                    'gateway__country__workspaces__response_plans__clusters__partners__partner_type', flat=True)
+                .distinct()
+            )
 
-        partner_types_loc = cluster_obj_loc.filter(gateway__country__workspaces__response_plans__clusters__partners__partner_type__in=partner_types).distinct().values_list('id', flat=True)
+        partner_types_loc = cluster_obj_loc.filter(
+            gateway__country__workspaces__response_plans__clusters__partners__partner_type__in=partner_types
+        ).distinct().values_list('id', flat=True)
 
         loc_ids = set(list(partner_types_loc))
         result = Location.objects.filter(id__in=loc_ids)
 
-        if filter_parameters['loc_type'] and filter_parameters['locs'] \
-            and filter_parameters['narrow_loc_type']:
-            narrow_loc_type = int(filter_parameters['narrow_loc_type'])
-            parent_loc_q = None
-
+        if filter_parameters['loc_type'] and filter_parameters['locs'] and filter_parameters['narrow_loc_type']:
             final_result = Location.objects.filter(
                 Q(parent__id__in=map(lambda x: int(x), filter_parameters['locs'].split(',')))
                 | Q(gateway__admin_level=int(filter_parameters['narrow_loc_type']))
@@ -920,7 +909,6 @@ class ClusterAnalysisIndicatorsListAPIView(GenericAPIView, ListModelMixin):
             'indicator_type': self.request.GET.get('indicator_type', 'cluster_activity'),
         }
 
-        workspace = response_plan.workspace
         clusters = Cluster.objects.filter(response_plan=response_plan)
 
         if filter_parameters['clusters']:
