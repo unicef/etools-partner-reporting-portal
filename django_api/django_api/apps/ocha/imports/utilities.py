@@ -3,6 +3,7 @@ from time import sleep
 
 import itertools
 import requests
+from requests import RequestException
 from requests.status_codes import codes
 
 from cluster.models import Cluster, ClusterObjective, ClusterActivity
@@ -30,12 +31,18 @@ MAX_URL_RETRIES = 2
 
 
 def get_json_from_url(url, retry_counter=MAX_URL_RETRIES):
-    logger.debug('Getting {}, attempt: {}'.format(url, MAX_URL_RETRIES - retry_counter + 1))
-    response = requests.get(url)
-
-    if response.status_code in RETRY_ON_STATUS_CODES and retry_counter > 0:
+    def retry():
         sleep(5)
         return get_json_from_url(url, retry_counter=retry_counter - 1)
+
+    logger.debug('Getting {}, attempt: {}'.format(url, MAX_URL_RETRIES - retry_counter + 1))
+    try:
+        response = requests.get(url, timeout=10)
+    except RequestException:
+        return retry()
+
+    if response.status_code in RETRY_ON_STATUS_CODES and retry_counter > 0:
+        return retry()
     elif not response.status_code == codes.ok:
         raise OCHAImportException('Invalid response status code: {}'.format(response.status_code))
 

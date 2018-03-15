@@ -1,3 +1,5 @@
+from dateutil.parser import parse
+from django.conf import settings
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers, status
 from rest_framework.response import Response
@@ -96,5 +98,8 @@ class RPMWorkspaceResponsePlanDetailAPIView(APIView):
             out_data['planType'] = RESPONSE_PLAN_TYPE.fa
         else:
             out_data['planType'] = RESPONSE_PLAN_TYPE.hrp
+
+        out_data['startDate'] = parse(out_data['startDate']).strftime(settings.DATE_FORMAT)
+        out_data['endDate'] = parse(out_data['endDate']).strftime(settings.DATE_FORMAT)
 
         return Response(out_data)
