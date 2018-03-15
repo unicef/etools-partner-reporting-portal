@@ -27,6 +27,7 @@
 <link rel="import" href="../../behaviors/modal.html">
 <link rel="import" href="../../styles/buttons.html">
 <link rel="import" href="../../styles/modal.html">
+<link rel="import" href="../error-box.html">
 
 <dom-module id="indicator-modal">
   <template>
@@ -99,6 +100,7 @@
       </div>
 
       <paper-dialog-scrollable>
+        <error-box errors="[[errors]]"></error-box>
         <div class="row">
           <labelled-item label="Type">
             <paper-radio-group
@@ -226,7 +228,8 @@
                   value="{{data.baseline}}"
                   type="number"
                   allowed-pattern="[+\-\d]"
-                  always-float-label>
+                  always-float-label
+                  required>
                 </paper-input>
               </div>
 
@@ -238,7 +241,8 @@
                   value="{{data.target}}"
                   type="number"
                   allowed-pattern="[+\-\d]"
-                  always-float-label>
+                  always-float-label
+                  required>
                 </paper-input>
               </div>
             </div>
@@ -486,6 +490,7 @@
         this.set('selectedDisaggregations', []);
         this.set('displayType', '');
         this.set('type', '');
+        this.set('errors', {});
         this.set('data', {
           cs_dates: [],
           locations: [],
@@ -588,11 +593,11 @@
               self.set('updatePending', false);
               self.set('type', '');
               self.set('displayType', '');
+              self.set('errors', {});
               self.close();
             })
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-
+            .catch(function (err) {
+              self.set('errors', err.data);
               self.set('updatePending', false);
             });
       },

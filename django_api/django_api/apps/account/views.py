@@ -1,6 +1,7 @@
 from django.contrib.auth import login, logout
 
 from rest_framework import status as statuses
+from rest_framework.exceptions import ValidationError
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -57,9 +58,7 @@ class LoginUserWithTokenAPIView(APIView):
     def post(self, request, *args, **kwargs):
         user = authenticate_by_token(request.data.get('token', None))
         if user:
-            login(request, user,
-                  backend='django.contrib.auth.backends.ModelBackend')
-            return Response({'success': True}, status=statuses.HTTP_200_OK)
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            return Response({'success': True})
         else:
-            return Response({'detail': 'Couldn\'t log you in. Invalid token.'},
-                            status=statuses.HTTP_400_BAD_REQUEST)
+            raise ValidationError('Couldn\'t log you in. Invalid token.')
