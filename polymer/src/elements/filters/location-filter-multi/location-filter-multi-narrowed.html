@@ -81,7 +81,7 @@
         return App.Endpoints.clusterLocationNames(responsePlanId);
       },
 
-      _fetchLocations: function (url) {
+      _fetchLocations: function () {
         this.debounce('fetch-locations', function () {
           var self = this;
 
