@@ -104,6 +104,19 @@
               </template>
             </template>
           </template>
+
+          <template
+              is="dom-if"
+              if="[[_equals(feature.geometry.type, 'Point')]]">
+            <leaflet-marker
+                longitude="[[feature.geometry.coordinates.0]]"
+                latitude="[[feature.geometry.coordinates.1]]"
+                icon='{"iconUrl": "[[_computeMarkerIcon(feature.properties, legend)]]"}'>
+              <div>[[feature.properties.title]]</div>
+              <div class="number-of-partners">[[feature.properties.partners.all.length]]</div>
+              <div>[[_commaSeparated(feature.properties.partners.all)]]</div>
+            </leaflet-marker>
+          </template>
         </template>
       </leaflet-map>
 
@@ -229,16 +242,27 @@
         ].join('');
       },
 
-      _computePolygonColor: function (properties, legend) {
+      _getLegendIndex: function (properties, legend) {
         var partnersCount = properties.partners.all.length;
         var i = 0;
-        var color = legend[i].color;
 
-        while (partnersCount >= legend[++i].threshold) {
-          color = legend[i].color;
-        }
+        do {
+          i++;
+        } while (partnersCount >= legend[i].threshold);
 
-        return color;
+        return i;
+      },
+
+      _computePolygonColor: function (properties, legend) {
+        var index = this._getLegendIndex(properties, legend);
+
+        return legend[index].color;
+      },
+
+      _computeMarkerIcon: function (properties, legend) {
+        var index = this._getLegendIndex(properties, legend);
+
+        return '/images/marker' + index + '.png';
       },
 
       _isPoint: function (node) {
@@ -271,13 +295,10 @@
             .filter(function (feature) {
               return !!feature.geometry;
             })
-            .forEach(function (feature) {
-              switch (feature.geometry.type) {
-                case 'MultiPolygon':
-                  traverse(feature.geometry.coordinates);
-                  break;
-              }
-            });
+            .map(function (feature) {
+              return feature.geometry.coordinates;
+            })
+            .forEach(traverse);
 
         return [
           minLon + (maxLon - minLon) / 2,

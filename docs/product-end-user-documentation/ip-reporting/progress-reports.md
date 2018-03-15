@@ -44,3 +44,13 @@ The term Lower Level Outputs, should not be used in IP. This should be PD Output
 
 The UNICEF PO is responsible for acceptance of a progress report that has been submitted. This happens in the PMP system. The PO can also **send the report back with a note**, in which case the partner should get an email informing them that should review the note and re-submit the report \(data in the report becomes editable once its been sent back\). In that case the partner can log back in, make any changes recommended and resubmit the report back to UNICEF.
 
+### Reporting Restrictions
+
+Partner must be able to report \(enter data and submit\) on Active, Ended, Suspended & Terminated PD’s. The only reports partners should not be able to report on are signed and closed
+
+PRP must generate reports for the partners when the PD is in active status. \(as we don’t allow partners to report on signed PD’s and we don’t show draft PD’s in PRP\).
+
+To add in case a PD is terminated or suspended in middle of the agreement then the final report must be moved to the end / suspended date of the contract and the other pending reports for the rest of the months must no longer be due.
+
+If PD is not active then in PMP we cannot "send back the report" even. 
+

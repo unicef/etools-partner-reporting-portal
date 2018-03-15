@@ -545,38 +545,40 @@ class ProgressReportReviewAPIView(APIView):
     """
     permission_classes = (UnicefPartnershipManagerOrRead,)
 
-    def get_object(self, pk):
+    def get_object(self):
         try:
             return ProgressReport.objects.get(
-                programme_document__workspace=self.workspace_id,
-                pk=pk)
+                programme_document__workspace=self.kwargs['workspace_id'],
+                pk=self.kwargs['pk']
+            )
         except ProgressReport.DoesNotExist as exp:
             logger.exception({
                 "endpoint": "ProgressReportReviewAPIView",
                 "request.data": self.request.data,
-                "pk": pk,
+                "pk": self.kwargs['pk'],
                 "exception": exp,
             })
             raise Http404
 
     @transaction.atomic
-    def post(self, request, workspace_id, pk, *args, **kwargs):
-        """
-        Only if the progress report is in submitted state that this POST
-        request will be successful.
-        """
-        self.workspace_id = workspace_id
-        progress_report = self.get_object(pk)
+    def post(self, request, *args, **kwargs):
+        progress_report = self.get_object()
 
-        if progress_report.status != PROGRESS_REPORT_STATUS.submitted:
-            raise ValidationError("This report is not in submitted state.")
+        if progress_report.status not in {
+            PROGRESS_REPORT_STATUS.submitted,
+            PROGRESS_REPORT_STATUS.accepted,
+        }:
+            raise ValidationError("This report is not in submitted / accepted state.")
 
         serializer = ProgressReportReviewSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
         progress_report.status = serializer.validated_data['status']
         progress_report.review_date = datetime.now().date()
+
         if progress_report.status == PROGRESS_REPORT_STATUS.sent_back:
             progress_report.sent_back_feedback = serializer.validated_data['comment']
+
         elif progress_report.status == PROGRESS_REPORT_STATUS.accepted:
             progress_report.review_overall_status = serializer.validated_data['overall_status']
 

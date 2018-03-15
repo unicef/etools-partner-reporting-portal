@@ -469,33 +469,34 @@ class IndicatorReportReviewAPIView(APIView):
     """
     permission_classes = (IsIMO,)
 
-    def get_object(self, pk):
+    def get_object(self):
         try:
-            return IndicatorReport.objects.get(pk=pk)
+            return IndicatorReport.objects.get(pk=self.kwargs['pk'])
         except IndicatorReport.DoesNotExist as exp:
             logger.exception({
                 "endpoint": "IndicatorReportReviewAPIView",
                 "request.data": self.request.data,
-                "pk": pk,
+                "pk": self.kwargs['pk'],
                 "exception": exp,
             })
             raise Http404
 
     @transaction.atomic
-    def post(self, request, pk, *args, **kwargs):
-        """
-        Only if the indicator report is in submitted state that this POST
-        request will be successful.
-        """
-        indicator_report = self.get_object(pk)
+    def post(self, request, *args, **kwargs):
+        indicator_report = self.get_object()
 
-        if indicator_report.report_status != INDICATOR_REPORT_STATUS.submitted:
-            raise ValidationError("This report is not in submitted state.")
+        if indicator_report.report_status not in {
+            INDICATOR_REPORT_STATUS.submitted,
+            INDICATOR_REPORT_STATUS.accepted,
+        }:
+            raise ValidationError("This report is not in submitted / accepted state.")
 
         serializer = IndicatorReportReviewSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
         indicator_report.report_status = serializer.validated_data['status']
         indicator_report.review_date = datetime.now().date()
+
         if indicator_report.report_status == INDICATOR_REPORT_STATUS.sent_back:
             indicator_report.sent_back_feedback = serializer.validated_data['comment']
 
