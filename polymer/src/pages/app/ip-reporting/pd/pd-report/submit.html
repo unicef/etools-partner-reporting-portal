@@ -131,9 +131,9 @@
               self.set('path', newPath);
             })
             .catch(function (res) {
-              var errors = res.data.errors;
-              var authorizedError = errors.filter(function (error) {
-                return error.code === 'PR_SUBMISSION_FAILED_USER_NOT_AUTHORIZED_OFFICER';
+              var errors = res.data.non_field_errors;
+              var authorizedError = res.data.error_codes.filter(function (error) {
+                return error === 'PR_SUBMISSION_FAILED_USER_NOT_AUTHORIZED_OFFICER';
               });
               if (authorizedError.length > 0) {
                 return self.$.officer.open();

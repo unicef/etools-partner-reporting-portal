@@ -29,6 +29,7 @@
 <link rel="import" href="../../../etools-prp-date-input.html">
 <link rel="import" href="../../../form-fields/partner-dropdown-content.html">
 <link rel="import" href="../../../form-fields/cluster-dropdown-content.html">
+<link rel="import" href="../../../error-box.html">
 
 <dom-module id="planned-action-activity-modal">
   <template>
@@ -136,6 +137,7 @@
       </div>
 
       <paper-dialog-scrollable>
+        <error-box errors="[[errors]]"></error-box>
         <template
           is="dom-if"
           if="[[_displayPartner(permissions)]]"
@@ -551,6 +553,7 @@
         });
         this.set('activities', []);
         this.set('objectives', []);
+        this.set('errors', {});
       },
 
       _onOpenedChanged: function (opened) {
@@ -670,11 +673,11 @@
             .then(function (res) {
               self.fire('activity-added', res.data);
               self.set('updatePending', false);
+              self.set('errors', {});
               self.close();
             })
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-
+            .catch(function (err) {
+              self.set('errors', err.data);
               self.set('updatePending', false);
             });
       },

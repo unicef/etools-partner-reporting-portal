@@ -20,6 +20,7 @@
 <link rel="import" href="../../../../../redux/actions.html">
 <link rel="import" href="../../../../../behaviors/date.html">
 <link rel="import" href="../../../../../behaviors/utils.html">
+<link rel="import" href="../../../../error-box.html">
 
 <dom-module id="cluster-activities-modal">
   <template>
@@ -103,6 +104,7 @@
       </div>
 
       <paper-dialog-scrollable>
+        <error-box errors="[[errors]]"></error-box>
         <template
             is="dom-if"
             if="[[refresh]]"
@@ -289,6 +291,7 @@
       close: function () {
         this.set('opened', false);
         this.set('refresh', false);
+        this.set('errors', {});
       },
 
       open: function () {
@@ -319,11 +322,12 @@
         thunk()
           .then(function (res) {
             self.updatePending = false;
+            self.set('errors', {});
             self._redirectToDetail(res.data.id);
           })
-          .catch(function (err) { // jshint ignore:line
+          .catch(function (err) {
+            self.set('errors', err.data);
             self.updatePending = false;
-            // TODO: error handling
           });
       },
     });

@@ -370,6 +370,7 @@ REST_FRAMEWORK = {
     ),
     'DATE_FORMAT': PRINT_DATA_FORMAT,
     'DATE_INPUT_FORMATS': ['iso-8601', PRINT_DATA_FORMAT],
+    'EXCEPTION_HANDLER': 'utils.exception_handler.detailed_exception_handler',
 }
 
 
