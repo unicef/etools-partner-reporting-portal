@@ -1,16 +1,19 @@
 import logging
 
 from django.db.models import Q
+from django.contrib.gis.db.models.functions import AsGeoJSON
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveAPIView
+from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveAPIView, GenericAPIView
+from rest_framework.mixins import ListModelMixin
 from rest_framework import status as statuses
 
 import django_filters
 
+from core.common import PARTNER_TYPE
 from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
 from core.serializers import ShortLocationSerializer
@@ -21,6 +24,10 @@ from indicator.serializers import (
     ClusterPartnerAnalysisIndicatorResultSerializer,
 )
 from indicator.models import IndicatorReport, Reportable
+from indicator.serializers import (
+    ClusterAnalysisIndicatorsListSerializer,
+    ClusterAnalysisIndicatorDetailSerializer,
+)
 from partner.models import (
     Partner,
     PartnerProject,
@@ -38,6 +45,7 @@ from cluster.serializers import (
     ResponsePlanClusterDashboardSerializer,
     ResponsePlanPartnerDashboardSerializer,
     PartnerAnalysisSummarySerializer,
+    OperationalPresenceLocationListSerializer,
 )
 from cluster.filters import (
     ClusterObjectiveFilter,
@@ -699,5 +707,303 @@ class PartnerAnalysisIndicatorResultAPIView(APIView):
         reportable = get_object_or_404(Reportable, id=reportable_id)
 
         serializer = ClusterPartnerAnalysisIndicatorResultSerializer(reportable)
+
+        return Response(serializer.data, status=statuses.HTTP_200_OK)
+
+
+class OperationalPresenceAggregationDataAPIView(APIView):
+    """
+    Aggregation Data for Clusters in a ResponsePlan - GET
+    Authentication required.
+
+    Can be filtered using Cluster, Cluster objective, Partner type, Location type, and Location IDs
+
+    Parameters:
+    - response_plan_id - Response plan ID
+
+    Returns:
+        - GET method - A JSON object of many aggregations.
+    """
+    permission_classes = (IsAuthenticated, )
+
+    def query_data(self, response_plan_id):
+        response_plan = get_object_or_404(
+            ResponsePlan,
+            id=response_plan_id)
+
+        filter_parameters = {
+            'clusters': self.request.GET.get('clusters', None),
+            'cluster_objectives': self.request.GET.get('cluster_objectives', None),
+            'partner_types': self.request.GET.get('partner_types', None),
+            'loc_type': self.request.GET.get('loc_type', '1'),
+            'locs': self.request.GET.get('locs', None),
+            'narrow_loc_type': self.request.GET.get('narrow_loc_type', None),
+        }
+
+        response_data = {
+            "clusters": None,
+            "num_of_clusters": None,
+            "num_of_partners": None,
+            "partners_per_type": None,
+            "partners_per_cluster": None,
+            "partners_per_cluster_objective": None,
+        }
+
+        clusters = Cluster.objects.filter(response_plan=response_plan)
+
+        if filter_parameters['clusters']:
+            clusters = clusters.filter(id__in=map(lambda x: int(x), filter_parameters['clusters'].split(',')))
+
+        objectives = ClusterObjective.objects.filter(cluster__in=clusters)
+
+        if filter_parameters['cluster_objectives']:
+            objectives = objectives.filter(
+                id__in=map(lambda x: int(x), filter_parameters['cluster_objectives'].split(','))
+            )
+
+        if filter_parameters['partner_types']:
+            partner_types = filter_parameters['partner_types'].split(',')
+
+        else:
+            partner_types = list(clusters.values_list('partners__partner_type', flat=True).distinct())
+
+        response_data["clusters"] = ClusterSimpleSerializer(clusters.distinct(), many=True).data
+        response_data["num_of_clusters"] = clusters.count()
+        response_data["num_of_partners"] = Partner.objects.filter(clusters__in=clusters).distinct().count()
+        response_data["partners_per_type"] = {}
+        response_data["partners_per_cluster"] = {}
+        response_data["partners_per_cluster_objective"] = {}
+
+        for partner_type in partner_types:
+            response_data["partners_per_type"][PARTNER_TYPE[partner_type]] = Partner.objects.filter(
+                partner_type=partner_type, clusters__in=clusters
+            ).distinct().values_list('title', flat=True)
+
+        for cluster in clusters:
+            cluster_type = cluster.type.capitalize()
+            response_data["partners_per_cluster"][cluster_type] = cluster.partners.values_list('title', flat=True)
+
+        for objective in objectives:
+            cluster_type = objective.cluster.type.capitalize()
+            objective_title = objective.title + " (" + cluster_type + ")"
+            response_data["partners_per_cluster_objective"][objective_title] = \
+                Partner.objects.filter(clusters__cluster_objectives=objective).values_list('title', flat=True)
+
+        return response_data
+
+    def get(self, request, response_plan_id):
+        if self.request.GET.get('narrow_loc_type', None):
+            if int(self.request.GET.get('narrow_loc_type', None)) <= int(self.request.GET.get('loc_type', None)):
+                return Response(
+                    {"message": "narrow_loc_type cannot be equal or higher than loc_type."},
+                    status=statuses.HTTP_400_BAD_REQUEST
+                )
+
+        return Response(self.query_data(response_plan_id))
+
+
+class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
+    """
+    Locations for Clusters in a ResponsePlan as geoJSON list - GET
+    Authentication required.
+
+    Can be filtered using Cluster, Cluster objective, Partner type, Location type, and Location IDs
+
+    Parameters:
+    - response_plan_id - Response plan ID
+
+    Returns:
+        - GET method - OperationalPresenceLocationListSerializer object list.
+    """
+    permission_classes = (IsAuthenticated, )
+    serializer_class = OperationalPresenceLocationListSerializer
+    lookup_field = lookup_url_kwarg = 'response_plan_id'
+
+    def get(self, request, response_plan_id):
+        if self.request.GET.get('narrow_loc_type', None):
+            if int(self.request.GET.get('narrow_loc_type', None)) <= int(self.request.GET.get('loc_type', None)):
+                return Response(
+                    {"message": "narrow_loc_type cannot be equal or higher than loc_type."},
+                    status=statuses.HTTP_400_BAD_REQUEST
+                )
+
+        return self.list(request, response_plan_id)
+
+    def get_queryset(self):
+        response_plan = get_object_or_404(
+            ResponsePlan,
+            id=self.kwargs.get(self.lookup_field))
+
+        filter_parameters = {
+            'clusters': self.request.GET.get('clusters', None),
+            'cluster_objectives': self.request.GET.get('cluster_objectives', None),
+            'partner_types': self.request.GET.get('partner_types', None),
+            'loc_type': self.request.GET.get('loc_type', '1'),
+            'locs': self.request.GET.get('locs', None),
+            'narrow_loc_type': self.request.GET.get('narrow_loc_type', None),
+        }
+
+        loc_ids = None
+        clusters = Cluster.objects.filter(response_plan=response_plan)
+
+        if filter_parameters['clusters']:
+            clusters = clusters.filter(id__in=map(lambda x: int(x), filter_parameters['clusters'].split(',')))
+
+        objectives = ClusterObjective.objects.filter(cluster__in=clusters)
+
+        if filter_parameters['cluster_objectives']:
+            objectives = objectives.filter(
+                id__in=map(lambda x: int(x), filter_parameters['cluster_objectives'].split(','))
+            )
+
+        cluster_obj_loc = Location.objects.filter(
+            gateway__country__workspaces__response_plans__clusters__cluster_objectives__in=objectives
+        ).distinct().values_list('id', flat=True)
+
+        if filter_parameters['partner_types']:
+            partner_types = filter_parameters['partner_types'].split(',')
+
+        else:
+            partner_types = list(
+                cluster_obj_loc.values_list(
+                    'gateway__country__workspaces__response_plans__clusters__partners__partner_type', flat=True)
+                .distinct()
+            )
+
+        partner_types_loc = cluster_obj_loc.filter(
+            gateway__country__workspaces__response_plans__clusters__partners__partner_type__in=partner_types
+        ).distinct().values_list('id', flat=True)
+
+        loc_ids = set(list(partner_types_loc))
+        result = Location.objects.filter(id__in=loc_ids)
+
+        if filter_parameters['loc_type'] and filter_parameters['locs'] and filter_parameters['narrow_loc_type']:
+            final_result = Location.objects.filter(
+                Q(parent__id__in=map(lambda x: int(x), filter_parameters['locs'].split(',')))
+                | Q(gateway__admin_level=int(filter_parameters['narrow_loc_type']))
+            )
+
+        else:
+            final_result = result.filter(
+                gateway__admin_level=int(filter_parameters['loc_type'])
+            )
+
+            if filter_parameters['locs']:
+                final_result = final_result.filter(id__in=map(lambda x: int(x), filter_parameters['locs'].split(',')))
+
+        return final_result.annotate(processed_json=AsGeoJSON('geom', precision=3))
+
+
+class ClusterAnalysisIndicatorsListAPIView(GenericAPIView, ListModelMixin):
+    """
+    Indicator list data for Clusters in a ResponsePlan - GET
+    Authentication required.
+
+    Can be filtered using Cluster, Cluster objective, Partner type, Location type, Indicator type, and Location IDs
+
+    indicator_type GET parameter values -
+    * cluster_activity
+    * cluster_objective
+    * partner_project
+    * partner_activity
+
+    Parameters:
+    - response_plan_id - Response plan ID
+
+    Returns:
+        - GET method - ClusterAnalysisIndicatorsListSerializer object list.
+    """
+    permission_classes = (IsAuthenticated, )
+    serializer_class = ClusterAnalysisIndicatorsListSerializer
+    lookup_field = lookup_url_kwarg = 'response_plan_id'
+
+    def get(self, request, response_plan_id):
+        return self.list(request, response_plan_id)
+
+    def get_queryset(self):
+        response_plan = get_object_or_404(
+            ResponsePlan,
+            id=self.kwargs.get(self.lookup_field))
+
+        filter_parameters = {
+            'clusters': self.request.GET.get('clusters', None),
+            'cluster_objectives': self.request.GET.get('cluster_objectives', None),
+            'partner_types': self.request.GET.get('partner_types', None),
+            'loc_type': self.request.GET.get('loc_type', '1'),
+            'locs': self.request.GET.get('locs', None),
+            'indicator_type': self.request.GET.get('indicator_type', 'cluster_activity'),
+        }
+
+        clusters = Cluster.objects.filter(response_plan=response_plan)
+
+        if filter_parameters['clusters']:
+            clusters = clusters.filter(id__in=map(lambda x: int(x), filter_parameters['clusters'].split(',')))
+
+            # validate this cluster belongs to the response plan
+            if not clusters:
+                raise Exception('Invalid cluster ids')
+
+        objectives = ClusterObjective.objects.filter(cluster__in=clusters)
+
+        if filter_parameters['cluster_objectives']:
+            objectives = objectives.filter(
+                id__in=map(lambda x: int(x), filter_parameters['cluster_objectives'].split(','))
+            )
+
+        if filter_parameters['indicator_type'] == 'cluster_activity':
+            indicators = Reportable.objects.filter(
+                content_type__model="clusteractivity",
+                cluster_activities__cluster_objective__in=objectives
+            )
+
+            if filter_parameters['partner_types']:
+                partner_types = filter_parameters['partner_types'].split(',')
+                indicators = indicators.filter(cluster_objective__cluster__partners__partner_type__in=partner_types)
+
+        elif filter_parameters['indicator_type'] == 'cluster_objective':
+            indicators = Reportable.objects.filter(
+                content_type__model="clusterobjective",
+                cluster_objectives__in=objectives)
+
+            if filter_parameters['partner_types']:
+                partner_types = filter_parameters['partner_types'].split(',')
+                indicators = indicators.filter(cluster__partners__partner_type__in=partner_types)
+
+        elif filter_parameters['indicator_type'] == 'partner_project':
+            indicators = Reportable.objects.filter(content_type__model="partnerproject")
+
+            if filter_parameters['partner_types']:
+                partner_types = filter_parameters['partner_types'].split(',')
+                indicators = indicators.filter(partner__partner_type__in=partner_types)
+
+        elif filter_parameters['indicator_type'] == 'partner_activity':
+            indicators = Reportable.objects.filter(content_type__model="partneractivity")
+
+            if filter_parameters['partner_types']:
+                partner_types = filter_parameters['partner_types'].split(',')
+                indicators = indicators.filter(partner__partner_type__in=partner_types)
+
+        return indicators.distinct()
+
+
+class ClusterAnalysisIndicatorDetailsAPIView(APIView):
+    """
+    Indicator expansion detail data for Clusters in a ResponsePlan - GET
+    Authentication required.
+
+    Parameters:
+    - response_plan_id - Response plan ID
+    - reportable_id - Reportable ID
+
+    Returns:
+        - GET method - ClusterAnalysisIndicatorDetailSerializer object list.
+    """
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request, response_plan_id, reportable_id, *args, **kwargs):
+        reportable = get_object_or_404(
+            Reportable, id=reportable_id)
+
+        serializer = ClusterAnalysisIndicatorDetailSerializer(reportable)
 
         return Response(serializer.data, status=statuses.HTTP_200_OK)

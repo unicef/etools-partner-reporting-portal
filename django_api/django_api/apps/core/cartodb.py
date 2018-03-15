@@ -171,7 +171,10 @@ def update_sites_from_cartodb(carto_table):
                         msg = msg.format('Multiple', parent_instance.pcode)
 
                     else:
-                        msg = msg.format('No', parent_instance.pcode)
+                        if parent_instance:
+                            msg = msg.format('No', parent_instance.pcode)
+                        else:
+                            msg = msg.format('No', 'None')
 
                     logger.warning(msg)
                     num_not_added += 1

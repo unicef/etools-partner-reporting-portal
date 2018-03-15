@@ -1,0 +1,183 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/etools-content-panel/etools-content-panel.html">
+<link rel="import" href="../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../../bower_components/iron-collapse/iron-collapse.html">
+
+<link rel="import" href="../../etools-prp-progress-bar.html">
+<link rel="import" href="../../etools-prp-progress-bar-alt.html">
+<link rel="import" href="indicator-details.html">
+<link rel="import" href="../../../styles/shared-styles.html">
+
+<dom-module id="analysis-cluster-activity">
+  <template>
+    <style include="iron-flex iron-flex-alignment shared-styles">
+      :host {
+        display: block;
+        margin-bottom: 25px;
+
+        --ecp-content: {
+          padding: 0;
+        };
+
+        --etools-prp-progress-bar: {
+          display: block;
+          width: 120px;
+          margin-right: 10px;
+        };
+
+        --etools-prp-progress-bar-height: 14px;
+
+        --paper-progress-container-color: var(--paper-grey-100);
+      }
+
+      .cluster-objective {
+        margin: 0;
+        padding: 25px;
+        font-size: 12px;
+      }
+
+      .cluster-objective dt,
+      .cluster-objective dd {
+        display: inline;
+        margin: 0;
+      }
+
+      .cluster-objective dt {
+        color: var(--theme-primary-text-color-medium);
+      }
+
+      .indicator {
+        padding: 5px 12px;
+        background: var(--paper-grey-300);
+      }
+
+      .indicator:not(:last-of-type) {
+        margin-bottom: 1px;
+      }
+
+      .toggle-button {
+        margin-right: 10px;
+      }
+
+      .indicator-title {
+        margin: 0;
+        font-size: 14px;
+
+        @apply(--truncate);
+      }
+
+      .indicator-progress {
+        margin: 0;
+        font-size: 11px;
+        line-height: 1;
+      }
+
+      .indicator-progress:not(:last-child) {
+        margin-bottom: 6px;
+      }
+
+      .indicator-progress dt {
+        width: 100px;
+        margin-right: 10px;
+        text-align: right;
+        color: var(--theme-secondary-text-color);
+      }
+
+      .indicator-progress dd {
+        margin: 0;
+      }
+
+      etools-prp-progress-bar {
+        @apply(--etools-prp-progress-bar);
+      }
+    </style>
+
+    <etools-content-panel panel-title="Cluster Activity: [[data.title]]">
+      <dl class="cluster-objective">
+        <dt>Cluster Objective:</dt>
+        <dd>[[data.co_title]]</dd>
+      </dl>
+
+      <template
+          is="dom-repeat"
+          items="[[data.indicators]]"
+          as="indicator">
+        <div class="indicator layout horizontal justified">
+          <div class="toggle-button flex-none">
+            <paper-icon-button
+                toggles="[[index]]"
+                on-tap="_toggle"
+                icon="[[_computeIcon(indicator.opened)]]">
+            </paper-icon-button>
+          </div>
+
+          <h3 class="indicator-title self-center flex">[[indicator.title]]</h3>
+
+          <div class="self-center flex-none">
+            <dl class="indicator-progress layout horizontal">
+              <dt class="flex-none self-center">Against Target:</dt>
+              <dd class="flex-none">
+                <etools-prp-progress-bar
+                    number="[[indicator.total_against_target]]">
+                </etools-prp-progress-bar>
+              </dd>
+            </dl>
+
+            <dl class="indicator-progress layout horizontal">
+                <dt class="flex-none self-center">Against In need:</dt>
+                <dd class="flex-none">
+                  <etools-prp-progress-bar-alt
+                      number="[[indicator.total_against_in_need]]">
+                  </etools-prp-progress-bar-alt>
+                </dd>
+              </dl>
+          </div>
+        </div>
+
+        <iron-collapse
+            id="collapse-[[index]]"
+            opened="{{indicator.opened}}"
+            on-opened-changed="_handleOpenedChanged"
+            no-animation>
+          <analysis-indicator-details
+              indicator-id="[[indicator.id]]">
+          </analysis-indicator-details>
+        </iron-collapse>
+      </template>
+    </etools-content-panel>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'analysis-cluster-activity',
+
+      properties: {
+        data: Object,
+      },
+
+      _computeIcon: function (opened) {
+        return opened ? 'icons:expand-less' : 'icons:expand-more';
+      },
+
+      _toggle: function (e) {
+        this.$$('#collapse-' + e.target.toggles).toggle();
+      },
+
+      _handleOpenedChanged: function (e, data) {
+        var indicatorDetails;
+
+        e.stopPropagation();
+
+        if (data.value) {
+          indicatorDetails = Polymer.dom(e.srcElement).querySelector('analysis-indicator-details');
+
+          try {
+            indicatorDetails.init();
+          } catch (err) {}
+        }
+      },
+    });
+  </script>
+</dom-module>

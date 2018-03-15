@@ -1,5 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-styles/color.html">
 
 <dom-module id="analysis-widget-styles">
   <template>
@@ -8,14 +8,26 @@
         display: block;
       }
 
-      .widget-container {
-
+      .analysis-widget {
+        position: relative;
       }
 
-      .widget-heading {
-        margin: 0 0 1.5em;
+      .analysis-widget__header {
+        padding-left: .5em;
+        margin: 0 0 1em;
+        border-left: 4px solid var(--theme-primary-color);
+        font-size: 18px;
+        font-weight: normal;
+        color: var(--theme-primary-text-color-dark);
+      }
 
-        @apply(--paper-font-body1);
+      .analysis-widget__body {
+        min-height: 100px;
+        position: relative;
+      }
+
+      etools-loading {
+        margin: -8px;
       }
     </style>
   </template>

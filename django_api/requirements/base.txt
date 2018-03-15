@@ -10,6 +10,7 @@ djangorestframework-jwt==1.11.0
 django-filter==1.0.4
 drfpasswordless==1.1.2
 django-rest-swagger==2.1.2
+djangorestframework-gis==0.12
 
 # Other Python packages
 cryptography==2.1.2
@@ -25,6 +26,7 @@ azure-storage==0.20.0
 git+https://github.com/robertavram/django-storages.git#egg=django-storages
 django-guardian==1.4.9
 Babel==2.5.3
+pycountry==18.2.23
 
 # Testing
 astroid==1.5.2
