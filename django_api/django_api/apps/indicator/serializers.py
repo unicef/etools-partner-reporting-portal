@@ -1297,7 +1297,7 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
                 self._get_progress_by_partner(child, partner_progresses)
 
         # If the indicator is UNICEF cluster which is linked as Partner, then show its progress only
-        else:
+        elif obj.content_type.model in ["partneractivity", "partnerproject"]:
             self._get_progress_by_partner(obj, partner_progresses)
 
         return partner_progresses
