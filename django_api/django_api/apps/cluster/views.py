@@ -866,7 +866,10 @@ class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
             if filter_parameters['locs']:
                 final_result = final_result.filter(id__in=map(lambda x: int(x), filter_parameters['locs'].split(',')))
 
-        return final_result.annotate(processed_json=AsGeoJSON('geom', precision=3))
+        return final_result.annotate(
+            processed_geom_json=AsGeoJSON('geom', precision=3),
+            processed_point_json=AsGeoJSON('point', precision=3)
+        )
 
 
 class ClusterAnalysisIndicatorsListAPIView(GenericAPIView, ListModelMixin):
