@@ -1240,22 +1240,25 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
         return num_of_partners
 
     def _increment_partner_by_status(self, reportable, num_of_partners):
-        overall_status = reportable.indicator_reports.latest('time_period_start').overall_status
+        latest_ir = reportable.indicator_reports.latest('time_period_start')
 
-        if overall_status == OVERALL_STATUS.met:
-            num_of_partners["met"] += 1
+        if latest_ir:
+            overall_status = latest_ir.overall_status
 
-        elif overall_status == OVERALL_STATUS.on_track:
-            num_of_partners["on_track"] += 1
+            if overall_status == OVERALL_STATUS.met:
+                num_of_partners["met"] += 1
 
-        elif overall_status == OVERALL_STATUS.no_progress:
-            num_of_partners["no_progress"] += 1
+            elif overall_status == OVERALL_STATUS.on_track:
+                num_of_partners["on_track"] += 1
 
-        elif overall_status == OVERALL_STATUS.constrained:
-            num_of_partners["constrained"] += 1
+            elif overall_status == OVERALL_STATUS.no_progress:
+                num_of_partners["no_progress"] += 1
 
-        elif overall_status == OVERALL_STATUS.no_status:
-            num_of_partners["no_status"] += 1
+            elif overall_status == OVERALL_STATUS.constrained:
+                num_of_partners["constrained"] += 1
+
+            elif overall_status == OVERALL_STATUS.no_status:
+                num_of_partners["no_status"] += 1
 
     def _get_progress_by_partner(self, reportable, partner_progresses):
         partner_progresses[reportable.content_object.partner.title] = int(reportable.total['c'])
