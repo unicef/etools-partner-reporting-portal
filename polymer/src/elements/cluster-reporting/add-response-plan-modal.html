@@ -102,6 +102,7 @@
 
     <etools-prp-ajax
         id="plans"
+        timeout="100000"
         url="[[ochaPlansUrl]]">
     </etools-prp-ajax>
 
@@ -112,7 +113,8 @@
 
     <etools-prp-ajax
       id="planDetails"
-      url="[[planDetailsUrl]]">
+      url="[[planDetailsUrl]]"
+      timeout="100000">
     </etools-prp-ajax>
 
 
@@ -261,9 +263,6 @@
 
       <etools-loading active="[[updatePending]]"></etools-loading>
     </paper-dialog>
-    <template is="dom-if" if="[[timeoutError]]">
-      <status-badge type="error"></status-badge>
-    </template>
   </template>
 
   <script>
@@ -393,7 +392,6 @@
         this.set('data', {});
         this.set('planDetails', {});
         this.set('errors', {});
-        this.set('timeoutError', false);
       },
 
       _onOpenedChanged: function (opened) {
@@ -438,7 +436,7 @@
             })
             .catch(function (err) { // jshint ignore:line
               if (err.code === 504) {
-                self.set('timeoutError', true);
+                self.fire('notify', {type: 'ocha-timeout'});
               }
               self.set('plansLoading', false);
               // TODO: error handling
@@ -458,7 +456,7 @@
             })
             .catch(function (err) { // jshint ignore:line
               if (err.code === 504) {
-                self.set('timeoutError', true);
+                self.fire('notify', {type: 'ocha-timeout'});
               }
               self.set('planDetailsLoading', false);
               // TODO: error handling
@@ -501,7 +499,7 @@
           })
           .catch(function (err) {
             if (err.code === 504) {
-              self.set('timeoutError', true);
+              self.fire('notify', {type: 'ocha-timeout'});
             }
             self.set('errors', err.data);
             self.set('updatePending', false);
