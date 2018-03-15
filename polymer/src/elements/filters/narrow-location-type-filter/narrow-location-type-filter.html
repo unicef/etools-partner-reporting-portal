@@ -58,14 +58,14 @@
 
         fieldValue: {
           type: String,
-          computed: '_computeFieldValue(data, params.loc_type, maxLocType)',
+          computed: '_computeFieldValue(value, data, params.loc_type, maxLocType)',
         },
 
         value: String,
       },
 
       _computeData: function (params, maxLocType) {
-        return Array.apply(null, Array(maxLocType))
+        var validData = Array.apply(null, Array(maxLocType))
             .map(function (_, index) {
               var id = index + 1;
 
@@ -75,21 +75,24 @@
               };
             })
             .slice(Number(params.loc_type));
+
+        return [
+          {
+            id: '',
+            title: 'None',
+          },
+        ].concat(validData);
       },
 
       _computeDisabled: function (data) {
-        return data && !data.length;
+        return data && data.length === 1;
       },
 
-      _computeFieldValue: function (data, locType, maxLocType) {
-        var value = this.get('value');
-
+      _computeFieldValue: function (value, data, locType, maxLocType) {
         switch (true) {
           case !value:
-            return (data[0] || {}).id;
-
-          case !data.length:
-            return null;
+          case data.length === 1:
+            return data[0].id;
 
           default:
             return Math.min(Math.max(Number(value), Number(locType) + 1), maxLocType);
