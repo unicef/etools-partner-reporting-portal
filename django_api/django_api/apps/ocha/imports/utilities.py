@@ -173,9 +173,9 @@ def save_activities_and_objectives_for_response_plan(entities_response={}, measu
 
     plan_entity_list = entities_response['planEntities'] + measurements_response['planEntities']
     for entity in plan_entity_list:
-        if entity['value']['type']['en']['singular'] in {'Strategic Objective', 'Cluster Objective'}:
+        if entity['entityPrototype']['refCode'] in {'SO', 'CO'}:
             objectives[entity['id']] = entity
-        elif entity['value']['type']['en']['singular'] == 'Cluster Activity':
+        elif entity['entityPrototype']['refCode'] == 'CA':
             activities.append(entity)
     logger.debug('Found {} objectives and {} activities'.format(
         len(objectives), len(activities)
