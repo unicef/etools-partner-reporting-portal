@@ -1240,9 +1240,9 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
         return num_of_partners
 
     def _increment_partner_by_status(self, reportable, num_of_partners):
-        latest_ir = reportable.indicator_reports.latest('time_period_start')
+        try:
+            latest_ir = reportable.indicator_reports.latest('time_period_start')
 
-        if latest_ir:
             overall_status = latest_ir.overall_status
 
             if overall_status == OVERALL_STATUS.met:
@@ -1259,6 +1259,10 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
 
             elif overall_status == OVERALL_STATUS.no_status:
                 num_of_partners["no_status"] += 1
+
+        except IndicatorReport.DoesNotExist:
+            # If there is no indicator report for this Reportable, then skip this process
+            pass
 
     def _get_progress_by_partner(self, reportable, partner_progresses):
         partner_progresses[reportable.content_object.partner.title] = int(reportable.total['c'])
