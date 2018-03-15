@@ -51,7 +51,7 @@
       <li class="item">
         <labelled-item label="Clusters">
           <template is="dom-repeat" items="[[planData.clusterNames]]">
-            <span class="value">[[item]]</span>
+            <div class="value">[[item]]</div>
           </template>
           <template is="dom-if" if="[[error]]">
               <span class="error">Cannot import plan without clusters</span>
