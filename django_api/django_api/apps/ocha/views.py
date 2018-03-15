@@ -9,7 +9,7 @@ from core.common import RESPONSE_PLAN_TYPE, EXTERNAL_DATA_SOURCES
 from core.models import Workspace, ResponsePlan
 from core.permissions import IsIMO
 from core.serializers import ResponsePlanSerializer
-from ocha.constants import HPC_V1_ROOT_URL
+from ocha.constants import HPC_V1_ROOT_URL, RefCode
 
 from ocha.imports.utilities import import_response_plan, get_json_from_url
 from ocha.imports.bulk import get_response_plans_for_countries
@@ -91,7 +91,8 @@ class RPMWorkspaceResponsePlanDetailAPIView(APIView):
         }
         if 'governingEntities' in plan_data:
             cluster_names = [
-                ge['name'] for ge in plan_data['governingEntities'] if ge['entityPrototype']['refCode'] == 'CL'
+                ge['name'] for ge in plan_data['governingEntities'] if
+                ge['entityPrototype']['refCode'] == RefCode.CLUSTER
             ]
         else:
             cluster_names = []

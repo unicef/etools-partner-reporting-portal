@@ -10,7 +10,7 @@ from cluster.models import Cluster, ClusterObjective, ClusterActivity
 from core.common import EXTERNAL_DATA_SOURCES
 from core.models import ResponsePlan
 from indicator.models import Reportable, IndicatorBlueprint
-from ocha.constants import HPC_V2_ROOT_URL, HPC_V1_ROOT_URL
+from ocha.constants import HPC_V2_ROOT_URL, HPC_V1_ROOT_URL, RefCode
 from ocha.imports.serializers import V2PartnerProjectImportSerializer, V1FundingSourceImportSerializer, \
     V1ResponsePlanImportSerializer
 from ocha.utilities import get_dict_from_list_by_key
@@ -173,9 +173,9 @@ def save_activities_and_objectives_for_response_plan(entities_response={}, measu
 
     plan_entity_list = entities_response['planEntities'] + measurements_response['planEntities']
     for entity in plan_entity_list:
-        if entity['entityPrototype']['refCode'] in {'SO', 'CO'}:
+        if entity['entityPrototype']['refCode'] in {RefCode.CLUSTER_OBJECTIVE, RefCode.STRATEGIC_OBJECTIVE}:
             objectives[entity['id']] = entity
-        elif entity['entityPrototype']['refCode'] == 'CA':
+        elif entity['entityPrototype']['refCode'] == RefCode.CLUSTER_ACTIVITY:
             activities.append(entity)
     logger.debug('Found {} objectives and {} activities'.format(
         len(objectives), len(activities)
