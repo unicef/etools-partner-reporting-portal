@@ -1307,20 +1307,31 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
 
         # Only if the indicator is cluster activity, the children (unicef indicators) will exist
         if obj.children.exists():
-            latest_indicator_reports = map(
-                lambda x: x.indicator_reports.latest('time_period_start'), obj.children.all()
-            )
+            latest_indicator_reports = []
 
-            for ir in latest_indicator_reports:
-                for ild in ir.indicator_location_data.all():
-                    location_progresses[ild.location.title] += ild.disaggregation['()']['c']
+            try:
+                latest_indicator_reports = map(
+                    lambda x: x.indicator_reports.latest('time_period_start'), obj.children.all()
+                )
+
+                for ir in latest_indicator_reports:
+                    for ild in ir.indicator_location_data.all():
+                        location_progresses[ild.location.title] += ild.disaggregation['()']['c']
+            except IndicatorReport.DoesNotExist:
+                # If there is no indicator report for this Reportable, then skip this process
+                pass
 
         # If the indicator is UNICEF cluster which is linked as Partner, then show its progress only
         else:
-            indicator_location_data = obj.indicator_reports.latest('time_period_start').indicator_location_data.all()
+            try:
+                indicator_location_data = obj.indicator_reports \
+                    .latest('time_period_start').indicator_location_data.all()
 
-            for ild in indicator_location_data:
-                location_progresses[ild.location.title] += ild.disaggregation['()']['c']
+                for ild in indicator_location_data:
+                    location_progresses[ild.location.title] += ild.disaggregation['()']['c']
+            except IndicatorReport.DoesNotExist:
+                # If there is no indicator report for this Reportable, then skip this process
+                pass
 
         return location_progresses
 
