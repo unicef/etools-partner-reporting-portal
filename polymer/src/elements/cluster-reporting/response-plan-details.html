@@ -35,6 +35,12 @@
       li {
         list-style-type: none;
       }
+      
+      .error {
+        color: var(--paper-deep-orange-a700);
+        font-size: 0.8em;
+      }
+
     </style>
     <ul class="app-grid">
       <li class="item">
@@ -44,17 +50,22 @@
       </li>
       <li class="item">
         <labelled-item label="Clusters">
-          <span class="value">[[_commaSeparatedValues(planData.clusterNames)]]</span>
+          <template is="dom-repeat" items="[[planData.clusterNames]]">
+            <div class="value">[[item]]</div>
+          </template>
+          <template is="dom-if" if="[[error]]">
+              <span class="error">Cannot import plan without clusters</span>
+            </template>
         </labelled-item>
       </li>
       <li class="item">
         <labelled-item label="Start Date">
-          <span class="value">[[prettyDate(planData.startDate)]]</span>
+          <span class="value">[[planData.startDate]]</span>
         </labelled-item>
       </li>
       <li class="item">
         <labelled-item label="End Date">
-          <span class="value">[[prettyDate(planData.endDate)]]</span>
+          <span class="value">[[planData.endDate]]</span>
         </labelled-item>
       </li>
     </ul>
@@ -74,6 +85,7 @@
       planData: Object,
       loading: Boolean,
     },
+
   });
 </script>
 </dom-module>

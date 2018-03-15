@@ -59,6 +59,10 @@
         @apply --app-grid-expandible-item;
       }
 
+      .fields {
+        position: relative;
+      }
+
       paper-radio-group {
         display: block;
         padding-top: 16px;
@@ -98,6 +102,7 @@
 
     <etools-prp-ajax
         id="plans"
+        timeout="100000"
         url="[[ochaPlansUrl]]">
     </etools-prp-ajax>
 
@@ -108,7 +113,8 @@
 
     <etools-prp-ajax
       id="planDetails"
-      url="[[planDetailsUrl]]">
+      url="[[planDetailsUrl]]"
+      timeout="100000">
     </etools-prp-ajax>
 
 
@@ -141,20 +147,27 @@
               is="dom-if"
               if="[[_equals(mode, 'ocha')]]"
               restamp="true">
-              <etools-single-selection-menu
-                class="item validate full-width"
-                label="Response Plan"
-                options="[[formattedPlans]]"
-                option-value="id"
-                option-label="title"
-                selected="{{selectedPlan}}"
-                on-iron-activate="_validate"
-                disabled="[[plansLoading]]"
-                trigger-value-change-event
-                required>
-              </etools-single-selection-menu>
-              <response-plan-details plan-data="[[planDetails]]" loading="[[planDetailsLoading]]"></response-plan-details>
-              <etools-loading active$="[[plansLoading]]"></etools-loading>
+              <div>
+                <etools-single-selection-menu
+                  class="item validate full-width"
+                  label="Response Plan"
+                  options="[[formattedPlans]]"
+                  option-value="id"
+                  option-label="title"
+                  selected="{{selectedPlan}}"
+                  on-iron-activate="_validate"
+                  disabled="[[plansLoading]]"
+                  trigger-value-change-event
+                  required>
+                </etools-single-selection-menu>
+                <response-plan-details
+                  id="details"
+                  plan-data="[[planDetails]]"
+                  loading="[[planDetailsLoading]]"
+                  error="[[emptyClustersError]]">
+                </response-plan-details>
+                <etools-loading active$="[[plansLoading]]"></etools-loading>
+              </div>
             </template>
 
           </div>
@@ -237,6 +250,7 @@
         <paper-button
             on-tap="_savePlan"
             class="btn-primary"
+            disabled="[[emptyClustersError]]"
             raised>
           Save
         </paper-button>
@@ -337,6 +351,16 @@
           statePath: App.Selectors.Config.clusterTypes,
         },
 
+        emptyClustersError: {
+          type: Boolean,
+          computed: '_computeClustersError(planDetails, mode)',
+        },
+
+      },
+
+      listeners: {
+        'details-loaded': 'adjustPosition',
+        'mode.selected-changed': 'adjustPosition',
       },
 
       observers: [
@@ -366,9 +390,7 @@
         this.set('selectedPlan', '');
         this.set('plansLoading', false);
         this.set('data', {});
-        this.set('planDetails', {
-          clusterNames: [],
-        });
+        this.set('planDetails', {});
         this.set('errors', {});
       },
 
@@ -394,6 +416,11 @@
         })[0];
       },
 
+      _computeClustersError: function(planDetails, mode) {
+        return (mode === 'ocha' && planDetails.clusterNames &&
+          planDetails.clusterNames.length === 0);
+      },
+
       _fetchPlans: function (mode) {
         if (mode !== 'ocha') {
           return;
@@ -408,6 +435,9 @@
               self.set('plans', res.data);
             })
             .catch(function (err) { // jshint ignore:line
+              if (err.code === 504) {
+                self.fire('notify', {type: 'ocha-timeout'});
+              }
               self.set('plansLoading', false);
               // TODO: error handling
             });
@@ -422,8 +452,12 @@
             .then(function (res) {
               self.set('planDetailsLoading', false);
               self.set('planDetails', res.data);
+              self.fire('details-loaded', this.name);
             })
             .catch(function (err) { // jshint ignore:line
+              if (err.code === 504) {
+                self.fire('notify', {type: 'ocha-timeout'});
+              }
               self.set('planDetailsLoading', false);
               // TODO: error handling
             });
@@ -464,6 +498,9 @@
             self.dispatch(App.Actions.addResponsePlan(res.data));
           })
           .catch(function (err) {
+            if (err.code === 504) {
+              self.fire('notify', {type: 'ocha-timeout'});
+            }
             self.set('errors', err.data);
             self.set('updatePending', false);
           });
