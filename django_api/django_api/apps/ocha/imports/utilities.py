@@ -37,7 +37,7 @@ def get_json_from_url(url, retry_counter=MAX_URL_RETRIES):
 
     logger.debug('Getting {}, attempt: {}'.format(url, MAX_URL_RETRIES - retry_counter + 1))
     try:
-        response = requests.get(url, timeout=10)
+        response = requests.get(url, timeout=20)
     except RequestException:
         return retry()
 
