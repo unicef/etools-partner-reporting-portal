@@ -102,10 +102,7 @@
       },
 
       getUTCDate: function(dateStr) {
-        var newDate = new Date(dateStr + ' UTC');
-        if (newDate.toString() === 'Invalid Date') {
-          return new Date(dateStr);
-        }
+        return new Date(dateStr + ' UTC');
       }
     };
 

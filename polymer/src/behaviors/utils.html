@@ -104,6 +104,9 @@
       },
 
       _commaSeparated: function (items) {
+        if (!items) {
+          return '';
+        }
         return items.join(', ');
       },
 
