@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 
 from core.common import RESPONSE_PLAN_TYPE, EXTERNAL_DATA_SOURCES
 from core.models import Workspace, ResponsePlan
-from core.permissions import IsAuthenticated
+from core.permissions import IsIMO
 from core.serializers import ResponsePlanSerializer
 from ocha.constants import HPC_V1_ROOT_URL
 
@@ -18,7 +18,7 @@ from ocha.imports.bulk import get_response_plans_for_countries
 class RPMWorkspaceResponsePlanAPIView(APIView):
 
     permission_classes = (
-        IsAuthenticated,
+        IsIMO,
     )
 
     def get_workspace(self):
@@ -80,7 +80,7 @@ class RPMWorkspaceResponsePlanAPIView(APIView):
 class RPMWorkspaceResponsePlanDetailAPIView(APIView):
 
     permission_classes = (
-        IsAuthenticated,
+        IsIMO,
     )
 
     def get(self, request, *args, **kwargs):
