@@ -5,8 +5,8 @@ from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.common import RESPONSE_PLAN_TYPE
-from core.models import Workspace
+from core.common import RESPONSE_PLAN_TYPE, EXTERNAL_DATA_SOURCES
+from core.models import Workspace, ResponsePlan
 from core.permissions import IsAuthenticated
 from core.serializers import ResponsePlanSerializer
 from ocha.constants import HPC_V1_ROOT_URL
@@ -68,6 +68,8 @@ class RPMWorkspaceResponsePlanAPIView(APIView):
             raise serializers.ValidationError({
                 'plan': 'Plan ID missing'
             })
+        elif ResponsePlan.objects.filter(external_id=plan_id, external_source=EXTERNAL_DATA_SOURCES.HPC).exists():
+            raise serializers.ValidationError('Plan has already been imported')
 
         response_plan = import_response_plan(plan_id, workspace=self.get_workspace())
         response_plan.refresh_from_db()
