@@ -52,12 +52,12 @@
       properties: {
         locationsUrl: {
           type: String,
-          computed: '_computeLocationsUrl(locationId)',
+          computed: '_computeLocationsUrl(responsePlanId)',
         },
 
-        locationId: {
+        responsePlanId: {
           type: String,
-          statePath: 'location.id',
+          statePath: 'responsePlans.currentID',
         },
 
         data: {
@@ -77,17 +77,13 @@
         '_fetchLocations(locationsUrl, params)',
       ],
 
-      _computeLocationsUrl: function (locationId) {
-        return locationId ? App.Endpoints.clusterLocationNames(locationId) : '';
+      _computeLocationsUrl: function (responsePlanId) {
+        return App.Endpoints.clusterLocationNames(responsePlanId);
       },
 
-      _fetchLocations: function (url) {
+      _fetchLocations: function () {
         this.debounce('fetch-locations', function () {
           var self = this;
-
-          if (!url) {
-            return;
-          }
 
           this.set('pending', true);
 
