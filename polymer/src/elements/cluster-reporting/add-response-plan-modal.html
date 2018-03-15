@@ -31,6 +31,7 @@
 <link rel="import" href="../../redux/actions.html">
 <link rel="import" href="../../redux/selectors/config.html">
 <link rel="import" href="../../redux/selectors/workspace.html">
+<link rel="import" href="./response-plan-details.html">
 
 <dom-module id="add-response-plan-modal">
   <template>
@@ -103,6 +104,11 @@
       url="[[configUrl]]">
     </etools-prp-ajax>
 
+    <etools-prp-ajax
+      id="planDetails"
+      url="[[planDetailsUrl]]">
+    </etools-prp-ajax>
+
 
     <paper-dialog
         id="dialog"
@@ -113,7 +119,7 @@
 
         <paper-icon-button
             class="self-center"
-            on-tap="close"
+            on-tap="_close"
             icon="icons:close">
         </paper-icon-button>
       </div>
@@ -144,6 +150,7 @@
                 trigger-value-change-event
                 required>
               </etools-single-selection-menu>
+              <response-plan-details plan-data="[[planDetails]]" loading="[[planDetailsLoading]]"></response-plan-details>
             </template>
           </div>
 
@@ -152,8 +159,7 @@
           </paper-radio-button>
 
           <div
-              class="fields"
-              empty$="[[!_equals(mode, 'custom')]]">
+            empty$="[[!_equals(mode, 'custom')]]">
             <template
                 is="dom-if"
                 if="[[_equals(mode, 'custom')]]"
@@ -231,7 +237,7 @@
         </paper-button>
 
         <paper-button
-            on-tap="close">
+            on-tap="_close">
           Cancel
         </paper-button>
       </div>
@@ -288,6 +294,11 @@
           computed: '_computeCreatePlanUrl(workspaceId, mode)',
         },
 
+        planDetailsUrl: {
+          type: String,
+          computed: '_computePlanDetailsUrl(selectedPlan)',
+        },
+
         formattedPlans: {
           type: String,
           computed: '_computeFormattedPlans(plans)',
@@ -323,13 +334,10 @@
 
       },
 
-      listeners: {
-        'mode.selected-changed': 'adjustPosition',
-      },
-
       observers: [
         '_fetchPlans(opened, ochaPlansUrl)',
         '_fetchConfig(opened, configUrl)',
+        '_fetchPlanDetails(planDetailsUrl)',
       ],
 
       _computeCreatePlanUrl: function (workspaceId, mode) {
@@ -341,6 +349,12 @@
 
       _computeOchaPlansUrl: function (workspaceId) {
         return App.Endpoints.ochaResponsePlans(workspaceId);
+      },
+
+      _computePlanDetailsUrl: function (planId) {
+        if (planId !== '') {
+          return App.Endpoints.ochaResponsePlanDetails(planId);
+        }
       },
 
       _setDefaults: function () {
@@ -394,6 +408,22 @@
             });
       },
 
+      _fetchPlanDetails: function () {
+        this.set('planDetailsLoading', true);
+        var self = this;
+        this.$.planDetails.abort();
+
+        this.$.planDetails.thunk()()
+            .then(function (res) {
+              self.set('planDetailsLoading', false);
+              self.set('planDetails', res.data);
+            })
+            .catch(function (err) { // jshint ignore:line
+              self.set('planDetailsLoading', false);
+              // TODO: error handling
+            });
+      },
+
       _fetchConfig: function (opened) {
         if (!opened) {
           return;
@@ -434,7 +464,7 @@
           .then(function (res) {
             // self.fire('activity-added', res.data);
             self.set('updatePending', false);
-            self.close();
+            self._close();
             self.dispatch(App.Actions.addResponsePlan(res.data));
           })
           .catch(function (err) { // jshint ignore:line
@@ -442,6 +472,11 @@
             self.set('updatePending', false);
           });
       },
+
+      _close: function() {
+        this.set('selectedPlan', '');
+        this.close();
+      }
     });
   </script>
 </dom-module>

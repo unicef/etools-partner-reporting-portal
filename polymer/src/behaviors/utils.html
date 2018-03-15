@@ -111,6 +111,10 @@
         return newList.join(', ');
       },
 
+       _commaSeparatedValues: function (list) {
+        return list.join(', ');
+      },
+
       _formatAddress: function (street, city, zip) {
         if (!(street || city || zip)) {
           return undefined;
