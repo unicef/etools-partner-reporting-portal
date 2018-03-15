@@ -81,6 +81,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_swagger',
+    'rest_framework_gis',
     'drfpasswordless',
     'django_filters',
     'djcelery',
@@ -369,6 +370,7 @@ REST_FRAMEWORK = {
     ),
     'DATE_FORMAT': PRINT_DATA_FORMAT,
     'DATE_INPUT_FORMATS': ['iso-8601', PRINT_DATA_FORMAT],
+    'EXCEPTION_HANDLER': 'utils.exception_handler.detailed_exception_handler',
 }
 
 

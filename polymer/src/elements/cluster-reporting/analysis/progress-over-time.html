@@ -1,0 +1,99 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/google-chart/google-chart.html">
+
+<link rel="import" href="analysis-widget.html">
+<link rel="import" href="../../../behaviors/utils.html">
+<link rel="import" href="../../../behaviors/analysis-chart.html">
+<link rel="import" href="../../../polyfills/es6-shim.html">
+
+<dom-module id="progress-over-time">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      google-chart {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+
+    <analysis-widget widget-title="Progress over time">
+      <google-chart
+          type="line"
+          options="[[options]]"
+          cols="[[cols]]"
+          rows="[[rows]]">
+      </google-chart>
+    </analysis-widget>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'progress-over-time',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.AnalysisChart,
+      ],
+
+      properties: {
+        data: Object,
+
+        cols: {
+          type: Array,
+          value: [
+            {
+              label: 'Time',
+              type: 'string',
+            },
+            {
+              label: 'Progress',
+              type: 'number',
+            },
+            {
+              label: 'Target',
+              type: 'number',
+            },
+            {
+              label: 'In need',
+              type: 'number',
+            },
+          ],
+        },
+
+        rows: {
+          type: Array,
+          computed: '_computeRows(data)',
+        },
+      },
+
+      _computeOptions: function () {
+        return Object.assign({}, this._baseOptions, {
+          colors: ['#88c245', '#4069c5', '#f19e3a'],
+          chartArea: {
+            top: 20,
+          },
+          legend: {
+            position: 'bottom',
+          },
+
+          // TODO: tooltips
+          enableInteractivity: false,
+          tooltip: null,
+        });
+      },
+
+      _computeRows: function (/* data */) {
+        // Dummy data
+        return [
+          ['Jan', 1000, 2000, 3000],
+          ['Feb', 2000, 1750, 1000],
+          ['Mar', 2100, 2750, 2500],
+          ['Apr', 2500, 3100, 4000],
+        ];
+      },
+    });
+  </script>
+</dom-module>

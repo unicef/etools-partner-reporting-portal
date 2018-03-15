@@ -1,0 +1,87 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
+<link rel="import" href="../polyfills/es6-shim.html">
+
+<dom-module id="error-box">
+  <template>
+    <style include="iron-flex iron-flex-alignment iron-flex-reverse">
+      :host {
+        color: var(--paper-input-container-invalid-color, --error-color);
+      }
+
+      #box {
+        background: var(--paper-grey-300);
+        padding: 10px;
+      }
+
+      iron-icon {
+        margin-right: 5px;
+      }
+
+      li {
+        font-size: 12px;
+      }
+    </style>
+
+    <div
+      id="box"
+      hidden$="[[_computeHidden(mappedErrors)]]">
+      <div class="layout horizontal center">
+        <iron-icon icon="icons:error"></iron-icon>
+        <span>Errors ocured. Please check the list to save the form.</span>
+      </div>
+      <ul>
+        <template is="dom-repeat" items="[[mappedErrors]]" as="error">
+          <li>[[error]]</li>
+        </template>
+      </ul>
+    </div>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'error-box',
+
+      properties: {
+        errors: {
+          type: Object,
+          value: {},
+        },
+
+        mappedErrors: {
+          type: Array,
+          value: [],
+          computed: '_mapErrors(errors)',
+          observer: '_scrollToBox',
+        },
+      },
+
+      _scrollToBox: function() {
+        this.$.box.scrollIntoView();
+      },
+
+      _mapErrors: function(errors) {
+        var errorList = [];
+        if (errors) {
+          Object.keys(errors).forEach(function (key) {
+            if (key !== 'error_codes') {
+              if (Array.isArray(errors[key])) {
+                errorList = errorList.concat(errors[key]);
+                return;
+              }
+              errorList.push(errors[key]);
+            }
+          });
+        }
+        return errorList;
+      },
+
+      _computeHidden: function(mappedErrors) {
+        return !mappedErrors.length;
+      }
+    });
+  </script>
+</dom-module>

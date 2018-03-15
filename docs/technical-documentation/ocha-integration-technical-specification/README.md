@@ -1,8 +1,10 @@
 ---
-description: This page covers all technical specification needed for OCHA integration
+description: This page documents the information needed to start integration work
 ---
 
-# OCHA Integration - technical specification
+# OCHA Integration - API and Model Documentation
+
+
 
 ## OCHA API's information
 
@@ -29,14 +31,16 @@ Authorization: Basic base64(clientABC:passwordXYZ)
 
 ### External ID
 
-All PRP models related to this integration should be updated with two new columns:
+Synced models should be updated with additional fields, to document their origin. This is achieved using a dedicated base model class.
 
 | **Column** | **Type** |
 | --- | --- | --- |
 | `external_id` | _integer_ |
-| `external_source` | _choice\_field_ |
+| `external_source` | _choice_ - HPC or OPS |
 
-All data pulled from OCHA should contains their orginal ID stored in `external_id` field and API source stored in `external_source `\(HPC or OPS\).
+{% hint style="info" %}
+Exception should be made for some simple tables \(such as Country, etc.\)
+{% endhint %}
 
 All further mappings includes those fields by default.
 
