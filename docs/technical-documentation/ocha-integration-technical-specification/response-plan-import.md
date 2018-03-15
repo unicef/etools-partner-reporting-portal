@@ -47,7 +47,7 @@ Code generating how cluster type is displayed has been changed to display based 
 ### Cluster Objectives and Activities
 
 {% hint style="warning" %}
-In OCHA there's a concept of Strategic Objective - related to multiple Clusters, in PRP we those as Cluster Objectives
+In OCHA there's a concept of Strategic Objective - related to multiple Clusters, in PRP we save those as Cluster Objectives
 {% endhint %}
 
 Those are somewhat oddly split between an _entities_ response:  
@@ -62,5 +62,31 @@ So to get them all both responses need to be retrieved and combined. They are co
 | Cluster Objective | CO |
 | Cluster Activity | CA |
 
-To find which Cluster an Objective belongs to we need to look under `value.support.planEntityIds`, it's the same case for tying Activities to Objectives.
+To find which Cluster an Objective belongs to we need to look for `parentId.`
+
+{% hint style="info" %}
+Some Objective don't seem to have `parent_id`, in which case we get the info from child Activities
+{% endhint %}
+
+| **Cluster Objective Model** | **OCHA Source** |
+| --- | --- | --- |
+| cluster | parentId |
+| title | value.description |
+
+List under `value.support.planEntityIds` ties Cluster Activities to Cluster Objectives.
+
+{% hint style="warning" %}
+In OCHA single Activity **can support multiple Objectives, this is not the case in PRP,** we only save the first one on the list.
+{% endhint %}
+
+| **Cluster Activity Model** | **OCHA Source** |
+| --- | --- | --- |
+| cluster\_objective | value.support.planEntityIds\[0\] |
+| title | value.description |
+
+{% hint style="danger" %}
+To save locations for Activity properly we're waiting for an API expansion
+{% endhint %}
+
+
 
