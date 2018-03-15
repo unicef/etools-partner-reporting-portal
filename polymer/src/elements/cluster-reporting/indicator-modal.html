@@ -94,9 +94,8 @@
       </div>
 
       <paper-dialog-scrollable>
-<<<<<<< HEAD
-=======
         <error-box errors="[[errors]]"></error-box>
+
         <div class="row">
           <labelled-item label="Type">
             <paper-radio-group
@@ -154,7 +153,6 @@
           </labelled-item>
         </div>
 
->>>>>>> develop
         <template
             is="dom-if"
             if="[[opened]]"
@@ -608,12 +606,7 @@
             .then(function (res) {
               self.fire('indicator-added', res.data);
               self.set('updatePending', false);
-<<<<<<< HEAD
-=======
-              self.set('type', '');
-              self.set('displayType', '');
               self.set('errors', {});
->>>>>>> develop
               self.close();
             })
             .catch(function (err) {
