@@ -358,17 +358,19 @@ class AnnotatedGeometryField(GeometryField):
         super().__init__(**kwargs)
 
     def to_representation(self, value):
-        if isinstance(value, dict) or value is None:
-            return value
+        target_geom_value = value.processed_geom_json or value.processed_point_json
 
-        # we expect value to be a GEOSGeometry instance
-        return GeoJsonDict(value)
+        if isinstance(target_geom_value, dict) or target_geom_value is None:
+            return target_geom_value
+
+        # we expect target_geom_value to be a GEOSGeometry instance
+        return GeoJsonDict(target_geom_value)
 
 
 class OperationalPresenceLocationListSerializer(GeoFeatureModelSerializer):
     partners = serializers.SerializerMethodField()
     point = GeometrySerializerMethodField()
-    geom = AnnotatedGeometryField(source="processed_json")
+    geom = AnnotatedGeometryField(source="*")
 
     def get_point(self, obj):
         return obj.geo_point or None
