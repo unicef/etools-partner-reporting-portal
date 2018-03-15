@@ -24,7 +24,7 @@ IMO can add a project for partners \(within their cluster?\) from the response p
 
 ![](../../.gitbook/assets/screen-shot-2018-03-06-at-12.13.34-pm.png)
 
-IMO chooses the partner and if the project is existing to be pulled from OCHA or a new custom project. Please see [OCHA integration](ocha-integration/) for more details.
+IMO chooses the partner and if the project is existing to be pulled from OCHA or a new custom project. Please see [OCHA integration](ocha-integration.md) for more details.
 
 **\(TBD Maciej: Need to confirm we can filter the projects for a specific partner in OCHA so we can pull the data successfully\)**
 

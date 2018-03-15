@@ -709,7 +709,7 @@
               self.fire('report-submitted', self.data.id);
             })
             .catch(function (res) {
-              var errors = res.data.errors;
+              var errors = res.data.non_field_errors;
 
               return self.$.error.open(errors).then(function () {
                 return Promise.reject(); // Revert
