@@ -40,13 +40,17 @@ from .disaggregators import (
     RatioIndicatorDisaggregator,
 )
 from .serializers import (
-    IndicatorListSerializer, IndicatorReportListSerializer, PDReportContextIndicatorReportSerializer,
-    IndicatorLLoutputsSerializer, IndicatorLocationDataUpdateSerializer,
+    IndicatorListSerializer,
+    IndicatorReportListSerializer,
+    PDReportContextIndicatorReportSerializer,
+    IndicatorLLoutputsSerializer,
+    IndicatorLocationDataUpdateSerializer,
     OverallNarrativeSerializer,
     ClusterIndicatorSerializer,
     DisaggregationListSerializer,
     IndicatorReportReviewSerializer,
-    IndicatorReportSimpleSerializer
+    IndicatorReportSimpleSerializer,
+    ReportableBaselineInNeedAUpdateSerializer,
 )
 from .filters import IndicatorFilter, PDReportsFilter
 from .models import (
@@ -240,6 +244,20 @@ class ReportableDetailAPIView(RetrieveAPIView):
     etc.
     """
     serializer_class = IndicatorListSerializer
+    queryset = Reportable.objects.all()
+    permission_classes = (IsAuthenticated, )
+    lookup_url_kwarg = 'reportable_id'
+
+    def patch(self, request, reportable_id, *args, **kwargs):
+        pass
+
+
+class ReportableUpdateBaselineInNeedAPIView(UpdateAPIView):
+    """
+    Updates Reportable's baseline and in_need.
+    Reserved for IMO only.
+    """
+    serializer_class = ReportableBaselineInNeedAUpdateSerializer
     queryset = Reportable.objects.all()
     permission_classes = (IsAuthenticated, )
     lookup_url_kwarg = 'reportable_id'

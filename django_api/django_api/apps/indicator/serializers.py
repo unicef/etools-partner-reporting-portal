@@ -28,6 +28,7 @@ from .models import (
     Reportable, IndicatorBlueprint,
     IndicatorReport, IndicatorLocationData,
     Disaggregation, DisaggregationValue,
+    ReportableLocationGoal,
     create_pa_reportables_for_new_ca_reportable,
 )
 
@@ -161,13 +162,45 @@ class ReportableSimpleSerializer(serializers.ModelSerializer):
         return obj.content_object.title
 
 
+class ReportableBaselineInNeedAUpdateSerializer(serializers.ModelSerializer):
+    baseline = serializers.JSONField()
+    in_need = serializers.JSONField()
+
+    class Meta:
+        model = Reportable
+        fields = (
+            'id',
+            'baseline',
+            'in_need',
+        )
+
+
+class ReportableLocationGoalSerializer(serializers.ModelSerializer):
+    baseline = serializers.JSONField()
+    in_need = serializers.JSONField()
+    target = serializers.JSONField()
+
+    class Meta:
+        model = ReportableLocationGoal
+        fields = (
+            'id',
+            'baseline',
+            'in_need',
+            'target',
+            'location',
+        )
+
+
 class IndicatorListSerializer(ReportableSimpleSerializer):
     """
     Useful anywhere a list of indicators needs to be shown with minimal
     amount of data.
     """
     disaggregations = DisaggregationListSerializer(many=True, read_only=True)
-    locations = ShortLocationSerializer(many=True, read_only=True)
+    locations = serializers.SerializerMethodField()
+
+    def get_locations(self, obj):
+        return ReportableLocationGoalSerializer(obj.reportablelocationgoal_set.all(), many=True).data
 
     class Meta:
         model = Reportable
@@ -650,7 +683,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
     disaggregations = IdDisaggregationSerializer(many=True, read_only=True)
     object_type = serializers.CharField(validators=[add_indicator_object_type_validator], write_only=True)
     blueprint = IndicatorBlueprintSerializer()
-    locations = IdLocationSerializer(many=True, read_only=True)
+    locations = ReportableLocationGoalSerializer(many=True, write_only=True)
     target = serializers.JSONField()
     baseline = serializers.JSONField()
     in_need = serializers.JSONField()
@@ -672,17 +705,6 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             'in_need',
         )
 
-    def check_locations_merge_to_list(self, locations):
-        if isinstance(locations, dict) and 'id' in locations:
-            return [locations]
-
-        if isinstance(locations, list) and all([loc.get('id', None) for loc in locations]):
-            return locations
-
-        raise ValidationError({
-            "locations": "List of dict location or one dict location expected"
-        })
-
     def check_disaggregation(self, disaggregations):
         if not isinstance(disaggregations, list) or False in [dis.get('id', False) for dis in disaggregations]:
             raise ValidationError(
@@ -703,13 +725,14 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 {"target": "Target cannot be greater than In Need"}
             )
 
-    def check_location_admin_levels(self, location_queryset):
-        if location_queryset.values_list('gateway__admin_level', flat=True).distinct().count() != 1:
+    def check_location_admin_levels(self, location_goal_queryset):
+        if location_goal_queryset.values_list(
+            'gateway__admin_level', flat=True) \
+                .distinct().count() != 1:
             raise ValidationError({"locations": "Selected locations should share same admin level"})
 
     @transaction.atomic
     def create(self, validated_data):
-        locations = self.check_locations_merge_to_list(self.initial_data.get('locations'))
         self.check_disaggregation(self.initial_data.get('disaggregations'))
         self.check_progress_values(validated_data)
 
@@ -754,12 +777,18 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
         validated_data['content_type'] = reportable_object_content_type
 
+        locations = validated_data.pop('locations', [])
+
         self.instance = Reportable.objects.create(**validated_data)
 
-        location_queryset = Location.objects.filter(id__in=[l['id'] for l in locations])
+        location_queryset = Location.objects.filter(
+            id__in=[l['location'].id for l in locations]
+        )
         self.check_location_admin_levels(location_queryset)
 
-        self.instance.locations.add(*location_queryset)
+        for loc_data in locations:
+            loc_data['reportable'] = self.instance
+            ReportableLocationGoal.objects.create(**loc_data)
 
         disaggregations = self.initial_data.get('disaggregations')
         self.instance.disaggregations.add(*Disaggregation.objects.filter(id__in=[d['id'] for d in disaggregations]))
