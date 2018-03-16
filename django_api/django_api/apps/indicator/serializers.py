@@ -800,17 +800,20 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         return self.instance
 
     def update(self, reportable, validated_data):
-        locations = self.check_locations_merge_to_list(self.initial_data.get('locations'))
-        locations_ids = [l['id'] for l in locations]
-        location_queryset = Location.objects.filter(id__in=locations_ids)
+        locations = validated_data.pop('locations', [])
+        location_queryset = Location.objects.filter(
+            id__in=[l['location'].id for l in locations]
+        )
         self.check_location_admin_levels(location_queryset)
 
         blueprint_data = validated_data.pop('blueprint', {})
         reportable.blueprint.title = blueprint_data.get('title', reportable.blueprint.title)
         reportable.blueprint.save()
 
-        reportable.locations.through.objects.exclude(location_id__in=locations_ids).delete()
-        reportable.locations.add(*location_queryset)
+        reportable.reportablelocationgoal_set.clear()
+        for loc_data in locations:
+            loc_data['reportable'] = self.instance
+            ReportableLocationGoal.objects.create(**loc_data)
 
         return super(ClusterIndicatorSerializer, self).update(reportable, validated_data)
 
