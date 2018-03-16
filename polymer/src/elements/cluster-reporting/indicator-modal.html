@@ -18,6 +18,7 @@
 <link rel="import" href="../labelled-item.html">
 <link rel="import" href="../etools-prp-chips.html">
 <link rel="import" href="../etools-prp-ajax.html">
+<link rel="import" href="../json-field.html">
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../behaviors/utils.html">
@@ -45,7 +46,8 @@
         };
       }
 
-      .row {
+      .row,
+      error-box {
         margin: 16px 0;
       }
 
@@ -56,7 +58,6 @@
       paper-radio-group {
         margin-left: -12px;
       }
-
     </style>
 
     <etools-prp-ajax
@@ -94,69 +95,12 @@
       </div>
 
       <paper-dialog-scrollable>
-        <error-box errors="[[errors]]"></error-box>
-
-        <div class="row">
-          <labelled-item label="Type">
-            <paper-radio-group
-                data-path="type"
-                on-paper-radio-group-changed="_onValueChanged"
-                selected="number">
-              <paper-radio-button name="number">Quantity (#)</paper-radio-button>
-              <paper-radio-button name="percentage_ratio">Percent/Ratio</paper-radio-button>
-            </paper-radio-group>
-          </labelled-item>
-        </div>
-
-        <div
-            class="row"
-            hidden$="[[!_equals(computedType, 'number')]]">
-          <div class="app-grid">
-            <div class="item">
-              <labelled-item label="Calculation method across locations">
-                <paper-radio-group
-                    data-path="data.blueprint.calculation_formula_across_locations"
-                    on-paper-radio-group-changed="_onValueChanged"
-                    selected="sum">
-                  <paper-radio-button name="sum">sum</paper-radio-button>
-                  <paper-radio-button name="max">max</paper-radio-button>
-                  <paper-radio-button name="avg">avg</paper-radio-button>
-                </paper-radio-group>
-              </labelled-item>
-            </div>
-            <div class="item">
-              <labelled-item label="Calculation method across reporting periods">
-                <paper-radio-group
-                    data-path="data.blueprint.calculation_formula_across_periods"
-                    on-paper-radio-group-changed="_onValueChanged"
-                    selected="sum">
-                  <paper-radio-button name="sum">sum</paper-radio-button>
-                  <paper-radio-button name="max">max</paper-radio-button>
-                  <paper-radio-button name="avg">avg</paper-radio-button>
-                </paper-radio-group>
-              </labelled-item>
-            </div>
-          </div>
-        </div>
-
-        <div
-            class="row"
-            hidden$="[[_equals(computedType, 'number')]]">
-          <labelled-item label="Display type">
-            <paper-radio-group
-                data-path="displayType"
-                on-paper-radio-group-changed="_onValueChanged"
-                selected="percentage">
-              <paper-radio-button name="percentage">Percentage</paper-radio-button>
-              <paper-radio-button name="ratio">Ratio</paper-radio-button>
-            </paper-radio-group>
-          </labelled-item>
-        </div>
-
         <template
             is="dom-if"
             if="[[opened]]"
             restamp="true">
+          <error-box errors="[[errors]]"></error-box>
+
           <div class="row">
             <paper-input
                 class="validate"
@@ -275,47 +219,37 @@
 
           <div class="row">
             <div class="app-grid">
-              <div class="item">
-                <paper-input
-                  class="validate"
+              <json-field
+                  class="item validate"
+                  type="[[data.blueprint.display_type]]"
                   label="Baseline"
                   on-input="_validate"
                   value="{{data.baseline}}"
-                  type="number"
-                  allowed-pattern="[+\-\d]"
-                  always-float-label
-                  required>
-                </paper-input>
-              </div>
+                  allowed-pattern="[+\-\d]">
+              </json-field>
 
-              <div class="item">
-                <paper-input
-                  class="validate"
+              <json-field
+                  class="item validate"
+                  type="[[data.blueprint.display_type]]"
                   label="Target"
                   on-input="_validate"
                   value="{{data.target}}"
-                  type="number"
                   allowed-pattern="[+\-\d]"
-                  always-float-label
                   required>
-                </paper-input>
-              </div>
+              </json-field>
             </div>
           </div>
 
           <div class="row">
             <div class="app-grid">
-              <div class="item">
-                <paper-input
-                  class="validate"
+              <json-field
+                  class="item validate"
+                  type="[[data.blueprint.display_type]]"
                   label="In need"
                   on-input="_validate"
                   value="{{data.in_need}}"
-                  type="number"
-                  allowed-pattern="[+\-\d]"
-                  always-float-label>
-                </paper-input>
-              </div>
+                  allowed-pattern="[+\-\d]">
+              </json-field>
             </div>
           </div>
 
@@ -522,6 +456,9 @@
         this.set('selectedDisaggregations', []);
         this.set('errors', {});
         this.set('data', {
+          baseline: {},
+          target: {},
+          in_need: {},
           cs_dates: [],
           locations: [],
           blueprint: {

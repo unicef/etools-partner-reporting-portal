@@ -143,19 +143,52 @@
           <dl class="indicator-data layout horizontal">
             <dt>Baseline:</dt>
             <dd>
-              <etools-prp-number value="[[data.baseline]]"></etools-prp-number>
+              <template
+                  is="dom-if"
+                  if="[[_equals(data.display_type, 'number')]]"
+                  restamp="true">
+                <etools-prp-number value="[[data.baseline.v]]"></etools-prp-number>
+              </template>
+              <template
+                  is="dom-if"
+                  if="[[_equals(data.display_type, 'percentage')]]"
+                  restamp="true">
+                <span>[[_toPercentage(data.baseline.c)]]</span>
+              </template>
             </dd>
           </dl>
           <dl class="indicator-data layout horizontal">
             <dt>Target:</dt>
             <dd>
-              <etools-prp-number value="[[data.target]]"></etools-prp-number>
+              <template
+                  is="dom-if"
+                  if="[[_equals(data.display_type, 'number')]]"
+                  restamp="true">
+                <etools-prp-number value="[[data.target.v]]"></etools-prp-number>
+              </template>
+              <template
+                  is="dom-if"
+                  if="[[_equals(data.display_type, 'percentage')]]"
+                  restamp="true">
+                <span>[[_toPercentage(data.target.c)]]</span>
+              </template>
             </dd>
           </dl>
           <dl class="indicator-data layout horizontal">
             <dt>In need:</dt>
             <dd>
-              <etools-prp-number value="[[data.in_need]]"></etools-prp-number>
+              <template
+                  is="dom-if"
+                  if="[[_equals(data.display_type, 'number')]]"
+                  restamp="true">
+                <etools-prp-number value="[[data.in_need.v]]"></etools-prp-number>
+              </template>
+              <template
+                  is="dom-if"
+                  if="[[_equals(data.display_type, 'percentage')]]"
+                  restamp="true">
+                <span>[[_toPercentage(data.in_need.c)]]</span>
+              </template>
             </dd>
           </dl>
         </div>

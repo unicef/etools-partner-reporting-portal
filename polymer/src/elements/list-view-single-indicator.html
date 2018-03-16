@@ -4,6 +4,7 @@
 
 <link rel="import" href="ip-reporting/ip-reporting-indicator-details.html">
 <link rel="import" href="etools-prp-progress-bar.html">
+<link rel="import" href="etools-prp-number.html">
 <link rel="import" href="../styles/table-styles.html">
 <link rel="import" href="../redux/store.html">
 <link rel="import" href="../behaviors/routing.html">
@@ -48,10 +49,32 @@
           [[indicator.blueprint.calculation_formula_across_periods]]
         </span>
         <span class="table-cell table-cell--text">
-          [[_withDefault(indicator.baseline)]]
+          <template
+              is="dom-if"
+              if="[[_equals(indicator.blueprint.display_type, 'number')]]"
+              restamp="true">
+            <etools-prp-number value="[[indicator.baseline.v]]"></etools-prp-number>
+          </template>
+          <template
+              is="dom-if"
+              if="[[_equals(indicator.blueprint.display_type, 'percentage')]]"
+              restamp="true">
+            <span>[[_toPercentage(indicator.baseline.c)]]</span>
+          </template>
          </span>
         <span class="table-cell table-cell--text">
-          [[_withDefault(indicator.target)]]
+          <template
+              is="dom-if"
+              if="[[_equals(indicator.blueprint.display_type, 'number')]]"
+              restamp="true">
+            <etools-prp-number value="[[indicator.target.v]]"></etools-prp-number>
+          </template>
+          <template
+              is="dom-if"
+              if="[[_equals(indicator.blueprint.display_type, 'percentage')]]"
+              restamp="true">
+            <span>[[_toPercentage(indicator.target.c)]]</span>
+          </template>
         </span>
         <span class="table-cell table-cell--text">
           [[indicator.achieved.c]]

@@ -19,6 +19,7 @@
 <link rel="import" href="../labelled-item.html">
 <link rel="import" href="../etools-prp-chips.html">
 <link rel="import" href="../etools-prp-ajax.html">
+<link rel="import" href="../json-field.html">
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../behaviors/utils.html">
@@ -154,29 +155,26 @@
           <div class="row">
             <div class="app-grid">
               <div class="item">
-                <paper-input
-                  class="validate"
-                  label="Baseline"
-                  on-input="_validate"
-                  value="{{data.baseline}}"
-                  type="number"
-                  allowed-pattern="[+\-\d]"
-                  always-float-label
-                  required>
-                </paper-input>
+                <json-field
+                    class="validate"
+                    type="[[data.blueprint.display_type]]"
+                    label="Baseline"
+                    on-input="_validate"
+                    value="{{data.baseline}}"
+                    allowed-pattern="[+\-\d]">
+                </json-field>
               </div>
 
               <div class="item">
-                <paper-input
-                  class="validate"
-                  label="Target"
-                  on-input="_validate"
-                  value="{{data.target}}"
-                  type="number"
-                  allowed-pattern="[+\-\d]"
-                  always-float-label
-                  required>
-                </paper-input>
+                <json-field
+                    class="validate"
+                    type="[[data.blueprint.display_type]]"
+                    label="Target"
+                    on-input="_validate"
+                    value="{{data.target}}"
+                    allowed-pattern="[+\-\d]"
+                    required>
+                </json-field>
               </div>
             </div>
           </div>
@@ -184,15 +182,14 @@
           <div class="row">
             <div class="app-grid">
               <div class="item">
-                <paper-input
-                  class="validate"
-                  label="In need"
-                  on-input="_validate"
-                  value="{{data.in_need}}"
-                  type="number"
-                  allowed-pattern="[+\-\d]"
-                  always-float-label>
-                </paper-input>
+                <json-field
+                    class="validate"
+                    type="[[data.blueprint.display_type]]"
+                    label="In need"
+                    on-input="_validate"
+                    value="{{data.in_need}}"
+                    allowed-pattern="[+\-\d]">
+                </json-field>
               </div>
             </div>
           </div>
