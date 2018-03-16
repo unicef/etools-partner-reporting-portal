@@ -44,7 +44,7 @@ if not ENV:
 DATA_VOLUME = '/data'
 
 UPLOADS_DIR_NAME = 'uploads'
-MEDIA_URL = '/%s/' % UPLOADS_DIR_NAME
+MEDIA_URL = '/api/%s/' % UPLOADS_DIR_NAME
 
 FILE_UPLOAD_MAX_MEMORY_SIZE = 4194304  # 4mb
 MEDIA_ROOT = os.path.join(DATA_VOLUME, '%s' % UPLOADS_DIR_NAME)
@@ -240,9 +240,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
-
 STATIC_URL = '/api/static/'
-# FORCE_SCRIPT_NAME = '/api/'
 
 # Authentication settings
 AUTH_USER_MODEL = 'account.User'

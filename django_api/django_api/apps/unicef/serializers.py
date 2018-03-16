@@ -633,7 +633,7 @@ class ProgressReportAttachmentSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super(ProgressReportAttachmentSerializer, self).to_representation(instance)
 
-        if "http" not in instance.attachment.url:
+        if instance.attachment and "http" not in instance.attachment.url:
             representation['path'] = settings.WWW_ROOT[:-1] + instance.attachment.url
 
         return representation

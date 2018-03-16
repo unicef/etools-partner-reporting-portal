@@ -244,13 +244,13 @@
 
       _getLegendIndex: function (properties, legend) {
         var partnersCount = properties.partners.all.length;
-        var i = 0;
+        var index = 0;
 
-        do {
-          i++;
-        } while (partnersCount >= legend[i].threshold);
+        while (partnersCount >= legend[index].threshold) {
+          index++;
+        }
 
-        return i;
+        return index;
       },
 
       _computePolygonColor: function (properties, legend) {
@@ -262,7 +262,7 @@
       _computeMarkerIcon: function (properties, legend) {
         var index = this._getLegendIndex(properties, legend);
 
-        return '/images/marker' + index + '.png';
+        return '/app/images/marker' + index + '.png';
       },
 
       _isPoint: function (node) {
