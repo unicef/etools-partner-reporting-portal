@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 
 from core.common import RESPONSE_PLAN_TYPE, EXTERNAL_DATA_SOURCES
 from core.models import Workspace, ResponsePlan
-from core.permissions import IsIMO
+from core.permissions import IsIMOForCurrentWorkspace
 from core.serializers import ResponsePlanSerializer
 from ocha.constants import HPC_V1_ROOT_URL, RefCode
 
@@ -18,7 +18,7 @@ from ocha.imports.bulk import get_response_plans_for_countries
 class RPMWorkspaceResponsePlanAPIView(APIView):
 
     permission_classes = (
-        IsIMO,
+        IsIMOForCurrentWorkspace,
     )
 
     def get_workspace(self):
@@ -80,12 +80,16 @@ class RPMWorkspaceResponsePlanAPIView(APIView):
 class RPMWorkspaceResponsePlanDetailAPIView(APIView):
 
     permission_classes = (
-        IsIMO,
+        IsIMOForCurrentWorkspace,
     )
 
     def get(self, request, *args, **kwargs):
         source_url = HPC_V1_ROOT_URL + 'rpm/plan/id/{}?format=json&content=entities'.format(self.kwargs['id'])
-        plan_data = get_json_from_url(source_url)['data']
+        try:
+            plan_data = get_json_from_url(source_url)['data']
+        except Exception:
+            raise serializers.ValidationError('OCHA service unavailable.')
+
         out_data = {
             k: v for k, v in plan_data.items() if type(v) not in {list, dict}
         }
