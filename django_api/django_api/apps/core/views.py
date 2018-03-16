@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 from core.common import DISPLAY_CLUSTER_TYPES
 from utils.serializers import serialize_choices
 from .filters import LocationFilter
-from .permissions import IsAuthenticated
+from .permissions import IsAuthenticated, IsIMOForCurrentWorkspace
 from .models import Workspace, Location, ResponsePlan
 from .serializers import (
     WorkspaceSerializer,
@@ -111,7 +111,7 @@ class ResponsePlanCreateAPIView(CreateAPIView):
     """
 
     serializer_class = CreateResponsePlanSerializer
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsIMOForCurrentWorkspace, )
 
 
 class ConfigurationAPIView(APIView):
