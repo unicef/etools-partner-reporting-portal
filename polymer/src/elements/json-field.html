@@ -1,0 +1,193 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/app-layout/app-grid/app-grid-style.html">
+
+<link rel="import" href="labelled-item.html">
+<link rel="import" href="../polyfills/es6-shim.html">
+<link rel="import" href="../behaviors/utils.html">
+
+<dom-module id="json-field">
+  <template>
+    <style include="app-grid-style">
+      :host {
+        display: block;
+
+        --app-grid-columns: 2;
+        --app-grid-gutter: 25px;
+        --app-grid-item-height: auto;
+
+        --labelled-item-label: {
+          position: relative;
+          top: 1px;
+        };
+      }
+
+      .app-grid {
+        margin: -var(--app-grid-gutter);
+        position: relative;
+      }
+
+      .app-grid::before {
+        content: "/";
+        position: absolute;
+        left: 50%;
+        top: 27px;
+        color: var(--theme-secondary-text-color);
+        transform: translateX(-50%);
+      }
+
+      labelled-item {
+        padding-top: 8px;
+      }
+
+      paper-input.item {
+        margin-top: -8px;
+      }
+    </style>
+
+    <template
+        is="dom-if"
+        if="[[!isPercentageRatio]]"
+        restamp="true">
+      <paper-input
+          class="validate"
+          label="[[label]]"
+          value="[[value.v]]"
+          on-input="_onInput"
+          data-field="v"
+          type="number"
+          allowed-pattern="[[allowedPattern]]"
+          required="[[required]]"
+          always-float-label>
+      </paper-input>
+    </template>
+
+    <template
+        is="dom-if"
+        if="[[isPercentageRatio]]"
+        restamp="true">
+      <labelled-item label="[[label]]">
+        <div class="app-grid">
+          <paper-input
+              class="item validate"
+              value="[[value.v]]"
+              on-input="_onInput"
+              data-field="v"
+              type="number"
+              allowed-pattern="[[allowedPattern]]"
+              required="[[_computeRequired(required, value, 'd')]]"
+              placeholder="Numerator"
+              no-label-float>
+          </paper-input>
+          <paper-input
+              class="item validate"
+              value="[[value.d]]"
+              on-input="_onInput"
+              data-field="d"
+              type="number"
+              allowed-pattern="[[allowedPattern]]"
+              required="[[_computeRequired(required, value, 'v')]]"
+              placeholder="Denominator"
+              no-label-float>
+          </paper-input>
+        </div>
+      </labelled-item>
+    </template>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'json-field',
+
+      behaviors: [
+        App.Behaviors.UtilsBehavior,
+      ],
+
+      properties: {
+        allowedPattern: String,
+        label: String,
+        type: String,
+
+        required: {
+          type: Boolean,
+          value: false,
+        },
+
+        value: {
+          type: Object,
+          notify: true,
+        },
+
+        isPercentageRatio: {
+          type: Boolean,
+          computed: '_computeIsPercentageRatio(type)',
+          observer: '_resetDenominator',
+        },
+
+        invalid: {
+          type: Boolean,
+          value: false,
+          notify: true,
+          computed: '_computeInvalid(required, isPercentageRatio, value)',
+        },
+      },
+
+      listeners: {
+        'value-changed': '_onValueChanged',
+      },
+
+      validate: function () {
+        this._fieldsAreValid();
+      },
+
+      _onInput: function (e) {
+        var change = {};
+
+        change[e.target.dataset.field] = e.target.value;
+
+        this.set('value', Object.assign({}, this.get('value'), change));
+      },
+
+      _computeIsPercentageRatio: function (type) {
+        return ['percentage', 'ratio'].indexOf(type) !== -1;
+      },
+
+      _computeInvalid: function (required, isPercentageRatio, value) {
+        if (required) {
+          if (isPercentageRatio) {
+            return !value.v || !value.d;
+          } else {
+            return !value.v;
+          }
+        } else {
+          if (isPercentageRatio) {
+            return !!value.v ? !value.d : !!value.d; // xor
+          } else {
+            return false;
+          }
+        }
+      },
+
+      _resetDenominator: function (isPercentageRatio) {
+        if (isPercentageRatio) {
+          return;
+        }
+
+        var newValue = Object.assign({}, this.get('value'));
+
+        delete newValue.d;
+
+        this.set('value', newValue);
+      },
+
+      _computeRequired: function (required, value, key) {
+        // May not be required yet still we need a valid value.
+        return required || !!value[key];
+      },
+
+      _onValueChanged: function (e) {
+        e.stopPropagation();
+      },
+    });
+  </script>
+</dom-module>
