@@ -18,7 +18,7 @@ To perform any analysis the user can filter the data by the following filters:
 * Narrow Location Type \[default:None\]
 * Indicator Type \[default:Cluster Activity\] - available in Indicators tab \(not as a global filter\);
 
-![Filters](../../.gitbook/assets/screen-shot-2018-01-16-at-11.08.39.png)
+![](../../.gitbook/assets/screen-shot-2018-03-19-at-11.29.26-am.png)
 
 ## Operational Presence
 
