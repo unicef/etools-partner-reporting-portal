@@ -50,7 +50,7 @@ from .serializers import (
     DisaggregationListSerializer,
     IndicatorReportReviewSerializer,
     IndicatorReportSimpleSerializer,
-    ReportableBaselineInNeedAUpdateSerializer,
+    ReportableLocationGoalBaselineInNeedSerializer,
 )
 from .filters import IndicatorFilter, PDReportsFilter
 from .models import (
@@ -58,7 +58,8 @@ from .models import (
     IndicatorReport,
     Reportable,
     IndicatorLocationData,
-    Disaggregation
+    Disaggregation,
+    ReportableLocationGoal
 )
 from functools import reduce
 
@@ -252,15 +253,43 @@ class ReportableDetailAPIView(RetrieveAPIView):
         pass
 
 
-class ReportableUpdateBaselineInNeedAPIView(UpdateAPIView):
+class ReportableLocationGoalBaselineInNeedAPIView(ListAPIView, UpdateAPIView):
     """
-    Updates Reportable's baseline and in_need.
+    Updates Reportable's ReportableLocationGoal instances' baseline and in_need.
     Reserved for IMO only.
     """
-    serializer_class = ReportableBaselineInNeedAUpdateSerializer
-    queryset = Reportable.objects.all()
+    serializer_class = ReportableLocationGoalBaselineInNeedSerializer
     permission_classes = (IsAuthenticated, )
     lookup_url_kwarg = 'reportable_id'
+
+    def get_queryset(self, *args, **kwargs):
+        reportable_id = self.kwargs.get('reportable_id', None)
+
+        if reportable_id:
+            return ReportableLocationGoal.objects.filter(reportable_id=reportable_id)
+        else:
+            raise Http404
+
+    def list(self, request, reportable_id, *args, **kwargs):
+        queryset = self.get_queryset(reportable_id)
+        serializer = self.get_serializer(queryset, many=True)
+
+        return Response(serializer.data)
+
+    def update(self, request, reportable_id, *args, **kwargs):
+        instances = ReportableLocationGoal.objects.filter(
+            id__in=map(lambda x: x['id'], request.data)
+        )
+        serializer = self.get_serializer(
+            instances,
+            data=request.data,
+            many=True,
+        )
+
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data)
 
 
 class IndicatorDataAPIView(APIView):

@@ -12,7 +12,8 @@ from .views import (
     IndicatorDataLocationAPIView,
     DisaggregationListCreateAPIView,
     ReportableDetailAPIView,
-    IndicatorReportReviewAPIView
+    IndicatorReportReviewAPIView,
+    ReportableLocationGoalBaselineInNeedAPIView
 )
 
 
@@ -21,8 +22,8 @@ urlpatterns = [
         ReportableDetailAPIView.as_view(),
         name='indicator-detail',),
     url(r'^(?P<reportable_id>\d+)/baseline_in_need$',
-        ReportableDetailAPIView.as_view(),
-        name='indicator-detail',),
+        ReportableLocationGoalBaselineInNeedAPIView.as_view(),
+        name='indicator-location-goal-detail',),
     url(r'^(?P<reportable_id>\d+)/indicator-reports/$',
         IndicatorReportListAPIView.as_view(),
         name='indicator-report-list-api'),

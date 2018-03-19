@@ -14,7 +14,7 @@ from partner.models import PartnerProject, PartnerActivity
 from cluster.models import ClusterObjective, ClusterActivity
 
 from core.common import OVERALL_STATUS, INDICATOR_REPORT_STATUS, FINAL_OVERALL_STATUS
-from core.serializers import LocationSerializer, IdLocationSerializer, ShortLocationSerializer
+from core.serializers import LocationSerializer, IdLocationSerializer
 from core.models import Location
 from core.validators import add_indicator_object_type_validator
 from core.helpers import (
@@ -162,16 +162,50 @@ class ReportableSimpleSerializer(serializers.ModelSerializer):
         return obj.content_object.title
 
 
-class ReportableBaselineInNeedAUpdateSerializer(serializers.ModelSerializer):
+class ReportableLocationGoalBaselineInNeedListSerializer(serializers.ListSerializer):
+    def update(self, instance, validated_data):
+        loc_goal_mapping = {loc_goal.id: loc_goal for loc_goal in instance}
+        data_mapping = {item['id']: item for item in validated_data}
+        updated = list()
+
+        if 'reportable_id' not in self.context['view'].kwargs:
+            raise ValidationError("The view needs reportable_id from url")
+
+        reportable_id = self.context['view'].kwargs['reportable_id']
+        reportable = get_object_or_404(Reportable, id=reportable_id)
+
+        # Handling creation and updates
+        for data_id, data in data_mapping.items():
+            loc_goal = loc_goal_mapping.get(data_id, None)
+            data['reportable'] = reportable
+
+            if not loc_goal:
+                updated.append(self.child.create(data))
+
+            else:
+                updated.append(self.child.update(loc_goal, data))
+
+        # Handling deletion from update
+        for loc_goal_id, loc_goal in loc_goal_mapping.items():
+            if loc_goal_id not in data_mapping:
+                loc_goal.delete()
+
+        return updated
+
+
+class ReportableLocationGoalBaselineInNeedSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField()
     baseline = serializers.JSONField()
     in_need = serializers.JSONField()
 
     class Meta:
-        model = Reportable
+        model = ReportableLocationGoal
+        list_serializer_class = ReportableLocationGoalBaselineInNeedListSerializer
         fields = (
             'id',
             'baseline',
             'in_need',
+            'location',
         )
 
 
