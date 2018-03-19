@@ -810,7 +810,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         reportable.blueprint.title = blueprint_data.get('title', reportable.blueprint.title)
         reportable.blueprint.save()
 
-        reportable.reportablelocationgoal_set.clear()
+        reportable.locations.clear()
         for loc_data in locations:
             loc_data['reportable'] = self.instance
             ReportableLocationGoal.objects.create(**loc_data)
