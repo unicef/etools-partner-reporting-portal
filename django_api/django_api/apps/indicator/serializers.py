@@ -197,6 +197,7 @@ class ReportableLocationGoalBaselineInNeedSerializer(serializers.ModelSerializer
     id = serializers.IntegerField()
     baseline = serializers.JSONField()
     in_need = serializers.JSONField()
+    location = LocationSerializer(read_only=True)
 
     class Meta:
         model = ReportableLocationGoal

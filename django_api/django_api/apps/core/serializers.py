@@ -20,10 +20,11 @@ class WorkspaceSerializer(serializers.ModelSerializer):
 
 
 class LocationSerializer(serializers.ModelSerializer):
+    admin_level = serializers.CharField(source="gateway.admin_level")
 
     class Meta:
         model = Location
-        fields = ('id', 'title', 'latitude', 'longitude', 'p_code')
+        fields = ('id', 'title', 'latitude', 'longitude', 'p_code', 'admin_level')
 
 
 class ShortLocationSerializer(serializers.ModelSerializer):
