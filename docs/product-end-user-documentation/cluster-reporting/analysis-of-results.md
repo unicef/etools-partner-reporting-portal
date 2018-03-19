@@ -15,6 +15,7 @@ To perform any analysis the user can filter the data by the following filters:
 * Partner Type\(s\) \[default:All\]
 * Location Type \(Admin level\) \[default:?\]
 * Location\(s\) \[default:All\]
+* Narrow Location Type \[default:None\]
 * Indicator Type \[default:Cluster Activity\] - available in Indicators tab \(not as a global filter\);
 
 ![Filters](../../.gitbook/assets/screen-shot-2018-01-16-at-11.08.39.png)
@@ -35,7 +36,7 @@ Charts are presenting information in descending order.
 On any charts, where we are referring to Partners, we are showing targets set by Partners themselves.
 {% endhint %}
 
-Link to Operational Presence tab - [https://invis.io/EDBIM0Y8M\#/265873598\_Analysis\_Cluster\_New\_01](https://invis.io/EDBIM0Y8M#/265873598_Analysis_Cluster_New_01)
+
 
 ![Operational Presence tab](../../.gitbook/assets/analysis_cluster_new_012x.png)
 
@@ -68,7 +69,7 @@ Below there are charts showing for this Indicator:
 * Current Progress by Partner - showing progress made by Partner with reference to the target set by this Partner for this Indicator;
 * Progress by Location - showing progress in each location \(made by all Contributing Partners in this location\).
 
-Link to the Indicators tab - [https://invis.io/EDBIM0Y8M\#/266599953\_Analysis\_Cluster\_New\_01\_02](https://invis.io/EDBIM0Y8M#/266599953_Analysis_Cluster_New_01_02)
+
 
 See screenshot below for details:
 
@@ -107,11 +108,7 @@ Both the target and the in-need for each indicator below has been set by the IMO
 * Do we really want each partner to provide "In need" figures, there will be certainly some overlaps between 1 partner and another figures. -  **if they have it, yes. i.e. optional**
 * Project indicators are partner specific and project activity \(custom\) indicators are as well. Proposing to in indicators tab just showing cluster objective and cluster activity as options for now?
 
-## Future Potential Enhancements
-
-* Option to export for each component - chart, map, etc.
-* Cluster icons on map
-* HRP/Country/emergency name is not mentioned on the page title - its in the top right bar, but can be added if its confusing in the future.
+## 
 
 
 
