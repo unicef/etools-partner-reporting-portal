@@ -47,7 +47,7 @@
 
     <template
         is="dom-if"
-        if="[[!isPercentageRatio]]"
+        if="[[!isRatio]]"
         restamp="true">
       <paper-input
           class="validate"
@@ -58,13 +58,14 @@
           type="number"
           allowed-pattern="[[allowedPattern]]"
           required="[[required]]"
+          disabled="[[disabled]]"
           always-float-label>
       </paper-input>
     </template>
 
     <template
         is="dom-if"
-        if="[[isPercentageRatio]]"
+        if="[[isRatio]]"
         restamp="true">
       <labelled-item label="[[label]]">
         <div class="app-grid">
@@ -76,9 +77,11 @@
               type="number"
               allowed-pattern="[[allowedPattern]]"
               required="[[_computeRequired(required, value, 'd')]]"
+              disabled="[[disabled]]"
               placeholder="Numerator"
               no-label-float>
           </paper-input>
+
           <paper-input
               class="item validate"
               value="[[value.d]]"
@@ -87,6 +90,7 @@
               type="number"
               allowed-pattern="[[allowedPattern]]"
               required="[[_computeRequired(required, value, 'v')]]"
+              disabled="[[disabled]]"
               placeholder="Denominator"
               no-label-float>
           </paper-input>
@@ -113,14 +117,19 @@
           value: false,
         },
 
+        disabled: {
+          type: Boolean,
+          value: false,
+        },
+
         value: {
           type: Object,
           notify: true,
         },
 
-        isPercentageRatio: {
+        isRatio: {
           type: Boolean,
-          computed: '_computeIsPercentageRatio(type)',
+          computed: '_computeIsRatio(type)',
           observer: '_resetDenominator',
         },
 
@@ -128,7 +137,7 @@
           type: Boolean,
           value: false,
           notify: true,
-          computed: '_computeInvalid(required, isPercentageRatio, value)',
+          computed: '_computeInvalid(required, isRatio, value)',
         },
       },
 
@@ -148,19 +157,19 @@
         this.set('value', Object.assign({}, this.get('value'), change));
       },
 
-      _computeIsPercentageRatio: function (type) {
-        return ['percentage', 'ratio'].indexOf(type) !== -1;
+      _computeIsRatio: function (type) {
+        return type === 'ratio';
       },
 
-      _computeInvalid: function (required, isPercentageRatio, value) {
+      _computeInvalid: function (required, isRatio, value) {
         if (required) {
-          if (isPercentageRatio) {
+          if (isRatio) {
             return !value.v || !value.d;
           } else {
             return !value.v;
           }
         } else {
-          if (isPercentageRatio) {
+          if (isRatio) {
             return !!value.v ? !value.d : !!value.d; // xor
           } else {
             return false;
@@ -168,8 +177,8 @@
         }
       },
 
-      _resetDenominator: function (isPercentageRatio) {
-        if (isPercentageRatio) {
+      _resetDenominator: function (isRatio) {
+        if (isRatio) {
           return;
         }
 

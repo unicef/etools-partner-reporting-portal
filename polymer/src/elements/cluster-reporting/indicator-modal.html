@@ -18,7 +18,9 @@
 <link rel="import" href="../labelled-item.html">
 <link rel="import" href="../etools-prp-chips.html">
 <link rel="import" href="../etools-prp-ajax.html">
+<link rel="import" href="../etools-prp-date-input.html">
 <link rel="import" href="../json-field.html">
+<link rel="import" href="../calculation-method.html">
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../behaviors/utils.html">
@@ -33,12 +35,13 @@
       :host {
         display: block;
 
-        --app-grid-columns: 2;
+        --app-grid-columns: 3;
         --app-grid-gutter: 24px;
         --app-grid-item-height: auto;
+        --app-grid-expandible-item-columns: 3;
 
         --paper-dialog: {
-          width: 600px;
+          width: 800px;
 
           & > * {
             margin: 0;
@@ -46,13 +49,25 @@
         };
       }
 
-      .row,
-      error-box {
+      .row {
         margin: 16px 0;
       }
 
+      .full-width {
+        @apply --app-grid-expandible-item;
+      }
+
       .app-grid {
-         margin: -var(--app-grid-gutter);
+         padding-top: 0;
+         margin: 0 -var(--app-grid-gutter);
+      }
+
+      .item {
+        margin-bottom: 0;
+      }
+
+      .calculation-method:not(:first-child) {
+        margin-left: 50px;
       }
 
       paper-radio-group {
@@ -106,7 +121,7 @@
                 class="validate"
                 label="Title"
                 on-input="_validate"
-                value="{{data.blueprint.title::change}}"
+                value="{{data.blueprint.title}}"
                 always-float-label
                 required>
             </paper-input>
@@ -124,70 +139,51 @@
           </div>
 
           <div class="row">
-            <div class="app-grid">
-              <div class="item">
-                <labelled-item label="Calculation method across locations">
-                  <paper-radio-group
-                      selected="{{data.blueprint.calculation_formula_across_locations}}">
-                    <paper-radio-button
-                        name="sum"
-                        disabled="[[isPercentageRatio]]">
-                      SUM
-                    </paper-radio-button>
-                    <paper-radio-button
-                        name="max"
-                        disabled="[[isPercentageRatio]]">
-                      MAX
-                    </paper-radio-button>
-                    <paper-radio-button
-                        name="avg"
-                        disabled="[[isPercentageRatio]]">
-                      AVG
-                    </paper-radio-button>
-                  </paper-radio-group>
-                </labelled-item>
-              </div>
-              <div class="item">
-                <labelled-item label="Calculation method across reporting periods">
-                  <paper-radio-group
-                      selected="{{data.blueprint.calculation_formula_across_periods}}">
-                    <paper-radio-button
-                        name="sum"
-                        disabled="[[isPercentageRatio]]">
-                      SUM
-                    </paper-radio-button>
-                    <paper-radio-button
-                        name="max"
-                        disabled="[[isPercentageRatio]]">
-                      MAX
-                    </paper-radio-button>
-                    <paper-radio-button
-                        name="avg"
-                        disabled="[[isPercentageRatio]]">
-                      AVG
-                    </paper-radio-button>
-                  </paper-radio-group>
-                </labelled-item>
-              </div>
+            <div class="layout horizontal">
+              <labelled-item
+                  class="calculation-method"
+                  label="Calculation method across locations">
+                <calculation-method
+                    value="{{data.blueprint.calculation_formula_across_locations}}"
+                    disabled="[[!isNumber]]">
+                </calculation-method>
+              </labelled-item>
+
+              <labelled-item
+                  class="calculation-method"
+                  label="Calculation method across reporting periods">
+                <calculation-method
+                    value="{{data.blueprint.calculation_formula_across_periods}}"
+                    disabled="[[!isNumber]]">
+                </calculation-method>
+              </labelled-item>
             </div>
           </div>
 
           <div class="row">
             <paper-input
                 class="validate"
-                label="Means of verification"
+                label="Comments (optional)"
                 on-input="_validate"
-                value="{{data.means_of_verification::change}}"
-                always-float-label
-                required>
+                value="{{data.comments}}"
+                always-float-label>
+            </paper-input>
+          </div>
+
+          <div class="row">
+            <paper-input
+                class="validate"
+                label="Measurement specifications (optional)"
+                on-input="_validate"
+                value="{{data.measurement_specifications}}"
+                always-float-label>
             </paper-input>
           </div>
 
           <div class="row">
             <div class="app-grid">
-              <div class="item">
-                <etools-single-selection-menu
-                  class="validate"
+              <etools-single-selection-menu
+                  class="item validate"
                   label="Frequency of reporting"
                   options="[[frequencies]]"
                   option-value="id"
@@ -197,24 +193,69 @@
                   trigger-value-change-event
                   hide-search
                   required>
-                </etools-single-selection-menu>
-              </div>
+              </etools-single-selection-menu>
 
               <template
                   is="dom-if"
-                  if="[[_showCSD(data.frequency)]]">
-                <div class="item">
-                  <etools-prp-chips
-                      value="{{data.cs_dates}}"
-                      class="validate"
-                      label="Date of report"
-                      on-selected-chips-updated="_validate"
-                      required>
-                    <chip-date-of-report></chip-date-of-report>
-                  </etools-prp-chips>
-                </div>
+                  if="[[_showCSD(data.frequency)]]"
+                  restamp="true">
+                <etools-prp-chips
+                    class="item validate"
+                    value="{{data.cs_dates}}"
+                    label="Date of report"
+                    on-selected-chips-updated="_validate"
+                    required>
+                  <chip-date-of-report></chip-date-of-report>
+                </etools-prp-chips>
               </template>
+
+              <etools-prp-date-input
+                  class="item validate"
+                  label="Start date of reporting period"
+                  value="{{data.start_date_of_reporting_period}}"
+                  error-message=""
+                  required
+                  no-init>
+              </etools-prp-date-input>
             </div>
+          </div>
+
+          <div class="row">
+            <template
+                is="dom-if"
+                if="[[isNumber]]"
+                restamp="true">
+              <paper-input
+                  class="validate"
+                  label="Label"
+                  on-input="_validate"
+                  value="{{data.label}}"
+                  always-float-label>
+              </paper-input>
+            </template>
+
+            <template
+                is="dom-if"
+                if="[[!isNumber]]"
+                restamp="true">
+              <div class="app-grid">
+                <paper-input
+                    class="item validate"
+                    label="Numerator Label"
+                    on-input="_validate"
+                    value="{{data.numerator_label}}"
+                    always-float-label>
+                </paper-input>
+
+                <paper-input
+                    class="item validate"
+                    label="Denominator Label"
+                    on-input="_validate"
+                    value="{{data.denominator_label}}"
+                    always-float-label>
+                </paper-input>
+              </div>
+            </template>
           </div>
 
           <div class="row">
@@ -228,6 +269,20 @@
                   allowed-pattern="[+\-\d]">
               </json-field>
 
+              <template
+                  is="dom-if"
+                  if="[[isNumber]]"
+                  restamp="true">
+                <json-field
+                    class="item validate"
+                    type="[[data.blueprint.display_type]]"
+                    label="In need (optional)"
+                    on-input="_validate"
+                    value="{{data.in_need}}"
+                    allowed-pattern="[+\-\d]">
+                </json-field>
+              </template>
+
               <json-field
                   class="item validate"
                   type="[[data.blueprint.display_type]]"
@@ -236,19 +291,6 @@
                   value="{{data.target}}"
                   allowed-pattern="[+\-\d]"
                   required>
-              </json-field>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="app-grid">
-              <json-field
-                  class="item validate"
-                  type="[[data.blueprint.display_type]]"
-                  label="In need"
-                  on-input="_validate"
-                  value="{{data.in_need}}"
-                  allowed-pattern="[+\-\d]">
               </json-field>
             </div>
           </div>
@@ -267,14 +309,12 @@
 
           <div class="row">
             <disaggregations-dropdown-widget
-              class="validate"
-              value="{{selectedDisaggregations}}"
-              disaggregations="[[disaggregations]]">
+                class="validate"
+                value="{{selectedDisaggregations}}"
+                disaggregations="[[disaggregations]]">
             </disaggregations-dropdown-widget>
           </div>
-
         </template>
-
       </paper-dialog-scrollable>
 
       <div class="buttons layout horizontal-reverse">
@@ -311,10 +351,9 @@
         objectType: String,
         modalTitle: String,
 
-        isPercentageRatio: {
+        isNumber: {
           type: Boolean,
-          computed: '_computeIsPercentageRatio(data.blueprint.display_type)',
-          observer: '_resetCalculationFormulas',
+          computed: '_computeIsNumber(data.blueprint.display_type)',
         },
 
         responsePlanId: {
@@ -396,14 +435,16 @@
       observers: [
         '_setDefaults(opened)',
         '_setLocations(selectedLocations.splices)',
+        '_resetCalculationFormulas(isNumber)',
+        '_resetFields(isNumber)',
       ],
 
-      _computeIsPercentageRatio: function (type) {
-        return ['percentage', 'ratio'].indexOf(type) !== -1;
+      _computeIsNumber: function (type) {
+        return type === 'number';
       },
 
-      _resetCalculationFormulas: function (isPercentageRatio) {
-        if (!isPercentageRatio) {
+      _resetCalculationFormulas: function (isNumber) {
+        if (isNumber) {
           return;
         }
 
@@ -411,6 +452,19 @@
 
         this.set('data.blueprint.calculation_formula_across_locations', formula);
         this.set('data.blueprint.calculation_formula_across_periods', formula);
+      },
+
+      _resetFields: function (isNumber) {
+        var data = this.get('data');
+        var newData;
+
+        if (isNumber) {
+          newData = this._omit(data, ['numerator_label', 'denominator_label']);
+        } else {
+          newData = this._omit(data, ['label', 'in_need']);
+        }
+
+        this.set('data', newData);
       },
 
       _setFrequency: function (e, data) {
