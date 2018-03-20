@@ -1,4 +1,5 @@
 import logging
+from collections import defaultdict
 
 from django.core.exceptions import MultipleObjectsReturned
 from rest_framework import serializers
@@ -65,6 +66,7 @@ class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, ser
     external_source = serializers.CharField(default=EXTERNAL_DATA_SOURCES.HPC)
     id = serializers.IntegerField(source='external_id')
     name = serializers.CharField(source='title')
+    objective = serializers.CharField(source='description')
     startDate = serializers.DateTimeField(source='start_date')
     endDate = serializers.DateTimeField(source='end_date')
     organizations = PartnerImportSerializer(many=True)
@@ -75,6 +77,7 @@ class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, ser
         model = PartnerProject
         fields = (
             'name',
+            'objective',
             'id',
             'startDate',
             'endDate',
@@ -199,14 +202,11 @@ class V1FundingSourceImportSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         sources = []
 
-        total_funding = validated_data['incoming'].get('fundingTotal', 0)
+        project_total_funding = defaultdict(int)
 
         for flow in validated_data['flows']:
             project = self.get_project_for_flow(flow)
-
-            if total_funding:
-                project.total_budget = total_funding
-                project.save()
+            project_total_funding[project.id] += flow['amountUSD']
 
             get_or_crete_kwargs = {
                 'external_id': flow['id'],
@@ -233,6 +233,9 @@ class V1FundingSourceImportSerializer(serializers.ModelSerializer):
 
             source, _ = FundingSource.objects.update_or_create(defaults=funding_source, **get_or_crete_kwargs)
             sources.append(source)
+
+        for project_id, total_usd_budget in project_total_funding.items():
+            PartnerProject.objects.filter(id=project_id).update(total_budget=total_usd_budget)
 
         return sources
 

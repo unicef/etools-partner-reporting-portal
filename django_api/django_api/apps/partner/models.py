@@ -186,7 +186,7 @@ class PartnerProject(TimeStampedExternalSourceModel):
     code = models.TextField(null=True, blank=True, unique=True)
 
     title = models.CharField(max_length=1024)
-    description = models.CharField(max_length=2048)
+    description = models.TextField(max_length=5120)
     additional_information = models.CharField(
         max_length=255, verbose_name="Additional information (e.g. links)"
     )
@@ -315,4 +315,5 @@ class PartnerActivity(TimeStampedModel):
 def check_pa_double_fks(sender, instance, **kwargs):
     if instance.cluster_activity and instance.cluster_objective:
         raise Exception(
-            "PartnerActivity cannot belong to both ClusterActivity and ClusterObjective")
+            "PartnerActivity cannot belong to both ClusterActivity and ClusterObjective"
+        )

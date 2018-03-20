@@ -9,10 +9,11 @@ from core.common import RESPONSE_PLAN_TYPE, EXTERNAL_DATA_SOURCES
 from core.models import Workspace, ResponsePlan
 from core.permissions import IsIMOForCurrentWorkspace
 from core.serializers import ResponsePlanSerializer
-from ocha.constants import HPC_V1_ROOT_URL, RefCode
+from ocha.constants import HPC_V1_ROOT_URL, RefCode, HPC_V2_ROOT_URL
 
-from ocha.imports.utilities import import_response_plan, get_json_from_url, get_project_list_for_plan
-from ocha.imports.bulk import get_response_plans_for_countries
+from ocha.imports.utilities import import_response_plan, get_json_from_url, get_project_list_for_plan, import_project
+from ocha.imports.bulk import get_response_plans_for_countries, fetch_json_urls_async
+from partner.serializers import PartnerProjectSerializer
 
 
 class RPMWorkspaceResponsePlanAPIView(APIView):
@@ -93,6 +94,7 @@ class RPMWorkspaceResponsePlanDetailAPIView(APIView):
         out_data = {
             k: v for k, v in plan_data.items() if type(v) not in {list, dict}
         }
+
         if 'governingEntities' in plan_data:
             cluster_names = [
                 ge['name'] for ge in plan_data['governingEntities'] if
@@ -142,3 +144,49 @@ class RPMProjectListAPIView(APIView):
         return Response(
             self.trim_projects_list(projects)
         )
+
+    def post(self, request, *args, **kwargs):
+        project_id = request.data.get('project')
+        if not project_id:
+            raise serializers.ValidationError({
+                'project': 'Project ID missing'
+            })
+        elif ResponsePlan.objects.filter(external_id=project_id, external_source=EXTERNAL_DATA_SOURCES.HPC).exists():
+            raise serializers.ValidationError('Project has already been imported')
+
+        partner_project = import_project(project_id, response_plan=self.get_response_plan())
+        partner_project.refresh_from_db()
+        return Response(PartnerProjectSerializer(partner_project).data, status=status.HTTP_201_CREATED)
+
+
+class RPMProjectDetailAPIView(APIView):
+
+    permission_classes = (
+        IsIMOForCurrentWorkspace,
+    )
+
+    def get(self, request, *args, **kwargs):
+        details_url = HPC_V2_ROOT_URL + 'project/{}'.format(self.kwargs['id'])
+        budget_url = HPC_V1_ROOT_URL + 'fts/flow?projectId={}'.format(self.kwargs['id'])
+
+        details, budget_info = fetch_json_urls_async([
+            details_url,
+            budget_url
+        ])
+
+        out_data = {
+            k: v for k, v in details['data'].items() if type(v) not in {list, dict}
+        }
+
+        out_data['totalBudgetUSD'] = sum([
+            f['amountUSD'] for f in budget_info['data']['flows']
+        ]) if budget_info['data']['flows'] else None
+
+        funding_sources = []
+        for flow in budget_info['data']['flows']:
+            funding_sources.extend([
+                fs['name'] for fs in flow.get('sourceObjects', []) if fs['type'] == 'Organization'
+            ])
+        out_data['fundingSources'] = funding_sources
+
+        return Response(out_data)
