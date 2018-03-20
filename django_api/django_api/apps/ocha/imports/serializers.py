@@ -2,10 +2,11 @@ import logging
 from collections import defaultdict
 
 from django.core.exceptions import MultipleObjectsReturned
+from django.utils import timezone
 from rest_framework import serializers
 
 from cluster.models import Cluster
-from core.common import EXTERNAL_DATA_SOURCES, CLUSTER_TYPES, RESPONSE_PLAN_TYPE
+from core.common import EXTERNAL_DATA_SOURCES, CLUSTER_TYPES, RESPONSE_PLAN_TYPE, PARTNER_PROJECT_STATUS
 from core.models import Country, ResponsePlan, Workspace, Location, GatewayType
 from partner.models import PartnerProject, Partner, FundingSource
 
@@ -87,6 +88,15 @@ class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, ser
             'locations',
         )
 
+    def get_status(self):
+        today = timezone.now()
+        if self.validated_data['start_date'] > today:
+            return PARTNER_PROJECT_STATUS.planned
+        elif self.validated_data['end_date'] < today:
+            return PARTNER_PROJECT_STATUS.completed
+        else:
+            return PARTNER_PROJECT_STATUS.ongoing
+
     def create(self, validated_data):
         partners = []
         for partner_data in validated_data.pop('organizations', []):
@@ -106,6 +116,7 @@ class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, ser
             })
 
         validated_data['partner'] = partners[0]
+        validated_data['status'] = self.get_status()
         locations = validated_data.pop('locations')
 
         partner_project = PartnerProject.objects.filter(code=validated_data['code']).first()

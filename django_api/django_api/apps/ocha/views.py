@@ -1,6 +1,7 @@
 from dateutil.parser import parse
 from django.conf import settings
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -188,5 +189,19 @@ class RPMProjectDetailAPIView(APIView):
                 fs['name'] for fs in flow.get('sourceObjects', []) if fs['type'] == 'Organization'
             ])
         out_data['fundingSources'] = funding_sources
+
+        start_datetime = parse(out_data['startDate'])
+        end_datetime = parse(out_data['endDate'])
+
+        out_data['startDate'] = start_datetime.strftime(settings.DATE_FORMAT)
+        out_data['endDate'] = end_datetime.strftime(settings.DATE_FORMAT)
+
+        today = timezone.now()
+        if start_datetime > today:
+            out_data['status'] = 'Planned'
+        elif end_datetime < today:
+            out_data['status'] = 'Completed'
+        else:
+            out_data['status'] = 'Ongoing'
 
         return Response(out_data)
