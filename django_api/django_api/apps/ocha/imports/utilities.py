@@ -221,6 +221,15 @@ def get_plan_list_for_country(country_iso3):
         return []
 
 
+def get_project_list_for_plan(plan_id):
+    source_url = HPC_V1_ROOT_URL + 'project/plan/{}'.format(plan_id)
+    try:
+        return get_json_from_url(source_url)['data']
+    except Exception:
+        logger.exception('Error trying to list projects for response plan')
+        return []
+
+
 def import_plans_for_country(country_iso3):
     plans = get_plan_list_for_country(country_iso3)
     logger.debug('Importing {} Response Plans for {}'.format(

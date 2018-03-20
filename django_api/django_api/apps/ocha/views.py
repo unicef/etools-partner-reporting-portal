@@ -11,7 +11,7 @@ from core.permissions import IsIMOForCurrentWorkspace
 from core.serializers import ResponsePlanSerializer
 from ocha.constants import HPC_V1_ROOT_URL, RefCode
 
-from ocha.imports.utilities import import_response_plan, get_json_from_url
+from ocha.imports.utilities import import_response_plan, get_json_from_url, get_project_list_for_plan
 from ocha.imports.bulk import get_response_plans_for_countries
 
 
@@ -110,3 +110,35 @@ class RPMWorkspaceResponsePlanDetailAPIView(APIView):
         out_data['endDate'] = parse(out_data['endDate']).strftime(settings.DATE_FORMAT)
 
         return Response(out_data)
+
+
+class RPMProjectListAPIView(APIView):
+
+    permission_classes = (
+        IsIMOForCurrentWorkspace,
+    )
+
+    def get_response_plan(self):
+        return get_object_or_404(
+            ResponsePlan, id=self.kwargs['plan_id']
+        )
+
+    def trim_projects_list(self, projects):
+        return [{
+            'id': p['id'],
+            'name': p['name'],
+        } for p in projects]
+
+    def get_projects(self):
+        response_plan = self.get_response_plan()
+        if not response_plan.external_id:
+            raise serializers.ValidationError('Cannot list projects for a RP without external ID')
+
+        return get_project_list_for_plan(response_plan.external_id)
+
+    def get(self, request, *args, **kwargs):
+        projects = self.get_projects()
+
+        return Response(
+            self.trim_projects_list(projects)
+        )
