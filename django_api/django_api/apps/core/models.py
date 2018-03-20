@@ -219,6 +219,15 @@ class ResponsePlan(TimeStampedExternalSourceModel):
     def all_clusters(self):
         return self.clusters.all()
 
+    @cached_property
+    def can_import_ocha_projects(self):
+        """
+        We need external id and source to search projects for this plan
+        """
+        return bool(
+            self.external_id and self.external_source == EXTERNAL_DATA_SOURCES.HPC
+        )
+
     def num_of_partners(self, clusters=None):
         from partner.models import Partner
 
