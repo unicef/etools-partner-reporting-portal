@@ -1,7 +1,3 @@
----
-description: 'IMO''s setup the response parameters: cluster objectives & activities'
----
-
 # Response Parameters setup
 
 In this section \("Response Parameters" in the left hand navigation\) of the interface all the response parameters of this response plan can be viewed. These are the cluster objectives, cluster activities, partner projects and partner activities along with the indicators that are associated with it.

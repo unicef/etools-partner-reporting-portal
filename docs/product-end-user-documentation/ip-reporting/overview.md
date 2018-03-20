@@ -1,7 +1,3 @@
----
-description: Summary background on IP Reporting
----
-
 # Overview
 
 The goal of IP Reporting in PRP is to enable partners and their users to be able to report on various PD's on a regular interval as agreed upon with UNICEF.

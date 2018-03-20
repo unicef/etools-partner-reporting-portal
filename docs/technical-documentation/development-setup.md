@@ -1,7 +1,3 @@
----
-description: Steps for a developer to setup their local development environment quickly
----
-
 # Development Setup
 
 ## Local Setup

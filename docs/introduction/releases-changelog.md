@@ -1,7 +1,3 @@
----
-description: Log of all releases and changes to the platform
----
-
 # Releases / Changelog\*
 
 ## 1.0.1 - 2018....
