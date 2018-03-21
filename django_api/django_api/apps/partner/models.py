@@ -12,7 +12,6 @@ from core.common import (
     SHARED_PARTNER_TYPE,
     CSO_TYPES,
     PARTNER_PROJECT_STATUS,
-    CURRENCIES,
 )
 from core.models import TimeStampedExternalSourceModel
 
