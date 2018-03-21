@@ -83,7 +83,7 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
     locations = ShortLocationSerializer(many=True, read_only=True, required=False)
     partner = serializers.CharField(required=False)
     partner_id = serializers.IntegerField(read_only=True)
-    part_response_plan = serializers.SerializerMethodField()
+    response_plan_title = serializers.SerializerMethodField()
     total_budget = serializers.CharField(required=False)
     description = serializers.CharField(required=False)
     additional_information = serializers.CharField(required=False)
@@ -110,7 +110,7 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
     def get_id(self, obj):
         return str(obj.id)
 
-    def get_part_response_plan(self, obj):
+    def get_response_plan_title(self, obj):
         first_cluster = obj.clusters.first()
         return first_cluster and first_cluster.response_plan.title or ''
 
