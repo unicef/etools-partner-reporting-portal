@@ -233,7 +233,7 @@ class PartnerProject(TimeStampedExternalSourceModel):
 class FundingSource(TimeStampedExternalSourceModel):
     partner_project = models.ForeignKey(PartnerProject, related_name="funding_sources")
     name = models.TextField(max_length=255)
-    organization_type = models.TextField(max_length=255)
+    organization_type = models.TextField(max_length=255, null=True, blank=True)
     usage_year = models.PositiveIntegerField(null=True, blank=True)
     usd_amount = models.DecimalField(decimal_places=2, max_digits=12, verbose_name='USD Amount')
     original_amount = models.DecimalField(decimal_places=2, max_digits=12, null=True, blank=True)
