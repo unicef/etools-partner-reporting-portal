@@ -1,7 +1,3 @@
----
-description: 'Exporting of various data in IP reporting, in PDF or XLS formats.'
----
-
 # Various data exports
 
 ### Exports Summary

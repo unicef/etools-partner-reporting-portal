@@ -1,7 +1,3 @@
----
-description: Details on how progress on a indicator is calculated in PRP
----
-
 # Calculating progress
 
 For a particular reporting period a partner will report progress on an indicator for one or more locations. To capture the progress made on that indicator across all locations, we need a way to calculate it. This is referred to as **"calculation method across locations"**.

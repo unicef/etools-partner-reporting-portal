@@ -1,7 +1,3 @@
----
-description: Managing and selecting response plans
----
-
 # Response Plans
 
 ### Selecting a Response Plan

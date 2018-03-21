@@ -1,7 +1,3 @@
----
-description: Analyze operational presence and progress on indicators
----
-
 # Analysis of results
 
 In this section \("Analysis" in the left hand navigation\) of the interface users can conduct analysis for a particular response plan and get a sense of progress/work being done. High level they can see the operational presence \(which partners, in which clusters, in which locations etc.\) and progress that indicators are making.

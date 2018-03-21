@@ -1,7 +1,3 @@
----
-description: Reporting detailed progress on an indicator
----
-
 # Disaggregations
 
 In some cases data reported by the partner for an indicators progress needs to be broken down further and not just be a total number.

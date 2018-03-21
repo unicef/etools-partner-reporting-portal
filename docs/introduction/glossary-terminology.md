@@ -1,9 +1,3 @@
----
-description: >-
-  Commonly used terminologies and acronyms used in this documentation and the
-  user interface of PRP
----
-
 # Glossary / Terminology
 
 * Activity \(also referred to as "project activity" or "partner activity"\) - Something a partner or cluster might be working on. As an example "Reunification of unaccompanied children". Another example: "“Water trucking in camps A and B” / “Distribution of school kits in province XYZ” etc.
