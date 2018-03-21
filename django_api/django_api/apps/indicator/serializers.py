@@ -227,7 +227,7 @@ class ReportableLocationGoalSerializer(serializers.ModelSerializer):
             'in_need',
             'target',
             'location',
-            'admin_level',
+            'loc_type',
         )
 
 
