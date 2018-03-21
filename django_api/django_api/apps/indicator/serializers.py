@@ -214,6 +214,10 @@ class ReportableLocationGoalSerializer(serializers.ModelSerializer):
     baseline = serializers.JSONField()
     in_need = serializers.JSONField()
     target = serializers.JSONField()
+    admin_level = serializers.SerializerMethodField()
+
+    def get_admin_level(self, obj):
+        return obj.location.gateway.admin_level
 
     class Meta:
         model = ReportableLocationGoal
@@ -223,6 +227,7 @@ class ReportableLocationGoalSerializer(serializers.ModelSerializer):
             'in_need',
             'target',
             'location',
+            'admin_level',
         )
 
 
