@@ -82,7 +82,7 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
     clusters = ClusterSimpleSerializer(many=True, read_only=True)
     locations = ShortLocationSerializer(many=True, read_only=True, required=False)
     partner = serializers.CharField(required=False)
-    partner_id = serializers.IntegerField(read_only=True)
+    partner_id = serializers.IntegerField()
     response_plan_title = serializers.SerializerMethodField()
     total_budget = serializers.CharField(required=False)
     description = serializers.CharField(required=False)
@@ -113,6 +113,27 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
     def get_response_plan_title(self, obj):
         first_cluster = obj.clusters.first()
         return first_cluster and first_cluster.response_plan.title or ''
+
+    def validate(self, attrs):
+        validated_data = super(PartnerProjectSerializer, self).validate(attrs)
+        if validated_data['end_date'] < validated_data['start_date']:
+            raise serializers.ValidationError({
+                'end_date': 'Cannot be earlier than Start Date'
+            })
+
+        return validated_data
+
+    def create(self, validated_data):
+        clusters_serializer = ClusterSimpleSerializer(
+            many=True, allow_empty=False, data=self.initial_data.get('clusters')
+        )
+        if not clusters_serializer.is_valid():
+            raise serializers.ValidationError({
+                'clusters': 'This list cannot be empty'
+            })
+
+        project = super(PartnerProjectSerializer, self).create(validated_data)
+        return project
 
 
 class PartnerProjectPatchSerializer(serializers.ModelSerializer):

@@ -126,24 +126,31 @@ class PartnerProjectAPIView(APIView):
     PartnerProject CRUD endpoint
     """
     # TODO: Implement Object-level permission for IMO
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (
+        IsAuthenticated,
+    )
 
-    def get_instance(self, request, pk=None):
+    def get_instance(self):
         try:
-            instance = PartnerProject.objects.get(
-                id=(pk or request.data['id']))
+            instance = PartnerProject.objects.get(id=(self.kwargs.get('ok') or self.request.data['id']))
         except PartnerProject.DoesNotExist:
             # TODO: log exception
             raise Http404
         return instance
 
-    def get(self, request, pk, *args, **kwargs):
-        instance = self.get_instance(request, pk)
+    def get(self, *args, **kwargs):
+        instance = self.get_instance()
         serializer = PartnerProjectSerializer(instance=instance)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def patch(self, request, pk, *args, **kwargs):
-        instance = self.get_instance(self.request, pk)
+    def post(self, request, *args, **kwargs):
+        serializer = PartnerProjectSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def patch(self, request, *args, **kwargs):
+        instance = self.get_instance()
         serializer = PartnerProjectPatchSerializer(
             instance=instance,
             data=self.request.data
@@ -175,7 +182,7 @@ class PartnerProjectAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def delete(self, request, pk, *args, **kwargs):
-        instance = self.get_instance(request, pk)
+        instance = self.get_instance()
         instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
