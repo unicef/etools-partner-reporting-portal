@@ -8,7 +8,7 @@ from rest_framework import serializers
 from cluster.models import Cluster
 from core.common import EXTERNAL_DATA_SOURCES, CLUSTER_TYPES, RESPONSE_PLAN_TYPE, PARTNER_PROJECT_STATUS
 from core.models import Country, ResponsePlan, Workspace, Location, GatewayType
-from partner.models import PartnerProject, Partner, FundingSource
+from partner.models import PartnerProject, Partner
 
 
 logger = logging.getLogger('ocha-sync')
@@ -170,13 +170,12 @@ class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, ser
         return partner_project
 
 
-class V1FundingSourceImportSerializer(serializers.ModelSerializer):
+class V1FundingSourceImportSerializer(serializers.Serializer):
     # Most of the information we want is nested, would be overkill to write serializer for all structures
     incoming = serializers.DictField()
     flows = serializers.ListField(allow_empty=False)
 
     class Meta:
-        model = FundingSource
         fields = (
             'incoming',
             'flows',
@@ -192,14 +191,12 @@ class V1FundingSourceImportSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Project info not found')
         return PartnerProject.objects.get(code=project_info[0]['code'])
 
-    def get_organization_info_for_flow(self, flow):
+    def get_organization_names_for_flow(self, flow):
         organization_info = list(filter(
             lambda src: src['type'] == 'Organization',
             flow['sourceObjects']
         ))
-        if not organization_info:
-            raise serializers.ValidationError('Source organization info missing')
-        return organization_info[0]
+        return [o['name'] for o in organization_info]
 
     def get_usage_year_for_flow(self, flow):
         usage_year_info = list(filter(
@@ -211,44 +208,21 @@ class V1FundingSourceImportSerializer(serializers.ModelSerializer):
         return int(usage_year_info[0]['name'])
 
     def create(self, validated_data):
-        sources = []
-
         project_total_funding = defaultdict(int)
+        project_funding_sources = defaultdict(list)
 
         for flow in validated_data['flows']:
             project = self.get_project_for_flow(flow)
             project_total_funding[project.id] += flow['amountUSD']
-
-            get_or_crete_kwargs = {
-                'external_id': flow['id'],
-                'external_source': EXTERNAL_DATA_SOURCES.HPC,
-                'partner_project_id': project.id,
-            }
-
-            organization_info = self.get_organization_info_for_flow(flow)
-
-            organization_type = organization_info['organizationTypes'] and organization_info['organizationTypes'][0]
-
-            funding_source = {
-                'usd_amount': flow['amountUSD'],
-                'name': organization_info['name'],
-                'organization_type': organization_type,
-                'usage_year': self.get_usage_year_for_flow(flow),
-            }
-            if 'originalAmount' in flow:
-                funding_source.update({
-                    'original_amount': flow['originalAmount'],
-                    'original_currency': flow['originalCurrency'],
-                    'exchange_rate': flow['exchangeRate'],
-                })
-
-            source, _ = FundingSource.objects.update_or_create(defaults=funding_source, **get_or_crete_kwargs)
-            sources.append(source)
+            project_funding_sources[project.id].extend(self.get_organization_names_for_flow(flow))
 
         for project_id, total_usd_budget in project_total_funding.items():
-            PartnerProject.objects.filter(id=project_id).update(total_budget=total_usd_budget)
+            PartnerProject.objects.filter(id=project_id).update(
+                total_budget=total_usd_budget,
+                funding_source='; '.join(project_funding_sources[project_id]),
+            )
 
-        return sources
+        return PartnerProject.objects.filter(id__in=project_total_funding.keys())
 
 
 class V1ResponsePlanLocationImportSerializer(DiscardUniqueTogetherValidationMixin, serializers.ModelSerializer):

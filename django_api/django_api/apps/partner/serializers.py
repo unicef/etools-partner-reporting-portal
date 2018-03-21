@@ -85,7 +85,6 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
     partner_id = serializers.IntegerField(read_only=True)
     part_response_plan = serializers.SerializerMethodField()
     total_budget = serializers.CharField(required=False)
-    funding_source = serializers.SerializerMethodField(required=False)
     description = serializers.CharField(required=False)
     additional_information = serializers.CharField(required=False)
 
@@ -114,10 +113,6 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
     def get_part_response_plan(self, obj):
         first_cluster = obj.clusters.first()
         return first_cluster and first_cluster.response_plan.title or ''
-
-    def get_funding_source(self, project):
-        source_names = project.funding_sources.values_list('name', flat=True)
-        return '; '.join(source_names) if source_names else None
 
 
 class PartnerProjectPatchSerializer(serializers.ModelSerializer):

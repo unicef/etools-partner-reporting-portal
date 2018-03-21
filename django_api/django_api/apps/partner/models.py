@@ -196,8 +196,9 @@ class PartnerProject(TimeStampedExternalSourceModel):
         max_length=3, choices=PARTNER_PROJECT_STATUS, default=PARTNER_PROJECT_STATUS.ongoing
     )
     total_budget = models.DecimalField(
-        null=True, decimal_places=2, help_text='Total Budget', max_digits=12
+        null=True, decimal_places=2, help_text='Total Budget (USD)', max_digits=12
     )
+    funding_source = models.TextField(max_length=2048, null=True, blank=True)
 
     clusters = models.ManyToManyField(
         'cluster.Cluster', related_name="partner_projects"
@@ -228,31 +229,6 @@ class PartnerProject(TimeStampedExternalSourceModel):
     @property
     def response_plan(self):
         return self.clusters.all()[0].response_plan
-
-
-class FundingSource(TimeStampedExternalSourceModel):
-    partner_project = models.ForeignKey(PartnerProject, related_name="funding_sources")
-    name = models.TextField(max_length=255)
-    organization_type = models.TextField(max_length=255, null=True, blank=True)
-    usage_year = models.PositiveIntegerField(null=True, blank=True)
-    usd_amount = models.DecimalField(decimal_places=2, max_digits=12, verbose_name='USD Amount')
-    original_amount = models.DecimalField(decimal_places=2, max_digits=12, null=True, blank=True)
-    original_currency = models.CharField(
-        choices=CURRENCIES,
-        default=CURRENCIES.usd,
-        max_length=16,
-    )
-    exchange_rate = models.DecimalField(decimal_places=3, max_digits=8, default=1)
-
-    def __str__(self):
-        return '{} {} ({} USD) for {} from {} ({})'.format(
-            self.original_amount,
-            self.original_currency,
-            self.usd_amount,
-            self.partner_project,
-            self.name,
-            self.organization_type,
-        )
 
 
 class PartnerActivity(TimeStampedModel):
