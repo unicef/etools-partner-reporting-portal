@@ -105,7 +105,7 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
             'locations',
             'partner',
             'partner_id',
-            'part_response_plan',
+            'response_plan_title',
         )
 
     def get_id(self, obj):
