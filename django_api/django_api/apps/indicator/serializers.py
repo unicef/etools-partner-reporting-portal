@@ -1,5 +1,5 @@
 from ast import literal_eval as make_tuple
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
@@ -163,6 +163,7 @@ class ReportableSimpleSerializer(serializers.ModelSerializer):
 
 
 class ReportableLocationGoalBaselineInNeedListSerializer(serializers.ListSerializer):
+    @transaction.atomic
     def update(self, instance, validated_data):
         loc_goal_mapping = {loc_goal.id: loc_goal for loc_goal in instance}
         data_mapping = {item['id']: item for item in validated_data}
@@ -772,7 +773,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             )
 
     def check_location_admin_levels(self, location_goal_queryset):
-        if location_goal_queryset.values_list(
+        if location_goal_queryset.exists() and location_goal_queryset.values_list(
             'gateway__admin_level', flat=True) \
                 .distinct().count() != 1:
             raise ValidationError(
@@ -850,48 +851,61 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
         return self.instance
 
+    @transaction.atomic
     def update(self, reportable, validated_data):
-        is_partner = self.context['request'].user.partner
+        # Remove disaggregations to update
+        validated_data.pop('disaggregations', [])
 
-        locations = validated_data.pop('locations', [])
+        # Swapping validated_data['locations'] with raw request.data['locations']
+        # Due to missing id field as it is write_only field
+        validated_data.pop('locations', [])
+        locations = list(map(
+            lambda item: OrderedDict(item),
+            self.context['request'].data['locations']
+        ))
+
+        try:
+            for loc_goal in locations:
+                loc_goal.pop('loc_type', None)
+                loc_goal['location'] = Location.objects.get(id=loc_goal['location'])
+
+        except Location.DoesNotExist:
+            raise ValidationError("Location ID %d does not exist" % loc_goal['location'])
+
         location_queryset = Location.objects.filter(
             id__in=[l['location'].id for l in locations]
         )
+
         self.check_location_admin_levels(location_queryset)
 
-        if is_partner:
-            # Remove disaggregations to update
-            validated_data.pop('disaggregations', [])
+        existing_loc_goals = reportable.reportablelocationgoal_set.all()
+        loc_goal_mapping = {
+            loc_goal.id: loc_goal for loc_goal in existing_loc_goals}
+        data_mapping = {loc_goal['id']: loc_goal for loc_goal in locations}
 
-            existing_loc_goals = reportable.reportablelocationgoal_set.all()
-            loc_goal_mapping = {
-                loc_goal.id: loc_goal for loc_goal in existing_loc_goals}
-            data_mapping = {loc_goal.id: loc_goal for loc_goal in locations}
+        # Handling creation and updates
+        for data_id, data in data_mapping.items():
+            loc_goal = loc_goal_mapping.get(data_id, None)
+            data['reportable'] = reportable
 
-            for loc in locations:
-                # Handling creation and updates
-                for data_id, data in data_mapping.items():
-                    loc_goal = loc_goal_mapping.get(data_id, None)
-                    data['reportable'] = reportable
+            if not loc_goal:
+                ReportableLocationGoal.objects.create(**data)
 
-                    if not loc_goal:
-                        ReportableLocationGoal.objects.create(**data)
+            else:
+                if loc_goal.location.id != data['location'].id:
+                    raise ValidationError(
+                        "Location %s cannot be changed for updating location goal" % loc_goal.location,
+                    )
 
-                    else:
-                        for key, val in data.items():
-                            setattr(loc_goal, key, val)
+                for key, val in data.items():
+                    setattr(loc_goal, key, val)
 
-                        loc_goal.save()
+                loc_goal.save()
 
-                # Handling deletion from update
-                for loc_goal_id, loc_goal in loc_goal_mapping.items():
-                    if loc_goal_id not in data_mapping:
-                        loc_goal.delete()
-
-        reportable.locations.clear()
-        for loc_data in locations:
-            loc_data['reportable'] = self.instance
-            ReportableLocationGoal.objects.create(**loc_data)
+        # Handling deletion from update
+        for loc_goal_id, loc_goal in loc_goal_mapping.items():
+            if loc_goal_id not in data_mapping:
+                loc_goal.delete()
 
         blueprint_data = validated_data.pop('blueprint', {})
         reportable.blueprint.title = blueprint_data.get(
