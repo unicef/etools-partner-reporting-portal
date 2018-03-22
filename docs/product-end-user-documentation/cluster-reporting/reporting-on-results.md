@@ -1,7 +1,3 @@
----
-description: Users report results/performance on indicators for specific reporting periods.
----
-
 # Reporting on results
 
 In this section \("Reporting Results" in the left hand navigation\) of the interface partners can come and report in the indicator reports that are due. IMO's can do the same for any partner and submit data on their behalf. Interface is split into:

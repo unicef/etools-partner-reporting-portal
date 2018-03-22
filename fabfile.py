@@ -124,3 +124,8 @@ def backend_lint():
     Run python code linter
     """
     local('docker-compose exec django_api flake8 ./ --count')
+
+
+def preview_uwsgi_log():
+    cmd = 'docker-compose exec django_api tail -f /var/log/uwsgi_global.log'
+    local(cmd)

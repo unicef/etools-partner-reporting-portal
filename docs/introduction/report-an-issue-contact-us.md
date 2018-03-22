@@ -1,7 +1,3 @@
----
-description: Get in touch for any questions or bug reports or feature requests
----
-
 # Report an Issue / Contact us
 
 ### Reporting Issues

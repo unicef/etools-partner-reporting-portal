@@ -26,10 +26,6 @@ Platform allows to search all active Response Plans stored in RPM API in selecte
 * Start Date
 * End Date
 
-{% hint style="info" %}
-API returning response plans for workspace is done \(not yet live on staging\). It doesn't do any filtering, but it should be enough to do it on the frontend.
-{% endhint %}
-
 Saving Response Plan triggers background synchronization of:
 
 * Cluster activities

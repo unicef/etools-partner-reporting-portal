@@ -1,7 +1,3 @@
----
-description: This page documents the information needed to start integration work
----
-
 # OCHA Integration - API and Model Documentation
 
 

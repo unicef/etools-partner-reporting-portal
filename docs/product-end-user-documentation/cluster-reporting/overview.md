@@ -1,7 +1,3 @@
----
-description: Summary background on Cluster Reporting
----
-
 # Overview
 
 The goal of Cluster Reporting in PRP is to enable IMO’s and Partners to report on various indicators and have access to the necessary data they need to accomplish their tasks. When data is submitted,  it is shared with PMP.
