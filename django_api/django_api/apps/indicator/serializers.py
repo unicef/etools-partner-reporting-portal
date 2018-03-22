@@ -1,5 +1,5 @@
 from ast import literal_eval as make_tuple
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
@@ -163,6 +163,7 @@ class ReportableSimpleSerializer(serializers.ModelSerializer):
 
 
 class ReportableLocationGoalBaselineInNeedListSerializer(serializers.ListSerializer):
+    @transaction.atomic
     def update(self, instance, validated_data):
         loc_goal_mapping = {loc_goal.id: loc_goal for loc_goal in instance}
         data_mapping = {item['id']: item for item in validated_data}
@@ -214,6 +215,10 @@ class ReportableLocationGoalSerializer(serializers.ModelSerializer):
     baseline = serializers.JSONField()
     in_need = serializers.JSONField()
     target = serializers.JSONField()
+    loc_type = serializers.SerializerMethodField()
+
+    def get_loc_type(self, obj):
+        return obj.location.gateway.admin_level
 
     class Meta:
         model = ReportableLocationGoal
@@ -223,6 +228,7 @@ class ReportableLocationGoalSerializer(serializers.ModelSerializer):
             'in_need',
             'target',
             'location',
+            'loc_type',
         )
 
 
@@ -439,7 +445,8 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
                 "disaggregation_reported_on list must have level_reported # of elements"
             )
 
-        disaggregation_id_list = data['indicator_report'].disaggregations.values_list('id', flat=True)
+        disaggregation_id_list = data['indicator_report'].disaggregations.values_list(
+            'id', flat=True)
 
         # num_disaggregation validation with actual Disaggregation count
         # from Reportable
@@ -452,7 +459,8 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
         if self.instance.id not in data['indicator_report'] \
                 .indicator_location_data.values_list('id', flat=True):
             raise serializers.ValidationError(
-                "IndicatorLocationData does not belong to this {}".format(data['indicator_report'])
+                "IndicatorLocationData does not belong to this {}".format(
+                    data['indicator_report'])
             )
 
         # disaggregation_reported_on element-wise assertion
@@ -555,12 +563,14 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
 
 
 class IndicatorReportListSerializer(serializers.ModelSerializer):
-    indicator_location_data = SimpleIndicatorLocationDataListSerializer(many=True, read_only=True)
+    indicator_location_data = SimpleIndicatorLocationDataListSerializer(
+        many=True, read_only=True)
     disagg_lookup_map = serializers.SerializerMethodField()
     disagg_choice_lookup_map = serializers.SerializerMethodField()
     total = serializers.JSONField()
     display_type = serializers.SerializerMethodField()
-    overall_status_display = serializers.CharField(source='get_overall_status_display')
+    overall_status_display = serializers.CharField(
+        source='get_overall_status_display')
 
     class Meta:
         model = IndicatorReport
@@ -587,7 +597,8 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
         return obj.display_type
 
     def get_disagg_lookup_map(self, obj):
-        serializer = DisaggregationListSerializer(obj.disaggregations, many=True)
+        serializer = DisaggregationListSerializer(
+            obj.disaggregations, many=True)
 
         disagg_lookup_list = serializer.data
         disagg_lookup_list.sort(key=lambda item: len(item['choices']))
@@ -716,7 +727,8 @@ class IndicatorBlueprintSerializer(serializers.ModelSerializer):
 class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
     disaggregations = IdDisaggregationSerializer(many=True, read_only=True)
-    object_type = serializers.CharField(validators=[add_indicator_object_type_validator], write_only=True)
+    object_type = serializers.CharField(
+        validators=[add_indicator_object_type_validator], write_only=True)
     blueprint = IndicatorBlueprintSerializer()
     locations = ReportableLocationGoalSerializer(many=True, write_only=True)
     target = serializers.JSONField()
@@ -761,10 +773,11 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             )
 
     def check_location_admin_levels(self, location_goal_queryset):
-        if location_goal_queryset.values_list(
+        if location_goal_queryset.exists() and location_goal_queryset.values_list(
             'gateway__admin_level', flat=True) \
                 .distinct().count() != 1:
-            raise ValidationError({"locations": "Selected locations should share same admin level"})
+            raise ValidationError(
+                {"locations": "Selected locations should share same admin level"})
 
     @transaction.atomic
     def create(self, validated_data):
@@ -779,13 +792,16 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
         if validated_data['blueprint']['unit'] == IndicatorBlueprint.PERCENTAGE:
             if validated_data['blueprint']['calculation_formula_across_periods'] != IndicatorBlueprint.SUM:
-                raise ValidationError("calculation_formula_across_periods must be sum for Ratio Indicator type")
+                raise ValidationError(
+                    "calculation_formula_across_periods must be sum for Ratio Indicator type")
 
             if validated_data['blueprint']['calculation_formula_across_locations'] != IndicatorBlueprint.SUM:
-                raise ValidationError("calculation_formula_across_locations must be sum for Ratio Indicator type")
+                raise ValidationError(
+                    "calculation_formula_across_locations must be sum for Ratio Indicator type")
 
         validated_data['blueprint']['disaggregatable'] = True
-        blueprint = IndicatorBlueprintSerializer(data=validated_data['blueprint'])
+        blueprint = IndicatorBlueprintSerializer(
+            data=validated_data['blueprint'])
         blueprint.is_valid(raise_exception=True)
 
         validated_data['blueprint'] = blueprint.save()
@@ -826,7 +842,8 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             ReportableLocationGoal.objects.create(**loc_data)
 
         disaggregations = self.initial_data.get('disaggregations')
-        self.instance.disaggregations.add(*Disaggregation.objects.filter(id__in=[d['id'] for d in disaggregations]))
+        self.instance.disaggregations.add(
+            *Disaggregation.objects.filter(id__in=[d['id'] for d in disaggregations]))
 
         # Only trigger to create PartnerActivity Reportable if ClusterActivity Reportable is created
         if reportable_object_content_model == ClusterActivity:
@@ -834,21 +851,66 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
         return self.instance
 
+    @transaction.atomic
     def update(self, reportable, validated_data):
-        locations = validated_data.pop('locations', [])
+        # Remove disaggregations to update
+        validated_data.pop('disaggregations', [])
+
+        # Swapping validated_data['locations'] with raw request.data['locations']
+        # Due to missing id field as it is write_only field
+        validated_data.pop('locations', [])
+        locations = list(map(
+            lambda item: OrderedDict(item),
+            self.context['request'].data['locations']
+        ))
+
+        try:
+            for loc_goal in locations:
+                loc_goal.pop('loc_type', None)
+                loc_goal['location'] = Location.objects.get(id=loc_goal['location'])
+
+        except Location.DoesNotExist:
+            raise ValidationError("Location ID %d does not exist" % loc_goal['location'])
+
         location_queryset = Location.objects.filter(
             id__in=[l['location'].id for l in locations]
         )
+
         self.check_location_admin_levels(location_queryset)
 
-        blueprint_data = validated_data.pop('blueprint', {})
-        reportable.blueprint.title = blueprint_data.get('title', reportable.blueprint.title)
-        reportable.blueprint.save()
+        existing_loc_goals = reportable.reportablelocationgoal_set.all()
+        loc_goal_mapping = {
+            loc_goal.id: loc_goal for loc_goal in existing_loc_goals}
+        data_mapping = {loc_goal['id']: loc_goal for loc_goal in locations}
 
-        reportable.locations.clear()
-        for loc_data in locations:
-            loc_data['reportable'] = self.instance
-            ReportableLocationGoal.objects.create(**loc_data)
+        # Handling creation and updates
+        for data_id, data in data_mapping.items():
+            loc_goal = loc_goal_mapping.get(data_id, None)
+            data['reportable'] = reportable
+
+            if not loc_goal:
+                ReportableLocationGoal.objects.create(**data)
+
+            else:
+                if loc_goal.location.id != data['location'].id:
+                    raise ValidationError(
+                        "Location %s cannot be changed for updating location goal" % loc_goal.location,
+                    )
+
+                for key, val in data.items():
+                    setattr(loc_goal, key, val)
+
+                loc_goal.save()
+
+        # Handling deletion from update
+        for loc_goal_id, loc_goal in loc_goal_mapping.items():
+            if loc_goal_id not in data_mapping:
+                loc_goal.delete()
+
+        blueprint_data = validated_data.pop('blueprint', {})
+        reportable.blueprint.title = blueprint_data.get(
+            'title', reportable.blueprint.title)
+        reportable.blueprint.save()
 
         return super(ClusterIndicatorSerializer, self).update(reportable, validated_data)
 
@@ -1106,7 +1168,8 @@ class PMPDisaggregationSerializer(serializers.ModelSerializer):
 
 class PMPDisaggregationValueSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='external_id')
-    disaggregation = serializers.PrimaryKeyRelatedField(queryset=Disaggregation.objects.all())
+    disaggregation = serializers.PrimaryKeyRelatedField(
+        queryset=Disaggregation.objects.all())
 
     class Meta:
         model = DisaggregationValue
@@ -1316,9 +1379,9 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
         num_of_partners = 0
 
         if obj.children.exists() and isinstance(obj.content_object, (ClusterActivity, )):
-                num_of_partners = obj.content_object.partner_activities.values_list(
-                    'partner', flat=True
-                ).distinct().count()
+            num_of_partners = obj.content_object.partner_activities.values_list(
+                'partner', flat=True
+            ).distinct().count()
 
         elif isinstance(obj.content_object, PartnerProject) or isinstance(obj.content_object, PartnerActivity):
             num_of_partners = 1
@@ -1330,7 +1393,8 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
 
     def _increment_partner_by_status(self, reportable, num_of_partners):
         try:
-            latest_ir = reportable.indicator_reports.latest('time_period_start')
+            latest_ir = reportable.indicator_reports.latest(
+                'time_period_start')
 
             overall_status = latest_ir.overall_status
 
@@ -1354,7 +1418,8 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
             pass
 
     def _get_progress_by_partner(self, reportable, partner_progresses):
-        partner_progresses[reportable.content_object.partner.title] = int(reportable.total['c'])
+        partner_progresses[reportable.content_object.partner.title] = int(
+            reportable.total['c'])
 
     def get_partners_by_status(self, obj):
         num_of_partners = {
@@ -1400,7 +1465,8 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
 
             try:
                 latest_indicator_reports = map(
-                    lambda x: x.indicator_reports.latest('time_period_start'), obj.children.all()
+                    lambda x: x.indicator_reports.latest(
+                        'time_period_start'), obj.children.all()
                 )
 
                 for ir in latest_indicator_reports:
