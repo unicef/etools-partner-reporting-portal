@@ -781,6 +781,8 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
+        partner = self.context['request'].user.partner
+
         self.check_disaggregation(self.initial_data.get('disaggregations'))
         self.check_progress_values(validated_data)
 
@@ -838,6 +840,11 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         self.check_location_admin_levels(location_queryset)
 
         for loc_data in locations:
+            if partner:
+                # Filter out location goal level baseline, in_need
+                loc_data.pop('baseline')
+                loc_data.pop('in_need')
+
             loc_data['reportable'] = self.instance
             ReportableLocationGoal.objects.create(**loc_data)
 

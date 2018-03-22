@@ -105,7 +105,9 @@ class IndicatorBlueprint(TimeStampedExternalSourceModel):
         (SUM, SUM),
     )
 
-    CALC_CHOICES = QUANTITY_CALC_CHOICES + RATIO_CALC_CHOICES
+    CALC_CHOICES = tuple(
+        set(QUANTITY_CALC_CHOICES + RATIO_CALC_CHOICES)
+    )
 
     QUANTITY_DISPLAY_TYPE_CHOICES = (
         (NUMBER, NUMBER),
