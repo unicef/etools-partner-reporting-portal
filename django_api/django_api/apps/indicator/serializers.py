@@ -853,8 +853,18 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def update(self, reportable, validated_data):
+        partner = self.context['request'].user.partner
+
         # Remove disaggregations to update
         validated_data.pop('disaggregations', [])
+
+        if partner:
+            # Filter out IndicatorBlueprint instance
+            # and Indicator level baseline, in_need, and target
+            validated_data.pop('blueprint')
+            validated_data.pop('baseline')
+            validated_data.pop('in_need')
+            validated_data.pop('target')
 
         # Swapping validated_data['locations'] with raw request.data['locations']
         # Due to missing id field as it is write_only field
@@ -887,6 +897,11 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         for data_id, data in data_mapping.items():
             loc_goal = loc_goal_mapping.get(data_id, None)
             data['reportable'] = reportable
+
+            if partner:
+                # Filter out location level baseline and in_need
+                data.pop('baseline')
+                data.pop('in_need')
 
             if not loc_goal:
                 ReportableLocationGoal.objects.create(**data)
