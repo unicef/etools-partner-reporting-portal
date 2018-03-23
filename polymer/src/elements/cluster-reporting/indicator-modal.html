@@ -10,10 +10,10 @@
 <link rel="import" href="../../../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../../../bower_components/paper-radio-button/paper-radio-button.html">
 <link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
-<link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-multi-selection-menu.html">
 
 <link rel="import" href="../../polyfills/es6-shim.html">
 <link rel="import" href="disaggregations-dropdown-widget.html">
+<link rel="import" href="indicator-locations-widget.html">
 <link rel="import" href="chip-date-of-report.html">
 <link rel="import" href="../labelled-item.html">
 <link rel="import" href="../etools-prp-chips.html">
@@ -58,8 +58,8 @@
       }
 
       .app-grid {
-         padding-top: 0;
-         margin: 0 -var(--app-grid-gutter);
+        padding-top: 0;
+        margin: 0 -var(--app-grid-gutter);
       }
 
       .item {
@@ -73,12 +73,11 @@
       paper-radio-group {
         margin-left: -12px;
       }
-    </style>
 
-    <etools-prp-ajax
-        id="locations"
-        url="[[locationsUrl]]">
-    </etools-prp-ajax>
+      indicator-locations-widget {
+        margin: 2em 0;
+      }
+    </style>
 
     <etools-prp-ajax
         id="disaggregations"
@@ -230,7 +229,8 @@
                   label="Label"
                   on-input="_validate"
                   value="{{data.label}}"
-                  always-float-label>
+                  always-float-label
+                  required>
               </paper-input>
             </template>
 
@@ -244,7 +244,8 @@
                     label="Numerator Label"
                     on-input="_validate"
                     value="{{data.numerator_label}}"
-                    always-float-label>
+                    always-float-label
+                    required>
                 </paper-input>
 
                 <paper-input
@@ -252,7 +253,8 @@
                     label="Denominator Label"
                     on-input="_validate"
                     value="{{data.denominator_label}}"
-                    always-float-label>
+                    always-float-label
+                    required>
                 </paper-input>
               </div>
             </template>
@@ -296,15 +298,11 @@
           </div>
 
           <div class="row">
-            <etools-multi-selection-menu
+            <indicator-locations-widget
                 class="validate"
-                label="Location"
-                options="[[locations]]"
-                selected-values="{{selectedLocations}}"
-                on-selected-values-changed="_validate"
-                trigger-value-change-event
-                required>
-            </etools-multi-selection-menu>
+                indicator-type="[[data.blueprint.display_type]]"
+                value="{{data.locations}}">
+            </indicator-locations-widget>
           </div>
 
           <div class="row">
@@ -361,11 +359,6 @@
           statePath: 'responsePlans.currentID',
         },
 
-        locationsUrl: {
-          type: String,
-          computed: '_computeLocationsUrl(responsePlanId)',
-        },
-
         disaggregationsUrl: {
           type: String,
           computed: '_computeDisaggregationsUrl(responsePlanId)',
@@ -381,21 +374,11 @@
           value: false,
         },
 
-        locations: {
-          type: Array,
-          value: [],
-        },
-
         disaggregationsParams: {
           type: Object,
           value: {
             page_size: 99999,
           },
-        },
-
-        selectedLocations: {
-          type: Array,
-          value: [],
         },
 
         selectedDisaggregations: {
@@ -434,7 +417,6 @@
 
       observers: [
         '_setDefaults(opened)',
-        '_setLocations(selectedLocations.splices)',
         '_resetCalculationFormulas(isNumber)',
         '_resetFields(isNumber)',
       ],
@@ -475,22 +457,6 @@
         this.set('data.frequency', freq.id);
       },
 
-      _setLocations: function () {
-        var selected = this.selectedLocations ?
-            this.locations
-                .filter(function (location) {
-                  return this.selectedLocations.indexOf(location.value) !== -1;
-                }, this)
-                .map(function (location) {
-                  return {
-                    id: location.id,
-                  };
-                }) :
-            [];
-
-        this.set('data.locations', selected);
-      },
-
       _setDisaggregations: function () {
         var selected = this.selectedDisaggregations ?
         this.selectedDisaggregations.map(function(dis) {
@@ -506,24 +472,19 @@
           return;
         }
 
-        this.set('selectedLocations', []);
         this.set('selectedDisaggregations', []);
         this.set('errors', {});
         this.set('data', {
-          baseline: {},
-          target: {},
-          in_need: {},
-          cs_dates: [],
-          locations: [],
           blueprint: {
             display_type: 'number',
             calculation_formula_across_locations: 'sum',
             calculation_formula_across_periods: 'sum',
           },
+          cs_dates: [],
+          locations: [],
           disaggregations: [],
         });
 
-        this._fetchLocations();
         this._fetchDisaggregations();
       },
 
@@ -535,21 +496,8 @@
         return frequency && this._equals(frequency, 'Csd');
       },
 
-      _computeLocationsUrl: function (responsePlanId) {
-        return App.Endpoints.clusterLocationNames(responsePlanId);
-      },
-
       _computeDisaggregationsUrl: function(responsePlanId) {
         return App.Endpoints.responseParametersClusterDisaggregations(responsePlanId);
-      },
-
-      _fetchLocations: function () {
-        var self = this;
-
-        this.$.locations.thunk()()
-            .then(function (res) {
-              self.set('locations', res.data.map(self._formatLocation));
-            });
       },
 
       _fetchDisaggregations: function() {
@@ -559,14 +507,6 @@
             .then(function(res) {
               self.set('disaggregations', res.data.results);
             });
-      },
-
-      _formatLocation: function (data) {
-        return {
-          id: data.id,
-          value: data.title,
-          label: data.title,
-        };
       },
 
       _processData: function (rawData) {

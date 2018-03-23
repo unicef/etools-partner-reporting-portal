@@ -28,11 +28,23 @@
         text-decoration: none;
         color: var(--theme-primary-color);
       }
+
+      etools-prp-progress-bar {
+        display: inline-block;
+        width: calc(100% - 30px);
+        vertical-align: text-bottom;
+      }
     </style>
 
-    <!-- TODO set permissions for who can edit indicators, for that cluster id of CO
-    the indicator belongs to is needed. -->
-    <indicator-edit-modal id="modal" edit-data="[[indicator]]"></indicator-edit-modal>
+    <template
+        is="dom-if"
+        if="[[canEdit]]"
+        restamp="true">
+      <indicator-edit-modal
+          id="modal"
+          edit-data="[[indicator]]">
+      </indicator-edit-modal>
+    </template>
 
     <etools-data-table-row on-opened-changed="_handleOpenedChanged">
       <div slot="row-data">
@@ -40,7 +52,7 @@
           <template is="dom-if" if="[[_flagIndicator(indicator.target, indicator.baseline, isCustom)]]">
             <status-badge type="error"></status-badge>
           </template>
-            [[indicator.blueprint.title]]
+          [[indicator.blueprint.title]]
         </span>
         <span class="table-cell table-cell--text">
           [[indicator.blueprint.calculation_formula_across_locations]]
@@ -79,14 +91,16 @@
         <span class="table-cell table-cell--text">
           [[indicator.achieved.c]]
         </span>
-        <span class="table-cell table-cell--text">
+        <span class="table-cell table-cell--text" flex-2>
           <etools-prp-progress-bar number="[[indicator.progress_percentage]]">
         </span>
+
         <template is="dom-if" if="[[isClusterApp]]" restamp="true">
           <span class="table-cell table-cell--text">
             <a href="[[indicatorReportsUrl]]">REPORTS</a>
           </span>
         </template>
+
         <template is="dom-if" if="[[canEdit]]" restamp="true">
           <span class="table-cell table-cell--text">
             <a href="#" on-tap="_openModal">EDIT</a>

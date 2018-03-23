@@ -8,11 +8,12 @@
 <link rel="import" href="../../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
 <link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
-<link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-multi-selection-menu.html">
 <link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html">
 
 
 <link rel="import" href="../../polyfills/es6-shim.html">
+<link rel="import" href="disaggregations-dropdown-widget.html">
+<link rel="import" href="indicator-locations-widget.html">
 <link rel="import" href="chip-date-of-report.html">
 <link rel="import" href="../labelled-item.html">
 <link rel="import" href="../etools-prp-chips.html">
@@ -26,6 +27,7 @@
 <link rel="import" href="../../styles/buttons.html">
 <link rel="import" href="../../styles/modal.html">
 <link rel="import" href="../error-box.html">
+<link rel="import" href="../etools-prp-permissions.html">
 
 <dom-module id="indicator-edit-modal">
   <template>
@@ -71,7 +73,15 @@
       .calculation-method:not(:first-child) {
         margin-left: 50px;
       }
+
+      indicator-locations-widget {
+        margin: 2em 0;
+      }
     </style>
+
+    <etools-prp-permissions
+        permissions={{permissions}}>
+    </etools-prp-permissions>
 
     <etools-prp-ajax
         id="locations"
@@ -102,7 +112,6 @@
       </div>
 
       <paper-dialog-scrollable>
-
         <template
             is="dom-if"
             if="[[opened]]"
@@ -116,6 +125,7 @@
                 on-input="_validate"
                 value="{{data.blueprint.title}}"
                 always-float-label
+                disabled="[[!permissions.editIndicatorDetails]]"
                 required>
             </paper-input>
           </div>
@@ -154,6 +164,7 @@
                 label="Comments (optional)"
                 on-input="_validate"
                 value="{{data.comments}}"
+                disabled="[[!permissions.editIndicatorDetails]]"
                 always-float-label>
             </paper-input>
           </div>
@@ -164,6 +175,7 @@
                 label="Measurement specifications (optional)"
                 on-input="_validate"
                 value="{{data.measurement_specifications}}"
+                disabled="[[!permissions.editIndicatorDetails]]"
                 always-float-label>
             </paper-input>
           </div>
@@ -178,6 +190,7 @@
                   option-label="title"
                   selected="{{data.frequency}}"
                   on-iron-activate="_validate"
+                  disabled="[[!permissions.editIndicatorDetails]]"
                   trigger-value-change-event
                   hide-search
                   required>
@@ -192,8 +205,14 @@
                     value="{{data.cs_dates}}"
                     label="Date of report"
                     on-selected-chips-updated="_validate"
+                    disabled="[[!permissions.editIndicatorDetails]]"
                     required>
-                  <chip-date-of-report></chip-date-of-report>
+                  <template
+                      is="dom-if"
+                      if="[[permissions.editIndicatorDetails]]"
+                      restamp="true">
+                    <chip-date-of-report></chip-date-of-report>
+                  </template>
                 </etools-prp-chips>
               </template>
 
@@ -201,6 +220,7 @@
                   class="item validate"
                   label="Start date of reporting period"
                   value="{{data.start_date_of_reporting_period}}"
+                  disabled="[[!permissions.editIndicatorDetails]]"
                   error-message=""
                   required
                   no-init>
@@ -218,7 +238,9 @@
                   label="Label"
                   on-input="_validate"
                   value="{{data.label}}"
-                  always-float-label>
+                  disabled="[[!permissions.editIndicatorDetails]]"
+                  always-float-label
+                  required>
               </paper-input>
             </template>
 
@@ -232,7 +254,9 @@
                     label="Numerator Label"
                     on-input="_validate"
                     value="{{data.numerator_label}}"
-                    always-float-label>
+                    disabled="[[!permissions.editIndicatorDetails]]"
+                    always-float-label
+                    required>
                 </paper-input>
 
                 <paper-input
@@ -240,7 +264,9 @@
                     label="Denominator Label"
                     on-input="_validate"
                     value="{{data.denominator_label}}"
-                    always-float-label>
+                    disabled="[[!permissions.editIndicatorDetails]]"
+                    always-float-label
+                    required>
                 </paper-input>
               </div>
             </template>
@@ -254,7 +280,8 @@
                   label="Baseline"
                   on-input="_validate"
                   value="{{data.baseline}}"
-                  allowed-pattern="[+\-\d]">
+                  allowed-pattern="[+\-\d]"
+                  disabled="[[!permissions.editIndicatorDetails]]">
               </json-field>
 
               <template
@@ -267,7 +294,8 @@
                     label="In need (optional)"
                     on-input="_validate"
                     value="{{data.in_need}}"
-                    allowed-pattern="[+\-\d]">
+                    allowed-pattern="[+\-\d]"
+                    disabled="[[!permissions.editIndicatorDetails]]">
                 </json-field>
               </template>
 
@@ -278,125 +306,30 @@
                   on-input="_validate"
                   value="{{data.target}}"
                   allowed-pattern="[+\-\d]"
+                  disabled="[[!permissions.editIndicatorDetails]]"
                   required>
               </json-field>
             </div>
           </div>
 
-
-
-
-
-
-
-
-
-
-<!--
           <div class="row">
-            <paper-input
-                class="validate"
-                label="Means of verification"
-                on-input="_validate"
-                value="{{data.means_of_verification::change}}"
-                always-float-label
-                required>
-            </paper-input>
-          </div>
-
-          <div class="row">
-            <div class="app-grid">
-              <div class="item">
-                <etools-single-selection-menu
-                    class="validate"
-                    label="Frequency of reporting"
-                    options="[[frequencies]]"
-                    option-value="id"
-                    option-label="title"
-                    selected="{{data.frequency}}"
-                    on-iron-activate="_validate"
-                    trigger-value-change-event
-                    hide-search
-                    required>
-                </etools-single-selection-menu>
-              </div>
-
-              <template
-                  is="dom-if"
-                  if="[[_showCSD(data.frequency)]]"
-                  restamp="true">
-                <div class="item">
-                  <etools-prp-chips
-                      value="{{data.cs_dates}}"
-                      class="validate"
-                      label="Date of report"
-                      on-selected-chips-updated="_validate"
-                      required>
-                    <chip-date-of-report></chip-date-of-report>
-                  </etools-prp-chips>
-                </div>
-              </template>
+            <div class="row">
+              <indicator-locations-widget
+                  class="validate"
+                  indicator-type="[[data.blueprint.display_type]]"
+                  value="{{data.locations}}"
+                  editing>
+              </indicator-locations-widget>
             </div>
           </div>
 
           <div class="row">
-            <div class="app-grid">
-              <div class="item">
-                <json-field
-                    class="validate"
-                    type="[[data.blueprint.display_type]]"
-                    label="Baseline"
-                    on-input="_validate"
-                    value="{{data.baseline}}"
-                    allowed-pattern="[+\-\d]">
-                </json-field>
-              </div>
-
-              <div class="item">
-                <json-field
-                    class="validate"
-                    type="[[data.blueprint.display_type]]"
-                    label="Target"
-                    on-input="_validate"
-                    value="{{data.target}}"
-                    allowed-pattern="[+\-\d]"
-                    required>
-                </json-field>
-              </div>
-            </div>
+            <disaggregations-dropdown-widget
+                value="{{data.disaggregations}}"
+                readonly>
+            </disaggregations-dropdown-widget>
           </div>
-
-          <div class="row">
-            <div class="app-grid">
-              <div class="item">
-                <json-field
-                    class="validate"
-                    type="[[data.blueprint.display_type]]"
-                    label="In need"
-                    on-input="_validate"
-                    value="{{data.in_need}}"
-                    allowed-pattern="[+\-\d]">
-                </json-field>
-              </div>
-            </div>
-          </div>
-
-          <div class="row">
-            <etools-multi-selection-menu
-                class="validate"
-                label="Location"
-                options="[[locations]]"
-                option-value="id"
-                option-label="title"
-                selected-values="{{selectedLocations}}"
-                on-selected-values-changed="_validate"
-                trigger-value-change-event
-                required>
-            </etools-multi-selection-menu>
-          </div> -->
-
         </template>
-
       </paper-dialog-scrollable>
 
       <div class="buttons layout horizontal-reverse">
@@ -419,7 +352,7 @@
 
   <script>
     Polymer({
-      id: 'indicator-edit-modal',
+      is: 'indicator-edit-modal',
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
@@ -428,9 +361,9 @@
       ],
 
       properties: {
+        editData: Object,
         data: Object,
-        objectId: Number,
-        objectType: String,
+        permissions: Object,
 
         isNumber: {
           type: Boolean,
@@ -441,11 +374,6 @@
          type: String,
          statePath: 'responsePlans.currentID',
        },
-
-        locationId: {
-          type: String,
-          statePath: 'location.id',
-        },
 
         indicatorType: {
           type: String,
@@ -472,11 +400,6 @@
           value: [],
         },
 
-        selectedLocations: {
-          type: Array,
-          value: [],
-        },
-
         frequencies: {
           type: Array,
           value: [
@@ -499,13 +422,14 @@
           ],
         },
 
-        editData: Object,
-
+        disaggregations: {
+          type: Array,
+          value: [],
+        },
       },
 
       observers: [
         '_setDefaults(opened)',
-        '_setLocations(selectedLocations.splices)',
       ],
 
       _computeIndicatorType: function (data) {
@@ -525,40 +449,17 @@
         return type === 'number';
       },
 
-      _setLocations: function () {
-        var selected = this.selectedLocations ?
-            this.locations
-                .filter(function (location) {
-                  return this.selectedLocations.indexOf(location.id) !== -1;
-                }, this)
-                .map(function (location) {
-                  return {
-                    id: location.id,
-                    title: location.title,
-                  };
-                }) :
-            [];
-
-        this.set('data.locations', selected);
-      },
-
       _setDefaults: function (opened) {
         if (!opened) {
           return;
         }
-        if (this.editData.locations) {
-          this.set('selectedLocations', this.editData.locations.map(function(item) {
-            return item.id;
-          }));
-        } else {
-          this.set('selectedLocations', []);
-        }
 
-        this.set('data', Object.assign({}, this.editData));
-        if (!this.editData.cs_dates) {
-          this.set('data.cs_dates', []);
-        }
+        this.set('data', Object.assign({
+          cs_dates: [],
+        }, this._clone(this.get('editData'))));
+
         this.set('errors', {});
+
         this._fetchLocations();
       },
 
