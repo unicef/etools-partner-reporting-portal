@@ -885,6 +885,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             for loc_goal in locations:
                 loc_goal.pop('loc_type', None)
                 loc_goal['location'] = Location.objects.get(id=loc_goal['location'])
+                loc_goal['reportable'] = reportable
 
         except Location.DoesNotExist:
             raise ValidationError("Location ID %d does not exist" % loc_goal['location'])
@@ -898,31 +899,30 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         existing_loc_goals = reportable.reportablelocationgoal_set.all()
         loc_goal_mapping = {
             loc_goal.id: loc_goal for loc_goal in existing_loc_goals}
-        data_mapping = {loc_goal['id']: loc_goal for loc_goal in locations}
+        data_mapping = {loc_goal['id']: loc_goal for loc_goal in locations if 'id' in loc_goal}
+        new_data_list = [loc_goal for loc_goal in locations if 'id' not in loc_goal]
 
         # Handling creation and updates
+        for data in new_data_list:
+            ReportableLocationGoal.objects.create(**data)
+
         for data_id, data in data_mapping.items():
             loc_goal = loc_goal_mapping.get(data_id, None)
-            data['reportable'] = reportable
 
             if partner:
                 # Filter out location level baseline and in_need
                 data.pop('baseline')
                 data.pop('in_need')
 
-            if not loc_goal:
-                ReportableLocationGoal.objects.create(**data)
+            if loc_goal.location.id != data['location'].id:
+                raise ValidationError(
+                    "Location %s cannot be changed for updating location goal" % loc_goal.location,
+                )
 
-            else:
-                if loc_goal.location.id != data['location'].id:
-                    raise ValidationError(
-                        "Location %s cannot be changed for updating location goal" % loc_goal.location,
-                    )
+            for key, val in data.items():
+                setattr(loc_goal, key, val)
 
-                for key, val in data.items():
-                    setattr(loc_goal, key, val)
-
-                loc_goal.save()
+            loc_goal.save()
 
         # Handling deletion from update
         for loc_goal_id, loc_goal in loc_goal_mapping.items():
