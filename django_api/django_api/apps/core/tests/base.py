@@ -1,4 +1,7 @@
+
 from __future__ import unicode_literals
+
+from django.contrib.auth import get_user_model
 from rest_framework.test import APITestCase, APIClient
 
 from core.management.commands._privates import generate_fake_data
@@ -16,6 +19,7 @@ class BaseAPITestCase(APITestCase):
     with_generate_fake_data = True
 
     def setUp(self):
+        super(BaseAPITestCase, self).setUp()
         # generating data
         if self.with_generate_fake_data:
             with suppress_stdout():
@@ -25,3 +29,8 @@ class BaseAPITestCase(APITestCase):
         if self.with_session_login:
             self.client = self.client_class()
             self.client.login(username='admin_imo', password='Passw0rd!')
+
+    def _post_teardown(self):
+        # For some reason original _post_teardown tries to delete groups before users and everything falls apart
+        get_user_model().objects.all().delete()
+        super(BaseAPITestCase, self)._post_teardown()

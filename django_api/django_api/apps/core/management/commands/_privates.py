@@ -406,7 +406,7 @@ def generate_fake_data(workspace_quantity=10):
             reportable_to_pa = QuantityReportableToPartnerActivityFactory(
                 content_object=pa, indicator_report__progress_report=None,
             )
-            
+
             for loc in locations:
                 LocationWithReportableLocationGoalFactory.create(
                     location=loc,
