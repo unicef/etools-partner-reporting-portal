@@ -1,6 +1,8 @@
 from datetime import date, datetime
 import operator
 import logging
+
+from django.conf import settings
 from django.db.models import Q
 from django.db import transaction
 from django.shortcuts import get_object_or_404
@@ -34,6 +36,7 @@ from core.common import (
 from core.serializers import ShortLocationSerializer
 from unicef.serializers import ProgressReportSerializer, ProgressReportUpdateSerializer
 from unicef.models import ProgressReport
+from utils.emails import send_email_from_template
 
 from .disaggregators import (
     QuantityIndicatorDisaggregator,
@@ -51,6 +54,7 @@ from .serializers import (
     IndicatorReportReviewSerializer,
     IndicatorReportSimpleSerializer,
     ReportableLocationGoalBaselineInNeedSerializer,
+    ClusterIndicatorIMOMessageSerializer,
 )
 from .filters import IndicatorFilter, PDReportsFilter
 from .models import (
@@ -613,3 +617,89 @@ class IndicatorDataLocationAPIView(ListAPIView):
             ir = get_object_or_404(IndicatorReport, id=ir_id)
             return Location.objects.filter(reportables=ir.reportable_id)
         raise Http404
+
+
+class ClusterIndicatorSendIMOMessageAPIView(APIView):
+    """
+    ClusterIndicatorSendIMOMessageAPIView sends
+    an message to belonging cluster's IMO
+    via e-mail.
+
+    Raises:
+        Http404 -- Throws 404 HTTP response
+
+    Returns:
+        Response -- DRF Response object
+    """
+
+    permission_classes = (
+        IsAuthenticated,
+        IsPartnerEditorOrPartnerAuthorizedOfficer,
+    )
+
+    def post(self, request, *args, **kwargs):
+        from cluster.models import Cluster
+
+        serializer = ClusterIndicatorIMOMessageSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        cluster = get_object_or_404(
+            Cluster,
+            id=serializer.validated_data['cluster_id']
+        )
+
+        reportable = get_object_or_404(
+            Reportable,
+            id=serializer.validated_data['reportable_id']
+        )
+
+        if cluster not in request.user.partner.clusters.all():
+            error_msg = "User does not belong to Cluster ID %d" % cluster.id
+
+            error_object = {
+                "cluster_id": [error_msg, ],
+                "error_codes": {"cluster_id": [error_msg, ]}
+            }
+
+            return Response(error_object, status=status.HTTP_400_BAD_REQUEST)
+
+        elif not cluster.imo_users.exists():
+            error_msg = "There is no IMO user on the Cluster ID %d" % cluster.id
+
+            error_object = {
+                "cluster_id": [error_msg, ],
+                "error_codes": {"cluster_id": [error_msg, ]}
+            }
+
+            return Response(error_object, status=status.HTTP_400_BAD_REQUEST)
+
+        elif reportable not in cluster.reportables.all():
+            error_msg = "Reportable ID does not belong to Cluster ID %d" % \
+                (reportable.id, cluster.id)
+
+            error_object = {
+                "reportable_id": [error_msg, ],
+                "error_codes": {"reportable_id": [error_msg, ]}
+            }
+
+            return Response(error_object, status=status.HTTP_400_BAD_REQUEST)
+
+        imo_user = cluster.imo_users.first()
+        template_data = {
+            "indicator_name": reportable.blueprint.title,
+            "partner_name": request.user.partner.title,
+            "partner_email": request.user.email,
+            "imo_user": imo_user,
+            "message": serializer.validated_data['message'],
+        }
+
+        send_email_from_template(
+            'email/notify_imo_on_cluster_indicator_change_request_subject.txt',
+            'email/notify_imo_on_cluster_indicator_change_request.txt',
+            template_data,
+            settings.DEFAULT_FROM_EMAIL,
+            [imo_user.email, ],
+            fail_silently=False
+        )
+
+        return Response(serializer.data, status=status.HTTP_200_OK)

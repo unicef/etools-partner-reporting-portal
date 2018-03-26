@@ -1542,3 +1542,9 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
             'current_progress_by_partner',
             'current_progress_by_location',
         )
+
+
+class ClusterIndicatorIMOMessageSerializer(serializers.Serializer):
+    message = serializers.CharField(max_length=4048)
+    cluster_id = serializers.IntegerField()
+    reportable_id = serializers.IntegerField()

@@ -1,0 +1,7 @@
+Dear {imo_user.get_full_name},
+
+A partner in your cluster sent this message:
+
+{message}
+
+-- {partner_name} - {partner_email}
