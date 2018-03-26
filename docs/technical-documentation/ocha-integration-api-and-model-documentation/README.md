@@ -10,7 +10,15 @@ Detailed documentation is available here: [api.hpc.tools/docs/v1/](https://api.h
 
 This documentation is intended for users of the HPC Service public API, which provides data in JSON or XML formats. 
 
-For the API v2 endpoints \(currently only data for Chad 2018 is available\), there isn’t yet any formal documentation on this.  OCHA developers are working on auto generating the docs, but this won’t be available until our next release in 2 weeks time.
+For the API v2 endpoints \(currently only data for Chad 2018 is available\).
+
+{% hint style="info" %}
+It includes the changes:
+
+-          [https://api.hpc.tools/v2/public/disaggregation-category-group/](https://api.hpc.tools/v2/public/disaggregation-category-group/)
+
+-          [https://api.hpc.tools/v2/public/location/:locationId](https://api.hpc.tools/v2/public/location/:locationId)
+{% endhint %}
 
 Old OPS API does not provide any documentation.
 
