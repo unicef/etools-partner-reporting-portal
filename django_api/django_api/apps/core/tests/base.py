@@ -16,18 +16,21 @@ class BaseAPITestCase(APITestCase):
     client_class = APIClient
     with_session_login = True
     with_generate_fake_data = True
+    user = None
 
     def setUp(self):
         super(BaseAPITestCase, self).setUp()
+
         # generating data
         if self.with_generate_fake_data:
             with suppress_stdout():
                 generate_fake_data(self.generate_fake_data_quantity)
 
-        # creating a session (login already created user in generate_fake_data)
-        if self.with_session_login:
-            self.client = self.client_class()
-            self.client.login(username='admin_imo', password='Passw0rd!')
+            # creating a session (login already created user in generate_fake_data)
+            if self.with_session_login:
+                self.client = self.client_class()
+                self.user = get_user_model().objects.get(username='admin_imo')
+                self.client.force_authenticate(self.user)
 
     def _post_teardown(self):
         # For some reason original _post_teardown tries to delete groups before users and everything falls apart
