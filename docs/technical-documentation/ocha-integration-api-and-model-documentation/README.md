@@ -15,9 +15,8 @@ For the API v2 endpoints \(currently only data for Chad 2018 is available\).
 {% hint style="info" %}
 It includes the changes:
 
--          [https://api.hpc.tools/v2/public/disaggregation-category-group/](https://api.hpc.tools/v2/public/disaggregation-category-group/)
-
--          [https://api.hpc.tools/v2/public/location/:locationId](https://api.hpc.tools/v2/public/location/:locationId)
+* [https://api.hpc.tools/v2/public/disaggregation-category-group](https://api.hpc.tools/v2/public/disaggregation-category-group)
+* [https://api.hpc.tools/v2/public/location/:locationId](https://api.hpc.tools/v2/public/location/:locationId)
 {% endhint %}
 
 Old OPS API does not provide any documentation.
