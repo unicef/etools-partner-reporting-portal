@@ -1,3 +1,4 @@
+from django.db import transaction
 from rest_framework import serializers
 
 from cluster.models import Cluster
@@ -123,6 +124,7 @@ class CreateResponsePlanSerializer(serializers.ModelSerializer):
 
         return validated_data
 
+    @transaction.atomic
     def create(self, validated_data):
         clusters_data = validated_data.pop('clusters')
         response_plan = ResponsePlan.objects.create(**validated_data)
@@ -146,8 +148,7 @@ class PMPWorkspaceSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # Update or create
         try:
-            instance = Workspace.objects.get(
-                workspace_code=validated_data['workspace_code'])
+            instance = Workspace.objects.get(workspace_code=validated_data['workspace_code'])
             return self.update(instance, validated_data)
         except Workspace.DoesNotExist:
             return Workspace.objects.create(**validated_data)
@@ -161,7 +162,8 @@ class PMPWorkspaceSerializer(serializers.ModelSerializer):
             'longitude',
             'initial_zoom',
             'business_area_code',
-            'country_short_code')
+            'country_short_code',
+        )
 
 
 class PMPGatewayTypeSerializer(serializers.ModelSerializer):

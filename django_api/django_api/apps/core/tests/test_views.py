@@ -7,7 +7,7 @@ from django.urls import reverse
 from rest_framework import status
 
 from core.common import CLUSTER_TYPES
-from core.models import Workspace
+from core.models import Workspace, IMORole
 from core.tests.base import BaseAPITestCase
 
 
@@ -67,8 +67,13 @@ from core.tests.base import BaseAPITestCase
 
 class TestResponsePlanAPIView(BaseAPITestCase):
 
+    def setUp(self):
+        super(TestResponsePlanAPIView, self).setUp()
+        self.workspace = Workspace.objects.first()
+        self.user.workspaces.add(self.workspace)
+        self.user.groups.add(IMORole.as_group())
+
     def test_response_plan(self):
-        workspace = Workspace.objects.first()
         rp_data = {
             'title': 'Test Response Plan',
             'plan_type': 'HRP',
@@ -80,13 +85,12 @@ class TestResponsePlanAPIView(BaseAPITestCase):
             ],
         }
 
-        url = reverse("response-plan-create", kwargs={'workspace_id': workspace.id})
+        url = reverse("response-plan-create", kwargs={'workspace_id': self.workspace.id})
         response = self.client.post(url, data=rp_data, format='json')
 
         self.assertEquals(response.status_code, status.HTTP_201_CREATED, msg=response.content)
 
     def test_end_lt_start(self):
-        workspace = Workspace.objects.first()
         rp_data = {
             'title': 'Test Response Plan',
             'plan_type': 'HRP',
@@ -98,7 +102,7 @@ class TestResponsePlanAPIView(BaseAPITestCase):
             ],
         }
 
-        url = reverse("response-plan-create", kwargs={'workspace_id': workspace.id})
+        url = reverse("response-plan-create", kwargs={'workspace_id': self.workspace.id})
         response = self.client.post(url, data=rp_data, format='json')
 
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST, msg=response.content)

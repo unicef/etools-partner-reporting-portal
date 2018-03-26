@@ -56,7 +56,7 @@ class IsIMOForCurrentWorkspace(IsAuthenticated):
     def has_permission(self, request, view):
         if super(IsIMOForCurrentWorkspace, self).has_permission(request, view):
             rules = [
-                request.user.groups.filter(name=IMORole.as_group().name).exists()
+                IMORole.as_group().user_set.filter(pk=request.user.pk).exists()
             ]
             workspace_id = request.resolver_match.kwargs.get('workspace_id')
             if workspace_id:
