@@ -170,6 +170,12 @@ class Workspace(TimeStampedExternalSourceModel):
         [pks.extend(filter(lambda x: x is not None, part)) for part in result]
         return Location.objects.filter(pk__in=pks)
 
+    @property
+    def can_import_ocha_response_plans(self):
+        return any([
+            c.details for c in self.countries.all()
+        ])
+
 
 class ResponsePlan(TimeStampedExternalSourceModel):
     """

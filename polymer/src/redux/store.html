@@ -25,6 +25,7 @@
 <link rel="import" href="reducers/clusterDashboardData.html">
 <link rel="import" href="reducers/userProfile.html">
 <link rel="import" href="reducers/analysis.html">
+<link rel="import" href="reducers/config.html">
 
 <script src="../../bower_components/redux-thunk/index.js"></script>
 
@@ -57,6 +58,7 @@
       clusterDashboardData: App.Reducers.ClusterDashboardData,
       userProfile: App.Reducers.UserProfile,
       analysis: App.Reducers.Analysis,
+      config: App.Reducers.Config,
     });
 
     var store = Redux.createStore(

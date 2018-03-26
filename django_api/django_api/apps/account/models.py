@@ -14,7 +14,7 @@ class User(AbstractUser):
     User model inherited after AbstractUser class.
 
     related models:
-        partner.Partnern (ForeignKey): "partner"
+        partner.Partner (ForeignKey): "partner"
     """
     first_name = models.CharField(max_length=64, blank=True, null=True)
     last_name = models.CharField(max_length=64, blank=True, null=True)

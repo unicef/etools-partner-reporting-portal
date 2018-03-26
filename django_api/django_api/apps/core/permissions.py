@@ -45,6 +45,24 @@ class IsPartnerEditorOrPartnerAuthorizedOfficer(BasePermission):
 
 
 class IsIMO(BasePermission):
+
     def has_permission(self, request, view):
         user = request.user
         return user.is_authenticated() and user.groups.filter(name=IMORole.as_group().name).exists()
+
+
+class IsIMOForCurrentWorkspace(IsAuthenticated):
+
+    def has_permission(self, request, view):
+        if super(IsIMOForCurrentWorkspace, self).has_permission(request, view):
+            rules = [
+                IMORole.as_group().user_set.filter(pk=request.user.pk).exists()
+            ]
+            workspace_id = request.resolver_match.kwargs.get('workspace_id')
+            if workspace_id:
+                rules.append(
+                    request.user.workspaces.filter(id=workspace_id).exists()
+                )
+            return all(rules)
+
+        return False

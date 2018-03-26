@@ -61,8 +61,6 @@ services:
     build:
       context: ./db
       dockerfile: ./Dockerfile
-#    volumes:
-#      - './postgres_data:/var/lib/postgresql/data'
 
   redis:
     image: unicef/etools-prp-redis
