@@ -220,6 +220,11 @@ class Reportable(TimeStampedExternalSourceModel):
     means_of_verification = models.CharField(max_length=255,
                                              null=True,
                                              blank=True)
+    comments = models.TextField(max_length=4048, blank=True, null=True)
+    measurement_specification = models.TextField(max_length=4048, blank=True, null=True)
+    label = models.TextField(max_length=4048, blank=True, null=True)
+    numerator_label = models.CharField(max_length=256, blank=True, null=True)
+    denominator_label = models.CharField(max_length=256, blank=True, null=True)
     is_cluster_indicator = models.BooleanField(default=False)
     contributes_to_partner = models.BooleanField(default=False)
 
