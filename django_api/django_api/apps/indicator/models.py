@@ -105,8 +105,10 @@ class IndicatorBlueprint(TimeStampedExternalSourceModel):
         (SUM, SUM),
     )
 
-    CALC_CHOICES = tuple(
-        set(QUANTITY_CALC_CHOICES + RATIO_CALC_CHOICES)
+    CALC_CHOICES = (
+        (SUM, SUM),
+        (MAX, MAX),
+        (AVG, AVG),
     )
 
     QUANTITY_DISPLAY_TYPE_CHOICES = (
@@ -221,10 +223,11 @@ class Reportable(TimeStampedExternalSourceModel):
                                              null=True,
                                              blank=True)
     comments = models.TextField(max_length=4048, blank=True, null=True)
-    measurement_specification = models.TextField(max_length=4048, blank=True, null=True)
+    measurement_specifications = models.TextField(max_length=4048, blank=True, null=True)
     label = models.TextField(max_length=4048, blank=True, null=True)
     numerator_label = models.CharField(max_length=256, blank=True, null=True)
     denominator_label = models.CharField(max_length=256, blank=True, null=True)
+    start_date_of_reporting_period = models.DateField(blank=True, null=True)
     is_cluster_indicator = models.BooleanField(default=False)
     contributes_to_partner = models.BooleanField(default=False)
 

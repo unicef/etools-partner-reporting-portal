@@ -252,6 +252,12 @@ class IndicatorListSerializer(ReportableSimpleSerializer):
             'pd_id',
             'disaggregations',
             'locations',
+            'comments',
+            'measurement_specifications',
+            'start_date_of_reporting_period',
+            'label',
+            'numerator_label',
+            'denominator_label',
         )
 
 
@@ -750,6 +756,12 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             'target',
             'baseline',
             'in_need',
+            'comments',
+            'measurement_specifications',
+            'start_date_of_reporting_period',
+            'label',
+            'numerator_label',
+            'denominator_label',
         )
 
     def check_disaggregation(self, disaggregations):
