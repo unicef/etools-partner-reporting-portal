@@ -298,7 +298,7 @@ from core.tests.base import BaseAPITestCase
 #         )
 
 
-class TestResponsePlanAPIView(BaseAPITestCase):
+class TestPartnerProjectAPIView(BaseAPITestCase):
 
     def test_create_project(self):
         rp = ResponsePlan.objects.first()
