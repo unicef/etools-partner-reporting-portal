@@ -222,7 +222,6 @@
                   value="{{data.start_date_of_reporting_period}}"
                   disabled="[[!permissions.editIndicatorDetails]]"
                   error-message=""
-                  required
                   no-init>
               </etools-prp-date-input>
             </div>
@@ -239,8 +238,7 @@
                   on-input="_validate"
                   value="{{data.label}}"
                   disabled="[[!permissions.editIndicatorDetails]]"
-                  always-float-label
-                  required>
+                  always-float-label>
               </paper-input>
             </template>
 
@@ -255,8 +253,7 @@
                     on-input="_validate"
                     value="{{data.numerator_label}}"
                     disabled="[[!permissions.editIndicatorDetails]]"
-                    always-float-label
-                    required>
+                    always-float-label>
                 </paper-input>
 
                 <paper-input
@@ -265,8 +262,7 @@
                     on-input="_validate"
                     value="{{data.denominator_label}}"
                     disabled="[[!permissions.editIndicatorDetails]]"
-                    always-float-label
-                    required>
+                    always-float-label>
                 </paper-input>
               </div>
             </template>
