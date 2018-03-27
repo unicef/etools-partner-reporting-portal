@@ -239,6 +239,21 @@ class IndicatorListSerializer(ReportableSimpleSerializer):
     """
     disaggregations = DisaggregationListSerializer(many=True, read_only=True)
     locations = serializers.SerializerMethodField()
+    cluster = serializers.SerializerMethodField()
+
+    def get_cluster(self, obj):
+        if isinstance(obj.content_object, PartnerProject) \
+                and obj.content_object.clusters.exists():
+            return obj.content_object.clusters.first().id
+
+        elif isinstance(obj.content_object, PartnerActivity) \
+                and obj.content_object.cluster_activity:
+            return obj.content_object.cluster_activity.cluster.id
+
+        elif isinstance(obj.content_object, (ClusterObjective, ClusterActivity)):
+            return obj.content_object.cluster.id
+
+        return None
 
     def get_locations(self, obj):
         return ReportableLocationGoalSerializer(obj.reportablelocationgoal_set.all(), many=True).data
@@ -258,6 +273,7 @@ class IndicatorListSerializer(ReportableSimpleSerializer):
             'label',
             'numerator_label',
             'denominator_label',
+            'cluster',
         )
 
 
