@@ -640,6 +640,8 @@ class ClusterIndicatorSendIMOMessageAPIView(APIView):
     def post(self, request, *args, **kwargs):
         from cluster.models import Cluster
 
+        from partner.models import PartnerActivity
+
         serializer = ClusterIndicatorIMOMessageSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -654,7 +656,7 @@ class ClusterIndicatorSendIMOMessageAPIView(APIView):
         )
 
         if cluster not in request.user.partner.clusters.all():
-            error_msg = "Cluster ID %d does not belong to Partner" % cluster.id
+            error_msg = "Cluster does not belong to Partner"
 
             error_object = {
                 "cluster_id": [error_msg, ],
@@ -663,9 +665,28 @@ class ClusterIndicatorSendIMOMessageAPIView(APIView):
 
             return Response(error_object, status=status.HTTP_400_BAD_REQUEST)
 
+        elif reportable.content_type.model_class() != PartnerActivity:
+            error_msg = "Indicator is not PartnerActivity Indicator"
+
+            error_object = {
+                "reportable_id": [error_msg, ],
+                "error_codes": {"reportable_id": [error_msg, ]}
+            }
+
+            return Response(error_object, status=status.HTTP_400_BAD_REQUEST)
+
+        elif reportable.content_type.model_class() == PartnerActivity and not reportable.content_type.cluster_activity:
+            error_msg = "Indicator is not PartnerActivity Indicator from ClusterActivity"
+
+            error_object = {
+                "reportable_id": [error_msg, ],
+                "error_codes": {"reportable_id": [error_msg, ]}
+            }
+
+            return Response(error_object, status=status.HTTP_400_BAD_REQUEST)
+
         elif reportable.content_object.cluster != cluster:
-            error_msg = "Reportable ID %d does not belong to Cluster ID %d" % \
-                (reportable.id, cluster.id)
+            error_msg = "Indicator does not belong to Cluster"
 
             error_object = {
                 "reportable_id": [error_msg, ],
@@ -675,7 +696,7 @@ class ClusterIndicatorSendIMOMessageAPIView(APIView):
             return Response(error_object, status=status.HTTP_400_BAD_REQUEST)
 
         elif not cluster.imo_users.exists():
-            error_msg = "There is no IMO user on the Cluster ID %d" % cluster.id
+            error_msg = "There is no IMO user on the Cluster"
 
             error_object = {
                 "cluster_id": [error_msg, ],
