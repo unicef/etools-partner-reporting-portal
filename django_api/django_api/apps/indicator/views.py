@@ -638,13 +638,15 @@ class ClusterIndicatorSendIMOMessageAPIView(APIView):
     )
 
     def post(self, request, *args, **kwargs):
-        serializer = ClusterIndicatorIMOMessageSerializer(data=request.data)
+        serializer = ClusterIndicatorIMOMessageSerializer(
+            data=request.data,
+            context={'request': request},
+        )
         serializer.is_valid(raise_exception=True)
 
-        cluster = serializer.validated_data['cluster']
         reportable = serializer.validated_data['reportable']
+        imo_user = serializer.validated_data['cluster'].imo_users.first()
 
-        imo_user = cluster.imo_users.first()
         template_data = {
             "indicator_name": reportable.blueprint.title,
             "partner_name": request.user.partner.title,

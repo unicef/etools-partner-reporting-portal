@@ -1549,7 +1549,7 @@ class ClusterIndicatorIMOMessageSerializer(serializers.Serializer):
     cluster = serializers.IntegerField()
     reportable = serializers.IntegerField()
 
-    def validate(self, data):
+    def to_internal_value(self, data):
         from cluster.models import Cluster
 
         from partner.models import PartnerActivity
@@ -1574,13 +1574,25 @@ class ClusterIndicatorIMOMessageSerializer(serializers.Serializer):
         elif reportable.content_type.model_class() != PartnerActivity:
             raise serializers.ValidationError("Indicator is not PartnerActivity Indicator")
 
-        elif reportable.content_type.model_class() == PartnerActivity and not reportable.content_type.cluster_activity:
+        elif reportable.content_type.model_class() == PartnerActivity \
+                and not reportable.content_object.cluster_activity:
             raise serializers.ValidationError("Indicator is not PartnerActivity Indicator from ClusterActivity")
 
-        elif reportable.content_object.cluster != cluster:
+        elif reportable.content_object.cluster_activity.cluster != cluster:
             raise serializers.ValidationError("Indicator does not belong to Cluster")
 
         elif not cluster.imo_users.exists():
             raise serializers.ValidationError("There is no IMO user on the Cluster")
 
-        return data
+        return {
+            'message': data['message'],
+            'cluster': cluster,
+            'reportable': reportable,
+        }
+
+    def to_representation(self, data):
+        return {
+            'message': data['message'],
+            'cluster': data['cluster'].id,
+            'reportable': data['reportable'].id,
+        }
