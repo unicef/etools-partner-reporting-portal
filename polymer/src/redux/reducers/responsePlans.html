@@ -21,7 +21,8 @@
       switch (action.type) {
         case App.Constants.SET_RESPONSE_PLANS:
           return action.plans;
-
+        case App.Constants.ADD_RESPONSE_PLAN:
+          return state.concat([action.plan]);
         case App.Constants.RESET:
           return [];
 

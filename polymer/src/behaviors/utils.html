@@ -104,6 +104,9 @@
       },
 
       _commaSeparated: function (items) {
+        if (!items) {
+          return '';
+        }
         return items.join(', ');
       },
 
@@ -113,6 +116,10 @@
         });
 
         return this._commaSeparated(newList);
+      },
+
+       _commaSeparatedValues: function (list) {
+        return list.join(', ');
       },
 
       _formatAddress: function (street, city, zip) {

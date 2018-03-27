@@ -4,7 +4,7 @@ steps:
 
     build_proxy:
         type: build
-        image_name: unicef/etools-prp-nginx-proxy
+        image_name: tivix/etools-prp-nginx-proxy
         dockerfile: Dockerfile
         working_directory: ${{main_clone}}/nginx_proxy
         tag: ${{CF_BRANCH}}

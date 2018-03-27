@@ -2,18 +2,22 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
 import django_filters
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework.response import Response
 from rest_framework import status as statuses
+from rest_framework.views import APIView
 
+from core.common import DISPLAY_CLUSTER_TYPES
+from utils.serializers import serialize_choices
 from .filters import LocationFilter
-from .permissions import IsAuthenticated
+from .permissions import IsAuthenticated, IsIMOForCurrentWorkspace
 from .models import Workspace, Location, ResponsePlan
 from .serializers import (
     WorkspaceSerializer,
     ShortLocationSerializer,
     ChildrenLocationSerializer,
     ResponsePlanSerializer,
+    CreateResponsePlanSerializer,
 )
 
 
@@ -99,3 +103,23 @@ class ResponsePlanAPIView(ListAPIView):
     def get_queryset(self):
         workspace_id = self.kwargs.get('workspace_id')
         return ResponsePlan.objects.filter(workspace_id=workspace_id)
+
+
+class ResponsePlanCreateAPIView(CreateAPIView):
+    """
+    REST API endpoint to create Response Plan
+    """
+
+    serializer_class = CreateResponsePlanSerializer
+    permission_classes = (IsIMOForCurrentWorkspace, )
+
+
+class ConfigurationAPIView(APIView):
+
+    # kept public on purpose
+    permission_classes = ()
+
+    def get(self, request):
+        return Response({
+            'CLUSTER_TYPE_CHOICES': serialize_choices(DISPLAY_CLUSTER_TYPES)
+        })

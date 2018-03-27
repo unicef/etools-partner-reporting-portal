@@ -9,6 +9,10 @@
         return BASE_URL + tail;
       },
 
+      config: function () {
+        return this._buildUrl('/core/configuration/');
+      },
+
       interventions: function () {
         return this._buildUrl('/core/workspace/');
       },
@@ -275,6 +279,18 @@
 
       indicatorIMOMessage: function () {
         return this._buildUrl('/indicator/cluster-indicator-imo-message/');
+      },
+      
+      ochaResponsePlans: function (workspaceId) {
+        return this._buildUrl('/ocha/response-plans/workspace/' + workspaceId + '/');
+      },
+
+      ochaResponsePlanDetails: function (planId) {
+        return this._buildUrl('/ocha/response-plans/' + planId + '/');
+      },
+
+      customResponsePlan: function (workspaceId) {
+        return this._buildUrl('/core/workspace/' + workspaceId + '/response-plan/create/');
       },
     };
   }());

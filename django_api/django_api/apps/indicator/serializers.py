@@ -792,12 +792,12 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         """
         if float(validated_data['baseline']['v']) > float(validated_data['target']['v']):
             raise ValidationError(
-                {"baseline": "Baseline cannot be greater than target"}
+                {"baseline": "Cannot be greater than target"}
             )
 
         if float(validated_data['target']['v']) > float(validated_data['in_need']['v']):
             raise ValidationError(
-                {"target": "Target cannot be greater than In Need"}
+                {"target": "Cannot be greater than In Need"}
             )
 
     def check_location_admin_levels(self, location_goal_queryset):

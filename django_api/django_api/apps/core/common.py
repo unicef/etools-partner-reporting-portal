@@ -15,7 +15,7 @@ REPORTING_TYPES = Choices(
     ('SR', 'Special Report'),
 )
 
-CLUSTER_TYPES = Choices(
+DISPLAY_CLUSTER_TYPES = Choices(
     ('cccm', 'CCCM'),
     ('early_recovery', 'Early Recovery'),
     ('education', 'Education'),
@@ -27,6 +27,9 @@ CLUSTER_TYPES = Choices(
     ('protection', 'Protection'),
     ('shelter', 'Shelter'),
     ('wash', 'WASH'),
+)
+
+CLUSTER_TYPES = DISPLAY_CLUSTER_TYPES + Choices(
     ('imported', 'Imported'),
 )
 

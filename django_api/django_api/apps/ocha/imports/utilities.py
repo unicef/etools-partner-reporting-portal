@@ -3,13 +3,14 @@ from time import sleep
 
 import itertools
 import requests
+from requests import RequestException
 from requests.status_codes import codes
 
 from cluster.models import Cluster, ClusterObjective, ClusterActivity
 from core.common import EXTERNAL_DATA_SOURCES
 from core.models import ResponsePlan
 from indicator.models import Reportable, IndicatorBlueprint
-from ocha.constants import HPC_V2_ROOT_URL, HPC_V1_ROOT_URL
+from ocha.constants import HPC_V2_ROOT_URL, HPC_V1_ROOT_URL, RefCode
 from ocha.imports.serializers import V2PartnerProjectImportSerializer, V1FundingSourceImportSerializer, \
     V1ResponsePlanImportSerializer
 from ocha.utilities import get_dict_from_list_by_key
@@ -30,12 +31,18 @@ MAX_URL_RETRIES = 2
 
 
 def get_json_from_url(url, retry_counter=MAX_URL_RETRIES):
-    logger.debug('Getting {}, attempt: {}'.format(url, MAX_URL_RETRIES - retry_counter + 1))
-    response = requests.get(url)
-
-    if response.status_code in RETRY_ON_STATUS_CODES and retry_counter > 0:
+    def retry():
         sleep(5)
         return get_json_from_url(url, retry_counter=retry_counter - 1)
+
+    logger.debug('Getting {}, attempt: {}'.format(url, MAX_URL_RETRIES - retry_counter + 1))
+    try:
+        response = requests.get(url, timeout=20)
+    except RequestException:
+        return retry()
+
+    if response.status_code in RETRY_ON_STATUS_CODES and retry_counter > 0:
+        return retry()
     elif not response.status_code == codes.ok:
         raise OCHAImportException('Invalid response status code: {}'.format(response.status_code))
 
@@ -46,7 +53,7 @@ def get_json_from_url(url, retry_counter=MAX_URL_RETRIES):
     return response_json
 
 
-def import_project(external_project_id, workspace_id=None):
+def import_project(external_project_id, workspace=None):
     source_url = HPC_V2_ROOT_URL + 'project/{}'.format(external_project_id)
     project_data = get_json_from_url(source_url)
     serializer = V2PartnerProjectImportSerializer(data=project_data['data'])
@@ -64,7 +71,7 @@ def import_project(external_project_id, workspace_id=None):
 
     for plan in project_data['data']['plans']:
         if not ResponsePlan.objects.filter(external_source=EXTERNAL_DATA_SOURCES.HPC, external_id=plan['id']).exists():
-            import_response_plan(plan['id'], workspace_id=workspace_id)
+            import_response_plan(plan['id'], workspace=workspace)
 
     project_cluster_ids = [c['id'] for c in project_data['data']['governingEntities']]
 
@@ -78,12 +85,12 @@ def import_project(external_project_id, workspace_id=None):
     return project
 
 
-def import_response_plan(external_plan_id, workspace_id=None):
+def import_response_plan(external_plan_id, workspace=None):
     logger.debug('Importing Response Plan #{}'.format(external_plan_id))
     source_url = HPC_V1_ROOT_URL + 'rpm/plan/id/{}?format=json&content=entities'.format(external_plan_id)
     plan_data = get_json_from_url(source_url)['data']
-    if workspace_id:
-        plan_data['workspace_id'] = workspace_id
+    if workspace:
+        plan_data['workspace_id'] = workspace.id
     plan_serializer = V1ResponsePlanImportSerializer(data=plan_data)
     plan_serializer.is_valid(raise_exception=True)
     response_plan = plan_serializer.save()
@@ -166,9 +173,9 @@ def save_activities_and_objectives_for_response_plan(entities_response={}, measu
 
     plan_entity_list = entities_response['planEntities'] + measurements_response['planEntities']
     for entity in plan_entity_list:
-        if entity['value']['type']['en']['singular'] in {'Strategic Objective', 'Cluster Objective'}:
+        if entity['entityPrototype']['refCode'] in {RefCode.CLUSTER_OBJECTIVE, RefCode.STRATEGIC_OBJECTIVE}:
             objectives[entity['id']] = entity
-        elif entity['value']['type']['en']['singular'] == 'Cluster Activity':
+        elif entity['entityPrototype']['refCode'] == RefCode.CLUSTER_ACTIVITY:
             activities.append(entity)
     logger.debug('Found {} objectives and {} activities'.format(
         len(objectives), len(activities)

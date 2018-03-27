@@ -266,7 +266,9 @@ class V1ResponsePlanImportSerializer(DiscardUniqueTogetherValidationMixin, seria
     locations = V1ResponsePlanLocationImportSerializer(many=True)
     emergencies = serializers.ListField()
     categories = serializers.ListField()
-    governingEntities = serializers.ListField(allow_empty=False)  # Clusters
+    governingEntities = serializers.ListField(allow_empty=False, error_messages={
+        'empty': 'This Response Plan has no Clusters.'
+    })
 
     class Meta:
         model = ResponsePlan
