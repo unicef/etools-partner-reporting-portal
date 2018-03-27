@@ -268,6 +268,10 @@
       analysisIndicator: function (responsePlanId, indicatorId) {
         return this.analysisIndicators(responsePlanId) + indicatorId;
       },
+
+      indicatorPerLocationVars: function (reportableId) {
+        return this._buildUrl('/indicator/' + reportableId + '/baseline_in_need');
+      },
     };
   }());
 </script>

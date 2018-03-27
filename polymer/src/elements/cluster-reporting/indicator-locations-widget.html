@@ -40,11 +40,15 @@
         @apply --app-grid-expandible-item;
       }
 
-      h2 {
+      header {
+        background-color: var(--paper-grey-200);
         padding: 5px 10px;
         margin: 0 0 1em;
+      }
+
+      h3 {
+        margin: 0;
         font-size: 14px;
-        background-color: var(--paper-grey-200);
       }
 
       .row {
@@ -75,6 +79,16 @@
 
         @apply --truncate;
       }
+
+      .imo-msg-label {
+        font-size: 12px;
+        color: var(--theme-secondary-text-color);
+      }
+
+      .imo-msg-btn {
+        padding: 0;
+        margin: 0;
+      }
     </style>
 
     <etools-prp-permissions
@@ -91,7 +105,25 @@
       </etools-prp-ajax>
     </template>
 
-    <h2>Locations ([[value.length]])</h2>
+    <header>
+      <h3>Locations ([[value.length]])</h3>
+      <template
+          is="dom-if"
+          if="[[canMessageIMO]]"
+          restamp="true">
+        <div class="layout horizontal justified">
+          <div class="imo-msg-label self-end">To propose "Baseline" and "In need" for locations added by you, please contact IMO.</div>
+          <div>
+            <paper-button
+                class="imo-msg-btn btn-primary"
+                on-tap="_msgIMO"
+                noink>
+              Send a message to IMO
+            </paper-button>
+          </div>
+        </div>
+      </template>
+    </header>
 
     <template
         is="dom-repeat"
@@ -299,6 +331,11 @@
             type: Boolean,
             computed: '_computeCanEditDetails(editing, permissions.editIndicatorDetails)',
           },
+
+          canMessageIMO: {
+            type: Boolean,
+            computed: '_computeCanMessageIMO(editing, canEditDetails)',
+          },
         },
 
         _computeIsNumber: function (type) {
@@ -337,6 +374,10 @@
 
         _computeCanEditDetails: function (editing, editIndicatorDetails) { // jshint ignore:line
           return true; // TODO: actual permissions
+        },
+
+        _computeCanMessageIMO: function (editing, canEditDetails) {
+          return editing && !canEditDetails;
         },
 
         _lockItems: function (value) {
@@ -440,6 +481,10 @@
           newLocations[loc_type] = value;
 
           this.set('locations', newLocations);
+        },
+
+        _msgIMO: function () {
+          // TODO
         },
 
         validate: function () {

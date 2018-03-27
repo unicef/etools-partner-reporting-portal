@@ -19,6 +19,8 @@
         --labelled-item-label: {
           position: relative;
           top: 1px;
+
+          @apply --json-field-label;
         };
       }
 
@@ -59,7 +61,8 @@
           allowed-pattern="[[allowedPattern]]"
           required="[[required]]"
           disabled="[[disabled]]"
-          always-float-label>
+          no-label-float="[[hideLabel]]"
+          always-float-label="[[!hideLabel]]">
       </paper-input>
     </template>
 
@@ -118,6 +121,11 @@
         },
 
         disabled: {
+          type: Boolean,
+          value: false,
+        },
+
+        hideLabel: {
           type: Boolean,
           value: false,
         },
