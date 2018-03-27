@@ -1,1 +1,1 @@
-Cluster Indicator change request from {partner_name}
+Cluster Indicator change request from {{partner_name}}

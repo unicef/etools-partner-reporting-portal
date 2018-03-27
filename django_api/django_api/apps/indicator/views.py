@@ -663,23 +663,23 @@ class ClusterIndicatorSendIMOMessageAPIView(APIView):
 
             return Response(error_object, status=status.HTTP_400_BAD_REQUEST)
 
-        elif not cluster.imo_users.exists():
-            error_msg = "There is no IMO user on the Cluster ID %d" % cluster.id
-
-            error_object = {
-                "cluster_id": [error_msg, ],
-                "error_codes": {"cluster_id": [error_msg, ]}
-            }
-
-            return Response(error_object, status=status.HTTP_400_BAD_REQUEST)
-
-        elif reportable not in cluster.reportables.all():
+        elif reportable.content_object.cluster != cluster:
             error_msg = "Reportable ID %d does not belong to Cluster ID %d" % \
                 (reportable.id, cluster.id)
 
             error_object = {
                 "reportable_id": [error_msg, ],
                 "error_codes": {"reportable_id": [error_msg, ]}
+            }
+
+            return Response(error_object, status=status.HTTP_400_BAD_REQUEST)
+
+        elif not cluster.imo_users.exists():
+            error_msg = "There is no IMO user on the Cluster ID %d" % cluster.id
+
+            error_object = {
+                "cluster_id": [error_msg, ],
+                "error_codes": {"cluster_id": [error_msg, ]}
             }
 
             return Response(error_object, status=status.HTTP_400_BAD_REQUEST)
