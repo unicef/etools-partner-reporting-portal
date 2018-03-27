@@ -654,7 +654,7 @@ class ClusterIndicatorSendIMOMessageAPIView(APIView):
         )
 
         if cluster not in request.user.partner.clusters.all():
-            error_msg = "User does not belong to Cluster ID %d" % cluster.id
+            error_msg = "Cluster ID %d does not belong to Partner" % cluster.id
 
             error_object = {
                 "cluster_id": [error_msg, ],
@@ -674,7 +674,7 @@ class ClusterIndicatorSendIMOMessageAPIView(APIView):
             return Response(error_object, status=status.HTTP_400_BAD_REQUEST)
 
         elif reportable not in cluster.reportables.all():
-            error_msg = "Reportable ID does not belong to Cluster ID %d" % \
+            error_msg = "Reportable ID %d does not belong to Cluster ID %d" % \
                 (reportable.id, cluster.id)
 
             error_object = {
