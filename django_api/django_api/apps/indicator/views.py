@@ -638,72 +638,11 @@ class ClusterIndicatorSendIMOMessageAPIView(APIView):
     )
 
     def post(self, request, *args, **kwargs):
-        from cluster.models import Cluster
-
-        from partner.models import PartnerActivity
-
         serializer = ClusterIndicatorIMOMessageSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        cluster = get_object_or_404(
-            Cluster,
-            id=serializer.validated_data['cluster_id']
-        )
-
-        reportable = get_object_or_404(
-            Reportable,
-            id=serializer.validated_data['reportable_id']
-        )
-
-        if cluster not in request.user.partner.clusters.all():
-            error_msg = "Cluster does not belong to Partner"
-
-            error_object = {
-                "cluster_id": [error_msg, ],
-                "error_codes": {"cluster_id": [error_msg, ]}
-            }
-
-            return Response(error_object, status=status.HTTP_400_BAD_REQUEST)
-
-        elif reportable.content_type.model_class() != PartnerActivity:
-            error_msg = "Indicator is not PartnerActivity Indicator"
-
-            error_object = {
-                "reportable_id": [error_msg, ],
-                "error_codes": {"reportable_id": [error_msg, ]}
-            }
-
-            return Response(error_object, status=status.HTTP_400_BAD_REQUEST)
-
-        elif reportable.content_type.model_class() == PartnerActivity and not reportable.content_type.cluster_activity:
-            error_msg = "Indicator is not PartnerActivity Indicator from ClusterActivity"
-
-            error_object = {
-                "reportable_id": [error_msg, ],
-                "error_codes": {"reportable_id": [error_msg, ]}
-            }
-
-            return Response(error_object, status=status.HTTP_400_BAD_REQUEST)
-
-        elif reportable.content_object.cluster != cluster:
-            error_msg = "Indicator does not belong to Cluster"
-
-            error_object = {
-                "reportable_id": [error_msg, ],
-                "error_codes": {"reportable_id": [error_msg, ]}
-            }
-
-            return Response(error_object, status=status.HTTP_400_BAD_REQUEST)
-
-        elif not cluster.imo_users.exists():
-            error_msg = "There is no IMO user on the Cluster"
-
-            error_object = {
-                "cluster_id": [error_msg, ],
-                "error_codes": {"cluster_id": [error_msg, ]}
-            }
-
-            return Response(error_object, status=status.HTTP_400_BAD_REQUEST)
+        cluster = serializer.validated_data['cluster']
+        reportable = serializer.validated_data['reportable']
 
         imo_user = cluster.imo_users.first()
         template_data = {

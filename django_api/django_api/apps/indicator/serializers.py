@@ -1546,5 +1546,41 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
 
 class ClusterIndicatorIMOMessageSerializer(serializers.Serializer):
     message = serializers.CharField(max_length=4048)
-    cluster_id = serializers.IntegerField()
-    reportable_id = serializers.IntegerField()
+    cluster = serializers.IntegerField()
+    reportable = serializers.IntegerField()
+
+    def validate(self, data):
+        from cluster.models import Cluster
+
+        from partner.models import PartnerActivity
+
+        cluster = get_object_or_404(
+            Cluster,
+            id=data['cluster']
+        )
+
+        data['cluster'] = cluster
+
+        reportable = get_object_or_404(
+            Reportable,
+            id=data['reportable']
+        )
+
+        data['reportable'] = reportable
+
+        if cluster not in self.context['request'].user.partner.clusters.all():
+            raise serializers.ValidationError("Cluster does not belong to Partner")
+
+        elif reportable.content_type.model_class() != PartnerActivity:
+            raise serializers.ValidationError("Indicator is not PartnerActivity Indicator")
+
+        elif reportable.content_type.model_class() == PartnerActivity and not reportable.content_type.cluster_activity:
+            raise serializers.ValidationError("Indicator is not PartnerActivity Indicator from ClusterActivity")
+
+        elif reportable.content_object.cluster != cluster:
+            raise serializers.ValidationError("Indicator does not belong to Cluster")
+
+        elif not cluster.imo_users.exists():
+            raise serializers.ValidationError("There is no IMO user on the Cluster")
+
+        return data
