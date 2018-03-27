@@ -1569,20 +1569,30 @@ class ClusterIndicatorIMOMessageSerializer(serializers.Serializer):
         data['reportable'] = reportable
 
         if cluster not in self.context['request'].user.partner.clusters.all():
-            raise serializers.ValidationError("Cluster does not belong to Partner")
+            raise ValidationError({
+                "cluster": "Cluster does not belong to Partner",
+            })
 
         elif reportable.content_type.model_class() != PartnerActivity:
-            raise serializers.ValidationError("Indicator is not PartnerActivity Indicator")
+            raise ValidationError({
+                "reportable": "Indicator is not PartnerActivity Indicator",
+            })
 
         elif reportable.content_type.model_class() == PartnerActivity \
                 and not reportable.content_object.cluster_activity:
-            raise serializers.ValidationError("Indicator is not PartnerActivity Indicator from ClusterActivity")
+            raise ValidationError({
+                "reportable": "Indicator is not PartnerActivity Indicator from ClusterActivity",
+            })
 
         elif reportable.content_object.cluster_activity.cluster != cluster:
-            raise serializers.ValidationError("Indicator does not belong to Cluster")
+            raise ValidationError({
+                "reportable": "Indicator does not belong to Cluster",
+            })
 
         elif not cluster.imo_users.exists():
-            raise serializers.ValidationError("There is no IMO user on the Cluster")
+            raise ValidationError({
+                "cluster": "There is no IMO user on the Cluster",
+            })
 
         return {
             'message': data['message'],
