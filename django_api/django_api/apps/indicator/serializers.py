@@ -252,6 +252,12 @@ class IndicatorListSerializer(ReportableSimpleSerializer):
             'pd_id',
             'disaggregations',
             'locations',
+            'comments',
+            'measurement_specifications',
+            'start_date_of_reporting_period',
+            'label',
+            'numerator_label',
+            'denominator_label',
         )
 
 
@@ -750,6 +756,12 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             'target',
             'baseline',
             'in_need',
+            'comments',
+            'measurement_specifications',
+            'start_date_of_reporting_period',
+            'label',
+            'numerator_label',
+            'denominator_label',
         )
 
     def check_disaggregation(self, disaggregations):
@@ -1530,3 +1542,67 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
             'current_progress_by_partner',
             'current_progress_by_location',
         )
+
+
+class ClusterIndicatorIMOMessageSerializer(serializers.Serializer):
+    message = serializers.CharField(max_length=4048)
+    cluster = serializers.IntegerField()
+    reportable = serializers.IntegerField()
+
+    def to_internal_value(self, data):
+        from cluster.models import Cluster
+
+        from partner.models import PartnerActivity
+
+        cluster = get_object_or_404(
+            Cluster,
+            id=data['cluster']
+        )
+
+        data['cluster'] = cluster
+
+        reportable = get_object_or_404(
+            Reportable,
+            id=data['reportable']
+        )
+
+        data['reportable'] = reportable
+
+        if cluster not in self.context['request'].user.partner.clusters.all():
+            raise ValidationError({
+                "cluster": "Cluster does not belong to Partner",
+            })
+
+        elif reportable.content_type.model_class() != PartnerActivity:
+            raise ValidationError({
+                "reportable": "Indicator is not PartnerActivity Indicator",
+            })
+
+        elif reportable.content_type.model_class() == PartnerActivity \
+                and not reportable.content_object.cluster_activity:
+            raise ValidationError({
+                "reportable": "Indicator is not PartnerActivity Indicator from ClusterActivity",
+            })
+
+        elif reportable.content_object.cluster_activity.cluster != cluster:
+            raise ValidationError({
+                "reportable": "Indicator does not belong to Cluster",
+            })
+
+        elif not cluster.imo_users.exists():
+            raise ValidationError({
+                "cluster": "There is no IMO user on the Cluster",
+            })
+
+        return {
+            'message': data['message'],
+            'cluster': cluster,
+            'reportable': reportable,
+        }
+
+    def to_representation(self, data):
+        return {
+            'message': data['message'],
+            'cluster': data['cluster'].id,
+            'reportable': data['reportable'].id,
+        }
