@@ -119,6 +119,7 @@
       properties: {
         data: Object,
         errors: Object,
+        clusterId: Number,
         indicatorId: Number,
 
         pending: {
@@ -138,14 +139,14 @@
       },
 
       observers: [
-        '_setDefaults(opened, indicatorId)',
+        '_setDefaults(opened, indicatorId, clusterId)',
       ],
 
       _validate: function (e) {
         e.target.validate();
       },
 
-      _setDefaults: function (opened, indicatorId) {
+      _setDefaults: function (opened, indicatorId, clusterId) {
         if (!opened) {
           return;
         }
@@ -154,6 +155,7 @@
 
         this.set('data', {
           reportable: indicatorId,
+          cluster: clusterId,
         });
       },
 
