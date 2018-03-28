@@ -134,13 +134,15 @@ class IndicatorBlueprint(TimeStampedExternalSourceModel):
     disaggregatable = models.BooleanField(default=False)
 
     calculation_formula_across_periods = models.CharField(
-        max_length=10, choices=CALC_CHOICES, default=SUM)
+        max_length=10, choices=CALC_CHOICES, default=SUM
+    )
     calculation_formula_across_locations = models.CharField(
-        max_length=10, choices=CALC_CHOICES, default=SUM)
+        max_length=10, choices=CALC_CHOICES, default=SUM
+    )
 
-    display_type = models.CharField(max_length=10,
-                                    choices=DISPLAY_TYPE_CHOICES,
-                                    default=NUMBER)
+    display_type = models.CharField(
+        max_length=10, choices=DISPLAY_TYPE_CHOICES, default=NUMBER
+    )
 
     # TODO: add:
     # siblings (similar indicators to this indicator)
@@ -221,9 +223,7 @@ class Reportable(TimeStampedExternalSourceModel):
     baseline = models.CharField(max_length=255, null=True, blank=True)
     in_need = models.CharField(max_length=255, null=True, blank=True)
     assumptions = models.TextField(null=True, blank=True)
-    means_of_verification = models.CharField(max_length=255,
-                                             null=True,
-                                             blank=True)
+    means_of_verification = models.CharField(max_length=255, null=True, blank=True)
     is_cluster_indicator = models.BooleanField(default=False)
 
     # Current total, transactional and dynamically calculated based on
@@ -241,9 +241,9 @@ class Reportable(TimeStampedExternalSourceModel):
     object_id = models.PositiveIntegerField()
     # One of ClusterObjective, ClusterActivity, PartnerProject, PartnerActivity
     content_object = GenericForeignKey('content_type', 'object_id')
-    blueprint = models.ForeignKey(IndicatorBlueprint,
-                                  null=True,
-                                  related_name="reportables")
+    blueprint = models.ForeignKey(
+        IndicatorBlueprint, null=True, related_name="reportables"
+    )
     parent_indicator = models.ForeignKey('self', null=True, blank=True,
                                          related_name='children',
                                          db_index=True)
@@ -259,8 +259,9 @@ class Reportable(TimeStampedExternalSourceModel):
     cs_dates = ArrayField(
         models.DateField(), default=list, null=True, blank=True
     )
-    location_admin_refs = ArrayField(JSONField(), default=list, null=True,
-                                     blank=True)
+    location_admin_refs = ArrayField(
+        JSONField(), default=list, null=True, blank=True
+    )
     disaggregations = models.ManyToManyField(Disaggregation, blank=True)
 
     active = models.BooleanField(default=True)

@@ -442,23 +442,28 @@ class Location(TimeStampedExternalSourceModel):
         'core.CartoDBTable',
         related_name="locations",
         blank=True,
-        null=True)
+        null=True
+    )
 
     latitude = models.DecimalField(
         null=True,
         blank=True,
         max_digits=8,
         decimal_places=5,
-        validators=[MinValueValidator(
-            Decimal(-90)), MaxValueValidator(Decimal(90))]
+        validators=[
+            MinValueValidator(Decimal(-90)),
+            MaxValueValidator(Decimal(90))
+        ]
     )
     longitude = models.DecimalField(
         null=True,
         blank=True,
         max_digits=8,
         decimal_places=5,
-        validators=[MinValueValidator(
-            Decimal(-180)), MaxValueValidator(Decimal(180))]
+        validators=[
+            MinValueValidator(Decimal(-180)),
+            MaxValueValidator(Decimal(180))
+        ]
     )
     p_code = models.CharField(max_length=32, blank=True, null=True, verbose_name='Postal Code')
 
@@ -480,8 +485,7 @@ class Location(TimeStampedExternalSourceModel):
                 self.title,
                 self.gateway.name,
                 "{}: {}".format(
-                    'CERD' if self.gateway.name == 'School' else 'PCode',
-                    self.p_code if self.p_code else ''
+                    'CERD' if self.gateway.name == 'School' else 'PCode', self.p_code or ''
                 ))
 
         return self.title

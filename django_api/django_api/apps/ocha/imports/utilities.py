@@ -8,7 +8,7 @@ from requests.status_codes import codes
 
 from cluster.models import Cluster, ClusterObjective, ClusterActivity
 from core.common import EXTERNAL_DATA_SOURCES, CLUSTER_TYPES
-from core.models import ResponsePlan
+from core.models import ResponsePlan, Location
 from indicator.models import Reportable, IndicatorBlueprint
 from ocha.constants import HPC_V2_ROOT_URL, HPC_V1_ROOT_URL, RefCode
 from ocha.imports.serializers import V2PartnerProjectImportSerializer, V1FundingSourceImportSerializer, \
@@ -53,6 +53,44 @@ def get_json_from_url(url, retry_counter=MAX_URL_RETRIES):
     return response_json
 
 
+def import_project_details(project, current_version_id):
+    source_url = HPC_V2_ROOT_URL + 'project-version/{}/attachments'.format(current_version_id)
+    attachments = get_json_from_url(source_url)['data']
+
+    reportables = []
+
+    for attachment in attachments:
+        if attachment['attachment']['type'] == 'indicator':
+            blueprint, _ = IndicatorBlueprint.objects.update_or_create(
+                external_source=EXTERNAL_DATA_SOURCES.HPC,
+                external_id=attachment['attachment']['id'],
+                defaults={
+                    'title': attachment['attachment']['value']['description'],
+                }
+            )
+
+            totals = attachment['attachment']['value']['metrics']['values']['totals']
+
+            target = get_dict_from_list_by_key(totals, 'Target', key='name.en')['value']
+            in_need = get_dict_from_list_by_key(totals, 'In Need', key='name.en')['value']
+            baseline = get_dict_from_list_by_key(totals, 'Baseline', key='name.en')['value']
+
+            # TODO: Parent activity
+            reportable, _ = Reportable.objects.update_or_create(
+                external_source=EXTERNAL_DATA_SOURCES.HPC,
+                external_id=attachment['attachment']['id'],
+                defaults={
+                    'blueprint': blueprint,
+                    'target': target,
+                    'in_need': in_need,
+                    'baseline': baseline,
+                }
+            )
+            reportables.append(reportable)
+
+    project.reportables.add(*reportables)
+
+
 def import_project(external_project_id, response_plan=None):
     source_url = HPC_V2_ROOT_URL + 'project/{}'.format(external_project_id)
     project_data = get_json_from_url(source_url)
@@ -95,6 +133,7 @@ def import_project(external_project_id, response_plan=None):
         external_id__in=project_cluster_ids,
     ))
     project.clusters.add(*clusters)
+    import_project_details(project, project_data['data']['currentPublishedVersionId'])
 
     return project
 
