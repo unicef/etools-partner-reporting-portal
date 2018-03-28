@@ -8,9 +8,10 @@ from requests.status_codes import codes
 
 from cluster.models import Cluster, ClusterObjective, ClusterActivity
 from core.common import EXTERNAL_DATA_SOURCES, CLUSTER_TYPES
-from core.models import ResponsePlan
+from core.models import ResponsePlan, Country, GatewayType, Location
 from indicator.models import Reportable, IndicatorBlueprint
 from ocha.constants import HPC_V2_ROOT_URL, HPC_V1_ROOT_URL, RefCode
+from ocha.imports.bulk import fetch_json_urls_async
 from ocha.imports.serializers import V2PartnerProjectImportSerializer, V1FundingSourceImportSerializer, \
     V1ResponsePlanImportSerializer
 from ocha.utilities import get_dict_from_list_by_key
@@ -53,6 +54,62 @@ def get_json_from_url(url, retry_counter=MAX_URL_RETRIES):
     return response_json
 
 
+def save_location_list(location_list):
+    location_ids = [l['id'] for l in location_list if 'id' in l]
+    source_urls = [
+        HPC_V2_ROOT_URL + 'location/{}'.format(lid) for lid in location_ids
+    ]
+    location_data_list = fetch_json_urls_async(source_urls)
+
+    location_country_map = {}
+
+    location_data_list = sorted(location_data_list, key=lambda l: l['data']['adminLevel'])
+
+    locations = []
+    for location_data in location_data_list:
+        if location_data['data']['adminLevel'] == 0:
+            country, _ = Country.objects.update_or_create(
+                country_short_code=location_data['data']['iso3'],
+                defaults={
+                    'name': location_data['data']['name']
+                }
+            )
+            for child in location_data['data']['children']:
+                location_country_map[child['id']] = country
+        elif location_data['data']['id'] in location_country_map:
+            country = location_country_map[location_data['data']['id']]
+            for child in location_data['data']['children']:
+                location_country_map[child['id']] = country
+        else:
+            logger.warning(
+                'Couldn\'t find country for {}, skipping'.format(location_data['data']['id'])
+            )
+
+        gateway_name = '{} - Admin Level {}'.format(country.country_short_code, location_data['data']['adminLevel'])
+        gateway, _ = GatewayType.objects.get_or_create(
+            country=country,
+            admin_level=location_data['data']['adminLevel'],
+            defaults={
+                'name': gateway_name
+            }
+        )
+
+        location, _ = Location.objects.update_or_create(
+            external_source=EXTERNAL_DATA_SOURCES.HPC,
+            external_id=location_data['data']['id'],
+            defaults={
+                'title': location_data['data']['name'],
+                'p_code': location_data['data']['pcode'],
+                'latitude': location_data['data'].get('latitude'),
+                'longitude': location_data['data'].get('longitude'),
+                'gateway': gateway,
+            }
+        )
+        locations.append(location)
+
+    return locations
+
+
 def import_project_details(project, current_version_id):
     source_url = HPC_V2_ROOT_URL + 'project-version/{}/attachments'.format(current_version_id)
     attachments = get_json_from_url(source_url)['data']
@@ -70,12 +127,15 @@ def import_project_details(project, current_version_id):
             )
 
             totals = attachment['attachment']['value']['metrics']['values']['totals']
+            disaggregated = attachment['attachment']['value']['metrics']['values']['disaggregated']
 
             target = get_dict_from_list_by_key(totals, 'Target', key='name.en')['value']
             in_need = get_dict_from_list_by_key(totals, 'In Need', key='name.en')['value']
             baseline = get_dict_from_list_by_key(totals, 'Baseline', key='name.en')['value']
 
-            # TODO: Parent activity
+            locations = save_location_list(disaggregated['locations'])
+
+            # TODO: Parent content_object
             reportable, _ = Reportable.objects.update_or_create(
                 external_source=EXTERNAL_DATA_SOURCES.HPC,
                 external_id=attachment['attachment']['id'],
@@ -86,8 +146,13 @@ def import_project_details(project, current_version_id):
                     'baseline': baseline,
                 }
             )
+
+            reportable.locations.add(*locations)
             reportables.append(reportable)
 
+    logger.debug('Saving {} reportables for {}'.format(
+        len(reportables), project
+    ))
     project.reportables.add(*reportables)
 
 

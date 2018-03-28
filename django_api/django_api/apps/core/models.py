@@ -492,8 +492,7 @@ class Location(TimeStampedExternalSourceModel):
 
     @property
     def geo_point(self):
-        return self.point if self.point else \
-            self.geom.point_on_surface if self.geom else ""
+        return self.point if self.point else self.geom.point_on_surface if self.geom else ""
 
     @property
     def point_lat_long(self):

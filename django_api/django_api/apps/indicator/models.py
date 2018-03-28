@@ -232,10 +232,9 @@ class Reportable(TimeStampedExternalSourceModel):
 
     # unique code for this indicator within the current context
     # eg: (1.1) result code 1 - indicator code 1
-    context_code = models.CharField(max_length=50,
-                                    null=True,
-                                    blank=True,
-                                    verbose_name="Code in current context")
+    context_code = models.CharField(
+        max_length=50, null=True, blank=True, verbose_name="Code in current context"
+    )
 
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
