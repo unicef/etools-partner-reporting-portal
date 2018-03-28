@@ -443,7 +443,11 @@
             });
       },
 
-      _fetchPlanDetails: function () {
+      _fetchPlanDetails: function (url) {
+        if (!url) {
+          return;
+        }
+
         this.set('planDetailsLoading', true);
         var self = this;
         this.$.planDetails.abort();
