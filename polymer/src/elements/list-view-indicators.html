@@ -10,6 +10,7 @@
 <link rel="import" href="../behaviors/utils.html">
 <link rel="import" href="list-view-single-indicator.html">
 <link rel="import" href="list-placeholder.html">
+<link rel="import" href="etools-prp-permissions.html">
 <link rel="import" href="../styles/table-styles.html">
 
 <dom-module id="list-view-indicators">
@@ -30,6 +31,10 @@
         params-string="{{query}}"
         params-object="{{queryParams}}">
     </iron-query-params>
+
+    <etools-prp-permissions
+        permissions="{{permissions}}">
+    </etools-prp-permissions>
 
     <etools-content-panel panel-title="List of Indicators">
       <etools-data-table-header
@@ -80,7 +85,12 @@
           <etools-data-table-column field="">
             <div class="table-column">&nbsp;</div>
           </etools-data-table-column>
+        </template>
 
+        <template
+            is="dom-if"
+            if="[[canEditLocations]]"
+            restamp="true">
           <etools-data-table-column field="">
             <div class="table-column">&nbsp;</div>
           </etools-data-table-column>
@@ -102,9 +112,10 @@
                 initial-count="[[pageSize]]"
                 as="indicator">
         <list-view-single-indicator
-          indicator="{{indicator}}"
-          is-custom="[[isCustom]]"
-          can-edit="[[canEdit]]">
+            indicator="{{indicator}}"
+            is-custom="[[isCustom]]"
+            can-edit="[[canEdit]]"
+            type="[[type]]">
         </list-view-single-indicator>
       </template>
 
@@ -151,6 +162,13 @@
 
         pageNumber: Number,
 
+        permissions: Object,
+
+        type: {
+          type: String,
+          value: '',
+        },
+
         openedDetails: {
           type: Array,
           value: []
@@ -165,6 +183,11 @@
           type: String,
           statePath: 'app.current',
         },
+
+        canEditLocations: {
+          type: Boolean,
+          computed: '_computeCanEditLocations(isClusterApp, type, permissions)',
+        },
       },
 
       listeners: {
@@ -174,6 +197,10 @@
 
       detached: function () {
           this.openedDetails.length = 0;
+      },
+
+      _computeCanEditLocations: function (isClusterApp, type, permissions) {
+        return isClusterApp && type === 'ca' && permissions.editIndicatorLocations;
       },
 
       _computeIsClusterApp: function(appName) {

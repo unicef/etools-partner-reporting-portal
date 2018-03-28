@@ -386,8 +386,8 @@
               });
         },
 
-        _computeCanEditDetails: function (editing, editIndicatorDetails) { // jshint ignore:line
-          return false; // TODO: actual permissions
+        _computeCanEditDetails: function (editing, editIndicatorDetails) {
+          return !editing || editIndicatorDetails;
         },
 
         _computeCanMessageIMO: function (editing, canEditDetails) {

@@ -12,6 +12,7 @@
 <link rel="import" href="../behaviors/routing.html">
 <link rel="import" href="../behaviors/utils.html">
 <link rel="import" href="status-badge.html">
+<link rel="import" href="etools-prp-permissions.html">
 <link rel="import" href="cluster-reporting/indicator-editing-modal.html">
 <link rel="import" href="cluster-reporting/indicator-locations-modal.html">
 
@@ -69,6 +70,10 @@
         text-align: right;
       }
     </style>
+
+    <etools-prp-permissions
+        permissions="{{permissions}}">
+    </etools-prp-permissions>
 
     <template
         is="dom-if"
@@ -162,7 +167,9 @@
           <span class="table-cell table-cell--text table-cell--action self-center">
             <a href="#" on-tap="_openModal" data-modal-type="edit">EDIT</a>
           </span>
+        </template>
 
+        <template is="dom-if" if="[[canEditLocations]]" restamp="true">
           <span class="table-cell table-cell--text table-cell--action self-center">
             <a href="#" on-tap="_openModal" data-modal-type="locations">LOCATIONS</a>
           </span>
@@ -195,6 +202,7 @@
 
       properties: {
         indicator: Object,
+        permissions: Object,
 
         detailsOpened: {
           type: Boolean,
@@ -216,6 +224,15 @@
           statePath: 'app.current',
         },
 
+        type: {
+          type: String,
+          value: '',
+        },
+
+        canEditLocations: {
+          type: Boolean,
+          computed: '_computeCanEditLocations(isClusterApp, type, permissions)',
+        },
       },
 
       _openModal: function (e) {
@@ -246,6 +263,10 @@
         query_params += '&indicator=' + indicator.id.toString();
 
         return this.buildUrl(baseUrl, query_params);
+      },
+
+      _computeCanEditLocations: function (isClusterApp, type, permissions) {
+        return isClusterApp && type === 'ca' && permissions.editIndicatorLocations;
       },
     });
   </script>
