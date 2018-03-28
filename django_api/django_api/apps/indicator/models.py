@@ -217,7 +217,7 @@ class Reportable(TimeStampedExternalSourceModel):
     """
     target = JSONField(default=dict([('d', 1), ('v', 0)]))
     baseline = JSONField(default=dict([('d', 1), ('v', 0)]))
-    in_need = JSONField(default=dict([('d', 1), ('v', 0)]))
+    in_need = JSONField(blank=True, null=True)
     assumptions = models.TextField(null=True, blank=True)
     means_of_verification = models.CharField(max_length=255,
                                              null=True,
@@ -321,6 +321,9 @@ class Reportable(TimeStampedExternalSourceModel):
 
     @property
     def calculated_in_need(self):
+        if not self.in_need:
+            return None
+
         if self.blueprint.unit == IndicatorBlueprint.NUMBER:
             return self.in_need['v']
         else:
@@ -473,7 +476,7 @@ class ReportableLocationGoal(TimeStampedModel):
     location = models.ForeignKey("core.Location", on_delete=models.CASCADE)
     target = JSONField(default=dict([('d', 1), ('v', 0)]))
     baseline = JSONField(default=dict([('d', 1), ('v', 0)]))
-    in_need = JSONField(default=dict([('d', 1), ('v', 0)]))
+    in_need = JSONField(default=dict([('d', 1), ('v', 0)]), blank=True, null=True)
 
 
 class IndicatorReportManager(models.Manager):

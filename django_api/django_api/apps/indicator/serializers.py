@@ -612,7 +612,8 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
             'disagg_choice_lookup_map',
             'overall_status',
             'overall_status_display',
-            'narrative_assessment'
+            'narrative_assessment',
+            'parent_indicator',
         )
 
     def get_display_type(self, obj):
