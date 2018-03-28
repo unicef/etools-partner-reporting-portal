@@ -274,6 +274,7 @@ class IndicatorListSerializer(ReportableSimpleSerializer):
             'numerator_label',
             'denominator_label',
             'cluster',
+            'parent_indicator',
         )
 
 
@@ -613,7 +614,6 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
             'overall_status',
             'overall_status_display',
             'narrative_assessment',
-            'parent_indicator',
         )
 
     def get_display_type(self, obj):
