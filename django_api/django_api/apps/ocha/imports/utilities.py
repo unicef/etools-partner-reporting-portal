@@ -8,7 +8,7 @@ from requests.status_codes import codes
 
 from cluster.models import Cluster, ClusterObjective, ClusterActivity
 from core.common import EXTERNAL_DATA_SOURCES, CLUSTER_TYPES
-from core.models import ResponsePlan, Location
+from core.models import ResponsePlan
 from indicator.models import Reportable, IndicatorBlueprint
 from ocha.constants import HPC_V2_ROOT_URL, HPC_V1_ROOT_URL, RefCode
 from ocha.imports.serializers import V2PartnerProjectImportSerializer, V1FundingSourceImportSerializer, \
