@@ -802,6 +802,15 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 {"target": "Cannot be greater than In Need"}
             )
 
+        if 'd' not in validated_data['baseline']:
+            validated_data['baseline']['d'] = 0
+
+        if 'd' not in validated_data['target']:
+            validated_data['target']['d'] = 0
+
+        if 'd' not in validated_data['in_need']:
+            validated_data['in_need']['d'] = 0
+
     def check_location_admin_levels(self, location_goal_queryset):
         if location_goal_queryset.exists() and location_goal_queryset.values_list(
             'gateway__admin_level', flat=True) \
