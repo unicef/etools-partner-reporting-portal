@@ -387,16 +387,16 @@
       },
 
       _setDefaults: function () {
+        this.set('errors', {});
         this.set('selectedPlan', '');
         this.set('plansLoading', false);
         this.set('data', {});
-        this.set('planDetails', {});
-        this.set('errors', {});
       },
 
       _onOpenedChanged: function (opened) {
         if (opened) {
-          this.set('mode', '');
+        this.set('mode', '');
+        this.set('planDetails', {});
         }
       },
 
@@ -489,7 +489,7 @@
         } else {
           this.$.plan.body = Object.assign({}, this.data);
         }
-       
+        
         this.$.plan.thunk()()
           .then(function (res) {
             self.set('updatePending', false);
