@@ -803,13 +803,14 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             )
 
         if 'd' not in validated_data['baseline']:
-            validated_data['baseline']['d'] = 0
+            validated_data['baseline']['d'] = 1
 
         if 'd' not in validated_data['target']:
-            validated_data['target']['d'] = 0
+            validated_data['target']['d'] = 1
 
-        if 'd' not in validated_data['in_need']:
-            validated_data['in_need']['d'] = 0
+        if 'in_need' in validated_data \
+                and 'd' not in validated_data['in_need']:
+            validated_data['in_need']['d'] = 1
 
     def check_location_admin_levels(self, location_goal_queryset):
         if location_goal_queryset.exists() and location_goal_queryset.values_list(

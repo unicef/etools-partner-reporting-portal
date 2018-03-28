@@ -303,6 +303,9 @@ class Reportable(TimeStampedExternalSourceModel):
         TODO: old function, called from places, referred to in
         serializers. Simply returning total for now.
         """
+        if self.blueprint.display_type == IndicatorBlueprint.PERCENTAGE:
+            self.total['c'] *= 100
+
         return self.total
 
     @property
@@ -383,6 +386,12 @@ def get_reportable_data_to_clone(instance):
         'means_of_verification': instance.means_of_verification,
         'modified': instance.modified,
         'target': instance.target,
+        'comments': instance.comments,
+        'measurement_specifications': instance.measurement_specifications,
+        'start_date_of_reporting_period': instance.start_date_of_reporting_period,
+        'label': instance.label,
+        'numerator_label': instance.numerator_label,
+        'denominator_label': instance.denominator_label,
     }
 
 
