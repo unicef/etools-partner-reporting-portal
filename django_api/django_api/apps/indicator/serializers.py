@@ -213,7 +213,7 @@ class ReportableLocationGoalBaselineInNeedSerializer(serializers.ModelSerializer
 
 class ReportableLocationGoalSerializer(serializers.ModelSerializer):
     baseline = serializers.JSONField()
-    in_need = serializers.JSONField()
+    in_need = serializers.JSONField(required=False)
     target = serializers.JSONField()
     loc_type = serializers.SerializerMethodField()
 
@@ -756,7 +756,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
     locations = ReportableLocationGoalSerializer(many=True, write_only=True)
     target = serializers.JSONField()
     baseline = serializers.JSONField()
-    in_need = serializers.JSONField()
+    in_need = serializers.JSONField(required=False)
 
     class Meta:
         model = Reportable
