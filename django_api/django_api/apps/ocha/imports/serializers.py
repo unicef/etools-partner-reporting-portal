@@ -8,6 +8,7 @@ from rest_framework import serializers
 from cluster.models import Cluster
 from core.common import EXTERNAL_DATA_SOURCES, CLUSTER_TYPES, RESPONSE_PLAN_TYPE, PARTNER_PROJECT_STATUS
 from core.models import Country, ResponsePlan, Workspace, Location, GatewayType
+from ocha.imports.utilities import save_location_list
 from partner.models import PartnerProject, Partner
 
 
@@ -117,7 +118,7 @@ class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, ser
 
         validated_data['partner'] = partners[0]
         validated_data['status'] = self.get_status()
-        locations = validated_data.pop('locations')
+        location_data_list = validated_data.pop('locations')
 
         partner_project = PartnerProject.objects.filter(code=validated_data['code']).first()
         if partner_project:
@@ -125,48 +126,9 @@ class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, ser
         else:
             partner_project = super(V2PartnerProjectImportSerializer, self).create(validated_data)
 
-        location_objects = []
+        locations = save_location_list(location_data_list)
 
-        for location_data in sorted(locations, key=lambda x: x['external_id']):
-            if not location_data['parentId'] and location_data['iso3']:
-                parent = None
-                try:
-                    country, _ = Country.objects.get_or_create(
-                        country_short_code=location_data['iso3'],
-                        defaults={
-                            'name': location_data['title']
-                        }
-                    )
-                except MultipleObjectsReturned:
-                    country = Country.objects.filter(country_short_code=location_data['iso3']).first()
-            else:
-                parent = Location.objects.filter(
-                    external_source=location_data['external_source'],
-                    external_id=location_data['parentId']
-                ).first()
-
-            gateway_name = '{} - Admin Level {}'.format(country.country_short_code, location_data['adminLevel'])
-            gateway, _ = GatewayType.objects.get_or_create(
-                country=country,
-                admin_level=location_data['adminLevel'],
-                defaults={
-                    'name': gateway_name
-                }
-            )
-            location_data.pop('parentId')
-            location_data.pop('iso3')
-            location_data.pop('adminLevel')
-            location_data['gateway'] = gateway
-            location_data['parent'] = parent
-
-            location, _ = Location.objects.update_or_create(
-                external_source=location_data.pop('external_source'),
-                external_id=location_data.pop('external_id'),
-                defaults=location_data
-            )
-            location_objects.append(location)
-
-        partner_project.locations.add(*location_objects)
+        partner_project.locations.add(*locations)
         return partner_project
 
 
