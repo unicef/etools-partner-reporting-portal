@@ -280,6 +280,7 @@
         properties: {
           indicatorType: String,
           indicatorId: Number,
+          parentIndicatorId: Number,
           clusterId: Number,
           locations: Object,
           pending: Object,
@@ -343,12 +344,12 @@
 
           canEditDetails: {
             type: Boolean,
-            computed: '_computeCanEditDetails(editing, permissions.editIndicatorDetails)',
+            computed: '_computeCanEditDetails(editing, parentIndicatorId, permissions)',
           },
 
           canMessageIMO: {
             type: Boolean,
-            computed: '_computeCanMessageIMO(editing, canEditDetails)',
+            computed: '_computeCanMessageIMO(editing, parentIndicatorId, permissions)',
           },
         },
 
@@ -386,12 +387,14 @@
               });
         },
 
-        _computeCanEditDetails: function (editing, editIndicatorDetails) {
-          return !editing || editIndicatorDetails;
+        _computeCanEditDetails: function (editing, parentIndicatorId, permissions) {
+          return !editing ||
+              permissions.createClusterEntities ||
+              (permissions.onlyEditOwnIndicatorDetails && !parentIndicatorId);
         },
 
-        _computeCanMessageIMO: function (editing, canEditDetails) {
-          return editing && !canEditDetails;
+        _computeCanMessageIMO: function (editing, parentIndicatorId, permissions) {
+          return !editing && permissions.onlyEditOwnIndicatorDetails && !!parentIndicatorId;
         },
 
         _lockItems: function (value) {

@@ -125,7 +125,7 @@
                 on-input="_validate"
                 value="{{data.blueprint.title}}"
                 always-float-label
-                disabled="[[!permissions.editIndicatorDetails]]"
+                disabled="[[!canEditDetails]]"
                 required>
             </paper-input>
           </div>
@@ -164,7 +164,7 @@
                 label="Comments (optional)"
                 on-input="_validate"
                 value="{{data.comments}}"
-                disabled="[[!permissions.editIndicatorDetails]]"
+                disabled="[[!canEditDetails]]"
                 always-float-label>
             </paper-input>
           </div>
@@ -175,7 +175,7 @@
                 label="Measurement specifications (optional)"
                 on-input="_validate"
                 value="{{data.measurement_specifications}}"
-                disabled="[[!permissions.editIndicatorDetails]]"
+                disabled="[[!canEditDetails]]"
                 always-float-label>
             </paper-input>
           </div>
@@ -190,7 +190,7 @@
                   option-label="title"
                   selected="{{data.frequency}}"
                   on-iron-activate="_validate"
-                  disabled="[[!permissions.editIndicatorDetails]]"
+                  disabled="[[!canEditDetails]]"
                   trigger-value-change-event
                   hide-search
                   required>
@@ -205,11 +205,11 @@
                     value="{{data.cs_dates}}"
                     label="Date of report"
                     on-selected-chips-updated="_validate"
-                    disabled="[[!permissions.editIndicatorDetails]]"
+                    disabled="[[!canEditDetails]]"
                     required>
                   <template
                       is="dom-if"
-                      if="[[permissions.editIndicatorDetails]]"
+                      if="[[canEditDetails]]"
                       restamp="true">
                     <chip-date-of-report></chip-date-of-report>
                   </template>
@@ -220,7 +220,7 @@
                   class="item validate"
                   label="Start date of reporting period"
                   value="{{data.start_date_of_reporting_period}}"
-                  disabled="[[!permissions.editIndicatorDetails]]"
+                  disabled="[[!canEditDetails]]"
                   error-message=""
                   no-init>
               </etools-prp-date-input>
@@ -237,7 +237,7 @@
                   label="Label"
                   on-input="_validate"
                   value="{{data.label}}"
-                  disabled="[[!permissions.editIndicatorDetails]]"
+                  disabled="[[!canEditDetails]]"
                   always-float-label>
               </paper-input>
             </template>
@@ -252,7 +252,7 @@
                     label="Numerator Label"
                     on-input="_validate"
                     value="{{data.numerator_label}}"
-                    disabled="[[!permissions.editIndicatorDetails]]"
+                    disabled="[[!canEditDetails]]"
                     always-float-label>
                 </paper-input>
 
@@ -261,7 +261,7 @@
                     label="Denominator Label"
                     on-input="_validate"
                     value="{{data.denominator_label}}"
-                    disabled="[[!permissions.editIndicatorDetails]]"
+                    disabled="[[!canEditDetails]]"
                     always-float-label>
                 </paper-input>
               </div>
@@ -277,7 +277,7 @@
                   on-input="_validate"
                   value="{{data.baseline}}"
                   allowed-pattern="[+\-\d]"
-                  disabled="[[!permissions.editIndicatorDetails]]">
+                  disabled="[[!canEditDetails]]">
               </json-field>
 
               <template
@@ -291,7 +291,7 @@
                     on-input="_validate"
                     value="{{data.in_need}}"
                     allowed-pattern="[+\-\d]"
-                    disabled="[[!permissions.editIndicatorDetails]]">
+                    disabled="[[!canEditDetails]]">
                 </json-field>
               </template>
 
@@ -302,7 +302,7 @@
                   on-input="_validate"
                   value="{{data.target}}"
                   allowed-pattern="[+\-\d]"
-                  disabled="[[!permissions.editIndicatorDetails]]"
+                  disabled="[[!canEditDetails]]"
                   required>
               </json-field>
             </div>
@@ -315,6 +315,7 @@
                   cluster-id="[[data.cluster]]"
                   indicator-id="[[data.id]]"
                   indicator-type="[[data.blueprint.display_type]]"
+                  parent-indicator-id="[[data.parent_indicator]]"
                   value="{{data.locations}}"
                   editing>
               </indicator-locations-widget>
@@ -424,6 +425,11 @@
           type: Array,
           value: [],
         },
+
+        canEditDetails: {
+          type: Boolean,
+          computed: '_computeCanEditDetails(permissions, data)',
+        },
       },
 
       observers: [
@@ -445,6 +451,11 @@
 
       _computeIsNumber: function (type) {
         return type === 'number';
+      },
+
+      _computeCanEditDetails: function (permissions, data) {
+        return permissions.createClusterEntities ||
+            (permissions.onlyEditOwnIndicatorDetails && !data.parent_indicator);
       },
 
       _setDefaults: function (opened) {
