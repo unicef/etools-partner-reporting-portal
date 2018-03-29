@@ -213,7 +213,7 @@ class ReportableLocationGoalBaselineInNeedSerializer(serializers.ModelSerializer
 
 class ReportableLocationGoalSerializer(serializers.ModelSerializer):
     baseline = serializers.JSONField()
-    in_need = serializers.JSONField()
+    in_need = serializers.JSONField(required=False)
     target = serializers.JSONField()
     loc_type = serializers.SerializerMethodField()
 
@@ -274,6 +274,7 @@ class IndicatorListSerializer(ReportableSimpleSerializer):
             'numerator_label',
             'denominator_label',
             'cluster',
+            'parent_indicator',
         )
 
 
@@ -612,7 +613,7 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
             'disagg_choice_lookup_map',
             'overall_status',
             'overall_status_display',
-            'narrative_assessment'
+            'narrative_assessment',
         )
 
     def get_display_type(self, obj):
@@ -755,7 +756,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
     locations = ReportableLocationGoalSerializer(many=True, write_only=True)
     target = serializers.JSONField()
     baseline = serializers.JSONField()
-    in_need = serializers.JSONField()
+    in_need = serializers.JSONField(required=False)
 
     class Meta:
         model = Reportable
@@ -795,10 +796,21 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 {"baseline": "Cannot be greater than target"}
             )
 
-        if float(validated_data['target']['v']) > float(validated_data['in_need']['v']):
+        if 'in_need' in validated_data \
+                and float(validated_data['target']['v']) > float(validated_data['in_need']['v']):
             raise ValidationError(
                 {"target": "Cannot be greater than In Need"}
             )
+
+        if 'd' not in validated_data['baseline']:
+            validated_data['baseline']['d'] = 1
+
+        if 'd' not in validated_data['target']:
+            validated_data['target']['d'] = 1
+
+        if 'in_need' in validated_data \
+                and 'd' not in validated_data['in_need']:
+            validated_data['in_need']['d'] = 1
 
     def check_location_admin_levels(self, location_goal_queryset):
         if location_goal_queryset.exists() and location_goal_queryset.values_list(

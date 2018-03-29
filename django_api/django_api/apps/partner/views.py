@@ -224,7 +224,7 @@ class PartnerActivityCreateAPIView(CreateAPIView):
         partner = serializer.validated_data['partner']
 
         # If user is IMO check if incoming partner belongs to IMO's clusters
-        if request.user.groups.filter(name='IMO', imo_clusters__partners=partner).exists() \
+        if request.user.groups.filter(name='IMO').exists() \
                 and partner.id not in request.user.imo_clusters.values_list('partners', flat=True):
             raise ValidationError({
                 'partner_id': "the partner_id does not belong to your clusters"

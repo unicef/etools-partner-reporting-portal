@@ -135,11 +135,8 @@
     <div class="container">
       <div class="container-inner">
         <div class="response-header">
-        <h2> Select Response Plan [[workspace]]</h2>
-          <template is="dom-if" if="[[permissions.adminResponsePlan]]">
-              <paper-button raised id="admin" on-tap="_redirectToAdmin"><iron-icon icon="icons:settings"></iron-icon>Response Plan Admin</paper-button>
-          </template>
-  </div>
+          <h2> Select Response Plan [[workspace]]</h2>
+        </div>
         <template is="dom-if" if="[[permissions.adminResponsePlan]]">
           <add-plan-panel></add-plan-panel>
         </template>
@@ -184,7 +181,7 @@
                 <div class="table-cell" flex-2>
                   [[plan.start]]
                 </div>
-                 <div class="table-cell" flex-2>
+                <div class="table-cell" flex-2>
                   [[plan.end]]
                 </div>
               </div>

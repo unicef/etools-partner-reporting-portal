@@ -217,7 +217,7 @@ class Reportable(TimeStampedExternalSourceModel):
     """
     target = JSONField(default=dict([('d', 1), ('v', 0)]))
     baseline = JSONField(default=dict([('d', 1), ('v', 0)]))
-    in_need = JSONField(default=dict([('d', 1), ('v', 0)]))
+    in_need = JSONField(blank=True, null=True)
     assumptions = models.TextField(null=True, blank=True)
     means_of_verification = models.CharField(max_length=255,
                                              null=True,
@@ -303,28 +303,34 @@ class Reportable(TimeStampedExternalSourceModel):
         TODO: old function, called from places, referred to in
         serializers. Simply returning total for now.
         """
+        if self.blueprint.display_type == IndicatorBlueprint.PERCENTAGE:
+            self.total['c'] *= 100
+
         return self.total
 
     @property
     def calculated_target(self):
         if self.blueprint.unit == IndicatorBlueprint.NUMBER:
-            return self.target['v']
+            return float(self.target['v'])
         else:
-            return self.target['v'] / self.target['d']
+            return float(self.target['v']) / float(self.target['d'])
 
     @property
     def calculated_baseline(self):
         if self.blueprint.unit == IndicatorBlueprint.NUMBER:
-            return self.baseline['v']
+            return float(self.baseline['v'])
         else:
-            return self.baseline['v'] / self.baseline['d']
+            return float(self.baseline['v']) / float(self.baseline['d'])
 
     @property
     def calculated_in_need(self):
+        if not self.in_need:
+            return None
+
         if self.blueprint.unit == IndicatorBlueprint.NUMBER:
-            return self.in_need['v']
+            return float(self.in_need['v'])
         else:
-            return self.in_need['v'] / self.in_need['d']
+            return float(self.in_need['v']) / float(self.in_need['d'])
 
     @property
     def progress_percentage(self):
@@ -380,6 +386,12 @@ def get_reportable_data_to_clone(instance):
         'means_of_verification': instance.means_of_verification,
         'modified': instance.modified,
         'target': instance.target,
+        'comments': instance.comments,
+        'measurement_specifications': instance.measurement_specifications,
+        'start_date_of_reporting_period': instance.start_date_of_reporting_period,
+        'label': instance.label,
+        'numerator_label': instance.numerator_label,
+        'denominator_label': instance.denominator_label,
     }
 
 
@@ -473,7 +485,7 @@ class ReportableLocationGoal(TimeStampedModel):
     location = models.ForeignKey("core.Location", on_delete=models.CASCADE)
     target = JSONField(default=dict([('d', 1), ('v', 0)]))
     baseline = JSONField(default=dict([('d', 1), ('v', 0)]))
-    in_need = JSONField(default=dict([('d', 1), ('v', 0)]))
+    in_need = JSONField(default=dict([('d', 1), ('v', 0)]), blank=True, null=True)
 
 
 class IndicatorReportManager(models.Manager):
