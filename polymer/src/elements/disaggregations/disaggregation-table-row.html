@@ -31,7 +31,7 @@
 
           <template
               is="dom-if"
-              if="[[!_equals(indicatorType, 'number')]]"
+              if="[[_equals(indicatorType, 'percentage')]]"
               restamp="true">
             <disaggregation-table-multi-cell
                 coords="[[item.key]]"
@@ -69,7 +69,7 @@
 
           <template
               is="dom-if"
-              if="[[!_equals(indicatorType, 'number')]]"
+              if="[[_equals(indicatorType, 'percentage')]]"
               restamp="true">
             <disaggregation-table-multi-cell
                 coords="[[data.total.key]]"
