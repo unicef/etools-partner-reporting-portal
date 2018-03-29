@@ -98,24 +98,26 @@ class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, ser
             return PARTNER_PROJECT_STATUS.ongoing
 
     def create(self, validated_data):
-        partners = []
-        for partner_data in validated_data.pop('organizations', []):
-            update_or_create_kwargs = {
-                'external_source': partner_data.pop('external_source'),
-                'external_id': partner_data.pop('external_id')
-            }
-
-            partners.append(Partner.objects.update_or_create(
-                defaults=partner_data, **update_or_create_kwargs
-            )[0])
-
-        if len(partners) > 1:
+        partner_data_list = validated_data.pop('organizations', [])
+        if len(partner_data_list) > 1:
             # While the schema seems to support more than one org we're told it's unlikely to occur
             raise serializers.ValidationError({
                 'organizations': 'More than one organization per project is not supported'
             })
 
-        validated_data['partner'] = partners[0]
+        partner_data = partner_data_list[0]
+        update_or_create_kwargs = {
+            'external_source': partner_data.pop('external_source'),
+            'external_id': partner_data.pop('external_id')
+        }
+
+        partner, _ = Partner.objects.update_or_create(
+            defaults=partner_data, **update_or_create_kwargs
+        )
+
+        logger.debug('Saved Partner {}'.format(partner))
+
+        validated_data['partner'] = partner
         validated_data['status'] = self.get_status()
         location_data_list = validated_data.pop('locations')
 

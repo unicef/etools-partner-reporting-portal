@@ -74,6 +74,9 @@ def finish_partner_project_import(project_id, response_plan_id=None):
         external_source=EXTERNAL_DATA_SOURCES.HPC,
         external_id__in=project_cluster_ids,
     ))
+    logger.debug('Adding {} clusters to project {} and it\'s partner.'.format(
+        len(clusters), project
+    ))
     project.clusters.add(*clusters)
     project.partner.clusters.add(*clusters)
     import_project_details(project, project_data['data']['currentPublishedVersionId'])
