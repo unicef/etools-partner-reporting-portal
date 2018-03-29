@@ -12,7 +12,9 @@ from core.permissions import IsIMOForCurrentWorkspace
 from core.serializers import ResponsePlanSerializer
 from ocha.constants import HPC_V1_ROOT_URL, RefCode, HPC_V2_ROOT_URL
 
-from ocha.imports.utilities import import_response_plan, get_json_from_url, get_project_list_for_plan, import_project
+from ocha.imports.utilities import get_json_from_url
+from ocha.imports.response_plan import import_response_plan
+from ocha.imports.project import import_project, get_project_list_for_plan
 from ocha.imports.bulk import get_response_plans_for_countries, fetch_json_urls_async
 from partner.serializers import PartnerProjectSerializer
 
