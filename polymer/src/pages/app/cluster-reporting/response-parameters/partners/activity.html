@@ -69,12 +69,15 @@
     </page-header>
 
     <template is="dom-if" if="[[_equals(tab, 'overview')]]" restamp="true">
-      <rp-partner-activity-details-overview activity-data=[[activityData]]></rp-partner-activity-details-overview>
+      <rp-partner-activity-details-overview
+          activity-data="[[activityData]]">
+      </rp-partner-activity-details-overview>
     </template>
 
     <template is="dom-if" if="[[_equals(tab, 'indicators')]]" restamp="true">
       <rp-partner-activity-details-indicators
         activity-id="[[activityId]]"
+        activity-data="[[activityData]]"
         is_custom="[[activityData.is_custom]]">
       </rp-partner-activity-details-indicators>
     </template>
@@ -144,7 +147,7 @@
         this.set('queryParams.page', 1);
         this.set('route.path', '/' + this.tab);
       },
-      
+
       _getActivityAjax: function () {
         var thunk = this.$.activity.thunk();
         var self = this;

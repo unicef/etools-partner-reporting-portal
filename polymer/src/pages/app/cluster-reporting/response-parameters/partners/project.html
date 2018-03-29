@@ -70,12 +70,15 @@
     </page-header>
 
     <template is="dom-if" if="[[_equals(tab, 'overview')]]" restamp="true">
-      <rp-partner-project-details-overview project-data=[[projectData]]></rp-partner-project-details-overview>
+      <rp-partner-project-details-overview
+          project-data=[[projectData]]>
+      </rp-partner-project-details-overview>
     </template>
 
     <template is="dom-if" if="[[_equals(tab, 'indicators')]]" restamp="true">
       <rp-partner-project-details-indicators
-        project-id="[[projectId]]">
+          project-id="[[projectId]]"
+          project-data="[[projectData]]">
       </rp-partner-project-details-indicators>
     </template>
 
