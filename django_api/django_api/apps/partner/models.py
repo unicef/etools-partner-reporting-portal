@@ -139,8 +139,9 @@ class Partner(TimeStampedExternalSourceModel):
         null=True,
     )
 
-    clusters = models.ManyToManyField('cluster.Cluster',
-                                      related_name="partners")
+    clusters = models.ManyToManyField(
+        'cluster.Cluster', related_name="partners"
+    )
 
     class Meta:
         ordering = ['title']

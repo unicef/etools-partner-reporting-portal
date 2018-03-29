@@ -20,7 +20,8 @@ def import_project_details(project, current_version_id):
                 external_id=attachment['attachment']['objectId'],
             ).first()
 
-            # Some indicators seem to reference Cluster directly, we don not have tha option in our schema, skipping
+            # Some indicators seem to reference Cluster directly,
+            # we do not have that option in our schema, skipping
             if not parent:
                 continue
 

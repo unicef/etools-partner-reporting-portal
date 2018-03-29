@@ -75,4 +75,5 @@ def finish_partner_project_import(project_id, response_plan_id=None):
         external_id__in=project_cluster_ids,
     ))
     project.clusters.add(*clusters)
+    project.partner.clusters.add(*clusters)
     import_project_details(project, project_data['data']['currentPublishedVersionId'])
