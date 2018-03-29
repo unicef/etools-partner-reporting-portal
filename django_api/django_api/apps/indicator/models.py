@@ -303,9 +303,6 @@ class Reportable(TimeStampedExternalSourceModel):
         TODO: old function, called from places, referred to in
         serializers. Simply returning total for now.
         """
-        if self.blueprint.display_type == IndicatorBlueprint.PERCENTAGE:
-            self.total['c'] *= 100
-
         return self.total
 
     @property
