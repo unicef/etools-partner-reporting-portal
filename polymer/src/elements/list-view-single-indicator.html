@@ -113,7 +113,7 @@
           </template>
           <template
               is="dom-if"
-              if="[[_equals(indicator.blueprint.display_type, 'percentage')]]"
+              if="[[!_equals(indicator.blueprint.display_type, 'number')]]"
               restamp="true">
             <span>[[_toPercentage(indicator.baseline.c)]]</span>
           </template>
@@ -127,7 +127,7 @@
           </template>
           <template
               is="dom-if"
-              if="[[_equals(indicator.blueprint.display_type, 'percentage')]]"
+              if="[[!_equals(indicator.blueprint.display_type, 'number')]]"
               restamp="true">
             <span>[[_toPercentage(indicator.target.c)]]</span>
           </template>

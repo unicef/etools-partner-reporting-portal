@@ -215,7 +215,7 @@
                 </template>
                 <template
                     is="dom-if"
-                    if="[[_equals(location.display_type, 'percentage')]]"
+                    if="[[!_equals(location.display_type, 'number')]]"
                     restamp="true">
                   <dt>Location progress:</dt>
                   <dd>[[_toPercentage(location.location_progress.c)]]</dd>
@@ -288,7 +288,7 @@
                             </template>
                             <template
                                 is="dom-if"
-                                if="[[_equals(location.display_type, 'percentage')]]"
+                                if="[[!_equals(location.display_type, 'number')]]"
                                 restamp="true">
                               <span>[[_toPercentage(location.location_progress.c)]]</span>
                             </template>

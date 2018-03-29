@@ -440,7 +440,7 @@
                   </template>
                   <template
                       is="dom-if"
-                      if="[[_equals(indicatorType, 'percentage')]]"
+                      if="[[!_equals(indicatorType, 'number')]]"
                       restamp="true">
                     [[_toPercentage(data.reportable.target.c)]]
                   </template>
@@ -458,7 +458,7 @@
                 </template>
                 <template
                     is="dom-if"
-                    if="[[_equals(indicatorType, 'percentage')]]"
+                    if="[[!_equals(indicatorType, 'number')]]"
                     restamp="true">
                   <dd class="flex">[[_toPercentage(data.reportable.achieved.c)]]</dd>
                 </template>
@@ -475,7 +475,7 @@
                 </template>
                 <template
                     is="dom-if"
-                    if="[[_equals(indicatorType, 'percentage')]]"
+                    if="[[!_equals(indicatorType, 'number')]]"
                     restamp="true">
                   <dd class="flex">[[_toPercentage(data.total.c)]]</dd>
                 </template>

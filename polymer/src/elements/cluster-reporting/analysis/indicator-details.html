@@ -130,7 +130,7 @@
                 </template>
                 <template
                     is="dom-if"
-                    if="[[_equals(data.display_type, 'percentage')]]"
+                    if="[[!_equals(data.display_type, 'number')]]"
                     restamp="true">
                   <span>[[_toPercentage(data.total.c)]]</span>
                 </template>
@@ -151,7 +151,7 @@
               </template>
               <template
                   is="dom-if"
-                  if="[[_equals(data.display_type, 'percentage')]]"
+                  if="[[!_equals(data.display_type, 'number')]]"
                   restamp="true">
                 <span>[[_toPercentage(data.baseline.c)]]</span>
               </template>
@@ -168,7 +168,7 @@
               </template>
               <template
                   is="dom-if"
-                  if="[[_equals(data.display_type, 'percentage')]]"
+                  if="[[!_equals(data.display_type, 'number')]]"
                   restamp="true">
                 <span>[[_toPercentage(data.target.c)]]</span>
               </template>
@@ -185,7 +185,7 @@
               </template>
               <template
                   is="dom-if"
-                  if="[[_equals(data.display_type, 'percentage')]]"
+                  if="[[!_equals(data.display_type, 'number')]]"
                   restamp="true">
                 <span>[[_toPercentage(data.in_need.c)]]</span>
               </template>

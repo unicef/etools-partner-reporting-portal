@@ -511,7 +511,9 @@
 
           this.messageModal = this.$$('#message-modal');
 
-          document.body.appendChild(this.messageModal);
+          if (this.messageModal) {
+            document.body.appendChild(this.messageModal);
+          }
         },
 
         detached: function () {
@@ -523,9 +525,11 @@
 
           this._cancelDebouncers(locTypeDebouncers.concat('reset-location'));
 
-          document.body.removeChild(this.messageModal);
+          if (this.messageModal) {
+            document.body.removeChild(this.messageModal);
 
-          this.messageModal = null;
+            this.messageModal = null;
+          }
         },
       });
     </script>

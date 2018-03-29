@@ -182,7 +182,7 @@
                   </template>
                   <template
                       is="dom-if"
-                      if="[[_equals(indicator.reportable.blueprint.display_type, 'percentage')]]"
+                      if="[[!_equals(indicator.reportable.blueprint.display_type, 'number')]]"
                       restamp="true">
                     [[_toPercentage(indicator.reportable.target.c)]]
                   </template>
@@ -200,7 +200,7 @@
                 </template>
                 <template
                     is="dom-if"
-                    if="[[_equals(indicator.reportable.blueprint.display_type, 'percentage')]]"
+                    if="[[!_equals(indicator.reportable.blueprint.display_type, 'number')]]"
                     restamp="true">
                   <dd class="flex">[[_toPercentage(indicator.reportable.achieved.c)]]</dd>
                 </template>
@@ -215,7 +215,7 @@
                 </template>
                 <template
                     is="dom-if"
-                    if="[[_equals(indicator.reportable.blueprint.display_type, 'percentage')]]"
+                    if="[[!_equals(indicator.reportable.blueprint.display_type, 'number')]]"
                     restamp="true">
                   <dd class="flex">[[_toPercentage(indicator.total.c)]]</dd>
                 </template>
