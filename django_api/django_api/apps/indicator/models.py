@@ -37,9 +37,10 @@ class Disaggregation(TimeStampedExternalSyncModelMixin):
         core.ResponsePlan (ForeignKey): "response_plan"
     """
     name = models.CharField(max_length=255, verbose_name="Disaggregation by")
-    response_plan = models.ForeignKey('core.ResponsePlan',
-                                      related_name="disaggregations",
-                                      blank=True, null=True)    # IP reporting ones won't have this fk.
+    # IP reporting ones won't have this fk.
+    response_plan = models.ForeignKey(
+        'core.ResponsePlan', related_name="disaggregations", blank=True, null=True
+    )
     active = models.BooleanField(default=True)
 
     class Meta:
