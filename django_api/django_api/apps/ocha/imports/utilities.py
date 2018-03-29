@@ -163,42 +163,10 @@ def import_project(external_project_id, response_plan=None):
     serializer.is_valid(raise_exception=True)
     project = serializer.save()
 
-    funding_url = HPC_V1_ROOT_URL + 'fts/flow?projectId={}'.format(external_project_id)
-    funding_data = get_json_from_url(funding_url)
-    try:
-        funding_serializer = V1FundingSourceImportSerializer(data=funding_data['data'])
-        funding_serializer.is_valid(raise_exception=True)
-        funding_serializer.save()
-    except Exception:
-        logger.exception('No funding data found for project_id: {}'.format(external_project_id))
-
-    clusters = []
-    if not response_plan:
-        for plan in project_data['data']['plans']:
-            if not ResponsePlan.objects.filter(
-                    external_source=EXTERNAL_DATA_SOURCES.HPC, external_id=plan['id']
-            ).exists():
-                import_response_plan(plan['id'])
-    else:
-        for global_cluster_data in project_data['data']['globalClusters']:
-            # Don't save external_id for global clusters - it won't pass unique constraint
-            cluster, _ = Cluster.objects.get_or_create(
-                external_source=EXTERNAL_DATA_SOURCES.HPC,
-                type=CLUSTER_TYPES.imported,
-                imported_type=global_cluster_data['name'],
-                response_plan=response_plan,
-            )
-            clusters.append(cluster)
-
-    project_cluster_ids = [c['id'] for c in project_data['data']['governingEntities'] if c['entityPrototypeId'] == 9]
-
-    # At this point all clusters should be in DB
-    clusters.extend(Cluster.objects.filter(
-        external_source=EXTERNAL_DATA_SOURCES.HPC,
-        external_id__in=project_cluster_ids,
-    ))
-    project.clusters.add(*clusters)
-    import_project_details(project, project_data['data']['currentPublishedVersionId'])
+    from ocha.tasks import finish_partner_project_import
+    finish_partner_project_import.delay(
+        project.pk, response_plan_id=getattr(response_plan, 'id', None)
+    )
 
     return project
 

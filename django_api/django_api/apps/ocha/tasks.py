@@ -2,8 +2,14 @@ import logging
 
 from celery import shared_task
 
-from ocha.constants import HPC_V1_ROOT_URL
-from ocha.imports.utilities import get_json_from_url, save_activities_and_objectives_for_response_plan
+from cluster.models import Cluster
+from core.common import EXTERNAL_DATA_SOURCES, CLUSTER_TYPES
+from core.models import ResponsePlan
+from ocha.constants import HPC_V1_ROOT_URL, HPC_V2_ROOT_URL
+from ocha.imports.serializers import V1FundingSourceImportSerializer
+from ocha.imports.utilities import get_json_from_url, save_activities_and_objectives_for_response_plan, \
+    import_response_plan, import_project_details
+from partner.models import PartnerProject
 
 logger = logging.getLogger('ocha-sync')
 
@@ -22,3 +28,50 @@ def finish_response_plan_import(external_plan_id):
     save_activities_and_objectives_for_response_plan(
         entities_response=plan_data, measurements_response=strategic_objectives_data
     )
+
+
+@shared_task
+def finish_partner_project_import(project_id, response_plan_id=None):
+    project = PartnerProject.objects.get(pk=project_id)
+    external_project_id = project.external_id
+
+    source_url = HPC_V2_ROOT_URL + 'project/{}'.format(external_project_id)
+    project_data = get_json_from_url(source_url)
+
+    funding_url = HPC_V1_ROOT_URL + 'fts/flow?projectId={}'.format(external_project_id)
+    funding_data = get_json_from_url(funding_url)
+    try:
+        funding_serializer = V1FundingSourceImportSerializer(data=funding_data['data'])
+        funding_serializer.is_valid(raise_exception=True)
+        funding_serializer.save()
+    except Exception:
+        logger.exception('No funding data found for project_id: {}'.format(external_project_id))
+
+    clusters = []
+    if not response_plan_id:
+        for plan in project_data['data']['plans']:
+            if not ResponsePlan.objects.filter(
+                    external_source=EXTERNAL_DATA_SOURCES.HPC, external_id=plan['id']
+            ).exists():
+                import_response_plan(plan['id'])
+    else:
+        response_plan = ResponsePlan.objects.get(pk=response_plan_id)
+        for global_cluster_data in project_data['data']['globalClusters']:
+            # Don't save external_id for global clusters - it won't pass unique constraint
+            cluster, _ = Cluster.objects.get_or_create(
+                external_source=EXTERNAL_DATA_SOURCES.HPC,
+                type=CLUSTER_TYPES.imported,
+                imported_type=global_cluster_data['name'],
+                response_plan=response_plan,
+            )
+            clusters.append(cluster)
+
+    project_cluster_ids = [c['id'] for c in project_data['data']['governingEntities'] if c['entityPrototypeId'] == 9]
+
+    # At this point all clusters should be in DB
+    clusters.extend(Cluster.objects.filter(
+        external_source=EXTERNAL_DATA_SOURCES.HPC,
+        external_id__in=project_cluster_ids,
+    ))
+    project.clusters.add(*clusters)
+    import_project_details(project, project_data['data']['currentPublishedVersionId'])
