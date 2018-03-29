@@ -105,32 +105,10 @@
           [[indicator.blueprint.calculation_formula_across_periods]]
         </span>
         <span class="table-cell table-cell--text self-center">
-          <template
-              is="dom-if"
-              if="[[_equals(indicator.blueprint.display_type, 'number')]]"
-              restamp="true">
-            <etools-prp-number value="[[indicator.baseline.v]]"></etools-prp-number>
-          </template>
-          <template
-              is="dom-if"
-              if="[[!_equals(indicator.blueprint.display_type, 'number')]]"
-              restamp="true">
-            <span>[[_toPercentage(indicator.baseline.c)]]</span>
-          </template>
+          <etools-prp-number value="[[indicator.baseline.v]]"></etools-prp-number>
         </span>
         <span class="table-cell table-cell--text self-center">
-          <template
-              is="dom-if"
-              if="[[_equals(indicator.blueprint.display_type, 'number')]]"
-              restamp="true">
-            <etools-prp-number value="[[indicator.target.v]]"></etools-prp-number>
-          </template>
-          <template
-              is="dom-if"
-              if="[[!_equals(indicator.blueprint.display_type, 'number')]]"
-              restamp="true">
-            <span>[[_toPercentage(indicator.target.c)]]</span>
-          </template>
+          <etools-prp-number value="[[indicator.target.v]]"></etools-prp-number>
         </span>
         <span class="table-cell table-cell--text self-center">
           [[indicator.achieved.c]]
