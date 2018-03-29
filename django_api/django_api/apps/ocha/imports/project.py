@@ -1,3 +1,4 @@
+from cluster.models import ClusterActivity
 from core.common import EXTERNAL_DATA_SOURCES
 from indicator.models import IndicatorBlueprint, Reportable
 from ocha.constants import HPC_V2_ROOT_URL, HPC_V1_ROOT_URL
@@ -14,6 +15,15 @@ def import_project_details(project, current_version_id):
 
     for attachment in attachments:
         if attachment['attachment']['type'] == 'indicator':
+            parent = ClusterActivity.objects.filter(
+                external_source=EXTERNAL_DATA_SOURCES.HPC,
+                external_id=attachment['attachment']['objectId'],
+            ).first()
+
+            # Some indicators seem to reference Cluster directly, we don not have tha option in our schema, skipping
+            if not parent:
+                continue
+
             blueprint, _ = IndicatorBlueprint.objects.update_or_create(
                 external_source=EXTERNAL_DATA_SOURCES.HPC,
                 external_id=attachment['attachment']['id'],
@@ -31,7 +41,6 @@ def import_project_details(project, current_version_id):
 
             locations = save_location_list(disaggregated['locations'])
 
-            # TODO: Parent content_object
             reportable, _ = Reportable.objects.update_or_create(
                 external_source=EXTERNAL_DATA_SOURCES.HPC,
                 external_id=attachment['attachment']['id'],
@@ -40,6 +49,7 @@ def import_project_details(project, current_version_id):
                     'target': target,
                     'in_need': in_need,
                     'baseline': baseline,
+                    'content_object': parent,
                 }
             )
 
