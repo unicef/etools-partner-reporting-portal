@@ -606,6 +606,7 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
     display_type = serializers.SerializerMethodField()
     overall_status_display = serializers.CharField(
         source='get_overall_status_display')
+    labels = serializers.SerializerMethodField()
 
     class Meta:
         model = IndicatorReport
@@ -626,7 +627,15 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
             'overall_status',
             'overall_status_display',
             'narrative_assessment',
+            'labels',
         )
+
+    def get_labels(self, obj):
+        return {
+            'label': obj.reportable.label,
+            'numerator_label': obj.reportable.numerator_label,
+            'denominator_label': obj.reportable.denominator_label,
+        }
 
     def get_display_type(self, obj):
         return obj.display_type
