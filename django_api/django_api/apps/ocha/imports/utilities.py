@@ -2,6 +2,7 @@ import logging
 from time import sleep
 
 import requests
+from django.core.cache import cache
 from requests import RequestException
 from requests.status_codes import codes
 
@@ -26,9 +27,14 @@ RETRY_ON_STATUS_CODES = {
 }
 
 MAX_URL_RETRIES = 2
+CACHE_URL_FOR = 300  # Seconds
 
 
 def get_json_from_url(url, retry_counter=MAX_URL_RETRIES):
+    cached_response = cache.get(url)
+    if cached_response:
+        return cached_response
+
     def retry():
         sleep(5)
         return get_json_from_url(url, retry_counter=retry_counter - 1)
@@ -47,6 +53,7 @@ def get_json_from_url(url, retry_counter=MAX_URL_RETRIES):
     response_json = response.json()
     if not response_json['status'] == 'ok':
         raise OCHAImportException('Invalid json response status: {}'.format(response_json['status']))
+    cache.set(url, response_json, CACHE_URL_FOR)
 
     return response_json
 
