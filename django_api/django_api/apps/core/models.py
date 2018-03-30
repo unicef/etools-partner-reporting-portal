@@ -408,7 +408,7 @@ class GatewayType(TimeStampedModel):
         verbose_name = 'Location Type'
 
     def __str__(self):
-        return self.name
+        return '{} - {}'.format(self.country, self.name)
 
 
 class LocationManager(models.GeoManager):

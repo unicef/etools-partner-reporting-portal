@@ -67,6 +67,7 @@ def save_activities_and_objectives_for_response_plan(entities_response={}, measu
                     'title': activity['value']['description'][:2048]
                 }
             )
+
             save_reportables_for_cluster_objective_or_activity(cluster_activity, activity['attachments'])
 
 

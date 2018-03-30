@@ -51,18 +51,33 @@ def get_json_from_url(url, retry_counter=MAX_URL_RETRIES):
     return response_json
 
 
-def save_location_list(location_list):
-    location_ids = [l['id'] for l in location_list if 'id' in l]
+def save_location_list(location_list, force_download_all=False):
+    location_ids = [l['id'] for l in location_list if 'id' in l and type(l['id']) == int]
+
+    location_country_map = {}
+    if not force_download_all:
+        locations = Location.objects.filter(
+            external_source=EXTERNAL_DATA_SOURCES.HPC,
+            external_id__in=map(str, location_ids)
+        )
+        saved_ids = set(locations.values_list('external_id', flat=True))
+        location_ids = list(filter(
+            lambda lid: str(lid) not in saved_ids,
+            location_ids
+        ))
+        locations = list(locations)
+        for loc in locations:
+            location_country_map[loc.external_id] = loc.gateway.country
+    else:
+        locations = []
+
     source_urls = [
-        HPC_V2_ROOT_URL + 'location/{}'.format(lid) for lid in location_ids
+        HPC_V2_ROOT_URL + 'location/{}'.format(lid) for lid in set(location_ids)
     ]
     location_data_list = fetch_json_urls_async(source_urls)
 
-    location_country_map = {}
-
     location_data_list = sorted(location_data_list, key=lambda l: l['data']['adminLevel'])
 
-    locations = []
     for location_data in location_data_list:
         if location_data['data']['adminLevel'] == 0:
             country, _ = Country.objects.update_or_create(
@@ -78,11 +93,19 @@ def save_location_list(location_list):
             for child in location_data['data']['children']:
                 location_country_map[child['id']] = country
         else:
-            logger.warning(
-                'Couldn\'t find country for {}, skipping'.format(location_data['data']['id'])
-            )
+            location = Location.objects.filter(
+                external_source=EXTERNAL_DATA_SOURCES.HPC,
+                external_id=location_data['data']['id']
+            ).first()
+            if location:
+                locations.append(location)
+            else:
+                logger.warning(
+                    'Couldn\'t find country for {}, skipping'.format(location_data['data']['id'])
+                )
+            continue
 
-        gateway_name = '{} - Admin Level {}'.format(country.country_short_code, location_data['data']['adminLevel'])
+        gateway_name = 'Admin Level {}'.format(location_data['data']['adminLevel'])
         gateway, _ = GatewayType.objects.get_or_create(
             country=country,
             admin_level=location_data['data']['adminLevel'],
@@ -162,5 +185,19 @@ def save_reportables_for_cluster_objective_or_activity(objective_or_activity, at
                 'blueprint': blueprint,
             }
         )
+
+        try:
+            locations = save_location_list(
+                attachment['value']['metrics']['values']['disaggregated']['locations']
+            )
+            logger.debug('Saving {} locations for {}'.format(
+                len(locations), reportable
+            ))
+            reportable.locations.add(*locations)
+            objective_or_activity.locations.add(*locations)
+        except KeyError:
+            logger.warning('No location info found for {}'.format(reportable))
+
         reportables.append(reportable)
+
     objective_or_activity.reportables.add(*reportables)
