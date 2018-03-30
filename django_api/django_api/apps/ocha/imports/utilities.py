@@ -105,7 +105,7 @@ def save_location_list(location_list, force_download_all=False):
                 )
             continue
 
-        gateway_name = 'Admin Level {}'.format(location_data['data']['adminLevel'])
+        gateway_name = '{} - Admin Level {}'.format(country.country_short_code, location_data['data']['adminLevel'])
         gateway, _ = GatewayType.objects.get_or_create(
             country=country,
             admin_level=location_data['data']['adminLevel'],
