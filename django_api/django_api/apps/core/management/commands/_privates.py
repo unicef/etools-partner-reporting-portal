@@ -7,6 +7,7 @@ from __future__ import unicode_literals
 import datetime
 import random
 
+import names
 from django.conf import settings
 
 from account.models import (
@@ -147,10 +148,12 @@ def generate_fake_users():
     ]
     users_created = []
     for username, email, group_wrapper in users_to_create:
-        admin, created = User.objects.get_or_create(username=username, defaults={
+        admin, _ = User.objects.get_or_create(username=username, defaults={
             'email': email,
             'is_superuser': True,
             'is_staff': True,
+            'first_name': names.get_first_name(),
+            'last_name': names.get_last_name(),
         })
         admin.set_password('Passw0rd!')
         admin.save()

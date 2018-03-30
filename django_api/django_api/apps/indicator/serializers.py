@@ -240,6 +240,16 @@ class IndicatorListSerializer(ReportableSimpleSerializer):
     disaggregations = DisaggregationListSerializer(many=True, read_only=True)
     locations = serializers.SerializerMethodField()
     cluster = serializers.SerializerMethodField()
+    total_against_in_need = serializers.SerializerMethodField()
+    total_against_target = serializers.SerializerMethodField()
+
+    def get_total_against_in_need(self, obj):
+        target = float(obj.calculated_target) if obj.calculated_target else 1.0
+        return float(obj.calculated_in_need) / target if obj.in_need else 0
+
+    def get_total_against_target(self, obj):
+        target = float(obj.calculated_target) if obj.calculated_target else 1.0
+        return obj.total['c'] / target
 
     def get_cluster(self, obj):
         if isinstance(obj.content_object, PartnerProject) \
@@ -275,6 +285,8 @@ class IndicatorListSerializer(ReportableSimpleSerializer):
             'denominator_label',
             'cluster',
             'parent_indicator',
+            'total_against_in_need',
+            'total_against_target',
         )
 
 

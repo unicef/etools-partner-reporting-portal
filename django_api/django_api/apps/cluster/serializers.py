@@ -34,7 +34,7 @@ class ClusterSimpleSerializer(serializers.ModelSerializer):
 
 
 class ClusterObjectiveSerializer(serializers.ModelSerializer):
-    cluster_title = serializers.CharField(source='cluster.title')
+    title = serializers.CharField(source='cluster.title')
 
     class Meta:
         model = ClusterObjective
@@ -42,7 +42,7 @@ class ClusterObjectiveSerializer(serializers.ModelSerializer):
             'id',
             'title',
             'cluster',
-            'cluster_title',
+            'title',
         )
 
 
@@ -58,19 +58,14 @@ class ClusterObjectivePatchSerializer(ClusterObjectiveSerializer):
 
 
 class ClusterActivitySerializer(serializers.ModelSerializer):
-
-    co_cluster_title = serializers.CharField(source='cluster_objective.cluster.title')
-    co_cluster_id = serializers.IntegerField(source='cluster_objective.cluster.id')
-    co_title = serializers.CharField(source='cluster_objective.title')
+    cluster = serializers.IntegerField(source='cluster_objective.cluster.id')
 
     class Meta:
         model = ClusterActivity
         fields = (
             'id',
             'title',
-            'co_cluster_title',
-            'co_cluster_id',
-            'co_title',
+            'cluster',
             'cluster_objective',
         )
 
