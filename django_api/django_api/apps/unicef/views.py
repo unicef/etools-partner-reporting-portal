@@ -450,9 +450,11 @@ class ProgressReportSubmitAPIView(APIView):
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         progress_report = self.get_object()
-        if not progress_report.programme_document.status == PD_STATUS.active:
+        if progress_report.programme_document.status \
+                not in [PD_STATUS.active, PD_STATUS.ended, PD_STATUS.terminated]:
             raise ValidationError(
-                "Updating Progress Report for a {} Programme Document is not allowed. Only Active "
+                "Updating Progress Report for a {} Programme Document is not allowed. "
+                "Only Active/Ended/Terminated "
                 "PDs can be reported on.".format(progress_report.programme_document.get_status_display())
             )
 
