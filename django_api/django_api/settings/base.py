@@ -424,7 +424,7 @@ if not DISABLE_JWT_AUTH:
 
 # Django-Guardian
 AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend', # this is default
+    'django.contrib.auth.backends.ModelBackend',  # this is default
     'guardian.backends.ObjectPermissionBackend',
 )
 # apm related - it's enough to set those as env variables, here just for documentation
