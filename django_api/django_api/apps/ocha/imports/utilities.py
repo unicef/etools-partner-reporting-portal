@@ -95,15 +95,9 @@ def import_response_plan(external_plan_id, workspace=None):
     plan_serializer.is_valid(raise_exception=True)
     response_plan = plan_serializer.save()
 
-    strategic_objectives_url = HPC_V1_ROOT_URL + 'rpm/plan/id/{}?format=json&content=measurements'.format(
-        external_plan_id
-    )
-    strategic_objectives_data = get_json_from_url(strategic_objectives_url)['data']
-
-    logger.debug('Importing Cluster Objectives and Activities for Response Plan #{}'.format(external_plan_id))
-    save_activities_and_objectives_for_response_plan(
-        entities_response=plan_data, measurements_response=strategic_objectives_data
-    )
+    # Do most of the work in background, otherwise it times out the request a lot
+    from ocha.tasks import finish_response_plan_import
+    finish_response_plan_import.delay(external_plan_id)
 
     return response_plan
 
