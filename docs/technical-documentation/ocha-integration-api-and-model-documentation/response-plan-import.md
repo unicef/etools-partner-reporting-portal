@@ -30,7 +30,7 @@ To account for this workspace endpoint had a `can_import_ocha_response_plans` bo
 | plan\_type | Can be detected from `categories` list in the response |
 
 {% hint style="info" %}
-For categories id 4 maps to HRP, 5 to FA, there are other typres that are ignored and HRP is used instead.
+For categories id 4 maps to HRP, 5 to FA, there are other types that are ignored and HRP is used as default.
 {% endhint %}
 
 ### Clusters
@@ -84,9 +84,27 @@ In OCHA single Activity **can support multiple Objectives, this is not the case 
 | cluster\_objective | value.support.planEntityIds\[0\] |
 | title | value.description |
 
-{% hint style="danger" %}
-To save locations for Activity properly we're waiting for an API expansion
-{% endhint %}
+### Reportables
 
+Indicators are stored under `attachments` key in the objective / activity payload, they are further distinguished by key `type` with value `indicator`.
 
+First we create the `IndicatorBlueprint` object:
+
+| **IndicatorBlueprint Model** | **OCHA Source** |
+| --- | --- | --- |
+| title | value.description |
+| disaggregatable | disaggregated |
+
+And with that we can make the `Reportable`
+
+| **Reportable Model** | **OCHA Source** |
+| --- | --- | --- | --- | --- | --- | --- |
+| blueprint | IndicatorBlueprint as created above |
+| content\_object | Cluster Objective or Activity it comes from. |
+| target | value.metrics.values.totals\[type=target\] |
+| baseline | value.metrics.values.totals\[type=baseline\] |
+| in\_need | value.metrics.values.totals\[type=inNeed\] |
+| locations | value.metrics.values.disaggregated.locations |
+
+At this point locations are also populated to the parent `content_object`.
 
