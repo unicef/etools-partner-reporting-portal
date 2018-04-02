@@ -1431,6 +1431,8 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
     num_of_partners = serializers.SerializerMethodField()
     partners_by_status = serializers.SerializerMethodField()
     progress_over_time = serializers.SerializerMethodField()
+    total_against_in_need = serializers.SerializerMethodField()
+    total_against_target = serializers.SerializerMethodField()
     current_progress_by_partner = serializers.SerializerMethodField()
     current_progress_by_location = serializers.SerializerMethodField()
     indicator_type = serializers.SerializerMethodField()
@@ -1438,6 +1440,14 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
     baseline = serializers.JSONField()
     target = serializers.JSONField()
     in_need = serializers.JSONField()
+
+    def get_total_against_in_need(self, obj):
+        target = float(obj.calculated_target) if obj.calculated_target else 1.0
+        return float(obj.calculated_in_need) / target if obj.in_need else 0
+
+    def get_total_against_target(self, obj):
+        target = float(obj.calculated_target) if obj.calculated_target else 1.0
+        return obj.total['c'] / target
 
     def get_indicator_type(self, obj):
         if obj.content_type.model == "clusteractivity":
@@ -1482,35 +1492,31 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
             overall_status = latest_ir.overall_status
 
             if overall_status == OVERALL_STATUS.met:
-                num_of_partners["met"] += 1
+                num_of_partners["Met"] += 1
 
             elif overall_status == OVERALL_STATUS.on_track:
-                num_of_partners["on_track"] += 1
+                num_of_partners["On Track"] += 1
 
             elif overall_status == OVERALL_STATUS.no_progress:
-                num_of_partners["no_progress"] += 1
+                num_of_partners["No Progress"] += 1
 
             elif overall_status == OVERALL_STATUS.constrained:
-                num_of_partners["constrained"] += 1
+                num_of_partners["Constrained"] += 1
 
             elif overall_status == OVERALL_STATUS.no_status:
-                num_of_partners["no_status"] += 1
+                num_of_partners["No Status"] += 1
 
         except IndicatorReport.DoesNotExist:
             # If there is no indicator report for this Reportable, then skip this process
             pass
 
-    def _get_progress_by_partner(self, reportable, partner_progresses):
-        partner_progresses[reportable.content_object.partner.title] = int(
-            reportable.total['c'])
-
     def get_partners_by_status(self, obj):
         num_of_partners = {
-            "met": 0,
-            "on_track": 0,
-            "no_progress": 0,
-            "constrained": 0,
-            "no_status": 0,
+            "Met": 0,
+            "On Track": 0,
+            "No Progress": 0,
+            "Constrained": 0,
+            "No Status": 0,
         }
 
         if obj.children.exists():
@@ -1524,6 +1530,13 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
 
     def get_progress_over_time(self, obj):
         return list(obj.indicator_reports.order_by('id').values_list('time_period_end', 'total'))
+
+    def _get_progress_by_partner(self, reportable, partner_progresses):
+        partner_progresses[reportable.content_object.partner.title] = {
+            'progress': int(reportable.total['c']),
+            'target': reportable.target,
+            'locations': list(reportable.locations.values_list('title', flat=True)),
+        }
 
     def get_current_progress_by_partner(self, obj):
         partner_progresses = {}
@@ -1590,6 +1603,8 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
             'progress_over_time',
             'current_progress_by_partner',
             'current_progress_by_location',
+            'total_against_in_need',
+            'total_against_target',
         )
 
 
