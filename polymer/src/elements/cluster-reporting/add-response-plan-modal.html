@@ -124,7 +124,6 @@
         opened="{{opened}}">
       <div class="header layout horizontal justified">
         <h2>Add Response Plan</h2>
-
         <paper-icon-button
             class="self-center"
             on-tap="close"
@@ -175,7 +174,7 @@
           <paper-radio-button name="custom">
             <strong>Custom</strong>
           </paper-radio-button>
-
+          
           <div
             empty$="[[!_equals(mode, 'custom')]]">
             <template
@@ -351,7 +350,10 @@
           statePath: App.Selectors.Config.clusterTypes,
         },
 
-        emptyClustersError: Boolean,
+        emptyClustersError: {
+          type: Boolean,
+          computed: '_computeClustersError(planDetails, mode)',
+        },
 
       },
 
@@ -364,7 +366,6 @@
         '_fetchPlans(mode, ochaPlansUrl)',
         '_fetchConfig(mode, configUrl)',
         '_fetchPlanDetails(planDetailsUrl)',
-        '_setEmptyClustersError(planDetails, mode)',
       ],
 
       _computeCreatePlanUrl: function (workspaceId, mode) {
@@ -385,17 +386,16 @@
       },
 
       _setDefaults: function () {
-        this.set('errors', {});
         this.set('selectedPlan', '');
         this.set('plansLoading', false);
         this.set('data', {});
         this.set('planDetails', {});
+        this.set('errors', {});
       },
 
       _onOpenedChanged: function (opened) {
         if (opened) {
-        this.set('mode', '');
-        
+          this.set('mode', '');
         }
       },
 
@@ -415,16 +415,9 @@
         })[0];
       },
 
-      _setEmptyClustersError: function(planDetails, mode) {
-        this.async(function () {
-          this.set(
-            'emptyClustersError',
-            mode === 'ocha' &&
-                planDetails &&
-                planDetails.clusterNames &&
-                !planDetails.clusterNames.length
-          );
-        });
+      _computeClustersError: function(planDetails, mode) {
+        return (mode === 'ocha' && planDetails.clusterNames &&
+          planDetails.clusterNames.length === 0);
       },
 
       _fetchPlans: function (mode) {
@@ -449,11 +442,7 @@
             });
       },
 
-      _fetchPlanDetails: function (url) {
-        if (!url) {
-          return;
-        }
-
+      _fetchPlanDetails: function () {
         this.set('planDetailsLoading', true);
         var self = this;
         this.$.planDetails.abort();
