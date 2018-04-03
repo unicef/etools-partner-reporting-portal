@@ -953,7 +953,6 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
             loc_data['reportable'] = self.instance
 
-            print(loc_data)
             ReportableLocationGoal.objects.create(**loc_data)
 
         disaggregations = self.initial_data.get('disaggregations')
