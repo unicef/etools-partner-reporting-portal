@@ -1269,15 +1269,11 @@ class PMPReportableSerializer(serializers.ModelSerializer):
     title = serializers.CharField(source='means_of_verification')
     blueprint_id = serializers.PrimaryKeyRelatedField(
         queryset=IndicatorBlueprint.objects.all(), source="blueprint")
-    location_ids = serializers.PrimaryKeyRelatedField(
-        queryset=Location.objects.all(), many=True, source="locations")
     disaggregation_ids = serializers.PrimaryKeyRelatedField(
         queryset=Disaggregation.objects.all(),
         many=True,
         allow_null=True,
         source="disaggregations")
-    baseline = serializers.IntegerField(source='baseline__v')
-    target = serializers.IntegerField(source='target__v')
 
     class Meta:
         model = Reportable
@@ -1288,7 +1284,6 @@ class PMPReportableSerializer(serializers.ModelSerializer):
             'title',
             'is_cluster_indicator',
             'blueprint_id',
-            'location_ids',
             'disaggregation_ids',
             'content_type',
             'object_id',

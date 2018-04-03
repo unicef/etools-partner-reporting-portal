@@ -17,7 +17,13 @@ from unicef.models import ProgrammeDocument, Person, LowerLevelOutput, PDResultL
 
 from indicator.serializers import PMPIndicatorBlueprintSerializer, PMPDisaggregationSerializer, \
     PMPDisaggregationValueSerializer, PMPReportableSerializer
-from indicator.models import IndicatorBlueprint, Disaggregation, Reportable, DisaggregationValue
+from indicator.models import (
+    IndicatorBlueprint,
+    Disaggregation,
+    Reportable,
+    DisaggregationValue,
+    ReportableLocationGoal,
+)
 
 from partner.models import Partner
 
@@ -348,7 +354,6 @@ def process_programme_documents(fast=False, area=False):
 
                                     # Create Reportable
                                     i['blueprint_id'] = blueprint.id if blueprint else None
-                                    i['location_ids'] = [l.id for l in locations]
                                     i['disaggregation_ids'] = [
                                         ds.id for ds in disaggregations]
 
@@ -357,6 +362,10 @@ def process_programme_documents(fast=False, area=False):
                                     i['object_id'] = llo.id
                                     i['start_date'] = item['start_date']
                                     i['end_date'] = item['end_date']
+
+                                    # Converting baseline and target to JSONFields
+                                    i['baseline'] = {'v': i['baseline'], 'd': 1}
+                                    i['target'] = {'v': i['target'], 'd': 1}
 
                                     # TODO: Fix db schema to accommodate larger lengths
                                     i['title'] = i['title'][:255] if i['title'] else "unknown"
@@ -368,6 +377,16 @@ def process_programme_documents(fast=False, area=False):
                                     )
                                     reportable.active = True
                                     reportable.save()
+
+                                    # Creating M2M Through model instances
+                                    rlgs = [
+                                        ReportableLocationGoal(
+                                            reportable=reportable,
+                                            location=l,
+                                        ) for l in locations
+                                    ]
+
+                                    ReportableLocationGoal.objects.bulk_create(rlgs)
 
                     # Check if another page exists
                     if list_data['next']:
