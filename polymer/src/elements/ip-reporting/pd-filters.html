@@ -72,15 +72,17 @@
 
       properties: {
         queryParams: Object,
+        statuses: Array,
 
         filters: {
           type: Object,
           notify: true,
         },
+      },
 
-        statuses: {
-          type: Array,
-          value: [
+      attached: function () {
+        this.async(function () {
+          this.set('statuses', [
             {title: 'Draft', id: 'Dra'},
             {title: 'Signed', id: 'Sig'},
             {title: 'Active', id: 'Act'},
@@ -88,8 +90,8 @@
             {title: 'Ended', id: 'End'},
             {title: 'Closed', id: 'Clo'},
             {title: 'Terminated', id: 'Ter'},
-          ],
-        },
+          ]);
+        });
       },
     });
   </script>
