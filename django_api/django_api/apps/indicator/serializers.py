@@ -202,17 +202,21 @@ class ReportableLocationGoalBaselineInNeedSerializer(serializers.ModelSerializer
 
     def validate_baseline(self, value):
         if 'd' not in value:
-            raise serializers.ValidationError("key 'd' is required")
+            value['d'] = 1
 
         elif value['d'] == 0:
             raise serializers.ValidationError("key 'd' cannot be zero")
+
+        return value
 
     def validate_in_need(self, value):
         if 'd' not in value:
-            raise serializers.ValidationError("key 'd' is required")
+            value['d'] = 1
 
         elif value['d'] == 0:
             raise serializers.ValidationError("key 'd' cannot be zero")
+
+        return value
 
     class Meta:
         model = ReportableLocationGoal
@@ -236,24 +240,30 @@ class ReportableLocationGoalSerializer(serializers.ModelSerializer):
 
     def validate_baseline(self, value):
         if 'd' not in value:
-            raise serializers.ValidationError("key 'd' is required")
+            value['d'] = 1
 
         elif value['d'] == 0:
             raise serializers.ValidationError("key 'd' cannot be zero")
+
+        return value
 
     def validate_in_need(self, value):
         if 'd' not in value:
-            raise serializers.ValidationError("key 'd' is required")
+            value['d'] = 1
 
         elif value['d'] == 0:
             raise serializers.ValidationError("key 'd' cannot be zero")
+
+        return value
 
     def validate_target(self, value):
         if 'd' not in value:
-            raise serializers.ValidationError("key 'd' is required")
+            value['d'] = 1
 
         elif value['d'] == 0:
             raise serializers.ValidationError("key 'd' cannot be zero")
+
+        return value
 
     class Meta:
         model = ReportableLocationGoal
@@ -942,6 +952,8 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 loc_data.pop('in_need')
 
             loc_data['reportable'] = self.instance
+
+            print(loc_data)
             ReportableLocationGoal.objects.create(**loc_data)
 
         disaggregations = self.initial_data.get('disaggregations')
