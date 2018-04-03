@@ -55,7 +55,7 @@
 
         createClusterEntitiesForCluster: function (params, clusterId) {
           return params.imoClusters.some(function (cluster) {
-            return cluster.id === clusterId;
+            return String(cluster.id) === String(clusterId);
           });
         },
 

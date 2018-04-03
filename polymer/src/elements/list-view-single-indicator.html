@@ -83,7 +83,12 @@
           id="modal-edit"
           edit-data="[[indicator]]">
       </indicator-edit-modal>
+    </template>
 
+    <template
+        is="dom-if"
+        if="[[canEditLocations]]"
+        restamp="true">
       <indicator-locations-modal
           id="modal-locations"
           edit-data="[[indicator]]">
