@@ -1532,11 +1532,21 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
         return list(obj.indicator_reports.order_by('id').values_list('time_period_end', 'total'))
 
     def _get_progress_by_partner(self, reportable, partner_progresses):
-        partner_progresses[reportable.content_object.partner.title] = {
+        data = {
             'progress': int(reportable.total['c']),
             'target': reportable.target,
-            'locations': list(reportable.locations.values_list('title', flat=True)),
+            'locations': set(
+                reportable.indicator_reports.values_list(
+                    'indicator_location_data__location__title',
+                    flat=True
+                )
+            ),
         }
+
+        if reportable.content_object.partner.title not in partner_progresses:
+            partner_progresses[reportable.content_object.partner.title] = list()
+
+        partner_progresses[reportable.content_object.partner.title].append(data)
 
     def get_current_progress_by_partner(self, obj):
         partner_progresses = {}
@@ -1549,6 +1559,23 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
         # If the indicator is UNICEF cluster which is linked as Partner, then show its progress only
         elif obj.content_type.model in ["partneractivity", "partnerproject"]:
             self._get_progress_by_partner(obj, partner_progresses)
+
+        # Consolidation for progress info
+        # partner_progresses is Dict[List[Dict]] type
+        for progress in partner_progresses:
+            consolidated = {
+                'progress': 0,
+                'target': {'d': 0, 'v': 0},
+                'locations': set(),
+            }
+
+            for progress_val in partner_progresses[progress]:
+                consolidated['progress'] += progress_val['progress']
+                consolidated['target']['d'] += int(progress_val['target']['d'])
+                consolidated['target']['v'] += int(progress_val['target']['v'])
+                consolidated['locations'] = consolidated['locations'].union(progress_val['locations'])
+
+            partner_progresses[progress] = consolidated
 
         return partner_progresses
 
