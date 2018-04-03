@@ -64,13 +64,17 @@
               is="dom-if"
               if="[[_equals(data.display_type, 'ratio')]]"
               restamp="true">
-            <dd>[[[labels.numerator_label]]] / [[[labels.denominator_label]]]</dd>
+            <dd>
+              [[[_withDefault(labels.numerator_label)]]]
+              /
+              [[[_withDefault(labels.denominator_label)]]]
+            </dd>
           </template>
           <template
               is="dom-if"
               if="[[!_equals(data.display_type, 'ratio')]]"
               restamp="true">
-            <dd>[[[labels.label]]]</dd>
+            <dd>[[[_withDefault(labels.label)]]]</dd>
           </template>
         </dl>
       </template>
