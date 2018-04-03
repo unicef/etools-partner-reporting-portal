@@ -200,6 +200,20 @@ class ReportableLocationGoalBaselineInNeedSerializer(serializers.ModelSerializer
     in_need = serializers.JSONField()
     location = LocationSerializer(read_only=True)
 
+    def validate_baseline(self, value):
+        if 'd' not in value:
+            raise serializers.ValidationError("key 'd' is required")
+
+        elif value['d'] == 0:
+            raise serializers.ValidationError("key 'd' cannot be zero")
+
+    def validate_in_need(self, value):
+        if 'd' not in value:
+            raise serializers.ValidationError("key 'd' is required")
+
+        elif value['d'] == 0:
+            raise serializers.ValidationError("key 'd' cannot be zero")
+
     class Meta:
         model = ReportableLocationGoal
         list_serializer_class = ReportableLocationGoalBaselineInNeedListSerializer
@@ -219,6 +233,27 @@ class ReportableLocationGoalSerializer(serializers.ModelSerializer):
 
     def get_loc_type(self, obj):
         return obj.location.gateway.admin_level
+
+    def validate_baseline(self, value):
+        if 'd' not in value:
+            raise serializers.ValidationError("key 'd' is required")
+
+        elif value['d'] == 0:
+            raise serializers.ValidationError("key 'd' cannot be zero")
+
+    def validate_in_need(self, value):
+        if 'd' not in value:
+            raise serializers.ValidationError("key 'd' is required")
+
+        elif value['d'] == 0:
+            raise serializers.ValidationError("key 'd' cannot be zero")
+
+    def validate_target(self, value):
+        if 'd' not in value:
+            raise serializers.ValidationError("key 'd' is required")
+
+        elif value['d'] == 0:
+            raise serializers.ValidationError("key 'd' cannot be zero")
 
     class Meta:
         model = ReportableLocationGoal
