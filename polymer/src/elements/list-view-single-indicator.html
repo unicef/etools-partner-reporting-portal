@@ -4,75 +4,206 @@
 
 <link rel="import" href="ip-reporting/ip-reporting-indicator-details.html">
 <link rel="import" href="etools-prp-progress-bar.html">
+<link rel="import" href="etools-prp-progress-bar-alt.html">
+<link rel="import" href="etools-prp-number.html">
 <link rel="import" href="../styles/table-styles.html">
+<link rel="import" href="../styles/shared-styles.html">
 <link rel="import" href="../redux/store.html">
 <link rel="import" href="../behaviors/routing.html">
 <link rel="import" href="../behaviors/utils.html">
 <link rel="import" href="status-badge.html">
+<link rel="import" href="etools-prp-permissions.html">
 <link rel="import" href="cluster-reporting/indicator-editing-modal.html">
+<link rel="import" href="cluster-reporting/indicator-locations-modal.html">
 
 
 <dom-module id="list-view-single-indicator">
   <template>
 
-    <style include="iron-flex iron-flex-factors data-table-styles table-styles">
+    <style include="iron-flex iron-flex-factors iron-flex-alignment data-table-styles table-styles shared-styles">
       :host {
         display: block;
+
+        --etools-prp-progress-bar-height: 14px;
+
         --list-row-collapse-wrapper: {
           padding: 0;
           background: white;
         }
+
+        --etools-prp-progress-bar: {
+          display: block;
+          width: calc(100% - 35px);
+        };
       }
+
       a {
-        text-decoration: none;
-        color: var(--theme-primary-color);
+        @apply --link;
+      }
+
+      .indicator-progress {
+        margin: 0;
+        font-size: 11px;
+        line-height: 1;
+      }
+
+      .indicator-progress:not(:last-child) {
+        margin-bottom: 6px;
+      }
+
+      .indicator-progress dt {
+        width: 100px;
+        margin-right: 10px;
+        text-align: right;
+        color: var(--theme-secondary-text-color);
+      }
+
+      .indicator-progress dd {
+        margin: 0;
+      }
+
+      etools-prp-progress-bar {
+        @apply --etools-prp-progress-bar;
+      }
+
+      .table-cell--action {
+        text-align: right;
       }
     </style>
 
-    <!-- TODO set permissions for who can edit indicators, for that cluster id of CO
-    the indicator belongs to is needed. -->
-    <indicator-edit-modal id="modal" edit-data="[[indicator]]"></indicator-edit-modal>
+    <etools-prp-permissions
+        permissions="{{permissions}}">
+    </etools-prp-permissions>
+
+    <template
+        is="dom-if"
+        if="[[canEdit]]"
+        restamp="true">
+      <indicator-edit-modal
+          id="modal-edit"
+          edit-data="[[indicator]]">
+      </indicator-edit-modal>
+    </template>
+
+    <template
+        is="dom-if"
+        if="[[canEditLocations]]"
+        restamp="true">
+      <indicator-locations-modal
+          id="modal-locations"
+          edit-data="[[indicator]]">
+      </indicator-locations-modal>
+    </template>
 
     <etools-data-table-row on-opened-changed="_handleOpenedChanged">
       <div slot="row-data">
-        <span class="table-cell table-cell--text">
+        <span class="table-cell table-cell--text self-center">
           <template is="dom-if" if="[[_flagIndicator(indicator.target, indicator.baseline, isCustom)]]">
             <status-badge type="error"></status-badge>
           </template>
-            [[indicator.blueprint.title]]
+          [[indicator.blueprint.title]]
         </span>
-        <span class="table-cell table-cell--text">
+        <span class="table-cell table-cell--text self-center">
           [[indicator.blueprint.calculation_formula_across_locations]]
         </span>
-        <span class="table-cell table-cell--text">
+        <span class="table-cell table-cell--text self-center">
           [[indicator.blueprint.calculation_formula_across_periods]]
         </span>
-        <span class="table-cell table-cell--text">
-          [[_withDefault(indicator.baseline)]]
-         </span>
-        <span class="table-cell table-cell--text">
-          [[_withDefault(indicator.target)]]
+        <span class="table-cell table-cell--text self-center">
+          <template
+              is="dom-if"
+              if="[[_equals(indicator.blueprint.display_type, 'number')]]"
+              restamp="true">
+            <etools-prp-number value="[[indicator.baseline.v]]"></etools-prp-number>
+          </template>
+          <template
+              is="dom-if"
+              if="[[_equals(indicator.blueprint.display_type, 'percentage')]]"
+              restamp="true">
+            <span>[[indicator.baseline.v]]%</span>
+          </template>
+          <template
+              is="dom-if"
+              if="[[_equals(indicator.blueprint.display_type, 'ratio')]]"
+              restamp="true">
+            <span>
+              <etools-prp-number value="[[indicator.baseline.v]]"></etools-prp-number>
+              /
+              <etools-prp-number value="[[indicator.baseline.d]]"></etools-prp-number>
+            </span>
+          </template>
         </span>
-        <span class="table-cell table-cell--text">
+        <span class="table-cell table-cell--text self-center">
+          <template
+              is="dom-if"
+              if="[[_equals(indicator.blueprint.display_type, 'number')]]"
+              restamp="true">
+            <etools-prp-number value="[[indicator.target.v]]"></etools-prp-number>
+          </template>
+          <template
+              is="dom-if"
+              if="[[_equals(indicator.blueprint.display_type, 'percentage')]]"
+              restamp="true">
+            <span>[[indicator.target.v]]%</span>
+          </template>
+          <template
+              is="dom-if"
+              if="[[_equals(indicator.blueprint.display_type, 'ratio')]]"
+              restamp="true">
+            <span>
+              <etools-prp-number value="[[indicator.target.v]]"></etools-prp-number>
+              /
+              <etools-prp-number value="[[indicator.target.d]]"></etools-prp-number>
+            </span>
+          </template>
+        </span>
+        <span class="table-cell table-cell--text self-center">
           [[indicator.achieved.c]]
         </span>
-        <span class="table-cell table-cell--text">
-          <etools-prp-progress-bar number="[[indicator.progress_percentage]]">
+        <span class="table-cell table-cell--text self-center" flex-2>
+          <div class="self-center flex-none">
+            <dl class="indicator-progress layout horizontal">
+              <dt class="flex-none self-center">Against Target:</dt>
+              <dd class="flex-none">
+                <etools-prp-progress-bar
+                    number="[[indicator.total_against_target]]">
+                </etools-prp-progress-bar>
+              </dd>
+            </dl>
+
+            <dl class="indicator-progress layout horizontal">
+                <dt class="flex-none self-center">Against In need:</dt>
+                <dd class="flex-none">
+                  <etools-prp-progress-bar-alt
+                      number="[[indicator.total_against_in_need]]">
+                  </etools-prp-progress-bar-alt>
+                </dd>
+              </dl>
+          </div>
         </span>
+
         <template is="dom-if" if="[[isClusterApp]]" restamp="true">
-          <span class="table-cell table-cell--text">
+          <span class="table-cell table-cell--text table-cell--action self-center">
             <a href="[[indicatorReportsUrl]]">REPORTS</a>
           </span>
         </template>
+
         <template is="dom-if" if="[[canEdit]]" restamp="true">
-          <span class="table-cell table-cell--text">
-            <a href="#" on-tap="_openModal">EDIT</a>
+          <span class="table-cell table-cell--text table-cell--action self-center">
+            <a href="#" on-tap="_openModal" data-modal-type="edit">EDIT</a>
+          </span>
+        </template>
+
+        <template is="dom-if" if="[[canEditLocations]]" restamp="true">
+          <span class="table-cell table-cell--text table-cell--action self-center">
+            <a href="#" on-tap="_openModal" data-modal-type="locations">LOCATIONS</a>
           </span>
         </template>
       </div>
       <div slot="row-data-details">
-        <ip-reporting-indicator-details indicator-id="[[indicator.id]]"
-                                        is-open="[[detailsOpened]]">
+        <ip-reporting-indicator-details
+            indicator-id="[[indicator.id]]"
+            is-open="[[detailsOpened]]">
         </ip-reporting-indicator-details>
       </div>
     </etools-data-table-row>
@@ -96,6 +227,7 @@
 
       properties: {
         indicator: Object,
+        permissions: Object,
 
         detailsOpened: {
           type: Boolean,
@@ -117,10 +249,19 @@
           statePath: 'app.current',
         },
 
+        type: {
+          type: String,
+          value: '',
+        },
+
+        canEditLocations: {
+          type: Boolean,
+          computed: '_computeCanEditLocations(isClusterApp, type, permissions)',
+        },
       },
 
-      _openModal: function() {
-        this.$$('#modal').open();
+      _openModal: function (e) {
+        this.$$('#modal-' + e.target.dataset.modalType).open();
       },
 
       _computeIsClusterApp: function(appName) {
@@ -147,6 +288,10 @@
         query_params += '&indicator=' + indicator.id.toString();
 
         return this.buildUrl(baseUrl, query_params);
+      },
+
+      _computeCanEditLocations: function (isClusterApp, type, permissions) {
+        return isClusterApp && type === 'ca' && permissions.editIndicatorLocations;
       },
     });
   </script>

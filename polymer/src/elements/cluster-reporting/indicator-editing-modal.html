@@ -7,22 +7,19 @@
 <link rel="import" href="../../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
-<link rel="import" href="../../../bower_components/paper-radio-group/paper-radio-group.html">
-<link rel="import" href="../../../bower_components/paper-radio-button/paper-radio-button.html">
 <link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
-<link rel="import" href="../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
-<link rel="import" href="../../../bower_components/paper-listbox/paper-listbox.html">
-<link rel="import" href="../../../bower_components/paper-item/paper-item.html">
-<link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-multi-selection-menu.html">
 <link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html">
 
 
 <link rel="import" href="../../polyfills/es6-shim.html">
 <link rel="import" href="disaggregations-dropdown-widget.html">
+<link rel="import" href="indicator-locations-widget.html">
 <link rel="import" href="chip-date-of-report.html">
 <link rel="import" href="../labelled-item.html">
 <link rel="import" href="../etools-prp-chips.html">
 <link rel="import" href="../etools-prp-ajax.html">
+<link rel="import" href="../json-field.html">
+<link rel="import" href="../calculation-method.html">
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../behaviors/utils.html">
@@ -30,6 +27,7 @@
 <link rel="import" href="../../styles/buttons.html">
 <link rel="import" href="../../styles/modal.html">
 <link rel="import" href="../error-box.html">
+<link rel="import" href="../etools-prp-permissions.html">
 
 <dom-module id="indicator-edit-modal">
   <template>
@@ -37,12 +35,13 @@
       :host {
         display: block;
 
-        --app-grid-columns: 2;
+        --app-grid-columns: 3;
         --app-grid-gutter: 24px;
         --app-grid-item-height: auto;
+        --app-grid-expandible-item-columns: 3;
 
         --paper-dialog: {
-          width: 600px;
+          width: 800px;
 
           & > * {
             margin: 0;
@@ -54,18 +53,35 @@
         margin: 16px 0;
       }
 
+      .full-width {
+        @apply --app-grid-expandible-item;
+      }
+
       .app-grid {
-         margin: -var(--app-grid-gutter);
+         padding-top: 0;
+         margin: 0 -var(--app-grid-gutter);
       }
 
-      paper-radio-group {
-        margin-left: -12px;
+      .item {
+        margin-bottom: 0;
       }
 
-      paper-dropdown-menu {
-        width: 100%;
+      .indicator-type {
+        color: var(--theme-secondary-text-color);
+      }
+
+      .calculation-method:not(:first-child) {
+        margin-left: 50px;
+      }
+
+      indicator-locations-widget {
+        margin: 2em 0;
       }
     </style>
+
+    <etools-prp-permissions
+        permissions={{permissions}}>
+    </etools-prp-permissions>
 
     <etools-prp-ajax
         id="locations"
@@ -96,131 +112,223 @@
       </div>
 
       <paper-dialog-scrollable>
-
         <template
             is="dom-if"
             if="[[opened]]"
             restamp="true">
           <error-box errors="[[errors]]"></error-box>
+
           <div class="row">
             <paper-input
                 class="validate"
                 label="Title"
                 on-input="_validate"
-                value="{{data.blueprint.title::change}}"
+                value="{{data.blueprint.title}}"
                 always-float-label
+                disabled="[[!canEditDetails]]"
                 required>
+            </paper-input>
+          </div>
+
+          <div class="row">
+            <labelled-item label="Type">
+              <span class="indicator-type">[[indicatorType]]</span>
+            </labelled-item>
+          </div>
+
+          <div class="row">
+            <div class="layout horizontal">
+              <labelled-item
+                  class="calculation-method"
+                  label="Calculation method across locations">
+                <calculation-method
+                    value="{{data.blueprint.calculation_formula_across_locations}}"
+                    readonly>
+                </calculation-method>
+              </labelled-item>
+
+              <labelled-item
+                  class="calculation-method"
+                  label="Calculation method across reporting periods">
+                <calculation-method
+                    value="{{data.blueprint.calculation_formula_across_periods}}"
+                    readonly>
+                </calculation-method>
+              </labelled-item>
+            </div>
+          </div>
+
+          <div class="row">
+            <paper-input
+                class="validate"
+                label="Comments (optional)"
+                on-input="_validate"
+                value="{{data.comments}}"
+                disabled="[[!canEditDetails]]"
+                always-float-label>
             </paper-input>
           </div>
 
           <div class="row">
             <paper-input
                 class="validate"
-                label="Means of verification"
+                label="Measurement specifications (optional)"
                 on-input="_validate"
-                value="{{data.means_of_verification::change}}"
-                always-float-label
-                required>
+                value="{{data.measurement_specifications}}"
+                disabled="[[!canEditDetails]]"
+                always-float-label>
             </paper-input>
           </div>
 
           <div class="row">
             <div class="app-grid">
-              <div class="item">
-                <etools-single-selection-menu
-                    class="validate"
-                    label="Frequency of reporting"
-                    options="[[frequencies]]"
-                    option-value="id"
-                    option-label="title"
-                    selected="{{data.frequency}}"
-                    on-iron-activate="_validate"
-                    trigger-value-change-event
-                    hide-search
-                    required>
-                </etools-single-selection-menu>
-              </div>
+              <etools-single-selection-menu
+                  class="item validate"
+                  label="Frequency of reporting"
+                  options="[[frequencies]]"
+                  option-value="id"
+                  option-label="title"
+                  selected="{{data.frequency}}"
+                  on-iron-activate="_validate"
+                  disabled="[[!canEditDetails]]"
+                  trigger-value-change-event
+                  hide-search
+                  required>
+              </etools-single-selection-menu>
 
               <template
                   is="dom-if"
                   if="[[_showCSD(data.frequency)]]"
                   restamp="true">
-                <div class="item">
-                  <etools-prp-chips
-                      value="{{data.cs_dates}}"
-                      class="validate"
-                      label="Date of report"
-                      on-selected-chips-updated="_validate"
-                      required>
+                <etools-prp-chips
+                    class="item validate"
+                    value="{{data.cs_dates}}"
+                    label="Date of report"
+                    on-selected-chips-updated="_validate"
+                    disabled="[[!canEditDetails]]"
+                    required>
+                  <template
+                      is="dom-if"
+                      if="[[canEditDetails]]"
+                      restamp="true">
                     <chip-date-of-report></chip-date-of-report>
-                  </etools-prp-chips>
-                </div>
+                  </template>
+                </etools-prp-chips>
               </template>
+
+              <etools-prp-date-input
+                  class="item validate"
+                  label="Start date of reporting period"
+                  value="{{data.start_date_of_reporting_period}}"
+                  disabled="[[!canEditDetails]]"
+                  error-message=""
+                  no-init>
+              </etools-prp-date-input>
             </div>
           </div>
 
           <div class="row">
-            <div class="app-grid">
-              <div class="item">
-                <paper-input
+            <template
+                is="dom-if"
+                if="[[isNumber]]"
+                restamp="true">
+              <paper-input
                   class="validate"
+                  label="Label"
+                  on-input="_validate"
+                  value="{{data.label}}"
+                  disabled="[[!canEditDetails]]"
+                  always-float-label>
+              </paper-input>
+            </template>
+
+            <template
+                is="dom-if"
+                if="[[!isNumber]]"
+                restamp="true">
+              <div class="app-grid">
+                <paper-input
+                    class="item validate"
+                    label="Numerator Label"
+                    on-input="_validate"
+                    value="{{data.numerator_label}}"
+                    disabled="[[!canEditDetails]]"
+                    always-float-label>
+                </paper-input>
+
+                <paper-input
+                    class="item validate"
+                    label="Denominator Label"
+                    on-input="_validate"
+                    value="{{data.denominator_label}}"
+                    disabled="[[!canEditDetails]]"
+                    always-float-label>
+                </paper-input>
+              </div>
+            </template>
+          </div>
+
+          <div class="row">
+            <div class="app-grid">
+              <json-field
+                  class="item validate"
+                  type="[[data.blueprint.display_type]]"
                   label="Baseline"
                   on-input="_validate"
                   value="{{data.baseline}}"
-                  type="number"
                   allowed-pattern="[+\-\d]"
-                  always-float-label
-                  required>
-                </paper-input>
-              </div>
+                  disabled="[[!canEditDetails]]">
+              </json-field>
 
-              <div class="item">
-                <paper-input
-                  class="validate"
+              <template
+                  is="dom-if"
+                  if="[[isNumber]]"
+                  restamp="true">
+                <json-field
+                    class="item validate"
+                    type="[[data.blueprint.display_type]]"
+                    label="In need (optional)"
+                    on-input="_validate"
+                    value="{{data.in_need}}"
+                    allowed-pattern="[+\-\d]"
+                    disabled="[[!canEditDetails]]">
+                </json-field>
+              </template>
+
+              <json-field
+                  class="item validate"
+                  type="[[data.blueprint.display_type]]"
                   label="Target"
                   on-input="_validate"
                   value="{{data.target}}"
-                  type="number"
                   allowed-pattern="[+\-\d]"
-                  always-float-label
+                  disabled="[[!canEditDetails]]"
                   required>
-                </paper-input>
-              </div>
+              </json-field>
             </div>
           </div>
 
           <div class="row">
-            <div class="app-grid">
-              <div class="item">
-                <paper-input
+            <div class="row">
+              <indicator-locations-widget
                   class="validate"
-                  label="In need"
-                  on-input="_validate"
-                  value="{{data.in_need}}"
-                  type="number"
-                  allowed-pattern="[+\-\d]"
-                  always-float-label>
-                </paper-input>
-              </div>
+                  cluster-id="[[data.cluster]]"
+                  indicator-id="[[data.id]]"
+                  indicator-type="[[data.blueprint.display_type]]"
+                  parent-indicator-id="[[data.parent_indicator]]"
+                  value="{{data.locations}}"
+                  editing>
+              </indicator-locations-widget>
             </div>
           </div>
 
           <div class="row">
-            <etools-multi-selection-menu
-                class="validate"
-                label="Location"
-                options="[[locations]]"
-                option-value="id"
-                option-label="title"
-                selected-values="{{selectedLocations}}"
-                on-selected-values-changed="_validate"
-                trigger-value-change-event
-                required>
-            </etools-multi-selection-menu>
+            <disaggregations-dropdown-widget
+                value="{{data.disaggregations}}"
+                readonly>
+            </disaggregations-dropdown-widget>
           </div>
-
         </template>
-
       </paper-dialog-scrollable>
 
       <div class="buttons layout horizontal-reverse">
@@ -243,7 +351,7 @@
 
   <script>
     Polymer({
-      id: 'indicator-edit-modal',
+      is: 'indicator-edit-modal',
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
@@ -252,26 +360,23 @@
       ],
 
       properties: {
+        editData: Object,
         data: Object,
+        permissions: Object,
 
-        type: String,
-
-        objectId: Number,
-
-        objectType: String,
-
-        baseline: Number,
-
-        target: Number,
+        isNumber: {
+          type: Boolean,
+          computed: '_computeIsNumber(data.blueprint.display_type)',
+        },
 
         responsePlanId: {
          type: String,
          statePath: 'responsePlans.currentID',
        },
 
-        locationId: {
+        indicatorType: {
           type: String,
-          statePath: 'location.id',
+          computed: '_computeIndicatorType(data)',
         },
 
         locationsUrl: {
@@ -290,17 +395,6 @@
         },
 
         locations: {
-          type: Array,
-          value: [],
-        },
-
-        invalid: {
-          type: Boolean,
-          notify: true,
-          value: true,
-        },
-
-        selectedLocations: {
           type: Array,
           value: [],
         },
@@ -327,53 +421,54 @@
           ],
         },
 
-        editData: Object,
+        disaggregations: {
+          type: Array,
+          value: [],
+        },
 
+        canEditDetails: {
+          type: Boolean,
+          computed: '_computeCanEditDetails(permissions, data)',
+        },
       },
 
       observers: [
         '_setDefaults(opened)',
-        '_setLocations(selectedLocations.splices)',
       ],
 
-      _setLocations: function () {
-        var selected = this.selectedLocations ?
-            this.locations
-                .filter(function (location) {
-                  return this.selectedLocations.indexOf(location.id) !== -1;
-                }, this)
-                .map(function (location) {
-                  return {
-                    id: location.id,
-                    title: location.title,
-                  };
-                }) :
-            [];
+      _computeIndicatorType: function (data) {
+        switch (data.blueprint.display_type) {
+          case 'number':
+            return 'Quantity (#)';
 
-        this.set('data.locations', selected);
+          case 'percentage':
+            return 'Percent';
+
+          case 'ratio':
+            return 'Ratio';
+        }
       },
 
-      _onValueChanged: function (e) {
-        this._updateValue(e.target);
+      _computeIsNumber: function (type) {
+        return type === 'number';
+      },
+
+      _computeCanEditDetails: function (permissions, data) {
+        return permissions.createClusterEntities ||
+            (permissions.onlyEditOwnIndicatorDetails && !data.parent_indicator);
       },
 
       _setDefaults: function (opened) {
         if (!opened) {
           return;
         }
-        if (this.editData.locations) {
-          this.set('selectedLocations', this.editData.locations.map(function(item) {
-            return item.id;
-          }));
-        } else {
-          this.set('selectedLocations', []);
-        }
 
-        this.set('data', Object.assign({}, this.editData));
-        if (!this.editData.cs_dates) {
-          this.set('data.cs_dates', []);
-        }
+        this.set('data', Object.assign({
+          cs_dates: [],
+        }, this._clone(this.get('editData'))));
+
         this.set('errors', {});
+
         this._fetchLocations();
       },
 
@@ -399,23 +494,9 @@
       },
 
       _save: function () {
-
-        var fields = [].slice.call(
-          Polymer.dom(this.root).querySelectorAll('.validate')
-        );
-
         var self = this;
-        var valid;
 
-        fields.forEach(function (field) {
-          field.validate();
-        });
-
-        valid = fields.every(function (field) {
-          return !field.invalid;
-        });
-
-        if (!valid) {
+        if (!this._fieldsAreValid()) {
           return;
         }
 

@@ -273,6 +273,14 @@
         return this.analysisIndicators(responsePlanId) + indicatorId;
       },
 
+      indicatorPerLocationVars: function (reportableId) {
+        return this._buildUrl('/indicator/' + reportableId + '/baseline_in_need');
+      },
+
+      indicatorIMOMessage: function () {
+        return this._buildUrl('/indicator/cluster-indicator-imo-message/');
+      },
+      
       ochaResponsePlans: function (workspaceId) {
         return this._buildUrl('/ocha/response-plans/workspace/' + workspaceId + '/');
       },

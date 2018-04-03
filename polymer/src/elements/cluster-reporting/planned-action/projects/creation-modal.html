@@ -399,7 +399,7 @@
           this.data = {};
           this.selectedClusters = [];
         }
-      
+
         this.set('opened', true);
         this.set('refresh', true);
       },
@@ -435,7 +435,7 @@
       },
 
       _redirectToDetail: function(id) {
-        var path = this.permissions.addPartnerToProject 
+        var path = this.permissions.addPartnerToProject
           ? 'response-parameters/partners/project/' + String(id)
           : '/planned-action/project/' + String(id);
         var url = this.buildUrl(this._baseUrlCluster, path);

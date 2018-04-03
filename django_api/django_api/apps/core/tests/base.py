@@ -1,3 +1,4 @@
+
 from __future__ import unicode_literals
 
 from django.contrib.auth import get_user_model
@@ -20,7 +21,6 @@ class BaseAPITestCase(APITestCase):
 
     def setUp(self):
         super(BaseAPITestCase, self).setUp()
-
         # generating data
         if self.with_generate_fake_data:
             with suppress_stdout():

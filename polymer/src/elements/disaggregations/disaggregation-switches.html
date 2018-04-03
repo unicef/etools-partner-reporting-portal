@@ -108,7 +108,7 @@
       },
 
       observers: [
-        '_computeWarning(data, reportedOn.splices)',
+        '_computeWarning(data.num_disaggregation, reportedOn.length)',
       ],
 
       _computeEditableBool: function (editable) {
@@ -163,8 +163,8 @@
         this._recordField(field);
       },
 
-      _computeWarning: function (data, _) { // jshint ignore:line
-        this.set('warning', this.reportedOn.length < data.num_disaggregation);
+      _computeWarning: function (numDisagg, reportedOnLength) { // jshint ignore:line
+        this.set('warning', !!numDisagg && reportedOnLength < numDisagg);
       },
 
       _recordField: function (field) {

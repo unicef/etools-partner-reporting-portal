@@ -66,9 +66,9 @@
       },
 
       _canEditProject: function(permissions, projectClusters) {
-        if (projectClusters) {
-          return permissions.editPartnerEntitiesAsIMO(projectClusters);
-        }
+        return projectClusters ?
+            permissions.editPartnerEntitiesAsIMO(projectClusters) :
+            false;
       },
     });
   </script>

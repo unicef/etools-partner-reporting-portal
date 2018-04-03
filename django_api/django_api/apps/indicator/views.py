@@ -1,6 +1,8 @@
 from datetime import date, datetime
 import operator
 import logging
+
+from django.conf import settings
 from django.db.models import Q
 from django.db import transaction
 from django.shortcuts import get_object_or_404
@@ -34,19 +36,25 @@ from core.common import (
 from core.serializers import ShortLocationSerializer
 from unicef.serializers import ProgressReportSerializer, ProgressReportUpdateSerializer
 from unicef.models import ProgressReport
+from utils.emails import send_email_from_template
 
 from .disaggregators import (
     QuantityIndicatorDisaggregator,
     RatioIndicatorDisaggregator,
 )
 from .serializers import (
-    IndicatorListSerializer, IndicatorReportListSerializer, PDReportContextIndicatorReportSerializer,
-    IndicatorLLoutputsSerializer, IndicatorLocationDataUpdateSerializer,
+    IndicatorListSerializer,
+    IndicatorReportListSerializer,
+    PDReportContextIndicatorReportSerializer,
+    IndicatorLLoutputsSerializer,
+    IndicatorLocationDataUpdateSerializer,
     OverallNarrativeSerializer,
     ClusterIndicatorSerializer,
     DisaggregationListSerializer,
     IndicatorReportReviewSerializer,
-    IndicatorReportSimpleSerializer
+    IndicatorReportSimpleSerializer,
+    ReportableLocationGoalBaselineInNeedSerializer,
+    ClusterIndicatorIMOMessageSerializer,
 )
 from .filters import IndicatorFilter, PDReportsFilter
 from .models import (
@@ -54,7 +62,8 @@ from .models import (
     IndicatorReport,
     Reportable,
     IndicatorLocationData,
-    Disaggregation
+    Disaggregation,
+    ReportableLocationGoal
 )
 from functools import reduce
 
@@ -243,6 +252,48 @@ class ReportableDetailAPIView(RetrieveAPIView):
     queryset = Reportable.objects.all()
     permission_classes = (IsAuthenticated, )
     lookup_url_kwarg = 'reportable_id'
+
+    def patch(self, request, reportable_id, *args, **kwargs):
+        pass
+
+
+class ReportableLocationGoalBaselineInNeedAPIView(ListAPIView, UpdateAPIView):
+    """
+    Updates Reportable's ReportableLocationGoal instances' baseline and in_need.
+    Reserved for IMO only.
+    """
+    serializer_class = ReportableLocationGoalBaselineInNeedSerializer
+    permission_classes = (IsAuthenticated, )
+    lookup_url_kwarg = 'reportable_id'
+
+    def get_queryset(self, *args, **kwargs):
+        reportable_id = self.kwargs.get('reportable_id', None)
+
+        if reportable_id:
+            return ReportableLocationGoal.objects.filter(reportable_id=reportable_id)
+        else:
+            raise Http404
+
+    def list(self, request, reportable_id, *args, **kwargs):
+        queryset = self.get_queryset(reportable_id)
+        serializer = self.get_serializer(queryset, many=True)
+
+        return Response(serializer.data)
+
+    def update(self, request, reportable_id, *args, **kwargs):
+        instances = ReportableLocationGoal.objects.filter(
+            id__in=map(lambda x: x['id'], request.data)
+        )
+        serializer = self.get_serializer(
+            instances,
+            data=request.data,
+            many=True,
+        )
+
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data)
 
 
 class IndicatorDataAPIView(APIView):
@@ -566,3 +617,51 @@ class IndicatorDataLocationAPIView(ListAPIView):
             ir = get_object_or_404(IndicatorReport, id=ir_id)
             return Location.objects.filter(reportables=ir.reportable_id)
         raise Http404
+
+
+class ClusterIndicatorSendIMOMessageAPIView(APIView):
+    """
+    ClusterIndicatorSendIMOMessageAPIView sends
+    an message to belonging cluster's IMO
+    via e-mail.
+
+    Raises:
+        Http404 -- Throws 404 HTTP response
+
+    Returns:
+        Response -- DRF Response object
+    """
+
+    permission_classes = (
+        IsAuthenticated,
+        IsPartnerEditorOrPartnerAuthorizedOfficer,
+    )
+
+    def post(self, request, *args, **kwargs):
+        serializer = ClusterIndicatorIMOMessageSerializer(
+            data=request.data,
+            context={'request': request},
+        )
+        serializer.is_valid(raise_exception=True)
+
+        reportable = serializer.validated_data['reportable']
+        imo_user = serializer.validated_data['cluster'].imo_users.first()
+
+        template_data = {
+            "indicator_name": reportable.blueprint.title,
+            "partner_name": request.user.partner.title,
+            "partner_email": request.user.email,
+            "imo_user": imo_user,
+            "message": serializer.validated_data['message'],
+        }
+
+        send_email_from_template(
+            'email/notify_imo_on_cluster_indicator_change_request_subject.txt',
+            'email/notify_imo_on_cluster_indicator_change_request.txt',
+            template_data,
+            settings.DEFAULT_FROM_EMAIL,
+            [imo_user.email, ],
+            fail_silently=False
+        )
+
+        return Response(serializer.data, status=status.HTTP_200_OK)

@@ -3,8 +3,9 @@
 
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../styles/disaggregation-table-styles.html">
-<link rel="import" href="disaggregation-table-cell.html">
-<link rel="import" href="disaggregation-table-multi-cell.html">
+<link rel="import" href="disaggregation-table-cell-number.html">
+<link rel="import" href="disaggregation-table-cell-percentage.html">
+<link rel="import" href="disaggregation-table-cell-ratio.html">
 
 <dom-module id="disaggregation-table-row">
   <template>
@@ -22,32 +23,32 @@
               is="dom-if"
               if="[[_equals(indicatorType, 'number')]]"
               restamp="true">
-            <disaggregation-table-cell
+            <disaggregation-table-cell-number
                 coords="[[item.key]]"
                 data="[[item.data]]"
                 editable="[[editable]]">
-            </disaggregation-table-cell>
+            </disaggregation-table-cell-number>
           </template>
 
           <template
               is="dom-if"
               if="[[_equals(indicatorType, 'percentage')]]"
               restamp="true">
-            <disaggregation-table-multi-cell
+            <disaggregation-table-cell-percentage
                 coords="[[item.key]]"
                 data="[[item.data]]"
                 editable="[[editable]]">
-            </disaggregation-table-multi-cell>
+            </disaggregation-table-cell-percentage>
           </template>
           <template
             is="dom-if"
             if="[[_equals(indicatorType, 'ratio')]]"
             restamp="true">
-            <disaggregation-table-multi-cell
+            <disaggregation-table-cell-ratio
               coords="[[item.key]]"
               data="[[item.data]]"
               editable="[[editable]]">
-            </disaggregation-table-multi-cell>
+            </disaggregation-table-cell-ratio>
           </template>
         </td>
       </template>
@@ -60,32 +61,32 @@
               is="dom-if"
               if="[[_equals(indicatorType, 'number')]]"
               restamp="true">
-            <disaggregation-table-cell
+            <disaggregation-table-cell-number
                 coords="[[data.total.key]]"
                 data="[[data.total.data]]"
                 editable="[[totalEditable]]">
-            </disaggregation-table-cell>
+            </disaggregation-table-cell-number>
           </template>
 
           <template
               is="dom-if"
               if="[[_equals(indicatorType, 'percentage')]]"
               restamp="true">
-            <disaggregation-table-multi-cell
+            <disaggregation-table-cell-percentage
                 coords="[[data.total.key]]"
                 data="[[data.total.data]]"
                 editable="[[totalEditable]]">
-            </disaggregation-table-multi-cell>
+            </disaggregation-table-cell-percentage>
           </template>
           <template
             is="dom-if"
             if="[[_equals(indicatorType, 'ratio')]]"
             restamp="true">
-            <disaggregation-table-multi-cell
+            <disaggregation-table-cell-ratio
               coords="[[item.key]]"
               data="[[item.data]]"
               editable="[[editable]]">
-            </disaggregation-table-multi-cell>
+            </disaggregation-table-cell-ratio>
           </template>
         </td>
       </template>
