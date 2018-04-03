@@ -230,7 +230,7 @@ class ReportableLocationGoalBaselineInNeedSerializer(serializers.ModelSerializer
 
 
 class ReportableLocationGoalSerializer(serializers.ModelSerializer):
-    baseline = serializers.JSONField()
+    baseline = serializers.JSONField(required=False)
     in_need = serializers.JSONField(required=False)
     target = serializers.JSONField()
     loc_type = serializers.SerializerMethodField()
@@ -853,10 +853,15 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 {"disaggregations": "List of dict disaggregation expected"}
             )
 
-    def check_progress_values(self, validated_data):
+    def check_progress_values(self, validated_data, partner):
         """
         Validates baseline, target, in-need
         """
+        if not partner and 'baseline' not in validated_data:
+            raise ValidationError(
+                {"baseline": "baseline is required for IMO creating Cluster Indicator"}
+            )
+
         if float(validated_data['baseline']['v']) > float(validated_data['target']['v']):
             raise ValidationError(
                 {"baseline": "Cannot be greater than target"}
@@ -890,7 +895,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         partner = self.context['request'].user.partner
 
         self.check_disaggregation(self.initial_data.get('disaggregations'))
-        self.check_progress_values(validated_data)
+        self.check_progress_values(validated_data, partner)
 
         if validated_data['blueprint']['display_type'] == IndicatorBlueprint.RATIO:
             validated_data['blueprint']['unit'] = IndicatorBlueprint.PERCENTAGE
@@ -979,6 +984,9 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             validated_data.pop('baseline')
             validated_data.pop('in_need')
             validated_data.pop('target')
+
+        else:
+            self.check_progress_values(validated_data, partner)
 
         # Swapping validated_data['locations'] with raw request.data['locations']
         # Due to missing id field as it is write_only field
