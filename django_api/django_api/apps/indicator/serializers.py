@@ -1532,6 +1532,16 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
         return list(obj.indicator_reports.order_by('id').values_list('time_period_end', 'total'))
 
     def _get_progress_by_partner(self, reportable, partner_progresses):
+        """
+        Mutates partner_progresses to include partner name as key
+        and its value as a list of progress dictionaries for
+        consolidation later on.
+
+        Arguments:
+            reportable {Reportable} -- Reportable ORM object
+            partner_progresses {Dict[str: List(Dict)]} -- A global dictionary for partner progresses
+        """
+
         data = {
             'progress': int(reportable.total['c']),
             'target': reportable.target,
@@ -1579,67 +1589,76 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
 
         return partner_progresses
 
+    def _get_progress_by_location(self, location_data, location_progresses):
+        """
+        Mutates location_progresses to include location name as key
+        and its value as a list of progress dictionaries for
+        consolidation later on.
+
+        Arguments:
+            location_data {Iterator[IndicatorLocationData]} -- A iterator of IndicatorLocationData ORM objects
+            location_progresses {Dict[str: Dict[List()]]} -- A global dictionary for location progresses
+        """
+        if not location_data:
+            return
+
+        for ild in location_data:
+            reportable = ild.indicator_report.reportable
+
+            partner_titles = set()
+            partner_title = reportable.content_object.partner.title \
+                + " (" + str(reportable.total['c']) + ")"
+            partner_titles.add(partner_title)
+
+            data = {
+                'progress': ild.disaggregation['()']['c'],
+                'partners': partner_titles,
+            }
+
+            if ild.location.title not in location_progresses:
+                location_progresses[ild.location.title] = list()
+
+            location_progresses[ild.location.title].append(data)
+
     def get_current_progress_by_location(self, obj):
         location_progresses = defaultdict()
 
-        # Only if the indicator is cluster activity, the children (unicef indicators) will exist
-        if obj.children.exists():
-            latest_indicator_reports = []
-
-            try:
+        try:
+            # Only if the indicator is cluster activity, the children (unicef indicators) will exist
+            if obj.children.exists():
                 latest_indicator_reports = map(
                     lambda x: x.indicator_reports.latest(
                         'time_period_start'), obj.children.all()
                 )
 
                 for ir in latest_indicator_reports:
-                    for ild in ir.indicator_location_data.all():
-                        partner_titles = set()
-                        partner_title = ild.indicator_report.reportable.content_object.partner.title \
-                            + " (" + str(ild.indicator_report.reportable.total['c']) + ")"
-                        partner_titles.add(partner_title)
+                    self._get_progress_by_location(ir.indicator_location_data.all(), location_progresses)
 
-                        data = {
-                            'progress': ild.disaggregation['()']['c'],
-                            'partners': partner_titles,
-                        }
-
-                        if ild.location.title in location_progresses:
-                            location_progresses[ild.location.title] += data
-
-                        else:
-                            location_progresses[ild.location.title] = data
-
-            except IndicatorReport.DoesNotExist:
-                # If there is no indicator report for this Reportable, then skip this process
-                pass
-
-        # If the indicator is UNICEF cluster which is linked as Partner, then show its progress only
-        else:
-            try:
+            # If the indicator is UNICEF cluster which is linked as Partner, then show its progress only
+            else:
                 indicator_location_data = obj.indicator_reports \
                     .latest('time_period_start').indicator_location_data.all()
 
                 for ild in indicator_location_data:
-                    partner_titles = set()
-                    partner_title = ild.indicator_report.reportable.content_object.partner.title \
-                        + " (" + str(ild.indicator_report.reportable.total['c']) + ")"
-                    partner_titles.add(partner_title)
+                    self._get_progress_by_location(indicator_location_data, location_progresses)
 
-                    data = {
-                        'progress': ild.disaggregation['()']['c'],
-                        'partners': partner_titles,
-                    }
+        except IndicatorReport.DoesNotExist:
+            # If there is no indicator report for this Reportable, then skip this process
+            pass
 
-                    if ild.location.title in location_progresses:
-                        location_progresses[ild.location.title] += data
+        # Consolidation for progress info
+        # location_progresses is Dict[List[Dict]] type
+        for progress in location_progresses:
+            consolidated = {
+                'progress': 0,
+                'partners': set(),
+            }
 
-                    else:
-                        location_progresses[ild.location.title] = data
+            for progress_val in location_progresses[progress]:
+                consolidated['progress'] += progress_val['progress']
+                consolidated['partners'] = consolidated['partners'].union(progress_val['partners'])
 
-            except IndicatorReport.DoesNotExist:
-                # If there is no indicator report for this Reportable, then skip this process
-                pass
+            location_progresses[progress] = consolidated
 
         return location_progresses
 
