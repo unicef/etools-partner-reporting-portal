@@ -21,6 +21,20 @@
       disaggregation-switches {
         margin-bottom: 1em;
       }
+
+      .data-key {
+        font-size: 12px;
+        color: var(--theme-secondary-text-color);
+      }
+
+      .data-key dt,
+      .data-key dd {
+        display: inline;
+      }
+
+      .data-key dd {
+        margin: 0;
+      }
     </style>
 
     <etools-prp-ajax
@@ -39,6 +53,27 @@
           formatted-data="{{formattedData}}"
           on-formatted-data-changed="_triggerModalRefit">
       </disaggregation-switches>
+
+      <template
+          is="dom-if"
+          if="[[labels]]"
+          restamp="true">
+        <dl class="data-key">
+          <dt>Data key -</dt>
+          <template
+              is="dom-if"
+              if="[[_equals(data.display_type, 'ratio')]]"
+              restamp="true">
+            <dd>[[[labels.numerator_label]]] / [[[labels.denominator_label]]]</dd>
+          </template>
+          <template
+              is="dom-if"
+              if="[[!_equals(data.display_type, 'ratio')]]"
+              restamp="true">
+            <dd>[[[labels.label]]]</dd>
+          </template>
+        </dl>
+      </template>
 
       <table class="vertical layout">
         <template
@@ -101,14 +136,14 @@
       ],
 
       properties: {
+        data: Object,
+        labels: Object,
+        totals: Object,
+
         editable: {
           type: Number,
           value: 0,
         },
-
-        data: Object,
-
-        totals: Object,
 
         formattedData: {
           type: Object,
