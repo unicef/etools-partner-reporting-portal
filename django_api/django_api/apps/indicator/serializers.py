@@ -777,7 +777,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
     locations = ReportableLocationGoalSerializer(many=True, write_only=True)
     target = serializers.JSONField()
     baseline = serializers.JSONField()
-    in_need = serializers.JSONField(required=False)
+    in_need = serializers.JSONField(required=False, allow_null=True)
 
     class Meta:
         model = Reportable
