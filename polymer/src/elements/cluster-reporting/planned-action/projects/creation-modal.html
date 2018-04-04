@@ -133,7 +133,7 @@
     <etools-prp-ajax
       id="projectAjax"
       url="[[url]]"
-      params="[[data]]"
+      body="[[data]]"
       content-type="application/json"
       method="[[_computeAjaxMethod(edit)]]">
     </etools-prp-ajax>
@@ -234,118 +234,118 @@
               </template>
             </div>
 
-                <paper-radio-button name="custom">
-                  <strong>Custom</strong>
-                </paper-radio-button>
-                  
-                <div
-                  empty$="[[!_equals(mode, 'custom')]]">
-                  <template
-                    is="dom-if"
-                    if="[[_equals(mode, 'custom')]]"
-                    restamp="true">
-                      <div class="item full-width">
-                        <paper-input
-                          class="item validate full-width"
-                          id="title"
-                          label="Title"
-                          value="{{data.title}}"
-                          type="string"
-                          required
-                          on-input="_validate">
-                        </paper-input>
-                      </div>
+            <paper-radio-button name="custom">
+              <strong>Custom</strong>
+            </paper-radio-button>
 
-                      <div class="row">
-                        <etools-multi-selection-menu
-                          class="validate"
-                          label="Clusters"
-                          options="[[formattedClusters]]"
-                          selected-values="{{selectedClusters}}"
-                          on-selected-values-changed="_validate"
-                          trigger-value-change-event
-                            required>
-                        </etools-multi-selection-menu>
-                      </div>
+            <div
+              empty$="[[!_equals(mode, 'custom')]]">
+              <template
+                is="dom-if"
+                if="[[_equals(mode, 'custom')]]"
+                restamp="true">
+                <div class="item full-width">
+                  <paper-input
+                    class="item validate full-width"
+                    id="title"
+                    label="Title"
+                    value="{{data.title}}"
+                    type="string"
+                    required
+                    on-input="_validate">
+                  </paper-input>
+                </div>
 
-                      <div class="item">
-                        <etools-prp-date-input
-                          class="start-date"
-                          label="Start date"
-                          value="{{data.start_date}}"
-                          error-message=""
-                          required
-                          no-init>
-                        </etools-prp-date-input>
-                      </div>
+                <div class="row">
+                  <etools-multi-selection-menu
+                    class="validate"
+                    label="Clusters"
+                    options="[[formattedClusters]]"
+                    selected-values="{{selectedClusters}}"
+                    on-selected-values-changed="_validate"
+                    trigger-value-change-event
+                      required>
+                  </etools-multi-selection-menu>
+                </div>
 
-                      <div class="item">
-                        <etools-prp-date-input
-                            class="end-date"
-                            label="End date"
-                            value="{{data.end_date}}"
-                            error-message=""
-                            required
-                            no-init>
-                        </etools-prp-date-input>
-                      </div>
+                <div class="item">
+                  <etools-prp-date-input
+                    class="start-date"
+                    label="Start date"
+                    value="{{data.start_date}}"
+                    error-message=""
+                    required
+                    no-init>
+                  </etools-prp-date-input>
+                </div>
 
-                      <paper-dropdown-menu
-                          class="item validate"
-                          label="Status"
-                          on-value-changed="_validate"
-                          always-float-label
-                          required>
-                        <paper-listbox
-                            selected="{{data.status}}"
-                            attr-for-selected="value"
-                            slot="dropdown-content"
-                            class="dropdown-content">
-                          <template
-                            is="dom-repeat"
-                            items="[[statuses]]">
-                            <paper-item value="[[item.id]]">[[item.title]]</paper-item>
-                          </template>
-                        </paper-listbox>
-                      </paper-dropdown-menu>
+                <div class="item">
+                  <etools-prp-date-input
+                      class="end-date"
+                      label="End date"
+                      value="{{data.end_date}}"
+                      error-message=""
+                      required
+                      no-init>
+                  </etools-prp-date-input>
+                </div>
 
-                      <paper-input
-                        class="item validate"
-                        id="total_budget"
-                        label="Total Budget"
-                        value="{{data.total_budget}}"
-                        type="number"
-                        allowed-pattern="[+\-\d.]"
-                        step="0.01"
-                        on-input="_validate">
-                      </paper-input>
+                <paper-dropdown-menu
+                    class="item validate"
+                    label="Status"
+                    on-value-changed="_validate"
+                    always-float-label
+                    required>
+                  <paper-listbox
+                      selected="{{data.status}}"
+                      attr-for-selected="value"
+                      slot="dropdown-content"
+                      class="dropdown-content">
+                    <template
+                      is="dom-repeat"
+                      items="[[statuses]]">
+                      <paper-item value="[[item.id]]">[[item.title]]</paper-item>
+                    </template>
+                  </paper-listbox>
+                </paper-dropdown-menu>
 
-                      <paper-input
-                        class="item validate full-width"
-                        id="funding_source"
-                        label="Funding Source"
-                        value="{{data.funding_source}}"
-                        type="string"
-                        on-input="_validate">
-                      </paper-input>
+                <paper-input
+                  class="item validate"
+                  id="total_budget"
+                  label="Total Budget"
+                  value="{{data.total_budget}}"
+                  type="number"
+                  allowed-pattern="[+\-\d.]"
+                  step="0.01"
+                  on-input="_validate">
+                </paper-input>
 
-                      <paper-input
-                        class="item validate full-width"
-                        id="description"
-                        label="Description"
-                        value="{{data.description}}"
-                        type="string"
-                        on-input="_validate">
-                      </paper-input>
+                <paper-input
+                  class="item validate full-width"
+                  id="funding_source"
+                  label="Funding Source"
+                  value="{{data.funding_source}}"
+                  type="string"
+                  on-input="_validate">
+                </paper-input>
 
-                    <paper-input
-                      class="item validate full-width"
-                      id="additional_information"
-                      label="Additional information (e.g. links)"
-                      value="{{data.additional_information}}"
-                      type="string"
-                      on-input="_validate">
-                    </paper-input>
+                <paper-input
+                  class="item validate full-width"
+                  id="description"
+                  label="Description"
+                  value="{{data.description}}"
+                  type="string"
+                  on-input="_validate">
+                </paper-input>
+
+                <paper-input
+                  class="item validate full-width"
+                  id="additional_information"
+                  label="Additional information (e.g. links)"
+                  value="{{data.additional_information}}"
+                  type="string"
+                  on-input="_validate">
+                </paper-input>
               </template>
             </div>
           </paper-radio-group>
@@ -414,7 +414,7 @@
 
         url: {
           type: String,
-          computed: '_computeUrl(responsePlanID, selectedPartner, data, edit)',
+          computed: '_computeUrl(responsePlanID)',
         },
 
         ochaProjectsUrl: {
@@ -514,17 +514,8 @@
         '_fetchOchaProjectDetails(selectedProject)',
       ],
 
-      _computeUrl: function(responsePlanID, selectedPartner, data, edit) {
-        if (edit) {
-          if (this.permissions.addPartnerToProject) {
-            var partnerId = data.partner_id;
-            return App.Endpoints.plannedActionsIMOEdit(responsePlanID, partnerId, data.id);
-          }
-          return App.Endpoints.plannedActionsProjectOverview(data.id);
-        }
-        return this.permissions.addPartnerToProject
-          ? App.Endpoints.plannedActionsIMO(responsePlanID, selectedPartner)
-          : App.Endpoints.plannedActions(responsePlanID);
+      _computeUrl: function(responsePlanID) {
+          return App.Endpoints.plannedActionsProjectOverview(responsePlanID);
       },
 
       close: function () {
