@@ -131,7 +131,7 @@ class PartnerProjectAPIView(APIView):
 
     def get_instance(self):
         try:
-            instance = PartnerProject.objects.get(id=(self.kwargs.get('ok') or self.request.data['id']))
+            instance = PartnerProject.objects.get(id=(self.kwargs.get('pk') or self.request.data['id']))
         except PartnerProject.DoesNotExist:
             # TODO: log exception
             raise Http404
