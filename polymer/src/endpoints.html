@@ -292,6 +292,14 @@
       customResponsePlan: function (workspaceId) {
         return this._buildUrl('/core/workspace/' + workspaceId + '/response-plan/create/');
       },
+
+      ochaProjectsList: function (responsePlanId) {
+        return this._buildUrl('/ocha/projects/response-plan/' + responsePlanId + '/');
+      },
+
+      partnerProjectCreate: function (responsePlanId) {
+        return this._buildUrl('/partner/partner-project-create/' + responsePlanId + '/');
+      },
     };
   }());
 </script>
