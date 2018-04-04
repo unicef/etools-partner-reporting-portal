@@ -143,7 +143,6 @@ class PartnerProjectPatchSerializer(serializers.ModelSerializer):
     start_date = serializers.DateField(required=False)
     end_date = serializers.DateField(required=False)
     description = serializers.CharField(required=False)
-    additional_information = serializers.CharField(required=False)
     total_budget = serializers.CharField(required=False)
     funding_source = serializers.CharField(required=False)
     clusters = ClusterSimpleSerializer(many=True, read_only=True)
@@ -164,6 +163,15 @@ class PartnerProjectPatchSerializer(serializers.ModelSerializer):
             'clusters',
             'locations',
         )
+
+    def validate(self, attrs):
+        validated_data = super(PartnerProjectPatchSerializer, self).validate(attrs)
+        if validated_data['end_date'] < validated_data['start_date']:
+            raise serializers.ValidationError({
+                'end_date': 'Cannot be earlier than Start Date'
+            })
+
+        return validated_data
 
 
 class PartnerProjectSimpleSerializer(serializers.ModelSerializer):
