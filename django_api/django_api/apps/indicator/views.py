@@ -263,7 +263,7 @@ class ReportableLocationGoalBaselineInNeedAPIView(ListAPIView, UpdateAPIView):
     Reserved for IMO only.
     """
     serializer_class = ReportableLocationGoalBaselineInNeedSerializer
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated, IsIMO,)
     lookup_url_kwarg = 'reportable_id'
 
     def get_queryset(self, *args, **kwargs):
@@ -292,6 +292,17 @@ class ReportableLocationGoalBaselineInNeedAPIView(ListAPIView, UpdateAPIView):
 
         serializer.is_valid(raise_exception=True)
         serializer.save()
+
+        # Update its child indicators for ReportableLocationGoal update
+        reportable = Reportable.objects.get(id=self.kwargs.get('reportable_id', None))
+        loc_goals_by_loc = {item.location: item for item in instances}
+
+        for child in reportable.children.all():
+            for loc_goal in child.reportablelocationgoal_set.all():
+                if loc_goal.location in loc_goals_by_loc:
+                    loc_goal.baseline = loc_goals_by_loc[loc_goal.location].baseline
+                    loc_goal.in_need = loc_goals_by_loc[loc_goal.location].in_need
+                    loc_goal.save()
 
         return Response(serializer.data)
 
