@@ -188,7 +188,7 @@ class PartnerProject(TimeStampedExternalSourceModel):
     title = models.CharField(max_length=1024)
     description = models.TextField(max_length=5120)
     additional_information = models.CharField(
-        max_length=255, verbose_name="Additional information (e.g. links)"
+        max_length=255, verbose_name="Additional information (e.g. links)", null=True, blank=True
     )
     start_date = models.DateField()
     end_date = models.DateField()
