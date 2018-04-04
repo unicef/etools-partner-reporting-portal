@@ -67,7 +67,7 @@ class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, ser
     external_source = serializers.CharField(default=EXTERNAL_DATA_SOURCES.HPC)
     id = serializers.IntegerField(source='external_id')
     name = serializers.CharField(source='title')
-    objective = serializers.CharField(source='description')
+    objective = serializers.CharField(source='description', allow_null=True)
     startDate = serializers.DateTimeField(source='start_date')
     endDate = serializers.DateTimeField(source='end_date')
     organizations = PartnerImportSerializer(many=True)
