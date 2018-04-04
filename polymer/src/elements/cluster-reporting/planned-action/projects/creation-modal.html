@@ -31,6 +31,7 @@
 <link rel="import" href="../../../form-fields/dropdown-form-input.html">
 <link rel="import" href="../../../form-fields/cluster-dropdown-content.html">
 <link rel="import" href="../../../form-fields/partner-dropdown-content.html">
+<link rel="import" href="../../../../behaviors/modal.html">
 <link rel="import" href="../../../../behaviors/routing.html">
 <link rel="import" href="../../../../behaviors/utils.html">
 <link rel="import" href="../../../../redux/store.html">
@@ -85,7 +86,7 @@
         padding: 24px;
       }
 
-            paper-radio-group {
+      paper-radio-group {
         display: block;
         padding-top: 16px;
       }
@@ -132,7 +133,7 @@
     <etools-prp-ajax
       id="projectAjax"
       url="[[url]]"
-      body="[[data]]"
+      params="[[data]]"
       content-type="application/json"
       method="[[_computeAjaxMethod(edit)]]">
     </etools-prp-ajax>
@@ -147,93 +148,91 @@
       id="projectDetails"
       url="[[ochaProjectDetailsUrl]]"
       body="[[ochaProjectRequestId]]"
-      content-type="multipart/form-data"
+      content-type="application/json"
       timeout="100000"
       method="post">
     </etools-prp-ajax>
 
     <paper-dialog
-        id="dialog"
-        with-backdrop
-        opened="{{opened}}">
+      id="dialog"
+      with-backdrop
+      opened="{{opened}}">
       <div class="header layout horizontal justified">
         <h2>[[_computeTitle(edit)]]</h2>
-          <paper-icon-button
-            class="self-center"
-            on-tap="close"
-            icon="icons:close">
-          </paper-icon-button>
-        </div>
+        <paper-icon-button
+          class="self-center"
+          on-tap="close"
+          icon="icons:close">
+        </paper-icon-button>
+      </div>
 
       <paper-dialog-scrollable>
         <template
+          is="dom-if"
+          if="[[refresh]]"
+          restamp="true">
+          <template
             is="dom-if"
-            if="[[refresh]]"
+            if="[[permissions.addPartnerToProject]]"
             restamp="true">
+            <etools-single-selection-menu
+              class="item validate full-width"
+              label="Partner"
+              options="[[partners]]"
+              option-value="id"
+              option-label="title"
+              selected="{{selectedPartner}}"
+              on-iron-activate="_validate"
+              trigger-value-change-event
+              required>
+            </etools-single-selection-menu>
+          </template>
 
-            <template
-              is="dom-if"
-              if="[[permissions.addPartnerToProject]]"
-              restamp="true">
-              <etools-single-selection-menu
-                class="item validate full-width"
-                label="Partner"
-                options="[[partners]]"
-                option-value="id"
-                option-label="title"
-                selected="{{selectedPartner}}"
-                on-iron-activate="_validate"
-                trigger-value-change-event
-                required>
-              </etools-single-selection-menu>
-            </template>
+          <template
+            is="dom-if"
+            if="[[_displayPartnerReadOnly(permissions, edit)]]"
+            restamp="true">
+            <labelled-item class="item full-width" label="Partner">
+              <span>[[data.partner]]</span>
+            </labelled-item>
+          </template>
 
-            <template
-              is="dom-if"
-              if="[[_displayPartnerReadOnly(permissions, edit)]]"
-              restamp="true">
-              <labelled-item class="item full-width" label="Partner">
-                <span>[[data.partner]]</span>
-              </labelled-item>
-            </template>
-
-            <paper-radio-group
-              id="mode"
-              selected={{mode}}>
-              <paper-radio-button name="ocha" active="true">
-                <strong>From OCHA</strong>
-              </paper-radio-button>
-
-              <div
+          <paper-radio-group
+            id="mode"
+            selected={{mode}}
+            on-change="_adjustPosition">
+            <paper-radio-button name="ocha" active="true">
+              <strong>From OCHA</strong>
+            </paper-radio-button>
+            <div
               class="fields"
               empty$="[[!_equals(mode, 'ocha')]]">
-            <template
-              is="dom-if"
-              if="[[_equals(mode, 'ocha')]]"
-              restamp="true">
-              <div>
-                <etools-single-selection-menu
-                  class="item validate full-width"
-                  label="Project"
-                  options="[[formattedProjects]]"
-                  option-value="id"
-                  option-label="title"
-                  selected="{{selectedProject}}"
-                  on-iron-activate="_validate"
-                  disabled="[[projectsLoading]]"
-                  trigger-value-change-event
-                  required>
-                </etools-single-selection-menu>
-                <project-details-display
-                  id="details"
-                  project-data="[[projectDetails]]"
-                  loading="[[projectDetailsLoading]]">
-                </project-details-display>
-                <etools-loading active$="[[projectsLoading]]"></etools-loading>
-              </div>
-            </template>
-
-          </div>
+              <template
+                is="dom-if"
+                if="[[_equals(mode, 'ocha')]]"
+                restamp="true">
+                <div>
+                  <etools-single-selection-menu
+                    class="item validate full-width"
+                    label="Project"
+                    options="[[formattedProjects]]"
+                    option-value="id"
+                    option-label="title"
+                    selected="{{selectedProject}}"
+                    on-iron-activate="_validate"
+                    disabled="[[projectsLoading]]"
+                    trigger-value-change-event
+                    required>
+                  </etools-single-selection-menu>
+                  <project-details-display
+                    id="details"
+                    project-data="[[projectDetails]]"
+                    loading="[[projectDetailsLoading]]">
+                  </project-details-display>
+                  <etools-loading active$="[[projectsLoading]]"></etools-loading>
+                </div>
+              </template>
+            </div>
 
                 <paper-radio-button name="custom">
                   <strong>Custom</strong>
@@ -246,15 +245,15 @@
                     if="[[_equals(mode, 'custom')]]"
                     restamp="true">
                       <div class="item full-width">
-                      <paper-input
-                        class="item validate full-width"
-                        id="title"
-                        label="Title"
-                        value="{{data.title}}"
-                        type="string"
-                        required
-                        on-input="_validate">
-                      </paper-input>
+                        <paper-input
+                          class="item validate full-width"
+                          id="title"
+                          label="Title"
+                          value="{{data.title}}"
+                          type="string"
+                          required
+                          on-input="_validate">
+                        </paper-input>
                       </div>
 
                       <div class="row">
@@ -339,18 +338,18 @@
                         on-input="_validate">
                       </paper-input>
 
-                      <paper-input
-                        class="item validate full-width"
-                        id="additional_information"
-                        label="Additional information (e.g. links)"
-                        value="{{data.additional_information}}"
-                        type="string"
-                        on-input="_validate">
-                      </paper-input>
-                  </template>
-                </div>
-              </paper-radio-group>
-          </template>
+                    <paper-input
+                      class="item validate full-width"
+                      id="additional_information"
+                      label="Additional information (e.g. links)"
+                      value="{{data.additional_information}}"
+                      type="string"
+                      on-input="_validate">
+                    </paper-input>
+              </template>
+            </div>
+          </paper-radio-group>
+        </template>
       </paper-dialog-scrollable>
 
       <div class="buttons layout horizontal-reverse">
@@ -375,6 +374,7 @@
         App.Behaviors.ReduxBehavior,
         App.Behaviors.RoutingBehavior,
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ModalBehavior,
       ],
 
       properties: {
@@ -399,7 +399,7 @@
 
         mode: {
           type: String,
-          value: 'ocha',
+          observer: '_setDefaults',
         },
 
         data: {
@@ -504,14 +504,15 @@
         },
       },
 
+      // listeners: {
+      //   'details-loaded': 'adjustPosition',
+      //   'mode.selected-changed': 'adjustPosition',
+      // },
+
       observers: [
         '_fetchOchaProjectsList(mode, ochaProjectsUrl)',
         '_fetchOchaProjectDetails(selectedProject)',
       ],
-
-      listeners: {
-        'details-loaded': 'adjustPosition',
-      },
 
       _computeUrl: function(responsePlanID, selectedPartner, data, edit) {
         if (edit) {
@@ -546,6 +547,14 @@
         this.set('opened', true);
         this.set('refresh', true);
       },
+
+      // adjustPosition: function (e) {
+      //   e.stopPropagation();
+
+      //   this.debounce('adjust-position', function () {
+      //     this.$.dialog.refit();
+      //   }, 100);
+      // },
 
       _computeTitle: function(edit) {
         return (edit ? 'Edit' : 'Add') + ' Project';
@@ -589,7 +598,7 @@
       },
 
       _computeOchaProjectRequestId: function (selectedProject) {
-        return {'project': selectedProject};
+        return ({'project': selectedProject});
       },
 
       _fetchOchaProjectDetails: function () {
@@ -665,6 +674,14 @@
         this.set('data', {});
         this.set('projectDetails', {});
         this.set('errors', {});
+      },
+
+      _adjustPosition: function (e) {
+        e.stopPropagation();
+
+        this.debounce('adjust-position', function () {
+          this.$.dialog.refit();
+        }, 100);
       },
 
       _save: function () {
