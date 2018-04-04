@@ -101,7 +101,6 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
             partner = get_object_or_404(Partner, id=partner_id)
 
             # TODO: Check Object-level permission for IMO
-
             # Make sure the user belongs to IMO group
             if not request.user.groups.filter(name='IMO').exists():
                 raise ValidationError('"user does not belong to IMO"')
