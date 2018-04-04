@@ -94,16 +94,16 @@
     </etools-prp-permissions>
 
     <etools-prp-ajax
-        id="plan"
-        url="[[createPlanUrl]]"
-        method="post"
-        content-type="application/json">
+      id="plan"
+      url="[[createPlanUrl]]"
+      method="post"
+      content-type="application/json">
     </etools-prp-ajax>
 
     <etools-prp-ajax
-        id="plans"
-        timeout="100000"
-        url="[[ochaPlansUrl]]">
+      id="plans"
+      timeout="100000"
+      url="[[ochaPlansUrl]]">
     </etools-prp-ajax>
 
     <etools-prp-ajax
@@ -168,7 +168,6 @@
                 <etools-loading active$="[[plansLoading]]"></etools-loading>
               </div>
             </template>
-
           </div>
 
           <paper-radio-button name="custom">

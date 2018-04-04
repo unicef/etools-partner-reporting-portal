@@ -26,7 +26,7 @@
 <link rel="import" href="../../../../polyfills/es6-shim.html">
 <link rel="import" href="../../../etools-prp-ajax.html">
 <link rel="import" href="../../../../elements/etools-prp-permissions.html">
-<link rel="import" href="../../../../elements/cluster-reporting/project-details.html">
+<link rel="import" href="../../../../elements/cluster-reporting/creation-modal-project-details.html">
 <link rel="import" href="../../../etools-prp-date-input.html">
 <link rel="import" href="../../../form-fields/dropdown-form-input.html">
 <link rel="import" href="../../../form-fields/cluster-dropdown-content.html">
@@ -224,11 +224,11 @@
                     trigger-value-change-event
                     required>
                   </etools-single-selection-menu>
-                  <project-details-display
+                  <creation-modal-project-details
                     id="details"
                     project-data="[[projectDetails]]"
                     loading="[[projectDetailsLoading]]">
-                  </project-details-display>
+                  </creation-modal-project-details>
                   <etools-loading active$="[[projectsLoading]]"></etools-loading>
                 </div>
               </template>
