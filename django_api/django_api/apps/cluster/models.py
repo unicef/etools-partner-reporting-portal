@@ -10,7 +10,7 @@ from core.common import (
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
     CLUSTER_TYPES)
-from core.models import TimeStampedExternalSourceModel
+from core.models import TimeStampedExternalSourceModel, IMORole
 
 from indicator.models import Reportable, IndicatorReport
 from partner.models import PartnerActivity
@@ -52,6 +52,10 @@ class Cluster(TimeStampedExternalSourceModel):
     @property
     def title(self):
         return self.imported_type or self.get_type_display()
+
+    @property
+    def imo_users(self):
+        return self.users.filter(groups__name=IMORole.as_group().name)
 
     @property
     def num_of_partners(self):

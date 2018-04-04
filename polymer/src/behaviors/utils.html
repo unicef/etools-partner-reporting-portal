@@ -224,6 +224,18 @@
       _prop: function (obj, key) {
         return obj[key];
       },
+
+      _omit: function (src, keys) {
+        return Object.keys(src)
+            .filter(function (key) {
+              return keys.indexOf(key) === -1;
+            })
+            .reduce(function (acc, key) {
+              acc[key] = src[key];
+
+              return acc;
+            }, {});
+      },
     };
 
     function buildQuery(chunks) {

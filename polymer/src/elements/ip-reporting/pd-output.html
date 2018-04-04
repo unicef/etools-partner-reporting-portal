@@ -178,13 +178,13 @@
                       is="dom-if"
                       if="[[_equals(indicator.reportable.blueprint.display_type, 'number')]]"
                       restamp="true">
-                    <etools-prp-number value="[[indicator.reportable.target]]"></etools-prp-number>
+                    <etools-prp-number value="[[indicator.reportable.target.v]]"></etools-prp-number>
                   </template>
                   <template
                       is="dom-if"
-                      if="[[_equals(indicator.reportable.blueprint.display_type, 'percentage')]]"
+                      if="[[!_equals(indicator.reportable.blueprint.display_type, 'number')]]"
                       restamp="true">
-                    [[_toPercentage(indicator.reportable.target)]]
+                    [[_toPercentage(indicator.reportable.target.c)]]
                   </template>
                 </dd>
               </dl>
@@ -200,7 +200,7 @@
                 </template>
                 <template
                     is="dom-if"
-                    if="[[_equals(indicator.reportable.blueprint.display_type, 'percentage')]]"
+                    if="[[!_equals(indicator.reportable.blueprint.display_type, 'number')]]"
                     restamp="true">
                   <dd class="flex">[[_toPercentage(indicator.reportable.achieved.c)]]</dd>
                 </template>
@@ -215,7 +215,7 @@
                 </template>
                 <template
                     is="dom-if"
-                    if="[[_equals(indicator.reportable.blueprint.display_type, 'percentage')]]"
+                    if="[[!_equals(indicator.reportable.blueprint.display_type, 'number')]]"
                     restamp="true">
                   <dd class="flex">[[_toPercentage(indicator.total.c)]]</dd>
                 </template>

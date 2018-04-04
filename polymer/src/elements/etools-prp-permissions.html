@@ -55,7 +55,7 @@
 
         createClusterEntitiesForCluster: function (params, clusterId) {
           return params.imoClusters.some(function (cluster) {
-            return cluster.id === clusterId;
+            return String(cluster.id) === String(clusterId);
           });
         },
 
@@ -133,7 +133,7 @@
         ],
 
         adminResponsePlan: [
-        App.Constants.GROUP_IMO,
+          App.Constants.GROUP_IMO,
         ],
 
         addPartnerToProject: [
@@ -148,6 +148,20 @@
           App.Constants.GROUP_IMO,
         ],
 
+        editIndicatorDetails: [
+          App.Constants.GROUP_IMO,
+          App.Constants.GROUP_AUTHORIZED_OFFICER,
+          App.Constants.GROUP_EDITOR,
+        ],
+
+        onlyEditOwnIndicatorDetails: [
+          App.Constants.GROUP_AUTHORIZED_OFFICER,
+          App.Constants.GROUP_EDITOR,
+        ],
+
+        editIndicatorLocations: [
+          App.Constants.GROUP_IMO,
+        ],
       };
 
       function isMember(groupName, groups) {

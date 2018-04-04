@@ -1,0 +1,324 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
+<link rel="import" href="../../../bower_components/etools-data-table/etools-data-table.html">
+
+<link rel="import" href="../../polyfills/es6-shim.html">
+<link rel="import" href="../../endpoints.html">
+<link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../behaviors/modal.html">
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../elements/etools-prp-ajax.html">
+<link rel="import" href="../../styles/buttons.html">
+<link rel="import" href="../../styles/modal.html">
+<link rel="import" href="../../styles/shared-styles.html">
+<link rel="import" href="../error-box.html">
+<link rel="import" href="../json-field.html">
+<link rel="import" href="../labelled-item.html">
+
+<dom-module id="indicator-locations-modal">
+  <template>
+    <style include="button-styles modal-styles shared-styles iron-flex iron-flex-alignment iron-flex-reverse">
+      :host {
+        display: block;
+
+        --paper-dialog: {
+          width: 800px;
+
+          & > * {
+            margin: 0;
+          }
+        };
+
+        --json-field-label: {
+          display: none;
+        };
+      }
+
+      .row {
+        margin: 16px 0;
+      }
+
+      table {
+        width: 100%;
+        table-layout: fixed;
+      }
+
+      th {
+        padding: 5px 10px;
+        background: var(--paper-grey-200);
+      }
+
+      td {
+        padding: 0 10px;
+      }
+
+      th:first-of-type {
+        text-align: left;
+      }
+
+      td:nth-of-type(1),
+      td:nth-of-type(2) {
+        background: var(--paper-grey-100);
+      }
+
+      th:nth-of-type(1),
+      td:nth-of-type(1) {
+        width: 150px;
+      }
+
+      .text {
+        @apply --truncate;
+      }
+
+      json-field {
+        text-align: center;
+      }
+    </style>
+
+    <etools-prp-ajax
+        id="locations"
+        url="[[locationsUrl]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
+        id="update"
+        url="[[updateUrl]]"
+        body="[[data.locations]]"
+        method="patch"
+        content-type="application/json">
+    </etools-prp-ajax>
+
+    <paper-dialog
+        id="dialog"
+        with-backdrop
+        opened="{{opened}}">
+      <div class="header layout horizontal justified">
+        <h2>Location settings for indicator</h2>
+
+        <paper-icon-button
+            class="self-center"
+            on-tap="close"
+            icon="icons:close">
+        </paper-icon-button>
+      </div>
+
+      <paper-dialog-scrollable>
+        <template
+            is="dom-if"
+            if="[[opened]]"
+            restamp="true">
+          <error-box errors="[[errors]]"></error-box>
+
+          <div class="row">
+            <labelled-item label="Title">
+              [[data.blueprint.title]]
+            </labelled-item>
+          </div>
+
+          <div class="row">
+            <table>
+              <thead>
+                <tr>
+                  <th>Location - Admin level</th>
+                  <th>Location</th>
+                  <th>Baseline</th>
+                  <template
+                      is="dom-if"
+                      if="[[isNumber]]"
+                      restamp="true">
+                    <th>In need (optional)</th>
+                  </template>
+                </tr>
+              </thead>
+
+              <tbody>
+                <template
+                    is="dom-repeat"
+                    items="[[data.locations]]"
+                    as="location">
+                  <tr>
+                    <td>Admin [[location.loc_type]]</td>
+                    <td>
+                      <div class="text">[[_getLocationName(location.location, locations)]]</div>
+                    </td>
+                    <td>
+                      <json-field
+                          class="validate"
+                          type="[[data.blueprint.display_type]]"
+                          on-input="_validate"
+                          value="{{location.baseline}}"
+                          allowed-pattern="[+\-\d]"
+                          hide-label>
+                      </json-field>
+                    </td>
+                    <template
+                        is="dom-if"
+                        if="[[isNumber]]"
+                        restamp="true">
+                      <td>
+                        <json-field
+                            class="validate"
+                            type="[[data.blueprint.display_type]]"
+                            on-input="_validate"
+                            value="{{location.in_need}}"
+                            allowed-pattern="[+\-\d]"
+                            hide-label>
+                        </json-field>
+                      </td>
+                    </template>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+        </template>
+      </paper-dialog-scrollable>
+
+      <div class="buttons layout horizontal-reverse">
+        <paper-button
+            on-tap="_save"
+            class="btn-primary"
+            raised>
+          Save
+        </paper-button>
+
+        <paper-button
+            on-tap="close">
+          Cancel
+        </paper-button>
+      </div>
+
+      <etools-loading active="[[pending]]"></etools-loading>
+    </paper-dialog>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'indicator-locations-modal',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+        App.Behaviors.UtilsBehavior,
+        App.Behaviors.ModalBehavior,
+      ],
+
+      properties: {
+        data: Object,
+        editData: Object,
+        locations: Array,
+        errors: Object,
+
+        pending: {
+          type: Boolean,
+          value: false,
+        },
+
+        responsePlanId: {
+          type: String,
+          statePath: 'responsePlans.currentID',
+        },
+
+        locationsUrl: {
+          type: String,
+          computed: '_computeLocationsUrl(responsePlanId)',
+        },
+
+        updateUrl: {
+          type: String,
+          computed: '_computeUpdateUrl(data)',
+        },
+
+        isNumber: {
+          type: Boolean,
+          computed: '_computeIsNumber(data.blueprint.display_type)',
+        },
+      },
+
+      observers: [
+        '_setDefaults(opened)',
+      ],
+
+      listeners: {
+        'indicator-locations-modal-refit': 'adjustPosition',
+      },
+
+      _computeUpdateUrl: function (data) {
+        return App.Endpoints.indicatorPerLocationVars(data.id);
+      },
+
+      _computeLocationsUrl: function (responsePlanId) {
+        return App.Endpoints.clusterLocationNames(responsePlanId);
+      },
+
+      _computeIsNumber: function (type) {
+        return type === 'number';
+      },
+
+      _getLocationName: function (locationId, locations) {
+        var location = locations.find(function (loc) {
+          return String(loc.id) === String(locationId);
+        });
+
+        return location ? location.title : 'Invalid location';
+      },
+
+      _setDefaults: function (opened) {
+        if (!opened) {
+          return;
+        }
+
+        this.set('errors', {});
+        this.set('data', this._clone(this.get('editData')));
+        this._fetchLocations();
+      },
+
+      _fetchLocations: function () {
+        var self = this;
+
+        this.set('pending', true);
+
+        this.$.locations.thunk()()
+            .then(function (res) {
+              self.set('pending', false);
+              self.set('locations', res.data);
+
+              self.fire('indicator-locations-modal-refit');
+            })
+            .catch(function () {
+              self.set('pending', false);
+            });
+      },
+
+      _validate: function (e) {
+        e.target.validate();
+      },
+
+      _save: function () {
+        var self = this;
+
+        if (!this._fieldsAreValid()) {
+          return;
+        }
+
+        this.set('pending', true);
+
+        this.$.update.thunk()()
+            .then(function () {
+              self.set('pending', false);
+              self.set('editData.locations', self.get('data.locations'));
+              self.close();
+            })
+            .catch(function (err) {
+              self.set('pending', false);
+              self.set('errors', err.data);
+            });
+      },
+    });
+  </script>
+</dom-module>

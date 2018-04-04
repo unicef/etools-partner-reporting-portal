@@ -7,6 +7,7 @@
 <link rel="import" href="../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../../bower_components/paper-tooltip/paper-tooltip.html">
 
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../styles/buttons.html">
@@ -48,10 +49,9 @@
         border-right: 1px solid var(--paper-grey-400);
       }
 
-      .col-name,
+      .col-name:not(:first-of-type),
       .col-values {
         padding-left: 24px;
-        width: 270px;
       }
 
       paper-dropdown-menu {
@@ -63,39 +63,65 @@
 
     <template is="dom-repeat" items="[[value]]" as="dataDisagg">
       <div class="row layout horizontal">
-        <div class="flex-none layout vertical center-center col-actions">
-          <paper-icon-button
+        <template
+            is="dom-if"
+            if="[[!readonly]]"
+            restamp="true">
+          <div class="flex-none layout vertical center-center col-actions">
+            <div>
+              <paper-icon-button
+                  index="[[index]]"
+                  class="remove-btn"
+                  on-tap="_remove"
+                  icon="icons:cancel">
+              </paper-icon-button>
+              <paper-tooltip offset="5">Remove</paper-tooltip>
+            </div>
+          </div>
+        </template>
+
+        <div class="col-name flex">
+          <template
+              is="dom-if"
+              if="[[readonly]]"
+              restamp="true">
+            <paper-input
+                label="Disaggregation By"
+                value="[[dataDisagg.name]]"
+                always-float-label
+                disabled>
+            </paper-input>
+          </template>
+
+          <template
+              is="dom-if"
+              if="[[!readonly]]"
+              restamp="true">
+            <paper-dropdown-menu
+              class="dis-menu validate"
+              id="disaggregationsDrop"
               index="[[index]]"
-              class="remove-btn"
-              on-tap="_remove"
-              icon="icons:cancel">
-          </paper-icon-button>
+              label="Disaggregation By"
+              on-value-changed="_validate"
+              on-selected-item-changed="_setDisaggregation"
+              disabled="[[readonly]]"
+              always-float-label
+              required>
+              <paper-listbox
+                slot="dropdown-content"
+                class="dropdown-content">
+                <template
+                  is="dom-repeat"
+                  items="[[disaggregations]]">
+                  <paper-item name="[[item.id]]">[[item.name]]
+                  </paper-item>
+                </template>
+              </paper-listbox>
+            </paper-dropdown-menu>
+          </template>
         </div>
 
-        <div class="col-name">
-          <paper-dropdown-menu
-            class="dis-menu validate"
-            id="disaggregationsDrop"
-            index="[[index]]"
-            label="Disaggregation By"
-            on-value-changed="_validate"
-            on-selected-item-changed="_setDisaggregation"
-            always-float-label
-            required>
-            <paper-listbox
-              slot="dropdown-content"
-              class="dropdown-content">
-              <template
-                is="dom-repeat"
-                items="[[disaggregations]]">
-                <paper-item name="[[item.id]]">[[item.name]]
-                </paper-item>
-              </template>
-            </paper-listbox>
-          </paper-dropdown-menu>
-        </div>
-
-        <div class="col-values">
+        <div class="col-values flex">
           <paper-input
             index="[[index]]"
             label="Disaggregation Groups"
@@ -108,13 +134,17 @@
       </div>
     </template>
 
-    <paper-button
-        class="btn-primary add-disaggregation-btn"
-        on-tap="_add"
-        disabled="[[!_canAddMore]]">
-      Add disaggregation
-    </paper-button>
-
+    <template
+        is="dom-if"
+        if="[[!readonly]]"
+        restamp="true">
+      <paper-button
+          class="btn-primary add-disaggregation-btn"
+          on-tap="_add"
+          disabled="[[!_canAddMore]]">
+        Add disaggregation
+      </paper-button>
+    </template>
   </template>
 
     <script>
@@ -151,6 +181,11 @@
           _canAddMore: {
             type: Boolean,
             value: true,
+          },
+
+          readonly: {
+            type: Boolean,
+            value: false,
           },
         },
 

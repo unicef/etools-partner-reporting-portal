@@ -104,9 +104,9 @@ class ProgressReportsXLSXExporter:
         partner = programme_document.partner
 
         try:
-            indicator_target = float(indicator_report.reportable.target)
+            indicator_target = float(indicator_report.reportable.calculated_target)
         except ValueError:
-            indicator_target = indicator_report.reportable.target
+            indicator_target = indicator_report.reportable.calculated_target
 
         previous_location_progress = location_data.previous_location_progress_value
 

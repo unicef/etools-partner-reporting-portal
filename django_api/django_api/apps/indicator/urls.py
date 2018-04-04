@@ -12,7 +12,9 @@ from .views import (
     IndicatorDataLocationAPIView,
     DisaggregationListCreateAPIView,
     ReportableDetailAPIView,
-    IndicatorReportReviewAPIView
+    IndicatorReportReviewAPIView,
+    ReportableLocationGoalBaselineInNeedAPIView,
+    ClusterIndicatorSendIMOMessageAPIView,
 )
 
 
@@ -20,6 +22,9 @@ urlpatterns = [
     url(r'^(?P<reportable_id>\d+)/$',
         ReportableDetailAPIView.as_view(),
         name='indicator-detail',),
+    url(r'^(?P<reportable_id>\d+)/baseline_in_need$',
+        ReportableLocationGoalBaselineInNeedAPIView.as_view(),
+        name='indicator-location-goal-detail',),
     url(r'^(?P<reportable_id>\d+)/indicator-reports/$',
         IndicatorReportListAPIView.as_view(),
         name='indicator-report-list-api'),
@@ -55,8 +60,11 @@ urlpatterns = [
         IndicatorReportReviewAPIView.as_view(),
         name='indicator-report-review'),
 
-
     url(r'^cluster-indicator/$', ClusterIndicatorAPIView.as_view(), name='cluster-indicator'),
+
+    url(r'^cluster-indicator-imo-message/$',
+        ClusterIndicatorSendIMOMessageAPIView.as_view(),
+        name='cluster-indicator-imo-message'),
 
     url(r'^response-plan/(?P<response_plan_id>\d+)/disaggregations/$',
         DisaggregationListCreateAPIView.as_view(),

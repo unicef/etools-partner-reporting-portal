@@ -1,5 +1,5 @@
 from django_filters import rest_framework as filters
-from django_filters.filters import ChoiceFilter
+from django_filters.filters import ChoiceFilter, NumberFilter
 
 from core.common import PROGRESS_REPORT_STATUS
 
@@ -7,6 +7,20 @@ from indicator.models import Reportable, IndicatorReport
 
 
 class IndicatorFilter(filters.FilterSet):
+    baseline = NumberFilter(
+        method="get_baseline",
+        label="Baseline")
+
+    target = NumberFilter(
+        method="get_target",
+        label="Target")
+
+    def get_target(self, queryset, name, value):
+        return queryset.filter(target__v=value)
+
+    def get_baseline(self, queryset, name, value):
+        return queryset.filter(baseline__v=value)
+
     class Meta:
         model = Reportable
         fields = (
