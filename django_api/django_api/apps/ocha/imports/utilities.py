@@ -9,7 +9,7 @@ from requests.status_codes import codes
 from cluster.models import Cluster, ClusterObjective
 from core.common import EXTERNAL_DATA_SOURCES
 from core.models import Country, GatewayType, Location
-from indicator.models import Reportable, IndicatorBlueprint
+from indicator.models import Reportable, IndicatorBlueprint, Disaggregation, DisaggregationValue
 from ocha.constants import HPC_V2_ROOT_URL
 from ocha.imports.bulk import fetch_json_urls_async
 from ocha.utilities import get_dict_from_list_by_key
@@ -137,6 +137,42 @@ def save_location_list(location_list, force_download_all=False):
     return locations
 
 
+def save_disaggregations(disaggregation_categories, response_plan=None):
+    category_to_group = get_disaggregation_category_to_group_map()
+
+    disaggregations = []
+
+    for category in disaggregation_categories:
+        logger.debug('Disaggregations {}'.format(category['ids']))
+        # TODO: Fix for multiple ids
+        if category['ids'][0] in category_to_group:
+            group_data = category_to_group[category['ids'][0]]
+            disaggregation, _ = Disaggregation.objects.update_or_create(
+                external_source=EXTERNAL_DATA_SOURCES.HPC,
+                external_id=group_data['id'],
+                defaults={
+                    'name': group_data['label'],
+                    'response_plan': response_plan,
+                }
+            )
+            disaggregations.append(disaggregation)
+
+            DisaggregationValue.objects.update_or_create(
+                external_source=EXTERNAL_DATA_SOURCES.HPC,
+                external_id=group_data['id'],
+                defaults={
+                    'value': category['label'],
+                    'disaggregation': disaggregation,
+                }
+            )
+
+    logger.debug('Saved {} disaggregations from {}'.format(
+        len(disaggregations), disaggregation_categories
+    ))
+
+    return disaggregations
+
+
 def save_cluster_objective(objective, child_activity):
     cluster_id = objective.get('parentId') or child_activity.get('parentId')
     cluster = Cluster.objects.filter(
@@ -205,6 +241,23 @@ def save_reportables_for_cluster_objective_or_activity(objective_or_activity, at
         except KeyError:
             logger.warning('No location info found for {}'.format(reportable))
 
+        reportable.disaggregations.add(*save_disaggregations(
+            disaggregated.get('categories', []), response_plan=objective_or_activity.cluster.response_plan
+        ))
+
         reportables.append(reportable)
 
     objective_or_activity.reportables.add(*reportables)
+
+
+def get_disaggregation_category_to_group_map():
+    source_url = HPC_V2_ROOT_URL + 'disaggregation-category-group'
+    group_category_list = get_json_from_url(source_url)['data']
+
+    mapping = {}
+
+    for group in group_category_list:
+        for category in group['disaggregationCategories']:
+            mapping[category['id']] = group
+
+    return mapping

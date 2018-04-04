@@ -19,7 +19,7 @@ from core.common import (
     PROGRESS_REPORT_STATUS,
     OVERALL_STATUS,
     FINAL_OVERALL_STATUS)
-from core.models import TimeStampedExternalSyncModelMixin, TimeStampedExternalSourceModel
+from core.models import TimeStampedExternalSourceModel
 from functools import reduce
 
 from indicator.disaggregators import (
@@ -29,7 +29,7 @@ from indicator.disaggregators import (
 from indicator.constants import ValueType
 
 
-class Disaggregation(TimeStampedExternalSyncModelMixin):
+class Disaggregation(TimeStampedExternalSourceModel):
     """
     Disaggregation module. For example: <Gender, Age>
 
@@ -50,7 +50,7 @@ class Disaggregation(TimeStampedExternalSyncModelMixin):
         return "Disaggregation <pk:%s> %s" % (self.id, self.name)
 
 
-class DisaggregationValue(TimeStampedExternalSyncModelMixin):
+class DisaggregationValue(TimeStampedExternalSourceModel):
     """
     Disaggregation Value module. For example: Gender <Male, Female, Other>
 
