@@ -82,9 +82,10 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
     clusters = ClusterSimpleSerializer(many=True, read_only=True)
     locations = ShortLocationSerializer(many=True, read_only=True, required=False)
     partner = serializers.CharField(required=False)
-    partner_id = serializers.IntegerField(read_only=True)
+    partner_id = serializers.IntegerField()
     response_plan_title = serializers.SerializerMethodField()
     total_budget = serializers.CharField(required=False)
+    funding_source = serializers.CharField(required=False)
     description = serializers.CharField(required=False)
     additional_information = serializers.CharField(required=False)
 
@@ -99,6 +100,7 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
             'description',
             'additional_information',
             'total_budget',
+            'funding_source',
             'clusters',
             'locations',
             'partner',
@@ -113,6 +115,27 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
         first_cluster = obj.clusters.first()
         return first_cluster and first_cluster.response_plan.title or ''
 
+    def validate(self, attrs):
+        validated_data = super(PartnerProjectSerializer, self).validate(attrs)
+        if validated_data['end_date'] < validated_data['start_date']:
+            raise serializers.ValidationError({
+                'end_date': 'Cannot be earlier than Start Date'
+            })
+
+        return validated_data
+
+    def create(self, validated_data):
+        clusters_serializer = ClusterSimpleSerializer(
+            many=True, allow_empty=False, data=self.initial_data.get('clusters')
+        )
+        if not clusters_serializer.is_valid():
+            raise serializers.ValidationError({
+                'clusters': 'This list cannot be empty'
+            })
+
+        project = super(PartnerProjectSerializer, self).create(validated_data)
+        return project
+
 
 class PartnerProjectPatchSerializer(serializers.ModelSerializer):
 
@@ -122,6 +145,7 @@ class PartnerProjectPatchSerializer(serializers.ModelSerializer):
     description = serializers.CharField(required=False)
     additional_information = serializers.CharField(required=False)
     total_budget = serializers.CharField(required=False)
+    funding_source = serializers.CharField(required=False)
     clusters = ClusterSimpleSerializer(many=True, read_only=True)
     locations = ShortLocationSerializer(many=True, read_only=True, required=False)
 
@@ -136,6 +160,7 @@ class PartnerProjectPatchSerializer(serializers.ModelSerializer):
             'description',
             'additional_information',
             'total_budget',
+            'funding_source',
             'clusters',
             'locations',
         )

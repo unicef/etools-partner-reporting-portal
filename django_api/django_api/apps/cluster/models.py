@@ -259,7 +259,7 @@ class ClusterObjective(TimeStampedExternalSourceModel):
         return self.cluster.response_plan
 
     def __str__(self):
-        return "<pk: %s> %s" % (self.id, self.title)
+        return "<pk: {}> {}".format(self.id, self.title)
 
 
 class ClusterActivity(TimeStampedExternalSourceModel):
@@ -299,4 +299,4 @@ class ClusterActivity(TimeStampedExternalSourceModel):
         return self.cluster.response_plan
 
     def __str__(self):
-        return "<pk: %s> %s" % (self.id, self.title)
+        return "<pk: {}> {}".format(self.id, self.title)

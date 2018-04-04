@@ -12,7 +12,6 @@ from core.common import (
     SHARED_PARTNER_TYPE,
     CSO_TYPES,
     PARTNER_PROJECT_STATUS,
-    CURRENCIES,
 )
 from core.models import TimeStampedExternalSourceModel
 
@@ -140,8 +139,9 @@ class Partner(TimeStampedExternalSourceModel):
         null=True,
     )
 
-    clusters = models.ManyToManyField('cluster.Cluster',
-                                      related_name="partners")
+    clusters = models.ManyToManyField(
+        'cluster.Cluster', related_name="partners"
+    )
 
     class Meta:
         ordering = ['title']
@@ -186,7 +186,7 @@ class PartnerProject(TimeStampedExternalSourceModel):
     code = models.TextField(null=True, blank=True, unique=True)
 
     title = models.CharField(max_length=1024)
-    description = models.CharField(max_length=2048)
+    description = models.TextField(max_length=5120)
     additional_information = models.CharField(
         max_length=255, verbose_name="Additional information (e.g. links)"
     )
@@ -196,8 +196,9 @@ class PartnerProject(TimeStampedExternalSourceModel):
         max_length=3, choices=PARTNER_PROJECT_STATUS, default=PARTNER_PROJECT_STATUS.ongoing
     )
     total_budget = models.DecimalField(
-        null=True, decimal_places=2, help_text='Total Budget', max_digits=12
+        null=True, decimal_places=2, help_text='Total Budget (USD)', max_digits=12
     )
+    funding_source = models.TextField(max_length=2048, null=True, blank=True)
 
     clusters = models.ManyToManyField(
         'cluster.Cluster', related_name="partner_projects"
@@ -228,31 +229,6 @@ class PartnerProject(TimeStampedExternalSourceModel):
     @property
     def response_plan(self):
         return self.clusters.all()[0].response_plan
-
-
-class FundingSource(TimeStampedExternalSourceModel):
-    partner_project = models.ForeignKey(PartnerProject, related_name="funding_sources")
-    name = models.TextField(max_length=255)
-    organization_type = models.TextField(max_length=255)
-    usage_year = models.PositiveIntegerField(null=True, blank=True)
-    usd_amount = models.DecimalField(decimal_places=2, max_digits=12, verbose_name='USD Amount')
-    original_amount = models.DecimalField(decimal_places=2, max_digits=12, null=True, blank=True)
-    original_currency = models.CharField(
-        choices=CURRENCIES,
-        default=CURRENCIES.usd,
-        max_length=16,
-    )
-    exchange_rate = models.DecimalField(decimal_places=3, max_digits=8, default=1)
-
-    def __str__(self):
-        return '{} {} ({} USD) for {} from {} ({})'.format(
-            self.original_amount,
-            self.original_currency,
-            self.usd_amount,
-            self.partner_project,
-            self.name,
-            self.organization_type,
-        )
 
 
 class PartnerActivity(TimeStampedModel):
@@ -315,4 +291,5 @@ class PartnerActivity(TimeStampedModel):
 def check_pa_double_fks(sender, instance, **kwargs):
     if instance.cluster_activity and instance.cluster_objective:
         raise Exception(
-            "PartnerActivity cannot belong to both ClusterActivity and ClusterObjective")
+            "PartnerActivity cannot belong to both ClusterActivity and ClusterObjective"
+        )
