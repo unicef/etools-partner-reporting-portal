@@ -34,7 +34,7 @@ class ClusterSimpleSerializer(serializers.ModelSerializer):
 
 
 class ClusterObjectiveSerializer(serializers.ModelSerializer):
-    title = serializers.CharField(source='cluster.title')
+    cluster_title = serializers.CharField(source='cluster.title', read_only=True)
 
     class Meta:
         model = ClusterObjective
@@ -42,7 +42,7 @@ class ClusterObjectiveSerializer(serializers.ModelSerializer):
             'id',
             'title',
             'cluster',
-            'title',
+            'cluster_title',
         )
 
 
