@@ -1,5 +1,9 @@
+from django.db import transaction
 from rest_framework import serializers
 
+from cluster.models import Cluster
+from core.common import CLUSTER_TYPES
+from utils.serializers import CurrentWorkspaceDefault
 from .models import Workspace, Location, ResponsePlan, Country, GatewayType
 
 
@@ -15,15 +19,22 @@ class WorkspaceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Workspace
-        fields = ('id', 'title', 'workspace_code', 'countries',
-                  'business_area_code')
+        fields = (
+            'id',
+            'title',
+            'workspace_code',
+            'countries',
+            'business_area_code',
+            'can_import_ocha_response_plans',
+        )
 
 
 class LocationSerializer(serializers.ModelSerializer):
+    admin_level = serializers.CharField(source="gateway.admin_level")
 
     class Meta:
         model = Location
-        fields = ('id', 'title', 'latitude', 'longitude', 'p_code')
+        fields = ('id', 'title', 'latitude', 'longitude', 'p_code', 'admin_level')
 
 
 class ShortLocationSerializer(serializers.ModelSerializer):
@@ -79,16 +90,56 @@ class ResponsePlanSerializer(serializers.ModelSerializer):
             'end',
             'workspace',
             'documents',
-            'clusters'
+            'clusters',
+            'can_import_ocha_projects',
         )
 
     def get_clusters(self, obj):
+        # done this way to avoid circular import issue
         from cluster.serializers import ClusterSimpleSerializer
         return ClusterSimpleSerializer(obj.clusters.all(), many=True).data
 
 
-# PMP API Serializers
+class CreateResponsePlanSerializer(serializers.ModelSerializer):
 
+    clusters = serializers.MultipleChoiceField(choices=CLUSTER_TYPES, write_only=True)
+    workspace = serializers.HiddenField(default=CurrentWorkspaceDefault())
+
+    class Meta:
+        model = ResponsePlan
+        fields = (
+            'workspace',
+            'title',
+            'start',
+            'end',
+            'plan_type',
+            'clusters',
+        )
+
+    def validate(self, attrs):
+        validated_data = super(CreateResponsePlanSerializer, self).validate(attrs)
+        if validated_data['end'] < validated_data['start']:
+            raise serializers.ValidationError({
+                'end': 'Cannot be earlier than Start'
+            })
+
+        return validated_data
+
+    @transaction.atomic
+    def create(self, validated_data):
+        clusters_data = validated_data.pop('clusters')
+        response_plan = ResponsePlan.objects.create(**validated_data)
+        clusters = []
+        for cluster in clusters_data:
+            clusters.append(Cluster.objects.create(
+                type=cluster, response_plan=response_plan
+            ))
+        if 'request' in self.context:
+            self.context['request'].user.imo_clusters.add(*clusters)
+        return response_plan
+
+
+# PMP API Serializers
 class PMPWorkspaceSerializer(serializers.ModelSerializer):
 
     id = serializers.CharField(source='external_id')
@@ -98,8 +149,7 @@ class PMPWorkspaceSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # Update or create
         try:
-            instance = Workspace.objects.get(
-                workspace_code=validated_data['workspace_code'])
+            instance = Workspace.objects.get(workspace_code=validated_data['workspace_code'])
             return self.update(instance, validated_data)
         except Workspace.DoesNotExist:
             return Workspace.objects.create(**validated_data)
@@ -113,7 +163,8 @@ class PMPWorkspaceSerializer(serializers.ModelSerializer):
             'longitude',
             'initial_zoom',
             'business_area_code',
-            'country_short_code')
+            'country_short_code',
+        )
 
 
 class PMPGatewayTypeSerializer(serializers.ModelSerializer):

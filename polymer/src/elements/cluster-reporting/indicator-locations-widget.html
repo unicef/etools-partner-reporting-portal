@@ -1,0 +1,539 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html">
+<link rel="import" href="../../../bower_components/paper-tooltip/paper-tooltip.html">
+
+<link rel="import" href="../../settings.html">
+<link rel="import" href="../../polyfills/es6-shim.html">
+<link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../redux/store.html">
+<link rel="import" href="../../styles/buttons.html">
+<link rel="import" href="../../styles/shared-styles.html">
+<link rel="import" href="../json-field.html">
+<link rel="import" href="../etools-prp-ajax.html">
+<link rel="import" href="../etools-prp-reset.html">
+<link rel="import" href="../etools-prp-permissions.html">
+<link rel="import" href="../labelled-item.html">
+<link rel="import" href="message-imo-modal.html">
+
+<dom-module id="indicator-locations-widget">
+  <template>
+    <style include="button-styles iron-flex iron-flex-alignment app-grid-style shared-styles">
+      :host {
+        display: block;
+
+        --app-grid-columns: 3;
+        --app-grid-gutter: 24px;
+        --app-grid-item-height: auto;
+        --app-grid-expandible-item-columns: 2;
+      }
+
+      .app-grid {
+        padding-top: 0;
+        margin: 0 -var(--app-grid-gutter);
+      }
+
+      .item-2-col {
+        @apply --app-grid-expandible-item;
+      }
+
+      header {
+        background-color: var(--paper-grey-200);
+        padding: 5px 10px;
+        margin: 0 0 1em;
+      }
+
+      h3 {
+        margin: 0;
+        font-size: 14px;
+      }
+
+      .row {
+        margin-bottom: 1em;
+      }
+
+      .col-actions {
+        width: 40px;
+        margin-right: 24px;
+        border-right: 1px solid var(--paper-grey-400);
+      }
+
+      .remove-btn {
+        width: 34px;
+        height: 34px;
+        color: var(--paper-deep-orange-a700);
+      }
+
+      labelled-item {
+        padding: 8px 0;
+      }
+
+      .readonly {
+        display: block;
+        font-size: 16px;
+        line-height: 1.5;
+        color: var(--theme-primary-text-color-medium);
+
+        @apply --truncate;
+      }
+
+      .imo-msg-label {
+        font-size: 12px;
+        color: var(--theme-secondary-text-color);
+      }
+
+      .imo-msg-btn {
+        padding: 0;
+        margin: 0;
+      }
+    </style>
+
+    <etools-prp-permissions
+        permissions="{{permissions}}">
+    </etools-prp-permissions>
+
+    <template
+        is="dom-repeat"
+        items="[[ajaxData]]">
+      <etools-prp-ajax
+          id="[[item.id]]"
+          url="[[locationsUrl]]"
+          params="[[item.params]]">
+      </etools-prp-ajax>
+    </template>
+
+    <template
+        is="dom-if"
+        if="[[canMessageIMO]]"
+        restamp="true">
+      <message-imo-modal
+          id="message-modal"
+          cluster-id="[[clusterId]]"
+          indicator-id="[[indicatorId]]">
+      </message-imo-modal>
+    </template>
+
+    <header>
+      <h3>Locations ([[value.length]])</h3>
+      <template
+          is="dom-if"
+          if="[[canMessageIMO]]"
+          restamp="true">
+        <div class="layout horizontal justified">
+          <div class="imo-msg-label self-end">To propose "Baseline" and "In need" for locations added by you, please contact IMO.</div>
+          <div>
+            <paper-button
+                class="imo-msg-btn btn-primary"
+                on-tap="_msgIMO"
+                noink>
+              Send a message to IMO
+            </paper-button>
+          </div>
+        </div>
+      </template>
+    </header>
+
+    <template
+        is="dom-repeat"
+        items="[[value]]">
+      <div class="row layout horizontal">
+        <template
+            is="dom-if"
+            if="[[!_isLocked(item, lockedItems)]]"
+            restamp="true">
+          <etools-prp-reset
+              trigger="[[item.loc_type]]"
+              reset="{{item.location}}"
+              skip-initial>
+          </etools-prp-reset>
+
+          <div class="flex-none layout vertical center-center col-actions">
+            <div>
+              <paper-icon-button
+                  index="[[index]]"
+                  class="remove-btn"
+                  data-index$="[[index]]"
+                  on-tap="_remove"
+                  icon="icons:cancel">
+              </paper-icon-button>
+              <paper-tooltip offset="5">Remove</paper-tooltip>
+            </div>
+          </div>
+        </template>
+
+        <div class="flex">
+          <div class="app-grid">
+            <template
+                is="dom-if"
+                if="[[_isLocked(item, lockedItems)]]"
+                restamp="true">
+              <labelled-item
+                  class="item"
+                  label="Location - administrative level">
+                <span class="readonly">Admin [[item.loc_type]]</span>
+              </labelled-item>
+            </template>
+
+            <template
+                is="dom-if"
+                if="[[!_isLocked(item, lockedItems)]]"
+                restamp="true">
+              <etools-single-selection-menu
+                  class="item"
+                  label="Location - administrative level"
+                  options="[[locationTypes]]"
+                  option-value="id"
+                  option-label="title"
+                  selected="{{item.loc_type}}"
+                  on-selected-changed="_onLocTypeChanged"
+                  required>
+              </etools-single-selection-menu>
+            </template>
+
+            <template
+                is="dom-if"
+                if="[[_isLocked(item, lockedItems)]]"
+                restamp="true">
+              <labelled-item
+                  class="item item-2-col"
+                  label="Location">
+                <span class="readonly">[[_getLocationTitle(locations, item.loc_type, item.location)]]</span>
+              </labelled-item>
+            </template>
+
+            <template
+                is="dom-if"
+                if="[[!_isLocked(item, lockedItems)]]"
+                restamp="true">
+              <etools-single-selection-menu
+                  class="item item-2-col validate"
+                  label="Location"
+                  options="[[_getLocations(locations, item.loc_type)]]"
+                  option-value="id"
+                  option-label="title"
+                  selected="{{item.location}}"
+                  data-index$="[[index]]"
+                  disabled="[[_getPending(pending, item.loc_type)]]"
+                  required>
+              </etools-single-selection-menu>
+            </template>
+
+            <json-field
+                class="item validate"
+                type="[[indicatorType]]"
+                label="Baseline"
+                on-input="_validate"
+                value="{{item.baseline}}"
+                allowed-pattern="[+\-\d]"
+                disabled="[[!canEditDetails]]">
+            </json-field>
+
+            <template
+                is="dom-if"
+                if="[[isNumber]]"
+                restamp="true">
+              <json-field
+                  class="item validate"
+                  type="[[indicatorType]]"
+                  label="In need (optional)"
+                  on-input="_validate"
+                  value="{{item.in_need}}"
+                  allowed-pattern="[+\-\d]"
+                  disabled="[[!canEditDetails]]">
+              </json-field>
+            </template>
+
+            <json-field
+                class="item validate"
+                type="[[indicatorType]]"
+                label="Target"
+                on-input="_validate"
+                value="{{item.target}}"
+                allowed-pattern="[+\-\d]"
+                required>
+            </json-field>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <paper-button
+        class="btn-primary"
+        on-tap="_add">
+      Add location
+    </paper-button>
+  </template>
+
+    <script>
+      Polymer({
+        is: 'indicator-locations-widget',
+
+        behaviors: [
+          App.Behaviors.UtilsBehavior,
+          App.Behaviors.ReduxBehavior,
+        ],
+
+        properties: {
+          indicatorType: String,
+          indicatorId: Number,
+          parentIndicatorId: Number,
+          clusterId: Number,
+          locations: Object,
+          pending: Object,
+
+          editing: {
+            type: Boolean,
+            value: false,
+          },
+
+          lockedItems: {
+            type: Array,
+            observer: '_fetchInitialLocations',
+          },
+
+          isNumber: {
+            type: Boolean,
+            computed: '_computeIsNumber(indicatorType)',
+          },
+
+          value: {
+            type: Array,
+            notify: true,
+            observer: '_lockItems',
+          },
+
+          valueInitialized: {
+            type: Boolean,
+            value: false,
+          },
+
+          invalid: {
+            type: Boolean,
+            notify: true,
+            value: false,
+          },
+
+          maxAdminLevel: {
+            type: Number,
+            value: App.Settings.cluster.maxLocType,
+          },
+
+          responsePlanId: {
+            type: String,
+            statePath: 'responsePlans.currentID',
+          },
+
+          locationTypes: {
+            type: Array,
+            computed: '_computeLocationTypes(maxAdminLevel)',
+          },
+
+          locationsUrl: {
+            type: String,
+            computed: '_computeLocationsUrl(responsePlanId)',
+          },
+
+          ajaxData: {
+            type: Array,
+            computed: '_computeAjaxData(maxAdminLevel)',
+          },
+
+          canEditDetails: {
+            type: Boolean,
+            computed: '_computeCanEditDetails(editing, parentIndicatorId, permissions)',
+          },
+
+          canMessageIMO: {
+            type: Boolean,
+            computed: '_computeCanMessageIMO(editing, parentIndicatorId, permissions)',
+          },
+        },
+
+        _computeIsNumber: function (type) {
+          return type === 'number';
+        },
+
+        _computeLocationsUrl: function (responsePlanId) {
+          return App.Endpoints.clusterLocationNames(responsePlanId);
+        },
+
+        _computeLocationTypes: function (maxAdminLevel) {
+          return Array.apply(null, Array(maxAdminLevel))
+              .map(function (_, index) {
+                var id = index + 1;
+
+                return {
+                  id: String(id),
+                  title: 'Admin' + id,
+                };
+              });
+        },
+
+        _computeAjaxData: function (maxAdminLevel) {
+          return Array.apply(null, Array(maxAdminLevel))
+              .map(function (_, index) {
+                var id = index + 1;
+
+                return {
+                  id: 'locations' + id,
+                  params: {
+                    loc_type: String(id),
+                  },
+                };
+              });
+        },
+
+        _computeCanEditDetails: function (editing, parentIndicatorId, permissions) {
+          return !editing ||
+              permissions.createClusterEntities ||
+              (permissions.onlyEditOwnIndicatorDetails && !parentIndicatorId);
+        },
+
+        _computeCanMessageIMO: function (editing, parentIndicatorId, permissions) {
+          return editing && permissions.onlyEditOwnIndicatorDetails && !!parentIndicatorId;
+        },
+
+        _lockItems: function (value) {
+          if (this.get('valueInitialized')) {
+            return;
+          }
+
+          this.set('valueInitialized', true);
+
+          this.async(function () {
+            this.set('lockedItems', value.slice());
+          });
+        },
+
+        _isLocked: function (item, locked) {
+          return locked.indexOf(item) !== -1;
+        },
+
+        _add: function () {
+          var initial = 1;
+
+          this.push('value', {
+            loc_type: initial,
+          });
+
+          this._fetchLocations(initial);
+        },
+
+        _remove: function (e) {
+          var value = this.get('value');
+          var toRemove = +e.target.dataset.index;
+          var newValue = value.slice(0, toRemove).concat(value.slice(toRemove + 1));
+
+          this.set('value', newValue);
+        },
+
+        _validate: function (e) {
+          e.target.validate();
+        },
+
+        _onLocTypeChanged: function (_, data) {
+          this._fetchLocations(data.value);
+        },
+
+        _fetchLocations: function (loc_type) {
+          if (this.get('locations')[loc_type]) {
+            return;
+          }
+
+          this.debounce('fetch-locations-' + loc_type, function () {
+            var self = this;
+
+            this._setPending(loc_type, true);
+
+            this.$$('#locations' + loc_type).thunk()()
+                .then(function (res) {
+                  self._setPending(loc_type, false);
+                  self._setLocations(loc_type, res.data);
+                })
+                .catch(function () {
+                  self._setPending(loc_type, false);
+                });
+          }, 100);
+        },
+
+        _fetchInitialLocations: function (lockedItems) {
+          lockedItems.forEach(function (item) {
+            this._fetchLocations(item.loc_type);
+          }, this);
+        },
+
+        _getPending: function (pending, loc_type) {
+          return !!pending[loc_type];
+        },
+
+        _getLocations: function (locations, loc_type) {
+          return locations[loc_type] || [];
+        },
+
+        _getLocationTitle: function (locations, loc_type, locationId) {
+          var allLocations = this._getLocations(locations, loc_type);
+
+          var location = allLocations.find(function (loc) {
+            return String(loc.id) === String(locationId);
+          });
+
+          return location ? location.title : '';
+        },
+
+        _setPending: function (loc_type, value) {
+          var newPending = Object.assign({}, this.get('pending'));
+
+          newPending[loc_type] = value;
+
+          this.set('pending', newPending);
+        },
+
+        _setLocations: function (loc_type, value) {
+          var newLocations = Object.assign({}, this.get('locations'));
+
+          newLocations[loc_type] = value;
+
+          this.set('locations', newLocations);
+        },
+
+        _msgIMO: function () {
+          this.messageModal.open();
+        },
+
+        validate: function () {
+          this.set('invalid', !this._fieldsAreValid());
+        },
+
+        attached: function () {
+          this.set('locations', {});
+          this.set('pending', {});
+
+          this.messageModal = this.$$('#message-modal');
+
+          if (this.messageModal) {
+            document.body.appendChild(this.messageModal);
+          }
+        },
+
+        detached: function () {
+          var locTypeDebouncers = Array(this.get('maxAdminLevel'))
+              .fill('fetch-locations-')
+              .map(function (item, index) {
+                return item + (++index);
+              });
+
+          this._cancelDebouncers(locTypeDebouncers.concat('reset-location'));
+
+          if (this.messageModal) {
+            document.body.removeChild(this.messageModal);
+
+            this.messageModal = null;
+          }
+        },
+      });
+    </script>
+</dom-module>

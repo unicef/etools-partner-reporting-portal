@@ -297,7 +297,7 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
         )
 
     def get_partner_org_id(self, obj):
-        return obj.programme_document.partner.id
+        return obj.programme_document.partner.external_id
 
     def get_partner_org_name(self, obj):
         return obj.programme_document.partner.title
@@ -359,28 +359,34 @@ class ProgressReportReviewSerializer(serializers.Serializer):
         PROGRESS_REPORT_STATUS.accepted
     ])
     comment = serializers.CharField(required=False)
-    overall_status = serializers.ChoiceField(required=False,
-                                             choices=OVERALL_STATUS)
+    overall_status = serializers.ChoiceField(required=False, choices=OVERALL_STATUS)
 
     def validate(self, data):
         """
         Make sure status is only accepted or sent back. Also overall_status
         should be set if accepting
         """
-        if data['status'] not in [PROGRESS_REPORT_STATUS.sent_back,
-                                  PROGRESS_REPORT_STATUS.accepted]:
-            raise serializers.ValidationError(
-                'Report status should be accepted or sent back')
-        if data.get('overall_status', None) == OVERALL_STATUS.no_status:
-            raise serializers.ValidationError('Invalid overall status')
-        if data.get('status', None) == PROGRESS_REPORT_STATUS.accepted and data.get(
-                'overall_status', None) is None:
-            raise serializers.ValidationError(
-                'Overall status required when accepting a report')
-        if data.get('status', None) == PROGRESS_REPORT_STATUS.sent_back and data.get(
-                'comment') is None:
-            raise serializers.ValidationError(
-                'Comment required when sending back report')
+        status = data['status']
+        overall_status = data.get('overall_status', None)
+
+        if status not in {
+            PROGRESS_REPORT_STATUS.sent_back, PROGRESS_REPORT_STATUS.accepted
+        }:
+            raise serializers.ValidationError({
+                'status': 'Report status should be accepted or sent back'
+            })
+        if overall_status == OVERALL_STATUS.no_status:
+            raise serializers.ValidationError({
+                'overall_status': 'Invalid overall status'
+            })
+        if status == PROGRESS_REPORT_STATUS.accepted and overall_status is None:
+            raise serializers.ValidationError({
+                'overall_status': 'Overall status required when accepting a report'
+            })
+        if status == PROGRESS_REPORT_STATUS.sent_back and not data.get('comment'):
+            raise serializers.ValidationError({
+                'comment': 'Comment required when sending back report'
+            })
 
         return data
 
@@ -627,7 +633,7 @@ class ProgressReportAttachmentSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super(ProgressReportAttachmentSerializer, self).to_representation(instance)
 
-        if "http" not in instance.attachment.url:
+        if instance.attachment and "http" not in instance.attachment.url:
             representation['path'] = settings.WWW_ROOT[:-1] + instance.attachment.url
 
         return representation

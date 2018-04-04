@@ -5,9 +5,11 @@ from functools import reduce
 from django.db.models import Q, F
 
 from rest_framework import serializers
+from rest_framework_gis.fields import GeometryField, GeoJsonDict
+from rest_framework_gis.serializers import GeoFeatureModelSerializer, GeometrySerializerMethodField
 
 from core.common import OVERALL_STATUS, PARTNER_PROJECT_STATUS, CLUSTER_TYPE_NAME_DICT
-from core.models import ResponsePlan, GatewayType
+from core.models import ResponsePlan, GatewayType, Location
 from indicator.models import Reportable, IndicatorReport, IndicatorLocationData
 from indicator.serializers import (
     ClusterIndicatorReportSerializer,
@@ -19,20 +21,20 @@ from .models import ClusterObjective, ClusterActivity, Cluster
 class ClusterSimpleSerializer(serializers.ModelSerializer):
 
     type = serializers.CharField(read_only=True)
-    title = serializers.CharField(read_only=True,
-                                  source='get_type_display')
+    title = serializers.CharField(read_only=True)
 
     class Meta:
         model = Cluster
         fields = (
             'id',
             'type',
+            'imported_type',
             'title',
         )
 
 
 class ClusterObjectiveSerializer(serializers.ModelSerializer):
-    cluster_title = serializers.SerializerMethodField()
+    title = serializers.CharField(source='cluster.title')
 
     class Meta:
         model = ClusterObjective
@@ -40,12 +42,8 @@ class ClusterObjectiveSerializer(serializers.ModelSerializer):
             'id',
             'title',
             'cluster',
-            'cluster_title',
-            # 'reportables',
+            'title',
         )
-
-    def get_cluster_title(self, obj):
-        return obj.cluster.get_type_display()
 
 
 class ClusterObjectivePatchSerializer(ClusterObjectiveSerializer):
@@ -60,30 +58,16 @@ class ClusterObjectivePatchSerializer(ClusterObjectiveSerializer):
 
 
 class ClusterActivitySerializer(serializers.ModelSerializer):
-
-    co_cluster_title = serializers.SerializerMethodField()
-    co_cluster_id = serializers.SerializerMethodField()
-    co_title = serializers.SerializerMethodField()
+    cluster = serializers.IntegerField(source='cluster_objective.cluster.id')
 
     class Meta:
         model = ClusterActivity
         fields = (
             'id',
             'title',
-            'co_cluster_title',
-            'co_cluster_id',
-            'co_title',
+            'cluster',
             'cluster_objective',
         )
-
-    def get_co_cluster_id(self, obj):
-        return obj.cluster_objective.cluster.id
-
-    def get_co_cluster_title(self, obj):
-        return obj.cluster_objective.cluster.get_type_display()
-
-    def get_co_title(self, obj):
-        return obj.cluster_objective.title
 
 
 class ClusterActivityPatchSerializer(serializers.ModelSerializer):
@@ -235,7 +219,6 @@ class PartnerAnalysisSummarySerializer(serializers.ModelSerializer):
         )
 
     def get_summary(self, obj):
-        pa_list = None
         projects = {
             'ongoing': [],
             'planned': [],
@@ -358,3 +341,59 @@ class PartnerAnalysisSummarySerializer(serializers.ModelSerializer):
             .values('id', 'title')
 
         return id_list
+
+
+class AnnotatedGeometryField(GeometryField):
+    """
+    GeometryField to handle annotated geoJSON from ORM
+    """
+    type_name = 'AnnotatedGeometryField'
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def to_representation(self, value):
+        target_geom_value = value.processed_geom_json or value.processed_point_json
+
+        if isinstance(target_geom_value, dict) or target_geom_value is None:
+            return target_geom_value
+
+        # we expect target_geom_value to be a GEOSGeometry instance
+        return GeoJsonDict(target_geom_value)
+
+
+class OperationalPresenceLocationListSerializer(GeoFeatureModelSerializer):
+    partners = serializers.SerializerMethodField()
+    point = GeometrySerializerMethodField()
+    geom = AnnotatedGeometryField(source="*")
+
+    def get_point(self, obj):
+        return obj.geo_point or None
+
+    def get_partners(self, obj):
+        partners = Partner.objects.filter(
+            clusters__response_plan__workspace__countries__gateway_types__locations=obj) \
+            .distinct() \
+            .values_list('title', flat=True)
+
+        partner_data = {
+            cluster: partners.filter(clusters__type=cluster) for cluster in set(
+                partners.values_list('clusters__type', flat=True))
+        }
+        partner_data["all"] = partners
+
+        return partner_data
+
+    class Meta:
+        model = Location
+        geo_field = 'geom'
+        fields = (
+            'id',
+            'title',
+            'latitude',
+            'longitude',
+            'p_code',
+            'geom',
+            'point',
+            'partners',
+        )

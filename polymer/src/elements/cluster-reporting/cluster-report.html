@@ -436,13 +436,13 @@
                       is="dom-if"
                       if="[[_equals(indicatorType, 'number')]]"
                       restamp="true">
-                    <etools-prp-number value="[[data.reportable.target]]"></etools-prp-number>
+                    <etools-prp-number value="[[data.reportable.target.v]]"></etools-prp-number>
                   </template>
                   <template
                       is="dom-if"
-                      if="[[_equals(indicatorType, 'percentage')]]"
+                      if="[[!_equals(indicatorType, 'number')]]"
                       restamp="true">
-                    [[_toPercentage(data.reportable.target)]]
+                    [[_toPercentage(data.reportable.target.c)]]
                   </template>
                 </dd>
               </dl>
@@ -458,7 +458,7 @@
                 </template>
                 <template
                     is="dom-if"
-                    if="[[_equals(indicatorType, 'percentage')]]"
+                    if="[[!_equals(indicatorType, 'number')]]"
                     restamp="true">
                   <dd class="flex">[[_toPercentage(data.reportable.achieved.c)]]</dd>
                 </template>
@@ -475,7 +475,7 @@
                 </template>
                 <template
                     is="dom-if"
-                    if="[[_equals(indicatorType, 'percentage')]]"
+                    if="[[!_equals(indicatorType, 'number')]]"
                     restamp="true">
                   <dd class="flex">[[_toPercentage(data.total.c)]]</dd>
                 </template>
@@ -709,7 +709,7 @@
               self.fire('report-submitted', self.data.id);
             })
             .catch(function (res) {
-              var errors = res.data.errors;
+              var errors = res.data.non_field_errors;
 
               return self.$.error.open(errors).then(function () {
                 return Promise.reject(); // Revert
@@ -791,7 +791,8 @@
       },
 
       _computeCanSendBack: function (data, permissions) {
-        return data.report_status === 'Sub' && permissions.sendBackIndicatorReport;
+        return (data.report_status === 'Sub' || data.report_status === 'Acc')
+          && permissions.sendBackIndicatorReport;
       },
 
       _computeShowFeedback: function (data, permissions) {

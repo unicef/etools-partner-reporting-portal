@@ -25,6 +25,7 @@ except BaseException:
 
 
 class UserAdminForm(forms.ModelForm):
+
     class Meta:
         model = User
         exclude = ('password', 'last_login', 'date_joined')

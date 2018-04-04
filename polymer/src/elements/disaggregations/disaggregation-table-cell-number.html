@@ -1,0 +1,55 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="disaggregation-field.html">
+<link rel="import" href="../etools-prp-number.html">
+<link rel="import" href="../../styles/disaggregation-table-styles.html">
+
+<dom-module id="disaggregation-table-cell-number">
+  <template>
+    <style include="disaggregation-table-styles">
+      :host {
+        display: block;
+      }
+    </style>
+
+    <template
+        is="dom-if"
+        if="[[editableBool]]">
+      <disaggregation-field
+          key="v"
+          value="[[data.v]]"
+          coords="[[coords]]">
+      </disaggregation-field>
+    </template>
+
+    <template
+        is="dom-if"
+        if="[[!editableBool]]">
+      <span class="cellValue">
+        <etools-prp-number value="[[data.v]]"></etools-prp-number>
+      </span>
+    </template>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'disaggregation-table-cell-number',
+
+      properties: {
+        data: Object,
+        coords: String,
+        editable: Number,
+
+        editableBool: {
+          type: Boolean,
+          computed: '_computeEditableBool(editable)',
+        },
+      },
+
+      _computeEditableBool: function (editable) {
+        return editable === 1;
+      },
+    });
+  </script>
+
+</dom-module>

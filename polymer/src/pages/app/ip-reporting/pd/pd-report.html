@@ -374,7 +374,9 @@
           case !!loading:
           case report.status === 'Sen' && !permissions.submitDraftProgressReport:
           case report.is_draft && !permissions.submitDraftProgressReport:
-          case report.programme_document && report.programme_document.status !== 'Act':
+          case report.programme_document &&
+            (report.programme_document.status === 'Sus'
+            || report.programme_document.status === 'Clo'):
             return false;
 
           default:

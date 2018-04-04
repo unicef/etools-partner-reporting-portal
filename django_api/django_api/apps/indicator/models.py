@@ -5,12 +5,12 @@ from django.utils.functional import cached_property
 from django.contrib.postgres.fields import JSONField, ArrayField
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from model_utils.models import TimeStampedModel
+from rest_framework import serializers
 
 from core.common import (
     INDICATOR_REPORT_STATUS,
@@ -19,7 +19,7 @@ from core.common import (
     PROGRESS_REPORT_STATUS,
     OVERALL_STATUS,
     FINAL_OVERALL_STATUS)
-from core.models import TimeStampedExternalSyncModelMixin
+from core.models import TimeStampedExternalSourceModel
 from functools import reduce
 
 from indicator.disaggregators import (
@@ -29,7 +29,7 @@ from indicator.disaggregators import (
 from indicator.constants import ValueType
 
 
-class Disaggregation(TimeStampedExternalSyncModelMixin):
+class Disaggregation(TimeStampedExternalSourceModel):
     """
     Disaggregation module. For example: <Gender, Age>
 
@@ -37,9 +37,10 @@ class Disaggregation(TimeStampedExternalSyncModelMixin):
         core.ResponsePlan (ForeignKey): "response_plan"
     """
     name = models.CharField(max_length=255, verbose_name="Disaggregation by")
-    response_plan = models.ForeignKey('core.ResponsePlan',
-                                      related_name="disaggregations",
-                                      blank=True, null=True)    # IP reporting ones won't have this fk.
+    # IP reporting ones won't have this fk.
+    response_plan = models.ForeignKey(
+        'core.ResponsePlan', related_name="disaggregations", blank=True, null=True
+    )
     active = models.BooleanField(default=True)
 
     class Meta:
@@ -49,7 +50,7 @@ class Disaggregation(TimeStampedExternalSyncModelMixin):
         return "Disaggregation <pk:%s> %s" % (self.id, self.name)
 
 
-class DisaggregationValue(TimeStampedExternalSyncModelMixin):
+class DisaggregationValue(TimeStampedExternalSourceModel):
     """
     Disaggregation Value module. For example: Gender <Male, Female, Other>
 
@@ -68,20 +69,16 @@ class DisaggregationValue(TimeStampedExternalSyncModelMixin):
         return "Disaggregation Value <pk:%s> %s" % (self.id, self.value)
 
 
-class IndicatorBlueprint(TimeStampedExternalSyncModelMixin):
+class IndicatorBlueprint(TimeStampedExternalSourceModel):
     """
     IndicatorBlueprint module is a pattern for indicator
     (here we setup basic parameter).
     """
     NUMBER = 'number'
     PERCENTAGE = 'percentage'
-    LIKERT = 'likert'
-    YESNO = 'yesno'
     UNIT_CHOICES = (
         (NUMBER, NUMBER),
         (PERCENTAGE, PERCENTAGE),
-        # (LIKERT, LIKERT),
-        # (YESNO, YESNO),
     )
 
     SUM = 'sum'
@@ -96,22 +93,24 @@ class IndicatorBlueprint(TimeStampedExternalSyncModelMixin):
     )
 
     RATIO_CALC_CHOICE_LIST = (
-        PERCENTAGE,
-        RATIO,
+        SUM,
     )
 
     QUANTITY_CALC_CHOICES = (
         (SUM, SUM),
         (MAX, MAX),
-        (AVG, AVG)
+        (AVG, AVG),
     )
 
     RATIO_CALC_CHOICES = (
-        (PERCENTAGE, PERCENTAGE),
-        (RATIO, RATIO)
+        (SUM, SUM),
     )
 
-    CALC_CHOICES = QUANTITY_CALC_CHOICES + RATIO_CALC_CHOICES
+    CALC_CHOICES = (
+        (SUM, SUM),
+        (MAX, MAX),
+        (AVG, AVG),
+    )
 
     QUANTITY_DISPLAY_TYPE_CHOICES = (
         (NUMBER, NUMBER),
@@ -125,7 +124,7 @@ class IndicatorBlueprint(TimeStampedExternalSyncModelMixin):
     DISPLAY_TYPE_CHOICES = QUANTITY_DISPLAY_TYPE_CHOICES + \
         RATIO_DISPLAY_TYPE_CHOICES
 
-    title = models.CharField(max_length=1024, db_index=True)
+    title = models.TextField(max_length=2048, db_index=True)
     unit = models.CharField(max_length=10, choices=UNIT_CHOICES,
                             default=NUMBER)
     description = models.CharField(max_length=3072, null=True, blank=True)
@@ -134,13 +133,15 @@ class IndicatorBlueprint(TimeStampedExternalSyncModelMixin):
     disaggregatable = models.BooleanField(default=False)
 
     calculation_formula_across_periods = models.CharField(
-        max_length=10, choices=CALC_CHOICES, default=SUM)
+        max_length=10, choices=CALC_CHOICES, default=SUM
+    )
     calculation_formula_across_locations = models.CharField(
-        max_length=10, choices=CALC_CHOICES, default=SUM)
+        max_length=10, choices=CALC_CHOICES, default=SUM
+    )
 
-    display_type = models.CharField(max_length=10,
-                                    choices=DISPLAY_TYPE_CHOICES,
-                                    default=NUMBER)
+    display_type = models.CharField(
+        max_length=10, choices=DISPLAY_TYPE_CHOICES, default=NUMBER
+    )
 
     # TODO: add:
     # siblings (similar indicators to this indicator)
@@ -168,8 +169,7 @@ class IndicatorBlueprint(TimeStampedExternalSyncModelMixin):
         }
         if self.calculation_formula_across_periods not in unit_to_valid_calc_values.get(self.unit, []) or \
                 self.calculation_formula_across_locations not in unit_to_valid_calc_values.get(self.unit, []):
-            raise ValidationError(
-                'Calculation methods not supported by selected unit')
+            raise serializers.ValidationError('Calculation methods not supported by selected unit')
 
         unit_to_valid_display_type_values = {
             self.NUMBER: map(lambda x: x[0], self.QUANTITY_DISPLAY_TYPE_CHOICES),
@@ -177,8 +177,7 @@ class IndicatorBlueprint(TimeStampedExternalSyncModelMixin):
         }
         if self.display_type not in unit_to_valid_display_type_values.get(self.unit, [
         ]):
-            raise ValidationError(
-                'Display type is not supported by selected unit')
+            raise serializers.ValidationError('Display type is not supported by selected unit')
 
     def __str__(self):
         return self.title
@@ -207,7 +206,7 @@ def trigger_indicator_report_recalculation(sender, instance, **kwargs):
             RatioIndicatorDisaggregator.calculate_indicator_report_total(ir)
 
 
-class Reportable(TimeStampedExternalSyncModelMixin):
+class Reportable(TimeStampedExternalSourceModel):
     """
     Reportable / Applied Indicator model.
 
@@ -219,36 +218,46 @@ class Reportable(TimeStampedExternalSyncModelMixin):
         cluster.ClusterObjective (ForeignKey): "content_object"
         self (ForeignKey): "parent_indicator"
     """
-    target = models.CharField(max_length=255, null=True, blank=True)
-    baseline = models.CharField(max_length=255, null=True, blank=True)
-    in_need = models.CharField(max_length=255, null=True, blank=True)
+    target = JSONField(default=dict([('d', 1), ('v', 0)]))
+    baseline = JSONField(default=dict([('d', 1), ('v', 0)]))
+    in_need = JSONField(blank=True, null=True)
     assumptions = models.TextField(null=True, blank=True)
-    means_of_verification = models.CharField(max_length=255,
-                                             null=True,
-                                             blank=True)
+    means_of_verification = models.CharField(max_length=255, null=True, blank=True)
+    comments = models.TextField(max_length=4048, blank=True, null=True)
+    measurement_specifications = models.TextField(max_length=4048, blank=True, null=True)
+    label = models.TextField(max_length=4048, blank=True, null=True)
+    numerator_label = models.CharField(max_length=256, blank=True, null=True)
+    denominator_label = models.CharField(max_length=256, blank=True, null=True)
+    start_date_of_reporting_period = models.DateField(blank=True, null=True)
+
     is_cluster_indicator = models.BooleanField(default=False)
+    contributes_to_partner = models.BooleanField(default=False)
 
     # Current total, transactional and dynamically calculated based on
     # IndicatorReports
-    total = JSONField(default=dict([('c', 0), ('d', 0), ('v', 0)]))
+    total = JSONField(default=dict([('c', 0), ('d', 1), ('v', 0)]))
 
     # unique code for this indicator within the current context
     # eg: (1.1) result code 1 - indicator code 1
-    context_code = models.CharField(max_length=50,
-                                    null=True,
-                                    blank=True,
-                                    verbose_name="Code in current context")
+    context_code = models.CharField(
+        max_length=50, null=True, blank=True, verbose_name="Code in current context"
+    )
 
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
+    # One of ClusterObjective, ClusterActivity, PartnerProject, PartnerActivity
     content_object = GenericForeignKey('content_type', 'object_id')
-    blueprint = models.ForeignKey(IndicatorBlueprint,
-                                  null=True,
-                                  related_name="reportables")
+    blueprint = models.ForeignKey(
+        IndicatorBlueprint, null=True, related_name="reportables"
+    )
     parent_indicator = models.ForeignKey('self', null=True, blank=True,
                                          related_name='children',
                                          db_index=True)
-    locations = models.ManyToManyField('core.Location', related_name="reportables")
+    locations = models.ManyToManyField(
+        'core.Location',
+        related_name="reportables",
+        through="ReportableLocationGoal"
+    )
 
     frequency = models.CharField(
         max_length=3,
@@ -260,8 +269,9 @@ class Reportable(TimeStampedExternalSyncModelMixin):
     cs_dates = ArrayField(
         models.DateField(), default=list, null=True, blank=True
     )
-    location_admin_refs = ArrayField(JSONField(), default=list, null=True,
-                                     blank=True)
+    location_admin_refs = ArrayField(
+        JSONField(), default=list, null=True, blank=True
+    )
     disaggregations = models.ManyToManyField(Disaggregation, blank=True)
 
     active = models.BooleanField(default=True)
@@ -298,15 +308,41 @@ class Reportable(TimeStampedExternalSyncModelMixin):
         return self.total
 
     @property
+    def calculated_target(self):
+        if self.blueprint.unit == IndicatorBlueprint.NUMBER:
+            return float(self.target['v'])
+        else:
+            return float(self.target['v']) / float(self.target['d'])
+
+    @property
+    def calculated_baseline(self):
+        if self.blueprint.unit == IndicatorBlueprint.NUMBER:
+            return float(self.baseline['v'])
+        else:
+            return float(self.baseline['v']) / float(self.baseline['d'])
+
+    @property
+    def calculated_in_need(self):
+        if not self.in_need:
+            return None
+
+        if self.blueprint.unit == IndicatorBlueprint.NUMBER:
+            return float(self.in_need['v'])
+        else:
+            return float(self.in_need['v']) / float(self.in_need['d'])
+
+    @property
     def progress_percentage(self):
         percentage = 0.0
 
         if self.achieved and self.baseline is not None and self.target is not None:
-            baseline = float(self.baseline)
+            baseline = float(self.calculated_baseline)
+            target = float(self.calculated_target)
+
             dividend = 0    # default progress is 0
             if self.achieved['c'] > baseline:
                 dividend = self.achieved['c'] - baseline
-            divisor = float(self.target) - baseline
+            divisor = float(target) - baseline
             if divisor:
                 percentage = round(dividend / divisor, 2)
         return percentage
@@ -322,8 +358,133 @@ class Reportable(TimeStampedExternalSyncModelMixin):
 
     def __str__(self):
         return "Reportable #{} {} on {}".format(
-            self.id, self.blueprint.title, self.content_object
+            self.id, self.blueprint and self.blueprint.title, self.content_object
         )
+
+
+def get_reportable_data_to_clone(instance):
+    """
+    get_reportable_data_to_clone returns a map of field name and its value
+    to clone a new Reportable instance
+
+    Arguments:
+        instance {indicator.models.Reportable} -- Reportable model instance
+    """
+    return {
+        'active': instance.active,
+        'assumptions': instance.assumptions,
+        'baseline': instance.baseline,
+        'context_code': instance.context_code,
+        'created': instance.created,
+        'cs_dates': instance.cs_dates,
+        'external_id': instance.external_id,
+        'frequency': instance.frequency,
+        'in_need': instance.in_need,
+        'is_cluster_indicator': instance.is_cluster_indicator,
+        'location_admin_refs': instance.location_admin_refs,
+        'means_of_verification': instance.means_of_verification,
+        'modified': instance.modified,
+        'target': instance.target,
+        'comments': instance.comments,
+        'measurement_specifications': instance.measurement_specifications,
+        'start_date_of_reporting_period': instance.start_date_of_reporting_period,
+        'label': instance.label,
+        'numerator_label': instance.numerator_label,
+        'denominator_label': instance.denominator_label,
+    }
+
+
+def create_reportable_for_pa_from_ca_reportable(pa, ca_reportable):
+    """
+    Copies one CA reportable instance to a partner activity.
+
+    Arguments:
+        pa {partner.models.PartnerActivity} -- PartnerActivity to copy to
+        reportable {indicator.models.Reportable} -- ClusterActivity Reportable
+
+    Raises:
+        ValidationError -- Django Exception
+    """
+
+    if ca_reportable.content_object != pa.cluster_activity:
+        raise serializers.ValidationError("The Parent-child relationship is not valid")
+
+    reportable_data_to_sync = get_reportable_data_to_clone(ca_reportable)
+    reportable_data_to_sync['total'] = dict([('c', 0), ('d', 1), ('v', 0)])
+    reportable_data_to_sync["content_object"] = pa
+    reportable_data_to_sync["blueprint"] = ca_reportable.blueprint
+    reportable_data_to_sync["parent_indicator"] = ca_reportable
+    pa_reportable = Reportable.objects.create(**reportable_data_to_sync)
+
+    pa_reportable.disaggregations.add(*ca_reportable.disaggregations.all())
+
+
+def create_pa_reportables_from_ca(pa, ca):
+    """
+    Creates a set of PartnerActivity Reportable instances from
+    ClusterActivity instance to target PartnerActivity instance
+
+    Arguments:
+        pa {partner.models.PartnerActivity} -- Target PartnerActivity instance
+        ca {cluster.models.ClusterActivity} -- ClusterActivity to copy from
+    """
+
+    if pa.reportables.count() > 0:
+        return
+
+    for reportable in ca.reportables.all():
+        create_reportable_for_pa_from_ca_reportable(pa, reportable)
+
+
+def create_pa_reportables_for_new_ca_reportable(instance):
+    """
+    Useful when creating a new CA reportable to create
+    a set of PartnerActivity Reportable instances.
+
+    Arguments:
+        instance {indicator.models.Reportable} -- Cluster Activity Reportable to copy from
+    """
+    for pa in instance.content_object.partner_activities.all():
+        create_reportable_for_pa_from_ca_reportable(pa, instance)
+
+
+def sync_ca_reportable_update_to_pa_reportables(instance, created):
+    """
+    Whenever a Cluster Activity Reportable is created or is updated,
+    clone_ca_reportable_to_pa handles a Reportable instance data to
+    its Cluster Activity's Partner Activity instances.
+
+    Under create flag, Partner Activity will get a new Reportable instance
+    from Cluster Activity Reportable instance.
+
+    Otherwise, update each cloned Reportable instance
+    from its Cluster Activity's Partner Activity instances.
+
+    Arguments:
+        instance {indicator.models.Reportable} -- Reportable model instance
+        created {boolean} -- created flag from Django post_save signal
+    """
+
+    if instance.content_type.model == "clusteractivity":
+        reportable_data_to_sync = get_reportable_data_to_clone(instance)
+
+        if not created:
+            instance.children.update(**reportable_data_to_sync)
+
+
+@receiver(post_save,
+          sender=Reportable,
+          dispatch_uid="clone_ca_reportable_to_pa")
+def clone_ca_reportable_to_pa_signal(sender, instance, created, **kwargs):
+    sync_ca_reportable_update_to_pa_reportables(instance, created)
+
+
+class ReportableLocationGoal(TimeStampedModel):
+    reportable = models.ForeignKey(Reportable, on_delete=models.CASCADE)
+    location = models.ForeignKey("core.Location", on_delete=models.CASCADE)
+    target = JSONField(default=dict([('d', 1), ('v', 0)]))
+    baseline = JSONField(default=dict([('d', 1), ('v', 0)]))
+    in_need = JSONField(default=dict([('d', 1), ('v', 0)]), blank=True, null=True)
 
 
 class IndicatorReportManager(models.Manager):
@@ -360,7 +521,7 @@ class IndicatorReport(TimeStampedModel):
         verbose_name='Frequency of reporting'
     )
 
-    total = JSONField(default=dict([('c', 0), ('d', 0), ('v', 0)]))
+    total = JSONField(default=dict([('c', 0), ('d', 1), ('v', 0)]))
 
     remarks = models.TextField(blank=True, null=True)
     report_status = models.CharField(
@@ -535,19 +696,14 @@ def recalculate_reportable_total(sender, instance, **kwargs):
             else:   # if its SUM or avg then add data up
                 for indicator_report in accepted_indicator_reports:
                     reportable_total['v'] += indicator_report.total['v']
-                    reportable_total['c'] += indicator_report.total['c']
 
                 if blueprint.calculation_formula_across_periods == IndicatorBlueprint.AVG:
                     ir_count = accepted_indicator_reports.count()
                     if ir_count > 0:
                         reportable_total['v'] = reportable_total['v'] / \
                             (ir_count * 1.0)
-                        reportable_total['c'] = reportable_total['c'] / \
-                            (ir_count * 1.0)
 
-                elif blueprint.calculation_formula_across_periods == IndicatorBlueprint.SUM and \
-                        reportable_total['c'] == 0:
-                    reportable_total['c'] = reportable_total['v']
+                reportable_total['c'] = reportable_total['v']
 
         # if unit is PERCENTAGE, doesn't matter if calc choice was percent or
         # ratio
@@ -562,6 +718,30 @@ def recalculate_reportable_total(sender, instance, **kwargs):
 
     reportable.total = reportable_total
     reportable.save()
+
+    # Triggering total recalculation on parent Reportable from its children
+    if reportable.parent_indicator:
+        new_parent_total = {
+            'c': 0,
+            'd': 1,
+            'v': 0,
+        }
+        child_totals = reportable.parent_indicator.children.values_list('total', flat=True)
+
+        for total in child_totals:
+            new_parent_total['v'] += total['v']
+            new_parent_total['d'] += total['d']
+
+        if reportable.parent_indicator.blueprint.unit == IndicatorBlueprint.NUMBER:
+            new_parent_total['d'] = 1
+            new_parent_total['c'] = new_parent_total['v']
+
+        else:
+            new_parent_total['c'] = new_parent_total['v'] / \
+                    (new_parent_total['d'] * 1.0)
+
+        reportable.parent_indicator.total = new_parent_total
+        reportable.parent_indicator.save()
 
 
 class IndicatorLocationData(TimeStampedModel):

@@ -25,6 +25,7 @@ from indicator.models import (
     IndicatorLocationData,
     Disaggregation,
     DisaggregationValue,
+    ReportableLocationGoal,
 )
 from unicef.models import (
     Section,
@@ -56,7 +57,7 @@ from core.countries import COUNTRIES_ALPHA2_CODE
 
 PARTNER_PROJECT_STATUS_LIST = [x[0] for x in PARTNER_PROJECT_STATUS]
 PD_STATUS_LIST = [x[0] for x in PD_STATUS]
-COUNTRIES_LIST = [x[0] for x in COUNTRIES_ALPHA2_CODE]
+COUNTRY_CODES_LIST = [x[0] for x in COUNTRIES_ALPHA2_CODE]
 COUNTRY_NAMES_LIST = [x[1] for x in COUNTRIES_ALPHA2_CODE]
 CALC_CHOICES_LIST = [x[0] for x in IndicatorBlueprint.CALC_CHOICES]
 DISPLAY_TYPE_CHOICES_LIST = [x[0]
@@ -168,7 +169,6 @@ class PartnerProjectFactory(factory.django.DjangoModelFactory):
     additional_information = factory.Sequence(
         lambda n: "additional_information %d" % n)
     total_budget = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
-    funding_source = factory.Sequence(lambda n: "funding_source %d" % n)
 
     @factory.post_generation
     def clusters(self, create, extracted, **kwargs):
@@ -232,7 +232,8 @@ class UserFactory(factory.django.DjangoModelFactory):
 
 
 class CountryFactory(factory.django.DjangoModelFactory):
-    name = fuzzy.FuzzyChoice(COUNTRY_NAMES_LIST)
+    country_short_code = fuzzy.FuzzyChoice(COUNTRY_CODES_LIST)
+    name = factory.LazyAttribute(lambda o: dict(COUNTRIES_ALPHA2_CODE)[o.country_short_code])
 
     class Meta:
         model = Country
@@ -240,7 +241,7 @@ class CountryFactory(factory.django.DjangoModelFactory):
 
 class WorkspaceFactory(factory.django.DjangoModelFactory):
     title = factory.Sequence(lambda n: "workspace_%d" % n)
-    workspace_code = fuzzy.FuzzyChoice(COUNTRIES_LIST)
+    workspace_code = fuzzy.FuzzyChoice(COUNTRY_CODES_LIST)
 
     class Meta:
         model = Workspace
@@ -328,7 +329,8 @@ class RatioTypeIndicatorBlueprintFactory(factory.django.DjangoModelFactory):
         RATIO_CALC_CHOICES_LIST)
     calculation_formula_across_periods = fuzzy.FuzzyChoice(
         RATIO_CALC_CHOICES_LIST)
-    display_type = IndicatorBlueprint.PERCENTAGE
+    display_type = fuzzy.FuzzyChoice(
+        RATIO_DISPLAY_TYPE_CHOICES_LIST)
 
     class Meta:
         model = IndicatorBlueprint
@@ -345,33 +347,46 @@ class ReportableFactory(factory.django.DjangoModelFactory):
     cs_dates = [cs_date_1, cs_date_2, cs_date_3]
     frequency = fuzzy.FuzzyChoice(REPORTABLE_FREQUENCY_LEVEL_CHOICE_LIST)
 
-    @factory.post_generation
-    def locations(self, create, extracted, **kwargs):
-        if not create:
-            return
-
-        if extracted:
-            for location in extracted:
-                self.locations.add(location)
-
     class Meta:
         exclude = ['content_object']
         abstract = True
 
 
+class ReportableLocationGoalFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = ReportableLocationGoal
+
+
+class LocationWithReportableLocationGoalFactory(factory.django.DjangoModelFactory):
+    location = factory.SubFactory('core.factories.LocationFactory')
+    reportable = factory.SubFactory('core.factories.ReportableFactory')
+    target = dict(
+        [('d', 1), ('v', random.randint(1000, 10000))])
+    baseline = dict(
+        [('d', 1), ('v', random.randint(0, 500))])
+    in_need = dict(
+        [('d', 1), ('v', random.randint(20000, 50000))])
+
+    class Meta:
+        model = ReportableLocationGoal
+
+
 class QuantityReportableToLowerLevelOutputFactory(ReportableFactory):
     content_object = factory.SubFactory(
         'core.factories.LowerLevelOutputFactory')
-    target = '5000'
-    baseline = '0'
+    target = dict(
+        [('d', 1), ('v', random.randint(1000, 10000))])
+    baseline = dict(
+        [('d', 1), ('v', random.randint(0, 500))])
+    in_need = dict(
+        [('d', 1), ('v', random.randint(20000, 50000))])
+    total = dict(
+        [('c', 0), ('d', 1), ('v', random.randint(0, 3000))])
 
     indicator_report = factory.RelatedFactory(
         'core.factories.QuantityIndicatorReportFactory', 'reportable')
 
     blueprint = factory.SubFactory(QuantityTypeIndicatorBlueprintFactory)
-
-    total = dict(
-        [('c', 0), ('d', 0), ('v', random.randint(0, 3000))])
 
     class Meta:
         model = Reportable
@@ -380,16 +395,19 @@ class QuantityReportableToLowerLevelOutputFactory(ReportableFactory):
 class RatioReportableToLowerLevelOutputFactory(ReportableFactory):
     content_object = factory.SubFactory(
         'core.factories.LowerLevelOutputFactory')
-    target = '5000'
-    baseline = '0'
+    target = dict(
+        [('d', random.randint(20000, 40000)), ('v', random.randint(10000, 20000))])
+    baseline = dict(
+        [('d', random.randint(200, 400)), ('v', random.randint(100, 200))])
+    in_need = dict(
+        [('d', random.randint(50000, 60000)), ('v', random.randint(30000, 40000))])
+    total = dict(
+        [('c', 0), ('d', random.randint(3000, 6000)), ('v', random.randint(0, 3000))])
 
     indicator_report = factory.RelatedFactory(
         'core.factories.RatioIndicatorReportFactory', 'reportable')
 
     blueprint = factory.SubFactory(RatioTypeIndicatorBlueprintFactory)
-
-    total = dict(
-        [('c', 0), ('d', random.randint(3000, 6000)), ('v', random.randint(0, 3000))])
 
     class Meta:
         model = Reportable
@@ -397,30 +415,36 @@ class RatioReportableToLowerLevelOutputFactory(ReportableFactory):
 
 class RatioReportableToClusterObjectiveFactory(ReportableFactory):
     content_object = factory.SubFactory(ClusterObjectiveFactory)
-    target = '5000'
-    baseline = '0'
+    target = dict(
+        [('d', random.randint(20000, 40000)), ('v', random.randint(10000, 20000))])
+    baseline = dict(
+        [('d', random.randint(200, 400)), ('v', random.randint(100, 200))])
+    in_need = dict(
+        [('d', random.randint(50000, 60000)), ('v', random.randint(30000, 40000))])
+    total = dict(
+        [('c', 0), ('d', random.randint(3000, 6000)), ('v', random.randint(0, 3000))])
 
     indicator_report = factory.RelatedFactory(
         'core.factories.RatioIndicatorReportFactory', 'reportable')
 
     blueprint = factory.SubFactory(RatioTypeIndicatorBlueprintFactory)
 
-    total = dict(
-        [('c', 0), ('d', random.randint(3000, 6000)), ('v', random.randint(0, 3000))])
-
 
 class QuantityReportableToPartnerProjectFactory(ReportableFactory):
     content_object = factory.SubFactory('core.factories.PartnerProjectFactory')
-    target = '5000'
-    baseline = '0'
+    target = dict(
+        [('d', 1), ('v', random.randint(1000, 10000))])
+    baseline = dict(
+        [('d', 1), ('v', random.randint(0, 500))])
+    in_need = dict(
+        [('d', 1), ('v', random.randint(20000, 50000))])
+    total = dict(
+        [('c', 0), ('d', 1), ('v', random.randint(0, 3000))])
 
     indicator_report = factory.RelatedFactory(
         'core.factories.QuantityIndicatorReportFactory', 'reportable')
 
     blueprint = factory.SubFactory(QuantityTypeIndicatorBlueprintFactory)
-
-    total = dict(
-        [('c', 0), ('d', 0), ('v', random.randint(0, 3000))])
 
     class Meta:
         model = Reportable
@@ -429,16 +453,19 @@ class QuantityReportableToPartnerProjectFactory(ReportableFactory):
 class QuantityReportableToClusterObjectiveFactory(ReportableFactory):
     content_object = factory.SubFactory(
         'core.factories.ClusterObjectiveFactory')
-    target = '5000'
-    baseline = '0'
+    target = dict(
+        [('d', 1), ('v', random.randint(1000, 10000))])
+    baseline = dict(
+        [('d', 1), ('v', random.randint(0, 500))])
+    in_need = dict(
+        [('d', 1), ('v', random.randint(20000, 50000))])
+    total = dict(
+        [('c', 0), ('d', 1), ('v', random.randint(0, 3000))])
 
     indicator_report = factory.RelatedFactory(
         'core.factories.QuantityIndicatorReportFactory', 'reportable')
 
     blueprint = factory.SubFactory(QuantityTypeIndicatorBlueprintFactory)
-
-    total = dict(
-        [('c', 0), ('d', 0), ('v', random.randint(0, 3000))])
 
     class Meta:
         model = Reportable
@@ -447,16 +474,19 @@ class QuantityReportableToClusterObjectiveFactory(ReportableFactory):
 class QuantityReportableToClusterActivityFactory(ReportableFactory):
     content_object = factory.SubFactory(
         'core.factories.ClusterActivityFactory')
-    target = '5000'
-    baseline = '0'
+    target = dict(
+        [('d', 1), ('v', random.randint(1000, 10000))])
+    baseline = dict(
+        [('d', 1), ('v', random.randint(0, 500))])
+    in_need = dict(
+        [('d', 1), ('v', random.randint(20000, 50000))])
+    total = dict(
+        [('c', 0), ('d', 1), ('v', random.randint(0, 3000))])
 
     indicator_report = factory.RelatedFactory(
         'core.factories.QuantityIndicatorReportFactory', 'reportable')
 
     blueprint = factory.SubFactory(QuantityTypeIndicatorBlueprintFactory)
-
-    total = dict(
-        [('c', 0), ('d', 0), ('v', random.randint(0, 3000))])
 
     class Meta:
         model = Reportable
@@ -465,16 +495,19 @@ class QuantityReportableToClusterActivityFactory(ReportableFactory):
 class QuantityReportableToPartnerActivityFactory(ReportableFactory):
     content_object = factory.SubFactory(
         'core.factories.PartnerActivityFactory')
-    target = '5000'
-    baseline = '0'
+    target = dict(
+        [('d', 1), ('v', random.randint(1000, 10000))])
+    baseline = dict(
+        [('d', 1), ('v', random.randint(0, 500))])
+    in_need = dict(
+        [('d', 1), ('v', random.randint(20000, 50000))])
+    total = dict(
+        [('c', 0), ('d', 1), ('v', random.randint(0, 3000))])
 
     indicator_report = factory.RelatedFactory(
         'core.factories.QuantityIndicatorReportFactory', 'reportable')
 
     blueprint = factory.SubFactory(QuantityTypeIndicatorBlueprintFactory)
-
-    total = dict(
-        [('c', 0), ('d', 0), ('v', random.randint(0, 3000))])
 
     class Meta:
         model = Reportable

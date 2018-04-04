@@ -10,23 +10,24 @@
 <link rel="import" href="../../../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../../../bower_components/paper-radio-button/paper-radio-button.html">
 <link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
-<link rel="import" href="../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
-<link rel="import" href="../../../bower_components/paper-listbox/paper-listbox.html">
-<link rel="import" href="../../../bower_components/paper-item/paper-item.html">
-<link rel="import" href="../../../bower_components/etools-searchable-multiselection-menu/etools-multi-selection-menu.html">
 
 <link rel="import" href="../../polyfills/es6-shim.html">
 <link rel="import" href="disaggregations-dropdown-widget.html">
+<link rel="import" href="indicator-locations-widget.html">
 <link rel="import" href="chip-date-of-report.html">
 <link rel="import" href="../labelled-item.html">
 <link rel="import" href="../etools-prp-chips.html">
 <link rel="import" href="../etools-prp-ajax.html">
+<link rel="import" href="../etools-prp-date-input.html">
+<link rel="import" href="../json-field.html">
+<link rel="import" href="../calculation-method.html">
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/modal.html">
 <link rel="import" href="../../styles/buttons.html">
 <link rel="import" href="../../styles/modal.html">
+<link rel="import" href="../error-box.html">
 
 <dom-module id="indicator-modal">
   <template>
@@ -34,12 +35,13 @@
       :host {
         display: block;
 
-        --app-grid-columns: 2;
+        --app-grid-columns: 3;
         --app-grid-gutter: 24px;
         --app-grid-item-height: auto;
+        --app-grid-expandible-item-columns: 3;
 
         --paper-dialog: {
-          width: 600px;
+          width: 800px;
 
           & > * {
             margin: 0;
@@ -51,23 +53,31 @@
         margin: 16px 0;
       }
 
+      .full-width {
+        @apply --app-grid-expandible-item;
+      }
+
       .app-grid {
-         margin: -var(--app-grid-gutter);
+        padding-top: 0;
+        margin: 0 -var(--app-grid-gutter);
+      }
+
+      .item {
+        margin-bottom: 0;
+      }
+
+      .calculation-method:not(:first-child) {
+        margin-left: 50px;
       }
 
       paper-radio-group {
         margin-left: -12px;
       }
 
-      paper-dropdown-menu {
-        width: 100%;
+      indicator-locations-widget {
+        margin: 2em 0;
       }
     </style>
-
-    <etools-prp-ajax
-        id="locations"
-        url="[[locationsUrl]]">
-    </etools-prp-ajax>
 
     <etools-prp-ajax
         id="disaggregations"
@@ -99,94 +109,80 @@
       </div>
 
       <paper-dialog-scrollable>
-        <div class="row">
-          <labelled-item label="Type">
-            <paper-radio-group
-                data-path="type"
-                on-paper-radio-group-changed="_onValueChanged"
-                selected="number">
-              <paper-radio-button name="number">Quantity (#)</paper-radio-button>
-              <paper-radio-button name="percentage_ratio">Percent/Ratio</paper-radio-button>
-            </paper-radio-group>
-          </labelled-item>
-        </div>
-
-        <div
-            class="row"
-            hidden$="[[!_equals(computedType, 'number')]]">
-          <div class="app-grid">
-            <div class="item">
-              <labelled-item label="Calculation method across locations">
-                <paper-radio-group
-                    data-path="data.blueprint.calculation_formula_across_locations"
-                    on-paper-radio-group-changed="_onValueChanged"
-                    selected="sum">
-                  <paper-radio-button name="sum">sum</paper-radio-button>
-                  <paper-radio-button name="max">max</paper-radio-button>
-                  <paper-radio-button name="avg">avg</paper-radio-button>
-                </paper-radio-group>
-              </labelled-item>
-            </div>
-            <div class="item">
-              <labelled-item label="Calculation method across reporting periods">
-                <paper-radio-group
-                    data-path="data.blueprint.calculation_formula_across_periods"
-                    on-paper-radio-group-changed="_onValueChanged"
-                    selected="sum">
-                  <paper-radio-button name="sum">sum</paper-radio-button>
-                  <paper-radio-button name="max">max</paper-radio-button>
-                  <paper-radio-button name="avg">avg</paper-radio-button>
-                </paper-radio-group>
-              </labelled-item>
-            </div>
-          </div>
-        </div>
-
-        <div
-            class="row"
-            hidden$="[[_equals(computedType, 'number')]]">
-          <labelled-item label="Display type">
-            <paper-radio-group
-                data-path="displayType"
-                on-paper-radio-group-changed="_onValueChanged"
-                selected="percentage">
-              <paper-radio-button name="percentage">Percentage</paper-radio-button>
-              <paper-radio-button name="ratio">Ratio</paper-radio-button>
-            </paper-radio-group>
-          </labelled-item>
-        </div>
-
         <template
             is="dom-if"
             if="[[opened]]"
             restamp="true">
+          <error-box errors="[[errors]]"></error-box>
+
           <div class="row">
             <paper-input
                 class="validate"
                 label="Title"
                 on-input="_validate"
-                value="{{data.blueprint.title::change}}"
+                value="{{data.blueprint.title}}"
                 always-float-label
                 required>
+            </paper-input>
+          </div>
+
+          <div class="row">
+            <labelled-item label="Type">
+              <paper-radio-group
+                  selected="{{data.blueprint.display_type}}">
+                <paper-radio-button name="number">Quantity (#)</paper-radio-button>
+                <paper-radio-button name="percentage">Percent</paper-radio-button>
+                <paper-radio-button name="ratio">Ratio</paper-radio-button>
+              </paper-radio-group>
+            </labelled-item>
+          </div>
+
+          <div class="row">
+            <div class="layout horizontal">
+              <labelled-item
+                  class="calculation-method"
+                  label="Calculation method across locations">
+                <calculation-method
+                    value="{{data.blueprint.calculation_formula_across_locations}}"
+                    disabled="[[!isNumber]]">
+                </calculation-method>
+              </labelled-item>
+
+              <labelled-item
+                  class="calculation-method"
+                  label="Calculation method across reporting periods">
+                <calculation-method
+                    value="{{data.blueprint.calculation_formula_across_periods}}"
+                    disabled="[[!isNumber]]">
+                </calculation-method>
+              </labelled-item>
+            </div>
+          </div>
+
+          <div class="row">
+            <paper-input
+                class="validate"
+                label="Comments (optional)"
+                on-input="_validate"
+                value="{{data.comments}}"
+                always-float-label>
             </paper-input>
           </div>
 
           <div class="row">
             <paper-input
                 class="validate"
-                label="Means of verification"
+                label="Measurement specifications (optional)"
                 on-input="_validate"
-                value="{{data.means_of_verification::change}}"
-                always-float-label
-                required>
+                value="{{data.measurement_specifications}}"
+                always-float-label>
             </paper-input>
           </div>
 
           <div class="row">
             <div class="app-grid">
-              <div class="item">
-                <etools-single-selection-menu
-                  class="validate"
+              <etools-single-selection-menu
+                  class="item validate"
                   label="Frequency of reporting"
                   options="[[frequencies]]"
                   option-value="id"
@@ -196,92 +192,123 @@
                   trigger-value-change-event
                   hide-search
                   required>
-                </etools-single-selection-menu>
-              </div>
+              </etools-single-selection-menu>
 
               <template
                   is="dom-if"
-                  if="[[_showCSD(data.frequency)]]">
-                <div class="item">
-                  <etools-prp-chips
-                      value="{{data.cs_dates}}"
-                      class="validate"
-                      label="Date of report"
-                      on-selected-chips-updated="_validate"
-                      required>
-                    <chip-date-of-report></chip-date-of-report>
-                  </etools-prp-chips>
-                </div>
+                  if="[[_showCSD(data.frequency)]]"
+                  restamp="true">
+                <etools-prp-chips
+                    class="item validate"
+                    value="{{data.cs_dates}}"
+                    label="Date of report"
+                    on-selected-chips-updated="_validate"
+                    required>
+                  <chip-date-of-report></chip-date-of-report>
+                </etools-prp-chips>
               </template>
+
+              <etools-prp-date-input
+                  class="item validate"
+                  label="Start date of reporting period"
+                  value="{{data.start_date_of_reporting_period}}"
+                  error-message=""
+                  no-init>
+              </etools-prp-date-input>
             </div>
           </div>
 
           <div class="row">
-            <div class="app-grid">
-              <div class="item">
-                <paper-input
+            <template
+                is="dom-if"
+                if="[[isNumber]]"
+                restamp="true">
+              <paper-input
                   class="validate"
+                  label="Label"
+                  on-input="_validate"
+                  value="{{data.label}}"
+                  always-float-label>
+              </paper-input>
+            </template>
+
+            <template
+                is="dom-if"
+                if="[[!isNumber]]"
+                restamp="true">
+              <div class="app-grid">
+                <paper-input
+                    class="item validate"
+                    label="Numerator Label"
+                    on-input="_validate"
+                    value="{{data.numerator_label}}"
+                    always-float-label>
+                </paper-input>
+
+                <paper-input
+                    class="item validate"
+                    label="Denominator Label"
+                    on-input="_validate"
+                    value="{{data.denominator_label}}"
+                    always-float-label>
+                </paper-input>
+              </div>
+            </template>
+          </div>
+
+          <div class="row">
+            <div class="app-grid">
+              <json-field
+                  class="item validate"
+                  type="[[data.blueprint.display_type]]"
                   label="Baseline"
                   on-input="_validate"
                   value="{{data.baseline}}"
-                  type="number"
-                  allowed-pattern="[+\-\d]"
-                  always-float-label>
-                </paper-input>
-              </div>
+                  allowed-pattern="[+\-\d]">
+              </json-field>
 
-              <div class="item">
-                <paper-input
-                  class="validate"
+              <template
+                  is="dom-if"
+                  if="[[isNumber]]"
+                  restamp="true">
+                <json-field
+                    class="item validate"
+                    type="[[data.blueprint.display_type]]"
+                    label="In need (optional)"
+                    on-input="_validate"
+                    value="{{data.in_need}}"
+                    allowed-pattern="[+\-\d]">
+                </json-field>
+              </template>
+
+              <json-field
+                  class="item validate"
+                  type="[[data.blueprint.display_type]]"
                   label="Target"
                   on-input="_validate"
                   value="{{data.target}}"
-                  type="number"
                   allowed-pattern="[+\-\d]"
-                  always-float-label>
-                </paper-input>
-              </div>
+                  required>
+              </json-field>
             </div>
           </div>
 
           <div class="row">
-            <div class="app-grid">
-              <div class="item">
-                <paper-input
-                  class="validate"
-                  label="In need"
-                  on-input="_validate"
-                  value="{{data.in_need}}"
-                  type="number"
-                  allowed-pattern="[+\-\d]"
-                  always-float-label>
-                </paper-input>
-              </div>
-            </div>
-          </div>
-
-          <div class="row">
-            <etools-multi-selection-menu
+            <indicator-locations-widget
                 class="validate"
-                label="Location"
-                options="[[locations]]"
-                selected-values="{{selectedLocations}}"
-                on-selected-values-changed="_validate"
-                trigger-value-change-event
-                required>
-            </etools-multi-selection-menu>
+                indicator-type="[[data.blueprint.display_type]]"
+                value="{{data.locations}}">
+            </indicator-locations-widget>
           </div>
 
           <div class="row">
             <disaggregations-dropdown-widget
-              class="validate"
-              value="{{selectedDisaggregations}}"
-              disaggregations="[[disaggregations]]">
+                class="validate"
+                value="{{selectedDisaggregations}}"
+                disaggregations="[[disaggregations]]">
             </disaggregations-dropdown-widget>
           </div>
-
         </template>
-
       </paper-dialog-scrollable>
 
       <div class="buttons layout horizontal-reverse">
@@ -314,29 +341,18 @@
 
       properties: {
         data: Object,
-
-        type: String,
-
         objectId: Number,
-
         objectType: String,
-
-        displayType: String,
-
-        baseline: Number,
-
-        target: Number,
-
         modalTitle: String,
+
+        isNumber: {
+          type: Boolean,
+          computed: '_computeIsNumber(data.blueprint.display_type)',
+        },
 
         responsePlanId: {
           type: String,
           statePath: 'responsePlans.currentID',
-        },
-
-        locationsUrl: {
-          type: String,
-          computed: '_computeLocationsUrl(responsePlanId)',
         },
 
         disaggregationsUrl: {
@@ -349,26 +365,9 @@
           value: App.Endpoints.clusterIndicators(),
         },
 
-        computedType: {
-          type: String,
-          computed: '_computeType(type, displayType)',
-          observer: '_setDisplayType',
-        },
-
         updatePending: {
           type: Boolean,
           value: false,
-        },
-
-        locations: {
-          type: Array,
-          value: [],
-        },
-
-        invalid: {
-          type: Boolean,
-          notify: true,
-          value: true,
         },
 
         disaggregationsParams: {
@@ -376,11 +375,6 @@
           value: {
             page_size: 99999,
           },
-        },
-
-        selectedLocations: {
-          type: Array,
-          value: [],
         },
 
         selectedDisaggregations: {
@@ -410,30 +404,45 @@
             },
           ],
         },
-      },
 
-      disaggregations: {
-        type: Array,
-        value: [],
+        disaggregations: {
+          type: Array,
+          value: [],
+        },
       },
 
       observers: [
         '_setDefaults(opened)',
-        '_setLocations(selectedLocations.splices)',
+        '_resetCalculationFormulas(isNumber)',
+        '_resetFields(isNumber)',
       ],
 
-      _computeType: function (type, displayType) {
-        switch (type) {
-          case 'number':
-            return type;
-
-          case 'percentage_ratio':
-            return displayType;
-        }
+      _computeIsNumber: function (type) {
+        return type === 'number';
       },
 
-      _setDisplayType: function (type) {
-        this.set('data.blueprint.display_type', type);
+      _resetCalculationFormulas: function (isNumber) {
+        if (isNumber) {
+          return;
+        }
+
+        var formula = 'sum';
+
+        this.set('data.blueprint.calculation_formula_across_locations', formula);
+        this.set('data.blueprint.calculation_formula_across_periods', formula);
+      },
+
+      _resetFields: function (isNumber) {
+        var data = this.get('data');
+        var newData;
+
+        if (isNumber) {
+          newData = this._omit(data, ['numerator_label', 'denominator_label']);
+        } else {
+          newData = this._omit(data, ['label', 'in_need']);
+        }
+
+        this.set('data', newData);
       },
 
       _setFrequency: function (e, data) {
@@ -442,22 +451,6 @@
           return;
         }
         this.set('data.frequency', freq.id);
-      },
-
-      _setLocations: function () {
-        var selected = this.selectedLocations ?
-            this.locations
-                .filter(function (location) {
-                  return this.selectedLocations.indexOf(location.value) !== -1;
-                }, this)
-                .map(function (location) {
-                  return {
-                    id: location.id,
-                  };
-                }) :
-            [];
-
-        this.set('data.locations', selected);
       },
 
       _setDisaggregations: function () {
@@ -470,31 +463,24 @@
         this.set('data.disaggregations', selected);
       },
 
-      _onValueChanged: function (e) {
-        this._updateValue(e.target);
-      },
-
-      _updateValue: function (el) {
-        this.set(el.dataset.path, el.selected);
-      },
-
       _setDefaults: function (opened) {
         if (!opened) {
           return;
         }
-        this.set('selectedLocations', []);
+
         this.set('selectedDisaggregations', []);
-        this.set('displayType', '');
-        this.set('type', '');
+        this.set('errors', {});
         this.set('data', {
+          blueprint: {
+            display_type: 'number',
+            calculation_formula_across_locations: 'sum',
+            calculation_formula_across_periods: 'sum',
+          },
           cs_dates: [],
           locations: [],
-          blueprint: {},
           disaggregations: [],
         });
 
-        this._forEach('paper-radio-group', this._updateValue);
-        this._fetchLocations();
         this._fetchDisaggregations();
       },
 
@@ -506,46 +492,21 @@
         return frequency && this._equals(frequency, 'Csd');
       },
 
-      _computeLocationsUrl: function (responsePlanId) {
-        return App.Endpoints.clusterLocationNames(responsePlanId);
-      },
-
       _computeDisaggregationsUrl: function(responsePlanId) {
         return App.Endpoints.responseParametersClusterDisaggregations(responsePlanId);
       },
 
-      _fetchLocations: function () {
-        var self = this;
-
-        this.$.locations.thunk()()
-            .then(function (res) {
-              self.set('locations', res.data.map(self._formatLocation));
-            });
-      },
-
       _fetchDisaggregations: function() {
         var self = this;
-        this.$.disaggregations.thunk()()
-          .then(function(res) {
-            self.set('disaggregations', res.data.results);
-          });
-      },
 
-      _formatLocation: function (data) {
-        return {
-          id: data.id,
-          value: data.title,
-          label: data.title,
-        };
+        this.$.disaggregations.thunk()()
+            .then(function(res) {
+              self.set('disaggregations', res.data.results);
+            });
       },
 
       _processData: function (rawData) {
         var data = this._clone(rawData);
-
-        if (['percentage', 'ratio'].indexOf(data.blueprint.display_type) !== -1) {
-          delete data.blueprint.calculation_formula_across_locations;
-          delete data.blueprint.calculation_formula_across_periods;
-        }
 
         if (data.frequency !== 'Csd') {
           delete data.cs_dates;
@@ -558,23 +519,9 @@
       },
 
       _save: function () {
-
-        var fields = [].slice.call(
-          Polymer.dom(this.root).querySelectorAll('.validate')
-        );
-
         var self = this;
-        var valid;
 
-        fields.forEach(function (field) {
-          field.validate();
-        });
-
-        valid = fields.every(function (field) {
-          return !field.invalid;
-        });
-
-        if (!valid) {
+        if (!this._fieldsAreValid()) {
           return;
         }
 
@@ -586,13 +533,11 @@
             .then(function (res) {
               self.fire('indicator-added', res.data);
               self.set('updatePending', false);
-              self.set('type', '');
-              self.set('displayType', '');
+              self.set('errors', {});
               self.close();
             })
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-
+            .catch(function (err) {
+              self.set('errors', err.data);
               self.set('updatePending', false);
             });
       },

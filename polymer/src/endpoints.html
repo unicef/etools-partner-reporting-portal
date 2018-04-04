@@ -9,6 +9,10 @@
         return BASE_URL + tail;
       },
 
+      config: function () {
+        return this._buildUrl('/core/configuration/');
+      },
+
       interventions: function () {
         return this._buildUrl('/core/workspace/');
       },
@@ -251,21 +255,42 @@
         return this._buildUrl('/account/user-profile/');
       },
 
-      partnerAnalysis: function () {
-        return this._buildUrl('/cluster/partner-analysis/');
-      },
-
-      partnerAnalysisReportableDetails: function (responsePlanId, reportableId) {
-        return this._buildUrl([
-          '/cluster/partner-analysis/response-plan/',
-          responsePlanId,
-          '/indicator/',
-          reportableId,
-        ].join(''));
-      },
-
       progressReportAttachment: function (locationId, reportId) {
         return this.progressReports(locationId) + reportId + '/attachment/';
+      },
+
+      analysisOperationalPresence: function (responsePlanId, type) {
+        return this._buildUrl(
+          '/cluster/cluster-analysis/' + responsePlanId + '/operational-presence/' + type
+        );
+      },
+
+      analysisIndicators: function (responsePlanId) {
+        return this._buildUrl('/cluster/cluster-analysis/' + responsePlanId + '/indicators/');
+      },
+
+      analysisIndicator: function (responsePlanId, indicatorId) {
+        return this.analysisIndicators(responsePlanId) + indicatorId;
+      },
+
+      indicatorPerLocationVars: function (reportableId) {
+        return this._buildUrl('/indicator/' + reportableId + '/baseline_in_need');
+      },
+
+      indicatorIMOMessage: function () {
+        return this._buildUrl('/indicator/cluster-indicator-imo-message/');
+      },
+      
+      ochaResponsePlans: function (workspaceId) {
+        return this._buildUrl('/ocha/response-plans/workspace/' + workspaceId + '/');
+      },
+
+      ochaResponsePlanDetails: function (planId) {
+        return this._buildUrl('/ocha/response-plans/' + planId + '/');
+      },
+
+      customResponsePlan: function (workspaceId) {
+        return this._buildUrl('/core/workspace/' + workspaceId + '/response-plan/create/');
       },
     };
   }());

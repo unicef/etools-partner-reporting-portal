@@ -13,12 +13,12 @@ from core.common import (
     CSO_TYPES,
     PARTNER_PROJECT_STATUS,
 )
-from core.models import TimeStampedExternalSyncModelMixin
+from core.models import TimeStampedExternalSourceModel
 
 from core.countries import COUNTRIES_ALPHA2_CODE_DICT, COUNTRIES_ALPHA2_CODE
 
 
-class Partner(TimeStampedExternalSyncModelMixin):
+class Partner(TimeStampedExternalSourceModel):
     """
     Partner model describe in details who is it and their activity humanitarian
     goals (clusters).
@@ -139,12 +139,15 @@ class Partner(TimeStampedExternalSyncModelMixin):
         null=True,
     )
 
-    clusters = models.ManyToManyField('cluster.Cluster',
-                                      related_name="partners")
+    clusters = models.ManyToManyField(
+        'cluster.Cluster', related_name="partners"
+    )
 
     class Meta:
         ordering = ['title']
-        unique_together = ('title', 'vendor_number')
+        unique_together = (
+            ('title', 'vendor_number'),
+        )
 
     def __str__(self):
         return self.title
@@ -155,11 +158,20 @@ class Partner(TimeStampedExternalSyncModelMixin):
 
     @property
     def address(self):
-        return ", ".join([self.street_address, self.city, self.postal_code,
-                          self.country])
+        address_lines = [
+            self.street_address,
+            self.city,
+            self.postal_code,
+            self.country,
+        ]
+
+        if all(address_lines):
+            return ", ".join(address_lines)
+        else:
+            return self.street_address or ''
 
 
-class PartnerProject(TimeStampedModel):
+class PartnerProject(TimeStampedExternalSourceModel):
     """
     PartnerProject model is a container for defined group of PartnerActivities
     model.
@@ -168,34 +180,50 @@ class PartnerProject(TimeStampedModel):
         cluster.Cluster (ManyToManyField): "clusters"
         core.Location (ManyToManyField): "locations"
         partner.Partner (ForeignKey): "partner"
+        partner.FundingSource (ForeignKey): "funding_sources"
         indicator.Reportable (GenericRelation): "reportables"
     """
-    title = models.CharField(max_length=255)
-    description = models.CharField(max_length=255)
-    additional_information = models.CharField(max_length=255,
-                                              verbose_name="Additional information (e.g. links)")
+    code = models.TextField(null=True, blank=True, unique=True)
+
+    title = models.CharField(max_length=1024)
+    description = models.TextField(max_length=5120)
+    additional_information = models.CharField(
+        max_length=255, verbose_name="Additional information (e.g. links)", null=True, blank=True
+    )
     start_date = models.DateField()
     end_date = models.DateField()
-    status = models.CharField(max_length=3, choices=PARTNER_PROJECT_STATUS,
-                              default=PARTNER_PROJECT_STATUS.ongoing)
-    total_budget = models.DecimalField(null=True, decimal_places=2,
-                                       help_text='Total Budget', max_digits=12)
-    funding_source = models.CharField(max_length=255)
+    status = models.CharField(
+        max_length=3, choices=PARTNER_PROJECT_STATUS, default=PARTNER_PROJECT_STATUS.ongoing
+    )
+    total_budget = models.DecimalField(
+        null=True, decimal_places=2, help_text='Total Budget (USD)', max_digits=12
+    )
+    funding_source = models.TextField(max_length=2048, null=True, blank=True)
 
-    clusters = models.ManyToManyField('cluster.Cluster',
-                                      related_name="partner_projects")
-    locations = models.ManyToManyField('core.Location',
-                                       related_name="partner_projects")
-    partner = models.ForeignKey(Partner,
-                                related_name="partner_projects")
-    reportables = GenericRelation('indicator.Reportable',
-                                  related_query_name='partner_projects')
+    clusters = models.ManyToManyField(
+        'cluster.Cluster', related_name="partner_projects"
+    )
+    locations = models.ManyToManyField(
+        'core.Location', related_name="partner_projects"
+    )
+    partner = models.ForeignKey(
+        Partner, related_name="partner_projects"
+    )
+    reportables = GenericRelation(
+        'indicator.Reportable', related_query_name='partner_projects'
+    )
 
     class Meta:
         ordering = ['-id']
+        unique_together = TimeStampedExternalSourceModel.Meta.unique_together
         permissions = (
             ('imo_object', 'IMO Object'),
             ('partner_object', 'Partner Object'),
+        )
+
+    def __str__(self):
+        return '{} <PK:{}> {}'.format(
+            self.__class__.__name__, self.id, self.title
         )
 
     @property
@@ -263,4 +291,5 @@ class PartnerActivity(TimeStampedModel):
 def check_pa_double_fks(sender, instance, **kwargs):
     if instance.cluster_activity and instance.cluster_objective:
         raise Exception(
-            "PartnerActivity cannot belong to both ClusterActivity and ClusterObjective")
+            "PartnerActivity cannot belong to both ClusterActivity and ClusterObjective"
+        )

@@ -1,0 +1,79 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../bower_components/etools-loading/etools-loading.html">
+
+<link rel="import" href="../../../polyfills/es6-shim.html">
+<link rel="import" href="../../../redux/store.html">
+<link rel="import" href="cluster-activity.html">
+
+<dom-module id="analysis-cluster-activities">
+  <template>
+    <style>
+      :host {
+        display: block;
+        min-height: 100px;
+        position: relative;
+      }
+    </style>
+
+    <template
+        is="dom-repeat"
+        items="[[data]]"
+        as="activity">
+      <analysis-cluster-activity data="[[activity]]"></analysis-cluster-activity>
+    </template>
+
+    <etools-loading active="[[loading]]"></etools-loading>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'analysis-cluster-activities',
+
+      behaviors: [
+        App.Behaviors.ReduxBehavior,
+      ],
+
+      properties: {
+        rawData: {
+          type: Array,
+          statePath: 'analysis.indicators.data',
+        },
+
+        data: {
+          type: Array,
+          computed: '_computeData(rawData)',
+        },
+
+        loading: {
+          type: Boolean,
+          statePath: 'analysis.indicators.dataLoading',
+        },
+      },
+
+      _computeData: function (rawData) {
+        return rawData.reduce(function (acc, curr) {
+          var activity = acc.find(function (activity) {
+            return activity.id === curr.content_object.id;
+          });
+
+          if (!activity) {
+            activity = Object.assign({}, curr.content_object, {
+              indicators: [],
+            });
+
+            acc.push(activity);
+          }
+
+          activity.indicators.push({
+            id: curr.id,
+            title: curr.blueprint.title,
+            total_against_in_need: curr.total_against_in_need,
+            total_against_target: curr.total_against_target,
+          });
+
+          return acc;
+        }, []);
+      },
+    });
+  </script>
+</dom-module>

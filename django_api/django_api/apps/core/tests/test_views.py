@@ -1,10 +1,14 @@
-# from django.urls import reverse
+from django.urls import reverse
 
-# from rest_framework import status
+# from rest_framework imports status
 
-# from core.models import ResponsePlan
-# from core.models import Location, Workspace
-# from .base import BaseAPITestCase
+# from core.models imports ResponsePlan
+# from core.models imports Location, Workspace
+from rest_framework import status
+
+from core.common import CLUSTER_TYPES
+from core.models import Workspace, IMORole
+from core.tests.base import BaseAPITestCase
 
 
 # class TestWorkspaceListAPIView(BaseAPITestCase):
@@ -59,3 +63,46 @@
 #                         ResponsePlan.objects.filter(
 #                             workspace=workspace).values_list('id', flat=True))
 #         self.assertEquals(response.data[0].get('workspace'), workspace.id)
+
+
+class TestResponsePlanAPIView(BaseAPITestCase):
+
+    def setUp(self):
+        super(TestResponsePlanAPIView, self).setUp()
+        self.workspace = Workspace.objects.first()
+        self.user.workspaces.add(self.workspace)
+        self.user.groups.add(IMORole.as_group())
+
+    def test_response_plan(self):
+        rp_data = {
+            'title': 'Test Response Plan',
+            'plan_type': 'HRP',
+            'start': '2013-01-01',
+            'end': '2018-01-01',
+            'clusters': [
+                CLUSTER_TYPES.cccm,
+                CLUSTER_TYPES.nutrition,
+            ],
+        }
+
+        url = reverse("response-plan-create", kwargs={'workspace_id': self.workspace.id})
+        response = self.client.post(url, data=rp_data, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED, msg=response.content)
+
+    def test_end_lt_start(self):
+        rp_data = {
+            'title': 'Test Response Plan',
+            'plan_type': 'HRP',
+            'start': '2018-01-01',
+            'end': '2013-01-01',
+            'clusters': [
+                CLUSTER_TYPES.cccm,
+                CLUSTER_TYPES.nutrition,
+            ],
+        }
+
+        url = reverse("response-plan-create", kwargs={'workspace_id': self.workspace.id})
+        response = self.client.post(url, data=rp_data, format='json')
+
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST, msg=response.content)

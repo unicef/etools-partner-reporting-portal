@@ -14,6 +14,7 @@ from cluster.serializers import (
     ClusterObjectiveSerializer
 )
 
+from indicator.models import create_pa_reportables_from_ca
 from indicator.serializers import ClusterIndicatorForPartnerActivitySerializer
 
 from .models import (
@@ -81,8 +82,8 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
     clusters = ClusterSimpleSerializer(many=True, read_only=True)
     locations = ShortLocationSerializer(many=True, read_only=True, required=False)
     partner = serializers.CharField(required=False)
-    partner_id = serializers.IntegerField(read_only=True)
-    part_response_plan = serializers.SerializerMethodField()
+    partner_id = serializers.IntegerField(required=False)
+    response_plan_title = serializers.SerializerMethodField()
     total_budget = serializers.CharField(required=False)
     funding_source = serializers.CharField(required=False)
     description = serializers.CharField(required=False)
@@ -104,15 +105,36 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
             'locations',
             'partner',
             'partner_id',
-            'part_response_plan',
+            'response_plan_title',
         )
 
     def get_id(self, obj):
         return str(obj.id)
 
-    def get_part_response_plan(self, obj):
+    def get_response_plan_title(self, obj):
         first_cluster = obj.clusters.first()
         return first_cluster and first_cluster.response_plan.title or ''
+
+    def validate(self, attrs):
+        validated_data = super(PartnerProjectSerializer, self).validate(attrs)
+        if validated_data['end_date'] < validated_data['start_date']:
+            raise serializers.ValidationError({
+                'end_date': 'Cannot be earlier than Start Date'
+            })
+
+        return validated_data
+
+    def create(self, validated_data):
+        clusters_serializer = ClusterSimpleSerializer(
+            many=True, allow_empty=False, data=self.initial_data.get('clusters')
+        )
+        if not clusters_serializer.is_valid():
+            raise serializers.ValidationError({
+                'clusters': 'This list cannot be empty'
+            })
+
+        project = super(PartnerProjectSerializer, self).create(validated_data)
+        return project
 
 
 class PartnerProjectPatchSerializer(serializers.ModelSerializer):
@@ -121,7 +143,6 @@ class PartnerProjectPatchSerializer(serializers.ModelSerializer):
     start_date = serializers.DateField(required=False)
     end_date = serializers.DateField(required=False)
     description = serializers.CharField(required=False)
-    additional_information = serializers.CharField(required=False)
     total_budget = serializers.CharField(required=False)
     funding_source = serializers.CharField(required=False)
     clusters = ClusterSimpleSerializer(many=True, read_only=True)
@@ -142,6 +163,15 @@ class PartnerProjectPatchSerializer(serializers.ModelSerializer):
             'clusters',
             'locations',
         )
+
+    def validate(self, attrs):
+        validated_data = super(PartnerProjectPatchSerializer, self).validate(attrs)
+        if validated_data['end_date'] < validated_data['start_date']:
+            raise serializers.ValidationError({
+                'end_date': 'Cannot be earlier than Start Date'
+            })
+
+        return validated_data
 
 
 class PartnerProjectSimpleSerializer(serializers.ModelSerializer):
@@ -297,6 +327,12 @@ class PartnerActivityFromClusterActivitySerializer(PartnerActivityBaseCreateSeri
             )
         except Exception as e:
             raise serializers.ValidationError(e.message)
+
+        # Grab Cluster Activity instance from this newly created Partner Activity instance
+        cluster_activity = validated_data['cluster_activity']
+
+        create_pa_reportables_from_ca(partner_activity, cluster_activity)
+
         return partner_activity
 
 

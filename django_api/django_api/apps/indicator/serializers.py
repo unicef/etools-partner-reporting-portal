@@ -1,4 +1,5 @@
 from ast import literal_eval as make_tuple
+from collections import defaultdict, OrderedDict
 
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
@@ -12,8 +13,8 @@ from unicef.models import LowerLevelOutput
 from partner.models import PartnerProject, PartnerActivity
 from cluster.models import ClusterObjective, ClusterActivity
 
-from core.common import INDICATOR_REPORT_STATUS, FINAL_OVERALL_STATUS
-from core.serializers import LocationSerializer, IdLocationSerializer, ShortLocationSerializer
+from core.common import OVERALL_STATUS, INDICATOR_REPORT_STATUS, FINAL_OVERALL_STATUS
+from core.serializers import LocationSerializer, IdLocationSerializer
 from core.models import Location
 from core.validators import add_indicator_object_type_validator
 from core.helpers import (
@@ -27,6 +28,8 @@ from .models import (
     Reportable, IndicatorBlueprint,
     IndicatorReport, IndicatorLocationData,
     Disaggregation, DisaggregationValue,
+    ReportableLocationGoal,
+    create_pa_reportables_for_new_ca_reportable,
 )
 
 
@@ -112,7 +115,7 @@ class IndicatorReportSimpleSerializer(serializers.ModelSerializer):
         return obj.reportable.blueprint.title
 
     def get_target(self, obj):
-        return obj.reportable and obj.reportable.target
+        return obj.reportable and obj.reportable.calculated_target
 
 
 class IndicatorReportStatusSerializer(serializers.ModelSerializer):
@@ -129,6 +132,9 @@ class ReportableSimpleSerializer(serializers.ModelSerializer):
     blueprint = IndicatorBlueprintSimpleSerializer()
     ref_num = serializers.CharField()
     achieved = serializers.JSONField()
+    baseline = serializers.JSONField()
+    target = serializers.JSONField()
+    in_need = serializers.JSONField()
     progress_percentage = serializers.FloatField()
     content_type_key = serializers.SerializerMethodField()
     content_object_title = serializers.SerializerMethodField()
@@ -156,13 +162,156 @@ class ReportableSimpleSerializer(serializers.ModelSerializer):
         return obj.content_object.title
 
 
+class ReportableLocationGoalBaselineInNeedListSerializer(serializers.ListSerializer):
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        loc_goal_mapping = {loc_goal.id: loc_goal for loc_goal in instance}
+        data_mapping = {item['id']: item for item in validated_data}
+        updated = list()
+
+        if 'reportable_id' not in self.context['view'].kwargs:
+            raise ValidationError("The view needs reportable_id from url")
+
+        reportable_id = self.context['view'].kwargs['reportable_id']
+        reportable = get_object_or_404(Reportable, id=reportable_id)
+
+        # Handling creation and updates
+        for data_id, data in data_mapping.items():
+            loc_goal = loc_goal_mapping.get(data_id, None)
+            data['reportable'] = reportable
+
+            if not loc_goal:
+                updated.append(self.child.create(data))
+
+            else:
+                updated.append(self.child.update(loc_goal, data))
+
+        # Handling deletion from update
+        for loc_goal_id, loc_goal in loc_goal_mapping.items():
+            if loc_goal_id not in data_mapping:
+                loc_goal.delete()
+
+        return updated
+
+
+class ReportableLocationGoalBaselineInNeedSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField()
+    baseline = serializers.JSONField()
+    in_need = serializers.JSONField()
+    location = LocationSerializer(read_only=True)
+
+    def validate_baseline(self, value):
+        if 'd' not in value:
+            value['d'] = 1
+
+        elif value['d'] == 0:
+            raise serializers.ValidationError("key 'd' cannot be zero")
+
+        return value
+
+    def validate_in_need(self, value):
+        if 'd' not in value:
+            value['d'] = 1
+
+        elif value['d'] == 0:
+            raise serializers.ValidationError("key 'd' cannot be zero")
+
+        return value
+
+    class Meta:
+        model = ReportableLocationGoal
+        list_serializer_class = ReportableLocationGoalBaselineInNeedListSerializer
+        fields = (
+            'id',
+            'baseline',
+            'in_need',
+            'location',
+        )
+
+
+class ReportableLocationGoalSerializer(serializers.ModelSerializer):
+    baseline = serializers.JSONField(required=False)
+    in_need = serializers.JSONField(required=False)
+    target = serializers.JSONField()
+    loc_type = serializers.SerializerMethodField()
+
+    def get_loc_type(self, obj):
+        return obj.location.gateway.admin_level
+
+    def validate_baseline(self, value):
+        if 'd' not in value:
+            value['d'] = 1
+
+        elif value['d'] == 0:
+            raise serializers.ValidationError("key 'd' cannot be zero")
+
+        return value
+
+    def validate_in_need(self, value):
+        if 'd' not in value:
+            value['d'] = 1
+
+        elif value['d'] == 0:
+            raise serializers.ValidationError("key 'd' cannot be zero")
+
+        return value
+
+    def validate_target(self, value):
+        if 'd' not in value:
+            value['d'] = 1
+
+        elif value['d'] == 0:
+            raise serializers.ValidationError("key 'd' cannot be zero")
+
+        return value
+
+    class Meta:
+        model = ReportableLocationGoal
+        fields = (
+            'id',
+            'baseline',
+            'in_need',
+            'target',
+            'location',
+            'loc_type',
+        )
+
+
 class IndicatorListSerializer(ReportableSimpleSerializer):
     """
     Useful anywhere a list of indicators needs to be shown with minimal
     amount of data.
     """
     disaggregations = DisaggregationListSerializer(many=True, read_only=True)
-    locations = ShortLocationSerializer(many=True, read_only=True)
+    locations = serializers.SerializerMethodField()
+    cluster = serializers.SerializerMethodField()
+    total_against_in_need = serializers.SerializerMethodField()
+    total_against_target = serializers.SerializerMethodField()
+
+    def get_total_against_in_need(self, obj):
+        target = float(obj.calculated_target) if obj.calculated_target else 1.0
+        return float(obj.calculated_in_need) / target if obj.in_need else 0
+
+    def get_total_against_target(self, obj):
+        target = float(obj.calculated_target) if obj.calculated_target else 1.0
+        return obj.total['c'] / target
+
+    def get_cluster(self, obj):
+        if isinstance(obj.content_object, PartnerProject) \
+                and obj.content_object.clusters.exists():
+            return obj.content_object.clusters.first().id
+
+        elif isinstance(obj.content_object, PartnerActivity) \
+                and obj.content_object.cluster_activity:
+            return obj.content_object.cluster_activity.cluster.id
+
+        elif isinstance(obj.content_object, (ClusterObjective, ClusterActivity)):
+            return obj.content_object.cluster.id
+
+        return None
+
+    def get_locations(self, obj):
+        return ReportableLocationGoalSerializer(obj.reportablelocationgoal_set.all(), many=True).data
 
     class Meta:
         model = Reportable
@@ -173,6 +322,16 @@ class IndicatorListSerializer(ReportableSimpleSerializer):
             'pd_id',
             'disaggregations',
             'locations',
+            'comments',
+            'measurement_specifications',
+            'start_date_of_reporting_period',
+            'label',
+            'numerator_label',
+            'denominator_label',
+            'cluster',
+            'parent_indicator',
+            'total_against_in_need',
+            'total_against_target',
         )
 
 
@@ -357,42 +516,38 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
         # level_reported and num_disaggregation validation
         if data['level_reported'] > data['num_disaggregation']:
             raise serializers.ValidationError(
-                "level_reported cannot be higher than "
-                + "its num_disaggregation"
+                "level_reported cannot be higher than its num_disaggregation"
             )
 
         # level_reported and disaggregation_reported_on validation
         if data['level_reported'] != len(data['disaggregation_reported_on']):
             raise serializers.ValidationError(
-                "disaggregation_reported_on list must have "
-                + "level_reported # of elements"
+                "disaggregation_reported_on list must have level_reported # of elements"
             )
 
-        disaggregation_id_list = data[
-            'indicator_report'].disaggregations.values_list('id', flat=True)
+        disaggregation_id_list = data['indicator_report'].disaggregations.values_list(
+            'id', flat=True)
 
         # num_disaggregation validation with actual Disaggregation count
         # from Reportable
         if data['num_disaggregation'] != len(disaggregation_id_list):
             raise serializers.ValidationError(
-                "num_disaggregation is not matched with "
-                + "its IndicatorReport's Reportable disaggregation counts"
+                "num_disaggregation is not matched with its IndicatorReport's Reportable disaggregation counts"
             )
 
         # IndicatorReport membership validation
         if self.instance.id not in data['indicator_report'] \
                 .indicator_location_data.values_list('id', flat=True):
             raise serializers.ValidationError(
-                "IndicatorLocationData does not belong to "
-                + "this {}".format(data['indicator_report'])
+                "IndicatorLocationData does not belong to this {}".format(
+                    data['indicator_report'])
             )
 
         # disaggregation_reported_on element-wise assertion
         for disagg_id in data['disaggregation_reported_on']:
             if disagg_id not in disaggregation_id_list:
                 raise serializers.ValidationError(
-                    "disaggregation_reported_on list must have "
-                    + "all its elements mapped to disaggregation ids"
+                    "disaggregation_reported_on list must have all its elements mapped to disaggregation ids"
                 )
 
         # Filter disaggregation option IDs
@@ -419,8 +574,7 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
         # level_reported against submitted disaggregation data
         if valid_entry_count < disaggregation_data_key_count:
             raise serializers.ValidationError(
-                "Submitted disaggregation data entries contains "
-                + "extra combination pair keys"
+                "Submitted disaggregation data entries contains extra combination pair keys"
             )
 
         valid_level_reported_key_count = len(list(filter(
@@ -489,13 +643,15 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
 
 
 class IndicatorReportListSerializer(serializers.ModelSerializer):
-    indicator_location_data = SimpleIndicatorLocationDataListSerializer(many=True, read_only=True)
+    indicator_location_data = SimpleIndicatorLocationDataListSerializer(
+        many=True, read_only=True)
     disagg_lookup_map = serializers.SerializerMethodField()
     disagg_choice_lookup_map = serializers.SerializerMethodField()
     total = serializers.JSONField()
     display_type = serializers.SerializerMethodField()
     overall_status_display = serializers.CharField(
         source='get_overall_status_display')
+    labels = serializers.SerializerMethodField()
 
     class Meta:
         model = IndicatorReport
@@ -515,14 +671,23 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
             'disagg_choice_lookup_map',
             'overall_status',
             'overall_status_display',
-            'narrative_assessment'
+            'narrative_assessment',
+            'labels',
         )
+
+    def get_labels(self, obj):
+        return {
+            'label': obj.reportable.label,
+            'numerator_label': obj.reportable.numerator_label,
+            'denominator_label': obj.reportable.denominator_label,
+        }
 
     def get_display_type(self, obj):
         return obj.display_type
 
     def get_disagg_lookup_map(self, obj):
-        serializer = DisaggregationListSerializer(obj.disaggregations, many=True)
+        serializer = DisaggregationListSerializer(
+            obj.disaggregations, many=True)
 
         disagg_lookup_list = serializer.data
         disagg_lookup_list.sort(key=lambda item: len(item['choices']))
@@ -651,11 +816,13 @@ class IndicatorBlueprintSerializer(serializers.ModelSerializer):
 class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
     disaggregations = IdDisaggregationSerializer(many=True, read_only=True)
-    object_type = serializers.CharField(validators=[add_indicator_object_type_validator], write_only=True)
+    object_type = serializers.CharField(
+        validators=[add_indicator_object_type_validator], write_only=True)
     blueprint = IndicatorBlueprintSerializer()
-    locations = IdLocationSerializer(many=True, read_only=True)
-    target = serializers.CharField(required=False)
-    baseline = serializers.CharField(required=False)
+    locations = ReportableLocationGoalSerializer(many=True, write_only=True)
+    target = serializers.JSONField()
+    baseline = serializers.JSONField()
+    in_need = serializers.JSONField(required=False, allow_null=True)
 
     class Meta:
         model = Reportable
@@ -672,18 +839,13 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             'target',
             'baseline',
             'in_need',
+            'comments',
+            'measurement_specifications',
+            'start_date_of_reporting_period',
+            'label',
+            'numerator_label',
+            'denominator_label',
         )
-
-    def check_locations_merge_to_list(self, locations):
-        if isinstance(locations, dict) and 'id' in locations:
-            return [locations]
-
-        if isinstance(locations, list) and all([loc.get('id', None) for loc in locations]):
-            return locations
-
-        raise ValidationError({
-            "locations": "List of dict location or one dict location expected"
-        })
 
     def check_disaggregation(self, disaggregations):
         if not isinstance(disaggregations, list) or False in [dis.get('id', False) for dis in disaggregations]:
@@ -691,36 +853,68 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 {"disaggregations": "List of dict disaggregation expected"}
             )
 
-    def check_progress_values(self, validated_data):
+    def check_progress_values(self, validated_data, partner):
         """
         Validates baseline, target, in-need
         """
-        if float(validated_data['baseline']) > float(validated_data['target']):
+        if not partner and 'baseline' not in validated_data:
             raise ValidationError(
-                {"baseline": "Baseline cannot be greater than target"}
+                {"baseline": "baseline is required for IMO creating Cluster Indicator"}
             )
 
-        if float(validated_data['target']) > float(validated_data['in_need']):
+        if float(validated_data['baseline']['v']) > float(validated_data['target']['v']):
             raise ValidationError(
-                {"target": "Target cannot be greater than In Need"}
+                {"baseline": "Cannot be greater than target"}
             )
 
-    def check_location_admin_levels(self, location_queryset):
-        if location_queryset.values_list('gateway__admin_level', flat=True).distinct().count() != 1:
-            raise ValidationError({"locations": "Selected locations should share same admin level"})
+        if 'in_need' in validated_data \
+                and float(validated_data['target']['v']) > float(validated_data['in_need']['v']):
+            raise ValidationError(
+                {"target": "Cannot be greater than In Need"}
+            )
+
+        if 'd' not in validated_data['baseline']:
+            validated_data['baseline']['d'] = 1
+
+        if 'd' not in validated_data['target']:
+            validated_data['target']['d'] = 1
+
+        if 'in_need' in validated_data \
+                and 'd' not in validated_data['in_need']:
+            validated_data['in_need']['d'] = 1
+
+    def check_location_admin_levels(self, location_goal_queryset):
+        if location_goal_queryset.exists() and location_goal_queryset.values_list(
+            'gateway__admin_level', flat=True) \
+                .distinct().count() != 1:
+            raise ValidationError(
+                {"locations": "Selected locations should share same admin level"})
 
     @transaction.atomic
     def create(self, validated_data):
-        locations = self.check_locations_merge_to_list(self.initial_data.get('locations'))
+        partner = self.context['request'].user.partner
+
         self.check_disaggregation(self.initial_data.get('disaggregations'))
-        self.check_progress_values(validated_data)
+        self.check_progress_values(validated_data, partner)
 
         if validated_data['blueprint']['display_type'] == IndicatorBlueprint.RATIO:
             validated_data['blueprint']['unit'] = IndicatorBlueprint.PERCENTAGE
+
         else:
             validated_data['blueprint']['unit'] = validated_data['blueprint']['display_type']
+
+        if validated_data['blueprint']['unit'] == IndicatorBlueprint.PERCENTAGE:
+            if validated_data['blueprint']['calculation_formula_across_periods'] != IndicatorBlueprint.SUM:
+                raise ValidationError(
+                    "calculation_formula_across_periods must be sum for Ratio Indicator type")
+
+            if validated_data['blueprint']['calculation_formula_across_locations'] != IndicatorBlueprint.SUM:
+                raise ValidationError(
+                    "calculation_formula_across_locations must be sum for Ratio Indicator type")
+
         validated_data['blueprint']['disaggregatable'] = True
-        blueprint = IndicatorBlueprintSerializer(data=validated_data['blueprint'])
+        blueprint = IndicatorBlueprintSerializer(
+            data=validated_data['blueprint'])
         blueprint.is_valid(raise_exception=True)
 
         validated_data['blueprint'] = blueprint.save()
@@ -747,30 +941,113 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
         validated_data['content_type'] = reportable_object_content_type
 
+        locations = validated_data.pop('locations', [])
+
         self.instance = Reportable.objects.create(**validated_data)
 
-        location_queryset = Location.objects.filter(id__in=[l['id'] for l in locations])
+        location_queryset = Location.objects.filter(
+            id__in=[l['location'].id for l in locations]
+        )
         self.check_location_admin_levels(location_queryset)
 
-        self.instance.locations.add(*location_queryset)
+        for loc_data in locations:
+            if partner:
+                # Filter out location goal level baseline, in_need
+                loc_data.pop('baseline')
+                loc_data.pop('in_need')
+
+            loc_data['reportable'] = self.instance
+
+            ReportableLocationGoal.objects.create(**loc_data)
 
         disaggregations = self.initial_data.get('disaggregations')
-        self.instance.disaggregations.add(*Disaggregation.objects.filter(id__in=[d['id'] for d in disaggregations]))
+        self.instance.disaggregations.add(
+            *Disaggregation.objects.filter(id__in=[d['id'] for d in disaggregations]))
+
+        # Only trigger to create PartnerActivity Reportable if ClusterActivity Reportable is created
+        if reportable_object_content_model == ClusterActivity:
+            create_pa_reportables_for_new_ca_reportable(self.instance)
 
         return self.instance
 
+    @transaction.atomic
     def update(self, reportable, validated_data):
-        locations = self.check_locations_merge_to_list(self.initial_data.get('locations'))
-        locations_ids = [l['id'] for l in locations]
-        location_queryset = Location.objects.filter(id__in=locations_ids)
+        partner = self.context['request'].user.partner
+
+        # Remove disaggregations to update
+        validated_data.pop('disaggregations', [])
+
+        if partner:
+            # Filter out IndicatorBlueprint instance
+            # and Indicator level baseline, in_need, and target
+            validated_data.pop('blueprint')
+            validated_data.pop('baseline')
+            validated_data.pop('in_need')
+            validated_data.pop('target')
+
+        else:
+            self.check_progress_values(validated_data, partner)
+
+        # Swapping validated_data['locations'] with raw request.data['locations']
+        # Due to missing id field as it is write_only field
+        validated_data.pop('locations', [])
+        locations = list(map(
+            lambda item: OrderedDict(item),
+            self.context['request'].data['locations']
+        ))
+
+        try:
+            for loc_goal in locations:
+                loc_goal.pop('loc_type', None)
+                loc_goal['location'] = Location.objects.get(id=loc_goal['location'])
+                loc_goal['reportable'] = reportable
+
+        except Location.DoesNotExist:
+            raise ValidationError("Location ID %d does not exist" % loc_goal['location'])
+
+        location_queryset = Location.objects.filter(
+            id__in=[l['location'].id for l in locations]
+        )
+
         self.check_location_admin_levels(location_queryset)
 
-        blueprint_data = validated_data.pop('blueprint', {})
-        reportable.blueprint.title = blueprint_data.get('title', reportable.blueprint.title)
-        reportable.blueprint.save()
+        existing_loc_goals = reportable.reportablelocationgoal_set.all()
+        loc_goal_mapping = {
+            loc_goal.id: loc_goal for loc_goal in existing_loc_goals}
+        data_mapping = {loc_goal['id']: loc_goal for loc_goal in locations if 'id' in loc_goal}
+        new_data_list = [loc_goal for loc_goal in locations if 'id' not in loc_goal]
 
-        reportable.locations.through.objects.exclude(location_id__in=locations_ids).delete()
-        reportable.locations.add(*location_queryset)
+        # Handling creation and updates
+        for data in new_data_list:
+            ReportableLocationGoal.objects.create(**data)
+
+        for data_id, data in data_mapping.items():
+            loc_goal = loc_goal_mapping.get(data_id, None)
+
+            if partner:
+                # Filter out location level baseline and in_need
+                data.pop('baseline')
+                data.pop('in_need')
+
+            if loc_goal.location.id != data['location'].id:
+                raise ValidationError(
+                    "Location %s cannot be changed for updating location goal" % loc_goal.location,
+                )
+
+            for key, val in data.items():
+                setattr(loc_goal, key, val)
+
+            loc_goal.save()
+
+        # Handling deletion from update
+        for loc_goal_id, loc_goal in loc_goal_mapping.items():
+            if loc_goal_id not in data_mapping:
+                loc_goal.delete()
+
+        blueprint_data = validated_data.pop('blueprint', {})
+        reportable.blueprint.title = blueprint_data.get(
+            'title', reportable.blueprint.title)
+        reportable.blueprint.save()
 
         return super(ClusterIndicatorSerializer, self).update(reportable, validated_data)
 
@@ -834,14 +1111,17 @@ class IndicatorReportReviewSerializer(serializers.Serializer):
         Make sure status is only accepted or sent back. Also overall_status
         should be set if accepting
         """
-        if data['status'] not in [INDICATOR_REPORT_STATUS.sent_back,
-                                  INDICATOR_REPORT_STATUS.accepted]:
-            raise serializers.ValidationError(
-                'Report status should be accepted or sent back')
-        if data.get('status', None) == INDICATOR_REPORT_STATUS.sent_back and data.get(
-                'comment') is None:
-            raise serializers.ValidationError(
-                'Comment required when sending back report')
+        if data['status'] not in {
+            INDICATOR_REPORT_STATUS.sent_back, INDICATOR_REPORT_STATUS.accepted
+        }:
+            raise serializers.ValidationError({
+                'status': 'Report status should be accepted or sent back'
+            })
+
+        if data['status'] == INDICATOR_REPORT_STATUS.sent_back and not data.get('comment'):
+            raise serializers.ValidationError({
+                'comment': 'Comment required when sending back report'
+            })
 
         return data
 
@@ -1025,7 +1305,8 @@ class PMPDisaggregationSerializer(serializers.ModelSerializer):
 
 class PMPDisaggregationValueSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='external_id')
-    disaggregation = serializers.PrimaryKeyRelatedField(queryset=Disaggregation.objects.all())
+    disaggregation = serializers.PrimaryKeyRelatedField(
+        queryset=Disaggregation.objects.all())
 
     class Meta:
         model = DisaggregationValue
@@ -1042,8 +1323,6 @@ class PMPReportableSerializer(serializers.ModelSerializer):
     title = serializers.CharField(source='means_of_verification')
     blueprint_id = serializers.PrimaryKeyRelatedField(
         queryset=IndicatorBlueprint.objects.all(), source="blueprint")
-    location_ids = serializers.PrimaryKeyRelatedField(
-        queryset=Location.objects.all(), many=True, source="locations")
     disaggregation_ids = serializers.PrimaryKeyRelatedField(
         queryset=Disaggregation.objects.all(),
         many=True,
@@ -1059,7 +1338,6 @@ class PMPReportableSerializer(serializers.ModelSerializer):
             'title',
             'is_cluster_indicator',
             'blueprint_id',
-            'location_ids',
             'disaggregation_ids',
             'content_type',
             'object_id',
@@ -1069,6 +1347,8 @@ class PMPReportableSerializer(serializers.ModelSerializer):
 class ClusterPartnerAnalysisIndicatorResultSerializer(serializers.ModelSerializer):
     blueprint = IndicatorBlueprintSimpleSerializer()
     achieved = serializers.JSONField()
+    baseline = serializers.JSONField()
+    target = serializers.JSONField()
     progress_percentage = serializers.FloatField()
     progress_by_location = serializers.SerializerMethodField()
     indicator_reports = serializers.SerializerMethodField()
@@ -1140,3 +1420,287 @@ class ClusterPartnerAnalysisIndicatorResultSerializer(serializers.ModelSerialize
             'cluster_activity',
             'latest_report_status',
         )
+
+
+class ClusterAnalysisIndicatorsListSerializer(serializers.ModelSerializer):
+    content_type = serializers.SerializerMethodField()
+    content_object = serializers.SerializerMethodField()
+    total_against_in_need = serializers.SerializerMethodField()
+    total_against_target = serializers.SerializerMethodField()
+    blueprint = IndicatorBlueprintSimpleSerializer(read_only=True)
+    baseline = serializers.JSONField()
+    target = serializers.JSONField()
+
+    def get_content_type(self, obj):
+        return obj.content_type.model
+
+    def get_total_against_in_need(self, obj):
+        target = float(obj.calculated_target) if obj.calculated_target else 1.0
+        return float(obj.calculated_in_need) / target if obj.in_need else 0
+
+    def get_total_against_target(self, obj):
+        target = float(obj.calculated_target) if obj.calculated_target else 1.0
+        return obj.total['c'] / target
+
+    def get_content_object(self, obj):
+        if isinstance(obj.content_object, (PartnerProject, )):
+            from partner.serializers import PartnerProjectSimpleSerializer
+            return PartnerProjectSimpleSerializer(obj.content_object).data
+
+        elif isinstance(obj.content_object, (PartnerActivity, )):
+            from partner.serializers import PartnerActivitySimpleSerializer
+            return PartnerActivitySimpleSerializer(obj.content_object).data
+
+        elif isinstance(obj.content_object, (ClusterObjective, )):
+            from cluster.serializers import ClusterObjectiveSerializer
+            return ClusterObjectiveSerializer(obj.content_object).data
+
+        elif isinstance(obj.content_object, (ClusterActivity, )):
+            from cluster.serializers import ClusterActivitySerializer
+            return ClusterActivitySerializer(obj.content_object).data
+
+    class Meta:
+        model = Reportable
+        fields = (
+            'id',
+            'target',
+            'baseline',
+            'in_need',
+            'blueprint',
+            'achieved',
+            'progress_percentage',
+            'content_type',
+            'content_object',
+            'total_against_in_need',
+            'total_against_target',
+        )
+
+
+class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
+    num_of_partners = serializers.SerializerMethodField()
+    partners_by_status = serializers.SerializerMethodField()
+    progress_over_time = serializers.SerializerMethodField()
+    current_progress_by_partner = serializers.SerializerMethodField()
+    current_progress_by_location = serializers.SerializerMethodField()
+    indicator_type = serializers.SerializerMethodField()
+    display_type = serializers.SerializerMethodField()
+    baseline = serializers.JSONField()
+    target = serializers.JSONField()
+    in_need = serializers.JSONField()
+
+    def get_indicator_type(self, obj):
+        if obj.content_type.model == "clusteractivity":
+            return "Cluster Activity Indicator"
+
+        elif obj.content_type.model == "clusterobjective":
+            return "Cluster Objective Indicator"
+
+        elif obj.content_type.model == "partneractivity":
+            return "Partner Activity Indicator"
+
+        elif obj.content_type.model == "partnerproject":
+            return "Partner Project Indicator"
+
+        else:
+            return "Lower Level Output Indicator"
+
+    def get_display_type(self, obj):
+        return obj.blueprint.display_type
+
+    def get_num_of_partners(self, obj):
+        num_of_partners = 0
+
+        if obj.children.exists() and isinstance(obj.content_object, (ClusterActivity, )):
+            num_of_partners = obj.content_object.partner_activities.values_list(
+                'partner', flat=True
+            ).distinct().count()
+
+        elif isinstance(obj.content_object, PartnerProject) or isinstance(obj.content_object, PartnerActivity):
+            num_of_partners = 1
+
+        else:
+            num_of_partners = 0
+
+        return num_of_partners
+
+    def _increment_partner_by_status(self, reportable, num_of_partners):
+        try:
+            latest_ir = reportable.indicator_reports.latest(
+                'time_period_start')
+
+            overall_status = latest_ir.overall_status
+
+            if overall_status == OVERALL_STATUS.met:
+                num_of_partners["met"] += 1
+
+            elif overall_status == OVERALL_STATUS.on_track:
+                num_of_partners["on_track"] += 1
+
+            elif overall_status == OVERALL_STATUS.no_progress:
+                num_of_partners["no_progress"] += 1
+
+            elif overall_status == OVERALL_STATUS.constrained:
+                num_of_partners["constrained"] += 1
+
+            elif overall_status == OVERALL_STATUS.no_status:
+                num_of_partners["no_status"] += 1
+
+        except IndicatorReport.DoesNotExist:
+            # If there is no indicator report for this Reportable, then skip this process
+            pass
+
+    def _get_progress_by_partner(self, reportable, partner_progresses):
+        partner_progresses[reportable.content_object.partner.title] = int(
+            reportable.total['c'])
+
+    def get_partners_by_status(self, obj):
+        num_of_partners = {
+            "met": 0,
+            "on_track": 0,
+            "no_progress": 0,
+            "constrained": 0,
+            "no_status": 0,
+        }
+
+        if obj.children.exists():
+            for child in obj.children.all():
+                self._increment_partner_by_status(child, num_of_partners)
+
+        else:
+            self._increment_partner_by_status(obj, num_of_partners)
+
+        return num_of_partners
+
+    def get_progress_over_time(self, obj):
+        return list(obj.indicator_reports.order_by('id').values_list('time_period_end', 'total'))
+
+    def get_current_progress_by_partner(self, obj):
+        partner_progresses = {}
+
+        # Only if the indicator is cluster activity, the children (unicef indicators) will exist
+        if obj.children.exists():
+            for child in obj.children.all():
+                self._get_progress_by_partner(child, partner_progresses)
+
+        # If the indicator is UNICEF cluster which is linked as Partner, then show its progress only
+        elif obj.content_type.model in ["partneractivity", "partnerproject"]:
+            self._get_progress_by_partner(obj, partner_progresses)
+
+        return partner_progresses
+
+    def get_current_progress_by_location(self, obj):
+        location_progresses = defaultdict(int)
+
+        # Only if the indicator is cluster activity, the children (unicef indicators) will exist
+        if obj.children.exists():
+            latest_indicator_reports = []
+
+            try:
+                latest_indicator_reports = map(
+                    lambda x: x.indicator_reports.latest(
+                        'time_period_start'), obj.children.all()
+                )
+
+                for ir in latest_indicator_reports:
+                    for ild in ir.indicator_location_data.all():
+                        location_progresses[ild.location.title] += ild.disaggregation['()']['c']
+            except IndicatorReport.DoesNotExist:
+                # If there is no indicator report for this Reportable, then skip this process
+                pass
+
+        # If the indicator is UNICEF cluster which is linked as Partner, then show its progress only
+        else:
+            try:
+                indicator_location_data = obj.indicator_reports \
+                    .latest('time_period_start').indicator_location_data.all()
+
+                for ild in indicator_location_data:
+                    location_progresses[ild.location.title] += ild.disaggregation['()']['c']
+            except IndicatorReport.DoesNotExist:
+                # If there is no indicator report for this Reportable, then skip this process
+                pass
+
+        return location_progresses
+
+    class Meta:
+        model = Reportable
+        fields = (
+            'id',
+            'target',
+            'baseline',
+            'in_need',
+            'total',
+            'blueprint',
+            'indicator_type',
+            'display_type',
+            'frequency',
+            'num_of_partners',
+            'partners_by_status',
+            'progress_over_time',
+            'current_progress_by_partner',
+            'current_progress_by_location',
+        )
+
+
+class ClusterIndicatorIMOMessageSerializer(serializers.Serializer):
+    message = serializers.CharField(max_length=4048)
+    cluster = serializers.IntegerField()
+    reportable = serializers.IntegerField()
+
+    def to_internal_value(self, data):
+        from cluster.models import Cluster
+
+        from partner.models import PartnerActivity
+
+        cluster = get_object_or_404(
+            Cluster,
+            id=data['cluster']
+        )
+
+        data['cluster'] = cluster
+
+        reportable = get_object_or_404(
+            Reportable,
+            id=data['reportable']
+        )
+
+        data['reportable'] = reportable
+
+        if cluster not in self.context['request'].user.partner.clusters.all():
+            raise ValidationError({
+                "cluster": "Cluster does not belong to Partner",
+            })
+
+        elif reportable.content_type.model_class() != PartnerActivity:
+            raise ValidationError({
+                "reportable": "Indicator is not PartnerActivity Indicator",
+            })
+
+        elif reportable.content_type.model_class() == PartnerActivity \
+                and not reportable.content_object.cluster_activity:
+            raise ValidationError({
+                "reportable": "Indicator is not PartnerActivity Indicator from ClusterActivity",
+            })
+
+        elif reportable.content_object.cluster_activity.cluster != cluster:
+            raise ValidationError({
+                "reportable": "Indicator does not belong to Cluster",
+            })
+
+        elif not cluster.imo_users.exists():
+            raise ValidationError({
+                "cluster": "There is no IMO user on the Cluster",
+            })
+
+        return {
+            'message': data['message'],
+            'cluster': cluster,
+            'reportable': reportable,
+        }
+
+    def to_representation(self, data):
+        return {
+            'message': data['message'],
+            'cluster': data['cluster'].id,
+            'reportable': data['reportable'].id,
+        }

@@ -114,7 +114,7 @@
                 </template>
                 <template
                     is="dom-if"
-                    if="[[_equals(report.display_type, 'percentage')]]"
+                    if="[[!_equals(report.display_type, 'number')]]"
                     restamp="true">
                   [[_toPercentage(report.total.c)]]
                 </template>

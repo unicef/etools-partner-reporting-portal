@@ -1,29 +1,29 @@
 # from ast import literal_eval as make_tuple
-# from datetime import date, timedelta
-# import random
-# import string
+# from datetime imports date, timedelta
+# imports random
+# imports string
 
-# from django.urls import reverse
-# from django.conf import settings
+# from django.urls imports reverse
+# from django.conf imports settings
 
-# from rest_framework import status
+# from rest_framework imports status
 
-# from core.models import Location
-# from core.helpers import (
+# from core.models imports Location
+# from core.helpers imports (
 #     get_cast_dictionary_keys_as_tuple,
 # )
-# from core.common import OVERALL_STATUS, PROGRESS_REPORT_STATUS, REPORTABLE_FREQUENCY_LEVEL, INDICATOR_REPORT_STATUS
-# from core.factories import ProgressReportFactory
-# from core.tests.base import BaseAPITestCase
-# from cluster.models import ClusterObjective, ClusterActivity
-# from partner.models import PartnerProject, PartnerActivity
-# from unicef.models import (
+# from core.common imports OVERALL_STATUS, PROGRESS_REPORT_STATUS, REPORTABLE_FREQUENCY_LEVEL, INDICATOR_REPORT_STATUS
+# from core.factories imports ProgressReportFactory
+# from core.tests.base imports BaseAPITestCase
+# from cluster.models imports ClusterObjective, ClusterActivity
+# from partner.models imports PartnerProject, PartnerActivity
+# from unicef.models imports (
 #     ProgrammeDocument
 # )
-# from indicator.serializers import (
+# from indicator.serializers imports (
 #     IndicatorLocationDataUpdateSerializer
 # )
-# from indicator.models import (
+# from indicator.models imports (
 #     Reportable,
 #     IndicatorReport,
 #     IndicatorLocationData,

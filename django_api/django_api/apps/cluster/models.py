@@ -6,19 +6,17 @@ from django.db.models import Q
 from django.utils.functional import cached_property
 from django.contrib.contenttypes.fields import GenericRelation
 
-from model_utils.models import TimeStampedModel
-
 from core.common import (
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
-    CLUSTER_TYPES,
-)
+    CLUSTER_TYPES)
+from core.models import TimeStampedExternalSourceModel, IMORole
 
 from indicator.models import Reportable, IndicatorReport
 from partner.models import PartnerActivity
 
 
-class Cluster(TimeStampedModel):
+class Cluster(TimeStampedExternalSourceModel):
     """
     Cluster model it is a group of partners that cooperate to reach the same
     goal (Removal of the humanitarian crisis). We can divide clusters to few
@@ -30,16 +28,34 @@ class Cluster(TimeStampedModel):
 
     """
     type = models.CharField(max_length=32, choices=CLUSTER_TYPES)
-    response_plan = models.ForeignKey('core.ResponsePlan', null=True,
-                                      related_name="clusters")
+    imported_type = models.TextField(
+        max_length=1024, null=True, blank=True, help_text='Type as specified in the external system'
+    )
+    response_plan = models.ForeignKey(
+        'core.ResponsePlan', null=True, related_name="clusters"
+    )
 
     class Meta:
         """One response plan can only have a cluster of one type."""
-
-        unique_together = ('type', 'response_plan')
+        unique_together = (
+            ('type', 'imported_type', 'response_plan'),
+            TimeStampedExternalSourceModel.Meta.unique_together
+        )
 
     def __str__(self):
-        return "<pk: %s> %s PLAN: %s" % (self.id, self.type, self.response_plan)
+        return "<pk: {}> `{}` PLAN: `{}`".format(
+            self.id,
+            self.title,
+            self.response_plan
+        )
+
+    @property
+    def title(self):
+        return self.imported_type or self.get_type_display()
+
+    @property
+    def imo_users(self):
+        return self.users.filter(groups__name=IMORole.as_group().name)
 
     @property
     def num_of_partners(self):
@@ -84,8 +100,7 @@ class Cluster(TimeStampedModel):
 
     @cached_property
     def partner_activities(self):
-        id_list = self.partners.values_list(
-            'partner_activities', flat=True).distinct()
+        id_list = self.partners.values_list('partner_activities', flat=True).distinct()
 
         return PartnerActivity.objects.filter(
             id__in=id_list
@@ -212,7 +227,7 @@ class Cluster(TimeStampedModel):
         )
 
 
-class ClusterObjective(TimeStampedModel):
+class ClusterObjective(TimeStampedExternalSourceModel):
     """
     ClusterObjective model is goal of cluster. This goal should be reached via
     whole cluster aspect.
@@ -222,26 +237,32 @@ class ClusterObjective(TimeStampedModel):
         cluster.Cluster (ForeignKey): "cluster"
         indicator.Reportable (GenericRelation): "reportables"
     """
-    title = models.CharField(max_length=255,
-                             verbose_name='Cluster Objective Title')
+    title = models.TextField(
+        max_length=2048, verbose_name='Cluster Objective Title'
+    )
     cluster = models.ForeignKey(Cluster, related_name="cluster_objectives")
-    locations = models.ManyToManyField('core.Location',
-                                       related_name="cluster_objectives")
-    reportables = GenericRelation('indicator.Reportable',
-                                  related_query_name='cluster_objectives')
+    locations = models.ManyToManyField(
+        'core.Location', related_name="cluster_objectives"
+    )
+    reportables = GenericRelation(
+        'indicator.Reportable', related_query_name='cluster_objectives'
+    )
 
     class Meta:
         ordering = ['-id']
+        unique_together = (
+            TimeStampedExternalSourceModel.Meta.unique_together
+        )
 
     @property
     def response_plan(self):
         return self.cluster.response_plan
 
     def __str__(self):
-        return "<pk: %s> %s" % (self.id, self.title)
+        return "<pk: {}> {}".format(self.id, self.title)
 
 
-class ClusterActivity(TimeStampedModel):
+class ClusterActivity(TimeStampedExternalSourceModel):
     """
     ClusterActivity models is an action, which one to take, to reach the goal
     (that is defined in ClusterObjective). These activities are decided by
@@ -252,16 +273,22 @@ class ClusterActivity(TimeStampedModel):
         cluster.ClusterObjective (ForeignKey): "cluster_objective"
         indicator.Reportable (GenericRelation): "reportables"
     """
-    title = models.CharField(max_length=255)
-    cluster_objective = models.ForeignKey(ClusterObjective,
-                                          related_name="cluster_activities")
-    locations = models.ManyToManyField('core.Location',
-                                       related_name="cluster_activities")
-    reportables = GenericRelation('indicator.Reportable',
-                                  related_query_name='cluster_activities')
+    title = models.TextField(max_length=2048)
+    cluster_objective = models.ForeignKey(
+        ClusterObjective, related_name="cluster_activities"
+    )
+    locations = models.ManyToManyField(
+        'core.Location', related_name="cluster_activities"
+    )
+    reportables = GenericRelation(
+        'indicator.Reportable', related_query_name='cluster_activities'
+    )
 
     class Meta:
         ordering = ['-id']
+        unique_together = (
+            TimeStampedExternalSourceModel.Meta.unique_together
+        )
 
     @property
     def cluster(self):
@@ -272,4 +299,4 @@ class ClusterActivity(TimeStampedModel):
         return self.cluster.response_plan
 
     def __str__(self):
-        return "<pk: %s> %s" % (self.id, self.title)
+        return "<pk: {}> {}".format(self.id, self.title)

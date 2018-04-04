@@ -122,35 +122,28 @@
                   <template
                       is="dom-if"
                       if="[[_canEdit(item, permissions)]]">
-                    <template
-                        is="dom-if"
-                        if="[[_equals(item.data.display_type, 'number')]]"
-                        restamp="true">
-                      <paper-radio-group
-                          data-id$="[[item.data.id]]"
-                          data-llo-id$="[[item.llo_id]]"
-                          data-scope="calculation_formula_across_locations"
-                          on-paper-radio-group-changed="_onValueChanged"
-                          selected="[[_computeSelected(item.data, 'calculation_formula_across_locations')]]">
-                        <paper-radio-button name="sum">SUM</paper-radio-button>
-                        <paper-radio-button name="max">MAX</paper-radio-button>
-                        <paper-radio-button name="avg">AVG</paper-radio-button>
-                      </paper-radio-group>
-                    </template>
-                    <template
-                        is="dom-if"
-                        if="[[_equals(item.data.display_type, 'percentage')]]"
-                        restamp="true">
-                      <paper-radio-group
-                          data-id$="[[item.data.id]]"
-                          data-llo-id$="[[item.llo_id]]"
-                          data-scope="calculation_formula_across_locations"
-                          on-paper-radio-group-changed="_onValueChanged"
-                          selected="[[_computeSelected(item.data, 'calculation_formula_across_locations')]]">
-                        <paper-radio-button name="percentage">PERCENTAGE</paper-radio-button>
-                        <paper-radio-button name="ratio">RATIO</paper-radio-button>
-                      </paper-radio-group>
-                    </template>
+                    <paper-radio-group
+                        data-id$="[[item.data.id]]"
+                        data-llo-id$="[[item.llo_id]]"
+                        data-scope="calculation_formula_across_locations"
+                        on-paper-radio-group-changed="_onValueChanged"
+                        selected="[[_computeSelected(item.data, 'calculation_formula_across_locations')]]">
+                      <paper-radio-button
+                          name="sum"
+                          disabled="[[_computeDisabled(item.data.display_type)]]">
+                        SUM
+                      </paper-radio-button>
+                      <paper-radio-button
+                          name="max"
+                          disabled="[[_computeDisabled(item.data.display_type)]]">
+                        MAX
+                      </paper-radio-button>
+                      <paper-radio-button
+                          name="avg"
+                          disabled="[[_computeDisabled(item.data.display_type)]]">
+                        AVG
+                      </paper-radio-button>
+                    </paper-radio-group>
                   </template>
                   <template
                       is="dom-if"
@@ -162,35 +155,29 @@
                   <template
                       is="dom-if"
                       if="[[_canEdit(item, permissions)]]">
-                    <template
-                        is="dom-if"
-                        if="[[_equals(item.data.display_type, 'number')]]"
-                        restamp="true">
-                      <paper-radio-group
-                          data-id$="[[item.data.id]]"
-                          data-llo-id$="[[item.llo_id]]"
-                          data-scope="calculation_formula_across_periods"
-                          on-paper-radio-group-changed="_onValueChanged"
-                          selected="[[_computeSelected(item.data, 'calculation_formula_across_periods')]]">
-                        <paper-radio-button name="sum">SUM</paper-radio-button>
-                        <paper-radio-button name="max">MAX</paper-radio-button>
-                        <paper-radio-button name="avg">AVG</paper-radio-button>
-                      </paper-radio-group>
-                    </template>
-                    <template
-                        is="dom-if"
-                        if="[[_equals(item.data.display_type, 'percentage')]]"
-                        restamp="true">
-                      <paper-radio-group
-                          data-id$="[[item.data.id]]"
-                          data-llo-id$="[[item.llo_id]]"
-                          data-scope="calculation_formula_across_periods"
-                          on-paper-radio-group-changed="_onValueChanged"
-                          selected="[[_computeSelected(item.data, 'calculation_formula_across_periods')]]">
-                        <paper-radio-button name="percentage">PERCENTAGE</paper-radio-button>
-                        <paper-radio-button name="ratio">RATIO</paper-radio-button>
-                      </paper-radio-group>
-                    </template>
+                    <paper-radio-group
+                        data-id$="[[item.data.id]]"
+                        data-llo-id$="[[item.llo_id]]"
+                        data-scope="calculation_formula_across_periods"
+                        on-paper-radio-group-changed="_onValueChanged"
+                        selected="[[_computeSelected(item.data, 'calculation_formula_across_periods')]]"
+                        disabled="[[_computeDisabled(item.data)]]">
+                      <paper-radio-button
+                          name="sum"
+                          disabled="[[_computeDisabled(item.data.display_type)]]">
+                        SUM
+                      </paper-radio-button>
+                      <paper-radio-button
+                          name="max"
+                          disabled="[[_computeDisabled(item.data.display_type)]]">
+                        MAX
+                      </paper-radio-button>
+                      <paper-radio-button
+                          name="avg"
+                          disabled="[[_computeDisabled(item.data.display_type)]]">
+                        AVG
+                      </paper-radio-button>
+                    </paper-radio-group>
                   </template>
                   <template
                       is="dom-if"
@@ -308,6 +295,10 @@
 
       _computeSelected: function (data, scope) {
         return data[scope];
+      },
+
+      _computeDisabled: function (display_type) {
+        return ['percentage', 'ratio'].indexOf(display_type) !== -1;
       },
 
       _fetchData: function (url) {

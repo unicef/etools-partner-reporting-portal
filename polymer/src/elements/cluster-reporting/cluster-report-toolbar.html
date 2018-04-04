@@ -18,7 +18,13 @@
       response-plan-id="{{responsePlanId}}"
     >
       <download-button url="[[exportUrl]]">Export</download-button>
-      <download-button url="[[importTemplateUrl]]">Import Template</download-button>
+
+      <template
+          is="dom-if"
+          if="[[_equals(submitted, 0)]]"
+          restamp="true">
+        <download-button url="[[importTemplateUrl]]">Import Template</download-button>
+      </template>
     </etools-prp-toolbar>
   </template>
 
@@ -31,7 +37,7 @@
       ],
 
       properties: {
-        submitted: String,
+        submitted: Number,
 
         importTemplateUrl: {
           type: String,

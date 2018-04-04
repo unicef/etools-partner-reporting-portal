@@ -56,7 +56,8 @@
     "etools-dialog": "^1.2.3",
     "app-localize-behavior": "PolymerElements/app-localize-behavior#^2.0.0",
     "intl": "^1.2.5",
-    "etools-file": "^1.2.4"
+    "etools-file": "^1.2.4",
+    "leaflet-map": "^1.2.0"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0"

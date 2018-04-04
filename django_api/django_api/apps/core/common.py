@@ -15,7 +15,7 @@ REPORTING_TYPES = Choices(
     ('SR', 'Special Report'),
 )
 
-CLUSTER_TYPES = Choices(
+DISPLAY_CLUSTER_TYPES = Choices(
     ('cccm', 'CCCM'),
     ('early_recovery', 'Early Recovery'),
     ('education', 'Education'),
@@ -27,6 +27,10 @@ CLUSTER_TYPES = Choices(
     ('protection', 'Protection'),
     ('shelter', 'Shelter'),
     ('wash', 'WASH'),
+)
+
+CLUSTER_TYPES = DISPLAY_CLUSTER_TYPES + Choices(
+    ('imported', 'Imported'),
 )
 
 CLUSTER_TYPE_NAME_DICT = {
@@ -165,6 +169,11 @@ PARTNER_ACTIVITY_STATUS = Choices(
     ("Ong", "ongoing", "Ongoing"),
     ("Pla", "planned", "Planned"),
     ("Com", "completed", "Completed"),
+)
+
+EXTERNAL_DATA_SOURCES = Choices(
+    ("HPC", "HPC"),
+    ("OPS", "OPS"),
 )
 
 CURRENCIES = Choices(

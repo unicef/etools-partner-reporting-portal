@@ -1,12 +1,12 @@
 # from django.urls import reverse
 
-# from rest_framework import status
+# from rest_framework imports status
 
-# from core.tests.base import BaseAPITestCase
-# from core.common import FREQUENCY_LEVEL
-# from core.factories import UserFactory
+# from core.tests.base imports BaseAPITestCase
+# from core.common imports FREQUENCY_LEVEL
+# from core.factories imports UserFactory
 
-# from cluster.models import ClusterObjective, Cluster, ClusterActivity
+# from cluster.models imports ClusterObjective, Cluster, ClusterActivity
 
 
 # class TestClusterObjectiveAPIView(BaseAPITestCase):

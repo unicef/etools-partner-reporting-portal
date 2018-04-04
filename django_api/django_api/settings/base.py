@@ -20,10 +20,8 @@ from cryptography.x509 import load_pem_x509_certificate
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(os.path.join(BASE_DIR, 'apps/'))
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
+APPS_DIR = os.path.join(BASE_DIR, 'apps/')
+sys.path.append(APPS_DIR)
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY')
@@ -43,7 +41,7 @@ if not ENV:
 DATA_VOLUME = '/data'
 
 UPLOADS_DIR_NAME = 'uploads'
-MEDIA_URL = '/%s/' % UPLOADS_DIR_NAME
+MEDIA_URL = '/api/%s/' % UPLOADS_DIR_NAME
 
 FILE_UPLOAD_MAX_MEMORY_SIZE = 4194304  # 4mb
 MEDIA_ROOT = os.path.join(DATA_VOLUME, '%s' % UPLOADS_DIR_NAME)
@@ -64,6 +62,16 @@ DEFAULT_FROM_EMAIL = 'no-reply@etools.unicef.org'
 
 ALLOWED_HOSTS = []
 
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://redis:6379/0",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient"
+        },
+        "KEY_PREFIX": "PRP"
+    }
+}
 
 # Application definition
 
@@ -80,6 +88,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_swagger',
+    'rest_framework_gis',
     'drfpasswordless',
     'django_filters',
     'djcelery',
@@ -87,6 +96,7 @@ INSTALLED_APPS = [
     'suit',
     'easy_pdf',
     'django_cron',
+    'fixture_magic',
     'guardian',
 
     'account',
@@ -95,6 +105,7 @@ INSTALLED_APPS = [
     'indicator',
     'partner',
     'unicef',
+    'ocha',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -236,9 +247,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
-
 STATIC_URL = '/api/static/'
-# FORCE_SCRIPT_NAME = '/api/'
 
 # Authentication settings
 AUTH_USER_MODEL = 'account.User'
@@ -263,6 +272,12 @@ LOGGING = {
         },
     },
     'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'stream': sys.stdout,
+            'formatter': 'standard',
+        },
         'default': {
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',
@@ -280,7 +295,13 @@ LOGGING = {
         '': {
             'handlers': ['default'],
             'level': 'INFO',
-            'propagate': True},
+            'propagate': True
+        },
+        'ocha-sync': {
+            'handlers': ['default', 'console'],
+            'level': 'DEBUG',
+            'propagate': True
+        },
         'elasticapm.errors': {
             'level': 'ERROR',
             'handlers': ['default'],
@@ -354,6 +375,7 @@ REST_FRAMEWORK = {
     ),
     'DATE_FORMAT': PRINT_DATA_FORMAT,
     'DATE_INPUT_FORMATS': ['iso-8601', PRINT_DATA_FORMAT],
+    'EXCEPTION_HANDLER': 'utils.exception_handler.detailed_exception_handler',
 }
 
 
@@ -409,7 +431,7 @@ if not DISABLE_JWT_AUTH:
 
 # Django-Guardian
 AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend', # this is default
+    'django.contrib.auth.backends.ModelBackend',  # this is default
     'guardian.backends.ObjectPermissionBackend',
 )
 # apm related - it's enough to set those as env variables, here just for documentation
