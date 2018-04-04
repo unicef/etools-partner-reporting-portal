@@ -67,12 +67,8 @@ def import_project(external_project_id, response_plan=None):
     source_url = HPC_V2_ROOT_URL + 'project/{}'.format(external_project_id)
     project_data = get_json_from_url(source_url)
     serializer = V2PartnerProjectImportSerializer(data=project_data['data'])
-    try:
-        serializer.is_valid(raise_exception=True)
-        project = serializer.save()
-    except Exception:
-        logger.exception('Error saving Project')
-        return
+    serializer.is_valid(raise_exception=True)
+    project = serializer.save()
 
     from ocha.tasks import finish_partner_project_import
     finish_partner_project_import.delay(
