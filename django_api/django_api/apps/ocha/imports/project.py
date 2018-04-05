@@ -4,7 +4,7 @@ from indicator.models import IndicatorBlueprint, Reportable, ReportableLocationG
 from ocha.constants import HPC_V2_ROOT_URL, HPC_V1_ROOT_URL
 from ocha.imports.serializers import V2PartnerProjectImportSerializer
 from ocha.imports.utilities import get_json_from_url, save_location_list, logger
-from ocha.utilities import get_dict_from_list_by_key
+from ocha.utilities import get_dict_from_list_by_key, convert_to_json_ratio_value
 
 
 def import_project_details(project, current_version_id):
@@ -43,9 +43,9 @@ def import_project_details(project, current_version_id):
             locations = save_location_list(disaggregated['locations'])
             defaults = {
                 'blueprint': blueprint,
-                'target': target,
-                'in_need': in_need,
-                'baseline': baseline,
+                'target': convert_to_json_ratio_value(target),
+                'baseline': convert_to_json_ratio_value(baseline),
+                'in_need': convert_to_json_ratio_value(in_need),
                 'content_object': parent,
             }
 

@@ -43,3 +43,17 @@ def get_dict_from_list_by_key(dict_list, value, key='type'):
         return list(filter(filter_functon, dict_list))[0]
     except (KeyError, IndexError):
         return {}
+
+
+def convert_to_json_ratio_value(value):
+    """
+    Get value as converted to json kind of storage we're doing eg on Reportable
+    """
+    try:
+        value = float(value)
+    except Exception:
+        value = 0
+    return {
+        'v': value,
+        'd': 1,
+    }

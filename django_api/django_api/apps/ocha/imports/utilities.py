@@ -12,7 +12,7 @@ from core.models import Country, GatewayType, Location
 from indicator.models import Reportable, IndicatorBlueprint, Disaggregation, DisaggregationValue, ReportableLocationGoal
 from ocha.constants import HPC_V2_ROOT_URL
 from ocha.imports.bulk import fetch_json_urls_async
-from ocha.utilities import get_dict_from_list_by_key
+from ocha.utilities import get_dict_from_list_by_key, convert_to_json_ratio_value
 
 logger = logging.getLogger('ocha-sync')
 
@@ -142,29 +142,34 @@ def save_disaggregations(disaggregation_categories, response_plan=None):
 
     disaggregations = []
 
+    # TODO: if response plan is provided make sure external id's are unique (append?)
     for category in disaggregation_categories:
-        logger.debug('Disaggregations {}'.format(category['ids']))
-        # TODO: Fix for multiple ids
-        if category['ids'][0] in category_to_group:
-            group_data = category_to_group[category['ids'][0]]
-            disaggregation, _ = Disaggregation.objects.update_or_create(
-                external_source=EXTERNAL_DATA_SOURCES.HPC,
-                external_id=group_data['id'],
-                defaults={
-                    'name': group_data['label'],
-                    'response_plan': response_plan,
-                }
-            )
-            disaggregations.append(disaggregation)
+        for category_id in category['ids']:
+            if category_id in category_to_group:
+                group_data = category_to_group[category_id]
+                disaggregation, _ = Disaggregation.objects.update_or_create(
+                    external_source=EXTERNAL_DATA_SOURCES.HPC,
+                    external_id=group_data['id'],
+                    defaults={
+                        'name': group_data['label'],
+                        'response_plan': response_plan,
+                    }
+                )
+                disaggregations.append(disaggregation)
 
-            DisaggregationValue.objects.update_or_create(
-                external_source=EXTERNAL_DATA_SOURCES.HPC,
-                external_id=group_data['id'],
-                defaults={
-                    'value': category['label'],
-                    'disaggregation': disaggregation,
-                }
-            )
+                for category_data in group_data['disaggregationCategories']:
+                    if category_data['id'] == category_id:
+                        category_label = category_data['label']
+                        break
+
+                DisaggregationValue.objects.update_or_create(
+                    external_source=EXTERNAL_DATA_SOURCES.HPC,
+                    external_id=group_data['id'],
+                    defaults={
+                        'value': category_label,
+                        'disaggregation': disaggregation,
+                    }
+                )
 
     logger.debug('Saved {} disaggregations from {}'.format(
         len(disaggregations), disaggregation_categories
@@ -217,10 +222,14 @@ def save_reportables_for_cluster_objective_or_activity(objective_or_activity, at
             }
         )
 
+        target = get_dict_from_list_by_key(values, 'target').get('value', 0),
+        baseline = get_dict_from_list_by_key(values, 'baseline').get('value', 0),
+        in_need = get_dict_from_list_by_key(values, 'inNeed').get('value', 0),
+
         defaults = {
-            'target': get_dict_from_list_by_key(values, 'target').get('value', 0),
-            'baseline': get_dict_from_list_by_key(values, 'baseline').get('value', 0),
-            'in_need': get_dict_from_list_by_key(values, 'inNeed').get('value', 0),
+            'target': convert_to_json_ratio_value(target),
+            'baseline': convert_to_json_ratio_value(baseline),
+            'in_need': convert_to_json_ratio_value(in_need),
             'content_object': objective_or_activity,
             'blueprint': blueprint,
         }
