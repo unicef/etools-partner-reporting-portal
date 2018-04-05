@@ -164,6 +164,8 @@
 
           change.c = calculated;
 
+          console.log('field-value-changed', key, JSON.stringify(change));
+
           this.fire('field-value-changed', {
             key: key,
             value: change,
