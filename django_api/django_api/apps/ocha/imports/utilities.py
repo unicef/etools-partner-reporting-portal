@@ -145,8 +145,6 @@ def save_disaggregations(disaggregation_categories, response_plan=None):
     for category in disaggregation_categories:
         logger.debug('Disaggregations {}'.format(category['ids']))
         # TODO: Fix for multiple ids
-        if len(category['ids']) > 1:
-            logger.info('>>>>>>>>>>>> {}, {}'.format(category, response_plan))
         if category['ids'][0] in category_to_group:
             group_data = category_to_group[category['ids'][0]]
             disaggregation, _ = Disaggregation.objects.update_or_create(
