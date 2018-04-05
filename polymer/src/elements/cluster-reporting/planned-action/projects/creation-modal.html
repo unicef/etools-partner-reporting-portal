@@ -38,6 +38,8 @@
 <link rel="import" href="../../../../redux/actions.html">
 <link rel="import" href="../../../../styles/buttons.html">
 <link rel="import" href="../../../labelled-item.html">
+<link rel="import" href="../../../error-box.html">
+
 
 <dom-module id="planned-action-projects-modal">
   <template>
@@ -196,14 +198,14 @@
             </etools-single-selection-menu>
           </template>
 
-          <template
+          <!-- <template
             is="dom-if"
-            if="[[_displayPartnerReadOnly(permissions, edit)]]"
+            if="[[_displayPartner(permissions, edit)]]"
             restamp="true">
             <labelled-item class="item full-width" label="Partner">
               <span>[[data.partner]]</span>
             </labelled-item>
-          </template>
+          </template> -->
 
           <paper-radio-group
             id="mode"
@@ -253,6 +255,9 @@
                 if="[[_equals(mode, 'custom')]]"
                 restamp="true">
                 <div class="app-grid">
+                  <div class="item full-width">
+                    <error-box errors="[[errors]]"></error-box>
+                  </div>
                 <div class="item full-width">
                   <paper-input
                     class="validate"
@@ -673,7 +678,8 @@
         });
       },
 
-      _setDefaults: function () {
+      _setDefaults: function (edit) {
+        if (edit) { return }
         this.set('selectedProject', '');
         this.set('projectLoading', false);
         this.set('data', {});
@@ -710,13 +716,14 @@
             if (self.edit) {
               self.fire('project-edited', res.data);
               self.close();
+              self.set('errors', {});
             } else {
               self._redirectToDetail(res.data.id);
             }
           })
           .catch(function (err) { // jshint ignore:line
             self.updatePending = false;
-            // TODO: error handling
+            self.set('errors', err.data);
           });
       },
 
