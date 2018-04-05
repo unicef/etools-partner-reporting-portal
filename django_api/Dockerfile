@@ -41,13 +41,8 @@ RUN apt-get install -y --no-install-recommends \
     libgdal1-dev
 
 # Install Python tools
-RUN pip install --upgrade \
-    virtualenv \
-    # virtualenvwrapper \ I guess it's not needed!
-    fabric \
-    pip \
-    wheel \
-    --trusted-host pypi.python.org
+RUN pip install --upgrade pip --trusted-host pypi.python.org
+RUN pip install --upgrade fabric --trusted-host pypi.python.org
 
 # http://gis.stackexchange.com/a/74060
 ENV CPLUS_INCLUDE_PATH /usr/include/gdal
