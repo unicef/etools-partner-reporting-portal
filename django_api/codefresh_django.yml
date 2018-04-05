@@ -21,7 +21,7 @@ steps:
                     - proxy
                     - django_api
                     - db
-                command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 -timeout=120 && flake8 && python /code/manage.py test --settings=django_api.settings --failfast --noinput"
+                command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 -timeout=120 && flake8 && python /code/manage.py test --settings=django_api.settings --failfast --noinput  --parallel"
                 environment:
                     - POSTGRES_DB=etools_prp
                     - POSTGRES_USER=etools_prp_user
