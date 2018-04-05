@@ -486,6 +486,9 @@ class ReportableLocationGoal(TimeStampedModel):
     baseline = JSONField(default=dict([('d', 1), ('v', 0)]))
     in_need = JSONField(default=dict([('d', 1), ('v', 0)]), blank=True, null=True)
 
+    class Meta:
+        unique_together = ('reportable', 'location')
+
 
 class IndicatorReportManager(models.Manager):
     def active_reports(self):
