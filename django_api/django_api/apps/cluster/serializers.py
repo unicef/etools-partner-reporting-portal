@@ -58,6 +58,7 @@ class ClusterObjectivePatchSerializer(ClusterObjectiveSerializer):
 
 
 class ClusterActivitySerializer(serializers.ModelSerializer):
+    cluster_title = serializers.CharField(source='cluster_objective.cluster.title', read_only=True)
     cluster = serializers.IntegerField(source='cluster_objective.cluster.id')
 
     class Meta:
@@ -66,7 +67,7 @@ class ClusterActivitySerializer(serializers.ModelSerializer):
             'id',
             'title',
             'cluster',
-            'cluster_objective',
+            'cluster_title',
         )
 
 
