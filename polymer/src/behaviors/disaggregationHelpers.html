@@ -128,6 +128,7 @@
 
         _calculateLevel2: function (key, data) {
           var coords = getCoords(key);
+          var _data = this._clone(data);
 
           var x = coords[0];
           var y = coords[1];
@@ -148,11 +149,11 @@
           tmpTotals1[xKey] = sumDisaggValues(xFields);
           tmpTotals1[yKey] = sumDisaggValues(yFields);
 
-          data = Object.assign({}, data, tmpTotals1);
+          _data = Object.assign({}, _data, tmpTotals1);
 
           var tKey = formatKey('');
 
-          var tFields = extractFields(data, tRe);
+          var tFields = extractFields(_data, tRe);
 
           tmpTotals2[tKey] = sumDisaggValues(tFields, divideBy(2));
 
@@ -161,6 +162,7 @@
 
         _calculateLevel3: function (key, data) {
           var coords = getCoords(key);
+          var _data = this._clone(data);
 
           var x = coords[0];
           var y = coords[1];
@@ -190,25 +192,25 @@
           tmpTotals1[xzKey] = sumDisaggValues(xzFields);
           tmpTotals1[yzKey] = sumDisaggValues(yzFields);
 
-          data = Object.assign({}, data, tmpTotals1);
+          _data = Object.assign({}, _data, tmpTotals1);
 
           var xKey = formatKey(x, '');
           var yKey = formatKey(y, '');
           var zKey = formatKey(z, '');
 
-          var xFields = extractFields(data, xRe);
-          var yFields = extractFields(data, yRe);
-          var zFields = extractFields(data, zRe);
+          var xFields = extractFields(_data, xRe);
+          var yFields = extractFields(_data, yRe);
+          var zFields = extractFields(_data, zRe);
 
           tmpTotals2[xKey] = sumDisaggValues(xFields, divideBy(2));
           tmpTotals2[yKey] = sumDisaggValues(yFields);
           tmpTotals2[zKey] = sumDisaggValues(zFields);
 
-          data = Object.assign({}, data, tmpTotals2);
+          _data = Object.assign({}, _data, tmpTotals2);
 
           var tKey = formatKey('');
 
-          var tFields = extractFields(data, tRe);
+          var tFields = extractFields(_data, tRe);
 
           tmpTotals3[tKey] = sumDisaggValues(tFields, divideBy(3));
 

@@ -74,7 +74,6 @@ CACHES = {
 }
 
 # Application definition
-
 INSTALLED_APPS = [
     'elasticapm.contrib.django',
     'django.contrib.admin',
@@ -85,6 +84,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
 
+    'storages',
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_swagger',
@@ -127,7 +127,7 @@ CORS_ORIGIN_WHITELIST = (
     'etools-demo.unicef.org',
     'etools-test.unicef.org',
     'etools-staging.unicef.org',
-    'etools-dev.unicef.org'
+    'etools-dev.unicef.org',
 )
 
 ROOT_URLCONF = 'django_api.urls'
@@ -286,6 +286,14 @@ LOGGING = {
             'backupCount': 5,
             'formatter': 'standard'
         },
+        'ocha': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(LOGS_PATH, 'ocha.log'),
+            'maxBytes': 1024 * 1024 * 5,  # 5 MB
+            'backupCount': 5,
+            'formatter': 'standard'
+        },
         'elasticapm': {
             'level': 'ERROR',
             'class': 'elasticapm.contrib.django.handlers.LoggingHandler',
@@ -298,7 +306,7 @@ LOGGING = {
             'propagate': True
         },
         'ocha-sync': {
-            'handlers': ['default', 'console'],
+            'handlers': ['ocha', 'console'],
             'level': 'DEBUG',
             'propagate': True
         },
@@ -396,21 +404,33 @@ PMP_API_PASSWORD = os.getenv('PMP_API_PASSWORD')
 
 # assuming we're using Azure Storage:
 # django-storages: https://django-storages.readthedocs.io/en/latest/backends/azure.html
-AZURE_ACCOUNT_NAME = os.environ.get('AZURE_ACCOUNT_NAME', None)  # noqa: F405
-AZURE_ACCOUNT_KEY = os.environ.get('AZURE_ACCOUNT_KEY', None)  # noqa: F405
-AZURE_CONTAINER = os.environ.get('AZURE_CONTAINER', None)  # noqa: F405
-AZURE_SSL = True
-AZURE_AUTO_SIGN = True  # flag for automatically signing urls
-AZURE_ACCESS_POLICY_EXPIRY = 120  # length of time before signature expires in seconds
-AZURE_ACCESS_POLICY_PERMISSION = 'r'  # read permission
+AZURE_ACCOUNT_NAME = os.environ.get('AZURE_ACCOUNT_NAME', None)
+AZURE_ACCOUNT_KEY = os.environ.get('AZURE_ACCOUNT_KEY', None)
+AZURE_CONTAINER = os.environ.get('AZURE_CONTAINER', None)
+
+# Optionally can use S3
+AWS_S3_ACCESS_KEY_ID = os.environ.get('AWS_S3_ACCESS_KEY_ID', None)
+AWS_S3_SECRET_ACCESS_KEY = os.environ.get('AWS_S3_SECRET_ACCESS_KEY', None)
+AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME', None)
 
 if all([AZURE_ACCOUNT_NAME, AZURE_ACCOUNT_KEY, AZURE_CONTAINER]):
     DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
+    AZURE_SSL = True
+    AZURE_AUTO_SIGN = True  # flag for automatically signing urls
+    AZURE_ACCESS_POLICY_EXPIRY = 120  # length of time before signature expires in seconds
+    AZURE_ACCESS_POLICY_PERMISSION = 'r'  # read permission
+
     from storages.backends.azure_storage import AzureStorage
     storage = AzureStorage()
     with storage.open('keys/jwt/certificate.pem') as jwt_cert:
         with open('keys/jwt/certificate.pem', 'w+') as new_jwt_cert:
             new_jwt_cert.write(jwt_cert.read())
+elif all([AWS_S3_ACCESS_KEY_ID, AWS_S3_SECRET_ACCESS_KEY, AWS_STORAGE_BUCKET_NAME]):
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    AWS_S3_FILE_OVERWRITE = False
+    AWS_S3_SIGNATURE_VERSION = 's3v4'
+    AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'eu-central-1')
+
 
 # JWT Authentication
 # production overrides for django-rest-framework-jwt
@@ -440,4 +460,3 @@ AUTHENTICATION_BACKENDS = (
 # ELASTIC_APM_SERVICE_NAME=<app-name> # set app name visible on dashboard
 # ELASTIC_APM_SECRET_TOKEN=<app-token> #secret token - needs to be exact same as on apm-server
 # ELASTIC_APM_SERVER_URL=http://elastic.tivixlabs.com:8200 # apm-server url
-

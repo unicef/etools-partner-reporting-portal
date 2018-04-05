@@ -9,7 +9,7 @@ from requests.status_codes import codes
 from cluster.models import Cluster, ClusterObjective
 from core.common import EXTERNAL_DATA_SOURCES
 from core.models import Country, GatewayType, Location
-from indicator.models import Reportable, IndicatorBlueprint, Disaggregation, DisaggregationValue
+from indicator.models import Reportable, IndicatorBlueprint, Disaggregation, DisaggregationValue, ReportableLocationGoal
 from ocha.constants import HPC_V2_ROOT_URL
 from ocha.imports.bulk import fetch_json_urls_async
 from ocha.utilities import get_dict_from_list_by_key
@@ -217,16 +217,18 @@ def save_reportables_for_cluster_objective_or_activity(objective_or_activity, at
             }
         )
 
+        defaults = {
+            'target': get_dict_from_list_by_key(values, 'target').get('value', 0),
+            'baseline': get_dict_from_list_by_key(values, 'baseline').get('value', 0),
+            'in_need': get_dict_from_list_by_key(values, 'inNeed').get('value', 0),
+            'content_object': objective_or_activity,
+            'blueprint': blueprint,
+        }
+
         reportable, _ = Reportable.objects.update_or_create(
             external_id=attachment['id'],
             external_source=EXTERNAL_DATA_SOURCES.HPC,
-            defaults={
-                'target': get_dict_from_list_by_key(values, 'target').get('value', 0),
-                'baseline': get_dict_from_list_by_key(values, 'baseline').get('value', 0),
-                'in_need': get_dict_from_list_by_key(values, 'inNeed').get('value', 0),
-                'content_object': objective_or_activity,
-                'blueprint': blueprint,
-            }
+            defaults={k: v for k, v in defaults.items() if v}
         )
 
         try:
@@ -236,7 +238,13 @@ def save_reportables_for_cluster_objective_or_activity(objective_or_activity, at
             logger.debug('Saving {} locations for {}'.format(
                 len(locations), reportable
             ))
-            reportable.locations.add(*locations)
+
+            for location in locations:
+                ReportableLocationGoal.objects.get_or_create(
+                    reportable=reportable,
+                    location=location
+                )
+
             objective_or_activity.locations.add(*locations)
         except KeyError:
             logger.warning('No location info found for {}'.format(reportable))
