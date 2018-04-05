@@ -90,10 +90,10 @@
         display: block;
         padding-top: 16px;
       }
-/* <!-- 
+
       paper-radio-group > .fields {
         padding: calc(var(--app-grid-gutter) / 2) 0;
-      } --> */
+      } 
 
       paper-radio-group > .fields[empty] {
         padding: 0;
@@ -143,6 +143,14 @@
       timeout="100000"
       url="[[ochaProjectsUrl]]">
     </etools-prp-ajax>
+
+    <!-- <etools-prp-ajax
+      id="ochaProjectCreate"
+      timeout="100000"
+      body="[[data]]"
+      method="post"
+      url="[[ochaProjectsUrl]]">
+    </etools-prp-ajax> -->
 
     <etools-prp-ajax
       id="projectDetails"
@@ -244,9 +252,10 @@
                 is="dom-if"
                 if="[[_equals(mode, 'custom')]]"
                 restamp="true">
+                <div class="app-grid">
                 <div class="item full-width">
                   <paper-input
-                    class="item validate full-width"
+                    class="validate"
                     id="title"
                     label="Title"
                     value="{{data.title}}"
@@ -256,7 +265,7 @@
                   </paper-input>
                 </div>
 
-                <div class="row">
+                <div class="item full-width">
                   <etools-multi-selection-menu
                     class="validate"
                     label="Clusters"
@@ -289,7 +298,7 @@
                       no-init>
                   </etools-prp-date-input>
                 </div>
-
+                <div class="row">
                 <paper-dropdown-menu
                     class="item validate"
                     label="Status"
@@ -308,6 +317,7 @@
                     </template>
                   </paper-listbox>
                 </paper-dropdown-menu>
+                </div>
 
                 <paper-input
                   class="item validate"
@@ -346,6 +356,7 @@
                   type="string"
                   on-input="_validate">
                 </paper-input>
+                </div>
               </template>
             </div>
           </paper-radio-group>
@@ -414,7 +425,7 @@
 
         url: {
           type: String,
-          computed: '_computeUrl(responsePlanID)',
+          computed: '_computeUrl(responsePlanID, mode)',
         },
 
         ochaProjectsUrl: {
@@ -494,7 +505,9 @@
           computed: '_computeImoClusters(profile)',
         },
 
-        selectedClusters: Array,
+        selectedClusters: { 
+          type: Array,
+        },
 
         edit: {
           type: Boolean,
@@ -510,10 +523,17 @@
       observers: [
         '_fetchOchaProjectsList(mode, ochaProjectsUrl)',
         '_fetchOchaProjectDetails(selectedProject)',
+        '_saveClusters(selectedClusters.splices)',
       ],
 
-      _computeUrl: function(responsePlanID) {
-          return App.Endpoints.partnerProjectCreate(responsePlanID);
+      _computeUrl: function(responsePlanID, mode) {
+        if (mode === 'custom') { 
+        return App.Endpoints.partnerProjectCreate(responsePlanID)
+        } else {return App.Endpoints.ochaProjectsList(responsePlanID)}
+      },
+
+      _computeOchaProjectsUrl: function(responsePlanID) {
+        return App.Endpoints.ochaProjectsList(responsePlanID)
       },
 
       close: function () {
@@ -537,14 +557,6 @@
         this.set('refresh', true);
       },
 
-      // adjustPosition: function (e) {
-      //   e.stopPropagation();
-
-      //   this.debounce('adjust-position', function () {
-      //     this.$.dialog.refit();
-      //   }, 100);
-      // },
-
       _computeTitle: function(edit) {
         return (edit ? 'Edit' : 'Add') + ' Project';
       },
@@ -557,10 +569,6 @@
         return (profile.imo_clusters || []).map(function(cluster) {
           return cluster.id;
         });
-      },
-
-      _computeOchaProjectsUrl: function (responsePlanID) {
-        return App.Endpoints.ochaProjectsList(responsePlanID);
       },
 
       _fetchOchaProjectsList: function (mode) {
@@ -590,7 +598,10 @@
         return ({'project': selectedProject});
       },
 
-      _fetchOchaProjectDetails: function () {
+      _fetchOchaProjectDetails: function (project) {
+        if (!project) {
+          return;
+        }
         this.set('projectDetailsLoading', true);
         var self = this;
         this.$.projectDetails.abort();
@@ -624,6 +635,12 @@
 
       _savePartner: function(partner) {
         this.set('data.partner_id', partner.id);
+      },
+
+      _saveClusters: function() {
+        this.set('data.clusters', this.selectedClusters.map(function(cluster) {
+            return {'id': cluster};
+          }))
       },
 
       _displayPartner: function (permissions, edit) {
@@ -674,18 +691,12 @@
 
       _save: function () {
         var self = this;
-
-
-        this.data.clusters = this.selectedClusters.map(function(item) {
-          return {id: Number(item)};
-        });
-
         if (!this.data.partner_id) {
           this.data.partner_id = this.partnerID;
         }
 
         if (this.mode === 'ocha') {
-          this.$.projectAjax.body = this.projectDetails
+          this.$.projectAjax.body = this.ochaProjectRequestId
         } else {
           this.$.projectAjax.body = Object.assign({}, this.data);
         }
