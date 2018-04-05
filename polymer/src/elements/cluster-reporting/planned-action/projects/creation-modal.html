@@ -110,7 +110,7 @@
       paper-dropdown-menu {
         width: 100%;
       }
-      
+
     </style>
 
     <etools-prp-permissions
@@ -181,7 +181,7 @@
               options="[[partners]]"
               option-value="id"
               option-label="title"
-              selected="{{selectedPartner}}"
+              selected="{{data.partner_id}}"
               on-iron-activate="_validate"
               trigger-value-change-event
               required>
@@ -476,14 +476,12 @@
         },
 
         selectedPartner: {
-          type: String,
-          value: '',
+          type: Number,
           observer: '_savePartner',
         },
 
         selectedProject: {
           type: String,
-          value: '',
         },
 
         profile: {
@@ -515,7 +513,7 @@
       ],
 
       _computeUrl: function(responsePlanID) {
-          return App.Endpoints.plannedActionsProjectOverview(responsePlanID);
+          return App.Endpoints.partnerProjectCreate(responsePlanID);
       },
 
       close: function () {
@@ -596,7 +594,6 @@
         this.set('projectDetailsLoading', true);
         var self = this;
         this.$.projectDetails.abort();
-        this.$.project
 
         this.$.projectDetails.thunk()()
           .then(function (res) {
@@ -626,7 +623,7 @@
       },
 
       _savePartner: function(partner) {
-        this.set('data.partner', partner);
+        this.set('data.partner_id', partner.id);
       },
 
       _displayPartner: function (permissions, edit) {
@@ -678,23 +675,24 @@
       _save: function () {
         var self = this;
 
-        var valid = [
-          this._fieldsAreValid(),
-          this._dateRangeValid('.start-date', '.end-date'),
-        ].every(Boolean);
 
-        if (!valid) {
-          return;
-        }
         this.data.clusters = this.selectedClusters.map(function(item) {
           return {id: Number(item)};
         });
 
-        if (!this.data.partner) {
-          this.data.partner = this.partnerID;
+        if (!this.data.partner_id) {
+          this.data.partner_id = this.partnerID;
         }
+
+        if (this.mode === 'ocha') {
+          this.$.projectAjax.body = this.projectDetails
+        } else {
+          this.$.projectAjax.body = Object.assign({}, this.data);
+        }
+
         this.updatePending = true;
         var thunk = this.$.projectAjax.thunk();
+        
         thunk()
           .then(function (res) {
             self.updatePending = false;
