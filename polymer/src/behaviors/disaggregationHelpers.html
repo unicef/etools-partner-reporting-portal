@@ -55,12 +55,6 @@
           transform = identity;
         }
 
-        try {
-          console.log('sumDisaggValues', App.Behaviors.UtilsBehavior._clone(fields));
-        } catch (err) {
-          console.log(err);
-        }
-
         result = fields.reduce(function (acc, curr) {
           ['v', 'd'].forEach(function (key) {
             if (typeof curr[key] !== 'undefined') {
@@ -76,8 +70,6 @@
         if (c === c) {
           result.c = c;
         }
-
-        console.log('result', result, App.Behaviors.UtilsBehavior._clone(result));
 
         return result;
       }
@@ -136,6 +128,7 @@
 
         _calculateLevel2: function (key, data) {
           var coords = getCoords(key);
+          var _data = this._clone(data);
 
           var x = coords[0];
           var y = coords[1];
@@ -156,7 +149,7 @@
           tmpTotals1[xKey] = sumDisaggValues(xFields);
           tmpTotals1[yKey] = sumDisaggValues(yFields);
 
-          var _data = Object.assign({}, data, tmpTotals1);
+          _data = Object.assign({}, _data, tmpTotals1);
 
           var tKey = formatKey('');
 
@@ -169,6 +162,7 @@
 
         _calculateLevel3: function (key, data) {
           var coords = getCoords(key);
+          var _data = this._clone(data);
 
           var x = coords[0];
           var y = coords[1];
@@ -198,7 +192,7 @@
           tmpTotals1[xzKey] = sumDisaggValues(xzFields);
           tmpTotals1[yzKey] = sumDisaggValues(yzFields);
 
-          var _data = Object.assign({}, data, tmpTotals1);
+          _data = Object.assign({}, _data, tmpTotals1);
 
           var xKey = formatKey(x, '');
           var yKey = formatKey(y, '');
