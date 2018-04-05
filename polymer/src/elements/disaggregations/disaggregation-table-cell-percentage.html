@@ -156,12 +156,10 @@
 
           change.c = calculated;
 
-          this.async(function () {
-            this.fire('field-value-changed', {
-              key: key,
-              value: change,
-              internal: true,
-            });
+          this.fire('field-value-changed', {
+            key: key,
+            value: change,
+            internal: true,
           });
         }
 
