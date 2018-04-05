@@ -151,6 +151,10 @@
           d.validate();
         }
 
+        if (typeof value.d !== 'undefined') {
+          v.validate();
+        }
+
         change = Object.assign({}, this.get('localData'), value);
 
         if (v.invalid || d.invalid) {

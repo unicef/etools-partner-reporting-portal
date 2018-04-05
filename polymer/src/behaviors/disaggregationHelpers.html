@@ -55,6 +55,12 @@
           transform = identity;
         }
 
+        try {
+          console.log('sumDisaggValues', App.Behaviors.UtilsBehavior._clone(fields));
+        } catch (err) {
+          console.log(err);
+        }
+
         result = fields.reduce(function (acc, curr) {
           ['v', 'd'].forEach(function (key) {
             if (typeof curr[key] !== 'undefined') {
