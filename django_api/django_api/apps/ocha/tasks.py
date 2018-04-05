@@ -46,7 +46,7 @@ def finish_partner_project_import(project_id, response_plan_id=None):
         funding_serializer.is_valid(raise_exception=True)
         funding_serializer.save()
     except Exception:
-        logger.exception('No funding data found for project_id: {}'.format(external_project_id))
+        logger.warning('No funding data found for project_id: {}'.format(external_project_id))
 
     clusters = []
     if not response_plan_id:

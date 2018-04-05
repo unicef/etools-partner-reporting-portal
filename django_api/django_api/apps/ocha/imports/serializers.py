@@ -253,17 +253,13 @@ class V1ResponsePlanImportSerializer(DiscardUniqueTogetherValidationMixin, seria
             raise serializers.ValidationError('No overall emergency named for multi country plan')
         # TODO: Handling of duplicate workspace codes
 
-        update_or_create_kwargs = {
-            'external_source': EXTERNAL_DATA_SOURCES.HPC,
-            'external_id': workspace_id
-        }
-
         workspace, _ = Workspace.objects.update_or_create(
+            workspace_code=workspace_code,
             defaults={
                 'title': workspace_title,
-                'workspace_code': workspace_code,
-            },
-            **update_or_create_kwargs
+                'external_source': EXTERNAL_DATA_SOURCES.HPC,
+                'external_id': workspace_id
+            }
         )
 
         location_serializer = V1ResponsePlanLocationImportSerializer(
