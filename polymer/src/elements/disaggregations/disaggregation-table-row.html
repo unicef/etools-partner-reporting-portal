@@ -41,13 +41,13 @@
             </disaggregation-table-cell-percentage>
           </template>
           <template
-            is="dom-if"
-            if="[[_equals(indicatorType, 'ratio')]]"
-            restamp="true">
+              is="dom-if"
+              if="[[_equals(indicatorType, 'ratio')]]"
+              restamp="true">
             <disaggregation-table-cell-ratio
-              coords="[[item.key]]"
-              data="[[item.data]]"
-              editable="[[editable]]">
+                coords="[[item.key]]"
+                data="[[item.data]]"
+                editable="[[editable]]">
             </disaggregation-table-cell-ratio>
           </template>
         </td>
@@ -79,13 +79,13 @@
             </disaggregation-table-cell-percentage>
           </template>
           <template
-            is="dom-if"
-            if="[[_equals(indicatorType, 'ratio')]]"
-            restamp="true">
+              is="dom-if"
+              if="[[_equals(indicatorType, 'ratio')]]"
+              restamp="true">
             <disaggregation-table-cell-ratio
-              coords="[[item.key]]"
-              data="[[item.data]]"
-              editable="[[totalEditable]]">
+                coords="[[data.total.key]]"
+                data="[[data.total.data]]"
+                editable="[[totalEditable]]">
             </disaggregation-table-cell-ratio>
           </template>
         </td>
