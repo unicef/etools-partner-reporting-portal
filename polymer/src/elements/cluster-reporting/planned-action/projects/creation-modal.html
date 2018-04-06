@@ -124,7 +124,7 @@
     <cluster-dropdown-content clusters="{{clusters}}"></cluster-dropdown-content>
     <template
     is="dom-if"
-    if="[[_displayPartner(permissions, edit)]]"
+    if="[[permissions.addPartnerToProject]]"
     restamp="true">
       <partner-dropdown-content
         partners="{{partners}}"
@@ -145,14 +145,6 @@
       timeout="100000"
       url="[[ochaProjectsUrl]]">
     </etools-prp-ajax>
-
-    <!-- <etools-prp-ajax
-      id="ochaProjectCreate"
-      timeout="100000"
-      body="[[data]]"
-      method="post"
-      url="[[ochaProjectsUrl]]">
-    </etools-prp-ajax> -->
 
     <etools-prp-ajax
       id="projectDetails"
@@ -520,15 +512,15 @@
         },
       },
 
-      // listeners: {
-      //   'details-loaded': 'adjustPosition',
-      //   'mode.selected-changed': 'adjustPosition',
-      // },
+      listeners: {
+        'details-loaded': 'adjustPosition',
+      },
 
       observers: [
         '_fetchOchaProjectsList(mode, ochaProjectsUrl)',
         '_fetchOchaProjectDetails(selectedProject)',
         '_saveClusters(selectedClusters.splices)',
+        // '_adjustPosition(projectDetails)',
       ],
 
       _computeUrl: function(responsePlanID, mode) {
@@ -616,6 +608,7 @@
             self.set('projectDetailsLoading', false);
             self.set('projectDetails', res.data);
             self.fire('details-loaded', this.name);
+
           })
           .catch(function (err) { // jshint ignore:line
             if (err.code === 504) {
@@ -689,7 +682,6 @@
 
       _adjustPosition: function (e) {
         e.stopPropagation();
-
         this.debounce('adjust-position', function () {
           this.$.dialog.refit();
         }, 100);
