@@ -325,6 +325,7 @@ class TestPartnerProjectAPIView(BaseAPITestCase):
             'start_date': '2018-01-01',
             'end_date': '2013-01-01',
             'partner_id': rp.clusters.first().partners.first().id,
+            'clusters': ClusterSimpleSerializer(rp.clusters.all(), many=True).data
         }
 
         url = reverse("partner-project-create", kwargs={'response_plan_pk': rp.pk})

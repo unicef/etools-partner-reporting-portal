@@ -131,82 +131,82 @@
               <ul class="app-grid">
                 <li class="item">
                   <labelled-item label="Name of Agency (acronyms)">
-                    <span class="value">[[_withDefault(projectData.acronym)]]</span>
+                    <span class="value">[[_withDefault(projectData.agency_name)]]</span>
                   </labelled-item>
                 </li>
                <li class="item">
                   <labelled-item label="Type of Agency">
-                    <span class="value">[[_withDefault(projectData.agencyType)]]</span>
+                    <span class="value">[[_withDefault(projectData.agency_type)]]</span>
                   </labelled-item>
                </li>
               <li class="item full-width">
                 <labelled-item label="Additional implementing partners">
-                  <span class="value">[[_withDefault(projectData.additional_implementing_partners)]]</span>
+                  <span class="value">[[_withDefault(projectData.additional_partners)]]</span>
                 </labelled-item>
               </li>
               <li class="item">
                 <labelled-item label="Prioritization Classification">
-                  <span class="value">[[_withDefault(projectData.classifications)]]</span>
+                  <span class="value">[[_withDefault(projectData.prioritization)]]</span>
                 </labelled-item>
               </li>
               <li class="item">
                 <labelled-item label="Project code in HRP">
-                  <span class="value">[[_withDefault(projectData.projectCode)]]</span>
+                  <span class="value">[[_withDefault(projectData.code)]]</span>
                 </labelled-item>
               </li>
               <li class="item full-width">
                 <labelled-item label="Funding Requirements (US$)">
                     <span class="value">
-                      <etools-prp-number value="[[_withDefault(projectData.funding_requirements, 0)]]"></etools-prp-number>
+                      <etools-prp-number value="[[_withDefault(projectData.funding.required_funding, 0)]]"></etools-prp-number>
                     </span>
                   </labelled-item>
               </li>
               <li class="item full-width">
                 <labelled-item label="Funding received / confirmed through own agency internal emergency funding mechanisms (US$)">
                   <span class="value">
-                    <etools-prp-number value="[[_withDefault(projectData.own_funding, 0)]]"></etools-prp-number>
+                    <etools-prp-number value="[[_withDefault(projectData.funding.internal_funding, 0)]]"></etools-prp-number>
                   </span>
                 </labelled-item>
               </li>
               <li class="item full-width">
                 <labelled-item label="Funding received / confirmed from CERF (US$)">
                   <span class="value">
-                    <etools-prp-number value="[[_withDefault(projectData.cerf_funding, 0)]]"></etools-prp-number>
+                    <etools-prp-number value="[[_withDefault(projectData.funding.cerf_funding, 0)]]"></etools-prp-number>
                   </span>
                 </labelled-item>
               </li>
               <li class="item full-width">
                 <labelled-item label="Funding received / confirmed from CBPF (Country based pooled funds), eg. CHF, ERF (US$)">
                   <span class="value">
-                    <etools-prp-number value="[[_withDefault(projectData.ccbpf_funding, 0)]]"></etools-prp-number>
+                    <etools-prp-number value="[[_withDefault(projectData.funding.cbpf_funding, 0)]]"></etools-prp-number>
                   </span>
                 </labelled-item>
               </li>
               <li class="item full-width">
-                <labelled-item label="Funding received / confirmed from bilateral agreeements, not including UNICEF/WFP (US$)">
+                <labelled-item label="Funding received / confirmed from bilateral agreements, not including UNICEF/WFP (US$)">
                   <span class="value">
-                    <etools-prp-number value="[[_withDefault(projectData.bilateral_funding, 0)]]"></etools-prp-number>
+                    <etools-prp-number value="[[_withDefault(projectData.funding.bilateral_funding, 0)]]"></etools-prp-number>
                   </span>
                 </labelled-item>
              </li>
              <li class="item full-width">
               <labelled-item label="Funding received / confirmed from UNICEF including supplies cost (US$)">
                 <span class="value">
-                  <etools-prp-number value="[[_withDefault(projectData.unicef_funding, 0)]]"></etools-prp-number>
+                  <etools-prp-number value="[[_withDefault(projectData.funding.unicef_funding, 0)]]"></etools-prp-number>
                 </span>
               </labelled-item>
             </li>
             <li class="item full-width">
               <labelled-item label="Funding received / confirmed from WFP including supplies cost (US$)">
                 <span class="value">
-                  <etools-prp-number value="[[_withDefault(projectData.wfp_funding, 0)]]"></etools-prp-number>
+                  <etools-prp-number value="[[_withDefault(projectData.funding.wfp_funding, 0)]]"></etools-prp-number>
                 </span>
               </labelled-item>
             </li>
             <li class="item full-width">
               <labelled-item label="Funding gap (US$)">
                   <span class="value">
-                    <etools-prp-number value="[[_withDefault(projectData.funding_gap, 0)]]"></etools-prp-number>
+                    <etools-prp-number value="[[_withDefault(projectData.funding.funding_gap, 0)]]"></etools-prp-number>
                   </span>
               </labelled-item>
             </li>
