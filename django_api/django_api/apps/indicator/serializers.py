@@ -945,8 +945,13 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
         self.instance = Reportable.objects.create(**validated_data)
 
+        location_ids = [l['location'].id for l in locations]
+
+        if len(location_ids) != len(set(location_ids)):
+            raise ValidationError("Duplicated locations are not allowed")
+
         location_queryset = Location.objects.filter(
-            id__in=[l['location'].id for l in locations]
+            id__in=location_ids
         )
         self.check_location_admin_levels(location_queryset)
 
