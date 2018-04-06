@@ -867,7 +867,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 {"baseline": "Cannot be greater than target"}
             )
 
-        if 'in_need' in validated_data \
+        if 'in_need' in validated_data and validated_data['in_need'] \
                 and float(validated_data['target']['v']) > float(validated_data['in_need']['v']):
             raise ValidationError(
                 {"target": "Cannot be greater than In Need"}
@@ -879,7 +879,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         if 'd' not in validated_data['target']:
             validated_data['target']['d'] = 1
 
-        if 'in_need' in validated_data \
+        if 'in_need' in validated_data and validated_data['in_need'] \
                 and 'd' not in validated_data['in_need']:
             validated_data['in_need']['d'] = 1
 
