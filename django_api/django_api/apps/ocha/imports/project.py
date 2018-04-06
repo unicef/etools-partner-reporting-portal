@@ -1,10 +1,10 @@
 from cluster.models import ClusterActivity
 from core.common import EXTERNAL_DATA_SOURCES
-from indicator.models import IndicatorBlueprint, Reportable
+from indicator.models import IndicatorBlueprint, Reportable, ReportableLocationGoal
 from ocha.constants import HPC_V2_ROOT_URL, HPC_V1_ROOT_URL
 from ocha.imports.serializers import V2PartnerProjectImportSerializer
 from ocha.imports.utilities import get_json_from_url, save_location_list, logger
-from ocha.utilities import get_dict_from_list_by_key
+from ocha.utilities import get_dict_from_list_by_key, convert_to_json_ratio_value
 
 
 def import_project_details(project, current_version_id):
@@ -41,20 +41,26 @@ def import_project_details(project, current_version_id):
             baseline = get_dict_from_list_by_key(totals, 'Baseline', key='name.en')['value']
 
             locations = save_location_list(disaggregated['locations'])
+            defaults = {
+                'blueprint': blueprint,
+                'target': convert_to_json_ratio_value(target),
+                'baseline': convert_to_json_ratio_value(baseline),
+                'in_need': convert_to_json_ratio_value(in_need),
+                'content_object': parent,
+            }
 
             reportable, _ = Reportable.objects.update_or_create(
                 external_source=EXTERNAL_DATA_SOURCES.HPC,
                 external_id=attachment['attachment']['id'],
-                defaults={
-                    'blueprint': blueprint,
-                    'target': target,
-                    'in_need': in_need,
-                    'baseline': baseline,
-                    'content_object': parent,
-                }
+                defaults={k: v for k, v in defaults.items() if v}
             )
 
-            reportable.locations.add(*locations)
+            for location in locations:
+                ReportableLocationGoal.objects.get_or_create(
+                    reportable=reportable,
+                    location=location
+                )
+
             reportables.append(reportable)
 
     logger.debug('Saving {} reportables for {}'.format(

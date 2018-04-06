@@ -125,15 +125,14 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
         return validated_data
 
     def create(self, validated_data):
-        clusters_serializer = ClusterSimpleSerializer(
-            many=True, allow_empty=False, data=self.initial_data.get('clusters')
-        )
-        if not clusters_serializer.is_valid():
+        clusters = self.initial_data.pop('clusters', [])
+        if not clusters:
             raise serializers.ValidationError({
                 'clusters': 'This list cannot be empty'
             })
 
         project = super(PartnerProjectSerializer, self).create(validated_data)
+        project.clusters.add(*Cluster.objects.filter(id__in=[c['id'] for c in clusters]))
         return project
 
 
