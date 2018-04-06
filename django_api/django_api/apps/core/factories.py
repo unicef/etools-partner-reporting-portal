@@ -527,6 +527,9 @@ class ProgressReportFactory(factory.django.DjangoModelFactory):
     due_date = start_date + datetime.timedelta(days=45)
 
     class Meta:
+        django_get_or_create = (
+            'programme_document', 'report_type', 'report_number'
+        )
         model = ProgressReport
 
 

@@ -142,34 +142,21 @@ def save_disaggregations(disaggregation_categories, response_plan=None):
 
     disaggregations = []
 
-    # TODO: if response plan is provided make sure external id's are unique (append?)
     for category in disaggregation_categories:
         for category_id in category['ids']:
             if category_id in category_to_group:
                 group_data = category_to_group[category_id]
                 disaggregation, _ = Disaggregation.objects.update_or_create(
-                    external_source=EXTERNAL_DATA_SOURCES.HPC,
-                    external_id=group_data['id'],
-                    defaults={
-                        'name': group_data['label'],
-                        'response_plan': response_plan,
-                    }
+                    name=group_data['label'],
+                    response_plan=response_plan
                 )
                 disaggregations.append(disaggregation)
 
                 for category_data in group_data['disaggregationCategories']:
-                    if category_data['id'] == category_id:
-                        category_label = category_data['label']
-                        break
-
-                DisaggregationValue.objects.update_or_create(
-                    external_source=EXTERNAL_DATA_SOURCES.HPC,
-                    external_id=group_data['id'],
-                    defaults={
-                        'value': category_label,
-                        'disaggregation': disaggregation,
-                    }
-                )
+                    DisaggregationValue.objects.update_or_create(
+                        value=category_data['label'],
+                        disaggregation=disaggregation
+                    )
 
     logger.debug('Saved {} disaggregations from {}'.format(
         len(disaggregations), disaggregation_categories
