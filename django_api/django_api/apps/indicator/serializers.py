@@ -290,7 +290,7 @@ class IndicatorListSerializer(ReportableSimpleSerializer):
 
     def get_total_against_in_need(self, obj):
         target = float(obj.calculated_target) if obj.calculated_target else 1.0
-        return float(obj.calculated_in_need) / target if obj.in_need else 0
+        return target / float(obj.calculated_in_need) if obj.in_need else 0
 
     def get_total_against_target(self, obj):
         target = float(obj.calculated_target) if obj.calculated_target else 1.0
@@ -1436,7 +1436,7 @@ class ClusterAnalysisIndicatorsListSerializer(serializers.ModelSerializer):
 
     def get_total_against_in_need(self, obj):
         target = float(obj.calculated_target) if obj.calculated_target else 1.0
-        return float(obj.calculated_in_need) / target if obj.in_need else 0
+        return target / float(obj.calculated_in_need) if obj.in_need else 0
 
     def get_total_against_target(self, obj):
         target = float(obj.calculated_target) if obj.calculated_target else 1.0
