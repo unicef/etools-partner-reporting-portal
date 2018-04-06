@@ -2,6 +2,7 @@
 <link rel="import" href="../../../../bower_components/google-chart/google-chart.html">
 
 <link rel="import" href="analysis-widget.html">
+<link rel="import" href="../../list-placeholder.html">
 <link rel="import" href="../../../behaviors/utils.html">
 <link rel="import" href="../../../behaviors/analysis-chart.html">
 <link rel="import" href="../../../polyfills/es6-shim.html">
@@ -19,13 +20,20 @@
       }
     </style>
 
-    <analysis-widget widget-title="Current progress by Location">
-      <google-chart
-          type="bar"
-          options="[[options]]"
-          cols="[[cols]]"
-          rows="[[rows]]">
-      </google-chart>
+    <analysis-widget widget-title="[[widgetTitle]]">
+      <div hidden$="[[!rows.length]]">
+        <google-chart
+            type="bar"
+            options="[[options]]"
+            cols="[[cols]]"
+            rows="[[rows]]">
+        </google-chart>
+      </div>
+
+      <list-placeholder
+          data="[[rows]]"
+          message="No data for [[widgetTitle]] yet.">
+      </list-placeholder>
     </analysis-widget>
   </template>
 
@@ -40,6 +48,11 @@
 
       properties: {
         data: Object,
+
+        widgetTitle: {
+          type: String,
+          value: 'Current progress by Location',
+        },
 
         cols: {
           type: Array,

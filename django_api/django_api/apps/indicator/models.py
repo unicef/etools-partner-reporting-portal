@@ -19,7 +19,7 @@ from core.common import (
     PROGRESS_REPORT_STATUS,
     OVERALL_STATUS,
     FINAL_OVERALL_STATUS)
-from core.models import TimeStampedExternalSyncModelMixin, TimeStampedExternalSourceModel
+from core.models import TimeStampedExternalSourceModel
 from functools import reduce
 
 from indicator.disaggregators import (
@@ -29,7 +29,7 @@ from indicator.disaggregators import (
 from indicator.constants import ValueType
 
 
-class Disaggregation(TimeStampedExternalSyncModelMixin):
+class Disaggregation(TimeStampedExternalSourceModel):
     """
     Disaggregation module. For example: <Gender, Age>
 
@@ -37,9 +37,10 @@ class Disaggregation(TimeStampedExternalSyncModelMixin):
         core.ResponsePlan (ForeignKey): "response_plan"
     """
     name = models.CharField(max_length=255, verbose_name="Disaggregation by")
-    response_plan = models.ForeignKey('core.ResponsePlan',
-                                      related_name="disaggregations",
-                                      blank=True, null=True)    # IP reporting ones won't have this fk.
+    # IP reporting ones won't have this fk.
+    response_plan = models.ForeignKey(
+        'core.ResponsePlan', related_name="disaggregations", blank=True, null=True
+    )
     active = models.BooleanField(default=True)
 
     class Meta:
@@ -49,7 +50,7 @@ class Disaggregation(TimeStampedExternalSyncModelMixin):
         return "Disaggregation <pk:%s> %s" % (self.id, self.name)
 
 
-class DisaggregationValue(TimeStampedExternalSyncModelMixin):
+class DisaggregationValue(TimeStampedExternalSourceModel):
     """
     Disaggregation Value module. For example: Gender <Male, Female, Other>
 
@@ -132,13 +133,15 @@ class IndicatorBlueprint(TimeStampedExternalSourceModel):
     disaggregatable = models.BooleanField(default=False)
 
     calculation_formula_across_periods = models.CharField(
-        max_length=10, choices=CALC_CHOICES, default=SUM)
+        max_length=10, choices=CALC_CHOICES, default=SUM
+    )
     calculation_formula_across_locations = models.CharField(
-        max_length=10, choices=CALC_CHOICES, default=SUM)
+        max_length=10, choices=CALC_CHOICES, default=SUM
+    )
 
-    display_type = models.CharField(max_length=10,
-                                    choices=DISPLAY_TYPE_CHOICES,
-                                    default=NUMBER)
+    display_type = models.CharField(
+        max_length=10, choices=DISPLAY_TYPE_CHOICES, default=NUMBER
+    )
 
     # TODO: add:
     # siblings (similar indicators to this indicator)
@@ -219,15 +222,14 @@ class Reportable(TimeStampedExternalSourceModel):
     baseline = JSONField(default=dict([('d', 1), ('v', 0)]))
     in_need = JSONField(blank=True, null=True)
     assumptions = models.TextField(null=True, blank=True)
-    means_of_verification = models.CharField(max_length=255,
-                                             null=True,
-                                             blank=True)
+    means_of_verification = models.CharField(max_length=255, null=True, blank=True)
     comments = models.TextField(max_length=4048, blank=True, null=True)
     measurement_specifications = models.TextField(max_length=4048, blank=True, null=True)
     label = models.TextField(max_length=4048, blank=True, null=True)
     numerator_label = models.CharField(max_length=256, blank=True, null=True)
     denominator_label = models.CharField(max_length=256, blank=True, null=True)
     start_date_of_reporting_period = models.DateField(blank=True, null=True)
+
     is_cluster_indicator = models.BooleanField(default=False)
     contributes_to_partner = models.BooleanField(default=False)
 
@@ -237,18 +239,17 @@ class Reportable(TimeStampedExternalSourceModel):
 
     # unique code for this indicator within the current context
     # eg: (1.1) result code 1 - indicator code 1
-    context_code = models.CharField(max_length=50,
-                                    null=True,
-                                    blank=True,
-                                    verbose_name="Code in current context")
+    context_code = models.CharField(
+        max_length=50, null=True, blank=True, verbose_name="Code in current context"
+    )
 
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     # One of ClusterObjective, ClusterActivity, PartnerProject, PartnerActivity
     content_object = GenericForeignKey('content_type', 'object_id')
-    blueprint = models.ForeignKey(IndicatorBlueprint,
-                                  null=True,
-                                  related_name="reportables")
+    blueprint = models.ForeignKey(
+        IndicatorBlueprint, null=True, related_name="reportables"
+    )
     parent_indicator = models.ForeignKey('self', null=True, blank=True,
                                          related_name='children',
                                          db_index=True)
@@ -268,8 +269,9 @@ class Reportable(TimeStampedExternalSourceModel):
     cs_dates = ArrayField(
         models.DateField(), default=list, null=True, blank=True
     )
-    location_admin_refs = ArrayField(JSONField(), default=list, null=True,
-                                     blank=True)
+    location_admin_refs = ArrayField(
+        JSONField(), default=list, null=True, blank=True
+    )
     disaggregations = models.ManyToManyField(Disaggregation, blank=True)
 
     active = models.BooleanField(default=True)
@@ -483,6 +485,9 @@ class ReportableLocationGoal(TimeStampedModel):
     target = JSONField(default=dict([('d', 1), ('v', 0)]))
     baseline = JSONField(default=dict([('d', 1), ('v', 0)]))
     in_need = JSONField(default=dict([('d', 1), ('v', 0)]), blank=True, null=True)
+
+    class Meta:
+        unique_together = ('reportable', 'location')
 
 
 class IndicatorReportManager(models.Manager):

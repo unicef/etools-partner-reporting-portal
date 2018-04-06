@@ -1,12 +1,14 @@
 import logging
+from collections import defaultdict
 
-from django.core.exceptions import MultipleObjectsReturned
+from django.utils import timezone
 from rest_framework import serializers
 
 from cluster.models import Cluster
-from core.common import EXTERNAL_DATA_SOURCES, CLUSTER_TYPES, RESPONSE_PLAN_TYPE
-from core.models import Country, ResponsePlan, Workspace, Location, GatewayType
-from partner.models import PartnerProject, Partner, FundingSource
+from core.common import EXTERNAL_DATA_SOURCES, CLUSTER_TYPES, RESPONSE_PLAN_TYPE, PARTNER_PROJECT_STATUS
+from core.models import Country, ResponsePlan, Workspace, Location
+from ocha.imports.utilities import save_location_list
+from partner.models import PartnerProject, Partner
 
 
 logger = logging.getLogger('ocha-sync')
@@ -65,6 +67,7 @@ class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, ser
     external_source = serializers.CharField(default=EXTERNAL_DATA_SOURCES.HPC)
     id = serializers.IntegerField(source='external_id')
     name = serializers.CharField(source='title')
+    objective = serializers.CharField(source='description', allow_null=True)
     startDate = serializers.DateTimeField(source='start_date')
     endDate = serializers.DateTimeField(source='end_date')
     organizations = PartnerImportSerializer(many=True)
@@ -75,6 +78,7 @@ class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, ser
         model = PartnerProject
         fields = (
             'name',
+            'objective',
             'id',
             'startDate',
             'endDate',
@@ -84,26 +88,38 @@ class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, ser
             'locations',
         )
 
+    def get_status(self):
+        today = timezone.now()
+        if self.validated_data['start_date'] > today:
+            return PARTNER_PROJECT_STATUS.planned
+        elif self.validated_data['end_date'] < today:
+            return PARTNER_PROJECT_STATUS.completed
+        else:
+            return PARTNER_PROJECT_STATUS.ongoing
+
     def create(self, validated_data):
-        partners = []
-        for partner_data in validated_data.pop('organizations', []):
-            update_or_create_kwargs = {
-                'external_source': partner_data.pop('external_source'),
-                'external_id': partner_data.pop('external_id')
-            }
-
-            partners.append(Partner.objects.update_or_create(
-                defaults=partner_data, **update_or_create_kwargs
-            )[0])
-
-        if len(partners) > 1:
+        partner_data_list = validated_data.pop('organizations', [])
+        if len(partner_data_list) > 1:
             # While the schema seems to support more than one org we're told it's unlikely to occur
             raise serializers.ValidationError({
                 'organizations': 'More than one organization per project is not supported'
             })
 
-        validated_data['partner'] = partners[0]
-        locations = validated_data.pop('locations')
+        partner_data = partner_data_list[0]
+        update_or_create_kwargs = {
+            'external_source': partner_data.pop('external_source'),
+            'external_id': partner_data.pop('external_id')
+        }
+
+        partner, _ = Partner.objects.update_or_create(
+            defaults=partner_data, **update_or_create_kwargs
+        )
+
+        logger.debug('Saved Partner {}'.format(partner))
+
+        validated_data['partner'] = partner
+        validated_data['status'] = self.get_status()
+        location_data_list = validated_data.pop('locations')
 
         partner_project = PartnerProject.objects.filter(code=validated_data['code']).first()
         if partner_project:
@@ -111,58 +127,18 @@ class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, ser
         else:
             partner_project = super(V2PartnerProjectImportSerializer, self).create(validated_data)
 
-        location_objects = []
+        locations = save_location_list(location_data_list)
 
-        for location_data in sorted(locations, key=lambda x: x['external_id']):
-            if not location_data['parentId'] and location_data['iso3']:
-                parent = None
-                try:
-                    country, _ = Country.objects.get_or_create(
-                        country_short_code=location_data['iso3'],
-                        defaults={
-                            'name': location_data['title']
-                        }
-                    )
-                except MultipleObjectsReturned:
-                    country = Country.objects.filter(country_short_code=location_data['iso3']).first()
-            else:
-                parent = Location.objects.filter(
-                    external_source=location_data['external_source'],
-                    external_id=location_data['parentId']
-                ).first()
-
-            gateway_name = '{} - Admin Level {}'.format(country.country_short_code, location_data['adminLevel'])
-            gateway, _ = GatewayType.objects.get_or_create(
-                country=country,
-                admin_level=location_data['adminLevel'],
-                defaults={
-                    'name': gateway_name
-                }
-            )
-            location_data.pop('parentId')
-            location_data.pop('iso3')
-            location_data.pop('adminLevel')
-            location_data['gateway'] = gateway
-            location_data['parent'] = parent
-
-            location, _ = Location.objects.update_or_create(
-                external_source=location_data.pop('external_source'),
-                external_id=location_data.pop('external_id'),
-                defaults=location_data
-            )
-            location_objects.append(location)
-
-        partner_project.locations.add(*location_objects)
+        partner_project.locations.add(*locations)
         return partner_project
 
 
-class V1FundingSourceImportSerializer(serializers.ModelSerializer):
+class V1FundingSourceImportSerializer(serializers.Serializer):
     # Most of the information we want is nested, would be overkill to write serializer for all structures
     incoming = serializers.DictField()
     flows = serializers.ListField(allow_empty=False)
 
     class Meta:
-        model = FundingSource
         fields = (
             'incoming',
             'flows',
@@ -178,14 +154,12 @@ class V1FundingSourceImportSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Project info not found')
         return PartnerProject.objects.get(code=project_info[0]['code'])
 
-    def get_organization_info_for_flow(self, flow):
+    def get_organization_names_for_flow(self, flow):
         organization_info = list(filter(
             lambda src: src['type'] == 'Organization',
             flow['sourceObjects']
         ))
-        if not organization_info:
-            raise serializers.ValidationError('Source organization info missing')
-        return organization_info[0]
+        return [o['name'] for o in organization_info]
 
     def get_usage_year_for_flow(self, flow):
         usage_year_info = list(filter(
@@ -197,44 +171,21 @@ class V1FundingSourceImportSerializer(serializers.ModelSerializer):
         return int(usage_year_info[0]['name'])
 
     def create(self, validated_data):
-        sources = []
-
-        total_funding = validated_data['incoming'].get('fundingTotal', 0)
+        project_total_funding = defaultdict(int)
+        project_funding_sources = defaultdict(list)
 
         for flow in validated_data['flows']:
             project = self.get_project_for_flow(flow)
+            project_total_funding[project.id] += flow['amountUSD']
+            project_funding_sources[project.id].extend(self.get_organization_names_for_flow(flow))
 
-            if total_funding:
-                project.total_budget = total_funding
-                project.save()
+        for project_id, total_usd_budget in project_total_funding.items():
+            PartnerProject.objects.filter(id=project_id).update(
+                total_budget=total_usd_budget,
+                funding_source='; '.join(project_funding_sources[project_id]),
+            )
 
-            get_or_crete_kwargs = {
-                'external_id': flow['id'],
-                'external_source': EXTERNAL_DATA_SOURCES.HPC,
-                'partner_project_id': project.id,
-            }
-
-            organization_info = self.get_organization_info_for_flow(flow)
-
-            organization_type = organization_info['organizationTypes'] and organization_info['organizationTypes'][0]
-
-            funding_source = {
-                'usd_amount': flow['amountUSD'],
-                'name': organization_info['name'],
-                'organization_type': organization_type,
-                'usage_year': self.get_usage_year_for_flow(flow),
-            }
-            if 'originalAmount' in flow:
-                funding_source.update({
-                    'original_amount': flow['originalAmount'],
-                    'original_currency': flow['originalCurrency'],
-                    'exchange_rate': flow['exchangeRate'],
-                })
-
-            source, _ = FundingSource.objects.update_or_create(defaults=funding_source, **get_or_crete_kwargs)
-            sources.append(source)
-
-        return sources
+        return PartnerProject.objects.filter(id__in=project_total_funding.keys())
 
 
 class V1ResponsePlanLocationImportSerializer(DiscardUniqueTogetherValidationMixin, serializers.ModelSerializer):
@@ -302,17 +253,13 @@ class V1ResponsePlanImportSerializer(DiscardUniqueTogetherValidationMixin, seria
             raise serializers.ValidationError('No overall emergency named for multi country plan')
         # TODO: Handling of duplicate workspace codes
 
-        update_or_create_kwargs = {
-            'external_source': EXTERNAL_DATA_SOURCES.HPC,
-            'external_id': workspace_id
-        }
-
         workspace, _ = Workspace.objects.update_or_create(
+            workspace_code=workspace_code,
             defaults={
                 'title': workspace_title,
-                'workspace_code': workspace_code,
-            },
-            **update_or_create_kwargs
+                'external_source': EXTERNAL_DATA_SOURCES.HPC,
+                'external_id': workspace_id
+            }
         )
 
         location_serializer = V1ResponsePlanLocationImportSerializer(

@@ -200,6 +200,24 @@ class ReportableLocationGoalBaselineInNeedSerializer(serializers.ModelSerializer
     in_need = serializers.JSONField()
     location = LocationSerializer(read_only=True)
 
+    def validate_baseline(self, value):
+        if 'd' not in value:
+            value['d'] = 1
+
+        elif value['d'] == 0:
+            raise serializers.ValidationError("key 'd' cannot be zero")
+
+        return value
+
+    def validate_in_need(self, value):
+        if 'd' not in value:
+            value['d'] = 1
+
+        elif value['d'] == 0:
+            raise serializers.ValidationError("key 'd' cannot be zero")
+
+        return value
+
     class Meta:
         model = ReportableLocationGoal
         list_serializer_class = ReportableLocationGoalBaselineInNeedListSerializer
@@ -212,13 +230,40 @@ class ReportableLocationGoalBaselineInNeedSerializer(serializers.ModelSerializer
 
 
 class ReportableLocationGoalSerializer(serializers.ModelSerializer):
-    baseline = serializers.JSONField()
+    baseline = serializers.JSONField(required=False)
     in_need = serializers.JSONField(required=False)
     target = serializers.JSONField()
     loc_type = serializers.SerializerMethodField()
 
     def get_loc_type(self, obj):
         return obj.location.gateway.admin_level
+
+    def validate_baseline(self, value):
+        if 'd' not in value:
+            value['d'] = 1
+
+        elif value['d'] == 0:
+            raise serializers.ValidationError("key 'd' cannot be zero")
+
+        return value
+
+    def validate_in_need(self, value):
+        if 'd' not in value:
+            value['d'] = 1
+
+        elif value['d'] == 0:
+            raise serializers.ValidationError("key 'd' cannot be zero")
+
+        return value
+
+    def validate_target(self, value):
+        if 'd' not in value:
+            value['d'] = 1
+
+        elif value['d'] == 0:
+            raise serializers.ValidationError("key 'd' cannot be zero")
+
+        return value
 
     class Meta:
         model = ReportableLocationGoal
@@ -777,7 +822,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
     locations = ReportableLocationGoalSerializer(many=True, write_only=True)
     target = serializers.JSONField()
     baseline = serializers.JSONField()
-    in_need = serializers.JSONField(required=False)
+    in_need = serializers.JSONField(required=False, allow_null=True)
 
     class Meta:
         model = Reportable
@@ -808,10 +853,15 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 {"disaggregations": "List of dict disaggregation expected"}
             )
 
-    def check_progress_values(self, validated_data):
+    def check_progress_values(self, validated_data, partner):
         """
         Validates baseline, target, in-need
         """
+        if not partner and 'baseline' not in validated_data:
+            raise ValidationError(
+                {"baseline": "baseline is required for IMO creating Cluster Indicator"}
+            )
+
         if float(validated_data['baseline']['v']) > float(validated_data['target']['v']):
             raise ValidationError(
                 {"baseline": "Cannot be greater than target"}
@@ -845,7 +895,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         partner = self.context['request'].user.partner
 
         self.check_disaggregation(self.initial_data.get('disaggregations'))
-        self.check_progress_values(validated_data)
+        self.check_progress_values(validated_data, partner)
 
         if validated_data['blueprint']['display_type'] == IndicatorBlueprint.RATIO:
             validated_data['blueprint']['unit'] = IndicatorBlueprint.PERCENTAGE
@@ -907,6 +957,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 loc_data.pop('in_need')
 
             loc_data['reportable'] = self.instance
+
             ReportableLocationGoal.objects.create(**loc_data)
 
         disaggregations = self.initial_data.get('disaggregations')
@@ -933,6 +984,9 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             validated_data.pop('baseline')
             validated_data.pop('in_need')
             validated_data.pop('target')
+
+        else:
+            self.check_progress_values(validated_data, partner)
 
         # Swapping validated_data['locations'] with raw request.data['locations']
         # Due to missing id field as it is write_only field
@@ -1269,15 +1323,11 @@ class PMPReportableSerializer(serializers.ModelSerializer):
     title = serializers.CharField(source='means_of_verification')
     blueprint_id = serializers.PrimaryKeyRelatedField(
         queryset=IndicatorBlueprint.objects.all(), source="blueprint")
-    location_ids = serializers.PrimaryKeyRelatedField(
-        queryset=Location.objects.all(), many=True, source="locations")
     disaggregation_ids = serializers.PrimaryKeyRelatedField(
         queryset=Disaggregation.objects.all(),
         many=True,
         allow_null=True,
         source="disaggregations")
-    baseline = serializers.IntegerField(source='baseline__v')
-    target = serializers.IntegerField(source='target__v')
 
     class Meta:
         model = Reportable
@@ -1288,7 +1338,6 @@ class PMPReportableSerializer(serializers.ModelSerializer):
             'title',
             'is_cluster_indicator',
             'blueprint_id',
-            'location_ids',
             'disaggregation_ids',
             'content_type',
             'object_id',

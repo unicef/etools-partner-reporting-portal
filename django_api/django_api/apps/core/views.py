@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework import status as statuses
 from rest_framework.views import APIView
 
-from core.common import DISPLAY_CLUSTER_TYPES
+from core.common import DISPLAY_CLUSTER_TYPES, PARTNER_PROJECT_STATUS
 from utils.serializers import serialize_choices
 from .filters import LocationFilter
 from .permissions import IsAuthenticated, IsIMOForCurrentWorkspace
@@ -121,5 +121,6 @@ class ConfigurationAPIView(APIView):
 
     def get(self, request):
         return Response({
-            'CLUSTER_TYPE_CHOICES': serialize_choices(DISPLAY_CLUSTER_TYPES)
+            'CLUSTER_TYPE_CHOICES': serialize_choices(DISPLAY_CLUSTER_TYPES),
+            'PARTNER_PROJECT_STATUS_CHOICES': serialize_choices(PARTNER_PROJECT_STATUS),
         })

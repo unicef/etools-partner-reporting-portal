@@ -2,7 +2,8 @@
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from ocha.imports.utilities import import_project
+from core.models import ResponsePlan
+from ocha.imports.project import import_project
 
 
 class Command(BaseCommand):
@@ -22,6 +23,13 @@ class Command(BaseCommand):
             dest='id',
             help='ID to pull',
         )
+        parser.add_argument(
+            '--rp',
+            action='store',
+            type=int,
+            dest='rp',
+            help='Response plan to pull into',
+        )
 
     def handle(self, *args, **options):
         if not settings.DEBUG:
@@ -30,8 +38,11 @@ class Command(BaseCommand):
 
         bulk = options.get('bulk')
         _id = options.get('id')
+        rp_id = options.get('rp')
+        response_plan = ResponsePlan.objects.filter(id=rp_id).first()
+
         if _id:
-            import_project(_id)
+            import_project(_id, response_plan=response_plan)
         elif bulk:
             try:
                 start_id, end_id = map(int, bulk.split('-'))
@@ -40,7 +51,7 @@ class Command(BaseCommand):
                 return
             for project_id in range(start_id, end_id + 1):
                 try:
-                    import_project(project_id)
+                    import_project(project_id, response_plan=response_plan)
                 except Exception as e:
                     self.stderr.write('Error getting {}: {}'.format(project_id, e))
         else:

@@ -1,3 +1,10 @@
+from django.urls import reverse
+from rest_framework import status
+
+from cluster.serializers import ClusterSimpleSerializer
+from core.models import ResponsePlan
+from core.tests.base import BaseAPITestCase
+
 # import datetime
 
 # from django.urls imports reverse
@@ -5,7 +12,6 @@
 
 # from rest_framework imports status
 
-# from core.tests.base imports BaseAPITestCase
 # from core.models imports Location
 # from core.factories imports PartnerProjectFactory, PartnerFactory, ClusterObjectiveFactory
 
@@ -290,3 +296,38 @@
 #             PartnerActivity.objects.all().count(),
 #             base_count + 1
 #         )
+
+
+class TestPartnerProjectAPIView(BaseAPITestCase):
+
+    def test_create_project(self):
+        rp = ResponsePlan.objects.first()
+        project_data = {
+            'title': 'Test Partner Project',
+            'start_date': '2013-01-01',
+            'end_date': '2018-01-01',
+            'partner_id': rp.clusters.first().partners.first().id,
+        }
+
+        url = reverse("partner-project-create", kwargs={'response_plan_pk': rp.pk})
+        response = self.client.post(url, data=project_data, format='json')
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST, msg=response.content)
+        self.assertIn('clusters', response.data)
+
+        project_data['clusters'] = ClusterSimpleSerializer(rp.clusters.all(), many=True).data
+        response = self.client.post(url, data=project_data, format='json')
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED, msg=response.content)
+
+    def test_end_lt_start(self):
+        rp = ResponsePlan.objects.first()
+        project_data = {
+            'title': 'Test Partner Project',
+            'start_date': '2018-01-01',
+            'end_date': '2013-01-01',
+            'partner_id': rp.clusters.first().partners.first().id,
+        }
+
+        url = reverse("partner-project-create", kwargs={'response_plan_pk': rp.pk})
+        response = self.client.post(url, data=project_data, format='json')
+        self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST, msg=response.content)
+        self.assertIn('end_date', response.data)
