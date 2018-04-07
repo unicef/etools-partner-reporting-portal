@@ -857,21 +857,16 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         """
         Validates baseline, target, in-need
         """
-        if not partner and 'baseline' not in validated_data:
-            raise ValidationError(
-                {"baseline": "baseline is required for IMO creating Cluster Indicator"}
-            )
+        if not partner:
+            if 'baseline' not in validated_data:
+                raise ValidationError(
+                    {"baseline": "baseline is required for IMO creating Cluster Indicator"}
+                )
 
-        if float(validated_data['baseline']['v']) > float(validated_data['target']['v']):
-            raise ValidationError(
-                {"baseline": "Cannot be greater than target"}
-            )
-
-        if 'in_need' in validated_data and validated_data['in_need'] \
-                and float(validated_data['target']['v']) > float(validated_data['in_need']['v']):
-            raise ValidationError(
-                {"target": "Cannot be greater than In Need"}
-            )
+            if 'target' not in validated_data:
+                raise ValidationError(
+                    {"target": "target is required for IMO creating Cluster Indicator"}
+                )
 
         if 'd' not in validated_data['baseline']:
             validated_data['baseline']['d'] = 1
@@ -879,9 +874,45 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         if 'd' not in validated_data['target']:
             validated_data['target']['d'] = 1
 
-        if 'in_need' in validated_data and validated_data['in_need'] \
-                and 'd' not in validated_data['in_need']:
-            validated_data['in_need']['d'] = 1
+        if validated_data['baseline']['d'] == 0:
+            raise ValidationError(
+                {"baseline": "denominator for baseline cannot be zero"}
+            )
+
+        if validated_data['target']['d'] == 0:
+            raise ValidationError(
+                {"target": "denominator for target cannot be zero"}
+            )
+
+        baseline_value = float(validated_data['baseline']['v']) if float(validated_data['baseline']['d']) == 1 else \
+            float(validated_data['baseline']['v']) / float(validated_data['baseline']['d'])
+
+        target_value = float(validated_data['target']['v']) if float(validated_data['target']['d']) == 1 else \
+            float(validated_data['target']['v']) / float(validated_data['target']['d'])
+
+        if baseline_value > target_value:
+            raise ValidationError(
+                {"baseline": "Cannot be greater than target"}
+            )
+
+        if 'in_need' in validated_data and validated_data['in_need']:
+            if 'd' not in validated_data['in_need']:
+                validated_data['in_need']['d'] = 1
+
+            if validated_data['in_need']['d'] == 0:
+                raise ValidationError(
+                    {"in_need": "denominator for in_need cannot be zero"}
+                )
+
+            in_need_value = float(validated_data['in_need']['v']) if float(validated_data['in_need']['d']) == 1 else \
+                float(validated_data['in_need']['v']) / float(validated_data['in_need']['d'])
+
+            print(validated_data)
+
+            if target_value > in_need_value:
+                raise ValidationError(
+                    {"target": "Cannot be greater than In Need"}
+                )
 
     def check_location_admin_levels(self, location_goal_queryset):
         if location_goal_queryset.exists() and location_goal_queryset.values_list(
@@ -947,6 +978,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
         location_ids = [l['location'].id for l in locations]
 
+        # Duplicated location safeguard
         if len(location_ids) != len(set(location_ids)):
             raise ValidationError("Duplicated locations are not allowed")
 
@@ -962,6 +994,9 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 loc_data.pop('in_need')
 
             loc_data['reportable'] = self.instance
+
+            # Location-level progress value validation
+            self.check_progress_values(loc_data, partner)
 
             ReportableLocationGoal.objects.create(**loc_data)
 
@@ -1007,11 +1042,25 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 loc_goal['location'] = Location.objects.get(id=loc_goal['location'])
                 loc_goal['reportable'] = reportable
 
+                if partner:
+                    # Filter out location goal level baseline, in_need
+                    loc_goal.pop('baseline')
+                    loc_goal.pop('in_need')
+
+                # Location-level progress value validation
+                self.check_progress_values(loc_goal, partner)
+
         except Location.DoesNotExist:
             raise ValidationError("Location ID %d does not exist" % loc_goal['location'])
 
+        location_ids = [l['location'].id for l in locations]
+
+        # Duplicated location safeguard
+        if len(location_ids) != len(set(location_ids)):
+            raise ValidationError("Duplicated locations are not allowed")
+
         location_queryset = Location.objects.filter(
-            id__in=[l['location'].id for l in locations]
+            id__in=location_ids
         )
 
         self.check_location_admin_levels(location_queryset)
