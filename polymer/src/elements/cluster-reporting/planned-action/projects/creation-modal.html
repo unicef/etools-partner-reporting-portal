@@ -27,6 +27,7 @@
 <link rel="import" href="../../../etools-prp-ajax.html">
 <link rel="import" href="../../../../elements/etools-prp-permissions.html">
 <link rel="import" href="../../../../elements/cluster-reporting/creation-modal-project-details.html">
+<link rel="import" href="../../../../elements/cluster-reporting/planned-action/projects/custom-fields-widget.html">
 <link rel="import" href="../../../etools-prp-date-input.html">
 <link rel="import" href="../../../form-fields/dropdown-form-input.html">
 <link rel="import" href="../../../form-fields/cluster-dropdown-content.html">
@@ -73,6 +74,41 @@
         background: var(--theme-primary-color);
       }
 
+      .infobox {
+        display: block;
+        --app-grid-columns:2;
+        --app-grid-gutter: 25px;
+        --app-grid-item-height: auto;
+        padding: 15px;
+        background: var(--paper-grey-300);
+      }
+
+      .infobox h4 {
+        display: inline;
+        color: #737373;
+        font-weight: 400;
+        font-size: 12px
+      }
+
+      .red {
+        color: red;
+        display: inline;
+      }
+
+      .justify-right {
+        float: right;
+      }
+
+      .show-more-details {
+        display: block;
+        padding: 15px;
+        background: var(--paper-grey-300);
+      }
+
+      .show-more-details .justify-right {
+        float: right;
+      }
+      
       .header h2 {
         @apply(--paper-font-title);
         margin: 0;
@@ -111,6 +147,16 @@
 
       paper-dropdown-menu {
         width: 100%;
+      }
+
+      iron-icon {
+        color: var(--list-icon-color, #2b2b2b);
+        height: 40px;
+        width: 40px;
+      }
+
+      iron-icon:hover {
+        color: var(--list-icon-hover-color, rgba(0, 0, 0, 0.87));
       }
 
     </style>
@@ -190,15 +236,6 @@
             </etools-single-selection-menu>
           </template>
 
-          <!-- <template
-            is="dom-if"
-            if="[[_displayPartner(permissions, edit)]]"
-            restamp="true">
-            <labelled-item class="item full-width" label="Partner">
-              <span>[[data.partner]]</span>
-            </labelled-item>
-          </template> -->
-
           <paper-radio-group
             id="mode"
             selected={{mode}}
@@ -246,26 +283,33 @@
                 is="dom-if"
                 if="[[_equals(mode, 'custom')]]"
                 restamp="true">
+                <div class="item full-width infobox">
+                  <span class="item">
+                    <h4>Basic Project details</h4>
+                  </span>  
+                  <span class="item justify-right">
+                    <div class="red">*</div>
+                    <h4>Fields required</h4>
+                  </span>
+                </div>
                 <div class="app-grid">
                   <div class="item full-width">
                     <error-box errors="[[errors]]"></error-box>
                   </div>
-                <div class="item full-width">
                   <paper-input
-                    class="validate"
+                    class="item validate full-width"
                     id="title"
-                    label="Title"
+                    label="Title *"
                     value="{{data.title}}"
                     type="string"
                     required
                     on-input="_validate">
                   </paper-input>
-                </div>
 
                 <div class="item full-width">
                   <etools-multi-selection-menu
                     class="validate"
-                    label="Clusters"
+                    label="Clusters *"
                     options="[[formattedClusters]]"
                     selected-values="{{selectedClusters}}"
                     on-selected-values-changed="_validate"
@@ -277,7 +321,7 @@
                 <div class="item">
                   <etools-prp-date-input
                     class="start-date"
-                    label="Start date"
+                    label="Start date *"
                     value="{{data.start_date}}"
                     error-message=""
                     required
@@ -288,7 +332,7 @@
                 <div class="item">
                   <etools-prp-date-input
                       class="end-date"
-                      label="End date"
+                      label="End date *"
                       value="{{data.end_date}}"
                       error-message=""
                       required
@@ -297,16 +341,16 @@
                 </div>
                 <div class="row">
                 <paper-dropdown-menu
-                    class="item validate"
-                    label="Status"
-                    on-value-changed="_validate"
-                    always-float-label
-                    required>
+                  class="item validate"
+                  label="Status *"
+                  on-value-changed="_validate"
+                  always-float-label
+                  required>
                   <paper-listbox
-                      selected="{{data.status}}"
-                      attr-for-selected="value"
-                      slot="dropdown-content"
-                      class="dropdown-content">
+                    selected="{{data.status}}"
+                    attr-for-selected="value"
+                    slot="dropdown-content"
+                    class="dropdown-content">
                     <template
                       is="dom-repeat"
                       items="[[statuses]]">
@@ -345,20 +389,76 @@
                   on-input="_validate">
                 </paper-input>
 
-                <paper-input
+                <!-- <paper-input
                   class="item validate full-width"
                   id="additional_information"
                   label="Additional information (e.g. links)"
                   value="{{data.additional_information}}"
                   type="string"
                   on-input="_validate">
-                </paper-input>
+                </paper-input> -->
+
+                <custom-fields-widget class="item full-width">
+
+                </custom-fields-widget>
+
+                <div class="item full-width show-more-details">
+                  <div class="item justify-right">
+                    <paper-button
+                      class="btn-primary-button"
+                      on-tap="_toggleShowMoreDetails">
+                      Show More Details
+                    </paper-button>
+                    <iron-icon id="more" icon="expand-more" hidden$="[[detailsOpened]]" on-tap="_toggleShowMoreDetails"></iron-icon>
+                    <iron-icon id="less" icon="expand-less" hidden$="[[!detailsOpened]]" on-tap="_toggleShowMoreDetails"></iron-icon>
+                  </div>
+                  <div class="item full-width">
+                  <iron-collapse
+                    id="details"
+                    opened="{{detailsOpened}}"
+                    no-animation="false">
+                    <div class="item full-width app-grid">
+                      <paper-input
+                        class="item validate "
+                        id="description"
+                        label="Description"
+                        value="{{data.description}}"
+                        type="string"
+                        on-input="_validate">
+                      </paper-input>
+                      <paper-input
+                        class="item validate full-width"
+                        id="description"
+                        label="Description"
+                        value="{{data.description}}"
+                        type="string"
+                        on-input="_validate">
+                      </paper-input>
+                      <paper-input
+                        class="item validate full-width"
+                        id="description"
+                        label="Description"
+                        value="{{data.description}}"
+                        type="string"
+                        on-input="_validate">
+                      </paper-input>
+                      <paper-input
+                        class="item validate full-width"
+                        id="description"
+                        label="Description"
+                        value="{{data.description}}"
+                        type="string"
+                        on-input="_validate">
+                      </paper-input>
+                    </div>
+                  </iron-collapse>
                 </div>
-              </template>
-            </div>
-          </paper-radio-group>
-        </template>
-      </paper-dialog-scrollable>
+              </div>
+            </template>
+          </div>
+        </paper-radio-group>
+      </template>
+    </paper-dialog-scrollable>
 
       <div class="buttons layout horizontal-reverse">
         <paper-button class="btn-primary" on-tap="_save" raised>
@@ -397,7 +497,11 @@
 
         opened: {
           type: Boolean,
-          observer: '_onOpenedChanged',
+        },
+
+        detailsOpened: {
+          type: Boolean,
+          value: false
         },
 
         updatePending: {
@@ -554,6 +658,10 @@
         this.set('refresh', true);
       },
 
+      _toggleShowMoreDetails: function() {
+        this.detailsOpened ? this.detailsOpened = false : this.detailsOpened = true
+      },
+
       _computeTitle: function(edit) {
         return (edit ? 'Edit' : 'Add') + ' Project';
       },
@@ -625,11 +733,11 @@
         });
       },
 
-      _onOpenedChanged: function (opened) {
-        if (opened) {
-          this.set('mode', '');
-        }
-      },
+      // _onOpenedChanged: function (opened) {
+      //   if (opened) {
+      //     this.set('mode', '');
+      //   }
+      // },
 
       _savePartner: function(partner) {
         this.set('data.partner_id', partner.id);
