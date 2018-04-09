@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.postgres.fields import ArrayField, JSONField
 from django.db import models
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
@@ -197,6 +198,7 @@ class PartnerProject(TimeStampedExternalSourceModel):
     additional_information = models.CharField(
         max_length=255, verbose_name="Additional information (e.g. links)", null=True, blank=True
     )
+    custom_fields = JSONField(default=[])
     start_date = models.DateField()
     end_date = models.DateField()
     status = models.CharField(

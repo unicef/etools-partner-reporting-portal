@@ -132,6 +132,11 @@ class PartnerProjectFundingSerializer(serializers.ModelSerializer):
         )
 
 
+class PartnerProjectCustomFieldSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    value = serializers.CharField()
+
+
 class PartnerProjectSerializer(serializers.ModelSerializer):
 
     id = serializers.CharField(read_only=True)
@@ -145,6 +150,7 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
     additional_information = serializers.CharField(required=False)
     funding = PartnerProjectFundingSerializer(read_only=True)
     additional_partners = PartnerSimpleSerializer(many=True, allow_null=True, read_only=True)
+    custom_fields = PartnerProjectCustomFieldSerializer(many=True, allow_null=True, required=False)
 
     class Meta:
         model = PartnerProject
@@ -170,6 +176,7 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
             'response_plan_title',
             'funding',
             'additional_partners',
+            'custom_fields',
         )
 
     def get_response_plan_title(self, obj):
@@ -182,6 +189,13 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({
                 'end_date': 'Cannot be earlier than Start Date'
             })
+
+        if validated_data.get('custom_fields'):
+            field_names = [cf['name'] for cf in validated_data['custom_fields']]
+            if not len(field_names) == len(set(field_names)):
+                raise serializers.ValidationError({
+                    'custom_fields': 'Custom Field Names should be unique'
+                })
 
         return validated_data
 
@@ -204,7 +218,14 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
                 'clusters': 'This list cannot be empty'
             })
 
+        custom_fields = validated_data.pop('custom_fields', None)
+
         project = super(PartnerProjectSerializer, self).create(validated_data)
+
+        if custom_fields is not None:
+            project.custom_fields = custom_fields
+            project.save()
+
         project.clusters.add(*Cluster.objects.filter(id__in=[c['id'] for c in clusters]))
 
         self.save_funding(instance=project)
@@ -218,7 +239,13 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
                 'clusters': 'This list cannot be empty'
             })
 
+        custom_fields = validated_data.pop('custom_fields', None)
+
         project = super(PartnerProjectSerializer, self).update(instance, validated_data)
+
+        if custom_fields is not None:
+            project.custom_fields = custom_fields
+            project.save()
 
         cluster_ids = [c['id'] for c in clusters]
         project.clusters.add(*Cluster.objects.filter(id__in=cluster_ids))
