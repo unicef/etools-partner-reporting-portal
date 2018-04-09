@@ -65,6 +65,13 @@
               label: 'Progress',
               type: 'number',
             },
+            {
+              type: 'string',
+              role: 'tooltip',
+              p: {
+                html: true,
+              },
+            },
           ],
         },
 
@@ -85,10 +92,6 @@
             left: '30%',
             width: '50%',
           },
-
-          // TODO: tooltips
-          enableInteractivity: false,
-          tooltip: null,
         });
       },
 
@@ -96,9 +99,21 @@
         return Object.keys(data || {}).map(function (key) {
           return [
             key,
-            data[key],
+            data[key].progress,
+            this._buildTooltipContent(key, data[key]),
           ];
-        });
+        }, this);
+      },
+
+      _buildTooltipContent: function (title, data) {
+        return [
+          '<div class="tooltip-content">',
+            '<div>' + title + '</div>',
+            '<div class="number-of-partners">' + data.progress + '</div>',
+            '<div>Contributing Partners:</div>',
+            '<div>' + this._commaSeparated(data.partners) + '</div>',
+          '</div>',
+        ].join('\n');
       },
     });
   </script>
