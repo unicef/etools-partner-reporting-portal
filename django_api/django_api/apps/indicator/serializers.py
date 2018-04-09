@@ -48,8 +48,18 @@ class DisaggregationListSerializer(serializers.ModelSerializer):
     choices = DisaggregationValueListSerializer(
         many=True, source='disaggregation_values')
 
+    @transaction.atomic
     def create(self, validated_data):
         disaggregation_values = validated_data.pop('disaggregation_values')
+
+        if disaggregation_values:
+            unique_list_dicts = list({v['value']:v for v in disaggregation_values}.values())
+
+            if len(disaggregation_values) != len(unique_list_dicts):
+                raise serializers.ValidationError({
+                    "disaggregation_values": "Duplicated disaggregation value is not allowed",
+                })
+
         instance = Disaggregation.objects.create(**validated_data)
         for choice in disaggregation_values:
             DisaggregationValue.objects.create(disaggregation=instance,
