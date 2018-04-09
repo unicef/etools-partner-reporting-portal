@@ -23,12 +23,12 @@ At the location level, IMO can set the admin level and specific location pertain
 
 For Percentage Indicator, we have added 2 labels for numerator and denominator. We won’t have In-Need. We’re only going to take one number for each label. The calculation method will be greyed out and defaulted to SUM.
 
-![](../../.gitbook/assets/01_-add-indicator_percent2x.png)
+![](../../.gitbook/assets/01_-add-indicator_percent-2x.png)
 
 **  
 **When it’s Ratio Indicator, we will have 2 labels, and will take 2 \#s \(numerator and denominator\) for baseline and target. The calculation method will be greyed out and defaulted to SUM. We won’t have In-Need
 
-![](../../.gitbook/assets/01_-add-indicator_ratio2x.png)
+![](../../.gitbook/assets/01_-add-indicator_ratio-2x.png)
 
 IMO or Partner can edit an indicator. The location admin level, specific location previously, and disaggregations set are not editable. Locations can be added though.
 
@@ -60,11 +60,11 @@ For Quantity Indicators, IMOs will be able to enter new baseline and In-Need for
 
 For Percent Indicators, IMOs will be able to enter a new Baseline. It defaults to 0.
 
-![](../../.gitbook/assets/05_locations-settings_percent2x.png)
+![](../../.gitbook/assets/05_locations-settings_percent-2x.png)
 
 For Ratio Indicators, IMOs will be able to enter a new Baseline. The data key specifies the numerator and denominator. 
 
-![](../../.gitbook/assets/05_locations-settings_ratio2x.png)
+![](../../.gitbook/assets/05_locations-settings_ratio-2x.png)
 
 ### Helper Text &lt;TBD&gt;
 

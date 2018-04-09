@@ -5,6 +5,8 @@
 * Importing happens into an existing Workspace
 * Response Plan list to choose from should be retrieved for workspace countries
 * OCHA provided cluster names **can be used directly**
+* Only **V1 API** is being used in this import
+* Only initial RP info is being pulled when the import request happens, a **background task** to retrieve other information is started afterwards
 
 {% hint style="warning" %}
 Cluster names in OCHA are not validated in any way

@@ -2,7 +2,7 @@
 
 The IP can set the appropriate calculation method for each indicator in a PD. If a partner selects a Ratio or Percent indicator, the calculation method will be set to SUM and greyed out. They cannot change the calculation method unless it is a Quantity Indicator. 
 
-![](../../.gitbook/assets/reporting-ip-pd-calculation_method_032x.png)
+![](../../.gitbook/assets/reporting-ip-pd-calculation_method_03-2x.png)
 
 ### Supported calculation methods
 
