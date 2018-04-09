@@ -12,7 +12,7 @@ from core.common import (
     SHARED_PARTNER_TYPE,
     CSO_TYPES,
     PARTNER_PROJECT_STATUS,
-)
+    RESPONSE_PLAN_TYPE)
 from core.models import TimeStampedExternalSourceModel
 
 from core.countries import COUNTRIES_ALPHA2_CODE_DICT, COUNTRIES_ALPHA2_CODE
@@ -184,6 +184,13 @@ class PartnerProject(TimeStampedExternalSourceModel):
         indicator.Reportable (GenericRelation): "reportables"
     """
     code = models.TextField(null=True, blank=True, unique=True, verbose_name='Project code in HRP')
+    type = models.CharField(
+        max_length=3,
+        choices=RESPONSE_PLAN_TYPE,
+        verbose_name='Plan Type',
+        help_text='Is this project part of an HRP or FA?',
+        null=True, blank=True
+    )
 
     title = models.CharField(max_length=1024)
     description = models.TextField(max_length=5120, null=True, blank=True)

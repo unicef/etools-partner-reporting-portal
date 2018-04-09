@@ -151,6 +151,7 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'code',
+            'type',
             'prioritization',
             'agency_name',
             'agency_type',
