@@ -14,11 +14,18 @@ def fetch_json_urls_async(url_list):
         async with client.get(url) as response:
             return await response.json()
 
-    return loop.run_until_complete(
+    data_list = loop.run_until_complete(
         asyncio.gather(
-            *[get_json(client, u) for u in url_list]
+            *[get_json(client, url) for url in url_list]
         )
     )
+
+    async def close_client():
+        return await client.close()
+
+    loop.run_until_complete(close_client())
+
+    return data_list
 
 
 def get_response_plans_for_countries(iso3_codes):
