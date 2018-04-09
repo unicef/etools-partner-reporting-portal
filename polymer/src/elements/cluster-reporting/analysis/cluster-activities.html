@@ -16,10 +16,15 @@
     </style>
 
     <template
-        is="dom-repeat"
-        items="[[data]]"
-        as="activity">
-      <analysis-cluster-activity data="[[activity]]"></analysis-cluster-activity>
+        is="dom-if"
+        if="[[render]]"
+        restamp="true">
+      <template
+          is="dom-repeat"
+          items="[[data]]"
+          as="activity">
+        <analysis-cluster-activity data="[[activity]]"></analysis-cluster-activity>
+      </template>
     </template>
 
     <etools-loading active="[[loading]]"></etools-loading>
@@ -42,12 +47,26 @@
         data: {
           type: Array,
           computed: '_computeData(rawData)',
+          observer: '_refresh',
         },
 
         loading: {
           type: Boolean,
           statePath: 'analysis.indicators.dataLoading',
         },
+
+        render: {
+          type: Boolean,
+          value: false,
+        },
+      },
+
+      _refresh: function () {
+        this.set('render', false);
+
+        this.async(function () {
+          this.set('render', true);
+        });
       },
 
       _computeData: function (rawData) {
