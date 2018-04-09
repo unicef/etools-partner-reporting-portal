@@ -58,12 +58,15 @@ class DisaggregationValue(TimeStampedExternalSourceModel):
         indicator.Disaggregation (ForeignKey): "disaggregation"
     """
     disaggregation = models.ForeignKey(Disaggregation, related_name="disaggregation_values")
-    value = models.CharField(max_length=15)
+    value = models.CharField(max_length=128)
 
     # TODO: we won't allow these to be edited out anymore, so 'active' might
     # not as relevant anymore.
     # See https://github.com/unicef/etools-partner-reporting-portal/issues/244
     active = models.BooleanField(default=True)
+
+    class Meta:
+        unique_together = ('disaggregation', 'value')
 
     def __str__(self):
         return "Disaggregation Value <pk:%s> %s" % (self.id, self.value)
@@ -506,7 +509,7 @@ class IndicatorReport(TimeStampedModel):
         unicef.ProgressReport (ForeignKey): "progress_report"
         core.Location (OneToOneField): "location"
     """
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=2048)
     reportable = models.ForeignKey(Reportable, related_name="indicator_reports")
     progress_report = models.ForeignKey(
         'unicef.ProgressReport', related_name="indicator_reports", null=True, blank=True

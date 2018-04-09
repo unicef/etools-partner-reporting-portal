@@ -228,7 +228,8 @@ class PartnerProject(TimeStampedExternalSourceModel):
 
     @property
     def response_plan(self):
-        return self.clusters.all()[0].response_plan
+        cluster = self.clusters.first()
+        return cluster and cluster.response_plan
 
 
 class PartnerActivity(TimeStampedModel):

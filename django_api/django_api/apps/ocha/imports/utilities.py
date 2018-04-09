@@ -245,9 +245,13 @@ def save_reportables_for_cluster_objective_or_activity(objective_or_activity, at
         except KeyError:
             logger.warning('No location info found for {}'.format(reportable))
 
-        reportable.disaggregations.add(*save_disaggregations(
+        for disaggregation in save_disaggregations(
             disaggregated.get('categories', []), response_plan=objective_or_activity.cluster.response_plan
-        ))
+        ):
+            reportable.disaggregations.through.objects.get_or_create(
+                reportable_id=reportable.id,
+                disaggregation_id=disaggregation.id
+            )
 
         reportables.append(reportable)
 
