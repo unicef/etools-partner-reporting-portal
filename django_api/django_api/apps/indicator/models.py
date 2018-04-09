@@ -487,7 +487,7 @@ class ReportableLocationGoal(TimeStampedModel):
     location = models.ForeignKey("core.Location", on_delete=models.CASCADE)
     target = JSONField(default=dict([('d', 1), ('v', 0)]))
     baseline = JSONField(default=dict([('d', 1), ('v', 0)]))
-    in_need = JSONField(default=dict([('d', 1), ('v', 0)]), blank=True, null=True)
+    in_need = JSONField(blank=True, null=True)
 
     class Meta:
         unique_together = ('reportable', 'location')
