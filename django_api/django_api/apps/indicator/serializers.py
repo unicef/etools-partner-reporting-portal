@@ -48,8 +48,18 @@ class DisaggregationListSerializer(serializers.ModelSerializer):
     choices = DisaggregationValueListSerializer(
         many=True, source='disaggregation_values')
 
+    @transaction.atomic
     def create(self, validated_data):
         disaggregation_values = validated_data.pop('disaggregation_values')
+
+        if disaggregation_values:
+            unique_list_dicts = list({v['value']: v for v in disaggregation_values}.values())
+
+            if len(disaggregation_values) != len(unique_list_dicts):
+                raise serializers.ValidationError({
+                    "disaggregation_values": "Duplicated disaggregation value is not allowed",
+                })
+
         instance = Disaggregation.objects.create(**validated_data)
         for choice in disaggregation_values:
             DisaggregationValue.objects.create(disaggregation=instance,
@@ -231,7 +241,7 @@ class ReportableLocationGoalBaselineInNeedSerializer(serializers.ModelSerializer
 
 class ReportableLocationGoalSerializer(serializers.ModelSerializer):
     baseline = serializers.JSONField(required=False)
-    in_need = serializers.JSONField(required=False)
+    in_need = serializers.JSONField(required=False, allow_null=True)
     target = serializers.JSONField()
     loc_type = serializers.SerializerMethodField()
 
@@ -248,11 +258,12 @@ class ReportableLocationGoalSerializer(serializers.ModelSerializer):
         return value
 
     def validate_in_need(self, value):
-        if 'd' not in value:
-            value['d'] = 1
+        if value:
+            if 'd' not in value:
+                value['d'] = 1
 
-        elif value['d'] == 0:
-            raise serializers.ValidationError("key 'd' cannot be zero")
+            elif value['d'] == 0:
+                raise serializers.ValidationError("key 'd' cannot be zero")
 
         return value
 

@@ -68,5 +68,7 @@ Parent Cluster Activity for an Indicator is referenced by `objectId`, some Indic
 | content\_object | parent Cluster Activity from `objectId` |
 | locations | value.metrics.values.disaggregated.locations |
 
+### Disaggregations
 
+Imported same as in [Response Plan Import](https://unicef.gitbook.io/prp/technical-documentation/ocha-integration-api-and-model-documentation/response-plan-import#disaggregations)
 
