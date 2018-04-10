@@ -82,7 +82,8 @@
     <template
       is="dom-repeat"
       items="[[data.customFields]]"
-      as="field">
+      as="field"
+      restamp="true">
       <div class="row layout horizontal">
         <div class="flex-none layout vertical center-center col-actions">
           <paper-icon-button
@@ -102,7 +103,7 @@
           name="customFieldTitle[[index]]"
           data-id$="[[field.id]]"
           label="Field's Title"
-          on-input="_updateCustomFields">
+          on-input="_updateCustomFieldTitle">
         </paper-input>
 
         <paper-input
@@ -111,7 +112,7 @@
           name="customFieldDescription[[index]]"
           data-id$="[[field.id]]"
           label="Field's Description"
-          on-input="_updateCustomFields">
+          on-input="_updateCustomFieldDescription">
         </paper-input>
       </div>
       </div>
@@ -138,6 +139,10 @@
         data: Object,
         },
 
+        observers: [
+          '_updateVisibleCustomFields(data.customFields)'
+        ],
+
         _add: function () {
           this.set('fieldId', this.get('fieldId') + 1);
           this.push('data.customFields', {
@@ -149,28 +154,37 @@
 
         _remove: function (e) {
           var value = this.get('data.customFields');
-          var toRemove = +e.target.id;
-          var newValue = value.slice(0, toRemove);
-          newValue = newValue.concat(value.slice(toRemove + 1));
+          var toRemove = e.target.id + 1;
+          var newValue = value.slice(0, toRemove).concat(value.slice(toRemove + 1));
 
           console.log(newValue);
 
           this.set('data.customFields', newValue);
         },
 
-        _updateCustomFields: function (e) {
+        _updateCustomFieldTitle: function (e) {
+          console.log(e.target.id);
           var field = this.data.customFields.find(function (field) {
-            return field.id === e.target.id;
+            return field.id == e.target.id;
           });
-          if (!field) {
-            field = {
-              value: e.target.value,
-            };
-          }
-          this.set(['data.customFields.', field, 'value'], e.target.value);
-          console.log(this.data.customFields)
+          field.title = e.target.value;
+          console.log(this.data.customFields);
+        },
 
-          
+        _updateCustomFieldDescription: function (e) {
+          console.log(e.target.id);
+          var field = this.data.customFields.find(function (field) {
+            return field.id == e.target.id;
+          });
+          field.description = e.target.value;
+          console.log(this.data.customFields);
+        },
+
+        _updateVisibleCustomFields: function (e) {
+          this.data.customFields.map(function (field) {
+            console.log(field);
+            return field
+            })
         },
 
       
