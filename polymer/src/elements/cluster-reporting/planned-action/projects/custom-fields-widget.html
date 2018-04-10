@@ -51,10 +51,6 @@
         font-size: 14px;
       }
 
-      .item-wut {
-        width: 50px;
-      }
-
       .col-actions {
         width: 40px;
         margin-right: 24px;
@@ -85,13 +81,14 @@
 
     <template
       is="dom-repeat"
-      items="[[data.customFields]]">
+      items="[[data.customFields]]"
+      as="field">
       <div class="row layout horizontal">
         <div class="flex-none layout vertical center-center col-actions">
           <paper-icon-button
-            index="[[index]]"
+            id="[[field.id]]"
             class="remove-btn"
-            data-index$="[[index]]"
+            data-id$="[[field.id]]"
             on-tap="_remove"
             icon="icons:cancel">
           </paper-icon-button>
@@ -100,21 +97,21 @@
           <div class="app-grid">
 
         <paper-input
-          class="item-wut"
-          id="customField[[index]]"
-          name="customField[[index]]"
-          data-index$="[[index]]"
+          class="item"
+          id="[[field.id]]"
+          name="customFieldTitle[[index]]"
+          data-id$="[[field.id]]"
           label="Field's Title"
-          on-input"_updateCustomFields">
+          on-input="_updateCustomFields">
         </paper-input>
 
         <paper-input
           class="item-2-col"
-          id="customField[[index]]"
-          name="customField[[index]]"
-          data-index$="[[index]]"
+          id="[[field.id]]"
+          name="customFieldDescription[[index]]"
+          data-id$="[[field.id]]"
           label="Field's Description"
-          on-input"_updateCustomFields">
+          on-input="_updateCustomFields">
         </paper-input>
       </div>
       </div>
@@ -136,17 +133,21 @@
         ],
 
         properties: {
+        fieldId: Number,
         customFields: Array,
         data: Object,
         },
 
         _add: function () {
-          this.push('data.customFields', {});
+          this.set('fieldId', this.get('fieldId') + 1);
+          this.push('data.customFields', {
+            id: this.fieldId,
+          });
         },
 
         _remove: function (e) {
           var value = this.get('data.customFields');
-          var toRemove = +e.target.dataset.index;
+          var toRemove = +e.target.id;
           var newValue = value.slice(0, toRemove);
           newValue = newValue.concat(value.slice(toRemove + 1));
 
@@ -163,12 +164,11 @@
             field = {
               value: e.target.value,
             };
-            this.push('data.customFields', field);
+            console.log(this.data.customFields)
           } else {
-            var index = this.data.customFields.findIndex(function (field) {
+            var id = this.data.customFields.findId(function (field) {
               return field.id === e.target.id;
             });
-            console.log(field, value);
             this.set(['data.customFields', index, 'value'], e.target.value);
           }
         },
@@ -178,6 +178,7 @@
           this.set('data', {
             customFields: [],
           });
+          this.set('fieldId', 0);
          },
       })
     </script>

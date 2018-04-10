@@ -126,7 +126,6 @@
         padding: 24px;
       }
 
-<<<<<<< HEAD
       .details-section {
         padding: 15px;
         background: var(--paper-grey-200);
@@ -151,7 +150,6 @@
       }
 
       
-=======
       paper-radio-group {
         display: block;
         padding-top: 16px;
@@ -187,7 +185,6 @@
         color: var(--list-icon-hover-color, rgba(0, 0, 0, 0.87));
       }
 
->>>>>>> 563-OCHA-integration
     </style>
 
     <etools-prp-permissions
@@ -252,329 +249,6 @@
             is="dom-if"
             if="[[permissions.addPartnerToProject]]"
             restamp="true">
-<<<<<<< HEAD
-          <iron-form class="app-grid">
-
-            <template
-              is="dom-if"
-              if="[[_displayPartner(permissions, edit)]]"
-              restamp="true">
-              <etools-single-selection-menu
-                class="item validate full-width"
-                label="Partner"
-                options="[[partners]]"
-                option-value="id"
-                option-label="title"
-                selected="{{selectedPartner}}"
-                on-iron-activate="_validate"
-                trigger-value-change-event
-                always-float-label
-                required>
-              </etools-single-selection-menu>
-            </template>
-
-            <template
-              is="dom-if"
-              if="[[_displayPartnerReadOnly(permissions, edit)]]"
-              restamp="true">
-              <labelled-item class="item full-width" label="Partner">
-                <span>[[data.partner]]</span>
-              </labelled-item>
-            </template>
-
-            <paper-input
-              class="item validate full-width"
-              id="title"
-              label="Title"
-              value="{{data.title}}"
-              type="string"
-              required
-              on-input="_validate"
-              always-float-label>
-            </paper-input>
-
-            <div class="row">
-              <etools-multi-selection-menu
-                class="validate"
-                label="Clusters"
-                options="[[formattedClusters]]"
-                selected-values="{{selectedClusters}}"
-                on-selected-values-changed="_validate"
-                trigger-value-change-event
-                  required>
-              </etools-multi-selection-menu>
-            </div>
-
-            <div class="item">
-              <etools-prp-date-input
-                class="start-date"
-                label="Start date"
-                value="{{data.start_date}}"
-                error-message=""
-                required
-                no-init>
-               </etools-prp-date-input>
-              </etools-date-input>
-            </div>
-
-            <div class="item">
-              <etools-prp-date-input
-                  class="end-date"
-                  label="End date"
-                  value="{{data.end_date}}"
-                  error-message=""
-                  required
-                  no-init>
-              </etools-prp-date-input>
-            </div>
-
-            <paper-dropdown-menu
-                class="item validate"
-                label="Status"
-                on-value-changed="_validate"
-                always-float-label
-                required>
-              <paper-listbox
-                  selected="{{data.status}}"
-                  attr-for-selected="value"
-                  slot="dropdown-content"
-                  class="dropdown-content">
-                <template
-                  is="dom-repeat"
-                  items="[[statuses]]">
-                  <paper-item value="[[item.id]]">[[item.title]]</paper-item>
-                </template>
-              </paper-listbox>
-            </paper-dropdown-menu>
-
-            <paper-input
-              class="item validate"
-              id="total_budget"
-              label="Total Budget"
-              value="{{data.total_budget}}"
-              type="number"
-              allowed-pattern="[+\-\d.]"
-              step="0.01"
-              on-input="_validate"
-              always-float-label>
-            </paper-input>
-
-            <paper-input
-              class="item validate full-width"
-              id="funding_source"
-              label="Funding Source"
-              value="{{data.funding_source}}"
-              type="string"
-              on-input="_validate"
-              always-float-label>
-            </paper-input>
-
-            <paper-input
-              class="item validate full-width"
-              id="description"
-              label="Description"
-              value="{{data.description}}"
-              type="string"
-              on-input="_validate"
-              always-float-label>
-            </paper-input>
-
-            <paper-input
-              class="item validate full-width"
-              id="additional_information"
-              label="Additional information (e.g. links)"
-              value="{{data.additional_information}}"
-              type="string"
-              on-input="_validate"
-              always-float-label>
-            </paper-input>
-
-          </iron-form>
-
-          <div class="details-section">
-            <div class="layout horizontal center justified">
-              <span class="details-text">Want to add more details to the Project info?</span>
-              <paper-button
-              class="btn-primary"
-              on-tap="_handleDetailsChange">
-                [[_computeDetailsButtonMsg(detailsOpened)]]
-                <div id="detailsIcon">
-                  <iron-icon
-                    icon="expand-more"
-                    hidden$="[[detailsOpened]]">
-                  </iron-icon>
-                  <iron-icon
-                    icon="expand-less"
-                    hidden$="[[!detailsOpened]]">
-                  </iron-icon>
-                </div>
-              </paper-button>
-            </div>
-            <iron-collapse
-              id="collapse"
-              opened="{{detailsOpened}}"
-            >
-              <iron-form class="app-grid">
-                <etools-single-selection-menu
-                  id="agencyAcronyms"
-                  class="item validate"
-                  label="Name of Agency (acronyms)"
-                  options="[[agencyAcronyms]]"
-                  option-value="id"
-                  option-label="title"
-                  selected="{{selectedAcronym}}"
-                  on-iron-activate="_validate"
-                  trigger-value-change-event
-                  always-float-label>
-                </etools-single-selection-menu>
-                <etools-single-selection-menu
-                  class="item validate"
-                  label="Type of Agency"
-                  options="[[agencyTypes]]"
-                  option-value="id"
-                  option-label="title"
-                  selected="{{selectedAgencyType}}"
-                  on-iron-activate="_validate"
-                  trigger-value-change-event
-                  always-float-label>
-                </etools-single-selection-menu>
-                <paper-input
-                  class="item validate full-width"
-                  id="additional_implementing_partners"
-                  label="Additional implementing partners"
-                  value="{{data.additional_implementing_partners}}"
-                  type="string"
-                  on-input="_validate"
-                  always-float-label>
-                </paper-input>
-                <div class="full-width">
-                  <labelled-item label="Is this project part of a HRP or FA?">
-                    <paper-radio-group
-                        data-path="data.part"
-                        on-paper-radio-group-changed="_onValueChanged"
-                        selected="hrp">
-                      <paper-radio-button name="hrp">HRP</paper-radio-button>
-                      <paper-radio-button name="fa">FA</paper-radio-button>
-                      <paper-radio-button name="no">No</paper-radio-button>
-                    </paper-radio-group>
-                  </labelled-item>
-                </div>
-                <etools-single-selection-menu
-                  class="item validate"
-                  label="Prioritization Classification"
-                  options="[[classifications]]"
-                  option-value="id"
-                  option-label="title"
-                  selected="{{selectedClassification}}"
-                  on-iron-activate="_validate"
-                  trigger-value-change-event
-                  always-float-label>
-                </etools-single-selection-menu>
-                <etools-single-selection-menu
-                  class="item validate"
-                  label="Project code in HRP"
-                  options="[[projectCodes]]"
-                  option-value="id"
-                  option-label="title"
-                  selected="{{selectedProjectCode}}"
-                  on-iron-activate="_validate"
-                  trigger-value-change-event
-                  always-float-label>
-                </etools-single-selection-menu>
-                <paper-input
-                  class="item validate full-width"
-                  id="funding_requirements"
-                  label="Funding Requirements (US$)"
-                  value="{{data.funding_requirements}}"
-                  type="number"
-                  allowed-pattern="[+\-\d.]"
-                  step="0.01"
-                  on-input="_validate"
-                  always-float-label>
-                </paper-input>
-                <paper-input
-                  class="item validate full-width"
-                  id="own_funding"
-                  label="Funding received / confirmed through own agency internal emergency funding mechanisms (US$)"
-                  value="{{data.own_funding}}"
-                  type="number"
-                  allowed-pattern="[+\-\d.]"
-                  step="0.01"
-                  on-input="_validate"
-                  always-float-label>
-                </paper-input>
-                <paper-input
-                  class="item validate full-width"
-                  id="cerf_funding"
-                  label="Funding received / confirmed from CERF (US$)"
-                  value="{{data.cerf_funding}}"
-                  type="number"
-                  allowed-pattern="[+\-\d.]"
-                  step="0.01"
-                  on-input="_validate"
-                  always-float-label>
-                </paper-input>
-                <paper-input
-                  class="item validate full-width"
-                  id="cbpf_funding"
-                  label="Funding received / confirmed from CBPF (Country based pooled funds), eg. CHF, ERF (US$)"
-                  value="{{data.ccbpf_funding}}"
-                  type="number"
-                  allowed-pattern="[+\-\d.]"
-                  step="0.01"
-                  on-input="_validate"
-                  always-float-label>
-              </paper-input>
-              <paper-input
-                class="item validate full-width"
-                id="bilateral_funding"
-                label="Funding received / confirmed from bilateral agreeements, not including UNICEF/WFP (US$)"
-                value="{{data.bilateral_funding}}"
-                type="number"
-                allowed-pattern="[+\-\d.]"
-                step="0.01"
-                on-input="_validate"
-                always-float-label>
-              </paper-input>
-              <paper-input
-                class="item validate full-width"
-                id="unicef_funding"
-                label="Funding received / confirmed from UNICEF including supplies cost (US$)"
-                value="{{data.unicef_funding}}"
-                type="number"
-                allowed-pattern="[+\-\d.]"
-                step="0.01"
-                on-input="_validate"
-                always-float-label>
-              </paper-input>
-              <paper-input
-                class="item validate full-width"
-                id="wfp_funding"
-                label="Funding received / confirmed from WFP including supplies cost (US$)"
-                value="{{data.wfp_funding}}"
-                type="number"
-                allowed-pattern="[+\-\d.]"
-                step="0.01"
-                on-input="_validate"
-                always-float-label>
-              </paper-input>
-              <paper-input
-                class="item validate full-width"
-                id="funding_gap"
-                label="Funding gap (US$)"
-                value="{{data.funding_gap}}"
-                type="number"
-                allowed-pattern="[+\-\d.]"
-                step="0.01"
-                on-input="_validate"
-                always-float-label>
-              </paper-input>
-              </iron-form>
-            </iron-collapse>
-        </div>
-        </template>
-      </paper-dialog-scrollable>
-=======
             <etools-single-selection-menu
               class="item validate full-width"
               label="Partner"
@@ -587,7 +261,6 @@
               required>
             </etools-single-selection-menu>
           </template>
-
           <paper-radio-group
             id="mode"
             selected={{mode}}
@@ -741,111 +414,223 @@
                   on-input="_validate">
                 </paper-input>
 
-                <!-- <paper-input
+                <paper-input
                   class="item validate full-width"
                   id="additional_information"
                   label="Additional information (e.g. links)"
                   value="{{data.additional_information}}"
                   type="string"
                   on-input="_validate">
-                </paper-input> -->
+                </paper-input>
 
                 <custom-fields-widget class="item full-width">
 
                 </custom-fields-widget>
-
-                <div class="row layout horizontal infobox item full-width">
-                  <div class="flex"><h4>Want to add more details to the Project info?</h4>
-                  <div class="justify-right">
-                    <paper-button
-                      class="btn-primary"
-                      on-tap="_toggleShowMoreDetails">Show more details
-                    </paper-button>
-                    <template
-                      is="dom-if"
-                      if="[[!detailsOpened]]"
-                      restamp="true">
-                      <iron-icon id="more" icon="expand-more" hidden$="[[detailsOpened]]" on-tap="_toggleShowMoreDetails">                   
-                      </iron-icon>
-                    </template>
-                    <template
-                      is="dom-if"
-                      if="[[detailsOpened]]"
-                      restamp="true">
-                    <iron-icon id="more" icon="expand-less" hidden$="[[!detailsOpened]]" on-tap="_toggleShowMoreDetails">                   
-                    </iron-icon>
-                  </template>
-                  </div>
-                  </div>
-                  <iron-collapse
-                    id="details"
-                    opened="{{detailsOpened}}"
-                    no-animation="false">
-                      <div class="app-grid">
-                      <etools-multi-selection-menu
-                        class="validate"
-                        label="Name of Agency (acronyms)"
-                        on-selected-values-changed="_validate"
-                        trigger-value-change-event
-                        required>
-                      </etools-multi-selection-menu>
-                      <etools-multi-selection-menu
-                        class="validate"
-                        label="Type of Agency (acronyms)"
-                        on-selected-values-changed="_validate"
-                        trigger-value-change-event
-                        required>
-                      </etools-multi-selection-menu>
-                      <paper-input
-                        class="item validate full-width"
-                        id="description"
-                        label="Description"
-                        type="string"
-                        on-input="_validate">
-                      </paper-input>
-                      <paper-input
-                        class="item validate full-width"
-                        id="description"
-                        label="Description"
-                        type="string"
-                        on-input="_validate">
-                      </paper-input>
-                      <paper-input
-                        class="item validate full-width"
-                        id="description"
-                        label="Description"
-                        type="string"
-                        on-input="_validate">
-                      </paper-input>
-                      <paper-input
-                        class="item validate full-width"
-                        id="description"
-                        label="Description"
-                        type="string"
-                        on-input="_validate">
-                      </paper-input>
-                    </div>
-                  </iron-collapse>
+          <div class="details-section item full-width">
+            <div class="layout horizontal center justified">
+              <span class="details-text">Want to add more details to the Project info?</span>
+              <paper-button
+              class="btn-primary"
+              on-tap="_handleDetailsChange">
+                [[_computeDetailsButtonMsg(detailsOpened)]]
+                <div id="detailsIcon">
+                  <iron-icon
+                    icon="expand-more"
+                    hidden$="[[detailsOpened]]">
+                  </iron-icon>
+                  <iron-icon
+                    icon="expand-less"
+                    hidden$="[[!detailsOpened]]">
+                  </iron-icon>
                 </div>
+              </paper-button>
+            </div>
+            <iron-collapse
+              id="collapse"
+              opened="{{detailsOpened}}">
+              
+              <div class="app-grid">
+                <etools-single-selection-menu
+                  id="agencyAcronyms"
+                  class="item validate"
+                  label="Name of Agency (acronyms)"
+                  options="[[agencyAcronyms]]"
+                  option-value="id"
+                  option-label="title"
+                  selected="{{selectedAcronym}}"
+                  on-iron-activate="_validate"
+                  trigger-value-change-event
+                  always-float-label>
+                </etools-single-selection-menu>
+                <etools-single-selection-menu
+                  class="item validate"
+                  label="Type of Agency"
+                  options="[[agencyTypes]]"
+                  option-value="id"
+                  option-label="title"
+                  selected="{{selectedAgencyType}}"
+                  on-iron-activate="_validate"
+                  trigger-value-change-event
+                  always-float-label>
+                </etools-single-selection-menu>
+                <paper-input
+                  class="item validate full-width"
+                  id="additional_implementing_partners"
+                  label="Additional implementing partners"
+                  value="{{data.additional_implementing_partners}}"
+                  type="string"
+                  on-input="_validate"
+                  always-float-label>
+                </paper-input>
+                <div class="full-width">
+                  <labelled-item label="Is this project part of a HRP or FA?">
+                    <paper-radio-group
+                        data-path="data.part"
+                        on-paper-radio-group-changed="_onValueChanged"
+                        selected="hrp">
+                      <paper-radio-button name="hrp">HRP</paper-radio-button>
+                      <paper-radio-button name="fa">FA</paper-radio-button>
+                      <paper-radio-button name="no">No</paper-radio-button>
+                    </paper-radio-group>
+                  </labelled-item>
+                </div>
+                <etools-single-selection-menu
+                  class="item validate"
+                  label="Prioritization Classification"
+                  options="[[classifications]]"
+                  option-value="id"
+                  option-label="title"
+                  selected="{{selectedClassification}}"
+                  on-iron-activate="_validate"
+                  trigger-value-change-event
+                  always-float-label>
+                </etools-single-selection-menu>
+                <etools-single-selection-menu
+                  class="item validate"
+                  label="Project code in HRP"
+                  options="[[projectCodes]]"
+                  option-value="id"
+                  option-label="title"
+                  selected="{{selectedProjectCode}}"
+                  on-iron-activate="_validate"
+                  trigger-value-change-event
+                  always-float-label>
+                </etools-single-selection-menu>
+                <paper-input
+                  class="item validate full-width"
+                  id="funding_requirements"
+                  label="Funding Requirements (US$)"
+                  value="{{data.funding.required.funding}}"
+                  type="number"
+                  allowed-pattern="[+\-\d.]"
+                  step="0.01"
+                  on-input="_validate"
+                  always-float-label>
+                </paper-input>
+                <paper-input
+                  class="item validate full-width"
+                  id="own_funding"
+                  label="Funding received / confirmed through own agency internal emergency funding mechanisms (US$)"
+                  value="{{data.funding.own_funding}}"
+                  type="number"
+                  allowed-pattern="[+\-\d.]"
+                  step="0.01"
+                  on-input="_validate"
+                  always-float-label>
+                </paper-input>
+                <paper-input
+                  class="item validate full-width"
+                  id="cerf_funding"
+                  label="Funding received / confirmed from CERF (US$)"
+                  value="{{data.funding.cerf_funding}}"
+                  type="number"
+                  allowed-pattern="[+\-\d.]"
+                  step="0.01"
+                  on-input="_validate"
+                  always-float-label>
+                </paper-input>
+                <paper-input
+                  class="item validate full-width"
+                  id="cbpf_funding"
+                  label="Funding received / confirmed from CBPF (Country based pooled funds), eg. CHF, ERF (US$)"
+                  value="{{data.funding.cbpf_funding}}"
+                  type="number"
+                  allowed-pattern="[+\-\d.]"
+                  step="0.01"
+                  on-input="_validate"
+                  always-float-label>
+                </paper-input>
+                <paper-input
+                  class="item validate full-width"
+                  id="bilateral_funding"
+                  label="Funding received / confirmed from bilateral agreeements, not including UNICEF/WFP (US$)"
+                  value="{{data.funding.bilateral_funding}}"
+                  type="number"
+                  allowed-pattern="[+\-\d.]"
+                  step="0.01"
+                  on-input="_validate"
+                  always-float-label>
+                </paper-input>
+                <paper-input
+                  class="item validate full-width"
+                  id="unicef_funding"
+                  label="Funding received / confirmed from UNICEF including supplies cost (US$)"
+                  value="{{data.funding.unicef_funding}}"
+                  type="number"
+                  allowed-pattern="[+\-\d.]"
+                  step="0.01"
+                  on-input="_validate"
+                  always-float-label>
+                </paper-input>
+                <paper-input
+                  class="item validate full-width"
+                  id="wfp_funding"
+                  label="Funding received / confirmed from WFP including supplies cost (US$)"
+                  value="{{data.funding.wfp_funding}}"
+                  type="number"
+                  allowed-pattern="[+\-\d.]"
+                  step="0.01"
+                  on-input="_validate"
+                  always-float-label>
+                </paper-input>
+                <paper-input
+                  class="item validate full-width"
+                  id="funding_gap"
+                  label="Funding gap (US$)"
+                  value="{{data.funding.funding_gap}}"
+                  type="number"
+                  allowed-pattern="[+\-\d.]"
+                  step="0.01"
+                  on-input="_validate"
+                  always-float-label>
+                </paper-input>
+              <div>
+            </iron-collapse>
+          </div>
+        </template>
+
+        <div class="buttons layout horizontal-reverse">
+            <paper-button class="btn-primary" on-tap="_save" raised>
+              Save
+            </paper-button>
+    
+            <paper-button  on-tap="close">
+              Cancel
+            </paper-button>
+          </div>
+    
+          <etools-loading active="[[updatePending]]"></etools-loading>
+
+
+                
               </div>
             </template>
           </div>
         </paper-radio-group>
       </template>
     </paper-dialog-scrollable>
->>>>>>> 563-OCHA-integration
 
-      <div class="buttons layout horizontal-reverse">
-        <paper-button class="btn-primary" on-tap="_save" raised>
-          Save
-        </paper-button>
-
-        <paper-button  on-tap="close">
-          Cancel
-        </paper-button>
-      </div>
-
-      <etools-loading active="[[updatePending]]"></etools-loading>
+      
     </paper-dialog>
   </template>
 
@@ -1039,13 +824,12 @@
         this.set('refresh', true);
       },
 
-<<<<<<< HEAD
       _handleDetailsChange: function () {
         this.detailsOpened = !this.detailsOpened;
-=======
+      },
+      
       _toggleShowMoreDetails: function() {
         this.detailsOpened ? this.detailsOpened = false : this.detailsOpened = true
->>>>>>> 563-OCHA-integration
       },
 
       _computeTitle: function(edit) {
@@ -1062,7 +846,6 @@
         });
       },
 
-<<<<<<< HEAD
       _computeDetailsButtonMsg: function(detailsOpened) {
         if (detailsOpened) {
           return 'show less details';
@@ -1070,7 +853,6 @@
         return 'show more details';
       },
 
-=======
       _fetchOchaProjectsList: function (mode) {
         if (mode !== 'ocha') {
           return;
@@ -1134,7 +916,6 @@
       //   }
       // },
 
->>>>>>> 563-OCHA-integration
       _savePartner: function(partner) {
         this.set('data.partner_id', partner.id);
       },
