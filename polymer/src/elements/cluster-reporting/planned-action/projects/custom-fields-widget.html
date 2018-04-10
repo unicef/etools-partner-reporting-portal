@@ -135,13 +135,13 @@
 
         properties: {
         fieldId: Number,
-        customFields: Array,
+        customFields: {
+          format: Array,
+          observer: '_updateVisibleCustomFields'
+        },
         data: Object,
         },
 
-        observers: [
-          '_updateVisibleCustomFields(data.customFields)'
-        ],
 
         _add: function () {
           this.set('fieldId', this.get('fieldId') + 1);
@@ -154,7 +154,8 @@
 
         _remove: function (e) {
           var value = this.get('data.customFields');
-          var toRemove = e.target.id + 1;
+          var toRemove = --e.target.id;
+          console.log(toRemove)
           var newValue = value.slice(0, toRemove).concat(value.slice(toRemove + 1));
 
           console.log(newValue);
@@ -180,11 +181,11 @@
           console.log(this.data.customFields);
         },
 
-        _updateVisibleCustomFields: function (e) {
-          this.data.customFields.map(function (field) {
-            console.log(field);
+        _updateVisibleCustomFields: function () {
+          var newCustomFields = this.data.customFields.map(function (field) {
             return field
-            })
+            });
+          this.data.customFields = newCustomFields;
         },
 
       
