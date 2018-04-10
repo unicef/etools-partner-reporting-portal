@@ -314,7 +314,7 @@
                     selected-values="{{selectedClusters}}"
                     on-selected-values-changed="_validate"
                     trigger-value-change-event
-                      required>
+                    required>
                   </etools-multi-selection-menu>
                 </div>
 
@@ -402,27 +402,52 @@
 
                 </custom-fields-widget>
 
-                <div class="item full-width show-more-details">
-                  <div class="item justify-right">
+                <div class="row layout horizontal infobox item full-width">
+                  <div class="flex"><h4>Want to add more details to the Project info?</h4>
+                  <div class="justify-right">
                     <paper-button
-                      class="btn-primary-button"
-                      on-tap="_toggleShowMoreDetails">
-                      Show More Details
+                      class="btn-primary"
+                      on-tap="_toggleShowMoreDetails">Show more details
                     </paper-button>
-                    <iron-icon id="more" icon="expand-more" hidden$="[[detailsOpened]]" on-tap="_toggleShowMoreDetails"></iron-icon>
-                    <iron-icon id="less" icon="expand-less" hidden$="[[!detailsOpened]]" on-tap="_toggleShowMoreDetails"></iron-icon>
+                    <template
+                      is="dom-if"
+                      if="[[!detailsOpened]]"
+                      restamp="true">
+                      <iron-icon id="more" icon="expand-more" hidden$="[[detailsOpened]]" on-tap="_toggleShowMoreDetails">                   
+                      </iron-icon>
+                    </template>
+                    <template
+                      is="dom-if"
+                      if="[[detailsOpened]]"
+                      restamp="true">
+                    <iron-icon id="more" icon="expand-less" hidden$="[[!detailsOpened]]" on-tap="_toggleShowMoreDetails">                   
+                    </iron-icon>
+                  </template>
                   </div>
-                  <div class="item full-width">
+                  </div>
                   <iron-collapse
                     id="details"
                     opened="{{detailsOpened}}"
                     no-animation="false">
-                    <div class="item full-width app-grid">
+                      <div class="app-grid">
+                      <etools-multi-selection-menu
+                        class="validate"
+                        label="Name of Agency (acronyms)"
+                        on-selected-values-changed="_validate"
+                        trigger-value-change-event
+                        required>
+                      </etools-multi-selection-menu>
+                      <etools-multi-selection-menu
+                        class="validate"
+                        label="Type of Agency (acronyms)"
+                        on-selected-values-changed="_validate"
+                        trigger-value-change-event
+                        required>
+                      </etools-multi-selection-menu>
                       <paper-input
-                        class="item validate "
+                        class="item validate full-width"
                         id="description"
                         label="Description"
-                        value="{{data.description}}"
                         type="string"
                         on-input="_validate">
                       </paper-input>
@@ -430,7 +455,6 @@
                         class="item validate full-width"
                         id="description"
                         label="Description"
-                        value="{{data.description}}"
                         type="string"
                         on-input="_validate">
                       </paper-input>
@@ -438,7 +462,6 @@
                         class="item validate full-width"
                         id="description"
                         label="Description"
-                        value="{{data.description}}"
                         type="string"
                         on-input="_validate">
                       </paper-input>
@@ -446,7 +469,6 @@
                         class="item validate full-width"
                         id="description"
                         label="Description"
-                        value="{{data.description}}"
                         type="string"
                         on-input="_validate">
                       </paper-input>
