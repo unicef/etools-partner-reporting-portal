@@ -16,19 +16,33 @@
 <link rel="import" href="../../../../../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../../../../../bower_components/paper-radio-button/paper-radio-button.html">
 
+<link rel="import" href="../../../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../../../../../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../../../../../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../../../../../bower_components/etools-loading/etools-loading.html">
+<link rel="import" href="../../../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../../../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../../../../bower_components/paper-item/paper-item.html">
+
 <link rel="import" href="../../../../polyfills/es6-shim.html">
 <link rel="import" href="../../../etools-prp-ajax.html">
 <link rel="import" href="../../../../elements/etools-prp-permissions.html">
+<link rel="import" href="../../../../elements/cluster-reporting/creation-modal-project-details.html">
+<link rel="import" href="../../../../elements/cluster-reporting/planned-action/projects/custom-fields-widget.html">
 <link rel="import" href="../../../etools-prp-date-input.html">
 <link rel="import" href="../../../form-fields/dropdown-form-input.html">
 <link rel="import" href="../../../form-fields/cluster-dropdown-content.html">
 <link rel="import" href="../../../form-fields/partner-dropdown-content.html">
+<link rel="import" href="../../../../behaviors/modal.html">
 <link rel="import" href="../../../../behaviors/routing.html">
 <link rel="import" href="../../../../behaviors/utils.html">
 <link rel="import" href="../../../../redux/store.html">
 <link rel="import" href="../../../../redux/actions.html">
 <link rel="import" href="../../../../styles/buttons.html">
 <link rel="import" href="../../../labelled-item.html">
+<link rel="import" href="../../../error-box.html">
+
 
 <dom-module id="planned-action-projects-modal">
   <template>
@@ -62,6 +76,41 @@
         background: var(--theme-primary-color);
       }
 
+      .infobox {
+        display: block;
+        --app-grid-columns:2;
+        --app-grid-gutter: 25px;
+        --app-grid-item-height: auto;
+        padding: 15px;
+        background: var(--paper-grey-300);
+      }
+
+      .infobox h4 {
+        display: inline;
+        color: #737373;
+        font-weight: 400;
+        font-size: 12px
+      }
+
+      .red {
+        color: red;
+        display: inline;
+      }
+
+      .justify-right {
+        float: right;
+      }
+
+      .show-more-details {
+        display: block;
+        padding: 15px;
+        background: var(--paper-grey-300);
+      }
+
+      .show-more-details .justify-right {
+        float: right;
+      }
+      
       .header h2 {
         @apply(--paper-font-title);
         margin: 0;
@@ -77,6 +126,7 @@
         padding: 24px;
       }
 
+<<<<<<< HEAD
       .details-section {
         padding: 15px;
         background: var(--paper-grey-200);
@@ -101,6 +151,43 @@
       }
 
       
+=======
+      paper-radio-group {
+        display: block;
+        padding-top: 16px;
+      }
+
+      paper-radio-group > .fields {
+        padding: calc(var(--app-grid-gutter) / 2) 0;
+      } 
+
+      paper-radio-group > .fields[empty] {
+        padding: 0;
+      }
+
+      paper-radio-group .app-grid {
+        margin: -var(--app-grid-gutter);
+      }
+
+      paper-radio-button {
+        margin-left: -12px;
+      }
+
+      paper-dropdown-menu {
+        width: 100%;
+      }
+
+      iron-icon {
+        color: var(--list-icon-color, #2b2b2b);
+        height: 40px;
+        width: 40px;
+      }
+
+      iron-icon:hover {
+        color: var(--list-icon-hover-color, rgba(0, 0, 0, 0.87));
+      }
+
+>>>>>>> 563-OCHA-integration
     </style>
 
     <etools-prp-permissions
@@ -112,7 +199,7 @@
     <cluster-dropdown-content clusters="{{clusters}}"></cluster-dropdown-content>
     <template
     is="dom-if"
-    if="[[_displayPartner(permissions, edit)]]"
+    if="[[permissions.addPartnerToProject]]"
     restamp="true">
       <partner-dropdown-content
         partners="{{partners}}"
@@ -128,26 +215,44 @@
       method="[[_computeAjaxMethod(edit)]]">
     </etools-prp-ajax>
 
+    <etools-prp-ajax
+      id="projects"
+      timeout="100000"
+      url="[[ochaProjectsUrl]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
+      id="projectDetails"
+      url="[[ochaProjectDetailsUrl]]"
+      body="[[ochaProjectRequestId]]"
+      content-type="application/json"
+      timeout="100000"
+      method="post">
+    </etools-prp-ajax>
 
     <paper-dialog
-        id="dialog"
-        with-backdrop
-        opened="{{opened}}">
+      id="dialog"
+      with-backdrop
+      opened="{{opened}}">
       <div class="header layout horizontal justified">
         <h2>[[_computeTitle(edit)]]</h2>
-          <paper-icon-button
-              class="self-center"
-              on-tap="close"
-              icon="icons:close">
-          </paper-icon-button>
-        </div>
+        <paper-icon-button
+          class="self-center"
+          on-tap="close"
+          icon="icons:close">
+        </paper-icon-button>
       </div>
 
       <paper-dialog-scrollable>
         <template
+          is="dom-if"
+          if="[[refresh]]"
+          restamp="true">
+          <template
             is="dom-if"
-            if="[[refresh]]"
+            if="[[permissions.addPartnerToProject]]"
             restamp="true">
+<<<<<<< HEAD
           <iron-form class="app-grid">
 
             <template
@@ -469,6 +574,266 @@
         </div>
         </template>
       </paper-dialog-scrollable>
+=======
+            <etools-single-selection-menu
+              class="item validate full-width"
+              label="Partner"
+              options="[[partners]]"
+              option-value="id"
+              option-label="title"
+              selected="{{data.partner_id}}"
+              on-iron-activate="_validate"
+              trigger-value-change-event
+              required>
+            </etools-single-selection-menu>
+          </template>
+
+          <paper-radio-group
+            id="mode"
+            selected={{mode}}
+            on-change="_adjustPosition">
+            <paper-radio-button name="ocha" active="true">
+              <strong>From OCHA</strong>
+            </paper-radio-button>
+            <div
+              class="fields"
+              empty$="[[!_equals(mode, 'ocha')]]">
+              <template
+                is="dom-if"
+                if="[[_equals(mode, 'ocha')]]"
+                restamp="true">
+                <div>
+                  <etools-single-selection-menu
+                    class="item validate full-width"
+                    label="Project"
+                    options="[[formattedProjects]]"
+                    option-value="id"
+                    option-label="title"
+                    selected="{{selectedProject}}"
+                    on-iron-activate="_validate"
+                    disabled="[[projectsLoading]]"
+                    trigger-value-change-event
+                    required>
+                  </etools-single-selection-menu>
+                  <creation-modal-project-details
+                    id="details"
+                    project-data="[[projectDetails]]"
+                    loading="[[projectDetailsLoading]]">
+                  </creation-modal-project-details>
+                  <etools-loading active$="[[projectsLoading]]"></etools-loading>
+                </div>
+              </template>
+            </div>
+
+            <paper-radio-button name="custom">
+              <strong>Custom</strong>
+            </paper-radio-button>
+
+            <div
+              empty$="[[!_equals(mode, 'custom')]]">
+              <template
+                is="dom-if"
+                if="[[_equals(mode, 'custom')]]"
+                restamp="true">
+                <div class="item full-width infobox">
+                  <span class="item">
+                    <h4>Basic Project details</h4>
+                  </span>  
+                  <span class="item justify-right">
+                    <div class="red">*</div>
+                    <h4>Fields required</h4>
+                  </span>
+                </div>
+                <div class="app-grid">
+                  <div class="item full-width">
+                    <error-box errors="[[errors]]"></error-box>
+                  </div>
+                  <paper-input
+                    class="item validate full-width"
+                    id="title"
+                    label="Title *"
+                    value="{{data.title}}"
+                    type="string"
+                    required
+                    on-input="_validate">
+                  </paper-input>
+
+                <div class="item full-width">
+                  <etools-multi-selection-menu
+                    class="validate"
+                    label="Clusters *"
+                    options="[[formattedClusters]]"
+                    selected-values="{{selectedClusters}}"
+                    on-selected-values-changed="_validate"
+                    trigger-value-change-event
+                    required>
+                  </etools-multi-selection-menu>
+                </div>
+
+                <div class="item">
+                  <etools-prp-date-input
+                    class="start-date"
+                    label="Start date *"
+                    value="{{data.start_date}}"
+                    error-message=""
+                    required
+                    no-init>
+                  </etools-prp-date-input>
+                </div>
+
+                <div class="item">
+                  <etools-prp-date-input
+                      class="end-date"
+                      label="End date *"
+                      value="{{data.end_date}}"
+                      error-message=""
+                      required
+                      no-init>
+                  </etools-prp-date-input>
+                </div>
+                <div class="row">
+                <paper-dropdown-menu
+                  class="item validate"
+                  label="Status *"
+                  on-value-changed="_validate"
+                  always-float-label
+                  required>
+                  <paper-listbox
+                    selected="{{data.status}}"
+                    attr-for-selected="value"
+                    slot="dropdown-content"
+                    class="dropdown-content">
+                    <template
+                      is="dom-repeat"
+                      items="[[statuses]]">
+                      <paper-item value="[[item.id]]">[[item.title]]</paper-item>
+                    </template>
+                  </paper-listbox>
+                </paper-dropdown-menu>
+                </div>
+
+                <paper-input
+                  class="item validate"
+                  id="total_budget"
+                  label="Total Budget"
+                  value="{{data.total_budget}}"
+                  type="number"
+                  allowed-pattern="[+\-\d.]"
+                  step="0.01"
+                  on-input="_validate">
+                </paper-input>
+
+                <paper-input
+                  class="item validate full-width"
+                  id="funding_source"
+                  label="Funding Source"
+                  value="{{data.funding_source}}"
+                  type="string"
+                  on-input="_validate">
+                </paper-input>
+
+                <paper-input
+                  class="item validate full-width"
+                  id="description"
+                  label="Description"
+                  value="{{data.description}}"
+                  type="string"
+                  on-input="_validate">
+                </paper-input>
+
+                <!-- <paper-input
+                  class="item validate full-width"
+                  id="additional_information"
+                  label="Additional information (e.g. links)"
+                  value="{{data.additional_information}}"
+                  type="string"
+                  on-input="_validate">
+                </paper-input> -->
+
+                <custom-fields-widget class="item full-width">
+
+                </custom-fields-widget>
+
+                <div class="row layout horizontal infobox item full-width">
+                  <div class="flex"><h4>Want to add more details to the Project info?</h4>
+                  <div class="justify-right">
+                    <paper-button
+                      class="btn-primary"
+                      on-tap="_toggleShowMoreDetails">Show more details
+                    </paper-button>
+                    <template
+                      is="dom-if"
+                      if="[[!detailsOpened]]"
+                      restamp="true">
+                      <iron-icon id="more" icon="expand-more" hidden$="[[detailsOpened]]" on-tap="_toggleShowMoreDetails">                   
+                      </iron-icon>
+                    </template>
+                    <template
+                      is="dom-if"
+                      if="[[detailsOpened]]"
+                      restamp="true">
+                    <iron-icon id="more" icon="expand-less" hidden$="[[!detailsOpened]]" on-tap="_toggleShowMoreDetails">                   
+                    </iron-icon>
+                  </template>
+                  </div>
+                  </div>
+                  <iron-collapse
+                    id="details"
+                    opened="{{detailsOpened}}"
+                    no-animation="false">
+                      <div class="app-grid">
+                      <etools-multi-selection-menu
+                        class="validate"
+                        label="Name of Agency (acronyms)"
+                        on-selected-values-changed="_validate"
+                        trigger-value-change-event
+                        required>
+                      </etools-multi-selection-menu>
+                      <etools-multi-selection-menu
+                        class="validate"
+                        label="Type of Agency (acronyms)"
+                        on-selected-values-changed="_validate"
+                        trigger-value-change-event
+                        required>
+                      </etools-multi-selection-menu>
+                      <paper-input
+                        class="item validate full-width"
+                        id="description"
+                        label="Description"
+                        type="string"
+                        on-input="_validate">
+                      </paper-input>
+                      <paper-input
+                        class="item validate full-width"
+                        id="description"
+                        label="Description"
+                        type="string"
+                        on-input="_validate">
+                      </paper-input>
+                      <paper-input
+                        class="item validate full-width"
+                        id="description"
+                        label="Description"
+                        type="string"
+                        on-input="_validate">
+                      </paper-input>
+                      <paper-input
+                        class="item validate full-width"
+                        id="description"
+                        label="Description"
+                        type="string"
+                        on-input="_validate">
+                      </paper-input>
+                    </div>
+                  </iron-collapse>
+                </div>
+              </div>
+            </template>
+          </div>
+        </paper-radio-group>
+      </template>
+    </paper-dialog-scrollable>
+>>>>>>> 563-OCHA-integration
 
       <div class="buttons layout horizontal-reverse">
         <paper-button class="btn-primary" on-tap="_save" raised>
@@ -492,6 +857,7 @@
         App.Behaviors.ReduxBehavior,
         App.Behaviors.RoutingBehavior,
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ModalBehavior,
       ],
 
       properties: {
@@ -506,12 +872,21 @@
 
         opened: {
           type: Boolean,
-          value: false,
+        },
+
+        detailsOpened: {
+          type: Boolean,
+          value: false
         },
 
         updatePending: {
           type: Boolean,
           value: false,
+        },
+
+        mode: {
+          type: String,
+          observer: '_setDefaults',
         },
 
         data: {
@@ -526,7 +901,22 @@
 
         url: {
           type: String,
-          computed: '_computeUrl(responsePlanID, selectedPartner, data, edit)'
+          computed: '_computeUrl(responsePlanID, mode)',
+        },
+
+        ochaProjectsUrl: {
+          type: String,
+          computed: '_computeOchaProjectsUrl(responsePlanID)',
+        },
+
+        ochaProjectDetailsUrl: {
+          type: String,
+          computed: '_computeOchaProjectsUrl(responsePlanID)',
+        },
+
+        ochaProjectRequestId: {
+          type: Object,
+          computed: '_computeOchaProjectRequestId(selectedProject)'
         },
 
         clusters: {
@@ -562,10 +952,23 @@
           ],
         },
 
-        selectedPartner: {
+        projects: {
+          type: Array,
+          value: [],
+        },
+
+        formattedProjects: {
           type: String,
-          value: '',
+          computed: "_computeFormattedProjects(projects)"
+        },
+
+        selectedPartner: {
+          type: Number,
           observer: '_savePartner',
+        },
+
+        selectedProject: {
+          type: String,
         },
 
         profile: {
@@ -578,7 +981,9 @@
           computed: '_computeImoClusters(profile)',
         },
 
-        selectedClusters: Array,
+        selectedClusters: { 
+          type: Array,
+        },
 
         edit: {
           type: Boolean,
@@ -591,17 +996,25 @@
         }
       },
 
-      _computeUrl: function(responsePlanID, selectedPartner, data, edit) {
-        if (edit) {
-          if (this.permissions.addPartnerToProject) {
-            var partnerId = data.partner_id;
-            return App.Endpoints.plannedActionsIMOEdit(responsePlanID, partnerId, data.id);
-          }
-          return App.Endpoints.plannedActionsProjectOverview(data.id);
-        }
-        return this.permissions.addPartnerToProject
-          ? App.Endpoints.plannedActionsIMO(responsePlanID, selectedPartner)
-          : App.Endpoints.plannedActions(responsePlanID);
+      listeners: {
+        'details-loaded': 'adjustPosition',
+      },
+
+      observers: [
+        '_fetchOchaProjectsList(mode, ochaProjectsUrl)',
+        '_fetchOchaProjectDetails(selectedProject)',
+        '_saveClusters(selectedClusters.splices)',
+        // '_adjustPosition(projectDetails)',
+      ],
+
+      _computeUrl: function(responsePlanID, mode) {
+        if (mode === 'custom') { 
+        return App.Endpoints.partnerProjectCreate(responsePlanID)
+        } else {return App.Endpoints.ochaProjectsList(responsePlanID)}
+      },
+
+      _computeOchaProjectsUrl: function(responsePlanID) {
+        return App.Endpoints.ochaProjectsList(responsePlanID)
       },
 
       close: function () {
@@ -626,8 +1039,13 @@
         this.set('refresh', true);
       },
 
+<<<<<<< HEAD
       _handleDetailsChange: function () {
         this.detailsOpened = !this.detailsOpened;
+=======
+      _toggleShowMoreDetails: function() {
+        this.detailsOpened ? this.detailsOpened = false : this.detailsOpened = true
+>>>>>>> 563-OCHA-integration
       },
 
       _computeTitle: function(edit) {
@@ -644,6 +1062,7 @@
         });
       },
 
+<<<<<<< HEAD
       _computeDetailsButtonMsg: function(detailsOpened) {
         if (detailsOpened) {
           return 'show less details';
@@ -651,8 +1070,79 @@
         return 'show more details';
       },
 
+=======
+      _fetchOchaProjectsList: function (mode) {
+        if (mode !== 'ocha') {
+          return;
+        }
+        this.set('projectsLoading', true);
+        var self = this;
+        this.$.projects.abort();
+
+        this.$.projects.thunk()()
+            .then(function (res) {
+              self.set('projectsLoading', false);
+              self.set('projects', res.data);
+              self.fire('details-loaded', this.name);
+            })
+            .catch(function (err) { // jshint ignore:line
+              if (err.code === 504) {
+                self.fire('notify', {type: 'ocha-timeout'});
+              }
+              self.set('projectsLoading', false);
+              // TODO: error handling
+            });
+      },
+
+      _computeOchaProjectRequestId: function (selectedProject) {
+        return ({'project': selectedProject});
+      },
+
+      _fetchOchaProjectDetails: function (project) {
+        if (!project) {
+          return;
+        }
+        this.set('projectDetailsLoading', true);
+        var self = this;
+        this.$.projectDetails.abort();
+
+        this.$.projectDetails.thunk()()
+          .then(function (res) {
+            self.set('projectDetailsLoading', false);
+            self.set('projectDetails', res.data);
+            self.fire('details-loaded', this.name);
+
+          })
+          .catch(function (err) { // jshint ignore:line
+            if (err.code === 504) {
+              self.fire('notify', {type: 'ocha-timeout'});
+            }
+            self.set('projectDetailsLoading', false);
+            // TODO: error handling
+          });
+      },      
+
+      _computeFormattedProjects: function(projects) {
+        return projects.map(function(project) {
+          return {id: project.id, title: project.name};
+        });
+      },
+
+      // _onOpenedChanged: function (opened) {
+      //   if (opened) {
+      //     this.set('mode', '');
+      //   }
+      // },
+
+>>>>>>> 563-OCHA-integration
       _savePartner: function(partner) {
-        this.set('data.partner', partner);
+        this.set('data.partner_id', partner.id);
+      },
+
+      _saveClusters: function() {
+        this.set('data.clusters', this.selectedClusters.map(function(cluster) {
+            return {'id': cluster};
+          }))
       },
 
       _displayPartner: function (permissions, edit) {
@@ -693,39 +1183,51 @@
         });
       },
 
+      _setDefaults: function (edit) {
+        if (edit) { return }
+        this.set('selectedProject', '');
+        this.set('projectLoading', false);
+        this.set('data', {});
+        this.set('projectDetails', {});
+        this.set('errors', {});
+      },
+
+      _adjustPosition: function (e) {
+        e.stopPropagation();
+        this.debounce('adjust-position', function () {
+          this.$.dialog.refit();
+        }, 100);
+      },
+
       _save: function () {
         var self = this;
-
-        var valid = [
-          this._fieldsAreValid(),
-          this._dateRangeValid('.start-date', '.end-date'),
-        ].every(Boolean);
-
-        if (!valid) {
-          return;
+        if (!this.data.partner_id) {
+          this.data.partner_id = this.partnerID;
         }
-        this.data.clusters = this.selectedClusters.map(function(item) {
-          return {id: Number(item)};
-        });
 
-        if (!this.data.partner) {
-          this.data.partner = this.partnerID;
+        if (this.mode === 'ocha') {
+          this.$.projectAjax.body = this.ochaProjectRequestId
+        } else {
+          this.$.projectAjax.body = Object.assign({}, this.data);
         }
+
         this.updatePending = true;
         var thunk = this.$.projectAjax.thunk();
+        
         thunk()
           .then(function (res) {
             self.updatePending = false;
             if (self.edit) {
               self.fire('project-edited', res.data);
               self.close();
+              self.set('errors', {});
             } else {
               self._redirectToDetail(res.data.id);
             }
           })
           .catch(function (err) { // jshint ignore:line
             self.updatePending = false;
-            // TODO: error handling
+            self.set('errors', err.data);
           });
       },
 

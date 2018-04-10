@@ -1,0 +1,184 @@
+<link rel="import" href="../../../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../../../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html">
+<link rel="import" href="../../../../../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../../../../../bower_components/paper-input/paper-input.html">
+
+<link rel="import" href="../../../../polyfills/es6-shim.html">
+<link rel="import" href="../../../../behaviors/utils.html">
+<link rel="import" href="../../../../redux/store.html">
+<link rel="import" href="../../../../styles/buttons.html">
+<link rel="import" href="../../../../styles/shared-styles.html">
+<link rel="import" href="../../../json-field.html">
+<link rel="import" href="../../../etools-prp-ajax.html">
+<link rel="import" href="../../../etools-prp-reset.html">
+<link rel="import" href="../../../etools-prp-permissions.html">
+<link rel="import" href="../../../labelled-item.html">
+
+<dom-module id="custom-fields-widget">
+  <template>
+    <style include="button-styles iron-flex iron-flex-alignment app-grid-style shared-styles">
+      :host {
+        display: block;
+
+        --app-grid-columns: 3;
+        --app-grid-gutter: 12px;
+        --app-grid-item-height: auto;
+        --app-grid-expandible-item-columns: 2;
+      }
+
+      .app-grid {
+        padding-top: 0;
+        margin: 0 -var(--app-grid-gutter);
+      }
+
+      .item-2-col {
+        @apply --app-grid-expandible-item;
+      }
+
+      header {
+        background-color: var(--paper-grey-200);
+        padding: 5px 10px;
+        margin: 0 0 1em;
+      }
+
+      h3 {
+        margin: 0;
+        font-size: 14px;
+      }
+
+      .item-wut {
+        width: 50px;
+      }
+
+      .col-actions {
+        width: 40px;
+        margin-right: 24px;
+        border-right: 1px solid var(--paper-grey-400);
+      }
+
+      .row {
+        margin-bottom: 1em;
+      }
+
+
+      .remove-btn {
+        width: 34px;
+        height: 34px;
+        color: var(--paper-deep-orange-a700);
+      }
+
+      labelled-item {
+        padding: 8px 0;
+      }
+
+    </style>
+
+    <etools-prp-permissions
+      permissions="{{permissions}}">
+    </etools-prp-permissions>
+
+
+    <template
+      is="dom-repeat"
+      items="[[data.customFields]]">
+      <div class="row layout horizontal">
+        <div class="flex-none layout vertical center-center col-actions">
+          <paper-icon-button
+            index="[[index]]"
+            class="remove-btn"
+            data-index$="[[index]]"
+            on-tap="_remove"
+            icon="icons:cancel">
+          </paper-icon-button>
+        </div>
+        <div class="flex">
+          <div class="app-grid">
+
+        <paper-input
+          class="item-wut"
+          id="customField[[index]]"
+          name="customField[[index]]"
+          data-index$="[[index]]"
+          label="Field's Title"
+          on-input"_updateCustomFields">
+        </paper-input>
+
+        <paper-input
+          class="item-2-col"
+          id="customField[[index]]"
+          name="customField[[index]]"
+          data-index$="[[index]]"
+          label="Field's Description"
+          on-input"_updateCustomFields">
+        </paper-input>
+      </div>
+      </div>
+    </template>
+    
+    <paper-button
+      class="btn-primary"
+      on-tap="_add">
+        Add Custom Field
+    </paper-button> 
+  </template>
+    <script>
+      Polymer({
+        is: 'custom-fields-widget',
+
+        behaviors: [
+          App.Behaviors.UtilsBehavior,
+          App.Behaviors.ReduxBehavior,
+        ],
+
+        properties: {
+        customFields: Array,
+        data: Object,
+        },
+
+        _add: function () {
+          this.push('data.customFields', {});
+        },
+
+        _remove: function (e) {
+          var value = this.get('data.customFields');
+          var toRemove = +e.target.dataset.index;
+          var newValue = value.slice(0, toRemove);
+          newValue = newValue.concat(value.slice(toRemove + 1));
+
+          console.log(newValue);
+
+          this.set('data.customFields', newValue);
+        },
+
+        _updateCustomFields: function (e) {
+          var field = this.data.customFields.find(function (field) {
+            return field.id === e.target.id;
+          });
+          if (!field) {
+            field = {
+              value: e.target.value,
+            };
+            this.push('data.customFields', field);
+          } else {
+            var index = this.data.customFields.findIndex(function (field) {
+              return field.id === e.target.id;
+            });
+            console.log(field, value);
+            this.set(['data.customFields', index, 'value'], e.target.value);
+          }
+        },
+
+      
+        attached: function () {
+          this.set('data', {
+            customFields: [],
+          });
+         },
+      })
+    </script>
+</dom-module>
