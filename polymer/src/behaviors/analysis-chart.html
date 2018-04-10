@@ -1,3 +1,6 @@
+<link rel="import" href="../../bower_components/numeral-js/numeral-import.html">
+
+<link rel="import" href="../constants.html">
 <link rel="import" href="../polyfills/es6-shim.html">
 
 <script>
@@ -27,7 +30,7 @@
         'color: #fff;',
       '}',
       '.number-of-partners + .progress {',
-        'margin-top: -1em;',
+        'margin-top: -.75em;',
       '}',
     ].join('\n');
 
@@ -59,7 +62,9 @@
         return [
           '<div class="tooltip-content">',
             '<div>' + title + '</div>',
-            '<div class="number-of-partners">' + data.length + '</div>',
+            '<div class="number-of-partners">',
+              numeral(data.length).format(App.Constants.FORMAT_NUMBER_DEFAULT),
+            '</div>',
             '<div>' + this._commaSeparated(data) + '</div>',
           '</div>',
         ].join('\n');

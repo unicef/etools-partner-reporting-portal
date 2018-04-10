@@ -1,10 +1,12 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../../bower_components/google-chart/google-chart.html">
+<link rel="import" href="../../../../bower_components/numeral-js/numeral-import.html">
 
 <link rel="import" href="analysis-widget.html">
 <link rel="import" href="../../list-placeholder.html">
 <link rel="import" href="../../../behaviors/utils.html">
 <link rel="import" href="../../../behaviors/analysis-chart.html">
+<link rel="import" href="../../../constants.html">
 <link rel="import" href="../../../polyfills/es6-shim.html">
 
 <dom-module id="current-progress-by-location">
@@ -109,7 +111,9 @@
         return [
           '<div class="tooltip-content">',
             '<div>' + title + '</div>',
-            '<div class="number-of-partners">' + data.progress + '</div>',
+            '<div class="number-of-partners">',
+              numeral(data.progress).format(App.Constants.FORMAT_NUMBER_DEFAULT),
+            '</div>',
             '<div>Contributing Partners:</div>',
             '<div>' + this._commaSeparated(data.partners) + '</div>',
           '</div>',
