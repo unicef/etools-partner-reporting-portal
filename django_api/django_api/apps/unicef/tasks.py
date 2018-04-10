@@ -37,8 +37,8 @@ LAST_NAME_MAX_LENGTH = User._meta.get_field('last_name').max_length
 
 
 def process_model(model_to_process, process_serializer, data, filter_dict):
-    obj = model_to_process.objects.filter(**filter_dict).first()
-    serializer = process_serializer(obj, data=data)
+    instance = model_to_process.objects.filter(**filter_dict).first()
+    serializer = process_serializer(instance=instance, data=data)
     serializer.is_valid(raise_exception=True)
     return serializer.save()
 
@@ -147,8 +147,12 @@ def process_programme_documents(fast=False, area=False):
 
                         try:
                             partner = process_model(
-                                Partner, PMPPDPartnerSerializer, partner_data, {
-                                    'vendor_number': partner_data['unicef_vendor_number']})
+                                Partner,
+                                PMPPDPartnerSerializer,
+                                partner_data, {
+                                    'vendor_number': partner_data['unicef_vendor_number']
+                                }
+                            )
                         except ValidationError:
                             logger.exception('Error trying to save Partner model with {}'.format(partner_data))
 
@@ -174,18 +178,12 @@ def process_programme_documents(fast=False, area=False):
                         item['status'] = item['status'].title()[:3]
 
                         try:
-                            # TODO: Temp fix for these fields: This is for UNICEF supply field
-                            item['funds_received'] = "0.0"
-                            item['funds_received_currency'] = ""
-
                             pd = process_model(
                                 ProgrammeDocument, PMPProgrammeDocumentSerializer, item,
                                 {'external_id': item['id'], 'workspace': workspace}
                             )
-                        except Exception as e:
-                            print(item)
-
-                            if e.message:
+                        except KeyError as e:
+                            if hasattr(e, 'message'):
                                 print(e.message)
                             else:
                                 print(e)
@@ -348,17 +346,20 @@ def process_programme_documents(fast=False, area=False):
                                             for dv in dis['disaggregation_values']:
                                                 dv['disaggregation'] = disaggregation.id
                                                 process_model(
-                                                    DisaggregationValue, PMPDisaggregationValueSerializer,
-                                                    dv, {'external_id': dv['id']}
+                                                    DisaggregationValue,
+                                                    PMPDisaggregationValueSerializer,
+                                                    dv,
+                                                    {
+                                                        'disaggregation_id': disaggregation.id,
+                                                        'value': dv['value'],
+                                                    }
                                                 )
 
                                     # Create Reportable
                                     i['blueprint_id'] = blueprint.id if blueprint else None
-                                    i['disaggregation_ids'] = [
-                                        ds.id for ds in disaggregations]
+                                    i['disaggregation_ids'] = [ds.id for ds in disaggregations]
 
-                                    i['content_type'] = ContentType.objects.get_for_model(
-                                        llo).id
+                                    i['content_type'] = ContentType.objects.get_for_model(llo).id
                                     i['object_id'] = llo.id
                                     i['start_date'] = item['start_date']
                                     i['end_date'] = item['end_date']
@@ -379,14 +380,14 @@ def process_programme_documents(fast=False, area=False):
                                     reportable.save()
 
                                     # Creating M2M Through model instances
-                                    rlgs = [
+                                    reportable_location_goals = [
                                         ReportableLocationGoal(
                                             reportable=reportable,
                                             location=l,
                                         ) for l in locations
                                     ]
 
-                                    ReportableLocationGoal.objects.bulk_create(rlgs)
+                                    ReportableLocationGoal.objects.bulk_create(reportable_location_goals)
 
                     # Check if another page exists
                     if list_data['next']:
