@@ -1659,6 +1659,7 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
         data = {
             'progress': int(reportable.total['c']),
             'target': reportable.target,
+            'in_need': reportable.in_need,
             'locations': set(
                 reportable.indicator_reports.values_list(
                     'indicator_location_data__location__title',
@@ -1690,6 +1691,7 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
             consolidated = {
                 'progress': 0,
                 'target': {'d': 0, 'v': 0},
+                'in_need': {'d': 0, 'v': 0},
                 'locations': set(),
             }
 
@@ -1698,6 +1700,10 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
                 consolidated['target']['d'] += int(progress_val['target']['d'])
                 consolidated['target']['v'] += int(progress_val['target']['v'])
                 consolidated['locations'] = consolidated['locations'].union(progress_val['locations'])
+
+                if progress_val['in_need']:
+                    consolidated['in_need']['d'] += int(progress_val['in_need']['d'])
+                    consolidated['in_need']['v'] += int(progress_val['in_need']['v'])
 
             partner_progresses[progress] = consolidated
 
