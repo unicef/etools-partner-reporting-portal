@@ -53,7 +53,7 @@ class DisaggregationListSerializer(serializers.ModelSerializer):
         disaggregation_values = validated_data.pop('disaggregation_values')
 
         if disaggregation_values:
-            unique_list_dicts = list({v['value']:v for v in disaggregation_values}.values())
+            unique_list_dicts = list({v['value']: v for v in disaggregation_values}.values())
 
             if len(disaggregation_values) != len(unique_list_dicts):
                 raise serializers.ValidationError({
