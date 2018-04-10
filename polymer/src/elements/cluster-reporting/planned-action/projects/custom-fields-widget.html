@@ -142,6 +142,8 @@
           this.set('fieldId', this.get('fieldId') + 1);
           this.push('data.customFields', {
             id: this.fieldId,
+            title: '',
+            desc: '',
           });
         },
 
@@ -164,13 +166,11 @@
             field = {
               value: e.target.value,
             };
-            console.log(this.data.customFields)
-          } else {
-            var id = this.data.customFields.findId(function (field) {
-              return field.id === e.target.id;
-            });
-            this.set(['data.customFields', index, 'value'], e.target.value);
           }
+          this.set(['data.customFields.', field, 'value'], e.target.value);
+          console.log(this.data.customFields)
+
+          
         },
 
       
