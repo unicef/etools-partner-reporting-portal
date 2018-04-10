@@ -420,7 +420,7 @@ class ResponsePlanClusterDashboardAPIView(APIView):
 
         # validate this cluster belongs to the response plan
         if cluster_ids:
-            cluster_ids = cluster_ids.split(',')
+            cluster_ids = list(map(lambda x: int(x), cluster_ids.split(',')))
             clusters = Cluster.objects.filter(id__in=cluster_ids,
                                               response_plan=response_plan)
             if not clusters:
@@ -461,7 +461,7 @@ class ResponsePlanPartnerDashboardAPIView(ResponsePlanClusterDashboardAPIView):
 
         # validate this cluster belongs to the response plan
         if cluster_ids:
-            cluster_ids = cluster_ids.split(',')
+            cluster_ids = list(map(lambda x: int(x), cluster_ids.split(',')))
             clusters = Cluster.objects.filter(id__in=cluster_ids,
                                               response_plan=response_plan)
             if not clusters:

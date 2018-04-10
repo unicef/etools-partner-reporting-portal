@@ -48,8 +48,18 @@ class DisaggregationListSerializer(serializers.ModelSerializer):
     choices = DisaggregationValueListSerializer(
         many=True, source='disaggregation_values')
 
+    @transaction.atomic
     def create(self, validated_data):
         disaggregation_values = validated_data.pop('disaggregation_values')
+
+        if disaggregation_values:
+            unique_list_dicts = list({v['value']: v for v in disaggregation_values}.values())
+
+            if len(disaggregation_values) != len(unique_list_dicts):
+                raise serializers.ValidationError({
+                    "disaggregation_values": "Duplicated disaggregation value is not allowed",
+                })
+
         instance = Disaggregation.objects.create(**validated_data)
         for choice in disaggregation_values:
             DisaggregationValue.objects.create(disaggregation=instance,
@@ -231,7 +241,7 @@ class ReportableLocationGoalBaselineInNeedSerializer(serializers.ModelSerializer
 
 class ReportableLocationGoalSerializer(serializers.ModelSerializer):
     baseline = serializers.JSONField(required=False)
-    in_need = serializers.JSONField(required=False)
+    in_need = serializers.JSONField(required=False, allow_null=True)
     target = serializers.JSONField()
     loc_type = serializers.SerializerMethodField()
 
@@ -248,11 +258,12 @@ class ReportableLocationGoalSerializer(serializers.ModelSerializer):
         return value
 
     def validate_in_need(self, value):
-        if 'd' not in value:
-            value['d'] = 1
+        if value:
+            if 'd' not in value:
+                value['d'] = 1
 
-        elif value['d'] == 0:
-            raise serializers.ValidationError("key 'd' cannot be zero")
+            elif value['d'] == 0:
+                raise serializers.ValidationError("key 'd' cannot be zero")
 
         return value
 
@@ -290,7 +301,7 @@ class IndicatorListSerializer(ReportableSimpleSerializer):
 
     def get_total_against_in_need(self, obj):
         target = float(obj.calculated_target) if obj.calculated_target else 1.0
-        return float(obj.calculated_in_need) / target if obj.in_need else 0
+        return target / float(obj.calculated_in_need) if obj.in_need else 0
 
     def get_total_against_target(self, obj):
         target = float(obj.calculated_target) if obj.calculated_target else 1.0
@@ -857,21 +868,16 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         """
         Validates baseline, target, in-need
         """
-        if not partner and 'baseline' not in validated_data:
-            raise ValidationError(
-                {"baseline": "baseline is required for IMO creating Cluster Indicator"}
-            )
+        if not partner:
+            if 'baseline' not in validated_data:
+                raise ValidationError(
+                    {"baseline": "baseline is required for IMO creating Cluster Indicator"}
+                )
 
-        if float(validated_data['baseline']['v']) > float(validated_data['target']['v']):
-            raise ValidationError(
-                {"baseline": "Cannot be greater than target"}
-            )
-
-        if 'in_need' in validated_data \
-                and float(validated_data['target']['v']) > float(validated_data['in_need']['v']):
-            raise ValidationError(
-                {"target": "Cannot be greater than In Need"}
-            )
+            if 'target' not in validated_data:
+                raise ValidationError(
+                    {"target": "target is required for IMO creating Cluster Indicator"}
+                )
 
         if 'd' not in validated_data['baseline']:
             validated_data['baseline']['d'] = 1
@@ -879,9 +885,45 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         if 'd' not in validated_data['target']:
             validated_data['target']['d'] = 1
 
-        if 'in_need' in validated_data \
-                and 'd' not in validated_data['in_need']:
-            validated_data['in_need']['d'] = 1
+        if validated_data['baseline']['d'] == 0:
+            raise ValidationError(
+                {"baseline": "denominator for baseline cannot be zero"}
+            )
+
+        if validated_data['target']['d'] == 0:
+            raise ValidationError(
+                {"target": "denominator for target cannot be zero"}
+            )
+
+        baseline_value = float(validated_data['baseline']['v']) if float(validated_data['baseline']['d']) == 1 else \
+            float(validated_data['baseline']['v']) / float(validated_data['baseline']['d'])
+
+        target_value = float(validated_data['target']['v']) if float(validated_data['target']['d']) == 1 else \
+            float(validated_data['target']['v']) / float(validated_data['target']['d'])
+
+        if baseline_value > target_value:
+            raise ValidationError(
+                {"baseline": "Cannot be greater than target"}
+            )
+
+        if 'in_need' in validated_data and validated_data['in_need']:
+            if 'd' not in validated_data['in_need']:
+                validated_data['in_need']['d'] = 1
+
+            if validated_data['in_need']['d'] == 0:
+                raise ValidationError(
+                    {"in_need": "denominator for in_need cannot be zero"}
+                )
+
+            in_need_value = float(validated_data['in_need']['v']) if float(validated_data['in_need']['d']) == 1 else \
+                float(validated_data['in_need']['v']) / float(validated_data['in_need']['d'])
+
+            print(validated_data)
+
+            if target_value > in_need_value:
+                raise ValidationError(
+                    {"target": "Cannot be greater than In Need"}
+                )
 
     def check_location_admin_levels(self, location_goal_queryset):
         if location_goal_queryset.exists() and location_goal_queryset.values_list(
@@ -945,8 +987,14 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
         self.instance = Reportable.objects.create(**validated_data)
 
+        location_ids = [l['location'].id for l in locations]
+
+        # Duplicated location safeguard
+        if len(location_ids) != len(set(location_ids)):
+            raise ValidationError("Duplicated locations are not allowed")
+
         location_queryset = Location.objects.filter(
-            id__in=[l['location'].id for l in locations]
+            id__in=location_ids
         )
         self.check_location_admin_levels(location_queryset)
 
@@ -957,6 +1005,9 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 loc_data.pop('in_need')
 
             loc_data['reportable'] = self.instance
+
+            # Location-level progress value validation
+            self.check_progress_values(loc_data, partner)
 
             ReportableLocationGoal.objects.create(**loc_data)
 
@@ -1002,11 +1053,25 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 loc_goal['location'] = Location.objects.get(id=loc_goal['location'])
                 loc_goal['reportable'] = reportable
 
+                if partner:
+                    # Filter out location goal level baseline, in_need
+                    loc_goal.pop('baseline')
+                    loc_goal.pop('in_need')
+
+                # Location-level progress value validation
+                self.check_progress_values(loc_goal, partner)
+
         except Location.DoesNotExist:
             raise ValidationError("Location ID %d does not exist" % loc_goal['location'])
 
+        location_ids = [l['location'].id for l in locations]
+
+        # Duplicated location safeguard
+        if len(location_ids) != len(set(location_ids)):
+            raise ValidationError("Duplicated locations are not allowed")
+
         location_queryset = Location.objects.filter(
-            id__in=[l['location'].id for l in locations]
+            id__in=location_ids
         )
 
         self.check_location_admin_levels(location_queryset)
@@ -1436,7 +1501,7 @@ class ClusterAnalysisIndicatorsListSerializer(serializers.ModelSerializer):
 
     def get_total_against_in_need(self, obj):
         target = float(obj.calculated_target) if obj.calculated_target else 1.0
-        return float(obj.calculated_in_need) / target if obj.in_need else 0
+        return target / float(obj.calculated_in_need) if obj.in_need else 0
 
     def get_total_against_target(self, obj):
         target = float(obj.calculated_target) if obj.calculated_target else 1.0

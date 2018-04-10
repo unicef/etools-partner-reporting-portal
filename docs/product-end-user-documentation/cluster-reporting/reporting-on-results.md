@@ -21,7 +21,7 @@ For each indicator report the partner can enter progress data for each location 
 
 We will have a data key to specify the labels of the indicators.
 
-![Ratio Indicator ](../../.gitbook/assets/reporting_012x.png)
+![Ratio Indicator ](../../.gitbook/assets/reporting_01-2x.png)
 
 ### Submitting an indicator report
 

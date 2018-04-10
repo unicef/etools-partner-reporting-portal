@@ -5,6 +5,8 @@
 * Importing happens into an existing Workspace
 * Response Plan list to choose from should be retrieved for workspace countries
 * OCHA provided cluster names **can be used directly**
+* With the exception of disaggregations, only **V1 API** is being used in this import
+* Only initial RP info is being pulled when the import request happens, a **background task** to retrieve other information is started afterwards
 
 {% hint style="warning" %}
 Cluster names in OCHA are not validated in any way
@@ -107,4 +109,21 @@ And with that we can make the `Reportable`
 | locations | value.metrics.values.disaggregated.locations |
 
 At this point locations are also populated to the parent `content_object`.
+
+### Disaggregations
+
+Global disaggregation groups and categories can be retrieved from https://api.hpc.tools/v2/public/disaggregation-category-group
+
+Name of the category \(eg. Age\) is saved as follows.
+
+| **Disaggregation Model** | **OCHA Source** |
+| --- | --- |
+| name | label |
+
+Then we save values \(eg. Children, Elderly, Adult\)
+
+| **Disaggregation Value Model** | **OCHA Source** |
+| --- | --- | --- |
+| value | label |
+| disaggregation | _as saved above_ |
 

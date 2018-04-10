@@ -93,7 +93,7 @@
       },
 
       _computeRows: function (data) {
-        return Object.keys(data).map(function (key) {
+        return Object.keys(data || {}).map(function (key) {
           return [
             key,
             data[key],

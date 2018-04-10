@@ -174,7 +174,7 @@ def process_programme_documents(fast=False, area=False):
                         item['status'] = item['status'].title()[:3]
 
                         try:
-                            # TODO: Temp fix for these fields
+                            # TODO: Temp fix for these fields: This is for UNICEF supply field
                             item['funds_received'] = "0.0"
                             item['funds_received_currency'] = ""
 

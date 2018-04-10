@@ -52,7 +52,7 @@ def finish_partner_project_import(project_id, response_plan_id=None):
     if not response_plan_id:
         for plan in project_data['data']['plans']:
             if not ResponsePlan.objects.filter(
-                    external_source=EXTERNAL_DATA_SOURCES.HPC, external_id=plan['id']
+                external_source=EXTERNAL_DATA_SOURCES.HPC, external_id=plan['id']
             ).exists():
                 import_response_plan(plan['id'])
     else:
