@@ -154,13 +154,17 @@
 
         _remove: function (e) {
           var value = this.get('data.customFields');
-          var toRemove = --e.target.id;
-          console.log(toRemove)
-          var newValue = value.slice(0, toRemove).concat(value.slice(toRemove + 1));
+          var toRemove = value.findIndex(function (field) {
+            return String(field.id) === String(e.target.id);
+          });
 
-          console.log(newValue);
 
-          this.set('data.customFields', newValue);
+          this.splice('data.customFields', toRemove, 1);
+          // var newValue = value.slice(0, toRemove).concat(value.slice(toRemove + 1));
+
+          // console.log(newValue);
+
+          // this.set('data.customFields', newValue);
         },
 
         _updateCustomFieldTitle: function (e) {
