@@ -358,8 +358,6 @@ class IndicatorLLoutputsSerializer(serializers.ModelSerializer):
     status = serializers.SerializerMethodField()
     indicator_reports = serializers.SerializerMethodField()
     overall_status = serializers.SerializerMethodField()
-    overall_status_display = serializers.CharField(
-        source='get_overall_status_display')
     narrative_assessment = serializers.SerializerMethodField()
     display_type = serializers.SerializerMethodField()
 
@@ -371,7 +369,6 @@ class IndicatorLLoutputsSerializer(serializers.ModelSerializer):
             'llo_id',
             'status',
             'overall_status',
-            'overall_status_display',
             'narrative_assessment',
             'indicator_reports',
             'display_type',
