@@ -862,20 +862,19 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 {"disaggregations": "List of dict disaggregation expected"}
             )
 
-    def check_progress_values(self, validated_data, partner):
+    def check_progress_values(self, validated_data):
         """
         Validates baseline, target, in-need
         """
-        if not partner:
-            if 'baseline' not in validated_data:
-                raise ValidationError(
-                    {"baseline": "baseline is required for IMO creating Cluster Indicator"}
-                )
+        if 'baseline' not in validated_data:
+            raise ValidationError(
+                {"baseline": "baseline is required for IMO creating Cluster Indicator"}
+            )
 
-            if 'target' not in validated_data:
-                raise ValidationError(
-                    {"target": "target is required for IMO creating Cluster Indicator"}
-                )
+        if 'target' not in validated_data:
+            raise ValidationError(
+                {"target": "target is required for IMO creating Cluster Indicator"}
+            )
 
         if 'd' not in validated_data['baseline']:
             validated_data['baseline']['d'] = 1
@@ -933,7 +932,9 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         partner = self.context['request'].user.partner
 
         self.check_disaggregation(self.initial_data.get('disaggregations'))
-        self.check_progress_values(validated_data, partner)
+
+        if not partner:
+            self.check_progress_values(validated_data)
 
         if validated_data['blueprint']['display_type'] == IndicatorBlueprint.RATIO:
             validated_data['blueprint']['unit'] = IndicatorBlueprint.PERCENTAGE
@@ -1000,10 +1001,11 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 loc_data.pop('baseline', None)
                 loc_data.pop('in_need', None)
 
-            loc_data['reportable'] = self.instance
+            else:
+                # Location-level progress value validation
+                self.check_progress_values(loc_data, partner)
 
-            # Location-level progress value validation
-            self.check_progress_values(loc_data, partner)
+            loc_data['reportable'] = self.instance
 
             ReportableLocationGoal.objects.create(**loc_data)
 
@@ -1032,8 +1034,8 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             validated_data.pop('in_need', None)
             validated_data.pop('target', None)
 
-        else:
-            self.check_progress_values(validated_data, partner)
+        if not partner:
+            self.check_progress_values(validated_data)
 
         # Swapping validated_data['locations'] with raw request.data['locations']
         # Due to missing id field as it is write_only field
@@ -1054,8 +1056,9 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                     loc_goal.pop('baseline', None)
                     loc_goal.pop('in_need', None)
 
-                # Location-level progress value validation
-                self.check_progress_values(loc_goal, partner)
+                if not partner:
+                    # Location-level progress value validation
+                    self.check_progress_values(loc_goal, partner)
 
         except Location.DoesNotExist:
             raise ValidationError("Location ID %d does not exist" % loc_goal['location'])
