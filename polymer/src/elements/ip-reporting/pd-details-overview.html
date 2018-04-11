@@ -4,6 +4,7 @@
 <link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
 <link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
+<link rel="import" href="../../../bower_components/etools-data-table/etools-data-table.html">
 
 <link rel="import" href="../../elements/page-body.html">
 
@@ -13,10 +14,11 @@
 <link rel="import" href="../../elements/etools-prp-currency.html">
 <link rel="import" href="../../elements/etools-prp-progress-bar.html">
 <link rel="import" href="../../elements/labelled-item.html">
+<link rel="import" href="../../styles/table-styles.html">
 
 <dom-module id="pd-details-overview">
   <template>
-    <style include="app-grid-style">
+    <style include="app-grid-style data-table-styles table-styles">
       :host {
         display: block;
         margin-bottom: 25px;
@@ -25,6 +27,14 @@
         --app-grid-gutter: 25px;
         --app-grid-item-height: auto;
         --app-grid-expandible-item-columns: 2;
+
+        --header-title: {
+          display: none;
+        };
+
+        --data-table-header: {
+          height: auto;
+        };
       }
 
       :host etools-content-panel {
@@ -175,6 +185,36 @@
         <labelled-item label="Location(s)">
           <span class="field-value">[[_commaSeparatedDictValues(pd.locations, 'title')]]</span>
         </labelled-item>
+      </etools-content-panel>
+
+      <etools-content-panel panel-title="Amendments">
+        <etools-loading active="[[!loaded]]"></etools-loading>
+
+        <etools-data-table-header no-collapse no-titl>
+          <etools-data-table-column field="">
+            Amendment Types
+          </etools-data-table-column>
+          <etools-data-table-column field="">
+            Signed Date
+          </etools-data-table-column>
+        </etools-data-table-header>
+
+        <template
+            id="list"
+            is="dom-repeat"
+            items="[[pd.amendments]]"
+            as="amendment">
+          <etools-data-table-row no-collapse>
+            <div slot="row-data">
+              <div class="table-cell">
+                [[amendment.types]]
+              </div>
+              <div class="table-cell">
+                [[amendment.signed_date]]
+              </div>
+            </div>
+          </etools-data-table-row>
+        </template>
       </etools-content-panel>
     </page-body>
   </template>
