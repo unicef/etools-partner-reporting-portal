@@ -99,9 +99,8 @@
 
         <paper-input
           class="item"
-          id="[[field.id]]"
+          nameid="[[field.id]]"
           name="customFieldTitle[[index]]"
-          data-id$="[[field.id]]"
           value=[[field.name]]
           label="Field's Title"
           on-input="_updateCustomFieldTitle">
@@ -109,9 +108,8 @@
 
         <paper-input
           class="item-2-col"
-          id="[[field.id]]"
+          valueid="[[field.id]]"
           name="customFieldDescription[[index]]"
-          data-id$="[[field.id]]"
           value=[[field.value]]
           label="Field's Value"
           on-input="_updateCustomFieldDescription">
@@ -147,7 +145,6 @@
           },
         },
 
-
         _add: function () {
           this.set('fieldId', this.get('fieldId') + 1);
           this.push('customFields', {
@@ -166,36 +163,33 @@
         },
 
         _updateCustomFieldTitle: function (e) {
-          console.log(e.target.id);
           var field = this.customFields.find(function (field) {
-            return field.id == e.target.id;
+            return Number(field.id) === Number(e.target.nameid);
           });
           field.name = e.target.value;
-          console.log(this.customFields);
         },
 
         _updateCustomFieldDescription: function (e) {
-          console.log(e.target.id);
           var field = this.customFields.find(function (field) {
-            return field.id == e.target.id;
+            return Number(field.id) === Number(e.target.valueid);
           });
           field.value = e.target.value;
-          console.log(this.customFields);
         },
 
         _updateVisibleCustomFields: function () {
           var newCustomFields = this.customFields.map(function (field) {
-            return field
+            return field;
             });
           this.customFields = newCustomFields;
         },
 
         attached: function (edit) {
-          if (edit) {return};
-          this.set('customFields',[]);
-          console.log(this.customFields);
+          if (edit) {
+            return;
+            }
+          this.set('customFields', []);
           this.set('fieldId', 0);
-         },
-      })
+         }
+      });
     </script>
 </dom-module>

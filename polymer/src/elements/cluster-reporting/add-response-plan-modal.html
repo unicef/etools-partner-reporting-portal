@@ -173,7 +173,7 @@
           <paper-radio-button name="custom">
             <strong>Custom</strong>
           </paper-radio-button>
-          
+
           <div
             empty$="[[!_equals(mode, 'custom')]]">
             <template
@@ -455,7 +455,6 @@
         this.set('planDetailsLoading', true);
         var self = this;
         this.$.planDetails.abort();
-
         this.$.planDetails.thunk()()
             .then(function (res) {
               self.set('planDetailsLoading', false);
@@ -475,11 +474,9 @@
         if (mode !== 'custom') {
           return;
         }
-
         var configThunk = this.$.config.thunk();
-
+        var self = this;
         this.$.config.abort();
-
         this.dispatch(
           App.Actions.Config.fetchConfig(configThunk, App.Selectors.Config.clusterTypes)
         )
@@ -490,14 +487,12 @@
 
       _savePlan: function () {
         var self = this;
-
         this.set('updatePending', true);
         if (this.mode === 'ocha') {
           this.$.plan.body = {plan: this.selectedPlan};
         } else {
           this.$.plan.body = Object.assign({}, this.data);
         }
-        
         this.$.plan.thunk()()
           .then(function (res) {
             self.set('updatePending', false);
