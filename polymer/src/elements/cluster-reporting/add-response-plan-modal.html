@@ -351,7 +351,6 @@
 
         emptyClustersError: {
           type: Boolean,
-          computed: '_computeClustersError(planDetails, mode)',
         },
 
       },
@@ -365,6 +364,7 @@
         '_fetchPlans(mode, ochaPlansUrl)',
         '_fetchConfig(mode, configUrl)',
         '_fetchPlanDetails(planDetailsUrl)',
+        '_setEmptyClustersError(planDetails, mode)',
       ],
 
       _computeCreatePlanUrl: function (workspaceId, mode) {
@@ -414,9 +414,16 @@
         })[0];
       },
 
-      _computeClustersError: function(planDetails, mode) {
-        return (mode === 'ocha' && planDetails.clusterNames &&
-          planDetails.clusterNames.length === 0);
+      _setEmptyClustersError: function(planDetails, mode) {
+        this.async(function () {
+        this.set(
+          'emptyClustersError',
+          mode === 'ocha' &&
+              planDetails &&
+              planDetails.clusterNames &&
+              !planDetails.clusterNames.length
+        );
+      });
       },
 
       _fetchPlans: function (mode) {
@@ -441,7 +448,10 @@
             });
       },
 
-      _fetchPlanDetails: function () {
+      _fetchPlanDetails: function (url) {
+        if (!url) {
+          return;
+        }
         this.set('planDetailsLoading', true);
         var self = this;
         this.$.planDetails.abort();
