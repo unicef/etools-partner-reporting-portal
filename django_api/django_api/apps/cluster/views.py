@@ -936,7 +936,7 @@ class ClusterAnalysisIndicatorsListAPIView(GenericAPIView, ListModelMixin):
 
             if filter_parameters['partner_types']:
                 partner_types = filter_parameters['partner_types'].split(',')
-                indicators = indicators.filter(cluster_objective__cluster__partners__partner_type__in=partner_types)
+                indicators = indicators.filter(cluster_objectives__cluster__partners__partner_type__in=partner_types)
 
         elif filter_parameters['indicator_type'] == 'cluster_objective':
             indicators = Reportable.objects.filter(

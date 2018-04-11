@@ -1757,8 +1757,7 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
                 indicator_location_data = obj.indicator_reports \
                     .latest('time_period_start').indicator_location_data.all()
 
-                for ild in indicator_location_data:
-                    self._get_progress_by_location(indicator_location_data, location_progresses)
+                self._get_progress_by_location(indicator_location_data, location_progresses)
 
         except IndicatorReport.DoesNotExist:
             # If there is no indicator report for this Reportable, then skip this process
