@@ -119,12 +119,12 @@
       </div>
       </div>
     </template>
-    
+
     <paper-button
       class="btn-primary"
       on-tap="_add">
         Add Custom Field
-    </paper-button> 
+    </paper-button>
   </template>
     <script>
       Polymer({
@@ -190,7 +190,7 @@
           this.customFields = newCustomFields;
         },
 
-        attached: function () {
+        attached: function (edit) {
           if (edit) {return};
           this.set('customFields',[]);
           console.log(this.customFields);
