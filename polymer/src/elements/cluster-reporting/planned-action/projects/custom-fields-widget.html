@@ -81,7 +81,7 @@
 
     <template
       is="dom-repeat"
-      items="[[data.customFields]]"
+      items="[[customFields]]"
       as="field"
       restamp="true">
       <div class="row layout horizontal">
@@ -134,18 +134,17 @@
         ],
 
         properties: {
-        fieldId: Number,
-        customFields: {
-          format: Array,
-          observer: '_updateVisibleCustomFields'
-        },
-        data: Object,
+          fieldId: Number,
+          customFields: {
+            format: Array,
+            notify: true,
+          }
         },
 
 
         _add: function () {
           this.set('fieldId', this.get('fieldId') + 1);
-          this.push('data.customFields', {
+          this.push('customFields', {
             id: this.fieldId,
             title: '',
             desc: '',
@@ -153,50 +152,41 @@
         },
 
         _remove: function (e) {
-          var value = this.get('data.customFields');
+          var value = this.get('customFields');
           var toRemove = value.findIndex(function (field) {
             return String(field.id) === String(e.target.id);
           });
-
-
-          this.splice('data.customFields', toRemove, 1);
-          // var newValue = value.slice(0, toRemove).concat(value.slice(toRemove + 1));
-
-          // console.log(newValue);
-
-          // this.set('data.customFields', newValue);
+          this.splice('customFields', toRemove, 1);
         },
 
         _updateCustomFieldTitle: function (e) {
           console.log(e.target.id);
-          var field = this.data.customFields.find(function (field) {
+          var field = this.customFields.find(function (field) {
             return field.id == e.target.id;
           });
           field.title = e.target.value;
-          console.log(this.data.customFields);
+          console.log(this.customFields);
         },
 
         _updateCustomFieldDescription: function (e) {
           console.log(e.target.id);
-          var field = this.data.customFields.find(function (field) {
+          var field = this.customFields.find(function (field) {
             return field.id == e.target.id;
           });
           field.description = e.target.value;
-          console.log(this.data.customFields);
+          console.log(this.customFields);
         },
 
         _updateVisibleCustomFields: function () {
-          var newCustomFields = this.data.customFields.map(function (field) {
+          var newCustomFields = this.customFields.map(function (field) {
             return field
             });
-          this.data.customFields = newCustomFields;
+          this.customFields = newCustomFields;
         },
 
-      
         attached: function () {
-          this.set('data', {
-            customFields: [],
-          });
+          this.set('customFields',[]);
+          console.log(this.customFields);
           this.set('fieldId', 0);
          },
       })

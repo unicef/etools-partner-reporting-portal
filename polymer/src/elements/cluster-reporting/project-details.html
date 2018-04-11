@@ -106,6 +106,18 @@
               </labelled-item>
             </li>
 
+            <template
+            is="dom-repeat"
+            items="[[projectData.customFields]]"
+            restamp="true"
+            as="field">
+              <li class="item">
+                <labelled-item label="[[field.title]]">
+                  <span class="value">[[field.desc]]</span>
+                </labelled-item>
+              </li>
+            </template>
+
           </ul>
           <div id="action">
             <paper-button
