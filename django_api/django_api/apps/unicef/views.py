@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.http import Http404
-from django.shortcuts import get_object_or_404, render_to_response
+from django.shortcuts import get_object_or_404
 
 from rest_framework import status as statuses
 from rest_framework.exceptions import ValidationError
@@ -287,7 +287,6 @@ class ProgressReportPDFView(RetrieveAPIView):
         }
 
         return render_to_pdf_response(request, "report_annex_c_pdf.html", data, encoding='utf8')
-        # return render_to_response("report_annex_c_pdf.html", data)
 
 
 class ProgressReportDetailsUpdateAPIView(APIView):
