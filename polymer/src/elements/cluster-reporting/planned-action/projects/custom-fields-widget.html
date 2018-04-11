@@ -102,6 +102,7 @@
           id="[[field.id]]"
           name="customFieldTitle[[index]]"
           data-id$="[[field.id]]"
+          value=[[field.name]]
           label="Field's Title"
           on-input="_updateCustomFieldTitle">
         </paper-input>
@@ -111,7 +112,8 @@
           id="[[field.id]]"
           name="customFieldDescription[[index]]"
           data-id$="[[field.id]]"
-          label="Field's Description"
+          value=[[field.value]]
+          label="Field's Value"
           on-input="_updateCustomFieldDescription">
         </paper-input>
       </div>
@@ -138,7 +140,11 @@
           customFields: {
             format: Array,
             notify: true,
-          }
+          },
+          edit: {
+            type: Boolean,
+            value: false,
+          },
         },
 
 
@@ -146,8 +152,8 @@
           this.set('fieldId', this.get('fieldId') + 1);
           this.push('customFields', {
             id: this.fieldId,
-            title: '',
-            desc: '',
+            name: '',
+            value: '',
           });
         },
 
@@ -164,7 +170,7 @@
           var field = this.customFields.find(function (field) {
             return field.id == e.target.id;
           });
-          field.title = e.target.value;
+          field.name = e.target.value;
           console.log(this.customFields);
         },
 
@@ -173,7 +179,7 @@
           var field = this.customFields.find(function (field) {
             return field.id == e.target.id;
           });
-          field.description = e.target.value;
+          field.value = e.target.value;
           console.log(this.customFields);
         },
 
@@ -185,6 +191,7 @@
         },
 
         attached: function () {
+          if (edit) {return};
           this.set('customFields',[]);
           console.log(this.customFields);
           this.set('fieldId', 0);
