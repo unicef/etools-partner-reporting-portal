@@ -114,7 +114,7 @@
 
       _canAddProject: function(permissions, responsePlanCurrent) {
         if (responsePlanCurrent) {
-          return permissions.createPartnerEntitiesByResponsePlan(responsePlanCurrent.clusters);
+          return permissions.createPartnerProject;
         }
         return false;
       },

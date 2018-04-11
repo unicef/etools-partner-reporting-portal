@@ -17,7 +17,6 @@ from .serializers import (
     PartnerDetailsSerializer,
     PartnerProjectSerializer,
     PartnerProjectSimpleSerializer,
-    PartnerProjectPatchSerializer,
     ClusterActivityPartnersSerializer,
     PartnerActivitySerializer,
     PartnerActivityFromClusterActivitySerializer,
@@ -140,7 +139,7 @@ class PartnerProjectAPIView(APIView):
                     'partner_id': "the partner_id does not belong to your clusters"
                 })
 
-        serializer = PartnerProjectPatchSerializer(
+        serializer = PartnerProjectSerializer(
             instance=self.get_instance(),
             data=self.request.data
         )

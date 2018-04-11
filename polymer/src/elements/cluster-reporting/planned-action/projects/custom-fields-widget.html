@@ -51,10 +51,6 @@
         font-size: 14px;
       }
 
-      .item-wut {
-        width: 50px;
-      }
-
       .col-actions {
         width: 40px;
         margin-right: 24px;
@@ -85,13 +81,15 @@
 
     <template
       is="dom-repeat"
-      items="[[data.customFields]]">
+      items="[[data.customFields]]"
+      as="field"
+      restamp="true">
       <div class="row layout horizontal">
         <div class="flex-none layout vertical center-center col-actions">
           <paper-icon-button
-            index="[[index]]"
+            id="[[field.id]]"
             class="remove-btn"
-            data-index$="[[index]]"
+            data-id$="[[field.id]]"
             on-tap="_remove"
             icon="icons:cancel">
           </paper-icon-button>
@@ -100,21 +98,21 @@
           <div class="app-grid">
 
         <paper-input
-          class="item-wut"
-          id="customField[[index]]"
-          name="customField[[index]]"
-          data-index$="[[index]]"
+          class="item"
+          id="[[field.id]]"
+          name="customFieldTitle[[index]]"
+          data-id$="[[field.id]]"
           label="Field's Title"
-          on-input"_updateCustomFields">
+          on-input="_updateCustomFieldTitle">
         </paper-input>
 
         <paper-input
           class="item-2-col"
-          id="customField[[index]]"
-          name="customField[[index]]"
-          data-index$="[[index]]"
+          id="[[field.id]]"
+          name="customFieldDescription[[index]]"
+          data-id$="[[field.id]]"
           label="Field's Description"
-          on-input"_updateCustomFields">
+          on-input="_updateCustomFieldDescription">
         </paper-input>
       </div>
       </div>
@@ -136,41 +134,62 @@
         ],
 
         properties: {
-        customFields: Array,
+        fieldId: Number,
+        customFields: {
+          format: Array,
+          observer: '_updateVisibleCustomFields'
+        },
         data: Object,
         },
 
+
         _add: function () {
-          this.push('data.customFields', {});
+          this.set('fieldId', this.get('fieldId') + 1);
+          this.push('data.customFields', {
+            id: this.fieldId,
+            title: '',
+            desc: '',
+          });
         },
 
         _remove: function (e) {
           var value = this.get('data.customFields');
-          var toRemove = +e.target.dataset.index;
-          var newValue = value.slice(0, toRemove);
-          newValue = newValue.concat(value.slice(toRemove + 1));
+          var toRemove = value.findIndex(function (field) {
+            return String(field.id) === String(e.target.id);
+          });
 
-          console.log(newValue);
 
-          this.set('data.customFields', newValue);
+          this.splice('data.customFields', toRemove, 1);
+          // var newValue = value.slice(0, toRemove).concat(value.slice(toRemove + 1));
+
+          // console.log(newValue);
+
+          // this.set('data.customFields', newValue);
         },
 
-        _updateCustomFields: function (e) {
+        _updateCustomFieldTitle: function (e) {
+          console.log(e.target.id);
           var field = this.data.customFields.find(function (field) {
-            return field.id === e.target.id;
+            return field.id == e.target.id;
           });
-          if (!field) {
-            field = {
-              value: e.target.value,
-            };
-            this.push('data.customFields', field);
-          } else {
-            var index = this.data.customFields.findIndex(function (field) {
-              return field.id === e.target.id;
+          field.title = e.target.value;
+          console.log(this.data.customFields);
+        },
+
+        _updateCustomFieldDescription: function (e) {
+          console.log(e.target.id);
+          var field = this.data.customFields.find(function (field) {
+            return field.id == e.target.id;
+          });
+          field.description = e.target.value;
+          console.log(this.data.customFields);
+        },
+
+        _updateVisibleCustomFields: function () {
+          var newCustomFields = this.data.customFields.map(function (field) {
+            return field
             });
-            console.log(field, value);
-            this.set(['data.customFields', index, 'value'], e.target.value);
-          }
+          this.data.customFields = newCustomFields;
         },
 
       
@@ -178,6 +197,7 @@
           this.set('data', {
             customFields: [],
           });
+          this.set('fieldId', 0);
          },
       })
     </script>
