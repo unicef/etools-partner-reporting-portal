@@ -916,8 +916,6 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             in_need_value = float(validated_data['in_need']['v']) if float(validated_data['in_need']['d']) == 1 else \
                 float(validated_data['in_need']['v']) / float(validated_data['in_need']['d'])
 
-            print(validated_data)
-
             if target_value > in_need_value:
                 raise ValidationError(
                     {"target": "Cannot be greater than In Need"}
@@ -999,8 +997,8 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         for loc_data in locations:
             if partner:
                 # Filter out location goal level baseline, in_need
-                loc_data.pop('baseline')
-                loc_data.pop('in_need')
+                loc_data.pop('baseline', None)
+                loc_data.pop('in_need', None)
 
             loc_data['reportable'] = self.instance
 
@@ -1029,10 +1027,10 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         if partner:
             # Filter out IndicatorBlueprint instance
             # and Indicator level baseline, in_need, and target
-            validated_data.pop('blueprint')
-            validated_data.pop('baseline')
-            validated_data.pop('in_need')
-            validated_data.pop('target')
+            validated_data.pop('blueprint', None)
+            validated_data.pop('baseline', None)
+            validated_data.pop('in_need', None)
+            validated_data.pop('target', None)
 
         else:
             self.check_progress_values(validated_data, partner)
@@ -1053,8 +1051,8 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
                 if partner:
                     # Filter out location goal level baseline, in_need
-                    loc_goal.pop('baseline')
-                    loc_goal.pop('in_need')
+                    loc_goal.pop('baseline', None)
+                    loc_goal.pop('in_need', None)
 
                 # Location-level progress value validation
                 self.check_progress_values(loc_goal, partner)
@@ -1089,8 +1087,8 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
             if partner:
                 # Filter out location level baseline and in_need
-                data.pop('baseline')
-                data.pop('in_need')
+                data.pop('baseline', None)
+                data.pop('in_need', None)
 
             if loc_goal.location.id != data['location'].id:
                 raise ValidationError(
