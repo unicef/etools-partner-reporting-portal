@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
+from ocha.imports.serializers import DiscardUniqueTogetherValidationMixin
 from unicef.models import LowerLevelOutput
 from partner.models import PartnerProject, PartnerActivity
 from cluster.models import ClusterObjective, ClusterActivity
@@ -357,8 +358,6 @@ class IndicatorLLoutputsSerializer(serializers.ModelSerializer):
     status = serializers.SerializerMethodField()
     indicator_reports = serializers.SerializerMethodField()
     overall_status = serializers.SerializerMethodField()
-    overall_status_display = serializers.CharField(
-        source='get_overall_status_display')
     narrative_assessment = serializers.SerializerMethodField()
     display_type = serializers.SerializerMethodField()
 
@@ -370,7 +369,6 @@ class IndicatorLLoutputsSerializer(serializers.ModelSerializer):
             'llo_id',
             'status',
             'overall_status',
-            'overall_status_display',
             'narrative_assessment',
             'indicator_reports',
             'display_type',
@@ -1368,10 +1366,9 @@ class PMPDisaggregationSerializer(serializers.ModelSerializer):
         )
 
 
-class PMPDisaggregationValueSerializer(serializers.ModelSerializer):
+class PMPDisaggregationValueSerializer(DiscardUniqueTogetherValidationMixin, serializers.ModelSerializer):
     id = serializers.CharField(source='external_id')
-    disaggregation = serializers.PrimaryKeyRelatedField(
-        queryset=Disaggregation.objects.all())
+    disaggregation = serializers.PrimaryKeyRelatedField(queryset=Disaggregation.objects.all())
 
     class Meta:
         model = DisaggregationValue
@@ -1386,13 +1383,13 @@ class PMPDisaggregationValueSerializer(serializers.ModelSerializer):
 class PMPReportableSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='external_id')
     title = serializers.CharField(source='means_of_verification')
-    blueprint_id = serializers.PrimaryKeyRelatedField(
-        queryset=IndicatorBlueprint.objects.all(), source="blueprint")
+    blueprint_id = serializers.PrimaryKeyRelatedField(queryset=IndicatorBlueprint.objects.all(), source="blueprint")
     disaggregation_ids = serializers.PrimaryKeyRelatedField(
         queryset=Disaggregation.objects.all(),
         many=True,
         allow_null=True,
-        source="disaggregations")
+        source="disaggregations"
+    )
 
     class Meta:
         model = Reportable

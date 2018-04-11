@@ -341,4 +341,5 @@ CURRENCIES = Choices(
     ("ZMW", "zmw", "zmw"),
     ("ZWD", "zwd", "zwd"),
     ("ZWL", "zwl", "zwl"),  # Temporary due API issue
+    ("SSP", "ssp", "ssp"),
 )

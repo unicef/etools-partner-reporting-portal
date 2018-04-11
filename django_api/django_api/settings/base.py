@@ -25,6 +25,7 @@ sys.path.append(APPS_DIR)
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY')
+REDIS_URL = os.getenv('REDIS_URL', 'redis://redis:6379/0')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -65,7 +66,7 @@ ALLOWED_HOSTS = []
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://redis:6379/0",
+        "LOCATION": REDIS_URL,
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient"
         },
@@ -320,7 +321,7 @@ LOGGING = {
 
 import djcelery
 djcelery.setup_loader()
-BROKER_URL = os.getenv('REDIS_URL', 'redis://redis:6379/0')
+BROKER_URL = REDIS_URL
 BROKER_VISIBILITY_VAR = os.environ.get('CELERY_VISIBILITY_TIMEOUT', 1800)
 BROKER_TRANSPORT_OPTIONS = {
     'visibility_timeout': int(BROKER_VISIBILITY_VAR)}  # 5 hours

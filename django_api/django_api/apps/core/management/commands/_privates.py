@@ -480,6 +480,12 @@ def generate_fake_data(workspace_quantity=10):
                     # we create IR's in the next for loop down below
                     reportable.indicator_reports.all().delete()
 
+                    for loc in locations:
+                        LocationWithReportableLocationGoalFactory.create(
+                            location=loc,
+                            reportable=reportable
+                        )
+
                 print("{} Reportables generated for {}".format(
                     num_reportables_range[-1] + 1,
                     llo
