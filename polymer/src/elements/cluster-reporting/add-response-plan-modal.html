@@ -444,7 +444,7 @@
                 self.fire('notify', {type: 'ocha-timeout'});
               }
               self.set('plansLoading', false);
-              // TODO: error handling
+              self.set('errors', err.data);
             });
       },
 
@@ -467,7 +467,7 @@
                 self.fire('notify', {type: 'ocha-timeout'});
               }
               self.set('planDetailsLoading', false);
-              // TODO: error handling
+              self.set('errors', err.data);
             });
       },
 
@@ -484,7 +484,7 @@
           App.Actions.Config.fetchConfig(configThunk, App.Selectors.Config.clusterTypes)
         )
           .catch(function (err) { // jshint ignore:line
-            // TODO: error handling
+            self.set('errors', err.data);
           });
       },
 
