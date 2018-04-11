@@ -4,8 +4,8 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import transaction
-from django.http import HttpResponse, Http404
-from django.shortcuts import get_object_or_404
+from django.http import Http404
+from django.shortcuts import get_object_or_404, render_to_response
 
 from rest_framework import status as statuses
 from rest_framework.exceptions import ValidationError
@@ -15,7 +15,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 import django_filters.rest_framework
-from easy_pdf.rendering import render_to_pdf
+from easy_pdf.rendering import render_to_pdf_response
 
 from core.api_error_codes import APIErrorCode
 from core.common import (
@@ -286,8 +286,8 @@ class ProgressReportPDFView(RetrieveAPIView):
             'outputs': group_indicator_reports_by_lower_level_output(report.indicator_reports.all())
         }
 
-        pdf = render_to_pdf("report_annex_c_pdf.html", data)
-        return HttpResponse(pdf, content_type='application/pdf')
+        return render_to_pdf_response(request, "report_annex_c_pdf.html", data, encoding='utf8')
+        # return render_to_response("report_annex_c_pdf.html", data)
 
 
 class ProgressReportDetailsUpdateAPIView(APIView):
