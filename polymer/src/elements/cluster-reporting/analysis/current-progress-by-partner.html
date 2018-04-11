@@ -64,6 +64,17 @@
               type: 'string',
             },
             {
+              label: 'Target',
+              type: 'number',
+            },
+            {
+              type: 'string',
+              role: 'tooltip',
+              p: {
+                html: true,
+              },
+            },
+            {
               label: 'Progress',
               type: 'number',
             },
@@ -85,31 +96,41 @@
 
       _computeOptions: function (rows) {
         return Object.assign({}, this._baseOptions, {
-          height: rows.length * 45 + 30,
-          colors: rows.map(function () {
-            return '#88c245';
-          }),
+          height: rows.length * 45 + 40,
+          colors: ['#e0e0e0', '#88c245'],
           chartArea: {
             top: 0,
+            bottom: 55,
             left: '30%',
             width: '50%',
+          },
+          bars: 'horizontal',
+          legend: {
+            position: 'bottom',
           },
         });
       },
 
       _computeRows: function (data) {
         return Object.keys(data || {}).map(function (key) {
+          var target = data[key].target;
+          var progress = data[key].progress;
+
           return [
             key,
-            data[key].progress,
+            this._fromJSON(target),
+            this._buildTooltipContent(key, data[key]),
+            progress,
             this._buildTooltipContent(key, data[key]),
           ];
         }, this);
       },
 
       _buildTooltipContent: function (title, data) {
-        // TODO: Progress calculation for non-number indicators
-        var progressAgainstTarget = data.progress / data.target.v;
+        var target = this._fromJSON(data.target);
+        var inNeed = this._fromJSON(data.in_need);
+        var progressAgainstTarget = data.progress / target;
+        var progressAgainstInNeed = data.progress / inNeed;
 
         return [
           '<div class="tooltip-content">',
@@ -119,6 +140,9 @@
             '</div>',
             '<div class="progress">',
               this._toPercentage(progressAgainstTarget) + ' of Target',
+            '</div>',
+            '<div class="progress">',
+              this._toPercentage(progressAgainstInNeed) + ' of In Need',
             '</div>',
             '<br>',
             '<div>Locations:</div>',
