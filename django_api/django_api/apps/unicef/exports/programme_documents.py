@@ -12,7 +12,7 @@ from openpyxl.styles import NamedStyle, Font, Alignment, PatternFill
 from openpyxl.styles.numbers import FORMAT_CURRENCY_USD, FORMAT_PERCENTAGE
 from openpyxl.utils import get_column_letter
 
-from unicef.exports.utilities import PARTNER_PORTAL_DATE_FORMAT_EXCEL, HTMLTableCell
+from unicef.exports.utilities import PARTNER_PORTAL_DATE_FORMAT_EXCEL, HTMLTableCell, HTMLTableHeader
 from unicef.templatetags.pdf_extras import format_currency
 
 logger = logging.getLogger(__name__)
@@ -144,11 +144,19 @@ class ProgrammeDocumentsPDFExporter:
             'title': 'Programme Document(s) Summary',
         }
 
-        rows = [[
-            HTMLTableCell('Title', element='th'),
-            HTMLTableCell('General Info', colspan=4, element='th'),
-            HTMLTableCell('Financial Info', colspan=2, element='th'),
-        ]]
+        pd = self.programme_documents.first()
+        partner_title = pd and pd.partner.title
+
+        rows = [
+            [
+                HTMLTableHeader(partner_title, colspan=7),
+            ],
+            [
+                HTMLTableHeader('Title'),
+                HTMLTableHeader('General Info', colspan=4),
+                HTMLTableHeader('Financial Info', colspan=2),
+            ]
+        ]
 
         for pd in self.programme_documents.order_by('id'):
             if pd.budget:
@@ -158,44 +166,44 @@ class ProgrammeDocumentsPDFExporter:
 
             rows.append([
                 HTMLTableCell(pd.title, rowspan=5),
-                HTMLTableCell('Agreement', element='th'),
+                HTMLTableHeader('Agreement'),
                 HTMLTableCell(pd.agreement),
-                HTMLTableCell('UNICEF Office(s)', element='th'),
+                HTMLTableHeader('UNICEF Office(s)'),
                 HTMLTableCell(pd.unicef_office),
-                HTMLTableCell('CSO contribution', element='th'),
+                HTMLTableHeader('CSO contribution'),
                 HTMLTableCell(format_currency(pd.cso_contribution, pd.cso_contribution_currency)),
             ])
 
             rows.append([
-                HTMLTableCell('Document Type', element='th'),
+                HTMLTableHeader('Document Type'),
                 HTMLTableCell(pd.get_document_type_display()),
-                HTMLTableCell('UNICEF Focal Point(s)', element='th'),
+                HTMLTableHeader('UNICEF Focal Point(s)'),
                 HTMLTableCell(', '.join([person.name for person in pd.unicef_focal_point.all()])),
-                HTMLTableCell('Total UNICEF cash', element='th'),
+                HTMLTableHeader('Total UNICEF cash'),
                 HTMLTableCell(format_currency(pd.total_unicef_cash, pd.total_unicef_cash_currency))
             ])
             rows.append([
-                HTMLTableCell('Reference Number', element='th'),
+                HTMLTableHeader('Reference Number'),
                 HTMLTableCell(pd.reference_number),
-                HTMLTableCell('Partner Focal Point(s)', element='th'),
+                HTMLTableHeader('Partner Focal Point(s)'),
                 HTMLTableCell(', '.join([person.name for person in pd.partner_focal_point.all()])),
-                HTMLTableCell('Total UNICEF supplies', element='th'),
+                HTMLTableHeader('Total UNICEF supplies'),
                 HTMLTableCell(format_currency(pd.in_kind_amount, pd.in_kind_amount_currency))
             ])
             rows.append([
-                HTMLTableCell('PD/SSFA status', element='th'),
+                HTMLTableHeader('PD/SSFA status'),
                 HTMLTableCell(pd.get_status_display()),
-                HTMLTableCell('Start Date', element='th'),
+                HTMLTableHeader('Start Date'),
                 HTMLTableCell(pd.start_date),
-                HTMLTableCell('Total Budget', element='th'),
+                HTMLTableHeader('Total Budget'),
                 HTMLTableCell(format_currency(pd.budget, pd.budget_currency))
             ])
             rows.append([
-                HTMLTableCell('In response to an HRP', element='th'),
+                HTMLTableHeader('In response to an HRP'),
                 HTMLTableCell(''),
-                HTMLTableCell('End Date', element='th'),
+                HTMLTableHeader('End Date'),
                 HTMLTableCell(pd.end_date),
-                HTMLTableCell('Cash Transfers to Date', element='th'),
+                HTMLTableHeader('Cash Transfers to Date'),
                 HTMLTableCell('{} ({}%)'.format(
                     format_currency(pd.funds_received_to_date, pd.funds_received_to_date_currency),
                     funds_received_to_date_percentage
