@@ -115,10 +115,12 @@
           customFields: {
             type: Array,
             notify: true,
+            value: [],
           },
           edit: {
             type: Boolean,
             value: false,
+            observer: '_setCustomFields'
           },
         },
 
@@ -160,11 +162,15 @@
           this.customFields = newCustomFields;
         },
 
-        attached: function (edit) {
+        _setCustomFields: function (edit) {
           if (edit) {
             return;
-            }
-          this.set('customFields', []);
+          } else {
+            this.set('customFields', []);
+          }
+        },
+
+        attached: function () {
           this.set('fieldId', 0);
          }
       });

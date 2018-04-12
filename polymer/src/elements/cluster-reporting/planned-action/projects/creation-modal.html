@@ -485,7 +485,7 @@
                 <div class="full-width">
                   <labelled-item label="Is this project part of a HRP or FA?">
                     <paper-radio-group
-                        selected={{dats.part}}>
+                        selected={{data.part}}>
                       <paper-radio-button name="hrp">HRP</paper-radio-button>
                       <paper-radio-button name="fa">FA</paper-radio-button>
                       <paper-radio-button name="no">No</paper-radio-button>
@@ -684,7 +684,6 @@
 
         data: {
           type: Object,
-          value: {},
         },
 
         refresh: {
@@ -815,7 +814,7 @@
             return cluster.id;
           });
         } else {
-          this.data = {};
+          this.data = {'custom_fields': []};
           this.selectedClusters = [];
         }
         this.set('opened', true);
@@ -939,7 +938,7 @@
            }
         this.set('selectedProject', '');
         this.set('projectLoading', false);
-        this.set('data', {});
+        this.set('data', {'custom_fields': []});
         this.set('projectDetails', {});
         this.set('errors', {});
       },
