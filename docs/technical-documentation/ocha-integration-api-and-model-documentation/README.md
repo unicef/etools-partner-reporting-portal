@@ -1,6 +1,8 @@
-# OCHA Integration - API and Model Documentation
+# OCHA Integration - Research Summary
 
-
+{% hint style="danger" %}
+This is a detailed summary of initial research on how to integrate the systems. See child pages for documentation of actual implementation.
+{% endhint %}
 
 ## OCHA API's information
 
