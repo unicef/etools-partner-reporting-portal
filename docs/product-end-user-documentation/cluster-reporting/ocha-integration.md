@@ -19,6 +19,12 @@ A lot of projects don't appear to have info there.
 
 IMO and partner users will still be able to add custom response plan, or new cluster objectives/activities, partner projects/activities etc. as per usual.
 
+{% hint style="info" %}
+On the initial import request only the basic entity \(Response Plan or Project\) is imported, since getting all the details can take a couple of minutes, it is delegated to a background task.
+{% endhint %}
+
+### Response Plan
+
 Platform allows to search all active Response Plans stored in RPM API in selected Workspace. Basic information is dynamically pulled out from API:
 
 * Plan Type
@@ -26,15 +32,37 @@ Platform allows to search all active Response Plans stored in RPM API in selecte
 * Start Date
 * End Date
 
-Saving Response Plan triggers background synchronization of:
+Saving Response Plan triggers background synchronisation of:
 
 * Cluster activities
 * Cluster objectives
 * Indicators
+* Disaggregation Groups \(eg. Age\) and Categories \(eg. Children, Adult, Elderly\)
+* Locations
 
-{% hint style="warning" %}
-For **indicators** -** **waiting on RPM to finish disaggregations and locations info. Promised to be rolled out with March 15th release
-{% endhint %}
+To see detailed breakdown of how data structures are mapped go to [technical documentation](https://unicef.gitbook.io/prp/~/edit/primary/technical-documentation/ocha-integration-api-and-model-documentation/response-plan-import) page.
 
+### Partner Project
 
+Once a Response Plan has been selected, contained projects can be imported from OCHA.
+
+Triggering an import downloads from API:
+
+* Title
+* Description
+* Start date
+* End date
+* Partner
+* Locations
+
+Saving Response Plan triggers background synchronisation of:
+
+* Clusters
+* Funding \(when available\)
+* Indicators
+* Reportables
+* Disaggregation Groups \(eg. Age\) and Categories \(eg. Children, Adult, Elderly\)
+* Locations
+
+Again, a detailed breakdown of how import works can be found in the [technical documentation](https://unicef.gitbook.io/prp/technical-documentation/ocha-integration-api-and-model-documentation/project-import).
 
