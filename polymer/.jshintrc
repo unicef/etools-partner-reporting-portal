@@ -27,6 +27,7 @@
     "sinon": true,
     "fixture": true,
     "assert": true,
-    "moment": true
+    "moment": true,
+    "numeral": true
   }
 }

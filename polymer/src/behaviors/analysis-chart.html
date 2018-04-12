@@ -1,3 +1,6 @@
+<link rel="import" href="../../bower_components/numeral-js/numeral-import.html">
+
+<link rel="import" href="../constants.html">
 <link rel="import" href="../polyfills/es6-shim.html">
 
 <script>
@@ -14,14 +17,25 @@
         'background: #424242;',
         'box-shadow: 0 3px 14px rgba(0, 0, 0, .4);',
         'opacity: .7;',
+        'z-index: 1000',
       '}',
       '.tooltip-content {',
         'max-width: 200px;',
       '}',
       '.number-of-partners {',
+        'margin: .5em 0;',
         'font-size: 2.5em;',
-        'line-height: 2;',
+        'line-height: 1;',
         'color: #fff;',
+      '}',
+      '.number-of-partners:last-child {',
+        'margin-bottom: 0;',
+      '}',
+      '.progress {',
+        'color: #fff;',
+      '}',
+      '.number-of-partners + .progress {',
+        'margin-top: -.75em;',
       '}',
     ].join('\n');
 
@@ -53,7 +67,9 @@
         return [
           '<div class="tooltip-content">',
             '<div>' + title + '</div>',
-            '<div class="number-of-partners">' + data.length + '</div>',
+            '<div class="number-of-partners">',
+              numeral(data.length).format(App.Constants.FORMAT_NUMBER_DEFAULT),
+            '</div>',
             '<div>' + this._commaSeparated(data) + '</div>',
           '</div>',
         ].join('\n');
@@ -67,6 +83,10 @@
             this._buildTooltipContent(key, data[key]),
           ];
         }, this);
+      },
+
+      _fromJSON: function (obj) {
+        return obj ? obj.v / obj.d : 0;
       },
 
       attached: function () {
