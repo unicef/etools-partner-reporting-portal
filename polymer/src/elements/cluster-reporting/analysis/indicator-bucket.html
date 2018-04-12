@@ -10,7 +10,7 @@
 <link rel="import" href="indicator-details.html">
 <link rel="import" href="../../../styles/shared-styles.html">
 
-<dom-module id="analysis-cluster-activity">
+<dom-module id="analysis-indicator-bucket">
   <template>
     <style include="iron-flex iron-flex-alignment shared-styles">
       :host {
@@ -65,7 +65,7 @@
         margin: 0;
         font-size: 14px;
 
-        @apply(--truncate);
+        @apply --truncate;
       }
 
       .indicator-progress {
@@ -90,11 +90,11 @@
       }
 
       etools-prp-progress-bar {
-        @apply(--etools-prp-progress-bar);
+        @apply --etools-prp-progress-bar;
       }
     </style>
 
-    <etools-content-panel panel-title="Cluster Activity: [[data.title]]">
+    <etools-content-panel panel-title="[[prefix]] [[data.title]]">
       <dl class="cluster-objective">
         <dt>Cluster Objective:</dt>
         <dd>[[data.co_title]]</dd>
@@ -151,10 +151,15 @@
 
   <script>
     Polymer({
-      is: 'analysis-cluster-activity',
+      is: 'analysis-indicator-bucket',
 
       properties: {
         data: Object,
+
+        prefix: {
+          type: String,
+          computed: '_computePrefix(data)',
+        },
       },
 
       _computeIcon: function (opened) {
@@ -163,6 +168,17 @@
 
       _toggle: function (e) {
         this.$$('#collapse-' + e.target.toggles).toggle();
+      },
+
+      _computePrefix: function (data) {
+        var prefix = {
+          partneractivity: 'Partner Activity',
+          partnerproject: 'Partner Project',
+          clusterobjective: 'Cluster Objective',
+          clusteractivity: 'Cluster Activity',
+        }[data.type];
+
+        return prefix ? prefix + ':' : '';
       },
 
       _handleOpenedChanged: function (e, data) {

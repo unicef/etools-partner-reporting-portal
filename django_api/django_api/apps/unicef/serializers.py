@@ -517,15 +517,18 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='external_id')
     offices = serializers.CharField(source='unicef_office')
     number = serializers.CharField(source='reference_number')
-    cso_budget = serializers.CharField(source='budget')
-    unicef_budget = serializers.CharField(source='total_unicef_cash')
-    funds_received = serializers.CharField(source='funds_received_to_date')
+    cso_budget = serializers.FloatField(source='cso_contribution')
+    unicef_budget = serializers.FloatField(source='total_unicef_cash')
+    funds_received = serializers.FloatField(source='funds_received_to_date', required=False)
     cso_budget_currency = serializers.ChoiceField(
-        choices=CURRENCIES, allow_blank=True, allow_null=True, source="budget_currency")
+        choices=CURRENCIES, allow_blank=True, allow_null=True, source="cso_contribution_currency"
+    )
     funds_received_currency = serializers.ChoiceField(
-        choices=CURRENCIES, allow_blank=True, allow_null=True, source="funds_received_to_date_currency")
+        choices=CURRENCIES, allow_blank=True, allow_null=True, required=False, source="funds_received_to_date_currency"
+    )
     unicef_budget_currency = serializers.ChoiceField(
-        choices=CURRENCIES, allow_blank=True, allow_null=True, source="total_unicef_cash_currency")
+        choices=CURRENCIES, allow_blank=True, allow_null=True, source="total_unicef_cash_currency"
+    )
     status = serializers.ChoiceField(choices=PD_STATUS)
     start_date = serializers.DateField(required=False, allow_null=True)
     end_date = serializers.DateField(required=False, allow_null=True)
@@ -536,6 +539,13 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
     amendments = serializers.JSONField(allow_null=True)
 
     def create(self, validated_data):
+        if validated_data['cso_contribution_currency'] == validated_data['total_unicef_cash_currency']:
+            validated_data['budget'] = sum([
+                validated_data['cso_contribution'],
+                validated_data['total_unicef_cash'],
+            ])
+            validated_data['budget_currency'] = validated_data['cso_contribution_currency']
+
         return ProgrammeDocument.objects.create(**validated_data)
 
     class Meta:

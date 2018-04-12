@@ -200,22 +200,22 @@
             data="[[data.partners_by_status]]">
         </partners-by-status>
 
-        <current-progress-by-partner
-            class="item"
-            data="[[data.current_progress_by_partner]]">
-        </current-progress-by-partner>
-
-        <!--
         <progress-over-time
             class="item"
+            target="[[data.target]]"
+            in-need="[[data.in_need]]"
             data="[[data.progress_over_time]]">
         </progress-over-time>
-        -->
       </div>
 
       <hr>
 
       <div class="app-grid">
+        <current-progress-by-partner
+            class="item"
+            data="[[data.current_progress_by_partner]]">
+        </current-progress-by-partner>
+
         <current-progress-by-location
             class="item"
             data="[[data.current_progress_by_location]]">

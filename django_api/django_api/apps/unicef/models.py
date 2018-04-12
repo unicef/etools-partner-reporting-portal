@@ -139,7 +139,7 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
 
     budget = models.DecimalField(
         decimal_places=2,
-        max_digits=12,
+        max_digits=64,
         blank=True,
         null=True,
         help_text='Total Budget'
@@ -151,10 +151,10 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
         verbose_name='Budget Currency'
     )
 
-    # intervention budged model from etool !!!
+    # intervention budged model from etool
     cso_contribution = models.DecimalField(
         decimal_places=2,
-        max_digits=12,
+        max_digits=64,
         default=0,
         verbose_name='CSO Contribution'
     )
@@ -165,10 +165,10 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
         verbose_name='CSO Contribution Currency'
     )
 
-    # intervention budged model from etool !!!
+    # intervention budged model from etool
     total_unicef_cash = models.DecimalField(
         decimal_places=2,
-        max_digits=12,
+        max_digits=64,
         default=0,
         verbose_name='UNICEF cash'
     )
@@ -179,9 +179,9 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
         verbose_name='UNICEF cash Currency'
     )
 
-    # intervention budged model from etool !!!
+    # intervention budged model from etool
     in_kind_amount = models.DecimalField(
-        max_digits=12,
+        max_digits=64,
         decimal_places=2,
         default=0,
         verbose_name='UNICEF Supplies'
@@ -195,7 +195,7 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
 
     funds_received_to_date = models.DecimalField(
         decimal_places=2,
-        max_digits=12,
+        max_digits=64,
         default=0,
         verbose_name='Funds received'
     )

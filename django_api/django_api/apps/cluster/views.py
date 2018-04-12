@@ -24,7 +24,7 @@ from indicator.serializers import (
     ReportableSimpleSerializer,
     ClusterPartnerAnalysisIndicatorResultSerializer,
 )
-from indicator.models import IndicatorReport, Reportable
+from indicator.models import IndicatorReport, Reportable, ReportableLocationGoal
 from indicator.serializers import (
     ClusterAnalysisIndicatorsListSerializer,
     ClusterAnalysisIndicatorDetailSerializer,
@@ -831,31 +831,51 @@ class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
                 id__in=map(lambda x: int(x), filter_parameters['cluster_objectives'].split(','))
             )
 
-        cluster_obj_loc = Location.objects.filter(
-            gateway__country__workspaces__response_plans__clusters__cluster_objectives__in=objectives
-        ).distinct().values_list('id', flat=True)
+        cluster_obj_pa_reportable_loc = ReportableLocationGoal.objects.filter(
+            reportable__partner_activities__cluster_activity__cluster_objective__in=objectives
+        ).distinct().values_list('location_id', flat=True)
+
+        cluster_obj_pa_custom_reportable_loc = ReportableLocationGoal.objects.filter(
+            reportable__partner_activities__cluster_objective__in=objectives
+        ).distinct().values_list('location_id', flat=True)
 
         if filter_parameters['partner_types']:
             partner_types = filter_parameters['partner_types'].split(',')
 
         else:
-            partner_types = list(
-                cluster_obj_loc.values_list(
-                    'gateway__country__workspaces__response_plans__clusters__partners__partner_type', flat=True)
-                .distinct()
-            )
+            partner_types = list()
 
-        partner_types_loc = cluster_obj_loc.filter(
-            gateway__country__workspaces__response_plans__clusters__partners__partner_type__in=partner_types
-        ).distinct().values_list('id', flat=True)
+            if cluster_obj_pa_reportable_loc.exists():
+                partner_types.extend(cluster_obj_pa_reportable_loc.values_list(
+                    'reportable__partner_activities__cluster_activity__'
+                    'cluster_objective__cluster__partners__partner_type', flat=True).distinct()
+                )
 
-        loc_ids = set(list(partner_types_loc))
+            if cluster_obj_pa_custom_reportable_loc.exists():
+                partner_types.extend(cluster_obj_pa_custom_reportable_loc.values_list(
+                    'reportable__partner_activities__cluster_objective__cluster__partners__partner_type', flat=True)
+                    .distinct()
+                )
+
+        partner_types_loc = list()
+
+        if cluster_obj_pa_reportable_loc.exists():
+            partner_types_loc.extend(cluster_obj_pa_reportable_loc.filter(
+                reportable__partner_activities__cluster_activity__cluster_objective__cluster__partners__partner_type__in=partner_types  # noqa: #E501
+            ).distinct().values_list('location_id', flat=True))
+
+        if cluster_obj_pa_custom_reportable_loc.exists():
+            partner_types_loc.extend(cluster_obj_pa_custom_reportable_loc.filter(
+                reportable__partner_activities__cluster_objective__cluster__partners__partner_type__in=partner_types
+            ).distinct().values_list('location_id', flat=True))
+
+        loc_ids = set(partner_types_loc)
         result = Location.objects.filter(id__in=loc_ids)
 
         if filter_parameters['loc_type'] and filter_parameters['locs'] and filter_parameters['narrow_loc_type']:
             final_result = Location.objects.filter(
                 Q(parent__id__in=map(lambda x: int(x), filter_parameters['locs'].split(',')))
-                | Q(gateway__admin_level=int(filter_parameters['narrow_loc_type']))
+                & Q(gateway__admin_level=int(filter_parameters['narrow_loc_type']))
             )
 
         else:
@@ -936,7 +956,7 @@ class ClusterAnalysisIndicatorsListAPIView(GenericAPIView, ListModelMixin):
 
             if filter_parameters['partner_types']:
                 partner_types = filter_parameters['partner_types'].split(',')
-                indicators = indicators.filter(cluster_objective__cluster__partners__partner_type__in=partner_types)
+                indicators = indicators.filter(cluster_objectives__cluster__partners__partner_type__in=partner_types)
 
         elif filter_parameters['indicator_type'] == 'cluster_objective':
             indicators = Reportable.objects.filter(
@@ -960,6 +980,23 @@ class ClusterAnalysisIndicatorsListAPIView(GenericAPIView, ListModelMixin):
             if filter_parameters['partner_types']:
                 partner_types = filter_parameters['partner_types'].split(',')
                 indicators = indicators.filter(partner__partner_type__in=partner_types)
+
+        if filter_parameters['loc_type'] and filter_parameters['locs'] and filter_parameters['narrow_loc_type']:
+            indicators = indicators.filter(
+                Q(reportablelocationgoal__location__parent__id__in=map(
+                    lambda x: int(x), filter_parameters['locs'].split(',')))
+                & Q(reportablelocationgoal__location__gateway__admin_level=int(filter_parameters['narrow_loc_type']))
+            )
+
+        else:
+            indicators = indicators.filter(
+                reportablelocationgoal__location__gateway__admin_level=int(filter_parameters['loc_type'])
+            )
+
+            if filter_parameters['locs']:
+                indicators = indicators.filter(reportablelocationgoal__location__id__in=map(
+                    lambda x: int(x), filter_parameters['locs'].split(','))
+                )
 
         return indicators.distinct()
 
