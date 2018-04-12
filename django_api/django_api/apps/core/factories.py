@@ -5,7 +5,6 @@ import random
 from collections import defaultdict
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.models import Group
-from django.db.models.signals import post_save
 from django.contrib.contenttypes.models import ContentType
 
 import factory
@@ -195,6 +194,7 @@ class PartnerProjectFactory(factory.django.DjangoModelFactory):
 class UserProfileFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = UserProfile
+        django_get_or_create = ('user_id', )
 
 
 class GroupFactory(factory.django.DjangoModelFactory):
@@ -209,19 +209,6 @@ class UserFactory(factory.django.DjangoModelFactory):
     email = factory.Sequence(lambda n: "user{}@notanemail.com".format(n))
     password = factory.PostGenerationMethodCall('set_password', 'test')
 
-    profile = factory.RelatedFactory(UserProfileFactory, 'user')
-
-    @classmethod
-    def _generate(cls, create, attrs):
-        """Override the default _generate() to disable the post-save signal."""
-
-        # Note: If the signal was defined with a dispatch_uid, include that in
-        # both calls.
-        post_save.disconnect(UserProfile.create_user_profile, User)
-        user = super(UserFactory, cls)._generate(create, attrs)
-        post_save.connect(UserProfile.create_user_profile, User)
-        return user
-
     @factory.post_generation
     def groups(self, create, extracted, **kwargs):
         group, created = Group.objects.get_or_create(name='UNICEF User')
@@ -229,6 +216,7 @@ class UserFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = User
+        django_get_or_create = ('email', )
 
 
 class CountryFactory(factory.django.DjangoModelFactory):
@@ -260,6 +248,7 @@ class ResponsePlanFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = ResponsePlan
+        django_get_or_create = ('title', 'plan_type', 'workspace')
 
 
 class ClusterFactory(factory.django.DjangoModelFactory):
@@ -548,6 +537,7 @@ class PersonFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = Person
+        django_get_or_create = ('email', )
 
 
 class ReportingPeriodDatesFactory(factory.django.DjangoModelFactory):
@@ -570,16 +560,11 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     frequency = fuzzy.FuzzyChoice(PD_FREQUENCY_LEVEL_CHOICE_LIST)
     budget = fuzzy.FuzzyDecimal(low=1000.0, high=100000.0, precision=2)
     unicef_office = factory.Sequence(lambda n: "JCO country programme %d" % n)
-    cso_contribution = fuzzy.FuzzyDecimal(
-        low=10000.0, high=100000.0, precision=2)
-    total_unicef_cash = fuzzy.FuzzyDecimal(
-        low=10000.0, high=100000.0, precision=2)
-    in_kind_amount = fuzzy.FuzzyDecimal(
-        low=10000.0, high=100000.0, precision=2)
-    funds_received_to_date = fuzzy.FuzzyDecimal(
-        low=10000.0, high=100000.0, precision=2)
+    cso_contribution = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
+    total_unicef_cash = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
+    in_kind_amount = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
+    funds_received_to_date = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
     partner = factory.SubFactory('core.factories.PartnerFactory')
-    # workspace = factory.SubFactory('core.factories.WorkspaceFactory')
 
     cp_output = factory.RelatedFactory(
         'core.factories.PDResultLinkFactory',
@@ -605,6 +590,7 @@ class DisaggregationFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = Disaggregation
+        django_get_or_create = ('name', 'response_plan')
 
 
 class DisaggregationValueFactory(factory.django.DjangoModelFactory):
@@ -612,6 +598,7 @@ class DisaggregationValueFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = DisaggregationValue
+        django_get_or_create = ('disaggregation', 'value')
 
 
 class QuantityIndicatorReportFactory(factory.django.DjangoModelFactory):
@@ -647,6 +634,7 @@ class PDResultLinkFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = PDResultLink
+        django_get_or_create = ('external_id', 'external_cp_output_id')
 
     @factory.post_generation
     def create_llos(self, create, extracted, **kwargs):
@@ -683,6 +671,7 @@ class GatewayTypeFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = GatewayType
+        django_get_or_create = ('name', )
 
 
 class CartoDBTableFactory(factory.django.DjangoModelFactory):

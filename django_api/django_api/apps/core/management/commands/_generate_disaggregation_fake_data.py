@@ -424,15 +424,12 @@ def generate_indicator_report_location_disaggregation_quantity_data():
     # including one for no response plan as well
     for response_plan in [None] + list(ResponsePlan.objects.all()):
         for disagg_name, values in sample_disaggregation_value_map.items():
-            disaggregation = DisaggregationFactory(name=disagg_name,
-                                                   response_plan=response_plan)
+            disaggregation = DisaggregationFactory(name=disagg_name, response_plan=response_plan)
 
             for value in values:
-                DisaggregationValueFactory(disaggregation=disaggregation,
-                                           value=value)
+                DisaggregationValueFactory(disaggregation=disaggregation, value=value)
 
-    queryset = Reportable.objects.filter(
-        blueprint__unit=IndicatorBlueprint.NUMBER).order_by('id')
+    queryset = Reportable.objects.filter(blueprint__unit=IndicatorBlueprint.NUMBER).order_by('id')
 
     for idx, reportable in enumerate(queryset):
         # -- Extra IndicatorReport and IndicatorLocationData --
@@ -612,16 +609,13 @@ def generate_indicator_report_location_disaggregation_ratio_data():
         if reportable.content_type.model in cluster_indicator_types:
             # ProgressReport - IndicatorReport from
             # RatioReportable object
-            indicator_report = RatioIndicatorReportFactory(
-                reportable=reportable)
+            indicator_report = RatioIndicatorReportFactory(reportable=reportable)
             indicator_report.progress_report = reportable.indicator_reports.first().progress_report
             indicator_report.save()
 
         # -- IndicatorLocationData --
         # -- IndicatorLocationData --
-        add_disaggregations_to_reportable(
-            reportable,
-            disaggregation_targets=["height", "gender"])
+        add_disaggregations_to_reportable(reportable, disaggregation_targets=["height", "gender"])
 
         generate_2_num_disagg_data(reportable, indicator_type="ratio")
 
