@@ -3,9 +3,9 @@
 
 <link rel="import" href="../../../polyfills/es6-shim.html">
 <link rel="import" href="../../../redux/store.html">
-<link rel="import" href="cluster-activity.html">
+<link rel="import" href="indicator-bucket.html">
 
-<dom-module id="analysis-cluster-activities">
+<dom-module id="analysis-indicators">
   <template>
     <style>
       :host {
@@ -22,8 +22,8 @@
       <template
           is="dom-repeat"
           items="[[data]]"
-          as="activity">
-        <analysis-cluster-activity data="[[activity]]"></analysis-cluster-activity>
+          as="bucket">
+        <analysis-indicator-bucket data="[[bucket]]"></analysis-indicator-bucket>
       </template>
     </template>
 
@@ -32,7 +32,7 @@
 
   <script>
     Polymer({
-      is: 'analysis-cluster-activities',
+      is: 'analysis-indicators',
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
@@ -71,19 +71,20 @@
 
       _computeData: function (rawData) {
         return rawData.reduce(function (acc, curr) {
-          var activity = acc.find(function (activity) {
-            return activity.id === curr.content_object.id;
+          var bucket = acc.find(function (_bucket) {
+            return _bucket.id === curr.content_object.id;
           });
 
-          if (!activity) {
-            activity = Object.assign({}, curr.content_object, {
+          if (!bucket) {
+            bucket = Object.assign({}, curr.content_object, {
+              type: curr.content_type,
               indicators: [],
             });
 
-            acc.push(activity);
+            acc.push(bucket);
           }
 
-          activity.indicators.push({
+          bucket.indicators.push({
             id: curr.id,
             title: curr.blueprint.title,
             total_against_in_need: curr.total_against_in_need,
