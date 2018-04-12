@@ -261,7 +261,7 @@
           <paper-radio-group
             id="mode"
             selected={{mode}}
-            on-change="_adjustPosition">
+            on-change="adjustPosition">
             <paper-radio-button name="ocha" active="true">
               <strong>From OCHA</strong>
             </paper-radio-button>
@@ -485,9 +485,7 @@
                 <div class="full-width">
                   <labelled-item label="Is this project part of a HRP or FA?">
                     <paper-radio-group
-                        data-path="data.part"
-                        on-paper-radio-group-changed="_onValueChanged"
-                        selected="hrp">
+                        selected={{dats.part}}>
                       <paper-radio-button name="hrp">HRP</paper-radio-button>
                       <paper-radio-button name="fa">FA</paper-radio-button>
                       <paper-radio-button name="no">No</paper-radio-button>
@@ -917,14 +915,6 @@
         e.target.validate();
       },
 
-      _onValueChanged: function (e) {
-        this._updateValue(e.target);
-      },
-
-      _updateValue: function (el) {
-        this.set(el.dataset.path, el.selected);
-      },
-
       _redirectToDetail: function(id) {
         var path = this.permissions.addPartnerToProject
           ? 'response-parameters/partners/project/' + String(id)
@@ -952,13 +942,6 @@
         this.set('data', {});
         this.set('projectDetails', {});
         this.set('errors', {});
-      },
-
-      _adjustPosition: function (e) {
-        e.stopPropagation();
-        this.debounce('adjust-position', function () {
-          this.$.dialog.refit();
-        }, 100);
       },
 
       _save: function () {
