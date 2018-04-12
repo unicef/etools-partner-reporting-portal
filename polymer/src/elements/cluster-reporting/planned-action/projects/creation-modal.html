@@ -17,10 +17,6 @@
 <link rel="import" href="../../../../../bower_components/paper-radio-button/paper-radio-button.html">
 
 <link rel="import" href="../../../../../bower_components/paper-input/paper-input.html">
-<link rel="import" href="../../../../../bower_components/app-layout/app-grid/app-grid-style.html">
-<link rel="import" href="../../../../../bower_components/paper-radio-group/paper-radio-group.html">
-<link rel="import" href="../../../../../bower_components/paper-radio-button/paper-radio-button.html">
-<link rel="import" href="../../../../../bower_components/etools-loading/etools-loading.html">
 <link rel="import" href="../../../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../../../../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../../../../bower_components/paper-item/paper-item.html">
@@ -761,11 +757,6 @@
           computed: '_computeFormattedProjects(projects)',
         },
 
-        selectedPartner: {
-          type: Number,
-          observer: '_savePartner',
-        },
-
         selectedProject: {
           type: String,
         },
@@ -892,18 +883,18 @@
         var self = this;
         this.$.projectDetails.abort();
         this.$.projectDetails.thunk()()
-          .then(function (res) {
-            self.set('projectDetailsLoading', false);
-            self.set('projectDetails', res.data);
-            self.fire('details-loaded', this.name);
-          })
-          .catch(function (err) { // jshint ignore:line
-            if (err.code === 504) {
-              self.fire('notify', {type: 'ocha-timeout'});
-            }
-            self.set('projectDetailsLoading', false);
+            .then(function (res) {
+              self.set('projectDetailsLoading', false);
+              self.set('projectDetails', res.data);
+              self.fire('details-loaded', this.name);
+            })
+            .catch(function (err) { // jshint ignore:line
+              if (err.code === 504) {
+                self.fire('notify', {type: 'ocha-timeout'});
+              }
+              self.set('projectDetailsLoading', false);
             // TODO: error handling
-          });
+            });
       },
 
       _computeFormattedProjects: function(projects) {
@@ -912,24 +903,10 @@
         });
       },
 
-      // _onOpenedChanged: function (opened) {
-      //   if (opened) {
-      //     this.set('mode', '');
-      //   }
-      // },
-
-      _savePartner: function(partner) {
-        this.set('data.partner_id', partner.id);
-      },
-
       _saveClusters: function() {
         this.set('data.clusters', this.selectedClusters.map(function(cluster) {
             return {'id': cluster};
           }));
-      },
-
-      _displayPartner: function (permissions, edit) {
-        return permissions.addPartnerToProject && !edit;
       },
 
       _displayPartnerReadOnly: function (permissions, edit) {

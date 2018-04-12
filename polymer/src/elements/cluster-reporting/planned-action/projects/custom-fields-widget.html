@@ -2,15 +2,8 @@
 <link rel="import" href="../../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../../../../bower_components/app-layout/app-grid/app-grid-style.html">
 <link rel="import" href="../../../../../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../../../../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../../../../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../../../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html">
-<link rel="import" href="../../../../../bower_components/paper-tooltip/paper-tooltip.html">
 <link rel="import" href="../../../../../bower_components/paper-input/paper-input.html">
-
-<link rel="import" href="../../../../polyfills/es6-shim.html">
-<link rel="import" href="../../../../behaviors/utils.html">
-<link rel="import" href="../../../../redux/store.html">
 <link rel="import" href="../../../../styles/buttons.html">
 <link rel="import" href="../../../../styles/shared-styles.html">
 <link rel="import" href="../../../json-field.html">
@@ -82,8 +75,7 @@
     <template
       is="dom-repeat"
       items="[[customFields]]"
-      as="field"
-      restamp="true">
+      as="field">
       <div class="row layout horizontal">
         <div class="flex-none layout vertical center-center col-actions">
           <paper-icon-button
@@ -128,15 +120,10 @@
       Polymer({
         is: 'custom-fields-widget',
 
-        behaviors: [
-          App.Behaviors.UtilsBehavior,
-          App.Behaviors.ReduxBehavior,
-        ],
-
         properties: {
           fieldId: Number,
           customFields: {
-            format: Array,
+            type: Array,
             notify: true,
           },
           edit: {
