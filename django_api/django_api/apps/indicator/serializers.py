@@ -301,11 +301,11 @@ class IndicatorListSerializer(ReportableSimpleSerializer):
     total_against_target = serializers.SerializerMethodField()
 
     def get_total_against_in_need(self, obj):
-        target = float(obj.calculated_target) if obj.calculated_target else 1.0
-        return target / float(obj.calculated_in_need) if obj.in_need else 0
+        return obj.calculated_target / obj.calculated_in_need \
+            if obj.calculated_in_need and obj.calculated_in_need != 0 else 0
 
     def get_total_against_target(self, obj):
-        target = float(obj.calculated_target) if obj.calculated_target else 1.0
+        target = obj.calculated_target if obj.calculated_target != 0 else 1.0
         return obj.total['c'] / target
 
     def get_cluster(self, obj):
@@ -1498,11 +1498,11 @@ class ClusterAnalysisIndicatorsListSerializer(serializers.ModelSerializer):
         return obj.content_type.model
 
     def get_total_against_in_need(self, obj):
-        target = float(obj.calculated_target) if obj.calculated_target else 1.0
-        return target / float(obj.calculated_in_need) if obj.in_need else 0
+        return obj.calculated_target / obj.calculated_in_need \
+            if obj.calculated_in_need and obj.calculated_in_need != 0 else 0
 
     def get_total_against_target(self, obj):
-        target = float(obj.calculated_target) if obj.calculated_target else 1.0
+        target = obj.calculated_target if obj.calculated_target != 0 else 1.0
         return obj.total['c'] / target
 
     def get_content_object(self, obj):
@@ -1554,11 +1554,11 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
     in_need = serializers.JSONField()
 
     def get_total_against_in_need(self, obj):
-        target = float(obj.calculated_target) if obj.calculated_target else 1.0
-        return float(obj.calculated_in_need) / target if obj.in_need else 0
+        return obj.calculated_target / obj.calculated_in_need \
+            if obj.calculated_in_need and obj.calculated_in_need != 0 else 0
 
     def get_total_against_target(self, obj):
-        target = float(obj.calculated_target) if obj.calculated_target else 1.0
+        target = obj.calculated_target if obj.calculated_target != 0 else 1.0
         return obj.total['c'] / target
 
     def get_indicator_type(self, obj):
