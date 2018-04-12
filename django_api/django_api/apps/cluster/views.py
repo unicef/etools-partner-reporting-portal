@@ -24,7 +24,7 @@ from indicator.serializers import (
     ReportableSimpleSerializer,
     ClusterPartnerAnalysisIndicatorResultSerializer,
 )
-from indicator.models import IndicatorReport, Reportable
+from indicator.models import IndicatorReport, Reportable, ReportableLocationGoal
 from indicator.serializers import (
     ClusterAnalysisIndicatorsListSerializer,
     ClusterAnalysisIndicatorDetailSerializer,
@@ -831,23 +831,23 @@ class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
                 id__in=map(lambda x: int(x), filter_parameters['cluster_objectives'].split(','))
             )
 
-        cluster_obj_loc = Location.objects.filter(
-            gateway__country__workspaces__response_plans__clusters__cluster_objectives__in=objectives
-        ).distinct().values_list('id', flat=True)
+        cluster_obj_reportable_loc = ReportableLocationGoal.objects.filter(
+            reportable__cluster_objectives__in=objectives
+        ).distinct().values_list('location_id', flat=True)
 
         if filter_parameters['partner_types']:
             partner_types = filter_parameters['partner_types'].split(',')
 
         else:
             partner_types = list(
-                cluster_obj_loc.values_list(
-                    'gateway__country__workspaces__response_plans__clusters__partners__partner_type', flat=True)
+                cluster_obj_reportable_loc.values_list(
+                    'reportable__cluster_objectives__cluster__partners__partner_type', flat=True)
                 .distinct()
             )
 
-        partner_types_loc = cluster_obj_loc.filter(
-            gateway__country__workspaces__response_plans__clusters__partners__partner_type__in=partner_types
-        ).distinct().values_list('id', flat=True)
+        partner_types_loc = cluster_obj_reportable_loc.filter(
+            reportable__cluster_objectives__cluster__partners__partner_type__in=partner_types
+        ).distinct().values_list('location_id', flat=True)
 
         loc_ids = set(list(partner_types_loc))
         result = Location.objects.filter(id__in=loc_ids)
@@ -855,7 +855,7 @@ class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
         if filter_parameters['loc_type'] and filter_parameters['locs'] and filter_parameters['narrow_loc_type']:
             final_result = Location.objects.filter(
                 Q(parent__id__in=map(lambda x: int(x), filter_parameters['locs'].split(',')))
-                | Q(gateway__admin_level=int(filter_parameters['narrow_loc_type']))
+                & Q(gateway__admin_level=int(filter_parameters['narrow_loc_type']))
             )
 
         else:
