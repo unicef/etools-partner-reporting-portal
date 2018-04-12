@@ -847,8 +847,8 @@ class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
 
             if cluster_obj_pa_reportable_loc.exists():
                 partner_types.extend(cluster_obj_pa_reportable_loc.values_list(
-                    'reportable__partner_activities__cluster_activity__cluster_objective__cluster__partners__partner_type', flat=True)
-                    .distinct()
+                    'reportable__partner_activities__cluster_activity__'
+                    'cluster_objective__cluster__partners__partner_type', flat=True).distinct()
                 )
 
             if cluster_obj_pa_custom_reportable_loc.exists():
@@ -861,7 +861,7 @@ class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
 
         if cluster_obj_pa_reportable_loc.exists():
             partner_types_loc.extend(cluster_obj_pa_reportable_loc.filter(
-                reportable__partner_activities__cluster_activity__cluster_objective__cluster__partners__partner_type__in=partner_types
+                reportable__partner_activities__cluster_activity__cluster_objective__cluster__partners__partner_type__in=partner_types  # noqa: #E501
             ).distinct().values_list('location_id', flat=True))
 
         if cluster_obj_pa_custom_reportable_loc.exists():
