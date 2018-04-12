@@ -170,7 +170,10 @@
           }
         },
 
-        attached: function () {
+        attached: function (edit) {
+          if (edit) {
+            return;
+            }
           this.set('fieldId', 0);
          }
       });
