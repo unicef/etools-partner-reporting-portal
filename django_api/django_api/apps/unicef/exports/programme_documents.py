@@ -39,6 +39,7 @@ class ProgrammeDocumentsXLSXExporter:
         self.worksheet.title = 'Programme Document(s) Summary'
         headers = [
             'Title',
+            'PD/SSFA status',
             'Agreement',
             'Document Type',
             'Reference Number',
@@ -47,7 +48,6 @@ class ProgrammeDocumentsXLSXExporter:
             'Partner Focal Point(s)',
             'In response to an HRP',
 
-            'PD/SSFA status',
             'Start date',
             'End date',
             'CSO contribution',
@@ -76,6 +76,7 @@ class ProgrammeDocumentsXLSXExporter:
 
             data_row = [
                 (pd.title, None),
+                (pd.get_status_display(), None),
                 (pd.agreement, None),
                 (pd.get_document_type_display(), None),
                 (pd.reference_number, None),
@@ -83,7 +84,6 @@ class ProgrammeDocumentsXLSXExporter:
                 (', '.join([person.name for person in pd.unicef_focal_point.all()]), None),
                 (', '.join([person.name for person in pd.partner_focal_point.all()]), None),
                 (None, None),  # This field is not calculated anywhere yet
-                (pd.get_status_display(), None),
                 (pd.start_date, PARTNER_PORTAL_DATE_FORMAT_EXCEL),
                 (pd.end_date, PARTNER_PORTAL_DATE_FORMAT_EXCEL),
                 (pd.cso_contribution, FORMAT_CURRENCY_USD),
