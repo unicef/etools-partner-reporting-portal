@@ -831,25 +831,45 @@ class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
                 id__in=map(lambda x: int(x), filter_parameters['cluster_objectives'].split(','))
             )
 
-        cluster_obj_reportable_loc = ReportableLocationGoal.objects.filter(
-            reportable__cluster_objectives__in=objectives
+        cluster_obj_pa_reportable_loc = ReportableLocationGoal.objects.filter(
+            reportable__partner_activities__cluster_activity__cluster_objective__in=objectives
+        ).distinct().values_list('location_id', flat=True)
+
+        cluster_obj_pa_custom_reportable_loc = ReportableLocationGoal.objects.filter(
+            reportable__partner_activities__cluster_objective__in=objectives
         ).distinct().values_list('location_id', flat=True)
 
         if filter_parameters['partner_types']:
             partner_types = filter_parameters['partner_types'].split(',')
 
         else:
-            partner_types = list(
-                cluster_obj_reportable_loc.values_list(
-                    'reportable__cluster_objectives__cluster__partners__partner_type', flat=True)
-                .distinct()
-            )
+            partner_types = list()
 
-        partner_types_loc = cluster_obj_reportable_loc.filter(
-            reportable__cluster_objectives__cluster__partners__partner_type__in=partner_types
-        ).distinct().values_list('location_id', flat=True)
+            if cluster_obj_pa_reportable_loc.exists():
+                partner_types.extend(cluster_obj_pa_reportable_loc.values_list(
+                    'reportable__partner_activities__cluster_activity__cluster_objective__cluster__partners__partner_type', flat=True)
+                    .distinct()
+                )
 
-        loc_ids = set(list(partner_types_loc))
+            if cluster_obj_pa_custom_reportable_loc.exists():
+                partner_types.extend(cluster_obj_pa_custom_reportable_loc.values_list(
+                    'reportable__partner_activities__cluster_objective__cluster__partners__partner_type', flat=True)
+                    .distinct()
+                )
+
+        partner_types_loc = list()
+
+        if cluster_obj_pa_reportable_loc.exists():
+            partner_types_loc.extend(cluster_obj_pa_reportable_loc.filter(
+                reportable__partner_activities__cluster_activity__cluster_objective__cluster__partners__partner_type__in=partner_types
+            ).distinct().values_list('location_id', flat=True))
+
+        if cluster_obj_pa_custom_reportable_loc.exists():
+            partner_types_loc.extend(cluster_obj_pa_custom_reportable_loc.filter(
+                reportable__partner_activities__cluster_objective__cluster__partners__partner_type__in=partner_types
+            ).distinct().values_list('location_id', flat=True))
+
+        loc_ids = set(partner_types_loc)
         result = Location.objects.filter(id__in=loc_ids)
 
         if filter_parameters['loc_type'] and filter_parameters['locs'] and filter_parameters['narrow_loc_type']:
