@@ -418,12 +418,6 @@
                   on-input="_validate">
                 </paper-input>
 
-                <custom-fields-widget
-                  class="item full-width"
-                  custom-fields="{{data.custom_fields}}"
-                  edit="[[edit]]">
-                </custom-fields-widget>
-
           <div class="details-section item full-width">
             <div class="layout horizontal center justified">
               <span class="details-text">Want to add more details to the Project info?</span>
@@ -612,6 +606,13 @@
                   on-input="_validate"
                   always-float-label>
                 </paper-input>
+
+                <custom-fields-widget
+                  class="item full-width"
+                  custom-fields="{{data.custom_fields}}"
+                  edit="[[edit]]">
+                </custom-fields-widget>
+
               <div>
             </iron-collapse>
           </div>
