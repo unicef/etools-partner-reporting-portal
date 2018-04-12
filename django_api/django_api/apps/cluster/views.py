@@ -961,6 +961,23 @@ class ClusterAnalysisIndicatorsListAPIView(GenericAPIView, ListModelMixin):
                 partner_types = filter_parameters['partner_types'].split(',')
                 indicators = indicators.filter(partner__partner_type__in=partner_types)
 
+        if filter_parameters['loc_type'] and filter_parameters['locs'] and filter_parameters['narrow_loc_type']:
+            indicators = indicators.filter(
+                Q(reportablelocationgoal__location__parent__id__in=map(
+                    lambda x: int(x), filter_parameters['locs'].split(',')))
+                & Q(reportablelocationgoal__location__gateway__admin_level=int(filter_parameters['narrow_loc_type']))
+            )
+
+        else:
+            indicators = indicators.filter(
+                reportablelocationgoal__location__gateway__admin_level=int(filter_parameters['loc_type'])
+            )
+
+            if filter_parameters['locs']:
+                indicators = indicators.filter(reportablelocationgoal__location__id__in=map(
+                    lambda x: int(x), filter_parameters['locs'].split(','))
+                )
+
         return indicators.distinct()
 
 
