@@ -282,10 +282,11 @@ class ProgressReportPDFView(RetrieveAPIView):
             'partner_contribution_to_date': report.partner_contribution_to_date,
             'submission_date': report.get_submission_date(),
             'authorized_officer': report.programme_document.unicef_officers.first(),
-            'focal_point': report.programme_document.unicef_focal_point.first(),
+            'focal_point': report.programme_document.partner_focal_point.first(),
             'outputs': group_indicator_reports_by_lower_level_output(report.indicator_reports.all()),
-            'title': 'PART 2: programme progress/final report - to '
-                     'be completed by CSO as part of reporting with FACE'.upper(),
+            'title': 'Progress Report',
+            'header': 'PART 2: programme progress/final report - to '
+                      'be completed by CSO as part of reporting with FACE'.upper(),
         }
 
         return render_to_pdf_response(request, "report_annex_c_pdf.html", data, encoding='utf8')
