@@ -1003,7 +1003,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
             else:
                 # Location-level progress value validation
-                self.check_progress_values(loc_data, partner)
+                self.check_progress_values(loc_data)
 
             loc_data['reportable'] = self.instance
 
@@ -1058,7 +1058,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
                 if not partner:
                     # Location-level progress value validation
-                    self.check_progress_values(loc_goal, partner)
+                    self.check_progress_values(loc_goal)
 
         except Location.DoesNotExist:
             raise ValidationError("Location ID %d does not exist" % loc_goal['location'])
