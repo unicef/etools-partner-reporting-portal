@@ -814,7 +814,7 @@
             return cluster.id;
           });
         } else {
-          this.data = {'custom_fields': []};
+          this.data = {'custom_fields': [], 'funding': {}};
           this.selectedClusters = [];
         }
         this.set('opened', true);
@@ -938,7 +938,10 @@
            }
         this.set('selectedProject', '');
         this.set('projectLoading', false);
-        this.set('data', {'custom_fields': []});
+        this.set('data', {
+          'custom_fields': [],
+          'funding': {}
+        });
         this.set('projectDetails', {});
         this.set('errors', {});
       },
