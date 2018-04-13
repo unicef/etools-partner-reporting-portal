@@ -100,6 +100,7 @@
       </div>
     </template>
 
+
     <paper-button
       class="btn-primary"
       on-tap="_add">
@@ -111,7 +112,14 @@
         is: 'custom-fields-widget',
 
         properties: {
-          fieldId: Number,
+          fieldId: {
+            type: Number,
+            value: 0,
+          },
+          editFieldId: {
+            type: Number,
+            value: 0,
+          },
           customFields: {
             type: Array,
             notify: true,
@@ -164,18 +172,27 @@
 
         _setCustomFields: function (edit) {
           if (edit) {
-            return;
+            var editFields = 0;
+            var newCustomFields = this.customFields.map(function (field) {
+              editFields += 1;
+              field.id = editFields - 1;
+              return field;
+            });
+            this.set('customFields', newCustomFields);
+            console.log('new custom fields are', newCustomFields);
+            this.set('editFieldId', editFields - 1);
           } else {
             this.set('customFields', []);
           }
         },
 
-        attached: function (edit) {
-          if (edit) {
-            return;
-            }
+        attached: function () {
+          if (this.editFieldId > 0) {
+            this.set('fieldId', this.editFieldId);
+          } else {
           this.set('fieldId', 0);
-         }
+          }
+        },
       });
     </script>
 </dom-module>
