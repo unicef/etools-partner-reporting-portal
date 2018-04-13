@@ -454,22 +454,9 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
         new_title = 'of temporary classrooms - updated'
         self.data['blueprint']['title'] = new_title
         self.data['blueprint']['calculation_formula_across_locations'] = IndicatorBlueprint.MAX
-        self.data['locations'] = [{'id': Location.objects.first().id}]
         response = self.client.put(self.url, data=self.data, format='json')
 
-        self.assertFalse(status.is_success(response.status_code))
-        expected_errors = set([
-            'Modify or change the `calculation_formula_across_periods` is not allowed.',
-            'Modify or change the `calculation_formula_across_locations` is not allowed.',
-            'Modify or change the `display_type` is not allowed.'
-        ])
-        self.assertTrue(expected_errors.issubset(response.data['errors']))
-
-        del self.data['blueprint']['calculation_formula_across_periods']
-        del self.data['blueprint']['calculation_formula_across_locations']
-        del self.data['blueprint']['display_type']
-        self.data['locations'] = [{'id': Location.objects.first().id}]
-        response = self.client.put(self.url, data=self.data, format='json')
+        self.assertTrue(status.is_success(response.status_code))
 
         reportable = Reportable.objects.get(id=response.data['id'])
         self.assertEquals(
@@ -479,7 +466,7 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
         self.assertEquals(
             reportable.blueprint.calculation_formula_across_locations,
             IndicatorBlueprint.AVG)
-        self.assertEquals(reportable.locations.count(), 1)
+        self.assertEquals(reportable.locations.count(), 2)
 
 
 # class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
