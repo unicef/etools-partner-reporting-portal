@@ -52,6 +52,8 @@ STATICFILES_DIRS = [
 ]
 
 DOMAIN_NAME = os.getenv('DOMAIN_NAME')
+FRONTEND_HOST = os.getenv('PRP_FRONTEND_HOST', 'http://localhost:8080')
+
 # Sendgrid stuff
 EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
 
