@@ -3,6 +3,8 @@ from django.conf.urls import url
 from ocha.views import (
     RPMWorkspaceResponsePlanAPIView,
     RPMWorkspaceResponsePlanDetailAPIView,
+    RPMProjectListAPIView,
+    RPMProjectDetailAPIView,
 )
 
 
@@ -13,4 +15,11 @@ urlpatterns = [
     url(r'^response-plans/(?P<id>\d+)/$',
         RPMWorkspaceResponsePlanDetailAPIView.as_view(),
         name="rpm-response-plan-details"),
+
+    url(r'^projects/response-plan/(?P<plan_id>\d+)/$',
+        RPMProjectListAPIView.as_view(),
+        name="rpm-projects"),
+    url(r'^projects/(?P<id>\d+)/$',
+        RPMProjectDetailAPIView.as_view(),
+        name="rpm-project-details"),
 ]

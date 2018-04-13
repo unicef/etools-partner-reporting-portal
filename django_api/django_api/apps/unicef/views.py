@@ -4,7 +4,7 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import transaction
-from django.http import HttpResponse, Http404
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 
 from rest_framework import status as statuses
@@ -15,7 +15,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 import django_filters.rest_framework
-from easy_pdf.rendering import render_to_pdf
+from easy_pdf.rendering import render_to_pdf_response
 
 from core.api_error_codes import APIErrorCode
 from core.common import (
@@ -282,12 +282,14 @@ class ProgressReportPDFView(RetrieveAPIView):
             'partner_contribution_to_date': report.partner_contribution_to_date,
             'submission_date': report.get_submission_date(),
             'authorized_officer': report.programme_document.unicef_officers.first(),
-            'focal_point': report.programme_document.unicef_focal_point.first(),
-            'outputs': group_indicator_reports_by_lower_level_output(report.indicator_reports.all())
+            'focal_point': report.programme_document.partner_focal_point.first(),
+            'outputs': group_indicator_reports_by_lower_level_output(report.indicator_reports.all()),
+            'title': 'Progress Report',
+            'header': 'PART 2: programme progress/final report - to '
+                      'be completed by CSO as part of reporting with FACE'.upper(),
         }
 
-        pdf = render_to_pdf("report_annex_c_pdf.html", data)
-        return HttpResponse(pdf, content_type='application/pdf')
+        return render_to_pdf_response(request, "report_annex_c_pdf.html", data, encoding='utf8')
 
 
 class ProgressReportDetailsUpdateAPIView(APIView):

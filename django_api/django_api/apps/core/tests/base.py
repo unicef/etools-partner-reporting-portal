@@ -1,3 +1,4 @@
+
 from __future__ import unicode_literals
 
 from django.contrib.auth import get_user_model
@@ -16,15 +17,15 @@ class BaseAPITestCase(APITestCase):
     client_class = APIClient
     with_session_login = True
     with_generate_fake_data = True
+    generate_all_disagg = False
     user = None
 
     def setUp(self):
         super(BaseAPITestCase, self).setUp()
-
         # generating data
         if self.with_generate_fake_data:
             with suppress_stdout():
-                generate_fake_data(self.generate_fake_data_quantity)
+                generate_fake_data(self.generate_fake_data_quantity, generate_all_disagg=self.generate_all_disagg)
 
             # creating a session (login already created user in generate_fake_data)
             if self.with_session_login:

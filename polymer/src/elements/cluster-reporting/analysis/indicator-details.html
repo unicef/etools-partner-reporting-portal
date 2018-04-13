@@ -130,7 +130,7 @@
                 </template>
                 <template
                     is="dom-if"
-                    if="[[_equals(data.display_type, 'percentage')]]"
+                    if="[[!_equals(data.display_type, 'number')]]"
                     restamp="true">
                   <span>[[_toPercentage(data.total.c)]]</span>
                 </template>
@@ -143,19 +143,52 @@
           <dl class="indicator-data layout horizontal">
             <dt>Baseline:</dt>
             <dd>
-              <etools-prp-number value="[[data.baseline]]"></etools-prp-number>
+              <template
+                  is="dom-if"
+                  if="[[_equals(data.display_type, 'number')]]"
+                  restamp="true">
+                <etools-prp-number value="[[data.baseline.v]]"></etools-prp-number>
+              </template>
+              <template
+                  is="dom-if"
+                  if="[[!_equals(data.display_type, 'number')]]"
+                  restamp="true">
+                <span>[[_toPercentage(data.baseline.c)]]</span>
+              </template>
             </dd>
           </dl>
           <dl class="indicator-data layout horizontal">
             <dt>Target:</dt>
             <dd>
-              <etools-prp-number value="[[data.target]]"></etools-prp-number>
+              <template
+                  is="dom-if"
+                  if="[[_equals(data.display_type, 'number')]]"
+                  restamp="true">
+                <etools-prp-number value="[[data.target.v]]"></etools-prp-number>
+              </template>
+              <template
+                  is="dom-if"
+                  if="[[!_equals(data.display_type, 'number')]]"
+                  restamp="true">
+                <span>[[_toPercentage(data.target.c)]]</span>
+              </template>
             </dd>
           </dl>
           <dl class="indicator-data layout horizontal">
             <dt>In need:</dt>
             <dd>
-              <etools-prp-number value="[[data.in_need]]"></etools-prp-number>
+              <template
+                  is="dom-if"
+                  if="[[_equals(data.display_type, 'number')]]"
+                  restamp="true">
+                <etools-prp-number value="[[data.in_need.v]]"></etools-prp-number>
+              </template>
+              <template
+                  is="dom-if"
+                  if="[[!_equals(data.display_type, 'number')]]"
+                  restamp="true">
+                <span>[[_toPercentage(data.in_need.c)]]</span>
+              </template>
             </dd>
           </dl>
         </div>
@@ -167,22 +200,22 @@
             data="[[data.partners_by_status]]">
         </partners-by-status>
 
-        <current-progress-by-partner
-            class="item"
-            data="[[data.current_progress_by_partner]]">
-        </current-progress-by-partner>
-
-        <!--
         <progress-over-time
             class="item"
+            target="[[data.target]]"
+            in-need="[[data.in_need]]"
             data="[[data.progress_over_time]]">
         </progress-over-time>
-        -->
       </div>
 
       <hr>
 
       <div class="app-grid">
+        <current-progress-by-partner
+            class="item"
+            data="[[data.current_progress_by_partner]]">
+        </current-progress-by-partner>
+
         <current-progress-by-location
             class="item"
             data="[[data.current_progress_by_location]]">

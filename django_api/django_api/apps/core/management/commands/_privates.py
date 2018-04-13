@@ -37,6 +37,7 @@ from indicator.models import (
     IndicatorLocationData,
     Disaggregation,
     DisaggregationValue,
+    ReportableLocationGoal,
 )
 from unicef.models import (
     Section,
@@ -62,6 +63,7 @@ from core.factories import (
     QuantityReportableToPartnerActivityFactory,
     QuantityReportableToClusterActivityFactory,
     QuantityIndicatorReportFactory,
+    LocationWithReportableLocationGoalFactory,
     RatioIndicatorReportFactory,
     UserFactory,
     ClusterFactory,
@@ -122,6 +124,7 @@ def clean_up_data():
         IndicatorLocationData.objects.all().delete()
         Disaggregation.objects.all().delete()
         DisaggregationValue.objects.all().delete()
+        ReportableLocationGoal.objects.all().delete()
         Section.objects.all().delete()
         ProgrammeDocument.objects.all().delete()
         ProgressReport.objects.all().delete()
@@ -180,7 +183,7 @@ def generate_real_data(fast=False, area=None, update=False):
     process_due_reports()
 
 
-def generate_fake_data(workspace_quantity=10):
+def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
     if not settings.IS_TEST and workspace_quantity < 1:
         workspace_quantity = 1
         print('Workspace quantity reset to {}'.format(workspace_quantity))
@@ -240,7 +243,7 @@ def generate_fake_data(workspace_quantity=10):
             location_type=gateways[0], country=country)
 
         locations = list()
-        for idx in range(8):
+        for idx in range(24):
             locations.append(
                 LocationFactory.create(
                     gateway=gateways[idx] if idx < 5 else gateways[4],
@@ -273,12 +276,15 @@ def generate_fake_data(workspace_quantity=10):
             cluster=cluster,
         )
 
-        QuantityReportableToClusterObjectiveFactory(
+        reportable = QuantityReportableToClusterObjectiveFactory(
             content_object=co, indicator_report__progress_report=None,
-            locations=locations,
         )
 
-        co.locations.add(*locations)
+        for loc in locations:
+            LocationWithReportableLocationGoalFactory.create(
+                location=loc,
+                reportable=reportable
+            )
 
         user = UserFactory(
             first_name="{} Cluster".format(cluster.type.upper()[:20]),
@@ -331,11 +337,15 @@ def generate_fake_data(workspace_quantity=10):
                 cluster_objective=cluster_objective,
             )
 
-            QuantityReportableToClusterActivityFactory(
+            reportable = QuantityReportableToClusterActivityFactory(
                 content_object=ca, indicator_report__progress_report=None,
-                locations=locations,
             )
-            ca.locations.add(*locations)
+
+            for loc in locations:
+                LocationWithReportableLocationGoalFactory.create(
+                    location=loc,
+                    reportable=reportable
+                )
 
         print(
             "{} Cluster Activity objects created for {}".format(
@@ -350,11 +360,15 @@ def generate_fake_data(workspace_quantity=10):
 
         pp.clusters.add(first_cluster)
 
-        QuantityReportableToPartnerProjectFactory(
+        reportable = QuantityReportableToPartnerProjectFactory(
             content_object=pp, indicator_report__progress_report=None,
-            locations=locations,
         )
-        pp.locations.add(*locations)
+
+        for loc in locations:
+            LocationWithReportableLocationGoalFactory.create(
+                location=loc,
+                reportable=reportable
+            )
 
         print(
             "{} PartnerProject objects created for {} under {} Cluster".format(
@@ -374,12 +388,15 @@ def generate_fake_data(workspace_quantity=10):
 
             reportable_to_pa = QuantityReportableToPartnerActivityFactory(
                 content_object=pa, indicator_report__progress_report=None,
-                locations=locations,
             )
             reportable_to_pa.parent_indicator = cluster_activity.reportables.first()
             reportable_to_pa.save()
 
-            pa.locations.add(*locations)
+            for loc in locations:
+                LocationWithReportableLocationGoalFactory.create(
+                    location=loc,
+                    reportable=reportable_to_pa
+                )
 
             pa = PartnerActivityFactory(
                 partner=project.partner,
@@ -391,9 +408,13 @@ def generate_fake_data(workspace_quantity=10):
 
             reportable_to_pa = QuantityReportableToPartnerActivityFactory(
                 content_object=pa, indicator_report__progress_report=None,
-                locations=locations,
             )
-            pa.locations.add(*locations)
+
+            for loc in locations:
+                LocationWithReportableLocationGoalFactory.create(
+                    location=loc,
+                    reportable=reportable_to_pa
+                )
 
             print(
                 "{} PartnerActivity objects created for {} under {} Cluster Activity and Custom Activity".format(
@@ -405,11 +426,11 @@ def generate_fake_data(workspace_quantity=10):
 
     PersonFactory.create_batch(workspace_quantity)
     # only create PD's for the partner being used above
-    # for partner in Partner.objects.all():
+    programme_documents = []
     for workspace in Workspace.objects.all():
         for i in range(workspace_quantity * 2):
-            pd = ProgrammeDocumentFactory.create(
-                partner=first_partner, workspace=workspace)
+            pd = ProgrammeDocumentFactory.create(partner=first_partner, workspace=workspace)
+            programme_documents.append(pd)
             for ir in range(3):
                 d = datetime.datetime.now() + datetime.timedelta(days=ir * 30)
                 report_type = REPORTING_TYPE_LIST_WITHOUT_SR[random.randint(0, 1)]
@@ -429,7 +450,7 @@ def generate_fake_data(workspace_quantity=10):
     # Section - ProgrammeDocument via QuantityReportableToLowerLevelOutput
     # ProgressReport - IndicatorReport from
     # QuantityReportableToLowerLevelOutput
-    for idx, pd in enumerate(ProgrammeDocument.objects.all()):
+    for idx, pd in enumerate(programme_documents):
         locations = pd.workspace.locations
 
         pd.sections.add(Section.objects.order_by('?').first())
@@ -448,18 +469,22 @@ def generate_fake_data(workspace_quantity=10):
                         reportable = QuantityReportableToLowerLevelOutputFactory(
                             content_object=llo,
                             indicator_report__progress_report=None,
-                            locations=locations,
                         )
                     else:
                         reportable = RatioReportableToLowerLevelOutputFactory(
                             content_object=llo,
                             indicator_report__progress_report=None,
-                            locations=locations,
                         )
 
                     # delete the junk indicator report the factory creates
                     # we create IR's in the next for loop down below
                     reportable.indicator_reports.all().delete()
+
+                    for loc in locations:
+                        LocationWithReportableLocationGoalFactory.create(
+                            location=loc,
+                            reportable=reportable
+                        )
 
                 print("{} Reportables generated for {}".format(
                     num_reportables_range[-1] + 1,
@@ -515,10 +540,10 @@ def generate_fake_data(workspace_quantity=10):
     print("ProgrammeDocument <-> QuantityReportableToLowerLevelOutput <-> IndicatorReport objects linked")
 
     print("Generating IndicatorLocationData for Quantity type")
-    generate_indicator_report_location_disaggregation_quantity_data()
+    generate_indicator_report_location_disaggregation_quantity_data(generate_all=generate_all_disagg)
 
     print("Generating IndicatorLocationData for Ratio type")
-    generate_indicator_report_location_disaggregation_ratio_data()
+    generate_indicator_report_location_disaggregation_ratio_data(generate_all=generate_all_disagg)
 
     # Fulfill submission date for closed IR
     IndicatorReport.objects.filter(

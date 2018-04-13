@@ -219,6 +219,15 @@ class ResponsePlan(TimeStampedExternalSourceModel):
     def all_clusters(self):
         return self.clusters.all()
 
+    @cached_property
+    def can_import_ocha_projects(self):
+        """
+        We need external id and source to search projects for this plan
+        """
+        return bool(
+            self.external_id and self.external_source == EXTERNAL_DATA_SOURCES.HPC
+        )
+
     def num_of_partners(self, clusters=None):
         from partner.models import Partner
 
@@ -399,7 +408,7 @@ class GatewayType(TimeStampedModel):
         verbose_name = 'Location Type'
 
     def __str__(self):
-        return self.name
+        return '{} - {}'.format(self.country, self.name)
 
 
 class LocationManager(models.GeoManager):
@@ -433,23 +442,28 @@ class Location(TimeStampedExternalSourceModel):
         'core.CartoDBTable',
         related_name="locations",
         blank=True,
-        null=True)
+        null=True
+    )
 
     latitude = models.DecimalField(
         null=True,
         blank=True,
         max_digits=8,
         decimal_places=5,
-        validators=[MinValueValidator(
-            Decimal(-90)), MaxValueValidator(Decimal(90))]
+        validators=[
+            MinValueValidator(Decimal(-90)),
+            MaxValueValidator(Decimal(90))
+        ]
     )
     longitude = models.DecimalField(
         null=True,
         blank=True,
         max_digits=8,
         decimal_places=5,
-        validators=[MinValueValidator(
-            Decimal(-180)), MaxValueValidator(Decimal(180))]
+        validators=[
+            MinValueValidator(Decimal(-180)),
+            MaxValueValidator(Decimal(180))
+        ]
     )
     p_code = models.CharField(max_length=32, blank=True, null=True, verbose_name='Postal Code')
 
@@ -471,16 +485,14 @@ class Location(TimeStampedExternalSourceModel):
                 self.title,
                 self.gateway.name,
                 "{}: {}".format(
-                    'CERD' if self.gateway.name == 'School' else 'PCode',
-                    self.p_code if self.p_code else ''
+                    'CERD' if self.gateway.name == 'School' else 'PCode', self.p_code or ''
                 ))
 
         return self.title
 
     @property
     def geo_point(self):
-        return self.point if self.point else \
-            self.geom.point_on_surface if self.geom else ""
+        return self.point if self.point else self.geom.point_on_surface if self.geom else ""
 
     @property
     def point_lat_long(self):

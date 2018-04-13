@@ -10,7 +10,7 @@ from core.common import (
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
     CLUSTER_TYPES)
-from core.models import TimeStampedExternalSourceModel
+from core.models import TimeStampedExternalSourceModel, IMORole
 
 from indicator.models import Reportable, IndicatorReport
 from partner.models import PartnerActivity
@@ -52,6 +52,10 @@ class Cluster(TimeStampedExternalSourceModel):
     @property
     def title(self):
         return self.imported_type or self.get_type_display()
+
+    @property
+    def imo_users(self):
+        return self.users.filter(groups__name=IMORole.as_group().name)
 
     @property
     def num_of_partners(self):
@@ -191,16 +195,6 @@ class Cluster(TimeStampedExternalSourceModel):
 
         return overdue.count() + due.count()
 
-    def num_of_due_overdue_indicator_reports_partner(self, partner=None):
-        """TODO: delete."""
-        overdue = self.overdue_indicator_reports.filter(
-            reportable__partner_activities__partner=partner)
-
-        due = self.due_indicator_reports.filter(
-            reportable__partner_activities__partner=partner)
-
-        return overdue.count() + due.count()
-
     def num_of_projects_in_my_organization_partner(self, partner=None):
         return partner.partner_projects.filter(clusters=self).count()
 
@@ -255,7 +249,7 @@ class ClusterObjective(TimeStampedExternalSourceModel):
         return self.cluster.response_plan
 
     def __str__(self):
-        return "<pk: %s> %s" % (self.id, self.title)
+        return "<pk: {}> {}".format(self.id, self.title)
 
 
 class ClusterActivity(TimeStampedExternalSourceModel):
@@ -295,4 +289,4 @@ class ClusterActivity(TimeStampedExternalSourceModel):
         return self.cluster.response_plan
 
     def __str__(self):
-        return "<pk: %s> %s" % (self.id, self.title)
+        return "<pk: {}> {}".format(self.id, self.title)

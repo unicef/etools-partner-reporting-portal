@@ -31,7 +31,10 @@ class ProgressReportDetailPDFExporter:
         for indicators in grouped_indicators:
             tables.append([
                 [
-                    HTMLTableHeader(indicators[0].reportable.content_object.title, colspan=2, klass='section'),
+                    HTMLTableHeader(
+                        'PD Output: {}'.format(indicators[0].reportable.content_object.title),
+                        colspan=2, klass='section'
+                    ),
                 ],
                 [
                     HTMLTableHeader('Overall Status'),
@@ -58,7 +61,7 @@ class ProgressReportDetailPDFExporter:
                     [
                         HTMLTableCell(indicator.reportable.blueprint.title, rowspan=2, colspan=2),
                         HTMLTableHeader('Target'),
-                        HTMLTableCell(indicator.reportable.target),
+                        HTMLTableCell(indicator.reportable.calculated_target),
                     ],
                     [
                         HTMLTableHeader('Total cumulative progress'),

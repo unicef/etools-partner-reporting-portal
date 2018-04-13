@@ -28,10 +28,10 @@
                  placeholder="[[placeholder]]"
                  on-down="openDatePicker"
                  data-selector="datePickerButton"
-                 disabled$="[[disabled]]"
-                 readonly$="[[readonly]]"
-                 required$="[[required]]"
-                 invalid="[[invalid]]"
+                 disabled="[[disabled]]"
+                 readonly="[[readonly]]"
+                 required="[[required]]"
+                 invalid="{{invalid}}"
                  auto-validate$="[[autoValidate]]"
                  error-message="[[errorMessage]]">
       <!-- <iron-icon prefix icon="date-range" hidden$="[[!readonly]]"></iron-icon> -->
@@ -42,7 +42,7 @@
                                 json-date="{{jsonValue}}"
                                 date="[[prepareDate(value)]]"
                                 is-disabled$="[[_disabledDatepicker(readonly, disabled)]]"
-                                hidden$="[[readonly]]"
+                                hidden="[[readonly]]"
                                 no-init="[[noInit]]"
                                 show-clear-btn="[[showClearBtn]]">
       </etools-datepicker-button>
@@ -95,7 +95,6 @@
           },
           invalid: {
             type: Boolean,
-            value: false,
             notify: true,
           },
           errorMessage: {

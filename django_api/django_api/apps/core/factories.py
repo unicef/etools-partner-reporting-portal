@@ -5,7 +5,6 @@ import random
 from collections import defaultdict
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.models import Group
-from django.db.models.signals import post_save
 from django.contrib.contenttypes.models import ContentType
 
 import factory
@@ -25,6 +24,7 @@ from indicator.models import (
     IndicatorLocationData,
     Disaggregation,
     DisaggregationValue,
+    ReportableLocationGoal,
 )
 from unicef.models import (
     Section,
@@ -194,6 +194,7 @@ class PartnerProjectFactory(factory.django.DjangoModelFactory):
 class UserProfileFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = UserProfile
+        django_get_or_create = ('user_id', )
 
 
 class GroupFactory(factory.django.DjangoModelFactory):
@@ -208,19 +209,6 @@ class UserFactory(factory.django.DjangoModelFactory):
     email = factory.Sequence(lambda n: "user{}@notanemail.com".format(n))
     password = factory.PostGenerationMethodCall('set_password', 'test')
 
-    profile = factory.RelatedFactory(UserProfileFactory, 'user')
-
-    @classmethod
-    def _generate(cls, create, attrs):
-        """Override the default _generate() to disable the post-save signal."""
-
-        # Note: If the signal was defined with a dispatch_uid, include that in
-        # both calls.
-        post_save.disconnect(UserProfile.create_user_profile, User)
-        user = super(UserFactory, cls)._generate(create, attrs)
-        post_save.connect(UserProfile.create_user_profile, User)
-        return user
-
     @factory.post_generation
     def groups(self, create, extracted, **kwargs):
         group, created = Group.objects.get_or_create(name='UNICEF User')
@@ -228,6 +216,7 @@ class UserFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = User
+        django_get_or_create = ('email', )
 
 
 class CountryFactory(factory.django.DjangoModelFactory):
@@ -259,6 +248,7 @@ class ResponsePlanFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = ResponsePlan
+        django_get_or_create = ('title', 'plan_type', 'workspace')
 
 
 class ClusterFactory(factory.django.DjangoModelFactory):
@@ -328,7 +318,8 @@ class RatioTypeIndicatorBlueprintFactory(factory.django.DjangoModelFactory):
         RATIO_CALC_CHOICES_LIST)
     calculation_formula_across_periods = fuzzy.FuzzyChoice(
         RATIO_CALC_CHOICES_LIST)
-    display_type = IndicatorBlueprint.PERCENTAGE
+    display_type = fuzzy.FuzzyChoice(
+        RATIO_DISPLAY_TYPE_CHOICES_LIST)
 
     class Meta:
         model = IndicatorBlueprint
@@ -345,33 +336,46 @@ class ReportableFactory(factory.django.DjangoModelFactory):
     cs_dates = [cs_date_1, cs_date_2, cs_date_3]
     frequency = fuzzy.FuzzyChoice(REPORTABLE_FREQUENCY_LEVEL_CHOICE_LIST)
 
-    @factory.post_generation
-    def locations(self, create, extracted, **kwargs):
-        if not create:
-            return
-
-        if extracted:
-            for location in extracted:
-                self.locations.add(location)
-
     class Meta:
         exclude = ['content_object']
         abstract = True
 
 
+class ReportableLocationGoalFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = ReportableLocationGoal
+
+
+class LocationWithReportableLocationGoalFactory(factory.django.DjangoModelFactory):
+    location = factory.SubFactory('core.factories.LocationFactory')
+    reportable = factory.SubFactory('core.factories.ReportableFactory')
+    target = dict(
+        [('d', 1), ('v', random.randint(1000, 10000))])
+    baseline = dict(
+        [('d', 1), ('v', random.randint(0, 500))])
+    in_need = dict(
+        [('d', 1), ('v', random.randint(20000, 50000))])
+
+    class Meta:
+        model = ReportableLocationGoal
+
+
 class QuantityReportableToLowerLevelOutputFactory(ReportableFactory):
     content_object = factory.SubFactory(
         'core.factories.LowerLevelOutputFactory')
-    target = '5000'
-    baseline = '0'
+    target = dict(
+        [('d', 1), ('v', random.randint(1000, 10000))])
+    baseline = dict(
+        [('d', 1), ('v', random.randint(0, 500))])
+    in_need = dict(
+        [('d', 1), ('v', random.randint(20000, 50000))])
+    total = dict(
+        [('c', 0), ('d', 1), ('v', random.randint(0, 3000))])
 
     indicator_report = factory.RelatedFactory(
         'core.factories.QuantityIndicatorReportFactory', 'reportable')
 
     blueprint = factory.SubFactory(QuantityTypeIndicatorBlueprintFactory)
-
-    total = dict(
-        [('c', 0), ('d', 0), ('v', random.randint(0, 3000))])
 
     class Meta:
         model = Reportable
@@ -380,16 +384,19 @@ class QuantityReportableToLowerLevelOutputFactory(ReportableFactory):
 class RatioReportableToLowerLevelOutputFactory(ReportableFactory):
     content_object = factory.SubFactory(
         'core.factories.LowerLevelOutputFactory')
-    target = '5000'
-    baseline = '0'
+    target = dict(
+        [('d', random.randint(20000, 40000)), ('v', random.randint(10000, 20000))])
+    baseline = dict(
+        [('d', random.randint(200, 400)), ('v', random.randint(100, 200))])
+    in_need = dict(
+        [('d', random.randint(50000, 60000)), ('v', random.randint(30000, 40000))])
+    total = dict(
+        [('c', 0), ('d', random.randint(3000, 6000)), ('v', random.randint(0, 3000))])
 
     indicator_report = factory.RelatedFactory(
         'core.factories.RatioIndicatorReportFactory', 'reportable')
 
     blueprint = factory.SubFactory(RatioTypeIndicatorBlueprintFactory)
-
-    total = dict(
-        [('c', 0), ('d', random.randint(3000, 6000)), ('v', random.randint(0, 3000))])
 
     class Meta:
         model = Reportable
@@ -397,30 +404,36 @@ class RatioReportableToLowerLevelOutputFactory(ReportableFactory):
 
 class RatioReportableToClusterObjectiveFactory(ReportableFactory):
     content_object = factory.SubFactory(ClusterObjectiveFactory)
-    target = '5000'
-    baseline = '0'
+    target = dict(
+        [('d', random.randint(20000, 40000)), ('v', random.randint(10000, 20000))])
+    baseline = dict(
+        [('d', random.randint(200, 400)), ('v', random.randint(100, 200))])
+    in_need = dict(
+        [('d', random.randint(50000, 60000)), ('v', random.randint(30000, 40000))])
+    total = dict(
+        [('c', 0), ('d', random.randint(3000, 6000)), ('v', random.randint(0, 3000))])
 
     indicator_report = factory.RelatedFactory(
         'core.factories.RatioIndicatorReportFactory', 'reportable')
 
     blueprint = factory.SubFactory(RatioTypeIndicatorBlueprintFactory)
 
-    total = dict(
-        [('c', 0), ('d', random.randint(3000, 6000)), ('v', random.randint(0, 3000))])
-
 
 class QuantityReportableToPartnerProjectFactory(ReportableFactory):
     content_object = factory.SubFactory('core.factories.PartnerProjectFactory')
-    target = '5000'
-    baseline = '0'
+    target = dict(
+        [('d', 1), ('v', random.randint(1000, 10000))])
+    baseline = dict(
+        [('d', 1), ('v', random.randint(0, 500))])
+    in_need = dict(
+        [('d', 1), ('v', random.randint(20000, 50000))])
+    total = dict(
+        [('c', 0), ('d', 1), ('v', random.randint(0, 3000))])
 
     indicator_report = factory.RelatedFactory(
         'core.factories.QuantityIndicatorReportFactory', 'reportable')
 
     blueprint = factory.SubFactory(QuantityTypeIndicatorBlueprintFactory)
-
-    total = dict(
-        [('c', 0), ('d', 0), ('v', random.randint(0, 3000))])
 
     class Meta:
         model = Reportable
@@ -429,16 +442,19 @@ class QuantityReportableToPartnerProjectFactory(ReportableFactory):
 class QuantityReportableToClusterObjectiveFactory(ReportableFactory):
     content_object = factory.SubFactory(
         'core.factories.ClusterObjectiveFactory')
-    target = '5000'
-    baseline = '0'
+    target = dict(
+        [('d', 1), ('v', random.randint(1000, 10000))])
+    baseline = dict(
+        [('d', 1), ('v', random.randint(0, 500))])
+    in_need = dict(
+        [('d', 1), ('v', random.randint(20000, 50000))])
+    total = dict(
+        [('c', 0), ('d', 1), ('v', random.randint(0, 3000))])
 
     indicator_report = factory.RelatedFactory(
         'core.factories.QuantityIndicatorReportFactory', 'reportable')
 
     blueprint = factory.SubFactory(QuantityTypeIndicatorBlueprintFactory)
-
-    total = dict(
-        [('c', 0), ('d', 0), ('v', random.randint(0, 3000))])
 
     class Meta:
         model = Reportable
@@ -447,16 +463,19 @@ class QuantityReportableToClusterObjectiveFactory(ReportableFactory):
 class QuantityReportableToClusterActivityFactory(ReportableFactory):
     content_object = factory.SubFactory(
         'core.factories.ClusterActivityFactory')
-    target = '5000'
-    baseline = '0'
+    target = dict(
+        [('d', 1), ('v', random.randint(1000, 10000))])
+    baseline = dict(
+        [('d', 1), ('v', random.randint(0, 500))])
+    in_need = dict(
+        [('d', 1), ('v', random.randint(20000, 50000))])
+    total = dict(
+        [('c', 0), ('d', 1), ('v', random.randint(0, 3000))])
 
     indicator_report = factory.RelatedFactory(
         'core.factories.QuantityIndicatorReportFactory', 'reportable')
 
     blueprint = factory.SubFactory(QuantityTypeIndicatorBlueprintFactory)
-
-    total = dict(
-        [('c', 0), ('d', 0), ('v', random.randint(0, 3000))])
 
     class Meta:
         model = Reportable
@@ -465,16 +484,19 @@ class QuantityReportableToClusterActivityFactory(ReportableFactory):
 class QuantityReportableToPartnerActivityFactory(ReportableFactory):
     content_object = factory.SubFactory(
         'core.factories.PartnerActivityFactory')
-    target = '5000'
-    baseline = '0'
+    target = dict(
+        [('d', 1), ('v', random.randint(1000, 10000))])
+    baseline = dict(
+        [('d', 1), ('v', random.randint(0, 500))])
+    in_need = dict(
+        [('d', 1), ('v', random.randint(20000, 50000))])
+    total = dict(
+        [('c', 0), ('d', 1), ('v', random.randint(0, 3000))])
 
     indicator_report = factory.RelatedFactory(
         'core.factories.QuantityIndicatorReportFactory', 'reportable')
 
     blueprint = factory.SubFactory(QuantityTypeIndicatorBlueprintFactory)
-
-    total = dict(
-        [('c', 0), ('d', 0), ('v', random.randint(0, 3000))])
 
     class Meta:
         model = Reportable
@@ -494,6 +516,9 @@ class ProgressReportFactory(factory.django.DjangoModelFactory):
     due_date = start_date + datetime.timedelta(days=45)
 
     class Meta:
+        django_get_or_create = (
+            'programme_document', 'report_type', 'report_number'
+        )
         model = ProgressReport
 
 
@@ -512,6 +537,7 @@ class PersonFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = Person
+        django_get_or_create = ('email', )
 
 
 class ReportingPeriodDatesFactory(factory.django.DjangoModelFactory):
@@ -534,16 +560,11 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     frequency = fuzzy.FuzzyChoice(PD_FREQUENCY_LEVEL_CHOICE_LIST)
     budget = fuzzy.FuzzyDecimal(low=1000.0, high=100000.0, precision=2)
     unicef_office = factory.Sequence(lambda n: "JCO country programme %d" % n)
-    cso_contribution = fuzzy.FuzzyDecimal(
-        low=10000.0, high=100000.0, precision=2)
-    total_unicef_cash = fuzzy.FuzzyDecimal(
-        low=10000.0, high=100000.0, precision=2)
-    in_kind_amount = fuzzy.FuzzyDecimal(
-        low=10000.0, high=100000.0, precision=2)
-    funds_received_to_date = fuzzy.FuzzyDecimal(
-        low=10000.0, high=100000.0, precision=2)
+    cso_contribution = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
+    total_unicef_cash = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
+    in_kind_amount = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
+    funds_received_to_date = fuzzy.FuzzyDecimal(low=10000.0, high=100000.0, precision=2)
     partner = factory.SubFactory('core.factories.PartnerFactory')
-    # workspace = factory.SubFactory('core.factories.WorkspaceFactory')
 
     cp_output = factory.RelatedFactory(
         'core.factories.PDResultLinkFactory',
@@ -569,6 +590,7 @@ class DisaggregationFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = Disaggregation
+        django_get_or_create = ('name', 'response_plan')
 
 
 class DisaggregationValueFactory(factory.django.DjangoModelFactory):
@@ -576,6 +598,7 @@ class DisaggregationValueFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = DisaggregationValue
+        django_get_or_create = ('disaggregation', 'value')
 
 
 class QuantityIndicatorReportFactory(factory.django.DjangoModelFactory):
@@ -611,6 +634,7 @@ class PDResultLinkFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = PDResultLink
+        django_get_or_create = ('external_id', 'external_cp_output_id')
 
     @factory.post_generation
     def create_llos(self, create, extracted, **kwargs):
@@ -647,6 +671,7 @@ class GatewayTypeFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = GatewayType
+        django_get_or_create = ('name', )
 
 
 class CartoDBTableFactory(factory.django.DjangoModelFactory):

@@ -34,7 +34,7 @@ On any charts, where we are referring to Partners, we are showing targets set by
 
 
 
-![Operational Presence tab](../../.gitbook/assets/analysis_cluster_new_012x.png)
+![Operational Presence tab](../../.gitbook/assets/analysis_cluster_new_01-2x.png)
 
 
 
@@ -69,7 +69,7 @@ Below there are charts showing for this Indicator:
 
 See screenshot below for details:
 
-![Indicators tab](../../.gitbook/assets/analysis_cluster_new_01_022x%20%281%29.png)
+![Indicators tab](../../.gitbook/assets/analysis_cluster_new_01_02-2x%20%281%29.png)
 
 Indicator types, that can be displayed here:
 
@@ -82,7 +82,7 @@ Indicator types, that can be displayed here:
 Both the target and the in-need for each indicator below has been set by the IMO, against which then, progress is shown in green and orange colors.
 {% endhint %}
 
-![Other types of Indicators](../../.gitbook/assets/analysis_cluster_new_022x.png)
+![Other types of Indicators](../../.gitbook/assets/analysis_cluster_new_02-2x.png)
 
 
 

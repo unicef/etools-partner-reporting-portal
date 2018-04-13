@@ -234,6 +234,10 @@ def find_missing_frequency_period_dates_for_indicator_report(indicator, latest_i
         indicator_start_date = indicator.content_object.start_date
         indicator_end_date = indicator.content_object.end_date
 
+    # Override start date if indicator has its own start date
+    if indicator.start_date_of_reporting_period:
+        indicator_start_date = indicator.start_date_of_reporting_period
+
     date_to_compare = latest_indicator_report_date if latest_indicator_report_date else indicator_start_date
     date_list = []
 

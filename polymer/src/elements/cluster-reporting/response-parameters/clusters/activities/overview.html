@@ -63,7 +63,7 @@
     <page-body>
 
       <template is="dom-if"
-        if="[[_canEditActivity(permissions, data.co_cluster_id)]]"
+        if="[[_canEditActivity(permissions, data.cluster)]]"
         restamp="true">
         <cluster-activities-editing-modal id="modal" edit-data="[[data]]">
         </cluster-activities-editing-modal>
@@ -84,7 +84,7 @@
             </li>
             <li class="item">
               <labelled-item label="Cluster">
-                <span class="value">[[_withDefault(data.co_cluster_title)]]</span>
+                <span class="value">[[_withDefault(data.cluster_title)]]</span>
               </labelled-item>
             </li>
           </ul>

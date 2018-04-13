@@ -1,4 +1,4 @@
-§{% extends "easy_pdf/base.html" %}
+{% extends "custom_pdf_base.html" %}
 {% load pdf_extras %}
 
 {% block extra_style %}
@@ -9,7 +9,6 @@
         }
 
         #pdf {
-            font-family: "Arial", "sans-serif";
             font-size: 10px;
         }
         table, td, th {

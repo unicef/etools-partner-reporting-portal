@@ -8,7 +8,7 @@
 
 <link rel="import" href="../../styles/disaggregation-table-styles.html">
 
-<dom-module id="disaggregation-table-multi-cell">
+<dom-module id="disaggregation-table-cell-ratio">
   <template>
     <style include="disaggregation-table-styles app-grid-style">
       :host {
@@ -67,7 +67,11 @@
               validator="[[vName]]">
           </disaggregation-field>
         </div>
-        <div class="computed-value">[[_toPercentage(localData.c)]]</div>
+        <div class="computed-value">
+          <etools-prp-number value="[[localData.v]]"></etools-prp-number>
+          /
+          <etools-prp-number value="[[localData.d]]"></etools-prp-number>
+        </div>
       </div>
     </template>
 
@@ -81,14 +85,18 @@
         <div class="item">
           <etools-prp-number value="[[data.d]]"></etools-prp-number>
         </div>
-        <div class="computed-value">[[_toPercentage(data.c)]]</div>
+        <div class="computed-value">
+          <etools-prp-number value="[[data.v]]"></etools-prp-number>
+          /
+          <etools-prp-number value="[[data.d]]"></etools-prp-number>
+        </div>
       </div>
     </template>
   </template>
 
   <script>
     Polymer({
-      is: 'disaggregation-table-multi-cell',
+      is: 'disaggregation-table-cell-ratio',
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
@@ -141,6 +149,10 @@
 
         if (typeof value.v !== 'undefined') {
           d.validate();
+        }
+
+        if (typeof value.d !== 'undefined') {
+          v.validate();
         }
 
         change = Object.assign({}, this.get('localData'), value);

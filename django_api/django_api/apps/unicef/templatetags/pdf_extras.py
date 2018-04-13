@@ -1,5 +1,7 @@
+import os
 from babel.numbers import format_currency as babel_currency_format
 from django import template
+from django.conf import settings
 from django.utils.translation import to_locale, get_language
 
 register = template.Library()
@@ -46,3 +48,12 @@ def format_currency(amount, currency='USD'):
     if amount:
         return babel_currency_format(amount, currency, locale=locale)
     return '0'
+
+
+@register.simple_tag
+def filesystem_static_path(filename):
+    return os.path.join(
+        settings.BASE_DIR,
+        'static',
+        filename
+    )
