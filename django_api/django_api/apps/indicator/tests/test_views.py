@@ -16,7 +16,7 @@ from unicef.models import (
 )
 from indicator.serializers import (
     IdDisaggregationSerializer,
-    ReportableLocationGoalSerializer,
+    # ReportableLocationGoalSerializer,
 )
 from indicator.models import (
     Reportable,
