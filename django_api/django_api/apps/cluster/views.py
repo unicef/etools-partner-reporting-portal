@@ -847,13 +847,19 @@ class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
 
             if cluster_obj_pa_reportable_loc.exists():
                 partner_types.extend(cluster_obj_pa_reportable_loc.values_list(
-                    'reportable__partner_activities__cluster_activity__'
-                    'cluster_objective__cluster__partners__partner_type', flat=True).distinct()
+                    'reportable__partner_activities',
+                    '__cluster_activity__',
+                    'cluster_objective__',
+                    'cluster__partners__partner_type', flat=True).distinct()
                 )
 
             if cluster_obj_pa_custom_reportable_loc.exists():
                 partner_types.extend(cluster_obj_pa_custom_reportable_loc.values_list(
-                    'reportable__partner_activities__cluster_objective__cluster__partners__partner_type', flat=True)
+                    'reportable__',
+                    'partner_activities__',
+                    'cluster_objective__',
+                    'cluster__partners__',
+                    'partner_type', flat=True)
                     .distinct()
                 )
 

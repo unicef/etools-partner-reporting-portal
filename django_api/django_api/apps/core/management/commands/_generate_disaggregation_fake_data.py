@@ -735,7 +735,10 @@ def generate_indicator_report_location_disaggregation_ratio_data(generate_all=Fa
                         reportable.locations.add(
                             Location.objects.get(id=location_id))
 
-            print("IndicatorReport and its Disaggregation data entries for RatioReportable object {} created".format(idx))
+            print(
+                "IndicatorReport and its Disaggregation data entries",
+                " for RatioReportable object {} created".format(idx),
+            )
 
     # Making the rest of IndicatorReport objects not latest so that
     # IndicatorReport objects with location data are guaranteed to show up
