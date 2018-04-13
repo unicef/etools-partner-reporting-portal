@@ -22,7 +22,7 @@ from core.permissions import (
     IsIMO,
 )
 from core.paginations import SmallPagination
-from core.models import Location, ResponsePlan
+from core.models import Location
 from core.common import (
     PROGRESS_REPORT_STATUS,
     INDICATOR_REPORT_STATUS,
