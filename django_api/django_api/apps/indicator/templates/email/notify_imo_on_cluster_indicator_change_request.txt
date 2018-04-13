@@ -1,7 +1,15 @@
-Dear {{imo_user.get_full_name}},
+Dear {{ imo_user.get_full_name }},
 
-A partner in your cluster sent this message:
+Partner "{{ partner_name }}" in your cluster sent this message:
 
-{{message}}
+{{ message }}
 
--- {{partner_name}} - {{partner_email}}
+-- {{ sender_user.get_full_name }} ({{ sender_user.email }})
+
+This message is regarding {{ indicator_name }} for {{ project_name }} project in {{ response_plan_name }} plan.
+This indicator contains {{ locations|length }} location{{ locations|pluralize }}:
+{% for location in locations %}
+    - {{ location }}
+{% endfor %}
+Details can be viewed at the link below.
+{{ target_url }}

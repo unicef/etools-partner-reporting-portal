@@ -22,7 +22,7 @@ from core.permissions import (
     IsIMO,
 )
 from core.paginations import SmallPagination
-from core.models import Location
+from core.models import Location, ResponsePlan
 from core.common import (
     PROGRESS_REPORT_STATUS,
     INDICATOR_REPORT_STATUS,
@@ -644,7 +644,6 @@ class ClusterIndicatorSendIMOMessageAPIView(APIView):
     """
 
     permission_classes = (
-        IsAuthenticated,
         IsPartnerEditorOrPartnerAuthorizedOfficer,
     )
 
@@ -656,23 +655,41 @@ class ClusterIndicatorSendIMOMessageAPIView(APIView):
         serializer.is_valid(raise_exception=True)
 
         reportable = serializer.validated_data['reportable']
-        imo_user = serializer.validated_data['cluster'].imo_users.first()
+        cluster = serializer.validated_data['cluster']
+        imo_user = cluster.imo_users.first()
 
-        template_data = {
+        # Could technically use HTTP_REFERER here to make it more frontend change proof, but is less secure
+        frontend_indicators_url = '{}/app/{}/cluster-reporting/plan/{}/planned-action/activity/{}/indicators'.format(
+            settings.FRONTEND_HOST,
+            cluster.response_plan.workspace.workspace_code,
+            cluster.response_plan.id,
+            reportable.object_id
+        )
+
+        try:
+            project_name = reportable.content_object.project.title
+        except Exception:
+            project_name = ''
+
+        context = {
             "indicator_name": reportable.blueprint.title,
             "partner_name": request.user.partner.title,
-            "partner_email": request.user.email,
+            "sender_user": request.user,
             "imo_user": imo_user,
             "message": serializer.validated_data['message'],
+            "target_url": frontend_indicators_url,
+            "project_name": project_name,
+            "response_plan_name": cluster.response_plan.title,
+            "locations": reportable.locations.all(),
         }
 
         send_email_from_template(
             'email/notify_imo_on_cluster_indicator_change_request_subject.txt',
             'email/notify_imo_on_cluster_indicator_change_request.txt',
-            template_data,
-            settings.DEFAULT_FROM_EMAIL,
-            [imo_user.email, ],
-            fail_silently=False
+            context,
+            to_email_list=[imo_user.email, ],
+            fail_silently=False,
+            reply_to=[request.user.email]
         )
 
         return Response(serializer.data, status=status.HTTP_200_OK)
