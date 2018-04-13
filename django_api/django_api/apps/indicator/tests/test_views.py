@@ -480,10 +480,6 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
             reportable.blueprint.calculation_formula_across_locations,
             IndicatorBlueprint.AVG)
         self.assertEquals(reportable.locations.count(), 1)
-        self.assertEquals(
-            reportable.locations.first().id,
-            Location.objects.first().id
-        )
 
 
 # class TestIndicatorLocationDataUpdateAPIView(BaseAPITestCase):
