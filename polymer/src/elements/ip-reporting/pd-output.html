@@ -391,7 +391,6 @@
         var computedMode = overrideMode || mode;
 
         switch (true) {
-          case report.is_draft && !permissions.savePdReport:
           case report.status === 'Sen' && !permissions.savePdReport:
             return 'view';
 
