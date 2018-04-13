@@ -16,6 +16,7 @@ from unicef.models import (
 )
 from indicator.serializers import (
     IdDisaggregationSerializer,
+    ReportableLocationGoalSerializer,
 )
 from indicator.models import (
     Reportable,
@@ -454,6 +455,11 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
         new_title = 'of temporary classrooms - updated'
         self.data['blueprint']['title'] = new_title
         self.data['blueprint']['calculation_formula_across_locations'] = IndicatorBlueprint.MAX
+
+        reportable = Reportable.objects.get(id=response.data['id'])
+        self.data['locations'] = ReportableLocationGoalSerializer(
+          reportable.reportablelocationgoal_set.all(), many=True
+        ).data
         response = self.client.put(self.url, data=self.data, format='json')
 
         self.assertTrue(status.is_success(response.status_code))
