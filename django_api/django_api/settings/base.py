@@ -51,8 +51,9 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
+DOMAIN_NAME = os.getenv('DOMAIN_NAME')
 # Sendgrid stuff
-EMAIL_BACKEND = DOMAIN_NAME = os.getenv('DOMAIN_NAME')
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
 
 EMAIL_HOST = 'smtp.sendgrid.net'
 EMAIL_PORT = 587
