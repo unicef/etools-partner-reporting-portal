@@ -1,0 +1,25 @@
+[{
+        "model": "sites.site",
+        "pk": 2,
+        "fields": {
+            "domain": "localhost",
+            "name": "localhost"
+        }
+    },
+    {
+        "model": "sites.site",
+        "pk": 3,
+        "fields": {
+            "domain": "prp.tivixlabs.com",
+            "name": "prp.tivixlabs.com"
+        }
+    },
+    {
+        "model": "sites.site",
+        "pk": 4,
+        "fields": {
+            "domain": "etools-test.unicef.org",
+            "name": "etools-test.unicef.org"
+        }
+    }
+]
