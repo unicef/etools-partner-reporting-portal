@@ -694,7 +694,7 @@
 
         url: {
           type: String,
-          computed: '_computeUrl(responsePlanID, mode)',
+          computed: '_computeUrl(responsePlanID, mode, edit, data)',
         },
 
         ochaProjectsUrl: {
@@ -789,8 +789,10 @@
         '_saveClusters(selectedClusters.splices)',
       ],
 
-      _computeUrl: function(responsePlanID, mode) {
-        if (mode === 'custom') {
+      _computeUrl: function(responsePlanID, mode, edit, data) {
+        if (edit) {
+          return App.Endpoints.plannedActionsProjectOverview(data.id)
+        } else if (mode === 'custom') {
         return App.Endpoints.partnerProjectCreate(responsePlanID);
         } else {
           return App.Endpoints.ochaProjectsList(responsePlanID);
@@ -958,6 +960,8 @@
           this.$.projectAjax.body = Object.assign({}, this.data);
         }
         this.updatePending = true;
+        console.log(this.data.id);
+        console.log(this.url);
         var thunk = this.$.projectAjax.thunk();
         thunk()
           .then(function (res) {
