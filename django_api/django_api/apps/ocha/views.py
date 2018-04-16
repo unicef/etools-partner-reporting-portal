@@ -16,6 +16,7 @@ from ocha.imports.utilities import get_json_from_url
 from ocha.imports.response_plan import import_response_plan
 from ocha.imports.project import import_project, get_project_list_for_plan
 from ocha.imports.bulk import get_response_plans_for_countries, fetch_json_urls_async
+from partner.models import Partner
 from partner.serializers import PartnerProjectSerializer
 
 
@@ -157,7 +158,14 @@ class RPMProjectListAPIView(APIView):
         elif ResponsePlan.objects.filter(external_id=project_id, external_source=EXTERNAL_DATA_SOURCES.HPC).exists():
             raise serializers.ValidationError('Project has already been imported')
 
-        partner_project = import_project(project_id, response_plan=self.get_response_plan())
+        partner_id = request.data.get('partner_id')
+        partner = request.user.imo_clusters.filter(partners=get_object_or_404(Partner, id=partner_id))
+        if not partner:
+            raise serializers.ValidationError({
+                'partner_id': "the partner_id does not belong to your clusters"
+            })
+
+        partner_project = import_project(project_id, partner_id, response_plan=self.get_response_plan())
         partner_project.refresh_from_db()
         return Response(PartnerProjectSerializer(partner_project).data, status=status.HTTP_201_CREATED)
 
