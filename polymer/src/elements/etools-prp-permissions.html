@@ -14,8 +14,6 @@
       var permissions = {
         viewProgressReport: App.Constants.GROUP_ALL,
 
-        viewProgressReportDraft: App.Constants.GROUP_ALL,
-
         editProgressReport: [
           App.Constants.GROUP_AUTHORIZED_OFFICER,
           App.Constants.GROUP_EDITOR,
@@ -23,25 +21,11 @@
 
         exportSubmittedProgressReport: App.Constants.GROUP_ALL,
 
-        exportDraftProgressReport: [
-          App.Constants.GROUP_AUTHORIZED_OFFICER,
-          App.Constants.GROUP_EDITOR,
-        ],
-
-        importDraftProgressReport: [
-          App.Constants.GROUP_AUTHORIZED_OFFICER,
-          App.Constants.GROUP_EDITOR,
-        ],
-
         viewPdDetails: App.Constants.GROUP_ALL,
 
         savePdReport: [
           App.Constants.GROUP_AUTHORIZED_OFFICER,
           App.Constants.GROUP_EDITOR,
-        ],
-
-        submitDraftProgressReport: [
-          App.Constants.GROUP_AUTHORIZED_OFFICER,
         ],
 
         changeProgrammeDocumentCalculationMethod: [
