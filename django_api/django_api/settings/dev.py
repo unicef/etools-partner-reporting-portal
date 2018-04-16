@@ -26,4 +26,12 @@ MIDDLEWARE_CLASSES = [
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ] + MIDDLEWARE_CLASSES
 
+# No SAML for local dev
+AUTHENTICATION_BACKENDS = (
+    # 'social_core.backends.azuread_b2c.AzureADB2COAuth2',
+    'core.mixins.CustomAzureADBBCOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
+
 CORS_ORIGIN_WHITELIST += ('localhost:8082', )
