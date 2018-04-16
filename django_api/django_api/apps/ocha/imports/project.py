@@ -77,10 +77,11 @@ def import_project_details(project, current_version_id):
     project.reportables.add(*reportables)
 
 
-def import_project(external_project_id, response_plan=None):
+def import_project(external_project_id, partner_id, response_plan=None):
     source_url = HPC_V2_ROOT_URL + 'project/{}'.format(external_project_id)
-    project_data = get_json_from_url(source_url)
-    serializer = V2PartnerProjectImportSerializer(data=project_data['data'])
+    project_data = get_json_from_url(source_url)['data']
+    project_data['partner_id'] = partner_id
+    serializer = V2PartnerProjectImportSerializer(data=partner_id)
     serializer.is_valid(raise_exception=True)
     project = serializer.save()
 
