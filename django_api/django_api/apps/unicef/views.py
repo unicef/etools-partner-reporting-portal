@@ -453,7 +453,7 @@ class ProgressReportSubmitAPIView(APIView):
     def post(self, request, *args, **kwargs):
         progress_report = self.get_object()
         if progress_report.programme_document.status \
-                not in [PD_STATUS.active, PD_STATUS.ended, PD_STATUS.terminated]:
+                not in [PD_STATUS.active, PD_STATUS.ended, PD_STATUS.terminated, PD_STATUS.suspended]:
             raise ValidationError(
                 "Updating Progress Report for a {} Programme Document is not allowed. "
                 "Only Active/Ended/Terminated "
