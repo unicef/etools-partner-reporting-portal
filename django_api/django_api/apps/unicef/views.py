@@ -456,7 +456,7 @@ class ProgressReportSubmitAPIView(APIView):
                 not in [PD_STATUS.active, PD_STATUS.ended, PD_STATUS.terminated, PD_STATUS.suspended]:
             raise ValidationError(
                 "Updating Progress Report for a {} Programme Document is not allowed. "
-                "Only Active/Ended/Terminated "
+                "Only Active/Ended/Suspended/Terminated "
                 "PDs can be reported on.".format(progress_report.programme_document.get_status_display())
             )
 
