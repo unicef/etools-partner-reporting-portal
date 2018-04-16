@@ -1,4 +1,5 @@
-from django.core.mail import send_mail
+from django.conf import settings
+from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template
 
 
@@ -6,9 +7,10 @@ def send_email_from_template(
         subject_template_path,
         body_template_path,
         template_data,
-        from_email,
-        to_email_list,
-        fail_silently=True
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to_email_list=(),
+        fail_silently=True,
+        **kwargs
 ):
     """
     send_email_from_template simplifies Django's send_email API
@@ -25,10 +27,11 @@ def send_email_from_template(
         fail_silently {bool} -- A flag to mute exception if it fails (default: {True})
     """
 
-    send_mail(
+    message = EmailMultiAlternatives(
         get_template(subject_template_path).render(template_data).strip(),
         get_template(body_template_path).render(template_data),
         from_email,
         to_email_list,
-        fail_silently=fail_silently,
+        **kwargs
     )
+    message.send(fail_silently=fail_silently)
