@@ -55,7 +55,7 @@ DOMAIN_NAME = os.getenv('DOMAIN_NAME')
 
 FRONTEND_HOST = os.getenv(
     'PRP_FRONTEND_HOST',
-    os.getenv('DJANGO_ALLOWED_HOST', 'http://localhost:8080')
+    os.getenv('DJANGO_ALLOWED_HOST', 'http://localhost:8082')
 )
 
 # Sendgrid stuff

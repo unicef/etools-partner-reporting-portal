@@ -39,5 +39,5 @@ WORKDIR /code
 
 RUN npm run bundle
 
-EXPOSE 8080
+EXPOSE 8082
 CMD ["node", "express.js"]

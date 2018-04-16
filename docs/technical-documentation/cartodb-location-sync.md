@@ -76,7 +76,7 @@ celerycam-prp:
   target_num_containers: 1
 flower-prp:
   autoredeploy: true
-  command: 'flower --address=0.0.0.0 --port=8080 --broker=redis://prp-redis:6379/0 -l DEBUG --auto_refresh=False --debug=True --autoreload=False --url_prefix=flower'
+  command: 'flower --address=0.0.0.0 --port=8082 --broker=redis://prp-redis:6379/0 -l DEBUG --auto_refresh=False --debug=True --autoreload=False --url_prefix=flower'
   environment:
     - CELERY_VISIBILITY_TIMEOUT=18000
     - DJANGO_ALLOWED_HOST=
@@ -98,7 +98,7 @@ flower-prp:
     - SECRET_KEY=
     - VIRTUAL_HOST_WEIGHT=1
   expose:
-    - '8080'
+    - '8082 
   image: 'unicef/etools-prp:develop'
   restart: always
   tags:
@@ -148,7 +148,7 @@ worker-prp:
 
 ### How to sync locations
 
-* Open up a browser and go \`http://localhost:8080/api/admin/core/cartodbtable/\` and log in.
+* Open up a browser and go \`http://localhost:8082 api/admin/core/cartodbtable/\` and log in.
 * In order to get real data, you'll need to go to etools.carto.com for getting dataset names. Here are the sample working dataset names:
   * Pakistan
     * pak\_adm0\_gaul\_1

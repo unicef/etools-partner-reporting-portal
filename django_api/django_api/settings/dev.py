@@ -10,7 +10,7 @@ DEBUG = True
 IS_DEV = True
 
 # domains/hosts etc.
-DOMAIN_NAME = os.getenv('DOMAIN_NAME', '127.0.0.1:8080')
+DOMAIN_NAME = os.getenv('DOMAIN_NAME', '127.0.0.1:8082')
 WWW_ROOT = 'http://%s/' % DOMAIN_NAME
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "*"]
 
