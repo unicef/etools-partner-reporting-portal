@@ -13,11 +13,15 @@ def social_details(backend, details, response, *args, **kwargs):
     if not r['details'].get('email'):
         r['details']['email'] = response.get('email')
 
+    print("social_details: ", r)
+
     return r
 
 
 def get_username(strategy, details, backend, user=None, *args, **kwargs):
     username = details.get('email')
+
+    print("get_username: ", username)
 
     try:
         get_user_model().objects.get(username=username)
@@ -64,6 +68,8 @@ def user_details(strategy, details, user=None, *args, **kwargs):
         if updates_available:
             user.save()
             user.profile.save()
+
+    print("user_details: ", strategy, details, user)
 
     return social_core_user.user_details(strategy, details, user, *args, **kwargs)
 

@@ -17,6 +17,12 @@ server {
       include /etc/nginx/conf.d/uwsgi_params;
     }
 
+    location /social/ {
+      proxy_read_timeout 180s;  # Some imports happen synchronously and take a while
+      uwsgi_pass django_api_uwsgi;
+      include /etc/nginx/conf.d/uwsgi_params;
+    }
+
     location /sockjs-node/ {
       proxy_set_header Upgrade $http_upgrade;
       proxy_set_header Connection "upgrade";
