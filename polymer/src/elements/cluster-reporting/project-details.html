@@ -106,7 +106,12 @@
               </labelled-item>
             </li>
 
+
+
           </ul>
+          <div class="app-grid">
+
+          </div>
           <div id="action">
             <paper-button
               class="btn-primary"
@@ -210,6 +215,17 @@
                   </span>
               </labelled-item>
             </li>
+
+            <template
+          is="dom-repeat"
+          items="[[projectData.custom_fields]]"
+          as="field">
+            <span class="item full-width">
+              <labelled-item label="[[field.name]]">
+                <span class="value">[[field.value]]</span>
+              </labelled-item>
+            </span>
+          </template>
           </iron-collapse>
         </div>
     </etools-content-panel>

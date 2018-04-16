@@ -173,7 +173,7 @@
           <paper-radio-button name="custom">
             <strong>Custom</strong>
           </paper-radio-button>
-          
+
           <div
             empty$="[[!_equals(mode, 'custom')]]">
             <template
@@ -351,7 +351,6 @@
 
         emptyClustersError: {
           type: Boolean,
-          computed: '_computeClustersError(planDetails, mode)',
         },
 
       },
@@ -365,6 +364,7 @@
         '_fetchPlans(mode, ochaPlansUrl)',
         '_fetchConfig(mode, configUrl)',
         '_fetchPlanDetails(planDetailsUrl)',
+        '_setEmptyClustersError(planDetails, mode)',
       ],
 
       _computeCreatePlanUrl: function (workspaceId, mode) {
@@ -414,9 +414,16 @@
         })[0];
       },
 
-      _computeClustersError: function(planDetails, mode) {
-        return (mode === 'ocha' && planDetails.clusterNames &&
-          planDetails.clusterNames.length === 0);
+      _setEmptyClustersError: function(planDetails, mode) {
+        this.async(function () {
+        this.set(
+          'emptyClustersError',
+          mode === 'ocha' &&
+              planDetails &&
+              planDetails.clusterNames &&
+              !planDetails.clusterNames.length
+        );
+      });
       },
 
       _fetchPlans: function (mode) {
@@ -437,15 +444,17 @@
                 self.fire('notify', {type: 'ocha-timeout'});
               }
               self.set('plansLoading', false);
-              // TODO: error handling
+              self.set('errors', err.data);
             });
       },
 
-      _fetchPlanDetails: function () {
+      _fetchPlanDetails: function (url) {
+        if (!url) {
+          return;
+        }
         this.set('planDetailsLoading', true);
         var self = this;
         this.$.planDetails.abort();
-
         this.$.planDetails.thunk()()
             .then(function (res) {
               self.set('planDetailsLoading', false);
@@ -457,7 +466,7 @@
                 self.fire('notify', {type: 'ocha-timeout'});
               }
               self.set('planDetailsLoading', false);
-              // TODO: error handling
+              self.set('errors', err.data);
             });
       },
 
@@ -465,29 +474,25 @@
         if (mode !== 'custom') {
           return;
         }
-
         var configThunk = this.$.config.thunk();
-
+        var self = this;
         this.$.config.abort();
-
         this.dispatch(
           App.Actions.Config.fetchConfig(configThunk, App.Selectors.Config.clusterTypes)
         )
           .catch(function (err) { // jshint ignore:line
-            // TODO: error handling
+            self.set('errors', err.data);
           });
       },
 
       _savePlan: function () {
         var self = this;
-
         this.set('updatePending', true);
         if (this.mode === 'ocha') {
           this.$.plan.body = {plan: this.selectedPlan};
         } else {
           this.$.plan.body = Object.assign({}, this.data);
         }
-        
         this.$.plan.thunk()()
           .then(function (res) {
             self.set('updatePending', false);

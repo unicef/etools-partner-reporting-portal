@@ -17,10 +17,6 @@
 <link rel="import" href="../../../../../bower_components/paper-radio-button/paper-radio-button.html">
 
 <link rel="import" href="../../../../../bower_components/paper-input/paper-input.html">
-<link rel="import" href="../../../../../bower_components/app-layout/app-grid/app-grid-style.html">
-<link rel="import" href="../../../../../bower_components/paper-radio-group/paper-radio-group.html">
-<link rel="import" href="../../../../../bower_components/paper-radio-button/paper-radio-button.html">
-<link rel="import" href="../../../../../bower_components/etools-loading/etools-loading.html">
 <link rel="import" href="../../../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../../../../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../../../../bower_components/paper-item/paper-item.html">
@@ -110,7 +106,7 @@
       .show-more-details .justify-right {
         float: right;
       }
-      
+
       .header h2 {
         @apply(--paper-font-title);
         margin: 0;
@@ -130,7 +126,7 @@
         padding: 15px;
         background: var(--paper-grey-200);
       }
-      
+
       .details-text {
         font-size: 12px;
         color: #757575;
@@ -149,7 +145,7 @@
         display: none !important;
       }
 
-      
+
       paper-radio-group {
         display: block;
         padding-top: 16px;
@@ -157,7 +153,7 @@
 
       paper-radio-group > .fields {
         padding: calc(var(--app-grid-gutter) / 2) 0;
-      } 
+      }
 
       paper-radio-group > .fields[empty] {
         padding: 0;
@@ -194,6 +190,7 @@
     <iron-location path="{{path}}"></iron-location>
 
     <cluster-dropdown-content clusters="{{clusters}}"></cluster-dropdown-content>
+
     <template
     is="dom-if"
     if="[[permissions.addPartnerToProject]]"
@@ -264,7 +261,7 @@
           <paper-radio-group
             id="mode"
             selected={{mode}}
-            on-change="_adjustPosition">
+            on-change="adjustPosition">
             <paper-radio-button name="ocha" active="true">
               <strong>From OCHA</strong>
             </paper-radio-button>
@@ -297,11 +294,9 @@
                 </div>
               </template>
             </div>
-
             <paper-radio-button name="custom">
               <strong>Custom</strong>
             </paper-radio-button>
-
             <div
               empty$="[[!_equals(mode, 'custom')]]">
               <template
@@ -311,7 +306,7 @@
                 <div class="item full-width infobox">
                   <span class="item">
                     <h4>Basic Project details</h4>
-                  </span>  
+                  </span>
                   <span class="item justify-right">
                     <div class="red">*</div>
                     <h4>Fields required</h4>
@@ -423,9 +418,6 @@
                   on-input="_validate">
                 </paper-input>
 
-                <custom-fields-widget class="item full-width">
-
-                </custom-fields-widget>
           <div class="details-section item full-width">
             <div class="layout horizontal center justified">
               <span class="details-text">Want to add more details to the Project info?</span>
@@ -448,7 +440,6 @@
             <iron-collapse
               id="collapse"
               opened="{{detailsOpened}}">
-              
               <div class="app-grid">
                 <etools-single-selection-menu
                   id="agencyAcronyms"
@@ -462,6 +453,7 @@
                   trigger-value-change-event
                   always-float-label>
                 </etools-single-selection-menu>
+
                 <etools-single-selection-menu
                   class="item validate"
                   label="Type of Agency"
@@ -473,6 +465,7 @@
                   trigger-value-change-event
                   always-float-label>
                 </etools-single-selection-menu>
+
                 <paper-input
                   class="item validate full-width"
                   id="additional_implementing_partners"
@@ -482,18 +475,18 @@
                   on-input="_validate"
                   always-float-label>
                 </paper-input>
+
                 <div class="full-width">
                   <labelled-item label="Is this project part of a HRP or FA?">
                     <paper-radio-group
-                        data-path="data.part"
-                        on-paper-radio-group-changed="_onValueChanged"
-                        selected="hrp">
+                        selected={{data.part}}>
                       <paper-radio-button name="hrp">HRP</paper-radio-button>
                       <paper-radio-button name="fa">FA</paper-radio-button>
                       <paper-radio-button name="no">No</paper-radio-button>
                     </paper-radio-group>
                   </labelled-item>
                 </div>
+
                 <etools-single-selection-menu
                   class="item validate"
                   label="Prioritization Classification"
@@ -505,6 +498,7 @@
                   trigger-value-change-event
                   always-float-label>
                 </etools-single-selection-menu>
+
                 <etools-single-selection-menu
                   class="item validate"
                   label="Project code in HRP"
@@ -516,17 +510,19 @@
                   trigger-value-change-event
                   always-float-label>
                 </etools-single-selection-menu>
+
                 <paper-input
                   class="item validate full-width"
                   id="funding_requirements"
                   label="Funding Requirements (US$)"
-                  value="{{data.funding.required.funding}}"
+                  value="{{data.funding.required_funding}}"
                   type="number"
                   allowed-pattern="[+\-\d.]"
                   step="0.01"
                   on-input="_validate"
                   always-float-label>
                 </paper-input>
+
                 <paper-input
                   class="item validate full-width"
                   id="own_funding"
@@ -538,6 +534,7 @@
                   on-input="_validate"
                   always-float-label>
                 </paper-input>
+
                 <paper-input
                   class="item validate full-width"
                   id="cerf_funding"
@@ -549,6 +546,7 @@
                   on-input="_validate"
                   always-float-label>
                 </paper-input>
+
                 <paper-input
                   class="item validate full-width"
                   id="cbpf_funding"
@@ -560,6 +558,7 @@
                   on-input="_validate"
                   always-float-label>
                 </paper-input>
+
                 <paper-input
                   class="item validate full-width"
                   id="bilateral_funding"
@@ -571,6 +570,7 @@
                   on-input="_validate"
                   always-float-label>
                 </paper-input>
+
                 <paper-input
                   class="item validate full-width"
                   id="unicef_funding"
@@ -582,6 +582,7 @@
                   on-input="_validate"
                   always-float-label>
                 </paper-input>
+
                 <paper-input
                   class="item validate full-width"
                   id="wfp_funding"
@@ -593,6 +594,7 @@
                   on-input="_validate"
                   always-float-label>
                 </paper-input>
+
                 <paper-input
                   class="item validate full-width"
                   id="funding_gap"
@@ -604,6 +606,13 @@
                   on-input="_validate"
                   always-float-label>
                 </paper-input>
+
+                <custom-fields-widget
+                  class="item full-width"
+                  custom-fields="{{data.custom_fields}}"
+                  edit="[[edit]]">
+                </custom-fields-widget>
+
               <div>
             </iron-collapse>
           </div>
@@ -613,16 +622,16 @@
             <paper-button class="btn-primary" on-tap="_save" raised>
               Save
             </paper-button>
-    
+
             <paper-button  on-tap="close">
               Cancel
             </paper-button>
           </div>
-    
+
           <etools-loading active="[[updatePending]]"></etools-loading>
 
 
-                
+
               </div>
             </template>
           </div>
@@ -630,7 +639,7 @@
       </template>
     </paper-dialog-scrollable>
 
-      
+
     </paper-dialog>
   </template>
 
@@ -661,7 +670,7 @@
 
         detailsOpened: {
           type: Boolean,
-          value: false
+          value: false,
         },
 
         updatePending: {
@@ -676,17 +685,16 @@
 
         data: {
           type: Object,
-          value: {}
         },
 
         refresh: {
           type: Boolean,
-          value: false
+          value: false,
         },
 
         url: {
           type: String,
-          computed: '_computeUrl(responsePlanID, mode)',
+          computed: '_computeUrl(responsePlanID, mode, edit, data)',
         },
 
         ochaProjectsUrl: {
@@ -701,12 +709,12 @@
 
         ochaProjectRequestId: {
           type: Object,
-          computed: '_computeOchaProjectRequestId(selectedProject)'
+          computed: '_computeOchaProjectRequestId(selectedProject)',
         },
 
         clusters: {
           format: Array,
-          value: []
+          value: [],
         },
 
         partnerID: {
@@ -716,7 +724,7 @@
 
         formattedClusters: {
           type: Array,
-          computed: '_formatForMultiselect(clusters)'
+          computed: '_formatForMultiselect(clusters)',
         },
 
         statuses: {
@@ -744,12 +752,7 @@
 
         formattedProjects: {
           type: String,
-          computed: "_computeFormattedProjects(projects)"
-        },
-
-        selectedPartner: {
-          type: Number,
-          observer: '_savePartner',
+          computed: '_computeFormattedProjects(projects)',
         },
 
         selectedProject: {
@@ -766,7 +769,7 @@
           computed: '_computeImoClusters(profile)',
         },
 
-        selectedClusters: { 
+        selectedClusters: {
           type: Array,
         },
 
@@ -774,11 +777,6 @@
           type: Boolean,
           value: false,
         },
-
-        detailsOpened: {
-          type: Boolean,
-          value: false,
-        }
       },
 
       listeners: {
@@ -789,17 +787,20 @@
         '_fetchOchaProjectsList(mode, ochaProjectsUrl)',
         '_fetchOchaProjectDetails(selectedProject)',
         '_saveClusters(selectedClusters.splices)',
-        // '_adjustPosition(projectDetails)',
       ],
 
-      _computeUrl: function(responsePlanID, mode) {
-        if (mode === 'custom') { 
-        return App.Endpoints.partnerProjectCreate(responsePlanID)
-        } else {return App.Endpoints.ochaProjectsList(responsePlanID)}
+      _computeUrl: function(responsePlanID, mode, edit, data) {
+        if (edit) {
+          return App.Endpoints.plannedActionsProjectOverview(data.id)
+        } else if (mode === 'custom') {
+        return App.Endpoints.partnerProjectCreate(responsePlanID);
+        } else {
+          return App.Endpoints.ochaProjectsList(responsePlanID);
+        }
       },
 
       _computeOchaProjectsUrl: function(responsePlanID) {
-        return App.Endpoints.ochaProjectsList(responsePlanID)
+        return App.Endpoints.ochaProjectsList(responsePlanID);
       },
 
       close: function () {
@@ -816,20 +817,15 @@
             return cluster.id;
           });
         } else {
-          this.data = {};
+          this.data = {'custom_fields': [], 'funding': {}};
           this.selectedClusters = [];
         }
-
         this.set('opened', true);
         this.set('refresh', true);
       },
 
       _handleDetailsChange: function () {
         this.detailsOpened = !this.detailsOpened;
-      },
-      
-      _toggleShowMoreDetails: function() {
-        this.detailsOpened ? this.detailsOpened = false : this.detailsOpened = true
       },
 
       _computeTitle: function(edit) {
@@ -860,7 +856,6 @@
         this.set('projectsLoading', true);
         var self = this;
         this.$.projects.abort();
-
         this.$.projects.thunk()()
             .then(function (res) {
               self.set('projectsLoading', false);
@@ -887,22 +882,20 @@
         this.set('projectDetailsLoading', true);
         var self = this;
         this.$.projectDetails.abort();
-
         this.$.projectDetails.thunk()()
-          .then(function (res) {
-            self.set('projectDetailsLoading', false);
-            self.set('projectDetails', res.data);
-            self.fire('details-loaded', this.name);
-
-          })
-          .catch(function (err) { // jshint ignore:line
-            if (err.code === 504) {
-              self.fire('notify', {type: 'ocha-timeout'});
-            }
-            self.set('projectDetailsLoading', false);
+            .then(function (res) {
+              self.set('projectDetailsLoading', false);
+              self.set('projectDetails', res.data);
+              self.fire('details-loaded', this.name);
+            })
+            .catch(function (err) { // jshint ignore:line
+              if (err.code === 504) {
+                self.fire('notify', {type: 'ocha-timeout'});
+              }
+              self.set('projectDetailsLoading', false);
             // TODO: error handling
-          });
-      },      
+            });
+      },
 
       _computeFormattedProjects: function(projects) {
         return projects.map(function(project) {
@@ -910,24 +903,10 @@
         });
       },
 
-      // _onOpenedChanged: function (opened) {
-      //   if (opened) {
-      //     this.set('mode', '');
-      //   }
-      // },
-
-      _savePartner: function(partner) {
-        this.set('data.partner_id', partner.id);
-      },
-
       _saveClusters: function() {
         this.set('data.clusters', this.selectedClusters.map(function(cluster) {
             return {'id': cluster};
-          }))
-      },
-
-      _displayPartner: function (permissions, edit) {
-        return permissions.addPartnerToProject && !edit;
+          }));
       },
 
       _displayPartnerReadOnly: function (permissions, edit) {
@@ -936,14 +915,6 @@
 
       _validate: function (e) {
         e.target.validate();
-      },
-
-      _onValueChanged: function (e) {
-        this._updateValue(e.target);
-      },
-
-      _updateValue: function (el) {
-        this.set(el.dataset.path, el.selected);
       },
 
       _redirectToDetail: function(id) {
@@ -965,19 +936,17 @@
       },
 
       _setDefaults: function (edit) {
-        if (edit) { return }
+        if (edit) {
+           return;
+           }
         this.set('selectedProject', '');
         this.set('projectLoading', false);
-        this.set('data', {});
+        this.set('data', {
+          'custom_fields': [],
+          'funding': {}
+        });
         this.set('projectDetails', {});
         this.set('errors', {});
-      },
-
-      _adjustPosition: function (e) {
-        e.stopPropagation();
-        this.debounce('adjust-position', function () {
-          this.$.dialog.refit();
-        }, 100);
       },
 
       _save: function () {
@@ -985,16 +954,15 @@
         if (!this.data.partner_id) {
           this.data.partner_id = this.partnerID;
         }
-
         if (this.mode === 'ocha') {
-          this.$.projectAjax.body = this.ochaProjectRequestId
+          this.$.projectAjax.body = this.ochaProjectRequestId;
         } else {
           this.$.projectAjax.body = Object.assign({}, this.data);
         }
-
         this.updatePending = true;
+        console.log(this.data.id);
+        console.log(this.url);
         var thunk = this.$.projectAjax.thunk();
-        
         thunk()
           .then(function (res) {
             self.updatePending = false;
@@ -1011,7 +979,6 @@
             self.set('errors', err.data);
           });
       },
-
     });
   </script>
 </dom-module>

@@ -2,22 +2,10 @@
 <link rel="import" href="../../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../../../../bower_components/app-layout/app-grid/app-grid-style.html">
 <link rel="import" href="../../../../../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../../../../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../../../../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../../../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html">
-<link rel="import" href="../../../../../bower_components/paper-tooltip/paper-tooltip.html">
 <link rel="import" href="../../../../../bower_components/paper-input/paper-input.html">
-
-<link rel="import" href="../../../../polyfills/es6-shim.html">
-<link rel="import" href="../../../../behaviors/utils.html">
-<link rel="import" href="../../../../redux/store.html">
 <link rel="import" href="../../../../styles/buttons.html">
 <link rel="import" href="../../../../styles/shared-styles.html">
-<link rel="import" href="../../../json-field.html">
-<link rel="import" href="../../../etools-prp-ajax.html">
-<link rel="import" href="../../../etools-prp-reset.html">
-<link rel="import" href="../../../etools-prp-permissions.html">
-<link rel="import" href="../../../labelled-item.html">
 
 <dom-module id="custom-fields-widget">
   <template>
@@ -74,16 +62,10 @@
 
     </style>
 
-    <etools-prp-permissions
-      permissions="{{permissions}}">
-    </etools-prp-permissions>
-
-
     <template
       is="dom-repeat"
-      items="[[data.customFields]]"
-      as="field"
-      restamp="true">
+      items="[[customFields]]"
+      as="field">
       <div class="row layout horizontal">
         <div class="flex-none layout vertical center-center col-actions">
           <paper-icon-button
@@ -99,106 +81,118 @@
 
         <paper-input
           class="item"
-          id="[[field.id]]"
+          nameid="[[field.id]]"
           name="customFieldTitle[[index]]"
-          data-id$="[[field.id]]"
+          value=[[field.name]]
           label="Field's Title"
           on-input="_updateCustomFieldTitle">
         </paper-input>
 
         <paper-input
           class="item-2-col"
-          id="[[field.id]]"
+          valueid="[[field.id]]"
           name="customFieldDescription[[index]]"
-          data-id$="[[field.id]]"
-          label="Field's Description"
+          value=[[field.value]]
+          label="Field's Value"
           on-input="_updateCustomFieldDescription">
         </paper-input>
       </div>
       </div>
     </template>
-    
+
+
     <paper-button
       class="btn-primary"
       on-tap="_add">
         Add Custom Field
-    </paper-button> 
+    </paper-button>
   </template>
     <script>
       Polymer({
         is: 'custom-fields-widget',
 
-        behaviors: [
-          App.Behaviors.UtilsBehavior,
-          App.Behaviors.ReduxBehavior,
-        ],
-
         properties: {
-        fieldId: Number,
-        customFields: {
-          format: Array,
-          observer: '_updateVisibleCustomFields'
+          fieldId: {
+            type: Number,
+            value: 0,
+          },
+          editFieldId: {
+            type: Number,
+            value: 0,
+          },
+          customFields: {
+            type: Array,
+            notify: true,
+            value: [],
+          },
+          edit: {
+            type: Boolean,
+            value: false,
+            observer: '_setCustomFields'
+          },
         },
-        data: Object,
-        },
-
 
         _add: function () {
           this.set('fieldId', this.get('fieldId') + 1);
-          this.push('data.customFields', {
+          this.push('customFields', {
             id: this.fieldId,
-            title: '',
-            desc: '',
+            name: '',
+            value: '',
           });
         },
 
         _remove: function (e) {
-          var value = this.get('data.customFields');
+          var value = this.get('customFields');
           var toRemove = value.findIndex(function (field) {
             return String(field.id) === String(e.target.id);
           });
-
-
-          this.splice('data.customFields', toRemove, 1);
-          // var newValue = value.slice(0, toRemove).concat(value.slice(toRemove + 1));
-
-          // console.log(newValue);
-
-          // this.set('data.customFields', newValue);
+          this.splice('customFields', toRemove, 1);
         },
 
         _updateCustomFieldTitle: function (e) {
-          console.log(e.target.id);
-          var field = this.data.customFields.find(function (field) {
-            return field.id == e.target.id;
+          var field = this.customFields.find(function (field) {
+            return Number(field.id) === Number(e.target.nameid);
           });
-          field.title = e.target.value;
-          console.log(this.data.customFields);
+          field.name = e.target.value;
         },
 
         _updateCustomFieldDescription: function (e) {
-          console.log(e.target.id);
-          var field = this.data.customFields.find(function (field) {
-            return field.id == e.target.id;
+          var field = this.customFields.find(function (field) {
+            return Number(field.id) === Number(e.target.valueid);
           });
-          field.description = e.target.value;
-          console.log(this.data.customFields);
+          field.value = e.target.value;
         },
 
         _updateVisibleCustomFields: function () {
-          var newCustomFields = this.data.customFields.map(function (field) {
-            return field
+          var newCustomFields = this.customFields.map(function (field) {
+            return field;
             });
-          this.data.customFields = newCustomFields;
+          this.customFields = newCustomFields;
         },
 
-      
+        _setCustomFields: function (edit) {
+          if (edit) {
+            var editFields = 0;
+            var newCustomFields = this.customFields.map(function (field) {
+              editFields += 1;
+              field.id = editFields - 1;
+              return field;
+            });
+            this.set('customFields', newCustomFields);
+            console.log('new custom fields are', newCustomFields);
+            this.set('editFieldId', editFields - 1);
+          } else {
+            this.set('customFields', []);
+          }
+        },
+
         attached: function () {
-          this.set('data', {
-            customFields: [],
-          });
+          if (this.editFieldId > 0) {
+            this.set('fieldId', this.editFieldId);
+          } else {
           this.set('fieldId', 0);
-         },
-      })
+          }
+        },
+      });
     </script>
 </dom-module>
