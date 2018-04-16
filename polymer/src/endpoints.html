@@ -9,6 +9,10 @@
         return BASE_URL + tail;
       },
 
+      login: function () {
+        return this._buildUrl('/social/login/azuread-b2c-oauth2/');
+      },
+
       config: function () {
         return this._buildUrl('/core/configuration/');
       },
@@ -280,7 +284,7 @@
       indicatorIMOMessage: function () {
         return this._buildUrl('/indicator/cluster-indicator-imo-message/');
       },
-      
+
       ochaResponsePlans: function (workspaceId) {
         return this._buildUrl('/ocha/response-plans/workspace/' + workspaceId + '/');
       },
