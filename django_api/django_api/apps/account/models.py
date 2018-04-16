@@ -19,8 +19,9 @@ class User(AbstractUser):
     first_name = models.CharField(max_length=64, blank=True, null=True)
     last_name = models.CharField(max_length=64, blank=True, null=True)
 
-    partner = models.ForeignKey('partner.Partner', related_name="users",
-                                null=True, blank=True)
+    partner = models.ForeignKey(
+        'partner.Partner', related_name="users", null=True, blank=True
+    )
     organization = models.CharField(max_length=255, null=True, blank=True)
     email = models.EmailField(
         verbose_name='email address',

@@ -847,13 +847,19 @@ class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
 
             if cluster_obj_pa_reportable_loc.exists():
                 partner_types.extend(cluster_obj_pa_reportable_loc.values_list(
-                    'reportable__partner_activities__cluster_activity__'
-                    'cluster_objective__cluster__partners__partner_type', flat=True).distinct()
+                    'reportable__partner_activities'
+                    '__cluster_activity__'
+                    'cluster_objective__'
+                    'cluster__partners__partner_type', flat=True).distinct()
                 )
 
             if cluster_obj_pa_custom_reportable_loc.exists():
                 partner_types.extend(cluster_obj_pa_custom_reportable_loc.values_list(
-                    'reportable__partner_activities__cluster_objective__cluster__partners__partner_type', flat=True)
+                    'reportable__'
+                    'partner_activities__'
+                    'cluster_objective__'
+                    'cluster__partners__'
+                    'partner_type', flat=True)
                     .distinct()
                 )
 
@@ -929,7 +935,8 @@ class ClusterAnalysisIndicatorsListAPIView(GenericAPIView, ListModelMixin):
             'partner_types': self.request.GET.get('partner_types', None),
             'loc_type': self.request.GET.get('loc_type', '1'),
             'locs': self.request.GET.get('locs', None),
-            'indicator_type': self.request.GET.get('indicator_type', 'cluster_activity'),
+            'narrow_loc_type': self.request.GET.get('narrow_loc_type', None),
+            'indicator_type': self.request.GET.get('indicator_type', 'all'),
         }
 
         clusters = Cluster.objects.filter(response_plan=response_plan)
@@ -948,38 +955,73 @@ class ClusterAnalysisIndicatorsListAPIView(GenericAPIView, ListModelMixin):
                 id__in=map(lambda x: int(x), filter_parameters['cluster_objectives'].split(','))
             )
 
-        if filter_parameters['indicator_type'] == 'cluster_activity':
-            indicators = Reportable.objects.filter(
+        if filter_parameters['partner_types']:
+            partner_types = filter_parameters['partner_types'].split(',')
+
+            cluster_activity_q = Q(
                 content_type__model="clusteractivity",
-                cluster_activities__cluster_objective__in=objectives
+                cluster_activities__cluster_objective__in=objectives,
+                cluster_activities__cluster_objective__cluster__partners__partner_type__in=partner_types,
             )
 
-            if filter_parameters['partner_types']:
-                partner_types = filter_parameters['partner_types'].split(',')
-                indicators = indicators.filter(cluster_objectives__cluster__partners__partner_type__in=partner_types)
+            cluster_objective_q = Q(
+                content_type__model="clusterobjective",
+                cluster_objectives__in=objectives,
+                cluster_objectives__cluster__partners__partner_type__in=partner_types,
+            )
+
+            partner_activity_q = Q(
+                content_type__model="partneractivity",
+                partner_activities__partner__clusters__in=clusters,
+                partner_activities__partner__partner_type__in=partner_types,
+            )
+
+            partner_project_q = Q(
+                content_type__model="partnerproject",
+                partner_projects__clusters__in=clusters,
+                partner_projects__partner__partner_type__in=partner_types,
+            )
+
+        else:
+            cluster_activity_q = Q(
+                content_type__model="clusteractivity",
+                cluster_activities__cluster_objective__in=objectives,
+            )
+
+            cluster_objective_q = Q(
+                content_type__model="clusterobjective",
+                cluster_objectives__in=objectives,
+            )
+
+            partner_activity_q = Q(
+                content_type__model="partneractivity",
+                partner_activities__partner__clusters__in=clusters,
+            )
+
+            partner_project_q = Q(
+                content_type__model="partnerproject",
+                partner_projects__clusters__in=clusters,
+            )
+
+        if filter_parameters['indicator_type'] == 'all':
+            indicators = Reportable.objects.filter(
+                cluster_activity_q
+                | cluster_objective_q
+                | partner_activity_q
+                | partner_project_q
+            )
+
+        elif filter_parameters['indicator_type'] == 'cluster_activity':
+            indicators = Reportable.objects.filter(cluster_activity_q)
 
         elif filter_parameters['indicator_type'] == 'cluster_objective':
-            indicators = Reportable.objects.filter(
-                content_type__model="clusterobjective",
-                cluster_objectives__in=objectives)
-
-            if filter_parameters['partner_types']:
-                partner_types = filter_parameters['partner_types'].split(',')
-                indicators = indicators.filter(cluster__partners__partner_type__in=partner_types)
+            indicators = Reportable.objects.filter(cluster_objective_q)
 
         elif filter_parameters['indicator_type'] == 'partner_project':
-            indicators = Reportable.objects.filter(content_type__model="partnerproject")
-
-            if filter_parameters['partner_types']:
-                partner_types = filter_parameters['partner_types'].split(',')
-                indicators = indicators.filter(partner__partner_type__in=partner_types)
+            indicators = Reportable.objects.filter(partner_project_q)
 
         elif filter_parameters['indicator_type'] == 'partner_activity':
-            indicators = Reportable.objects.filter(content_type__model="partneractivity")
-
-            if filter_parameters['partner_types']:
-                partner_types = filter_parameters['partner_types'].split(',')
-                indicators = indicators.filter(partner__partner_type__in=partner_types)
+            indicators = Reportable.objects.filter(partner_activity_q)
 
         if filter_parameters['loc_type'] and filter_parameters['locs'] and filter_parameters['narrow_loc_type']:
             indicators = indicators.filter(

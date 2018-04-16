@@ -3,6 +3,7 @@
 <link rel="import" href="../../../../bower_components/numeral-js/numeral-import.html">
 
 <link rel="import" href="analysis-widget.html">
+<link rel="import" href="../../list-placeholder.html">
 <link rel="import" href="../../../constants.html">
 <link rel="import" href="../../../behaviors/utils.html">
 <link rel="import" href="../../../behaviors/analysis-chart.html">
@@ -21,13 +22,20 @@
       }
     </style>
 
-    <analysis-widget widget-title="Progress over time">
-      <google-chart
-          type="line"
-          options="[[options]]"
-          cols="[[cols]]"
-          rows="[[rows]]">
-      </google-chart>
+    <analysis-widget widget-title="[[widgetTitle]]">
+      <div hidden$="[[!rows.length]]">
+        <google-chart
+            type="line"
+            options="[[options]]"
+            cols="[[cols]]"
+            rows="[[rows]]">
+        </google-chart>
+      </div>
+
+      <list-placeholder
+          data="[[rows]]"
+          message="No data for [[widgetTitle]] yet.">
+      </list-placeholder>
     </analysis-widget>
   </template>
 
@@ -44,6 +52,11 @@
         target: Object,
         inNeed: Object,
         data: Array,
+
+        widgetTitle: {
+          type: String,
+          value: 'Progress over time',
+        },
 
         actualTarget: {
           type: Number,

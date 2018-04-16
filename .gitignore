@@ -12,6 +12,7 @@
 *.pyc
 *.pem
 !django_api/django_api/keys/jwt/certificate.pem
+.coverage
 
 # Frontend
 node_modules/

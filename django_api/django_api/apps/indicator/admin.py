@@ -3,6 +3,7 @@ from django.contrib import admin
 from .models import (
     IndicatorBlueprint,
     Reportable,
+    ReportableLocationGoal,
     IndicatorReport,
     IndicatorLocationData,
     Disaggregation,
@@ -20,7 +21,14 @@ class IndicatorBlueprintAdmin(admin.ModelAdmin):
     search_fields = ('title', 'description', 'code')
 
 
+class ReportableLocationGoalInline(admin.StackedInline):
+    model = ReportableLocationGoal
+    extra = 1
+    min_num = 0
+
+
 class ReportableAdmin(admin.ModelAdmin):
+    inlines = (ReportableLocationGoalInline, )
     list_display = ('blueprint', 'active', 'target', 'baseline', 'total',
                     'parent_indicator', 'frequency', 'assumptions',
                     'means_of_verification', 'is_cluster_indicator',

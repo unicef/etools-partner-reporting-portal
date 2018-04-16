@@ -183,7 +183,7 @@ def generate_real_data(fast=False, area=None, update=False):
     process_due_reports()
 
 
-def generate_fake_data(workspace_quantity=10):
+def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
     if not settings.IS_TEST and workspace_quantity < 1:
         workspace_quantity = 1
         print('Workspace quantity reset to {}'.format(workspace_quantity))
@@ -243,7 +243,7 @@ def generate_fake_data(workspace_quantity=10):
             location_type=gateways[0], country=country)
 
         locations = list()
-        for idx in range(8):
+        for idx in range(24):
             locations.append(
                 LocationFactory.create(
                     gateway=gateways[idx] if idx < 5 else gateways[4],
@@ -426,11 +426,11 @@ def generate_fake_data(workspace_quantity=10):
 
     PersonFactory.create_batch(workspace_quantity)
     # only create PD's for the partner being used above
-    # for partner in Partner.objects.all():
+    programme_documents = []
     for workspace in Workspace.objects.all():
         for i in range(workspace_quantity * 2):
-            pd = ProgrammeDocumentFactory.create(
-                partner=first_partner, workspace=workspace)
+            pd = ProgrammeDocumentFactory.create(partner=first_partner, workspace=workspace)
+            programme_documents.append(pd)
             for ir in range(3):
                 d = datetime.datetime.now() + datetime.timedelta(days=ir * 30)
                 report_type = REPORTING_TYPE_LIST_WITHOUT_SR[random.randint(0, 1)]
@@ -450,7 +450,7 @@ def generate_fake_data(workspace_quantity=10):
     # Section - ProgrammeDocument via QuantityReportableToLowerLevelOutput
     # ProgressReport - IndicatorReport from
     # QuantityReportableToLowerLevelOutput
-    for idx, pd in enumerate(ProgrammeDocument.objects.all()):
+    for idx, pd in enumerate(programme_documents):
         locations = pd.workspace.locations
 
         pd.sections.add(Section.objects.order_by('?').first())
@@ -540,10 +540,10 @@ def generate_fake_data(workspace_quantity=10):
     print("ProgrammeDocument <-> QuantityReportableToLowerLevelOutput <-> IndicatorReport objects linked")
 
     print("Generating IndicatorLocationData for Quantity type")
-    generate_indicator_report_location_disaggregation_quantity_data()
+    generate_indicator_report_location_disaggregation_quantity_data(generate_all=generate_all_disagg)
 
     print("Generating IndicatorLocationData for Ratio type")
-    generate_indicator_report_location_disaggregation_ratio_data()
+    generate_indicator_report_location_disaggregation_ratio_data(generate_all=generate_all_disagg)
 
     # Fulfill submission date for closed IR
     IndicatorReport.objects.filter(

@@ -79,6 +79,21 @@
       json-field {
         text-align: center;
       }
+
+      .data-key {
+        margin: 0;
+        font-size: 12px;
+        color: var(--theme-secondary-text-color);
+      }
+
+      .data-key dt,
+      .data-key dd {
+        display: inline;
+      }
+
+      .data-key dd {
+        margin: 0;
+      }
     </style>
 
     <etools-prp-ajax
@@ -116,9 +131,31 @@
           <error-box errors="[[errors]]"></error-box>
 
           <div class="row">
-            <labelled-item label="Title">
-              [[data.blueprint.title]]
-            </labelled-item>
+            <div class="layout horizontal justified">
+              <labelled-item label="Title">
+                [[data.blueprint.title]]
+              </labelled-item>
+
+              <dl class="data-key">
+                <dt>Data key -</dt>
+                <template
+                    is="dom-if"
+                    if="[[_equals(data.blueprint.display_type, 'ratio')]]"
+                    restamp="true">
+                  <dd>
+                    [[[_withDefault(data.numerator_label)]]]
+                    /
+                    [[[_withDefault(data.denominator_label)]]]
+                  </dd>
+                </template>
+                <template
+                    is="dom-if"
+                    if="[[!_equals(data.blueprint.display_type, 'ratio')]]"
+                    restamp="true">
+                  <dd>[[[_withDefault(data.label)]]]</dd>
+                </template>
+              </dl>
+            </div>
           </div>
 
           <div class="row">
