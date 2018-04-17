@@ -158,14 +158,13 @@ class RPMProjectListAPIView(APIView):
         elif ResponsePlan.objects.filter(external_id=project_id, external_source=EXTERNAL_DATA_SOURCES.HPC).exists():
             raise serializers.ValidationError('Project has already been imported')
 
-        partner_id = request.data.get('partner_id')
-        partner = request.user.imo_clusters.filter(partners=get_object_or_404(Partner, id=partner_id))
-        if not partner:
+        partner = get_object_or_404(Partner, id=request.data.get('partner_id'))
+        if not request.user.imo_clusters.filter(partners=partner).exists():
             raise serializers.ValidationError({
                 'partner_id': "the partner_id does not belong to your clusters"
             })
 
-        partner_project = import_project(project_id, partner_id, response_plan=self.get_response_plan())
+        partner_project = import_project(project_id, partner.pk, response_plan=self.get_response_plan())
         partner_project.refresh_from_db()
         return Response(PartnerProjectSerializer(partner_project).data, status=status.HTTP_201_CREATED)
 

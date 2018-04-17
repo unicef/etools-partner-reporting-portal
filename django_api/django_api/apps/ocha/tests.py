@@ -3,25 +3,20 @@ import os
 from django.test import TestCase
 from django.conf import settings
 
+from core.tests.base import BaseAPITestCase
 from ocha.imports.serializers import V2PartnerProjectImportSerializer, V1FundingSourceImportSerializer, \
     V1ResponsePlanImportSerializer
+from partner.models import Partner
 
 SAMPLES_DIR = os.path.join(settings.APPS_DIR, 'ocha', 'samples')
 
 
-class V2PartnerProjectSerializerTest(TestCase):
-
-    def test_empty_organizations(self):
-        with open(os.path.join(SAMPLES_DIR, 'V2_project_info.json')) as sample_file:
-            external_project_data = json.load(sample_file)['data']
-        external_project_data.pop('organizations')
-        serializer = V2PartnerProjectImportSerializer(data=external_project_data)
-        self.assertFalse(serializer.is_valid())
-        self.assertIn('organizations', serializer.errors)
+class V2PartnerProjectSerializerTest(BaseAPITestCase):
 
     def test_load_data(self):
         with open(os.path.join(SAMPLES_DIR, 'V2_project_info.json')) as sample_file:
             external_project_data = json.load(sample_file)['data']
+        external_project_data['partner'] = Partner.objects.first().pk
         serializer = V2PartnerProjectImportSerializer(data=external_project_data)
         self.assertTrue(serializer.is_valid(raise_exception=True))
         partner_project = serializer.save()
@@ -30,6 +25,7 @@ class V2PartnerProjectSerializerTest(TestCase):
 
         with open(os.path.join(SAMPLES_DIR, 'V1_cash_flow.json')) as sample_file:
             external_project_data = json.load(sample_file)['data']
+        external_project_data['partner'] = Partner.objects.first().pk
         serializer = V1FundingSourceImportSerializer(data=external_project_data)
         self.assertTrue(serializer.is_valid(raise_exception=True))
         funding_source = serializer.save()

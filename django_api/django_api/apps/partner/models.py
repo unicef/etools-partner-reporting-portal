@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
@@ -12,7 +13,7 @@ from core.common import (
     SHARED_PARTNER_TYPE,
     CSO_TYPES,
     PARTNER_PROJECT_STATUS,
-)
+    RESPONSE_PLAN_TYPE)
 from core.models import TimeStampedExternalSourceModel
 
 from core.countries import COUNTRIES_ALPHA2_CODE_DICT, COUNTRIES_ALPHA2_CODE
@@ -183,18 +184,33 @@ class PartnerProject(TimeStampedExternalSourceModel):
         partner.FundingSource (ForeignKey): "funding_sources"
         indicator.Reportable (GenericRelation): "reportables"
     """
-    code = models.TextField(null=True, blank=True, unique=True)
+    code = models.TextField(null=True, blank=True, unique=True, verbose_name='Project code in HRP')
+    type = models.CharField(
+        max_length=3,
+        choices=RESPONSE_PLAN_TYPE,
+        verbose_name='Plan Type',
+        help_text='Is this project part of an HRP or FA?',
+        null=True, blank=True
+    )
 
     title = models.CharField(max_length=1024)
     description = models.TextField(max_length=5120, null=True, blank=True)
     additional_information = models.CharField(
         max_length=255, verbose_name="Additional information (e.g. links)", null=True, blank=True
     )
+    custom_fields = JSONField(default=[])
     start_date = models.DateField()
     end_date = models.DateField()
     status = models.CharField(
         max_length=3, choices=PARTNER_PROJECT_STATUS, default=PARTNER_PROJECT_STATUS.ongoing
     )
+
+    agency_name = models.TextField(max_length=512, null=True, blank=True)
+    agency_type = models.TextField(max_length=128, null=True, blank=True)
+
+    # TODO: Should be a choicefield, or an integerfield?
+    prioritization = models.TextField(null=True, blank=True, verbose_name='Prioritization Classification')
+
     total_budget = models.DecimalField(
         null=True, decimal_places=2, help_text='Total Budget (USD)', max_digits=12
     )
@@ -208,6 +224,9 @@ class PartnerProject(TimeStampedExternalSourceModel):
     )
     partner = models.ForeignKey(
         Partner, related_name="partner_projects"
+    )
+    additional_partners = models.ManyToManyField(
+        Partner, blank=True, verbose_name='Additional implementing partners'
     )
     reportables = GenericRelation(
         'indicator.Reportable', related_query_name='partner_projects'
@@ -230,6 +249,55 @@ class PartnerProject(TimeStampedExternalSourceModel):
     def response_plan(self):
         cluster = self.clusters.first()
         return cluster and cluster.response_plan
+
+    @property
+    def funding(self):
+        return PartnerProjectFunding.objects.get_or_create(project=self)[0]
+
+
+class PartnerProjectFunding(TimeStampedModel):
+    project = models.OneToOneField(PartnerProject)
+
+    # All fields below stored in USD
+    required_funding = models.DecimalField(decimal_places=2, max_digits=32, null=True, blank=True)
+    internal_funding = models.DecimalField(decimal_places=2, max_digits=32, null=True, blank=True)
+    cerf_funding = models.DecimalField(
+        decimal_places=2, max_digits=32, null=True, blank=True, verbose_name='Central Emergency Response Fund funding'
+    )
+    cbpf_funding = models.DecimalField(
+        decimal_places=2, max_digits=32, null=True, blank=True, verbose_name='Country based pooled funds funding'
+    )
+    bilateral_funding = models.DecimalField(
+        decimal_places=2, max_digits=32, null=True, blank=True,
+        verbose_name='Funding from bilateral agreements, not including UNICEF/WFP'
+    )
+    unicef_funding = models.DecimalField(
+        decimal_places=2, max_digits=32, null=True, blank=True,
+        verbose_name='Funding from UNICEF including supplies cost'
+    )
+    wfp_funding = models.DecimalField(
+        decimal_places=2, max_digits=32, null=True, blank=True, verbose_name='Funding from WFP including supplies cost'
+    )
+
+    @property
+    def total_funding(self):
+        return sum(list(filter(
+            None, [
+                self.internal_funding,
+                self.cerf_funding,
+                self.cbpf_funding,
+                self.bilateral_funding,
+                self.unicef_funding,
+                self.wfp_funding,
+            ]
+        )))
+
+    @property
+    def funding_gap(self):
+        if not self.required_funding:
+            return None
+
+        return self.required_funding - self.total_funding
 
 
 class PartnerActivity(TimeStampedModel):

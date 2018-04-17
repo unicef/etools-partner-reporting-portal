@@ -13,20 +13,32 @@
 <link rel="import" href="../../../../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../../../../../bower_components/etools-searchable-multiselection-menu/etools-multi-selection-menu.html">
 <link rel="import" href="../../../../../bower_components/etools-searchable-multiselection-menu/etools-single-selection-menu.html">
+<link rel="import" href="../../../../../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../../../../../bower_components/paper-radio-button/paper-radio-button.html">
+
+<link rel="import" href="../../../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../../../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../../../../bower_components/paper-item/paper-item.html">
 
 <link rel="import" href="../../../../polyfills/es6-shim.html">
 <link rel="import" href="../../../etools-prp-ajax.html">
 <link rel="import" href="../../../../elements/etools-prp-permissions.html">
+<link rel="import" href="../../../../elements/cluster-reporting/creation-modal-project-details.html">
+<link rel="import" href="../../../../elements/cluster-reporting/planned-action/projects/custom-fields-widget.html">
 <link rel="import" href="../../../etools-prp-date-input.html">
 <link rel="import" href="../../../form-fields/dropdown-form-input.html">
 <link rel="import" href="../../../form-fields/cluster-dropdown-content.html">
 <link rel="import" href="../../../form-fields/partner-dropdown-content.html">
+<link rel="import" href="../../../../behaviors/modal.html">
 <link rel="import" href="../../../../behaviors/routing.html">
 <link rel="import" href="../../../../behaviors/utils.html">
 <link rel="import" href="../../../../redux/store.html">
 <link rel="import" href="../../../../redux/actions.html">
 <link rel="import" href="../../../../styles/buttons.html">
 <link rel="import" href="../../../labelled-item.html">
+<link rel="import" href="../../../error-box.html">
+
 
 <dom-module id="planned-action-projects-modal">
   <template>
@@ -60,6 +72,41 @@
         background: var(--theme-primary-color);
       }
 
+      .infobox {
+        display: block;
+        --app-grid-columns:2;
+        --app-grid-gutter: 25px;
+        --app-grid-item-height: auto;
+        padding: 15px;
+        background: var(--paper-grey-300);
+      }
+
+      .infobox h4 {
+        display: inline;
+        color: #737373;
+        font-weight: 400;
+        font-size: 12px
+      }
+
+      .red {
+        color: red;
+        display: inline;
+      }
+
+      .justify-right {
+        float: right;
+      }
+
+      .show-more-details {
+        display: block;
+        padding: 15px;
+        background: var(--paper-grey-300);
+      }
+
+      .show-more-details .justify-right {
+        float: right;
+      }
+
       .header h2 {
         @apply(--paper-font-title);
         margin: 0;
@@ -74,6 +121,66 @@
       .buttons {
         padding: 24px;
       }
+
+      .details-section {
+        padding: 15px;
+        background: var(--paper-grey-200);
+      }
+
+      .details-text {
+        font-size: 12px;
+        color: #757575;
+      }
+
+      #detailsIcon {
+        padding-left: 5px;
+        color: #9e9e9e;
+      }
+
+      #detailsIcon iron-icon:hover {
+        color: rgba(0, 0, 0, 0.87);
+      }
+
+      #detailsIcon iron-icon[hidden] {
+        display: none !important;
+      }
+
+
+      paper-radio-group {
+        display: block;
+        padding-top: 16px;
+      }
+
+      paper-radio-group > .fields {
+        padding: calc(var(--app-grid-gutter) / 2) 0;
+      }
+
+      paper-radio-group > .fields[empty] {
+        padding: 0;
+      }
+
+      paper-radio-group .app-grid {
+        margin: -var(--app-grid-gutter);
+      }
+
+      paper-radio-button {
+        margin-left: -12px;
+      }
+
+      paper-dropdown-menu {
+        width: 100%;
+      }
+
+      iron-icon {
+        color: var(--list-icon-color, #2b2b2b);
+        height: 40px;
+        width: 40px;
+      }
+
+      iron-icon:hover {
+        color: var(--list-icon-hover-color, rgba(0, 0, 0, 0.87));
+      }
+
     </style>
 
     <etools-prp-permissions
@@ -83,9 +190,10 @@
     <iron-location path="{{path}}"></iron-location>
 
     <cluster-dropdown-content clusters="{{clusters}}"></cluster-dropdown-content>
+
     <template
     is="dom-if"
-    if="[[_displayPartner(permissions, edit)]]"
+    if="[[permissions.addPartnerToProject]]"
     restamp="true">
       <partner-dropdown-content
         partners="{{partners}}"
@@ -101,170 +209,442 @@
       method="[[_computeAjaxMethod(edit)]]">
     </etools-prp-ajax>
 
+    <etools-prp-ajax
+      id="projects"
+      timeout="100000"
+      url="[[ochaProjectsUrl]]">
+    </etools-prp-ajax>
+
+    <etools-prp-ajax
+      id="projectDetails"
+      url="[[ochaProjectDetailsUrl]]"
+      body="[[ochaProjectRequestId]]"
+      content-type="application/json"
+      timeout="100000">
+    </etools-prp-ajax>
 
     <paper-dialog
-        id="dialog"
-        with-backdrop
-        opened="{{opened}}">
+      id="dialog"
+      with-backdrop
+      opened="{{opened}}">
       <div class="header layout horizontal justified">
         <h2>[[_computeTitle(edit)]]</h2>
-          <paper-icon-button
-              class="self-center"
-              on-tap="close"
-              icon="icons:close">
-          </paper-icon-button>
-        </div>
+        <paper-icon-button
+          class="self-center"
+          on-tap="close"
+          icon="icons:close">
+        </paper-icon-button>
       </div>
 
       <paper-dialog-scrollable>
+        <error-box errors="[[errors]]"></error-box>
         <template
+          is="dom-if"
+          if="[[refresh]]"
+          restamp="true">
+          <template
             is="dom-if"
-            if="[[refresh]]"
+            if="[[permissions.addPartnerToProject]]"
             restamp="true">
-          <iron-form class="app-grid">
-
-            <template
-              is="dom-if"
-              if="[[_displayPartner(permissions, edit)]]"
-              restamp="true">
-              <etools-single-selection-menu
-                class="item validate full-width"
-                label="Partner"
-                options="[[partners]]"
-                option-value="id"
-                option-label="title"
-                selected="{{selectedPartner}}"
-                on-iron-activate="_validate"
-                trigger-value-change-event
-                required>
-              </etools-single-selection-menu>
-            </template>
-
-            <template
-              is="dom-if"
-              if="[[_displayPartnerReadOnly(permissions, edit)]]"
-              restamp="true">
-              <labelled-item class="item full-width" label="Partner">
-                <span>[[data.partner]]</span>
-              </labelled-item>
-            </template>
-
-            <paper-input
+            <etools-single-selection-menu
               class="item validate full-width"
-              id="title"
-              label="Title"
-              value="{{data.title}}"
-              type="string"
-              required
-              on-input="_validate">
-            </paper-input>
+              label="Partner"
+              options="[[partners]]"
+              option-value="id"
+              option-label="title"
+              selected="{{data.partner_id}}"
+              on-iron-activate="_validate"
+              trigger-value-change-event
+              required>
+            </etools-single-selection-menu>
+          </template>
+          <paper-radio-group
+            id="mode"
+            selected={{mode}}
+            on-change="adjustPosition">
+            <template
+              is="dom-if"
+              if="[[canAddOchaProjects]]"
+              restamp="true">
+              <paper-radio-button name="ocha" active="true">
+                <strong>From OCHA</strong>
+              </paper-radio-button>
+            </template>
+            <div
+              class="fields"
+              empty$="[[!_equals(mode, 'ocha')]]">
+              <template
+                is="dom-if"
+                if="[[_equals(mode, 'ocha')]]"
+                restamp="true">
+                <div>
+                  <etools-single-selection-menu
+                    class="item validate full-width"
+                    label="Project"
+                    options="[[formattedProjects]]"
+                    option-value="id"
+                    option-label="title"
+                    selected="{{selectedProject}}"
+                    on-iron-activate="_validate"
+                    disabled="[[projectsLoading]]"
+                    trigger-value-change-event
+                    required>
+                  </etools-single-selection-menu>
+                  <creation-modal-project-details
+                    id="details"
+                    project-data="[[projectDetails]]"
+                    loading="[[projectDetailsLoading]]">
+                  </creation-modal-project-details>
+                  <etools-loading active$="[[projectsLoading]]"></etools-loading>
+                </div>
+              </template>
+            </div>
+            <paper-radio-button name="custom">
+              <strong>Custom</strong>
+            </paper-radio-button>
+            <div
+              empty$="[[!_equals(mode, 'custom')]]">
+              <template
+                is="dom-if"
+                if="[[_equals(mode, 'custom')]]"
+                restamp="true">
+                <div class="item full-width infobox">
+                  <span class="item">
+                    <h4>Basic Project details</h4>
+                  </span>
+                  <span class="item justify-right">
+                    <div class="red">*</div>
+                    <h4>Fields required</h4>
+                  </span>
+                </div>
+                <div class="app-grid">
+                  <div class="item full-width">
+                    <error-box errors="[[errors]]"></error-box>
+                  </div>
+                  <paper-input
+                    class="item validate full-width"
+                    id="title"
+                    label="Title *"
+                    value="{{data.title}}"
+                    type="string"
+                    required
+                    on-input="_validate">
+                  </paper-input>
 
-            <div class="row">
-              <etools-multi-selection-menu
-                class="validate"
-                label="Clusters"
-                options="[[formattedClusters]]"
-                selected-values="{{selectedClusters}}"
-                on-selected-values-changed="_validate"
-                trigger-value-change-event
+                <div class="item full-width">
+                  <etools-multi-selection-menu
+                    class="validate"
+                    label="Clusters *"
+                    options="[[formattedClusters]]"
+                    selected-values="{{selectedClusters}}"
+                    on-selected-values-changed="_validate"
+                    trigger-value-change-event
+                    required>
+                  </etools-multi-selection-menu>
+                </div>
+
+                <div class="item">
+                  <etools-prp-date-input
+                    class="start-date"
+                    label="Start date *"
+                    value="{{data.start_date}}"
+                    error-message=""
+                    required
+                    no-init>
+                  </etools-prp-date-input>
+                </div>
+
+                <div class="item">
+                  <etools-prp-date-input
+                      class="end-date"
+                      label="End date *"
+                      value="{{data.end_date}}"
+                      error-message=""
+                      required
+                      no-init>
+                  </etools-prp-date-input>
+                </div>
+                <div class="row">
+                <paper-dropdown-menu
+                  class="item validate"
+                  label="Status *"
+                  on-value-changed="_validate"
+                  always-float-label
                   required>
-              </etools-multi-selection-menu>
+                  <paper-listbox
+                    selected="{{data.status}}"
+                    attr-for-selected="value"
+                    slot="dropdown-content"
+                    class="dropdown-content">
+                    <template
+                      is="dom-repeat"
+                      items="[[statuses]]">
+                      <paper-item value="[[item.id]]">[[item.title]]</paper-item>
+                    </template>
+                  </paper-listbox>
+                </paper-dropdown-menu>
+                </div>
+
+                <paper-input
+                  class="item validate"
+                  id="total_budget"
+                  label="Total Budget"
+                  value="{{data.total_budget}}"
+                  type="number"
+                  allowed-pattern="[+\-\d.]"
+                  step="0.01"
+                  on-input="_validate">
+                </paper-input>
+
+                <paper-input
+                  class="item validate full-width"
+                  id="funding_source"
+                  label="Funding Source"
+                  value="{{data.funding_source}}"
+                  type="string"
+                  on-input="_validate">
+                </paper-input>
+
+                <paper-input
+                  class="item validate full-width"
+                  id="description"
+                  label="Description"
+                  value="{{data.description}}"
+                  type="string"
+                  on-input="_validate">
+                </paper-input>
+
+                <paper-input
+                  class="item validate full-width"
+                  id="additional_information"
+                  label="Additional information (e.g. links)"
+                  value="{{data.additional_information}}"
+                  type="string"
+                  on-input="_validate">
+                </paper-input>
+
+          <div class="details-section item full-width">
+            <div class="layout horizontal center justified">
+              <span class="details-text">Want to add more details to the Project info?</span>
+              <paper-button
+              class="btn-primary"
+              on-tap="_handleDetailsChange">
+                [[_computeDetailsButtonMsg(detailsOpened)]]
+                <div id="detailsIcon">
+                  <iron-icon
+                    icon="expand-more"
+                    hidden$="[[detailsOpened]]">
+                  </iron-icon>
+                  <iron-icon
+                    icon="expand-less"
+                    hidden$="[[!detailsOpened]]">
+                  </iron-icon>
+                </div>
+              </paper-button>
             </div>
+            <iron-collapse
+              id="collapse"
+              opened="{{detailsOpened}}">
+              <div class="app-grid">
+                <etools-single-selection-menu
+                  id="agencyAcronyms"
+                  class="item validate"
+                  label="Name of Agency (acronyms)"
+                  options="[[agencyAcronyms]]"
+                  option-value="id"
+                  option-label="title"
+                  selected="{{selectedAcronym}}"
+                  on-iron-activate="_validate"
+                  trigger-value-change-event
+                  always-float-label>
+                </etools-single-selection-menu>
 
-            <div class="item">
-              <etools-prp-date-input
-                class="start-date"
-                label="Start date"
-                value="{{data.start_date}}"
-                error-message=""
-                required
-                no-init>
-               </etools-prp-date-input>
-              </etools-date-input>
-            </div>
+                <etools-single-selection-menu
+                  class="item validate"
+                  label="Type of Agency"
+                  options="[[agencyTypes]]"
+                  option-value="id"
+                  option-label="title"
+                  selected="{{selectedAgencyType}}"
+                  on-iron-activate="_validate"
+                  trigger-value-change-event
+                  always-float-label>
+                </etools-single-selection-menu>
 
-            <div class="item">
-              <etools-prp-date-input
-                  class="end-date"
-                  label="End date"
-                  value="{{data.end_date}}"
-                  error-message=""
-                  required
-                  no-init>
-              </etools-prp-date-input>
-            </div>
+                <paper-input
+                  class="item validate full-width"
+                  id="additional_implementing_partners"
+                  label="Additional implementing partners"
+                  value="{{data.additional_implementing_partners}}"
+                  type="string"
+                  on-input="_validate"
+                  always-float-label>
+                </paper-input>
 
-            <paper-dropdown-menu
-                class="item validate"
-                label="Status"
-                on-value-changed="_validate"
-                always-float-label
-                required>
-              <paper-listbox
-                  selected="{{data.status}}"
-                  attr-for-selected="value"
-                  slot="dropdown-content"
-                  class="dropdown-content">
-                <template
-                  is="dom-repeat"
-                  items="[[statuses]]">
-                  <paper-item value="[[item.id]]">[[item.title]]</paper-item>
-                </template>
-              </paper-listbox>
-            </paper-dropdown-menu>
+                <div class="full-width">
+                  <labelled-item label="Is this project part of a HRP or FA?">
+                    <paper-radio-group
+                        selected={{data.part}}>
+                      <paper-radio-button name="hrp">HRP</paper-radio-button>
+                      <paper-radio-button name="fa">FA</paper-radio-button>
+                      <paper-radio-button name="no">No</paper-radio-button>
+                    </paper-radio-group>
+                  </labelled-item>
+                </div>
 
-            <paper-input
-              class="item validate"
-              id="total_budget"
-              label="Total Budget"
-              value="{{data.total_budget}}"
-              type="number"
-              allowed-pattern="[+\-\d.]"
-              step="0.01"
-              on-input="_validate">
-            </paper-input>
+                <etools-single-selection-menu
+                  class="item validate"
+                  label="Prioritization Classification"
+                  options="[[classifications]]"
+                  option-value="id"
+                  option-label="title"
+                  selected="{{selectedClassification}}"
+                  on-iron-activate="_validate"
+                  trigger-value-change-event
+                  always-float-label>
+                </etools-single-selection-menu>
 
-            <paper-input
-              class="item validate full-width"
-              id="funding_source"
-              label="Funding Source"
-              value="{{data.funding_source}}"
-              type="string"
-              on-input="_validate">
-            </paper-input>
+                <etools-single-selection-menu
+                  class="item validate"
+                  label="Project code in HRP"
+                  options="[[projectCodes]]"
+                  option-value="id"
+                  option-label="title"
+                  selected="{{selectedProjectCode}}"
+                  on-iron-activate="_validate"
+                  trigger-value-change-event
+                  always-float-label>
+                </etools-single-selection-menu>
 
-            <paper-input
-              class="item validate full-width"
-              id="description"
-              label="Description"
-              value="{{data.description}}"
-              type="string"
-              on-input="_validate">
-            </paper-input>
+                <paper-input
+                  class="item validate full-width"
+                  id="funding_requirements"
+                  label="Funding Requirements (US$)"
+                  value="{{data.funding.required_funding}}"
+                  type="number"
+                  allowed-pattern="[+\-\d.]"
+                  step="0.01"
+                  on-input="_validate"
+                  always-float-label>
+                </paper-input>
 
-            <paper-input
-              class="item validate full-width"
-              id="additional_information"
-              label="Additional information (e.g. links)"
-              value="{{data.additional_information}}"
-              type="string"
-              on-input="_validate">
-            </paper-input>
-          </iron-form>
+                <paper-input
+                  class="item validate full-width"
+                  id="own_funding"
+                  label="Funding received / confirmed through own agency internal emergency funding mechanisms (US$)"
+                  value="{{data.funding.own_funding}}"
+                  type="number"
+                  allowed-pattern="[+\-\d.]"
+                  step="0.01"
+                  on-input="_validate"
+                  always-float-label>
+                </paper-input>
+
+                <paper-input
+                  class="item validate full-width"
+                  id="cerf_funding"
+                  label="Funding received / confirmed from CERF (US$)"
+                  value="{{data.funding.cerf_funding}}"
+                  type="number"
+                  allowed-pattern="[+\-\d.]"
+                  step="0.01"
+                  on-input="_validate"
+                  always-float-label>
+                </paper-input>
+
+                <paper-input
+                  class="item validate full-width"
+                  id="cbpf_funding"
+                  label="Funding received / confirmed from CBPF (Country based pooled funds), eg. CHF, ERF (US$)"
+                  value="{{data.funding.cbpf_funding}}"
+                  type="number"
+                  allowed-pattern="[+\-\d.]"
+                  step="0.01"
+                  on-input="_validate"
+                  always-float-label>
+                </paper-input>
+
+                <paper-input
+                  class="item validate full-width"
+                  id="bilateral_funding"
+                  label="Funding received / confirmed from bilateral agreeements, not including UNICEF/WFP (US$)"
+                  value="{{data.funding.bilateral_funding}}"
+                  type="number"
+                  allowed-pattern="[+\-\d.]"
+                  step="0.01"
+                  on-input="_validate"
+                  always-float-label>
+                </paper-input>
+
+                <paper-input
+                  class="item validate full-width"
+                  id="unicef_funding"
+                  label="Funding received / confirmed from UNICEF including supplies cost (US$)"
+                  value="{{data.funding.unicef_funding}}"
+                  type="number"
+                  allowed-pattern="[+\-\d.]"
+                  step="0.01"
+                  on-input="_validate"
+                  always-float-label>
+                </paper-input>
+
+                <paper-input
+                  class="item validate full-width"
+                  id="wfp_funding"
+                  label="Funding received / confirmed from WFP including supplies cost (US$)"
+                  value="{{data.funding.wfp_funding}}"
+                  type="number"
+                  allowed-pattern="[+\-\d.]"
+                  step="0.01"
+                  on-input="_validate"
+                  always-float-label>
+                </paper-input>
+
+                <paper-input
+                  class="item validate full-width"
+                  id="funding_gap"
+                  label="Funding gap (US$)"
+                  value="{{data.funding.funding_gap}}"
+                  type="number"
+                  allowed-pattern="[+\-\d.]"
+                  step="0.01"
+                  on-input="_validate"
+                  always-float-label>
+                </paper-input>
+
+                <custom-fields-widget
+                  class="item full-width"
+                  custom-fields="{{data.custom_fields}}"
+                  edit="[[edit]]">
+                </custom-fields-widget>
+
+              <div>
+            </iron-collapse>
+          </div>
         </template>
-      </paper-dialog-scrollable>
 
-      <div class="buttons layout horizontal-reverse">
-        <paper-button class="btn-primary" on-tap="_save" raised>
-          Save
-        </paper-button>
+        <div class="buttons layout horizontal-reverse">
+            <paper-button class="btn-primary" on-tap="_save" raised>
+              Save
+            </paper-button>
 
-        <paper-button  on-tap="close">
-          Cancel
-        </paper-button>
-      </div>
+            <paper-button  on-tap="close">
+              Cancel
+            </paper-button>
+          </div>
 
-      <etools-loading active="[[updatePending]]"></etools-loading>
+          <etools-loading active="[[updatePending]]"></etools-loading>
+
+
+
+              </div>
+            </template>
+          </div>
+        </paper-radio-group>
+      </template>
+    </paper-dialog-scrollable>
+
+
     </paper-dialog>
   </template>
 
@@ -276,6 +656,7 @@
         App.Behaviors.ReduxBehavior,
         App.Behaviors.RoutingBehavior,
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ModalBehavior,
       ],
 
       properties: {
@@ -284,11 +665,20 @@
           statePath: 'responsePlans.currentID',
         },
 
+        canAddOchaProjects: {
+          type: Boolean,
+          statePath: 'responsePlans.current.can_import_ocha_projects'
+        },
+
         path: String,
 
         reportingPeriod: String,
 
         opened: {
+          type: Boolean,
+        },
+
+        detailsOpened: {
           type: Boolean,
           value: false,
         },
@@ -298,24 +688,43 @@
           value: false,
         },
 
+        mode: {
+          type: String,
+          observer: '_setDefaults',
+        },
+
         data: {
           type: Object,
-          value: {}
         },
 
         refresh: {
           type: Boolean,
-          value: false
+          value: false,
         },
 
         url: {
           type: String,
-          computed: '_computeUrl(responsePlanID, selectedPartner, data, edit)'
+          computed: '_computeUrl(responsePlanID, mode, edit, data)',
+        },
+
+        ochaProjectsUrl: {
+          type: String,
+          computed: '_computeOchaProjectsUrl(responsePlanID)',
+        },
+
+        ochaProjectDetailsUrl: {
+          type: String,
+          computed: '_computeOchaProjectDetailsUrl(selectedProject)',
+        },
+
+        ochaProjectRequestId: {
+          type: Object,
+          computed: '_computeOchaProjectRequestId(selectedProject)',
         },
 
         clusters: {
           format: Array,
-          value: []
+          value: [],
         },
 
         partnerID: {
@@ -325,7 +734,7 @@
 
         formattedClusters: {
           type: Array,
-          computed: '_formatForMultiselect(clusters)'
+          computed: '_formatForMultiselect(clusters)',
         },
 
         statuses: {
@@ -346,10 +755,18 @@
           ],
         },
 
-        selectedPartner: {
+        projects: {
+          type: Array,
+          value: [],
+        },
+
+        formattedProjects: {
           type: String,
-          value: '',
-          observer: '_savePartner',
+          computed: '_computeFormattedProjects(projects)',
+        },
+
+        selectedProject: {
+          type: String,
         },
 
         profile: {
@@ -362,7 +779,9 @@
           computed: '_computeImoClusters(profile)',
         },
 
-        selectedClusters: Array,
+        selectedClusters: {
+          type: Array,
+        },
 
         edit: {
           type: Boolean,
@@ -370,23 +789,40 @@
         },
       },
 
-      _computeUrl: function(responsePlanID, selectedPartner, data, edit) {
+      listeners: {
+        'details-loaded': 'adjustPosition',
+      },
+
+      observers: [
+        '_fetchOchaProjectsList(mode, ochaProjectsUrl)',
+        '_computeOchaProjectDetailsUrl(selectedProject)',
+        '_fetchOchaProjectDetails(selectedProject)',
+        '_saveClusters(selectedClusters.splices)',
+      ],
+
+      _computeUrl: function(responsePlanID, mode, edit, data) {
         if (edit) {
-          if (this.permissions.addPartnerToProject) {
-            var partnerId = data.partner_id;
-            return App.Endpoints.plannedActionsIMOEdit(responsePlanID, partnerId, data.id);
-          }
           return App.Endpoints.plannedActionsProjectOverview(data.id);
+        } else if (mode === 'custom') {
+        return App.Endpoints.partnerProjectCreate(responsePlanID);
+        } else if (mode === 'ocha') {
+        return App.Endpoints.ochaProjectsList(responsePlanID);
         }
-        return this.permissions.addPartnerToProject
-          ? App.Endpoints.plannedActionsIMO(responsePlanID, selectedPartner)
-          : App.Endpoints.plannedActions(responsePlanID);
+      },
+
+      _computeOchaProjectsUrl: function(responsePlanID) {
+        return App.Endpoints.ochaProjectsList(responsePlanID);
+      },
+
+      _computeOchaProjectDetailsUrl: function(selectedProject) {
+        return App.Endpoints.ochaProjectDetails(selectedProject);
       },
 
       close: function () {
         this.set('data', {});
         this.set('opened', false);
         this.set('refresh', false);
+        this.set('detailsOpened', false);
       },
 
       open: function () {
@@ -396,12 +832,15 @@
             return cluster.id;
           });
         } else {
-          this.data = {};
+          this.data = {'custom_fields': [], 'funding': {}};
           this.selectedClusters = [];
         }
-
         this.set('opened', true);
         this.set('refresh', true);
+      },
+
+      _handleDetailsChange: function () {
+        this.detailsOpened = !this.detailsOpened;
       },
 
       _computeTitle: function(edit) {
@@ -418,12 +857,74 @@
         });
       },
 
-      _savePartner: function(partner) {
-        this.set('data.partner', partner);
+      _computeDetailsButtonMsg: function(detailsOpened) {
+        if (detailsOpened) {
+          return 'show less details';
+        }
+        return 'show more details';
       },
 
-      _displayPartner: function (permissions, edit) {
-        return permissions.addPartnerToProject && !edit;
+      _fetchOchaProjectsList: function (mode) {
+        if (mode !== 'ocha') {
+          return;
+        }
+        this.set('projectsLoading', true);
+        var self = this;
+        this.$.projects.abort();
+        this.$.projects.thunk()()
+            .then(function (res) {
+              self.set('projectsLoading', false);
+              self.set('projects', res.data);
+              self.fire('details-loaded', this.name);
+            })
+            .catch(function (err) { // jshint ignore:line
+              if (err.code === 504) {
+                self.fire('notify', {type: 'ocha-timeout'});
+              }
+              self.set('projectsLoading', false);
+              self.set('errors', err.data);
+            });
+      },
+
+      _computeOchaProjectRequestId: function (selectedProject) {
+        var ob = Object.assign({}, {'project': selectedProject});
+        var obb = Object.assign(ob, {'partner_id': this.data.partner_id});
+        return obb;
+      },
+
+      _fetchOchaProjectDetails: function (project) {
+        if (!project) {
+          return;
+        }
+        this.set('projectDetailsLoading', true);
+        var self = this;
+        this.$.projectDetails.abort();
+        this.$.projectDetails.thunk()()
+            .then(function (res) {
+              self.set('projectDetailsLoading', false);
+              self.set('projectDetails', res.data);
+              console.log(self.projectDetails);
+              self.fire('details-loaded', this.name);
+            })
+            .catch(function (err) { // jshint ignore:line
+              if (err.code === 504) {
+                self.fire('notify', {type: 'ocha-timeout'});
+              }
+              self.set('projectDetailsLoading', false);
+              self.set('errors', err.data);
+            });
+      },
+
+      _computeFormattedProjects: function(projects) {
+        return projects.map(function(project) {
+          return {id: project.id, title: project.name};
+        });
+      },
+
+      _saveClusters: function() {
+        this.set('data.clusters', this.selectedClusters.map(function(cluster) {
+            return {'id': cluster};
+          }));
       },
 
       _displayPartnerReadOnly: function (permissions, edit) {
@@ -452,25 +953,33 @@
         });
       },
 
+      _setDefaults: function (edit) {
+        if (edit) {
+           return;
+           }
+        this.set('selectedProject', '');
+        this.set('projectLoading', false);
+        this.set('data', {
+          'custom_fields': [],
+          'funding': {}
+        });
+        this.set('projectDetails', {});
+        this.set('errors', {});
+      },
+
       _save: function () {
         var self = this;
-
-        var valid = [
-          this._fieldsAreValid(),
-          this._dateRangeValid('.start-date', '.end-date'),
-        ].every(Boolean);
-
-        if (!valid) {
-          return;
+        if (!this.data.partner_id) {
+          this.data.partner_id = this.partnerID;
         }
-        this.data.clusters = this.selectedClusters.map(function(item) {
-          return {id: Number(item)};
-        });
-
-        if (!this.data.partner) {
-          this.data.partner = this.partnerID;
+        if (this.mode === 'ocha') {
+          this.$.projectAjax.body = Object.assign({}, this.ochaProjectRequestId);
+        } else {
+          this.$.projectAjax.body = Object.assign({}, this.data);
         }
         this.updatePending = true;
+        console.log(this.data.partner_id);
+        console.log(this.url);
         var thunk = this.$.projectAjax.thunk();
         thunk()
           .then(function (res) {
@@ -478,16 +987,16 @@
             if (self.edit) {
               self.fire('project-edited', res.data);
               self.close();
+              self.set('errors', {});
             } else {
               self._redirectToDetail(res.data.id);
             }
           })
           .catch(function (err) { // jshint ignore:line
             self.updatePending = false;
-            // TODO: error handling
+            self.set('errors', err.data);
           });
       },
-
     });
   </script>
 </dom-module>

@@ -94,16 +94,16 @@
     </etools-prp-permissions>
 
     <etools-prp-ajax
-        id="plan"
-        url="[[createPlanUrl]]"
-        method="post"
-        content-type="application/json">
+      id="plan"
+      url="[[createPlanUrl]]"
+      method="post"
+      content-type="application/json">
     </etools-prp-ajax>
 
     <etools-prp-ajax
-        id="plans"
-        timeout="100000"
-        url="[[ochaPlansUrl]]">
+      id="plans"
+      timeout="100000"
+      url="[[ochaPlansUrl]]">
     </etools-prp-ajax>
 
     <etools-prp-ajax
@@ -124,7 +124,6 @@
         opened="{{opened}}">
       <div class="header layout horizontal justified">
         <h2>Add Response Plan</h2>
-
         <paper-icon-button
             class="self-center"
             on-tap="close"
@@ -169,7 +168,6 @@
                 <etools-loading active$="[[plansLoading]]"></etools-loading>
               </div>
             </template>
-
           </div>
 
           <paper-radio-button name="custom">
@@ -351,7 +349,9 @@
           statePath: App.Selectors.Config.clusterTypes,
         },
 
-        emptyClustersError: Boolean,
+        emptyClustersError: {
+          type: Boolean,
+        },
 
       },
 
@@ -385,17 +385,16 @@
       },
 
       _setDefaults: function () {
-        this.set('errors', {});
         this.set('selectedPlan', '');
         this.set('plansLoading', false);
         this.set('data', {});
         this.set('planDetails', {});
+        this.set('errors', {});
       },
 
       _onOpenedChanged: function (opened) {
         if (opened) {
-        this.set('mode', '');
-        
+          this.set('mode', '');
         }
       },
 
@@ -417,14 +416,14 @@
 
       _setEmptyClustersError: function(planDetails, mode) {
         this.async(function () {
-          this.set(
-            'emptyClustersError',
-            mode === 'ocha' &&
-                planDetails &&
-                planDetails.clusterNames &&
-                !planDetails.clusterNames.length
-          );
-        });
+        this.set(
+          'emptyClustersError',
+          mode === 'ocha' &&
+              planDetails &&
+              planDetails.clusterNames &&
+              !planDetails.clusterNames.length
+        );
+      });
       },
 
       _fetchPlans: function (mode) {
@@ -445,7 +444,7 @@
                 self.fire('notify', {type: 'ocha-timeout'});
               }
               self.set('plansLoading', false);
-              // TODO: error handling
+              self.set('errors', err.data);
             });
       },
 
@@ -453,11 +452,9 @@
         if (!url) {
           return;
         }
-
         this.set('planDetailsLoading', true);
         var self = this;
         this.$.planDetails.abort();
-
         this.$.planDetails.thunk()()
             .then(function (res) {
               self.set('planDetailsLoading', false);
@@ -469,7 +466,7 @@
                 self.fire('notify', {type: 'ocha-timeout'});
               }
               self.set('planDetailsLoading', false);
-              // TODO: error handling
+              self.set('errors', err.data);
             });
       },
 
@@ -477,29 +474,25 @@
         if (mode !== 'custom') {
           return;
         }
-
         var configThunk = this.$.config.thunk();
-
+        var self = this;
         this.$.config.abort();
-
         this.dispatch(
           App.Actions.Config.fetchConfig(configThunk, App.Selectors.Config.clusterTypes)
         )
           .catch(function (err) { // jshint ignore:line
-            // TODO: error handling
+            self.set('errors', err.data);
           });
       },
 
       _savePlan: function () {
         var self = this;
-
         this.set('updatePending', true);
         if (this.mode === 'ocha') {
           this.$.plan.body = {plan: this.selectedPlan};
         } else {
           this.$.plan.body = Object.assign({}, this.data);
         }
-        
         this.$.plan.thunk()()
           .then(function (res) {
             self.set('updatePending', false);

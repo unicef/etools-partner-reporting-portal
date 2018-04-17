@@ -10,6 +10,7 @@ def send_email_from_template(
         from_email=settings.DEFAULT_FROM_EMAIL,
         to_email_list=(),
         fail_silently=True,
+        content_subtype='plain',
         **kwargs
 ):
     """
@@ -34,4 +35,5 @@ def send_email_from_template(
         to_email_list,
         **kwargs
     )
+    message.content_subtype = content_subtype
     message.send(fail_silently=fail_silently)
