@@ -106,6 +106,7 @@ INSTALLED_APPS = [
     'django_cron',
     'fixture_magic',
     'guardian',
+    'django_nose',
 
     'account',
     'cluster',
@@ -462,6 +463,10 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',  # this is default
     'guardian.backends.ObjectPermissionBackend',
 )
+
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+NOSE_ARGS = ['--with-timer', '--nocapture']
+
 # apm related - it's enough to set those as env variables, here just for documentation
 # by default logging and apm is off, so below envs needs to be set per environment
 

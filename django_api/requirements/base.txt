@@ -1,6 +1,8 @@
 # Django packages
 Django==1.11.11
 django-redis==4.9.0
+django-nose==1.4.5
+nose-timer==0.7.1
 
 #apm
 elastic-apm==2.0.0
