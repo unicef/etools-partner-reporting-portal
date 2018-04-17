@@ -445,6 +445,25 @@ def synchronize_ir_status_from_pr(sender, instance, **kwargs):
         ir.save()
 
 
+@receiver(post_save,
+          sender=ProgrammeDocument,
+          dispatch_uid="handle_terminated_suspended_pd_reports")
+def handle_terminated_suspended_pd_reports(sender, instance, created, **kwargs):
+    """
+    To add in case a PD is terminated or suspended in middle of the agreement
+    then the final report must be moved to the end / suspended date of the contract
+    and the other pending reports for the rest of the months must no longer be due.
+    """
+    if instance.progress_reports.exists() and \
+            (instance.status == PD_STATUS.terminated or instance.status == PD_STATUS.suspended):
+        final_pr = instance.progress_reports.latest('end_date')
+        final_pr.end_date = instance.end_date
+        final_pr.save()
+
+        rest_of_reports = instance.progress_reports.exclude(id=final_pr.id)
+        rest_of_reports.update(status=PROGRESS_REPORT_STATUS.overdue)
+
+
 class ReportingPeriodDates(TimeStampedExternalSyncModelMixin):
     """
     Used for storing start_date, end_date and due_date fields for multiple reports

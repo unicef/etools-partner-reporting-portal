@@ -13,10 +13,9 @@
 
       _getMode: function (report) {
         switch (true) {
-          case report.is_draft:
-            return 'draft';
-
-          case this._isReadOnlyReport(report):
+          case this._isReadOnlyReport(report) ||
+              (report.programme_document.status === 'Signed' ||
+              report.programme_document.status === 'Closed'):
             return 'view';
 
           default:
@@ -29,7 +28,6 @@
 
         switch (true) {
           case mode === 'view' && !permissions.viewProgressReport:
-          case mode === 'draft' && !permissions.viewProgressReportDraft:
           case mode === 'edit' && !permissions.editProgressReport:
             return false;
 
