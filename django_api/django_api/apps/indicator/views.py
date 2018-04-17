@@ -689,7 +689,8 @@ class ClusterIndicatorSendIMOMessageAPIView(APIView):
             context,
             to_email_list=[imo_user.email, ],
             fail_silently=False,
-            reply_to=[request.user.email]
+            reply_to=[request.user.email],
+            content_subtype='html',
         )
 
         return Response('OK', status=status.HTTP_200_OK)
