@@ -658,13 +658,13 @@ class ClusterIndicatorSendIMOMessageAPIView(APIView):
         cluster = serializer.validated_data['cluster']
         imo_user = cluster.imo_users.first()
 
-        # Could technically use HTTP_REFERER here to make it more frontend change proof, but is less secure
-        frontend_indicators_url = '{}/app/{}/cluster-reporting/plan/{}/planned-action/activity/{}/indicators'.format(
-            settings.FRONTEND_HOST,
-            cluster.response_plan.workspace.workspace_code,
-            cluster.response_plan.id,
-            reportable.object_id
-        )
+        imo_frontend_indicators_url = \
+            '{}/app/{}/cluster-reporting/plan/{}/response-parameters/clusters/activity/{}/indicators'.format(
+                settings.FRONTEND_HOST,
+                cluster.response_plan.workspace.workspace_code,
+                cluster.response_plan.id,
+                reportable.object.cluster_activity.id
+            )
 
         try:
             project_name = reportable.content_object.project.title
@@ -677,7 +677,7 @@ class ClusterIndicatorSendIMOMessageAPIView(APIView):
             "sender_user": request.user,
             "imo_user": imo_user,
             "message": serializer.validated_data['message'],
-            "target_url": frontend_indicators_url,
+            "target_url": imo_frontend_indicators_url,
             "project_name": project_name,
             "response_plan_name": cluster.response_plan.title,
             "locations": reportable.locations.all(),
