@@ -261,9 +261,14 @@
             id="mode"
             selected={{mode}}
             on-change="adjustPosition">
-            <paper-radio-button name="ocha" active="true">
-              <strong>From OCHA</strong>
-            </paper-radio-button>
+            <template
+              is="dom-if"
+              if="[[canAddOchaProjects]]"
+              restamp="true">
+              <paper-radio-button name="ocha" active="true">
+                <strong>From OCHA</strong>
+              </paper-radio-button>
+            </template>
             <div
               class="fields"
               empty$="[[!_equals(mode, 'ocha')]]">
@@ -657,6 +662,11 @@
         responsePlanID: {
           type: String,
           statePath: 'responsePlans.currentID',
+        },
+
+        canAddOchaProjects: {
+          type: Boolean,
+          statePath: 'responsePlans.current.can_import_ocha_projects'
         },
 
         path: String,
