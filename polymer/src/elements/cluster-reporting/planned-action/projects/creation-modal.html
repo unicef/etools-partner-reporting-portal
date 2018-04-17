@@ -237,6 +237,7 @@
       </div>
 
       <paper-dialog-scrollable>
+        <error-box errors="[[errors]]"></error-box>
         <template
           is="dom-if"
           if="[[refresh]]"
@@ -881,16 +882,14 @@
                 self.fire('notify', {type: 'ocha-timeout'});
               }
               self.set('projectsLoading', false);
-              // TODO: error handling
+              self.set('errors', err.data);
             });
       },
 
       _computeOchaProjectRequestId: function (selectedProject) {
         var ob = Object.assign({}, {'project': selectedProject});
         var obb = Object.assign(ob, {'partner_id': this.data.partner_id});
-        // var obb = Object.assign({'partner_id': this.data.partner_id}, ob);
-        console.log(obb);
-        return ob;
+        return obb;
       },
 
       _fetchOchaProjectDetails: function (project) {
@@ -912,7 +911,7 @@
                 self.fire('notify', {type: 'ocha-timeout'});
               }
               self.set('projectDetailsLoading', false);
-            // TODO: error handling
+              self.set('errors', err.data);
             });
       },
 
