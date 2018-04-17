@@ -47,6 +47,7 @@
     "yargs": "^5.0.0"
   },
   "dependencies": {
-    "express": "^4.16.2"
+    "express": "^4.16.2",
+    "web-component-tester": "^6.5.0"
   }
 }
