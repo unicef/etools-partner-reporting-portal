@@ -346,42 +346,42 @@ class TestClusterActivityAPIView(BaseAPITestCase):
         self.assertEquals(status.HTTP_404_NOT_FOUND, response.status_code)
 
 
-class TestClusterDashboardAPIView(BaseAPITestCase):
-
-    def setUp(self):
-        super().setUp()
-
-        # Logging in as IMO admin
-        self.client.login(username='admin_imo', password='Passw0rd!')
-        self.user = User.objects.get(username='admin_imo')
-
-    def test_get_partner_dashboard(self):
-        first_cluster = Cluster.objects.first()
-
-        url = reverse('response-plan-cluster-dashboard', kwargs={
-            'response_plan_id': first_cluster.response_plan_id
-        }) + '?cluster_id=%d' % first_cluster.id
-
-        response = self.client.get(url, format='json')
-
-        self.assertTrue(status.is_success(response.status_code))
-        self.assertEquals(
-            response.data['num_of_partners'],
-            first_cluster.num_of_partners)
-        self.assertEquals(
-            response.data['num_of_met_indicator_reports'],
-            first_cluster.num_of_met_indicator_reports())
-        self.assertEquals(
-            response.data['num_of_constrained_indicator_reports'],
-            first_cluster.num_of_constrained_indicator_reports())
-        self.assertEquals(
-            response.data['num_of_non_cluster_activities'],
-            first_cluster.num_of_non_cluster_activities())
-        self.assertEquals(
-            len(
-                response.data['overdue_indicator_reports']),
-            first_cluster.overdue_indicator_reports.count())
-        self.assertEquals(
-            len(
-                response.data['constrained_indicator_reports']),
-            first_cluster.constrained_indicator_reports.count())
+# class TestClusterDashboardAPIView(BaseAPITestCase):
+#
+#     def setUp(self):
+#         super().setUp()
+#
+#         # Logging in as IMO admin
+#         self.client.login(username='admin_imo', password='Passw0rd!')
+#         self.user = User.objects.get(username='admin_imo')
+#
+#     def test_get_partner_dashboard(self):
+#         first_cluster = Cluster.objects.first()
+#
+#         url = reverse('response-plan-cluster-dashboard', kwargs={
+#             'response_plan_id': first_cluster.response_plan_id
+#         }) + '?cluster_id=%d' % first_cluster.id
+#
+#         response = self.client.get(url, format='json')
+#
+#         self.assertTrue(status.is_success(response.status_code))
+#         self.assertEquals(
+#             response.data['num_of_partners'],
+#             first_cluster.num_of_partners)
+#         self.assertEquals(
+#             response.data['num_of_met_indicator_reports'],
+#             first_cluster.num_of_met_indicator_reports())
+#         self.assertEquals(
+#             response.data['num_of_constrained_indicator_reports'],
+#             first_cluster.num_of_constrained_indicator_reports())
+#         self.assertEquals(
+#             response.data['num_of_non_cluster_activities'],
+#             first_cluster.num_of_non_cluster_activities())
+#         self.assertEquals(
+#             len(
+#                 response.data['overdue_indicator_reports']),
+#             first_cluster.overdue_indicator_reports.count())
+#         self.assertEquals(
+#             len(
+#                 response.data['constrained_indicator_reports']),
+#             first_cluster.constrained_indicator_reports.count())
