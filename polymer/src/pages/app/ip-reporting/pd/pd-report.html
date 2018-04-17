@@ -260,7 +260,7 @@
 
         canSubmit: {
           type: Boolean,
-          computed: '_computeCanSubmit(loading, mode, currentReport, permissions)',
+          computed: '_computeCanSubmit(loading, mode, currentReport)',
         },
 
         canSubmittedOnBehalf: {
@@ -305,10 +305,6 @@
           case 'edit':
             prefix = 'Enter data for';
             break;
-
-          case 'draft':
-            prefix = 'Draft for';
-            break;
         }
 
         return prefix + ' ' + this._withDefault(pd.title);
@@ -344,7 +340,6 @@
       _handlePermissions: function (permissions, mode, baseUrl, tail) {
         if (
           !permissions.viewProgressReport ||
-          (!permissions.viewProgressReportDraft && mode === 'draft') ||
           (!permissions.editProgressReport && mode === 'edit')
         ) {
           window.history.pushState(null, document.title, this.buildUrl(baseUrl, tail));
@@ -355,7 +350,6 @@
         switch (true) {
           case !!loading:
           case report.status === 'Sub' && !permissions.exportSubmittedProgressReport:
-          case report.is_draft && !permissions.exportDraftProgressReport:
           case mode === 'edit':
             return false;
 
@@ -368,14 +362,12 @@
         return permissions.viewPdDetails;
       },
 
-      _computeCanSubmit: function (loading, mode, report, permissions) {
+      _computeCanSubmit: function (loading, mode, report) {
         switch (true) {
           case mode === 'view':
           case !!loading:
-          case report.status === 'Sen' && !permissions.submitDraftProgressReport:
-          case report.is_draft && !permissions.submitDraftProgressReport:
           case report.programme_document &&
-            (report.programme_document.status === 'Sus'
+            (report.programme_document.status === 'Sig'
             || report.programme_document.status === 'Clo'):
             return false;
 

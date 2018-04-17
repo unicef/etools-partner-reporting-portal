@@ -80,49 +80,49 @@
     </style>
 
     <etools-prp-ajax
-        id="disaggregations"
-        url="[[disaggregationsUrl]]"
-        params="[[disaggregationsParams]]">
+      id="disaggregations"
+      url="[[disaggregationsUrl]]"
+      params="[[disaggregationsParams]]">
     </etools-prp-ajax>
 
     <etools-prp-ajax
-        id="indicators"
-        url="[[indicatorsUrl]]"
-        method="post"
-        body="[[data]]"
-        content-type="application/json">
+      id="indicators"
+      url="[[indicatorsUrl]]"
+      method="post"
+      body="[[data]]"
+      content-type="application/json">
     </etools-prp-ajax>
 
     <paper-dialog
-        id="dialog"
-        with-backdrop
-        opened="{{opened}}">
+      id="dialog"
+      with-backdrop
+      opened="{{opened}}">
 
       <div class="header layout horizontal justified">
         <h2>[[modalTitle]]</h2>
 
         <paper-icon-button
-            class="self-center"
-            on-tap="close"
-            icon="icons:close">
+          class="self-center"
+          on-tap="close"
+          icon="icons:close">
         </paper-icon-button>
       </div>
 
       <paper-dialog-scrollable>
         <template
-            is="dom-if"
-            if="[[opened]]"
-            restamp="true">
+          is="dom-if"
+          if="[[opened]]"
+          restamp="true">
           <error-box errors="[[errors]]"></error-box>
 
           <div class="row">
             <paper-input
-                class="validate"
-                label="Title"
-                on-input="_validate"
-                value="{{data.blueprint.title}}"
-                always-float-label
-                required>
+              class="validate"
+              label="Title"
+              on-input="_validate"
+              value="{{data.blueprint.title}}"
+              always-float-label
+              required>
             </paper-input>
           </div>
 
@@ -140,20 +140,20 @@
           <div class="row">
             <div class="layout horizontal">
               <labelled-item
-                  class="calculation-method"
-                  label="Calculation method across locations">
+                class="calculation-method"
+                label="Calculation method across locations">
                 <calculation-method
-                    value="{{data.blueprint.calculation_formula_across_locations}}"
-                    disabled="[[!isNumber]]">
+                  value="{{data.blueprint.calculation_formula_across_locations}}"
+                  disabled="[[!isNumber]]">
                 </calculation-method>
               </labelled-item>
 
               <labelled-item
-                  class="calculation-method"
-                  label="Calculation method across reporting periods">
+                class="calculation-method"
+                label="Calculation method across reporting periods">
                 <calculation-method
-                    value="{{data.blueprint.calculation_formula_across_periods}}"
-                    disabled="[[!isNumber]]">
+                  value="{{data.blueprint.calculation_formula_across_periods}}"
+                  disabled="[[!isNumber]]">
                 </calculation-method>
               </labelled-item>
             </div>
@@ -161,37 +161,37 @@
 
           <div class="row">
             <paper-input
-                class="validate"
-                label="Comments (optional)"
-                on-input="_validate"
-                value="{{data.comments}}"
-                always-float-label>
+              class="validate"
+              label="Comments (optional)"
+              on-input="_validate"
+              value="{{data.comments}}"
+              always-float-label>
             </paper-input>
           </div>
 
           <div class="row">
             <paper-input
-                class="validate"
-                label="Measurement specifications (optional)"
-                on-input="_validate"
-                value="{{data.measurement_specifications}}"
-                always-float-label>
+              class="validate"
+              label="Measurement specifications (optional)"
+              on-input="_validate"
+              value="{{data.measurement_specifications}}"
+              always-float-label>
             </paper-input>
           </div>
 
           <div class="row">
             <div class="app-grid">
               <etools-single-selection-menu
-                  class="item validate"
-                  label="Frequency of reporting"
-                  options="[[frequencies]]"
-                  option-value="id"
-                  option-label="title"
-                  selected="{{data.frequency}}"
-                  on-iron-activate="_validate"
-                  trigger-value-change-event
-                  hide-search
-                  required>
+                class="item validate"
+                label="Frequency of reporting"
+                options="[[frequencies]]"
+                option-value="id"
+                option-label="title"
+                selected="{{data.frequency}}"
+                on-iron-activate="_validate"
+                trigger-value-change-event
+                hide-search
+                required>
               </etools-single-selection-menu>
 
               <template
@@ -199,58 +199,58 @@
                   if="[[_showCSD(data.frequency)]]"
                   restamp="true">
                 <etools-prp-chips
-                    class="item validate"
-                    value="{{data.cs_dates}}"
-                    label="Date of report"
-                    on-selected-chips-updated="_validate"
-                    required>
+                  class="item validate"
+                  value="{{data.cs_dates}}"
+                  label="Date of report"
+                  on-selected-chips-updated="_validate"
+                  required>
                   <chip-date-of-report></chip-date-of-report>
                 </etools-prp-chips>
               </template>
 
               <etools-prp-date-input
-                  class="item validate"
-                  label="Start date of reporting period"
-                  value="{{data.start_date_of_reporting_period}}"
-                  error-message=""
-                  no-init>
+                class="item validate"
+                label="Start date of reporting period"
+                value="{{data.start_date_of_reporting_period}}"
+                error-message=""
+                no-init>
               </etools-prp-date-input>
             </div>
           </div>
 
           <div class="row">
             <template
-                is="dom-if"
-                if="[[isNumber]]"
-                restamp="true">
+              is="dom-if"
+              if="[[isNumber]]"
+              restamp="true">
               <paper-input
-                  class="validate"
-                  label="Label"
-                  on-input="_validate"
-                  value="{{data.label}}"
-                  always-float-label>
+                class="validate"
+                label="Label"
+                on-input="_validate"
+                value="{{data.label}}"
+                always-float-label>
               </paper-input>
             </template>
 
             <template
-                is="dom-if"
-                if="[[!isNumber]]"
-                restamp="true">
+              is="dom-if"
+              if="[[!isNumber]]"
+              restamp="true">
               <div class="app-grid">
                 <paper-input
-                    class="item validate"
-                    label="Numerator Label"
-                    on-input="_validate"
-                    value="{{data.numerator_label}}"
-                    always-float-label>
+                  class="item validate"
+                  label="Numerator Label"
+                  on-input="_validate"
+                  value="{{data.numerator_label}}"
+                  always-float-label>
                 </paper-input>
 
                 <paper-input
-                    class="item validate"
-                    label="Denominator Label"
-                    on-input="_validate"
-                    value="{{data.denominator_label}}"
-                    always-float-label>
+                  class="item validate"
+                  label="Denominator Label"
+                  on-input="_validate"
+                  value="{{data.denominator_label}}"
+                  always-float-label>
                 </paper-input>
               </div>
             </template>
@@ -259,12 +259,12 @@
           <div class="row">
             <div class="app-grid">
               <json-field
-                  class="item validate"
-                  type="[[data.blueprint.display_type]]"
-                  label="Baseline"
-                  on-input="_validate"
-                  value="{{data.baseline}}"
-                  allowed-pattern="[+\-\d]">
+                class="item validate"
+                type="[[data.blueprint.display_type]]"
+                label="Baseline"
+                on-input="_validate"
+                value="{{data.baseline}}"
+                allowed-pattern="[+\-\d]">
               </json-field>
 
               <template
@@ -272,40 +272,40 @@
                   if="[[isNumber]]"
                   restamp="true">
                 <json-field
-                    class="item validate"
-                    type="[[data.blueprint.display_type]]"
-                    label="In need (optional)"
-                    on-input="_validate"
-                    value="{{data.in_need}}"
-                    allowed-pattern="[+\-\d]">
+                  class="item validate"
+                  type="[[data.blueprint.display_type]]"
+                  label="In need (optional)"
+                  on-input="_validate"
+                  value="{{data.in_need}}"
+                  allowed-pattern="[+\-\d]">
                 </json-field>
               </template>
 
               <json-field
-                  class="item validate"
-                  type="[[data.blueprint.display_type]]"
-                  label="Target"
-                  on-input="_validate"
-                  value="{{data.target}}"
-                  allowed-pattern="[+\-\d]"
-                  required>
+                class="item validate"
+                type="[[data.blueprint.display_type]]"
+                label="Target"
+                on-input="_validate"
+                value="{{data.target}}"
+                allowed-pattern="[+\-\d]"
+                required>
               </json-field>
             </div>
           </div>
 
           <div class="row">
             <indicator-locations-widget
-                class="validate"
-                indicator-type="[[data.blueprint.display_type]]"
-                value="{{data.locations}}">
+              class="validate"
+              indicator-type="[[data.blueprint.display_type]]"
+              value="{{data.locations}}">
             </indicator-locations-widget>
           </div>
 
           <div class="row">
             <disaggregations-dropdown-widget
-                class="validate"
-                value="{{selectedDisaggregations}}"
-                disaggregations="[[disaggregations]]">
+              class="validate"
+              value="{{selectedDisaggregations}}"
+              disaggregations="[[disaggregations]]">
             </disaggregations-dropdown-widget>
           </div>
         </template>
@@ -500,9 +500,9 @@
         var self = this;
 
         this.$.disaggregations.thunk()()
-            .then(function(res) {
-              self.set('disaggregations', res.data.results);
-            });
+          .then(function(res) {
+            self.set('disaggregations', res.data.results);
+          });
       },
 
       _processData: function (rawData) {
@@ -530,16 +530,16 @@
         this.$.indicators.body = this._processData(this.data);
 
         this.$.indicators.thunk()()
-            .then(function (res) {
-              self.fire('indicator-added', res.data);
-              self.set('updatePending', false);
-              self.set('errors', {});
-              self.close();
-            })
-            .catch(function (err) {
-              self.set('errors', err.data);
-              self.set('updatePending', false);
-            });
+          .then(function (res) {
+            self.fire('indicator-added', res.data);
+            self.set('updatePending', false);
+            self.set('errors', {});
+            self.close();
+          })
+          .catch(function (err) {
+            self.set('errors', err.data);
+            self.set('updatePending', false);
+          });
       },
     });
   </script>

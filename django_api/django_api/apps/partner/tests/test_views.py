@@ -325,9 +325,32 @@ class TestPartnerProjectAPIView(BaseAPITestCase):
             'start_date': '2018-01-01',
             'end_date': '2013-01-01',
             'partner_id': rp.clusters.first().partners.first().id,
+            'clusters': ClusterSimpleSerializer(rp.clusters.all(), many=True).data
         }
 
         url = reverse("partner-project-create", kwargs={'response_plan_pk': rp.pk})
         response = self.client.post(url, data=project_data, format='json')
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST, msg=response.content)
         self.assertIn('end_date', response.data)
+
+    def test_create_project_with_custom_fields(self):
+        rp = ResponsePlan.objects.first()
+        project_data = {
+            'title': 'Test Partner Project',
+            'start_date': '2013-01-01',
+            'end_date': '2018-01-01',
+            'partner_id': rp.clusters.first().partners.first().id,
+            'custom_fields': [{
+                'name': 'Test Field 1',
+                'value': '1',
+            }, {
+                'name': 'Test Field 2',
+                'value': '2',
+            }],
+            'clusters': ClusterSimpleSerializer(rp.clusters.all(), many=True).data
+        }
+
+        url = reverse("partner-project-create", kwargs={'response_plan_pk': rp.pk})
+        response = self.client.post(url, data=project_data, format='json')
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED, msg=response.content)
+        self.assertEquals(len(response.data['custom_fields']), 2)

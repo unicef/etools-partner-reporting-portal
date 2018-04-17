@@ -1,3 +1,4 @@
+from django.db import transaction
 from rest_framework import serializers
 
 from core.serializers import ShortLocationSerializer
@@ -21,7 +22,40 @@ from .models import (
     Partner,
     PartnerProject,
     PartnerActivity,
-)
+    PartnerProjectFunding)
+
+
+class PartnerProjectSimpleSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PartnerProject
+        fields = (
+            'id',
+            'title',
+        )
+
+
+class PartnerSimpleSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Partner
+        fields = (
+            'id',
+            'title',
+        )
+
+
+class PartnerActivitySimpleSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PartnerActivity
+        fields = (
+            'id',
+            'title',
+            'project',
+            'partner',
+            'cluster_activity'
+        )
 
 
 class PartnerDetailsSerializer(serializers.ModelSerializer):
@@ -76,23 +110,57 @@ class PartnerDetailsSerializer(serializers.ModelSerializer):
         return obj.get_shared_partner_display()
 
 
+class PartnerProjectFundingSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PartnerProjectFunding
+        fields = (
+            'project_id',
+            'id',
+            'required_funding',
+            'internal_funding',
+            'cerf_funding',
+            'cbpf_funding',
+            'bilateral_funding',
+            'unicef_funding',
+            'wfp_funding',
+            'funding_gap',
+        )
+        read_only_fields = (
+            'project_id',
+            'id',
+        )
+
+
+class PartnerProjectCustomFieldSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    value = serializers.CharField()
+
+
 class PartnerProjectSerializer(serializers.ModelSerializer):
 
-    id = serializers.SerializerMethodField()
+    id = serializers.CharField(read_only=True)
     clusters = ClusterSimpleSerializer(many=True, read_only=True)
     locations = ShortLocationSerializer(many=True, read_only=True, required=False)
-    partner = serializers.CharField(required=False)
+    partner = serializers.CharField(required=False, read_only=True)
     partner_id = serializers.IntegerField(required=False)
     response_plan_title = serializers.SerializerMethodField()
     total_budget = serializers.CharField(required=False)
-    funding_source = serializers.CharField(required=False)
     description = serializers.CharField(required=False)
     additional_information = serializers.CharField(required=False)
+    funding = PartnerProjectFundingSerializer(read_only=True)
+    additional_partners = PartnerSimpleSerializer(many=True, allow_null=True, read_only=True)
+    custom_fields = PartnerProjectCustomFieldSerializer(many=True, allow_null=True, required=False)
 
     class Meta:
         model = PartnerProject
         fields = (
             'id',
+            'code',
+            'type',
+            'prioritization',
+            'agency_name',
+            'agency_type',
             'title',
             'start_date',
             'end_date',
@@ -106,10 +174,10 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
             'partner',
             'partner_id',
             'response_plan_title',
+            'funding',
+            'additional_partners',
+            'custom_fields',
         )
-
-    def get_id(self, obj):
-        return str(obj.id)
 
     def get_response_plan_title(self, obj):
         first_cluster = obj.clusters.first()
@@ -122,8 +190,27 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
                 'end_date': 'Cannot be earlier than Start Date'
             })
 
+        if validated_data.get('custom_fields'):
+            field_names = [cf['name'] for cf in validated_data['custom_fields']]
+            if not len(field_names) == len(set(field_names)):
+                raise serializers.ValidationError({
+                    'custom_fields': 'Custom Field Names should be unique'
+                })
+
         return validated_data
 
+    def save_funding(self, instance=None):
+        funding_data = self.initial_data.get('funding', None)
+        if funding_data:
+            funding_instance = (instance or self.instance).funding
+            serializer = PartnerProjectFundingSerializer(
+                instance=funding_instance,
+                data=funding_data
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+
+    @transaction.atomic
     def create(self, validated_data):
         clusters = self.initial_data.pop('clusters', [])
         if not clusters:
@@ -131,79 +218,42 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
                 'clusters': 'This list cannot be empty'
             })
 
+        custom_fields = validated_data.pop('custom_fields', None)
+
         project = super(PartnerProjectSerializer, self).create(validated_data)
+
+        if custom_fields is not None:
+            project.custom_fields = custom_fields
+            project.save()
+
         project.clusters.add(*Cluster.objects.filter(id__in=[c['id'] for c in clusters]))
+
+        self.save_funding(instance=project)
         return project
 
-
-class PartnerProjectPatchSerializer(serializers.ModelSerializer):
-
-    title = serializers.CharField(required=False)
-    start_date = serializers.DateField(required=False)
-    end_date = serializers.DateField(required=False)
-    description = serializers.CharField(required=False)
-    total_budget = serializers.CharField(required=False)
-    funding_source = serializers.CharField(required=False)
-    clusters = ClusterSimpleSerializer(many=True, read_only=True)
-    locations = ShortLocationSerializer(many=True, read_only=True, required=False)
-
-    class Meta:
-        model = PartnerProject
-        fields = (
-            'id',
-            'title',
-            'start_date',
-            'end_date',
-            'status',
-            'description',
-            'additional_information',
-            'total_budget',
-            'funding_source',
-            'clusters',
-            'locations',
-        )
-
-    def validate(self, attrs):
-        validated_data = super(PartnerProjectPatchSerializer, self).validate(attrs)
-        if validated_data['end_date'] < validated_data['start_date']:
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        clusters = self.initial_data.pop('clusters', [])
+        if not clusters:
             raise serializers.ValidationError({
-                'end_date': 'Cannot be earlier than Start Date'
+                'clusters': 'This list cannot be empty'
             })
 
-        return validated_data
+        custom_fields = validated_data.pop('custom_fields', None)
 
+        project = super(PartnerProjectSerializer, self).update(instance, validated_data)
 
-class PartnerProjectSimpleSerializer(serializers.ModelSerializer):
+        if custom_fields is not None:
+            project.custom_fields = custom_fields
+            project.save()
 
-    class Meta:
-        model = PartnerProject
-        fields = (
-            'id',
-            'title',
-        )
+        cluster_ids = [c['id'] for c in clusters]
+        project.clusters.add(*Cluster.objects.filter(id__in=cluster_ids))
+        project.clusters.through.objects.exclude(cluster_id__in=cluster_ids).delete()
 
+        self.save_funding(instance=instance)
 
-class PartnerSimpleSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Partner
-        fields = (
-            'id',
-            'title',
-        )
-
-
-class PartnerActivitySimpleSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = PartnerActivity
-        fields = (
-            'id',
-            'title',
-            'project',
-            'partner',
-            'cluster_activity'
-        )
+        return project
 
 
 class ClusterActivityPartnersSerializer(serializers.ModelSerializer):
