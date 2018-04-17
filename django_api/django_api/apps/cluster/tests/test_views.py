@@ -2,8 +2,6 @@ from django.urls import reverse
 
 from rest_framework import status
 
-from account.models import User
-
 from core.tests.base import BaseAPITestCase
 from core.common import FREQUENCY_LEVEL
 
