@@ -791,7 +791,7 @@
 
       _computeUrl: function(responsePlanID, mode, edit, data) {
         if (edit) {
-          return App.Endpoints.plannedActionsProjectOverview(data.id)
+          return App.Endpoints.plannedActionsProjectOverview(data.id);
         } else if (mode === 'custom') {
         return App.Endpoints.partnerProjectCreate(responsePlanID);
         } else if (mode === 'ocha') {
