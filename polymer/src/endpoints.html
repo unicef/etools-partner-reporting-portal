@@ -280,7 +280,7 @@
       indicatorIMOMessage: function () {
         return this._buildUrl('/indicator/cluster-indicator-imo-message/');
       },
-      
+
       ochaResponsePlans: function (workspaceId) {
         return this._buildUrl('/ocha/response-plans/workspace/' + workspaceId + '/');
       },
@@ -295,6 +295,10 @@
 
       ochaProjectsList: function (responsePlanId) {
         return this._buildUrl('/ocha/projects/response-plan/' + responsePlanId + '/');
+      },
+
+      ochaProjectDetails: function (projectId) {
+        return this._buildUrl('/ocha/projects/' + projectId + '/');
       },
 
       partnerProjectCreate: function (responsePlanId) {

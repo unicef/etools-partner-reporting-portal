@@ -220,8 +220,7 @@
       url="[[ochaProjectDetailsUrl]]"
       body="[[ochaProjectRequestId]]"
       content-type="application/json"
-      timeout="100000"
-      method="post">
+      timeout="100000">
     </etools-prp-ajax>
 
     <paper-dialog
@@ -704,7 +703,7 @@
 
         ochaProjectDetailsUrl: {
           type: String,
-          computed: '_computeOchaProjectsUrl(responsePlanID)',
+          computed: '_computeOchaProjectDetailsUrl(selectedProject)',
         },
 
         ochaProjectRequestId: {
@@ -785,6 +784,7 @@
 
       observers: [
         '_fetchOchaProjectsList(mode, ochaProjectsUrl)',
+        '_computeOchaProjectDetailsUrl(selectedProject)',
         '_fetchOchaProjectDetails(selectedProject)',
         '_saveClusters(selectedClusters.splices)',
       ],
@@ -794,13 +794,17 @@
           return App.Endpoints.plannedActionsProjectOverview(data.id)
         } else if (mode === 'custom') {
         return App.Endpoints.partnerProjectCreate(responsePlanID);
-        } else {
-          return App.Endpoints.ochaProjectsList(responsePlanID);
+        } else if (mode === 'ocha') {
+        return App.Endpoints.ochaProjectsList(responsePlanID);
         }
       },
 
       _computeOchaProjectsUrl: function(responsePlanID) {
         return App.Endpoints.ochaProjectsList(responsePlanID);
+      },
+
+      _computeOchaProjectDetailsUrl: function(selectedProject) {
+        return App.Endpoints.ochaProjectDetails(selectedProject);
       },
 
       close: function () {
@@ -872,7 +876,11 @@
       },
 
       _computeOchaProjectRequestId: function (selectedProject) {
-        return ({'project': selectedProject});
+        var ob = Object.assign({}, {'project': selectedProject});
+        var obb = Object.assign(ob, {'partner_id': this.data.partner_id});
+        // var obb = Object.assign({'partner_id': this.data.partner_id}, ob);
+        console.log(obb);
+        return ob;
       },
 
       _fetchOchaProjectDetails: function (project) {
@@ -886,6 +894,7 @@
             .then(function (res) {
               self.set('projectDetailsLoading', false);
               self.set('projectDetails', res.data);
+              console.log(self.projectDetails);
               self.fire('details-loaded', this.name);
             })
             .catch(function (err) { // jshint ignore:line
@@ -955,12 +964,12 @@
           this.data.partner_id = this.partnerID;
         }
         if (this.mode === 'ocha') {
-          this.$.projectAjax.body = this.ochaProjectRequestId;
+          this.$.projectAjax.body = Object.assign({}, this.ochaProjectRequestId);
         } else {
           this.$.projectAjax.body = Object.assign({}, this.data);
         }
         this.updatePending = true;
-        console.log(this.data.id);
+        console.log(this.data.partner_id);
         console.log(this.url);
         var thunk = this.$.projectAjax.thunk();
         thunk()

@@ -70,7 +70,6 @@ class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, ser
     objective = serializers.CharField(source='description', allow_null=True)
     startDate = serializers.DateTimeField(source='start_date')
     endDate = serializers.DateTimeField(source='end_date')
-    partner_id = serializers.PrimaryKeyRelatedField(queryset=Partner.objects.all())
     code = serializers.CharField()
     locations = V2PartnerProjectLocationImportSerializer(many=True)
 
@@ -79,11 +78,10 @@ class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, ser
         fields = (
             'name',
             'objective',
-            'partner_id',
+            'partner',
             'id',
             'startDate',
             'endDate',
-            'organizations',
             'external_source',
             'code',
             'locations',
