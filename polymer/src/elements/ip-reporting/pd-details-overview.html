@@ -67,6 +67,12 @@
         top: 0;
         color: var(--paper-grey-600);
       }
+
+      .amendments {
+        --ecp-content: {
+          padding: 0;
+        };
+      }
     </style>
     <page-body>
       <etools-content-panel panel-title="Partnership Information">
@@ -187,7 +193,7 @@
         </labelled-item>
       </etools-content-panel>
 
-      <etools-content-panel panel-title="Amendments">
+      <etools-content-panel panel-title="Amendments" class="amendments">
         <etools-loading active="[[!loaded]]"></etools-loading>
 
         <etools-data-table-header no-collapse no-titl>
