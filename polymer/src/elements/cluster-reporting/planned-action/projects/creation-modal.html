@@ -532,7 +532,7 @@
                   class="item validate full-width"
                   id="own_funding"
                   label="Funding received / confirmed through own agency internal emergency funding mechanisms (US$)"
-                  value="{{data.funding.own_funding}}"
+                  value="{{data.funding.internal_funding}}"
                   type="number"
                   allowed-pattern="[+\-\d.]"
                   step="0.01"
@@ -903,7 +903,6 @@
             .then(function (res) {
               self.set('projectDetailsLoading', false);
               self.set('projectDetails', res.data);
-              console.log(self.projectDetails);
               self.fire('details-loaded', this.name);
             })
             .catch(function (err) { // jshint ignore:line
@@ -978,8 +977,6 @@
           this.$.projectAjax.body = Object.assign({}, this.data);
         }
         this.updatePending = true;
-        console.log(this.data.partner_id);
-        console.log(this.url);
         var thunk = this.$.projectAjax.thunk();
         thunk()
           .then(function (res) {

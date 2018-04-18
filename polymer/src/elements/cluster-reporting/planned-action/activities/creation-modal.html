@@ -81,6 +81,8 @@
       }
     </style>
 
+    <cluster-dropdown-content clusters="{{clusters}}"></cluster-dropdown-content>
+
     <etools-prp-permissions
       permissions="{{permissions}}">
     </etools-prp-permissions>
@@ -111,14 +113,12 @@
         url="[[objectivesUrl]]">
     </etools-prp-ajax>
 
-    <cluster-dropdown-content clusters="{{clusters}}"></cluster-dropdown-content>
     <template
     is="dom-if"
     if="[[_displayPartner(permissions)]]"
     restamp="true">
       <partner-dropdown-content
-        partners="{{partners}}"
-        clusters="[[imoClusters]]">
+        partners="{{partners}}">
       </partner-dropdown-content>
     </template>
 
@@ -154,7 +154,7 @@
             required>
           </etools-single-selection-menu>
         </template>
-        
+
         <paper-radio-group
             id="mode"
             selected="{{mode}}">
@@ -182,6 +182,7 @@
                         slot="dropdown-content"
                         class="dropdown-content">
                       <template
+                          id="clusters"
                           is="dom-repeat"
                           items="[[clusters]]">
                         <paper-item value="[[item.id]]">[[item.title]]</paper-item>
@@ -526,7 +527,7 @@
           type: Array,
           computed: '_computeImoClusters(profile)',
         },
-        
+
       },
 
       listeners: {
