@@ -518,7 +518,8 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
     offices = serializers.CharField(source='unicef_office')
     number = serializers.CharField(source='reference_number')
     cso_budget = serializers.FloatField(source='cso_contribution')
-    unicef_budget = serializers.FloatField(source='total_unicef_cash')
+    unicef_budget_cash = serializers.FloatField(source='total_unicef_cash')
+    unicef_budget_supplies = serializers.FloatField(source='in_kind_amount')
     funds_received = serializers.FloatField(source='funds_received_to_date', required=False)
     cso_budget_currency = serializers.ChoiceField(
         choices=CURRENCIES, allow_blank=True, allow_null=True, source="cso_contribution_currency"
@@ -538,15 +539,20 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
         queryset=Workspace.objects.all())
     amendments = serializers.JSONField(allow_null=True)
 
-    def create(self, validated_data):
+    def validate(self, attrs):
+        validated_data = super(PMPProgrammeDocumentSerializer, self).validate(attrs)
+
         if validated_data['cso_contribution_currency'] == validated_data['total_unicef_cash_currency']:
             validated_data['budget'] = sum([
                 validated_data['cso_contribution'],
                 validated_data['total_unicef_cash'],
+                validated_data['in_kind_amount'],
             ])
             validated_data['budget_currency'] = validated_data['cso_contribution_currency']
 
-        return ProgrammeDocument.objects.create(**validated_data)
+        validated_data['in_kind_amount_currency'] = validated_data['total_unicef_cash_currency']
+
+        return validated_data
 
     class Meta:
         model = ProgrammeDocument
@@ -562,8 +568,9 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
             "end_date",
             "cso_budget",
             "cso_budget_currency",
-            "unicef_budget",
+            "unicef_budget_cash",
             "unicef_budget_currency",
+            "unicef_budget_supplies",
             "funds_received",
             "funds_received_currency",
             "workspace",
