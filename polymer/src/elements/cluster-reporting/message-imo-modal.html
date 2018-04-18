@@ -171,6 +171,7 @@
         this.$.message.thunk()()
             .then(function () {
               self.set('pending', false);
+              self.fire('imo-message-sent');
               self.close();
             })
             .catch(function (err) {
