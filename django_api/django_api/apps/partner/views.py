@@ -119,13 +119,6 @@ class PartnerProjectAPIView(APIView):
         serializer = PartnerProjectSerializer(instance=instance)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    # TODO: Fix duplicated creation endpoints with PartnerProjectListCreateAPIView.post
-    def post(self, request, *args, **kwargs):
-        serializer = PartnerProjectSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
     def patch(self, request, *args, **kwargs):
         partner_id = self.kwargs.get('partner_id')
 

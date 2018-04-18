@@ -804,7 +804,7 @@
         if (edit) {
           return App.Endpoints.plannedActionsProjectOverview(data.id);
         } else if (mode === 'custom') {
-        return App.Endpoints.partnerProjectCreate(responsePlanID);
+        return App.Endpoints.plannedActions(responsePlanID);
         } else if (mode === 'ocha') {
         return App.Endpoints.ochaProjectsList(responsePlanID);
         }
