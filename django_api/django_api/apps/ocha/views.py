@@ -7,8 +7,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from core.common import RESPONSE_PLAN_TYPE, EXTERNAL_DATA_SOURCES
-from core.models import Workspace, ResponsePlan
-from core.permissions import IsIMOForCurrentWorkspace
+from core.models import Workspace, ResponsePlan, IMORole
+from core.permissions import IsIMOForCurrentWorkspace, IsPartnerAuthorizedOfficer, AnyPermission
 from core.serializers import ResponsePlanSerializer
 from ocha.constants import HPC_V1_ROOT_URL, RefCode, HPC_V2_ROOT_URL
 
@@ -121,7 +121,7 @@ class RPMWorkspaceResponsePlanDetailAPIView(APIView):
 class RPMProjectListAPIView(APIView):
 
     permission_classes = (
-        IsIMOForCurrentWorkspace,
+        AnyPermission(IsIMOForCurrentWorkspace, IsPartnerAuthorizedOfficer),
     )
 
     def get_response_plan(self):
@@ -149,6 +149,20 @@ class RPMProjectListAPIView(APIView):
             self.trim_projects_list(projects)
         )
 
+    def get_partner(self):
+        if self.request.user.groups.filter(name=IMORole.as_group().name).exists():
+            partner = get_object_or_404(Partner, id=self.request.data.get('partner_id'))
+            if not self.request.user.imo_clusters.filter(partners=partner).exists():
+                raise serializers.ValidationError({
+                    'partner_id': "the partner_id does not belong to your clusters"
+                })
+            return partner
+        elif self.request.user.partner:
+            return self.request.user.partner
+        raise serializers.ValidationError({
+            'partner_id': "Could not find a valid partner"
+        })
+
     def post(self, request, *args, **kwargs):
         project_id = request.data.get('project')
         if not project_id:
@@ -158,11 +172,7 @@ class RPMProjectListAPIView(APIView):
         elif ResponsePlan.objects.filter(external_id=project_id, external_source=EXTERNAL_DATA_SOURCES.HPC).exists():
             raise serializers.ValidationError('Project has already been imported')
 
-        partner = get_object_or_404(Partner, id=request.data.get('partner_id'))
-        if not request.user.imo_clusters.filter(partners=partner).exists():
-            raise serializers.ValidationError({
-                'partner_id': "the partner_id does not belong to your clusters"
-            })
+        partner = self.get_partner()
 
         partner_project = import_project(project_id, partner.pk, response_plan=self.get_response_plan())
         partner_project.refresh_from_db()
@@ -172,7 +182,7 @@ class RPMProjectListAPIView(APIView):
 class RPMProjectDetailAPIView(APIView):
 
     permission_classes = (
-        IsIMOForCurrentWorkspace,
+        AnyPermission(IsIMOForCurrentWorkspace, IsPartnerAuthorizedOfficer),
     )
 
     def get(self, request, *args, **kwargs):

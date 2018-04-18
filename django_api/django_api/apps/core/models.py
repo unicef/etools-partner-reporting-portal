@@ -32,15 +32,15 @@ logger = logging.getLogger('locations.models')
 
 # Define groups that UNICEF IP reporting users can belong to
 try:
-    PartnerAuthorizedOfficerRole = GroupWrapper(code='ip_authorized_officer',
-                                                name='IP Authorized Officer',
-                                                create_group=False)
-    PartnerEditorRole = GroupWrapper(code='ip_editor',
-                                     name='IP Editor',
-                                     create_group=False)
-    PartnerViewerRole = GroupWrapper(code='ip_viewer',
-                                     name='IP Viewer',
-                                     create_group=False)
+    PartnerAuthorizedOfficerRole = GroupWrapper(
+        code='ip_authorized_officer', name='IP Authorized Officer', create_group=False
+    )
+    PartnerEditorRole = GroupWrapper(
+        code='ip_editor', name='IP Editor', create_group=False
+    )
+    PartnerViewerRole = GroupWrapper(
+        code='ip_viewer', name='IP Viewer', create_group=False
+    )
     IMORole = GroupWrapper(code='imo', name='IMO', create_group=False)
 except Exception as e:
     print("Group DB is not ready yet! - Error: %s" % e)

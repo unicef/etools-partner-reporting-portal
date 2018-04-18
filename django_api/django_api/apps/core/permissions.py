@@ -7,40 +7,56 @@ from .models import (
 )
 
 
+class AnyPermission(BasePermission):
+    """
+    Works like an OR clause between provided auth backends
+    """
+
+    def __init__(self, *permission_classes):
+        self.permission_classes = permission_classes
+
+    def has_permission(self, request, view):
+        for permission_class in self.permission_classes:
+            if permission_class().has_permission(request, view):
+                return True
+        return False
+
+    # Bit hacky but is needed since passed permission_classes are called before before verified
+    def __call__(self, *args, **kwargs):
+        return self
+
+
 class IsAuthenticated(BasePermission):
     """
     Allows access only to authenticated users.
     """
 
     def has_permission(self, request, view):
-        # we can extend permissions verification in future!
         return request.user.is_authenticated()
 
 
 class IsPartnerAuthorizedOfficer(BasePermission):
+
     def has_permission(self, request, view):
         user = request.user
-        return user.is_authenticated() and \
-            user.groups.filter(
+        return user.is_authenticated() and user.groups.filter(
             name=PartnerAuthorizedOfficerRole.as_group().name).exists()
 
 
 class IsPartnerEditor(BasePermission):
+
     def has_permission(self, request, view):
         user = request.user
-        return user.is_authenticated() and \
-            user.groups.filter(
-            name=PartnerEditorRole.as_group().name).exists()
+        return user.is_authenticated() and user.groups.filter(name=PartnerEditorRole.as_group().name).exists()
 
 
 class IsPartnerEditorOrPartnerAuthorizedOfficer(BasePermission):
+
     def has_permission(self, request, view):
         user = request.user
         return user.is_authenticated() and (
-            user.groups.filter(
-                name=PartnerEditorRole.as_group().name).exists() or
-            user.groups.filter(
-                name=PartnerAuthorizedOfficerRole.as_group().name).exists()
+            user.groups.filter(name=PartnerEditorRole.as_group().name).exists() or
+            user.groups.filter(name=PartnerAuthorizedOfficerRole.as_group().name).exists()
         )
 
 
