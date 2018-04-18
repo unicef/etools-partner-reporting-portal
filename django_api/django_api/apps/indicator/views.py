@@ -663,7 +663,7 @@ class ClusterIndicatorSendIMOMessageAPIView(APIView):
                 settings.FRONTEND_HOST,
                 cluster.response_plan.workspace.workspace_code,
                 cluster.response_plan.id,
-                reportable.object.cluster_activity.id
+                reportable.content_object.cluster_activity.id
             )
 
         try:
