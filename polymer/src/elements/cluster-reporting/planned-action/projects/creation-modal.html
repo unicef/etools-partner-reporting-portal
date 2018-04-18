@@ -453,7 +453,7 @@
                   options="[[agencyAcronyms]]"
                   option-value="id"
                   option-label="title"
-                  selected="{{selectedAcronym}}"
+                  selected="{{data.agency_name}}"
                   on-iron-activate="_validate"
                   trigger-value-change-event
                   always-float-label>
@@ -465,7 +465,7 @@
                   options="[[agencyTypes]]"
                   option-value="id"
                   option-label="title"
-                  selected="{{selectedAgencyType}}"
+                  selected="{{data.agency_type}}"
                   on-iron-activate="_validate"
                   trigger-value-change-event
                   always-float-label>
@@ -498,7 +498,7 @@
                   options="[[classifications]]"
                   option-value="id"
                   option-label="title"
-                  selected="{{selectedClassification}}"
+                  selected="{{data.prioritization}}"
                   on-iron-activate="_validate"
                   trigger-value-change-event
                   always-float-label>
@@ -510,7 +510,7 @@
                   options="[[projectCodes]]"
                   option-value="id"
                   option-label="title"
-                  selected="{{selectedProjectCode}}"
+                  selected="{{data.code}}"
                   on-iron-activate="_validate"
                   trigger-value-change-event
                   always-float-label>
@@ -804,9 +804,9 @@
         if (edit) {
           return App.Endpoints.plannedActionsProjectOverview(data.id);
         } else if (mode === 'custom') {
-        return App.Endpoints.plannedActions(responsePlanID);
+          return App.Endpoints.plannedActions(responsePlanID);
         } else if (mode === 'ocha') {
-        return App.Endpoints.ochaProjectsList(responsePlanID);
+          return App.Endpoints.ochaProjectsList(responsePlanID);
         }
       },
 
