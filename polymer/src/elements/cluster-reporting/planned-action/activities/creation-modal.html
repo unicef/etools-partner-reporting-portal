@@ -117,9 +117,6 @@
     is="dom-if"
     if="[[_displayPartner(permissions)]]"
     restamp="true">
-      <partner-dropdown-content
-        partners="{{partners}}">
-      </partner-dropdown-content>
     </template>
 
     <paper-dialog
@@ -447,7 +444,7 @@
 
         clusters: {
           type: Array,
-          value: [],
+          statePath: 'responsePlans.current.clusters',
         },
 
         statuses: {
@@ -523,11 +520,6 @@
           statePath: 'userProfile.profile',
         },
 
-        imoClusters: {
-          type: Array,
-          computed: '_computeImoClusters(profile)',
-        },
-
       },
 
       listeners: {
@@ -539,13 +531,6 @@
         '_fetchActivities(data.cluster.cluster)',
         '_fetchObjectives(data.custom.cluster)',
       ],
-
-      _computeImoClusters: function (profile) {
-        // if user is not imo admin this should give empty array so no filtering by cluster
-        return (profile.imo_clusters || []).map(function(cluster) {
-          return cluster.id;
-        });
-      },
 
       _setDefaults: function () {
         this.set('data', {
@@ -559,11 +544,11 @@
 
       _onOpenedChanged: function (opened) {
         if (opened) {
-          this.set('mode', '');
+          this.set('mode', 'cluster');
 
-          this.async(function () {
-            this.set('mode', 'cluster');
-          });
+          // this.async(function () {
+          //   this.set('mode', 'cluster');
+          // });
         }
       },
 
