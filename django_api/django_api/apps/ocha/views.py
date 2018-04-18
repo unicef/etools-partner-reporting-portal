@@ -216,11 +216,23 @@ class RPMProjectDetailAPIView(APIView):
         out_data['startDate'] = start_datetime.strftime(settings.DATE_FORMAT)
         out_data['endDate'] = end_datetime.strftime(settings.DATE_FORMAT)
 
-        out_data['clusters'] = [
-            global_cluster_data['name'] for global_cluster_data in details['data']['globalClusters']
-        ] + [
-            c['name'] for c in details['data']['governingEntities'] if c['entityPrototypeId'] == 9
-        ]
+        clusters = []
+
+        try:
+            clusters += [
+                global_cluster_data['name'] for global_cluster_data in details['data']['globalClusters']
+            ]
+        except Exception:
+            pass
+
+        try:
+            clusters += [
+                c['name'] for c in details['data']['governingEntities'] if c['entityPrototypeId'] == 9
+            ]
+        except Exception:
+            pass
+
+        out_data['clusters'] = clusters
 
         today = timezone.now()
         if start_datetime > today:
