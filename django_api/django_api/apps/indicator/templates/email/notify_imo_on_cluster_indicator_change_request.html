@@ -2,16 +2,16 @@
     <head></head>
     <body>
         <div>
-            <h3>Dear {{ imo_user.get_full_name }},</h3><br/>
+            Dear {{ imo_user.get_full_name }},<br/>
 
             Partner "{{ partner_name }}" in your cluster sent this message:<br/><br/>
             {{ message }}<br/><br/>
             -- {{ sender_user.get_full_name }} ({{ sender_user.email }})<br/><br/>
-            This message is regarding {{ indicator_name }} for {{ project_name }} project in {{ response_plan_name }} plan.<br/>
+            This message is regarding {{ indicator_name }} for {{ project_name }} project in {{ response_plan_name }} plan.<br/><br/>
             This indicator contains {{ locations|length }} location{{ locations|pluralize }}:<br/>
             {% for location in locations %}
                 - {{ location }}<br/>
-            {% endfor %}
+            {% endfor %}<br/>
             Details can be viewed at the link below.<br/>
             <a href="{{ target_url }}">{{ target_url }}</a>
         </div>
