@@ -81,6 +81,8 @@
       }
     </style>
 
+    <cluster-dropdown-content clusters="{{clusters}}"></cluster-dropdown-content>
+
     <etools-prp-permissions
       permissions="{{permissions}}">
     </etools-prp-permissions>
@@ -111,15 +113,10 @@
         url="[[objectivesUrl]]">
     </etools-prp-ajax>
 
-    <cluster-dropdown-content clusters="{{clusters}}"></cluster-dropdown-content>
     <template
     is="dom-if"
     if="[[_displayPartner(permissions)]]"
     restamp="true">
-      <partner-dropdown-content
-        partners="{{partners}}"
-        clusters="[[imoClusters]]">
-      </partner-dropdown-content>
     </template>
 
     <paper-dialog
@@ -154,7 +151,7 @@
             required>
           </etools-single-selection-menu>
         </template>
-        
+
         <paper-radio-group
             id="mode"
             selected="{{mode}}">
@@ -182,6 +179,7 @@
                         slot="dropdown-content"
                         class="dropdown-content">
                       <template
+                          id="clusters"
                           is="dom-repeat"
                           items="[[clusters]]">
                         <paper-item value="[[item.id]]">[[item.title]]</paper-item>
@@ -446,7 +444,7 @@
 
         clusters: {
           type: Array,
-          value: [],
+          statePath: 'responsePlans.current.clusters',
         },
 
         statuses: {
@@ -522,11 +520,6 @@
           statePath: 'userProfile.profile',
         },
 
-        imoClusters: {
-          type: Array,
-          computed: '_computeImoClusters(profile)',
-        },
-        
       },
 
       listeners: {
@@ -538,13 +531,6 @@
         '_fetchActivities(data.cluster.cluster)',
         '_fetchObjectives(data.custom.cluster)',
       ],
-
-      _computeImoClusters: function (profile) {
-        // if user is not imo admin this should give empty array so no filtering by cluster
-        return (profile.imo_clusters || []).map(function(cluster) {
-          return cluster.id;
-        });
-      },
 
       _setDefaults: function () {
         this.set('data', {
@@ -558,11 +544,11 @@
 
       _onOpenedChanged: function (opened) {
         if (opened) {
-          this.set('mode', '');
+          this.set('mode', 'cluster');
 
-          this.async(function () {
-            this.set('mode', 'cluster');
-          });
+          // this.async(function () {
+          //   this.set('mode', 'cluster');
+          // });
         }
       },
 
