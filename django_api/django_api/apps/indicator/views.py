@@ -685,7 +685,7 @@ class ClusterIndicatorSendIMOMessageAPIView(APIView):
 
         send_email_from_template(
             'email/notify_imo_on_cluster_indicator_change_request_subject.txt',
-            'email/notify_imo_on_cluster_indicator_change_request.txt',
+            'email/notify_imo_on_cluster_indicator_change_request.html',
             context,
             to_email_list=[imo_user.email, ],
             fail_silently=False,
