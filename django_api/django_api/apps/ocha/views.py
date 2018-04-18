@@ -193,6 +193,7 @@ class RPMProjectDetailAPIView(APIView):
             details_url,
             budget_url
         ])
+        print(details)
 
         out_data = {
             k: v for k, v in details['data'].items() if type(v) not in {list, dict}
@@ -214,6 +215,12 @@ class RPMProjectDetailAPIView(APIView):
 
         out_data['startDate'] = start_datetime.strftime(settings.DATE_FORMAT)
         out_data['endDate'] = end_datetime.strftime(settings.DATE_FORMAT)
+
+        out_data['clusters'] = [
+            global_cluster_data['name'] for global_cluster_data in details['data']['globalClusters']
+        ] + [
+            c['name'] for c in details['data']['governingEntities'] if c['entityPrototypeId'] == 9
+        ]
 
         today = timezone.now()
         if start_datetime > today:
