@@ -140,19 +140,19 @@
                 <dt>Data key -</dt>
                 <template
                     is="dom-if"
-                    if="[[_equals(data.blueprint.display_type, 'ratio')]]"
+                    if="[[_equals(data.blueprint.display_type, 'number')]]"
+                    restamp="true">
+                  <dd>[[[_withDefault(data.label)]]]</dd>
+                </template>
+                <template
+                    is="dom-if"
+                    if="[[!_equals(data.blueprint.display_type, 'number')]]"
                     restamp="true">
                   <dd>
                     [[[_withDefault(data.numerator_label)]]]
                     /
                     [[[_withDefault(data.denominator_label)]]]
                   </dd>
-                </template>
-                <template
-                    is="dom-if"
-                    if="[[!_equals(data.blueprint.display_type, 'ratio')]]"
-                    restamp="true">
-                  <dd>[[[_withDefault(data.label)]]]</dd>
                 </template>
               </dl>
             </div>
