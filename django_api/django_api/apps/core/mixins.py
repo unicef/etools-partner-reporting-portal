@@ -13,15 +13,11 @@ def social_details(backend, details, response, *args, **kwargs):
     if not r['details'].get('email'):
         r['details']['email'] = response.get('email')
 
-    print("social_details: ", r)
-
     return r
 
 
 def get_username(strategy, details, backend, user=None, *args, **kwargs):
     username = details.get('email')
-
-    print("get_username: ", username)
 
     try:
         get_user_model().objects.get(username=username)
