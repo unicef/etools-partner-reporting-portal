@@ -13,7 +13,7 @@ class UserAdmin(admin.ModelAdmin):
     list_filter = ('is_superuser', 'is_staff', 'is_active', 'workspaces',
                    'partner', 'imo_clusters')
     search_fields = ('email', 'username',)
-    exclude = ('password', 'date_joined', 'last_login')
+    exclude = ('date_joined', 'last_login')
     form = UserAdminForm
 
 
