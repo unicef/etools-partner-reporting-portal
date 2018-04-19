@@ -187,6 +187,7 @@ class IndicatorBlueprint(TimeStampedExternalSourceModel):
 
     class Meta:
         ordering = ['-id']
+        unique_together = TimeStampedExternalSourceModel.Meta.unique_together
 
 
 @receiver(post_save,

@@ -130,10 +130,17 @@ class RPMProjectListAPIView(APIView):
         )
 
     def trim_projects_list(self, projects):
-        return [{
-            'id': p['id'],
-            'name': p['name'],
-        } for p in projects]
+        out = []
+        for project in projects:
+            try:
+                out.append({
+                    'id': project['id'],
+                    'name': project['name'],
+                })
+            except KeyError:
+                pass
+
+        return out
 
     def get_projects(self):
         response_plan = self.get_response_plan()

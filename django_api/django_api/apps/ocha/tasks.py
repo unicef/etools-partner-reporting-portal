@@ -7,7 +7,7 @@ from core.common import EXTERNAL_DATA_SOURCES, CLUSTER_TYPES
 from core.models import ResponsePlan
 from ocha.constants import HPC_V1_ROOT_URL, HPC_V2_ROOT_URL
 from ocha.imports.serializers import V1FundingSourceImportSerializer
-from ocha.imports.utilities import get_json_from_url
+from ocha.imports.utilities import get_json_from_url, save_location_list
 from ocha.imports.response_plan import import_response_plan, save_activities_and_objectives_for_response_plan
 from ocha.imports.project import import_project_details
 from partner.models import PartnerProject
@@ -19,6 +19,7 @@ logger = logging.getLogger('ocha-sync')
 def finish_response_plan_import(external_plan_id):
     source_url = HPC_V1_ROOT_URL + 'rpm/plan/id/{}?format=json&content=entities'.format(external_plan_id)
     plan_data = get_json_from_url(source_url)['data']
+    save_location_list(plan_data.get('locations', []))
 
     strategic_objectives_url = HPC_V1_ROOT_URL + 'rpm/plan/id/{}?format=json&content=measurements'.format(
         external_plan_id

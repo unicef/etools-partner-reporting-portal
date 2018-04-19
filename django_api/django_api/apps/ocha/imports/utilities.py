@@ -58,7 +58,7 @@ def get_json_from_url(url, retry_counter=MAX_URL_RETRIES):
     return response_json
 
 
-def save_location_list(location_list, force_download_all=False):
+def save_location_list(location_list, parent=None, force_download_all=False):
     location_ids = [l['id'] for l in location_list if 'id' in l and type(l['id']) == int]
 
     location_country_map = {}
@@ -82,11 +82,18 @@ def save_location_list(location_list, force_download_all=False):
         HPC_V2_ROOT_URL + 'location/{}'.format(lid) for lid in set(location_ids)
     ]
     location_data_list = fetch_json_urls_async(source_urls)
-
+    location_data_list = filter(lambda l: 'data' in l, location_data_list)
     location_data_list = sorted(location_data_list, key=lambda l: l['data']['adminLevel'])
 
     for location_data in location_data_list:
-        if location_data['data']['adminLevel'] == 0:
+        location = Location.objects.filter(
+            external_source=EXTERNAL_DATA_SOURCES.HPC,
+            external_id=location_data['data']['id']
+        ).first()
+
+        if parent:
+            country = parent.gateway.country
+        elif location_data['data']['adminLevel'] == 0:
             country, _ = Country.objects.update_or_create(
                 country_short_code=location_data['data']['iso3'],
                 defaults={
@@ -99,39 +106,37 @@ def save_location_list(location_list, force_download_all=False):
             country = location_country_map[location_data['data']['id']]
             for child in location_data['data']['children']:
                 location_country_map[child['id']] = country
-        else:
-            location = Location.objects.filter(
-                external_source=EXTERNAL_DATA_SOURCES.HPC,
-                external_id=location_data['data']['id']
-            ).first()
-            if location:
-                locations.append(location)
-            else:
-                logger.warning(
-                    'Couldn\'t find country for {}, skipping'.format(location_data['data']['id'])
-                )
+        elif not country:
+            logger.warning('Couldn\'t find country for {}, skipping'.format(
+                HPC_V2_ROOT_URL + 'location/{}'.format(location_data['data']['id'])
+            ))
             continue
 
-        gateway_name = '{} - Admin Level {}'.format(country.country_short_code, location_data['data']['adminLevel'])
-        gateway, _ = GatewayType.objects.get_or_create(
-            country=country,
-            admin_level=location_data['data']['adminLevel'],
-            defaults={
-                'name': gateway_name
-            }
-        )
+        if not location:
+            gateway_name = '{} - Admin Level {}'.format(country.country_short_code, location_data['data']['adminLevel'])
+            gateway, _ = GatewayType.objects.get_or_create(
+                country=country,
+                admin_level=location_data['data']['adminLevel'],
+                defaults={
+                    'name': gateway_name
+                }
+            )
 
-        location, _ = Location.objects.update_or_create(
-            external_source=EXTERNAL_DATA_SOURCES.HPC,
-            external_id=location_data['data']['id'],
-            defaults={
-                'title': location_data['data']['name'],
-                'p_code': location_data['data']['pcode'],
-                'latitude': location_data['data'].get('latitude'),
-                'longitude': location_data['data'].get('longitude'),
-                'gateway': gateway,
-            }
-        )
+            location, _ = Location.objects.update_or_create(
+                external_source=EXTERNAL_DATA_SOURCES.HPC,
+                external_id=location_data['data']['id'],
+                defaults={
+                    'title': location_data['data']['name'],
+                    'p_code': location_data['data']['pcode'],
+                    'latitude': location_data['data'].get('latitude'),
+                    'longitude': location_data['data'].get('longitude'),
+                    'gateway': gateway,
+                    'parent': parent,
+                }
+            )
+            logger.debug('Saved location {} as {}'.format(location_data['data']['id'], location))
+            save_location_list(location_data['data'].get('children', []), parent=location)
+
         locations.append(location)
 
     return locations

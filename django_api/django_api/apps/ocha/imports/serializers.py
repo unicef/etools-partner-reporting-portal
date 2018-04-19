@@ -45,8 +45,8 @@ class V2PartnerProjectLocationImportSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source='title')
     iso3 = serializers.CharField(allow_null=True)
     parentId = serializers.IntegerField(allow_null=True)
-    latitude = serializers.FloatField()
-    longitude = serializers.FloatField()
+    latitude = serializers.FloatField(allow_null=True)
+    longitude = serializers.FloatField(allow_null=True)
     adminLevel = serializers.IntegerField()
 
     class Meta:
@@ -67,7 +67,7 @@ class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, ser
     external_source = serializers.CharField(default=EXTERNAL_DATA_SOURCES.HPC)
     id = serializers.IntegerField(source='external_id')
     name = serializers.CharField(source='title')
-    objective = serializers.CharField(source='description', allow_null=True)
+    objective = serializers.CharField(source='description', allow_null=True, allow_blank=True)
     startDate = serializers.DateTimeField(source='start_date')
     endDate = serializers.DateTimeField(source='end_date')
     code = serializers.CharField()

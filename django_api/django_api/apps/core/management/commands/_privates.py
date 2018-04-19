@@ -112,9 +112,9 @@ def clean_up_data():
 
         User.objects.all().delete()
         UserProfile.objects.all().delete()
-        Cluster.objects.all().delete()
-        ClusterObjective.objects.all().delete()
         ClusterActivity.objects.all().delete()
+        ClusterObjective.objects.all().delete()
+        Cluster.objects.all().delete()
         Partner.objects.all().delete()
         PartnerProject.objects.all().delete()
         PartnerActivity.objects.all().delete()
