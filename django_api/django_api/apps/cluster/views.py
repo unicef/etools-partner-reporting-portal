@@ -476,6 +476,13 @@ class ResponsePlanPartnerDashboardAPIView(ResponsePlanClusterDashboardAPIView):
             })
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
+class ClusterIndicatorsListExcelImportView(APIView):
+
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        return Response('OK', status=status.HTTP_200_OK)
+
 
 class ClusterIndicatorsListExcelExportView(ListAPIView):
     """
