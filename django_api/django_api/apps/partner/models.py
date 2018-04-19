@@ -312,7 +312,7 @@ class PartnerActivity(TimeStampedModel):
         cluster.ClusterActivity (ForeignKey): "cluster_activity"
         indicator.Reportable (GenericRelation): "reportables"
     """
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=2048)
     project = models.ForeignKey(PartnerProject, null=True,
                                 related_name="partner_activities")
     partner = models.ForeignKey(Partner, related_name="partner_activities")

@@ -467,12 +467,12 @@ class PartnerActivitySerializer(serializers.ModelSerializer):
         if obj.cluster_activity:
             return {
                 "id": obj.cluster_activity.cluster_objective.cluster.id,
-                "name": obj.cluster_activity.cluster_objective.cluster.get_type_display(),
+                "name": obj.cluster_activity.cluster_objective.cluster.title,
             }
         elif obj.cluster_objective:
             return {
                 "id": obj.cluster_objective.cluster.id,
-                "name": obj.cluster_objective.cluster.get_type_display(),
+                "name": obj.cluster_objective.cluster.title,
             }
         else:
             return None
