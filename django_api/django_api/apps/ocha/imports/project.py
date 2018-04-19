@@ -21,11 +21,6 @@ def import_project_details(project, current_version_id):
                 external_id=attachment['attachment']['objectId'],
             ).first()
 
-            # Some indicators seem to reference Cluster directly,
-            # we do not have that option in our schema, skipping
-            if not cluster_activity:
-                continue
-
             blueprint, _ = IndicatorBlueprint.objects.update_or_create(
                 external_source=EXTERNAL_DATA_SOURCES.HPC,
                 external_id=attachment['attachment']['id'],
@@ -54,19 +49,6 @@ def import_project_details(project, current_version_id):
                 defaults={k: v for k, v in defaults.items() if v}
             )
 
-            partner_activity, _ = PartnerActivity.objects.update_or_create(
-                project=project,
-                cluster_activity=cluster_activity,
-                defaults={
-                    'title': cluster_activity.title,
-                    'start_date': project.start_date,
-                    'end_date': project.end_date,
-                    'partner': project.partner,
-                }
-
-            )
-            partner_activity.reportables.add(reportable)
-
             try:
                 disaggregated = attachment['attachment']['value']['metrics']['values']['disaggregated']
                 for disaggregation in save_disaggregations(
@@ -80,9 +62,22 @@ def import_project_details(project, current_version_id):
                 locations = save_location_list(disaggregated['locations'])
                 for location in locations:
                     ReportableLocationGoal.objects.get_or_create(reportable=reportable, location=location)
+            except (KeyError, TypeError, AttributeError):
+                locations = []
+
+            if cluster_activity:
+                partner_activity, _ = PartnerActivity.objects.update_or_create(
+                    project=project,
+                    cluster_activity=cluster_activity,
+                    defaults={
+                        'title': cluster_activity.title,
+                        'start_date': project.start_date,
+                        'end_date': project.end_date,
+                        'partner': project.partner,
+                    }
+                )
+                partner_activity.reportables.add(reportable)
                 partner_activity.locations.add(*locations)
-            except KeyError:
-                pass
 
             reportables.append(reportable)
 

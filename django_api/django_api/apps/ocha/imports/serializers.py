@@ -7,6 +7,7 @@ from rest_framework import serializers
 from cluster.models import Cluster
 from core.common import EXTERNAL_DATA_SOURCES, CLUSTER_TYPES, RESPONSE_PLAN_TYPE, PARTNER_PROJECT_STATUS
 from core.models import Country, ResponsePlan, Workspace, Location
+from ocha.constants import RefCode
 from ocha.imports.utilities import save_location_list
 from partner.models import PartnerProject, Partner
 
@@ -252,16 +253,16 @@ class V1ResponsePlanImportSerializer(DiscardUniqueTogetherValidationMixin, seria
 
     def save_clusters(self, response_plan, clusters_data):
         for cluster_data in clusters_data:
-            if not cluster_data['entityPrototype']['value']['name']['en']['singular'] == 'Cluster':
+            if not cluster_data['entityPrototype']['refCode'] == RefCode.CLUSTER:
                 continue
 
             Cluster.objects.update_or_create(
-                external_id=cluster_data['id'],
-                external_source=self.validated_data['external_source'],
+                type=CLUSTER_TYPES.imported,
+                imported_type=cluster_data['name'],
                 response_plan=response_plan,
                 defaults={
-                    'type': CLUSTER_TYPES.imported,
-                    'imported_type': cluster_data['name'],
+                    'external_id': cluster_data['id'],
+                    'external_source': self.validated_data['external_source'],
                 }
             )
 

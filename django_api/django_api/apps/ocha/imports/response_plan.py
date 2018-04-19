@@ -70,6 +70,9 @@ def save_activities_and_objectives_for_response_plan(entities_response={}, measu
 
             save_reportables_for_cluster_objective_or_activity(cluster_activity, activity['attachments'])
 
+    for objective in objectives.values():
+        save_cluster_objective(objective)
+
 
 def get_plan_list_for_country(country_iso3):
     source_url = HPC_V1_ROOT_URL + 'plan/country/{}'.format(country_iso3)

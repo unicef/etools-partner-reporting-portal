@@ -57,3 +57,16 @@ def convert_to_json_ratio_value(value):
         'v': value,
         'd': 1,
     }
+
+
+def trim_list(object_list):
+    out = []
+    for obj in object_list:
+        try:
+            out.append({
+                'id': obj['id'],
+                'name': obj['name'],
+            })
+        except KeyError:
+            pass
+    return sorted(out, key=lambda x: x['name'])
