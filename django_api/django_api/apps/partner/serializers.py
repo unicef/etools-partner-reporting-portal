@@ -567,7 +567,7 @@ class PMPPartnerSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         validated_data = self.fix_choices(validated_data)
         return Partner.objects.filter(
-            external_id=validated_data['external_id']).update(**validated_data)
+            vendor_number=validated_data['vendor_number']).update(**validated_data)
 
     def create(self, validated_data):
         validated_data = self.fix_choices(validated_data)
