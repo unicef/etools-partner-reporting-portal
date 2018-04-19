@@ -111,7 +111,7 @@
           App.Actions.PDReportsAttachments.sync(deleteThunk, this.reportId)
         )
             .then(function () {
-              self._notifyAttachmentDeleted();
+              self._notifyFileDeleted();
             })
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
@@ -149,7 +149,7 @@
             App.Actions.PDReportsAttachments.sync(uploadThunk, this.reportId)
           )
               .then(function () {
-                self._notifyAttachmentUploaded();
+                self._notifyFileUploaded();
               })
               .catch(function (err) { // jshint ignore:line
                 // TODO: error handling

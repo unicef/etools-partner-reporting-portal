@@ -481,7 +481,7 @@ class ClusterIndicatorsListExcelImportView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
-        return Response('OK', status=status.HTTP_200_OK)
+        return Response('OK', status=statuses.HTTP_200_OK)
 
 
 class ClusterIndicatorsListExcelExportView(ListAPIView):
