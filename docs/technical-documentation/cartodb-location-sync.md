@@ -46,7 +46,6 @@ beater-prp:
     - AZURE_B2C_CLIENT_ID=ID
     - AZURE_B2C_CLIENT_SECRET=SECRET
     - AZURE_B2C_POLICY_NAME=b2c_1A_UNICEF_PARTNERS_signup_signin
-    - AZURE_B2C_REDIRECT_URI=http://localhost:8082/social/complete/azuread-b2c-oauth2/
   image: 'unicef/etools-prp:develop'
   restart: always
   tags:
@@ -84,7 +83,7 @@ celerycam-prp:
     - AZURE_B2C_CLIENT_ID=ID
     - AZURE_B2C_CLIENT_SECRET=SECRET
     - AZURE_B2C_POLICY_NAME=b2c_1A_UNICEF_PARTNERS_signup_signin
-    - AZURE_B2C_REDIRECT_URI=http://localhost:8082/social/complete/azuread-b2c-oauth2/ldsfskdljfsdf98483u4530495iofjweiosjfsdjfLKJSLDFJ09
+  ldsfskdljfsdf98483u4530495iofjweiosjfsdjfLKJSLDFJ09
   image: 'unicef/etools-prp:develop'
   restart: always
   tags:
@@ -122,7 +121,6 @@ flower-prp:
     - AZURE_B2C_CLIENT_ID=ID
     - AZURE_B2C_CLIENT_SECRET=SECRET
     - AZURE_B2C_POLICY_NAME=b2c_1A_UNICEF_PARTNERS_signup_signin
-    - AZURE_B2C_REDIRECT_URI=http://localhost:8082/social/complete/azuread-b2c-oauth2/
     - VIRTUAL_HOST_WEIGHT=1
   expose:
     - '8082 
@@ -173,7 +171,6 @@ worker-prp:
     - AZURE_B2C_CLIENT_ID=ID
     - AZURE_B2C_CLIENT_SECRET=SECRET
     - AZURE_B2C_POLICY_NAME=b2c_1A_UNICEF_PARTNERS_signup_signin
-    - AZURE_B2C_REDIRECT_URI=http://localhost:8082/social/complete/azuread-b2c-oauth2/
   image: 'unicef/etools-prp:develop'
   restart: always
   tags:
