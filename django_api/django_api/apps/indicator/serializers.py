@@ -1334,7 +1334,7 @@ class ReportableIdSerializer(serializers.ModelSerializer):
         )
 
     def get_title(self, obj):
-        return obj.blueprint.title
+        return obj.blueprint.title + " (Cluster Activity)" if obj.children.exists() else obj.blueprint.title
 
 # PMP API Serializers
 
