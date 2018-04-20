@@ -314,7 +314,6 @@
 
       listeners: {
         'reportable-meta-changed': '_updateMeta',
-        'refresh-report': '_updateMeta',
       },
 
       _toggle: function (e) {
@@ -402,21 +401,6 @@
           default:
             return computedMode;
         }
-      },
-
-      _onRefreshOutput: function (e, reportId) {
-        e.stopPropagation();
-
-        var ajax = document.createElement('etools-prp-ajax');
-
-        ajax.url = App.Endpoints.ProgrammeDocumentReports(this.reportId, this.data.id);
-
-        this.dispatch(
-          App.Actions.ClusterIndicatorReports.fetchSingle(ajax.thunk(), reportId)
-        )
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-            });
       },
 
       _computeReportableData: function (data) {
