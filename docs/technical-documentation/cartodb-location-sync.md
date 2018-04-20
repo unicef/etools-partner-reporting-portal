@@ -38,6 +38,15 @@ beater-prp:
     - POSTGRES_USER=postgres
     - 'REDIS_URL=redis://prp-redis:6379/'
     - SECRET_KEY=
+    - AWS_S3_ACCESS_KEY_ID=ID
+    - AWS_S3_SECRET_ACCESS_KEY=SECRET
+    - AWS_STORAGE_BUCKET_NAME=bucket
+    - AWS_S3_REGION_NAME=eu-central-1
+    - PRP_FRONTEND_HOST=localhost:8082
+    - AZURE_B2C_CLIENT_ID=ID
+    - AZURE_B2C_CLIENT_SECRET=SECRET
+    - AZURE_B2C_POLICY_NAME=b2c_1A_UNICEF_PARTNERS_signup_signin
+    - AZURE_B2C_REDIRECT_URI=http://localhost:8082/social/complete/azuread-b2c-oauth2/
   image: 'unicef/etools-prp:develop'
   restart: always
   tags:
@@ -66,7 +75,16 @@ celerycam-prp:
     - POSTGRES_PASSWORD=
     - POSTGRES_USER=postgres
     - 'REDIS_URL=redis://prp-redis:6379/'
-    - SECRET_KEY=ldsfskdljfsdf98483u4530495iofjweiosjfsdjfLKJSLDFJ09
+    - SECRET_KEY=
+    - AWS_S3_ACCESS_KEY_ID=ID
+    - AWS_S3_SECRET_ACCESS_KEY=SECRET
+    - AWS_STORAGE_BUCKET_NAME=bucket
+    - AWS_S3_REGION_NAME=eu-central-1
+    - PRP_FRONTEND_HOST=localhost:8082
+    - AZURE_B2C_CLIENT_ID=ID
+    - AZURE_B2C_CLIENT_SECRET=SECRET
+    - AZURE_B2C_POLICY_NAME=b2c_1A_UNICEF_PARTNERS_signup_signin
+    - AZURE_B2C_REDIRECT_URI=http://localhost:8082/social/complete/azuread-b2c-oauth2/ldsfskdljfsdf98483u4530495iofjweiosjfsdjfLKJSLDFJ09
   image: 'unicef/etools-prp:develop'
   restart: always
   tags:
@@ -96,6 +114,15 @@ flower-prp:
     - POSTGRES_USER=postgres
     - 'REDIS_URL=redis://prp-redis:6379/0'
     - SECRET_KEY=
+    - AWS_S3_ACCESS_KEY_ID=ID
+    - AWS_S3_SECRET_ACCESS_KEY=SECRET
+    - AWS_STORAGE_BUCKET_NAME=bucket
+    - AWS_S3_REGION_NAME=eu-central-1
+    - PRP_FRONTEND_HOST=localhost:8082
+    - AZURE_B2C_CLIENT_ID=ID
+    - AZURE_B2C_CLIENT_SECRET=SECRET
+    - AZURE_B2C_POLICY_NAME=b2c_1A_UNICEF_PARTNERS_signup_signin
+    - AZURE_B2C_REDIRECT_URI=http://localhost:8082/social/complete/azuread-b2c-oauth2/
     - VIRTUAL_HOST_WEIGHT=1
   expose:
     - '8082 
@@ -138,6 +165,15 @@ worker-prp:
     - POSTGRES_USER=postgres
     - 'REDIS_URL=redis://prp-redis:6379/0'
     - SECRET_KEY=
+    - AWS_S3_ACCESS_KEY_ID=ID
+    - AWS_S3_SECRET_ACCESS_KEY=SECRET
+    - AWS_STORAGE_BUCKET_NAME=bucket
+    - AWS_S3_REGION_NAME=eu-central-1
+    - PRP_FRONTEND_HOST=localhost:8082
+    - AZURE_B2C_CLIENT_ID=ID
+    - AZURE_B2C_CLIENT_SECRET=SECRET
+    - AZURE_B2C_POLICY_NAME=b2c_1A_UNICEF_PARTNERS_signup_signin
+    - AZURE_B2C_REDIRECT_URI=http://localhost:8082/social/complete/azuread-b2c-oauth2/
   image: 'unicef/etools-prp:develop'
   restart: always
   tags:
