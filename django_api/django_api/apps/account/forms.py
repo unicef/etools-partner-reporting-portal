@@ -28,7 +28,7 @@ class UserAdminForm(forms.ModelForm):
 
     class Meta:
         model = User
-        exclude = ('password', 'last_login', 'date_joined')
+        exclude = ('last_login', 'date_joined')
 
     def clean_first_name(self):
         if not self.cleaned_data['first_name']:

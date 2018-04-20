@@ -17,17 +17,23 @@ server {
       include /etc/nginx/conf.d/uwsgi_params;
     }
 
+    location /social/ {
+      proxy_read_timeout 180s;  # Some imports happen synchronously and take a while
+      uwsgi_pass django_api_uwsgi;
+      include /etc/nginx/conf.d/uwsgi_params;
+    }
+
     location /sockjs-node/ {
       proxy_set_header Upgrade $http_upgrade;
       proxy_set_header Connection "upgrade";
       proxy_http_version 1.1;
-      proxy_pass http://polymer:8080/sockjs-node/;
+      proxy_pass http://polymer:8082/sockjs-node/;
     }
 
     location / {
       proxy_set_header Host $host:$server_port;
       proxy_set_header X-Real-IP $remote_addr;
       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-      proxy_pass http://polymer:8080/;
+      proxy_pass http://polymer:8082/;
     }
 }

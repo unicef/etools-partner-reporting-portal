@@ -155,7 +155,7 @@
             <h1>Partner Reporting Portal</h1>
           </div>
           <div class="login-buttons">
-            <p class="login-buttons-label">Sign in with email</p>
+            <p class="login-buttons-label">Login via Active Directory</p>
 
             <ul>
               <template is="dom-if" if="{{emailSubmitted}}">
@@ -167,12 +167,9 @@
                   <li><p class="error-token">Unable to login, invalid token, please try again.</p></li>
                 </template>
               <li>
-              <iron-form>
-                <paper-input label="Your Email" id="email" required type="email" value="{{data.email}}">
-                </paper-input>
-                <paper-button on-tap="submit">Submit
-                </paper-button>
-            </iron-form>
+              <paper-button id="login" on-tap="_redirectAuth" class="btn-primary" raised>
+                Sign in
+              </paper-button>
           </li>
 
               <!-- <li>
@@ -254,6 +251,10 @@
 
       _computeLogoSize: function (isDesktop) {
         return isDesktop ? 180 : 120;
+      },
+
+      _redirectAuth: function () {
+        window.location.href = App.Endpoints.login();
       },
 
       attached: function() {
