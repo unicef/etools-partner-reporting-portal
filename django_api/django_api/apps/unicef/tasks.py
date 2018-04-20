@@ -384,7 +384,7 @@ def process_programme_documents(fast=False, area=False):
                                     # If the locations for this reportable has been created before
                                     if rlgs.exists():
                                         existing_locs = set(rlgs.values_list('location', flat=True))
-                                        new_locs = set(locations) - existing_locs
+                                        new_locs = set(map(lambda x: x.id, locations)) - existing_locs
 
                                         # Creating M2M Through model instances for new locations
                                         reportable_location_goals = [
