@@ -357,9 +357,9 @@ class IndicatorReportDetailAPIView(RetrieveAPIView):
     get_queryset = IndicatorReportsListAPIView.get_queryset
 
 
-class ReportablesSimpleListAPIView(ListAPIView):
+class ClusterReportablesIdListAPIView(ListAPIView):
     """
-    Cluster IndicatorReportsListAPIView simplified API - GET/POST
+    API for grabbing all Cluster Indicator instances as id & title pairs - GET
     Authentication required.
 
     Parameters:
