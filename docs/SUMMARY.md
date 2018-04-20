@@ -19,7 +19,12 @@
   * [Partner roles and permissions](product-end-user-documentation/ip-reporting/partner-roles-and-permissions.md)
   * [User Interface](product-end-user-documentation/ip-reporting/user-interface.md)
   * [Setting calculation methods for indicators](product-end-user-documentation/ip-reporting/setting-calculation-methods-for-indicators.md)
-  * [Progress Reports](product-end-user-documentation/ip-reporting/progress-reports.md)
+  * Progress Reports
+    * [Reporting Overview](product-end-user-documentation/ip-reporting/progress-reports/reporting-overview.md)
+    * [Special Reports \(SR\)](product-end-user-documentation/ip-reporting/progress-reports/special-reports-sr.md)
+    * [Humanitarian Reports \(HR\)](product-end-user-documentation/ip-reporting/progress-reports/humanitarian-reports-hr.md)
+    * [Standard Quarterly Progress Reports \(QPR\)](product-end-user-documentation/ip-reporting/progress-reports/standard-quarterly-progress-reports-qpr.md)
+    * [Reporting Process](product-end-user-documentation/ip-reporting/progress-reports/reporting-process.md)
   * [Various data exports](product-end-user-documentation/ip-reporting/various-data-exports.md)
 * Cluster Reporting
   * [Overview](product-end-user-documentation/cluster-reporting/overview.md)
@@ -30,7 +35,8 @@
   * [Response Plan Dashboard](product-end-user-documentation/cluster-reporting/response-plan-dashboard.md)
   * [Response Parameters setup](product-end-user-documentation/cluster-reporting/response-parameters-setup.md)
   * [Planning your action as a Partner](product-end-user-documentation/cluster-reporting/planning-your-action-as-a-partner.md)
-  * [Reporting on results](product-end-user-documentation/cluster-reporting/reporting-on-results.md)
+  * [Reporting on results](product-end-user-documentation/cluster-reporting/reporting-on-results/README.md)
+    * [Reporting to UNICEF](product-end-user-documentation/cluster-reporting/reporting-on-results/reporting-to-unicef.md)
   * [Analysis of results](product-end-user-documentation/cluster-reporting/analysis-of-results.md)
   * [OCHA Integration](product-end-user-documentation/cluster-reporting/ocha-integration.md)
 
