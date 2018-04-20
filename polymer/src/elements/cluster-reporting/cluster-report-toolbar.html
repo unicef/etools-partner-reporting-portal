@@ -19,17 +19,17 @@
         response-plan-id="{{responsePlanId}}">
       <upload-button
           url="[[importUrl]]"
-          modal-title="Export">
-        Export
+          modal-title="Import Template">
+        Import Template
       </upload-button>
 
-      <download-button url="[[exportUrl]]">Import</download-button>
+      <download-button url="[[exportUrl]]">Export</download-button>
 
       <template
           is="dom-if"
           if="[[_equals(submitted, 0)]]"
           restamp="true">
-        <download-button url="[[importTemplateUrl]]">Import Template</download-button>
+        <download-button url="[[exportTemplateUrl]]">Export Template</download-button>
       </template>
     </etools-prp-toolbar>
   </template>
@@ -45,7 +45,7 @@
       properties: {
         submitted: Number,
 
-        importTemplateUrl: {
+        exportTemplateUrl: {
           type: String,
           computed: '_computeImportTemplateUrl(responsePlanId, query, submitted)',
         },

@@ -1,19 +1,16 @@
 # -*- coding: utf-8 -*-
-import urllib, StringIO
 
 from openpyxl.reader.excel import load_workbook
 
 
-class XLSXReader(object):
+class IndicatorsXLSXReader(object):
 
     def __init__(self, path):
+        self.wb = load_workbook(path)
+        self.sheet = self.wb.active
 
-        f = StringIO.StringIO()
-        f.write(urllib.urlopen(path).read())
-        self.wb = load_workbook(f)
-
-
-    def import_data(self, kind=None):
+    def import_data(self):
+        return self.sheet.cell('A1').value
 
         # if not self.sheet:
         #     return None
@@ -172,4 +169,3 @@ class XLSXReader(object):
         #
         # #for item in items:
         # #    print item
-        return {'items': items, 'error': errors}
