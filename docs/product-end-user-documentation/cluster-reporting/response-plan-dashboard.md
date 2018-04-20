@@ -1,8 +1,6 @@
 # Response Plan Dashboard
 
-In this section \("Dashboard" in the left hand navigation\) of the interface an IMO or a signed in partner can see an overview of the response. Depending on whether a partner or an IMO has signed in, a slightly different dashboard will show.
-
-### Partner Dashboard
+**Partner Dashboard**
 
 The Partner will be shown the following:
 
