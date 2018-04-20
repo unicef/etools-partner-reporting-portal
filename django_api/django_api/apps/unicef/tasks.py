@@ -379,13 +379,29 @@ def process_programme_documents(fast=False, area=False):
                                     reportable.active = True
                                     reportable.save()
 
-                                    # Creating M2M Through model instances
-                                    reportable_location_goals = [
-                                        ReportableLocationGoal(
-                                            reportable=reportable,
-                                            location=l,
-                                        ) for l in locations
-                                    ]
+                                    rlgs = ReportableLocationGoal.objects.filter(reportable=reportable)
+
+                                    # If the locations for this reportable has been created before
+                                    if rlgs.exists():
+                                        existing_locs = set(rlgs.values_list('location', flat=True))
+                                        new_locs = set(locations) - existing_locs
+
+                                        # Creating M2M Through model instances for new locations
+                                        reportable_location_goals = [
+                                            ReportableLocationGoal(
+                                                reportable=reportable,
+                                                location=l,
+                                            ) for l in Location.objects.filter(id__in=new_locs)
+                                        ]
+
+                                    else:
+                                        # Creating M2M Through model instances
+                                        reportable_location_goals = [
+                                            ReportableLocationGoal(
+                                                reportable=reportable,
+                                                location=l,
+                                            ) for l in locations
+                                        ]
 
                                     ReportableLocationGoal.objects.bulk_create(reportable_location_goals)
 
