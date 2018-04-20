@@ -3,7 +3,7 @@
 ## Local Setup
 
 1. Install [Docker](https://docs.docker.com/engine/installation/) for your OS. Also install Fabric via `pip install fabric`
-2. Create .env file with the reference of`.env.example `or receive .env file from your team member.
+2. Create .env file with the reference of`.env.example`or receive .env file from your team member.
 3. Run`fab up`
 4. Go to [http://127.0.0.1:8082/](http://127.0.0.1:8082/) to see the frontend / polymer running. The Django app is running under
 
@@ -48,6 +48,4 @@ Re-build docker images for containers
 ```text
 $ fab rebuild
 ```
-
-
 
