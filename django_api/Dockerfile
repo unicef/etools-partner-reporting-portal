@@ -41,7 +41,6 @@ RUN apt-get install -y --no-install-recommends \
     libgdal1-dev
 
 # Install Python tools
-RUN pip install --upgrade pip --trusted-host pypi.python.org
 RUN pip install --upgrade fabric --trusted-host pypi.python.org
 
 # http://gis.stackexchange.com/a/74060
@@ -52,7 +51,7 @@ ADD ./requirements/* /tmp/
 
 # Install PyPi dependencies
 WORKDIR /tmp
-RUN pip install -r $REQUIREMENT_FILE --trusted-host pypi.python.org
+RUN pip install --upgrade pip --trusted-host pypi.python.org && pip install -r $REQUIREMENT_FILE --trusted-host pypi.python.org
 
 ADD . /code/
 
