@@ -21,7 +21,7 @@ from core.serializers import ShortLocationSerializer
 from core.models import Location, ResponsePlan
 from indicator.serializers import (
     ClusterIndicatorReportSerializer,
-    ReportableSimpleSerializer,
+    ReportableIdSerializer,
     ClusterPartnerAnalysisIndicatorResultSerializer,
 )
 from indicator.models import IndicatorReport, Reportable, ReportableLocationGoal
@@ -366,10 +366,10 @@ class ReportablesSimpleListAPIView(ListAPIView):
     - response_plan_id - Response plan ID
 
     Returns:
-        - GET method - ReportableSimpleSerializer object.
-        - POST method - ReportableSimpleSerializer object.
+        - GET method - ReportableIdSerializer object.
+        - POST method - ReportableIdSerializer object.
     """
-    serializer_class = ReportableSimpleSerializer
+    serializer_class = ReportableIdSerializer
     pagination_class = filter_class = None
 
     def get_queryset(self):

@@ -1322,7 +1322,7 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
         return obj.can_submit
 
 
-class ReportableSimpleSerializer(serializers.ModelSerializer):
+class ReportableIdSerializer(serializers.ModelSerializer):
 
     title = serializers.SerializerMethodField()
 
