@@ -178,7 +178,6 @@ class RPMProjectDetailAPIView(APIView):
             details_url,
             budget_url
         ])
-        print(details)
 
         out_data = {
             k: v for k, v in details['data'].items() if type(v) not in {list, dict}

@@ -247,8 +247,7 @@ class ProgressReportSimpleSerializer(serializers.ModelSerializer):
 class ProgressReportSerializer(ProgressReportSimpleSerializer):
     programme_document = ProgrammeDocumentOutputSerializer()
     indicator_reports = serializers.SerializerMethodField()
-    review_overall_status_display = serializers.CharField(
-        source='get_review_overall_status_display')
+    review_overall_status_display = serializers.CharField(source='get_review_overall_status_display')
     funds_received_to_date = serializers.SerializerMethodField()
     funds_received_to_date_currency = serializers.SerializerMethodField()
     funds_received_to_date_percentage = serializers.SerializerMethodField()
@@ -323,9 +322,8 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
             qset = qset.filter(reportable__object_id=self.llo_id)
         if self.location_id and self.llo_id is not None:
             qset = qset.filter(reportable__locations__id=self.location_id)
-        # TODO: use incomplete flag
-        return PDReportContextIndicatorReportSerializer(
-            instance=qset, read_only=True, many=True).data
+
+        return PDReportContextIndicatorReportSerializer(instance=qset, read_only=True, many=True).data
 
     def get_reporting_period(self, obj):
         return "%s - %s " % (

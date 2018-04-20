@@ -181,7 +181,7 @@ worker-prp:
 
 ### How to sync locations
 
-* Open up a browser and go \`http://localhost:8082 api/admin/core/cartodbtable/\` and log in.
+* Open up a browser and go \`[http://localhost:8082](http://localhost:8082) api/admin/core/cartodbtable/\` and log in.
 * In order to get real data, you'll need to go to etools.carto.com for getting dataset names. Here are the sample working dataset names:
   * Pakistan
     * pak\_adm0\_gaul\_1
@@ -196,7 +196,7 @@ worker-prp:
     * mli\_admbnda\_adm3\_gov\_ocha\_1
     * mli\_admbnda\_adm4\_iom\_gov\_1
 * Click "ADD CARTO DB TABLE" button in Django admin and fill the following information:
-  * Domain: https://etools.carto.com
+  * Domain: [https://etools.carto.com](https://etools.carto.com)
   * API KEY: \*\*\*\*\*
   * Table name: \(Use above dataset name\) 
   * Location type: \(Create a new one with right admin level\)
@@ -204,6 +204,4 @@ worker-prp:
 * Repeat Step 4 for each country until every single admin level carto db table is created.
 * After creating a carto db table, select 1 carto db table at a time \(with admin level descending\) and do "Import sites" Django admin action.
 * After that, the new locations should be created if import is successful.
-
-
 
