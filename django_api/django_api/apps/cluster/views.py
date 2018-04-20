@@ -749,20 +749,22 @@ class OperationalPresenceAggregationDataAPIView(APIView):
         response_data["partners_per_cluster"] = {}
         response_data["partners_per_cluster_objective"] = {}
 
-        for partner_type in partner_types:
-            response_data["partners_per_type"][PARTNER_TYPE[partner_type]] = Partner.objects.filter(
-                partner_type=partner_type, clusters__in=clusters
-            ).distinct().values_list('title', flat=True)
+        # As long as clusters have any partners
+        if partner_types != [None]:
+            for partner_type in partner_types:
+                response_data["partners_per_type"][PARTNER_TYPE[partner_type]] = Partner.objects.filter(
+                    partner_type=partner_type, clusters__in=clusters
+                ).distinct().values_list('title', flat=True)
 
-        for cluster in clusters:
-            cluster_type = cluster.type.capitalize()
-            response_data["partners_per_cluster"][cluster_type] = cluster.partners.values_list('title', flat=True)
+            for cluster in clusters:
+                cluster_type = cluster.type.capitalize()
+                response_data["partners_per_cluster"][cluster_type] = cluster.partners.values_list('title', flat=True)
 
-        for objective in objectives:
-            cluster_type = objective.cluster.type.capitalize()
-            objective_title = objective.title + " (" + cluster_type + ")"
-            response_data["partners_per_cluster_objective"][objective_title] = \
-                Partner.objects.filter(clusters__cluster_objectives=objective).values_list('title', flat=True)
+            for objective in objectives:
+                cluster_type = objective.cluster.type.capitalize()
+                objective_title = objective.title + " (" + cluster_type + ")"
+                response_data["partners_per_cluster_objective"][objective_title] = \
+                    Partner.objects.filter(clusters__cluster_objectives=objective).values_list('title', flat=True)
 
         return response_data
 
