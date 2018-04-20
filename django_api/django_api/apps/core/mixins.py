@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 
@@ -74,4 +75,4 @@ class CustomAzureADBBCOAuth2(AzureADB2COAuth2):
 
     def __init__(self, *args, **kwargs):
         super(CustomAzureADBBCOAuth2, self).__init__(*args, **kwargs)
-        self.redirect_uri = 'http://localhost:8082/social/complete/azuread-b2c-oauth2/'
+        self.redirect_uri = settings.AZURE_B2C_REDIRECT_URI
