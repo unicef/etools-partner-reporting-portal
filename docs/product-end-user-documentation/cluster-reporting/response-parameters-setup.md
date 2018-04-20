@@ -16,27 +16,21 @@ This represents a place where any signed in user can view all partner projects a
 
 ### Adding a Project for a Partner as an IMO
 
-IMO can add a project for partners \(within their cluster?\) from the response parameter section.
+IMO can add a project for partners \(within their cluster\) from the response parameter section.
 
 ![](../../.gitbook/assets/screen-shot-2018-03-06-at-12.13.34-pm.png)
 
 IMO chooses the partner and if the project is existing to be pulled from OCHA or a new custom project. Please see [OCHA integration](ocha-integration.md) for more details.
 
-**\(TBD Maciej: Need to confirm we can filter the projects for a specific partner in OCHA so we can pull the data successfully\)**
-
 ![](../../.gitbook/assets/screen-shot-2018-03-06-at-12.13.18-pm.png)
 
-If the IMO pulls a project from OCHA, they will be able to choose from a list of projects pertaining to that partner and see details for that project. This flow / screens / fields etc. \(other than the partner dropdown\) are exactly the same as what the partner would do. Please see [here](planning-your-action-as-a-partner.md) for more details.
+If the IMO pulls a project from OCHA, they will be able to choose from a list of projects pertaining to that partner and see details for that project. This flow / screens / fields etc. \(other than the partner dropdown\) are exactly the same as what the partner would do. Please see[ here](https://unicef.gitbook.io/prp/product-end-user-documentation/cluster-reporting/planning-your-action-as-a-partner) for more details.
 
 IMO can edit project afterwards as well.
 
 ![](../../.gitbook/assets/screen-shot-2018-03-06-at-12.10.02-pm.png)
 
 ### Adding an Activity for a Partner as an IMO
-
-
-
-**\(TBD Maciej: still researching Partner activities for OCHA integration\)**
 
 The IMO can add activities for partners \(within their cluster\) as well.
 
