@@ -114,9 +114,12 @@
     </etools-prp-ajax>
 
     <template
-    is="dom-if"
-    if="[[_displayPartner(permissions)]]"
-    restamp="true">
+        is="dom-if"
+        if="[[_displayPartner(permissions)]]"
+        restamp="true">
+      <partner-dropdown-content
+          partners="{{partners}}">
+      </partner-dropdown-content>
     </template>
 
     <paper-dialog
@@ -397,7 +400,7 @@
 
   <script>
     Polymer({
-      id: 'planned-action-activity-modal',
+      is: 'planned-action-activity-modal',
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
