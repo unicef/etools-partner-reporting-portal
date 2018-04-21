@@ -7,7 +7,7 @@ This report type is used in different situations to request the IP to provide sp
 
 The workflow for the special report\(s\) \(special report 1, special report 2, etc.\) includes [accept/send back functionality](./) with PMP and the system validates if the report was [submitted by a or on behalf of](./) which Authorized Officer as registered in PMP.
 
-The report due date\(s\) is generated in PMP. This report does not require a start and end date and the fields will be displayed blank in PRP. The report itself will be generated 1 month before the due date.
+The report due date\(s\) is generated in PMP. This report does not require a start and end date and hence none of those will be shown in PRP. The report itself will be generated 1 month before the due date.
 
 ​
 
