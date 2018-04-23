@@ -10,8 +10,12 @@
 
     App.Actions.ClusterIndicatorReports = {
 
-      fetch: function (reportsThunk) {
+      fetch: function (reportsThunk, reset) {
         return function (dispatch) {
+          if (reset) {
+            dispatch(App.Actions.ClusterIndicatorReports.set([]));
+          }
+
           dispatch(App.Actions.ClusterIndicatorReports.loadingStart());
 
           return reportsThunk()

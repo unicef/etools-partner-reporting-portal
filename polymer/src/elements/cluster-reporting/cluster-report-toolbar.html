@@ -61,6 +61,10 @@
         },
       },
 
+      listeners: {
+        'file-uploaded': '_onFileUploaded',
+      },
+
       _computeImportTemplateUrl: function (responsePlanId, query, submitted) {
         return this._appendQuery(
           App.Endpoints.clusterIndicatorReportsImportTemplate(responsePlanId),
@@ -79,6 +83,12 @@
 
       _computeImportUrl: function (responsePlanId) {
         return App.Endpoints.clusterIndicatorReportsImport(responsePlanId);
+      },
+
+      _onFileUploaded: function (e) {
+        e.stopPropagation();
+
+        this.fire('template-file-uploaded');
       },
     });
   </script>

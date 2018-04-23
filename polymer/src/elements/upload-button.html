@@ -78,7 +78,7 @@
           <div class="row">
             <etools-file
                 files="{{files}}"
-                label="TODO: file input label"
+                label="Template file"
                 disabled="[[pending]]"
                 accept=".xlsx, .xls"
                 required>
@@ -154,6 +154,7 @@
               self.set('pending', false);
               self.close();
               self._notifyFileUploaded();
+              self.fire('file-uploaded');
             })
             .catch(function (res) {
               self.set('errors', res.data);
