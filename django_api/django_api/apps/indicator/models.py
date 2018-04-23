@@ -187,6 +187,7 @@ class IndicatorBlueprint(TimeStampedExternalSourceModel):
 
     class Meta:
         ordering = ['-id']
+        unique_together = TimeStampedExternalSourceModel.Meta.unique_together
 
 
 @receiver(post_save,
@@ -569,9 +570,19 @@ class IndicatorReport(TimeStampedModel):
             return self._get_FIELD_display(field_object)
 
     @property
+    def is_complete(self):
+        location_disaggregations = IndicatorLocationData.objects.filter(indicator_report=self).values_list(
+            'disaggregation', flat=True
+        )
+        for location_disaggregation in location_disaggregations:
+            if location_disaggregation == {"()": {"c": 0, "d": 0, "v": 0}}:
+                return False
+
+        return True
+
+    @property
     def is_draft(self):
-        if self.submission_date is None and IndicatorLocationData.objects.filter(
-                indicator_report=self).exists():
+        if self.submission_date is None and IndicatorLocationData.objects.filter(indicator_report=self).exists():
             return True
         return False
 
@@ -783,8 +794,9 @@ class IndicatorLocationData(TimeStampedModel):
     def is_complete(self):
         """
         Returns if this indicator location data has had some data entered for
-        it, and is compelte.
+        it, and is complete.
         """
+        # When changing this remember to adjust same method for indicator_report
         return self.disaggregation != {"()": {"c": 0, "d": 0, "v": 0}}
 
     @cached_property

@@ -11,7 +11,6 @@ from core.common import EXTERNAL_DATA_SOURCES
 from core.models import Country, GatewayType, Location
 from indicator.models import Reportable, IndicatorBlueprint, Disaggregation, DisaggregationValue, ReportableLocationGoal
 from ocha.constants import HPC_V2_ROOT_URL
-from ocha.imports.bulk import fetch_json_urls_async
 from ocha.utilities import get_dict_from_list_by_key, convert_to_json_ratio_value
 
 logger = logging.getLogger('ocha-sync')
@@ -58,81 +57,73 @@ def get_json_from_url(url, retry_counter=MAX_URL_RETRIES):
     return response_json
 
 
-def save_location_list(location_list, force_download_all=False):
+def save_location_list(location_list, parent=None, save_children=False):
     location_ids = [l['id'] for l in location_list if 'id' in l and type(l['id']) == int]
 
     location_country_map = {}
-    if not force_download_all:
-        locations = Location.objects.filter(
+    locations = []
+
+    for location_id in sorted(location_ids):
+        location = Location.objects.filter(
             external_source=EXTERNAL_DATA_SOURCES.HPC,
-            external_id__in=map(str, location_ids)
-        )
-        saved_ids = set(locations.values_list('external_id', flat=True))
-        location_ids = list(filter(
-            lambda lid: str(lid) not in saved_ids,
-            location_ids
-        ))
-        locations = list(locations)
-        for loc in locations:
-            location_country_map[loc.external_id] = loc.gateway.country
-    else:
-        locations = []
+            external_id=location_id
+        ).first()
 
-    source_urls = [
-        HPC_V2_ROOT_URL + 'location/{}'.format(lid) for lid in set(location_ids)
-    ]
-    location_data_list = fetch_json_urls_async(source_urls)
+        if not location or save_children:
+            location_data = get_json_from_url(HPC_V2_ROOT_URL + 'location/{}'.format(location_id))
+            if 'data' not in location_data:
+                continue
 
-    location_data_list = sorted(location_data_list, key=lambda l: l['data']['adminLevel'])
+        if not location:
+            country = None
+            if parent:
+                country = parent.gateway.country
+            elif location_data['data']['adminLevel'] == 0:
+                country, _ = Country.objects.update_or_create(
+                    country_short_code=location_data['data']['iso3'],
+                    defaults={
+                        'name': location_data['data']['name']
+                    }
+                )
+                for child in location_data['data']['children']:
+                    location_country_map[child['id']] = country
+            elif location_data['data']['id'] in location_country_map:
+                country = location_country_map[location_data['data']['id']]
+                for child in location_data['data']['children']:
+                    location_country_map[child['id']] = country
+            elif not country:
+                logger.warning('Couldn\'t find country for {}, skipping'.format(
+                    HPC_V2_ROOT_URL + 'location/{}'.format(location_data['data']['id'])
+                ))
+                continue
 
-    for location_data in location_data_list:
-        if location_data['data']['adminLevel'] == 0:
-            country, _ = Country.objects.update_or_create(
-                country_short_code=location_data['data']['iso3'],
+            gateway_name = '{} - Admin Level {}'.format(country.country_short_code, location_data['data']['adminLevel'])
+            gateway, _ = GatewayType.objects.get_or_create(
+                country=country,
+                admin_level=location_data['data']['adminLevel'],
                 defaults={
-                    'name': location_data['data']['name']
+                    'name': gateway_name
                 }
             )
-            for child in location_data['data']['children']:
-                location_country_map[child['id']] = country
-        elif location_data['data']['id'] in location_country_map:
-            country = location_country_map[location_data['data']['id']]
-            for child in location_data['data']['children']:
-                location_country_map[child['id']] = country
-        else:
-            location = Location.objects.filter(
+
+            location, _ = Location.objects.update_or_create(
                 external_source=EXTERNAL_DATA_SOURCES.HPC,
-                external_id=location_data['data']['id']
-            ).first()
-            if location:
-                locations.append(location)
-            else:
-                logger.warning(
-                    'Couldn\'t find country for {}, skipping'.format(location_data['data']['id'])
-                )
-            continue
+                external_id=location_data['data']['id'],
+                defaults={
+                    'title': location_data['data']['name'],
+                    'p_code': location_data['data']['pcode'],
+                    'latitude': location_data['data'].get('latitude'),
+                    'longitude': location_data['data'].get('longitude'),
+                    'gateway': gateway,
+                    'parent': parent,
+                }
+            )
+            logger.debug('Saved location {} as {}'.format(location_data['data']['id'], location))
 
-        gateway_name = '{} - Admin Level {}'.format(country.country_short_code, location_data['data']['adminLevel'])
-        gateway, _ = GatewayType.objects.get_or_create(
-            country=country,
-            admin_level=location_data['data']['adminLevel'],
-            defaults={
-                'name': gateway_name
-            }
-        )
-
-        location, _ = Location.objects.update_or_create(
-            external_source=EXTERNAL_DATA_SOURCES.HPC,
-            external_id=location_data['data']['id'],
-            defaults={
-                'title': location_data['data']['name'],
-                'p_code': location_data['data']['pcode'],
-                'latitude': location_data['data'].get('latitude'),
-                'longitude': location_data['data'].get('longitude'),
-                'gateway': gateway,
-            }
-        )
         locations.append(location)
+
+        if save_children:
+            save_location_list(location_data['data'].get('children', []), parent=location)
 
     return locations
 
@@ -165,7 +156,8 @@ def save_disaggregations(disaggregation_categories, response_plan=None):
     return disaggregations
 
 
-def save_cluster_objective(objective, child_activity):
+def save_cluster_objective(objective, child_activity=None):
+    child_activity = child_activity or {}
     cluster_id = objective.get('parentId') or child_activity.get('parentId')
     cluster = Cluster.objects.filter(
         external_source=EXTERNAL_DATA_SOURCES.HPC,
@@ -185,7 +177,7 @@ def save_cluster_objective(objective, child_activity):
             'title': objective['value']['description'][:2048]
         }
     )
-
+    logger.debug('Saved Cluster Objective: {}'.format(cluster_objective))
     save_reportables_for_cluster_objective_or_activity(cluster_objective, objective['attachments'])
     return cluster_objective
 
@@ -242,16 +234,15 @@ def save_reportables_for_cluster_objective_or_activity(objective_or_activity, at
                 )
 
             objective_or_activity.locations.add(*locations)
-        except KeyError:
+            for disaggregation in save_disaggregations(
+                disaggregated.get('categories', []), response_plan=objective_or_activity.cluster.response_plan
+            ):
+                reportable.disaggregations.through.objects.get_or_create(
+                    reportable_id=reportable.id,
+                    disaggregation_id=disaggregation.id
+                )
+        except (KeyError, TypeError, AttributeError):
             logger.warning('No location info found for {}'.format(reportable))
-
-        for disaggregation in save_disaggregations(
-            disaggregated.get('categories', []), response_plan=objective_or_activity.cluster.response_plan
-        ):
-            reportable.disaggregations.through.objects.get_or_create(
-                reportable_id=reportable.id,
-                disaggregation_id=disaggregation.id
-            )
 
         reportables.append(reportable)
 

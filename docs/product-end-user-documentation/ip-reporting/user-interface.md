@@ -8,7 +8,7 @@ Gives partner details and risk ratings. This data comes from the PMP system and 
 {% endtab %}
 
 {% tab title="Programme Documents" %}
-Filterable list of the PD's associated with the partner. Can filter by ref \#, title, pd status and location. Report \# will not be on the PD list page.
+Filterable \(defaults to signed and active PD's\) list of the PD's associated with the partner. Can filter by ref \#, title, pd status and location. Report \# will not be on the PD list page.
 
 ![](../../.gitbook/assets/screen-shot-2018-02-12-at-1.11.46-pm.png)
 
@@ -32,11 +32,11 @@ This data comes from the PMP system and displayed to the partner for their infor
 {% tab title="Progress Reports" %}
 Filterable list of the Progress Reports associated with all the various PD's of this partner. The user does not generate progress reports, but these are generated periodically/automatically for the partner based on the reporting periods and due dates set by the PO at UNICEF.
 
-See the [progress reports section](progress-reports.md) for more details on submission process, various statuses etc. of a progress report.
+See the [progress reports section](progress-reports/) for more details on submission process, various statuses etc. of a progress report.
 
 ### Progress Reports - list view
 
-The default list view for progress reports will be overdue, sent back and due report, but the partner will have the ability to select a different report status to show all reports. The columns in progress report list will also be sortable.
+The default list view for progress reports will be status, sent back and due report, and report type: QPR, HR & SR. The partner will have the ability to select a different report status to show all reports. The columns in progress report list will also be sortable.
 
 ![](../../.gitbook/assets/screen-shot-2018-02-05-at-1.58.35-pm.png)
 {% endtab %}

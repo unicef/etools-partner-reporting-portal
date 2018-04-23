@@ -38,6 +38,14 @@ beater-prp:
     - POSTGRES_USER=postgres
     - 'REDIS_URL=redis://prp-redis:6379/'
     - SECRET_KEY=
+    - AWS_S3_ACCESS_KEY_ID=ID
+    - AWS_S3_SECRET_ACCESS_KEY=SECRET
+    - AWS_STORAGE_BUCKET_NAME=bucket
+    - AWS_S3_REGION_NAME=eu-central-1
+    - PRP_FRONTEND_HOST=localhost:8082
+    - AZURE_B2C_CLIENT_ID=ID
+    - AZURE_B2C_CLIENT_SECRET=SECRET
+    - AZURE_B2C_POLICY_NAME=b2c_1A_UNICEF_PARTNERS_signup_signin
   image: 'unicef/etools-prp:develop'
   restart: always
   tags:
@@ -66,7 +74,16 @@ celerycam-prp:
     - POSTGRES_PASSWORD=
     - POSTGRES_USER=postgres
     - 'REDIS_URL=redis://prp-redis:6379/'
-    - SECRET_KEY=ldsfskdljfsdf98483u4530495iofjweiosjfsdjfLKJSLDFJ09
+    - SECRET_KEY=
+    - AWS_S3_ACCESS_KEY_ID=ID
+    - AWS_S3_SECRET_ACCESS_KEY=SECRET
+    - AWS_STORAGE_BUCKET_NAME=bucket
+    - AWS_S3_REGION_NAME=eu-central-1
+    - PRP_FRONTEND_HOST=localhost:8082
+    - AZURE_B2C_CLIENT_ID=ID
+    - AZURE_B2C_CLIENT_SECRET=SECRET
+    - AZURE_B2C_POLICY_NAME=b2c_1A_UNICEF_PARTNERS_signup_signin
+  ldsfskdljfsdf98483u4530495iofjweiosjfsdjfLKJSLDFJ09
   image: 'unicef/etools-prp:develop'
   restart: always
   tags:
@@ -76,7 +93,7 @@ celerycam-prp:
   target_num_containers: 1
 flower-prp:
   autoredeploy: true
-  command: 'flower --address=0.0.0.0 --port=8080 --broker=redis://prp-redis:6379/0 -l DEBUG --auto_refresh=False --debug=True --autoreload=False --url_prefix=flower'
+  command: 'flower --address=0.0.0.0 --port=8082 --broker=redis://prp-redis:6379/0 -l DEBUG --auto_refresh=False --debug=True --autoreload=False --url_prefix=flower'
   environment:
     - CELERY_VISIBILITY_TIMEOUT=18000
     - DJANGO_ALLOWED_HOST=
@@ -96,9 +113,17 @@ flower-prp:
     - POSTGRES_USER=postgres
     - 'REDIS_URL=redis://prp-redis:6379/0'
     - SECRET_KEY=
+    - AWS_S3_ACCESS_KEY_ID=ID
+    - AWS_S3_SECRET_ACCESS_KEY=SECRET
+    - AWS_STORAGE_BUCKET_NAME=bucket
+    - AWS_S3_REGION_NAME=eu-central-1
+    - PRP_FRONTEND_HOST=localhost:8082
+    - AZURE_B2C_CLIENT_ID=ID
+    - AZURE_B2C_CLIENT_SECRET=SECRET
+    - AZURE_B2C_POLICY_NAME=b2c_1A_UNICEF_PARTNERS_signup_signin
     - VIRTUAL_HOST_WEIGHT=1
   expose:
-    - '8080'
+    - '8082 
   image: 'unicef/etools-prp:develop'
   restart: always
   tags:
@@ -138,6 +163,14 @@ worker-prp:
     - POSTGRES_USER=postgres
     - 'REDIS_URL=redis://prp-redis:6379/0'
     - SECRET_KEY=
+    - AWS_S3_ACCESS_KEY_ID=ID
+    - AWS_S3_SECRET_ACCESS_KEY=SECRET
+    - AWS_STORAGE_BUCKET_NAME=bucket
+    - AWS_S3_REGION_NAME=eu-central-1
+    - PRP_FRONTEND_HOST=localhost:8082
+    - AZURE_B2C_CLIENT_ID=ID
+    - AZURE_B2C_CLIENT_SECRET=SECRET
+    - AZURE_B2C_POLICY_NAME=b2c_1A_UNICEF_PARTNERS_signup_signin
   image: 'unicef/etools-prp:develop'
   restart: always
   tags:
@@ -148,7 +181,7 @@ worker-prp:
 
 ### How to sync locations
 
-* Open up a browser and go \`http://localhost:8080/api/admin/core/cartodbtable/\` and log in.
+* Open up a browser and go \`[http://localhost:8082](http://localhost:8082) api/admin/core/cartodbtable/\` and log in.
 * In order to get real data, you'll need to go to etools.carto.com for getting dataset names. Here are the sample working dataset names:
   * Pakistan
     * pak\_adm0\_gaul\_1
@@ -163,7 +196,7 @@ worker-prp:
     * mli\_admbnda\_adm3\_gov\_ocha\_1
     * mli\_admbnda\_adm4\_iom\_gov\_1
 * Click "ADD CARTO DB TABLE" button in Django admin and fill the following information:
-  * Domain: https://etools.carto.com
+  * Domain: [https://etools.carto.com](https://etools.carto.com)
   * API KEY: \*\*\*\*\*
   * Table name: \(Use above dataset name\) 
   * Location type: \(Create a new one with right admin level\)
@@ -171,6 +204,4 @@ worker-prp:
 * Repeat Step 4 for each country until every single admin level carto db table is created.
 * After creating a carto db table, select 1 carto db table at a time \(with admin level descending\) and do "Import sites" Django admin action.
 * After that, the new locations should be created if import is successful.
-
-
 

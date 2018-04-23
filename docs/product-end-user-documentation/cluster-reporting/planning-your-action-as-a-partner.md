@@ -16,9 +16,7 @@ Partners can add custom Projects here or pull from OCHA.
 
 We will show basic details in a drop down so the partner knows which project they are pulling from OCHA. 
 
-\( **TBD Maciej: After selecting a project from OCHA, we may need to allow partner to select/edit the clusters because the names incoming from OCHA are not standard.**
-
-**TBD Status and Additional information. We might not include Funding Source because there might be multiple. Total funding is not always available so it will be optional. \)**
+We will include all names of Funding Source because there might be multiple sources. Funding Source is not always available though so it will be optional. Total funding is not always available so it will be optional too. User can edit the funding source and total funding.
 
 ![](../../.gitbook/assets/screen-shot-2018-02-14-at-1.56.58-pm.png)
 
@@ -63,7 +61,9 @@ The project details can be editable.
 
 ### Project Activities
 
-Under activities the partner can add activities they are conducting. They can choose to adopt a cluster activity or create a custom activity of their own.
+Within a project the partner can add activities they are conducting. Partners would only select from a cluster activity list if adding them to a project.
+
+They can choose to adopt a cluster activity or create a custom activity of their own.
 
 If the Partner selects from a Cluster Activity, we will to show
 

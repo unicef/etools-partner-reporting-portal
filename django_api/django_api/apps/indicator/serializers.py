@@ -452,10 +452,7 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
     location_progress = serializers.SerializerMethodField()
     previous_location_progress = serializers.SerializerMethodField()
     display_type = serializers.SerializerMethodField()
-    is_complete = serializers.SerializerMethodField()
-
-    def get_is_complete(self, obj):
-        return obj.is_complete
+    is_complete = serializers.BooleanField(read_only=True)
 
     def get_display_type(self, obj):
         return obj.indicator_report.display_type
@@ -756,10 +753,8 @@ class PDReportContextIndicatorReportSerializer(serializers.ModelSerializer):
     due_date = serializers.SerializerMethodField()
     is_cluster_indicator = serializers.SerializerMethodField()
     reportable = ReportableSimpleSerializer()
-    report_status_display = serializers.CharField(
-        source='get_report_status_display')
-    overall_status_display = serializers.CharField(
-        source='get_overall_status_display')
+    report_status_display = serializers.CharField(source='get_report_status_display')
+    overall_status_display = serializers.CharField(source='get_overall_status_display')
 
     class Meta:
         model = IndicatorReport
@@ -780,6 +775,7 @@ class PDReportContextIndicatorReportSerializer(serializers.ModelSerializer):
             'overall_status',
             'overall_status_display',
             'narrative_assessment',
+            'is_complete',
         )
 
     def get_id(self, obj):
@@ -1326,7 +1322,7 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
         return obj.can_submit
 
 
-class ReportableSimpleSerializer(serializers.ModelSerializer):
+class ReportableIdSerializer(serializers.ModelSerializer):
 
     title = serializers.SerializerMethodField()
 
@@ -1338,7 +1334,7 @@ class ReportableSimpleSerializer(serializers.ModelSerializer):
         )
 
     def get_title(self, obj):
-        return obj.blueprint.title
+        return obj.blueprint.title + " (Cluster Activity)" if obj.children.exists() else obj.blueprint.title
 
 # PMP API Serializers
 

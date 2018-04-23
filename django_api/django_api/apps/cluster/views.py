@@ -21,7 +21,7 @@ from core.serializers import ShortLocationSerializer
 from core.models import Location, ResponsePlan
 from indicator.serializers import (
     ClusterIndicatorReportSerializer,
-    ReportableSimpleSerializer,
+    ReportableIdSerializer,
     ClusterPartnerAnalysisIndicatorResultSerializer,
 )
 from indicator.models import IndicatorReport, Reportable, ReportableLocationGoal
@@ -357,19 +357,19 @@ class IndicatorReportDetailAPIView(RetrieveAPIView):
     get_queryset = IndicatorReportsListAPIView.get_queryset
 
 
-class ReportablesSimpleListAPIView(ListAPIView):
+class ClusterReportablesIdListAPIView(ListAPIView):
     """
-    Cluster IndicatorReportsListAPIView simplified API - GET/POST
+    API for grabbing all Cluster Indicator instances as id & title pairs - GET
     Authentication required.
 
     Parameters:
     - response_plan_id - Response plan ID
 
     Returns:
-        - GET method - ReportableSimpleSerializer object.
-        - POST method - ReportableSimpleSerializer object.
+        - GET method - ReportableIdSerializer object.
+        - POST method - ReportableIdSerializer object.
     """
-    serializer_class = ReportableSimpleSerializer
+    serializer_class = ReportableIdSerializer
     pagination_class = filter_class = None
 
     def get_queryset(self):
@@ -756,20 +756,22 @@ class OperationalPresenceAggregationDataAPIView(APIView):
         response_data["partners_per_cluster"] = {}
         response_data["partners_per_cluster_objective"] = {}
 
-        for partner_type in partner_types:
-            response_data["partners_per_type"][PARTNER_TYPE[partner_type]] = Partner.objects.filter(
-                partner_type=partner_type, clusters__in=clusters
-            ).distinct().values_list('title', flat=True)
+        # As long as clusters have any partners
+        if partner_types != [None]:
+            for partner_type in partner_types:
+                response_data["partners_per_type"][PARTNER_TYPE[partner_type]] = Partner.objects.filter(
+                    partner_type=partner_type, clusters__in=clusters
+                ).distinct().values_list('title', flat=True)
 
-        for cluster in clusters:
-            cluster_type = cluster.type.capitalize()
-            response_data["partners_per_cluster"][cluster_type] = cluster.partners.values_list('title', flat=True)
+            for cluster in clusters:
+                cluster_type = cluster.type.capitalize()
+                response_data["partners_per_cluster"][cluster_type] = cluster.partners.values_list('title', flat=True)
 
-        for objective in objectives:
-            cluster_type = objective.cluster.type.capitalize()
-            objective_title = objective.title + " (" + cluster_type + ")"
-            response_data["partners_per_cluster_objective"][objective_title] = \
-                Partner.objects.filter(clusters__cluster_objectives=objective).values_list('title', flat=True)
+            for objective in objectives:
+                cluster_type = objective.cluster.type.capitalize()
+                objective_title = objective.title + " (" + cluster_type + ")"
+                response_data["partners_per_cluster_objective"][objective_title] = \
+                    Partner.objects.filter(clusters__cluster_objectives=objective).values_list('title', flat=True)
 
         return response_data
 

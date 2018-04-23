@@ -4,7 +4,7 @@ description: Overview of the PRP Platform
 
 # PRP Documentation
 
-PRP stands for **Partner Reporting Portal**.
+PRP stands for **Partner Reporting Portal**. 
 
 It's a web application built by [UNICEF](https://www.unicef.org/) to ease the reporting of data by its partners in the context of IP \(Implementing Partner\) reporting and also in the context of [Cluster](https://www.humanitarianresponse.info/clusters) reporting.
 
@@ -14,7 +14,7 @@ PRP is an open-source project and can be found on [Github](https://github.com/un
 
 PRP consists of two somewhat distinct user experiences targeting different but potentially overlapping use-cases. This is what is referred to as [IP](https://github.com/unicef/etools-partner-reporting-portal/tree/4210b652f2748069ce5e2223b85f475ba3480729/docs/product-end-user-documentation/ip-reporting/README.md) and [Cluster Reporting](https://github.com/unicef/etools-partner-reporting-portal/tree/4210b652f2748069ce5e2223b85f475ba3480729/docs/product-end-user-documentation/cluster-reporting/README.md). More details if you click on each of them in the left hand navigation.
 
-Both of these sub-systems is built on top of the same [data model](technical-documentation/data-model.md) and all the data is stored in the same database.
+Both of these sub-systems is built on top of the same [data model](technical-documentation/data-model.md) and all the data is stored in the same database. 
 
 ## Design Philosophy
 

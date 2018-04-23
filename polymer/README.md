@@ -49,14 +49,14 @@ To run the application you can use:
 
 ```bash
 $ polymer serve
-View your app at http://localhost:8080
+View your app at http://localhost:8082
 ```
 This command will start the server and serve your files directly from app sources.
 At this point you do not need to build anything, the files will not be served from build folder.
 
 ```bash
 $ polymer serve build/bundled
-View your app at http://localhost:8080
+View your app at http://localhost:8082
 ```
 This command will start the server and use the bundled build (build/bundled folder) to serve the files from.
 Before you can serve the bundled build you have to generate the build files.

@@ -2,6 +2,7 @@
 <link rel="import" href="../../../../bower_components/google-chart/google-chart.html">
 
 <link rel="import" href="analysis-widget.html">
+<link rel="import" href="../../list-placeholder.html">
 <link rel="import" href="../../../redux/store.html">
 <link rel="import" href="../../../behaviors/utils.html">
 <link rel="import" href="../../../behaviors/analysis-chart.html">
@@ -21,14 +22,21 @@ a
     </style>
 
     <analysis-widget
-        widget-title="Partners per Cluster Objective"
+        widget-title="[[widgetTitle]]"
         loading="[[loading]]">
-      <google-chart
-          type="bar"
-          options="[[options]]"
-          cols="[[cols]]"
-          rows="[[rows]]">
-      </google-chart>
+      <div hidden$="[[!rows.length]]">
+        <google-chart
+            type="bar"
+            options="[[options]]"
+            cols="[[cols]]"
+            rows="[[rows]]">
+        </google-chart>
+      </div>
+
+      <list-placeholder
+          data="[[rows]]"
+          message="No data for [[widgetTitle]].">
+      </list-placeholder>
     </analysis-widget>
   </template>
 
@@ -43,6 +51,11 @@ a
       ],
 
       properties: {
+        widgetTitle: {
+          type: String,
+          value: 'Partners per Cluster Objective',
+        },
+
         loading: {
           type: Boolean,
           statePath: 'analysis.operationalPresence.dataLoading',

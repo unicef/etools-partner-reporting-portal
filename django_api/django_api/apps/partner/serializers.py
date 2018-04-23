@@ -147,7 +147,7 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
     response_plan_title = serializers.SerializerMethodField()
     total_budget = serializers.CharField(required=False)
     description = serializers.CharField(required=False)
-    additional_information = serializers.CharField(required=False)
+    additional_information = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     funding = PartnerProjectFundingSerializer(read_only=True)
     additional_partners = PartnerSimpleSerializer(many=True, allow_null=True, read_only=True)
     custom_fields = PartnerProjectCustomFieldSerializer(many=True, allow_null=True, required=False)
@@ -177,6 +177,7 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
             'funding',
             'additional_partners',
             'custom_fields',
+            'is_ocha_imported',
         )
 
     def get_response_plan_title(self, obj):
@@ -248,8 +249,8 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
             project.save()
 
         cluster_ids = [c['id'] for c in clusters]
+        project.clusters.clear()
         project.clusters.add(*Cluster.objects.filter(id__in=cluster_ids))
-        project.clusters.through.objects.exclude(cluster_id__in=cluster_ids).delete()
 
         self.save_funding(instance=instance)
 
@@ -467,12 +468,12 @@ class PartnerActivitySerializer(serializers.ModelSerializer):
         if obj.cluster_activity:
             return {
                 "id": obj.cluster_activity.cluster_objective.cluster.id,
-                "name": obj.cluster_activity.cluster_objective.cluster.get_type_display(),
+                "name": obj.cluster_activity.cluster_objective.cluster.title,
             }
         elif obj.cluster_objective:
             return {
                 "id": obj.cluster_objective.cluster.id,
-                "name": obj.cluster_objective.cluster.get_type_display(),
+                "name": obj.cluster_objective.cluster.title,
             }
         else:
             return None
@@ -567,7 +568,7 @@ class PMPPartnerSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         validated_data = self.fix_choices(validated_data)
         return Partner.objects.filter(
-            external_id=validated_data['external_id']).update(**validated_data)
+            vendor_number=validated_data['vendor_number']).update(**validated_data)
 
     def create(self, validated_data):
         validated_data = self.fix_choices(validated_data)

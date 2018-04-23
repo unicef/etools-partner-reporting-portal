@@ -264,11 +264,16 @@
             on-change="adjustPosition">
             <template
               is="dom-if"
-              if="[[canAddOchaProjects]]"
+              if="[[!edit]]"
               restamp="true">
-              <paper-radio-button name="ocha" active="true">
-                <strong>From OCHA</strong>
-              </paper-radio-button>
+              <template
+                is="dom-if"
+                if="[[canAddOchaProjects]]"
+                restamp="true">
+                <paper-radio-button name="ocha" active="true">
+                  <strong>From OCHA</strong>
+                </paper-radio-button>
+              </template>
             </template>
             <div
               class="fields"
@@ -299,9 +304,14 @@
                 </div>
               </template>
             </div>
-            <paper-radio-button name="custom">
-              <strong>Custom</strong>
-            </paper-radio-button>
+            <template
+            is="dom-if"
+            if="[[!edit]]"
+            restamp="true">
+              <paper-radio-button name="custom">
+                <strong>Custom</strong>
+              </paper-radio-button>
+            </template>
             <div
               empty$="[[!_equals(mode, 'custom')]]">
               <template
@@ -831,6 +841,7 @@
           this.selectedClusters = this.editData.clusters.map(function(cluster) {
             return cluster.id;
           });
+          this.set('mode', 'custom');
         } else {
           this.data = {'custom_fields': [], 'funding': {}};
           this.selectedClusters = [];

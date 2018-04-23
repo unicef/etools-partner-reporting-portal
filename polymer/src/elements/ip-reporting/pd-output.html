@@ -156,7 +156,7 @@
               <div class="layout horizontal">
                 <div class="status-badge layout vertical center-justified">
                   <report-status
-                      status="[[indicator.report_status]]"
+                      status="[[_computeCompleteIndicator(indicator.is_complete)]]"
                       no-label>
                   </report-status>
                 </div>
@@ -328,6 +328,10 @@
 
       _computeIcon: function (opened) {
         return opened ? 'less' : 'more';
+      },
+
+      _computeCompleteIndicator: function (complete) {
+        return complete ? 'Met' : 'Ove';
       },
 
       _computeReportableUrl: function (reportId, data) {
