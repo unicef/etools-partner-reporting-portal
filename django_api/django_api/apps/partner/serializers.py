@@ -147,7 +147,7 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
     response_plan_title = serializers.SerializerMethodField()
     total_budget = serializers.CharField(required=False)
     description = serializers.CharField(required=False)
-    additional_information = serializers.CharField(required=False)
+    additional_information = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     funding = PartnerProjectFundingSerializer(read_only=True)
     additional_partners = PartnerSimpleSerializer(many=True, allow_null=True, read_only=True)
     custom_fields = PartnerProjectCustomFieldSerializer(many=True, allow_null=True, required=False)
