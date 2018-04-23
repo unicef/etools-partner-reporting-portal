@@ -81,7 +81,7 @@
         },
 
         // pdId
-        // reportId
+        // reportId programmeDocumentReports.current.id
 
         data: {
           type: Array,
@@ -92,26 +92,6 @@
           type: Array,
           computed: '_computeViewData(data)',
         },
-
-        listeners: {
-          'refresh-report': '_onRefreshOutput',
-        },
-      },
-
-      _onRefreshOutput: function (e, reportId) {
-        e.stopPropagation();
-
-        var ajax = document.createElement('etools-prp-ajax');
-
-        ajax.url = App.Endpoints.programmeDocumentReport(this.pdId, this.currentReport);
-        console.log('chwyta');
-
-        this.dispatch(
-          App.Actions.PDReports.fetchSingle(ajax.thunk(), this.pdId)
-        )
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-            });
       },
 
       _computeViewData: function (data) {
