@@ -249,8 +249,8 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
             project.save()
 
         cluster_ids = [c['id'] for c in clusters]
+        project.clusters.clear()
         project.clusters.add(*Cluster.objects.filter(id__in=cluster_ids))
-        project.clusters.through.objects.exclude(cluster_id__in=cluster_ids).delete()
 
         self.save_funding(instance=instance)
 
