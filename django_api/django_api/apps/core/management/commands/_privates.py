@@ -4,6 +4,7 @@
 
 from __future__ import unicode_literals
 
+import calendar
 import datetime
 import random
 
@@ -46,6 +47,7 @@ from unicef.models import (
     PDResultLink,
     LowerLevelOutput,
     Person,
+    ReportingPeriodDates,
 )
 from core.models import (
     Workspace,
@@ -120,6 +122,7 @@ def clean_up_data():
         PartnerActivity.objects.all().delete()
         IndicatorBlueprint.objects.all().delete()
         Reportable.objects.all().delete()
+        ReportingPeriodDates.objects.all().delete()
         IndicatorReport.objects.all().delete()
         IndicatorLocationData.objects.all().delete()
         Disaggregation.objects.all().delete()
@@ -132,10 +135,10 @@ def clean_up_data():
         LowerLevelOutput.objects.all().delete()
         Workspace.objects.all().delete()
         ResponsePlan.objects.all().delete()
-        Location.objects.all().delete()
-        GatewayType.objects.all().delete()
-        CartoDBTable.objects.all().delete()
-        Person.objects.all().delete()
+        Location.objects.filter(title__icontains="location_").delete()
+        GatewayType.objects.filter(name__icontains="gateway_type_").delete()
+        CartoDBTable.objects.filter(domain__icontains="domain_").delete()
+        Person.objects.filter(name__icontains="Person_").delete()
         print("All ORM objects deleted")
 
 
@@ -428,21 +431,61 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
     # only create PD's for the partner being used above
     programme_documents = []
     for workspace in Workspace.objects.all():
-        for i in range(workspace_quantity * 2):
+        for i in range(workspace_quantity * 4):
             pd = ProgrammeDocumentFactory.create(partner=first_partner, workspace=workspace)
             programme_documents.append(pd)
-            for ir in range(3):
-                d = datetime.datetime.now() + datetime.timedelta(days=ir * 30)
-                report_type = REPORTING_TYPE_LIST_WITHOUT_SR[random.randint(0, 1)]
 
-                ReportingPeriodDatesFactory.create(
+            now = datetime.datetime.now()
+
+            # HRs
+            for month in range(1, 13):
+                monthrange = calendar.monthrange(now.year, month)
+
+                ReportingPeriodDatesFactory(
                     programme_document=pd,
-                    report_type=report_type,
-                    start_date=d,
-                    end_date=d + datetime.timedelta(days=30),
-                    due_date=d + datetime.timedelta(days=45),
+                    report_type="HR",
+                    start_date=datetime.datetime(now.year, month, 1),
+                    end_date=datetime.datetime(now.year, month, monthrange[1]),
+                    due_date=datetime.datetime(now.year, month, monthrange[1]),
                 )
-    print("{} ProgrammeDocument objects created".format(min(4, workspace_quantity * 2)))
+
+            # Q1
+            ReportingPeriodDatesFactory(
+                programme_document=pd,
+                report_type="QPR",
+                start_date=datetime.datetime(now.year, 1, 1),
+                end_date=datetime.datetime(now.year, 3, 31),
+                due_date=datetime.datetime(now.year, 3, 31),
+            )
+
+            # Q2
+            ReportingPeriodDatesFactory(
+                programme_document=pd,
+                report_type="QPR",
+                start_date=datetime.datetime(now.year, 4, 1),
+                end_date=datetime.datetime(now.year, 6, 30),
+                due_date=datetime.datetime(now.year, 6, 30),
+            )
+
+            # Q3
+            ReportingPeriodDatesFactory(
+                programme_document=pd,
+                report_type="QPR",
+                start_date=datetime.datetime(now.year, 7, 1),
+                end_date=datetime.datetime(now.year, 9, 30),
+                due_date=datetime.datetime(now.year, 9, 30),
+            )
+
+            # Q4
+            ReportingPeriodDatesFactory(
+                programme_document=pd,
+                report_type="QPR",
+                start_date=datetime.datetime(now.year, 10, 1),
+                end_date=datetime.datetime(now.year, 12, 31),
+                due_date=datetime.datetime(now.year, 12, 31),
+            )
+
+    print("{} ProgrammeDocument objects created".format(min(4, workspace_quantity * 4)))
 
     # Linking the followings:
     # ProgressReport - ProgrammeDocument
@@ -497,10 +540,15 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
             queryset = pd.reporting_periods.filter(report_type=report_type)
 
             for idx, rpd in enumerate(queryset):
+                print(rpd.report_type, rpd.start_date, rpd.end_date, rpd.due_date)
+
                 progress_report = ProgressReportFactory(
                     programme_document=pd,
                     report_type=report_type,
-                    report_number=idx + 1
+                    report_number=idx + 1,
+                    start_date=rpd.start_date,
+                    end_date=rpd.end_date,
+                    due_date=rpd.due_date,
                 )
 
                 if idx == queryset.count() - 1:
@@ -511,19 +559,25 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
                     for llo in cp_output.ll_outputs.all():
                         # All Indicator Reports inside LLO should have same status
                         # We should skip "No status"
-                        status = OVERALL_STATUS_LIST[random.randint(0, 4)]
+                        status = "NoS"
                         for reportable in llo.reportables.all():
                             if reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
                                 QuantityIndicatorReportFactory(
                                     reportable=reportable,
                                     progress_report=progress_report,
                                     overall_status=status,
+                                    time_period_start=rpd.start_date,
+                                    time_period_end=rpd.end_date,
+                                    due_date=rpd.due_date,
                                 )
                             elif reportable.blueprint.unit == IndicatorBlueprint.PERCENTAGE:
                                 RatioIndicatorReportFactory(
                                     reportable=reportable,
                                     progress_report=progress_report,
                                     overall_status=status,
+                                    time_period_start=rpd.start_date,
+                                    time_period_end=rpd.end_date,
+                                    due_date=rpd.due_date,
                                 )
 
         # QPR generation
