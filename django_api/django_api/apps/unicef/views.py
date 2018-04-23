@@ -540,6 +540,120 @@ class ProgressReportSubmitAPIView(APIView):
             )
 
 
+class ProgressReportSRSubmitAPIView(APIView):
+    """
+    A dedicated API endpoint for submitting SR Progress Report.
+    Only a partner authorized officer can submit a progress report.
+    """
+    permission_classes = (IsAuthenticated, IsPartnerAuthorizedOfficer)
+
+    def get_object(self):
+        try:
+            return ProgressReport.objects.get(
+                programme_document__partner=self.request.user.partner,
+                programme_document__workspace=self.kwargs['workspace_id'],
+                pk=self.kwargs['pk'],
+                report_type="SR")
+        except ProgressReport.DoesNotExist as exp:
+            logger.exception({
+                "endpoint": "ProgressReportSubmitAPIView",
+                "request.data": self.request.data,
+                "pk": self.kwargs['pk'],
+                "exception": exp,
+            })
+            raise Http404
+
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        progress_report = self.get_object()
+        if progress_report.programme_document.status \
+                not in [PD_STATUS.active, PD_STATUS.ended, PD_STATUS.terminated, PD_STATUS.suspended]:
+            raise ValidationError(
+                "Updating Progress Report for a {} Programme Document is not allowed. "
+                "Only Active/Ended/Suspended/Terminated "
+                "PDs can be reported on.".format(progress_report.programme_document.get_status_display())
+            )
+
+        for ir in progress_report.indicator_reports.all():
+            # Check if all indicator data is fulfilled for IR status different
+            # then Met or No Progress
+            if ir.overall_status not in {OVERALL_STATUS.met, OVERALL_STATUS.no_progress}:
+                for data in ir.indicator_location_data.all():
+                    for key, vals in data.disaggregation.items():
+                        if ir.is_percentage and (vals.get('c', None) in [None, '']):
+                            raise ValidationError(
+                                "You have not completed all required indicators for this progress report. Unless your "
+                                "Output status is Met or has No Progress, all indicator data needs to be completed."
+                            )
+
+                        elif ir.is_number and (vals.get('v', None) in [None, '']):
+                            raise ValidationError(
+                                "You have not completed all required indicators for this progress report. Unless your "
+                                "Output status is Met or has No Progress, all indicator data needs to be completed."
+                            )
+                if not ir.narrative_assessment:
+                    raise ValidationError(
+                        "You have not completed narrative assessment for one of Outputs ({}). Unless your Output "
+                        "status is Met or has No Progress, all indicator data needs to be completed.".format(
+                            ir.reportable.content_object
+                        )
+                    )
+
+            # Check if indicator was already submitted or SENT BACK
+            if ir.submission_date is None or ir.report_status == INDICATOR_REPORT_STATUS.sent_back:
+                ir.submission_date = datetime.now().date()
+                ir.report_status = INDICATOR_REPORT_STATUS.submitted
+                ir.save()
+
+        # Check if PR other tab is fulfilled
+        other_tab_errors = []
+        if not progress_report.partner_contribution_to_date:
+            other_tab_errors.append("You have not completed Partner Contribution To Date field on Other Info tab.")
+        if not progress_report.challenges_in_the_reporting_period:
+            other_tab_errors.append(
+                "You have not completed Challenges / bottlenecks in the reporting period field on Other Info tab."
+            )
+        if not progress_report.proposed_way_forward:
+            other_tab_errors.append("You have not completed Proposed way forward field on Other Info tab.")
+
+        if other_tab_errors:
+            raise ValidationError(other_tab_errors)
+
+        if progress_report.submission_date is None or progress_report.status == PROGRESS_REPORT_STATUS.sent_back:
+            provided_email = request.data.get('submitted_by_email')
+
+            authorized_officer_user = get_user_model().objects.filter(
+                email=provided_email or self.request.user.email,
+                groups=PartnerAuthorizedOfficerRole.as_group(),
+                email__in=progress_report.programme_document.partner_focal_point.values_list('email', flat=True)
+            ).first()
+
+            if not authorized_officer_user:
+                if provided_email:
+                    _error_message = 'Report could not be submitted, because {} is not the authorized ' \
+                                     'officer assigned to the PCA that is connected to that PD.'.format(provided_email)
+                else:
+                    _error_message = 'Your report could not be submitted, because you are not the authorized ' \
+                                     'officer assigned to the PCA that is connected to that PD.'
+                raise ValidationError(
+                    _error_message, code=APIErrorCode.PR_SUBMISSION_FAILED_USER_NOT_AUTHORIZED_OFFICER
+                )
+
+            progress_report.status = PROGRESS_REPORT_STATUS.submitted
+            progress_report.submission_date = datetime.now().date()
+            progress_report.submitted_by = authorized_officer_user
+            progress_report.submitting_user = self.request.user
+            progress_report.save()
+
+            serializer = ProgressReportSerializer(instance=progress_report)
+            return Response(serializer.data, status=statuses.HTTP_200_OK)
+        else:
+            raise ValidationError(
+                "Progress report was already submitted. Your IMO will need to send it "
+                "back for you to edit your submission."
+            )
+
+
 class ProgressReportReviewAPIView(APIView):
     """
     Called by PO to accept or send back a submitted progress report. Called
