@@ -177,6 +177,7 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
             'funding',
             'additional_partners',
             'custom_fields',
+            'is_ocha_imported',
         )
 
     def get_response_plan_title(self, obj):
