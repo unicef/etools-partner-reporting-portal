@@ -60,7 +60,8 @@ from .serializers import (
     ProgrammeDocumentCalculationMethodsSerializer,
     ProgrammeDocumentProgressSerializer,
     ProgressReportUpdateSerializer,
-    ProgressReportAttachmentSerializer
+    ProgressReportAttachmentSerializer,
+    ProgressReportSRUpdateSerializer,
 )
 from .models import ProgrammeDocument, ProgressReport
 from .permissions import (
@@ -320,7 +321,12 @@ class ProgressReportDetailsUpdateAPIView(APIView):
     def put(self, request, workspace_id, pk, *args, **kwargs):
         self.workspace_id = workspace_id
         pr = self.get_object(pk)
-        serializer = ProgressReportUpdateSerializer(instance=pr, data=request.data)
+
+        if pr.report_type == "SR":
+            serializer = ProgressReportSRUpdateSerializer(instance=pr, data=request.data)
+        else:
+            serializer = ProgressReportUpdateSerializer(instance=pr, data=request.data)
+
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=statuses.HTTP_200_OK)
@@ -572,6 +578,11 @@ class ProgressReportSRSubmitAPIView(APIView):
                 "Updating Progress Report for a {} Programme Document is not allowed. "
                 "Only Active/Ended/Suspended/Terminated "
                 "PDs can be reported on.".format(progress_report.programme_document.get_status_display())
+            )
+
+        if not progress_report.narrative:
+            raise ValidationError(
+                "Narrative is required for SR report type"
             )
 
         # Attachment field validation

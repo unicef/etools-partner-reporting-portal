@@ -351,6 +351,18 @@ class ProgressReportUpdateSerializer(serializers.ModelSerializer):
         )
 
 
+class ProgressReportSRUpdateSerializer(serializers.ModelSerializer):
+
+    narrative = serializers.CharField()
+
+    class Meta:
+        model = ProgressReport
+        fields = (
+            'id',
+            'narrative',
+        )
+
+
 class ProgressReportReviewSerializer(serializers.Serializer):
     status = serializers.ChoiceField(choices=[
         PROGRESS_REPORT_STATUS.sent_back,
