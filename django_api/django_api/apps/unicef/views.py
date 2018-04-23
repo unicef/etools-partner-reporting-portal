@@ -574,6 +574,12 @@ class ProgressReportSRSubmitAPIView(APIView):
                 "PDs can be reported on.".format(progress_report.programme_document.get_status_display())
             )
 
+        # Attachment field validation
+        if not progress_report.attachment:
+            raise ValidationError(
+                "Attachment is required for SR report type"
+            )
+
         # Accept/send back validation and submission on behalf feature
         if progress_report.submission_date is None or progress_report.status == PROGRESS_REPORT_STATUS.sent_back:
             provided_email = request.data.get('submitted_by_email')
