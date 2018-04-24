@@ -162,10 +162,8 @@ class ResponsePlanClusterDashboardSerializer(serializers.ModelSerializer):
 
     def get_overdue_indicator_reports(self, obj):
         return ClusterIndicatorReportSerializer(
-            obj.overdue_indicator_reports(
-                clusters=self.context['clusters'],
-                limit=10),
-            many=True).data
+            obj.overdue_indicator_reports(clusters=self.context['clusters'], limit=10), many=True
+        ).data
 
     def get_constrained_indicator_reports(self, obj):
         return ClusterIndicatorReportSerializer(
