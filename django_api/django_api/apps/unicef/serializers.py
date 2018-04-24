@@ -2,6 +2,7 @@ from django.conf import settings
 from rest_framework import serializers
 
 from core.serializers import ShortLocationSerializer
+from utils.filters.constants import Boolean
 from .models import ProgrammeDocument, Section, ProgressReport, Person, \
     LowerLevelOutput, PDResultLink, ReportingPeriodDates
 
@@ -260,7 +261,7 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
         request = kwargs.get('context', {}).get('request')
         self.llo_id = kwargs.get('llo_id') or request and request.GET.get('llo')
         self.location_id = kwargs.get('location_id') or request and request.GET.get('location')
-        self.show_incomplete = kwargs.get('incomplete') or request and request.GET.get('incomplete')
+        self.show_incomplete_only = kwargs.get('incomplete') or request and request.GET.get('incomplete')
 
         super(ProgressReportSerializer, self).__init__(*args, **kwargs)
 
@@ -317,13 +318,19 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
         return obj.programme_document.funds_received_to_date_percentage
 
     def get_indicator_reports(self, obj):
-        qset = obj.indicator_reports.all()
+        queryset = obj.indicator_reports.all()
         if self.llo_id and self.llo_id is not None:
-            qset = qset.filter(reportable__object_id=self.llo_id)
+            queryset = queryset.filter(reportable__object_id=self.llo_id)
         if self.location_id and self.llo_id is not None:
-            qset = qset.filter(reportable__locations__id=self.location_id)
+            queryset = queryset.filter(reportable__locations__id=self.location_id)
 
-        return PDReportContextIndicatorReportSerializer(instance=qset, read_only=True, many=True).data
+        if self.show_incomplete_only == Boolean.TRUE:
+            queryset = filter(
+                lambda x: not x.is_complete,
+                queryset
+            )
+
+        return PDReportContextIndicatorReportSerializer(queryset, read_only=True, many=True).data
 
     def get_reporting_period(self, obj):
         return "%s - %s " % (
