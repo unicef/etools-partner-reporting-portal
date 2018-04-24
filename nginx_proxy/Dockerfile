@@ -1,5 +1,6 @@
 FROM nginx:1.13.12
 
+ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && \
     apt-get install -y --no-install-recommends apt-utils && \
     apt-get install --assume-yes python-pip python-dev python-setuptools build-essential
