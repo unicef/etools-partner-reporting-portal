@@ -477,14 +477,18 @@ class ProgressReportSubmitAPIView(APIView):
                         for key, vals in data.disaggregation.items():
                             if ir.is_percentage and (vals.get('c', None) in [None, '']):
                                 raise ValidationError(
-                                    "You have not completed all required indicators for this progress report. Unless your "
-                                    "Output status is Met or has No Progress, all indicator data needs to be completed."
+                                    "You have not completed all required indicators "
+                                    "for this progress report. Unless your "
+                                    "Output status is Met or has No Progress, "
+                                    "all indicator data needs to be completed."
                                 )
 
                             elif ir.is_number and (vals.get('v', None) in [None, '']):
                                 raise ValidationError(
-                                    "You have not completed all required indicators for this progress report. Unless your "
-                                    "Output status is Met or has No Progress, all indicator data needs to be completed."
+                                    "You have not completed all required indicators "
+                                    "for this progress report. Unless your "
+                                    "Output status is Met or has No Progress, "
+                                    "all indicator data needs to be completed."
                                 )
                     if not ir.narrative_assessment:
                         raise ValidationError(

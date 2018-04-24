@@ -60,10 +60,10 @@ def process_period_reports():
     def get_latest_pr_by_type(pd, report_type):
         """
         Return latest ProgressReport instance given report_type
-        
+
         Arguments:
             report_type {str} -- A report type as string: [QPR, HR, SR]
-        
+
         Returns:
             ProgressReport -- Latest ProgressReport instance for given report_type
         """
@@ -140,7 +140,7 @@ def process_period_reports():
             start_date = reporting_period.start_date
 
             # Create ProgressReport first
-            print("Creating ProgressReport for {} - {}".format(start_date, end_date))            
+            print("Creating ProgressReport for {} - {}".format(start_date, end_date))
 
             # Re-query latest ProgressReport by report type
             latest_progress_report = get_latest_pr_by_type(pd, reporting_period.report_type)
