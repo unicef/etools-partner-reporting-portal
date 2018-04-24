@@ -534,7 +534,14 @@ class ProgressReportSubmitAPIView(APIView):
                     _error_message, code=APIErrorCode.PR_SUBMISSION_FAILED_USER_NOT_AUTHORIZED_OFFICER
                 )
 
-            progress_report.status = PROGRESS_REPORT_STATUS.submitted
+            # HR report type progress report is automatically accepted
+            if progress_report.report_type == "HR":
+                progress_report.status = PROGRESS_REPORT_STATUS.accepted
+
+            # QPR report type is submitted at this stage
+            else:
+                progress_report.status = PROGRESS_REPORT_STATUS.submitted
+
             progress_report.submission_date = datetime.now().date()
             progress_report.submitted_by = authorized_officer_user
             progress_report.submitting_user = self.request.user
