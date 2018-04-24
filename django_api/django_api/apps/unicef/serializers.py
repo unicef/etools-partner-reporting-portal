@@ -329,7 +329,7 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
         return "%s - %s " % (
             obj.start_date.strftime(settings.PRINT_DATA_FORMAT),
             obj.end_date.strftime(settings.PRINT_DATA_FORMAT)
-        )
+        ) if obj.start_date and obj.end_date else "No reporting period"
 
     def get_is_draft(self, obj):
         return obj.latest_indicator_report.is_draft if obj.latest_indicator_report else None
