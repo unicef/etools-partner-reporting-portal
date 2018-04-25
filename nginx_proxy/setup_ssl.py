@@ -15,7 +15,7 @@ CERTIFICATE_FILE = os.path.join(
     CERTIFICATES_PATH, 'fullchain.pem'
 )
 
-NGINX_SSL_CFG_FILE = '"/etc/nginx/conf.d/default-with-ssl.conf"'
+NGINX_SSL_CFG_FILE = "/etc/nginx/conf.d/default-with-ssl.conf"
 
 if __name__ == '__main__':
     if not DOMAIN_NAME and not ADMIN_MAIL:
