@@ -35,7 +35,7 @@ def render_base_programme_info_for_report(report):
         'report': report,
         'pd': report.programme_document,
         'authorized_officer': report.programme_document.unicef_officers.first(),
-        'focal_point': report.programme_document.unicef_focal_point.first(),
+        'focal_point': report.programme_document.partner_focal_point.first(),
         'funds_received_to_date_percentage': funds_received_to_date_percentage
     }
 

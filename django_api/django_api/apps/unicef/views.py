@@ -266,7 +266,7 @@ class ProgressReportAPIView(ListExportMixin, ListAPIView):
         )
 
 
-class ProgressReportPDFView(RetrieveAPIView):
+class ProgressReportAnnexCPDFView(RetrieveAPIView):
     """
         Endpoint for getting PDF of Progress Report Annex C.
     """
