@@ -6,6 +6,11 @@ server {
     listen      80;
     client_max_body_size 100m;
 
+    location /.well-known/acme-challenge {
+        allow all;
+        root /usr/share/nginx/html;
+    }
+
     location /api/ {
       uwsgi_pass django_api_uwsgi;
       include /etc/nginx/conf.d/uwsgi_params;
