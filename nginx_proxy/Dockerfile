@@ -4,7 +4,7 @@ ENV DEBIAN_FRONTEND noninteractive
 ENV SSL_CERTIFICATE ''
 RUN apt-get update && \
     apt-get install -y --no-install-recommends apt-utils && \
-    apt-get install --assume-yes python-pip python-dev python-setuptools build-essential
+    apt-get install --assume-yes python-pip python-dev python-setuptools build-essential cron
 RUN pip install j2cli
 RUN pip install cryptography==2.1.4
 RUN pip install requests --upgrade
