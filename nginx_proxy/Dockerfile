@@ -29,6 +29,3 @@ EXPOSE 80
 EXPOSE 443
 
 CMD ["/command.sh"]
-#CMD ["python", "setup_ssl.py"]
-#CMD ["nginx", "-s", "stop"]
-#CMD ["nginx", "-g", "daemon off;"]
