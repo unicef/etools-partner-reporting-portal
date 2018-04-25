@@ -1,7 +1,6 @@
 FROM nginx:1.13.12
 
 ENV DEBIAN_FRONTEND noninteractive
-ENV NGINX_LISTEN_PORT 80
 ENV SSL_CERTIFICATE ''
 RUN apt-get update && \
     apt-get install -y --no-install-recommends apt-utils && \
