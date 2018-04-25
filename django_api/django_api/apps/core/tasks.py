@@ -57,67 +57,127 @@ def process_workspaces():
 
 @shared_task
 def process_period_reports():
+    def get_latest_pr_by_type(pd, report_type):
+        """
+        Return latest ProgressReport instance given report_type
+        Arguments:
+            report_type {str} -- A report type as string: [QPR, HR, SR]
+        Returns:
+            ProgressReport -- Latest ProgressReport instance for given report_type
+        """
+
+        if report_type == "QPR":
+            return pd.progress_reports \
+                .filter(report_type="QPR").order_by(
+                    'report_type',
+                    'report_number',
+                    'is_final',
+                    'end_date'
+                ).last()
+
+        if report_type == "HR":
+            return pd.progress_reports \
+                .filter(report_type="HR").order_by(
+                    'report_type',
+                    'report_number',
+                    'is_final',
+                    'end_date'
+                ).last()
+
+        if report_type == "SR":
+            return pd.progress_reports \
+                .filter(report_type="SR").order_by(
+                    'report_type',
+                    'report_number',
+                    'is_final',
+                    'due_date'
+                ).last()
+
     for pd in ProgrammeDocument.objects.filter(status=PD_STATUS.active):
         print("\nProcessing ProgrammeDocument {}".format(pd.id))
         print(10 * "****")
 
         reportable_queryset = pd.reportable_queryset
-        latest_progress_report = pd.progress_reports.order_by(
-            'report_type', 'report_number', 'is_final', 'end_date'
-        ).last()
 
-        generate_from_date = None
+        latest_progress_report_qpr = get_latest_pr_by_type(pd, "QPR")
+        latest_progress_report_hr = get_latest_pr_by_type(pd, "HR")
+        latest_progress_report_sr = get_latest_pr_by_type(pd, "SR")
 
-        # Get missing date list based on progress report existence
-        if latest_progress_report:
-            generate_from_date = latest_progress_report.start_date
+        generate_from_date_qpr = None
+        generate_from_date_hr = None
+        generate_from_date_sr = None
 
-        print("Last report: %s" % generate_from_date)
+        if latest_progress_report_qpr:
+            generate_from_date_qpr = latest_progress_report_qpr.start_date
 
-        with transaction.atomic():
-            for idx, reporting_period in enumerate(pd.reporting_periods.all()):
-                # If PR start date is greater than now, skip!
-                if reporting_period.start_date > datetime.now().date():
-                    print("No new reports to generate")
-                    continue
+        if latest_progress_report_hr:
+            generate_from_date_hr = latest_progress_report_hr.start_date
 
-                # If PR was already generated, skip!
-                if generate_from_date and reporting_period.start_date <= generate_from_date:
-                    print("No new reports to generate")
-                    continue
+        if latest_progress_report_sr:
+            generate_from_date_sr = latest_progress_report_sr.due_date
 
-                end_date = reporting_period.end_date
-                due_date = reporting_period.due_date
-                start_date = reporting_period.start_date
+        print("Last QPR report: %s for PD %s" % (generate_from_date_qpr, pd))
+        print("Last HR report: %s for PD %s" % (generate_from_date_hr, pd))
+        print("Last SR report: %s for PD %s" % (generate_from_date_sr, pd))
 
-                # Create ProgressReport first
-                print("Creating ProgressReport for {} - {}".format(start_date, end_date))
+        def create_pr_for_report_type(reporting_period, generate_from_date):
+            """
+            Create ProgressReport instance by its ReportingPeriodDate instance's report type
+            Arguments:
+                reporting_period {ReportingPeriodDates} -- ReportingPeriodDates instance for new ProgressReport
+                generate_from_date {datetime.datetime} -- datetime instance from latest ProgressReport on same report
+            Returns:
+                Tuple[ProgressReport, datetime.datetime, datetime.datetime, datetime.datetime]
+                - Newly generated ProgressReport & 3 datetime objects
+            """
 
-                # Re-query latest ProgressReport
-                latest_progress_report = pd.progress_reports.order_by(
-                    'report_type', 'report_number', 'is_final', 'end_date'
-                ).last()
+            end_date = reporting_period.end_date
+            due_date = reporting_period.due_date
+            start_date = reporting_period.start_date
 
-                if latest_progress_report:
-                    report_type = latest_progress_report.report_type
-                    report_number = latest_progress_report.report_number + 1
+            # Create ProgressReport first
+            print("Creating ProgressReport for {} - {}".format(start_date, end_date))
 
-                    is_final = idx == pd.reporting_periods.count() - 1
-                else:
-                    report_number = 1
-                    report_type = "QPR"
-                    is_final = False
+            # Re-query latest ProgressReport by report type
+            latest_progress_report = get_latest_pr_by_type(pd, reporting_period.report_type)
 
-                next_progress_report = ProgressReportFactory(
-                    start_date=start_date,
-                    end_date=end_date,
-                    due_date=due_date,
-                    programme_document=pd,
-                    report_type=report_type,
-                    report_number=report_number,
-                    is_final=is_final,
-                )
+            print(latest_progress_report, reporting_period.report_type)
 
+            if latest_progress_report:
+                report_type = latest_progress_report.report_type
+                report_number = latest_progress_report.report_number + 1
+                is_final = idx == pd.reporting_periods.count() - 1
+
+            else:
+                report_number = 1
+                report_type = reporting_period.report_type
+                is_final = False
+
+            next_progress_report = ProgressReportFactory(
+                start_date=start_date,
+                end_date=end_date,
+                due_date=due_date,
+                programme_document=pd,
+                report_type=report_type,
+                report_number=report_number,
+                is_final=is_final,
+            )
+
+            return (next_progress_report, start_date, end_date, due_date)
+
+        def create_ir_and_ilds_for_pr(reportable_queryset, next_progress_report, start_date, end_date, due_date):
+            """
+            Create a set of new IndicatorReports and IndicatorLocationData instances per
+            IndicatorReport instance, with passed-in new dates and new ProgressReport instance
+            Arguments:
+                reportable_queryset {django.Queryset[Reportable]} -- Reportable queryset on LLO
+                next_progress_report {ProgressReport} -- Newly generated Progress Report instance
+                start_date {datetime.datetime} -- Start date for reporting
+                end_date {datetime.datetime} -- End date for reporting
+                due_date {datetime.datetime} -- due date for reporting
+            """
+
+            if next_progress_report.report_type != "SR":
                 for reportable in reportable_queryset:
                     if reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
                         print("Creating Quantity IndicatorReport for {} - {}".format(start_date, end_date))
@@ -181,6 +241,79 @@ def process_period_reports():
 
                     indicator_report.progress_report = next_progress_report
                     indicator_report.save()
+
+        with transaction.atomic():
+            # Handling QPR reporting periods
+            for idx, reporting_period in enumerate(pd.reporting_periods.filter(report_type="QPR")):
+                # If PR start date is greater than now, skip!
+                if reporting_period.start_date > datetime.now().date():
+                    print("No new reports to generate")
+                    continue
+
+                # If PR was already generated, skip!
+                if generate_from_date_qpr and reporting_period.start_date <= generate_from_date_qpr:
+                    print("No new reports to generate")
+                    continue
+
+                next_progress_report, start_date, end_date, due_date = create_pr_for_report_type(
+                    reporting_period, generate_from_date_qpr
+                )
+
+                create_ir_and_ilds_for_pr(
+                    reportable_queryset,
+                    next_progress_report,
+                    start_date,
+                    end_date,
+                    due_date
+                )
+
+            # Handling HR reporting periods
+            for idx, reporting_period in enumerate(pd.reporting_periods.filter(report_type="HR")):
+                # If PR start date is greater than now, skip!
+                if reporting_period.start_date > datetime.now().date():
+                    print("No new reports to generate")
+                    continue
+
+                # If PR was already generated, skip!
+                if generate_from_date_hr and reporting_period.start_date <= generate_from_date_hr:
+                    print("No new reports to generate")
+                    continue
+
+                next_progress_report, start_date, end_date, due_date = create_pr_for_report_type(
+                    reporting_period, generate_from_date_hr
+                )
+
+                create_ir_and_ilds_for_pr(
+                    reportable_queryset,
+                    next_progress_report,
+                    start_date,
+                    end_date,
+                    due_date
+                )
+
+            # Handling SR reporting periods
+            for idx, reporting_period in enumerate(pd.reporting_periods.filter(report_type="SR")):
+                # If PR due date is greater than now, skip!
+                if reporting_period.due_date >= datetime.now().date() + timedelta(days=30):
+                    print("No new reports to generate")
+                    continue
+
+                # If PR was already generated, skip!
+                if generate_from_date_sr and reporting_period.due_date <= generate_from_date_sr:
+                    print("No new reports to generate")
+                    continue
+
+                next_progress_report, start_date, end_date, due_date = create_pr_for_report_type(
+                    reporting_period, generate_from_date_sr
+                )
+
+                create_ir_and_ilds_for_pr(
+                    reportable_queryset,
+                    next_progress_report,
+                    start_date,
+                    end_date,
+                    due_date
+                )
 
     for reportable in Reportable.objects.filter(
             content_type__model__in=['partnerproject', 'partneractivity', 'clusterobjective'], active=True

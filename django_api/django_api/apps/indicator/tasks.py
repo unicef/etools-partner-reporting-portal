@@ -38,7 +38,9 @@ def process_due_reports():
             report.status = PROGRESS_REPORT_STATUS.overdue
             report.save()
             updates.append(['Overdue', report])
-        elif due_date > today > report.start_date and report.status != PROGRESS_REPORT_STATUS.due:
+        elif (report.report_type != "SR" and due_date > today > report.start_date) \
+                or (report.report_type == "SR" and due_date > today) \
+                and report.status != PROGRESS_REPORT_STATUS.due:
             report.status = PROGRESS_REPORT_STATUS.due
             report.save()
             updates.append(['Due', report])
