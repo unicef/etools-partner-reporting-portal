@@ -9,6 +9,7 @@ RUN pip install j2cli
 RUN pip install cryptography==2.1.4
 RUN pip install requests --upgrade
 RUN pip install certbot==0.23.0
+RUN pip install python-crontab==2.2.8
 
 ADD nginx.conf.j2 /
 ADD nginx-site.conf.j2 /
