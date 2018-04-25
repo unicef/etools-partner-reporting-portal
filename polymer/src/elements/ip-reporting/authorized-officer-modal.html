@@ -151,7 +151,7 @@
       },
 
       _computeAuthorizedPartners: function (pd) {
-        var partners = pd.partner_focal_point.filter(function(partner) {
+        var partners = (pd.partner_focal_point || []).filter(function(partner) {
           return partner.is_authorized_officer;
         });
         var formattedPartners = partners.map(function (partner) {
