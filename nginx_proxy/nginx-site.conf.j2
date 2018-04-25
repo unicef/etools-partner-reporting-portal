@@ -6,8 +6,8 @@ server {
     listen 80;
     {% if SSL_CERTIFICATE %}
         listen 443 ssl;
-        ssl_certificate     {{ SSL_CERTIFICATE }}fullchain.pem;
-        ssl_certificate_key {{ SSL_CERTIFICATE }}privkey.pem;
+        ssl_certificate     {{ SSL_CERTIFICATE }}/fullchain.pem;
+        ssl_certificate_key {{ SSL_CERTIFICATE }}/privkey.pem;
     {% endif %}
 
     client_max_body_size 100m;
