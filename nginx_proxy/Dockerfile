@@ -1,5 +1,6 @@
-FROM nginx:1.12
+FROM nginx:1.13.12
 
+ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && \
     apt-get install -y --no-install-recommends apt-utils && \
     apt-get install --assume-yes python-pip python-dev python-setuptools build-essential
@@ -14,4 +15,5 @@ RUN chmod a+rx /docker-entrypoint.sh
 ENTRYPOINT ["/bin/bash", "/docker-entrypoint.sh"]
 
 EXPOSE 80
+EXPOSE 443
 CMD ["nginx", "-g", "daemon off;"]

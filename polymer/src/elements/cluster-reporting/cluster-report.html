@@ -410,7 +410,7 @@
                     restamp="true">
                   <div class="status-badge layout vertical center-justified">
                     <report-status
-                        status="[[data.overall_status]]"
+                        status="[[_computeCompleteIndicator(data.is_complete)]]"
                         no-label>
                     </report-status>
                   </div>
@@ -641,6 +641,10 @@
 
       _computeIndicatorType: function (data) {
         return data.reportable.blueprint.display_type;
+      },
+
+      _computeCompleteIndicator: function (complete) {
+        return complete ? 'Met' : 'Ove';
       },
 
       _toggle: function () {

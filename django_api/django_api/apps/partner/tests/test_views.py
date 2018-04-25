@@ -309,7 +309,7 @@ class TestPartnerProjectAPIView(BaseAPITestCase):
             'partner_id': rp.clusters.first().partners.first().id,
         }
 
-        url = reverse("partner-project-create", kwargs={'response_plan_pk': rp.pk})
+        url = reverse("partner-project-list", kwargs={'response_plan_id': rp.pk})
         response = self.client.post(url, data=project_data, format='json')
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST, msg=response.content)
         self.assertIn('clusters', response.data)
@@ -328,7 +328,7 @@ class TestPartnerProjectAPIView(BaseAPITestCase):
             'clusters': ClusterSimpleSerializer(rp.clusters.all(), many=True).data
         }
 
-        url = reverse("partner-project-create", kwargs={'response_plan_pk': rp.pk})
+        url = reverse("partner-project-list", kwargs={'response_plan_id': rp.pk})
         response = self.client.post(url, data=project_data, format='json')
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST, msg=response.content)
         self.assertIn('end_date', response.data)
@@ -350,7 +350,7 @@ class TestPartnerProjectAPIView(BaseAPITestCase):
             'clusters': ClusterSimpleSerializer(rp.clusters.all(), many=True).data
         }
 
-        url = reverse("partner-project-create", kwargs={'response_plan_pk': rp.pk})
+        url = reverse("partner-project-list", kwargs={'response_plan_id': rp.pk})
         response = self.client.post(url, data=project_data, format='json')
         self.assertEquals(response.status_code, status.HTTP_201_CREATED, msg=response.content)
         self.assertEquals(len(response.data['custom_fields']), 2)

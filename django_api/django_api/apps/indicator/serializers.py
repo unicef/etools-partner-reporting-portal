@@ -496,7 +496,6 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
 class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
 
     disaggregation = serializers.JSONField()
-    is_complete = serializers.SerializerMethodField()
 
     class Meta:
         model = IndicatorLocationData
@@ -509,9 +508,6 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
             'disaggregation_reported_on',
             'is_complete',
         )
-
-    def get_is_complete(self, obj):
-        return obj.is_complete
 
     def validate(self, data):
         """
@@ -1234,6 +1230,7 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
             'can_submit',
             'time_period_start',
             'time_period_end',
+            'is_complete',
         )
 
     def get_indicator_name(self, obj):
