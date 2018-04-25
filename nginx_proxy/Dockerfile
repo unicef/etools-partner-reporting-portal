@@ -16,13 +16,19 @@ ADD nginx-site.conf.j2 /
 ADD uwsgi_params /etc/nginx/conf.d/uwsgi_params
 ADD docker-entrypoint.sh /
 ADD setup_ssl.py /
+ADD command.sh /
 
 RUN mkdir -p /etc/letsencrypt
 VOLUME /etc/letsencrypt
 
 RUN chmod a+rx /docker-entrypoint.sh
+RUN chmod a+rx /command.sh
 ENTRYPOINT ["/bin/bash", "/docker-entrypoint.sh"]
 
 EXPOSE 80
 EXPOSE 443
-CMD ["nginx", "-g", "daemon off;"]
+
+CMD ["/command.sh"]
+#CMD ["python", "setup_ssl.py"]
+#CMD ["nginx", "-s", "stop"]
+#CMD ["nginx", "-g", "daemon off;"]

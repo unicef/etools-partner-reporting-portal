@@ -27,6 +27,8 @@ services:
     image: unicef/etools-prp-nginx-proxy
     environment:
       - DJANGO_APPLICATION_SERVICE_HOST=django_api
+    env_file:
+      - .env
     build:
       context: ./nginx_proxy
       dockerfile: ./Dockerfile
