@@ -36,6 +36,19 @@ services:
       - django_api
       - polymer
 
+  proxy-ssl:
+    image: unicef/etools-prp-nginx-proxy
+    environment:
+      - DJANGO_APPLICATION_SERVICE_HOST=django_api
+    env_file:
+      - .env
+    build:
+      context: ./nginx_proxy
+      dockerfile: ./Dockerfile
+    command: python setup_ssl.py
+    volumes_from:
+      - proxy
+
   django_api:
     image: unicef/etools-prp
     env_file:

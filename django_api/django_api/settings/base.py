@@ -68,6 +68,12 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'no-reply@etools.unicef.org'
 
+ADMIN_MAIL = os.getenv('ADMIN_MAIL')
+if ADMIN_MAIL:
+    ADMINS = [
+        ('Admin', ADMIN_MAIL),
+    ]
+
 ALLOWED_HOSTS = []
 
 CACHES = {

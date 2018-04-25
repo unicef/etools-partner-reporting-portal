@@ -3,7 +3,12 @@ upstream django_api_uwsgi {
 }
 
 server {
-    listen      80;
+    listen {{ NGINX_LISTEN_PORT }};
+    {% if SSL_CERTIFICATE %}
+        ssl_certificate     {{ SSL_CERTIFICATE }}.crt;
+        ssl_certificate_key {{ SSL_CERTIFICATE }}.key;
+    {% endif %}
+
     client_max_body_size 100m;
 
     location /.well-known/acme-challenge {
