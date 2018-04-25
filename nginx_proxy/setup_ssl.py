@@ -66,3 +66,4 @@ if __name__ == '__main__':
         ['certbot', 'renew'] + default_args
     ))
     renew_job.hour.on(0)
+    cron.write()
