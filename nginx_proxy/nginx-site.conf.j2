@@ -5,6 +5,10 @@ upstream django_api_uwsgi {
 server {
     listen 80;
     {% if SSL_CERTIFICATE %}
+       return 301 https://$server_name$request_uri;
+    }
+
+    server {
         listen 443 ssl;
         ssl_certificate     {{ SSL_CERTIFICATE }}/fullchain.pem;
         ssl_certificate_key {{ SSL_CERTIFICATE }}/privkey.pem;
