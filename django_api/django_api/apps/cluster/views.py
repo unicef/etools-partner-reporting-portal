@@ -491,7 +491,7 @@ class ClusterIndicatorsListExcelImportView(APIView):
             destination.close()
         reader = IndicatorsXLSXReader(filepath)
         result = reader.import_data()
-        return Response(result, status=statuses.HTTP_200_OK)
+        return Response({'errors': result}, status=statuses.HTTP_200_OK)
 
 
 class ClusterIndicatorsListExcelExportView(ListAPIView):

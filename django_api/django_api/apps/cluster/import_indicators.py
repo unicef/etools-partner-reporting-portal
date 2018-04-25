@@ -21,6 +21,8 @@ class IndicatorsXLSXReader(object):
                 if self.sheet.cell(row=COLUMN_HASH_ID, column=column).value == "#loc+id":
                     location_column_id = column
                     break
+            if not location_column_id:
+                return "Cannot find Location ID column"
 
             # Find "Total" column
             total_column_id = None
@@ -28,6 +30,8 @@ class IndicatorsXLSXReader(object):
                 if self.sheet.cell(row=1, column=column).value == "Total":
                     total_column_id = column
                     break
+            if not total_column_id:
+                return "Cannot find Total column"
 
             # Find first Disaggregation Value column
             dis_data_column_start_id = None
@@ -43,28 +47,34 @@ class IndicatorsXLSXReader(object):
                     break
 
                 # Get IndicatorLocationData ID
-                indicator = IndicatorLocationData.objects.get(pk=self.sheet.cell(row=row, column=location_column_id).value)
+                try:
+                    indicator = IndicatorLocationData.objects.get(pk=self.sheet.cell(row=row, column=location_column_id).value)
+                except:
+                    return "Cannot find Indicator Location Data data for ID " + str(self.sheet.cell(row=row, column=location_column_id).value)
                 blueprint = indicator.indicator_report.reportable.blueprint
                 data = indicator.disaggregation
                 # Prepare
                 for column in range(dis_data_column_start_id, total_column_id + 1):
-                    value = self.sheet.cell(row=row, column=column).value
-                    # Check if value is present in cell
-                    if value:
-                        # Evaluate ID of Disaggregation Type
-                        dis_type_id = "()"
-                        dis_type_value = self.sheet.cell(row=2, column=column).value
-                        if dis_type_value:
-                            dis_type_value = sorted(list(map(int, str(dis_type_value).split(","))), key=int)
-                            dis_type_id = str(tuple(dis_type_value))
+                    try:
+                        value = self.sheet.cell(row=row, column=column).value
+                        # Check if value is present in cell
+                        if value:
+                            # Evaluate ID of Disaggregation Type
+                            dis_type_id = "()"
+                            dis_type_value = self.sheet.cell(row=2, column=column).value
+                            if dis_type_value:
+                                dis_type_value = sorted(list(map(int, str(dis_type_value).split(","))), key=int)
+                                dis_type_id = str(tuple(dis_type_value))
 
-                        # Update values
-                        if blueprint.unit == IndicatorBlueprint.NUMBER:
-                            data[dis_type_id]["v"] = value
-                        else:
-                            v, d = value.split("/")
-                            data[dis_type_id]["v"] = int(v)
-                            data[dis_type_id]["d"] = int(d)
+                            # Update values
+                            if blueprint.unit == IndicatorBlueprint.NUMBER:
+                                data[dis_type_id]["v"] = value
+                            else:
+                                v, d = value.split("/")
+                                data[dis_type_id]["v"] = int(v)
+                                data[dis_type_id]["d"] = int(d)
+                    except:
+                        return "Cannot assign disaggregation value to column " + str(column)
                 indicator.disaggregation = data
                 indicator.save()
 
@@ -74,4 +84,4 @@ class IndicatorsXLSXReader(object):
                 if blueprint.unit == IndicatorBlueprint.PERCENTAGE:
                     RatioIndicatorDisaggregator.post_process(indicator)
 
-
+        return
