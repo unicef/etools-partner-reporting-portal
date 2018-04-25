@@ -5,21 +5,21 @@
 <link rel="import" href="../../../../../bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="../../../../../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../../../../../bower_components/iron-pages/iron-pages.html">
-<link rel="import" href="../../../../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../../../../bower_components/promise-polyfill/promise-polyfill-lite.html">
 
 <link rel="import" href="../../../../pages/app/ip-reporting/pd/pd-report/results.html">
 <link rel="import" href="../../../../pages/app/ip-reporting/pd/pd-report/info.html">
-<link rel="import" href="../../../../pages/app/ip-reporting/pd/pd-report/submit.html">
 <link rel="import" href="../../../../elements/page-header.html">
 <link rel="import" href="../../../../elements/page-body.html">
 <link rel="import" href="../../../../elements/reporting-period.html">
 <link rel="import" href="../../../../elements/report-status.html">
 <link rel="import" href="../../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../../elements/etools-prp-permissions.html">
+<link rel="import" href="../../../../elements/error-modal.html">
 <link rel="import" href="../../../../elements/ip-reporting/pd-report-export-button.html">
 <link rel="import" href="../../../../elements/ip-reporting/pd-modal.html">
 <link rel="import" href="../../../../elements/ip-reporting/pd-reports-report-title.html">
+<link rel="import" href="../../../../elements/ip-reporting/authorized-officer-modal.html">
 <link rel="import" href="../../../../endpoints.html">
 <link rel="import" href="../../../../behaviors/utils.html">
 <link rel="import" href="../../../../behaviors/progressReportUtils.html">
@@ -27,11 +27,12 @@
 <link rel="import" href="../../../../redux/store.html">
 <link rel="import" href="../../../../redux/actions.html">
 <link rel="import" href="../../../../redux/selectors/programmeDocumentReports.html">
+<link rel="import" href="../../../../styles/shared-styles.html">
 <link rel="import" href="../../../../styles/buttons.html">
 
 <dom-module id="page-ip-reporting-pd-report">
   <template>
-    <style include="button-styles">
+    <style include="shared-styles button-styles">
       :host {
         display: block;
 
@@ -59,6 +60,12 @@
       .tabs paper-tab {
         text-transform: uppercase;
       }
+
+      .pd-details-link {
+        margin-left: .5em;
+
+        @apply --link;
+      }
     </style>
 
     <etools-prp-permissions
@@ -72,6 +79,7 @@
     </app-route>
 
     <iron-location
+        path="{{path}}"
         query="{{query}}">
     </iron-location>
 
@@ -86,8 +94,14 @@
         params="[[queryParams]]">
     </etools-prp-ajax>
 
+    <etools-prp-ajax
+        id="submit"
+        url="[[submitUrl]]"
+        method="post">
+    </etools-prp-ajax>
+
     <page-header
-        title="[[headingText]]"
+        title="[[headingPrefix]]"
         back="[[backLink]]">
       <reporting-period
           class="above-title"
@@ -97,26 +111,30 @@
         class="above-title"
         report=[[currentReport]]>
       </pd-reports-report-title>
-
-
+      <a
+          href="#"
+          class="pd-details-link in-title"
+          on-tap="_showPdDetails">[[currentReport.programme_document.reference_number]]</a>
       <div class="toolbar">
         <report-status status="[[currentReport.status]]"></report-status>
+
         <template
             is="dom-if"
-            if="[[_canExport(loading, currentReport, mode, permissions)]]"
+            if="[[_canExport(currentReport, mode, permissions)]]"
             restamp="true">
           <pd-report-export-button></pd-report-export-button>
         </template>
 
         <template
             is="dom-if"
-            if="[[_canViewPdDetails(permissions)]]"
+            if="[[canSubmit]]"
             restamp="true">
           <paper-button
               class="btn-primary"
-              on-tap="_showPdDetails"
+              on-tap="_submit"
+              disabled="[[busy]]"
               raised>
-            Show PD/SSFA ToR Details
+            Submit
           </paper-button>
         </template>
       </div>
@@ -140,13 +158,6 @@
             hide-scroll-buttons>
           <paper-tab name="results">Reporting on results</paper-tab>
           <paper-tab name="info">Other info</paper-tab>
-
-          <template
-              is="dom-if"
-              if="[[canSubmit]]"
-              restamp="true">
-            <paper-tab name="submit">Review and submit</paper-tab>
-          </template>
         </paper-tabs>
       </div>
     </page-header>
@@ -172,24 +183,20 @@
               name="info">
           </page-ip-reporting-report-info>
         </template>
-
-        <template
-            is="dom-if"
-            if="[[canSubmit]]"
-            restamp="true">
-          <template
-              is="dom-if"
-              if="[[_equals(selectedTab, 'submit')]]"
-              restamp="true">
-            <page-ip-reporting-report-submit
-                name="submit">
-            </page-ip-reporting-report-submit>
-          </template>
-        </template>
-
+      </iron-pages>
     </page-body>
 
     <pd-modal id="pdDetails"></pd-modal>
+
+    <error-modal id="error"></error-modal>
+
+    <authorized-officer-modal
+        id="officer"
+        pd-id="[[pdId]]"
+        report-id="[[reportId]]"
+        data="[[currentReport]]"
+        submit-url="[[submitUrl]]">
+    </authorized-officer-modal>
   </template>
 
   <script>
@@ -204,8 +211,8 @@
       ],
 
       properties: {
+        path: String,
         routeData: Object,
-
         queryParams: Object,
 
         mode: {
@@ -233,6 +240,11 @@
           computed: '_computeReportUrl(locationId, reportId, pdId)',
         },
 
+        submitUrl: {
+          type: String,
+          computed: '_computeSubmitUrl(locationId, reportId)',
+        },
+
         currentReport: {
           type: Object,
           statePath: App.Selectors.ProgrammeDocumentReports.current,
@@ -243,9 +255,9 @@
           statePath: 'programmeDocumentReports.current.loading',
         },
 
-        headingText: {
+        headingPrefix: {
           type: String,
-          computed: '_computeHeadingText(currentReport, mode)',
+          computed: '_computeHeadingPrefix(mode)',
         },
 
         backLink: {
@@ -260,12 +272,18 @@
 
         canSubmit: {
           type: Boolean,
-          computed: '_computeCanSubmit(loading, mode, currentReport)',
+          value: false,
+          computed: '_computeCanSubmit(mode, currentReport)',
         },
 
         canSubmittedOnBehalf: {
           type: Boolean,
           computed: '_computeSubmittedOnBehalf(currentReport)',
+        },
+
+        busy: {
+          type: Boolean,
+          value: false,
         },
       },
 
@@ -293,25 +311,25 @@
         }
       },
 
-      _computeHeadingText: function (report, mode) {
-        var pd = report.programme_document || {};
-        var prefix;
-
+      _computeHeadingPrefix: function (mode) {
         switch (mode) {
           case 'view':
-            prefix = 'Report for';
-            break;
+            return 'Report for';
 
           case 'edit':
-            prefix = 'Enter data for';
-            break;
-        }
+            return 'Enter data for';
 
-        return prefix + ' ' + this._withDefault(pd.title);
+          default:
+            return '';
+        }
       },
 
       _computeReportUrl: function (locationId, reportId, _) { // jshint ignore:line
         return App.Endpoints.programmeDocumentReport(locationId, reportId);
+      },
+
+      _computeSubmitUrl: function (locationId, reportId) {
+        return App.Endpoints.programmeDocumentReportSubmit(locationId, reportId);
       },
 
       _fetchReport: function (_, queryParams) {
@@ -333,7 +351,9 @@
         }, 300);
       },
 
-      _showPdDetails: function () {
+      _showPdDetails: function (e) {
+        e.preventDefault();
+
         this.$.pdDetails.open();
       },
 
@@ -346,9 +366,8 @@
         }
       },
 
-      _canExport: function (loading, report, mode, permissions) {
+      _canExport: function (report, mode, permissions) {
         switch (true) {
-          case !!loading:
           case report.status === 'Sub' && !permissions.exportSubmittedProgressReport:
           case mode === 'edit':
             return false;
@@ -358,14 +377,9 @@
         }
       },
 
-      _canViewPdDetails: function (permissions) {
-        return permissions.viewPdDetails;
-      },
-
-      _computeCanSubmit: function (loading, mode, report) {
+      _computeCanSubmit: function (mode, report) {
         switch (true) {
           case mode === 'view':
-          case !!loading:
           case report.programme_document &&
             (report.programme_document.status === 'Sig'
             || report.programme_document.status === 'Clo'):
@@ -384,12 +398,51 @@
         }
       },
 
+      _submit: function () {
+        var self = this;
+
+        this.set('busy', true);
+
+        this.$.submit.thunk()()
+            .then(function (res) {
+              var newPath = self.buildUrl(
+                self._baseUrl,
+                'pd/' + self.pdId + '/view/reports'
+              );
+
+              self.dispatch(App.Actions.PDReports.updateSingle(
+                self.pdId,
+                self.reportId,
+                res.data
+              ));
+
+              self.set('busy', false);
+              self.set('path', newPath);
+            })
+            .catch(function (res) {
+              var errors = res.data.non_field_errors;
+              var authorizedError = res.data.error_codes.filter(function (error) {
+                return error === 'PR_SUBMISSION_FAILED_USER_NOT_AUTHORIZED_OFFICER';
+              });
+              if (authorizedError.length > 0) {
+                return self.$.officer.open();
+              }
+              return self.$.error.open(errors);
+            })
+            .then(function () {
+              self.set('busy', false);
+            });
+      },
+
       detached: function () {
         this.$.report.abort();
 
-        if (this.isDebouncerActive('fetch-report')) {
-          this.cancelDebouncer('fetch-report');
-        }
+        this.$.error.close();
+        this.$.officer.close();
+
+        this._cancelDebouncers([
+          'fetch-report',
+        ]);
       },
     });
   </script>
