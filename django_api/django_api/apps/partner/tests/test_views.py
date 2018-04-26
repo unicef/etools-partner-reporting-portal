@@ -1,28 +1,15 @@
 from django.urls import reverse
 from rest_framework import status
 
+from cluster.models import Cluster
 from cluster.serializers import ClusterSimpleSerializer
-from core.models import ResponsePlan
+from core.factories import ClusterObjectiveFactory
+from core.models import ResponsePlan, PartnerAuthorizedOfficerRole
 from core.tests.base import BaseAPITestCase
 
-# import datetime
-
-# from django.urls imports reverse
-# from django.conf imports settings
-
-# from rest_framework imports status
-
-# from core.models imports Location
-# from core.factories imports PartnerProjectFactory, PartnerFactory, ClusterObjectiveFactory
-
-# from cluster.models imports (
-#     Cluster,
-# )
-
-# from partner.models imports (
-#     PartnerProject,
-#     PartnerActivity,
-# )
+from partner.models import (
+    PartnerActivity,
+)
 
 
 # class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
@@ -221,81 +208,75 @@ from core.tests.base import BaseAPITestCase
 #         self.assertEquals(PartnerProject.objects.all().count(), base_count)
 
 
-# class TestPartnerActivityAPIView(BaseAPITestCase):
+class TestPartnerActivityAPIView(BaseAPITestCase):
 
-#     def setUp(self):
-#         super(TestPartnerActivityAPIView, self).setUp()
+    force_login_as_role = PartnerAuthorizedOfficerRole
 
-#         self.cluster = Cluster.objects.filter(
-#             partner_projects__isnull=False,
-#             partner_projects__partner__isnull=False).distinct().first()
+    def setUp(self):
+        super(TestPartnerActivityAPIView, self).setUp()
 
-#         self.cluster_objective = ClusterObjectiveFactory(cluster=self.cluster)
+        partner = self.user.partner
+        self.cluster = partner.clusters.first()
+        self.partner_project = partner.partner_projects.first()
+        self.cluster_objective = ClusterObjectiveFactory(cluster=self.cluster)
 
-#         self.partner_project = self.cluster.partner_projects.first()
+        self.data = {
+            "cluster": self.cluster.id,
+            "partner": partner.id,
+            "project": self.partner_project.id,
+            "start_date": "2017-01-01",
+            "end_date": "2017-05-31",
+            "status": "Ong"
+        }
 
-#         self.data = {
-#             "cluster": self.cluster.id,
-#             "partner": self.partner_project.partner.id,
-#             "project": self.partner_project.id,
-#             "start_date": "2017-01-01",
-#             "end_date": "2017-05-31",
-#             "status": "Ong"
-#         }
+    def test_create_activity_from_cluster_activity(self):
+        base_count = PartnerActivity.objects.all().count()
 
-#         # Logging in as Partner AO
-#         self.client.login(username='admin_ao', password='Passw0rd!')
+        self.cluster_activity = self.cluster.cluster_objectives.first().cluster_activities.first()
 
-#     def test_create_activity_from_cluster_activity(self):
-#         base_count = PartnerActivity.objects.all().count()
+        self.data['cluster_activity'] = self.cluster_activity.id
 
-#         self.cluster_activity = self.cluster.cluster_objectives.first().cluster_activities.first()
+        # test for creating object
+        url = reverse(
+            'partner-activity-create',
+            kwargs={
+                'response_plan_id': self.cluster.response_plan_id,
+                'create_mode': 'cluster',
+            }
+        )
 
-#         self.data['cluster_activity'] = self.cluster_activity.id
+        response = self.client.post(url, data=self.data, format='json')
 
-#         # test for creating object
-#         url = reverse(
-#             'partner-activity-create',
-#             kwargs={
-#                 'response_plan_id': self.cluster.response_plan_id,
-#                 'create_mode': 'cluster',
-#             }
-#         )
+        self.assertTrue(status.is_success(response.status_code), msg=response.content)
+        created_obj = PartnerActivity.objects.get(id=response.data['id'])
+        self.assertEquals(created_obj.title, self.cluster_activity.title)
+        self.assertEquals(PartnerActivity.objects.all().count(), base_count + 1)
 
-#         response = self.client.post(url, data=self.data, format='json')
+    def test_create_activity_from_custom_activity(self):
+        base_count = PartnerActivity.objects.all().count()
 
-#         self.assertTrue(status.is_success(response.status_code))
-#         created_obj = PartnerActivity.objects.get(id=response.data['id'])
-#         self.assertEquals(created_obj.title, self.cluster_activity.title)
-#         self.assertEquals(
-#             PartnerActivity.objects.all().count(),
-#             base_count + 1)
+        self.data['cluster_objective'] = self.cluster.cluster_objectives.first().id
 
-#     def test_create_activity_from_custom_activity(self):
-#         base_count = PartnerActivity.objects.all().count()
+        self.data['title'] = 'TEST'
 
-#         self.data['cluster_objective'] = self.cluster.cluster_objectives.first().id
+        # test for creating object
+        url = reverse(
+            'partner-activity-create',
+            kwargs={
+                'response_plan_id': self.cluster.response_plan_id,
+                'create_mode': 'custom',
+            }
+        )
 
-#         self.data['title'] = 'TEST'
+        response = self.client.post(url, data=self.data, format='json')
 
-#         # test for creating object
-#         url = reverse(
-#             'partner-activity-create',
-#             kwargs={
-#                 'response_plan_id': self.cluster.response_plan_id,
-#                 'create_mode': 'custom',
-#             }
-#         )
-
-#         response = self.client.post(url, data=self.data, format='json')
-
-#         self.assertTrue(status.is_success(response.status_code))
-#         created_obj = PartnerActivity.objects.get(id=response.data['id'])
-#         self.assertEquals(created_obj.title, self.data['title'])
-#         self.assertEquals(
-#             PartnerActivity.objects.all().count(),
-#             base_count + 1
-#         )
+        self.assertTrue(status.is_success(response.status_code), msg=response.content)
+        created_obj = PartnerActivity.objects.get(id=response.data['id'])
+        self.assertEquals(created_obj.title, self.data['title'])
+        self.assertEquals(
+            PartnerActivity.objects.all().count(),
+            base_count + 1
+        )
 
 
 class TestPartnerProjectAPIView(BaseAPITestCase):
