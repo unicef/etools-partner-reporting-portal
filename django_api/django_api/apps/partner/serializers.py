@@ -405,12 +405,11 @@ class PartnerActivityFromCustomActivitySerializer(PartnerActivityBaseCreateSeria
                 )
             })
 
-        if 'request' in self.context \
-            and not self.context['imo'] \
+        if 'request' in self.context and not self.context['imo'] \
                 and not data['partner'] == self.context['request'].user.partner:
-                    raise serializers.ValidationError({
-                        'partner': "Partner id did not match this user's partner"
-                    })
+                raise serializers.ValidationError({
+                    'partner': "Partner id did not match this user's partner"
+                })
 
         if data['project'].partner != data['partner']:
             return serializers.ValidationError({

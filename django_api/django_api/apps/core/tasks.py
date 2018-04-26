@@ -173,7 +173,10 @@ def process_period_reports():
             """
             Create a set of new IndicatorReports and IndicatorLocationData instances per
             IndicatorReport instance, with passed-in new dates and new ProgressReport instance
+<<<<<<< HEAD
 
+=======
+>>>>>>> develop
             Arguments:
                 reportable_queryset {django.Queryset[Reportable]} -- Reportable queryset on LLO
                 next_progress_report {ProgressReport} -- Newly generated Progress Report instance

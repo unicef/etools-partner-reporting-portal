@@ -28,7 +28,7 @@ from core.factories import (
     RatioIndicatorReportFactory,
     DisaggregationFactory,
     DisaggregationValueFactory,
-)
+    LocationWithReportableLocationGoalFactory)
 
 
 def generate_0_num_disagg_data(reportable, indicator_type="quantity"):
@@ -569,8 +569,10 @@ def generate_indicator_report_location_disaggregation_quantity_data(generate_all
                                         flat=True)):
                     if not first_reportable_location_id or (
                             first_reportable_location_id and first_reportable_location_id != location_id):
-                        reportable.locations.add(
-                            Location.objects.get(id=location_id))
+                        LocationWithReportableLocationGoalFactory.create(
+                            location=Location.objects.get(id=location_id),
+                            reportable=reportable
+                        )
 
             print(
                 "IndicatorReport and its Disaggregation data entries "
@@ -732,8 +734,10 @@ def generate_indicator_report_location_disaggregation_ratio_data(generate_all=Fa
                                         flat=True)):
                     if not first_reportable_location_id or (
                             first_reportable_location_id and first_reportable_location_id != location_id):
-                        reportable.locations.add(
-                            Location.objects.get(id=location_id))
+                        LocationWithReportableLocationGoalFactory.create(
+                            location=Location.objects.get(id=location_id),
+                            reportable=reportable
+                        )
 
             print(
                 "IndicatorReport and its Disaggregation data entries",
