@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import ReadOnlyPasswordHashField, UserCreationForm
+from django.contrib.auth.forms import ReadOnlyPasswordHashField, UserCreationForm, UserChangeForm
 
 from core.models import (
     PartnerAuthorizedOfficerRole,
@@ -33,17 +33,9 @@ class CustomUserCreationForm(UserCreationForm):
         )
 
 
-class UserAdminForm(forms.ModelForm):
-    password = ReadOnlyPasswordHashField(
-        label="Password",
-        help_text=(
-            "Raw passwords are not stored, so there is no way to see this "
-            "user's password, but you can change the password using "
-            "<a href=\"../password/\">this form</a>."
-        ),
-    )
+class UserAdminForm(UserChangeForm):
 
-    class Meta:
+    class Meta(UserChangeForm.Meta):
         model = User
         exclude = ('last_login', 'date_joined')
 
