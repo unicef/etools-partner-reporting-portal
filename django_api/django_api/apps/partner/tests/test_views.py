@@ -1,7 +1,6 @@
 from django.urls import reverse
 from rest_framework import status
 
-from cluster.models import Cluster
 from cluster.serializers import ClusterSimpleSerializer
 from core.factories import ClusterObjectiveFactory
 from core.models import ResponsePlan, PartnerAuthorizedOfficerRole
