@@ -519,7 +519,7 @@ AUTHENTICATION_BACKENDS = (
     'guardian.backends.ObjectPermissionBackend',
 )
 
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+TEST_RUNNER = 'utils.test_runner.CustomNoseTestSuiteRunner'
 NOSE_ARGS = ['--with-timer', '--nocapture', '--nologcapture']
 
 # apm related - it's enough to set those as env variables, here just for documentation

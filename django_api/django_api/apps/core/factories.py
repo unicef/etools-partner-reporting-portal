@@ -358,6 +358,7 @@ class LocationWithReportableLocationGoalFactory(factory.django.DjangoModelFactor
 
     class Meta:
         model = ReportableLocationGoal
+        django_get_or_create = ('location', 'reportable')
 
 
 class QuantityReportableToLowerLevelOutputFactory(ReportableFactory):
