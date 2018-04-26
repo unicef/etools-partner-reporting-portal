@@ -59,6 +59,8 @@ class CustomUserAdmin(UserAdmin):
         ),
     )
 
+    filter_horizontal = ('groups', 'user_permissions', 'workspaces', 'imo_clusters')
+
 
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(UserProfile)
