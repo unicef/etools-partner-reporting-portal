@@ -1,9 +1,12 @@
+import datetime
+
+from django.conf import settings
 from django.urls import reverse
 from rest_framework import status
 
 from cluster.serializers import ClusterSimpleSerializer
 from core.factories import ClusterObjectiveFactory
-from core.models import ResponsePlan, PartnerAuthorizedOfficerRole
+from core.models import ResponsePlan, PartnerAuthorizedOfficerRole, Location
 from core.tests.base import BaseAPITestCase
 
 from partner.models import (
@@ -12,130 +15,109 @@ from partner.models import (
 )
 
 
-# class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
+class TestPartnerProjectListCreateAPIView(BaseAPITestCase):
 
-#     def setUp(self):
-#         super(TestPartnerProjectListCreateAPIView, self).setUp()
+    force_login_as_role = PartnerAuthorizedOfficerRole
 
-#         self.cluster = Cluster.objects.first()
+    def setUp(self):
+        super(TestPartnerProjectListCreateAPIView, self).setUp()
 
-#         self.partner = PartnerFactory(
-#             title="{} - {} Cluster Partner".format(
-#                 self.cluster.response_plan.title, self.cluster.type),
-#             partner_activity=None,
-#             partner_project=None,
-#             user=None,
-#         )
+        partner = self.user.partner
+        self.cluster = partner.clusters.first()
+        self.pp = partner.partner_projects.first()
 
-#         self.partner.clusters.add(self.cluster)
+        self.data = {
+            'clusters': [{"id": self.cluster.id}],
+            'locations': [{"id": Location.objects.first().id}, {"id": Location.objects.last().id}],
+            'title': 'partner project title',
+            'start_date': datetime.date.today().strftime(settings.INPUT_DATA_FORMAT),
+            'end_date': datetime.date.today().strftime(settings.INPUT_DATA_FORMAT),
+            'status': 'Ong',
+            'description': "description",
+            'additional_information': "additional_information",
+            'total_budget': 100000,
+            'funding_source': "UNICEF",
+        }
 
-#         self.pp = PartnerProjectFactory(
-#             partner=self.cluster.partners.first(),
-#             title="{} Partner Project".format(
-#                 self.cluster.partners.first().title)
-#         )
+        # Logging in as Partner AO
+        self.client.login(username='admin_ao', password='Passw0rd!')
 
-#         self.pp.clusters.add(self.cluster)
+    def test_list_partner_project(self):
+        """
+        get list unit test for PartnerProjectListCreateAPIView
+        """
+        url = reverse(
+            'partner-project-list',
+            kwargs={
+                'response_plan_id': self.cluster.response_plan_id})
+        response = self.client.get(url, format='json')
 
-#         self.data = {
-#             'clusters': [{"id": self.cluster.id}],
-#             'locations': [{"id": Location.objects.first().id}, {"id": Location.objects.last().id}],
-#             'title': 'partner project title',
-#             'start_date': datetime.date.today().strftime(settings.INPUT_DATA_FORMAT),
-#             'end_date': datetime.date.today().strftime(settings.INPUT_DATA_FORMAT),
-#             'status': 'Ong',
-#             'description': "description",
-#             'additional_information': "additional_information",
-#             'total_budget': 100000,
-#             'funding_source': "UNICEF",
-#         }
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(response.data['count'], PartnerProject.objects.filter(
+            clusters__response_plan_id=self.cluster.response_plan_id).count())
 
-#         # Logging in as Partner AO
-#         self.client.login(username='admin_ao', password='Passw0rd!')
+    def test_list_partner_project_by_cluster(self):
+        """
+        get list by given cluster id unit test for PartnerProjectListCreateAPIView
+        """
+        cluster_id = self.cluster.id
+        url = reverse(
+            'partner-project-list',
+            kwargs={
+                'response_plan_id': self.cluster.response_plan_id}) + "?cluster_id=" + str(cluster_id)
+        response = self.client.get(url, format='json')
 
-#     def test_list_partner_project(self):
-#         """
-#         get list unit test for PartnerProjectListCreateAPIView
-#         """
-#         url = reverse(
-#             'partner-project-list',
-#             kwargs={
-#                 'response_plan_id': self.cluster.response_plan_id})
-#         response = self.client.get(url, format='json')
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(
+            response.data['count'],
+            PartnerProject.objects.filter(
+                clusters__in=[cluster_id]).count())
 
-#         self.assertTrue(status.is_success(response.status_code))
-#         self.assertEquals(response.data['count'], PartnerProject.objects.filter(
-#             clusters__response_plan_id=self.cluster.response_plan_id).count())
+    def test_create_partner_project(self):
+        """
+        create unit test for ClusterObjectiveAPIView
+        """
+        base_count = PartnerProject.objects.all().count()
 
-#     def test_list_partner_project_by_cluster(self):
-#         """
-#         get list by given cluster id unit test for PartnerProjectListCreateAPIView
-#         """
-#         cluster_id = self.cluster.id
-#         url = reverse(
-#             'partner-project-list',
-#             kwargs={
-#                 'response_plan_id': self.cluster.response_plan_id}) + "?cluster_id=" + str(cluster_id)
-#         response = self.client.get(url, format='json')
+        # test for creating object
+        url = reverse(
+            'partner-project-list',
+            kwargs={
+                'response_plan_id': self.cluster.response_plan_id})
+        response = self.client.post(url, data=self.data, format='json')
 
-#         self.assertTrue(status.is_success(response.status_code))
-#         self.assertEquals(
-#             response.data['count'],
-#             PartnerProject.objects.filter(
-#                 clusters__in=[cluster_id]).count())
+        self.assertTrue(status.is_success(response.status_code))
+        created_obj = PartnerProject.objects.get(id=response.data['id'])
+        self.assertEquals(created_obj.title, self.data['title'])
+        self.assertEquals(PartnerProject.objects.all().count(), base_count + 1)
 
-#     def test_create_partner_project(self):
-#         """
-#         create unit test for ClusterObjectiveAPIView
-#         """
-#         base_count = PartnerProject.objects.all().count()
+    def test_list_filters_partner_project(self):
+        """
+        get list unit test for PartnerProjectListCreateAPIView
+        """
+        pp = self.cluster.partner_projects.first()
+        location = Location.objects.first()
+        pp.locations.add(location)
+        url = reverse('partner-project-list', kwargs={'response_plan_id': self.cluster.response_plan_id})
+        url += "?location=%d" % location.id
+        response = self.client.get(url, format='json')
 
-#         # test for creating object
-#         url = reverse(
-#             'partner-project-list',
-#             kwargs={
-#                 'response_plan_id': self.cluster.response_plan_id})
-#         response = self.client.post(url, data=self.data, format='json')
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(response.data['count'], 1)
+        self.assertEquals(response.data['results'][0]['id'], str(pp.id))
+        self.assertEquals(response.data['results'][0]['title'], pp.title)
+        self.assertEquals(
+            response.data['results'][0]['locations'][0]['id'],
+            str(location.id)
+        )
 
-#         self.assertTrue(status.is_success(response.status_code))
-#         created_obj = PartnerProject.objects.get(id=response.data['id'])
-#         self.assertEquals(created_obj.title, self.data['title'])
-#         self.assertEquals(PartnerProject.objects.all().count(), base_count + 1)
-
-#     def test_list_filters_partner_project(self):
-#         """
-#         get list unit test for PartnerProjectListCreateAPIView
-#         """
-#         pp = self.cluster.partner_projects.first()
-#         location = Location.objects.first()
-#         pp.locations.add(location)
-#         url = reverse(
-#             'partner-project-list',
-#             kwargs={
-#                 'response_plan_id': self.cluster.response_plan_id})
-#         url += "?location=%d" % location.id
-#         response = self.client.get(url, format='json')
-
-#         self.assertTrue(status.is_success(response.status_code))
-#         self.assertEquals(response.data['count'], 1)
-#         self.assertEquals(response.data['results'][0]['id'], str(pp.id))
-#         self.assertEquals(response.data['results'][0]['title'], pp.title)
-#         self.assertEquals(
-#             response.data['results'][0]['locations'][0]['id'], str(
-#                 location.id))
-
-#         partner = self.cluster.partners.first()
-#         url = reverse(
-#             'partner-project-list',
-#             kwargs={
-#                 'response_plan_id': self.cluster.response_plan_id})
-#         url += "?partner=%d" % partner.id
-#         response = self.client.get(url, format='json')
-#         self.assertTrue(status.is_success(response.status_code))
-#         self.assertEquals(response.data['count'], 1)
-#         self.assertEquals(
-#             response.data['results'][0]['partner'], str(
-#                 partner.id))
+        partner = self.cluster.partners.first()
+        url = reverse('partner-project-list', kwargs={'response_plan_id': self.cluster.response_plan_id})
+        url += "?partner=%d" % partner.id
+        response = self.client.get(url, format='json')
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(response.data['count'], 1)
+        self.assertEquals(response.data['results'][0]['partner'], partner.title)
 
 
 class TestPartnerProjectAPIView(BaseAPITestCase):
