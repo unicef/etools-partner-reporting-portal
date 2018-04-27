@@ -233,6 +233,7 @@ class ProgressReportSimpleSerializer(serializers.ModelSerializer):
             'review_overall_status_display',
             'sent_back_feedback',
             'programme_document',
+            'narrative',
         )
 
     def get_reporting_period(self, obj):
@@ -294,6 +295,7 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
             'submitted_by',
             'submitting_user',
             'is_final',
+            'narrative',
         )
 
     def get_partner_org_id(self, obj):
