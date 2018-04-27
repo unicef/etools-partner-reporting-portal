@@ -134,7 +134,8 @@ class PartnerProjectAPIView(APIView):
 
         serializer = PartnerProjectSerializer(
             instance=self.get_instance(),
-            data=self.request.data
+            data=self.request.data,
+            partial=True
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()

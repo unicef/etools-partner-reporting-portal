@@ -156,7 +156,7 @@ class TestPartnerProjectAPIView(BaseAPITestCase):
 
         self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_update_patch_partner_project(self):
+    def test_update_partner_project(self):
         """
         patch object unit test for PartnerProjectAPIView
         """
@@ -166,12 +166,12 @@ class TestPartnerProjectAPIView(BaseAPITestCase):
         data = dict(id=last.id, title='new updated title')
         url = reverse('partner-project-details', kwargs={"pk": last.id})
         response = self.client.patch(url, data=data, format='json')
-        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(response.status_code, status.HTTP_200_OK, msg=response.content)
         self.assertEquals(PartnerProject.objects.all().count(), base_count)
         self.assertEquals(
-            PartnerProject.objects.get(
-                id=response.data['id']).title,
-            data['title'])
+            PartnerProject.objects.get(id=response.data['id']).title,
+            data['title']
+        )
 
     def test_update_patch_non_existent_partner_project(self):
         """
@@ -275,7 +275,7 @@ class TestPartnerActivityAPIView(BaseAPITestCase):
         )
 
 
-class TestPartnerProjectAPIView(BaseAPITestCase):
+class TestCustomPartnerProjectAPIView(BaseAPITestCase):
 
     def test_create_project(self):
         rp = ResponsePlan.objects.first()

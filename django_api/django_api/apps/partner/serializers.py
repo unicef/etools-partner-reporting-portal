@@ -186,7 +186,10 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         validated_data = super(PartnerProjectSerializer, self).validate(attrs)
-        if validated_data['end_date'] < validated_data['start_date']:
+        start_date = validated_data.get('start_date', getattr(self.instance, 'start_date', None))
+        end_date = validated_data.get('end_date', getattr(self.instance, 'start_date', None))
+
+        if start_date and end_date and end_date < start_date:
             raise serializers.ValidationError({
                 'end_date': 'Cannot be earlier than Start Date'
             })
@@ -234,8 +237,8 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def update(self, instance, validated_data):
-        clusters = self.initial_data.pop('clusters', [])
-        if not clusters:
+        clusters = self.initial_data.get('clusters')
+        if clusters is not None and not clusters:
             raise serializers.ValidationError({
                 'clusters': 'This list cannot be empty'
             })
@@ -248,9 +251,10 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
             project.custom_fields = custom_fields
             project.save()
 
-        cluster_ids = [c['id'] for c in clusters]
-        project.clusters.clear()
-        project.clusters.add(*Cluster.objects.filter(id__in=cluster_ids))
+        if clusters:
+            cluster_ids = [c['id'] for c in clusters]
+            project.clusters.clear()
+            project.clusters.add(*Cluster.objects.filter(id__in=cluster_ids))
 
         self.save_funding(instance=instance)
 
