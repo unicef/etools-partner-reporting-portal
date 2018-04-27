@@ -62,6 +62,7 @@ from core.factories import (
     RatioReportableToLowerLevelOutputFactory,
     QuantityReportableToPartnerProjectFactory,
     QuantityReportableToClusterObjectiveFactory,
+    RatioReportableToClusterObjectiveFactory,
     QuantityReportableToPartnerActivityFactory,
     QuantityReportableToClusterActivityFactory,
     QuantityIndicatorReportFactory,
@@ -279,7 +280,12 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
             cluster=cluster,
         )
 
-        reportable = QuantityReportableToClusterObjectiveFactory(
+        if random.randint(0, 1) == 0:
+            reportable = RatioReportableToClusterObjectiveFactory(
+                content_object=co, indicator_report__progress_report=None,
+            )
+        else:
+            reportable = QuantityReportableToClusterObjectiveFactory(
             content_object=co, indicator_report__progress_report=None,
         )
 

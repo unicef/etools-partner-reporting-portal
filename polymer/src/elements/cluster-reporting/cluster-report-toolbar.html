@@ -4,6 +4,7 @@
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../etools-prp-toolbar.html">
 <link rel="import" href="../download-button.html">
+<link rel="import" href="../upload-button.html">
 
 <dom-module id="cluster-report-toolbar">
   <template>
@@ -14,16 +15,21 @@
     </style>
 
     <etools-prp-toolbar
-      query="{{query}}"
-      response-plan-id="{{responsePlanId}}"
-    >
+        query="{{query}}"
+        response-plan-id="{{responsePlanId}}">
+      <upload-button
+          url="[[importUrl]]"
+          modal-title="Import Template">
+        Import Template
+      </upload-button>
+
       <download-button url="[[exportUrl]]">Export</download-button>
 
       <template
           is="dom-if"
           if="[[_equals(submitted, 0)]]"
           restamp="true">
-        <download-button url="[[importTemplateUrl]]">Import Template</download-button>
+        <download-button url="[[exportTemplateUrl]]">Export Template</download-button>
       </template>
     </etools-prp-toolbar>
   </template>
@@ -39,7 +45,7 @@
       properties: {
         submitted: Number,
 
-        importTemplateUrl: {
+        exportTemplateUrl: {
           type: String,
           computed: '_computeImportTemplateUrl(responsePlanId, query, submitted)',
         },
@@ -48,6 +54,15 @@
           type: String,
           computed: '_computeExportUrl(responsePlanId, query, submitted)',
         },
+
+        importUrl: {
+          type: String,
+          computed: '_computeImportUrl(responsePlanId)',
+        },
+      },
+
+      listeners: {
+        'file-uploaded': '_onFileUploaded',
       },
 
       _computeImportTemplateUrl: function (responsePlanId, query, submitted) {
@@ -64,6 +79,16 @@
           query,
           {submitted: submitted}
         );
+      },
+
+      _computeImportUrl: function (responsePlanId) {
+        return App.Endpoints.clusterIndicatorReportsImport(responsePlanId);
+      },
+
+      _onFileUploaded: function (e) {
+        e.stopPropagation();
+
+        this.fire('template-file-uploaded');
       },
     });
   </script>

@@ -419,6 +419,9 @@ class RatioReportableToClusterObjectiveFactory(ReportableFactory):
 
     blueprint = factory.SubFactory(RatioTypeIndicatorBlueprintFactory)
 
+    class Meta:
+        model = Reportable
+
 
 class QuantityReportableToPartnerProjectFactory(ReportableFactory):
     content_object = factory.SubFactory('core.factories.PartnerProjectFactory')

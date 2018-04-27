@@ -7,7 +7,7 @@ from django.db.models import Count
 
 import itertools
 
-from indicator.models import Disaggregation, DisaggregationValue
+from indicator.models import Disaggregation, DisaggregationValue, IndicatorBlueprint
 
 PATH = settings.BASE_DIR + "/apps/cluster/templates/excel/indicators_export.xlsx"
 SAVE_PATH = settings.MEDIA_ROOT + '/'
@@ -274,11 +274,14 @@ class IndicatorsXLSXExporter:
                             column=disaggregation_types_map[reported_disaggregation_type]).value = "X"
 
                 # Check location item values
+                blueprint = location_data.indicator_report.reportable.blueprint
+
                 for k, v in location_data.disaggregation.items():
                     if k == "()":
                         self.sheet.cell(
                             row=start_row_id,
-                            column=disaggregation_values_map['()']).value = v['c']
+                            column=disaggregation_values_map['()']).value = v['v'] if blueprint.unit == IndicatorBlueprint.NUMBER else "{}/{}".format(v['v'], v['d'])
+
                     else:
                         for dk, dv in disaggregation_values_map.items():
                             if dk == "()":
@@ -286,7 +289,7 @@ class IndicatorsXLSXExporter:
                             if sorted(list(eval(k))) == sorted(
                                     list(int(k) for k in dk.split(","))):
                                 self.sheet.cell(
-                                    row=start_row_id, column=dv).value = v['c']
+                                    row=start_row_id, column=dv).value = v['v'] if blueprint.unit == IndicatorBlueprint.NUMBER else "{}/{}".format(v['v'], v['d'])
 
                 start_row_id += 1
 

@@ -182,6 +182,10 @@
         return this.clusterIndicatorReports(responsePlanId) + 'export-for-analysis/';
       },
 
+      clusterIndicatorReportsImport: function (responsePlanId) {
+        return this.clusterIndicatorReports(responsePlanId) + 'import/';
+      },
+
       clusterIndicatorNames: function (responsePlanId) {
         return this._buildUrl(
           '/cluster/' +
