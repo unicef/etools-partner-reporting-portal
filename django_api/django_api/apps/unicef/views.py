@@ -575,7 +575,7 @@ class ProgressReportSRSubmitAPIView(APIView):
                 report_type="SR")
         except ProgressReport.DoesNotExist as exp:
             logger.exception({
-                "endpoint": "ProgressReportSubmitAPIView",
+                "endpoint": "ProgressReportSRSubmitAPIView",
                 "request.data": self.request.data,
                 "pk": self.kwargs['pk'],
                 "exception": exp,
