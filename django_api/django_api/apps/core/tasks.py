@@ -60,8 +60,10 @@ def process_period_reports():
     def get_latest_pr_by_type(pd, report_type):
         """
         Return latest ProgressReport instance given report_type
+
         Arguments:
             report_type {str} -- A report type as string: [QPR, HR, SR]
+
         Returns:
             ProgressReport -- Latest ProgressReport instance for given report_type
         """
@@ -123,9 +125,11 @@ def process_period_reports():
         def create_pr_for_report_type(reporting_period, generate_from_date):
             """
             Create ProgressReport instance by its ReportingPeriodDate instance's report type
+
             Arguments:
                 reporting_period {ReportingPeriodDates} -- ReportingPeriodDates instance for new ProgressReport
                 generate_from_date {datetime.datetime} -- datetime instance from latest ProgressReport on same report
+
             Returns:
                 Tuple[ProgressReport, datetime.datetime, datetime.datetime, datetime.datetime]
                 - Newly generated ProgressReport & 3 datetime objects

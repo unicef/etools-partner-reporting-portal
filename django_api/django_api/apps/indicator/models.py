@@ -280,6 +280,12 @@ class Reportable(TimeStampedExternalSourceModel):
 
     active = models.BooleanField(default=True)
 
+    ca_indicator_used_by_reporting_entity = models.ForeignKey(
+        'self', null=True, blank=True,
+        related_name='ca_indicators_re',
+        db_index=True
+    )
+
     class Meta:
         ordering = ['-id']
 
@@ -551,6 +557,12 @@ class IndicatorReport(TimeStampedModel):
                                    null=True)
     sent_back_feedback = models.TextField(blank=True, null=True)
 
+    parent = models.ForeignKey('self',
+                               null=True,
+                               blank=True,
+                               related_name='children',
+                               db_index=True)
+
     objects = IndicatorReportManager()
 
     class Meta:
@@ -759,6 +771,25 @@ def recalculate_reportable_total(sender, instance, **kwargs):
 
         reportable.parent_indicator.total = new_parent_total
         reportable.parent_indicator.save()
+
+
+class ReportingEntity(TimeStampedModel):
+    """
+    ReportingEntity module it includes an organization entity for
+    Cluster Activity indicator that is adopted from ProgrammeDocument
+
+    related models:
+        indicator.IndicatorReport (ForeignKey): "indicator_report"
+    """
+    indicator_report = models.ForeignKey(
+        IndicatorReport, related_name="reporting_entities"
+    )
+
+    class Meta:
+        ordering = ['id']
+
+    def __str__(self):
+        return "Reporting entity for {}".format(self.indicator_report)
 
 
 class IndicatorLocationData(TimeStampedModel):

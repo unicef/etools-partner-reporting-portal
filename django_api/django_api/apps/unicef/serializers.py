@@ -239,7 +239,7 @@ class ProgressReportSimpleSerializer(serializers.ModelSerializer):
         return "%s - %s " % (
             obj.start_date.strftime(settings.PRINT_DATA_FORMAT),
             obj.end_date.strftime(settings.PRINT_DATA_FORMAT)
-        )
+        ) if obj.start_date and obj.end_date else "No reporting period"
 
     def get_is_draft(self, obj):
         return obj.latest_indicator_report.is_draft if obj.latest_indicator_report else None
@@ -336,7 +336,7 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
         return "%s - %s " % (
             obj.start_date.strftime(settings.PRINT_DATA_FORMAT),
             obj.end_date.strftime(settings.PRINT_DATA_FORMAT)
-        )
+        ) if obj.start_date and obj.end_date else "No reporting period"
 
     def get_is_draft(self, obj):
         return obj.latest_indicator_report.is_draft if obj.latest_indicator_report else None
@@ -355,6 +355,18 @@ class ProgressReportUpdateSerializer(serializers.ModelSerializer):
             'partner_contribution_to_date',
             'challenges_in_the_reporting_period',
             'proposed_way_forward',
+        )
+
+
+class ProgressReportSRUpdateSerializer(serializers.ModelSerializer):
+
+    narrative = serializers.CharField()
+
+    class Meta:
+        model = ProgressReport
+        fields = (
+            'id',
+            'narrative',
         )
 
 

@@ -17,7 +17,6 @@
 
 <link rel="import" href="../../../../elements/page-body.html">
 <link rel="import" href="../../../../elements/etools-prp-ajax.html">
-<link rel="import" href="../../../../elements/etools-prp-permissions.html">
 <link rel="import" href="../../../../endpoints.html">
 <link rel="import" href="../../../../redux/actions.html">
 <link rel="import" href="../../../../redux/store.html">
@@ -29,10 +28,6 @@
         display: block;
       }
     </style>
-
-    <etools-prp-permissions
-        permissions="{{permissions}}">
-    </etools-prp-permissions>
 
     <app-route
       route="{{route}}"
@@ -47,12 +42,7 @@
             attr-for-selected="name"
             scrollable
             hide-scroll-buttons>
-          <template
-              is="dom-if"
-              if="[[canViewPdDetails]]"
-              restamp="true">
-            <paper-tab name="details">Details</paper-tab>
-          </template>
+          <paper-tab name="details">Details</paper-tab>
           <paper-tab name="reports">Reports</paper-tab>
           <paper-tab name="calculation-methods">Calculation Methods</paper-tab>
         </paper-tabs>
@@ -60,18 +50,12 @@
     </page-header>
 
     <iron-pages
-      id="tabContent"
-      attr-for-selected="name"
-      fallback-selection="details"
-      on-iron-items-changed="_updateTabSelection">
-
-      <template
-          is="dom-if"
-          if="[[canViewPdDetails]]"
-          restamp="true">
-        <template is="dom-if" if="[[_equals(pdTab, 'details')]]" restamp="true">
-          <pd-details-overview name="details"></pd-details-overview>
-        </template>
+        id="tabContent"
+        attr-for-selected="name"
+        fallback-selection="details"
+        on-iron-items-changed="_updateTabSelection">
+      <template is="dom-if" if="[[_equals(pdTab, 'details')]]" restamp="true">
+        <pd-details-overview name="details"></pd-details-overview>
       </template>
 
       <template is="dom-if" if="[[_equals(pdTab, 'reports')]]" restamp="true">
@@ -97,17 +81,11 @@
       properties: {
         pdTab: String,
         routeData: Object,
-        permissions: Object,
 
         pd: {
           type: Object,
           value: {},
           statePath: App.Selectors.ProgrammeDocuments.current,
-        },
-
-        canViewPdDetails: {
-          type: Boolean,
-          computed: '_computeCanViewPdDetails(permissions)',
         },
       },
 
@@ -121,10 +99,6 @@
 
       _updateUrlTab: function (dashTab) {
         this.set('pdTab', dashTab);
-      },
-
-      _computeCanViewPdDetails: function (permissions) {
-        return permissions.viewPdDetails;
       },
     });
   </script>

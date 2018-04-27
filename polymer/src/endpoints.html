@@ -57,6 +57,10 @@
         return this.programmeDocumentReport(workspaceId, reportId) + 'submit/';
       },
 
+      programmeDocumentReportSubmitSpecial: function (workspaceId, reportId) {
+        return this.programmeDocumentReportSubmit(workspaceId, reportId) + 'sr/';
+      },
+
       programmeDocumentReportUpdate: function (workspaceId, reportId) {
         return this.programmeDocumentReport(workspaceId, reportId) + 'update/';
       },
