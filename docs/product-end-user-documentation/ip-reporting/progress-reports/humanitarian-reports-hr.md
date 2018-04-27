@@ -15,7 +15,11 @@ The frequency of reporting and report due dates are decided, with the following 
 * For humanitarian response indicators that are “cluster indicators”, the frequency of reporting \(report start and end dates\) and due dates are those defined in PRP Cluster, with no ability for the UNICEF user to modify dates in PMP; if reporting requirements are modified by the IMO in PRP-Cluster, adjustments will automatically be reflected in PMP and PRP-IP.
 * For humanitarian response indicators that are UNICEF specific “high-frequency humanitarian response indicators”, the due date is defined by the user in PMP, and the start and end date of the reporting period are automatically assigned \(start date: previous due date reporting period \(or PD start date for first HR\) + 1 day; end date: due date selected by the user\).
 
-All humanitarian response indicators in the same PD \(or SSFA\) are bundled in the same report when they have the same due date and reporting periods. The same PD may have multiple humanitarian reports, for the same time period that are overlapping, depending on the frequency of reporting defined in PRP-Cluster and/or PMP.
+All humanitarian response indicators in the same PD \(or SSFA\) are bundled in the same report when they have the same due date and reporting periods. The same PD may have multiple humanitarian reports, for the same time period that are overlapping, depending on the frequency of reporting defined in PRP-Cluster and/or PMP. Example screenshot showing HF cluster \(one\) and HF non-cluster in the same HR:
+
+![](https://lh6.googleusercontent.com/z6VyMc2ZCHsJiN6WxXHA5E_RIMMAtAHQqiXYxCLFCp_d9PpNTYi0nEkJiCn5GyT1YgH2C_ueZuDYcFX7M-K-vynxX9-r1Oke8pGVs-TRA4aYK2k4zby7Yhp14HD2xjctoRsUnLOS)
+
+
 
 Each location for an adopted cluster activity indicator, coming from the PD will also be pushed to the partner activity indicator. So Eg. PAI \(Partner Activity Indicator\) has locations L1, L2 and HF cluster indicator from PD has locations L2, L3. L3 will also be hence added to the PAI. Hence **PAI will have a superset of all locations** whether already added to it by the partner/IMO or the ones coming from the PD. This change should be wherever we create Reportable's and their locations for PD indicators.
 
@@ -30,4 +34,8 @@ Each location for an adopted cluster activity indicator, coming from the PD will
 {% hint style="info" %}
 If data for this indicator report \(inside the HR\) has been submitted \(hence "Received"\) already in [cluster reporting](../../cluster-reporting/reporting-on-results/reporting-to-unicef.md), then the "ENTER DATA" button data for that indicator report in the HR would not show and hence none of the data will be be editable for it.
 {% endhint %}
+
+
+
+
 
