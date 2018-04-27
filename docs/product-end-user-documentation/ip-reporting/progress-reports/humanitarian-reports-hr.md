@@ -27,6 +27,7 @@ Each location for an adopted cluster activity indicator, coming from the PD will
 
 ![Appropriate data recorded for UNICEF reporting purposes.](https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-KzwqgC7O0kW5EDlHvvK%2F-LAWe30zunKHgZEeE0Kc%2F-LAWfBmgmu8jok8o8iS0%2FReporting-IP-Enter-Data_02_V3_04.png?alt=media&token=889757a7-8ff1-4788-88a2-75bcdbe64b6a)
 
-  
-
+{% hint style="info" %}
+If data for this indicator report \(inside the HR\) has been submitted \(hence "Received"\) already in [cluster reporting](../../cluster-reporting/reporting-on-results/reporting-to-unicef.md), then the "ENTER DATA" button data for that indicator report in the HR would not show and hence none of the data will be be editable for it.
+{% endhint %}
 
