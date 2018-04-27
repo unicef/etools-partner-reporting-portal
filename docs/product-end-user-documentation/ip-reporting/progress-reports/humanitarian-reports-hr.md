@@ -4,9 +4,9 @@ This report type is used in humanitarian situations, when it is critical to rece
 
 * For each PD output \(or SSFA expected result\), report progress only against humanitarian response indicators defined for the PD/SSFA in PMP, at the level of disaggregation defined, or above, if applicable. Humanitarian response indicators are only those defined as “cluster indicators” or UNICEF specific “high-frequency humanitarian response indicators” in PMP.
 
-The structure of this report is simplified compared to the standard QPR. This report does not include PD output rating or narrative assessment of progress and there is no “other info" tab in the user interface for this report. The tab in the PD report page called “Reporting on Results” must be renamed to “Reporting on Indicators”.
+The structure of this report is simplified compared to the standard QPR. This report **does not include PD output rating or narrative assessment** of progress and there is no “other info" tab in the user interface for this report. The tab in the PD report page called “Reporting on Results” must be renamed to “Reporting on Indicators”.
 
-There is no workflow following the submission by the IP to UNICEF and Cluster. HR’s status can be set to “Received”, and the underlying cluster specific indicator report \(if any\) would be set to Received as well.
+There is **no workflow** following the submission by the IP to UNICEF and Cluster. HR’s status can be set to “Received”, and the underlying cluster specific indicator report \(if any\) would be set to Received as well.
 
 If data for a Indicator \(Report\) has been submitted \(hence "Received"\) already in cluster reporting, then data for that indicator in the HR would not be editable in IP reporting.
 
@@ -16,6 +16,8 @@ The frequency of reporting and report due dates are decided, with the following 
 * For humanitarian response indicators that are UNICEF specific “high-frequency humanitarian response indicators”, the due date is defined by the user in PMP, and the start and end date of the reporting period are automatically assigned \(start date: previous due date reporting period \(or PD start date for first HR\) + 1 day; end date: due date selected by the user\).
 
 All humanitarian response indicators in the same PD \(or SSFA\) are bundled in the same report when they have the same due date and reporting periods. The same PD may have multiple humanitarian reports, for the same time period that are overlapping, depending on the frequency of reporting defined in PRP-Cluster and/or PMP.
+
+Each location for an adopted cluster activity indicator, coming from the PD will also be pushed to the partner activity indicator. So Eg. PAI \(Partner Activity Indicator\) has locations L1, L2 and HF cluster indicator from PD has locations L2, L3. L3 will also be hence added to the PAI. Hence **PAI will have a superset of all locations** whether already added to it by the partner/IMO or the ones coming from the PD. This change should be wherever we create Reportable's and their locations for PD indicators.
 
 ### Screenshots {#screenshots}
 
