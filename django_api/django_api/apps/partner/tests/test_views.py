@@ -8,6 +8,7 @@ from core.tests.base import BaseAPITestCase
 
 from partner.models import (
     PartnerActivity,
+    PartnerProject,
 )
 
 
@@ -137,74 +138,70 @@ from partner.models import (
 #                 partner.id))
 
 
-# class TestPartnerProjectAPIView(BaseAPITestCase):
+class TestPartnerProjectAPIView(BaseAPITestCase):
 
-#     def setUp(self):
-#         super().setUp()
+    force_login_as_role = PartnerAuthorizedOfficerRole
 
-#         # Logging in as Partner AO
-#         self.client.login(username='admin_ao', password='Passw0rd!')
+    def test_get_instance(self):
+        first = PartnerProject.objects.first()
+        url = reverse('partner-project-details', kwargs={"pk": first.id})
+        response = self.client.get(url, format='json')
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(response.data['id'], str(first.id))
+        self.assertEquals(response.data['title'], first.title)
 
-#     def test_get_instance(self):
-#         first = PartnerProject.objects.first()
-#         url = reverse('partner-project-details', kwargs={"pk": first.id})
-#         response = self.client.get(url, format='json')
-#         self.assertTrue(status.is_success(response.status_code))
-#         self.assertEquals(response.data['id'], str(first.id))
-#         self.assertEquals(response.data['title'], first.title)
+    def test_get_non_existent_instance(self):
+        url = reverse('partner-project-details', kwargs={"pk": 9999999})
+        response = self.client.get(url, format='json')
 
-#     def test_get_non_existent_instance(self):
-#         url = reverse('partner-project-details', kwargs={"pk": 9999999})
-#         response = self.client.get(url, format='json')
+        self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
 
-#         self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
+    def test_update_patch_partner_project(self):
+        """
+        patch object unit test for PartnerProjectAPIView
+        """
+        base_count = PartnerProject.objects.all().count()
+        last = PartnerProject.objects.last()
 
-#     def test_update_patch_partner_project(self):
-#         """
-#         patch object unit test for PartnerProjectAPIView
-#         """
-#         base_count = PartnerProject.objects.all().count()
-#         last = PartnerProject.objects.last()
+        data = dict(id=last.id, title='new updated title')
+        url = reverse('partner-project-details', kwargs={"pk": last.id})
+        response = self.client.patch(url, data=data, format='json')
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(PartnerProject.objects.all().count(), base_count)
+        self.assertEquals(
+            PartnerProject.objects.get(
+                id=response.data['id']).title,
+            data['title'])
 
-#         data = dict(id=last.id, title='new updated title')
-#         url = reverse('partner-project-details', kwargs={"pk": last.id})
-#         response = self.client.patch(url, data=data, format='json')
-#         self.assertTrue(status.is_success(response.status_code))
-#         self.assertEquals(PartnerProject.objects.all().count(), base_count)
-#         self.assertEquals(
-#             PartnerProject.objects.get(
-#                 id=response.data['id']).title,
-#             data['title'])
+    def test_update_patch_non_existent_partner_project(self):
+        """
+        patch object unit test for PartnerProjectAPIView
+        """
+        data = dict(id=9999999, title='new updated title')
+        url = reverse('partner-project-details', kwargs={"pk": 9999999})
+        response = self.client.patch(url, data=data, format='json')
 
-#     def test_update_patch_non_existent_partner_project(self):
-#         """
-#         patch object unit test for PartnerProjectAPIView
-#         """
-#         data = dict(id=9999999, title='new updated title')
-#         url = reverse('partner-project-details', kwargs={"pk": 9999999})
-#         response = self.client.patch(url, data=data, format='json')
+        self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
 
-#         self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
+    def test_delete_partner_project(self):
+        base_count = PartnerProject.objects.all().count()
+        last = PartnerProject.objects.last()
+        url = reverse('partner-project-details', kwargs={"pk": last.id})
+        response = self.client.delete(url, data={"id": last.pk}, format='json')
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEquals(response.data, None)
+        self.assertEquals(PartnerProject.objects.all().count(), base_count - 1)
 
-#     def test_delete_partner_project(self):
-#         base_count = PartnerProject.objects.all().count()
-#         last = PartnerProject.objects.last()
-#         url = reverse('partner-project-details', kwargs={"pk": last.id})
-#         response = self.client.delete(url, data={"id": last.pk}, format='json')
-#         self.assertTrue(status.is_success(response.status_code))
-#         self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
-#         self.assertEquals(response.data, None)
-#         self.assertEquals(PartnerProject.objects.all().count(), base_count - 1)
+    def test_delete_non_existent_partner_project(self):
+        base_count = PartnerProject.objects.all().count()
+        last = PartnerProject.objects.last()
+        url = reverse('partner-project-details', kwargs={"pk": 9999999})
+        response = self.client.delete(
+            url, data={"id": last.pk + 1}, format='json')
 
-#     def test_delete_non_existent_partner_project(self):
-#         base_count = PartnerProject.objects.all().count()
-#         last = PartnerProject.objects.last()
-#         url = reverse('partner-project-details', kwargs={"pk": 9999999})
-#         response = self.client.delete(
-#             url, data={"id": last.pk + 1}, format='json')
-
-#         self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
-#         self.assertEquals(PartnerProject.objects.all().count(), base_count)
+        self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEquals(PartnerProject.objects.all().count(), base_count)
 
 
 class TestPartnerActivityAPIView(BaseAPITestCase):
