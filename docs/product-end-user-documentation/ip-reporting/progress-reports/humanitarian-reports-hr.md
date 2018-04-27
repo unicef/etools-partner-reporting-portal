@@ -27,15 +27,13 @@ Each location for an adopted cluster activity indicator, coming from the PD will
 
 ![Data entry for a cluster indicator inside a HR](https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-KzwqgC7O0kW5EDlHvvK%2F-LAWe30zunKHgZEeE0Kc%2F-LAWePAeUu1woi-KT2_4%2FReporting-IP-Enter-Data_02_V3_03.png?alt=media&token=9ef4a4fd-0818-4cea-8b5d-fe9238021db0)
 
-​
+For the reporting entity \(UNICEF\) that a part of the cluster indicator progress data needs to be sent/attributed to, will also be shown in the data entry modal for each location. The user will have to enter the percentage of data they would like to allocate. The user can select whatever disaggregation level they are reporting at, and the reporting entity data will also be saved/attributed then at the same level.
 
 ![Appropriate data recorded for UNICEF reporting purposes.](https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-KzwqgC7O0kW5EDlHvvK%2F-LAWe30zunKHgZEeE0Kc%2F-LAWfBmgmu8jok8o8iS0%2FReporting-IP-Enter-Data_02_V3_04.png?alt=media&token=889757a7-8ff1-4788-88a2-75bcdbe64b6a)
 
 {% hint style="info" %}
 If data for this indicator report \(inside the HR\) has been submitted \(hence "Received"\) already in [cluster reporting](../../cluster-reporting/reporting-on-results/reporting-to-unicef.md), then the "ENTER DATA" button data for that indicator report in the HR would not show and hence none of the data will be be editable for it.
 {% endhint %}
-
-
 
 
 
