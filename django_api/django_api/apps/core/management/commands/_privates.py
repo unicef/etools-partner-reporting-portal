@@ -286,8 +286,8 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
             )
         else:
             reportable = QuantityReportableToClusterObjectiveFactory(
-            content_object=co, indicator_report__progress_report=None,
-        )
+                content_object=co, indicator_report__progress_report=None,
+            )
 
         for loc in locations:
             LocationWithReportableLocationGoalFactory.create(

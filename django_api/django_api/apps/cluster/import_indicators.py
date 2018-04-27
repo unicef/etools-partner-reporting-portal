@@ -8,6 +8,7 @@ from indicator.disaggregators import QuantityIndicatorDisaggregator, RatioIndica
 COLUMN_HASH_ID = 4
 MAX_COLUMNS = 1000
 
+
 class IndicatorsXLSXReader(object):
 
     def __init__(self, path):
@@ -48,15 +49,20 @@ class IndicatorsXLSXReader(object):
 
                 # Get IndicatorLocationData ID
                 try:
-                    indicator = IndicatorLocationData.objects.get(pk=self.sheet.cell(row=row, column=location_column_id).value)
-                except:
-                    return "Cannot find Indicator Location Data data for ID " + str(self.sheet.cell(row=row, column=location_column_id).value)
+                    indicator = IndicatorLocationData.objects.get(
+                        pk=self.sheet.cell(row=row, column=location_column_id).value
+                    )
+                except IndicatorLocationData.DoesNotExist:
+                    return "Cannot find Indicator Location Data data for ID " \
+                        + str(self.sheet.cell(row=row, column=location_column_id).value)
+
                 blueprint = indicator.indicator_report.reportable.blueprint
                 data = indicator.disaggregation
                 # Prepare
                 for column in range(dis_data_column_start_id, total_column_id + 1):
                     try:
                         value = self.sheet.cell(row=row, column=column).value
+
                         # Check if value is present in cell
                         if value:
                             # Evaluate ID of Disaggregation Type
@@ -73,8 +79,9 @@ class IndicatorsXLSXReader(object):
                                 v, d = value.split("/")
                                 data[dis_type_id]["v"] = int(v)
                                 data[dis_type_id]["d"] = int(d)
-                    except:
+                    except Exception:
                         return "Cannot assign disaggregation value to column " + str(column)
+
                 indicator.disaggregation = data
                 indicator.save()
 

@@ -11,7 +11,6 @@ from rest_framework.response import Response
 from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveAPIView, GenericAPIView
 from rest_framework.mixins import ListModelMixin
 from rest_framework import status as statuses
-from rest_framework.parsers import FileUploadParser
 
 import django_filters
 
@@ -478,6 +477,7 @@ class ResponsePlanPartnerDashboardAPIView(ResponsePlanClusterDashboardAPIView):
             })
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
+
 class ClusterIndicatorsListExcelImportView(APIView):
 
     permission_classes = (IsAuthenticated,)
@@ -492,7 +492,7 @@ class ClusterIndicatorsListExcelImportView(APIView):
         reader = IndicatorsXLSXReader(filepath)
         result = reader.import_data()
         if result:
-            return Response({'parsing_errors': [result,]}, status=statuses.HTTP_400_BAD_REQUEST)
+            return Response({'parsing_errors': [result, ]}, status=statuses.HTTP_400_BAD_REQUEST)
         else:
             return Response({}, status=statuses.HTTP_200_OK)
 

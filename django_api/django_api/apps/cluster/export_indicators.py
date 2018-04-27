@@ -280,7 +280,8 @@ class IndicatorsXLSXExporter:
                     if k == "()":
                         self.sheet.cell(
                             row=start_row_id,
-                            column=disaggregation_values_map['()']).value = v['v'] if blueprint.unit == IndicatorBlueprint.NUMBER else "{}/{}".format(v['v'], v['d'])
+                            column=disaggregation_values_map['()']).value = v['v'] \
+                                if blueprint.unit == IndicatorBlueprint.NUMBER else "{}/{}".format(v['v'], v['d'])
 
                     else:
                         for dk, dv in disaggregation_values_map.items():
@@ -289,7 +290,9 @@ class IndicatorsXLSXExporter:
                             if sorted(list(eval(k))) == sorted(
                                     list(int(k) for k in dk.split(","))):
                                 self.sheet.cell(
-                                    row=start_row_id, column=dv).value = v['v'] if blueprint.unit == IndicatorBlueprint.NUMBER else "{}/{}".format(v['v'], v['d'])
+                                    row=start_row_id, column=dv).value = v['v'] \
+                                        if blueprint.unit == IndicatorBlueprint.NUMBER \
+                                        else "{}/{}".format(v['v'], v['d'])
 
                 start_row_id += 1
 
