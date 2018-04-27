@@ -457,22 +457,30 @@ def handle_terminated_suspended_pd_reports(sender, instance, created, **kwargs):
     if instance.progress_reports.exists() and \
             (instance.status == PD_STATUS.terminated or instance.status == PD_STATUS.suspended):
         final_ids = list()
-        final_pr_qpr = instance.progress_reports.filter(report_type="QPR").latest('end_date')
-        final_pr_hr = instance.progress_reports.filter(report_type="HR").latest('end_date')
 
-        final_pr_qpr.end_date = instance.end_date
-        final_pr_qpr.due_date = instance.end_date
-        final_pr_qpr.is_final = True
-        final_pr_qpr.status = PROGRESS_REPORT_STATUS.overdue
-        final_pr_qpr.save()
-        final_ids.append(final_pr_qpr.id)
+        try:
+            final_pr_qpr = instance.progress_reports.filter(report_type="QPR").latest('end_date')
+        except ProgressReport.DoesNotExist:
+            pass
+        else:
+            final_pr_qpr.end_date = instance.end_date
+            final_pr_qpr.due_date = instance.end_date
+            final_pr_qpr.is_final = True
+            final_pr_qpr.status = PROGRESS_REPORT_STATUS.overdue
+            final_pr_qpr.save()
+            final_ids.append(final_pr_qpr.id)
 
-        final_pr_hr.end_date = instance.end_date
-        final_pr_hr.due_date = instance.end_date
-        final_pr_hr.is_final = True
-        final_pr_hr.status = PROGRESS_REPORT_STATUS.overdue
-        final_pr_hr.save()
-        final_ids.append(final_pr_hr.id)
+        try:
+            final_pr_hr = instance.progress_reports.filter(report_type="HR").latest('end_date')
+        except ProgressReport.DoesNotExist:
+            pass
+        else:
+            final_pr_hr.end_date = instance.end_date
+            final_pr_hr.due_date = instance.end_date
+            final_pr_hr.is_final = True
+            final_pr_hr.status = PROGRESS_REPORT_STATUS.overdue
+            final_pr_hr.save()
+            final_ids.append(final_pr_hr.id)
 
         try:
             final_pr_sr = instance.progress_reports.filter(report_type="SR").latest('end_date')
@@ -484,8 +492,11 @@ def handle_terminated_suspended_pd_reports(sender, instance, created, **kwargs):
             final_pr_sr.save()
             final_ids.append(final_pr_sr.id)
 
-        rest_of_reports = instance.progress_reports.exclude(id__in=final_ids).filter(status=PROGRESS_REPORT_STATUS.due)
-        rest_of_reports.update(status=PROGRESS_REPORT_STATUS.overdue)
+        if final_ids:
+            rest_of_reports = instance.progress_reports.exclude(
+                id__in=final_ids
+            ).filter(status=PROGRESS_REPORT_STATUS.due)
+            rest_of_reports.update(status=PROGRESS_REPORT_STATUS.overdue)
 
 
 class ReportingPeriodDates(TimeStampedExternalSyncModelMixin):

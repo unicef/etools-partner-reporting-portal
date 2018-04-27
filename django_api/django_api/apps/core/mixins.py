@@ -39,6 +39,11 @@ def user_details(strategy, details, user=None, *args, **kwargs):
         user_groups = [group.name for group in user.groups.all()]
         # business_area_code = details.get("business_area_code", 'defaultBA1235')
 
+        # Update username with email and unusable password
+        user.username = user.email
+        user.set_unusable_password()
+        user.save()
+
         if details.get("idp") == "UNICEF Azure AD" and "UNICEF User" not in user_groups:
             user.groups.add(Group.objects.get(name='UNICEF User'))
             user.is_staff = True
@@ -65,8 +70,6 @@ def user_details(strategy, details, user=None, *args, **kwargs):
         if updates_available:
             user.save()
             user.profile.save()
-
-    print("user_details: ", strategy, details, user)
 
     return social_core_user.user_details(strategy, details, user, *args, **kwargs)
 
