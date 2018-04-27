@@ -12,7 +12,7 @@ If data for a Indicator \(Report\) has been submitted \(hence "Received"\) alrea
 
 The frequency of reporting and report due dates are decided, with the following logic:
 
-* For humanitarian response indicators that are “cluster indicators”, the frequency of reporting \(report start and end dates\) and due dates are those defined in PRP Cluster, with no ability for the UNICEF user to modify dates in PMP; if reporting requirements are modified by the IMO in PRP-Cluster, adjustments will automatically be reflected in PMP and PRP-IP \[**TBD**: requires discussion\].
+* For humanitarian response indicators that are “cluster indicators”, the frequency of reporting \(report start and end dates\) and due dates are those defined in PRP Cluster, with no ability for the UNICEF user to modify dates in PMP; if reporting requirements are modified by the IMO in PRP-Cluster, adjustments will automatically be reflected in PMP and PRP-IP.
 * For humanitarian response indicators that are UNICEF specific “high-frequency humanitarian response indicators”, the due date is defined by the user in PMP, and the start and end date of the reporting period are automatically assigned \(start date: previous due date reporting period \(or PD start date for first HR\) + 1 day; end date: due date selected by the user\).
 
 All humanitarian response indicators in the same PD \(or SSFA\) are bundled in the same report when they have the same due date and reporting periods. The same PD may have multiple humanitarian reports, for the same time period that are overlapping, depending on the frequency of reporting defined in PRP-Cluster and/or PMP.
