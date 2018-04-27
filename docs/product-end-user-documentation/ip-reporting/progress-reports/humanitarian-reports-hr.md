@@ -2,7 +2,9 @@
 
 This report type is used in humanitarian situations, when it is critical to receive data on the PD \(or SSFA if applicable\) progress at a higher frequency than quarterly. In this report, the IP provides the following information:
 
-* For each PD output \(or SSFA expected result\), report progress only against humanitarian response indicators defined for the PD/SSFA in PMP, at the level of disaggregation defined, or above, if applicable. Humanitarian response indicators are only those defined as “cluster indicators” or UNICEF specific “high-frequency humanitarian response indicators” in PMP.
+* For each PD output \(or SSFA expected result\), report progress only against humanitarian response indicators defined for the PD/SSFA in PMP, at the level of disaggregation defined, or above, if applicable. Humanitarian response indicators are only those defined as:
+  *  “cluster indicators”
+  * UNICEF specific “high-frequency humanitarian response indicators” in PMP.
 
 The structure of this report is simplified compared to the standard QPR. This report **does not include PD output rating or narrative assessment** of progress and there is no “other info" tab in the user interface for this report. The tab in the PD report page called “Reporting on Results” must be renamed to “Reporting on Indicators”.
 
@@ -22,6 +24,10 @@ All humanitarian response indicators in the same PD \(or SSFA\) are bundled in t
 
 
 Each location for an adopted cluster activity indicator, coming from the PD will also be pushed to the partner activity indicator. So Eg. PAI \(Partner Activity Indicator\) has locations L1, L2 and HF cluster indicator from PD has locations L2, L3. L3 will also be hence added to the PAI. Hence **PAI will have a superset of all locations** whether already added to it by the partner/IMO or the ones coming from the PD. This change should be wherever we create Reportable's and their locations for PD indicators.
+
+{% hint style="info" %}
+Cluster indicators that are adopted in a PD are the ones on which **"dual reporting"** happens. This implies that the partner will report cluster progress data and have the option to allocate a percentage of that progress towards the UNICEF PD result\(s\). Such will also happen in [cluster reporting](../../cluster-reporting/reporting-on-results/reporting-to-unicef.md).
+{% endhint %}
 
 ### Screenshots {#screenshots}
 
