@@ -82,7 +82,15 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
         Person  (ManyToManyField): "officer_programme_documents"
         Workspace (ForeignKey): "workspace_programme_documents"
     """
+    cluster_activity_indicator_id = models.CharField(
+        help_text='An ID representing ClusterActivity Reportable in PRP for dual reporting',
+        blank=True,
+        null=True,
+        max_length=32
+    )
+
     agreement = models.CharField(max_length=255, verbose_name='Agreement')
+    
     document_type = models.CharField(
         max_length=3,
         choices=PD_DOCUMENT_TYPE,
