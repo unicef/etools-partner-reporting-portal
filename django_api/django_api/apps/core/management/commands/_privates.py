@@ -39,6 +39,7 @@ from indicator.models import (
     Disaggregation,
     DisaggregationValue,
     ReportableLocationGoal,
+    ReportingEntity,
 )
 from unicef.models import (
     Section,
@@ -208,6 +209,9 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
     CountryFactory.create_batch(workspace_quantity)
     print("{} Country objects created".format(workspace_quantity))
 
+    unicef_re = ReportingEntity.objects.get(title="UNICEF")
+    cluster_re = ReportingEntity.objects.get(title="Cluster")
+
     ws_list = list()
 
     for i in random.sample(range(0, len(COUNTRIES_ALPHA2_CODE) - 1), workspace_quantity):
@@ -282,11 +286,15 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
 
         if random.randint(0, 1) == 0:
             reportable = RatioReportableToClusterObjectiveFactory(
-                content_object=co, indicator_report__progress_report=None,
+                content_object=co,
+                indicator_report__progress_report=None,
+                indicator_report__reporting_entity=cluster_re,
             )
         else:
             reportable = QuantityReportableToClusterObjectiveFactory(
-                content_object=co, indicator_report__progress_report=None,
+                content_object=co,
+                indicator_report__progress_report=None,
+                indicator_report__reporting_entity=cluster_re,
             )
 
         for loc in locations:
@@ -347,7 +355,9 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
             )
 
             reportable = QuantityReportableToClusterActivityFactory(
-                content_object=ca, indicator_report__progress_report=None,
+                content_object=ca,
+                indicator_report__progress_report=None,
+                indicator_report__reporting_entity=cluster_re,
             )
 
             for loc in locations:
@@ -370,7 +380,9 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
         pp.clusters.add(first_cluster)
 
         reportable = QuantityReportableToPartnerProjectFactory(
-            content_object=pp, indicator_report__progress_report=None,
+            content_object=pp,
+            indicator_report__progress_report=None,
+            indicator_report__reporting_entity=cluster_re,
         )
 
         for loc in locations:
@@ -396,7 +408,9 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
             )
 
             reportable_to_pa = QuantityReportableToPartnerActivityFactory(
-                content_object=pa, indicator_report__progress_report=None,
+                content_object=pa,
+                indicator_report__progress_report=None,
+                indicator_report__reporting_entity=cluster_re,
             )
             reportable_to_pa.parent_indicator = cluster_activity.reportables.first()
             reportable_to_pa.save()
@@ -416,7 +430,9 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
             )
 
             reportable_to_pa = QuantityReportableToPartnerActivityFactory(
-                content_object=pa, indicator_report__progress_report=None,
+                content_object=pa,
+                indicator_report__progress_report=None,
+                indicator_report__reporting_entity=cluster_re,
             )
 
             for loc in locations:
@@ -518,11 +534,13 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
                         reportable = QuantityReportableToLowerLevelOutputFactory(
                             content_object=llo,
                             indicator_report__progress_report=None,
+                            indicator_report__reporting_entity=unicef_re,
                         )
                     else:
                         reportable = RatioReportableToLowerLevelOutputFactory(
                             content_object=llo,
                             indicator_report__progress_report=None,
+                            indicator_report__reporting_entity=unicef_re,
                         )
 
                     # delete the junk indicator report the factory creates
@@ -575,6 +593,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
                                     time_period_start=rpd.start_date,
                                     time_period_end=rpd.end_date,
                                     due_date=rpd.due_date,
+                                    reporting_entity=unicef_re,
                                 )
                             elif reportable.blueprint.unit == IndicatorBlueprint.PERCENTAGE:
                                 RatioIndicatorReportFactory(
@@ -584,6 +603,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
                                     time_period_start=rpd.start_date,
                                     time_period_end=rpd.end_date,
                                     due_date=rpd.due_date,
+                                    reporting_entity=unicef_re,
                                 )
 
         # QPR generation
