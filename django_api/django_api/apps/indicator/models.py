@@ -516,6 +516,7 @@ class IndicatorReport(TimeStampedModel):
         indicator.Reportable (ForeignKey): "indicator"
         unicef.ProgressReport (ForeignKey): "progress_report"
         core.Location (OneToOneField): "location"
+        indicator.ReportingEntity (ForeignKey): "reporting_entity"
     """
     title = models.CharField(max_length=2048)
     reportable = models.ForeignKey(Reportable, related_name="indicator_reports")
@@ -563,6 +564,10 @@ class IndicatorReport(TimeStampedModel):
                                blank=True,
                                related_name='children',
                                db_index=True)
+
+    reporting_entity = models.ForeignKey(
+        'indicator.ReportingEntity', related_name="indicator_reports"
+    )
 
     objects = IndicatorReportManager()
 
@@ -778,19 +783,14 @@ class ReportingEntity(TimeStampedModel):
     """
     ReportingEntity module it includes an organization entity for
     Cluster Activity indicator that is adopted from ProgrammeDocument
-
-    related models:
-        indicator.IndicatorReport (ForeignKey): "indicator_report"
     """
-    indicator_report = models.ForeignKey(
-        IndicatorReport, related_name="reporting_entities"
-    )
+    title = models.CharField(max_length=256, unique=True)
 
     class Meta:
         ordering = ['id']
 
     def __str__(self):
-        return "Reporting entity for {}".format(self.indicator_report)
+        return "Reporting entity: {}".format(self.title)
 
 
 class IndicatorLocationData(TimeStampedModel):

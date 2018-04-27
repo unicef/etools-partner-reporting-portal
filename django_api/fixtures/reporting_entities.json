@@ -1,0 +1,13 @@
+[{
+    "model": "indicator.reportingentity",
+    "pk": 1,
+    "fields": {
+        "title": "UNICEF"
+    }
+}, {
+    "model": "indicator.reportingentity",
+    "pk": 2,
+    "fields": {
+        "title": "Cluster"
+    }
+}]
