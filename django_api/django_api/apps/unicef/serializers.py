@@ -344,9 +344,9 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
 
 class ProgressReportUpdateSerializer(serializers.ModelSerializer):
 
-    partner_contribution_to_date = serializers.CharField(required=False)
-    challenges_in_the_reporting_period = serializers.CharField(required=False)
-    proposed_way_forward = serializers.CharField(required=False)
+    partner_contribution_to_date = serializers.CharField(required=False, allow_blank=True)
+    challenges_in_the_reporting_period = serializers.CharField(required=False, allow_blank=True)
+    proposed_way_forward = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
         model = ProgressReport
