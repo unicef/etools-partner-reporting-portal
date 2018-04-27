@@ -235,12 +235,6 @@ class Reportable(TimeStampedExternalSourceModel):
     start_date_of_reporting_period = models.DateField(blank=True, null=True)
 
     is_cluster_indicator = models.BooleanField(default=False)
-    cluster_activity_indicator_id = models.CharField(
-        help_text='An ID representing ClusterActivity Reportable in PRP for dual reporting',
-        blank=True,
-        null=True,
-        max_length=32
-    )
 
     contributes_to_partner = models.BooleanField(default=False)
 
