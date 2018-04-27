@@ -377,6 +377,27 @@ def process_programme_documents(fast=False, area=False):
                                         {'external_id': i['id']}
                                     )
                                     reportable.active = True
+
+                                    # TODO: Update the PMP PD indicator data field
+                                    # for ca_indicator_used_by_reporting_entity
+
+                                    # Associate this LLO Reportable with ClusterActivity Reportable
+                                    # for dual reporting
+                                    if 'cai_prp_id' in i and i['cai_prp_id'] is not None:
+                                        try:
+                                            cai = Reportable.objects.get(id=int(i['cai_prp_id']))
+                                            reportable.ca_indicator_used_by_reporting_entity = cai
+                                        except Reportable.DoesNotExist:
+                                            print(
+                                                "No ClusterActivity Reportable found "
+                                                "for dual reporting - skipping link!"
+                                            )
+                                        except Exception:
+                                            print(
+                                                "Invalid ClusterActivity Reportable ID "
+                                                "for dual reporting - skipping link!"
+                                            )
+
                                     reportable.save()
 
                                     rlgs = ReportableLocationGoal.objects.filter(reportable=reportable)
