@@ -268,7 +268,7 @@ class ProgressReportAPIView(ListExportMixin, ListAPIView):
 
 class ProgressReportAnnexCPDFView(RetrieveAPIView):
     """
-        Endpoint for getting PDF of Progress Report Annex C.
+    Endpoint for getting PDF of Progress Report Annex C.
     """
     queryset = ProgressReport.objects.all()
 
@@ -283,7 +283,6 @@ class ProgressReportAnnexCPDFView(RetrieveAPIView):
             'partner_contribution_to_date': report.partner_contribution_to_date,
             'submission_date': report.get_submission_date(),
             'authorized_officer': report.programme_document.unicef_officers.first(),
-            'focal_point': report.programme_document.partner_focal_point.first(),
             'outputs': group_indicator_reports_by_lower_level_output(report.indicator_reports.all()),
             'title': 'Progress Report',
             'header': 'PART 2: programme progress/final report - to '
