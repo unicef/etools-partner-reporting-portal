@@ -1,6 +1,6 @@
 # Special Reports \(SR\)
 
-This report type is used in different situations to request the IP to provide specific information on an ad hoc basis. This report is not associated with any outputs or indicators or in any way related to QPR’s and HR’s \(see in below sections\). In this report, the IP provides the following information:
+This report type is used in different situations to request the IP to provide specific information on an ad hoc basis in PRP. This report is not associated with any outputs or indicators or in any way related to QPR’s and HR’s \(see in below sections\). In this report, the IP provides the following information:
 
 * A narrative text \(256 characters or less\). Required field.
 * One attachment, required.
