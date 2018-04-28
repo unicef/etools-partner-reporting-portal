@@ -10,6 +10,9 @@ from rest_framework.exceptions import ValidationError
 from core.api import PMP_API
 from core.models import Workspace, GatewayType, Location, PartnerAuthorizedOfficerRole
 from core.serializers import PMPGatewayTypeSerializer, PMPLocationSerializer
+from core.common import PARTNER_ACTIVITY_STATUS
+
+from partner.models import PartnerActivity
 
 from unicef.serializers import PMPProgrammeDocumentSerializer, PMPPDPartnerSerializer, PMPPDPersonSerializer, \
     PMPLLOSerializer, PMPPDResultLinkSerializer, PMPSectionSerializer, PMPReportingPeriodDatesSerializer
@@ -23,6 +26,7 @@ from indicator.models import (
     Reportable,
     DisaggregationValue,
     ReportableLocationGoal,
+    create_pa_reportables_from_ca,
 )
 
 from partner.models import Partner
@@ -387,6 +391,32 @@ def process_programme_documents(fast=False, area=False):
                                         try:
                                             cai = Reportable.objects.get(id=int(i['cai_prp_id']))
                                             reportable.ca_indicator_used_by_reporting_entity = cai
+
+                                            # Force adoption of PartnerActivity from ClusterActivity Indicator
+                                            if pd.partner.id not in cai.partner_activities.values_list(
+                                                    'partner', flat=True):
+                                                try:
+                                                    # TODO: Figure out what to put for
+                                                    # project, start_date, end_date, and status
+                                                    partner_activity = PartnerActivity.objects.create(
+                                                        title=cai.title,
+                                                        project=pd.partner.partner_projects.first(),
+                                                        partner=pd.partner,
+                                                        cluster_activity=cai,
+                                                        start_date=cai.response_plan.start,
+                                                        end_date=cai.response_plan.end,
+                                                        status=PARTNER_ACTIVITY_STATUS.ongoing,
+                                                    )
+                                                except Exception as e:
+                                                    print(
+                                                        "Cannot associate PartnerActivity to ClusterActivity "
+                                                        "for dual reporting - skipping link!"
+                                                    )
+
+                                                # Grab Cluster Activity instance from
+                                                # this newly created Partner Activity instance
+                                                create_pa_reportables_from_ca(partner_activity, cai)
+
                                         except Reportable.DoesNotExist:
                                             print(
                                                 "No ClusterActivity Reportable found "
