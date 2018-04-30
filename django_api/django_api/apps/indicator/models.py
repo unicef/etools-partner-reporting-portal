@@ -831,6 +831,7 @@ class IndicatorLocationData(TimeStampedModel):
         max_digits=5,
         default=100,
     )
+    reporting_entity_percentage_map = ArrayField(JSONField(), default=list)
 
     class Meta:
         ordering = ['id']

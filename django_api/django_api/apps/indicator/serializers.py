@@ -503,6 +503,7 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
             'is_complete',
             'reporting_entity',
             'percentage_allocated',
+            'reporting_entity_percentage_map',
         )
 
 
@@ -520,6 +521,7 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
             'level_reported',
             'disaggregation_reported_on',
             'is_complete',
+            'reporting_entity_percentage_map',
         )
 
     def validate(self, data):
