@@ -249,7 +249,8 @@
       },
 
       _computeUserHasGroups: function (groups) {
-        if (groups === []) {
+        var emptyArray = [];
+        if (String(groups) === String(emptyArray)) {
           return false;
         } else { return true; }
       },
