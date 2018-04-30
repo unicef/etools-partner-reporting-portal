@@ -480,7 +480,19 @@ def sync_ca_reportable_update_to_pa_reportables(instance, created):
         reportable_data_to_sync = get_reportable_data_to_clone(instance)
 
         if not created:
+            # Update PA Reportable instances first
             instance.children.update(**reportable_data_to_sync)
+
+            # Grab LLO Reportable instances that have CAI ID reference
+            llo_reportables = Reportable.objects.filter(
+                ca_indicator_used_by_reporting_entity=instance,
+                lower_level_outputs__isnull=False
+            )
+
+            # Update these LLO Reportable instances except parent_indicator info
+            if llo_reportables.exists():
+                del reportable_data_to_sync["parent_indicator"]
+                llo_reportables.update(**reportable_data_to_sync)
 
 
 @receiver(post_save,
