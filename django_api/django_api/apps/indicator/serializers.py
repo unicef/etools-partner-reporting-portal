@@ -510,6 +510,9 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
 class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
 
     disaggregation = serializers.JSONField()
+    reporting_entity_percentage_map = serializers.JSONField(
+        required=False,
+    )
 
     class Meta:
         model = IndicatorLocationData
@@ -655,6 +658,27 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
                 "Submitted disaggregation data entries do not contain "
                 + "all level %d combination pair keys" % (data['level_reported'])
             )
+
+        # Reporting entity & Percentage pair validation
+        if 'reporting_entity_percentage_map' in data:
+            if not all(map(lambda x: isinstance(x, dict), data["reporting_entity_percentage_map"])):
+                raise serializers.ValidationError(
+                    {"reporting_entity_percentage_map": {"The field should be a list of dictionaries"}}
+                )
+
+            if not all(map(lambda x: x, data["reporting_entity_percentage_map"])):
+                raise serializers.ValidationError(
+                    {"reporting_entity_percentage_map": {"The field should be a list of non-empty dictionaries"}}
+                )
+
+            data['reporting_entity_percentage_map'] = list(
+                map(lambda x: dict(x), data["reporting_entity_percentage_map"])
+            )
+
+        else:
+            data['reporting_entity_percentage_map'] = [
+                {'reporting_entity': data['reporting_entity']['title'], 'percentage': 100}
+            ]
 
         return data
 
