@@ -677,8 +677,29 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
 
         else:
             data['reporting_entity_percentage_map'] = [
-                {'reporting_entity': data['reporting_entity']['title'], 'percentage': 100}
+                {'reporting_entity': data['reporting_entity']['title'], 'percentage': 100.00}
             ]
+
+        if data['indicator_report'].children.exists() \
+                and len(data['reporting_entity_percentage_map']) >= 2:
+
+            # Data split begins for dual reporting on non-Cluster reporting entity
+            split_data = {}
+
+            for entity in data['reporting_entity_percentage_map']:
+                split_data[entity['title']] = {}
+
+                for key, val in data['disaggregation'].values():
+                    split_data[entity['title']][key] = val * (float(entity['percentage']) / 100)
+
+            # Grab LLO Reportable's indicator reports from parent-child
+            ild = IndicatorLocationData.objects.get(
+                indicator_report__in=data['indicator_report'].children.first(),
+                location=IndicatorLocationData.objects.get(id=data['id']).location,
+            )
+
+            ild.disaggregation = split_data['UNICEF']['title']
+            ild.save()
 
         return data
 
