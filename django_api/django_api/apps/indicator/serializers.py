@@ -30,6 +30,7 @@ from .models import (
     IndicatorReport, IndicatorLocationData,
     Disaggregation, DisaggregationValue,
     ReportableLocationGoal,
+    ReportingEntity,
     create_pa_reportables_for_new_ca_reportable,
 )
 
@@ -445,6 +446,15 @@ class OverallNarrativeSerializer(serializers.ModelSerializer):
         return overall_status
 
 
+class ReportingEntitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReportingEntity
+        fields = (
+            'id',
+            'title',
+        )
+
+
 class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
 
     location = LocationSerializer(read_only=True)
@@ -453,6 +463,7 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
     previous_location_progress = serializers.SerializerMethodField()
     display_type = serializers.SerializerMethodField()
     is_complete = serializers.BooleanField(read_only=True)
+    reporting_entity = ReportingEntitySerializer(source="indicator_report.reporting_entity")
 
     def get_display_type(self, obj):
         return obj.indicator_report.display_type
@@ -490,6 +501,7 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
             'location_progress',
             'previous_location_progress',
             'is_complete',
+            'reporting_entity',
         )
 
 
