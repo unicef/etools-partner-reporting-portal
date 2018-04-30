@@ -456,6 +456,24 @@ def process_programme_documents(fast=False, area=False):
 
                                     ReportableLocationGoal.objects.bulk_create(reportable_location_goals)
 
+                                    # Force update on PA Reportable instance for location update
+                                    for pa_reportable in partner_activity.reportables.all():
+                                        llo_locations = reportable.locations.values_list('id', flat=True)
+                                        pai_locations = pa_reportable.locations.values_list('id', flat=True)
+                                        loc_diff = pai_locations.exclude(id__in=llo_locations)
+
+                                        # Add new locations from LLO Reportable to PA Reportable
+                                        if loc_diff.exists():
+                                            # Creating M2M Through model instances
+                                            reportable_location_goals = [
+                                                ReportableLocationGoal(
+                                                    reportable=reportable,
+                                                    location=l,
+                                                ) for l in loc_diff
+                                            ]
+
+                                            ReportableLocationGoal.objects.bulk_create(reportable_location_goals)
+
                     # Check if another page exists
                     if list_data['next']:
                         print("Found new page")
