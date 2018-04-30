@@ -23,7 +23,7 @@ from core.factories import (
     IndicatorLocationDataFactory,
 )
 from unicef.models import ProgrammeDocument
-from indicator.models import Reportable, IndicatorBlueprint
+from indicator.models import Reportable, IndicatorBlueprint, IndicatorReport
 
 
 DUE_DATE_DAYS_TIMEDELTA = 15
@@ -183,10 +183,36 @@ def process_period_reports():
 
             if next_progress_report.report_type != "SR":
                 for reportable in reportable_queryset:
+                    cai_indicator = reportable.ca_indicator_used_by_reporting_entity
+                    pai_ir_for_period = None
+
+                    # If LLO indicator has ClusterActivity Indicator ID reference,
+                    # find the adopted PartnerActivity indicator from ClusterActivity Indicator with LLO's Partner ID
+                    # and grab a corresponding IndicatorReport from ClusterActivity Indicator
+                    # given the start & end date
+                    if cai_indicator:
+                        try:
+                            pai_indicator = cai_indicator.children.get(content_object__partner=pd.partner)
+                            pai_ir_for_period = pai_indicator.indicator_reports.get(
+                                time_period_start=start_date,
+                                time_period_end=end_date,
+                            )
+                        except Reportable.DoesNotExist as e:
+                            print(
+                                "FAILURE: CANNOT FIND adopted PartnerActivity Reportable "
+                                "from given ClusterActivity Reportable and PD Partner ID. "
+                                "Skipping link!", e)
+                        except IndicatorReport.DoesNotExist as e:
+                            print(
+                                "FAILURE: CANNOT FIND IndicatorReport from adopted PartnerActivity Reportable "
+                                "linked with LLO Reportable. "
+                                "Skipping link!", e)
+
                     if reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
                         print("Creating Quantity IndicatorReport for {} - {}".format(start_date, end_date))
                         indicator_report = QuantityIndicatorReportFactory(
                             reportable=reportable,
+                            parent=pai_ir_for_period,
                             time_period_start=start_date,
                             time_period_end=end_date,
                             due_date=due_date,
@@ -217,6 +243,7 @@ def process_period_reports():
                         print("Creating PD {} Ratio IndicatorReport for {} - {}".format(pd, start_date, end_date))
                         indicator_report = RatioIndicatorReportFactory(
                             reportable=reportable,
+                            parent=pai_ir_for_period,
                             time_period_start=start_date,
                             time_period_end=end_date,
                             due_date=due_date,
