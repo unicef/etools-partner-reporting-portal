@@ -825,6 +825,12 @@ class IndicatorLocationData(TimeStampedModel):
     num_disaggregation = models.IntegerField()
     level_reported = models.IntegerField()
     disaggregation_reported_on = ArrayField(models.IntegerField(), default=list)
+    percentage_allocated = models.DecimalField(
+        decimal_places=2,
+        help_text='Entered data value allocation by %',
+        max_digits=5,
+        default=100,
+    )
 
     class Meta:
         ordering = ['id']

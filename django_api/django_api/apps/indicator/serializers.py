@@ -502,6 +502,7 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
             'previous_location_progress',
             'is_complete',
             'reporting_entity',
+            'percentage_allocated',
         )
 
 
