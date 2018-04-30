@@ -308,7 +308,7 @@
         showMeta: {
           type: Boolean,
           value: false,
-          computed: '_computeShowMeta(reportId, data)',
+          computed: '_computeShowMeta(currentReport)',
         },
       },
 
@@ -345,8 +345,8 @@
               );
       },
 
-      _computeShowMeta: function () {
-        return true;
+      _computeShowMeta: function (report) {
+        return report.report_type === 'QPR';
       },
 
       _handleOpenedChanged: function (e, data) {
