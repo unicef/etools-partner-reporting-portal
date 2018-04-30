@@ -249,10 +249,7 @@
       },
 
       _computeUserHasGroups: function (groups) {
-        var emptyArray = [];
-        if (String(groups) === String(emptyArray)) {
-          return false;
-        } else { return true; }
+        return !!groups.length;
       },
 
       _pageChanged: function (page) {
