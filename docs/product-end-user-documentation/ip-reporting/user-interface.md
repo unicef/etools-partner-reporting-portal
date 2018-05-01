@@ -53,11 +53,17 @@ Unicef/Cluster indicators and show report type. Partners can find high frequency
 
 ![](../../.gitbook/assets/screen-shot-2018-02-12-at-1.14.34-pm.png)
 
-Clicking on details of each PD and High Frequency indicator will show the latest and previous to latest data reported against that indicator by this partner. The PD blue hyperlink will lead to the specific PD and the date blue hyperlink will lead to that specific report.
+**PD \(UNICEF only\) indicator or High Frequency non-cluster indicator**
 
-For cluster indicators, the data reported against cluster target in latest QPR or HR/C** **will be on the right. Indicator data reported against UNICEF PD target in latest QPR or HR/C will be on the left.
+Clicking on details of each PD \(UNICEF only\) indicator or High Frequency non-cluster indicator will show the latest and previous to latest data reported against that indicator by this partner. This data is part of an indicator report, which could be in a QPR \(in case of PD UNICEF indicator\) or a QPR / HR \(in case of high frequency non-cluster indicator\). The PD blue hyperlink will lead to the specific PD and the date blue hyperlink will lead to that specific report.
 
-![Cluster Indicator](../../.gitbook/assets/screen-shot-2018-05-01-at-1.19.11-pm.png)
+The latest and previous to latest is always decided based on the "end date" of the report \(whether QPR or HR, doesn't matter\).
+
+Report data shown will be for Indicator Reports that have been marked either submitted or accepted \(received in cluster\).
+
+**Cluster Indicators**
+
+For cluster indicators, the behavior described above still applies. The only difference will be that there will be an additional "Cluster" tab on each side, which will show data reported against the cluster as well for each location.
 {% endtab %}
 {% endtabs %}
 
