@@ -23,7 +23,7 @@ from core.factories import (
     IndicatorLocationDataFactory,
 )
 from unicef.models import ProgrammeDocument
-from indicator.models import Reportable, IndicatorBlueprint, IndicatorReport
+from indicator.models import Reportable, IndicatorBlueprint, IndicatorReport, ReportingEntity
 
 
 DUE_DATE_DAYS_TIMEDELTA = 15
@@ -192,7 +192,7 @@ def process_period_reports():
                     # given the start & end date
                     if cai_indicator:
                         try:
-                            pai_indicator = cai_indicator.children.get(content_object__partner=pd.partner)
+                            pai_indicator = cai_indicator.children.get(partner_activities__partner=pd.partner)
                             pai_ir_for_period = pai_indicator.indicator_reports.get(
                                 time_period_start=start_date,
                                 time_period_end=end_date,
@@ -221,6 +221,7 @@ def process_period_reports():
                             overall_status="NoS",
                             report_status="Due",
                             submission_date=None,
+                            reporting_entity=ReportingEntity.objects.get(title="UNICEF"),
                         )
 
                         for location in reportable.locations.all():
@@ -252,6 +253,7 @@ def process_period_reports():
                             overall_status="NoS",
                             report_status="Due",
                             submission_date=None,
+                            reporting_entity=ReportingEntity.objects.get(title="UNICEF"),
                         )
 
                         for location in reportable.locations.all():
@@ -423,6 +425,7 @@ def process_period_reports():
                         overall_status="NoS",
                         report_status="Due",
                         submission_date=None,
+                        reporting_entity=ReportingEntity.objects.get(title="Cluster"),
                     )
 
                     for location in reportable.locations.all():
@@ -457,6 +460,7 @@ def process_period_reports():
                         overall_status="NoS",
                         report_status="Due",
                         submission_date=None,
+                        reporting_entity=ReportingEntity.objects.get(title="Cluster"),
                     )
 
                     for location in reportable.locations.all():

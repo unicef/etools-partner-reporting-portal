@@ -660,6 +660,12 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
                 + "all level %d combination pair keys" % (data['level_reported'])
             )
 
+        if data['indicator_report'].parent:
+            raise serializers.ValidationError(
+                "This IndicatorLocationData cannot be updated for dual-reporting: "
+                "Use Cluster reporting entity IndicatorLocationData instance"
+            )
+
         # Reporting entity & Percentage pair validation
         map_list = data["reporting_entity_percentage_map"]
 
