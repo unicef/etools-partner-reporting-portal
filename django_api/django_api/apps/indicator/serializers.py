@@ -463,6 +463,7 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
     previous_location_progress = serializers.SerializerMethodField()
     display_type = serializers.SerializerMethodField()
     is_complete = serializers.BooleanField(read_only=True)
+    is_master_location_data = serializers.BooleanField(read_only=True, source="indicator_report.children.exists")
     reporting_entity = ReportingEntitySerializer(source="indicator_report.reporting_entity")
 
     def get_display_type(self, obj):
@@ -501,6 +502,7 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
             'location_progress',
             'previous_location_progress',
             'is_complete',
+            'is_master_location_data',
             'reporting_entity',
             'percentage_allocated',
         )
@@ -707,8 +709,7 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
 
 
 class IndicatorReportListSerializer(serializers.ModelSerializer):
-    indicator_location_data = SimpleIndicatorLocationDataListSerializer(
-        many=True, read_only=True)
+    indicator_location_data = serializers.SerializerMethodField()
     disagg_lookup_map = serializers.SerializerMethodField()
     disagg_choice_lookup_map = serializers.SerializerMethodField()
     total = serializers.JSONField()
@@ -738,6 +739,21 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
             'narrative_assessment',
             'labels',
         )
+
+    def get_indicator_location_data(self, obj):
+        objects = list(obj.indicator_location_data.all())
+        child_ilds = IndicatorLocationData.objects.filter(
+            id__in=obj.children.values_list('indicator_location_data', flat=True)
+        )
+
+        if obj.children.exists():
+            objects.extend(list(child_ilds))
+
+        return SimpleIndicatorLocationDataListSerializer(
+            objects,
+            many=True,
+            read_only=True
+        ).data
 
     def get_labels(self, obj):
         return {
