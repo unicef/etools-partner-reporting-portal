@@ -8,3 +8,11 @@ The indicators \(Reportables in the data model\) can be associated via a generic
 
 ![Conceptual Data Model of PRP](../.gitbook/assets/unicef-humanitarian-cluster-portal-kickoff-etools-prp-data-model-v2.png)
 
+### Handling reporting on indicators by multiple reporting entities
+
+See [Reporting to UNICEF](../product-end-user-documentation/cluster-reporting/reporting-on-results/reporting-to-unicef.md).
+
+TBD: more details via Silin and update data model above.
+
+
+
