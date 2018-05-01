@@ -1,4 +1,5 @@
 from ast import literal_eval as make_tuple
+import copy
 from collections import defaultdict, OrderedDict
 
 from django.conf import settings
@@ -526,6 +527,7 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
             'disaggregation_reported_on',
             'is_complete',
             'reporting_entity_percentage_map',
+            'percentage_allocated',
         )
 
     def validate(self, data):
@@ -667,10 +669,10 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
             )
 
         # Reporting entity & Percentage pair validation
-        map_list = data["reporting_entity_percentage_map"]
+        if "reporting_entity_percentage_map" in data and data["reporting_entity_percentage_map"]:
+            map_list = data["reporting_entity_percentage_map"]
 
-        if map_list:
-            if not isinstance(map_list, dict) \
+            if not isinstance(map_list, list) \
                     or not all(map(lambda x: isinstance(x, dict), map_list)):
                 raise serializers.ValidationError(
                     {"reporting_entity_percentage_map": {"The field should be a list of dictionaries"}}
@@ -686,30 +688,39 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
                     {"reporting_entity_percentage_map": {"Each dictionary should have 'title' and 'percentage' key"}}
                 )
 
-            if not all(map(lambda x: x["percentage"] > 1 or x["percentage"] < 0, map_list)):
+            if not all(map(lambda x: x["percentage"] <= 1 or float(x["percentage"]) >= 0, map_list)):
                 raise serializers.ValidationError(
                     {"reporting_entity_percentage_map": {"Each dictionary should 'percentage' value between 0 to 1"}}
                 )
 
-        # Data split begins for dual reporting if IndicatorLocationData belongs to
-        # IndicatorReport that has children
-        if data['indicator_report'].children.exists() and map_list:
-            split_data = {}
+            # Data split begins for dual reporting if IndicatorLocationData belongs to
+            # IndicatorReport that has children
+            if data['indicator_report'].children.exists():
+                # Grab LLO Reportable's indicator reports from parent-child
+                ild = IndicatorLocationData.objects.get(
+                    indicator_report=data['indicator_report'].children.first(),
+                    location=self.instance.location,
+                )
 
-            for entity in map_list:
-                split_data[entity['title']] = {}
+                split_data = {}
+                disagg_data_copy = copy.deepcopy(data['disaggregation'])
 
-                for key, val in data['disaggregation'].values():
-                    split_data[entity['title']][key] = val * float(entity['percentage'])
+                for entity in map_list:
+                    split_data[entity['title']] = {}
 
-            # Grab LLO Reportable's indicator reports from parent-child
-            ild = IndicatorLocationData.objects.get(
-                indicator_report__in=data['indicator_report'].children.first(),
-                location=IndicatorLocationData.objects.get(id=data['id']).location,
-            )
+                    if entity['title'] == "UNICEF":
+                        ild.percentage_allocated = float(entity['percentage'])
 
-            ild.disaggregation = split_data['UNICEF']
-            ild.save()
+                    for key, val in disagg_data_copy.items():
+                        for val_key in val:
+                            if val[val_key]:
+                                val[val_key] *= float(entity['percentage'])
+
+                        split_data[entity['title']][key] = val
+
+                ild.disaggregation = split_data['UNICEF']
+                ild.level_reported = data['level_reported']
+                ild.save()
 
         return data
 

@@ -596,6 +596,20 @@ class IndicatorLocationDataUpdateAPIView(APIView):
         if blueprint.unit == IndicatorBlueprint.PERCENTAGE:
             RatioIndicatorDisaggregator.post_process(indicator_location_data)
 
+        # Re-calculating the child IR's ILD instance if exists
+        if indicator_location_data.indicator_report.children.exists():
+            # Grab LLO Reportable's indicator reports from parent-child
+            ild = IndicatorLocationData.objects.get(
+                indicator_report=indicator_location_data.indicator_report.children.first(),
+                location=indicator_location_data.location,
+            )
+
+            if ild.indicator_report.reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
+                QuantityIndicatorDisaggregator.post_process(ild)
+
+            if ild.indicator_report.reportable.blueprint.unit == IndicatorBlueprint.PERCENTAGE:
+                RatioIndicatorDisaggregator.post_process(ild)
+
         serializer.data['disaggregation'] = indicator_location_data.disaggregation
 
         return Response(serializer.data, status=status.HTTP_200_OK)
