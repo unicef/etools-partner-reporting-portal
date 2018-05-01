@@ -55,6 +55,8 @@ The project details can be editable.
 
 ![](../../.gitbook/assets/screen-shot-2018-02-14-at-2.25.08-pm.png)
 
+![](../../.gitbook/assets/screen-shot-2018-05-01-at-11.35.50-am.png)
+
 ![](../../.gitbook/assets/screen-shot-2018-02-14-at-2.27.30-pm.png)
 
 ### 
