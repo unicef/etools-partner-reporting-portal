@@ -829,7 +829,7 @@ class IndicatorLocationData(TimeStampedModel):
         decimal_places=2,
         help_text='Entered data value allocation by %',
         max_digits=5,
-        default=100,
+        default=1.0000,
     )
 
     class Meta:
