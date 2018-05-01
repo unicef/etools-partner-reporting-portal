@@ -35,16 +35,31 @@ Once all the data for all locations has been entered the indicator report can be
 
 The Partner will see the report the Draft/Due Column with a ‘Sent Back’ notice. They will be able to make the appropriate edits and re-submit.
 
-![](https://lh4.googleusercontent.com/HOx3XxvSTV3WBCTBTdrKWDEgB5-uE-GRhHk87klw4Skxd9a8loxpkpJHHOEgEBdBkG_LYuqYJYAeVxuQQpNdRpQ0sVgBgZuEdaOcdYPRBPapXL2ODCCX__gKg7wzQN-R4Ckwry_j)
+### **Import / Export of data**
 
-### Import / Export of data
+On the Reporting Results Page, we will have 3 options for the user
 
-Users will be able to export data they see here. Additionally they will be able to export an "import template" which they can then use to import data back into the system.
+* Export Template
+* Export
+* Import Template
 
-Here is a link to an example export of multiple reports: [https://docs.google.com/spreadsheets/d/1q5KdU2dRckCEqsJB5pVC3ZLmDMzZDeT8-kK1F3Tn\_mA/edit?usp=sharing](https://docs.google.com/spreadsheets/d/1q5KdU2dRckCEqsJB5pVC3ZLmDMzZDeT8-kK1F3Tn_mA/edit?usp=sharing)
+Partner/IMO can download the export template for the indicators they are currently looking at based on the applied filters in xlsx format that includes all of the data pertaining to the indicators. The partner or IMO can enter the proper disaggregation value here instead of on the platform.**  
+**
 
-The import template should include multiple rows with indicators, locations etc and data on targets, in-need, baseline \(where available in PRP\). The only thing that should be blank \(no data\) should be the achieved data that the partner will report on. If they have not stated targets in PRP then that column might have no data and could also be filled in the import template.  
+![](https://lh6.googleusercontent.com/JdcLPeZVCxZDz76q9a6FwpufirqwDfiEZj1OrRaXz06kMJOmDN81XZZQ2hbHAjT4Rrtn-T1T6BR-xL5DTI77kmupcn2QP_ISM3BrGKnv3DQLloxoWGIY5uiHe7fv8zMK5M-RFTiK)
 
+The export template should include multiple rows with indicators, locations etc and data on targets, in-need, baseline \(where available in PRP\). The only thing that should be blank \(no data\) should be the achieved data that the partner will report on. If they have not stated targets in PRP then that column might have no data and could also be filled.
+
+Here is a link to an example export of multiple reports: [https://docs.google.com/spreadsheets/d/1CDQP0VLgRIQbzJ-SUpgZSG4l9-n-6iVt65jnW8m5ucQ/edit?usp=sharing](https://docs.google.com/spreadsheets/d/1CDQP0VLgRIQbzJ-SUpgZSG4l9-n-6iVt65jnW8m5ucQ/edit?usp=sharing)
+
+Once the Partner/IMO is done editing the export template, they can upload it via import template. They will only be able to update the disaggregation value and will receive an error if they add/delete columns or edit any data that is not a disaggregation.**  
+**
+
+![](https://lh6.googleusercontent.com/I8LAZGL-gN1wQGK-_wxFwZCK2KSNnqByxAr1wQrdfBYJ8mI_qKkWxAiy-gUsTWr8Qsr2dyJPIY4Kta3wkK9Lx9uFsSbBbHnYMdCzPiy8aWuKCGX74r_Gh0awVt6rbI_PnoV5DfBp)
+
+Partner/IMO cannot import submitted/accepted reports. We will validate to make sure users do not add/subtract disaggregation value for indicators that pertain to them.
+
+The Export Analysis will be similar to the Export Template but also have Cluster ID, Cluster Objective ID, Activity ID, Indicator ID, Partner ID, Project ID, Report ID, Location ID. Here is an example  [https://docs.google.com/spreadsheets/d/1PNFzzN75daFZ\_uHF\_8nB1yjTeGWbv5ec5n0vRS2chac/edit?usp=sharing](https://docs.google.com/spreadsheets/d/1PNFzzN75daFZ_uHF_8nB1yjTeGWbv5ec5n0vRS2chac/edit?usp=sharing)
 
 ### Workflow of Indicator Reports
 
