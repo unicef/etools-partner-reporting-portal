@@ -503,7 +503,6 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
             'is_complete',
             'reporting_entity',
             'percentage_allocated',
-            'reporting_entity_percentage_map',
         )
 
 
@@ -660,37 +659,40 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
             )
 
         # Reporting entity & Percentage pair validation
-        if 'reporting_entity_percentage_map' in data:
-            if not all(map(lambda x: isinstance(x, dict), data["reporting_entity_percentage_map"])):
+        map_list = data["reporting_entity_percentage_map"]
+
+        if map_list:
+            if not isinstance(map_list, dict) \
+                    or not all(map(lambda x: isinstance(x, dict), map_list)):
                 raise serializers.ValidationError(
                     {"reporting_entity_percentage_map": {"The field should be a list of dictionaries"}}
                 )
 
-            if not all(map(lambda x: x, data["reporting_entity_percentage_map"])):
+            if not all(map(lambda x: x, map_list)):
                 raise serializers.ValidationError(
                     {"reporting_entity_percentage_map": {"The field should be a list of non-empty dictionaries"}}
                 )
 
-            data['reporting_entity_percentage_map'] = list(
-                map(lambda x: dict(x), data["reporting_entity_percentage_map"])
-            )
+            if not all(map(lambda x: "title" in x and "percentage" in x, map_list)):
+                raise serializers.ValidationError(
+                    {"reporting_entity_percentage_map": {"Each dictionary should have 'title' and 'percentage' key"}}
+                )
 
-        else:
-            data['reporting_entity_percentage_map'] = [
-                {'reporting_entity': data['reporting_entity']['title'], 'percentage': 100.00}
-            ]
+            if not all(map(lambda x: x["percentage"] > 1 or x["percentage"] < 0, map_list)):
+                raise serializers.ValidationError(
+                    {"reporting_entity_percentage_map": {"Each dictionary should 'percentage' value between 0 to 1"}}
+                )
 
-        if data['indicator_report'].children.exists() \
-                and len(data['reporting_entity_percentage_map']) >= 2:
-
-            # Data split begins for dual reporting on non-Cluster reporting entity
+        # Data split begins for dual reporting if IndicatorLocationData belongs to
+        # IndicatorReport that has children
+        if data['indicator_report'].children.exists() and map_list:
             split_data = {}
 
-            for entity in data['reporting_entity_percentage_map']:
+            for entity in map_list:
                 split_data[entity['title']] = {}
 
                 for key, val in data['disaggregation'].values():
-                    split_data[entity['title']][key] = val * (float(entity['percentage']) / 100)
+                    split_data[entity['title']][key] = val * float(entity['percentage'])
 
             # Grab LLO Reportable's indicator reports from parent-child
             ild = IndicatorLocationData.objects.get(
@@ -698,7 +700,7 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
                 location=IndicatorLocationData.objects.get(id=data['id']).location,
             )
 
-            ild.disaggregation = split_data['UNICEF']['title']
+            ild.disaggregation = split_data['UNICEF']
             ild.save()
 
         return data
