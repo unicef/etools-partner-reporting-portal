@@ -22,7 +22,7 @@ This introduces a new data model that is dedicated for dual reporting purposes: 
 
 With this model, any IndicatorLocationData to LLO Indicator will be marked as data reported by Partner as UNICEF. Respectively, IndicatorLocationData to PartnerActivity Indicator will be marked as data reported by Partner as Cluster.
 
-To leverage this reporting data flag for dual reporting, IndicatorReport model now has self-referential Foreignkey to establish a link between LLO IndicatorReport and PartnerActivity IndicatorReport.
+To leverage this reporting data flag for dual reporting, IndicatorReport model now has self-referential Foreignkey to establish a link between LLO IndicatorReport and PartnerActivity IndicatorReport. With this new foreignkey, a percentage-weighted version of PartnerActivity IndicatorReport data per location can be copied over to LLO IndicatorReport. In other words, a Partner user can specify a % weight to report Cluster reporting data on LLO IndicatorReport in order to report both on Cluster and IP reporting.
 
 Likewise, there is now a new self-referential Foreignkey in Reportable model to establish a link between LLO and ClusterActivity which has PartnerActivity, a Cluster activity that the Partner in PD LowerLevelOutput contributes a progress in Cluster reporting world for that ClusterActivity.
 
