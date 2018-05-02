@@ -14,5 +14,7 @@ See [Reporting to UNICEF](../product-end-user-documentation/cluster-reporting/re
 
 TBD: more details via Silin and update data model above.
 
+![A narrow look on PRP data model for dual reporting key components](../.gitbook/assets/unicef-humanitarian-cluster-portal-kickoff-etools-prp-dual-reporting-data-model-focus.png)
 
+![Example PRP data model interaction for dual reporting](../.gitbook/assets/unicef-humanitarian-cluster-portal-kickoff-etools-prp-example-dual-reporting-linkage.png)
 
