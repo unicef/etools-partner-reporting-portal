@@ -6,7 +6,7 @@ The high-level conceptual data model for the product is below. Its designed in a
 The indicators \(Reportables in the data model\) can be associated via a generic foreign key to any other model, keeping it generic and expandable in the future
 {% endhint %}
 
-![Conceptual Data Model of PRP](../.gitbook/assets/unicef-humanitarian-cluster-portal-kickoff-etools-prp-data-model-v2.png)
+![](../.gitbook/assets/unicef-humanitarian-cluster-portal-kickoff-etools-prp-data-model-v3-wip.png)
 
 ### Handling reporting on indicators by multiple reporting entities
 
