@@ -482,6 +482,14 @@ class ProgressReportSubmitAPIView(APIView):
                             "all indicator reports for this progress report."
                         )
 
+            # Check if indicator was already submitted or SENT BACK
+            if ir.submission_date is None or ir.report_status == INDICATOR_REPORT_STATUS.sent_back:
+                ir.submission_date = datetime.now().date()
+                ir.report_status = INDICATOR_REPORT_STATUS.submitted
+                ir.save()
+
+        # QPR report type specific validations
+        if progress_report.report_type == "QPR":
             # Check for IndicatorReport narrative assessment for overall status Met or No Progress
             if ir.overall_status not in {OVERALL_STATUS.met, OVERALL_STATUS.no_progress} \
                     and not ir.narrative_assessment:
@@ -492,14 +500,6 @@ class ProgressReportSubmitAPIView(APIView):
                     )
                 )
 
-            # Check if indicator was already submitted or SENT BACK
-            if ir.submission_date is None or ir.report_status == INDICATOR_REPORT_STATUS.sent_back:
-                ir.submission_date = datetime.now().date()
-                ir.report_status = INDICATOR_REPORT_STATUS.submitted
-                ir.save()
-
-        # QPR report type specific validations
-        if progress_report.report_type == "QPR":
             # Check if PR other tab is fulfilled
             other_tab_errors = []
             if not progress_report.partner_contribution_to_date:
