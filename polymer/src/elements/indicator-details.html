@@ -166,7 +166,11 @@
             is="dom-if"
             if="[[indicatorStatus]]">
           <span class="printme" style="margin-right: .5em;">Indicator status:</span>
-          <report-status class="printme" status="[[indicatorStatus]]"></report-status>
+          <report-status
+              class="printme"
+              status="[[indicatorStatus]]"
+              report-type="[[reportType]]">
+          </report-status>
         </template>
 
         <div class="printme" style="margin-bottom: 2em;"></div>
@@ -334,6 +338,8 @@
         indicatorName: String,
 
         indicatorStatus: String,
+
+        reportType: String,
 
         reportableId: Number,
 
