@@ -56,73 +56,78 @@
     <analysis-widget
         widget-title="Operational Presence Map"
         loading="[[loading]]">
-      <leaflet-map
-          longitude="[[center.0]]"
-          latitude="[[center.1]]"
-          zoom="[[zoom]]"
-          no-scroll-wheel-zoom>
-        <leaflet-tilelayer url="[[tileUrl]]">
-          Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors,
-          <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>,
-          Imagery © <a href="http://mapbox.com">Mapbox</a>
-        </leaflet-tilelayer>
+      <template
+          is="dom-if"
+          if="[[showMap]]"
+          restamp="true">
+        <leaflet-map
+            longitude="[[center.0]]"
+            latitude="[[center.1]]"
+            zoom="[[zoom]]"
+            no-scroll-wheel-zoom>
+          <leaflet-tilelayer url="[[tileUrl]]">
+            Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors,
+            <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>,
+            Imagery © <a href="http://mapbox.com">Mapbox</a>
+          </leaflet-tilelayer>
 
-        <template
-            is="dom-repeat"
-            items="[[map.features]]"
-            as="feature">
           <template
-              is="dom-if"
-              if="[[_equals(feature.geometry.type, 'MultiPolygon')]]">
+              is="dom-repeat"
+              items="[[map.features]]"
+              as="feature">
             <template
-                is="dom-repeat"
-                items="[[feature.geometry.coordinates]]"
-                as="coords_lvl1">
+                is="dom-if"
+                if="[[_equals(feature.geometry.type, 'MultiPolygon')]]">
               <template
                   is="dom-repeat"
-                  items="[[coords_lvl1]]"
-                  as="coords_lvl2">
-                <leaflet-polygon
-                    color="#fff"
-                    fill-color="[[_computePolygonColor(feature.properties, legend)]]"
-                    fill-opacity="0.7"
-                    weight="2">
-                  <template
-                      is="dom-repeat"
-                      items="[[coords_lvl2]]"
-                      as="point">
-                    <leaflet-point
-                        longitude="[[point.0]]"
-                        latitude="[[point.1]]">
-                    </leaflet-point>
-                  </template>
+                  items="[[feature.geometry.coordinates]]"
+                  as="coords_lvl1">
+                <template
+                    is="dom-repeat"
+                    items="[[coords_lvl1]]"
+                    as="coords_lvl2">
+                  <leaflet-polygon
+                      color="#fff"
+                      fill-color="[[_computePolygonColor(feature.properties, legend)]]"
+                      fill-opacity="0.7"
+                      weight="2">
+                    <template
+                        is="dom-repeat"
+                        items="[[coords_lvl2]]"
+                        as="point">
+                      <leaflet-point
+                          longitude="[[point.0]]"
+                          latitude="[[point.1]]">
+                      </leaflet-point>
+                    </template>
 
-                  <div>[[feature.properties.title]]</div>
-                  <div class="number-of-partners">
-                    [[_getPartnersCount(feature.properties.partners.all)]]
-                  </div>
-                  <div>[[_commaSeparated(feature.properties.partners.all)]]</div>
-                </leaflet-polygon>
+                    <div>[[feature.properties.title]]</div>
+                    <div class="number-of-partners">
+                      [[_getPartnersCount(feature.properties.partners.all)]]
+                    </div>
+                    <div>[[_commaSeparated(feature.properties.partners.all)]]</div>
+                  </leaflet-polygon>
+                </template>
               </template>
             </template>
-          </template>
 
-          <template
-              is="dom-if"
-              if="[[_equals(feature.geometry.type, 'Point')]]">
-            <leaflet-marker
-                longitude="[[feature.geometry.coordinates.0]]"
-                latitude="[[feature.geometry.coordinates.1]]"
-                icon='{"iconUrl": "[[_computeMarkerIcon(feature.properties, legend)]]"}'>
-              <div>[[feature.properties.title]]</div>
-              <div class="number-of-partners">
-                [[_getPartnersCount(feature.properties.partners.all)]]
-              </div>
-              <div>[[_commaSeparated(feature.properties.partners.all)]]</div>
-            </leaflet-marker>
+            <template
+                is="dom-if"
+                if="[[_equals(feature.geometry.type, 'Point')]]">
+              <leaflet-marker
+                  longitude="[[feature.geometry.coordinates.0]]"
+                  latitude="[[feature.geometry.coordinates.1]]"
+                  icon='{"iconUrl": "[[_computeMarkerIcon(feature.properties, legend)]]"}'>
+                <div>[[feature.properties.title]]</div>
+                <div class="number-of-partners">
+                  [[_getPartnersCount(feature.properties.partners.all)]]
+                </div>
+                <div>[[_commaSeparated(feature.properties.partners.all)]]</div>
+              </leaflet-marker>
+            </template>
           </template>
-        </template>
-      </leaflet-map>
+        </leaflet-map>
+      </template>
 
       <div class="legend">
         <h4>Number of partners:</h4>
@@ -171,6 +176,7 @@
         map: {
           type: Object,
           statePath: 'analysis.operationalPresence.map',
+          observer: '_refresh',
         },
 
         zoom: {
@@ -235,6 +241,11 @@
               color: '#123666',
             },
           ],
+        },
+
+        showMap: {
+          type: Boolean,
+          value: false,
         },
       },
 
@@ -314,12 +325,20 @@
         return partners.length;
       },
 
-      attached: function () {
-        var style = document.createElement('style');
+      _refresh: function () {
+        this.set('showMap', false);
 
-        style.innerHTML = this.mapStyles;
+        this.async(function () {
+          this.set('showMap', true);
 
-        this.$$('leaflet-map').shadowRoot.appendChild(style);
+          this.async(function () {
+            var style = document.createElement('style');
+
+            style.innerHTML = this.mapStyles;
+
+            this.$$('leaflet-map').shadowRoot.appendChild(style);
+          });
+        });
       },
     });
   </script>

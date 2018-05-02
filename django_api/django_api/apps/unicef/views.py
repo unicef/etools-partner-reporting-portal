@@ -466,42 +466,33 @@ class ProgressReportSubmitAPIView(APIView):
                 "PDs can be reported on.".format(progress_report.programme_document.get_status_display())
             )
 
-        # QPR report type specific validations
-        if progress_report.report_type == "QPR":
-            for ir in progress_report.indicator_reports.all():
-                # Check if all indicator data is fulfilled for IR status different
-                # then Met or No Progress
-                if ir.overall_status not in {OVERALL_STATUS.met, OVERALL_STATUS.no_progress}:
-                    for data in ir.indicator_location_data.all():
-                        for key, vals in data.disaggregation.items():
-                            if ir.is_percentage and (vals.get('c', None) in [None, '']):
-                                raise ValidationError(
-                                    "You have not completed all required indicators "
-                                    "for this progress report. Unless your "
-                                    "Output status is Met or has No Progress, "
-                                    "all indicator data needs to be completed."
-                                )
-
-                            elif ir.is_number and (vals.get('v', None) in [None, '']):
-                                raise ValidationError(
-                                    "You have not completed all required indicators "
-                                    "for this progress report. Unless your "
-                                    "Output status is Met or has No Progress, "
-                                    "all indicator data needs to be completed."
-                                )
-                    if not ir.narrative_assessment:
+        for ir in progress_report.indicator_reports.all():
+            # Check if all indicator data is fulfilled
+            for data in ir.indicator_location_data.all():
+                for key, vals in data.disaggregation.items():
+                    if (vals.get('d', 0) in [0, None, '']):
                         raise ValidationError(
-                            "You have not completed narrative assessment for one of Outputs ({}). Unless your Output "
-                            "status is Met or has No Progress, all indicator data needs to be completed.".format(
-                                ir.reportable.content_object
-                            )
+                            "You have not completed all indicator location data across "
+                            "all indicator reports for this progress report."
                         )
 
-                # Check if indicator was already submitted or SENT BACK
-                if ir.submission_date is None or ir.report_status == INDICATOR_REPORT_STATUS.sent_back:
-                    ir.submission_date = datetime.now().date()
-                    ir.report_status = INDICATOR_REPORT_STATUS.submitted
-                    ir.save()
+            # Check if indicator was already submitted or SENT BACK
+            if ir.submission_date is None or ir.report_status == INDICATOR_REPORT_STATUS.sent_back:
+                ir.submission_date = datetime.now().date()
+                ir.report_status = INDICATOR_REPORT_STATUS.submitted
+                ir.save()
+
+        # QPR report type specific validations
+        if progress_report.report_type == "QPR":
+            # Check for IndicatorReport narrative assessment for overall status Met or No Progress
+            if ir.overall_status not in {OVERALL_STATUS.met, OVERALL_STATUS.no_progress} \
+                    and not ir.narrative_assessment:
+                raise ValidationError(
+                    "You have not completed narrative assessment for one of Outputs ({}). Unless your Output "
+                    "status is Met or No Progress.".format(
+                        ir.reportable.content_object
+                    )
+                )
 
             # Check if PR other tab is fulfilled
             other_tab_errors = []
