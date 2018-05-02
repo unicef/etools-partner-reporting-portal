@@ -470,13 +470,7 @@ class ProgressReportSubmitAPIView(APIView):
             # Check if all indicator data is fulfilled
             for data in ir.indicator_location_data.all():
                 for key, vals in data.disaggregation.items():
-                    if ir.is_percentage and (vals.get('c', None) in [None, '']):
-                        raise ValidationError(
-                            "You have not completed all indicator location data across "
-                            "all indicator reports for this progress report."
-                        )
-
-                    elif ir.is_number and (vals.get('v', None) in [None, '']):
+                    if (vals.get('d', 0) in [0, None, '']):
                         raise ValidationError(
                             "You have not completed all indicator location data across "
                             "all indicator reports for this progress report."
