@@ -36,3 +36,5 @@ In the above example, QPR 1 will be able to pull in aggregated data for high fre
 
 Once data has been pulled in it can still be edited by the IP to be more accurate or for other reporting reasons.
 
+QPR indicators \(HF cluster ones specifically\) will only always show PD locations set. Even if that shared indicator has more locations \(in cluster reporting\).
+
