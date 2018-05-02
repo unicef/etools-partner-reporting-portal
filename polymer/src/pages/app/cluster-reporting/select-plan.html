@@ -44,7 +44,11 @@
         };
 
         --select-plan-workspaces-offset: {
-          transform: translate(0px, -12px)
+          transform: translate(0px, -12px);
+        };
+
+        --workspaces-dropdown-width: {
+          width: 240px;
         };
       }
 
@@ -71,6 +75,14 @@
         background-color: var(--theme-primary-color);
         color: white;
         float: right;
+      }
+
+      paper-card {
+        z-index: 1;
+      }
+
+      workspace-dropdown {
+        z-index: 2;
       }
 
       paper-radio-button {
@@ -155,7 +167,7 @@
 
     <div class="container">
       <div class="container-inner">
-        <h2>Select Workspace</h2>
+          <h2>Select Workspace</h2>
           <workspace-dropdown
               data="[[workspaces]]"
               current="[[workspace]]">
