@@ -734,6 +734,8 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
     overall_status_display = serializers.CharField(
         source='get_overall_status_display')
     labels = serializers.SerializerMethodField()
+    parent_ir_id = serializers.SerializerMethodField()
+    child_ir_ids = serializers.SerializerMethodField()
 
     class Meta:
         model = IndicatorReport
@@ -755,7 +757,15 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
             'overall_status_display',
             'narrative_assessment',
             'labels',
+            'parent_ir_id',
+            'child_ir_ids',
         )
+
+    def get_parent_ir_id(self, obj):
+        return obj.parent.id if obj.parent else None
+
+    def get_child_ir_ids(self, obj):
+        return obj.children.values_list('id', flat=True) if obj.children.exists() else None
 
     def get_indicator_location_data(self, obj):
         objects = list(obj.indicator_location_data.all())
@@ -846,6 +856,8 @@ class PDReportContextIndicatorReportSerializer(serializers.ModelSerializer):
     reportable = ReportableSimpleSerializer()
     report_status_display = serializers.CharField(source='get_report_status_display')
     overall_status_display = serializers.CharField(source='get_overall_status_display')
+    parent_ir_id = serializers.SerializerMethodField()
+    child_ir_ids = serializers.SerializerMethodField()
 
     class Meta:
         model = IndicatorReport
@@ -867,7 +879,15 @@ class PDReportContextIndicatorReportSerializer(serializers.ModelSerializer):
             'overall_status_display',
             'narrative_assessment',
             'is_complete',
+            'parent_ir_id',
+            'child_ir_ids',
         )
+
+    def get_parent_ir_id(self, obj):
+        return obj.parent.id if obj.parent else None
+
+    def get_child_ir_ids(self, obj):
+        return obj.children.values_list('id', flat=True) if obj.children.exists() else None
 
     def get_id(self, obj):
         return str(obj.id)
@@ -1294,6 +1314,8 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
     cluster_activity = serializers.SerializerMethodField()
     is_draft = serializers.SerializerMethodField()
     can_submit = serializers.SerializerMethodField()
+    parent_ir_id = serializers.SerializerMethodField()
+    child_ir_ids = serializers.SerializerMethodField()
 
     class Meta:
         model = IndicatorReport
@@ -1326,7 +1348,15 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
             'time_period_start',
             'time_period_end',
             'is_complete',
+            'parent_ir_id',
+            'child_ir_ids',
         )
+
+    def get_parent_ir_id(self, obj):
+        return obj.parent.id if obj.parent else None
+
+    def get_child_ir_ids(self, obj):
+        return obj.children.values_list('id', flat=True) if obj.children.exists() else None
 
     def get_indicator_name(self, obj):
         return obj.reportable.blueprint.title
