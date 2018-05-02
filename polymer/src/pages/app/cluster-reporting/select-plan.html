@@ -17,6 +17,9 @@
 <link rel="import" href="../../../styles/app-theme-cluster.html">
 <link rel="import" href="../../../elements/cluster-reporting/add-plan-panel.html">
 
+<link rel="import" href="../../../elements/workspace-dropdown.html">
+<link rel="import" href="../../../elements/etools-prp-workspaces.html">
+
 <dom-module id="page-cluster-reporting-select-plan">
   <template>
     <style include="data-table-styles table-styles app-theme-cluster-styles">
@@ -30,6 +33,18 @@
         --container-inner-layout: {
           @apply(--layout-vertical);
           @apply(--layout-center-justified);
+        };
+
+        --underline-shown: {
+          display: block;
+        };
+
+        --workspace-dropdown-input: {
+          color: black;
+        };
+
+        --select-plan-workspaces-offset: {
+          transform: translate(0px, -12px)
         };
       }
 
@@ -74,6 +89,7 @@
         min-height: 100%;
         padding: 3em;
       }
+
       .container-inner {
         @apply(--container-inner-layout);
       }
@@ -132,8 +148,18 @@
         permissions="{{permissions}}">
     </etools-prp-permissions>
 
+    <etools-prp-workspaces
+        all="{{workspaces}}"
+        current="{{workspace}}">
+    </etools-prp-workspaces>
+
     <div class="container">
       <div class="container-inner">
+        <h2>Select Workspace</h2>
+          <workspace-dropdown
+              data="[[workspaces]]"
+              current="[[workspace]]">
+          </workspace-dropdown>
         <div class="response-header">
           <h2> Select Response Plan [[workspace]]</h2>
         </div>
