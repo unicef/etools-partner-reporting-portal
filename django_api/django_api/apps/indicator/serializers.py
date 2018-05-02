@@ -527,7 +527,6 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
             'disaggregation_reported_on',
             'is_complete',
             'reporting_entity_percentage_map',
-            'percentage_allocated',
         )
 
     def validate(self, data):
