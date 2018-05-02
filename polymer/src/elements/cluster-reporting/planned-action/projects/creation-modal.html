@@ -473,7 +473,7 @@
                   class="item validate"
                   label="Type of Agency"
                   options="[[agencyTypes]]"
-                  option-value="id"
+                  option-value="title"
                   option-label="title"
                   selected="{{data.agency_type}}"
                   on-iron-activate="_validate"
@@ -485,7 +485,7 @@
                   class="item validate full-width"
                   id="additional_implementing_partners"
                   label="Additional implementing partners"
-                  value="{{data.additional_implementing_partners}}"
+                  value="{{data.additional_partners}}"
                   type="string"
                   on-input="_validate"
                   always-float-label>
@@ -506,7 +506,7 @@
                   class="item validate"
                   label="Prioritization Classification"
                   options="[[classifications]]"
-                  option-value="id"
+                  option-value="title"
                   option-label="title"
                   selected="{{data.prioritization}}"
                   on-iron-activate="_validate"
@@ -514,17 +514,15 @@
                   always-float-label>
                 </etools-single-selection-menu>
 
-                <etools-single-selection-menu
+                <paper-input
                   class="item validate"
+                  id="project_code"
                   label="Project code in HRP"
-                  options="[[projectCodes]]"
-                  option-value="id"
-                  option-label="title"
-                  selected="{{data.code}}"
-                  on-iron-activate="_validate"
-                  trigger-value-change-event
+                  value="{{data.code}}"
+                  type="string"
+                  on-input="_validate"
                   always-float-label>
-                </etools-single-selection-menu>
+                </paper-input>
 
                 <paper-input
                   class="item validate full-width"
@@ -789,6 +787,27 @@
           computed: '_computeImoClusters(profile)',
         },
 
+        agencyTypes: {
+          type: Array,
+          value: [
+            {title: 'UN Agency', id: 'UN Agency'},
+            {title: 'Government Organisation', id: 'Government Organisation'},
+            {title: 'International NGO', id: 'International NGO'},
+            {title: 'National NGO', id: 'National NGO'},
+            {title: 'Community based organisation', id: 'Community based organisation'},
+            {title: 'Other', id: 'Other'},
+          ],
+        },
+
+        classifications: {
+          type: Array,
+          value: [
+            {title: 'High', id: 'High'},
+            {title: 'Medium', id: 'Medium'},
+            {title: 'Low', id: 'Low'},
+          ]
+        },
+
         selectedClusters: {
           type: Array,
         },
@@ -870,9 +889,9 @@
 
       _computeDetailsButtonMsg: function(detailsOpened) {
         if (detailsOpened) {
-          return 'show less details';
+          return 'show less funding details';
         }
-        return 'show more details';
+        return 'show more funding details';
       },
 
       _fetchOchaProjectsList: function (mode) {
