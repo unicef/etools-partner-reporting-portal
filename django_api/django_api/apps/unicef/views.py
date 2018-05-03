@@ -62,8 +62,9 @@ from .serializers import (
     ProgressReportUpdateSerializer,
     ProgressReportAttachmentSerializer,
     ProgressReportSRUpdateSerializer,
+    ProgressReportPullHFDataSerializer,
 )
-from .models import ProgrammeDocument, ProgressReport
+from .models import ProgrammeDocument, ProgressReport, LowerLevelOutput
 from .permissions import (
     CanChangePDCalculationMethod,
     UnicefPartnershipManagerOrRead
@@ -629,6 +630,57 @@ class ProgressReportSRSubmitAPIView(APIView):
                 "Progress report was already submitted. Your IMO will need to send it "
                 "back for you to edit your submission."
             )
+
+
+class ProgressReportPullHFDataAPIView(APIView):
+    """
+    Reserved only for a LLO Reportable's IndicatorLocationData on QPR ProgressReport
+    to pull data from LLO Reportable's IndicatorLocationData on HR ProgressReports
+    with overlapping start and end date period to QPR end date.
+    """
+    permission_classes = (IsAuthenticated, IsPartnerAuthorizedOfficer)
+
+    def get_object(self):
+        try:
+            return ProgressReport.objects.get(
+                programme_document__workspace=self.kwargs['workspace_id'],
+                pk=self.kwargs['pk'],
+            )
+        except ProgressReport.DoesNotExist as exp:
+            logger.exception({
+                "endpoint": "ProgressReportPullHFDataAPIView",
+                "request.data": self.request.data,
+                "pk": self.kwargs['pk'],
+                "exception": exp,
+            })
+            raise Http404
+
+    def get(self, request, *args, **kwargs):
+        progress_report = self.get_object()
+
+        if progress_report.report_type != "QPR":
+            raise ValidationError("This Progress Report is not QPR type.")
+
+        try:
+            reportable = Reportable.objects.get(id=self.kwargs['reportable_pk'])
+        except Reportable.DoesNotExist:
+            raise ValidationError("Reportable does not exist.")
+
+        pd_from_reportable = reportable.content_object.cp_output.programme_document
+
+        if isinstance(reportable.content_object, LowerLevelOutput) \
+                and progress_report not in pd_from_reportable.progress_reports.all():
+            raise ValidationError("Reportable does not belong to the passed-in progress report.")
+
+        hf_reports = ProgressReport.objects.filter(
+            programme_document=progress_report.programme_document,
+            report_type="HR",
+            start_date__gte=progress_report.start_date,
+            end_date__lte=progress_report.end_date,
+        )
+
+        serializer = ProgressReportPullHFDataSerializer(hf_reports, many=True)
+        return Response(serializer.data, status=statuses.HTTP_200_OK)
 
 
 class ProgressReportReviewAPIView(APIView):
