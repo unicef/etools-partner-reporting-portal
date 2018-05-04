@@ -499,6 +499,7 @@
             self.close();
             self.set('errors', {});
             self.dispatch(App.Actions.addResponsePlan(res.data));
+            self.fire('refresh-plan-list');
           })
           .catch(function (err) {
             if (err.code === 504) {
