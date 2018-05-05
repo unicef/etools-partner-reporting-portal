@@ -150,7 +150,7 @@ def process_period_reports():
             if latest_progress_report:
                 report_type = latest_progress_report.report_type
                 report_number = latest_progress_report.report_number + 1
-                is_final = idx == pd.reporting_periods.count() - 1
+                is_final = idx == pd.reporting_periods.filter(report_type=reporting_period.report_type).count() - 1
 
             else:
                 report_number = 1
