@@ -33,7 +33,7 @@ from core.permissions import (
 from core.models import Location, PartnerAuthorizedOfficerRole
 from core.serializers import ShortLocationSerializer
 
-from indicator.models import Reportable, IndicatorReport, IndicatorBlueprint
+from indicator.models import Reportable, IndicatorReport, IndicatorBlueprint, IndicatorLocationData
 from indicator.serializers import (
     IndicatorListSerializer,
     PDReportContextIndicatorReportSerializer
@@ -666,10 +666,12 @@ class ProgressReportPullHFDataAPIView(APIView):
         except Reportable.DoesNotExist:
             raise ValidationError("Reportable does not exist.")
 
+        if not isinstance(reportable.content_object, LowerLevelOutput):
+            raise ValidationError("Reportable is not LLO type.")
+
         pd_from_reportable = reportable.content_object.cp_output.programme_document
 
-        if isinstance(reportable.content_object, LowerLevelOutput) \
-                and progress_report not in pd_from_reportable.progress_reports.all():
+        if progress_report.programme_document != pd_from_reportable:
             raise ValidationError("Reportable does not belong to the passed-in progress report.")
 
         hf_reports = ProgressReport.objects.filter(
@@ -679,7 +681,11 @@ class ProgressReportPullHFDataAPIView(APIView):
             end_date__lte=progress_report.end_date,
         )
 
-        serializer = ProgressReportPullHFDataSerializer(hf_reports, many=True)
+        serializer = ProgressReportPullHFDataSerializer(
+            hf_reports,
+            many=True,
+            context={'reportable': reportable}
+        )
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
 
