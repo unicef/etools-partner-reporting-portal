@@ -491,7 +491,6 @@ def sync_ca_reportable_update_to_pa_reportables(instance, created):
 
             # Update these LLO Reportable instances except parent_indicator info
             if llo_reportables.exists():
-                del reportable_data_to_sync["parent_indicator"]
                 llo_reportables.update(**reportable_data_to_sync)
 
 
