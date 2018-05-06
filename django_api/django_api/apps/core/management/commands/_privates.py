@@ -517,6 +517,15 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
     # QuantityReportableToLowerLevelOutput
     for idx, pd in enumerate(programme_documents):
         locations = pd.workspace.locations
+        is_unicef_hf_indicator = idx == 0
+
+        if is_unicef_hf_indicator:
+            cluster_activity_reportable = Reportable.objects.filter(
+                cluster_activities__partner_activities__partner=pd.partner
+            ).first()
+
+        else:
+            cluster_activity_reportable = None
 
         pd.sections.add(Section.objects.order_by('?').first())
         pd.unicef_focal_point.add(Person.objects.order_by('?').first())
@@ -535,12 +544,16 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
                             content_object=llo,
                             indicator_report__progress_report=None,
                             indicator_report__reporting_entity=unicef_re,
+                            is_unicef_hf_indicator=is_unicef_hf_indicator,
+                            ca_indicator_used_by_reporting_entity=cluster_activity_reportable,
                         )
                     else:
                         reportable = RatioReportableToLowerLevelOutputFactory(
                             content_object=llo,
                             indicator_report__progress_report=None,
                             indicator_report__reporting_entity=unicef_re,
+                            is_unicef_hf_indicator=is_unicef_hf_indicator,
+                            ca_indicator_used_by_reporting_entity=cluster_activity_reportable,
                         )
 
                     # delete the junk indicator report the factory creates
@@ -561,21 +574,21 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
         # Generate progress reports per pd based on its reporting period dates. Requires creating indicator
         # reports for each llo and then associating them with a progress report
         def generate_initial_progress_reports(report_type):
-            queryset = pd.reporting_periods.filter(report_type=report_type)
+            rpd_queryset = pd.reporting_periods.filter(report_type=report_type)
 
-            for idx, rpd in enumerate(queryset):
-                print(rpd.report_type, rpd.start_date, rpd.end_date, rpd.due_date)
+            for rpd_idx, rpd in enumerate(rpd_queryset):
+                print("Generating ProgressReport: ", rpd.report_type, rpd.start_date, rpd.end_date, rpd.due_date)
 
                 progress_report = ProgressReportFactory(
                     programme_document=pd,
                     report_type=report_type,
-                    report_number=idx + 1,
+                    report_number=rpd_idx + 1,
                     start_date=rpd.start_date,
                     end_date=rpd.end_date,
                     due_date=rpd.due_date,
                 )
 
-                if idx == queryset.count() - 1:
+                if rpd_idx == rpd_queryset.count() - 1:
                     progress_report.is_final = True
                     progress_report.save()
 
@@ -584,7 +597,12 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
                         # All Indicator Reports inside LLO should have same status
                         # We should skip "No status"
                         status = "NoS"
-                        for reportable in llo.reportables.all():
+                        queryset = llo.reportables.all()
+
+                        if report_type == "HR":
+                            queryset = queryset.filter(is_unicef_hf_indicator=True)
+
+                        for reportable in queryset:
                             if reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
                                 QuantityIndicatorReportFactory(
                                     reportable=reportable,
@@ -609,8 +627,9 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
         # QPR generation
         generate_initial_progress_reports("QPR")
 
-        # HR generation
-        generate_initial_progress_reports("HR")
+        if is_unicef_hf_indicator:
+            # HR generation
+            generate_initial_progress_reports("HR")
 
         print("{} Progress Reports generated for {}".format(
             ProgressReport.objects.filter(programme_document=pd).count(),

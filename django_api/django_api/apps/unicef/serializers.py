@@ -1,3 +1,5 @@
+from functools import reduce
+
 from django.conf import settings
 from rest_framework import serializers
 
@@ -369,6 +371,35 @@ class ProgressReportSRUpdateSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'narrative',
+        )
+
+
+class ProgressReportPullHFDataSerializer(serializers.ModelSerializer):
+    total_loc_progress = serializers.SerializerMethodField()
+
+    def get_total_loc_progress(self, obj):
+        total = reduce(
+            lambda acc, next: dict(list(acc.items()) + list(next.items())),
+            map(lambda report: report.total, obj.indicator_reports.all())
+        )
+
+        # Sanity check on denominator just in case
+        if total['d'] <= 0:
+            total['d'] = 1
+
+        # Recalculate calculated total again
+        total['c'] = total['v'] / total['d']
+
+        return total
+
+    class Meta:
+        model = ProgressReport
+        fields = (
+            'id',
+            'start_date',
+            'end_date',
+            'due_date',
+            'total_loc_progress',
         )
 
 

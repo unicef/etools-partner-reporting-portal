@@ -235,6 +235,7 @@ class Reportable(TimeStampedExternalSourceModel):
     start_date_of_reporting_period = models.DateField(blank=True, null=True)
 
     is_cluster_indicator = models.BooleanField(default=False)
+    is_unicef_hf_indicator = models.BooleanField(default=False)
 
     contributes_to_partner = models.BooleanField(default=False)
 
