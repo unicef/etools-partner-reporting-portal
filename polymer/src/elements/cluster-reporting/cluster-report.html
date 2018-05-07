@@ -109,6 +109,14 @@
         cursor: pointer;
       }
 
+      .special-report-cluster .report__toggle {
+        background: #0099ff;
+      }
+
+      .special-report-ip .report__toggle {
+        background: #009d55;
+      }
+
       .reportable {
         padding: 6px 25px 6px 10px;
         background: var(--paper-grey-300);
@@ -204,7 +212,7 @@
         method="post">
     </etools-prp-ajax>
 
-    <div class="report">
+    <div class$="report [[containerClassName]]">
       <div class="layout horizontal">
         <div
             class="report__toggle flex-none layout horizontal center-center"
@@ -497,7 +505,7 @@
 
   <script>
     Polymer({
-      id: 'cluster-report',
+      is: 'cluster-report',
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
@@ -513,6 +521,11 @@
         opened: Boolean,
 
         mode: String,
+
+        app: {
+          type: String,
+          statePath: 'app.current',
+        },
 
         busy: {
           type: Boolean,
@@ -584,6 +597,11 @@
         showFeedback: {
           type: Boolean,
           computed: '_computeShowFeedback(data, permissions)',
+        },
+
+        containerClassName: {
+          type: String,
+          computed: '_computeContainerClassName(data, app)',
         },
       },
 
@@ -772,6 +790,19 @@
         this.async(function () {
           this.$$('#nonViewMenu').select(1);
         });
+      },
+
+      _computeContainerClassName: function (data, app) {
+        switch (true) {
+          case !!data.child_ir_ids && app === 'cluster-reporting':
+            return 'special-report-cluster';
+
+          case !!data.parent_ir_id && app === 'ip-reporting':
+            return 'special-report-ip';
+
+          default:
+            return '';
+        }
       },
 
       detached: function () {

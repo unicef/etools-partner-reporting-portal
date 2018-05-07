@@ -330,6 +330,7 @@
                     restamp="true">
                   <disaggregation-table
                       data="[[topLevelLocation.byEntity.0]]"
+                      by-entity="[[topLevelLocation.byEntity]]"
                       mapping="[[disaggregations.disagg_lookup_map]]"
                       labels="[[disaggregations.labels]]"
                       indicator-id="[[indicatorId]]"
@@ -441,9 +442,19 @@
         'location-updated': '_onLocationUpdated',
       },
 
+      _fetchData: function () {
+        var disaggregationsThunk = this.$.disaggregations.thunk();
+
+        // Cancel the pending request, if any
+        this.$.disaggregations.abort();
+
+        return this.dispatch(
+          App.Actions.Disaggregations.fetch(disaggregationsThunk, this.indicatorId)
+        );
+      },
+
       init: function () {
         var self = this;
-        var disaggregationsThunk;
 
         if (this.initialized) {
           return;
@@ -451,14 +462,7 @@
 
         this.set('initialized', true);
 
-        disaggregationsThunk = this.$.disaggregations.thunk();
-
-        // Cancel the pending request, if any
-        this.$.disaggregations.abort();
-
-        this.dispatch(
-          App.Actions.Disaggregations.fetch(disaggregationsThunk, this.indicatorId)
-        )
+        this._fetchData()
             .then(function () {
               self.set('loading', false);
             })
@@ -520,6 +524,8 @@
       _onLocationUpdated: function (e) {
         e.stopPropagation();
 
+        this._fetchData();
+
         this.fire('refresh-report', this.indicatorId);
 
         var allComplete = this.disaggregations.indicator_location_data
@@ -562,6 +568,10 @@
             .sort(function (a, b) {
               return b.is_master_location_data - a.is_master_location_data;
             });
+      },
+
+      _isDualReportingEnabled: function (entities) {
+        return entities.length > 1;
       },
 
       attached: function () {
