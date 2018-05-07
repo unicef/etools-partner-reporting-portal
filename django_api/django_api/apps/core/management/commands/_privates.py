@@ -90,7 +90,8 @@ from core.factories import (
 from core.common import (
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
-    REPORTING_TYPES
+    REPORTING_TYPES,
+    PD_STATUS,
 )
 from core.countries import COUNTRIES_ALPHA2_CODE
 
@@ -517,15 +518,21 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
     # QuantityReportableToLowerLevelOutput
     for idx, pd in enumerate(programme_documents):
         locations = pd.workspace.locations
-        is_unicef_hf_indicator = idx == 0
 
-        if is_unicef_hf_indicator:
+        # Only mark first 2 ProgrammeDocuments to be HF indicator
+        is_unicef_hf_indicator = idx == 0 or idx == 1
+
+        # Make the first ProgrammeDocument to be dual reporting enabled
+        if idx == 0:
             cluster_activity_reportable = Reportable.objects.filter(
                 cluster_activities__partner_activities__partner=pd.partner
             ).first()
 
         else:
             cluster_activity_reportable = None
+
+        if is_unicef_hf_indicator:
+            pd.status = PD_STATUS.active
 
         pd.sections.add(Section.objects.order_by('?').first())
         pd.unicef_focal_point.add(Person.objects.order_by('?').first())
@@ -635,6 +642,15 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
             ProgressReport.objects.filter(programme_document=pd).count(),
             pd
         ))
+
+    cai_llo_queryset = Reportable.objects.filter(
+        content_type__model="lowerleveloutput",
+        ca_indicator_used_by_reporting_entity__isnull=False,
+    )
+
+    for indicator in cai_llo_queryset:
+        indicator.blueprint = indicator.ca_indicator_used_by_reporting_entity.blueprint
+        indicator.save()
 
     print("ProgrammeDocument <-> QuantityReportableToLowerLevelOutput <-> IndicatorReport objects linked")
 
