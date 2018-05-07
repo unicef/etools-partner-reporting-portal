@@ -544,7 +544,7 @@
       },
 
       _computeLocationData: function (rawLocationData) {
-        var byLocation = rawLocationData
+        var byLocation = (rawLocationData || [])
             .reduce(function (acc, location) {
               var locationId = location.location.id;
 
