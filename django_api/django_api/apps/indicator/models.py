@@ -832,6 +832,7 @@ class IndicatorLocationData(TimeStampedModel):
         max_digits=5,
         default=1.0000,
     )
+    is_locked = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['id']

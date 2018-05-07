@@ -542,6 +542,10 @@ class ProgressReportSubmitAPIView(APIView):
             progress_report.submitting_user = self.request.user
             progress_report.save()
 
+            # IndicatorLocationData lock marking
+            ild_ids = progress_report.indicator_reports.values_list('indicator_location_data', flat=True)
+            IndicatorLocationData.objects.filter(id__in=ild_ids).update(is_locked=True)
+
             serializer = ProgressReportSerializer(instance=progress_report)
             return Response(serializer.data, status=statuses.HTTP_200_OK)
         else:
