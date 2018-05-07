@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from django.db.models import Q
+
 from openpyxl.reader.excel import load_workbook
 
 from indicator.models import IndicatorLocationData, IndicatorBlueprint
@@ -11,8 +13,9 @@ MAX_COLUMNS = 1000
 
 class IndicatorsXLSXReader(object):
 
-    def __init__(self, path):
+    def __init__(self, path, partner):
         self.wb = load_workbook(path)
+        self.partner = partner
 
     def import_data(self):
         for self.sheet in self.wb.worksheets:
@@ -49,6 +52,17 @@ class IndicatorsXLSXReader(object):
 
                 # Get IndicatorLocationData ID
                 try:
+                    # Check if Partner is allowed to modify data
+                    if IndicatorLocationData.objects.filter(
+                        pk=self.sheet.cell(row=row, column=location_column_id).value).filter(
+                    Q(indicator_report__reportable__cluster_objectives__cluster__partner_projects__partner=self.partner) |
+                    Q(indicator_report__reportable__cluster_objectives__cluster_activities__partner_activities__partner=self.partner) |
+                    Q(indicator_report__reportable__cluster_activities__cluster_objective__cluster__partner_projects__partner=self.partner) |
+                    Q(indicator_report__reportable__cluster_activities__partner_activities__partner=self.partner)
+                    |
+                    Q(indicator_report__reportable__partner_activities__project__partner=self.partner) |
+                    Q(indicator_report__reportable__partner_projects__partner=self.partner)).count() == 0:
+                        return "Indicator ID " + str(indicator.id) + " does not belong to partner " + str(self.partner)
                     indicator = IndicatorLocationData.objects.get(
                         pk=self.sheet.cell(row=row, column=location_column_id).value
                     )

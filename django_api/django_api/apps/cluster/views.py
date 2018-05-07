@@ -489,7 +489,7 @@ class ClusterIndicatorsListExcelImportView(APIView):
         for chunk in up_file.chunks():
             destination.write(chunk)
             destination.close()
-        reader = IndicatorsXLSXReader(filepath)
+        reader = IndicatorsXLSXReader(filepath, request.user.partner)
         result = reader.import_data()
         if result:
             return Response({'parsing_errors': [result, ]}, status=statuses.HTTP_400_BAD_REQUEST)
