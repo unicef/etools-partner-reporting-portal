@@ -253,7 +253,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
             location_type=gateways[0], country=country)
 
         locations = list()
-        for idx in range(24):
+        for idx in range(12):
             locations.append(
                 LocationFactory.create(
                     gateway=gateways[idx] if idx < 5 else gateways[4],
@@ -455,7 +455,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
     # only create PD's for the partner being used above
     programme_documents = []
     for workspace in Workspace.objects.all():
-        for i in range(workspace_quantity * 4):
+        for i in range(workspace_quantity * 2):
             pd = ProgrammeDocumentFactory.create(partner=first_partner, workspace=workspace)
             programme_documents.append(pd)
 
@@ -509,7 +509,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
                 due_date=datetime.datetime(now.year, 12, 31),
             )
 
-    print("{} ProgrammeDocument objects created".format(min(4, workspace_quantity * 4)))
+    print("{} ProgrammeDocument objects created".format(min(2, workspace_quantity * 2)))
 
     # Linking the followings:
     # ProgressReport - ProgrammeDocument
