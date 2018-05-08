@@ -522,17 +522,9 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
         # Only mark first 2 ProgrammeDocuments to be HF indicator
         is_unicef_hf_indicator = idx == 0 or idx == 1
 
-        # Make the first ProgrammeDocument to be dual reporting enabled
-        if idx == 0:
-            cluster_activity_reportable = Reportable.objects.filter(
-                cluster_activities__partner_activities__partner=pd.partner
-            ).first()
-
-        else:
-            cluster_activity_reportable = None
-
         if is_unicef_hf_indicator:
             pd.status = PD_STATUS.active
+            pd.save()
 
         pd.sections.add(Section.objects.order_by('?').first())
         pd.unicef_focal_point.add(Person.objects.order_by('?').first())
@@ -540,8 +532,18 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
         pd.unicef_officers.add(Person.objects.order_by('?').first())
 
         # generate reportables for this PD
-        for cp_output in pd.cp_outputs.all():
-            for llo in cp_output.ll_outputs.all():
+        for cp_idx, cp_output in enumerate(pd.cp_outputs.all()):
+            for llo_idx, llo in enumerate(cp_output.ll_outputs.all()):
+
+                # Make the first LLO from first ProgrammeDocument
+                # to be dual reporting enabled
+                if idx == 0 and cp_idx == 0 and llo_idx == 0:
+                    cluster_activity_reportable = Reportable.objects.filter(
+                        cluster_activities__partner_activities__partner=pd.partner
+                    ).first()
+
+                else:
+                    cluster_activity_reportable = None
 
                 # generate 2 reportable (indicators) per llo
                 num_reportables_range = range(2)
@@ -653,7 +655,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
         indicator.save()
 
         partner_activity = PartnerActivity.objects.filter(
-            cluster_activity=indicator.ca_indicator_used_by_reporting_entity,
+            cluster_activity=indicator.ca_indicator_used_by_reporting_entity.content_object,
             partner=indicator.content_object.cp_output.programme_document.partner,
         ).first()
 
