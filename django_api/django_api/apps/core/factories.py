@@ -143,7 +143,7 @@ class PartnerActivityFactory(factory.django.DjangoModelFactory):
     project = factory.SubFactory('core.factories.PartnerProjectFactory')
 
     start_date = beginning_of_this_year
-    end_date = beginning_of_this_year + datetime.timedelta(days=30)
+    end_date = beginning_of_this_year + datetime.timedelta(days=180)
     status = fuzzy.FuzzyChoice(PARTNER_PROJECT_STATUS_LIST)
 
     @factory.post_generation
@@ -496,6 +496,7 @@ class QuantityReportableToPartnerActivityFactory(ReportableFactory):
         [('d', 1), ('v', random.randint(20000, 50000))])
     total = dict(
         [('c', 0), ('d', 1), ('v', random.randint(0, 3000))])
+    frequency = REPORTABLE_FREQUENCY_LEVEL.monthly
 
     indicator_report = factory.RelatedFactory(
         'core.factories.QuantityIndicatorReportFactory', 'reportable')
