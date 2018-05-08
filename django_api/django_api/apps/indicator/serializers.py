@@ -464,6 +464,7 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
     previous_location_progress = serializers.SerializerMethodField()
     display_type = serializers.SerializerMethodField()
     is_complete = serializers.BooleanField(read_only=True)
+    is_locked = serializers.BooleanField(read_only=True)
     is_master_location_data = serializers.BooleanField(read_only=True, source="indicator_report.children.exists")
     reporting_entity = ReportingEntitySerializer(source="indicator_report.reporting_entity")
 
@@ -503,6 +504,7 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
             'location_progress',
             'previous_location_progress',
             'is_complete',
+            'is_locked',
             'is_master_location_data',
             'reporting_entity',
             'percentage_allocated',

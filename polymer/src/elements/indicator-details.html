@@ -199,12 +199,12 @@
             as="topLevelLocation"
             index-as="topLevelLocationIndex">
           <div>
-            <div class="tab-header layout horizontal justified">
-              <div class="self-center">Enter data for this location</div>
-              <div>
-                <template
-                    is="dom-if"
-                    if="[[!_equals(computedMode, 'view')]]">
+            <template
+                is="dom-if"
+                if="[[!_equals(computedMode, 'view')]]">
+              <div class="tab-header layout horizontal justified">
+                <div class="self-center">Enter data for this location</div>
+                <div>
                   <paper-button
                       class="btn-primary"
                       modal-index="[[topLevelLocationIndex]]"
@@ -212,9 +212,10 @@
                       raised>
                     Enter data
                   </paper-button>
-                </template>
-              </div>
+                </div>
             </div>
+          </template>
+
 
             <paper-tabs
                 selected="{{topLevelLocation.selected}}"
