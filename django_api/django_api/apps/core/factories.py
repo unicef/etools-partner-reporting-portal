@@ -481,6 +481,8 @@ class QuantityReportableToClusterActivityFactory(ReportableFactory):
 
     blueprint = factory.SubFactory(QuantityTypeIndicatorBlueprintFactory)
 
+    frequency = REPORTABLE_FREQUENCY_LEVEL.monthly
+
     class Meta:
         model = Reportable
 

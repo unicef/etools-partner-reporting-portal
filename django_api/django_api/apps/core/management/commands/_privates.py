@@ -92,6 +92,7 @@ from core.common import (
     OVERALL_STATUS,
     REPORTING_TYPES,
     PD_STATUS,
+    REPORTABLE_FREQUENCY_LEVEL,
 )
 from core.countries import COUNTRIES_ALPHA2_CODE
 
@@ -662,6 +663,9 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
         # Copy-paste from unicef/tasks.py
         # Force update on PA Reportable instance for location update
         for pa_reportable in partner_activity.reportables.all():
+            pa_reportable.frequency = REPORTABLE_FREQUENCY_LEVEL.monthly
+            pa_reportable.save()
+
             llo_locations = indicator.locations.values_list('id', flat=True)
             pai_locations = pa_reportable.locations.values_list('id', flat=True)
             loc_diff = pai_locations.exclude(id__in=llo_locations)
