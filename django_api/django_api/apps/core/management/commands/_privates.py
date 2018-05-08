@@ -652,6 +652,30 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
         indicator.blueprint = indicator.ca_indicator_used_by_reporting_entity.blueprint
         indicator.save()
 
+        partner_activity = PartnerActivity.objects.filter(
+            cluster_activity=indicator.ca_indicator_used_by_reporting_entity,
+            partner=indicator.content_object.cp_output.programme_document.partner,
+        ).first()
+
+        # Copy-paste from unicef/tasks.py
+        # Force update on PA Reportable instance for location update
+        for pa_reportable in partner_activity.reportables.all():
+            llo_locations = indicator.locations.values_list('id', flat=True)
+            pai_locations = pa_reportable.locations.values_list('id', flat=True)
+            loc_diff = pai_locations.exclude(id__in=llo_locations)
+
+            # Add new locations from LLO Reportable to PA Reportable
+            if loc_diff.exists():
+                # Creating M2M Through model instances
+                reportable_location_goals = [
+                    ReportableLocationGoal(
+                        reportable=indicator,
+                        location=l,
+                    ) for l in loc_diff
+                ]
+
+                ReportableLocationGoal.objects.bulk_create(reportable_location_goals)
+
     print("ProgrammeDocument <-> QuantityReportableToLowerLevelOutput <-> IndicatorReport objects linked")
 
     print("Generating IndicatorLocationData for Quantity type")

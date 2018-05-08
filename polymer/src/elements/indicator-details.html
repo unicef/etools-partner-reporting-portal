@@ -557,7 +557,9 @@
               }
 
               acc[locationId].byEntity.push(location);
-
+              if (acc[locationId].byEntity.length >= 2) {
+                acc[locationId].selected = acc[locationId].byEntity.length - 1;
+              }
               return acc;
             }, {});
 

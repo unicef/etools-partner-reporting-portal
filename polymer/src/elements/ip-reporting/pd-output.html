@@ -45,6 +45,14 @@
         margin-bottom: 25px;
       }
 
+      .cluster-indicator .indicator-toggle {
+        background: #009d55;
+      }
+
+      .pd-indicator .indicator-toggle {
+        background: #0099ff;
+      }
+
       .indicator:not(:last-child) {
         margin-bottom: 25px;
       }
@@ -136,7 +144,7 @@
         is="dom-repeat"
         items="[[data.indicator_reports]]"
         as="indicator">
-      <div class="indicator">
+      <div class$="indicator [[_computeContainerClassName(indicator, app)]]">
         <div class="layout horizontal">
           <div
               class="indicator-toggle flex-none layout horizontal center-center"
@@ -232,7 +240,7 @@
           <indicator-details
               reportable-id="[[data.id]]"
               indicator-name="[[indicator.reportable.blueprint.title]]"
-              indicator-id="[[indicator.id]]"
+              indicator-id="[[_computeIndicatorId(indicator)]]"
               indicator-status="[[indicator.report_status]]"
               reporting-period="[[currentReport.reporting_period]]"
               override-mode="[[computedMode]]">
@@ -259,6 +267,11 @@
         data: Object,
         permissions: Object,
         reportableMeta: Object,
+
+        app: {
+          type: String,
+          statePath: 'app.current',
+        },
 
         reportableData: {
           type: Object,
@@ -363,6 +376,10 @@
         }
       },
 
+      _computeIndicatorId: function(indicatorReport) {
+        return indicatorReport.parent_ir_id ? indicatorReport.parent_ir_id : indicatorReport.id
+      },
+
       _updateMeta: function (e, data) {
         var self = this;
         var updateThunk;
@@ -410,6 +427,17 @@
           overall_status: first.overall_status,
           narrative_assessment: first.narrative_assessment,
         };
+      },
+
+      _computeContainerClassName: function (data, app) {
+        console.log(!!data.parent_ir_id, app)
+        switch (true) {
+          case !!data.parent_ir_id && app === 'ip-reporting':
+            return 'cluster-indicator';
+
+          default:
+            return 'pd-indicator';
+        }
       },
 
       detached: function () {
