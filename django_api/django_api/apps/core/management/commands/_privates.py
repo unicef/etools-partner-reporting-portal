@@ -535,10 +535,11 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
         # generate reportables for this PD
         for cp_idx, cp_output in enumerate(pd.cp_outputs.all()):
             for llo_idx, llo in enumerate(cp_output.ll_outputs.all()):
+                first_llo_indicator_flag = idx == 0 and cp_idx == 0 and llo_idx == 0
 
                 # Make the first LLO from first ProgrammeDocument
                 # to be dual reporting enabled
-                if idx == 0 and cp_idx == 0 and llo_idx == 0:
+                if first_llo_indicator_flag:
                     cluster_activity_reportable = Reportable.objects.filter(
                         cluster_activities__partner_activities__partner=pd.partner
                     ).first()
@@ -557,7 +558,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
                             is_unicef_hf_indicator=is_unicef_hf_indicator,
                             ca_indicator_used_by_reporting_entity=cluster_activity_reportable,
                         )
-                    else:
+                    elif i % 2 == 0 and not first_llo_indicator_flag:
                         reportable = RatioReportableToLowerLevelOutputFactory(
                             content_object=llo,
                             indicator_report__progress_report=None,
