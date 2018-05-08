@@ -15,6 +15,7 @@ from indicator.serializers import (
     PDReportContextIndicatorReportSerializer,
     IndicatorBlueprintSimpleSerializer,
 )
+from indicator.models import IndicatorLocationData
 
 from partner.models import Partner
 
@@ -375,22 +376,29 @@ class ProgressReportSRUpdateSerializer(serializers.ModelSerializer):
 
 
 class ProgressReportPullHFDataSerializer(serializers.ModelSerializer):
-    total_loc_progress = serializers.SerializerMethodField()
+    total_progress = serializers.SerializerMethodField()
 
-    def get_total_loc_progress(self, obj):
-        total = reduce(
-            lambda acc, next: dict(list(acc.items()) + list(next.items())),
-            map(lambda report: report.total, obj.indicator_reports.all())
+    def get_total_progress(self, obj):
+        reportable = self.context['reportable']
+        locations = reportable.locations.all()
+
+        target_hf_irs = obj.indicator_reports.filter(
+            time_period_start__gte=obj.start_date,
+            time_period_end__lte=obj.end_date,
+            reportable=reportable,
         )
 
-        # Sanity check on denominator just in case
-        if total['d'] <= 0:
-            total['d'] = 1
+        calculated = {loc.id: {'c': 0, 'v': 0, 'd': 0} for loc in locations}
 
-        # Recalculate calculated total again
-        total['c'] = total['v'] / total['d']
+        for ir in target_hf_irs:
+            for ild in ir.indicator_location_data.all():
+                calculated[ild.location.id] = dict(list(calculated[ild.location.id].items()) + list(ild.disaggregation['()'].items()))
 
-        return total
+        # # calculated value Re-calculation
+        # for key, val in calculated.items():
+        #     val['c'] = val['v'] / val['d']
+
+        return calculated
 
     class Meta:
         model = ProgressReport
@@ -399,7 +407,7 @@ class ProgressReportPullHFDataSerializer(serializers.ModelSerializer):
             'start_date',
             'end_date',
             'due_date',
-            'total_loc_progress',
+            'total_progress',
         )
 
 
