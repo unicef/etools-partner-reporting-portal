@@ -689,7 +689,7 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
                     {"reporting_entity_percentage_map": {"Each dictionary should have 'title' and 'percentage' key"}}
                 )
 
-            if any(map(lambda x: x["percentage"] >= 1 or float(x["percentage"]) <= 0, map_list)):
+            if any(map(lambda x: x["percentage"] > 1 or float(x["percentage"]) < 0, map_list)):
                 raise serializers.ValidationError(
                     {"reporting_entity_percentage_map": {"Each dictionary should 'percentage' value between 0 to 1"}}
                 )
