@@ -659,38 +659,67 @@ class ProgressReportPullHFDataAPIView(APIView):
             })
             raise Http404
 
-    def get(self, request, *args, **kwargs):
-        progress_report = self.get_object()
+    def _get_target_hf_reports_with_indicator_report(self):
+        self.progress_report = self.get_object()
 
-        if progress_report.report_type != "QPR":
+        if self.progress_report.report_type != "QPR":
             raise ValidationError("This Progress Report is not QPR type.")
 
         try:
-            reportable = Reportable.objects.get(id=self.kwargs['reportable_pk'])
-        except Reportable.DoesNotExist:
-            raise ValidationError("Reportable does not exist.")
+            indicator_report = IndicatorReport.objects.get(id=self.kwargs['indicator_report_pk'])
+        except IndicatorReport.DoesNotExist:
+            raise ValidationError("IndicatorReport does not exist.")
 
-        if not isinstance(reportable.content_object, LowerLevelOutput):
+        if not isinstance(indicator_report.reportable.content_object, LowerLevelOutput):
             raise ValidationError("Reportable is not LLO type.")
 
-        pd_from_reportable = reportable.content_object.cp_output.programme_document
+        pd_from_reportable = indicator_report.reportable.content_object.cp_output.programme_document
 
-        if progress_report.programme_document != pd_from_reportable:
+        if self.progress_report.programme_document != pd_from_reportable:
             raise ValidationError("Reportable does not belong to the passed-in progress report.")
 
         hf_reports = ProgressReport.objects.filter(
-            programme_document=progress_report.programme_document,
+            programme_document=self.progress_report.programme_document,
             report_type="HR",
-            start_date__gte=progress_report.start_date,
-            end_date__lte=progress_report.end_date,
+            start_date__gte=self.progress_report.start_date,
+            end_date__lte=self.progress_report.end_date,
         )
+
+        return indicator_report, hf_reports
+
+    def get(self, request, *args, **kwargs):
+        indicator_report, hf_reports = self._get_target_hf_reports_with_indicator_report()
 
         serializer = ProgressReportPullHFDataSerializer(
             hf_reports,
             many=True,
-            context={'reportable': reportable}
+            context={'indicator_report': indicator_report}
         )
         return Response(serializer.data, status=statuses.HTTP_200_OK)
+
+    def post(self, request, *args, **kwargs):
+        indicator_report, hf_reports = self._get_target_hf_reports_with_indicator_report()
+
+        serializer = ProgressReportPullHFDataSerializer(
+            hf_reports,
+            many=True,
+            context={'indicator_report': indicator_report}
+        )
+
+        locations = indicator_report.reportable.locations.all()
+        loc_totals = {loc.id: {'()': {'c': 0, 'v': 0, 'd': 0}} for loc in locations}
+
+        # Data pull total consolidation
+        for hf_report_data in serializer.data:
+            for loc_id, total in hf_report_data['total_progress'].items():
+                loc_totals[loc_id]['()'] = dict(list(loc_totals[loc_id]['()'].items()) + list(total.items()))
+
+        # Data pull updates
+        for ild in indicator_report.indicator_location_data.all():
+            ild.disaggregation = loc_totals[ild.location.id]
+            ild.save()
+
+        return Response(loc_totals, status=statuses.HTTP_200_OK)
 
 
 class ProgressReportReviewAPIView(APIView):

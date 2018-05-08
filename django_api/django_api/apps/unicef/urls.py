@@ -62,7 +62,7 @@ urlpatterns = [
     url(r'^(?P<workspace_id>\d+)/progress-reports/(?P<pk>\d+)/review/$',
         ProgressReportReviewAPIView.as_view(),
         name="progress-reports-review"),
-    url(r'^(?P<workspace_id>\d+)/progress-reports/(?P<pk>\d+)/indicators/(?P<reportable_pk>\d+)/pull/$',
+    url(r'^(?P<workspace_id>\d+)/progress-reports/(?P<pk>\d+)/indicators/(?P<indicator_report_pk>\d+)/pull/$',
         ProgressReportPullHFDataAPIView.as_view(),
         name="progress-reports-pull-hf-data"),
     url(r'^(?P<workspace_id>\d+)/progress-reports/(?P<progress_report_id>\d+)/indicator-reports/$',
