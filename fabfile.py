@@ -45,7 +45,7 @@ def restart(service):
     restart a service container
     :param service: ['django_api', 'polymer', 'proxy', 'db']
     """
-    assert service in ['django_api', 'polymer', 'proxy', 'db'], "%s is unrecognized service"
+    assert service in ['django_api', 'polymer', 'proxy', 'db', 'beater-prp', 'worker-prp'], "%s is unrecognized service"
     local('docker-compose restart %s' % service)
 
 
