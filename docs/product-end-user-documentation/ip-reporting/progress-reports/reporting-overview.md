@@ -2,7 +2,7 @@
 
 ### Report Types {#report-types}
 
-There are 3 report types supported:
+There are 3 progress report types supported:
 
 * [​Special Reports \(SR\)](special-reports-sr.md)​
 * [​Humanitarian Reports \(HR\)](humanitarian-reports-hr.md)​
@@ -10,11 +10,9 @@ There are 3 report types supported:
 
 ### Overview {#overview}
 
-Progress Reports are essentially a **container of one or more indicator reports** \(except for [SR's](special-reports-sr.md)\). The reporting period \(start -&gt; end date\) that this progress report is being submitted would be exactly the same range for all the included indicator reports.
+Progress Reports are essentially a **container of one or more indicator reports** \(except for [SR's](special-reports-sr.md)\). The reporting period \(start -&gt; end date\) that this progress report is being submitted would be exactly the same date range for all the included indicator reports.
 
 In IP Reporting the individual indicator reports are not given any prominence, but under the hood thats what the partner is really reporting on. The following image shows the relationship at a high level. Please refer to the [date model](../../../technical-documentation/data-model.md) for more details.
-
-The user does not generate progress reports, but these are generated periodically/automatically for the partner based on the reporting periods and due dates set by the PO at UNICEF.
 
 {% hint style="info" %}
 **Partners do not create progress reports** or indicator reports or for that matter anything in the IP Reporting interface. These are **auto-generated for them** at a frequency as setup/agreed upon in PMP and they have to come in and enter data for them in PRP.
