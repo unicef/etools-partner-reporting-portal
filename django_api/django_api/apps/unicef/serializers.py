@@ -1,5 +1,3 @@
-from functools import reduce
-
 from django.conf import settings
 from rest_framework import serializers
 
@@ -15,7 +13,6 @@ from indicator.serializers import (
     PDReportContextIndicatorReportSerializer,
     IndicatorBlueprintSimpleSerializer,
 )
-from indicator.models import IndicatorLocationData
 
 from partner.models import Partner
 

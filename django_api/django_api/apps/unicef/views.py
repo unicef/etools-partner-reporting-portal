@@ -698,7 +698,9 @@ class ProgressReportPullHFDataAPIView(APIView):
 
         for ir in target_hf_irs:
             for ild in ir.indicator_location_data.all():
-                calculated[ild.location.id] = dict(list(calculated[ild.location.id].items()) + list(ild.disaggregation['()'].items()))
+                calculated[ild.location.id] = dict(
+                    list(calculated[ild.location.id].items()) + list(ild.disaggregation['()'].items())
+                )
 
         return calculated
 
