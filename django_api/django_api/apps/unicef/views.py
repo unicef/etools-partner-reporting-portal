@@ -687,6 +687,21 @@ class ProgressReportPullHFDataAPIView(APIView):
 
         return indicator_report, hf_reports
 
+    def _calculate_report_location_totals_per_reports(self, indicator_report, locations):
+        target_hf_irs = self.progress_report.indicator_reports.filter(
+            time_period_start__gte=self.progress_report.start_date,
+            time_period_end__lte=self.progress_report.end_date,
+            reportable=indicator_report.reportable,
+        )
+
+        calculated = {loc.id: {'c': 0, 'v': 0, 'd': 0} for loc in locations}
+
+        for ir in target_hf_irs:
+            for ild in ir.indicator_location_data.all():
+                calculated[ild.location.id] = dict(list(calculated[ild.location.id].items()) + list(ild.disaggregation['()'].items()))
+
+        return calculated
+
     def get(self, request, *args, **kwargs):
         indicator_report, hf_reports = self._get_target_hf_reports_with_indicator_report()
 
@@ -709,9 +724,14 @@ class ProgressReportPullHFDataAPIView(APIView):
         locations = indicator_report.reportable.locations.all()
         loc_totals = {loc.id: {'()': {'c': 0, 'v': 0, 'd': 0}} for loc in locations}
 
+        consolidated_total_per_location_dict = self._calculate_report_location_totals_per_reports(
+            indicator_report,
+            locations
+        )
+
         # Data pull total consolidation
         for hf_report_data in serializer.data:
-            for loc_id, total in hf_report_data['total_progress'].items():
+            for loc_id, total in consolidated_total_per_location_dict.items():
                 loc_totals[loc_id]['()'] = dict(list(loc_totals[loc_id]['()'].items()) + list(total.items()))
 
         # Data pull updates
