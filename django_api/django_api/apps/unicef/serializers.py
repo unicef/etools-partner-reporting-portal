@@ -377,6 +377,23 @@ class ProgressReportSRUpdateSerializer(serializers.ModelSerializer):
 
 class ProgressReportPullHFDataSerializer(serializers.ModelSerializer):
     report_name = serializers.SerializerMethodField()
+    report_location_total = serializers.SerializerMethodField()
+
+    def get_report_location_total(self, obj):
+        indicator_report = self.context['indicator_report']
+
+        target_hf_irs = obj.indicator_reports.filter(
+            time_period_start__gte=obj.start_date,
+            time_period_end__lte=obj.end_date,
+            reportable=indicator_report.reportable,
+        )
+
+        calculated = {'c': 0, 'v': 0, 'd': 0}
+
+        for ir in target_hf_irs:
+            calculated = dict(list(calculated.items()) + list(ir.total.items()))
+
+        return calculated
 
     def get_report_name(self, obj):
         return obj.report_type + str(obj.report_number)
@@ -389,6 +406,7 @@ class ProgressReportPullHFDataSerializer(serializers.ModelSerializer):
             'start_date',
             'end_date',
             'due_date',
+            'report_location_total',
         )
 
 
