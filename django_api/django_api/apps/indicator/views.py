@@ -521,8 +521,14 @@ class IndicatorReportListAPIView(APIView):
         return indicator_reports
 
     def get(self, request, *args, **kwargs):
+        pd_id_for_locations = int(self.request.query_params.get('pd_id_for_locations', '-1'))
+
         indicator_reports = self.get_queryset()
-        serializer = IndicatorReportListSerializer(indicator_reports, many=True)
+        serializer = IndicatorReportListSerializer(
+            indicator_reports,
+            many=True,
+            context={'pd_id_for_locations': pd_id_for_locations}
+        )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 

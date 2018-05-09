@@ -769,9 +769,24 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
         return obj.children.values_list('id', flat=True) if obj.children.exists() else None
 
     def get_indicator_location_data(self, obj):
+        if 'pd_id_for_locations' in self.context:
+            pd_id_for_locations = self.context['pd_id_for_locations']
+
+        else:
+            pd_id_for_locations = -1
+
         objects = list(obj.indicator_location_data.all())
+
+        child_ir_ild_ids = obj.children.values_list('indicator_location_data', flat=True)
+
+        if child_ir_ild_ids.exists() and pd_id_for_locations != -1:
+            child_ir_ild_ids = child_ir_ild_ids.filter(
+                reporting_entity__title="UNICEF",
+                reportable__lower_level_outputs__cp_output__programme_document_id=pd_id_for_locations,
+            )
+
         child_ilds = IndicatorLocationData.objects.filter(
-            id__in=obj.children.values_list('indicator_location_data', flat=True)
+            id__in=child_ir_ild_ids,
         )
 
         if obj.children.exists():
