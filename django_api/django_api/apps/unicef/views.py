@@ -687,20 +687,27 @@ class ProgressReportPullHFDataAPIView(APIView):
 
         return indicator_report, hf_reports
 
-    def _calculate_report_location_totals_per_reports(self, indicator_report, locations):
-        target_hf_irs = self.progress_report.indicator_reports.filter(
+    def _calculate_report_location_totals_per_reports(self, indicator_report, hf_reports, locations):
+        ir_ids = hf_reports.values_list('indicator_reports', flat=True)
+        target_hf_irs = IndicatorReport.objects.filter(
+            id__in=ir_ids,
             time_period_start__gte=self.progress_report.start_date,
             time_period_end__lte=self.progress_report.end_date,
             reportable=indicator_report.reportable,
         )
 
-        calculated = {loc.id: {'c': 0, 'v': 0, 'd': 0} for loc in locations}
+        calculated = {loc_id: {'c': 0, 'v': 0, 'd': 0} for loc_id in locations}
 
         for ir in target_hf_irs:
             for ild in ir.indicator_location_data.all():
-                calculated[ild.location.id] = dict(
-                    list(calculated[ild.location.id].items()) + list(ild.disaggregation['()'].items())
-                )
+                calculated[ild.location.id]['c'] += ild.disaggregation['()']['c']
+                calculated[ild.location.id]['v'] += ild.disaggregation['()']['v']
+
+                if indicator_report.reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
+                    calculated[ild.location.id]['d'] = 1
+
+                else:
+                    calculated[ild.location.id]['d'] += ild.disaggregation['()']['d']
 
         return calculated
 
@@ -716,25 +723,18 @@ class ProgressReportPullHFDataAPIView(APIView):
 
     def post(self, request, *args, **kwargs):
         indicator_report, hf_reports = self._get_target_hf_reports_with_indicator_report()
-
-        serializer = ProgressReportPullHFDataSerializer(
-            hf_reports,
-            many=True,
-            context={'indicator_report': indicator_report}
-        )
-
-        locations = indicator_report.reportable.locations.all()
-        loc_totals = {loc.id: {'()': {'c': 0, 'v': 0, 'd': 0}} for loc in locations}
+        locations = indicator_report.indicator_location_data.values_list('location', flat=True)
+        loc_totals = {loc_id: {'()': {'c': 0, 'v': 0, 'd': 0}} for loc_id in locations}
 
         consolidated_total_per_location_dict = self._calculate_report_location_totals_per_reports(
             indicator_report,
+            hf_reports,
             locations
         )
 
         # Data pull total consolidation
-        for hf_report_data in serializer.data:
-            for loc_id, total in consolidated_total_per_location_dict.items():
-                loc_totals[loc_id]['()'] = dict(list(loc_totals[loc_id]['()'].items()) + list(total.items()))
+        for loc_id, total in consolidated_total_per_location_dict.items():
+            loc_totals[loc_id]['()'] = dict(list(loc_totals[loc_id]['()'].items()) + list(total.items()))
 
         # Data pull updates
         for ild in indicator_report.indicator_location_data.all():

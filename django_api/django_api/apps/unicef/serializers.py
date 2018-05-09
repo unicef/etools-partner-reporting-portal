@@ -9,6 +9,7 @@ from .models import ProgrammeDocument, Section, ProgressReport, Person, \
 from core.common import PROGRESS_REPORT_STATUS, OVERALL_STATUS, CURRENCIES, PD_STATUS
 from core.models import Workspace, Location
 
+from indicator.models import IndicatorBlueprint
 from indicator.serializers import (
     PDReportContextIndicatorReportSerializer,
     IndicatorBlueprintSimpleSerializer,
@@ -388,7 +389,14 @@ class ProgressReportPullHFDataSerializer(serializers.ModelSerializer):
         calculated = {'c': 0, 'v': 0, 'd': 0}
 
         for ir in target_hf_irs:
-            calculated = dict(list(calculated.items()) + list(ir.total.items()))
+            calculated['c'] += ir.total['c']
+            calculated['v'] += ir.total['v']
+
+            if indicator_report.reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
+                calculated['d'] = 1
+
+            else:
+                calculated['d'] += ir.total['d']
 
         return calculated
 
