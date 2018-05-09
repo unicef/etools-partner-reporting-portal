@@ -16,6 +16,7 @@
 <link rel="import" href="disaggregations/disaggregation-table.html">
 <link rel="import" href="disaggregations/disaggregation-modal.html">
 <link rel="import" href="report-status.html">
+<link rel="import" href="pull-modal.html">
 <link rel="import" href="../endpoints.html">
 <link rel="import" href="../behaviors/utils.html">
 <link rel="import" href="../redux/store.html">
@@ -44,13 +45,12 @@
       }
 
       .locations-heading {
-        margin: 0 75px 0 25px;
+        margin: 20px 75px 0 25px;
         font-size: 12px;
       }
 
       etools-prp-printer {
-        position: absolute;
-        top: 5px;
+        position: relative;
         right: 15px;
       }
 
@@ -135,14 +135,32 @@
     </etools-prp-ajax>
 
     <template is="dom-if" if="[[!loading]]">
+      <div>
+      <template
+          is="dom-if"
+          if="[[reportIsQpr]]">
+        <div class="tab-header layout horizontal justified">
+          <div class="self-center">For this cluster indicator data can be pulled from reports matching this reporting period</div>
+          <div>
+            <paper-button
+                class="btn-primary"
+                modal-index="[[indicatorId]]"
+                on-tap="_openPullModal">
+              Pull Data
+            </paper-button>
+          </div>
+        </div>
+      </template>
+      </div>
+      <div class="header layout horizontal justified">
       <h3 class="locations-heading">Data for locations</h3>
-
+        <div class="layout horizontal">
       <etools-prp-printer selector=".printme">
         <paper-icon-button
             class="print-btn"
             icon="icons:print">
         </paper-icon-button>
-      </etools-prp-printer>
+      </etools-prp-printer></div></div>
 
       <div hidden aria-hidden="true">
         <template
@@ -199,6 +217,7 @@
             as="topLevelLocation"
             index-as="topLevelLocationIndex">
           <div>
+
             <template
                 is="dom-if"
                 if="[[!_equals(computedMode, 'view')]]">
@@ -345,6 +364,14 @@
       </iron-pages>
     </template>
 
+  <pull-modal
+    id="pull-modal-[[indicatorId]]"
+    indicator-name="[[indicatorName]]"
+    reporting-period="[[reportingPeriod]]"
+    indicator-id="[[indicatorId]]"
+    report-id="[[reportId]]">
+  </pull-modal>
+
     <etools-loading active="[[loading]]"></etools-loading>
   </template>
 
@@ -367,6 +394,10 @@
         reportType: String,
 
         reportableId: Number,
+
+        reportId: {
+          type: String,
+        },
 
         reportingPeriod: String,
 
@@ -437,6 +468,10 @@
           type: String,
           computed: '_computeMode(mode, overrideMode)',
         },
+
+        reportIsQpr: {
+          type: Boolean,
+        },
       },
 
       listeners: {
@@ -493,6 +528,10 @@
 
       _openModal: function (e) {
         this.$$('#modal-' + e.target.modalIndex).open();
+      },
+
+      _openPullModal: function (e) {
+        this.$$('#pull-modal-' + e.target.modalIndex).open();
       },
 
       _updateModals: function (e, data) {

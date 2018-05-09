@@ -119,6 +119,18 @@
         return this._buildUrl('/indicator/indicator-location-data-entries/');
       },
 
+      indicatorPullData: function(workspaceId, reportId, indicatorId) {
+        return this._buildUrl(
+          '/unicef/' +
+          workspaceId +
+          '/progress-reports/' +
+          reportId +
+          '/indicators/' +
+          indicatorId +
+          '/pull/'
+        );
+      },
+
       responseParametersClusterObjectives: function(responsePlanId) {
         return this._buildUrl('/cluster/' + responsePlanId + '/cluster-objective-list/');
       },
