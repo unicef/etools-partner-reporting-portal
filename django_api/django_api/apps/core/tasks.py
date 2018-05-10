@@ -57,6 +57,139 @@ def process_workspaces():
 
 @shared_task
 def process_period_reports():
+    # Cluster reporting Indicator report generation first
+    for reportable in Reportable.objects.filter(
+            content_type__model__in=['partnerproject', 'partneractivity', 'clusterobjective'], active=True
+    ):
+        print("Processing Reportable {}".format(reportable))
+
+        if reportable.locations.count() == 0:
+            continue
+
+        frequency = reportable.frequency
+        latest_indicator_report = reportable.indicator_reports.order_by('time_period_end').last()
+
+        if frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
+            print("Indicator {} frequency is custom specific dates".format(reportable))
+
+            if not latest_indicator_report:
+                # PartnerProject, PartnerActivity
+                if hasattr(reportable.content_object, 'start_date'):
+                    date_list = [reportable.content_object.start_date]
+                # ClusterObjective
+                elif hasattr(reportable.content_object, 'response_plan'):
+                    date_list = [reportable.content_object.response_plan.start_date]
+                date_list.extend(reportable.cs_dates)
+            else:
+                date_list = [latest_indicator_report.time_period_end + timedelta(days=1)]
+                date_list.extend(filter(
+                    lambda item: item > latest_indicator_report.time_period_end,
+                    reportable.cs_dates
+                ))
+
+        else:
+            # Get missing date list based on progress report existence
+            if latest_indicator_report:
+                print("Indicator {} IndicatorReport Found with period of {} - {} ".format(
+                    reportable,
+                    latest_indicator_report.time_period_start,
+                    latest_indicator_report.time_period_end
+                ))
+
+                date_list = find_missing_frequency_period_dates_for_indicator_report(
+                    reportable,
+                    latest_indicator_report.time_period_end,
+                    frequency,
+                )
+            else:
+                print("Indicator {} IndicatorReport Not Found".format(reportable))
+                date_list = find_missing_frequency_period_dates_for_indicator_report(reportable, None, frequency)
+
+        print("Missing dates: {}".format(date_list))
+
+        with transaction.atomic():
+            last_element_idx = len(date_list) - 1
+
+            for idx, start_date in enumerate(date_list):
+                if frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
+                    if idx != last_element_idx:
+                        end_date = calculate_end_date_given_start_date(start_date, frequency, cs_dates=date_list)
+                    else:
+                        break
+
+                else:
+                    end_date = calculate_end_date_given_start_date(start_date, frequency)
+
+                if reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
+                    print("Creating Indicator {} Quantity IndicatorReport object for {} - {}".format(
+                        reportable, start_date, end_date
+                    ))
+
+                    indicator_report = QuantityIndicatorReportFactory(
+                        reportable=reportable,
+                        time_period_start=start_date,
+                        time_period_end=end_date,
+                        due_date=end_date + relativedelta(days=random.randint(2, 15)),
+                        title=reportable.blueprint.title,
+                        total={'c': 0, 'd': 0, 'v': 0},
+                        overall_status="NoS",
+                        report_status="Due",
+                        submission_date=None,
+                        reporting_entity=ReportingEntity.objects.get(title="Cluster"),
+                    )
+
+                    for location in reportable.locations.all():
+                        print("Creating IndicatorReport {} IndicatorLocationData object {} - {}".format(
+                            indicator_report, start_date, end_date
+                        ))
+
+                        IndicatorLocationDataFactory(
+                            indicator_report=indicator_report,
+                            location=location,
+                            num_disaggregation=indicator_report.disaggregations.count(),
+                            level_reported=indicator_report.disaggregations.count(),
+                            disaggregation_reported_on=list(indicator_report.disaggregations.values_list(
+                                'id', flat=True)),
+                            disaggregation={
+                                '()': {'c': 0, 'd': 0, 'v': 0}
+                            },
+                        )
+
+                else:
+                    print("Creating Indicator {} Ratio IndicatorReport object for {} - {}".format(
+                        reportable, start_date, end_date
+                    ))
+
+                    indicator_report = RatioIndicatorReportFactory(
+                        reportable=reportable,
+                        time_period_start=start_date,
+                        time_period_end=end_date,
+                        due_date=end_date + relativedelta(days=random.randint(2, 15)),
+                        title=reportable.blueprint.title,
+                        total={'c': 0, 'd': 0, 'v': 0},
+                        overall_status="NoS",
+                        report_status="Due",
+                        submission_date=None,
+                        reporting_entity=ReportingEntity.objects.get(title="Cluster"),
+                    )
+
+                    for location in reportable.locations.all():
+                        print("Creating IndicatorReport {} IndicatorLocationData object {} - {}".format(
+                            indicator_report, start_date, end_date
+                        ))
+
+                        IndicatorLocationDataFactory(
+                            indicator_report=indicator_report,
+                            location=location,
+                            num_disaggregation=indicator_report.disaggregations.count(),
+                            level_reported=indicator_report.disaggregations.count(),
+                            disaggregation_reported_on=list(indicator_report.disaggregations.values_list(
+                                'id', flat=True)),
+                            disaggregation={
+                                '()': {'c': 0, 'd': 0, 'v': 0}
+                            },
+                        )
+
     def get_latest_pr_by_type(pd, report_type):
         """
         Return latest ProgressReport instance given report_type
@@ -95,6 +228,7 @@ def process_period_reports():
                     'due_date'
                 ).last()
 
+    # PD report generation
     for pd in ProgrammeDocument.objects.filter(status=PD_STATUS.active):
         print("\nProcessing ProgrammeDocument {}".format(pd.id))
         print(10 * "****")
@@ -347,135 +481,3 @@ def process_period_reports():
                     end_date,
                     due_date
                 )
-
-    for reportable in Reportable.objects.filter(
-            content_type__model__in=['partnerproject', 'partneractivity', 'clusterobjective'], active=True
-    ):
-        print("Processing Reportable {}".format(reportable))
-
-        if reportable.locations.count() == 0:
-            continue
-
-        frequency = reportable.frequency
-        latest_indicator_report = reportable.indicator_reports.order_by('time_period_end').last()
-
-        if frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
-            print("Indicator {} frequency is custom specific dates".format(reportable))
-
-            if not latest_indicator_report:
-                # PartnerProject, PartnerActivity
-                if hasattr(reportable.content_object, 'start_date'):
-                    date_list = [reportable.content_object.start_date]
-                # ClusterObjective
-                elif hasattr(reportable.content_object, 'response_plan'):
-                    date_list = [reportable.content_object.response_plan.start_date]
-                date_list.extend(reportable.cs_dates)
-            else:
-                date_list = [latest_indicator_report.time_period_end + timedelta(days=1)]
-                date_list.extend(filter(
-                    lambda item: item > latest_indicator_report.time_period_end,
-                    reportable.cs_dates
-                ))
-
-        else:
-            # Get missing date list based on progress report existence
-            if latest_indicator_report:
-                print("Indicator {} IndicatorReport Found with period of {} - {} ".format(
-                    reportable,
-                    latest_indicator_report.time_period_start,
-                    latest_indicator_report.time_period_end
-                ))
-
-                date_list = find_missing_frequency_period_dates_for_indicator_report(
-                    reportable,
-                    latest_indicator_report.time_period_end,
-                    frequency,
-                )
-            else:
-                print("Indicator {} IndicatorReport Not Found".format(reportable))
-                date_list = find_missing_frequency_period_dates_for_indicator_report(reportable, None, frequency)
-
-        print("Missing dates: {}".format(date_list))
-
-        with transaction.atomic():
-            last_element_idx = len(date_list) - 1
-
-            for idx, start_date in enumerate(date_list):
-                if frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
-                    if idx != last_element_idx:
-                        end_date = calculate_end_date_given_start_date(start_date, frequency, cs_dates=date_list)
-                    else:
-                        break
-
-                else:
-                    end_date = calculate_end_date_given_start_date(start_date, frequency)
-
-                if reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
-                    print("Creating Indicator {} Quantity IndicatorReport object for {} - {}".format(
-                        reportable, start_date, end_date
-                    ))
-
-                    indicator_report = QuantityIndicatorReportFactory(
-                        reportable=reportable,
-                        time_period_start=start_date,
-                        time_period_end=end_date,
-                        due_date=end_date + relativedelta(days=random.randint(2, 15)),
-                        title=reportable.blueprint.title,
-                        total={'c': 0, 'd': 0, 'v': 0},
-                        overall_status="NoS",
-                        report_status="Due",
-                        submission_date=None,
-                        reporting_entity=ReportingEntity.objects.get(title="Cluster"),
-                    )
-
-                    for location in reportable.locations.all():
-                        print("Creating IndicatorReport {} IndicatorLocationData object {} - {}".format(
-                            indicator_report, start_date, end_date
-                        ))
-
-                        IndicatorLocationDataFactory(
-                            indicator_report=indicator_report,
-                            location=location,
-                            num_disaggregation=indicator_report.disaggregations.count(),
-                            level_reported=indicator_report.disaggregations.count(),
-                            disaggregation_reported_on=list(indicator_report.disaggregations.values_list(
-                                'id', flat=True)),
-                            disaggregation={
-                                '()': {'c': 0, 'd': 0, 'v': 0}
-                            },
-                        )
-
-                else:
-                    print("Creating Indicator {} Ratio IndicatorReport object for {} - {}".format(
-                        reportable, start_date, end_date
-                    ))
-
-                    indicator_report = RatioIndicatorReportFactory(
-                        reportable=reportable,
-                        time_period_start=start_date,
-                        time_period_end=end_date,
-                        due_date=end_date + relativedelta(days=random.randint(2, 15)),
-                        title=reportable.blueprint.title,
-                        total={'c': 0, 'd': 0, 'v': 0},
-                        overall_status="NoS",
-                        report_status="Due",
-                        submission_date=None,
-                        reporting_entity=ReportingEntity.objects.get(title="Cluster"),
-                    )
-
-                    for location in reportable.locations.all():
-                        print("Creating IndicatorReport {} IndicatorLocationData object {} - {}".format(
-                            indicator_report, start_date, end_date
-                        ))
-
-                        IndicatorLocationDataFactory(
-                            indicator_report=indicator_report,
-                            location=location,
-                            num_disaggregation=indicator_report.disaggregations.count(),
-                            level_reported=indicator_report.disaggregations.count(),
-                            disaggregation_reported_on=list(indicator_report.disaggregations.values_list(
-                                'id', flat=True)),
-                            disaggregation={
-                                '()': {'c': 0, 'd': 0, 'v': 0}
-                            },
-                        )
