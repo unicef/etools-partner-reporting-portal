@@ -222,6 +222,7 @@
           this.$.pull.thunk()()
               .then(function () {
                 self.close();
+                self.fire('refresh-report', this.indicatorId);
               })
               .catch(function () {
                 //TODO: error handling
@@ -240,7 +241,6 @@
           var thunk = this.$.reports.thunk();
           thunk()
               .then(function (res) {
-                console.log(res.data);
                 self.set('data', {'reports': res.data});
                 self.set('opened', true);
                 })
