@@ -396,7 +396,7 @@
       },
 
       _computeIndicatorId: function(indicatorReport) {
-        return indicatorReport.parent_ir_id ? indicatorReport.parent_ir_id : indicatorReport.id
+        return indicatorReport.parent_ir_id ? indicatorReport.parent_ir_id : indicatorReport.id;
       },
 
       _updateMeta: function (e, data) {
@@ -449,7 +449,6 @@
       },
 
       _computeContainerClassName: function (data, app) {
-        console.log(!!data.parent_ir_id, app)
         switch (true) {
           case !!data.parent_ir_id && app === 'ip-reporting':
             return 'cluster-indicator';

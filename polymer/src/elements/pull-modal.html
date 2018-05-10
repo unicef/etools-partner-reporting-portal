@@ -78,8 +78,7 @@
           url="[[pullUrl]]"
           method="post"
           body=[[postBody]]
-          content-type="application/json"
-          >
+          content-type="application/json">
       </etools-prp-ajax>
 
       <paper-dialog
@@ -173,9 +172,9 @@
         is: 'pull-modal',
 
         behaviors: [
-        App.Behaviors.ReduxBehavior,
-        App.Behaviors.UtilsBehavior,
-        App.Behaviors.ModalBehavior,
+          App.Behaviors.ReduxBehavior,
+          App.Behaviors.UtilsBehavior,
+          App.Behaviors.ModalBehavior,
         ],
 
         properties: {
@@ -221,12 +220,12 @@
         _save: function () {
           var self = this;
           this.$.pull.thunk()()
-              .then(function (res) {
+              .then(function () {
                 self.close();
               })
-              .catch(function (res) {
+              .catch(function () {
                 //TODO: error handling
-              })
+              });
         },
 
         close: function () {
@@ -245,9 +244,9 @@
                 self.set('data', {'reports': res.data});
                 self.set('opened', true);
                 })
-              .catch(function (err) {
+              .catch(function () {
                 //TODO: error handling
-              })
+              });
         }
 
       });
