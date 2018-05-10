@@ -11,7 +11,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from ocha.imports.serializers import DiscardUniqueTogetherValidationMixin
-from unicef.models import LowerLevelOutput
+from unicef.models import LowerLevelOutput, ProgressReport
 from partner.models import PartnerProject, PartnerActivity
 from cluster.models import ClusterObjective, ClusterActivity
 
@@ -737,6 +737,7 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
     labels = serializers.SerializerMethodField()
     parent_ir_id = serializers.SerializerMethodField()
     child_ir_ids = serializers.SerializerMethodField()
+    has_high_frequency_reports = serializers.SerializerMethodField()
 
     class Meta:
         model = IndicatorReport
@@ -760,7 +761,24 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
             'labels',
             'parent_ir_id',
             'child_ir_ids',
+            'has_high_frequency_reports',
         )
+
+    def get_has_high_frequency_reports(self, obj):
+        # No HF report indicator for Cluster IndicatorReport
+        if not obj.progress_report:
+            return False
+
+        pr = obj.progress_report
+
+        hf_reports = ProgressReport.objects.filter(
+            programme_document=pr.programme_document,
+            report_type="HR",
+            start_date__gte=pr.start_date,
+            end_date__lte=pr.end_date,
+        )
+
+        return True if pr.report_type == "QPR" and hf_reports.exists() else False
 
     def get_parent_ir_id(self, obj):
         return obj.parent.id if obj.parent else None
