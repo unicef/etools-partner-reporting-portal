@@ -427,7 +427,7 @@ def process_programme_documents(fast=False, area=False):
                                                 "Invalid ClusterActivity Reportable ID "
                                                 "for dual reporting - skipping link!"
                                             )
-                                    
+
                                     else:
                                         partner_activity = None
 
