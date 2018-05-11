@@ -1,5 +1,6 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../../bower_components/promise-polyfill/promise-polyfill-lite.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
 
 <link rel="import" href="table-content/three-disaggregations.html">
 <link rel="import" href="table-content/two-disaggregations.html">
@@ -18,6 +19,12 @@
 <dom-module id="disaggregation-table">
   <template>
     <style include="disaggregation-table-styles">
+      :host {
+        --paper-input-container: {
+          padding: 0;
+        };
+      }
+
       disaggregation-switches {
         margin-bottom: 1em;
       }
@@ -34,6 +41,39 @@
 
       .data-key dd {
         margin: 0;
+      }
+
+      h4 {
+        font-size: 12px;
+      }
+
+      .percentage-map {
+        padding-left: 25px;
+      }
+
+      .percentage-map ul {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+        font-size: 13px;
+      }
+
+      .percentage-map li {
+        margin-bottom: 5px;
+      }
+
+      .percentage-map paper-input {
+        width: 60px;
+        padding: 0;
+        margin: 0 5px;
+        text-align: center;
+      }
+
+      .percentage-map .entity-name {
+        display: inline-block;
+        padding: 3px 10px;
+        white-space: nowrap;
+        background-color: var(--paper-grey-100)
       }
     </style>
 
@@ -79,51 +119,93 @@
         </dl>
       </template>
 
-      <table class="vertical layout">
-        <template
-            is="dom-if"
-            if="[[_equals(formattedMapping.length, 0)]]"
-            restamp="true">
-          <zero-disaggregations
-              data="[[viewData]]"
-              mapping="[[formattedMapping]]"
-              editable="[[editable]]">
-          </zero-disaggregations>
-        </template>
+      <div class="layout horizontal justified">
+        <div class="flex">
+          <template
+              is="dom-if"
+              if="[[dualReportingEnabled]]"
+              restamp="true">
+            <h4>Progress against Cluster target:</h4>
+          </template>
+
+          <table class="vertical layout">
+            <template
+                is="dom-if"
+                if="[[_equals(formattedMapping.length, 0)]]"
+                restamp="true">
+              <zero-disaggregations
+                  data="[[viewData]]"
+                  mapping="[[formattedMapping]]"
+                  editable="[[editable]]">
+              </zero-disaggregations>
+            </template>
+
+            <template
+                is="dom-if"
+                if="[[_equals(formattedMapping.length, 1)]]"
+                restamp="true">
+              <one-disaggregation
+                  data="[[viewData]]"
+                  mapping="[[formattedMapping]]"
+                  editable="[[editable]]">
+              </one-disaggregation>
+            </template>
+
+            <template
+                is="dom-if"
+                if="[[_equals(formattedMapping.length, 2)]]"
+                restamp="true">
+              <two-disaggregations
+                  data="[[viewData]]"
+                  mapping="[[formattedMapping]]"
+                  editable="[[editable]]">
+              </two-disaggregations>
+            </template>
+
+            <template
+                is="dom-if"
+                if="[[_equals(formattedMapping.length, 3)]]"
+                restamp="true">
+              <three-disaggregations
+                  data="[[viewData]]"
+                  mapping="[[formattedMapping]]"
+                  editable="[[editable]]">
+              </three-disaggregations>
+            </template>
+          </table>
+        </div>
 
         <template
             is="dom-if"
-            if="[[_equals(formattedMapping.length, 1)]]"
+            if="[[dualReportingEnabled]]"
             restamp="true">
-          <one-disaggregation
-              data="[[viewData]]"
-              mapping="[[formattedMapping]]"
-              editable="[[editable]]">
-          </one-disaggregation>
-        </template>
+          <div class="flex-none percentage-map">
+            <h4>Percentage funded by:</h4>
 
-        <template
-            is="dom-if"
-            if="[[_equals(formattedMapping.length, 2)]]"
-            restamp="true">
-          <two-disaggregations
-              data="[[viewData]]"
-              mapping="[[formattedMapping]]"
-              editable="[[editable]]">
-          </two-disaggregations>
+            <ul>
+              <template
+                  is="dom-repeat"
+                  items="[[localData.reporting_entity_percentage_map]]">
+                <li class="layout horizontal">
+                  <span class="flex self-center entity-name">[[item.title]]</span>
+                  <span class="flex-none">
+                    <paper-input
+                        class="validate"
+                        on-input="_handleInput"
+                        data-index$="[[index]]"
+                        value="[[_formatPercentage(item.percentage)]]"
+                        allowed-pattern="^\d*\.?\d*$"
+                        no-label-float
+                        required>
+                    </paper-input>
+                  </span>
+                  <span class="flex-none self-center">%</span>
+                </li>
+              </template>
+            </ul>
+          </div>
         </template>
-
-        <template
-            is="dom-if"
-            if="[[_equals(formattedMapping.length, 3)]]"
-            restamp="true">
-          <three-disaggregations
-              data="[[viewData]]"
-              mapping="[[formattedMapping]]"
-              editable="[[editable]]">
-          </three-disaggregations>
-        </template>
-      </table>
+      </div>
     </div>
 
   </template>
@@ -143,6 +225,13 @@
         data: Object,
         labels: Object,
         totals: Object,
+
+        byEntity: {
+          type: Array,
+          value: function () {
+            return [];
+          },
+        },
 
         editable: {
           type: Number,
@@ -179,6 +268,16 @@
           computed: '_computeIndicatorType(data)',
         },
 
+        dualReportingEnabled: {
+          type: Boolean,
+          computed: '_computeDualReportingEnabled(byEntity, editableBool)',
+        },
+
+        reportingEntityPercentageMap: {
+          type: Array,
+          computed: '_computeReportingEntityPercentageMap(byEntity)',
+        },
+
         fields: Array,
 
         localData: Object,
@@ -193,6 +292,7 @@
 
       observers: [
         '_resetFields(formattedData.disaggregation_reported_on)',
+        '_initPercentageMap(localData, reportingEntityPercentageMap)',
       ],
 
       _registerField: function (e, field) {
@@ -266,7 +366,8 @@
       save: function () {
         var self = this;
         var updateThunk;
-        var valid;
+        var cellsValid;
+        var percentagesValid;
 
         if (!this.editable) {
           return Promise.reject();
@@ -276,11 +377,13 @@
           field.validate();
         });
 
-        valid = this.fields.every(function (field) {
+        cellsValid = this.fields.every(function (field) {
           return !field.invalid;
         });
 
-        if (!valid) {
+        percentagesValid = this._fieldsAreValid();
+
+        if (!cellsValid || !percentagesValid) {
           return Promise.reject();
         }
 
@@ -328,6 +431,51 @@
         return Object.assign({}, data, {
           disaggregation: Object.assign({}, data.disaggregation, totals),
         });
+      },
+
+      _computeDualReportingEnabled: function (byEntity, editableBool) {
+        return byEntity.length > 1 && editableBool;
+      },
+
+      _computeReportingEntityPercentageMap: function (byEntity) {
+        return byEntity
+            .filter(function (location) {
+              return !location.is_master_location_data;
+            })
+            .map(function (location) {
+              return {
+                title: location.reporting_entity.title,
+                percentage: Number(location.percentage_allocated),
+              };
+            });
+      },
+
+      _initPercentageMap: function (localData, map) {
+        if (!map.length) {
+          return;
+        }
+
+        this.set('localData.reporting_entity_percentage_map', map);
+      },
+
+      _formatPercentage: function (value) {
+        return value * 100;
+      },
+
+      _parsePercentage: function (percentage) {
+        return Number(percentage) / 100;
+      },
+
+      _handleInput: function (e) {
+        var input = e.target;
+
+        input.validate();
+
+        this.set([
+          'localData.reporting_entity_percentage_map',
+          input.dataset.index,
+          'percentage'
+        ], this._parsePercentage(input.value));
       },
 
       attached: function () {

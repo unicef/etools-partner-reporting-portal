@@ -83,6 +83,7 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
         Workspace (ForeignKey): "workspace_programme_documents"
     """
     agreement = models.CharField(max_length=255, verbose_name='Agreement')
+
     document_type = models.CharField(
         max_length=3,
         choices=PD_DOCUMENT_TYPE,

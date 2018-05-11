@@ -39,6 +39,7 @@ from indicator.models import (
     Disaggregation,
     DisaggregationValue,
     ReportableLocationGoal,
+    ReportingEntity,
 )
 from unicef.models import (
     Section,
@@ -89,7 +90,9 @@ from core.factories import (
 from core.common import (
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
-    REPORTING_TYPES
+    REPORTING_TYPES,
+    PD_STATUS,
+    REPORTABLE_FREQUENCY_LEVEL,
 )
 from core.countries import COUNTRIES_ALPHA2_CODE
 
@@ -208,6 +211,9 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
     CountryFactory.create_batch(workspace_quantity)
     print("{} Country objects created".format(workspace_quantity))
 
+    unicef_re = ReportingEntity.objects.get(title="UNICEF")
+    cluster_re = ReportingEntity.objects.get(title="Cluster")
+
     ws_list = list()
 
     for i in random.sample(range(0, len(COUNTRIES_ALPHA2_CODE) - 1), workspace_quantity):
@@ -247,7 +253,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
             location_type=gateways[0], country=country)
 
         locations = list()
-        for idx in range(24):
+        for idx in range(12):
             locations.append(
                 LocationFactory.create(
                     gateway=gateways[idx] if idx < 5 else gateways[4],
@@ -282,11 +288,15 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
 
         if random.randint(0, 1) == 0:
             reportable = RatioReportableToClusterObjectiveFactory(
-                content_object=co, indicator_report__progress_report=None,
+                content_object=co,
+                indicator_report__progress_report=None,
+                indicator_report__reporting_entity=cluster_re,
             )
         else:
             reportable = QuantityReportableToClusterObjectiveFactory(
-                content_object=co, indicator_report__progress_report=None,
+                content_object=co,
+                indicator_report__progress_report=None,
+                indicator_report__reporting_entity=cluster_re,
             )
 
         for loc in locations:
@@ -347,7 +357,9 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
             )
 
             reportable = QuantityReportableToClusterActivityFactory(
-                content_object=ca, indicator_report__progress_report=None,
+                content_object=ca,
+                indicator_report__progress_report=None,
+                indicator_report__reporting_entity=cluster_re,
             )
 
             for loc in locations:
@@ -370,7 +382,9 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
         pp.clusters.add(first_cluster)
 
         reportable = QuantityReportableToPartnerProjectFactory(
-            content_object=pp, indicator_report__progress_report=None,
+            content_object=pp,
+            indicator_report__progress_report=None,
+            indicator_report__reporting_entity=cluster_re,
         )
 
         for loc in locations:
@@ -396,7 +410,9 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
             )
 
             reportable_to_pa = QuantityReportableToPartnerActivityFactory(
-                content_object=pa, indicator_report__progress_report=None,
+                content_object=pa,
+                indicator_report__progress_report=None,
+                indicator_report__reporting_entity=cluster_re,
             )
             reportable_to_pa.parent_indicator = cluster_activity.reportables.first()
             reportable_to_pa.save()
@@ -416,7 +432,9 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
             )
 
             reportable_to_pa = QuantityReportableToPartnerActivityFactory(
-                content_object=pa, indicator_report__progress_report=None,
+                content_object=pa,
+                indicator_report__progress_report=None,
+                indicator_report__reporting_entity=cluster_re,
             )
 
             for loc in locations:
@@ -437,7 +455,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
     # only create PD's for the partner being used above
     programme_documents = []
     for workspace in Workspace.objects.all():
-        for i in range(workspace_quantity * 4):
+        for i in range(workspace_quantity * 2):
             pd = ProgrammeDocumentFactory.create(partner=first_partner, workspace=workspace)
             programme_documents.append(pd)
 
@@ -491,7 +509,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
                 due_date=datetime.datetime(now.year, 12, 31),
             )
 
-    print("{} ProgrammeDocument objects created".format(min(4, workspace_quantity * 4)))
+    print("{} ProgrammeDocument objects created".format(min(2, workspace_quantity * 2)))
 
     # Linking the followings:
     # ProgressReport - ProgrammeDocument
@@ -502,14 +520,32 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
     for idx, pd in enumerate(programme_documents):
         locations = pd.workspace.locations
 
+        # Only mark first 2 ProgrammeDocuments to be HF indicator
+        is_unicef_hf_indicator = idx == 0 or idx == 1
+
+        if is_unicef_hf_indicator:
+            pd.status = PD_STATUS.active
+            pd.save()
+
         pd.sections.add(Section.objects.order_by('?').first())
         pd.unicef_focal_point.add(Person.objects.order_by('?').first())
         pd.partner_focal_point.add(Person.objects.order_by('?').first())
         pd.unicef_officers.add(Person.objects.order_by('?').first())
 
         # generate reportables for this PD
-        for cp_output in pd.cp_outputs.all():
-            for llo in cp_output.ll_outputs.all():
+        for cp_idx, cp_output in enumerate(pd.cp_outputs.all()):
+            for llo_idx, llo in enumerate(cp_output.ll_outputs.all()):
+                first_llo_indicator_flag = idx == 0 and cp_idx == 0 and llo_idx == 0
+
+                # Make the first LLO from first ProgrammeDocument
+                # to be dual reporting enabled
+                if first_llo_indicator_flag:
+                    cluster_activity_reportable = Reportable.objects.filter(
+                        cluster_activities__partner_activities__partner=pd.partner
+                    ).first()
+
+                else:
+                    cluster_activity_reportable = None
 
                 # generate 2 reportable (indicators) per llo
                 num_reportables_range = range(2)
@@ -518,11 +554,17 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
                         reportable = QuantityReportableToLowerLevelOutputFactory(
                             content_object=llo,
                             indicator_report__progress_report=None,
+                            indicator_report__reporting_entity=unicef_re,
+                            is_unicef_hf_indicator=is_unicef_hf_indicator,
+                            ca_indicator_used_by_reporting_entity=cluster_activity_reportable,
                         )
-                    else:
+                    elif i % 2 == 0 and not first_llo_indicator_flag:
                         reportable = RatioReportableToLowerLevelOutputFactory(
                             content_object=llo,
                             indicator_report__progress_report=None,
+                            indicator_report__reporting_entity=unicef_re,
+                            is_unicef_hf_indicator=is_unicef_hf_indicator,
+                            ca_indicator_used_by_reporting_entity=cluster_activity_reportable,
                         )
 
                     # delete the junk indicator report the factory creates
@@ -543,21 +585,21 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
         # Generate progress reports per pd based on its reporting period dates. Requires creating indicator
         # reports for each llo and then associating them with a progress report
         def generate_initial_progress_reports(report_type):
-            queryset = pd.reporting_periods.filter(report_type=report_type)
+            rpd_queryset = pd.reporting_periods.filter(report_type=report_type)
 
-            for idx, rpd in enumerate(queryset):
-                print(rpd.report_type, rpd.start_date, rpd.end_date, rpd.due_date)
+            for rpd_idx, rpd in enumerate(rpd_queryset):
+                print("Generating ProgressReport: ", rpd.report_type, rpd.start_date, rpd.end_date, rpd.due_date)
 
                 progress_report = ProgressReportFactory(
                     programme_document=pd,
                     report_type=report_type,
-                    report_number=idx + 1,
+                    report_number=rpd_idx + 1,
                     start_date=rpd.start_date,
                     end_date=rpd.end_date,
                     due_date=rpd.due_date,
                 )
 
-                if idx == queryset.count() - 1:
+                if rpd_idx == rpd_queryset.count() - 1:
                     progress_report.is_final = True
                     progress_report.save()
 
@@ -566,7 +608,12 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
                         # All Indicator Reports inside LLO should have same status
                         # We should skip "No status"
                         status = "NoS"
-                        for reportable in llo.reportables.all():
+                        queryset = llo.reportables.all()
+
+                        if report_type == "HR":
+                            queryset = queryset.filter(is_unicef_hf_indicator=True)
+
+                        for reportable in queryset:
                             if reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
                                 QuantityIndicatorReportFactory(
                                     reportable=reportable,
@@ -575,6 +622,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
                                     time_period_start=rpd.start_date,
                                     time_period_end=rpd.end_date,
                                     due_date=rpd.due_date,
+                                    reporting_entity=unicef_re,
                                 )
                             elif reportable.blueprint.unit == IndicatorBlueprint.PERCENTAGE:
                                 RatioIndicatorReportFactory(
@@ -584,18 +632,56 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
                                     time_period_start=rpd.start_date,
                                     time_period_end=rpd.end_date,
                                     due_date=rpd.due_date,
+                                    reporting_entity=unicef_re,
                                 )
 
         # QPR generation
         generate_initial_progress_reports("QPR")
 
-        # HR generation
-        generate_initial_progress_reports("HR")
+        if is_unicef_hf_indicator:
+            # HR generation
+            generate_initial_progress_reports("HR")
 
         print("{} Progress Reports generated for {}".format(
             ProgressReport.objects.filter(programme_document=pd).count(),
             pd
         ))
+
+    cai_llo_queryset = Reportable.objects.filter(
+        content_type__model="lowerleveloutput",
+        ca_indicator_used_by_reporting_entity__isnull=False,
+    )
+
+    for indicator in cai_llo_queryset:
+        indicator.blueprint = indicator.ca_indicator_used_by_reporting_entity.blueprint
+        indicator.save()
+
+        partner_activity = PartnerActivity.objects.filter(
+            cluster_activity=indicator.ca_indicator_used_by_reporting_entity.content_object,
+            partner=indicator.content_object.cp_output.programme_document.partner,
+        ).first()
+
+        # Copy-paste from unicef/tasks.py
+        # Force update on PA Reportable instance for location update
+        for pa_reportable in partner_activity.reportables.all():
+            pa_reportable.frequency = REPORTABLE_FREQUENCY_LEVEL.monthly
+            pa_reportable.save()
+
+            llo_locations = indicator.locations.values_list('id', flat=True)
+            pai_locations = pa_reportable.locations.values_list('id', flat=True)
+            loc_diff = pai_locations.exclude(id__in=llo_locations)
+
+            # Add new locations from LLO Reportable to PA Reportable
+            if loc_diff.exists():
+                # Creating M2M Through model instances
+                reportable_location_goals = [
+                    ReportableLocationGoal(
+                        reportable=indicator,
+                        location=l,
+                    ) for l in loc_diff
+                ]
+
+                ReportableLocationGoal.objects.bulk_create(reportable_location_goals)
 
     print("ProgrammeDocument <-> QuantityReportableToLowerLevelOutput <-> IndicatorReport objects linked")
 

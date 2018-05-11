@@ -16,6 +16,7 @@
 <link rel="import" href="disaggregations/disaggregation-table.html">
 <link rel="import" href="disaggregations/disaggregation-modal.html">
 <link rel="import" href="report-status.html">
+<link rel="import" href="pull-modal.html">
 <link rel="import" href="../endpoints.html">
 <link rel="import" href="../behaviors/utils.html">
 <link rel="import" href="../redux/store.html">
@@ -38,18 +39,18 @@
         --app-grid-item-height: auto;
 
         --paper-tabs: {
+          padding-left: 12px;
           border-bottom: 1px solid var(--paper-grey-300);
         };
       }
 
       .locations-heading {
-        margin: 0 75px 0 25px;
+        margin: 20px 75px 0 25px;
         font-size: 12px;
       }
 
       etools-prp-printer {
-        position: absolute;
-        top: 5px;
+        position: relative;
         right: 15px;
       }
 
@@ -63,32 +64,32 @@
         margin: 0;
       }
 
-      .tab-header dl {
-        margin: 0;
-        font-size: 12px;
-        color: var(--theme-primary-text-color-medium);
+      .table-container {
+        max-height: 500px;
+        padding-bottom: 25px;
+        overflow: auto;
       }
 
-      .tab-header dt,
-      .tab-header dd {
+      .table-container dl {
+        margin: 0;
+        font-size: 12px;
+        color: var(--theme-secondary-text-color);
+      }
+
+      .table-container dt,
+      .table-container dd {
         display: inline;
         margin: 0;
       }
 
-      .tab-header dt:first-of-type,
-      .tab-header dd:first-of-type {
-        font-size: 13px;
-        color: var(--theme-primary-text-color-dark);
+      .table-container dt:first-of-type,
+      .table-container dd:first-of-type {
+        font-weight: bold;
       }
 
-      .tab-header dd::after {
+      .table-container dd::after {
         content: '\A';
 	      white-space: pre;
-      }
-
-      .table-container {
-        max-height: 500px;
-        overflow: auto;
       }
 
       .location {
@@ -134,14 +135,32 @@
     </etools-prp-ajax>
 
     <template is="dom-if" if="[[!loading]]">
+      <div>
+      <template
+          is="dom-if"
+          if="[[reportIsNonClusterQpr]]">
+        <div class="tab-header layout horizontal justified">
+          <div class="self-center">For this cluster indicator data can be pulled from reports matching this reporting period</div>
+          <div>
+            <paper-button
+                class="btn-primary"
+                modal-index="[[indicatorId]]"
+                on-tap="_openPullModal">
+              Pull Data
+            </paper-button>
+          </div>
+        </div>
+      </template>
+      </div>
+      <div class="header layout horizontal justified">
       <h3 class="locations-heading">Data for locations</h3>
-
+        <div class="layout horizontal">
       <etools-prp-printer selector=".printme">
         <paper-icon-button
             class="print-btn"
             icon="icons:print">
         </paper-icon-button>
-      </etools-prp-printer>
+      </etools-prp-printer></div></div>
 
       <div hidden aria-hidden="true">
         <template
@@ -178,147 +197,180 @@
 
       <paper-tabs
           selected="{{selected}}"
-          fallback-selection="location-[[disaggregations.indicator_location_data.0.location.id]]"
-          attr-for-selected="name"
+          hide-scroll-buttons
           scrollable>
         <template
             is="dom-repeat"
-            items="[[disaggregations.indicator_location_data]]"
-            as="location">
-          <paper-tab name="location-[[location.location.id]]">
-            <status-badge type="[[_computeLocationStatus(location)]]"></status-badge>
-            [[location.location.title]]
+            items="[[locationData]]"
+            as="topLevelLocation">
+          <paper-tab>
+            <status-badge type="[[_computeLocationStatus(topLevelLocation)]]"></status-badge>
+            [[topLevelLocation.title]]
           </paper-tab>
         </template>
       </paper-tabs>
 
-      <iron-pages
-          attr-for-selected="name"
-          selected="{{selected}}">
+      <iron-pages selected="{{selected}}">
         <template
             is="dom-repeat"
-            items="[[disaggregations.indicator_location_data]]"
-            as="location">
-          <div name="location-[[location.location.id]]">
-            <div class="tab-header layout horizontal justified">
-              <dl>
-                <template
-                    is="dom-if"
-                    if="[[_equals(location.display_type, 'number')]]"
-                    restamp="true">
-                  <dt>Location progress:</dt>
-                  <dd>
-                    <etools-prp-number value="[[location.location_progress.v]]"></etools-prp-number>
-                  </dd>
-                  <dt>Previous location progress:</dt>
-                  <dd>
-                    <etools-prp-number value="[[location.previous_location_progress.v]]"></etools-prp-number>
-                  </dd>
-                </template>
-                <template
-                    is="dom-if"
-                    if="[[!_equals(location.display_type, 'number')]]"
-                    restamp="true">
-                  <dt>Location progress:</dt>
-                  <dd>[[_toPercentage(location.location_progress.c)]]</dd>
-                  <dt>Previous location progress:</dt>
-                  <dd>[[_toPercentage(location.previous_location_progress.c)]]</dd>
-                </template>
-              </dl>
-              <div>
-                <template
-                    is="dom-if"
-                    if="[[!_equals(computedMode, 'view')]]">
+            items="[[locationData]]"
+            as="topLevelLocation"
+            index-as="topLevelLocationIndex">
+          <div>
+
+            <template
+                is="dom-if"
+                if="[[!_equals(computedMode, 'view')]]">
+              <div class="tab-header layout horizontal justified">
+                <div class="self-center">Enter data for this location</div>
+                <div>
                   <paper-button
                       class="btn-primary"
-                      modal-index="[[index]]"
+                      modal-index="[[topLevelLocationIndex]]"
                       on-tap="_openModal"
                       raised>
                     Enter data
                   </paper-button>
-                </template>
-              </div>
-            </div>
-
-            <div class="table-container app-grid">
-              <div class="item">
-                <div hidden aria-hidden="true">
-                  <dl class="printme">
-                    <dt style="display: inline;">Location:</dt>
-                    <dd style="display: inline; margin: 0;">[[location.location.title]]</dd>
-                  </dl>
                 </div>
+            </div>
+          </template>
 
-                <disaggregation-table
-                    class="printme"
-                    data="[[location]]"
-                    mapping="[[disaggregations.disagg_lookup_map]]"
-                    labels="[[disaggregations.labels]]">
-                </disaggregation-table>
+
+            <paper-tabs
+                selected="{{topLevelLocation.selected}}"
+                hide-scroll-buttons
+                scrollable>
+              <template
+                  is="dom-repeat"
+                  items="[[topLevelLocation.byEntity]]"
+                  as="location">
+                <paper-tab>[[location.reporting_entity.title]]</paper-tab>
+              </template>
+            </paper-tabs>
+
+            <iron-pages selected="{{topLevelLocation.selected}}">
+              <template
+                  is="dom-repeat"
+                  items="[[topLevelLocation.byEntity]]"
+                  as="location">
+                <div>
+                  <div class="table-container app-grid">
+                    <div class="item">
+                      <div hidden aria-hidden="true">
+                        <dl class="printme">
+                          <dt style="display: inline;">Location:</dt>
+                          <dd style="display: inline; margin: 0;">[[location.location.title]] - [[location.reporting_entity.title]]</dd>
+                        </dl>
+                      </div>
+
+                      <dl>
+                        <template
+                            is="dom-if"
+                            if="[[_equals(location.display_type, 'number')]]"
+                            restamp="true">
+                          <dt>Location progress against [[location.reporting_entity.title]] target:</dt>
+                          <dd>
+                            <etools-prp-number value="[[location.location_progress.v]]"></etools-prp-number>
+                          </dd>
+                          <dt>Previous location progress:</dt>
+                          <dd>
+                            <etools-prp-number value="[[location.previous_location_progress.v]]"></etools-prp-number>
+                          </dd>
+                        </template>
+                        <template
+                            is="dom-if"
+                            if="[[!_equals(location.display_type, 'number')]]"
+                            restamp="true">
+                          <dt>Location progress:</dt>
+                          <dd>[[_toPercentage(location.location_progress.c)]]</dd>
+                          <dt>Previous location progress:</dt>
+                          <dd>[[_toPercentage(location.previous_location_progress.c)]]</dd>
+                        </template>
+                      </dl>
+
+                      <disaggregation-table
+                          class="printme"
+                          data="[[location]]"
+                          mapping="[[disaggregations.disagg_lookup_map]]"
+                          labels="[[disaggregations.labels]]">
+                      </disaggregation-table>
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </iron-pages>
+
+            <template
+                is="dom-if"
+                if="[[!_equals(computedMode, 'view')]]">
+              <disaggregation-modal
+                  id="modal-[[topLevelLocationIndex]]"
+                  reporting-period="[[reportingPeriod]]"
+                  on-opened-changed="_updateModals">
+                <div class="meta layout horizontal justified">
+                  <div>
+                    <h3>[[indicatorName]]</h3>
+                    <p class="location">
+                      <iron-icon icon="maps:place"></iron-icon>
+                      [[topLevelLocation.title]]
+                    </p>
+                    <template
+                        is="dom-if"
+                        if="[[hasPD]]"
+                        restamp="true">
+                      <p class="current-pd">
+                        [[currentPD.agreement]] | [[currentPD.title]]
+                      </p>
+                    </template>
+                  </div>
+                  <div class="layout vertical end-justified">
+                    <dl class="location-progress">
+                      <dt>Location progress</dt>
+                      <dd>
+                        <template
+                            is="dom-if"
+                            if="[[_equals(topLevelLocation.byEntity.0.display_type, 'number')]]"
+                            restamp="true">
+                          <etools-prp-number value="[[topLevelLocation.byEntity.0.location_progress.v]]"></etools-prp-number>
+                        </template>
+                        <template
+                            is="dom-if"
+                            if="[[!_equals(topLevelLocation.byEntity.0.display_type, 'number')]]"
+                            restamp="true">
+                          <span>[[_toPercentage(topLevelLocation.byEntity.0.location_progress.c)]]</span>
+                        </template>
+                      </dd>
+                    </dl>
+                  </div>
+                </div>
 
                 <template
                     is="dom-if"
-                    if="[[!_equals(computedMode, 'view')]]">
-                  <disaggregation-modal
-                      id="modal-[[index]]"
-                      reporting-period="[[reportingPeriod]]"
-                      on-opened-changed="_updateModals">
-                    <div class="meta layout horizontal justified">
-                      <div>
-                        <h3>[[indicatorName]]</h3>
-                        <p class="location">
-                          <iron-icon icon="maps:place"></iron-icon>
-                          [[location.location.title]]
-                        </p>
-                        <template
-                            is="dom-if"
-                            if="[[hasPD]]"
-                            restamp="true">
-                          <p class="current-pd">
-                            [[currentPD.agreement]] | [[currentPD.title]]
-                          </p>
-                        </template>
-                      </div>
-                      <div class="layout vertical end-justified">
-                        <dl class="location-progress">
-                          <dt>Location progress</dt>
-                          <dd>
-                            <template
-                                is="dom-if"
-                                if="[[_equals(location.display_type, 'number')]]"
-                                restamp="true">
-                              <etools-prp-number value="[[location.location_progress.v]]"></etools-prp-number>
-                            </template>
-                            <template
-                                is="dom-if"
-                                if="[[!_equals(location.display_type, 'number')]]"
-                                restamp="true">
-                              <span>[[_toPercentage(location.location_progress.c)]]</span>
-                            </template>
-                          </dd>
-                        </dl>
-                      </div>
-                    </div>
-                    <template
-                        is="dom-if"
-                        if="[[_computeTableVisibility(opened, index)]]"
-                        restamp="true">
-                      <disaggregation-table
-                          data="[[location]]"
-                          mapping="[[disaggregations.disagg_lookup_map]]"
-                          labels="[[disaggregations.labels]]"
-                          indicator-id="[[indicatorId]]"
-                          editable="1">
-                      </disaggregation-table>
-                    </template>
-                  </disaggregation-modal>
+                    if="[[_computeTableVisibility(opened, topLevelLocationIndex)]]"
+                    restamp="true">
+                  <disaggregation-table
+                      data="[[topLevelLocation.byEntity.0]]"
+                      by-entity="[[topLevelLocation.byEntity]]"
+                      mapping="[[disaggregations.disagg_lookup_map]]"
+                      labels="[[disaggregations.labels]]"
+                      indicator-id="[[indicatorId]]"
+                      editable="1">
+                  </disaggregation-table>
                 </template>
-              </div>
-            </div>
+              </disaggregation-modal>
+            </template>
           </div>
         </template>
       </iron-pages>
     </template>
+
+  <pull-modal
+    id="pull-modal-[[indicatorId]]"
+    indicator-name="[[indicatorName]]"
+    reporting-period="[[reportingPeriod]]"
+    indicator-id="[[indicatorId]]"
+    report-id="[[reportId]]">
+  </pull-modal>
 
     <etools-loading active="[[loading]]"></etools-loading>
   </template>
@@ -342,6 +394,10 @@
         reportType: String,
 
         reportableId: Number,
+
+        reportId: {
+          type: String,
+        },
 
         reportingPeriod: String,
 
@@ -392,6 +448,11 @@
           computed: '_computeDisaggregations(data, indicatorId)',
         },
 
+        locationData: {
+          type: Array,
+          computed: '_computeLocationData(disaggregations.indicator_location_data)',
+        },
+
         mode: {
           type: String,
           value: '',
@@ -407,15 +468,29 @@
           type: String,
           computed: '_computeMode(mode, overrideMode)',
         },
+
+        reportIsNonClusterQpr: {
+          type: Boolean,
+        },
       },
 
       listeners: {
         'location-updated': '_onLocationUpdated',
       },
 
+      _fetchData: function () {
+        var disaggregationsThunk = this.$.disaggregations.thunk();
+
+        // Cancel the pending request, if any
+        this.$.disaggregations.abort();
+
+        return this.dispatch(
+          App.Actions.Disaggregations.fetch(disaggregationsThunk, this.indicatorId)
+        );
+      },
+
       init: function () {
         var self = this;
-        var disaggregationsThunk;
 
         if (this.initialized) {
           return;
@@ -423,14 +498,7 @@
 
         this.set('initialized', true);
 
-        disaggregationsThunk = this.$.disaggregations.thunk();
-
-        // Cancel the pending request, if any
-        this.$.disaggregations.abort();
-
-        this.dispatch(
-          App.Actions.Disaggregations.fetch(disaggregationsThunk, this.indicatorId)
-        )
+        this._fetchData()
             .then(function () {
               self.set('loading', false);
             })
@@ -462,6 +530,10 @@
         this.$$('#modal-' + e.target.modalIndex).open();
       },
 
+      _openPullModal: function (e) {
+        this.$$('#pull-modal-' + e.target.modalIndex).open();
+      },
+
       _updateModals: function (e, data) {
         var id = e.target.id;
         var change;
@@ -482,7 +554,7 @@
       },
 
       _computeLocationStatus: function (location) {
-        return location.is_complete ? 'success' : 'error';
+        return location.byEntity[0].is_complete ? 'success' : 'error';
       },
 
       _computeHasPD: function (currentPD) {
@@ -491,6 +563,8 @@
 
       _onLocationUpdated: function (e) {
         e.stopPropagation();
+
+        this._fetchData();
 
         this.fire('refresh-report', this.indicatorId);
 
@@ -507,6 +581,39 @@
           indicatorId: this.indicatorId,
           reportableId: this.reportableId,
         });
+      },
+
+      _computeLocationData: function (rawLocationData) {
+        var byLocation = (rawLocationData || [])
+            .reduce(function (acc, location) {
+              var locationId = location.location.id;
+
+              if (typeof acc[locationId] === 'undefined') {
+                acc[locationId] = {
+                  title: location.location.title,
+                  byEntity: [],
+                  selected: 0,
+                };
+              }
+
+              acc[locationId].byEntity.push(location);
+              if (acc[locationId].byEntity.length >= 2) {
+                acc[locationId].selected = acc[locationId].byEntity.length - 1;
+              }
+              return acc;
+            }, {});
+
+        return Object.keys(byLocation)
+            .map(function(key) {
+              return byLocation[key];
+            })
+            .sort(function (a, b) {
+              return b.is_master_location_data - a.is_master_location_data;
+            });
+      },
+
+      _isDualReportingEnabled: function (entities) {
+        return entities.length > 1;
       },
 
       attached: function () {

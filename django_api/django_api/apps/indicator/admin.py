@@ -8,6 +8,7 @@ from .models import (
     IndicatorLocationData,
     Disaggregation,
     DisaggregationValue,
+    ReportingEntity,
 )
 
 
@@ -66,9 +67,15 @@ class DisaggregationValueAdmin(admin.ModelAdmin):
     search_fields = ('value',)
 
 
+class ReportingEntityAdmin(admin.ModelAdmin):
+    list_display = ('title',)
+    search_fields = ('title',)
+
+
 admin.site.register(IndicatorBlueprint, IndicatorBlueprintAdmin)
 admin.site.register(Reportable, ReportableAdmin)
 admin.site.register(IndicatorReport, IndicatorReportAdmin)
 admin.site.register(IndicatorLocationData, IndicatorLocationDataAdmin)
 admin.site.register(Disaggregation, DisaggregationAdmin)
 admin.site.register(DisaggregationValue, DisaggregationValueAdmin)
+admin.site.register(ReportingEntity, ReportingEntityAdmin)

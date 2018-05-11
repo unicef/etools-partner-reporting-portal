@@ -10,6 +10,9 @@ from rest_framework.exceptions import ValidationError
 from core.api import PMP_API
 from core.models import Workspace, GatewayType, Location, PartnerAuthorizedOfficerRole
 from core.serializers import PMPGatewayTypeSerializer, PMPLocationSerializer
+from core.common import PARTNER_ACTIVITY_STATUS
+
+from partner.models import PartnerActivity
 
 from unicef.serializers import PMPProgrammeDocumentSerializer, PMPPDPartnerSerializer, PMPPDPersonSerializer, \
     PMPLLOSerializer, PMPPDResultLinkSerializer, PMPSectionSerializer, PMPReportingPeriodDatesSerializer
@@ -23,6 +26,7 @@ from indicator.models import (
     Reportable,
     DisaggregationValue,
     ReportableLocationGoal,
+    create_pa_reportables_from_ca,
 )
 
 from partner.models import Partner
@@ -377,6 +381,53 @@ def process_programme_documents(fast=False, area=False):
                                         {'external_id': i['id']}
                                     )
                                     reportable.active = True
+
+                                    # TODO: Update the PMP PD indicator data field
+                                    # for ca_indicator_used_by_reporting_entity
+
+                                    # Associate this LLO Reportable with ClusterActivity Reportable
+                                    # for dual reporting
+                                    if 'cai_prp_id' in i and i['cai_prp_id'] is not None:
+                                        try:
+                                            cai = Reportable.objects.get(id=int(i['cai_prp_id']))
+                                            reportable.ca_indicator_used_by_reporting_entity = cai
+
+                                            # Force adoption of PartnerActivity from ClusterActivity Indicator
+                                            if pd.partner.id not in cai.partner_activities.values_list(
+                                                    'partner', flat=True):
+                                                try:
+                                                    # TODO: Figure out what to put for
+                                                    # project, start_date, end_date, and status
+                                                    partner_activity = PartnerActivity.objects.create(
+                                                        title=cai.title,
+                                                        project=pd.partner.partner_projects.first(),
+                                                        partner=pd.partner,
+                                                        cluster_activity=cai,
+                                                        start_date=cai.response_plan.start,
+                                                        end_date=cai.response_plan.end,
+                                                        status=PARTNER_ACTIVITY_STATUS.ongoing,
+                                                    )
+                                                except Exception as e:
+                                                    print(
+                                                        "Cannot associate PartnerActivity to ClusterActivity "
+                                                        "for dual reporting - skipping link!"
+                                                    )
+
+                                                # Grab Cluster Activity instance from
+                                                # this newly created Partner Activity instance
+                                                create_pa_reportables_from_ca(partner_activity, cai)
+
+                                        except Reportable.DoesNotExist:
+                                            print(
+                                                "No ClusterActivity Reportable found "
+                                                "for dual reporting - skipping link!"
+                                            )
+                                        except Exception:
+                                            print(
+                                                "Invalid ClusterActivity Reportable ID "
+                                                "for dual reporting - skipping link!"
+                                            )
+
                                     reportable.save()
 
                                     rlgs = ReportableLocationGoal.objects.filter(reportable=reportable)
@@ -404,6 +455,24 @@ def process_programme_documents(fast=False, area=False):
                                         ]
 
                                     ReportableLocationGoal.objects.bulk_create(reportable_location_goals)
+
+                                    # Force update on PA Reportable instance for location update
+                                    for pa_reportable in partner_activity.reportables.all():
+                                        llo_locations = reportable.locations.values_list('id', flat=True)
+                                        pai_locations = pa_reportable.locations.values_list('id', flat=True)
+                                        loc_diff = pai_locations.exclude(id__in=llo_locations)
+
+                                        # Add new locations from LLO Reportable to PA Reportable
+                                        if loc_diff.exists():
+                                            # Creating M2M Through model instances
+                                            reportable_location_goals = [
+                                                ReportableLocationGoal(
+                                                    reportable=reportable,
+                                                    location=l,
+                                                ) for l in loc_diff
+                                            ]
+
+                                            ReportableLocationGoal.objects.bulk_create(reportable_location_goals)
 
                     # Check if another page exists
                     if list_data['next']:

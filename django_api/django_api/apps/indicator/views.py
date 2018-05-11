@@ -421,6 +421,9 @@ class IndicatorDataAPIView(APIView):
                 ir.report_status = INDICATOR_REPORT_STATUS.accepted
                 ir.save()
 
+            # IndicatorLocationData lock marking
+            IndicatorLocationData.objects.filter(indicator_report=ir).update(is_locked=True)
+
             serializer = PDReportContextIndicatorReportSerializer(instance=ir)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
@@ -518,8 +521,14 @@ class IndicatorReportListAPIView(APIView):
         return indicator_reports
 
     def get(self, request, *args, **kwargs):
+        pd_id_for_locations = int(self.request.query_params.get('pd_id_for_locations', '-1'))
+
         indicator_reports = self.get_queryset()
-        serializer = IndicatorReportListSerializer(indicator_reports, many=True)
+        serializer = IndicatorReportListSerializer(
+            indicator_reports,
+            many=True,
+            context={'pd_id_for_locations': pd_id_for_locations}
+        )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -595,6 +604,20 @@ class IndicatorLocationDataUpdateAPIView(APIView):
 
         if blueprint.unit == IndicatorBlueprint.PERCENTAGE:
             RatioIndicatorDisaggregator.post_process(indicator_location_data)
+
+        # Re-calculating the child IR's ILD instance if exists
+        if indicator_location_data.indicator_report.children.exists():
+            # Grab LLO Reportable's indicator reports from parent-child
+            ild = IndicatorLocationData.objects.get(
+                indicator_report=indicator_location_data.indicator_report.children.first(),
+                location=indicator_location_data.location,
+            )
+
+            if ild.indicator_report.reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
+                QuantityIndicatorDisaggregator.post_process(ild)
+
+            if ild.indicator_report.reportable.blueprint.unit == IndicatorBlueprint.PERCENTAGE:
+                RatioIndicatorDisaggregator.post_process(ild)
 
         serializer.data['disaggregation'] = indicator_location_data.disaggregation
 
