@@ -387,9 +387,9 @@ def process_programme_documents(fast=False, area=False):
 
                                     # Associate this LLO Reportable with ClusterActivity Reportable
                                     # for dual reporting
-                                    if 'cai_prp_id' in i and i['cai_prp_id'] is not None:
+                                    if 'cluster_indicator_id' in i and i['cluster_indicator_id'] is not None:
                                         try:
-                                            cai = Reportable.objects.get(id=int(i['cai_prp_id']))
+                                            cai = Reportable.objects.get(id=int(i['cluster_indicator_id']))
                                             reportable.ca_indicator_used_by_reporting_entity = cai
 
                                             # Force adoption of PartnerActivity from ClusterActivity Indicator
