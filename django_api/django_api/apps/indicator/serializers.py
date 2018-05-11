@@ -892,6 +892,7 @@ class PDReportContextIndicatorReportSerializer(serializers.ModelSerializer):
     overall_status_display = serializers.CharField(source='get_overall_status_display')
     parent_ir_id = serializers.SerializerMethodField()
     child_ir_ids = serializers.SerializerMethodField()
+    is_related_to_cluster_reporting = serializers.SerializerMethodField()
 
     class Meta:
         model = IndicatorReport
@@ -915,7 +916,11 @@ class PDReportContextIndicatorReportSerializer(serializers.ModelSerializer):
             'is_complete',
             'parent_ir_id',
             'child_ir_ids',
+            'is_related_to_cluster_reporting',
         )
+
+    def get_is_related_to_cluster_reporting(self, obj):
+        return True if obj.reportable.ca_indicator_used_by_reporting_entity else False
 
     def get_parent_ir_id(self, obj):
         return obj.parent.id if obj.parent else None

@@ -238,7 +238,7 @@
             on-opened-changed="_handleOpenedChanged"
             no-animation>
           <indicator-details
-              report-is-qpr="[[reportIsQpr]]"
+              report-is-non-cluster-qpr="[[_computeReportIsNonClusterQpr(currentReport, indicator)]]"
               reportable-id="[[data.id]]"
               indicator-name="[[indicator.reportable.blueprint.title]]"
               indicator-id="[[_computeIndicatorId(indicator)]]"
@@ -330,12 +330,6 @@
         workspaceId: {
           type: String,
         },
-
-        reportIsQpr: {
-          type: Boolean,
-          computed: '_computeIsReportQpr(currentReport)',
-          observer: '_log',
-        },
       },
 
       listeners: {
@@ -371,9 +365,9 @@
               );
       },
 
-      _computeIsReportQpr: function (currentReport) {
-        if (currentReport) {
-        return String(currentReport.report_type) === String('QPR');
+      _computeReportIsNonClusterQpr: function (currentReport, indicator) {
+        if (currentReport && indicator) {
+          return String(currentReport.report_type) === String('QPR') && !indicator.is_related_to_cluster_reporting;
         }
       },
 
