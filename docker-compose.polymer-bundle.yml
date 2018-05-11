@@ -28,7 +28,7 @@ services:
       - './django_api:/code/'
       - './data/django_api_logs:/data/django_api/logs'
       - './data/django_api_uploads_unicef_progress_reports:/data/django_api/uploads/unicef/progress_reports'
-    command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 && python /code/manage.py makemigrations --merge --noinput && python /code/manage.py migrate && python /code/manage.py loaddata sites && python manage.py collectstatic --noinput && uwsgi --ini /code/django_api/uwsgi.ini"
+    command: bash -c "/usr/local/bin/waitforit -host=db -port=5432 && python /code/manage.py makemigrations --merge --noinput && python /code/manage.py loaddata sites && python /code/manage.py loaddata reporting_entities && python /code/manage.py migrate && python manage.py collectstatic --noinput && uwsgi --ini /code/django_api/uwsgi.ini"
     depends_on:
       - db
 

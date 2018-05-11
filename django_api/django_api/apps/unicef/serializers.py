@@ -9,6 +9,7 @@ from .models import ProgrammeDocument, Section, ProgressReport, Person, \
 from core.common import PROGRESS_REPORT_STATUS, OVERALL_STATUS, CURRENCIES, PD_STATUS
 from core.models import Workspace, Location
 
+from indicator.models import IndicatorBlueprint
 from indicator.serializers import (
     PDReportContextIndicatorReportSerializer,
     IndicatorBlueprintSimpleSerializer,
@@ -369,6 +370,48 @@ class ProgressReportSRUpdateSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'narrative',
+        )
+
+
+class ProgressReportPullHFDataSerializer(serializers.ModelSerializer):
+    report_name = serializers.SerializerMethodField()
+    report_location_total = serializers.SerializerMethodField()
+
+    def get_report_location_total(self, obj):
+        indicator_report = self.context['indicator_report']
+
+        target_hf_irs = obj.indicator_reports.filter(
+            time_period_start__gte=obj.start_date,
+            time_period_end__lte=obj.end_date,
+            reportable=indicator_report.reportable,
+        )
+
+        calculated = {'c': 0, 'v': 0, 'd': 0}
+
+        for ir in target_hf_irs:
+            calculated['c'] += ir.total['c']
+            calculated['v'] += ir.total['v']
+
+            if indicator_report.reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
+                calculated['d'] = 1
+
+            else:
+                calculated['d'] += ir.total['d']
+
+        return calculated
+
+    def get_report_name(self, obj):
+        return obj.report_type + str(obj.report_number)
+
+    class Meta:
+        model = ProgressReport
+        fields = (
+            'id',
+            'report_name',
+            'start_date',
+            'end_date',
+            'due_date',
+            'report_location_total',
         )
 
 

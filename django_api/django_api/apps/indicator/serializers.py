@@ -1,4 +1,5 @@
 from ast import literal_eval as make_tuple
+import copy
 from collections import defaultdict, OrderedDict
 
 from django.conf import settings
@@ -10,7 +11,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from ocha.imports.serializers import DiscardUniqueTogetherValidationMixin
-from unicef.models import LowerLevelOutput
+from unicef.models import LowerLevelOutput, ProgressReport
 from partner.models import PartnerProject, PartnerActivity
 from cluster.models import ClusterObjective, ClusterActivity
 
@@ -30,6 +31,7 @@ from .models import (
     IndicatorReport, IndicatorLocationData,
     Disaggregation, DisaggregationValue,
     ReportableLocationGoal,
+    ReportingEntity,
     create_pa_reportables_for_new_ca_reportable,
 )
 
@@ -445,6 +447,15 @@ class OverallNarrativeSerializer(serializers.ModelSerializer):
         return overall_status
 
 
+class ReportingEntitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReportingEntity
+        fields = (
+            'id',
+            'title',
+        )
+
+
 class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
 
     location = LocationSerializer(read_only=True)
@@ -453,6 +464,9 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
     previous_location_progress = serializers.SerializerMethodField()
     display_type = serializers.SerializerMethodField()
     is_complete = serializers.BooleanField(read_only=True)
+    is_locked = serializers.BooleanField(read_only=True)
+    is_master_location_data = serializers.BooleanField(read_only=True, source="indicator_report.children.exists")
+    reporting_entity = ReportingEntitySerializer(source="indicator_report.reporting_entity")
 
     def get_display_type(self, obj):
         return obj.indicator_report.display_type
@@ -490,12 +504,19 @@ class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
             'location_progress',
             'previous_location_progress',
             'is_complete',
+            'is_locked',
+            'is_master_location_data',
+            'reporting_entity',
+            'percentage_allocated',
         )
 
 
 class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
 
     disaggregation = serializers.JSONField()
+    reporting_entity_percentage_map = serializers.JSONField(
+        required=False,
+    )
 
     class Meta:
         model = IndicatorLocationData
@@ -507,6 +528,7 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
             'level_reported',
             'disaggregation_reported_on',
             'is_complete',
+            'reporting_entity_percentage_map',
         )
 
     def validate(self, data):
@@ -641,12 +663,71 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
                 + "all level %d combination pair keys" % (data['level_reported'])
             )
 
+        if data['indicator_report'].parent:
+            raise serializers.ValidationError(
+                "This IndicatorLocationData cannot be updated for dual-reporting: "
+                "Use Cluster reporting entity IndicatorLocationData instance"
+            )
+
+        # Reporting entity & Percentage pair validation
+        if "reporting_entity_percentage_map" in data and data["reporting_entity_percentage_map"]:
+            map_list = data["reporting_entity_percentage_map"]
+
+            if not isinstance(map_list, list) \
+                    or not all(map(lambda x: isinstance(x, dict), map_list)):
+                raise serializers.ValidationError(
+                    {"reporting_entity_percentage_map": {"The field should be a list of dictionaries"}}
+                )
+
+            if not all(map(lambda x: x, map_list)):
+                raise serializers.ValidationError(
+                    {"reporting_entity_percentage_map": {"The field should be a list of non-empty dictionaries"}}
+                )
+
+            if not all(map(lambda x: "title" in x and "percentage" in x, map_list)):
+                raise serializers.ValidationError(
+                    {"reporting_entity_percentage_map": {"Each dictionary should have 'title' and 'percentage' key"}}
+                )
+
+            if any(map(lambda x: x["percentage"] > 1 or float(x["percentage"]) < 0, map_list)):
+                raise serializers.ValidationError(
+                    {"reporting_entity_percentage_map": {"Each dictionary should 'percentage' value between 0 to 1"}}
+                )
+
+            # Data split begins for dual reporting if IndicatorLocationData belongs to
+            # IndicatorReport that has children
+            if data['indicator_report'].children.exists():
+                # Grab LLO Reportable's indicator reports from parent-child
+                ild = IndicatorLocationData.objects.get(
+                    indicator_report=data['indicator_report'].children.first(),
+                    location=self.instance.location,
+                )
+
+                split_data = {}
+                disagg_data_copy = copy.deepcopy(data['disaggregation'])
+
+                for entity in map_list:
+                    split_data[entity['title']] = {}
+
+                    if entity['title'] == "UNICEF":
+                        ild.percentage_allocated = float(entity['percentage'])
+
+                    for key, val in disagg_data_copy.items():
+                        for val_key in val:
+                            if val[val_key]:
+                                val[val_key] *= float(entity['percentage'])
+
+                        split_data[entity['title']][key] = val
+
+                ild.disaggregation = split_data['UNICEF']
+                ild.level_reported = data['level_reported']
+                ild.save()
+
         return data
 
 
 class IndicatorReportListSerializer(serializers.ModelSerializer):
-    indicator_location_data = SimpleIndicatorLocationDataListSerializer(
-        many=True, read_only=True)
+    indicator_location_data = serializers.SerializerMethodField()
     disagg_lookup_map = serializers.SerializerMethodField()
     disagg_choice_lookup_map = serializers.SerializerMethodField()
     total = serializers.JSONField()
@@ -654,6 +735,9 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
     overall_status_display = serializers.CharField(
         source='get_overall_status_display')
     labels = serializers.SerializerMethodField()
+    parent_ir_id = serializers.SerializerMethodField()
+    child_ir_ids = serializers.SerializerMethodField()
+    has_high_frequency_reports = serializers.SerializerMethodField()
 
     class Meta:
         model = IndicatorReport
@@ -675,7 +759,62 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
             'overall_status_display',
             'narrative_assessment',
             'labels',
+            'parent_ir_id',
+            'child_ir_ids',
+            'has_high_frequency_reports',
         )
+
+    def get_has_high_frequency_reports(self, obj):
+        # No HF report indicator for Cluster IndicatorReport
+        if not obj.progress_report:
+            return False
+
+        pr = obj.progress_report
+
+        hf_reports = ProgressReport.objects.filter(
+            programme_document=pr.programme_document,
+            report_type="HR",
+            start_date__gte=pr.start_date,
+            end_date__lte=pr.end_date,
+        )
+
+        return True if pr.report_type == "QPR" and hf_reports.exists() else False
+
+    def get_parent_ir_id(self, obj):
+        return obj.parent.id if obj.parent else None
+
+    def get_child_ir_ids(self, obj):
+        return obj.children.values_list('id', flat=True) if obj.children.exists() else None
+
+    def get_indicator_location_data(self, obj):
+        if 'pd_id_for_locations' in self.context:
+            pd_id_for_locations = self.context['pd_id_for_locations']
+
+        else:
+            pd_id_for_locations = -1
+
+        objects = list(obj.indicator_location_data.all())
+
+        child_ir_ild_ids = obj.children.values_list('indicator_location_data', flat=True)
+
+        if child_ir_ild_ids.exists() and pd_id_for_locations != -1:
+            child_ir_ild_ids = child_ir_ild_ids.filter(
+                reporting_entity__title="UNICEF",
+                reportable__lower_level_outputs__cp_output__programme_document_id=pd_id_for_locations,
+            )
+
+        child_ilds = IndicatorLocationData.objects.filter(
+            id__in=child_ir_ild_ids,
+        )
+
+        if obj.children.exists():
+            objects.extend(list(child_ilds))
+
+        return SimpleIndicatorLocationDataListSerializer(
+            objects,
+            many=True,
+            read_only=True
+        ).data
 
     def get_labels(self, obj):
         return {
@@ -751,6 +890,9 @@ class PDReportContextIndicatorReportSerializer(serializers.ModelSerializer):
     reportable = ReportableSimpleSerializer()
     report_status_display = serializers.CharField(source='get_report_status_display')
     overall_status_display = serializers.CharField(source='get_overall_status_display')
+    parent_ir_id = serializers.SerializerMethodField()
+    child_ir_ids = serializers.SerializerMethodField()
+    is_related_to_cluster_reporting = serializers.SerializerMethodField()
 
     class Meta:
         model = IndicatorReport
@@ -772,7 +914,19 @@ class PDReportContextIndicatorReportSerializer(serializers.ModelSerializer):
             'overall_status_display',
             'narrative_assessment',
             'is_complete',
+            'parent_ir_id',
+            'child_ir_ids',
+            'is_related_to_cluster_reporting',
         )
+
+    def get_is_related_to_cluster_reporting(self, obj):
+        return True if obj.reportable.ca_indicator_used_by_reporting_entity else False
+
+    def get_parent_ir_id(self, obj):
+        return obj.parent.id if obj.parent else None
+
+    def get_child_ir_ids(self, obj):
+        return obj.children.values_list('id', flat=True) if obj.children.exists() else None
 
     def get_id(self, obj):
         return str(obj.id)
@@ -1199,6 +1353,8 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
     cluster_activity = serializers.SerializerMethodField()
     is_draft = serializers.SerializerMethodField()
     can_submit = serializers.SerializerMethodField()
+    parent_ir_id = serializers.SerializerMethodField()
+    child_ir_ids = serializers.SerializerMethodField()
 
     class Meta:
         model = IndicatorReport
@@ -1231,7 +1387,15 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
             'time_period_start',
             'time_period_end',
             'is_complete',
+            'parent_ir_id',
+            'child_ir_ids',
         )
+
+    def get_parent_ir_id(self, obj):
+        return obj.parent.id if obj.parent else None
+
+    def get_child_ir_ids(self, obj):
+        return obj.children.values_list('id', flat=True) if obj.children.exists() else None
 
     def get_indicator_name(self, obj):
         return obj.reportable.blueprint.title
