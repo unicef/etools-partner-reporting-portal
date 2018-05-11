@@ -367,7 +367,8 @@
 
       _computeReportIsNonClusterQpr: function (currentReport, indicator) {
         if (currentReport && indicator) {
-          return String(currentReport.report_type) === String('QPR') && !indicator.is_related_to_cluster_reporting;
+          return String(currentReport.report_type) === String('QPR') &&
+                 !indicator.is_related_to_cluster_reporting;
         }
       },
 
