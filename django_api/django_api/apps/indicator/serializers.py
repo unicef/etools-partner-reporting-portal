@@ -301,6 +301,20 @@ class IndicatorListSerializer(ReportableSimpleSerializer):
     cluster = serializers.SerializerMethodField()
     total_against_in_need = serializers.SerializerMethodField()
     total_against_target = serializers.SerializerMethodField()
+    cluster_partner_indicator_reportable_id = serializers.SerializerMethodField()
+
+    def get_cluster_partner_indicator_reportable_id(self, obj):
+        if not obj.ca_indicator_used_by_reporting_entity:
+            return None
+
+        try:
+            pai = obj.ca_indicator_used_by_reporting_entity.children.get(
+                partner_activities__partner=obj.content_object.cp_output.programme_document.partner,
+            )
+
+            return pai.id
+        except Reportable.DoesNotExist:
+            return None
 
     def get_total_against_in_need(self, obj):
         return obj.calculated_target / obj.calculated_in_need \
@@ -346,6 +360,8 @@ class IndicatorListSerializer(ReportableSimpleSerializer):
             'parent_indicator',
             'total_against_in_need',
             'total_against_target',
+            'ca_indicator_used_by_reporting_entity',
+            'cluster_partner_indicator_reportable_id',
         )
 
 
