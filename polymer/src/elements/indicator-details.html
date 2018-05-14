@@ -435,7 +435,7 @@
 
         params: {
           type: Object,
-          computed: '_computeParams(indicatorId)',
+          computed: '_computeParams(indicatorId, currentPD)',
         },
 
         data: {
@@ -511,10 +511,11 @@
         return App.Endpoints.indicatorReports(reportableId);
       },
 
-      _computeParams: function (indicatorId) {
+      _computeParams: function (indicatorId, currentPD) {
         return {
           pks: indicatorId,
           limit: 1,
+          pd_id_for_locations: currentPD.id,
         };
       },
 
