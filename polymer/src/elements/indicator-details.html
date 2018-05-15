@@ -512,11 +512,16 @@
       },
 
       _computeParams: function (indicatorId, currentPD) {
-        return {
+        var params = {
           pks: indicatorId,
           limit: 1,
-          pd_id_for_locations: currentPD.id,
         };
+
+        if (currentPD.id !== undefined) {
+          params.pd_id_for_locations = currentPD.id;
+        }
+
+        return params;
       },
 
       _computeDisaggregations: function (data, key) {
