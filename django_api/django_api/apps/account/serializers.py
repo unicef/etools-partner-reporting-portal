@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from core.models import IMORole
+
 from cluster.models import Cluster
 from partner.serializers import PartnerDetailsSerializer
 from .models import User
@@ -26,10 +28,28 @@ class UserSerializer(serializers.ModelSerializer):
     imo_clusters = ClusterResponsePlanSerializer(read_only=True,
                                                  many=True)
     partner = PartnerDetailsSerializer(read_only=True)
+    access = serializers.SerializerMethodField()
+
+    def get_access(self, obj):
+        accesses = []
+        is_imo = obj.groups.filter(name=IMORole.as_group().name).exists()
+
+        # Cluster access check
+        if is_imo or (obj.partner and obj.partner.clusters.exists()):
+            accesses.append('cluster')
+
+        # IP access check
+        if obj.partner and obj.partner.programmedocument_set.exists():
+            accesses.append('ip')
+
+        return accesses
 
     class Meta:
         model = User
-        fields = ('id', 'email', 'first_name', 'last_name', 'profile',
-                  'groups', 'partner', 'organization', 'workspaces',
-                  'imo_clusters')
+        fields = (
+            'id', 'email', 'first_name',
+            'last_name', 'profile',
+            'groups', 'partner', 'organization',
+            'workspaces', 'imo_clusters', 'access'
+        )
         depth = 1
