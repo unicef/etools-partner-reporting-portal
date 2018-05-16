@@ -36,11 +36,11 @@ class UserSerializer(serializers.ModelSerializer):
 
         # Cluster access check
         if is_imo or (obj.partner and obj.partner.clusters.exists()):
-            accesses.append('cluster')
+            accesses.append('cluster-reporting')
 
         # IP access check
         if obj.partner and obj.partner.programmedocument_set.exists():
-            accesses.append('ip')
+            accesses.append('ip-reporting')
 
         return accesses
 
