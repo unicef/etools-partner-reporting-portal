@@ -45,7 +45,7 @@
       // structures them in "()" format for lookup.
       _formatDisaggregationIds: function (unsortedIds) {
         // IDs must be in ascending order.
-        var ids = unsortedIds.sort(function (a, b) {return a - b;}).reverse();
+        var ids = unsortedIds.sort(comparer);
         var sortedString = '';
 
         if (ids.length === 1) {
@@ -58,5 +58,8 @@
       },
     };
 
-}());
+    function comparer(a, b) {
+      return a - b;
+    }
+  }());
 </script>
