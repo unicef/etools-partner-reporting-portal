@@ -81,7 +81,8 @@
 
     <etools-prp-ajax
         id="indicatorDetail"
-        url="[[indicatorDetailUrl]]">
+        url="[[indicatorDetailUrl]]"
+        params="[[params]]">
     </etools-prp-ajax>
 
     <template is="dom-if" if="[[loading]]">
@@ -233,12 +234,45 @@
         locations: {
           type: Array,
           computed: '_bucketByLocation(data)'
-        }
+        },
+
+        appName: {
+          type: String,
+          statePath: 'app.current',
+        },
+
+        isClusterApp: {
+          type: Boolean,
+          computed: '_computeIsClusterApp(appName)',
+        },
+
+        params: {
+          type: Object,
+          computed: '_computeParams(isClusterApp)',
+        },
       },
 
       observers: [
         '_getDataByKey(dataDict)'
       ],
+
+      _computeParams: function (isClusterApp) {
+        var params = {};
+
+        if (isClusterApp === true) {
+          params = Object.assign({}, params, {
+            hide_children: 1,
+          });
+        }
+
+        console.log(isClusterApp, params);
+
+        return params;
+      },
+
+      _computeIsClusterApp: function(appName) {
+        return appName === 'cluster-reporting';
+      },
 
       _computeIndicatorReportsUrl: function (indicator) {
         var target_indicator_id = indicator.cluster_partner_indicator_reportable_id

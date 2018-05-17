@@ -719,6 +719,22 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
                     location=self.instance.location,
                 )
 
+                if self.instance.indicator_report:
+                    def get_disagg_lookup_map(ir):
+                        serializer = DisaggregationListSerializer(
+                            ir.disaggregations, many=True)
+
+                        disagg_lookup_list = serializer.data
+                        disagg_lookup_list.sort(key=lambda item: len(item['choices']))
+
+                        return disagg_lookup_list
+
+                    def get_disagg_choice_lookup_map(ir):
+                        lookup_array = ir.disaggregation_values(id_only=False)
+                        lookup_array.sort(key=len)
+
+                        return lookup_array
+
                 split_data = {}
                 disagg_data_copy = copy.deepcopy(data['disaggregation'])
 
@@ -809,22 +825,29 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
         else:
             pd_id_for_locations = -1
 
+        if 'hide_children' in self.context:
+            hide_children = self.context['hide_children']
+
+        else:
+            hide_children = -1
+
         objects = list(obj.indicator_location_data.all())
 
-        child_ir_ild_ids = obj.children.values_list('indicator_location_data', flat=True)
+        if hide_children == -1:
+            child_ir_ild_ids = obj.children.values_list('indicator_location_data', flat=True)
 
-        if child_ir_ild_ids.exists() and pd_id_for_locations != -1:
-            child_ir_ild_ids = child_ir_ild_ids.filter(
-                reporting_entity__title="UNICEF",
-                reportable__lower_level_outputs__cp_output__programme_document_id=pd_id_for_locations,
+            if child_ir_ild_ids.exists() and pd_id_for_locations != -1:
+                child_ir_ild_ids = child_ir_ild_ids.filter(
+                    reporting_entity__title="UNICEF",
+                    reportable__lower_level_outputs__cp_output__programme_document_id=pd_id_for_locations,
+                )
+
+            child_ilds = IndicatorLocationData.objects.filter(
+                id__in=child_ir_ild_ids,
             )
 
-        child_ilds = IndicatorLocationData.objects.filter(
-            id__in=child_ir_ild_ids,
-        )
-
-        if obj.children.exists():
-            objects.extend(list(child_ilds))
+            if obj.children.exists():
+                objects.extend(list(child_ilds))
 
         return SimpleIndicatorLocationDataListSerializer(
             objects,

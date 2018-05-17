@@ -522,12 +522,16 @@ class IndicatorReportListAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
         pd_id_for_locations = int(self.request.query_params.get('pd_id_for_locations', '-1'))
+        hide_children = int(self.request.query_params.get('hide_children', '-1'))
 
         indicator_reports = self.get_queryset()
         serializer = IndicatorReportListSerializer(
             indicator_reports,
             many=True,
-            context={'pd_id_for_locations': pd_id_for_locations}
+            context={
+                'pd_id_for_locations': pd_id_for_locations,
+                'hide_children': hide_children,
+            }
         )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
