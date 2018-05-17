@@ -333,7 +333,7 @@ def process_programme_documents(fast=False, area=False):
                                         try:
                                             disaggregations = list(
                                                 Reportable.objects.get(
-                                                    external_id=i['cluster_indicator_id']).disaggregations.all())
+                                                    id=i['cluster_indicator_id']).disaggregations.all())
                                         except Reportable.DoesNotExist:
                                             disaggregations = list()
                                     else:
