@@ -180,14 +180,19 @@ def generate_real_data(fast=False, area=None, update=False):
         # Generate partners
         process_partners()
 
-    # # Generate programme documents
-    # process_programme_documents(fast, area)
-    #
-    # # Generate PR/IR
-    # process_period_reports()
-    #
-    # # Generate due/overdue reports
-    # process_due_reports()
+    # Generate programme documents
+    process_programme_documents(fast, area)
+
+    # Generate reports
+    generate_reports()
+
+
+def generate_reports():
+    # Generate PR/IR
+    process_period_reports()
+
+    # Generate due/overdue reports
+    process_due_reports()
 
 
 def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
