@@ -32,7 +32,7 @@ In the above example, QPR 1 will be able to pull in aggregated data for high fre
 
 ​
 
-![Modal to show user data from which HR&apos;s is being pulled in for this particular QPR high frequency indicator](https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-KzwqgC7O0kW5EDlHvvK%2F-LAWg-O_lUlN1LvZuuCK%2F-LAWgQqojBz3M3zugg8K%2FReporting-IP-Enter-Data_02_B.png?alt=media&token=f3e180ba-250b-44a8-921b-955c14eed737)
+![Modal to show user data from which HR&apos;s is being pulled in for this particular QPR high frequency indicator](../../../.gitbook/assets/pull-data-modal.png)
 
 Once data has been pulled in it can still be edited by the IP to be more accurate or for other reporting reasons.
 

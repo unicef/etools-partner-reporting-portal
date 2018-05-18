@@ -287,6 +287,7 @@
           clusterId: Number,
           locations: Object,
           pending: Object,
+          isPAI: Boolean,
 
           editing: {
             type: Boolean,
@@ -347,7 +348,7 @@
 
           canEditDetails: {
             type: Boolean,
-            computed: '_computeCanEditDetails(editing, parentIndicatorId, permissions)',
+            computed: '_computeCanEditDetails(editing, parentIndicatorId, isPAI, permissions)',
           },
 
           canMessageIMO: {
@@ -390,9 +391,9 @@
               });
         },
 
-        _computeCanEditDetails: function (editing, parentIndicatorId, permissions) {
+        _computeCanEditDetails: function (editing, parentIndicatorId, isPAI, permissions) {
           return !editing ||
-              permissions.createClusterEntities ||
+              (permissions.createClusterEntities && !isPAI) ||
               (permissions.onlyEditOwnIndicatorDetails && !parentIndicatorId);
         },
 

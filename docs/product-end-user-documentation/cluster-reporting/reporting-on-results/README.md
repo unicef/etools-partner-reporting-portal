@@ -43,8 +43,8 @@ On the Reporting Results Page, we will have 3 options for the user
 * Export
 * Import Template
 
-Partner/IMO can download the export template for the indicators they are currently looking at based on the applied filters in xlsx format that includes all of the data pertaining to the indicators. The partner or IMO can enter the proper disaggregation value here instead of on the platform.**  
-**
+Partner/IMO can download the export template for the indicators they are currently looking at based on the applied filters in xlsx format that includes all of the data pertaining to the indicators. The partner or IMO can enter the proper disaggregation value here instead of on the platform.  
+****
 
 ![](https://lh6.googleusercontent.com/JdcLPeZVCxZDz76q9a6FwpufirqwDfiEZj1OrRaXz06kMJOmDN81XZZQ2hbHAjT4Rrtn-T1T6BR-xL5DTI77kmupcn2QP_ISM3BrGKnv3DQLloxoWGIY5uiHe7fv8zMK5M-RFTiK)
 
@@ -52,8 +52,8 @@ The export template should include multiple rows with indicators, locations etc 
 
 Here is a link to an example export of multiple reports: [https://docs.google.com/spreadsheets/d/1CDQP0VLgRIQbzJ-SUpgZSG4l9-n-6iVt65jnW8m5ucQ/edit?usp=sharing](https://docs.google.com/spreadsheets/d/1CDQP0VLgRIQbzJ-SUpgZSG4l9-n-6iVt65jnW8m5ucQ/edit?usp=sharing)
 
-Once the Partner/IMO is done editing the export template, they can upload it via import template. They will only be able to update the disaggregation value and will receive an error if they add/delete columns or edit any data that is not a disaggregation.**  
-**
+Once the Partner/IMO is done editing the export template, they can upload it via import template. They will only be able to update the disaggregation value and will receive an error if they add/delete columns or edit any data that is not a disaggregation.  
+****
 
 ![](https://lh6.googleusercontent.com/I8LAZGL-gN1wQGK-_wxFwZCK2KSNnqByxAr1wQrdfBYJ8mI_qKkWxAiy-gUsTWr8Qsr2dyJPIY4Kta3wkK9Lx9uFsSbBbHnYMdCzPiy8aWuKCGX74r_Gh0awVt6rbI_PnoV5DfBp)
 
