@@ -4,7 +4,7 @@
 
 <dom-module id="etools-prp-printer">
   <template>
-    <content select=".print-btn"></content>
+    <content></content>
   </template>
 
   <script>
@@ -24,7 +24,11 @@
         tap: '_onTap',
       },
 
-      _onTap: function () {
+      _onTap: function (e) {
+        if (!e.target.classList.contains('print-btn')) {
+          return;
+        }
+
         var parent = Polymer.dom(this).parentNode;
         var toPrint = Polymer.dom(parent).querySelectorAll(this.selector);
         var style = document.createElement('style');

@@ -17,12 +17,16 @@
     <etools-prp-toolbar
         query="{{query}}"
         response-plan-id="{{responsePlanId}}">
-      <upload-button
-          url="[[importUrl]]"
-          modal-title="Import Template">
-        Import Template
-      </upload-button>
-
+        <template
+            is="dom-if"
+            if="[[_equals(submitted, 0)]]"
+            restamp="true">
+            <upload-button
+                url="[[importUrl]]"
+                modal-title="Import Template">
+              Import Template
+            </upload-button>
+        </template>
       <download-button url="[[exportUrl]]">Export</download-button>
 
       <template

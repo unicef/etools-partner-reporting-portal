@@ -6,6 +6,7 @@
 <link rel="import" href="../user-profile/profile-dropdown.html">
 
 <link rel="import" href="../etools-logo.html">
+<link rel="import" href="../app-switcher.html">
 <link rel="import" href="../workspace-dropdown.html">
 <link rel="import" href="../etools-prp-workspaces.html">
 
@@ -24,13 +25,28 @@
 
       app-toolbar {
         @apply(--layout-justified);
+
+        padding-left: 0;
       }
 
       workspace-dropdown {
         @apply(--layout-self-center);
       }
-      .right-wrapper {
+
+      .wrapper {
+        height: 100%;
+
         @apply(--layout-horizontal);
+        @apply(--layout-center-center);
+      }
+
+      .app-switcher-container {
+        width: 64px;
+        height: 100%;
+        margin-right: .75em;
+        border-right: 1px solid rgba(255, 255, 255, 0.3);
+
+        @apply(--layout-vertical);
         @apply(--layout-center-center);
       }
     </style>
@@ -43,8 +59,14 @@
     <app-header-layout>
       <app-header fixed>
         <app-toolbar>
-          <etools-logo size="120" text-color="#fff"></etools-logo>
-          <div class="right-wrapper">
+          <div class="wrapper">
+            <div class="app-switcher-container">
+              <app-switcher></app-switcher>
+            </div>
+            <etools-logo size="120" text-color="#fff"></etools-logo>
+          </div>
+
+          <div class="wrapper">
             <workspace-dropdown
                 data="[[workspaces]]"
                 current="[[workspace]]">
@@ -60,7 +82,7 @@
 
   <script>
     Polymer({
-      id: 'ip-reporting-app-header',
+      is: 'ip-reporting-app-header',
     });
   </script>
 </dom-module>

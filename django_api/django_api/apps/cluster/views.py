@@ -346,7 +346,8 @@ class IndicatorReportsListAPIView(ListCreateAPIView, RetrieveAPIView):
             Q(reportable__cluster_objectives__cluster__response_plan=response_plan_id)
             | Q(reportable__cluster_activities__cluster_objective__cluster__response_plan=response_plan_id)
             | Q(reportable__partner_projects__clusters__response_plan=response_plan_id)
-            | Q(reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)  # noqa: E501
+            | Q(reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)   # noqa: E501
+            | Q(reportable__partner_activities__cluster_objective__cluster__response_plan=response_plan_id)   # noqa: E501
         )
         return queryset
 
@@ -385,6 +386,7 @@ class ClusterReportablesIdListAPIView(ListAPIView):
             | Q(cluster_activities__cluster_objective__cluster__response_plan=response_plan_id)
             | Q(partner_projects__clusters__response_plan=response_plan_id)
             | Q(partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)  # noqa: E501
+            | Q(partner_activities__cluster_objective__cluster__response_plan=response_plan_id)  # noqa: E501
         ).distinct()
         return queryset
 

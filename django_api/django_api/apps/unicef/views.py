@@ -33,7 +33,7 @@ from core.permissions import (
 from core.models import Location, PartnerAuthorizedOfficerRole
 from core.serializers import ShortLocationSerializer
 
-from indicator.models import Reportable, IndicatorReport, IndicatorBlueprint
+from indicator.models import Reportable, IndicatorReport, IndicatorBlueprint, IndicatorLocationData
 from indicator.serializers import (
     IndicatorListSerializer,
     PDReportContextIndicatorReportSerializer
@@ -62,8 +62,9 @@ from .serializers import (
     ProgressReportUpdateSerializer,
     ProgressReportAttachmentSerializer,
     ProgressReportSRUpdateSerializer,
+    ProgressReportPullHFDataSerializer,
 )
-from .models import ProgrammeDocument, ProgressReport
+from .models import ProgrammeDocument, ProgressReport, LowerLevelOutput
 from .permissions import (
     CanChangePDCalculationMethod,
     UnicefPartnershipManagerOrRead
@@ -541,6 +542,10 @@ class ProgressReportSubmitAPIView(APIView):
             progress_report.submitting_user = self.request.user
             progress_report.save()
 
+            # IndicatorLocationData lock marking
+            ild_ids = progress_report.indicator_reports.values_list('indicator_location_data', flat=True)
+            IndicatorLocationData.objects.filter(id__in=ild_ids).update(is_locked=True)
+
             serializer = ProgressReportSerializer(instance=progress_report)
             return Response(serializer.data, status=statuses.HTTP_200_OK)
         else:
@@ -629,6 +634,114 @@ class ProgressReportSRSubmitAPIView(APIView):
                 "Progress report was already submitted. Your IMO will need to send it "
                 "back for you to edit your submission."
             )
+
+
+class ProgressReportPullHFDataAPIView(APIView):
+    """
+    Reserved only for a LLO Reportable's IndicatorLocationData on QPR ProgressReport
+    to pull data from LLO Reportable's IndicatorLocationData on HR ProgressReports
+    with overlapping start and end date period to QPR end date.
+    """
+    permission_classes = (IsAuthenticated, IsPartnerAuthorizedOfficer)
+
+    def get_object(self):
+        try:
+            return ProgressReport.objects.get(
+                programme_document__workspace=self.kwargs['workspace_id'],
+                pk=self.kwargs['pk'],
+            )
+        except ProgressReport.DoesNotExist as exp:
+            logger.exception({
+                "endpoint": "ProgressReportPullHFDataAPIView",
+                "request.data": self.request.data,
+                "pk": self.kwargs['pk'],
+                "exception": exp,
+            })
+            raise Http404
+
+    def _get_target_hf_reports_with_indicator_report(self):
+        self.progress_report = self.get_object()
+
+        if self.progress_report.report_type != "QPR":
+            raise ValidationError("This Progress Report is not QPR type.")
+
+        try:
+            indicator_report = IndicatorReport.objects.get(id=self.kwargs['indicator_report_pk'])
+        except IndicatorReport.DoesNotExist:
+            raise ValidationError("IndicatorReport does not exist.")
+
+        if not isinstance(indicator_report.reportable.content_object, LowerLevelOutput):
+            raise ValidationError("Reportable is not LLO type.")
+
+        pd_from_reportable = indicator_report.reportable.content_object.cp_output.programme_document
+
+        if self.progress_report.programme_document != pd_from_reportable:
+            raise ValidationError("Reportable does not belong to the passed-in progress report.")
+
+        hf_reports = ProgressReport.objects.filter(
+            programme_document=self.progress_report.programme_document,
+            report_type="HR",
+            start_date__gte=self.progress_report.start_date,
+            end_date__lte=self.progress_report.end_date,
+        )
+
+        return indicator_report, hf_reports
+
+    def _calculate_report_location_totals_per_reports(self, indicator_report, hf_reports, locations):
+        ir_ids = hf_reports.values_list('indicator_reports', flat=True)
+        target_hf_irs = IndicatorReport.objects.filter(
+            id__in=ir_ids,
+            time_period_start__gte=self.progress_report.start_date,
+            time_period_end__lte=self.progress_report.end_date,
+            reportable=indicator_report.reportable,
+        )
+
+        calculated = {loc_id: {'c': 0, 'v': 0, 'd': 0} for loc_id in locations}
+
+        for ir in target_hf_irs:
+            for ild in ir.indicator_location_data.all():
+                calculated[ild.location.id]['c'] += ild.disaggregation['()']['c']
+                calculated[ild.location.id]['v'] += ild.disaggregation['()']['v']
+
+                if indicator_report.reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
+                    calculated[ild.location.id]['d'] = 1
+
+                else:
+                    calculated[ild.location.id]['d'] += ild.disaggregation['()']['d']
+
+        return calculated
+
+    def get(self, request, *args, **kwargs):
+        indicator_report, hf_reports = self._get_target_hf_reports_with_indicator_report()
+
+        serializer = ProgressReportPullHFDataSerializer(
+            hf_reports,
+            many=True,
+            context={'indicator_report': indicator_report}
+        )
+        return Response(serializer.data, status=statuses.HTTP_200_OK)
+
+    def post(self, request, *args, **kwargs):
+        indicator_report, hf_reports = self._get_target_hf_reports_with_indicator_report()
+        locations = indicator_report.indicator_location_data.values_list('location', flat=True)
+        loc_totals = {loc_id: {'()': {'c': 0, 'v': 0, 'd': 0}} for loc_id in locations}
+
+        consolidated_total_per_location_dict = self._calculate_report_location_totals_per_reports(
+            indicator_report,
+            hf_reports,
+            locations
+        )
+
+        # Data pull total consolidation
+        for loc_id, total in consolidated_total_per_location_dict.items():
+            loc_totals[loc_id]['()'] = dict(list(loc_totals[loc_id]['()'].items()) + list(total.items()))
+
+        # Data pull updates
+        for ild in indicator_report.indicator_location_data.all():
+            ild.disaggregation = loc_totals[ild.location.id]
+            ild.save()
+
+        return Response(loc_totals, status=statuses.HTTP_200_OK)
 
 
 class ProgressReportReviewAPIView(APIView):

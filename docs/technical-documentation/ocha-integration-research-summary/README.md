@@ -85,7 +85,7 @@ To get details of response plan, another endpoint is required:
 
 Example: [https://api.hpc.tools/v1/public/rpm/plan/id/514](https://api.hpc.tools/v1/public/rpm/plan/id/514)
 
-Same endpoints returns different values depends on _content _parameter:
+Same endpoints returns different values depends on _content_ parameter:
 
 {% hint style="info" %}
 **content**: required \(one of basic, entities, measurements\)Specify the detail level for the content of the API response:
@@ -356,7 +356,7 @@ The old OPS is accessible under this URL, and does not require any authenticatio
 
 [https://ops.unocha.org/api/v1/project/appeal/\[id\].xml](https://ops.unocha.org/api/v1/project/appeal/%5bid%5d.xml)
 
-Where the` [id]` is the `appeal id`.  Note that this `id` is different from the `plan id` in the HPC database.  The response from this endpoint is published \(finalized\) project data for the appeal.
+Where the `[id]` is the `appeal id`.  Note that this `id` is different from the `plan id` in the HPC database.  The response from this endpoint is published \(finalized\) project data for the appeal.
 
 ### List of available Projects
 
@@ -370,7 +370,7 @@ To get list of available projects for given plan:
 We need to figure out if we want to limit projects to choosed partner \(organization\)  
 {% endhint %}
 
-Filtering is not available, so iteration over all set is required \(`organizations -> organization -> name `or `abbreviation` should be same like choosed PRP organization / partner\).
+Filtering is not available, so iteration over all set is required \(`organizations -> organization -> name` or `abbreviation` should be same like choosed PRP organization / partner\).
 
 #### Old OPS
 
@@ -428,7 +428,7 @@ where `projectId` is `id` field from project details endpoint, for example:
 {% endhint %}
 
 {% hint style="info" %}
-**\(2\) **Since `funding_source` might have more then one funding relation must be changed to 0 -&gt; N.
+**\(2\)** Since `funding_source` might have more then one funding relation must be changed to 0 -&gt; N.
 
 ```text
 class FundingSource(models.model):
@@ -468,7 +468,7 @@ class FundingSource(models.model):
 | **PRP Partner Project model new fields** | **New Project Module response** |
 | --- | --- | --- |
 | `code` | `code` |
-| `priorization_classification` | `projectPriority`** \(1\)** |
+| `priorization_classification` | `projectPriority` **\(1\)** |
 
 {% hint style="info" %}
 Only v1 holds this information except Chad and Libya \(that works only on v2\)
@@ -500,7 +500,7 @@ I do not see possibility of filtering data.
 | `reportables` | **n/a** |
 
 {% hint style="info" %}
-**\(1\) and \(2\) **same like in New Project Module - data comes from FTS
+**\(1\) and \(2\)** same like in New Project Module - data comes from FTS
 {% endhint %}
 
 ### Clusters
@@ -513,7 +513,7 @@ There is `globalClusters`  section where provided ID is global for all projects 
 
 | **PRP Cluster model** | **RPM API fields** |
 | --- | --- | --- |
-| _`type`_ | _`globalClusters -> name `\(1\)_ |
+| _`type`_ | _`globalClusters -> name` \(1\)_ |
 | _`response_plan`_ | _`plans -> id` \(matched by external\_id\)_ |
 
 #### Old OPS
@@ -521,7 +521,7 @@ There is `globalClusters`  section where provided ID is global for all projects 
 | **PRP Cluster model** | **OPS API fields** |
 | --- | --- | --- |
 | _`type`_ | `cluster -> value` |
-| _`response_plan`_ | _`appeal -> id `_\(matched by external\_id\) |
+| _`response_plan`_ | _`appeal -> id`_ \(matched by external\_id\) |
 
 ### Partner
 

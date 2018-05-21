@@ -62,9 +62,9 @@ Parent Cluster Activity for an Indicator is referenced by `objectId`, some Indic
 | **Reportable Model** | **OCHA Source** |
 | --- | --- | --- | --- | --- | --- | --- |
 | blueprint | _as saved above_ |
-| target | value.metrics.values.totals _where _`name.en = Target` |
-| in\_need | value.metrics.values.totals _where _`name.en = In Need` |
-| baseline | value.metrics.values.totals _where _`name.en = Baseline` |
+| target | value.metrics.values.totals _where_ `name.en = Target` |
+| in\_need | value.metrics.values.totals _where_ `name.en = In Need` |
+| baseline | value.metrics.values.totals _where_ `name.en = Baseline` |
 | content\_object | parent Cluster Activity from `objectId` |
 | locations | value.metrics.values.disaggregated.locations |
 

@@ -1,4 +1,4 @@
-# Standard Quarterly Progress Reports \(QPR\)
+# Quarterly Progress Reports \(QPR\)
 
 In this report, the IP provides the following information:
 
@@ -20,7 +20,7 @@ The final report has a different rating options for PD outputs: "achieved as pla
 
 ### Reporting on High frequency humanitarian response Indicators {#reporting-on-high-frequency-humanitarian-response-indicators}
 
-If the PD includes high frequency humanitarian response indicators \(cluster or non-cluster\) the partner will be able to pull data for these indicators into the data entry table based on previous humanitarian indicator reports submitted by the IP in PRP-IP or PRP-Cluster. If there is no indicator report submitted then nothing can be pulled in. When the reporting periods for the quarterly progress reports and humanitarian reports do not match, the report will allow pulling in data already submitted by the IP falling within the current reporting period, if applicable. Data reported by the IP beyond the report end date will be allowed to be pulled in, in the subsequent standard QPR. The illustration of this is shown here:
+If the PD includes high frequency humanitarian response indicators \(cluster or non-cluster\) the partner will be able to pull data for these indicators into the data entry table based on previous humanitarian indicator reports submitted by the IP in PRP-IP or PRP-Cluster. If there is no indicator report submitted then nothing can be pulled in. When the reporting periods for the quarterly progress reports and humanitarian reports do not match, the report will allow pulling in data already submitted by the IP falling within the current reporting period, if applicable. Data reported by the IP beyond the report end date will be allowed to be pulled in, in the subsequent QPR. The illustration of this is shown here:
 
 ![](https://lh3.googleusercontent.com/HwEoAhrpg6BpFmR1SYEeu6sUF-kVHHExxO90vVt1BC1tvi8ex81VOLrFxIYSurWABeUzG4lvBqCP-wijyc_ZUlBKuVKxv3CIbCnM4M2Oq_ufk9R07BeNCBEWoa02byVh-YoDOL2Zxeygv7iA_Q)
 
@@ -32,7 +32,7 @@ In the above example, QPR 1 will be able to pull in aggregated data for high fre
 
 ​
 
-![Modal to show user data from which HR&apos;s is being pulled in for this particular QPR high frequency indicator](https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-KzwqgC7O0kW5EDlHvvK%2F-LAWg-O_lUlN1LvZuuCK%2F-LAWgQqojBz3M3zugg8K%2FReporting-IP-Enter-Data_02_B.png?alt=media&token=f3e180ba-250b-44a8-921b-955c14eed737)
+![Modal to show user data from which HR&apos;s is being pulled in for this particular QPR high frequency indicator](../../../.gitbook/assets/pull-data-modal.png)
 
 Once data has been pulled in it can still be edited by the IP to be more accurate or for other reporting reasons.
 

@@ -7,6 +7,7 @@
 
 <link rel="import" href="../elements/etools-prp-workspaces.html">
 <link rel="import" href="../elements/etools-prp-ajax.html">
+<link rel="import" href="../elements/app-redirect.html">
 
 <link rel="import" href="../behaviors/utils.html">
 <link rel="import" href="../redux/actions.html">
@@ -26,6 +27,8 @@
         text-align: center;
       }
     </style>
+
+    <app-redirect></app-redirect>
 
     <iron-localstorage
         name="defaultApp"
@@ -56,7 +59,7 @@
 
     <template
         is="dom-if"
-        if="[[!userHasGroups]]">
+        if="[[!userHasGroupsOrAccess]]">
     <div class="no-groups-notification">
       <h3>Account created.</h3>
       <p>Please wait 1-2 business days for your admin to approve you.<br>
@@ -162,9 +165,14 @@
           statePath: 'userProfile.profile.groups',
         },
 
-        userHasGroups: {
+        access: {
+          type: Array,
+          statePath: 'userProfile.profile.access'
+        },
+
+        userHasGroupsOrAccess: {
           type: Boolean,
-          computed: '_computeUserHasGroups(groups)',
+          computed: '_computeUserHasGroupsOrAccess(groups, access)',
         }
       },
 
@@ -248,8 +256,8 @@
         });
       },
 
-      _computeUserHasGroups: function (groups) {
-        return !!groups.length;
+      _computeUserHasGroupsOrAccess: function (groups, access) {
+        return !!groups.length || !!access.length;
       },
 
       _pageChanged: function (page) {

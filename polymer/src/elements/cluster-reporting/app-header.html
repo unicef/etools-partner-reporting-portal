@@ -5,6 +5,7 @@
 <link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout.html">
 
 <link rel="import" href="../etools-logo.html">
+<link rel="import" href="../app-switcher.html">
 <link rel="import" href="../workspace-dropdown.html">
 <link rel="import" href="../etools-prp-workspaces.html">
 <link rel="import" href="change-response-plan.html">
@@ -25,6 +26,8 @@
 
       app-toolbar {
         @apply(--layout-justified);
+
+        padding-left: 0;
       }
 
       workspace-dropdown {
@@ -35,8 +38,20 @@
         margin: 0 10px 0 30px;
       }
 
-      .right-wrapper {
+      .wrapper {
+        height: 100%;
+
         @apply(--layout-horizontal);
+        @apply(--layout-center-center);
+      }
+
+      .app-switcher-container {
+        width: 64px;
+        height: 100%;
+        margin-right: .75em;
+        border-right: 1px solid rgba(255, 255, 255, 0.3);
+
+        @apply(--layout-vertical);
         @apply(--layout-center-center);
       }
 
@@ -51,8 +66,14 @@
       <app-header fixed>
 
         <app-toolbar>
-          <etools-logo size="120" text-color="#fff"></etools-logo>
-          <div class="right-wrapper">
+          <div class="wrapper">
+            <div class="app-switcher-container">
+              <app-switcher></app-switcher>
+            </div>
+            <etools-logo size="120" text-color="#fff"></etools-logo>
+          </div>
+
+          <div class="wrapper">
 
             <workspace-dropdown
                 data="[[workspaces]]"
@@ -70,7 +91,7 @@
 
   <script>
     Polymer({
-      id: 'cluster-reporting-app-header',
+      is: 'cluster-reporting-app-header',
     });
   </script>
 </dom-module>

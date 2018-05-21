@@ -235,6 +235,8 @@ class Reportable(TimeStampedExternalSourceModel):
     start_date_of_reporting_period = models.DateField(blank=True, null=True)
 
     is_cluster_indicator = models.BooleanField(default=False)
+    is_unicef_hf_indicator = models.BooleanField(default=False)
+
     contributes_to_partner = models.BooleanField(default=False)
 
     # Current total, transactional and dynamically calculated based on
@@ -479,7 +481,19 @@ def sync_ca_reportable_update_to_pa_reportables(instance, created):
         reportable_data_to_sync = get_reportable_data_to_clone(instance)
 
         if not created:
+            # Update PA Reportable instances first
             instance.children.update(**reportable_data_to_sync)
+
+            # Grab LLO Reportable instances that have CAI ID reference
+            llo_reportables = Reportable.objects.filter(
+                ca_indicator_used_by_reporting_entity=instance,
+                lower_level_outputs__isnull=False
+            )
+
+            # Update these LLO Reportable instances except parent_indicator info
+            if llo_reportables.exists():
+                reportable_data_to_sync['blueprint'] = instance.blueprint
+                llo_reportables.update(**reportable_data_to_sync)
 
 
 @receiver(post_save,
@@ -515,6 +529,7 @@ class IndicatorReport(TimeStampedModel):
         indicator.Reportable (ForeignKey): "indicator"
         unicef.ProgressReport (ForeignKey): "progress_report"
         core.Location (OneToOneField): "location"
+        indicator.ReportingEntity (ForeignKey): "reporting_entity"
     """
     title = models.CharField(max_length=2048)
     reportable = models.ForeignKey(Reportable, related_name="indicator_reports")
@@ -562,6 +577,10 @@ class IndicatorReport(TimeStampedModel):
                                blank=True,
                                related_name='children',
                                db_index=True)
+
+    reporting_entity = models.ForeignKey(
+        'indicator.ReportingEntity', related_name="indicator_reports"
+    )
 
     objects = IndicatorReportManager()
 
@@ -777,19 +796,14 @@ class ReportingEntity(TimeStampedModel):
     """
     ReportingEntity module it includes an organization entity for
     Cluster Activity indicator that is adopted from ProgrammeDocument
-
-    related models:
-        indicator.IndicatorReport (ForeignKey): "indicator_report"
     """
-    indicator_report = models.ForeignKey(
-        IndicatorReport, related_name="reporting_entities"
-    )
+    title = models.CharField(max_length=256, unique=True)
 
     class Meta:
         ordering = ['id']
 
     def __str__(self):
-        return "Reporting entity for {}".format(self.indicator_report)
+        return "Reporting entity: {}".format(self.title)
 
 
 class IndicatorLocationData(TimeStampedModel):
@@ -812,6 +826,13 @@ class IndicatorLocationData(TimeStampedModel):
     num_disaggregation = models.IntegerField()
     level_reported = models.IntegerField()
     disaggregation_reported_on = ArrayField(models.IntegerField(), default=list)
+    percentage_allocated = models.DecimalField(
+        decimal_places=2,
+        help_text='Entered data value allocation by %',
+        max_digits=5,
+        default=1.0000,
+    )
+    is_locked = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['id']
