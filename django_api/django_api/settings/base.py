@@ -238,7 +238,7 @@ PRINT_DATA_FORMAT = "%d %b %Y"
 
 INPUT_DATA_FORMAT = "%Y-%m-%d"
 
-LOGS_PATH = os.path.join(DATA_VOLUME, 'django_api', 'logs')
+# LOGS_PATH = os.path.join(DATA_VOLUME, 'django_api', 'logs')
 
 LOGGING = {
     'version': 1,
@@ -255,11 +255,8 @@ LOGGING = {
     'handlers': {
         'default': {
             'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(LOGS_PATH, 'django.log'),
-            'maxBytes': 1024 * 1024 * 5,  # 5 MB
-            'backupCount': 5,
-            'formatter': 'standard'
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
         },
     },
     'loggers': {
