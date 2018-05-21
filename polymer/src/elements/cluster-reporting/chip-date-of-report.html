@@ -5,7 +5,6 @@
 <link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../../bower_components/moment-element/moment-import.html">
 
-<link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/chip.html">
 <link rel="import" href="../../styles/buttons.html">
 
@@ -54,7 +53,7 @@
         vertical-align="bottom">
       <paper-date-picker
           id="picker"
-          date="{{_formattedDate}}"
+          date="{{_date}}"
           force-narrow>
       </paper-date-picker>
 
@@ -78,14 +77,11 @@
       id: 'chip-date-of-report',
 
       behaviors: [
-        App.Behaviors.UtilsBehavior,
         App.Behaviors.ChipBehavior,
       ],
 
       properties: {
-        _date: {
-          type: Object,
-        },
+        _date: Object,
       },
 
       _add: function () {
