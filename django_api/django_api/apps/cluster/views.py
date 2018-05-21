@@ -18,7 +18,7 @@ from core.common import PARTNER_TYPE
 from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
 from core.serializers import ShortLocationSerializer
-from core.models import Location, ResponsePlan, IMORole, PartnerAuthorizedOfficerRole
+from core.models import Location, ResponsePlan, IMORole
 from indicator.serializers import (
     ClusterIndicatorReportSerializer,
     ReportableIdSerializer,
