@@ -264,11 +264,16 @@
             on-change="adjustPosition">
             <template
               is="dom-if"
-              if="[[canAddOchaProjects]]"
+              if="[[!edit]]"
               restamp="true">
-              <paper-radio-button name="ocha" active="true">
-                <strong>From OCHA</strong>
-              </paper-radio-button>
+              <template
+                is="dom-if"
+                if="[[canAddOchaProjects]]"
+                restamp="true">
+                <paper-radio-button name="ocha" active="true">
+                  <strong>From OCHA</strong>
+                </paper-radio-button>
+              </template>
             </template>
             <div
               class="fields"
@@ -299,9 +304,19 @@
                 </div>
               </template>
             </div>
-            <paper-radio-button name="custom">
-              <strong>Custom</strong>
-            </paper-radio-button>
+            <template
+              is="dom-if"
+              if="[[!edit]]"
+              restamp="true">
+              <template
+                is="dom-if"
+                if="[[canAddOchaProjects]]"
+                restamp="true">
+                <paper-radio-button name="custom">
+                  <strong>Custom</strong>
+                </paper-radio-button>
+              </template>
+            </template>
             <div
               empty$="[[!_equals(mode, 'custom')]]">
               <template
@@ -446,26 +461,23 @@
               id="collapse"
               opened="{{detailsOpened}}">
               <div class="app-grid">
-                <etools-single-selection-menu
+                <paper-input
                   id="agencyAcronyms"
                   class="item validate"
-                  label="Name of Agency (acronyms)"
-                  options="[[agencyAcronyms]]"
-                  option-value="id"
-                  option-label="title"
-                  selected="{{selectedAcronym}}"
-                  on-iron-activate="_validate"
-                  trigger-value-change-event
+                  label="Name of Funding Agency (acronyms)"
+                  value="{{data.agency_name}}"
+                  type="string"
+                  on-input="_validate"
                   always-float-label>
-                </etools-single-selection-menu>
+                </paper-input>
 
                 <etools-single-selection-menu
                   class="item validate"
                   label="Type of Agency"
                   options="[[agencyTypes]]"
-                  option-value="id"
+                  option-value="title"
                   option-label="title"
-                  selected="{{selectedAgencyType}}"
+                  selected="{{data.agency_type}}"
                   on-iron-activate="_validate"
                   trigger-value-change-event
                   always-float-label>
@@ -475,7 +487,7 @@
                   class="item validate full-width"
                   id="additional_implementing_partners"
                   label="Additional implementing partners"
-                  value="{{data.additional_implementing_partners}}"
+                  value="{{data.additional_partners}}"
                   type="string"
                   on-input="_validate"
                   always-float-label>
@@ -496,25 +508,23 @@
                   class="item validate"
                   label="Prioritization Classification"
                   options="[[classifications]]"
-                  option-value="id"
+                  option-value="title"
                   option-label="title"
-                  selected="{{selectedClassification}}"
+                  selected="{{data.prioritization}}"
                   on-iron-activate="_validate"
                   trigger-value-change-event
                   always-float-label>
                 </etools-single-selection-menu>
 
-                <etools-single-selection-menu
+                <paper-input
                   class="item validate"
+                  id="project_code"
                   label="Project code in HRP"
-                  options="[[projectCodes]]"
-                  option-value="id"
-                  option-label="title"
-                  selected="{{selectedProjectCode}}"
-                  on-iron-activate="_validate"
-                  trigger-value-change-event
+                  value="{{data.code}}"
+                  type="string"
+                  on-input="_validate"
                   always-float-label>
-                </etools-single-selection-menu>
+                </paper-input>
 
                 <paper-input
                   class="item validate full-width"
@@ -532,7 +542,7 @@
                   class="item validate full-width"
                   id="own_funding"
                   label="Funding received / confirmed through own agency internal emergency funding mechanisms (US$)"
-                  value="{{data.funding.own_funding}}"
+                  value="{{data.funding.internal_funding}}"
                   type="number"
                   allowed-pattern="[+\-\d.]"
                   step="0.01"
@@ -667,7 +677,7 @@
 
         canAddOchaProjects: {
           type: Boolean,
-          statePath: 'responsePlans.current.can_import_ocha_projects'
+          statePath: 'responsePlans.current.can_import_ocha_projects',
         },
 
         path: String,
@@ -779,6 +789,27 @@
           computed: '_computeImoClusters(profile)',
         },
 
+        agencyTypes: {
+          type: Array,
+          value: [
+            {title: 'UN Agency', id: 'UN Agency'},
+            {title: 'Government Organisation', id: 'Government Organisation'},
+            {title: 'International NGO', id: 'International NGO'},
+            {title: 'National NGO', id: 'National NGO'},
+            {title: 'Community based organisation', id: 'Community based organisation'},
+            {title: 'Other', id: 'Other'},
+          ],
+        },
+
+        classifications: {
+          type: Array,
+          value: [
+            {title: 'High', id: 'High'},
+            {title: 'Medium', id: 'Medium'},
+            {title: 'Low', id: 'Low'},
+          ]
+        },
+
         selectedClusters: {
           type: Array,
         },
@@ -804,9 +835,9 @@
         if (edit) {
           return App.Endpoints.plannedActionsProjectOverview(data.id);
         } else if (mode === 'custom') {
-        return App.Endpoints.plannedActions(responsePlanID);
+          return App.Endpoints.plannedActions(responsePlanID);
         } else if (mode === 'ocha') {
-        return App.Endpoints.ochaProjectsList(responsePlanID);
+          return App.Endpoints.ochaProjectsList(responsePlanID);
         }
       },
 
@@ -831,7 +862,11 @@
           this.selectedClusters = this.editData.clusters.map(function(cluster) {
             return cluster.id;
           });
+          this.set('mode', 'custom');
         } else {
+          if (!this.canAddOchaProjects) {
+            this.set('mode', 'custom');
+          }
           this.data = {'custom_fields': [], 'funding': {}};
           this.selectedClusters = [];
         }
@@ -859,9 +894,9 @@
 
       _computeDetailsButtonMsg: function(detailsOpened) {
         if (detailsOpened) {
-          return 'show less details';
+          return 'show less funding details';
         }
-        return 'show more details';
+        return 'show more funding details';
       },
 
       _fetchOchaProjectsList: function (mode) {
@@ -903,7 +938,6 @@
             .then(function (res) {
               self.set('projectDetailsLoading', false);
               self.set('projectDetails', res.data);
-              console.log(self.projectDetails);
               self.fire('details-loaded', this.name);
             })
             .catch(function (err) { // jshint ignore:line
@@ -978,8 +1012,6 @@
           this.$.projectAjax.body = Object.assign({}, this.data);
         }
         this.updatePending = true;
-        console.log(this.data.partner_id);
-        console.log(this.url);
         var thunk = this.$.projectAjax.thunk();
         thunk()
           .then(function (res) {

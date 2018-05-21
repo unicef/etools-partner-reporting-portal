@@ -9,6 +9,10 @@
         return BASE_URL + tail;
       },
 
+      login: function () {
+        return '/social/login/azuread-b2c-oauth2/';
+      },
+
       config: function () {
         return this._buildUrl('/core/configuration/');
       },
@@ -51,6 +55,10 @@
 
       programmeDocumentReportSubmit: function (workspaceId, reportId) {
         return this.programmeDocumentReport(workspaceId, reportId) + 'submit/';
+      },
+
+      programmeDocumentReportSubmitSpecial: function (workspaceId, reportId) {
+        return this.programmeDocumentReportSubmit(workspaceId, reportId) + 'sr/';
       },
 
       programmeDocumentReportUpdate: function (workspaceId, reportId) {
@@ -109,6 +117,18 @@
 
       indicatorLocationDataEntries: function() {
         return this._buildUrl('/indicator/indicator-location-data-entries/');
+      },
+
+      indicatorPullData: function(workspaceId, reportId, indicatorId) {
+        return this._buildUrl(
+          '/unicef/' +
+          workspaceId +
+          '/progress-reports/' +
+          reportId +
+          '/indicators/' +
+          indicatorId +
+          '/pull/'
+        );
       },
 
       responseParametersClusterObjectives: function(responsePlanId) {
@@ -172,6 +192,10 @@
 
       clusterIndicatorReportsExport: function (responsePlanId) {
         return this.clusterIndicatorReports(responsePlanId) + 'export-for-analysis/';
+      },
+
+      clusterIndicatorReportsImport: function (responsePlanId) {
+        return this.clusterIndicatorReports(responsePlanId) + 'import/';
       },
 
       clusterIndicatorNames: function (responsePlanId) {

@@ -128,14 +128,19 @@
           type: String,
         },
 
+        currentPd: {
+          type: Object,
+          statePath: App.Selectors.ProgrammeDocuments.current,
+        },
+
         currentAuthorizedPartners: {
           type: Array,
-          statePath: App.Selectors.ProgrammeDocuments.currentAuthorizedPartners,
+          computed: '_computeAuthorizedPartners(currentPd)',
         },
 
         postBody: {
           type: Object,
-          computed: '_computePostBody(selectedFocalPoint)'
+          computed: '_computePostBody(selectedFocalPoint)',
         }
       },
 
@@ -143,6 +148,19 @@
         return {
           submitted_by_email: selectedFocalPoint,
         };
+      },
+
+      _computeAuthorizedPartners: function (pd) {
+        var partners = (pd.partner_focal_point || []).filter(function(partner) {
+          return partner.is_authorized_officer;
+        });
+        var formattedPartners = partners.map(function (partner) {
+          return {
+            value: partner.email,
+            title: partner.name + ' ' + partner.title
+          };
+        });
+        return formattedPartners;
       },
 
       _validate: function (e) {

@@ -2,12 +2,14 @@ from django.conf import settings
 from rest_framework import serializers
 
 from core.serializers import ShortLocationSerializer
+from utils.filters.constants import Boolean
 from .models import ProgrammeDocument, Section, ProgressReport, Person, \
     LowerLevelOutput, PDResultLink, ReportingPeriodDates
 
 from core.common import PROGRESS_REPORT_STATUS, OVERALL_STATUS, CURRENCIES, PD_STATUS
 from core.models import Workspace, Location
 
+from indicator.models import IndicatorBlueprint
 from indicator.serializers import (
     PDReportContextIndicatorReportSerializer,
     IndicatorBlueprintSimpleSerializer,
@@ -232,13 +234,14 @@ class ProgressReportSimpleSerializer(serializers.ModelSerializer):
             'review_overall_status_display',
             'sent_back_feedback',
             'programme_document',
+            'narrative',
         )
 
     def get_reporting_period(self, obj):
         return "%s - %s " % (
             obj.start_date.strftime(settings.PRINT_DATA_FORMAT),
             obj.end_date.strftime(settings.PRINT_DATA_FORMAT)
-        )
+        ) if obj.start_date and obj.end_date else "No reporting period"
 
     def get_is_draft(self, obj):
         return obj.latest_indicator_report.is_draft if obj.latest_indicator_report else None
@@ -247,8 +250,7 @@ class ProgressReportSimpleSerializer(serializers.ModelSerializer):
 class ProgressReportSerializer(ProgressReportSimpleSerializer):
     programme_document = ProgrammeDocumentOutputSerializer()
     indicator_reports = serializers.SerializerMethodField()
-    review_overall_status_display = serializers.CharField(
-        source='get_review_overall_status_display')
+    review_overall_status_display = serializers.CharField(source='get_review_overall_status_display')
     funds_received_to_date = serializers.SerializerMethodField()
     funds_received_to_date_currency = serializers.SerializerMethodField()
     funds_received_to_date_percentage = serializers.SerializerMethodField()
@@ -261,7 +263,7 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
         request = kwargs.get('context', {}).get('request')
         self.llo_id = kwargs.get('llo_id') or request and request.GET.get('llo')
         self.location_id = kwargs.get('location_id') or request and request.GET.get('location')
-        self.show_incomplete = kwargs.get('incomplete') or request and request.GET.get('incomplete')
+        self.show_incomplete_only = kwargs.get('incomplete') or request and request.GET.get('incomplete')
 
         super(ProgressReportSerializer, self).__init__(*args, **kwargs)
 
@@ -294,6 +296,7 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
             'submitted_by',
             'submitting_user',
             'is_final',
+            'narrative',
         )
 
     def get_partner_org_id(self, obj):
@@ -318,20 +321,25 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
         return obj.programme_document.funds_received_to_date_percentage
 
     def get_indicator_reports(self, obj):
-        qset = obj.indicator_reports.all()
+        queryset = obj.indicator_reports.all()
         if self.llo_id and self.llo_id is not None:
-            qset = qset.filter(reportable__object_id=self.llo_id)
+            queryset = queryset.filter(reportable__object_id=self.llo_id)
         if self.location_id and self.llo_id is not None:
-            qset = qset.filter(reportable__locations__id=self.location_id)
-        # TODO: use incomplete flag
-        return PDReportContextIndicatorReportSerializer(
-            instance=qset, read_only=True, many=True).data
+            queryset = queryset.filter(reportable__locations__id=self.location_id)
+
+        if self.show_incomplete_only == Boolean.TRUE:
+            queryset = filter(
+                lambda x: not x.is_complete,
+                queryset
+            )
+
+        return PDReportContextIndicatorReportSerializer(queryset, read_only=True, many=True).data
 
     def get_reporting_period(self, obj):
         return "%s - %s " % (
             obj.start_date.strftime(settings.PRINT_DATA_FORMAT),
             obj.end_date.strftime(settings.PRINT_DATA_FORMAT)
-        )
+        ) if obj.start_date and obj.end_date else "No reporting period"
 
     def get_is_draft(self, obj):
         return obj.latest_indicator_report.is_draft if obj.latest_indicator_report else None
@@ -339,9 +347,9 @@ class ProgressReportSerializer(ProgressReportSimpleSerializer):
 
 class ProgressReportUpdateSerializer(serializers.ModelSerializer):
 
-    partner_contribution_to_date = serializers.CharField(required=False)
-    challenges_in_the_reporting_period = serializers.CharField(required=False)
-    proposed_way_forward = serializers.CharField(required=False)
+    partner_contribution_to_date = serializers.CharField(required=False, allow_blank=True)
+    challenges_in_the_reporting_period = serializers.CharField(required=False, allow_blank=True)
+    proposed_way_forward = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
         model = ProgressReport
@@ -350,6 +358,60 @@ class ProgressReportUpdateSerializer(serializers.ModelSerializer):
             'partner_contribution_to_date',
             'challenges_in_the_reporting_period',
             'proposed_way_forward',
+        )
+
+
+class ProgressReportSRUpdateSerializer(serializers.ModelSerializer):
+
+    narrative = serializers.CharField()
+
+    class Meta:
+        model = ProgressReport
+        fields = (
+            'id',
+            'narrative',
+        )
+
+
+class ProgressReportPullHFDataSerializer(serializers.ModelSerializer):
+    report_name = serializers.SerializerMethodField()
+    report_location_total = serializers.SerializerMethodField()
+
+    def get_report_location_total(self, obj):
+        indicator_report = self.context['indicator_report']
+
+        target_hf_irs = obj.indicator_reports.filter(
+            time_period_start__gte=obj.start_date,
+            time_period_end__lte=obj.end_date,
+            reportable=indicator_report.reportable,
+        )
+
+        calculated = {'c': 0, 'v': 0, 'd': 0}
+
+        for ir in target_hf_irs:
+            calculated['c'] += ir.total['c']
+            calculated['v'] += ir.total['v']
+
+            if indicator_report.reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
+                calculated['d'] = 1
+
+            else:
+                calculated['d'] += ir.total['d']
+
+        return calculated
+
+    def get_report_name(self, obj):
+        return obj.report_type + str(obj.report_number)
+
+    class Meta:
+        model = ProgressReport
+        fields = (
+            'id',
+            'report_name',
+            'start_date',
+            'end_date',
+            'due_date',
+            'report_location_total',
         )
 
 

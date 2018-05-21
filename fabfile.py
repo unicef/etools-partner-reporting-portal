@@ -18,7 +18,7 @@ def up_recreate():
     """
     Recreate containers even if their configuration and image haven't changed.
     """
-    local('docker-compose down && docker-compose up')
+    local('docker-compose stop && docker-compose up')
 
 
 def up(quick=False):
@@ -45,22 +45,25 @@ def restart(service):
     restart a service container
     :param service: ['django_api', 'polymer', 'proxy', 'db']
     """
-    assert service in ['django_api', 'polymer', 'proxy', 'db'], "%s is unrecognized service"
+    assert service in ['django_api', 'polymer', 'proxy', 'db', 'beater-prp', 'worker-prp'], "%s is unrecognized service"
     local('docker-compose restart %s' % service)
 
 
 def down():
     """
-    Stop all containers.
+    Destroy all containers with volumes.
     """
     local('docker-compose down')
 
 
-def rebuild():
+def rebuild(service):
     """
     Re-build docker images for containers.
     """
-    local('docker-compose build')
+    if service:
+        assert service in ['django_api', 'polymer', 'proxy', 'db'], "%s is unrecognized service"
+
+    local('docker-compose build %s' % service if service else '')
 
 
 def ps():
@@ -70,11 +73,14 @@ def ps():
     local('docker-compose ps')
 
 
-def stop():
+def stop(service):
     """
-    Stop services.
+    Stop service(s).
     """
-    local('docker-compose stop')
+    if service:
+        assert service in ['django_api', 'polymer', 'proxy', 'db'], "%s is unrecognized service"
+
+    local('docker-compose stop %s' % service if service else '')
 
 
 def fixtures(quantity=2):
@@ -86,7 +92,7 @@ def fixtures(quantity=2):
 
 def real_fixtures(area=False):
     """
-    Uses real sync with PMP API to get all data.
+    Destroy current DB data and uses real sync with PMP API to get all data.
     """
     local('docker-compose exec django_api python manage.py generate_real_data --clean_before %s' % ("--area %s --fast" % area if area else ""))
 
@@ -95,19 +101,12 @@ def tests(test_path=''):
     """
     Run django_api tests.
     """
-    local('docker-compose exec django_api python manage.py test {} --parallel --noinput'.format(test_path))
-
-
-def fake_users(fast=False):
-    """
-    Uses real sync with PMP API to get all data.
-    """
-    local('docker-compose exec django_api python manage.py generate_fake_users --clean_before')
+    local('docker-compose exec django_api python manage.py test {} --settings=django_api.settings.test --parallel --noinput'.format(test_path))
 
 
 def update_real_fixtures(area=False):
     """
-    Uses real sync with PMP API to get all data.
+    Uses real sync with PMP API to update data.
     """
     local('docker-compose exec django_api python manage.py generate_real_data %s --update' % ("--area %s --fast" % area if area else ""))
 

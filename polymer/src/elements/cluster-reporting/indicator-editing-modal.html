@@ -316,6 +316,7 @@
                   indicator-id="[[data.id]]"
                   indicator-type="[[data.blueprint.display_type]]"
                   parent-indicator-id="[[data.parent_indicator]]"
+                  is-pai="[[isPAI]]"
                   value="{{data.locations}}"
                   editing>
               </indicator-locations-widget>
@@ -426,9 +427,14 @@
           value: [],
         },
 
+        isPAI: {
+          type: Boolean,
+          computed: '_computeIsPAI(data)',
+        },
+
         canEditDetails: {
           type: Boolean,
-          computed: '_computeCanEditDetails(permissions, data)',
+          computed: '_computeCanEditDetails(permissions, data, isPAI)',
         },
       },
 
@@ -453,9 +459,13 @@
         return type === 'number';
       },
 
-      _computeCanEditDetails: function (permissions, data) {
-        return permissions.createClusterEntities ||
+      _computeCanEditDetails: function (permissions, data, isPAI) {
+        return (permissions.createClusterEntities && !isPAI) ||
             (permissions.onlyEditOwnIndicatorDetails && !data.parent_indicator);
+      },
+
+      _computeIsPAI: function (data) {
+        return (data.content_type_key || '').split('.').pop().toLowerCase() === 'partneractivity';
       },
 
       _setDefaults: function (opened) {

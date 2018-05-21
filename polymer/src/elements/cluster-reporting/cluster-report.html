@@ -15,13 +15,11 @@
 <link rel="import" href="../../polyfills/es6-shim.html">
 <link rel="import" href="../../endpoints.html">
 <link rel="import" href="../../behaviors/utils.html">
-<link rel="import" href="../../behaviors/notifications.html">
 <link rel="import" href="../../behaviors/routing.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/actions.html">
 <link rel="import" href="send-back-modal.html">
 <link rel="import" href="feedback-modal.html">
-<link rel="import" href="../reportable-meta.html">
 <link rel="import" href="../error-modal.html">
 <link rel="import" href="../report-status.html">
 <link rel="import" href="../etools-prp-ajax.html">
@@ -109,6 +107,14 @@
         color: white;
         background: var(--theme-primary-color);
         cursor: pointer;
+      }
+
+      .special-report-cluster .report__toggle {
+        background: #0099ff;
+      }
+
+      .special-report-ip .report__toggle {
+        background: #009d55;
       }
 
       .reportable {
@@ -206,15 +212,7 @@
         method="post">
     </etools-prp-ajax>
 
-    <etools-prp-ajax
-        id="update"
-        url="[[reportUrl]]"
-        body="[[reportMeta]]"
-        method="patch"
-        content-type="application/json">
-    </etools-prp-ajax>
-
-    <div class="report">
+    <div class$="report [[containerClassName]]">
       <div class="layout horizontal">
         <div
             class="report__toggle flex-none layout horizontal center-center"
@@ -420,7 +418,7 @@
                     restamp="true">
                   <div class="status-badge layout vertical center-justified">
                     <report-status
-                        status="[[data.overall_status]]"
+                        status="[[_computeCompleteIndicator(data.is_complete)]]"
                         no-label>
                     </report-status>
                   </div>
@@ -491,12 +489,6 @@
             opened="{{opened}}"
             on-opened-changed="_handleOpenedChanged"
             no-animation>
-          <reportable-meta
-              data="[[data]]"
-              mode="[[editMode]]"
-              allow-no-status>
-          </reportable-meta>
-
           <indicator-details
             reportable-id="[[data.reportable.id]]"
             indicator-name="[[data.indicator_name]]"
@@ -513,11 +505,10 @@
 
   <script>
     Polymer({
-      id: 'cluster-report',
+      is: 'cluster-report',
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
-        App.Behaviors.NotificationsBehavior,
         App.Behaviors.ReduxBehavior,
         App.Behaviors.RoutingBehavior,
       ],
@@ -527,11 +518,14 @@
 
         data: Object,
 
-        reportMeta: Object,
-
         opened: Boolean,
 
         mode: String,
+
+        app: {
+          type: String,
+          statePath: 'app.current',
+        },
 
         busy: {
           type: Boolean,
@@ -604,11 +598,15 @@
           type: Boolean,
           computed: '_computeShowFeedback(data, permissions)',
         },
+
+        containerClassName: {
+          type: String,
+          computed: '_computeContainerClassName(data, app)',
+        },
       },
 
       listeners: {
         'report-complete': '_onReportComplete',
-        'reportable-meta-changed': '_updateMeta',
       },
 
       _computeIcon: function (opened) {
@@ -661,6 +659,10 @@
 
       _computeIndicatorType: function (data) {
         return data.reportable.blueprint.display_type;
+      },
+
+      _computeCompleteIndicator: function (complete) {
+        return complete ? 'Met' : 'Ove';
       },
 
       _toggle: function () {
@@ -734,32 +736,6 @@
         );
       },
 
-      _updateMeta: function (e, data) {
-        var self = this;
-        var updateThunk;
-
-        e.stopPropagation();
-
-        this.set('reportMeta', data);
-
-        updateThunk = this.$.update.thunk();
-
-        this.$.update.abort();
-
-        this.dispatch(
-          App.Actions.ClusterIndicatorReports.update(
-            updateThunk,
-            this.data.id
-          )
-        )
-            .then(function () {
-              self._notifyChangesSaved();
-            })
-            .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-            });
-      },
-
       _computeExportParams: function (queryParams, data) {
         return Object.assign({}, queryParams, {
           indicator: data.id,
@@ -816,9 +792,21 @@
         });
       },
 
+      _computeContainerClassName: function (data, app) {
+        switch (true) {
+          case !!data.child_ir_ids && app === 'cluster-reporting':
+            return 'special-report-cluster';
+
+          case !!data.parent_ir_id && app === 'ip-reporting':
+            return 'special-report-ip';
+
+          default:
+            return '';
+        }
+      },
+
       detached: function () {
         this.$.submit.abort();
-        this.$.update.abort();
         this.$.error.close();
       },
     });

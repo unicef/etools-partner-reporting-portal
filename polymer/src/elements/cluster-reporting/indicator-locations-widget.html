@@ -10,6 +10,7 @@
 <link rel="import" href="../../settings.html">
 <link rel="import" href="../../polyfills/es6-shim.html">
 <link rel="import" href="../../behaviors/utils.html">
+<link rel="import" href="../../behaviors/notifications.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../styles/buttons.html">
 <link rel="import" href="../../styles/shared-styles.html">
@@ -276,6 +277,7 @@
         behaviors: [
           App.Behaviors.UtilsBehavior,
           App.Behaviors.ReduxBehavior,
+          App.Behaviors.NotificationsBehavior,
         ],
 
         properties: {
@@ -285,6 +287,7 @@
           clusterId: Number,
           locations: Object,
           pending: Object,
+          isPai: Boolean,
 
           editing: {
             type: Boolean,
@@ -345,7 +348,7 @@
 
           canEditDetails: {
             type: Boolean,
-            computed: '_computeCanEditDetails(editing, parentIndicatorId, permissions)',
+            computed: '_computeCanEditDetails(editing, parentIndicatorId, isPai, permissions)',
           },
 
           canMessageIMO: {
@@ -388,9 +391,9 @@
               });
         },
 
-        _computeCanEditDetails: function (editing, parentIndicatorId, permissions) {
+        _computeCanEditDetails: function (editing, parentIndicatorId, isPAI, permissions) {
           return !editing ||
-              permissions.createClusterEntities ||
+              (permissions.createClusterEntities && !isPAI) ||
               (permissions.onlyEditOwnIndicatorDetails && !parentIndicatorId);
         },
 
@@ -505,6 +508,12 @@
           this.messageModal.open();
         },
 
+        _handleMessageSent: function (e) {
+          e.stopPropagation();
+
+          this._notifyMessageSent();
+        },
+
         validate: function () {
           this.set('invalid', !this._fieldsAreValid());
         },
@@ -513,9 +522,12 @@
           this.set('locations', {});
           this.set('pending', {});
 
+          this._handleMessageSent = this._handleMessageSent.bind(this);
           this.messageModal = this.$$('#message-modal');
 
           if (this.messageModal) {
+            this.messageModal.addEventListener('imo-message-sent', this._handleMessageSent);
+
             document.body.appendChild(this.messageModal);
           }
         },
@@ -532,6 +544,7 @@
           if (this.messageModal) {
             document.body.removeChild(this.messageModal);
 
+            this.messageModal.removeEventListener('imo-message-sent', this._handleMessageSent);
             this.messageModal = null;
           }
         },

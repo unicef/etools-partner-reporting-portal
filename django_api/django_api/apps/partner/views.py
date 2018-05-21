@@ -134,7 +134,8 @@ class PartnerProjectAPIView(APIView):
 
         serializer = PartnerProjectSerializer(
             instance=self.get_instance(),
-            data=self.request.data
+            data=self.request.data,
+            partial=True
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -286,11 +287,10 @@ class PartnerActivityListAPIView(ListAPIView):
     def get_queryset(self, *args, **kwargs):
         response_plan_id = self.kwargs.get('response_plan_id')
 
-        queryset = PartnerActivity.objects.select_related(
-            'cluster_activity').filter(
-                Q(cluster_activity__cluster_objective__cluster__response_plan_id=response_plan_id) |
-                Q(cluster_objective__cluster__response_plan_id=response_plan_id)
-            )
+        queryset = PartnerActivity.objects.select_related('cluster_activity').filter(
+            Q(cluster_activity__cluster_objective__cluster__response_plan_id=response_plan_id) |
+            Q(cluster_objective__cluster__response_plan_id=response_plan_id)
+        )
 
         order = self.request.query_params.get('sort', None)
         if order:

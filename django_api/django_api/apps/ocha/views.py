@@ -16,6 +16,7 @@ from ocha.imports.utilities import get_json_from_url
 from ocha.imports.response_plan import import_response_plan
 from ocha.imports.project import import_project, get_project_list_for_plan
 from ocha.imports.bulk import get_response_plans_for_countries, fetch_json_urls_async
+from ocha.utilities import trim_list
 from partner.models import Partner
 from partner.serializers import PartnerProjectSerializer
 
@@ -51,21 +52,13 @@ class RPMWorkspaceResponsePlanAPIView(APIView):
 
         return iso3_codes
 
-    def trim_plans_list(self, response_plans):
-        return [{
-            'id': rp['id'],
-            'name': rp['name'],
-        } for rp in response_plans]
-
     def get_response_plans(self):
         return get_response_plans_for_countries(self.get_country_iso3_codes())
 
     def get(self, request, *args, **kwargs):
         response_plans = self.get_response_plans()
 
-        return Response(
-            self.trim_plans_list(response_plans)
-        )
+        return Response(trim_list(response_plans))
 
     def post(self, request, *args, **kwargs):
         plan_id = request.data.get('plan')
@@ -129,12 +122,6 @@ class RPMProjectListAPIView(APIView):
             ResponsePlan, id=self.kwargs['plan_id']
         )
 
-    def trim_projects_list(self, projects):
-        return [{
-            'id': p['id'],
-            'name': p['name'],
-        } for p in projects]
-
     def get_projects(self):
         response_plan = self.get_response_plan()
         if not response_plan.external_id:
@@ -145,9 +132,7 @@ class RPMProjectListAPIView(APIView):
     def get(self, request, *args, **kwargs):
         projects = self.get_projects()
 
-        return Response(
-            self.trim_projects_list(projects)
-        )
+        return Response(trim_list(projects))
 
     def get_partner(self):
         if self.request.user.groups.filter(name=IMORole.as_group().name).exists():
@@ -193,7 +178,6 @@ class RPMProjectDetailAPIView(APIView):
             details_url,
             budget_url
         ])
-        print(details)
 
         out_data = {
             k: v for k, v in details['data'].items() if type(v) not in {list, dict}

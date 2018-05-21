@@ -55,7 +55,7 @@ DOMAIN_NAME = os.getenv('DOMAIN_NAME')
 
 FRONTEND_HOST = os.getenv(
     'PRP_FRONTEND_HOST',
-    os.getenv('DJANGO_ALLOWED_HOST', 'http://localhost:8080')
+    os.getenv('DJANGO_ALLOWED_HOST', 'http://localhost:8082')
 )
 
 # Sendgrid stuff
@@ -67,6 +67,12 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'no-reply@etools.unicef.org'
+
+ADMIN_MAIL = os.getenv('ADMIN_MAIL')
+if ADMIN_MAIL:
+    ADMINS = [
+        ('Admin', ADMIN_MAIL),
+    ]
 
 ALLOWED_HOSTS = []
 
@@ -90,6 +96,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'corsheaders',
 
     'storages',
@@ -106,6 +113,7 @@ INSTALLED_APPS = [
     'django_cron',
     'fixture_magic',
     'guardian',
+    'social_django',
     'django_nose',
 
     'account',
@@ -122,6 +130,7 @@ MIDDLEWARE_CLASSES = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -152,6 +161,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
             'loaders': [
               'django.template.loaders.filesystem.Loader',
@@ -273,7 +284,7 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'standard': {
-            'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
+            'format': '[%(asctime)s][%(levelname)s][%(name)s] %(filename)s %(funcName)s:%(lineno)d %(message)s'
         },
         'json': {
             '()': 'pythonjsonlogger.jsonlogger.JsonFormatter',
@@ -288,20 +299,16 @@ LOGGING = {
             'formatter': 'standard',
         },
         'default': {
-            'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(LOGS_PATH, 'django.log'),
-            'maxBytes': 1024 * 1024 * 5,  # 5 MB
-            'backupCount': 5,
-            'formatter': 'standard'
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'stream': sys.stdout,
+            'formatter': 'standard',
         },
         'ocha': {
-            'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(LOGS_PATH, 'ocha.log'),
-            'maxBytes': 1024 * 1024 * 5,  # 5 MB
-            'backupCount': 5,
-            'formatter': 'standard'
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'stream': sys.stdout,
+            'formatter': 'standard',
         },
         'elasticapm': {
             'level': 'ERROR',
@@ -315,7 +322,7 @@ LOGGING = {
             'propagate': True
         },
         'ocha-sync': {
-            'handlers': ['ocha', 'console'],
+            'handlers': ['ocha'],
             'level': 'DEBUG',
             'propagate': True
         },
@@ -406,6 +413,50 @@ PASSWORDLESS_AUTH = {
     'PASSWORDLESS_EMAIL_SUBJECT': 'UNICEF Partner Reporting Portal: Your login link'
 }
 
+# Django-social-auth settings
+KEY = os.getenv('AZURE_B2C_CLIENT_ID', None)
+SECRET = os.getenv('AZURE_B2C_CLIENT_SECRET', None)
+
+SOCIAL_AUTH_URL_NAMESPACE = 'social'
+SOCIAL_AUTH_SANITIZE_REDIRECTS = False
+POLICY = os.getenv('AZURE_B2C_POLICY_NAME', "b2c_1A_UNICEF_PARTNERS_signup_signin")
+
+TENANT_ID = os.getenv('AZURE_B2C_TENANT', 'unicefpartners.onmicrosoft.com')
+SCOPE = ['openid', 'email']
+IGNORE_DEFAULT_SCOPE = True
+SOCIAL_AUTH_USERNAME_IS_FULL_EMAIL = True
+SOCIAL_AUTH_PROTECTED_USER_FIELDS = ['email']
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = "/app"
+
+# TODO: Re-enable this back once we figure out all email domain names to whitelist from partners
+# SOCIAL_AUTH_WHITELISTED_DOMAINS = ['unicef.org', 'google.com']
+
+# TODO: Set this url properly later
+LOGIN_ERROR_URL = "/404"
+JWT_LEEWAY = 1000
+
+SOCIAL_AUTH_PIPELINE = (
+    # 'social_core.pipeline.social_auth.social_details',
+    'core.mixins.social_details',
+    'social_core.pipeline.social_auth.social_uid',
+
+    # allows based on emails being listed in 'WHITELISTED_EMAILS' or 'WHITELISTED_DOMAINS'
+    'social_core.pipeline.social_auth.auth_allowed',
+
+    'social_core.pipeline.social_auth.social_user',
+    # 'social_core.pipeline.user.get_username',
+    'core.mixins.get_username',
+
+    'social_core.pipeline.user.create_user',
+
+    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.social_auth.load_extra_data',
+    'social_core.pipeline.user.user_details',
+    'social_core.pipeline.social_auth.associate_by_email',
+    'core.mixins.user_details',
+)
+
+
 # PMP API
 PMP_API_ENDPOINT = "https://etools-demo.unicef.org/api"
 PMP_API_USER = os.getenv('PMP_API_USER')
@@ -464,8 +515,8 @@ AUTHENTICATION_BACKENDS = (
     'guardian.backends.ObjectPermissionBackend',
 )
 
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
-NOSE_ARGS = ['--with-timer', '--nocapture']
+TEST_RUNNER = 'utils.test_runner.CustomNoseTestSuiteRunner'
+NOSE_ARGS = ['--with-timer', '--nocapture', '--nologcapture']
 
 # apm related - it's enough to set those as env variables, here just for documentation
 # by default logging and apm is off, so below envs needs to be set per environment

@@ -16,7 +16,6 @@ from unicef.models import (
 )
 from indicator.serializers import (
     IdDisaggregationSerializer,
-    # ReportableLocationGoalSerializer,
 )
 from indicator.models import (
     Reportable,
@@ -66,7 +65,6 @@ class TestPDReportsAPIView(BaseAPITestCase):
 
 
 class TestIndicatorDataAPIView(BaseAPITestCase):
-    generate_fake_data_quantity = 3
 
     def setUp(self):
         super().setUp()
@@ -180,7 +178,6 @@ class TestIndicatorDataAPIView(BaseAPITestCase):
 
 
 class TestIndicatorListAPIView(BaseAPITestCase):
-    generate_fake_data_quantity = 3
 
     def setUp(self):
         super().setUp()
@@ -298,8 +295,6 @@ class TestIndicatorReportListAPIView(BaseAPITestCase):
 
 
 class TestClusterIndicatorAPIView(BaseAPITestCase):
-
-    generate_fake_data_quantity = 2
 
     def setUp(self):
         super(TestClusterIndicatorAPIView, self).setUp()

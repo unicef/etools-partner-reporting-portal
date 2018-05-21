@@ -11,7 +11,6 @@
 <link rel="import" href="../report-status.html">
 <link rel="import" href="../etools-prp-number.html">
 <link rel="import" href="../etools-prp-currency.html">
-<link rel="import" href="../etools-prp-permissions.html">
 <link rel="import" href="../list-placeholder.html">
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/data-table.html">
@@ -35,10 +34,6 @@
         text-transform: uppercase;
       }
     </style>
-
-    <etools-prp-permissions
-        permissions="{{permissions}}">
-    </etools-prp-permissions>
 
     <iron-location
         query="{{query}}">
@@ -102,24 +97,10 @@
         <etools-data-table-row no-collapse>
           <div slot="row-data">
             <div class="table-cell table-cell--text">
-              <template
-                  is="dom-if"
-                  if="[[canViewPdDetails]]"
-                  restamp="true">
-                <a href="[[ pd.id ]]/view/details">
-                  [[_withDefault(pd.reference_number)]]
-                  <paper-tooltip>[[pd.title]]</paper-tooltip>
-                </a>
-              </template>
-              <template
-                  is="dom-if"
-                  if="[[!canViewPdDetails]]"
-                  restamp="true">
-                <span>
-                  [[_withDefault(pd.reference_number)]]
-                  <paper-tooltip>[[pd.title]]</paper-tooltip>
-                </span>
-              </template>
+              <a href="[[ pd.id ]]/view/details">
+                [[_withDefault(pd.reference_number)]]
+                <paper-tooltip>[[pd.title]]</paper-tooltip>
+              </a>
             </div>
             <div class="table-cell table-cell--text">
               [[_withDefault(pd.status)]]
@@ -198,8 +179,6 @@
       ],
 
       properties: {
-        permissions: Object,
-
         loading: {
           type: Boolean,
           statePath: 'programmeDocuments.loading',
@@ -214,15 +193,6 @@
           type: Number,
           statePath: 'programmeDocuments.count',
         },
-
-        canViewPdDetails: {
-          type: Boolean,
-          computed: '_computeCanViewPdDetails(permissions)',
-        },
-      },
-
-      _computeCanViewPdDetails: function (permissions) {
-        return permissions.viewPdDetails;
       },
     });
   </script>

@@ -12,8 +12,6 @@
 
 # class TestProgrammeDocumentListAPIView(BaseAPITestCase):
 
-#     generate_fake_data_quantity = 3
-
 #     def setUp(self):
 #         super().setUp()
 

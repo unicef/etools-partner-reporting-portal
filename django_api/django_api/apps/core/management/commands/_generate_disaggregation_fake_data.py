@@ -7,6 +7,7 @@ from indicator.models import (
     Reportable,
     IndicatorReport,
     Disaggregation,
+    ReportingEntity,
 )
 from indicator.disaggregators import (
     QuantityIndicatorDisaggregator,
@@ -28,7 +29,11 @@ from core.factories import (
     RatioIndicatorReportFactory,
     DisaggregationFactory,
     DisaggregationValueFactory,
-)
+    LocationWithReportableLocationGoalFactory)
+
+
+unicef_re = ReportingEntity.objects.get(title="UNICEF")
+cluster_re = ReportingEntity.objects.get(title="Cluster")
 
 
 def generate_0_num_disagg_data(reportable, indicator_type="quantity"):
@@ -441,12 +446,19 @@ def generate_indicator_report_location_disaggregation_quantity_data(generate_all
         ]
 
         if reportable.content_type.model in cluster_indicator_types:
-            # ProgressReport - IndicatorReport from
-            # QuantityReportable object
             indicator_report = QuantityIndicatorReportFactory(
-                reportable=reportable)
+                reportable=reportable,
+                reporting_entity=cluster_re)
+
+        # ProgressReport - IndicatorReport from
+        # QuantityReportable object
+        else:
+            indicator_report = QuantityIndicatorReportFactory(
+                reportable=reportable,
+                reporting_entity=unicef_re)
             indicator_report.progress_report = reportable.indicator_reports.first().progress_report
-            indicator_report.save()
+
+        indicator_report.save()
 
         # -- IndicatorLocationData --
         add_disaggregations_to_reportable(
@@ -569,8 +581,10 @@ def generate_indicator_report_location_disaggregation_quantity_data(generate_all
                                         flat=True)):
                     if not first_reportable_location_id or (
                             first_reportable_location_id and first_reportable_location_id != location_id):
-                        reportable.locations.add(
-                            Location.objects.get(id=location_id))
+                        LocationWithReportableLocationGoalFactory.create(
+                            location=Location.objects.get(id=location_id),
+                            reportable=reportable
+                        )
 
             print(
                 "IndicatorReport and its Disaggregation data entries "
@@ -609,11 +623,15 @@ def generate_indicator_report_location_disaggregation_ratio_data(generate_all=Fa
         ]
 
         if reportable.content_type.model in cluster_indicator_types:
-            # ProgressReport - IndicatorReport from
-            # RatioReportable object
-            indicator_report = RatioIndicatorReportFactory(reportable=reportable)
+            indicator_report = RatioIndicatorReportFactory(reportable=reportable, reporting_entity=cluster_re)
+
+        # ProgressReport - IndicatorReport from
+        # RatioReportable object
+        else:
+            indicator_report = RatioIndicatorReportFactory(reportable=reportable, reporting_entity=unicef_re)
             indicator_report.progress_report = reportable.indicator_reports.first().progress_report
-            indicator_report.save()
+
+        indicator_report.save()
 
         # -- IndicatorLocationData --
         # -- IndicatorLocationData --
@@ -732,8 +750,10 @@ def generate_indicator_report_location_disaggregation_ratio_data(generate_all=Fa
                                         flat=True)):
                     if not first_reportable_location_id or (
                             first_reportable_location_id and first_reportable_location_id != location_id):
-                        reportable.locations.add(
-                            Location.objects.get(id=location_id))
+                        LocationWithReportableLocationGoalFactory.create(
+                            location=Location.objects.get(id=location_id),
+                            reportable=reportable
+                        )
 
             print(
                 "IndicatorReport and its Disaggregation data entries",

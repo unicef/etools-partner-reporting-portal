@@ -16,8 +16,8 @@ class User(AbstractUser):
     related models:
         partner.Partner (ForeignKey): "partner"
     """
-    first_name = models.CharField(max_length=64, blank=True, null=True)
-    last_name = models.CharField(max_length=64, blank=True, null=True)
+    first_name = models.CharField(max_length=64)
+    last_name = models.CharField(max_length=64)
 
     partner = models.ForeignKey(
         'partner.Partner', related_name="users", null=True, blank=True

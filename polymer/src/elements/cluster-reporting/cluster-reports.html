@@ -80,6 +80,7 @@
       listeners: {
         'report-submitted': '_onContentsChanged',
         'report-reviewed': '_onContentsChanged',
+        'template-file-uploaded': '_onTemplateFileUploaded',
         'refresh-report': '_onRefreshReport',
       },
 
@@ -93,13 +94,13 @@
         return App.Endpoints.clusterIndicatorReports(responsePlanId);
       },
 
-      _fetchData: function () {
+      _fetchData: function (reset) {
         var reportsThunk = this.$.reports.thunk();
 
         this.$.reports.abort();
 
         this.dispatch(
-          App.Actions.ClusterIndicatorReports.fetch(reportsThunk)
+          App.Actions.ClusterIndicatorReports.fetch(reportsThunk, reset)
         )
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
@@ -131,6 +132,12 @@
             .catch(function (err) { // jshint ignore:line
               // TODO: error handling
             });
+      },
+
+      _onTemplateFileUploaded: function (e) {
+        e.stopPropagation();
+
+        this._fetchData(true);
       },
 
       detached: function () {

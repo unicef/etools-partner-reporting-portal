@@ -145,9 +145,9 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
     partner = serializers.CharField(required=False, read_only=True)
     partner_id = serializers.IntegerField(required=False)
     response_plan_title = serializers.SerializerMethodField()
-    total_budget = serializers.CharField(required=False)
+    total_budget = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     description = serializers.CharField(required=False)
-    additional_information = serializers.CharField(required=False)
+    additional_information = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     funding = PartnerProjectFundingSerializer(read_only=True)
     additional_partners = PartnerSimpleSerializer(many=True, allow_null=True, read_only=True)
     custom_fields = PartnerProjectCustomFieldSerializer(many=True, allow_null=True, required=False)
@@ -177,6 +177,7 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
             'funding',
             'additional_partners',
             'custom_fields',
+            'is_ocha_imported',
         )
 
     def get_response_plan_title(self, obj):
@@ -185,7 +186,10 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         validated_data = super(PartnerProjectSerializer, self).validate(attrs)
-        if validated_data['end_date'] < validated_data['start_date']:
+        start_date = validated_data.get('start_date', getattr(self.instance, 'start_date', None))
+        end_date = validated_data.get('end_date', getattr(self.instance, 'start_date', None))
+
+        if start_date and end_date and end_date < start_date:
             raise serializers.ValidationError({
                 'end_date': 'Cannot be earlier than Start Date'
             })
@@ -233,8 +237,8 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def update(self, instance, validated_data):
-        clusters = self.initial_data.pop('clusters', [])
-        if not clusters:
+        clusters = self.initial_data.get('clusters')
+        if clusters is not None and not clusters:
             raise serializers.ValidationError({
                 'clusters': 'This list cannot be empty'
             })
@@ -247,9 +251,10 @@ class PartnerProjectSerializer(serializers.ModelSerializer):
             project.custom_fields = custom_fields
             project.save()
 
-        cluster_ids = [c['id'] for c in clusters]
-        project.clusters.add(*Cluster.objects.filter(id__in=cluster_ids))
-        project.clusters.through.objects.exclude(cluster_id__in=cluster_ids).delete()
+        if clusters:
+            cluster_ids = [c['id'] for c in clusters]
+            project.clusters.clear()
+            project.clusters.add(*Cluster.objects.filter(id__in=cluster_ids))
 
         self.save_funding(instance=instance)
 
@@ -404,12 +409,11 @@ class PartnerActivityFromCustomActivitySerializer(PartnerActivityBaseCreateSeria
                 )
             })
 
-        if 'request' in self.context \
-            and not self.context['imo'] \
+        if 'request' in self.context and not self.context['imo'] \
                 and not data['partner'] == self.context['request'].user.partner:
-                    raise serializers.ValidationError({
-                        'partner': "Partner id did not match this user's partner"
-                    })
+                raise serializers.ValidationError({
+                    'partner': "Partner id did not match this user's partner"
+                })
 
         if data['project'].partner != data['partner']:
             return serializers.ValidationError({
@@ -467,12 +471,12 @@ class PartnerActivitySerializer(serializers.ModelSerializer):
         if obj.cluster_activity:
             return {
                 "id": obj.cluster_activity.cluster_objective.cluster.id,
-                "name": obj.cluster_activity.cluster_objective.cluster.get_type_display(),
+                "name": obj.cluster_activity.cluster_objective.cluster.title,
             }
         elif obj.cluster_objective:
             return {
                 "id": obj.cluster_objective.cluster.id,
-                "name": obj.cluster_objective.cluster.get_type_display(),
+                "name": obj.cluster_objective.cluster.title,
             }
         else:
             return None
@@ -567,7 +571,7 @@ class PMPPartnerSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         validated_data = self.fix_choices(validated_data)
         return Partner.objects.filter(
-            external_id=validated_data['external_id']).update(**validated_data)
+            vendor_number=validated_data['vendor_number']).update(**validated_data)
 
     def create(self, validated_data):
         validated_data = self.fix_choices(validated_data)

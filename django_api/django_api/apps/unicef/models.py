@@ -83,6 +83,7 @@ class ProgrammeDocument(TimeStampedExternalSyncModelMixin):
         Workspace (ForeignKey): "workspace_programme_documents"
     """
     agreement = models.CharField(max_length=255, verbose_name='Agreement')
+
     document_type = models.CharField(
         max_length=3,
         choices=PD_DOCUMENT_TYPE,
@@ -363,16 +364,15 @@ class ProgressReport(TimeStampedModel):
     Represents a report on multiple lower level outputs by a partner
     for a certain time period, against a PD.
     """
-    partner_contribution_to_date = models.CharField(max_length=256)
-    challenges_in_the_reporting_period = models.CharField(max_length=256)
-    proposed_way_forward = models.CharField(max_length=256)
+    partner_contribution_to_date = models.CharField(max_length=256, blank=True, null=True)
+    challenges_in_the_reporting_period = models.CharField(max_length=256, blank=True, null=True)
+    proposed_way_forward = models.CharField(max_length=256, blank=True, null=True)
     status = models.CharField(max_length=3, choices=PROGRESS_REPORT_STATUS, default=PROGRESS_REPORT_STATUS.due)
     programme_document = models.ForeignKey(ProgrammeDocument,
                                            related_name="progress_reports",
                                            default=-1)
-    # attachments ???
-    start_date = models.DateField(verbose_name='Start Date')
-    end_date = models.DateField(verbose_name='End Date')
+    start_date = models.DateField(verbose_name='Start Date', blank=True, null=True)
+    end_date = models.DateField(verbose_name='End Date', blank=True, null=True)
     due_date = models.DateField(verbose_name='Due Date')
     submission_date = models.DateField(verbose_name='Submission Date', blank=True, null=True)
     # User should match by email to Person in programme_document.partner_focal_point list
@@ -402,6 +402,7 @@ class ProgressReport(TimeStampedModel):
     report_number = models.IntegerField(verbose_name="Report Number")
     report_type = models.CharField(verbose_name="Report type", choices=REPORTING_TYPES, max_length=3)
     is_final = models.BooleanField(verbose_name="Is final report", default=False)
+    narrative = models.CharField(verbose_name="Narrative", max_length=256, blank=True, null=True)
 
     class Meta:
         ordering = ['-due_date', '-id']
@@ -456,12 +457,47 @@ def handle_terminated_suspended_pd_reports(sender, instance, created, **kwargs):
     """
     if instance.progress_reports.exists() and \
             (instance.status == PD_STATUS.terminated or instance.status == PD_STATUS.suspended):
-        final_pr = instance.progress_reports.latest('end_date')
-        final_pr.end_date = instance.end_date
-        final_pr.save()
+        final_ids = list()
 
-        rest_of_reports = instance.progress_reports.exclude(id=final_pr.id)
-        rest_of_reports.update(status=PROGRESS_REPORT_STATUS.overdue)
+        try:
+            final_pr_qpr = instance.progress_reports.filter(report_type="QPR").latest('end_date')
+        except ProgressReport.DoesNotExist:
+            pass
+        else:
+            final_pr_qpr.end_date = instance.end_date
+            final_pr_qpr.due_date = instance.end_date
+            final_pr_qpr.is_final = True
+            final_pr_qpr.status = PROGRESS_REPORT_STATUS.overdue
+            final_pr_qpr.save()
+            final_ids.append(final_pr_qpr.id)
+
+        try:
+            final_pr_hr = instance.progress_reports.filter(report_type="HR").latest('end_date')
+        except ProgressReport.DoesNotExist:
+            pass
+        else:
+            final_pr_hr.end_date = instance.end_date
+            final_pr_hr.due_date = instance.end_date
+            final_pr_hr.is_final = True
+            final_pr_hr.status = PROGRESS_REPORT_STATUS.overdue
+            final_pr_hr.save()
+            final_ids.append(final_pr_hr.id)
+
+        try:
+            final_pr_sr = instance.progress_reports.filter(report_type="SR").latest('end_date')
+        except ProgressReport.DoesNotExist:
+            pass
+        else:
+            final_pr_sr.is_final = True
+            final_pr_sr.status = PROGRESS_REPORT_STATUS.overdue
+            final_pr_sr.save()
+            final_ids.append(final_pr_sr.id)
+
+        if final_ids:
+            rest_of_reports = instance.progress_reports.exclude(
+                id__in=final_ids
+            ).filter(status=PROGRESS_REPORT_STATUS.due)
+            rest_of_reports.update(status=PROGRESS_REPORT_STATUS.overdue)
 
 
 class ReportingPeriodDates(TimeStampedExternalSyncModelMixin):

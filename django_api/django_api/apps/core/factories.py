@@ -143,7 +143,7 @@ class PartnerActivityFactory(factory.django.DjangoModelFactory):
     project = factory.SubFactory('core.factories.PartnerProjectFactory')
 
     start_date = beginning_of_this_year
-    end_date = beginning_of_this_year + datetime.timedelta(days=30)
+    end_date = beginning_of_this_year + datetime.timedelta(days=180)
     status = fuzzy.FuzzyChoice(PARTNER_PROJECT_STATUS_LIST)
 
     @factory.post_generation
@@ -358,6 +358,7 @@ class LocationWithReportableLocationGoalFactory(factory.django.DjangoModelFactor
 
     class Meta:
         model = ReportableLocationGoal
+        django_get_or_create = ('location', 'reportable')
 
 
 class QuantityReportableToLowerLevelOutputFactory(ReportableFactory):
@@ -418,6 +419,9 @@ class RatioReportableToClusterObjectiveFactory(ReportableFactory):
 
     blueprint = factory.SubFactory(RatioTypeIndicatorBlueprintFactory)
 
+    class Meta:
+        model = Reportable
+
 
 class QuantityReportableToPartnerProjectFactory(ReportableFactory):
     content_object = factory.SubFactory('core.factories.PartnerProjectFactory')
@@ -477,6 +481,8 @@ class QuantityReportableToClusterActivityFactory(ReportableFactory):
 
     blueprint = factory.SubFactory(QuantityTypeIndicatorBlueprintFactory)
 
+    frequency = REPORTABLE_FREQUENCY_LEVEL.monthly
+
     class Meta:
         model = Reportable
 
@@ -492,6 +498,7 @@ class QuantityReportableToPartnerActivityFactory(ReportableFactory):
         [('d', 1), ('v', random.randint(20000, 50000))])
     total = dict(
         [('c', 0), ('d', 1), ('v', random.randint(0, 3000))])
+    frequency = REPORTABLE_FREQUENCY_LEVEL.monthly
 
     indicator_report = factory.RelatedFactory(
         'core.factories.QuantityIndicatorReportFactory', 'reportable')
@@ -555,7 +562,7 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     agreement = factory.Sequence(lambda n: "JOR/PCA2017%d" % n)
     reference_number = factory.Sequence(lambda n: "reference_number_%d" % n)
     start_date = beginning_of_this_year
-    end_date = today + datetime.timedelta(days=70)
+    end_date = beginning_of_this_year + datetime.timedelta(days=364)
     status = fuzzy.FuzzyChoice(PD_STATUS_LIST)
     frequency = fuzzy.FuzzyChoice(PD_FREQUENCY_LEVEL_CHOICE_LIST)
     budget = fuzzy.FuzzyDecimal(low=1000.0, high=100000.0, precision=2)
@@ -577,11 +584,11 @@ class ProgrammeDocumentFactory(factory.django.DjangoModelFactory):
     @factory.post_generation
     def create_cpos(self, create, extracted, **kwargs):
         """
-        Create 2-3 CP outputs per PD
+        Create 1-2 CP outputs per PD
         """
         if not create:
             return
-        for i in range(random.randint(2, 3)):
+        for i in range(random.randint(1, 2)):
             PDResultLinkFactory.create(programme_document=self)
 
 
@@ -643,7 +650,7 @@ class PDResultLinkFactory(factory.django.DjangoModelFactory):
         """
         if not create:
             return
-        for i in range(random.randint(2, 5)):
+        for i in range(random.randint(1, 3)):
             LowerLevelOutputFactory.create(cp_output=self)
 
 

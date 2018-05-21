@@ -187,6 +187,7 @@ class IndicatorBlueprint(TimeStampedExternalSourceModel):
 
     class Meta:
         ordering = ['-id']
+        unique_together = TimeStampedExternalSourceModel.Meta.unique_together
 
 
 @receiver(post_save,
@@ -234,6 +235,8 @@ class Reportable(TimeStampedExternalSourceModel):
     start_date_of_reporting_period = models.DateField(blank=True, null=True)
 
     is_cluster_indicator = models.BooleanField(default=False)
+    is_unicef_hf_indicator = models.BooleanField(default=False)
+
     contributes_to_partner = models.BooleanField(default=False)
 
     # Current total, transactional and dynamically calculated based on
@@ -278,6 +281,12 @@ class Reportable(TimeStampedExternalSourceModel):
     disaggregations = models.ManyToManyField(Disaggregation, blank=True)
 
     active = models.BooleanField(default=True)
+
+    ca_indicator_used_by_reporting_entity = models.ForeignKey(
+        'self', null=True, blank=True,
+        related_name='ca_indicators_re',
+        db_index=True
+    )
 
     class Meta:
         ordering = ['-id']
@@ -472,7 +481,19 @@ def sync_ca_reportable_update_to_pa_reportables(instance, created):
         reportable_data_to_sync = get_reportable_data_to_clone(instance)
 
         if not created:
+            # Update PA Reportable instances first
             instance.children.update(**reportable_data_to_sync)
+
+            # Grab LLO Reportable instances that have CAI ID reference
+            llo_reportables = Reportable.objects.filter(
+                ca_indicator_used_by_reporting_entity=instance,
+                lower_level_outputs__isnull=False
+            )
+
+            # Update these LLO Reportable instances except parent_indicator info
+            if llo_reportables.exists():
+                reportable_data_to_sync['blueprint'] = instance.blueprint
+                llo_reportables.update(**reportable_data_to_sync)
 
 
 @receiver(post_save,
@@ -508,6 +529,7 @@ class IndicatorReport(TimeStampedModel):
         indicator.Reportable (ForeignKey): "indicator"
         unicef.ProgressReport (ForeignKey): "progress_report"
         core.Location (OneToOneField): "location"
+        indicator.ReportingEntity (ForeignKey): "reporting_entity"
     """
     title = models.CharField(max_length=2048)
     reportable = models.ForeignKey(Reportable, related_name="indicator_reports")
@@ -550,6 +572,16 @@ class IndicatorReport(TimeStampedModel):
                                    null=True)
     sent_back_feedback = models.TextField(blank=True, null=True)
 
+    parent = models.ForeignKey('self',
+                               null=True,
+                               blank=True,
+                               related_name='children',
+                               db_index=True)
+
+    reporting_entity = models.ForeignKey(
+        'indicator.ReportingEntity', related_name="indicator_reports"
+    )
+
     objects = IndicatorReportManager()
 
     class Meta:
@@ -569,9 +601,19 @@ class IndicatorReport(TimeStampedModel):
             return self._get_FIELD_display(field_object)
 
     @property
+    def is_complete(self):
+        location_disaggregations = IndicatorLocationData.objects.filter(indicator_report=self).values_list(
+            'disaggregation', flat=True
+        )
+        for location_disaggregation in location_disaggregations:
+            if location_disaggregation == {"()": {"c": 0, "d": 0, "v": 0}}:
+                return False
+
+        return True
+
+    @property
     def is_draft(self):
-        if self.submission_date is None and IndicatorLocationData.objects.filter(
-                indicator_report=self).exists():
+        if self.submission_date is None and IndicatorLocationData.objects.filter(indicator_report=self).exists():
             return True
         return False
 
@@ -750,6 +792,20 @@ def recalculate_reportable_total(sender, instance, **kwargs):
         reportable.parent_indicator.save()
 
 
+class ReportingEntity(TimeStampedModel):
+    """
+    ReportingEntity module it includes an organization entity for
+    Cluster Activity indicator that is adopted from ProgrammeDocument
+    """
+    title = models.CharField(max_length=256, unique=True)
+
+    class Meta:
+        ordering = ['id']
+
+    def __str__(self):
+        return "Reporting entity: {}".format(self.title)
+
+
 class IndicatorLocationData(TimeStampedModel):
     """
     IndicatorLocationData module it includes indicators for chosen location.
@@ -770,6 +826,13 @@ class IndicatorLocationData(TimeStampedModel):
     num_disaggregation = models.IntegerField()
     level_reported = models.IntegerField()
     disaggregation_reported_on = ArrayField(models.IntegerField(), default=list)
+    percentage_allocated = models.DecimalField(
+        decimal_places=2,
+        help_text='Entered data value allocation by %',
+        max_digits=5,
+        default=1.0000,
+    )
+    is_locked = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['id']
@@ -783,8 +846,9 @@ class IndicatorLocationData(TimeStampedModel):
     def is_complete(self):
         """
         Returns if this indicator location data has had some data entered for
-        it, and is compelte.
+        it, and is complete.
         """
+        # When changing this remember to adjust same method for indicator_report
         return self.disaggregation != {"()": {"c": 0, "d": 0, "v": 0}}
 
     @cached_property

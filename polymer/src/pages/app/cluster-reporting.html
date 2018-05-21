@@ -96,6 +96,10 @@
         '_routePageChanged(routeData.page)',
       ],
 
+      listeners: {
+        'refresh-plan-list': '_fetchResponsePlans',
+      },
+
       _routePageChanged: function (page) {
         switch (page) {
           case 'select-plan':

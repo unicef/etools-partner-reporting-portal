@@ -13,7 +13,7 @@ from core.common import (
     SHARED_PARTNER_TYPE,
     CSO_TYPES,
     PARTNER_PROJECT_STATUS,
-    RESPONSE_PLAN_TYPE)
+    RESPONSE_PLAN_TYPE, EXTERNAL_DATA_SOURCES)
 from core.models import TimeStampedExternalSourceModel
 
 from core.countries import COUNTRIES_ALPHA2_CODE_DICT, COUNTRIES_ALPHA2_CODE
@@ -129,15 +129,18 @@ class Partner(TimeStampedExternalSourceModel):
     rating = models.CharField(
         max_length=50,
         null=True,
+        blank=True,
         verbose_name='Risk Rating'
     )
     type_of_assessment = models.CharField(
         max_length=50,
         null=True,
+        blank=True,
     )
     basis_for_risk_rating = models.CharField(
         max_length=50,
         null=True,
+        blank=True,
     )
 
     clusters = models.ManyToManyField(
@@ -254,6 +257,10 @@ class PartnerProject(TimeStampedExternalSourceModel):
     def funding(self):
         return PartnerProjectFunding.objects.get_or_create(project=self)[0]
 
+    @property
+    def is_ocha_imported(self):
+        return bool(self.external_id and self.external_source == EXTERNAL_DATA_SOURCES.HPC)
+
 
 class PartnerProjectFunding(TimeStampedModel):
     project = models.OneToOneField(PartnerProject)
@@ -312,7 +319,7 @@ class PartnerActivity(TimeStampedModel):
         cluster.ClusterActivity (ForeignKey): "cluster_activity"
         indicator.Reportable (GenericRelation): "reportables"
     """
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=2048)
     project = models.ForeignKey(PartnerProject, null=True,
                                 related_name="partner_activities")
     partner = models.ForeignKey(Partner, related_name="partner_activities")

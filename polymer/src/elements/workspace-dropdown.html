@@ -14,13 +14,17 @@
         display: block;
         position: relative;
         cursor: pointer;
+        @apply --select-plan-workspaces-offset;
       }
 
       paper-dropdown-menu {
         width: 160px;
+        @apply --workspaces-dropdown-width;
+
 
         --paper-input-container-underline: {
           display: none;
+          @apply --underline-shown;
         };
 
         --paper-input-container-underline-focus: {
@@ -47,6 +51,7 @@
         --paper-input-container-input: {
           margin-bottom: 2px;
           color: var(--theme-primary-text-color-medium);
+          @apply --workspace-dropdown-input;
         }
       }
 

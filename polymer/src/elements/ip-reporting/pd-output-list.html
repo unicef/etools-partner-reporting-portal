@@ -7,6 +7,7 @@
 <link rel="import" href="../ip-reporting/pd-output.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/selectors/llos.html">
+<link rel="import" href="pd-output.html">
 
 <dom-module id="pd-output-list">
   <template>
@@ -52,7 +53,8 @@
             items="[[viewData]]">
           <pd-output
               data="[[item]]"
-              override-mode="[[overrideMode]]">
+              override-mode="[[overrideMode]]"
+              workspace-id="[[workspaceId]]">
           </pd-output>
         </template>
 
@@ -89,13 +91,43 @@
           type: Array,
           computed: '_computeViewData(data)',
         },
+
+        reportId: {
+          type: String,
+          statePath: 'programmeDocumentReports.current.id',
+        },
+
+        workspaceId: {
+          type: String,
+          statePath: 'location.id',
+        },
+
+        pdId: {
+          type: Number,
+          statePath: 'programmeDocuments.current',
+        },
       },
 
-      _computeViewData: function (data) {
-        return data.filter(function (item) {
-          return Boolean(item.indicator_reports.length);
-        });
-      },
-    });
+        listeners: {
+          'refresh-report': '_onRefreshOutput',
+        },
+
+        _onRefreshOutput: function () {
+          var ajax = document.createElement('etools-prp-ajax');
+          ajax.url = App.Endpoints.programmeDocumentReport(this.workspaceId, this.reportId);
+          this.dispatch(
+            App.Actions.PDReports.fetchSingle(ajax.thunk(), this.pdId)
+          )
+              .catch(function (err) { // jshint ignore:line
+              // TODO: error handling
+              });
+        },
+
+        _computeViewData: function (data) {
+          return data.filter(function (item) {
+            return Boolean(item.indicator_reports.length);
+          });
+        },
+      });
   </script>
 </dom-module>

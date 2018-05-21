@@ -91,6 +91,9 @@
           <etools-data-table-column field="Location">
             <div class="table-column">Location</div>
           </etools-data-table-column>
+          <etools-data-table-column field="ocha">
+            <div class="table-column">From OCHA</div>
+          </etools-data-table-column>
         </etools-data-table-header>
 
         <etools-data-table-footer
@@ -126,6 +129,13 @@
               </div>
               <div class="table-cell table-cell--text">
                 [[_commaSeparatedDictValues(project.locations, 'title')]]
+              </div>
+              <div class="table-cell table-cell--text">
+                <template
+                    is="dom-if"
+                    if="[[project.is_ocha_imported]]">
+                  <iron-icon icon="icons:check"></iron-icon>
+                </template>
               </div>
             </div>
             <div slot="row-data-details">

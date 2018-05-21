@@ -14,7 +14,8 @@ If the response plan the IMO would like to work on, is not there, they can add a
 
 ![](../../.gitbook/assets/screen-shot-2018-03-12-at-11.14.30-am.png)
 
-For Custom Response Plans, IMO can fill out Response Plan name, plan type, start date, end date, and select cluster\(s\) involved. They can select many or at least one for this response plan. 
+For Custom Response Plans, IMO can fill out Response Plan name, plan type, start date, end date, and select cluster\(s\) involved. They can select many Clusters or at least one for this response plan. There is no "edit response plan" capability. It can be done as an admin fix in django admin.  
+
 
 ![](../../.gitbook/assets/screen-shot-2018-02-14-at-12.12.50-pm.png)
 
