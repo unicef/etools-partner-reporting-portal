@@ -18,7 +18,7 @@ from core.common import PARTNER_TYPE
 from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
 from core.serializers import ShortLocationSerializer
-from core.models import Location, ResponsePlan
+from core.models import Location, ResponsePlan, IMORole
 from indicator.serializers import (
     ClusterIndicatorReportSerializer,
     ReportableIdSerializer,
@@ -485,16 +485,41 @@ class ClusterIndicatorsListExcelImportView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, response_plan_id, format=None):
+        partner_id = int(request.query_params.get('partner_id', '-1'))
+        partner = None
+
+        # IMO user needs to specify Partner ID when importing Indicator list
+        if request.user.groups.filter(name=IMORole.as_group().name).exists():
+            if partner_id != -1:
+                partner = get_object_or_404(Partner, id=partner_id)
+
+            else:
+                raise ValidationError({
+                    'partner': "partner_id GET parameter is required for IMO user"
+                })
+
+        else:
+            partner = request.user.partner
+
+            if not partner:
+                raise ValidationError({
+                    'partner': "Cannot find partner from this user. Is this user correctly configured?"
+                })
+
         up_file = request.FILES['file']
         filepath = "/tmp/" + up_file.name
         destination = open(filepath, 'wb+')
+
         for chunk in up_file.chunks():
             destination.write(chunk)
             destination.close()
-        reader = IndicatorsXLSXReader(filepath)
+
+        reader = IndicatorsXLSXReader(filepath, partner)
         result = reader.import_data()
+
         if result:
             return Response({'parsing_errors': [result, ]}, status=statuses.HTTP_400_BAD_REQUEST)
+
         else:
             return Response({}, status=statuses.HTTP_200_OK)
 
