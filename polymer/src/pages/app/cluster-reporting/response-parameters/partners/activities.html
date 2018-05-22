@@ -138,9 +138,9 @@
       },
 
       detached: function () {
-        if (this.isDebouncerActive('activities-ajax')) {
-          this.cancelDebouncer('activities-ajax');
-        }
+        this._cancelDebouncers([
+          'activities-ajax',
+        ]);
       },
 
     });

@@ -38,11 +38,18 @@
     </etools-prp-ajax>
 
     <app-route
+      route="{{parentRoute}}"
+      pattern="/:id"
+      data="{{parentRouteData}}"
+      tail="{{route}}">
+    </app-route>
+
+    <app-route
       route="{{route}}"
       pattern="/:tab"
-      subroute="{{subroute}}"
       data="{{routeData}}">
     </app-route>
+
 
     <page-header
         title="[[activityData.title]]"
@@ -76,7 +83,7 @@
 
     <template is="dom-if" if="[[_equals(tab, 'indicators')]]" restamp="true">
       <rp-partner-activity-details-indicators
-        activity-id="[[activityId]]"
+        activity-id="[[parentRouteData.id]]"
         activity-data="[[activityData]]"
         is_custom="[[activityData.is_custom]]">
       </rp-partner-activity-details-indicators>
@@ -89,6 +96,7 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
+        App.Behaviors.ReduxBehavior,
       ],
 
       observers: [
@@ -98,10 +106,10 @@
       properties: {
         tab: String,
 
-        routeData: Object,
-
-        activityId: String,
-        responsePlanId: String,
+        responsePlanID: {
+          type: String,
+          statePath: 'responsePlans.currentID',
+        },
 
         activityData: {
           type: Object,
@@ -110,7 +118,8 @@
 
         overviewUrl: {
           type: String,
-          computed: '_computeOverviewUrl(responsePlanId, activityId)'
+          computed: '_computeOverviewUrl(responsePlanID, parentRouteData.id)',
+          observer: '_getActivityAjax',
         },
 
         backLink: {
@@ -131,8 +140,8 @@
         return '/response-parameters/partners/activities' + '?' + query;
       },
 
-      _computeOverviewUrl: function(responsePlanId, activityId) {
-        return App.Endpoints.plannedActionsActivityOverview(responsePlanId, activityId);
+      _computeOverviewUrl: function(responsePlanID, activityId) {
+        return App.Endpoints.plannedActionsActivityOverview(responsePlanID, activityId);
       },
 
       _updateTabSelection: function () {
@@ -143,29 +152,33 @@
         if (!tab) {
           tab = 'overview';
         }
+
         this.set('tab', tab);
-        this.set('queryParams.page', 1);
-        this.set('route.path', '/' + this.tab);
+        this.notifyPath('route.path', '/' + this.tab);
       },
 
       _getActivityAjax: function () {
-        var thunk = this.$.activity.thunk();
-        var self = this;
-        thunk()
-          .then(function (res) {
-            self.updatePending = false;
-            self.activityData = res.data;
-          })
-          .catch(function (err) { // jshint ignore:line
-            self.updatePending = false;
-            // TODO: error handling
-          });
+        this.debounce('activity-ajax', function () {
+          var thunk = this.$.activity.thunk();
+          var self = this;
+
+          thunk()
+            .then(function (res) {
+              self.updatePending = false;
+              self.activityData = res.data;
+            })
+            .catch(function (err) { // jshint ignore:line
+              self.updatePending = false;
+              // TODO: error handling
+            });
+        }, 100);
       },
 
-      attached: function () {
-        this._getActivityAjax();
+      detached: function () {
+        this._cancelDebouncers([
+          'activity-ajax',
+        ]);
       },
-
     });
   </script>
 </dom-module>

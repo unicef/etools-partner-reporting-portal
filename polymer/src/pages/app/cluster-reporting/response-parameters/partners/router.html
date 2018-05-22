@@ -17,44 +17,38 @@
     <iron-location></iron-location>
 
     <app-route
-      route="{{route}}"
-      pattern="/:id"
-      data="{{routeData}}"
-      tail="{{subroute}}">
+        route="{{parentRoute}}"
+        pattern="/:page"
+        data="{{parentRouteData}}"
+        tail="{{route}}">
     </app-route>
 
     <iron-pages
         selected="[[page]]"
         attr-for-selected="name">
-
       <template is="dom-if" if="[[_equals(page, 'projects')]]" restamp="true">
         <rp-partners-projects
-          name="projects"
-          route="{{subroute}}">
+          name="projects">
         </rp-partners-projects>
       </template>
 
       <template is="dom-if" if="[[_equals(page, 'project')]]" restamp="true">
         <rp-partners-project-detail
           name="project"
-          project-id="{{id}}"
-          route="{{subroute}}">
+          parent-route="{{route}}">
         </rp-partners-project-detail>
       </template>
 
       <template is="dom-if" if="[[_equals(page, 'activities')]]" restamp="true">
         <rp-partners-activities
-          name="activities"
-          route="{{subroute}}">
+          name="activities">
         </rp-partners-activities>
       </template>
 
       <template is="dom-if" if="[[_equals(page, 'activity')]]" restamp="true">
         <rp-partners-activity-detail
           name="activity"
-          activity-id="{{id}}"
-          response-plan-id="{{responsePlanID}}"
-          route="{{subroute}}">
+          parent-route="{{route}}">
         </rp-partners-activity-detail>
       </template>
     </iron-pages>
@@ -66,57 +60,31 @@
 
       behaviors: [
         App.Behaviors.UtilsBehavior,
-        App.Behaviors.ReduxBehavior,
       ],
 
       observers: [
-        '_routeChanged(routeData.id)',
+        '_routeChanged(parentRouteData.page)',
       ],
 
       properties: {
-        visible: Boolean,
-
-        id: String,
-
-        page: {
-          type: String,
-          observer: '_pageChanged',
-        },
-
-        responsePlanID: {
-          type: String,
-          statePath: 'responsePlans.currentID',
-        },
+        page: String,
       },
 
-      _routeChanged: function (id) {
-        this.id = id;
-      },
-
-      _pageChanged: function (page) {
-        var resolvedPageUrl;
-
-        if (!page) {
-          return;
-        }
-
-        this.async(function () {
-          if (!this.visible) {
-            return;
+      _routeChanged: function (page) {
+        this.debounce('route-changed', function () {
+          if (!page) {
+            page = 'projects';
           }
 
-          resolvedPageUrl = this.resolveUrl(page + '.html');
+          this.set('page', page);
 
-          this.importHref(resolvedPageUrl, null, this._notFound, true);
+          this.importHref(
+            this.resolveUrl(page + '.html'),
+            null,
+            this._notFound,
+            true
+          );
         });
-      },
-
-      attached: function () {
-        this.set('visible', true);
-      },
-
-      detached: function () {
-        this.set('visible', false);
       },
     });
   </script>
