@@ -515,7 +515,8 @@ class ProgrammeDocumentProgressSerializer(serializers.ModelSerializer):
 
     def get_latest_accepted_pr(self, obj):
         qset = ProgressReport.objects.filter(
-            status=PROGRESS_REPORT_STATUS.accepted).order_by('-end_date')
+            status=PROGRESS_REPORT_STATUS.accepted,
+            report_type="QPR").order_by('-end_date')
         if qset:
             return ProgressReportSimpleSerializer(
                 instance=qset[0], read_only=True).data
@@ -528,7 +529,8 @@ class ProgrammeDocumentProgressSerializer(serializers.ModelSerializer):
         with this PD (if any).
         """
         qset = ProgressReport.objects.filter(
-            status=PROGRESS_REPORT_STATUS.accepted).order_by('-end_date')
+            status=PROGRESS_REPORT_STATUS.accepted,
+            report_type="QPR").order_by('-end_date')
         if qset:
             return PDReportContextIndicatorReportSerializer(
                 instance=qset[0].indicator_reports.all(),
