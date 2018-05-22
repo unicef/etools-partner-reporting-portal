@@ -240,13 +240,36 @@ def process_programme_documents(fast=False, area=False):
                             )  # Is section unique globally or per workspace?
                             pd.sections.add(section)
 
-                        # Create Reporting Date Periods
-                        reporting_periods = item['reporting_periods']
-                        for reporting_period in reporting_periods:
-                            reporting_period['programme_document'] = pd.id
+                        # Create Reporting Date Periods for QPR and HR report type
+                        reporting_requirements = item['reporting_requirements']
+                        for reporting_requirement in reporting_requirements:
+                            reporting_requirement['programme_document'] = pd.id
                             process_model(
-                                ReportingPeriodDates, PMPReportingPeriodDatesSerializer,
-                                reporting_period, {'external_id': reporting_period['id']}
+                                ReportingPeriodDates,
+                                PMPReportingPeriodDatesSerializer,
+                                reporting_requirement,
+                                {
+                                    'start_date': reporting_requirement['start_date'],
+                                    'end_date': reporting_requirement['end_date'],
+                                    'due_date': reporting_requirement['due_date'],
+                                    'report_type': reporting_requirement['report_type'],
+                                }
+                            )
+
+                        # Create Reporting Date Periods for SR report type
+                        # TODO: Wait for PMP PD sync API to expose this field
+                        special_reports = item['special_reports'] if 'special_reports' in item else []
+                        for special_report in special_reports:
+                            special_report['programme_document'] = pd.id
+                            special_report['report_type'] = 'SR'
+                            process_model(
+                                ReportingPeriodDates,
+                                PMPReportingPeriodDatesSerializer,
+                                special_report,
+                                {
+                                    'due_date': special_report['due_date'],
+                                    'report_type': special_report['report_type'],
+                                }
                             )
 
                         if item['status'] not in ("draft, signed",):
