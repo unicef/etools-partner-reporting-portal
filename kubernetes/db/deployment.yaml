@@ -11,7 +11,7 @@ spec:
       port: 5432
       targetPort: 5432
 ---
-apiVersion: apps/v1beta2
+apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: db

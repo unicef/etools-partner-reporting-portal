@@ -15,7 +15,7 @@ spec:
   selector:
     app: backend-container
 ---
-apiVersion: apps/v1beta2
+apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: backend
