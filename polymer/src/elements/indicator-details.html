@@ -481,7 +481,7 @@
       },
 
       listeners: {
-        'location-updated': '_onLocationUpdated',
+        'locations-updated': '_onLocationsUpdated',
       },
 
       _fetchData: function () {
@@ -573,7 +573,7 @@
         return !!Object.keys(currentPD).length;
       },
 
-      _onLocationUpdated: function (e) {
+      _onLocationsUpdated: function (e) {
         e.stopPropagation();
 
         this._fetchData();

@@ -221,7 +221,7 @@
           this.$.pull.thunk()()
               .then(function () {
                 self.close();
-                self.fire('refresh-report', this.indicatorId);
+                self.fire('locations-updated');
               })
               .catch(function () {
                 //TODO: error handling
