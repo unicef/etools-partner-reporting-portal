@@ -49,10 +49,45 @@ steps:
         type: push
         title: Pushing django image to docker hub
         candidate: ${{build_django}}
+        registry: unicef-dockerhub
         tags:
             - ${{CF_BRANCH}}
+            - ${{CF_SHORT_REVISION}}
             - latest
         when:
             branch:
                 only:
                     - develop
+
+    push_to_cfcr:
+        type: push
+        title: Pushing django image to docker hub
+        candidate: ${{build_django}}
+        registry: cfcr
+        tags:
+            - ${{CF_BRANCH}}
+            - ${{CF_SHORT_REVISION}}
+            - latest
+        when:
+            branch:
+                only:
+                    - develop
+
+    deploy_celery:
+        image: codefresh/cf-deploy-kubernetes
+        tag: ${{CF_SHORT_REVISION}}
+        working_directory: ${{main_clone}}
+        commands:
+          - /cf-deploy-kubernetes ./kubernetes/backend/deployment.yml
+        environment:
+          - KUBECONTEXT=${{KUBECONTEXT}}
+          - KUBERNETES_NAMESPACE=${{NAMESPACE}}
+          - ENV=${{ENV}}
+          - POSTGRES_USER=${{POSTGRES_USER}}
+          - POSTGRES_DB=${{POSTGRES_DB}}
+          - POSTGRES_HOST=${{POSTGRES_HOST}}
+        when:
+          branch:
+            only:
+              - staging
+              - master

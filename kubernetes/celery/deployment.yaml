@@ -1,0 +1,315 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: beater
+  labels:
+    app: beater
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: beater-container
+  template:
+    metadata:
+      labels:
+        app: beater-container
+    spec:
+      containers:
+        - name: beater
+          image: unicef/etools-prp
+          volumeMounts:
+            - name: data-volume
+              mountPath: /data
+          command: ["bash"]
+          args: ["-c", "/usr/local/bin/waitforit -host=db -port=5432 && python manage.py celery beat --loglevel=${CELERY_LOG_LEVEL:-debug}"]
+          ports:
+            - containerPort: 8000
+          env:
+            - name: AWS_S3_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: AWS_S3_ACCESS_KEY_ID
+            - name: AWS_S3_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: AWS_S3_SECRET_ACCESS_KEY
+            - name: AWS_STORAGE_BUCKET_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: AWS_STORAGE_BUCKET_NAME
+            - name: AZURE_B2C_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: AZURE_B2C_CLIENT_ID
+            - name: AZURE_B2C_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: AZURE_B2C_CLIENT_SECRET
+            - name: AZURE_B2C_POLICY_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: AZURE_B2C_POLICY_NAME
+            - name: DJANGO_ALLOWED_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: DJANGO_ALLOWED_HOST
+            - name: DJANGO_DEBUG
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: DJANGO_DEBUG
+            - name: DOMAIN_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: DOMAIN_NAME
+            - name: ELASTIC_APM_DEBUG
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: ELASTIC_APM_DEBUG
+            - name: ELASTIC_APM_SECRET_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: ELASTIC_APM_SECRET_TOKEN
+            - name: ELASTIC_APM_SERVER_URL
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: ELASTIC_APM_SERVER_URL
+            - name: ELASTIC_APM_SERVICE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: ELASTIC_APM_SERVICE_NAME
+            - name: EMAIL_BACKEND
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: EMAIL_BACKEND
+            - name: EMAIL_HOST_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: EMAIL_HOST_PASSWORD
+            - name: EMAIL_HOST_USER
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: EMAIL_HOST_USER
+            - name: ENV
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: ENV
+            - name: PMP_API_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: PMP_API_PASSWORD
+            - name: PMP_API_USER
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: PMP_API_USER
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: POSTGRES_DB
+            - name: POSTGRES_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: POSTGRES_HOST
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: POSTGRES_USER
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: REDIS_URL
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: SECRET_KEY
+      volumes:
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: data-volume-claim
+---
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: worker
+  labels:
+    app: worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: worker-container
+  template:
+    metadata:
+      labels:
+        app: worker-container
+    spec:
+      containers:
+        - name: beater
+          image: unicef/etools-prp
+          volumeMounts:
+            - name: data-volume
+              mountPath: /data
+          command: ["bash"]
+          args: ["-c", "/usr/local/bin/waitforit -host=db -port=5432 && python manage.py celery worker -E --loglevel=${CELERY_LOG_LEVEL:-info}"]
+          ports:
+            - containerPort: 8000
+          env:
+            - name: AWS_S3_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: AWS_S3_ACCESS_KEY_ID
+            - name: AWS_S3_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: AWS_S3_SECRET_ACCESS_KEY
+            - name: AWS_STORAGE_BUCKET_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: AWS_STORAGE_BUCKET_NAME
+            - name: AZURE_B2C_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: AZURE_B2C_CLIENT_ID
+            - name: AZURE_B2C_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: AZURE_B2C_CLIENT_SECRET
+            - name: AZURE_B2C_POLICY_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: AZURE_B2C_POLICY_NAME
+            - name: DJANGO_ALLOWED_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: DJANGO_ALLOWED_HOST
+            - name: DJANGO_DEBUG
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: DJANGO_DEBUG
+            - name: DOMAIN_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: DOMAIN_NAME
+            - name: ELASTIC_APM_DEBUG
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: ELASTIC_APM_DEBUG
+            - name: ELASTIC_APM_SECRET_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: ELASTIC_APM_SECRET_TOKEN
+            - name: ELASTIC_APM_SERVER_URL
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: ELASTIC_APM_SERVER_URL
+            - name: ELASTIC_APM_SERVICE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: ELASTIC_APM_SERVICE_NAME
+            - name: EMAIL_BACKEND
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: EMAIL_BACKEND
+            - name: EMAIL_HOST_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: EMAIL_HOST_PASSWORD
+            - name: EMAIL_HOST_USER
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: EMAIL_HOST_USER
+            - name: ENV
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: ENV
+            - name: PMP_API_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: PMP_API_PASSWORD
+            - name: PMP_API_USER
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: PMP_API_USER
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: POSTGRES_DB
+            - name: POSTGRES_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: POSTGRES_HOST
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: POSTGRES_USER
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: REDIS_URL
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: SECRET_KEY
+            - name: C_FORCE_ROOT
+              value: "1"
+      volumes:
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: data-volume-claim
