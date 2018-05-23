@@ -1,3 +1,17 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: proxy-service
+spec:
+  ports:
+   - name: http
+     protocol: TCP
+     port: 80
+  type: NodePort
+  selector:
+    app: proxy-container
+---
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
