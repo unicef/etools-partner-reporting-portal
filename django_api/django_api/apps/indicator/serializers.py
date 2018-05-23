@@ -472,6 +472,21 @@ class ReportingEntitySerializer(serializers.ModelSerializer):
         )
 
 
+class ReportableReportingFrequencyIdSerializer(serializers.Serializer):
+    reportable_ids = serializers.ListField(
+        child=serializers.IntegerField()
+    )
+
+
+class ReportableReportingFrequencyListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Reportable
+        fields = (
+            'id',
+            'title',
+        )
+
+
 class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
 
     location = LocationSerializer(read_only=True)
