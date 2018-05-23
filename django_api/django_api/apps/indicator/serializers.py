@@ -478,15 +478,6 @@ class ReportableReportingFrequencyIdSerializer(serializers.Serializer):
     )
 
 
-class ReportableReportingFrequencyListSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Reportable
-        fields = (
-            'id',
-            'title',
-        )
-
-
 class SimpleIndicatorLocationDataListSerializer(serializers.ModelSerializer):
 
     location = LocationSerializer(read_only=True)
