@@ -18,6 +18,9 @@ metadata:
   name: proxy
   labels:
     app: proxy
+  annotations:
+    revision: "{{CF_SHORT_REVISION}}"
+  namespace: {{NAMESPACE}}
 spec:
   replicas: 1
   selector:
@@ -30,7 +33,7 @@ spec:
     spec:
       containers:
         - name: proxy
-          image: unicef/etools-prp-nginx-proxy
+          image: unicef/etools-prp-nginx-proxy:{{CF_SHORT_REVISION}}
           volumeMounts:
             - name: data-volume
               mountPath: /data
