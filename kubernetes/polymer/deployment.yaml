@@ -18,6 +18,9 @@ metadata:
   name: polymer
   labels:
     app: polymer
+  annotations:
+    revision: "{{CF_SHORT_REVISION}}"
+  namespace: {{NAMESPACE}}
 spec:
   replicas: 1
   selector:
@@ -32,6 +35,6 @@ spec:
         - name: polymer
           ports:
             - containerPort: 8082
-          image: unicef/etools-prp-polymer
+          image: unicef/etools-prp-polymer:{{CF_SHORT_REVISION}}
           command: ["ash"]
           args: ["-c", "node express.js"]
