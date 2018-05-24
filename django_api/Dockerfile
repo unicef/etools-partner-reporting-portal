@@ -36,8 +36,7 @@ RUN apt-get install -y --no-install-recommends \
     python-gdal \
     gdal-bin \
     libgdal-dev \
-    libgdal1h \
-    libgdal1-dev
+    libgdal20
 
 # Install Python tools
 RUN pip install --upgrade fabric --trusted-host pypi.python.org
