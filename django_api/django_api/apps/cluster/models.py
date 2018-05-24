@@ -116,9 +116,7 @@ class Cluster(TimeStampedExternalSourceModel):
 
     @cached_property
     def partner_activity_reportables_queryset(self):
-        return Reportable.objects.filter(
-            Q(partner_activities__partner__clusters=self)
-        ).distinct()
+        return Reportable.objects.filter(partner_activities__partner__clusters=self).distinct()
 
     @cached_property
     def latest_indicator_reports(self):
@@ -126,10 +124,17 @@ class Cluster(TimeStampedExternalSourceModel):
         Returns the latest indicator reports for each reportable that is
         associated with partner activities for this cluster.
         """
+        latest_irs = list()
+
+        for reportable in self.partner_activity_reportables_queryset:
+            try:
+                latest_irs.append(reportable.indicator_reports.latest('time_period_end'))
+            except IndicatorReport.DoesNotExist:
+                pass
+
         return IndicatorReport.objects.filter(
-            reportable__in=self.partner_activity_reportables_queryset).order_by(
-                'reportable__id', '-submission_date'
-        ).distinct('reportable__id')
+            id__in=list(map(lambda x: x.id, latest_irs))
+        )
 
     @cached_property
     def overdue_indicator_reports(self):
