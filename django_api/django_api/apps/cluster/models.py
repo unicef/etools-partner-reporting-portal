@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 import datetime
 
 from django.db import models
-from django.db.models import Q
 from django.utils.functional import cached_property
 from django.contrib.contenttypes.fields import GenericRelation
 
