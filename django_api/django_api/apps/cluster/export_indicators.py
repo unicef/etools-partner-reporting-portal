@@ -247,10 +247,10 @@ class IndicatorsXLSXExporter:
                 self.sheet.cell(row=start_row_id, column=36).value = cluster.id
                 self.sheet.cell(
                     row=start_row_id,
-                    column=37).value = cluster_objective.id
+                    column=37).value = cluster_objective.id if cluster_objective else ""
                 self.sheet.cell(
                     row=start_row_id,
-                    column=38).value = partner_activity.id
+                    column=38).value = partner_activity.id if partner_activity else ""
                 self.sheet.cell(
                     row=start_row_id,
                     column=39).value = indicator.reportable.blueprint.id
@@ -258,7 +258,7 @@ class IndicatorsXLSXExporter:
                                 column=40).value = partner_project.partner.id
                 self.sheet.cell(
                     row=start_row_id,
-                    column=41).value = partner_project.id
+                    column=41).value = partner_project.id if partner_project else ""
                 self.sheet.cell(
                     row=start_row_id,
                     column=42).value = indicator.id
