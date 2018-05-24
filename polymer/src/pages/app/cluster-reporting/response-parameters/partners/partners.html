@@ -74,8 +74,7 @@
     </template>
 
     <response-parameters-partners-router
-      route="{{subroute}}"
-      page={{subpage}}>
+      parent-route="{{route}}">
     </response-parameters-partners-router>
 
   </template>
@@ -103,7 +102,7 @@
           this.async(function () {
             this.set('route.path', '/projects');
           });
-        } else {
+        } else if (subpage !== this.subpage) {
           this.subpage = subpage;
         }
       },

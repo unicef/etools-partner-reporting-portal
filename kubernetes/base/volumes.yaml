@@ -1,0 +1,29 @@
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: data-volume
+  labels:
+    type: local
+spec:
+  capacity:
+    storage: 4Gi
+  storageClassName: standard
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: /data
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: data-volume-claim
+  labels:
+    type: local
+spec:
+  storageClassName: standard
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 3Gi

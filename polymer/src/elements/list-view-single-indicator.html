@@ -1,6 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/etools-data-table/etools-data-table.html">
+<link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
 
 <link rel="import" href="ip-reporting/ip-reporting-indicator-details.html">
 <link rel="import" href="etools-prp-progress-bar.html">
@@ -102,6 +103,7 @@
             <status-badge type="error"></status-badge>
           </template>
           [[indicator.blueprint.title]]
+          <paper-tooltip>[[indicator.blueprint.title]]</paper-tooltip>
         </span>
         <span class="table-cell table-cell--text self-center">
           [[indicator.blueprint.calculation_formula_across_locations]]
@@ -197,6 +199,7 @@
         <template is="dom-if" if="[[canEditLocations]]" restamp="true">
           <span class="table-cell table-cell--text table-cell--action self-center">
             <a href="#" on-tap="_openModal" data-modal-type="locations">LOCATIONS</a>
+            <paper-tooltip>Location goals for partners</paper-tooltip>
           </span>
         </template>
       </div>

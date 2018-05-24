@@ -1,0 +1,144 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: backend-fakedata
+spec:
+  template:
+    spec:
+      containers:
+      - name: backend-fakedata-container
+        image: unicef/etools-prp
+        command: ["bash"]
+        args: ["-c", "python manage.py generate_fake_data"]
+        env:
+          - name: AWS_S3_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: eprp-staging
+                key: AWS_S3_ACCESS_KEY_ID
+          - name: AWS_S3_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: eprp-staging
+                key: AWS_S3_SECRET_ACCESS_KEY
+          - name: AWS_STORAGE_BUCKET_NAME
+            valueFrom:
+              secretKeyRef:
+                name: eprp-staging
+                key: AWS_STORAGE_BUCKET_NAME
+          - name: AZURE_B2C_CLIENT_ID
+            valueFrom:
+              secretKeyRef:
+                name: eprp-staging
+                key: AZURE_B2C_CLIENT_ID
+          - name: AZURE_B2C_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: eprp-staging
+                key: AZURE_B2C_CLIENT_SECRET
+          - name: AZURE_B2C_POLICY_NAME
+            valueFrom:
+              secretKeyRef:
+                name: eprp-staging
+                key: AZURE_B2C_POLICY_NAME
+          - name: DJANGO_ALLOWED_HOST
+            valueFrom:
+              secretKeyRef:
+                name: eprp-staging
+                key: DJANGO_ALLOWED_HOST
+          - name: DJANGO_DEBUG
+            valueFrom:
+              secretKeyRef:
+                name: eprp-staging
+                key: DJANGO_DEBUG
+          - name: DOMAIN_NAME
+            valueFrom:
+              secretKeyRef:
+                name: eprp-staging
+                key: DOMAIN_NAME
+          - name: ELASTIC_APM_DEBUG
+            valueFrom:
+              secretKeyRef:
+                name: eprp-staging
+                key: ELASTIC_APM_DEBUG
+          - name: ELASTIC_APM_SECRET_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: eprp-staging
+                key: ELASTIC_APM_SECRET_TOKEN
+          - name: ELASTIC_APM_SERVER_URL
+            valueFrom:
+              secretKeyRef:
+                name: eprp-staging
+                key: ELASTIC_APM_SERVER_URL
+          - name: ELASTIC_APM_SERVICE_NAME
+            valueFrom:
+              secretKeyRef:
+                name: eprp-staging
+                key: ELASTIC_APM_SERVICE_NAME
+          - name: EMAIL_BACKEND
+            valueFrom:
+              secretKeyRef:
+                name: eprp-staging
+                key: EMAIL_BACKEND
+          - name: EMAIL_HOST_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: eprp-staging
+                key: EMAIL_HOST_PASSWORD
+          - name: EMAIL_HOST_USER
+            valueFrom:
+              secretKeyRef:
+                name: eprp-staging
+                key: EMAIL_HOST_USER
+          - name: ENV
+            valueFrom:
+              secretKeyRef:
+                name: eprp-staging
+                key: ENV
+          - name: PMP_API_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: eprp-staging
+                key: PMP_API_PASSWORD
+          - name: PMP_API_USER
+            valueFrom:
+              secretKeyRef:
+                name: eprp-staging
+                key: PMP_API_USER
+          - name: POSTGRES_DB
+            valueFrom:
+              secretKeyRef:
+                name: eprp-staging
+                key: POSTGRES_DB
+          - name: POSTGRES_HOST
+            valueFrom:
+              secretKeyRef:
+                name: eprp-staging
+                key: POSTGRES_HOST
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: eprp-staging
+                key: POSTGRES_PASSWORD
+          - name: POSTGRES_USER
+            valueFrom:
+              secretKeyRef:
+                name: eprp-staging
+                key: POSTGRES_USER
+          - name: REDIS_URL
+            valueFrom:
+              secretKeyRef:
+                name: eprp-staging
+                key: REDIS_URL
+          - name: SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: eprp-staging
+                key: SECRET_KEY
+      volumes:
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: data-volume-claim
+      restartPolicy: Never
+  backoffLimit: 4

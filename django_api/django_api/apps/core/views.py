@@ -102,7 +102,13 @@ class ResponsePlanAPIView(ListAPIView):
 
     def get_queryset(self):
         workspace_id = self.kwargs.get('workspace_id')
-        return ResponsePlan.objects.filter(workspace_id=workspace_id)
+
+        queryset = ResponsePlan.objects.filter(workspace_id=workspace_id)
+
+        if self.request.user.partner:
+            queryset = queryset.filter(clusters__partners=self.request.user.partner).distinct()
+
+        return queryset
 
 
 class ResponsePlanCreateAPIView(CreateAPIView):

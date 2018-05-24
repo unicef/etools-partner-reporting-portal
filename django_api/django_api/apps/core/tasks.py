@@ -78,7 +78,7 @@ def process_period_reports():
                     date_list = [reportable.content_object.start_date]
                 # ClusterObjective
                 elif hasattr(reportable.content_object, 'response_plan'):
-                    date_list = [reportable.content_object.response_plan.start_date]
+                    date_list = [reportable.content_object.response_plan.start]
                 date_list.extend(reportable.cs_dates)
             else:
                 date_list = [latest_indicator_report.time_period_end + timedelta(days=1)]

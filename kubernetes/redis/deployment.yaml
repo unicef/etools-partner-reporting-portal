@@ -1,0 +1,19 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: redis
+  labels:
+    app: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis-container
+  template:
+    metadata:
+      labels:
+        app: redis-container
+    spec:
+      containers:
+        - name: redis
+          image: tivix/etools-prp-redis:develop
