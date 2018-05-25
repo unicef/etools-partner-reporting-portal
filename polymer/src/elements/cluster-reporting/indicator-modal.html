@@ -10,7 +10,6 @@
 <link rel="import" href="../../../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../../../bower_components/paper-radio-button/paper-radio-button.html">
 <link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
-<link rel="import" href="../../../bower_components/moment-element/moment-import.html">
 
 <link rel="import" href="../../polyfills/es6-shim.html">
 <link rel="import" href="../../settings.html">
@@ -215,6 +214,7 @@
                 label="Start date of reporting period"
                 value="{{data.start_date_of_reporting_period}}"
                 error-message=""
+                format="[[dateFormat]]"
                 no-init>
               </etools-prp-date-input>
             </div>
@@ -412,6 +412,13 @@
           value: [],
         },
 
+        dateFormat: {
+          type: String,
+          value: function () {
+            return App.Settings.dateFormat;
+          },
+        },
+
         _minDate: {
           type: Date,
           value: function () {
@@ -508,7 +515,7 @@
       },
 
       _computeMinDate: function (date) {
-        return date ? moment(date).startOf('day').toDate() : null;
+        return date ? this._normalizeDate(date) : null;
       },
 
       _fetchDisaggregations: function() {
@@ -542,11 +549,11 @@
         }
 
         dates = this.get('data.cs_dates');
-        startDate = moment(startDateStr).startOf('day').toDate();
+        startDate = this._normalizeDate(startDateStr);
 
         this.set('data.cs_dates', dates && dates.filter(function (d) {
-          return moment(d, App.Settings.dateFormat).startOf('day').toDate() >= startDate;
-        }));
+          return this._normalizeDate(d) >= startDate;
+        }, this));
       },
 
       _save: function () {

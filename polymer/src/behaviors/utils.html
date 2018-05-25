@@ -1,7 +1,9 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/promise-polyfill/promise-polyfill-lite.html">
+<link rel="import" href="../../bower_components/moment-element/moment-import.html">
 
 <link rel="import" href="../polyfills/es6-shim.html">
+<link rel="import" href="../settings.html">
 
 <script>
   (function () {
@@ -235,6 +237,10 @@
 
               return acc;
             }, {});
+      },
+
+      _normalizeDate: function (date) {
+        return moment(date, App.Settings.dateFormat).startOf('day').toDate();
       },
     };
 
