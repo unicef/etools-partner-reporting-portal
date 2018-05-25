@@ -168,7 +168,8 @@ class IndicatorsXLSXExporter:
                                 column=4).value = cluster.get_type_display()
                 self.sheet.cell(
                     row=start_row_id,
-                    column=5).value = cluster.partner_projects.first().partner.title if cluster.partner_projects.first() else ""
+                    column=5).value = \
+                        cluster.partner_projects.first().partner.title if cluster.partner_projects.first() else ""
                 self.sheet.cell(
                     row=start_row_id,
                     column=6).value = cluster_objective.title if cluster_objective else ""
