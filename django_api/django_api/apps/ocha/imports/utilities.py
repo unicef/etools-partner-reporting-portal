@@ -97,13 +97,12 @@ def save_location_list(location_list, parent=None, save_children=False):
                 ))
                 continue
 
-            gateway_name = '{} - Admin Level {}'.format(country.country_short_code, location_data['data']['adminLevel'])
+            gateway_name = '{} - {} - Admin Level {}'.format(country.country_short_code, location_data['data']['name'], location_data['data']['adminLevel'])
+            logger.debug('Saving gateway type with name {}'.format(gateway_name))
             gateway, _ = GatewayType.objects.get_or_create(
                 country=country,
                 admin_level=location_data['data']['adminLevel'],
-                defaults={
-                    'name': gateway_name
-                }
+                name= gateway_name,
             )
 
             location, _ = Location.objects.update_or_create(

@@ -540,8 +540,10 @@ class IndicatorsXLSXExporter:
 
         # Remove empty spreadsheets
         for s in to_remove:
-            self.sheets.remove(s)
-            self.wb.remove_sheet(s)
+            # Spreadsheet need atleast 1 sheet
+            if len(self.sheets) > 1:
+                self.sheets.remove(s)
+                self.wb.remove_sheet(s)
 
         if self.analysis:
             self.merge_sheets()

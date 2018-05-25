@@ -97,6 +97,13 @@ def real_fixtures(area=False):
     local('docker-compose exec django_api python manage.py generate_real_data --clean_before %s' % ("--area %s --fast" % area if area else ""))
 
 
+def generate_reports():
+    """
+    Generate reports based on current data
+    """
+    local('docker-compose exec django_api python manage.py generate_reports')
+
+
 def tests(test_path=''):
     """
     Run django_api tests.
