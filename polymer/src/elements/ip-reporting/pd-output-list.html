@@ -108,26 +108,11 @@
         },
       },
 
-        listeners: {
-          'refresh-report': '_onRefreshOutput',
-        },
-
-        _onRefreshOutput: function () {
-          var ajax = document.createElement('etools-prp-ajax');
-          ajax.url = App.Endpoints.programmeDocumentReport(this.workspaceId, this.reportId);
-          this.dispatch(
-            App.Actions.PDReports.fetchSingle(ajax.thunk(), this.pdId)
-          )
-              .catch(function (err) { // jshint ignore:line
-              // TODO: error handling
-              });
-        },
-
-        _computeViewData: function (data) {
-          return data.filter(function (item) {
-            return Boolean(item.indicator_reports.length);
-          });
-        },
-      });
+      _computeViewData: function (data) {
+        return data.filter(function (item) {
+          return Boolean(item.indicator_reports.length);
+        });
+      },
+    });
   </script>
 </dom-module>

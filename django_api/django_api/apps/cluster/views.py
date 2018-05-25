@@ -18,7 +18,7 @@ from core.common import PARTNER_TYPE
 from core.permissions import IsAuthenticated
 from core.paginations import SmallPagination
 from core.serializers import ShortLocationSerializer
-from core.models import Location, ResponsePlan
+from core.models import Location, ResponsePlan, IMORole
 from indicator.serializers import (
     ClusterIndicatorReportSerializer,
     ReportableIdSerializer,
@@ -485,16 +485,32 @@ class ClusterIndicatorsListExcelImportView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, response_plan_id, format=None):
+
+        # IMO user are able to upload any partner data
+        if request.user.groups.filter(name=IMORole.as_group().name).exists():
+            partner = None
+        else:
+            partner = request.user.partner
+
+            if not partner:
+                raise ValidationError({
+                    'partner': "Cannot find partner from this user. Is this user correctly configured?"
+                })
+
         up_file = request.FILES['file']
         filepath = "/tmp/" + up_file.name
         destination = open(filepath, 'wb+')
+
         for chunk in up_file.chunks():
             destination.write(chunk)
             destination.close()
-        reader = IndicatorsXLSXReader(filepath)
+
+        reader = IndicatorsXLSXReader(filepath, partner)
         result = reader.import_data()
+
         if result:
             return Response({'parsing_errors': [result, ]}, status=statuses.HTTP_400_BAD_REQUEST)
+
         else:
             return Response({}, status=statuses.HTTP_200_OK)
 

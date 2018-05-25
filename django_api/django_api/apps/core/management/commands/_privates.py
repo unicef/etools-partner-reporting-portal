@@ -696,6 +696,12 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
     print("Generating IndicatorLocationData for Ratio type")
     generate_indicator_report_location_disaggregation_ratio_data(generate_all=generate_all_disagg)
 
+    # Disaggregation association fix for CAI LLO indicators
+    for indicator in cai_llo_queryset:
+        ca_reportable = indicator.ca_indicator_used_by_reporting_entity
+        indicator.disaggregations.clear()
+        indicator.disaggregations.add(*ca_reportable.disaggregations.all())
+
     # Fulfill submission date for closed IR
     IndicatorReport.objects.filter(
         report_status__in=(

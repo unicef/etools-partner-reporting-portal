@@ -287,7 +287,7 @@
           clusterId: Number,
           locations: Object,
           pending: Object,
-          isPAI: Boolean,
+          isPai: Boolean,
 
           editing: {
             type: Boolean,
@@ -348,7 +348,7 @@
 
           canEditDetails: {
             type: Boolean,
-            computed: '_computeCanEditDetails(editing, parentIndicatorId, isPAI, permissions)',
+            computed: '_computeCanEditDetails(editing, parentIndicatorId, isPai, permissions)',
           },
 
           canMessageIMO: {

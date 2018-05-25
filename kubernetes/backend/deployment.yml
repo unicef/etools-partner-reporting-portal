@@ -1,0 +1,173 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: backend
+  annotations:
+    revision: "{{CF_SHORT_REVISION}}"
+  namespace: {{NAMESPACE}}
+spec:
+  ports:
+  - protocol: TCP
+    port: 8000
+    nodePort: 30822
+  type: NodePort
+  selector:
+    app: backend-container
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: backend
+  annotations:
+    revision: "{{CF_SHORT_REVISION}}"
+  namespace: {{NAMESPACE}}
+  labels:
+    app: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend-container
+  template:
+    metadata:
+      labels:
+        app: backend-container
+    spec:
+      containers:
+        - name: backend
+          image: unicef/etools-prp:{{CF_SHORT_REVISION}}
+          volumeMounts:
+            - name: data-volume
+              mountPath: /data
+          command: ["bash"]
+          args: ["-c", "uwsgi --ini /code/django_api/uwsgi.ini"]
+          ports:
+            - containerPort: 8000
+          env:
+            - name: AWS_S3_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: AWS_S3_ACCESS_KEY_ID
+            - name: AWS_S3_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: AWS_S3_SECRET_ACCESS_KEY
+            - name: AWS_STORAGE_BUCKET_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: AWS_STORAGE_BUCKET_NAME
+            - name: AZURE_B2C_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: AZURE_B2C_CLIENT_ID
+            - name: AZURE_B2C_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: AZURE_B2C_CLIENT_SECRET
+            - name: AZURE_B2C_POLICY_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: AZURE_B2C_POLICY_NAME
+            - name: DJANGO_ALLOWED_HOST
+              value: {{DJANGO_ALLOWED_HOST}}
+            - name: DJANGO_DEBUG
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: DJANGO_DEBUG
+            - name: DOMAIN_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: DOMAIN_NAME
+            - name: ELASTIC_APM_DEBUG
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: ELASTIC_APM_DEBUG
+            - name: ELASTIC_APM_SECRET_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: ELASTIC_APM_SECRET_TOKEN
+            - name: ELASTIC_APM_SERVER_URL
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: ELASTIC_APM_SERVER_URL
+            - name: ELASTIC_APM_SERVICE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: ELASTIC_APM_SERVICE_NAME
+            - name: EMAIL_BACKEND
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: EMAIL_BACKEND
+            - name: EMAIL_HOST_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: EMAIL_HOST_PASSWORD
+            - name: EMAIL_HOST_USER
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: EMAIL_HOST_USER
+            - name: ENV
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: ENV
+            - name: PMP_API_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: PMP_API_PASSWORD
+            - name: PMP_API_USER
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: PMP_API_USER
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: POSTGRES_DB
+            - name: POSTGRES_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: POSTGRES_HOST
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: POSTGRES_USER
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: REDIS_URL
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: SECRET_KEY
+      volumes:
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: data-volume-claim

@@ -38,9 +38,15 @@
     </etools-prp-ajax>
 
     <app-route
+      route="{{parentRoute}}"
+      pattern="/:id"
+      data="{{parentRouteData}}"
+      tail="{{route}}">
+    </app-route>
+
+    <app-route
       route="{{route}}"
       pattern="/:tab"
-      subroute="{{subroute}}"
       data="{{routeData}}">
     </app-route>
 
@@ -71,19 +77,21 @@
 
     <template is="dom-if" if="[[_equals(tab, 'overview')]]" restamp="true">
       <rp-partner-project-details-overview
-          project-data=[[projectData]]>
+          project-data="[[projectData]]">
       </rp-partner-project-details-overview>
     </template>
 
     <template is="dom-if" if="[[_equals(tab, 'indicators')]]" restamp="true">
       <rp-partner-project-details-indicators
-          project-id="[[projectId]]"
+          project-id="[[parentRouteData.id]]"
           project-data="[[projectData]]">
       </rp-partner-project-details-indicators>
     </template>
 
     <template is="dom-if" if="[[_equals(tab, 'activities')]]" restamp="true">
-      <rp-partner-project-details-activities project-id=[[projectId]]></rp-partner-project-details-activities>
+      <rp-partner-project-details-activities
+          project-id="[[parentRouteData.id]]">
+      </rp-partner-project-details-activities>
     </template>
   </template>
 
@@ -102,10 +110,6 @@
       properties: {
         tab: String,
 
-        routeData: Object,
-
-        projectId: String,
-
         projectData: {
           type: Object,
           value: {}
@@ -113,7 +117,8 @@
 
         overviewUrl: {
           type: String,
-          computed: '_computeOverviewUrl(projectId)'
+          computed: '_computeOverviewUrl(parentRouteData.id)',
+          observer: '_getProjectAjax',
         },
 
         backLink: {
@@ -142,9 +147,9 @@
         if (!tab) {
           tab = 'overview';
         }
+
         this.set('tab', tab);
-        this.set('queryParams.page', 1);
-        this.set('route.path', '/' + this.tab);
+        this.notifyPath('route.path', '/' + this.tab);
       },
 
       _onSuccess: function() {
@@ -152,23 +157,26 @@
       },
 
       _getProjectAjax: function () {
-        var thunk = this.$.project.thunk();
-        var self = this;
-        thunk()
-          .then(function (res) {
-            self.updatePending = false;
-            self.projectData = res.data;
-          })
-          .catch(function (err) { // jshint ignore:line
-            self.updatePending = false;
-            // TODO: error handling
-          });
+        this.debounce('project-ajax', function () {
+          var thunk = this.$.project.thunk();
+          var self = this;
+          thunk()
+            .then(function (res) {
+              self.updatePending = false;
+              self.projectData = res.data;
+            })
+            .catch(function (err) { // jshint ignore:line
+              self.updatePending = false;
+              // TODO: error handling
+            });
+        }, 100);
       },
 
-      attached: function () {
-        this._getProjectAjax();
+      detached: function () {
+        this._cancelDebouncers([
+          'project-ajax',
+        ]);
       },
-
     });
   </script>
 </dom-module>
