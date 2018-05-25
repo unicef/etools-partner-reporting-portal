@@ -55,7 +55,7 @@ class IndicatorsXLSXReader(object):
                     ild_id = str(self.sheet.cell(row=row, column=location_column_id).value)
 
                     # Check if Partner is allowed to modify data
-                    if IndicatorLocationData.objects.filter(
+                    if self.partner and IndicatorLocationData.objects.filter(
                         pk=ild_id).filter(
                             Q(**{
                                 'indicator_report__reportable__cluster_objectives'

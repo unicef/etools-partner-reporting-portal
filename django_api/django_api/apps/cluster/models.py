@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 import datetime
 
 from django.db import models
-from django.db.models import Q
 from django.utils.functional import cached_property
 from django.contrib.contenttypes.fields import GenericRelation
 
@@ -137,18 +136,24 @@ class Cluster(TimeStampedExternalSourceModel):
         )
 
     @cached_property
+    def indicator_reports(self):
+        return IndicatorReport.objects.filter(
+            reportable__in=self.partner_activity_reportables_queryset
+        )
+
+    @cached_property
     def overdue_indicator_reports(self):
-        return self.latest_indicator_reports.filter(
+        return self.indicator_reports.filter(
             report_status=INDICATOR_REPORT_STATUS.overdue)
 
     @cached_property
     def due_indicator_reports(self):
-        return self.latest_indicator_reports.filter(
+        return self.indicator_reports.filter(
             report_status=INDICATOR_REPORT_STATUS.due)
 
     @cached_property
     def accepted_indicator_reports(self):
-        return self.latest_indicator_reports.filter(
+        return self.indicator_reports.filter(
             report_status=INDICATOR_REPORT_STATUS.accepted)
 
     @cached_property
