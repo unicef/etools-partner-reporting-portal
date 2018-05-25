@@ -10,8 +10,10 @@
 <link rel="import" href="../../../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../../../bower_components/paper-radio-button/paper-radio-button.html">
 <link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
+<link rel="import" href="../../../bower_components/moment-element/moment-import.html">
 
 <link rel="import" href="../../polyfills/es6-shim.html">
+<link rel="import" href="../../settings.html">
 <link rel="import" href="disaggregations-dropdown-widget.html">
 <link rel="import" href="indicator-locations-widget.html">
 <link rel="import" href="chip-date-of-report.html">
@@ -204,7 +206,7 @@
                   label="Date of report"
                   on-selected-chips-updated="_validate"
                   required>
-                  <chip-date-of-report></chip-date-of-report>
+                  <chip-date-of-report min-date="[[_minDate]]"></chip-date-of-report>
                 </etools-prp-chips>
               </template>
 
@@ -409,12 +411,21 @@
           type: Array,
           value: [],
         },
+
+        _minDate: {
+          type: Date,
+          value: function () {
+            return null;
+          },
+          computed: '_computeMinDate(data.start_date_of_reporting_period)',
+        },
       },
 
       observers: [
         '_setDefaults(opened)',
         '_resetCalculationFormulas(isNumber)',
         '_resetFields(isNumber)',
+        '_updateCSDates(data.start_date_of_reporting_period)',
       ],
 
       _computeIsNumber: function (type) {
@@ -496,6 +507,10 @@
         return App.Endpoints.responseParametersClusterDisaggregations(responsePlanId);
       },
 
+      _computeMinDate: function (date) {
+        return date ? moment(date).startOf('day').toDate() : null;
+      },
+
       _fetchDisaggregations: function() {
         var self = this;
 
@@ -516,6 +531,22 @@
           object_id: this.objectId,
           object_type: this.objectType,
         });
+      },
+
+      _updateCSDates: function (startDateStr) {
+        var dates;
+        var startDate;
+
+        if (!startDateStr) {
+          return;
+        }
+
+        dates = this.get('data.cs_dates');
+        startDate = moment(startDateStr).startOf('day').toDate();
+
+        this.set('data.cs_dates', dates && dates.filter(function (d) {
+          return moment(d, App.Settings.dateFormat).startOf('day').toDate() >= startDate;
+        }));
       },
 
       _save: function () {
