@@ -607,6 +607,12 @@ class PMPProgrammeDocumentSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         validated_data = super(PMPProgrammeDocumentSerializer, self).validate(attrs)
 
+        validated_data['budget'] = sum([
+            validated_data['cso_budget'],
+            validated_data['unicef_budget_cash'],
+            validated_data['unicef_budget_supplies'],
+        ])
+
         validated_data['total_unicef_cash_currency'] = validated_data['cso_contribution_currency']
         validated_data['in_kind_amount_currency'] = validated_data['cso_contribution_currency']
         validated_data['funds_received_to_date_currency'] = validated_data['cso_contribution_currency']
