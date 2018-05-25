@@ -8,9 +8,11 @@ A future use-case that PRP can be extended to support is the ability to be able 
 
 ​
 
-![](https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-KzwqgC7O0kW5EDlHvvK%2F-LAWg-O_lUlN1LvZuuCK%2F-LAWhfdFo-da2KFuvXXY%2FData_Entry_01_02_Sug_01_02.png?alt=media&token=e3a920da-53f8-4701-8d47-0a5b9e419361)
+
 
 ​
+
+![](https://lh5.googleusercontent.com/DuVM5B3FW43_8nR1SBV7qlwLrovWhe0xrowSR46VSMJi7XkR6r-6YwWA7wNri_h6RETahVfAh5XaqgYGYGn4Uw1tpgn4gAa0gQQVhGZn1Rvad4JVadYdp5BrIy_GGxGszg9cFaaq)
 
 {% hint style="info" %}
 If a partner has not adopted this cluster activity in PRP-Cluster, but on of the cluster activity indicators is associated with this partner's PD in PMP, then PRP will assume adoption of this activity \(and all its indicators\) by this partner.
