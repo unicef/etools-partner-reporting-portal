@@ -1,27 +1,22 @@
-import requests
-
 from celery import shared_task
 from core.api import PMP_API
 from core.models import Workspace
-from core.countries import COUNTRIES_ALPHA2_CODE_DICT
 
 from partner.serializers import PMPPartnerSerializer
 from partner.models import Partner
 
 MAX_RETRIES = 6
 
+
 @shared_task
 def process_partners(area=None):
     # Hit API
     api = PMP_API()
 
-
     if area:
         workspaces = Workspace.objects.filter(business_area_code=area)  # 2130 for Iraq
     else:
         workspaces = Workspace.objects.all()
-
-
 
     for workspace in workspaces:
         # Skip global workspace and Syria Cross Border / MENARO
