@@ -485,19 +485,10 @@ class ClusterIndicatorsListExcelImportView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, response_plan_id, format=None):
-        partner_id = int(request.query_params.get('partner_id', '-1'))
-        partner = None
 
-        # IMO user needs to specify Partner ID when importing Indicator list
+        # IMO user are able to upload any partner data
         if request.user.groups.filter(name=IMORole.as_group().name).exists():
-            if partner_id != -1:
-                partner = get_object_or_404(Partner, id=partner_id)
-
-            else:
-                raise ValidationError({
-                    'partner': "partner_id GET parameter is required for IMO user"
-                })
-
+            partner = None
         else:
             partner = request.user.partner
 

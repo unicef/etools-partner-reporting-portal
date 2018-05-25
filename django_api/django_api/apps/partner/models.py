@@ -15,7 +15,7 @@ from core.common import (
     PARTNER_PROJECT_STATUS,
     RESPONSE_PLAN_TYPE, EXTERNAL_DATA_SOURCES)
 from core.models import TimeStampedExternalSourceModel
-
+from core.fields import UniqueNullCharField
 from core.countries import COUNTRIES_ALPHA2_CODE_DICT, COUNTRIES_ALPHA2_CODE
 
 
@@ -85,7 +85,7 @@ class Partner(TimeStampedExternalSourceModel):
         null=True
     )
     city = models.CharField(
-        max_length=32,
+        max_length=64,
         blank=True,
         null=True
     )
@@ -132,11 +132,7 @@ class Partner(TimeStampedExternalSourceModel):
         blank=True,
         verbose_name='Risk Rating'
     )
-    type_of_assessment = models.CharField(
-        max_length=50,
-        null=True,
-        blank=True,
-    )
+
     basis_for_risk_rating = models.CharField(
         max_length=50,
         null=True,
@@ -146,6 +142,8 @@ class Partner(TimeStampedExternalSourceModel):
     clusters = models.ManyToManyField(
         'cluster.Cluster', related_name="partners"
     )
+
+    ocha_external_id = UniqueNullCharField(max_length=128, blank=True, null=True, unique=True)
 
     class Meta:
         ordering = ['title']
