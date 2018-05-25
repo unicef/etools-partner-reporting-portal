@@ -95,7 +95,6 @@ class PartnerDetailsSerializer(serializers.ModelSerializer):
             'clusters',
             # Risk Rating part
             'last_assessment_date',
-            'type_of_assessment',
             'rating',
             'basis_for_risk_rating',
         )
