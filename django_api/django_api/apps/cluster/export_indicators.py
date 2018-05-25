@@ -10,7 +10,7 @@ import itertools
 from indicator.models import Disaggregation, DisaggregationValue, IndicatorBlueprint
 
 PATH = settings.BASE_DIR + "/apps/cluster/templates/excel/indicators_export.xlsx"
-SAVE_PATH = settings.MEDIA_ROOT + '/'
+SAVE_PATH = '/tmp/'
 
 DISAGGREGATION_COLUMN_START = 44
 INDICATOR_DATA_ROW_START = 5
@@ -168,7 +168,7 @@ class IndicatorsXLSXExporter:
                                 column=4).value = cluster.get_type_display()
                 self.sheet.cell(
                     row=start_row_id,
-                    column=5).value = cluster.partner_projects.first().partner.title
+                    column=5).value = cluster.partner_projects.first().partner.title if cluster.partner_projects.first() else ""
                 self.sheet.cell(
                     row=start_row_id,
                     column=6).value = cluster_objective.title if cluster_objective else ""
