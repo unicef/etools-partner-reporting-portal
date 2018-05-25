@@ -11,6 +11,8 @@ import random
 import names
 from django.conf import settings
 
+from social_django.models import UserSocialAuth
+
 from account.models import (
     User,
     UserProfile,
@@ -143,6 +145,7 @@ def clean_up_data():
         GatewayType.objects.filter(name__icontains="gateway_type_").delete()
         CartoDBTable.objects.filter(domain__icontains="domain_").delete()
         Person.objects.filter(name__icontains="Person_").delete()
+        UserSocialAuth.objects.all().delete()
         print("All ORM objects deleted")
 
 
