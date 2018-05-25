@@ -9,7 +9,7 @@ spec:
       - name: backend-migration-container
         image: unicef/etools-prp
         command: ["bash"]
-        args: ["-c", "python /code/manage.py makemigrations --merge --noinput && python /code/manage.py migrate && python /code/manage.py loaddata sites"]
+        args: ["-c", "python /code/manage.py makemigrations --merge --noinput && python /code/manage.py migrate && python /code/manage.py loaddata sites && python /code/manage.py loaddata reporting_entities"]
         env:
           - name: AWS_S3_ACCESS_KEY_ID
             valueFrom:
