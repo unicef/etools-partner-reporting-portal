@@ -299,20 +299,16 @@ LOGGING = {
             'formatter': 'standard',
         },
         'default': {
-            'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(LOGS_PATH, 'django.log'),
-            'maxBytes': 1024 * 1024 * 5,  # 5 MB
-            'backupCount': 5,
-            'formatter': 'standard'
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'stream': sys.stdout,
+            'formatter': 'standard',
         },
         'ocha': {
-            'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(LOGS_PATH, 'ocha.log'),
-            'maxBytes': 1024 * 1024 * 5,  # 5 MB
-            'backupCount': 5,
-            'formatter': 'standard'
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'stream': sys.stdout,
+            'formatter': 'standard',
         },
         'elasticapm': {
             'level': 'ERROR',
@@ -326,7 +322,7 @@ LOGGING = {
             'propagate': True
         },
         'ocha-sync': {
-            'handlers': ['ocha', 'console'],
+            'handlers': ['ocha'],
             'level': 'DEBUG',
             'propagate': True
         },

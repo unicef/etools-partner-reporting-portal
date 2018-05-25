@@ -38,7 +38,7 @@ This export will follow the Annex C part 2 standard format. It contains data fro
 
 A "XLS" button with download icon will be added to the single Progress Report page.
 
-This export will contain all the data associated with the report. Data from the "other info" tab will **not be included **in this export. Each output, its indicators, their progress and all raw/disaggregated data per location will also be included in this export.
+This export will contain all the data associated with the report. Data from the "other info" tab will **not be included** in this export. Each output, its indicators, their progress and all raw/disaggregated data per location will also be included in this export.
 
 XLS file will always be 1 tab with many rows and columns. Since each indicator could have different disaggregation choices and the partner could have reported at varying disaggregation levels as well, the columns represent all unique combinations of valid disaggregation choices and hence there might be a lot of empty cells. The overall status and narrative assessment would be repeated per indicator, even thought it was entered at the output level by the partner user.
 

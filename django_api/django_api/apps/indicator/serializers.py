@@ -301,9 +301,23 @@ class IndicatorListSerializer(ReportableSimpleSerializer):
     cluster = serializers.SerializerMethodField()
     total_against_in_need = serializers.SerializerMethodField()
     total_against_target = serializers.SerializerMethodField()
+    cluster_partner_indicator_reportable_id = serializers.SerializerMethodField()
+
+    def get_cluster_partner_indicator_reportable_id(self, obj):
+        if not obj.ca_indicator_used_by_reporting_entity:
+            return None
+
+        try:
+            pai = obj.ca_indicator_used_by_reporting_entity.children.get(
+                partner_activities__partner=obj.content_object.cp_output.programme_document.partner,
+            )
+
+            return pai.id
+        except Reportable.DoesNotExist:
+            return None
 
     def get_total_against_in_need(self, obj):
-        return obj.calculated_target / obj.calculated_in_need \
+        return obj.total['c'] / obj.calculated_in_need \
             if obj.calculated_in_need and obj.calculated_in_need != 0 else 0
 
     def get_total_against_target(self, obj):
@@ -346,6 +360,8 @@ class IndicatorListSerializer(ReportableSimpleSerializer):
             'parent_indicator',
             'total_against_in_need',
             'total_against_target',
+            'ca_indicator_used_by_reporting_entity',
+            'cluster_partner_indicator_reportable_id',
         )
 
 
@@ -703,6 +719,22 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
                     location=self.instance.location,
                 )
 
+                if self.instance.indicator_report:
+                    def get_disagg_lookup_map(ir):
+                        serializer = DisaggregationListSerializer(
+                            ir.disaggregations, many=True)
+
+                        disagg_lookup_list = serializer.data
+                        disagg_lookup_list.sort(key=lambda item: len(item['choices']))
+
+                        return disagg_lookup_list
+
+                    def get_disagg_choice_lookup_map(ir):
+                        lookup_array = ir.disaggregation_values(id_only=False)
+                        lookup_array.sort(key=len)
+
+                        return lookup_array
+
                 split_data = {}
                 disagg_data_copy = copy.deepcopy(data['disaggregation'])
 
@@ -793,22 +825,29 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
         else:
             pd_id_for_locations = -1
 
+        if 'hide_children' in self.context:
+            hide_children = self.context['hide_children']
+
+        else:
+            hide_children = -1
+
         objects = list(obj.indicator_location_data.all())
 
-        child_ir_ild_ids = obj.children.values_list('indicator_location_data', flat=True)
+        if hide_children == -1:
+            child_ir_ild_ids = obj.children.values_list('indicator_location_data', flat=True)
 
-        if child_ir_ild_ids.exists() and pd_id_for_locations != -1:
-            child_ir_ild_ids = child_ir_ild_ids.filter(
-                reporting_entity__title="UNICEF",
-                reportable__lower_level_outputs__cp_output__programme_document_id=pd_id_for_locations,
+            if child_ir_ild_ids.exists() and pd_id_for_locations != -1:
+                child_ir_ild_ids = child_ir_ild_ids.filter(
+                    reporting_entity__title="UNICEF",
+                    reportable__lower_level_outputs__cp_output__programme_document_id=pd_id_for_locations,
+                )
+
+            child_ilds = IndicatorLocationData.objects.filter(
+                id__in=child_ir_ild_ids,
             )
 
-        child_ilds = IndicatorLocationData.objects.filter(
-            id__in=child_ir_ild_ids,
-        )
-
-        if obj.children.exists():
-            objects.extend(list(child_ilds))
+            if obj.children.exists():
+                objects.extend(list(child_ilds))
 
         return SimpleIndicatorLocationDataListSerializer(
             objects,
@@ -1655,7 +1694,7 @@ class ClusterAnalysisIndicatorsListSerializer(serializers.ModelSerializer):
         return obj.content_type.model
 
     def get_total_against_in_need(self, obj):
-        return obj.calculated_target / obj.calculated_in_need \
+        return obj.total['c'] / obj.calculated_in_need \
             if obj.calculated_in_need and obj.calculated_in_need != 0 else 0
 
     def get_total_against_target(self, obj):
@@ -1711,7 +1750,7 @@ class ClusterAnalysisIndicatorDetailSerializer(serializers.ModelSerializer):
     in_need = serializers.JSONField()
 
     def get_total_against_in_need(self, obj):
-        return obj.calculated_target / obj.calculated_in_need \
+        return obj.total['c'] / obj.calculated_in_need \
             if obj.calculated_in_need and obj.calculated_in_need != 0 else 0
 
     def get_total_against_target(self, obj):

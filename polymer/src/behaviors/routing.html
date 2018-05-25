@@ -39,7 +39,11 @@
       },
 
       _$computeBaseUrlCluster: function(workspace, app, planId) {
-        return '/app/' + workspace + '/' + app + '/plan/' + planId;
+        return this._$computeBaseUrl(workspace, app) + '/plan/' + planId;
+      },
+
+      buildBaseUrl: function () {
+        return this._$computeBaseUrl.apply(this, arguments);
       },
 
       /**

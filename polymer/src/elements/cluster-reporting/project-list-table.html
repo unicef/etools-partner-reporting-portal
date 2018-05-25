@@ -2,6 +2,7 @@
 <link rel="import" href="../../../bower_components/app-route/app-route.html">
 <link rel="import" href="../../../bower_components/etools-data-table/etools-data-table.html">
 <link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
+<link rel="import" href="../../../bower_components/paper-tooltip/paper-tooltip.html">
 <link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../../bower_components/iron-location/iron-location.html">
@@ -115,6 +116,7 @@
             <div slot="row-data">
               <div class="table-cell table-cell--text">
                 <a href="[[_detailUrl(project, anchorQuery)]]">[[project.title]]</a>
+                <paper-tooltip>[[project.title]]</paper-tooltip>
               </div>
               <div class="table-cell table-cell--text">
                 [[_commaSeparatedDictValues(project.clusters, 'title')]]

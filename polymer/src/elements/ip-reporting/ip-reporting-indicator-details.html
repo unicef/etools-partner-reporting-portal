@@ -23,6 +23,7 @@
         width: 100%;
 
         --paper-tabs: {
+          padding-left: 12px;
           border-bottom: 1px solid var(--paper-grey-300);
         };
 
@@ -80,7 +81,8 @@
 
     <etools-prp-ajax
         id="indicatorDetail"
-        url="[[indicatorDetailUrl]]">
+        url="[[indicatorDetailUrl]]"
+        params="[[params]]">
     </etools-prp-ajax>
 
     <template is="dom-if" if="[[loading]]">
@@ -200,7 +202,7 @@
       properties: {
         indicatorDetailUrl: {
           type: String,
-          computed: '_computeIndicatorReportsUrl(indicatorId)',
+          computed: '_computeIndicatorReportsUrl(indicator)',
         },
 
         selected: {
@@ -213,7 +215,7 @@
           observer: '_openChanged',
         },
 
-        indicatorId: Number,
+        indicator: Object,
 
         loading: {
           type: Boolean,
@@ -232,15 +234,49 @@
         locations: {
           type: Array,
           computed: '_bucketByLocation(data)'
-        }
+        },
+
+        appName: {
+          type: String,
+          statePath: 'app.current',
+        },
+
+        isClusterApp: {
+          type: Boolean,
+          computed: '_computeIsClusterApp(appName)',
+        },
+
+        params: {
+          type: Object,
+          computed: '_computeParams(isClusterApp)',
+        },
       },
 
       observers: [
         '_getDataByKey(dataDict)'
       ],
 
-      _computeIndicatorReportsUrl: function (indicatorId) {
-        return App.Endpoints.indicatorReports(indicatorId) + '?limit=2';
+      _computeParams: function (isClusterApp) {
+        var params = {};
+
+        if (isClusterApp === true) {
+          params = Object.assign({}, params, {
+            hide_children: 1,
+          });
+        }
+
+        return params;
+      },
+
+      _computeIsClusterApp: function(appName) {
+        return appName === 'cluster-reporting';
+      },
+
+      _computeIndicatorReportsUrl: function (indicator) {
+        var target_indicator_id = indicator.cluster_partner_indicator_reportable_id
+          ? indicator.cluster_partner_indicator_reportable_id
+          : indicator.id;
+        return App.Endpoints.indicatorReports(target_indicator_id) + '?limit=2';
       },
 
       _bucketByLocation: function(data) {
@@ -290,7 +326,7 @@
 
       _getDataByKey: function(dataDict) {
         if (dataDict.details) {
-          this.data = dataDict.details[this.indicatorId];
+          this.data = dataDict.details[this.indicator.id];
         }
       },
 
@@ -302,7 +338,7 @@
         if (this.isOpen) {
           var thunk = this.$.indicatorDetail.thunk();
           var action = App.Actions.Indicators;
-          this.dispatch(action.fetchIndicatorDetails(thunk, this.indicatorId))
+          this.dispatch(action.fetchIndicatorDetails(thunk, this.indicator.id))
             .catch(function (err) { // jshint ignore:line
                 // TODO: error handling.
             });

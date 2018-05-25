@@ -305,12 +305,17 @@
               </template>
             </div>
             <template
-            is="dom-if"
-            if="[[!edit]]"
-            restamp="true">
-              <paper-radio-button name="custom">
-                <strong>Custom</strong>
-              </paper-radio-button>
+              is="dom-if"
+              if="[[!edit]]"
+              restamp="true">
+              <template
+                is="dom-if"
+                if="[[canAddOchaProjects]]"
+                restamp="true">
+                <paper-radio-button name="custom">
+                  <strong>Custom</strong>
+                </paper-radio-button>
+              </template>
             </template>
             <div
               empty$="[[!_equals(mode, 'custom')]]">
@@ -456,18 +461,15 @@
               id="collapse"
               opened="{{detailsOpened}}">
               <div class="app-grid">
-                <etools-single-selection-menu
+                <paper-input
                   id="agencyAcronyms"
                   class="item validate"
                   label="Name of Funding Agency (acronyms)"
-                  options="[[agencyAcronyms]]"
-                  option-value="id"
-                  option-label="title"
-                  selected="{{data.agency_name}}"
-                  on-iron-activate="_validate"
-                  trigger-value-change-event
+                  value="{{data.agency_name}}"
+                  type="string"
+                  on-input="_validate"
                   always-float-label>
-                </etools-single-selection-menu>
+                </paper-input>
 
                 <etools-single-selection-menu
                   class="item validate"
@@ -675,7 +677,7 @@
 
         canAddOchaProjects: {
           type: Boolean,
-          statePath: 'responsePlans.current.can_import_ocha_projects'
+          statePath: 'responsePlans.current.can_import_ocha_projects',
         },
 
         path: String,
@@ -862,6 +864,9 @@
           });
           this.set('mode', 'custom');
         } else {
+          if (!this.canAddOchaProjects) {
+            this.set('mode', 'custom');
+          }
           this.data = {'custom_fields': [], 'funding': {}};
           this.selectedClusters = [];
         }

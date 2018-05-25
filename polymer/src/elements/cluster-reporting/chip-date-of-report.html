@@ -85,7 +85,7 @@
       },
 
       _add: function () {
-        var formatted = moment(this._date).format('YYYY-MM-DD');
+        var formatted = moment(this._date).format('DD-MMM-YYYY');
 
         this.fire('chip-add', formatted);
         this._close();
