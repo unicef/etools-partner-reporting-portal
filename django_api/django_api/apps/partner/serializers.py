@@ -2,7 +2,7 @@ from django.db import transaction
 from rest_framework import serializers
 
 from core.serializers import ShortLocationSerializer
-from core.common import PARTNER_PROJECT_STATUS, PARTNER_TYPE, CSO_TYPES
+from core.common import PARTNER_PROJECT_STATUS  # , PARTNER_TYPE, CSO_TYPES
 
 from cluster.models import (
     Cluster,
@@ -544,28 +544,30 @@ class PMPPartnerSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='external_id')
     name = serializers.CharField(source='title', allow_blank=True)
     short_name = serializers.CharField(source='short_title', allow_blank=True)
-    partner_type = serializers.ChoiceField(
-        choices=[
-            (x[1],
-             x[0]) for x in PARTNER_TYPE],
-        allow_blank=True,
-        allow_null=True)
-    cso_type = serializers.ChoiceField(
-        choices=[
-            (x[1],
-             x[0]) for x in CSO_TYPES],
-        allow_blank=True,
-        allow_null=True)
+    alternate_name = serializers.CharField(source='alternate_title', allow_blank=True, allow_null=True)
+    # partner_type = serializers.ChoiceField(
+    #     choices=[
+    #         (x[1],
+    #          x[0]) for x in PARTNER_TYPE],
+    #     allow_blank=True,
+    #     allow_null=True)
+    # cso_type = serializers.ChoiceField(
+    #     choices=[
+    #         (x[1],
+    #          x[0]) for x in CSO_TYPES],
+    #     allow_blank=True,
+    #     allow_null=True)
     address = serializers.CharField(source='street_address', allow_blank=True, allow_null=True)
     basis_for_risk_rating = serializers.CharField(allow_blank=True, allow_null=True)
+    unicef_vendor_number = serializers.CharField(source="vendor_number")
 
     def fix_choices(self, validated_data):
-        for pt in [(x[1], x[0]) for x in PARTNER_TYPE]:
-            if pt[0] == validated_data['partner_type']:
-                validated_data['partner_type'] = pt[1]
-        for ct in [(x[1], x[0]) for x in CSO_TYPES]:
-            if ct[0] == validated_data['cso_type']:
-                validated_data['cso_type'] = ct[1]
+        # for pt in [(x[1], x[0]) for x in PARTNER_TYPE]:
+        #     if pt[0] == validated_data['partner_type']:
+        #         validated_data['partner_type'] = pt[1]
+        # for ct in [(x[1], x[0]) for x in CSO_TYPES]:
+        #     if ct[0] == validated_data['cso_type']:
+        #         validated_data['cso_type'] = ct[1]
         return validated_data
 
     def update(self, instance, validated_data):
@@ -581,18 +583,22 @@ class PMPPartnerSerializer(serializers.ModelSerializer):
         model = Partner
         fields = (
             "id",
-            "vendor_number",
+            "unicef_vendor_number",
             "name",
             "short_name",
+            "alternate_name",
             "partner_type",
             "cso_type",
             "rating",
             "shared_partner",
             "email",
             "phone_number",
-            "total_ct_cp",
-            "total_ct_cy",
+            "country_code",
+            # "total_ct_cp",
+            # "total_ct_cy",
             "address",
             "city",
             "basis_for_risk_rating",
+            "last_assessment_date",
+            "core_values_assessment_date"
         )

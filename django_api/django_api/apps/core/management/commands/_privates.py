@@ -178,7 +178,7 @@ def generate_real_data(fast=False, area=None, update=False):
         process_workspaces()
 
         # Generate partners
-        process_partners()
+        process_partners(area)
 
     # Generate programme documents
     process_programme_documents(fast, area)

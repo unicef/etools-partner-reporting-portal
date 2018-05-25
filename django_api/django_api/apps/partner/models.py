@@ -85,7 +85,7 @@ class Partner(TimeStampedExternalSourceModel):
         null=True
     )
     city = models.CharField(
-        max_length=32,
+        max_length=64,
         blank=True,
         null=True
     )
@@ -132,11 +132,7 @@ class Partner(TimeStampedExternalSourceModel):
         blank=True,
         verbose_name='Risk Rating'
     )
-    type_of_assessment = models.CharField(
-        max_length=50,
-        null=True,
-        blank=True,
-    )
+
     basis_for_risk_rating = models.CharField(
         max_length=50,
         null=True,
