@@ -4,6 +4,7 @@
 <link rel="import" href="../../../../../bower_components/iron-pages/iron-pages.html">
 
 <link rel="import" href="../../../../elements/page-header.html">
+<link rel="import" href="../../../../elements/message-box.html">
 <link rel="import" href="../../../../elements/ip-reporting/pd-details-overview.html">
 <link rel="import" href="../../../../elements/ip-reporting/pd-details-reports.html">
 <link rel="import" href="../../../../elements/ip-reporting/pd-details-calculation-methods.html">
@@ -27,6 +28,10 @@
       :host {
         display: block;
       }
+
+      .header-content {
+        margin: .5em 0;
+      }
     </style>
 
     <app-route
@@ -36,6 +41,17 @@
     </app-route>
 
     <page-header title="[[ pd.title ]]" back="pd?&status=Sig%2CAct%2CSus">
+      <template
+          is="dom-if"
+          if="[[_equals(pd.status, 'Suspended')]]"
+          restamp="true">
+        <message-box
+            class="header-content"
+            type="warning">
+          PD is suspended, please contact UNICEF programme focal person to confirm reporting requirement.
+        </message-box>
+      </template>
+
       <div class="tabs">
         <paper-tabs
             selected="{{ routeData.dashTab }}"
