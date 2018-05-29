@@ -32,10 +32,12 @@ from core.common import (
     REPORTABLE_PP_CONTENT_OBJECT,
     REPORTABLE_PA_CONTENT_OBJECT,
     OVERALL_STATUS,
+    REPORTABLE_FREQUENCY_LEVEL,
 )
 from core.serializers import ShortLocationSerializer
 from unicef.serializers import ProgressReportSerializer, ProgressReportUpdateSerializer
 from unicef.models import ProgressReport
+from unicef.permissions import UnicefPartnershipManagerOrRead
 from utils.emails import send_email_from_template
 
 from .disaggregators import (
@@ -55,6 +57,7 @@ from .serializers import (
     IndicatorReportSimpleSerializer,
     ReportableLocationGoalBaselineInNeedSerializer,
     ClusterIndicatorIMOMessageSerializer,
+    ReportableReportingFrequencyIdSerializer,
 )
 from .filters import IndicatorFilter, PDReportsFilter
 from .models import (
@@ -721,3 +724,33 @@ class ClusterIndicatorSendIMOMessageAPIView(APIView):
         )
 
         return Response('OK', status=status.HTTP_200_OK)
+
+
+class ReportableReportingFrequencyListAPIView(APIView):
+    """
+    Called by PO to get a list of unique reporting frequencies given a list of Reportable ids.
+    Called from outside of PRP.
+
+    Only a PO (not a partner user) should be allowed to do this action.
+    """
+    permission_classes = (UnicefPartnershipManagerOrRead,)
+
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        serializer = ReportableReportingFrequencyIdSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        reportables = Reportable.objects.filter(id__in=serializer.validated_data['reportable_ids'])
+        non_custom_freq_reportables = reportables.exclude(frequency=REPORTABLE_FREQUENCY_LEVEL.custom_specific_dates)
+        custom_freq_reportables = reportables.filter(frequency=REPORTABLE_FREQUENCY_LEVEL.custom_specific_dates)
+
+        response = list()
+
+        for freq in set(non_custom_freq_reportables.values_list('frequency', flat=True)):
+            frequency_data = {'frequency': freq, 'cs_dates': []}
+            response.append(frequency_data)
+
+        for freq, cs_dates in custom_freq_reportables.values_list('frequency', 'cs_dates'):
+            response.append({'frequency': freq, 'cs_dates': cs_dates})
+
+        return Response(response, status=status.HTTP_200_OK)
