@@ -598,6 +598,9 @@ class IndicatorLocationDataUpdateAPIView(APIView):
         indicator_location_data = self.get_object(
             request, pk=request.data['id'])
 
+        if indicator_location_data.is_locked:
+            raise ValidationError("This location data is locked to be updated.")
+
         serializer = IndicatorLocationDataUpdateSerializer(
             instance=indicator_location_data, data=request.data)
 
