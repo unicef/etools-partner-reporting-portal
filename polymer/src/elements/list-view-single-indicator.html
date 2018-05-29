@@ -6,6 +6,7 @@
 <link rel="import" href="ip-reporting/ip-reporting-indicator-details.html">
 <link rel="import" href="etools-prp-progress-bar.html">
 <link rel="import" href="etools-prp-progress-bar-alt.html">
+<link rel="import" href="etools-prp-progress-bar-cluster.html">
 <link rel="import" href="etools-prp-number.html">
 <link rel="import" href="../styles/table-styles.html">
 <link rel="import" href="../styles/shared-styles.html">
@@ -167,9 +168,22 @@
             <dl class="indicator-progress layout horizontal">
               <dt class="flex-none self-center">Against Target:</dt>
               <dd class="flex-none">
-                <etools-prp-progress-bar
-                    number="[[indicator.total_against_target]]">
-                </etools-prp-progress-bar>
+                <template
+                    is="dom-if"
+                    if="[[_equals(progressBarType, 'cluster')]]"
+                    restamp="true">
+                  <etools-prp-progress-bar-cluster
+                      number="[[indicator.total_against_target]]">
+                  </etools-prp-progress-bar-cluster>
+                </template>
+                <template
+                    is="dom-if"
+                    if="[[_equals(progressBarType, 'default')]]"
+                    restamp="true">
+                  <etools-prp-progress-bar
+                      number="[[indicator.total_against_target]]">
+                  </etools-prp-progress-bar>
+                </template>
               </dd>
             </dl>
 
@@ -216,7 +230,7 @@
 
   <script>
     Polymer({
-      id: 'list-view-single-indicator',
+      is: 'list-view-single-indicator',
 
       behaviors: [
         App.Behaviors.ReduxBehavior,
@@ -261,6 +275,11 @@
           type: Boolean,
           computed: '_computeCanEditLocations(isClusterApp, type, permissions)',
         },
+
+        progressBarType: {
+          type: String,
+          computed: '_computeProgressBarType(isClusterApp, indicator)',
+        },
       },
 
       _openModal: function (e) {
@@ -295,6 +314,18 @@
 
       _computeCanEditLocations: function (isClusterApp, type, permissions) {
         return isClusterApp && type === 'ca' && permissions.editIndicatorLocations;
+      },
+
+      _computeProgressBarType: function (isClusterApp, indicator) {
+        switch (true) {
+          case !isClusterApp && !!indicator.ca_indicator_used_by_reporting_entity:
+            return 'cluster';
+
+          // TODO: other cases
+
+          default:
+            return 'default';
+        }
       },
     });
   </script>
