@@ -424,6 +424,9 @@ class IndicatorDataAPIView(APIView):
             # IndicatorLocationData lock marking
             IndicatorLocationData.objects.filter(indicator_report=ir).update(is_locked=True)
 
+            child_irs = ir.children.values_list('id', flat=True)
+            IndicatorLocationData.objects.filter(indicator_report__in=child_irs).update(is_locked=True)
+
             serializer = PDReportContextIndicatorReportSerializer(instance=ir)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:

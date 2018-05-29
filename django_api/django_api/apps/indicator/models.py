@@ -22,6 +22,8 @@ from core.common import (
 from core.models import TimeStampedExternalSourceModel
 from functools import reduce
 
+from partner.models import PartnerActivity
+
 from indicator.disaggregators import (
     QuantityIndicatorDisaggregator,
     RatioIndicatorDisaggregator
@@ -710,7 +712,8 @@ def unlock_ild_for_sent_back_cluster_ir(sender, instance, **kwargs):
     Whenever a Cluster indicator report is saved and found to be
     Sent back state then trigger unlock IndicatorLocationData instances.
     """
-    if instance.report_status != INDICATOR_REPORT_STATUS.sent_back:
+    if instance.report_status != INDICATOR_REPORT_STATUS.sent_back \
+            and not isinstance(instance.reportable.content_object, PartnerActivity):
         return
 
     with transaction.atomic():
