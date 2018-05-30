@@ -7,6 +7,7 @@
 
 <link rel="import" href="../../behaviors/chip.html">
 <link rel="import" href="../../styles/buttons.html">
+<link rel="import" href="../../settings.html">
 
 <dom-module id="chip-date-of-report">
   <template>
@@ -54,6 +55,7 @@
       <paper-date-picker
           id="picker"
           date="{{_date}}"
+          min-date="[[minDate]]"
           force-narrow>
       </paper-date-picker>
 
@@ -74,7 +76,7 @@
 
   <script>
     Polymer({
-      id: 'chip-date-of-report',
+      is: 'chip-date-of-report',
 
       behaviors: [
         App.Behaviors.ChipBehavior,
@@ -82,21 +84,27 @@
 
       properties: {
         _date: Object,
+
+        minDate: Date,
       },
 
       _add: function () {
-        var formatted = moment(this._date).format('DD-MMM-YYYY');
+        var formatted = moment(this._date).format(App.Settings.dateFormat);
 
         this.fire('chip-add', formatted);
         this._close();
       },
 
       _setDefaults: function (adding) {
+        var today;
+
         if (!adding) {
           return;
         }
 
-        this.set('_date', new Date());
+        today = new Date();
+
+        this.set('_date', today < this.minDate ? this.minDate : today);
       },
 
       attached: function () {

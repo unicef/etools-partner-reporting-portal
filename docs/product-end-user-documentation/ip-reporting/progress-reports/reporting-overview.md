@@ -6,7 +6,7 @@ There are 3 progress report types supported:
 
 * [​Special Reports \(SR\)](special-reports-sr.md)​
 * [​Humanitarian Reports \(HR\)](humanitarian-reports-hr.md)​
-* ​[Quarterly Progress Reports \(QPR\)​](standard-quarterly-progress-reports-qpr.md)
+* ​[Quarterly Progress Reports \(QPR\)​](quarterly-progress-reports-qpr.md)
 
 ### Overview {#overview}
 

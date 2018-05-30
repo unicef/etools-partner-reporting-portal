@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 import datetime
 
 from django.db import models
-from django.db.models import Q
 from django.utils.functional import cached_property
 from django.contrib.contenttypes.fields import GenericRelation
 
@@ -116,9 +115,7 @@ class Cluster(TimeStampedExternalSourceModel):
 
     @cached_property
     def partner_activity_reportables_queryset(self):
-        return Reportable.objects.filter(
-            Q(partner_activities__partner__clusters=self)
-        ).distinct()
+        return Reportable.objects.filter(partner_activities__partner__clusters=self).distinct()
 
     @cached_property
     def latest_indicator_reports(self):
@@ -126,24 +123,37 @@ class Cluster(TimeStampedExternalSourceModel):
         Returns the latest indicator reports for each reportable that is
         associated with partner activities for this cluster.
         """
+        latest_irs = list()
+
+        for reportable in self.partner_activity_reportables_queryset:
+            try:
+                latest_irs.append(reportable.indicator_reports.latest('time_period_end'))
+            except IndicatorReport.DoesNotExist:
+                pass
+
         return IndicatorReport.objects.filter(
-            reportable__in=self.partner_activity_reportables_queryset).order_by(
-                'reportable__id', '-submission_date'
-        ).distinct('reportable__id')
+            id__in=list(map(lambda x: x.id, latest_irs))
+        )
+
+    @cached_property
+    def indicator_reports(self):
+        return IndicatorReport.objects.filter(
+            reportable__in=self.partner_activity_reportables_queryset
+        )
 
     @cached_property
     def overdue_indicator_reports(self):
-        return self.latest_indicator_reports.filter(
+        return self.indicator_reports.filter(
             report_status=INDICATOR_REPORT_STATUS.overdue)
 
     @cached_property
     def due_indicator_reports(self):
-        return self.latest_indicator_reports.filter(
+        return self.indicator_reports.filter(
             report_status=INDICATOR_REPORT_STATUS.due)
 
     @cached_property
     def accepted_indicator_reports(self):
-        return self.latest_indicator_reports.filter(
+        return self.indicator_reports.filter(
             report_status=INDICATOR_REPORT_STATUS.accepted)
 
     @cached_property

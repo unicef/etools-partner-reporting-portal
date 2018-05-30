@@ -12,6 +12,7 @@
 
 
 <link rel="import" href="../../polyfills/es6-shim.html">
+<link rel="import" href="../../settings.html">
 <link rel="import" href="disaggregations-dropdown-widget.html">
 <link rel="import" href="indicator-locations-widget.html">
 <link rel="import" href="chip-date-of-report.html">
@@ -211,7 +212,7 @@
                       is="dom-if"
                       if="[[canEditDetails]]"
                       restamp="true">
-                    <chip-date-of-report></chip-date-of-report>
+                    <chip-date-of-report min-date="[[_minDate]]"></chip-date-of-report>
                   </template>
                 </etools-prp-chips>
               </template>
@@ -221,6 +222,7 @@
                   label="Start date of reporting period"
                   value="{{data.start_date_of_reporting_period}}"
                   disabled="[[!canEditDetails]]"
+                  format="[[dateFormat]]"
                   error-message=""
                   no-init>
               </etools-prp-date-input>
@@ -436,10 +438,26 @@
           type: Boolean,
           computed: '_computeCanEditDetails(permissions, data, isPAI)',
         },
+
+        dateFormat: {
+          type: String,
+          value: function () {
+            return App.Settings.dateFormat;
+          },
+        },
+
+        _minDate: {
+          type: Date,
+          value: function () {
+            return null;
+          },
+          computed: '_computeMinDate(data.start_date_of_reporting_period)',
+        },
       },
 
       observers: [
         '_setDefaults(opened)',
+        '_updateCSDates(data.start_date_of_reporting_period)',
       ],
 
       _computeIndicatorType: function (data) {
@@ -466,6 +484,10 @@
 
       _computeIsPAI: function (data) {
         return (data.content_type_key || '').split('.').pop().toLowerCase() === 'partneractivity';
+      },
+
+      _computeMinDate: function (date) {
+        return date ? this._normalizeDate(date) : null;
       },
 
       _setDefaults: function (opened) {
@@ -501,6 +523,22 @@
             .then(function (res) {
               self.set('locations', res.data);
             });
+      },
+
+      _updateCSDates: function (startDateStr) {
+        var dates;
+        var startDate;
+
+        if (!startDateStr) {
+          return;
+        }
+
+        dates = this.get('data.cs_dates');
+        startDate = this._normalizeDate(startDateStr);
+
+        this.set('data.cs_dates', dates && dates.filter(function (d) {
+          return this._normalizeDate(d) >= startDate;
+        }, this));
       },
 
       _save: function () {

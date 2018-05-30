@@ -41,6 +41,8 @@ def user_details(strategy, details, user=None, *args, **kwargs):
 
         # Update username with email and unusable password
         user.username = user.email
+        user.first_name = details['first_name']
+        user.last_name = details['last_name']
         user.set_unusable_password()
         user.save()
 

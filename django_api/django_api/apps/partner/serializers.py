@@ -95,7 +95,6 @@ class PartnerDetailsSerializer(serializers.ModelSerializer):
             'clusters',
             # Risk Rating part
             'last_assessment_date',
-            'type_of_assessment',
             'rating',
             'basis_for_risk_rating',
         )
@@ -544,6 +543,7 @@ class PMPPartnerSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='external_id')
     name = serializers.CharField(source='title', allow_blank=True)
     short_name = serializers.CharField(source='short_title', allow_blank=True)
+    alternate_name = serializers.CharField(source='alternate_title', allow_blank=True, allow_null=True)
     partner_type = serializers.ChoiceField(
         choices=[
             (x[1],
@@ -558,6 +558,7 @@ class PMPPartnerSerializer(serializers.ModelSerializer):
         allow_null=True)
     address = serializers.CharField(source='street_address', allow_blank=True, allow_null=True)
     basis_for_risk_rating = serializers.CharField(allow_blank=True, allow_null=True)
+    unicef_vendor_number = serializers.CharField(source="vendor_number")
 
     def fix_choices(self, validated_data):
         for pt in [(x[1], x[0]) for x in PARTNER_TYPE]:
@@ -581,18 +582,22 @@ class PMPPartnerSerializer(serializers.ModelSerializer):
         model = Partner
         fields = (
             "id",
-            "vendor_number",
+            "unicef_vendor_number",
             "name",
             "short_name",
+            "alternate_name",
             "partner_type",
             "cso_type",
             "rating",
             "shared_partner",
             "email",
             "phone_number",
+            "country_code",
             "total_ct_cp",
             "total_ct_cy",
             "address",
             "city",
             "basis_for_risk_rating",
+            "last_assessment_date",
+            "core_values_assessment_date"
         )

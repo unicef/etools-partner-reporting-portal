@@ -313,10 +313,6 @@ class Reportable(TimeStampedExternalSourceModel):
 
     @property
     def achieved(self):
-        """
-        TODO: old function, called from places, referred to in
-        serializers. Simply returning total for now.
-        """
         return self.total
 
     @property

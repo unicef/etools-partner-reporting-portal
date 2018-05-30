@@ -1,0 +1,40 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: polymer
+spec:
+  ports:
+  - protocol: TCP
+    port: 8082
+    nodePort: 30085
+  type: NodePort
+  selector:
+    app: polymer-container
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: polymer
+  labels:
+    app: polymer
+  annotations:
+    revision: "{{CF_SHORT_REVISION}}"
+  namespace: {{NAMESPACE}}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: polymer-container
+  template:
+    metadata:
+      labels:
+        app: polymer-container
+    spec:
+      containers:
+        - name: polymer
+          ports:
+            - containerPort: 8082
+          image: unicef/etools-prp-polymer:{{CF_SHORT_REVISION}}
+          command: ["ash"]
+          args: ["-c", "node express.js"]

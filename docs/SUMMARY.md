@@ -23,7 +23,7 @@
     * [Reporting Overview](product-end-user-documentation/ip-reporting/progress-reports/reporting-overview.md)
     * [Special Reports \(SR\)](product-end-user-documentation/ip-reporting/progress-reports/special-reports-sr.md)
     * [Humanitarian Reports \(HR\)](product-end-user-documentation/ip-reporting/progress-reports/humanitarian-reports-hr.md)
-    * [Quarterly Progress Reports \(QPR\)](product-end-user-documentation/ip-reporting/progress-reports/standard-quarterly-progress-reports-qpr.md)
+    * [Quarterly Progress Reports \(QPR\)](product-end-user-documentation/ip-reporting/progress-reports/quarterly-progress-reports-qpr.md)
     * [Reporting Process](product-end-user-documentation/ip-reporting/progress-reports/reporting-process.md)
   * [Various data exports](product-end-user-documentation/ip-reporting/various-data-exports.md)
 * Cluster Reporting

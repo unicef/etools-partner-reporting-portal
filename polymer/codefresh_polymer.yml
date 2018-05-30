@@ -15,8 +15,23 @@ steps:
         candidate: ${{build_polymer}}
         tags:
             - ${{CF_BRANCH}}
+            - ${{CF_SHORT_REVISION}}
             - latest
         when:
             branch:
                 only:
                     - develop
+
+    deploy_backend:
+        image: codefresh/cf-deploy-kubernetes
+        tag: ${{CF_SHORT_REVISION}}
+        working_directory: ${{main_clone}}
+        commands:
+          - /cf-deploy-kubernetes ./kubernetes/polymer/deployment.yaml
+        environment:
+          - KUBECONTEXT=${{KUBECONTEXT}}
+          - KUBERNETES_NAMESPACE=${{NAMESPACE}}
+        when:
+          branch:
+            only:
+              - develop

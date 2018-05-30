@@ -11,16 +11,17 @@
 <link rel="import" href="../../../../redux/store.html">
 <link rel="import" href="../../../../redux/actions.html">
 <link rel="import" href="../../../../redux/selectors/programmeDocumentReports.html">
+<link rel="import" href="../../../../redux/selectors/programmeDocuments.html">
 <link rel="import" href="../../../../behaviors/utils.html">
 <link rel="import" href="../../../../behaviors/progressReportUtils.html">
 <link rel="import" href="../../../../behaviors/routing.html">
-<link rel="import" href="../../../../redux/selectors/programmeDocumentReports.html">
 <link rel="import" href="../../../../elements/etools-prp-ajax.html">
 <link rel="import" href="../../../../elements/etools-prp-permissions.html">
 <link rel="import" href="../../../../elements/page-header.html">
 <link rel="import" href="../../../../elements/page-body.html">
 <link rel="import" href="../../../../elements/reporting-period.html">
 <link rel="import" href="../../../../elements/report-status.html">
+<link rel="import" href="../../../../elements/message-box.html">
 <link rel="import" href="../../../../elements/error-modal.html">
 <link rel="import" href="../../../../elements/ip-reporting/pd-reports-report-title.html">
 <link rel="import" href="../../../../elements/ip-reporting/pd-report-export-button.html">
@@ -49,6 +50,10 @@
         margin-left: 5px;
         font-size: 10px;
         padding: 1px 3px;
+      }
+
+      .header-content {
+        margin: .5em 0;
       }
 
       .toolbar report-status {
@@ -118,6 +123,17 @@
           href="#"
           class="pd-details-link in-title"
           on-tap="_showPdDetails">[[currentReport.programme_document.reference_number]]</a>
+
+      <template
+          is="dom-if"
+          if="[[_equals(currentPd.status, 'Suspended')]]"
+          restamp="true">
+        <message-box
+            class="header-content"
+            type="warning">
+          This report belongs to a suspended PD. Please contact UNICEF programme focal person to confirm reporting requirement.
+        </message-box>
+      </template>
 
       <div class="toolbar">
         <report-status status="[[currentReport.status]]"></report-status>
@@ -245,6 +261,11 @@
         path: String,
         routeData: Object,
         permissions: Object,
+
+        currentPd: {
+          type: Object,
+          statePath: App.Selectors.ProgrammeDocuments.current,
+        },
 
         selectedTab: {
           type: String,

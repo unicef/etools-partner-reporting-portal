@@ -17,6 +17,7 @@
     <etools-prp-toolbar
         query="{{query}}"
         response-plan-id="{{responsePlanId}}">
+        <download-button url="[[exportUrl]]">Export</download-button>
         <template
             is="dom-if"
             if="[[_equals(submitted, 0)]]"
@@ -27,13 +28,11 @@
               Import Template
             </upload-button>
         </template>
-      <download-button url="[[exportUrl]]">Export</download-button>
-
       <template
           is="dom-if"
           if="[[_equals(submitted, 0)]]"
           restamp="true">
-        <download-button url="[[exportTemplateUrl]]">Export Template</download-button>
+        <download-button url="[[exportTemplateUrl]]">Generate Uploader Template</download-button>
       </template>
     </etools-prp-toolbar>
   </template>

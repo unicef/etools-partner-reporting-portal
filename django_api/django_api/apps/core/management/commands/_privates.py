@@ -11,6 +11,8 @@ import random
 import names
 from django.conf import settings
 
+from social_django.models import UserSocialAuth
+
 from account.models import (
     User,
     UserProfile,
@@ -143,6 +145,7 @@ def clean_up_data():
         GatewayType.objects.filter(name__icontains="gateway_type_").delete()
         CartoDBTable.objects.filter(domain__icontains="domain_").delete()
         Person.objects.filter(name__icontains="Person_").delete()
+        UserSocialAuth.objects.all().delete()
         print("All ORM objects deleted")
 
 
@@ -178,11 +181,16 @@ def generate_real_data(fast=False, area=None, update=False):
         process_workspaces()
 
         # Generate partners
-        process_partners()
+        process_partners(area)
 
     # Generate programme documents
     process_programme_documents(fast, area)
 
+    # Generate reports
+    generate_reports()
+
+
+def generate_reports():
     # Generate PR/IR
     process_period_reports()
 
@@ -690,6 +698,12 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
 
     print("Generating IndicatorLocationData for Ratio type")
     generate_indicator_report_location_disaggregation_ratio_data(generate_all=generate_all_disagg)
+
+    # Disaggregation association fix for CAI LLO indicators
+    for indicator in cai_llo_queryset:
+        ca_reportable = indicator.ca_indicator_used_by_reporting_entity
+        indicator.disaggregations.clear()
+        indicator.disaggregations.add(*ca_reportable.disaggregations.all())
 
     # Fulfill submission date for closed IR
     IndicatorReport.objects.filter(

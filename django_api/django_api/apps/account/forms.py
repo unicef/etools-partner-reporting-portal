@@ -29,7 +29,7 @@ class CustomUserCreationForm(UserCreationForm):
 
     class Meta(UserCreationForm.Meta):
         fields = (
-            'username', 'first_name', 'last_name'
+            'username', 'first_name', 'last_name', 'email'
         )
 
 
@@ -95,7 +95,10 @@ class UserAdminForm(UserChangeForm):
             raise forms.ValidationError("User who belongs to an agency role/group cannot be assigned a partner.")
 
         if not self.cleaned_data.get('imo_clusters') and agency_group_count > 0:
-            raise forms.ValidationError('Please select one or more IMO clusters.')
+            # Check if any Clusters are available?
+            from cluster.models import Cluster
+            if Cluster.objects.all().exists():
+                raise forms.ValidationError('Please select one or more IMO clusters.')
 
         if not self.cleaned_data.get('partner') and partner_group_count > 0:
             raise forms.ValidationError('Please select a partner for this user.')

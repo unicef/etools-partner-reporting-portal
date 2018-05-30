@@ -10,7 +10,7 @@ import itertools
 from indicator.models import Disaggregation, DisaggregationValue, IndicatorBlueprint
 
 PATH = settings.BASE_DIR + "/apps/cluster/templates/excel/indicators_export.xlsx"
-SAVE_PATH = settings.MEDIA_ROOT + '/'
+SAVE_PATH = '/tmp/'
 
 DISAGGREGATION_COLUMN_START = 44
 INDICATOR_DATA_ROW_START = 5
@@ -137,7 +137,8 @@ class IndicatorsXLSXExporter:
 
             if cluster_objective:
                 cluster = cluster_objective.cluster
-                partner_activity = cluster_objective.cluster_activities.first().partner_activities.first()
+                partner_activity = cluster_objective.cluster_activities.first().partner_activities.first() \
+                    if cluster_objective.cluster_activities.first() else ""
                 partner_project = cluster_objective.cluster.partner_projects.first()
             elif cluster_activity:
                 cluster = cluster_activity.cluster_objective.cluster
@@ -168,7 +169,8 @@ class IndicatorsXLSXExporter:
                                 column=4).value = cluster.get_type_display()
                 self.sheet.cell(
                     row=start_row_id,
-                    column=5).value = cluster.partner_projects.first().partner.title
+                    column=5).value = cluster.partner_projects.first().partner.title if \
+                    cluster.partner_projects.first() else ""
                 self.sheet.cell(
                     row=start_row_id,
                     column=6).value = cluster_objective.title if cluster_objective else ""
@@ -194,11 +196,11 @@ class IndicatorsXLSXExporter:
                     column=12).value = partner_project.title if partner_project else ""
                 self.sheet.cell(
                     row=start_row_id,
-                    column=13).value = partner_project.get_status_display()
+                    column=13).value = partner_project.get_status_display() if partner_project else ""
                 self.sheet.cell(row=start_row_id,
-                                column=14).value = partner_activity.start_date
+                                column=14).value = partner_activity.start_date if partner_activity else ""
                 self.sheet.cell(row=start_row_id,
-                                column=15).value = partner_activity.end_date
+                                column=15).value = partner_activity.end_date if partner_activity else ""
 
                 self.sheet.cell(
                     row=start_row_id,
@@ -247,18 +249,19 @@ class IndicatorsXLSXExporter:
                 self.sheet.cell(row=start_row_id, column=36).value = cluster.id
                 self.sheet.cell(
                     row=start_row_id,
-                    column=37).value = cluster_objective.id
+                    column=37).value = cluster_objective.id if cluster_objective else ""
                 self.sheet.cell(
                     row=start_row_id,
-                    column=38).value = partner_activity.id
+                    column=38).value = partner_activity.id if partner_activity else ""
                 self.sheet.cell(
                     row=start_row_id,
                     column=39).value = indicator.reportable.blueprint.id
                 self.sheet.cell(row=start_row_id,
-                                column=40).value = partner_project.partner.id
+                                column=40).value = partner_project.partner.id if partner_project else \
+                    (partner_activity.partner.id if partner_activity else "")
                 self.sheet.cell(
                     row=start_row_id,
-                    column=41).value = partner_project.id
+                    column=41).value = partner_project.id if partner_project else ""
                 self.sheet.cell(
                     row=start_row_id,
                     column=42).value = indicator.id
@@ -540,8 +543,10 @@ class IndicatorsXLSXExporter:
 
         # Remove empty spreadsheets
         for s in to_remove:
-            self.sheets.remove(s)
-            self.wb.remove_sheet(s)
+            # Spreadsheet need atleast 1 sheet
+            if len(self.sheets) > 1:
+                self.sheets.remove(s)
+                self.wb.remove_sheet(s)
 
         if self.analysis:
             self.merge_sheets()

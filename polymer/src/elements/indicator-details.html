@@ -144,7 +144,7 @@
       <div>
         <template
             is="dom-if"
-            if="[[reportIsNonClusterQpr]]">
+            if="[[reportIsQpr]]">
           <div class="tab-header layout horizontal justified">
             <div class="self-center">For this cluster indicator data can be pulled from reports matching this reporting period</div>
             <div>
@@ -475,13 +475,13 @@
           computed: '_computeMode(mode, overrideMode)',
         },
 
-        reportIsNonClusterQpr: {
+        reportIsQpr: {
           type: Boolean,
         },
       },
 
       listeners: {
-        'location-updated': '_onLocationUpdated',
+        'locations-updated': '_onLocationsUpdated',
       },
 
       _fetchData: function () {
@@ -573,7 +573,7 @@
         return !!Object.keys(currentPD).length;
       },
 
-      _onLocationUpdated: function (e) {
+      _onLocationsUpdated: function (e) {
         e.stopPropagation();
 
         this._fetchData();
