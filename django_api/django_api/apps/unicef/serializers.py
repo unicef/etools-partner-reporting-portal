@@ -681,6 +681,23 @@ class PMPReportingPeriodDatesSerializer(serializers.ModelSerializer):
             'start_date',
             'end_date',
             'due_date',
+            'report_type',
+            'programme_document',
+        )
+
+
+class PMPReportingPeriodDatesSRSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='external_id')
+    programme_document = serializers.PrimaryKeyRelatedField(
+        queryset=ProgrammeDocument.objects.all())
+
+    class Meta:
+        model = ReportingPeriodDates
+        fields = (
+            'id',
+            'due_date',
+            'report_type',
+            'description',
             'programme_document',
         )
 
