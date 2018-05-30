@@ -226,7 +226,7 @@
             <div>
               <template
                   is="dom-if"
-                  if="[[!_equals(computedMode, 'view')]]">
+                  if="[[_canEnterData(computedMode, topLevelLocation.byEntity.0.is_locked)]]">
                 <div class="tab-header layout horizontal justified">
                   <div class="self-center">Enter data for this location</div>
                   <div>
@@ -626,6 +626,10 @@
 
       _isDualReportingEnabled: function (entities) {
         return entities.length > 1;
+      },
+
+      _canEnterData: function (mode, isLocked) {
+        return mode !== 'view' && !isLocked;
       },
 
       attached: function () {
