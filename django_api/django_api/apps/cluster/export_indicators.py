@@ -137,7 +137,8 @@ class IndicatorsXLSXExporter:
 
             if cluster_objective:
                 cluster = cluster_objective.cluster
-                partner_activity = cluster_objective.cluster_activities.first().partner_activities.first()
+                partner_activity = cluster_objective.cluster_activities.first().partner_activities.first() \
+                    if cluster_objective.cluster_activities.first() else ""
                 partner_project = cluster_objective.cluster.partner_projects.first()
             elif cluster_activity:
                 cluster = cluster_activity.cluster_objective.cluster
@@ -195,11 +196,11 @@ class IndicatorsXLSXExporter:
                     column=12).value = partner_project.title if partner_project else ""
                 self.sheet.cell(
                     row=start_row_id,
-                    column=13).value = partner_project.get_status_display()
+                    column=13).value = partner_project.get_status_display() if partner_project else ""
                 self.sheet.cell(row=start_row_id,
-                                column=14).value = partner_activity.start_date
+                                column=14).value = partner_activity.start_date if partner_activity else ""
                 self.sheet.cell(row=start_row_id,
-                                column=15).value = partner_activity.end_date
+                                column=15).value = partner_activity.end_date if partner_activity else ""
 
                 self.sheet.cell(
                     row=start_row_id,
@@ -256,7 +257,8 @@ class IndicatorsXLSXExporter:
                     row=start_row_id,
                     column=39).value = indicator.reportable.blueprint.id
                 self.sheet.cell(row=start_row_id,
-                                column=40).value = partner_project.partner.id
+                                column=40).value = partner_project.partner.id if partner_project else \
+                    (partner_activity.partner.id if partner_activity else "")
                 self.sheet.cell(
                     row=start_row_id,
                     column=41).value = partner_project.id if partner_project else ""
