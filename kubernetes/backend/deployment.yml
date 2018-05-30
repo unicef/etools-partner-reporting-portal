@@ -137,6 +137,16 @@ spec:
                 secretKeyRef:
                   name: eprp-staging
                   key: PMP_API_USER
+            - name: PMP_API_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: PMP_API_ENDPOINT
+            - name: DOMAIN_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: eprp-staging
+                  key: DOMAIN_NAME
             - name: POSTGRES_DB
               valueFrom:
                 secretKeyRef:
