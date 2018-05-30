@@ -45,10 +45,10 @@ spec:
           env:
             - name: DJANGO_APPLICATION_SERVICE_HOST
               value: backend
-            # - name: ADMIN_MAIL
-            #   value: unicef@tivix.com
-            # - name: DOMAIN_NAME
-            #   value: prp.tivixlabs.com
+            - name: DJANGO_NGINX_SERVER_NAME
+              value: prp.tivixlabs.com
+            - name: HTTPS_REDIRECT
+              value: 1
       volumes:
       - name: data-volume
         persistentVolumeClaim:
