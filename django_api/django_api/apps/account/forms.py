@@ -29,7 +29,7 @@ class CustomUserCreationForm(UserCreationForm):
 
     class Meta(UserCreationForm.Meta):
         fields = (
-            'username', 'first_name', 'last_name'
+            'username', 'first_name', 'last_name', 'email'
         )
 
 
