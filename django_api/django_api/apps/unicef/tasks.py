@@ -14,8 +14,16 @@ from core.common import PARTNER_ACTIVITY_STATUS
 
 from partner.models import PartnerActivity
 
-from unicef.serializers import PMPProgrammeDocumentSerializer, PMPPDPartnerSerializer, PMPPDPersonSerializer, \
-    PMPLLOSerializer, PMPPDResultLinkSerializer, PMPSectionSerializer, PMPReportingPeriodDatesSerializer
+from unicef.serializers import (
+    PMPProgrammeDocumentSerializer,
+    PMPPDPartnerSerializer,
+    PMPPDPersonSerializer,
+    PMPLLOSerializer,
+    PMPPDResultLinkSerializer,
+    PMPSectionSerializer,
+    PMPReportingPeriodDatesSerializer,
+    PMPReportingPeriodDatesSRSerializer,
+)
 from unicef.models import ProgrammeDocument, Person, LowerLevelOutput, PDResultLink, Section, ReportingPeriodDates
 
 from indicator.serializers import PMPIndicatorBlueprintSerializer, PMPDisaggregationSerializer, \
@@ -252,14 +260,13 @@ def process_programme_documents(fast=False, area=False):
                             )
 
                         # Create Reporting Date Periods for SR report type
-                        # TODO: Wait for PMP PD sync API to expose this field
                         special_reports = item['special_reports'] if 'special_reports' in item else []
                         for special_report in special_reports:
                             special_report['programme_document'] = pd.id
                             special_report['report_type'] = 'SR'
                             process_model(
                                 ReportingPeriodDates,
-                                PMPReportingPeriodDatesSerializer,
+                                PMPReportingPeriodDatesSRSerializer,
                                 special_report,
                                 {'external_id': special_report['id']},
                             )
