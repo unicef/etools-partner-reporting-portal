@@ -155,6 +155,7 @@ def generate_fake_users():
         ('admin_ao', 'admin_ao@notanemail.com', PartnerAuthorizedOfficerRole),
         ('admin_pe', 'admin_pe@notanemail.com', PartnerEditorRole),
         ('admin_pv', 'admin_pv@notanemail.com', PartnerViewerRole),
+        ('default_unicef_user', 'etools-api-user@unicef.org', PartnerAuthorizedOfficerRole),
     ]
     users_created = []
     for username, email, group_wrapper in users_to_create:

@@ -21,5 +21,12 @@
             "domain": "etools-test.unicef.org",
             "name": "etools-test.unicef.org"
         }
+    }, {
+        "model": "sites.site",
+        "pk": 5,
+        "fields": {
+            "domain": "127.0.0.1",
+            "name": "127.0.0.1"
+        }
     }
 ]
