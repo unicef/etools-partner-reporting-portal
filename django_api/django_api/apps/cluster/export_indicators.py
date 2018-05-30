@@ -196,11 +196,11 @@ class IndicatorsXLSXExporter:
                     column=12).value = partner_project.title if partner_project else ""
                 self.sheet.cell(
                     row=start_row_id,
-                    column=13).value = partner_project.get_status_display()
+                    column=13).value = partner_project.get_status_display() if partner_project else ""
                 self.sheet.cell(row=start_row_id,
-                                column=14).value = partner_activity.start_date
+                                column=14).value = partner_activity.start_date if partner_activity else ""
                 self.sheet.cell(row=start_row_id,
-                                column=15).value = partner_activity.end_date
+                                column=15).value = partner_activity.end_date if partner_activity else ""
 
                 self.sheet.cell(
                     row=start_row_id,
