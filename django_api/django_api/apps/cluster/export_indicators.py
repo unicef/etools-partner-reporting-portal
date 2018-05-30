@@ -257,7 +257,8 @@ class IndicatorsXLSXExporter:
                     row=start_row_id,
                     column=39).value = indicator.reportable.blueprint.id
                 self.sheet.cell(row=start_row_id,
-                                column=40).value = partner_project.partner.id
+                                column=40).value = partner_project.partner.id if partner_project else \
+                    (partner_activity.partner.id if partner_activity else "")
                 self.sheet.cell(
                     row=start_row_id,
                     column=41).value = partner_project.id if partner_project else ""
