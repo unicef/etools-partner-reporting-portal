@@ -48,7 +48,7 @@ spec:
             - name: DJANGO_NGINX_SERVER_NAME
               value: prp.tivixlabs.com
             - name: HTTPS_REDIRECT
-              value: 1
+              value: "1"
       volumes:
       - name: data-volume
         persistentVolumeClaim:
