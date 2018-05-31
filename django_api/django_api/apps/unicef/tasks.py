@@ -258,6 +258,7 @@ def process_programme_documents(fast=False, area=False):
                                 reporting_requirement,
                                 {
                                     'external_id': reporting_requirement['id'],
+                                    'report_type': reporting_requirement['report_type'],
                                     'programme_document': pd.id,
                                 },
                             )
@@ -273,6 +274,7 @@ def process_programme_documents(fast=False, area=False):
                                 special_report,
                                 {
                                     'external_id': special_report['id'],
+                                    'report_type': special_report['report_type'],
                                     'programme_document': pd.id,
                                 },
                             )
