@@ -725,22 +725,6 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
                     location=self.instance.location,
                 )
 
-                if self.instance.indicator_report:
-                    def get_disagg_lookup_map(ir):
-                        serializer = DisaggregationListSerializer(
-                            ir.disaggregations, many=True)
-
-                        disagg_lookup_list = serializer.data
-                        disagg_lookup_list.sort(key=lambda item: len(item['choices']))
-
-                        return disagg_lookup_list
-
-                    def get_disagg_choice_lookup_map(ir):
-                        lookup_array = ir.disaggregation_values(id_only=False)
-                        lookup_array.sort(key=len)
-
-                        return lookup_array
-
                 split_data = {}
                 disagg_data_copy = copy.deepcopy(data['disaggregation'])
 

@@ -5,7 +5,7 @@ from django.utils.functional import cached_property
 from django.contrib.postgres.fields import JSONField, ArrayField
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.db import models
+from django.db import models, transaction
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
@@ -21,6 +21,8 @@ from core.common import (
     FINAL_OVERALL_STATUS)
 from core.models import TimeStampedExternalSourceModel
 from functools import reduce
+
+from partner.models import PartnerActivity
 
 from indicator.disaggregators import (
     QuantityIndicatorDisaggregator,
@@ -700,6 +702,25 @@ class IndicatorReport(TimeStampedModel):
                     output_list))
 
         return output_list
+
+
+@receiver(post_save,
+          sender=IndicatorReport,
+          dispatch_uid="unlock_ild_for_sent_back_cluster_ir")
+def unlock_ild_for_sent_back_cluster_ir(sender, instance, **kwargs):
+    """
+    Whenever a Cluster indicator report is saved and found to be
+    Sent back state then trigger unlock IndicatorLocationData instances.
+    """
+    if instance.report_status != INDICATOR_REPORT_STATUS.sent_back \
+            and not isinstance(instance.reportable.content_object, PartnerActivity):
+        return
+
+    with transaction.atomic():
+        instance.indicator_location_data.all().update(is_locked=False)
+
+        child_irs = instance.children.values_list('id', flat=True)
+        IndicatorLocationData.objects.filter(indicator_report__in=child_irs).update(is_locked=False)
 
 
 @receiver(post_save,

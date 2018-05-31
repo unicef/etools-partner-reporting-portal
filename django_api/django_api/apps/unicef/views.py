@@ -546,6 +546,9 @@ class ProgressReportSubmitAPIView(APIView):
             ild_ids = progress_report.indicator_reports.values_list('indicator_location_data', flat=True)
             IndicatorLocationData.objects.filter(id__in=ild_ids).update(is_locked=True)
 
+            parent_irs = progress_report.indicator_reports.values_list('parent', flat=True)
+            IndicatorLocationData.objects.filter(indicator_report__in=parent_irs).update(is_locked=True)
+
             serializer = ProgressReportSerializer(instance=progress_report)
             return Response(serializer.data, status=statuses.HTTP_200_OK)
         else:
