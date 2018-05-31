@@ -256,7 +256,10 @@ def process_programme_documents(fast=False, area=False):
                                 ReportingPeriodDates,
                                 PMPReportingPeriodDatesSerializer,
                                 reporting_requirement,
-                                {'external_id': reporting_requirement['id']},
+                                {
+                                    'external_id': reporting_requirement['id'],
+                                    'programme_document': pd.id,
+                                },
                             )
 
                         # Create Reporting Date Periods for SR report type
@@ -268,7 +271,10 @@ def process_programme_documents(fast=False, area=False):
                                 ReportingPeriodDates,
                                 PMPReportingPeriodDatesSRSerializer,
                                 special_report,
-                                {'external_id': special_report['id']},
+                                {
+                                    'external_id': special_report['id'],
+                                    'programme_document': pd.id,
+                                },
                             )
 
                         if item['status'] not in ("draft, signed",):
