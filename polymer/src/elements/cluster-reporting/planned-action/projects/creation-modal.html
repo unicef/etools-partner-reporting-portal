@@ -908,8 +908,10 @@
         var self = this;
         this.$.projects.abort();
         if (this.data.partner_id) {
-        this.$.projects.body = Object.assign({}, {'partnerID': this.data.partner_id});
-        } else { this.$.projects.body = Object.assign({}, {'partnerID': this.partnerID})};
+          this.$.projects.body = Object.assign({}, {'partnerID': this.data.partner_id});
+        } else {
+          this.$.projects.body = Object.assign({}, {'partnerID': this.partnerID});
+        }
         this.$.projects.thunk()()
             .then(function (res) {
               self.set('projectsLoading', false);
