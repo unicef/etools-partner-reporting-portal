@@ -274,7 +274,7 @@ def process_programme_documents(fast=False, area=False):
                                 special_report,
                                 {
                                     'external_id': special_report['id'],
-                                    'report_type': special_report['report_type'],
+                                    'report_type': 'SR',
                                     'programme_document': pd.id,
                                 },
                             )
