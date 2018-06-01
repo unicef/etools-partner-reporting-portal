@@ -686,10 +686,18 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
             )
 
         if data['indicator_report'].parent:
-            raise serializers.ValidationError(
-                "This IndicatorLocationData cannot be updated for dual-reporting: "
-                "Use Cluster reporting entity IndicatorLocationData instance"
+            parent_ild = IndicatorLocationData.objects.filter(
+                indicator_report=data['indicator_report'].parent,
+                location=self.instance.location,
             )
+
+            # If the Indicator report is dual reporting and has parent IndicatorLocationData instance
+            # on the same location
+            if parent_ild.exists():
+                raise serializers.ValidationError(
+                    "This IndicatorLocationData cannot be updated for dual-reporting: "
+                    "Use Cluster reporting entity IndicatorLocationData instance"
+                )
 
         # Reporting entity & Percentage pair validation
         if "reporting_entity_percentage_map" in data and data["reporting_entity_percentage_map"]:
@@ -719,31 +727,36 @@ class IndicatorLocationDataUpdateSerializer(serializers.ModelSerializer):
             # Data split begins for dual reporting if IndicatorLocationData belongs to
             # IndicatorReport that has children
             if data['indicator_report'].children.exists():
-                # Grab LLO Reportable's indicator reports from parent-child
-                ild = IndicatorLocationData.objects.get(
-                    indicator_report=data['indicator_report'].children.first(),
-                    location=self.instance.location,
-                )
+                try:
+                    # Grab LLO Reportable's indicator reports from parent-child
+                    ild = IndicatorLocationData.objects.get(
+                        indicator_report=data['indicator_report'].children.first(),
+                        location=self.instance.location,
+                    )
 
-                split_data = {}
-                disagg_data_copy = copy.deepcopy(data['disaggregation'])
+                    split_data = {}
+                    disagg_data_copy = copy.deepcopy(data['disaggregation'])
 
-                for entity in map_list:
-                    split_data[entity['title']] = {}
+                    for entity in map_list:
+                        split_data[entity['title']] = {}
 
-                    if entity['title'] == "UNICEF":
-                        ild.percentage_allocated = float(entity['percentage'])
+                        if entity['title'] == "UNICEF":
+                            ild.percentage_allocated = float(entity['percentage'])
 
-                    for key, val in disagg_data_copy.items():
-                        for val_key in val:
-                            if val[val_key]:
-                                val[val_key] *= float(entity['percentage'])
+                        for key, val in disagg_data_copy.items():
+                            for val_key in val:
+                                if val[val_key]:
+                                    val[val_key] *= float(entity['percentage'])
 
-                        split_data[entity['title']][key] = val
+                            split_data[entity['title']][key] = val
 
-                ild.disaggregation = split_data['UNICEF']
-                ild.level_reported = data['level_reported']
-                ild.save()
+                    ild.disaggregation = split_data['UNICEF']
+                    ild.level_reported = data['level_reported']
+                    ild.save()
+
+                # If IndicatorLocationData is not marked as dual reporting then skip
+                except IndicatorLocationData.DoesNotExist:
+                    pass
 
         return data
 

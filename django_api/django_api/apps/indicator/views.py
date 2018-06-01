@@ -620,17 +620,22 @@ class IndicatorLocationDataUpdateAPIView(APIView):
 
         # Re-calculating the child IR's ILD instance if exists
         if indicator_location_data.indicator_report.children.exists():
-            # Grab LLO Reportable's indicator reports from parent-child
-            ild = IndicatorLocationData.objects.get(
-                indicator_report=indicator_location_data.indicator_report.children.first(),
-                location=indicator_location_data.location,
-            )
+            try:
+                # Grab LLO Reportable's indicator reports from parent-child
+                ild = IndicatorLocationData.objects.get(
+                    indicator_report=indicator_location_data.indicator_report.children.first(),
+                    location=indicator_location_data.location,
+                )
 
-            if ild.indicator_report.reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
-                QuantityIndicatorDisaggregator.post_process(ild)
+                if ild.indicator_report.reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
+                    QuantityIndicatorDisaggregator.post_process(ild)
 
-            if ild.indicator_report.reportable.blueprint.unit == IndicatorBlueprint.PERCENTAGE:
-                RatioIndicatorDisaggregator.post_process(ild)
+                if ild.indicator_report.reportable.blueprint.unit == IndicatorBlueprint.PERCENTAGE:
+                    RatioIndicatorDisaggregator.post_process(ild)
+
+            # If IndicatorLocationData is not marked as dual reporting then skip
+            except IndicatorLocationData.DoesNotExist:
+                pass
 
         serializer.data['disaggregation'] = indicator_location_data.disaggregation
 
