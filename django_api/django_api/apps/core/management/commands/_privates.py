@@ -308,7 +308,13 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
                 indicator_report__reporting_entity=cluster_re,
             )
 
-        for loc in locations:
+        for loc in locations[:4]:
+            LocationWithReportableLocationGoalFactory.create(
+                location=loc,
+                reportable=reportable
+            )
+
+        for loc in locations[-2:-1:-1]:
             LocationWithReportableLocationGoalFactory.create(
                 location=loc,
                 reportable=reportable
@@ -371,7 +377,13 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
                 indicator_report__reporting_entity=cluster_re,
             )
 
-            for loc in locations:
+            for loc in locations[:4]:
+                LocationWithReportableLocationGoalFactory.create(
+                    location=loc,
+                    reportable=reportable
+                )
+
+            for loc in locations[-2:-1:-1]:
                 LocationWithReportableLocationGoalFactory.create(
                     location=loc,
                     reportable=reportable
@@ -396,7 +408,13 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
             indicator_report__reporting_entity=cluster_re,
         )
 
-        for loc in locations:
+        for loc in locations[:4]:
+            LocationWithReportableLocationGoalFactory.create(
+                location=loc,
+                reportable=reportable
+            )
+
+        for loc in locations[-2:-1:-1]:
             LocationWithReportableLocationGoalFactory.create(
                 location=loc,
                 reportable=reportable
@@ -426,7 +444,13 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
             reportable_to_pa.parent_indicator = cluster_activity.reportables.first()
             reportable_to_pa.save()
 
-            for loc in locations:
+            for loc in locations[:4]:
+                LocationWithReportableLocationGoalFactory.create(
+                    location=loc,
+                    reportable=reportable_to_pa
+                )
+
+            for loc in locations[-2:-1:-1]:
                 LocationWithReportableLocationGoalFactory.create(
                     location=loc,
                     reportable=reportable_to_pa
@@ -446,7 +470,13 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
                 indicator_report__reporting_entity=cluster_re,
             )
 
-            for loc in locations:
+            for loc in locations[:4]:
+                LocationWithReportableLocationGoalFactory.create(
+                    location=loc,
+                    reportable=reportable_to_pa
+                )
+
+            for loc in locations[-2:-1:-1]:
                 LocationWithReportableLocationGoalFactory.create(
                     location=loc,
                     reportable=reportable_to_pa
@@ -580,7 +610,7 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
                     # we create IR's in the next for loop down below
                     reportable.indicator_reports.all().delete()
 
-                    for loc in locations:
+                    for loc in locations[:9]:
                         LocationWithReportableLocationGoalFactory.create(
                             location=loc,
                             reportable=reportable
