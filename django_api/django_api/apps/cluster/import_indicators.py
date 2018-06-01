@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-
 from django.db.models import Q
+from django.db import transaction
 
 from openpyxl.reader.excel import load_workbook
 
-from indicator.models import IndicatorLocationData, IndicatorBlueprint
+from indicator.models import IndicatorLocationData, IndicatorBlueprint, DisaggregationValue
 from indicator.disaggregators import QuantityIndicatorDisaggregator, RatioIndicatorDisaggregator
 
 COLUMN_HASH_ID = 4
@@ -110,6 +110,22 @@ class IndicatorsXLSXReader(object):
                                 dis_type_value = sorted(list(map(int, str(dis_type_value).split(","))), key=int)
                                 dis_type_id = str(tuple(dis_type_value))
 
+                            if dis_type_id not in data:
+                                # Check if data is proper disaggregation value
+                                for dt in dis_type_value:
+                                    if not DisaggregationValue.objects.filter(pk=dt).exists():
+                                        transaction.rollback()
+                                        return "Disaggregation {} does not exists".format(
+                                            self.sheet.cell(row=4, column=column).value)
+                                    # Check if filled disaggregation values belongs to their type
+                                    dv = DisaggregationValue.objects.get(pk=dt)
+                                    if dv.disaggregation.id not in indicator.disaggregation_reported_on:
+                                        transaction.rollback()
+                                        return "Disaggregation {} does not belong to this Indicator".format(
+                                            self.sheet.cell(row=4, column=column).value)
+                                # Create value
+                                data[dis_type_id] = dict()
+
                             # Update values
                             if blueprint.unit == IndicatorBlueprint.NUMBER:
                                 data[dis_type_id]["v"] = value
@@ -118,7 +134,9 @@ class IndicatorsXLSXReader(object):
                                 data[dis_type_id]["v"] = int(v)
                                 data[dis_type_id]["d"] = int(d)
                     except Exception:
-                        return "Cannot assign disaggregation value to column " + str(column)
+                        transaction.rollback()
+                        return "Cannot assign disaggregation value to column {}, row {}"\
+                            .format(self.sheet.cell(row=4, column=column).value, row)
 
                 indicator.disaggregation = data
                 indicator.save()
