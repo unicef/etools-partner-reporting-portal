@@ -45,14 +45,6 @@
         margin-bottom: 25px;
       }
 
-      .cluster-indicator .indicator-toggle {
-        background: #009d55;
-      }
-
-      .pd-indicator .indicator-toggle {
-        background: #0099ff;
-      }
-
       .indicator:not(:last-child) {
         margin-bottom: 25px;
       }
@@ -62,8 +54,15 @@
         position: relative;
         z-index: 1;
         color: white;
-        background: var(--theme-primary-color);
         cursor: pointer;
+      }
+
+      .indicator-toggle[type="default"] {
+        background: #0099ff;
+      }
+
+      .indicator-toggle[type="cluster"] {
+        background: #009d55;
       }
 
       .indicator-header {
@@ -144,10 +143,11 @@
         is="dom-repeat"
         items="[[data.indicator_reports]]"
         as="indicator">
-      <div class$="indicator [[_computeContainerClassName(indicator, app)]]">
+      <div class="indicator">
         <div class="layout horizontal">
           <div
               class="indicator-toggle flex-none layout horizontal center-center"
+              type$="[[_computeToggleType(indicator.is_related_to_cluster_reporting)]]"
               on-tap="_toggle"
               toggles="[[index]]"
               role="button"
@@ -270,11 +270,6 @@
         data: Object,
         permissions: Object,
         reportableMeta: Object,
-
-        app: {
-          type: String,
-          statePath: 'app.current',
-        },
 
         reportableData: {
           type: Object,
@@ -442,14 +437,8 @@
         };
       },
 
-      _computeContainerClassName: function (data, app) {
-        switch (true) {
-          case !!data.parent_ir_id && app === 'ip-reporting':
-            return 'cluster-indicator';
-
-          default:
-            return 'pd-indicator';
-        }
+      _computeToggleType: function (isCluster) {
+        return isCluster ? 'cluster' : 'default';
       },
 
       detached: function () {
