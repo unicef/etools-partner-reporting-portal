@@ -1,10 +1,12 @@
+# data volume for backend
 ---
 kind: PersistentVolume
 apiVersion: v1
 metadata:
-  name: data-volume
+  name: static-volume-{{NAMESPACE}}
   labels:
     type: local
+  namespace: {{NAMESPACE}}
 spec:
   capacity:
     storage: 4Gi
@@ -12,14 +14,15 @@ spec:
   accessModes:
     - ReadWriteMany
   hostPath:
-    path: /data
+    path: /data-{{NAMESPACE}}
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: data-volume-claim
+  name: static-volume-claim-{{NAMESPACE}}
   labels:
     type: local
+  namespace: {{NAMESPACE}}
 spec:
   storageClassName: standard
   accessModes:
@@ -27,3 +30,36 @@ spec:
   resources:
     requests:
       storage: 3Gi
+
+# postgres volume
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: db-volume-{{NAMESPACE}}
+  labels:
+    type: local
+  namespace: {{NAMESPACE}}
+spec:
+  capacity:
+    storage: 10Gi
+  storageClassName: standard
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: /db-{{NAMESPACE}}
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: db-volume-claim-{{NAMESPACE}}
+  labels:
+    type: local
+  namespace: {{NAMESPACE}}
+spec:
+  storageClassName: standard
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 8Gi

@@ -1,0 +1,53 @@
+# deployment for kops addon to get dynamic CNAMES to service ELB /untaint master before start this/
+
+# RBAC - create serviceAccount
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: route53
+  namespace: kube-system
+
+# RBAC - create cluster role bindings /full admin rights/
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: kube-system-default-cluster-admin
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: route53
+  namespace: kube-system
+
+# route53-mapper deployment
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: route53-mapper
+  namespace: kube-system
+  labels:
+    app: route53-mapper
+    k8s-addon: route53-mapper.addons.k8s.io
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: route53-mapper
+  template:
+    metadata:
+      labels:
+        app: route53-mapper
+      annotations:
+        scheduler.alpha.kubernetes.io/tolerations: '[{"key":"dedicated", "value":"master"}]'
+    spec:
+      serviceAccountName: route53
+      nodeSelector:
+        kubernetes.io/role: master
+      containers:
+        - image: quay.io/molecule/route53-kubernetes:v1.3.0
+          name: route53-mapper

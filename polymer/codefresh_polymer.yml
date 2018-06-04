@@ -22,7 +22,7 @@ steps:
                 only:
                     - develop
 
-    deploy_backend:
+    deploy_frontend:
         image: codefresh/cf-deploy-kubernetes
         tag: ${{CF_SHORT_REVISION}}
         working_directory: ${{main_clone}}

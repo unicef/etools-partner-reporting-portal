@@ -3,12 +3,27 @@ kind: Service
 apiVersion: v1
 metadata:
   name: proxy-service
+  namespace: {{NAMESPACE}}
+  labels:
+    dns: route53
+  annotations:
+    domainName: "{{DOMAIN}}"
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: |-
+      {{SSL_CERT}}
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: http
+    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443"
+    
 spec:
   ports:
-   - name: http
-     protocol: TCP
-     port: 80
-  type: NodePort
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+    - name: https
+      protocol: TCP
+      port: 443
+      targetPort: 80
+  type: LoadBalancer
   selector:
     app: proxy-container
 ---
@@ -23,8 +38,6 @@ metadata:
   namespace: {{NAMESPACE}}
 spec:
   replicas: 1
-  strategy:
-    type: Recreate
   selector:
     matchLabels:
       app: proxy-container
@@ -37,7 +50,7 @@ spec:
         - name: proxy
           image: unicef/etools-prp-nginx-proxy:{{CF_SHORT_REVISION}}
           volumeMounts:
-            - name: data-volume
+            - name: static-volume-{{NAMESPACE}}
               mountPath: /data
           ports:
             - containerPort: 80
@@ -50,6 +63,6 @@ spec:
             - name: HTTPS_REDIRECT
               value: "1"
       volumes:
-      - name: data-volume
+      - name: static-volume-{{NAMESPACE}}
         persistentVolumeClaim:
-          claimName: data-volume-claim
+          claimName: data-volume-claim-{{NAMESPACE}}

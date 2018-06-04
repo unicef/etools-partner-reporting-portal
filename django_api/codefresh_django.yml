@@ -76,3 +76,21 @@ steps:
           branch:
             only:
               - develop
+              
+    deploy_celery:
+        image: codefresh/cf-deploy-kubernetes
+        tag: ${{CF_SHORT_REVISION}}
+        working_directory: ${{main_clone}}
+        commands:
+          - /cf-deploy-kubernetes ./kubernetes/celery/deployment.yml
+        environment:
+          - KUBECONTEXT=${{KUBECONTEXT}}
+          - KUBERNETES_NAMESPACE=${{NAMESPACE}}
+          - ENV=${{ENV}}
+          - POSTGRES_USER=${{POSTGRES_USER}}
+          - POSTGRES_DB=${{POSTGRES_DB}}
+          - POSTGRES_HOST=${{POSTGRES_HOST}}
+        when:
+          branch:
+            only:
+              - develop          

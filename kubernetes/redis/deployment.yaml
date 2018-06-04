@@ -1,9 +1,22 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: redis
+  namespace: {{NAMESPACE}}
+spec:
+  selector:
+    app: redis-container
+  ports:
+    - port: 6379
+---
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: redis
   labels:
     app: redis
+  namespace: {{NAMESPACE}}
 spec:
   replicas: 1
   selector:

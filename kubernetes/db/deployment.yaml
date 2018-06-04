@@ -3,6 +3,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: db
+  namespace: {{NAMESPACE}}
 spec:
   selector:
     app: db-container
@@ -17,6 +18,7 @@ metadata:
   name: db
   labels:
     app: db
+  namespace: {{NAMESPACE}}
 spec:
   replicas: 1
   selector:
@@ -34,8 +36,8 @@ spec:
             - containerPort: 5432
           volumeMounts:
           - mountPath: /var/lib/postgresql/data
-            name: pg-volume
+            name: db-volume-{{NAMESPACE}}
       volumes:
-      - name: pg-volume
+      - name: db-volume-{{NAMESPACE}}
         persistentVolumeClaim:
-        claimName: pg-volume-claim
+          claimName: db-volume-claim-{{NAMESPACE}}
