@@ -46,81 +46,80 @@ spec:
             - name: AWS_S3_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
-                  name: eprp-staging
-                  key: aws-s3-access-key-id
+                  name: aws-s3-access-key-id
+                  key: password
             - name: AWS_S3_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: eprp-staging
-                  key: aws-s3-secret-access-key
+                  name: aws-s3-secret-access-key
+                  key: password
             - name: AWS_STORAGE_BUCKET_NAME
               valueFrom:
                 secretKeyRef:
-                  name: eprp-staging
-                  key: aws-storage-bucket-name
+                  name: aws-storage-bucket-name
+                  key: password
             - name: AZURE_B2C_CLIENT_ID
               valueFrom:
                 secretKeyRef:
-                  name: eprp-staging
-                  key: azure-b2c-client-id
+                  name: azure-b2c-client-id
+                  key: password
             - name: AZURE_B2C_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: eprp-staging
-                  key: azure-b2c-client-secret
+                  name: azure-b2c-client-secret
+                  key: password
             - name: AZURE_B2C_POLICY_NAME
               valueFrom:
                 secretKeyRef:
-                  name: eprp-staging
-                  key: azure-b2c-policy-name
+                  name: azure-b2c-policy-name
+                  key: password
             - name: ELASTIC_APM_DEBUG
               valueFrom:
                 secretKeyRef:
-                  name: eprp-staging
-                  key: elastic-apm-debug
+                  name: elastic-apm-debug
+                  key: password
             - name: ELASTIC_APM_SECRET_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: eprp-staging
-                  key: elastic-apm-secret-token
+                  name: elastic-apm-secret-token
+                  key: password
             - name: ELASTIC_APM_SERVER_URL
               valueFrom:
                 secretKeyRef:
-                  name: eprp-staging
-                  key: elastic-apm-server-url
+                  name: elastic-apm-server-url
+                  key: password
             - name: ELASTIC_APM_SERVICE_NAME
               valueFrom:
                 secretKeyRef:
-                  name: eprp-staging
-                  key: elastic-apm-service-name
+                  name: elastic-apm-service-name
+                  key: password
             - name: EMAIL_BACKEND
               valueFrom:
                 secretKeyRef:
-                  name: eprp-staging
-                  key: email-backend
-            
+                  name: email-backend
+                  key: password
             - name: PMP_API_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: eprp-staging
-                  key: pmp-api-password
+                  name: pmp-api-password
+                  key: password
             - name: PMP_API_USER
               valueFrom:
                 secretKeyRef:
-                  name: eprp-staging
-                  key: pmp-api-user
+                  name: pmp-api-user
+                  key: password
             
             # - name: POSTGRES_PASSWORD
             #   valueFrom:
             #     secretKeyRef:
             #       name: eprp-staging
             #       key: postgres-password
-
+            
             - name: SECRET_KEY
               valueFrom:
                 secretKeyRef:
-                  name: eprp-staging
-                  key: secret-key
+                  name: secret-key
+                  key: password
       volumes:
       - name: static-volume-{{NAMESPACE}}
         persistentVolumeClaim:
@@ -177,69 +176,68 @@ spec:
             - name: AWS_S3_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
-                  name: eprp-staging
-                  key: aws-s3-access-key-id
+                  name: aws-s3-access-key-id
+                  key: password
             - name: AWS_S3_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: eprp-staging
-                  key: aws-s3-secret-access-key
+                  name: aws-s3-secret-access-key
+                  key: password
             - name: AWS_STORAGE_BUCKET_NAME
               valueFrom:
                 secretKeyRef:
-                  name: eprp-staging
-                  key: aws-storage-bucket-name
+                  name: aws-storage-bucket-name
+                  key: password
             - name: AZURE_B2C_CLIENT_ID
               valueFrom:
                 secretKeyRef:
-                  name: eprp-staging
-                  key: azure-b2c-client-id
+                  name: azure-b2c-client-id
+                  key: password
             - name: AZURE_B2C_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: eprp-staging
-                  key: azure-b2c-client-secret
+                  name: azure-b2c-client-secret
+                  key: password
             - name: AZURE_B2C_POLICY_NAME
               valueFrom:
                 secretKeyRef:
-                  name: eprp-staging
-                  key: azure-b2c-policy-name
+                  name: azure-b2c-policy-name
+                  key: password
             - name: ELASTIC_APM_DEBUG
               valueFrom:
                 secretKeyRef:
-                  name: eprp-staging
-                  key: elastic-apm-debug
+                  name: elastic-apm-debug
+                  key: password
             - name: ELASTIC_APM_SECRET_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: eprp-staging
-                  key: elastic-apm-secret-token
+                  name: elastic-apm-secret-token
+                  key: password
             - name: ELASTIC_APM_SERVER_URL
               valueFrom:
                 secretKeyRef:
-                  name: eprp-staging
-                  key: elastic-apm-server-url
+                  name: elastic-apm-server-url
+                  key: password
             - name: ELASTIC_APM_SERVICE_NAME
               valueFrom:
                 secretKeyRef:
-                  name: eprp-staging
-                  key: elastic-apm-service-name
+                  name: elastic-apm-service-name
+                  key: password
             - name: EMAIL_BACKEND
               valueFrom:
                 secretKeyRef:
-                  name: eprp-staging
-                  key: email-backend
-            
+                  name: email-backend
+                  key: password
             - name: PMP_API_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: eprp-staging
-                  key: pmp-api-password
+                  name: pmp-api-password
+                  key: password
             - name: PMP_API_USER
               valueFrom:
                 secretKeyRef:
-                  name: eprp-staging
-                  key: pmp-api-user
+                  name: pmp-api-user
+                  key: password
             
             # - name: POSTGRES_PASSWORD
             #   valueFrom:
@@ -250,8 +248,8 @@ spec:
             - name: SECRET_KEY
               valueFrom:
                 secretKeyRef:
-                  name: eprp-staging
-                  key: secret-key
+                  name: secret-key
+                  key: password
             
       volumes:
       - name: static-volume-{{NAMESPACE}}
