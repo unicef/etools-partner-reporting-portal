@@ -5,6 +5,8 @@ metadata:
   annotations:
     revision: "{{CF_SHORT_REVISION}}"
   namespace: {{NAMESPACE}}
+  labels:
+    redeploy: "true" 
 spec:
   template:
     spec:
@@ -131,6 +133,8 @@ metadata:
   annotations:
     revision: "{{CF_SHORT_REVISION}}"
   namespace: {{NAMESPACE}}
+  labels:
+    redeploy: "true" 
 spec:
   template:
     spec:

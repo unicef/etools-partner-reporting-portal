@@ -93,4 +93,24 @@ steps:
         when:
           branch:
             only:
+              - develop
+
+    deploy_jobs:
+        title: Creating backend jobs (skipping fakedata)
+        image: codefresh/cf-deploy-kubernetes
+        tag: ${{CF_SHORT_REVISION}}
+        working_directory: ${{main_clone}}
+        commands:
+          - /cf-deploy-kubernetes ./kubernetes/backend/jobs.yaml
+        environment:
+          - KUBECONTEXT=${{KUBECONTEXT}}
+          - KUBERNETES_NAMESPACE=${{NAMESPACE}}
+          - ENV=${{ENV}}
+          - DJANGO_ALLOWED_HOST=${{DJANGO_ALLOWED_HOST}}
+          - POSTGRES_USER=${{POSTGRES_USER}}
+          - POSTGRES_DB=${{POSTGRES_DB}}
+          - POSTGRES_HOST=${{POSTGRES_HOST}}
+        when:
+          branch:
+            only:
               - develop          

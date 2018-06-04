@@ -21,7 +21,7 @@ spec:
         - name: beater
           image: unicef/etools-prp
           volumeMounts:
-            - name: data-volume
+            - name: static-volume-{{NAMESPACE}}
               mountPath: /data
           command: ["bash"]
           args: ["-c", "/usr/local/bin/waitforit -host=db -port=5432 && python manage.py celery beat --loglevel=${CELERY_LOG_LEVEL:-debug}"]
@@ -148,7 +148,7 @@ spec:
         - name: beater
           image: unicef/etools-prp
           volumeMounts:
-            - name: data-volume
+            - name: static-volume-{{NAMESPACE}}
               mountPath: /data
           command: ["bash"]
           args: ["-c", "/usr/local/bin/waitforit -host=db -port=5432 && python manage.py celery worker -E --loglevel=${CELERY_LOG_LEVEL:-info}"]
