@@ -117,6 +117,11 @@ spec:
                 secretKeyRef:
                   name: pmp-api-user
                   key: password
+            - name: PMP_API_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: pmp-api-endpoint
+                  key: password
             
             # - name: POSTGRES_PASSWORD
             #   valueFrom:
@@ -255,6 +260,11 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: pmp-api-user
+                  key: password
+            - name: PMP_API_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: pmp-api-endpoint
                   key: password
             
             # - name: POSTGRES_PASSWORD
