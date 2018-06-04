@@ -82,7 +82,7 @@ steps:
         tag: ${{CF_SHORT_REVISION}}
         working_directory: ${{main_clone}}
         commands:
-          - /cf-deploy-kubernetes ./kubernetes/celery/deployment.yml
+          - /cf-deploy-kubernetes ./kubernetes/celery/deployment.yaml
         environment:
           - KUBECONTEXT=${{KUBECONTEXT}}
           - KUBERNETES_NAMESPACE=${{NAMESPACE}}
