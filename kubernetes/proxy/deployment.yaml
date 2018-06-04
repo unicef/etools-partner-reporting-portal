@@ -65,4 +65,4 @@ spec:
       volumes:
       - name: static-volume-{{NAMESPACE}}
         persistentVolumeClaim:
-          claimName: data-volume-claim-{{NAMESPACE}}
+          claimName: static-volume-claim-{{NAMESPACE}}

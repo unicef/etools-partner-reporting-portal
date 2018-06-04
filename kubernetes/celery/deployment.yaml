@@ -32,7 +32,7 @@ spec:
               value: {{DJANGO_ALLOWED_HOST}}
             
             - name: DJANGO_DEBUG
-              value: {{DJANGO_DEBUG}}
+              value: "{{DJANGO_DEBUG}}"
 
             - name: DOMAIN_NAME
               value: {{DOMAIN_NAME}}
@@ -163,7 +163,7 @@ spec:
               value: {{DJANGO_ALLOWED_HOST}}
             
             - name: DJANGO_DEBUG
-              value: {{DJANGO_DEBUG}}
+              value: "{{DJANGO_DEBUG}}"
 
             - name: DOMAIN_NAME
               value: {{DOMAIN_NAME}}
@@ -239,39 +239,6 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: eprp-staging
-<<<<<<< Updated upstream
-                  key: PMP_API_USER
-            - name: PMP_API_ENDPOINT
-              valueFrom:
-                secretKeyRef:
-                  name: eprp-staging
-                  key: PMP_API_ENDPOINT
-            - name: POSTGRES_DB
-              valueFrom:
-                secretKeyRef:
-                  name: eprp-staging
-                  key: POSTGRES_DB
-            - name: POSTGRES_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: eprp-staging
-                  key: POSTGRES_HOST
-            - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: eprp-staging
-                  key: POSTGRES_PASSWORD
-            - name: POSTGRES_USER
-              valueFrom:
-                secretKeyRef:
-                  name: eprp-staging
-                  key: POSTGRES_USER
-            - name: REDIS_URL
-              valueFrom:
-                secretKeyRef:
-                  name: eprp-staging
-                  key: REDIS_URL
-=======
                   key: pmp-api-user
             
             # - name: POSTGRES_PASSWORD
@@ -280,7 +247,6 @@ spec:
             #       name: eprp-staging
             #       key: postgres-password
             
->>>>>>> Stashed changes
             - name: SECRET_KEY
               valueFrom:
                 secretKeyRef:

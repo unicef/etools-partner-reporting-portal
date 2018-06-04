@@ -47,7 +47,7 @@ spec:
               value: {{DJANGO_ALLOWED_HOST}}
             
             - name: DJANGO_DEBUG
-              value: {{DJANGO_DEBUG}}
+              value: "{{DJANGO_DEBUG}}"
 
             - name: DOMAIN_NAME
               value: {{DOMAIN_NAME}}
