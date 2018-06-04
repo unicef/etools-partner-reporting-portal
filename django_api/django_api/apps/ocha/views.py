@@ -183,6 +183,16 @@ class RPMProjectDetailAPIView(APIView):
             k: v for k, v in details['data'].items() if type(v) not in {list, dict}
         }
 
+        current_project_data = None
+
+        for project in details['data']['projectVersions']:
+            if details['data']['currentPublishedVersionId'] == project['id']:
+                current_project_data = project
+                break
+
+        out_data['startDate'] = current_project_data['startDate']
+        out_data['endDate'] = current_project_data['endDate']
+
         out_data['totalBudgetUSD'] = sum([
             f['amountUSD'] for f in budget_info['data']['flows']
         ]) if budget_info['data']['flows'] else None
@@ -204,14 +214,14 @@ class RPMProjectDetailAPIView(APIView):
 
         try:
             clusters += [
-                global_cluster_data['name'] for global_cluster_data in details['data']['globalClusters']
+                global_cluster_data['name'] for global_cluster_data in current_project_data['globalClusters']
             ]
         except Exception:
             pass
 
         try:
             clusters += [
-                c['name'] for c in details['data']['governingEntities'] if c['entityPrototypeId'] == 9
+                c['name'] for c in current_project_data['governingEntities'] if c['entityPrototypeId'] == 9
             ]
         except Exception:
             pass
