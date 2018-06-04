@@ -43,6 +43,15 @@ spec:
             - name: REDIS_URL
               value: redis://redis:6379/0
 
+            - name: POSTGRES_DB
+              value: {{POSTGRES_DB}}
+
+            - name: POSTGRES_HOST
+              value: {{POSTGRES_HOST}}
+
+            - name: POSTGRES_USER
+              value: {{POSTGRES_USER}}
+
             - name: AWS_S3_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
@@ -172,6 +181,15 @@ spec:
 
             - name: REDIS_URL
               value: redis://redis:6379/0
+
+            - name: POSTGRES_DB
+              value: {{POSTGRES_DB}}
+
+            - name: POSTGRES_HOST
+              value: {{POSTGRES_HOST}}
+
+            - name: POSTGRES_USER
+              value: {{POSTGRES_USER}}
 
             - name: AWS_S3_ACCESS_KEY_ID
               valueFrom:
