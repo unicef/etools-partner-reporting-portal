@@ -89,8 +89,18 @@ def import_project_details(project, current_version_id):
 def import_project(external_project_id, partner_id, response_plan=None, async=True):
     source_url = HPC_V2_ROOT_URL + 'project/{}'.format(external_project_id)
     project_data = get_json_from_url(source_url)['data']
-    project_data['partner'] = partner_id
-    serializer = V2PartnerProjectImportSerializer(data=project_data)
+
+    # Grab project details from projectVersion array of dict
+    current_project_data = None
+
+    for project in project_data['projectVersions']:
+        if project_data['currentPublishedVersionId'] == project['id']:
+            current_project_data = project
+            break
+
+    current_project_data['partner'] = partner_id
+
+    serializer = V2PartnerProjectImportSerializer(data=current_project_data)
     serializer.is_valid(raise_exception=True)
     project = serializer.save()
 

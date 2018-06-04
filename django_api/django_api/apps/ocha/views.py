@@ -183,6 +183,7 @@ class RPMProjectDetailAPIView(APIView):
             k: v for k, v in details['data'].items() if type(v) not in {list, dict}
         }
 
+        # Grab project details from projectVersion array of dict
         current_project_data = None
 
         for project in details['data']['projectVersions']:
