@@ -94,6 +94,22 @@ steps:
           branch:
             only:
               - develop
+              
+    delete_jobs:
+        title: Delete backend jobs with label redeploy
+        image: codefresh/kube-helm:master
+        environment:
+            - KUBECONTEXT=${{KUBECONTEXT}}
+            - NAMESPACE=${{NAMESPACE}}
+        commands:
+            - kubectl config get-contexts
+            - kubectl config use-context ${{KUBECONTEXT}}
+            - >-
+              kubectl --namespace ${{NAMESPACE}} delete job -lredeploy=true
+        when:
+          branch:
+            only:
+              - develop
 
     deploy_jobs:
         title: Creating backend jobs (skipping fakedata)
