@@ -83,14 +83,22 @@ def stop(service):
     local('docker-compose stop %s' % service if service else '')
 
 
-def fixtures(quantity=2):
+def fixtures():
+    """
+    Load fixture data for Site and ReportingEntities.
+    """
+    local('docker-compose exec django_api python manage.py loaddata sites')
+    local('docker-compose exec django_api python manage.py loaddata reporting_entities')
+
+
+def fake_data(quantity=1):
     """
     Load example data from generate_fake_data management command.
     """
     local('docker-compose exec django_api python manage.py generate_fake_data --quantity %d --clean_before' % (int(quantity)))
 
 
-def real_fixtures(area=False):
+def real_data(area=False):
     """
     Destroy current DB data and uses real sync with PMP API to get all data.
     """
