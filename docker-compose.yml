@@ -29,6 +29,8 @@ services:
       - DJANGO_APPLICATION_SERVICE_HOST=django_api
       - DJANGO_NGINX_SERVER_NAME=
       - HTTPS_REDIRECT=
+      - DOMAIN_NAME=
+      - ADMIN_MAIL=
     build:
       context: ./nginx_proxy
       dockerfile: ./Dockerfile
