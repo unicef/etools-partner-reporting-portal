@@ -89,6 +89,7 @@ def fixtures():
     """
     local('docker-compose exec django_api python manage.py loaddata sites')
     local('docker-compose exec django_api python manage.py loaddata reporting_entities')
+    local('docker-compose exec django_api python manage.py loaddata periodic_tasks')
 
 
 def fake_data(quantity=1):
