@@ -119,9 +119,10 @@ def process_programme_documents(fast=False, area=False):
 
     with transaction.atomic():
         for workspace in workspaces:
-            # Skip global workspace
-            if workspace.business_area_code == "0":
+            # Skip global workspace and Syria Cross Border / MENARO
+            if workspace.business_area_code in ("0", "234R"):
                 continue
+
             try:
                 # Iterate over all pages
                 page_url = None
