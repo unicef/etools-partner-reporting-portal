@@ -35,13 +35,9 @@
       ],
 
       _redirectIfNeeded: function (app, workspace, access) {
-        var loaded = [].slice.call(arguments).every(Boolean);
-
-        if (!loaded) {
-          return;
-        }
-
-        if (access.indexOf(app) === -1) {
+        if (!access.length) {
+          location.href = '/unauthorized';
+        } else if (access.indexOf(app) === -1) {
           location.href = this.buildBaseUrl(workspace, access[0]);
         }
       },

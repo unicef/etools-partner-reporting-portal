@@ -51,6 +51,7 @@ global.config = {
         navigateFallbackWhitelist: [
             /^\/app\//,
             /^\/login\//,
+            /^\/unauthorized\//,
             /^\/not-found\//,
         ],
     },

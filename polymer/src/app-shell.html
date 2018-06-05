@@ -12,6 +12,7 @@
 <link rel="import" href="redux/store.html">
 <link rel="import" href="elements/etools-prp-auth.html">
 <link rel="import" href="elements/etools-prp-ajax.html">
+<link rel="import" href="elements/app-redirect.html">
 
 <dom-module id="app-shell">
   <template>
@@ -25,6 +26,8 @@
         height: 100%;
       }
     </style>
+
+    <app-redirect></app-redirect>
 
     <etools-prp-auth authenticated="{{authenticated}}"></etools-prp-auth>
 
@@ -57,6 +60,10 @@
 
       <template is="dom-if" if="[[_equals(page, 'login')]]" restamp="true">
         <page-login name="login" value="{{error}}"></page-login>
+      </template>
+
+      <template is="dom-if" if="[[_equals(page, 'unauthorized')]]" restamp="true">
+        <page-unauthorized name="unauthorized"></page-unauthorized>
       </template>
 
       <template is="dom-if" if="[[_equals(page, 'not-found')]]" restamp="true">

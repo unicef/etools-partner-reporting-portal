@@ -1,0 +1,82 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/etools-loading/etools-loading.html">
+
+<link rel="import" href="../endpoints.html">
+<link rel="import" href="../elements/etools-prp-ajax.html">
+<link rel="import" href="../elements/message-box.html">
+<link rel="import" href="../elements/page-body.html">
+
+<dom-module id="page-unauthorized">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      message-box {
+        max-width: 620px;
+        margin: 0 auto;
+      }
+
+      .loader {
+        text-align: center;
+      }
+    </style>
+
+    <etools-prp-ajax
+        id="userProfile"
+        url="[[profileUrl]]">
+    </etools-prp-ajax>
+
+    <page-body>
+      <template
+          is="dom-if"
+          if="[[loading]]"
+          restamp="true">
+        <div class="loader">
+          <etools-loading no-overlay></etools-loading>
+        </div>
+      </template>
+
+      <template
+          is="dom-if"
+          if="[[!loading]]"
+          restamp="true">
+        <message-box type="warning">
+          Please contact Business Analyst in PRP to add cluster in cluster reporting. You can also contact PMP.
+        </message-box>
+      </template>
+    </page-body>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'page-unauthorized',
+
+      properties: {
+        loading: {
+          type: Boolean,
+          value: true,
+        },
+
+        profileUrl: {
+          type: String,
+          value: App.Endpoints.userProfile(),
+        },
+      },
+
+      attached: function () {
+        var self = this;
+
+        this.$.userProfile.thunk()()
+            .then(function (res) {
+              if (res.data.access.length) {
+                location.href = '/';
+              } else {
+                self.set('loading', false);
+              }
+            });
+      },
+    });
+  </script>
+</dom-module>

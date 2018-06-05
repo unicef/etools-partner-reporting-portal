@@ -5,6 +5,7 @@
     "src/pages/not-found.html",
     "src/pages/login.html",
     "src/pages/login-token.html",
+    "src/pages/unauthorized.html",
     "src/pages/app.html",
 
     "src/pages/app/ip-reporting.html",
