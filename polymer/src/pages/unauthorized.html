@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/etools-loading/etools-loading.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
 
 <link rel="import" href="../endpoints.html">
 <link rel="import" href="../elements/etools-prp-ajax.html">
@@ -14,8 +15,12 @@
       }
 
       message-box {
-        max-width: 620px;
+        max-width: 600px;
         margin: 0 auto;
+      }
+
+      message-box span {
+        @apply --paper-font-subhead;
       }
 
       .loader {
@@ -43,7 +48,7 @@
           if="[[!loading]]"
           restamp="true">
         <message-box type="warning">
-          Please contact Business Analyst in PRP to add cluster in cluster reporting. You can also contact PMP.
+          <span>Please contact Business Analyst in PRP to add cluster in cluster reporting. You can also contact PMP.</span>
         </message-box>
       </template>
     </page-body>
