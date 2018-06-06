@@ -13,10 +13,11 @@ class CustomUserAdmin(UserAdmin):
         'email', 'username', 'last_login', 'date_joined', 'partner',
     )
     list_filter = (
-        'is_superuser', 'is_staff', 'is_active', 'groups', 'workspaces', 'partner', 'imo_clusters'
+        'is_superuser', 'is_staff', 'is_active', 'groups', 'workspaces',
     )
     search_fields = ('email', 'username',)
     exclude = ('date_joined', 'last_login')
+    raw_id_fields = ('partner',)
 
     add_form = CustomUserCreationForm
     add_fieldsets = (

@@ -14,7 +14,7 @@ spec:
       - name: backend-migration-container
         image: unicef/etools-prp
         command: ["bash"]
-        args: ["-c", "python /code/manage.py makemigrations --merge --noinput && python /code/manage.py migrate && python /code/manage.py loaddata sites && python /code/manage.py loaddata reporting_entities"]
+        args: ["-c", "python /code/manage.py makemigrations --merge --noinput && python /code/manage.py migrate"]
         env:
             - name: DJANGO_ALLOWED_HOST
               value: {{DJANGO_ALLOWED_HOST}}
