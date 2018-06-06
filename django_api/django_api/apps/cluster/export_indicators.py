@@ -126,7 +126,14 @@ class IndicatorsXLSXExporter:
         # Each row is one location per indicator
         start_row_id = INDICATOR_DATA_ROW_START
 
+        all_indicators = list()
+        # Dual Reporting
         for indicator in indicators:
+            all_indicators.append(indicator)
+            for children_indicator in indicator.children.all():
+                all_indicators.append(children_indicator)
+
+        for indicator in all_indicators:
             cluster_objective = indicator.reportable.cluster_objectives.first()
             cluster_activity = indicator.reportable.cluster_activities.first()
             partner_project = indicator.reportable.partner_projects.first()
@@ -163,14 +170,14 @@ class IndicatorsXLSXExporter:
                     row=start_row_id,
                     column=2).value = location_data.location.gateway.country.country_short_code
                 self.sheet.cell(row=start_row_id,
-                                column=3).value = cluster.response_plan.title
+                                column=3).value = cluster.response_plan.title if cluster else ""
 
                 self.sheet.cell(row=start_row_id,
-                                column=4).value = cluster.get_type_display()
+                                column=4).value = cluster.get_type_display() if cluster else ""
                 self.sheet.cell(
                     row=start_row_id,
-                    column=5).value = cluster.partner_projects.first().partner.title if \
-                    cluster.partner_projects.first() else ""
+                    column=5).value = (cluster.partner_projects.first().partner.title if \
+                    cluster.partner_projects.first() else "") if cluster else ""
                 self.sheet.cell(
                     row=start_row_id,
                     column=6).value = cluster_objective.title if cluster_objective else ""
@@ -246,7 +253,7 @@ class IndicatorsXLSXExporter:
 
                 self.sheet.cell(row=start_row_id,
                                 column=35).value = indicator.submission_date
-                self.sheet.cell(row=start_row_id, column=36).value = cluster.id
+                self.sheet.cell(row=start_row_id, column=36).value = cluster.id if cluster else ""
                 self.sheet.cell(
                     row=start_row_id,
                     column=37).value = cluster_objective.id if cluster_objective else ""

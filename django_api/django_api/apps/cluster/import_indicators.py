@@ -152,8 +152,6 @@ class IndicatorsXLSXReader(object):
                                             return "Please fulfill required value to column {}, row {}"\
                                                 .format(self.sheet.cell(row=4, column=column).value, row)
 
-
-
                     except Exception:
                         traceback.print_exc()
                         transaction.rollback()
