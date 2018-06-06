@@ -138,8 +138,20 @@ class ConfigurationAPIView(APIView):
 
 
 class TaskTriggerAPIView(APIView):
+    """
+    TaskTriggerAPIView manually triggers a celery periodic task
+    for superuser purposes.
 
-    # kept public on purpose
+    Raises:
+        ValidationError -- GET parameter task_name is not present
+        ValidationError -- GET parameter business_area_code is not numeric
+        ValidationError -- Given celery task does not exist
+        ValidationError -- Celery task python path fails to load
+
+    Returns:
+        rest_framework.response.Response -- REST API response object
+    """
+
     permission_classes = (IsSuperuser,)
 
     def get(self, request):
