@@ -288,6 +288,7 @@
           locations: Object,
           pending: Object,
           isPai: Boolean,
+          mounted: Boolean,
 
           editing: {
             type: Boolean,
@@ -444,7 +445,7 @@
         },
 
         _fetchLocations: function (loc_type) {
-          if (this.get('locations')[loc_type]) {
+          if (this.get('locations')[loc_type] || !this.get('mounted')) {
             return;
           }
 
@@ -521,6 +522,7 @@
         attached: function () {
           this.set('locations', {});
           this.set('pending', {});
+          this.set('mounted', true);
 
           this._handleMessageSent = this._handleMessageSent.bind(this);
           this.messageModal = this.$$('#message-modal');
@@ -540,6 +542,8 @@
               });
 
           this._cancelDebouncers(locTypeDebouncers.concat('reset-location'));
+
+          this.set('mounted', false);
 
           if (this.messageModal) {
             document.body.removeChild(this.messageModal);
