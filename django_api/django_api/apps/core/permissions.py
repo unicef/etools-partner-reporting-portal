@@ -82,3 +82,10 @@ class IsIMOForCurrentWorkspace(IsAuthenticated):
             return all(rules)
 
         return False
+
+
+class IsSuperuser(BasePermission):
+
+    def has_permission(self, request, view):
+        user = request.user
+        return user.is_authenticated() and user.is_superuser

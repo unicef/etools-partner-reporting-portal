@@ -7,10 +7,12 @@ from .views import (
     ResponsePlanAPIView,
     ResponsePlanCreateAPIView,
     ConfigurationAPIView,
+    TaskTriggerAPIView,
 )
 
 
 urlpatterns = [
+    url(r'^task-trigger/$', TaskTriggerAPIView.as_view(), name="task-trigger"),
     url(r'^configuration/$', ConfigurationAPIView.as_view(), name="configuration"),
     url(r'^workspace/$', WorkspaceAPIView.as_view(), name="workspace"),
     url(r'^workspace/(?P<workspace_id>\d+)/response-plan/$',

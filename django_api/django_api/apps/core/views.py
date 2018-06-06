@@ -1,3 +1,5 @@
+import importlib
+
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
@@ -6,11 +8,14 @@ from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework.response import Response
 from rest_framework import status as statuses
 from rest_framework.views import APIView
+from rest_framework.exceptions import ValidationError
+
+from djcelery.models import PeriodicTask
 
 from core.common import DISPLAY_CLUSTER_TYPES, PARTNER_PROJECT_STATUS
 from utils.serializers import serialize_choices
 from .filters import LocationFilter
-from .permissions import IsAuthenticated, IsIMOForCurrentWorkspace
+from .permissions import IsAuthenticated, IsIMOForCurrentWorkspace, IsSuperuser
 from .models import Workspace, Location, ResponsePlan
 from .serializers import (
     WorkspaceSerializer,
@@ -129,4 +134,37 @@ class ConfigurationAPIView(APIView):
         return Response({
             'CLUSTER_TYPE_CHOICES': serialize_choices(DISPLAY_CLUSTER_TYPES),
             'PARTNER_PROJECT_STATUS_CHOICES': serialize_choices(PARTNER_PROJECT_STATUS),
+        })
+
+
+class TaskTriggerAPIView(APIView):
+
+    # kept public on purpose
+    permission_classes = (IsSuperuser,)
+
+    def get(self, request):
+        if 'task_name' not in request.GET:
+            raise ValidationError("task_name is required")
+
+        task_name = request.GET['task_name']
+        arguments = list()
+
+        if 'arguments' in request.GET:
+            arguments = request.GET['arguments'].split(",")
+
+        try:
+            task = PeriodicTask.objects.get(name=task_name)
+        except PeriodicTask.DoesNotExist:
+            raise ValidationError("No task is found with name: " + task_name)
+
+        module_path_name, function_name = task_name.rsplit('.', 1)
+        module = importlib.import_module(module_path_name)
+        task_func = getattr(module, function_name)
+
+        # Execute the task!
+        task_func(*arguments)
+
+        return Response({
+            'task_name': task_name,
+            'status': 'scheduled'
         })
