@@ -81,7 +81,7 @@
     </style>
 
     <etools-prp-permissions
-        permissions={{permissions}}>
+        permissions="{{permissions}}">
     </etools-prp-permissions>
 
     <etools-prp-ajax
@@ -426,7 +426,9 @@
 
         disaggregations: {
           type: Array,
-          value: [],
+          value: function () {
+            return [];
+          },
         },
 
         isPAI: {
@@ -544,9 +546,13 @@
       _save: function () {
         var self = this;
 
+        console.log('saving');
+
         if (!this._fieldsAreValid()) {
           return;
         }
+
+        console.log('valid');
 
         this.set('updatePending', true);
 
