@@ -147,24 +147,37 @@ class TaskTriggerAPIView(APIView):
             raise ValidationError("task_name is required")
 
         task_name = request.GET['task_name']
-        arguments = list()
+        business_area_code = request.GET.get('business_area_code', None)
 
-        if 'arguments' in request.GET:
-            arguments = request.GET['arguments'].split(",")
+        if business_area_code and not business_area_code.isdigit():
+            raise ValidationError('business_area_code must be digit only')
+        else:
+            business_area_code = int(business_area_code)
 
         try:
-            task = PeriodicTask.objects.get(name=task_name)
+            PeriodicTask.objects.get(task=task_name)
         except PeriodicTask.DoesNotExist:
-            raise ValidationError("No task is found with name: " + task_name)
+            raise ValidationError('No task is found with name: ' + task_name)
 
-        module_path_name, function_name = task_name.rsplit('.', 1)
-        module = importlib.import_module(module_path_name)
-        task_func = getattr(module, function_name)
+        try:
+            # Dynamic task module load
+            module_path_name, function_name = task_name.rsplit('.', 1)
+            module = importlib.import_module(module_path_name)
+            task_func = getattr(module, function_name)
+        except Exception:
+            raise ValidationError('ERROR loading the task function: ' + task_name)
 
         # Execute the task!
-        task_func(*arguments)
+        if not business_area_code:
+            task_func()
+        else:
+            if task_name == 'partner.tasks.process_partners':
+                task_func(business_area_code)
+
+            elif task_name == 'unicef.tasks.process_programme_documents	':
+                task_func(True, business_area_code)
 
         return Response({
             'task_name': task_name,
-            'status': 'scheduled'
+            'status': 'started'
         })
