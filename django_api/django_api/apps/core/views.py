@@ -149,10 +149,11 @@ class TaskTriggerAPIView(APIView):
         task_name = request.GET['task_name']
         business_area_code = request.GET.get('business_area_code', None)
 
-        if business_area_code and not business_area_code.isdigit():
-            raise ValidationError('business_area_code must be digit only')
-        else:
-            business_area_code = int(business_area_code)
+        if business_area_code:
+            if not business_area_code.isdigit():
+                raise ValidationError('business_area_code must be digit only')
+            else:
+                business_area_code = int(business_area_code)
 
         try:
             PeriodicTask.objects.get(task=task_name)
@@ -174,8 +175,10 @@ class TaskTriggerAPIView(APIView):
             if task_name == 'partner.tasks.process_partners':
                 task_func(business_area_code)
 
-            elif task_name == 'unicef.tasks.process_programme_documents	':
+            elif task_name == 'unicef.tasks.process_programme_documents':
                 task_func(True, business_area_code)
+            else:
+                task_func()
 
         return Response({
             'task_name': task_name,
