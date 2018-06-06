@@ -445,12 +445,16 @@
         },
 
         _fetchLocations: function (loc_type) {
-          if (this.get('locations')[loc_type] || !this.get('mounted')) {
+          if (this.get('locations')[loc_type]) {
             return;
           }
 
           this.debounce('fetch-locations-' + loc_type, function () {
             var self = this;
+
+            if (!this.get('mounted')) {
+              return;
+            }
 
             this._setPending(loc_type, true);
 
