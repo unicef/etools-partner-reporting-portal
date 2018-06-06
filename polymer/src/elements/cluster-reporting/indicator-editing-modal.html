@@ -546,13 +546,9 @@
       _save: function () {
         var self = this;
 
-        console.log('saving');
-
         if (!this._fieldsAreValid()) {
           return;
         }
-
-        console.log('valid');
 
         this.set('updatePending', true);
 

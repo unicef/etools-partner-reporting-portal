@@ -172,13 +172,15 @@
       _computeInvalid: function (required, isRatio, value) {
         if (required) {
           if (isRatio) {
-            return !value.v || !value.d;
+            return typeof value.v === 'undefined' || typeof value.d === 'undefined';
           } else {
-            return !value.v;
+            return typeof value.v === 'undefined';
           }
         } else {
           if (isRatio) {
-            return !!value.v ? !value.d : !!value.d; // xor
+            return typeof value.v !== 'undefined' ?
+                typeof value.d === 'undefined' :
+                typeof value.d !== 'undefined'; // xor
           } else {
             return false;
           }
