@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import traceback
 from django.db.models import Q
 from django.db import transaction
 
@@ -52,7 +53,7 @@ class IndicatorsXLSXReader(object):
 
                 # Get IndicatorLocationData ID
                 try:
-                    ild_id = str(self.sheet.cell(row=row, column=location_column_id).value)
+                    ild_id = str(int(self.sheet.cell(row=row, column=location_column_id).value))
 
                     # Check if Partner is allowed to modify data
                     if self.partner and IndicatorLocationData.objects.filter(
@@ -88,7 +89,7 @@ class IndicatorsXLSXReader(object):
                             })).count() == 0:
                         return "Indicator ID " + ild_id + " does not belong to partner " + str(self.partner)
                     indicator = IndicatorLocationData.objects.get(
-                        pk=self.sheet.cell(row=row, column=location_column_id).value
+                        pk=int(self.sheet.cell(row=row, column=location_column_id).value)
                     )
                 except IndicatorLocationData.DoesNotExist:
                     return "Cannot find Indicator Location Data data for ID " \
@@ -100,9 +101,9 @@ class IndicatorsXLSXReader(object):
                 for column in range(dis_data_column_start_id, total_column_id + 1):
                     try:
                         value = self.sheet.cell(row=row, column=column).value
-
+                        print(value)
                         # Check if value is present in cell
-                        if value:
+                        if value is not None:
                             # Evaluate ID of Disaggregation Type
                             dis_type_id = "()"
                             dis_type_value = self.sheet.cell(row=2, column=column).value
@@ -133,7 +134,28 @@ class IndicatorsXLSXReader(object):
                                 v, d = value.split("/")
                                 data[dis_type_id]["v"] = int(v)
                                 data[dis_type_id]["d"] = int(d)
+                        else:
+                            # if value is not present, check if it should be
+                            # all rows need to updated
+
+                            # Evaluate ID of Disaggregation Type
+                            dis_type_value = self.sheet.cell(row=2, column=column).value
+                            if dis_type_value:
+                                dis_type_value = sorted(list(map(int, str(dis_type_value).split(","))), key=int)
+                            if dis_type_value:
+                                if len(dis_type_value) == indicator.level_reported:
+                                    # Check if data is proper disaggregation value
+                                    for dt in dis_type_value:
+                                        dv = DisaggregationValue.objects.get(pk=dt)
+                                        if dv.disaggregation.id in indicator.disaggregation_reported_on:
+                                            transaction.rollback()
+                                            return "Please fulfill required value to column {}, row {}"\
+                                                .format(self.sheet.cell(row=4, column=column).value, row)
+
+
+
                     except Exception:
+                        traceback.print_exc()
                         transaction.rollback()
                         return "Cannot assign disaggregation value to column {}, row {}"\
                             .format(self.sheet.cell(row=4, column=column).value, row)
