@@ -165,6 +165,7 @@ class TaskTriggerAPIView(APIView):
             module_path_name, function_name = task_name.rsplit('.', 1)
             module = importlib.import_module(module_path_name)
             task_func = getattr(module, function_name)
+            task_func = task_func.delay
         except Exception:
             raise ValidationError('ERROR loading the task function: ' + task_name)
 
@@ -173,10 +174,10 @@ class TaskTriggerAPIView(APIView):
             task_func()
         else:
             if task_name == 'partner.tasks.process_partners':
-                task_func(business_area_code)
+                task_func(area=business_area_code)
 
             elif task_name == 'unicef.tasks.process_programme_documents':
-                task_func(True, business_area_code)
+                task_func(fast=True, area=business_area_code)
             else:
                 task_func()
 
