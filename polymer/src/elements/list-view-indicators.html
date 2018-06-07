@@ -10,6 +10,7 @@
 <link rel="import" href="../behaviors/utils.html">
 <link rel="import" href="list-view-single-indicator.html">
 <link rel="import" href="list-placeholder.html">
+<link rel="import" href="message-box.html">
 <link rel="import" href="etools-prp-permissions.html">
 <link rel="import" href="../styles/table-styles.html">
 
@@ -18,8 +19,12 @@
     <style include="iron-flex iron-flex-factors data-table-styles table-styles">
       :host {
         --ecp-content: {
-          padding: 0;
+          padding: 1px 0 0;
         };
+      }
+
+      message-box {
+        margin: 25px 25px 0;
       }
     </style>
 
@@ -37,6 +42,15 @@
     </etools-prp-permissions>
 
     <etools-content-panel panel-title="List of Indicators">
+      <template
+          is="dom-if"
+          if="[[showLocationsWarning]]"
+          restamp="[[true]]">
+        <message-box type="warning">
+          Please make sure indicators have locations set for reports to be generated.
+        </message-box>
+      </template>
+
       <etools-data-table-header
         id="listHeader"
         label="[[visibleRange.0]]-[[visibleRange.1]] of [[totalResults]] results to show">
@@ -188,6 +202,11 @@
           type: Boolean,
           computed: '_computeCanEditLocations(isClusterApp, type, permissions)',
         },
+
+        showLocationsWarning: {
+          type: Boolean,
+          computed: '_computeShowLocationsWarning(isClusterApp, canEdit, data)',
+        },
       },
 
       listeners: {
@@ -205,6 +224,12 @@
 
       _computeIsClusterApp: function(appName) {
         return appName === 'cluster-reporting';
+      },
+
+      _computeShowLocationsWarning: function (isClusterApp, canEdit, data) {
+        return isClusterApp && canEdit && data.some(function (indicator) {
+          return !indicator.locations.length;
+        });
       },
     });
   </script>
