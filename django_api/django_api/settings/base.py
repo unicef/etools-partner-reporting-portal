@@ -458,6 +458,10 @@ PMP_API_ENDPOINT = os.getenv('PMP_API_ENDPOINT', "http://172.19.0.1:8082/api")
 PMP_API_USER = os.getenv('PMP_API_USER')
 PMP_API_PASSWORD = os.getenv('PMP_API_PASSWORD')
 
+# OCHA API
+OCHA_API_USER = os.getenv('OCHA_API_USER', '')
+OCHA_API_PASSWORD = os.getenv('OCHA_API_PASSWORD', '')
+
 # assuming we're using Azure Storage:
 # django-storages: https://django-storages.readthedocs.io/en/latest/backends/azure.html
 AZURE_ACCOUNT_NAME = os.environ.get('AZURE_ACCOUNT_NAME', None)

@@ -4,11 +4,12 @@ import asyncio
 import itertools
 
 from ocha.constants import HPC_V1_ROOT_URL
+from . import utilities
 
 
 def fetch_json_urls_async(url_list):
     loop = asyncio.get_event_loop()
-    client = aiohttp.ClientSession(loop=loop)
+    client = aiohttp.ClientSession(loop=loop, headers=utilities.get_headers())
 
     async def get_json(client, url):
         async with client.get(url) as response:
