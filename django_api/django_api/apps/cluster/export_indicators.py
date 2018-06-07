@@ -177,7 +177,7 @@ class IndicatorsXLSXExporter:
                 self.sheet.cell(
                     row=start_row_id,
                     column=5).value = (cluster.partner_projects.first().partner.title if
-                        cluster.partner_projects.first() else "") if cluster else ""
+                                       cluster.partner_projects.first() else "") if cluster else ""
                 self.sheet.cell(
                     row=start_row_id,
                     column=6).value = cluster_objective.title if cluster_objective else ""
