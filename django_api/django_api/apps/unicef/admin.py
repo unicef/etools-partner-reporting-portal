@@ -21,15 +21,16 @@ class ProgrammeDocumentAdmin(admin.ModelAdmin):
 class ProgressReportAdmin(admin.ModelAdmin):
     list_display = ('programme_document', 'status', 'submitted_by',
                     'start_date', 'end_date', 'due_date', 'submission_date',
-                    'review_date')
+                    'review_date', 'report_type', 'report_number')
     list_filter = (
         'status',
         'programme_document__status',
         'programme_document')
+    search_fields = ('programme_document__title', )
 
 
 class ReportingPeriodDatesAdmin(admin.ModelAdmin):
-    list_display = ('programme_document', 'start_date', 'end_date', 'due_date')
+    list_display = ('programme_document', 'report_type', 'start_date', 'end_date', 'due_date')
     search_fields = ('programme_document__title', )
 
 

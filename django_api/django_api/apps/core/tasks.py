@@ -1,4 +1,3 @@
-import random
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
@@ -203,30 +202,15 @@ def process_period_reports():
 
         if report_type == "QPR":
             return pd.progress_reports \
-                .filter(report_type="QPR").order_by(
-                    'report_type',
-                    'report_number',
-                    'is_final',
-                    'end_date'
-                ).last()
+                .filter(report_type="QPR").order_by('start_date').last()
 
         if report_type == "HR":
             return pd.progress_reports \
-                .filter(report_type="HR").order_by(
-                    'report_type',
-                    'report_number',
-                    'is_final',
-                    'end_date'
-                ).last()
+                .filter(report_type="HR").order_by('start_date').last()
 
         if report_type == "SR":
             return pd.progress_reports \
-                .filter(report_type="SR").order_by(
-                    'report_type',
-                    'report_number',
-                    'is_final',
-                    'due_date'
-                ).last()
+                .filter(report_type="SR").order_by('due_date').last()
 
     # PD report generation
     for pd in ProgrammeDocument.objects.filter(status=PD_STATUS.active):
@@ -278,8 +262,6 @@ def process_period_reports():
 
             # Re-query latest ProgressReport by report type
             latest_progress_report = get_latest_pr_by_type(pd, reporting_period.report_type)
-
-            print(latest_progress_report, reporting_period.report_type)
 
             if latest_progress_report:
                 report_type = latest_progress_report.report_type
