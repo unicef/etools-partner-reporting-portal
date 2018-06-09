@@ -393,7 +393,7 @@ def process_period_reports():
 
         with transaction.atomic():
             # Handling QPR reporting periods
-            for idx, reporting_period in enumerate(pd.reporting_periods.filter(report_type="QPR")):
+            for idx, reporting_period in enumerate(pd.reporting_periods.filter(report_type="QPR")).order_by('start_date'):
                 # If PR start date is greater than now, skip!
                 if reporting_period.start_date > datetime.now().date():
                     print("No new reports to generate")
@@ -417,7 +417,7 @@ def process_period_reports():
                 )
 
             # Handling HR reporting periods
-            for idx, reporting_period in enumerate(pd.reporting_periods.filter(report_type="HR")):
+            for idx, reporting_period in enumerate(pd.reporting_periods.filter(report_type="HR")).order_by('start_date'):
                 # If PR start date is greater than now, skip!
                 if reporting_period.start_date > datetime.now().date():
                     print("No new reports to generate")
@@ -441,7 +441,7 @@ def process_period_reports():
                 )
 
             # Handling SR reporting periods
-            for idx, reporting_period in enumerate(pd.reporting_periods.filter(report_type="SR")):
+            for idx, reporting_period in enumerate(pd.reporting_periods.filter(report_type="SR")).order_by('due_date'):
                 # If PR due date is greater than now, skip!
                 if reporting_period.due_date >= datetime.now().date() + timedelta(days=30):
                     print("No new reports to generate")
