@@ -129,7 +129,7 @@ class ClusterObjectiveAPIView(APIView):
 
     def patch(self, request, pk, *args, **kwargs):
         if not IsIMOForCurrentWorkspaceCheck(request):
-            raise PermissionDenied()
+            raise PermissionDenied
 
         serializer = ClusterObjectivePatchSerializer(
             instance=self.get_instance(self.request, pk=pk),
@@ -145,7 +145,7 @@ class ClusterObjectiveAPIView(APIView):
         :return: ClusterObjective serializer data
         """
         if not IsIMOForCurrentWorkspaceCheck(request):
-            raise PermissionDenied()
+            raise PermissionDenied
 
         if 'id' in self.request.data.keys():
             serializer = ClusterObjectiveSerializer(
@@ -200,7 +200,7 @@ class ClusterObjectiveListCreateAPIView(ListCreateAPIView):
         :return: ClusterObjective object id
         """
         if not IsIMOForCurrentWorkspaceCheck(request):
-            raise PermissionDenied()
+            raise PermissionDenied
 
         serializer = ClusterObjectiveSerializer(data=self.request.data)
         serializer.is_valid(raise_exception=True)
@@ -241,7 +241,7 @@ class ClusterActivityAPIView(APIView):
 
     def patch(self, request, pk, *args, **kwargs):
         if not IsIMOForCurrentWorkspaceCheck(request):
-            raise PermissionDenied()
+            raise PermissionDenied
 
         serializer = ClusterActivityPatchSerializer(
             instance=self.get_instance(self.request, pk),
@@ -257,7 +257,7 @@ class ClusterActivityAPIView(APIView):
         :return: ClusterActivity serializer data
         """
         if not IsIMOForCurrentWorkspaceCheck(request):
-            raise PermissionDenied()
+            raise PermissionDenied
 
         if 'id' in self.request.data.keys():
             serializer = ClusterActivitySerializer(
@@ -312,7 +312,7 @@ class ClusterActivityListAPIView(ListCreateAPIView):
         :return: ClusterActivity object id
         """
         if not IsIMOForCurrentWorkspaceCheck(request):
-            raise PermissionDenied()
+            raise PermissionDenied
 
         serializer = ClusterActivitySerializer(data=self.request.data)
         serializer.is_valid(raise_exception=True)
