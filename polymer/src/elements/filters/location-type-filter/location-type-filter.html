@@ -38,13 +38,11 @@
       },
 
       _computeData: function (maxLocType) {
-        return Array.apply(null, Array(maxLocType))
+        return Array.apply(null, Array(maxLocType + 1))
             .map(function (_, index) {
-              var id = index + 1;
-
               return {
-                id: String(id),
-                title: 'Admin' + id,
+                id: String(index),
+                title: 'Admin' + index,
               };
             });
       },
