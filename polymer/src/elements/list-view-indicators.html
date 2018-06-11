@@ -205,7 +205,7 @@
 
         showLocationsWarning: {
           type: Boolean,
-          computed: '_computeShowLocationsWarning(isClusterApp, canEdit, data)',
+          computed: '_computeShowLocationsWarning(isClusterApp, type, canEdit, data)',
         },
       },
 
@@ -226,8 +226,10 @@
         return appName === 'cluster-reporting';
       },
 
-      _computeShowLocationsWarning: function (isClusterApp, canEdit, data) {
-        return isClusterApp && canEdit && data.some(function (indicator) {
+      _computeShowLocationsWarning: function (isClusterApp, type, canEdit, data) {
+        var baseConditionsMet = isClusterApp && type !== 'ca' && canEdit;
+
+        return baseConditionsMet && data.some(function (indicator) {
           return !indicator.locations.length;
         });
       },

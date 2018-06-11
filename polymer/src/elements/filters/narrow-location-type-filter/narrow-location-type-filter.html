@@ -65,16 +65,14 @@
       },
 
       _computeData: function (params, maxLocType) {
-        var validData = Array.apply(null, Array(maxLocType))
+        var validData = Array.apply(null, Array(maxLocType + 1))
             .map(function (_, index) {
-              var id = index + 1;
-
               return {
-                id: String(id),
-                title: 'Admin' + id,
+                id: String(index),
+                title: 'Admin' + index,
               };
             })
-            .slice(Number(params.loc_type));
+            .slice(Number(params.loc_type) + 1);
 
         return [
           {

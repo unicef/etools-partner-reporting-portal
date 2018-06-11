@@ -500,6 +500,7 @@
             self.set('errors', {});
             self.dispatch(App.Actions.addResponsePlan(res.data));
             self.fire('refresh-plan-list');
+            self.fire('fetch-profile');
           })
           .catch(function (err) {
             if (err.code === 504) {
