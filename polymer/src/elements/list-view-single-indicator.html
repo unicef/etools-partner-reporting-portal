@@ -223,7 +223,7 @@
               EDIT
               <template
                   is="dom-if"
-                  if="[[_hasNoLocations(indicator)]]"
+                  if="[[_showLocationsWarning(indicator)]]"
                   restamp="true">
                 <iron-icon class="locations-warning" icon="icons:error"></iron-icon>
               </template>
@@ -349,8 +349,9 @@
         }
       },
 
-      _hasNoLocations: function (indicator) {
-        return !indicator.locations.length;
+      _showLocationsWarning: function (indicator) {
+        return !indicator.locations.length &&
+            !/clusteractivity/.test(indicator.content_type_key);
       },
     });
   </script>
