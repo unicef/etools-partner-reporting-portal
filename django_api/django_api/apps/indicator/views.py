@@ -415,12 +415,12 @@ class IndicatorDataAPIView(APIView):
         if ir.submission_date is None or ir.report_status == INDICATOR_REPORT_STATUS.sent_back:
             ir.submission_date = date.today()
 
-            # set status on progress report
+            # Throw validation error if Indicator report is being submitted directly without its Progress Report
             if ir.progress_report is not None:
-                ir.report_status = INDICATOR_REPORT_STATUS.submitted
-                ir.save()
-                ir.progress_report.status = PROGRESS_REPORT_STATUS.submitted
-                ir.progress_report.save()
+                raise ValidationError(
+                    "This indicator report has Progress Report linked. Please submit the progress report for"
+                    "this indicator report instead."
+                )
             else:
                 # cluster IR's go to accepted directly
                 ir.report_status = INDICATOR_REPORT_STATUS.accepted
