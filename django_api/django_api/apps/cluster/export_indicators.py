@@ -7,7 +7,7 @@ from django.db.models import Count
 
 import itertools
 
-from indicator.models import Disaggregation, DisaggregationValue, IndicatorBlueprint
+from indicator.models import Disaggregation, DisaggregationValue, IndicatorBlueprint, IndicatorReport
 
 PATH = settings.BASE_DIR + "/apps/cluster/templates/excel/indicators_export.xlsx"
 SAVE_PATH = '/tmp/'
@@ -109,6 +109,7 @@ class IndicatorsXLSXExporter:
         disaggregation_values_map["()"] = totals_column
 
         indicators = self.indicators
+        indicators = IndicatorReport.objects.filter(pk__in=[i.id for i in indicators])
         if disaggregation_types:
             indicators = indicators.annotate(
                 count=Count('reportable__disaggregations')).filter(
@@ -153,8 +154,10 @@ class IndicatorsXLSXExporter:
                 partner_activity = cluster_activity.partner_activities.first()
                 partner_project = cluster_activity.cluster_objective.cluster.partner_projects.first()
             elif partner_activity:
-                cluster = partner_activity.cluster_activity.cluster_objective.cluster
-                cluster_objective = partner_activity.cluster_activity.cluster_objective
+                cluster = partner_activity.cluster_activity.cluster_objective.cluster if \
+                    partner_activity.cluster_activity else partner_activity.cluster_objective.cluster
+                cluster_objective = partner_activity.cluster_activity.cluster_objective if \
+                    partner_activity.cluster_activity else partner_activity.cluster_objective
                 partner_project = partner_activity.project
             elif partner_project:
                 cluster = partner_project.clusters.first()

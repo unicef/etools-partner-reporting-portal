@@ -536,6 +536,7 @@ class ClusterIndicatorsListExcelExportView(ListAPIView):
 
     def get_queryset(self):
         response_plan_id = self.kwargs.get(self.lookup_field)
+
         queryset = IndicatorReport.objects.filter(
             Q(reportable__cluster_objectives__isnull=False)
             | Q(reportable__cluster_activities__isnull=False)
@@ -545,7 +546,10 @@ class ClusterIndicatorsListExcelExportView(ListAPIView):
             Q(reportable__cluster_objectives__cluster__response_plan=response_plan_id)
             | Q(reportable__cluster_activities__cluster_objective__cluster__response_plan=response_plan_id)
             | Q(reportable__partner_projects__clusters__response_plan=response_plan_id)
-            | Q(reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)  # noqa: E501
+            | Q(
+                reportable__partner_activities__cluster_activity__cluster_objective__cluster__response_plan=response_plan_id)  # noqa: E501
+            | Q(reportable__partner_activities__cluster_objective__cluster__response_plan=response_plan_id)
+            # noqa: E501
         )
         return queryset
 
