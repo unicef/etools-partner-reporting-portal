@@ -35,6 +35,26 @@ class IsAuthenticated(BasePermission):
         return request.user.is_authenticated()
 
 
+def IsIMOForCurrentWorkspaceCheck(request):
+    rules = [
+        IMORole.as_group().user_set.filter(pk=request.user.pk).exists()
+    ]
+    workspace_id = request.resolver_match.kwargs.get('workspace_id')
+    if workspace_id:
+        rules.append(
+            request.user.workspaces.filter(id=workspace_id).exists()
+        )
+    return all(rules)
+
+
+def IsPartnerAuthorizedOfficerCheck(request):
+    rules = [
+        request.user.is_authenticated(),
+        PartnerAuthorizedOfficerRole.as_group().user_set.filter(pk=request.user.pk).exists(),
+    ]
+    return all(rules)
+
+
 class IsPartnerAuthorizedOfficer(BasePermission):
 
     def has_permission(self, request, view):
@@ -71,14 +91,27 @@ class IsIMOForCurrentWorkspace(IsAuthenticated):
 
     def has_permission(self, request, view):
         if super(IsIMOForCurrentWorkspace, self).has_permission(request, view):
-            rules = [
-                IMORole.as_group().user_set.filter(pk=request.user.pk).exists()
-            ]
-            workspace_id = request.resolver_match.kwargs.get('workspace_id')
-            if workspace_id:
-                rules.append(
-                    request.user.workspaces.filter(id=workspace_id).exists()
-                )
-            return all(rules)
+            return IsIMOForCurrentWorkspaceCheck(request)
 
         return False
+
+
+class IsPartnerEditorOrPartnerAuthorizedOfficerOrIMOForCurrentWorkspace(BasePermission):
+
+    def has_permission(self, request, view):
+        user = request.user
+        return user.is_authenticated() and (
+            user.groups.filter(name=PartnerEditorRole.as_group().name).exists() or
+            user.groups.filter(name=PartnerAuthorizedOfficerRole.as_group().name).exists() or
+            IsIMOForCurrentWorkspaceCheck(request)
+        )
+
+
+class IsPartnerAuthorizedOfficerOrIMOForCurrentWorkspace(BasePermission):
+
+    def has_permission(self, request, view):
+        user = request.user
+        return user.is_authenticated() and (
+            IsPartnerAuthorizedOfficerCheck(request) or
+            IsIMOForCurrentWorkspaceCheck(request)
+        )
