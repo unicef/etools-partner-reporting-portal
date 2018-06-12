@@ -91,6 +91,13 @@ class IndicatorsXLSXReader(object):
                     indicator = IndicatorLocationData.objects.get(
                         pk=int(self.sheet.cell(row=row, column=location_column_id).value)
                     )
+
+                    # Check if Indicator Report is not able to submit anymore
+                    if not indicator.indicator_report.can_import:
+                        transaction.rollback()
+                        return "Indicator in row {} is already submitted. Please remove row and try again.".format(
+                            row,)
+
                 except IndicatorLocationData.DoesNotExist:
                     return "Cannot find Indicator Location Data data for ID " \
                         + str(self.sheet.cell(row=row, column=location_column_id).value)
@@ -98,10 +105,10 @@ class IndicatorsXLSXReader(object):
                 blueprint = indicator.indicator_report.reportable.blueprint
                 data = indicator.disaggregation
                 # Prepare
+                already_updated_row_value = False
                 for column in range(dis_data_column_start_id, total_column_id + 1):
                     try:
                         value = self.sheet.cell(row=row, column=column).value
-                        print(value)
                         # Check if value is present in cell
                         if value is not None:
                             # Evaluate ID of Disaggregation Type
@@ -127,6 +134,8 @@ class IndicatorsXLSXReader(object):
                                 # Create value
                                 data[dis_type_id] = dict()
 
+                            already_updated_row_value = True
+
                             # Update values
                             if blueprint.unit == IndicatorBlueprint.NUMBER:
                                 data[dis_type_id]["v"] = value
@@ -147,7 +156,7 @@ class IndicatorsXLSXReader(object):
                                     # Check if data is proper disaggregation value
                                     for dt in dis_type_value:
                                         dv = DisaggregationValue.objects.get(pk=dt)
-                                        if dv.disaggregation.id in indicator.disaggregation_reported_on:
+                                        if dv.disaggregation.id in indicator.disaggregation_reported_on and already_updated_row_value:
                                             transaction.rollback()
                                             return "Please fulfill required value to column {}, row {}"\
                                                 .format(self.sheet.cell(row=4, column=column).value, row)
