@@ -1,8 +1,10 @@
 import logging
 from time import sleep
 
+import base64
 import requests
 from django.core.cache import cache
+from django.conf import settings
 from requests import RequestException
 from requests.status_codes import codes
 
@@ -29,6 +31,18 @@ MAX_URL_RETRIES = 2
 CACHE_URL_FOR = 300  # Seconds
 
 
+def get_headers():
+    username = settings.OCHA_API_USER
+    password = settings.OCHA_API_PASSWORD
+
+    headers = {}
+    if username and password:
+        auth_pair_str = '%s:%s' % (username, password)
+        headers['Authorization'] = 'Basic ' + \
+                                   base64.b64encode(auth_pair_str.encode()).decode()
+    return headers
+
+
 def get_json_from_url(url, retry_counter=MAX_URL_RETRIES):
     cached_response = cache.get(url)
     if cached_response:
@@ -40,7 +54,11 @@ def get_json_from_url(url, retry_counter=MAX_URL_RETRIES):
 
     logger.debug('Getting {}, attempt: {}'.format(url, MAX_URL_RETRIES - retry_counter + 1))
     try:
-        response = requests.get(url, timeout=20)
+        response = requests.get(
+            url,
+            timeout=20,
+            headers=get_headers()
+        )
     except RequestException:
         return retry()
 

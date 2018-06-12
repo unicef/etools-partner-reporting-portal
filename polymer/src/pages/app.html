@@ -189,6 +189,7 @@
 
       listeners: {
         'notify': '_notify',
+        'fetch-profile': '_fetchProfile',
       },
 
       _redirectToWorkspace: function (workspace) {
@@ -297,13 +298,18 @@
         } catch (err) {}
       },
 
+      _fetchProfile: function () {
+        var userProfileThunk = this.$.userProfile.thunk();
+
+        return this.dispatch(App.Actions.fetchUserProfile(userProfileThunk));
+      },
+
       attached: function () {
         var interventionsThunk = this.$.interventions.thunk();
-        var userProfileThunk = this.$.userProfile.thunk();
 
         Promise.all([
           this.dispatch(App.Actions.fetchWorkspaces(interventionsThunk)),
-          this.dispatch(App.Actions.fetchUserProfile(userProfileThunk)),
+          this._fetchProfile(),
         ])
             .catch(function () {
               window.location.href = '/login';

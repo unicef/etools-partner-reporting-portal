@@ -448,9 +448,19 @@
                   </template>
                   <template
                       is="dom-if"
-                      if="[[!_equals(indicatorType, 'number')]]"
+                      if="[[_equals(indicatorType, 'percentage')]]"
                       restamp="true">
-                    [[_toPercentage(data.reportable.target.c)]]
+                    <span>[[data.reportable.target.v]]%</span>
+                  </template>
+                  <template
+                      is="dom-if"
+                      if="[[_equals(indicatorType, 'ratio')]]"
+                      restamp="true">
+                    <span>
+                      <etools-prp-number value="[[data.reportable.target.v]]"></etools-prp-number>
+                      /
+                      <etools-prp-number value="[[data.reportable.target.d]]"></etools-prp-number>
+                    </span>
                   </template>
                 </dd>
               </dl>
