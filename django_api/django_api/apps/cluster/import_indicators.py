@@ -156,7 +156,8 @@ class IndicatorsXLSXReader(object):
                                     # Check if data is proper disaggregation value
                                     for dt in dis_type_value:
                                         dv = DisaggregationValue.objects.get(pk=dt)
-                                        if dv.disaggregation.id in indicator.disaggregation_reported_on and already_updated_row_value:
+                                        if dv.disaggregation.id in indicator.disaggregation_reported_on and \
+                                                already_updated_row_value:
                                             transaction.rollback()
                                             return "Please fulfill required value to column {}, row {}"\
                                                 .format(self.sheet.cell(row=4, column=column).value, row)
