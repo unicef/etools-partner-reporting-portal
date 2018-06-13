@@ -100,7 +100,6 @@ class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, ser
     def create(self, validated_data):
         validated_data['status'] = self.get_status()
         location_data_list = validated_data.pop('locations')
-
         partner_project = PartnerProject.objects.filter(code=validated_data['code']).first()
         if partner_project:
             partner_project = super(V2PartnerProjectImportSerializer, self).update(partner_project, validated_data)
