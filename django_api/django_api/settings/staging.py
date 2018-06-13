@@ -4,7 +4,7 @@ import os
 from .base import *
 
 
-DEBUG = False
+DEBUG = True
 IS_STAGING = True
 
 # domains/hosts etc.
