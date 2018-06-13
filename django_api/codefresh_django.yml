@@ -10,6 +10,7 @@ steps:
         tag: ${{CF_BRANCH}}
         build_arguments:
             - env=$ENV
+            - requirement_file=$REQUIREMENT_FILE
 
     # composition_step:
     #     type: composition
@@ -69,6 +70,7 @@ steps:
           - KUBECONTEXT=${{KUBECONTEXT}}
           - KUBERNETES_NAMESPACE=${{NAMESPACE}}
           - ENV=${{ENV}}
+          - REQUIREMENT_FILE=${{REQUIREMENT_FILE}}
           - POSTGRES_USER=${{POSTGRES_USER}}
           - POSTGRES_DB=${{POSTGRES_DB}}
           - POSTGRES_HOST=${{POSTGRES_HOST}}
@@ -87,6 +89,7 @@ steps:
           - KUBECONTEXT=${{KUBECONTEXT}}
           - KUBERNETES_NAMESPACE=${{NAMESPACE}}
           - ENV=${{ENV}}
+          - REQUIREMENT_FILE=${{REQUIREMENT_FILE}}
           - POSTGRES_USER=${{POSTGRES_USER}}
           - POSTGRES_DB=${{POSTGRES_DB}}
           - POSTGRES_HOST=${{POSTGRES_HOST}}
@@ -122,6 +125,7 @@ steps:
           - KUBECONTEXT=${{KUBECONTEXT}}
           - KUBERNETES_NAMESPACE=${{NAMESPACE}}
           - ENV=${{ENV}}
+          - REQUIREMENT_FILE=${{REQUIREMENT_FILE}}
           - DJANGO_ALLOWED_HOST=${{DJANGO_ALLOWED_HOST}}
           - POSTGRES_USER=${{POSTGRES_USER}}
           - POSTGRES_DB=${{POSTGRES_DB}}
