@@ -121,7 +121,20 @@
             <labelled-item label="IMO for Clusters">
               <dl class="clusters">
                 <template is="dom-repeat" items="[[profile.imo_clusters]]">
-                  <dt>[[item.title]]:</dt>
+                  <dt>
+                    <template
+                        is="dom-if"
+                        if="[[_equals(item.type, 'imported')]]"
+                        restamp="[[true]]">
+                      [[item.imported_type]]:
+                    </template>
+                    <template
+                        is="dom-if"
+                        if="[[!_equals(item.type, 'imported')]]"
+                        restamp="[[true]]">
+                      [[item.title]]:
+                    </template>
+                  </dt>
                   <dd>[[item.response_plan.title]]</dd>
                 </template>
               </dl>
