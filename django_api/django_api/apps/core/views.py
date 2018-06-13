@@ -1,3 +1,5 @@
+import importlib
+
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
@@ -6,11 +8,14 @@ from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework.response import Response
 from rest_framework import status as statuses
 from rest_framework.views import APIView
+from rest_framework.exceptions import ValidationError
+
+from djcelery.models import PeriodicTask
 
 from core.common import DISPLAY_CLUSTER_TYPES, PARTNER_PROJECT_STATUS
 from utils.serializers import serialize_choices
 from .filters import LocationFilter
-from .permissions import IsAuthenticated, IsIMOForCurrentWorkspace
+from .permissions import IsAuthenticated, IsIMOForCurrentWorkspace, IsSuperuser
 from .models import Workspace, Location, ResponsePlan
 from .serializers import (
     WorkspaceSerializer,
@@ -129,4 +134,66 @@ class ConfigurationAPIView(APIView):
         return Response({
             'CLUSTER_TYPE_CHOICES': serialize_choices(DISPLAY_CLUSTER_TYPES),
             'PARTNER_PROJECT_STATUS_CHOICES': serialize_choices(PARTNER_PROJECT_STATUS),
+        })
+
+
+class TaskTriggerAPIView(APIView):
+    """
+    TaskTriggerAPIView manually triggers a celery periodic task
+    for superuser purposes.
+
+    Raises:
+        ValidationError -- GET parameter task_name is not present
+        ValidationError -- GET parameter business_area_code is not numeric
+        ValidationError -- Given celery task does not exist
+        ValidationError -- Celery task python path fails to load
+
+    Returns:
+        rest_framework.response.Response -- REST API response object
+    """
+
+    permission_classes = (IsSuperuser,)
+
+    def get(self, request):
+        if 'task_name' not in request.GET:
+            raise ValidationError("task_name is required")
+
+        task_name = request.GET['task_name']
+        business_area_code = request.GET.get('business_area_code', None)
+
+        if business_area_code:
+            if not business_area_code.isdigit():
+                raise ValidationError('business_area_code must be digit only')
+            else:
+                business_area_code = int(business_area_code)
+
+        try:
+            PeriodicTask.objects.get(task=task_name)
+        except PeriodicTask.DoesNotExist:
+            raise ValidationError('No task is found with name: ' + task_name)
+
+        try:
+            # Dynamic task module load
+            module_path_name, function_name = task_name.rsplit('.', 1)
+            module = importlib.import_module(module_path_name)
+            task_func = getattr(module, function_name)
+            task_func = task_func.delay
+        except Exception:
+            raise ValidationError('ERROR loading the task function: ' + task_name)
+
+        # Execute the task!
+        if not business_area_code:
+            task_func()
+        else:
+            if task_name == 'partner.tasks.process_partners':
+                task_func(area=business_area_code)
+
+            elif task_name == 'unicef.tasks.process_programme_documents':
+                task_func(fast=True, area=business_area_code)
+            else:
+                task_func()
+
+        return Response({
+            'task_name': task_name,
+            'status': 'started'
         })
