@@ -5,6 +5,7 @@ from .base import *
 
 
 DEBUG = True
+IS_DEV = False
 IS_STAGING = True
 
 # domains/hosts etc.
