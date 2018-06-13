@@ -624,6 +624,14 @@ class IndicatorReport(TimeStampedModel):
         return self.display_type == self.reportable.blueprint.NUMBER
 
     @property
+    def can_import(self):
+        if self.submission_date and self.report_status in [
+                INDICATOR_REPORT_STATUS.accepted,
+                INDICATOR_REPORT_STATUS.submitted]:
+            return False
+        return True
+
+    @property
     def can_submit(self):
         if self.submission_date is not None and self.report_status == INDICATOR_REPORT_STATUS.sent_back:
             pass  # lets go and check throw disaggregation
