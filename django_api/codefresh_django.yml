@@ -9,8 +9,8 @@ steps:
         working_directory: ${{main_clone}}/django_api
         tag: ${{CF_BRANCH}}
         build_arguments:
-            - env=$ENV
-            - requirement_file=$REQUIREMENT_FILE
+            - env=${{ENV}}
+            - requirement_file=${{REQUIREMENT_FILE}}
 
     # composition_step:
     #     type: composition
