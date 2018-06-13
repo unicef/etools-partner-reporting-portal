@@ -55,9 +55,17 @@ class IndicatorsXLSXReader(object):
                 try:
                     ild_id = str(int(self.sheet.cell(row=row, column=location_column_id).value))
 
+                    ind = IndicatorLocationData.objects.filter(pk=ild_id)
+
+                    # Check if indicator has parent (UNICEF)
+                    # If does, use parent to check partner
+                    if self.partner and ind.filter(indicator_report__parent__isnull=False):
+                        if not ind.filter(
+                                indicator_report__parent__reportable__partner_activities__project__partner=self.partner
+                        ).exists():
+                            return "Parent of Indicator ID " + ild_id + " does not belong to partner " + str(self.partner)
                     # Check if Partner is allowed to modify data
-                    if self.partner and IndicatorLocationData.objects.filter(
-                        pk=ild_id).filter(
+                    elif self.partner and ind.filter(
                             Q(**{
                                 'indicator_report__reportable__cluster_objectives'
                                 '__cluster__partner_projects__partner': self.partner
