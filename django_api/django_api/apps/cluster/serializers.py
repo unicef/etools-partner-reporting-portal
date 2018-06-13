@@ -5,6 +5,7 @@ from functools import reduce
 from django.db.models import Q, F
 
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from rest_framework_gis.fields import GeometryField, GeoJsonDict
 from rest_framework_gis.serializers import GeoFeatureModelSerializer, GeometrySerializerMethodField
 
@@ -45,6 +46,17 @@ class ClusterObjectiveSerializer(serializers.ModelSerializer):
             'cluster_title',
         )
 
+    def validate(self, data):
+        cluster = data['cluster']
+        user = self.context['request'].user
+
+        if cluster not in user.imo_clusters.all():
+            raise ValidationError({
+                "cluster": "Cluster does not belong to this user",
+            })
+
+        return data
+
 
 class ClusterObjectivePatchSerializer(ClusterObjectiveSerializer):
     title = serializers.CharField(required=False)
@@ -75,6 +87,17 @@ class ClusterActivitySerializer(serializers.ModelSerializer):
             'cluster_objective',
             'cluster_objective_title',
         )
+
+    def validate(self, data):
+        cluster = data['cluster']
+        user = self.context['request'].user
+
+        if cluster not in user.imo_clusters.all():
+            raise ValidationError({
+                "cluster": "Cluster does not belong to this user",
+            })
+
+        return data
 
 
 class ClusterActivityPatchSerializer(serializers.ModelSerializer):

@@ -19,10 +19,12 @@ from core.permissions import (
     IsIMOForCurrentWorkspaceCheck,
     IsPartnerAuthorizedOfficerCheck,
     AnyPermission,
+    IsPartnerEditor,
     IsAuthenticated,
     IsIMOForCurrentWorkspace,
     IsPartnerAuthorizedOfficerOrIMOForCurrentWorkspace,
     IsPartnerAuthorizedOfficer,
+    IsPartnerViewer,
 )
 from core.paginations import SmallPagination
 from core.serializers import ShortLocationSerializer
@@ -85,11 +87,8 @@ class ClusterListAPIView(ListAPIView):
     filter_class = ClusterFilter
 
     def get_queryset(self, *args, **kwargs):
-        queryset = Cluster.objects
         response_plan_id = self.kwargs.get(self.lookup_field)
-        if response_plan_id:
-            return queryset.filter(response_plan_id=response_plan_id)
-        return queryset.all()
+        return Cluster.objects.filter(response_plan_id=response_plan_id)
 
 
 class ClusterObjectiveAPIView(APIView):
@@ -133,7 +132,8 @@ class ClusterObjectiveAPIView(APIView):
 
         serializer = ClusterObjectivePatchSerializer(
             instance=self.get_instance(self.request, pk=pk),
-            data=self.request.data
+            data=self.request.data,
+            context={'request', request},
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -150,7 +150,8 @@ class ClusterObjectiveAPIView(APIView):
         if 'id' in self.request.data.keys():
             serializer = ClusterObjectiveSerializer(
                 instance=self.get_instance(self.request),
-                data=self.request.data
+                data=self.request.data,
+                context={'request', request},
             )
         else:
             raise ValidationError({"id": "This field is required!"})
@@ -202,7 +203,10 @@ class ClusterObjectiveListCreateAPIView(ListCreateAPIView):
         if not IsIMOForCurrentWorkspaceCheck(request):
             raise PermissionDenied
 
-        serializer = ClusterObjectiveSerializer(data=self.request.data)
+        serializer = ClusterObjectiveSerializer(
+            data=self.request.data,
+            context={'request': request},
+        )
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(
@@ -262,7 +266,8 @@ class ClusterActivityAPIView(APIView):
         if 'id' in self.request.data.keys():
             serializer = ClusterActivitySerializer(
                 instance=self.get_instance(self.request, pk=pk),
-                data=self.request.data
+                data=self.request.data,
+                context={'request': request},
             )
         else:
             raise ValidationError({"id": "This field is required!"})
@@ -314,7 +319,10 @@ class ClusterActivityListAPIView(ListCreateAPIView):
         if not IsIMOForCurrentWorkspaceCheck(request):
             raise PermissionDenied
 
-        serializer = ClusterActivitySerializer(data=self.request.data)
+        serializer = ClusterActivitySerializer(
+            data=self.request.data,
+            context={'request': request},
+        )
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({'id': serializer.instance.id},
@@ -343,7 +351,7 @@ class IndicatorReportsListAPIView(ListAPIView, RetrieveAPIView):
         - GET method - ClusterIndicatorReportSerializer object.
         - POST method - ClusterIndicatorReportSerializer object.
     """
-    permission_classes = (IsPartnerAuthorizedOfficerOrIMOForCurrentWorkspace, )
+    permission_classes = (IsAuthenticated, )
     serializer_class = ClusterIndicatorReportSerializer
     pagination_class = SmallPagination
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
@@ -368,7 +376,7 @@ class IndicatorReportsListAPIView(ListAPIView, RetrieveAPIView):
 
 class IndicatorReportDetailAPIView(RetrieveAPIView):
 
-    permission_classes = (IsPartnerAuthorizedOfficerOrIMOForCurrentWorkspace, )
+    permission_classes = (IsAuthenticated, )
     serializer_class = ClusterIndicatorReportSerializer
     get_queryset = IndicatorReportsListAPIView.get_queryset
 
@@ -385,7 +393,7 @@ class ClusterReportablesIdListAPIView(ListAPIView):
         - GET method - ReportableIdSerializer object.
         - POST method - ReportableIdSerializer object.
     """
-    permission_classes = (IsPartnerAuthorizedOfficerOrIMOForCurrentWorkspace, )
+    permission_classes = (IsAuthenticated, )
     serializer_class = ReportableIdSerializer
     pagination_class = filter_class = None
 
@@ -468,7 +476,7 @@ class ResponsePlanPartnerDashboardAPIView(ResponsePlanClusterDashboardAPIView):
     Returns:
         - GET method - ResponsePlanPartnerDashboardSerializer object.
     """
-    permission_classes = (IsPartnerAuthorizedOfficer, )
+    permission_classes = (AnyPermission(IsPartnerAuthorizedOfficer, IsPartnerEditor, IsPartnerViewer), )
 
     def get(self, request, response_plan_id, *args, **kwargs):
         response_plan = self.get_instance(request, response_plan_id)
@@ -497,7 +505,7 @@ class ResponsePlanPartnerDashboardAPIView(ResponsePlanClusterDashboardAPIView):
 
 class ClusterIndicatorsListExcelImportView(APIView):
 
-    permission_classes = (IsPartnerAuthorizedOfficerOrIMOForCurrentWorkspace,)
+    permission_classes = (AnyPermission(IsPartnerAuthorizedOfficer, IsIMOForCurrentWorkspace, IsPartnerEditor),)
 
     def post(self, request, response_plan_id, format=None):
 
@@ -543,7 +551,7 @@ class ClusterIndicatorsListExcelExportView(ListAPIView):
     Returns:
         - GET method - Cluster indicator list data as Excel file
     """
-    permission_classes = (IsPartnerAuthorizedOfficerOrIMOForCurrentWorkspace,)
+    permission_classes = (AnyPermission(IsPartnerAuthorizedOfficer, IsIMOForCurrentWorkspace, IsPartnerEditor),)
     serializer_class = ClusterIndicatorReportSerializer
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
     filter_class = ClusterIndicatorsFilter
@@ -599,7 +607,7 @@ class ClusterIndicatorsListExcelExportForAnalysisView(
     Returns:
         - GET method - Cluster indicator list data as Excel file
     """
-    permission_classes = (IsPartnerAuthorizedOfficerOrIMOForCurrentWorkspace,)
+    permission_classes = (IsIMOForCurrentWorkspace,)
 
     def list(self, request, response_plan_id, *args, **kwargs):
         # Render to excel
@@ -621,7 +629,7 @@ class ClusterIndicatorsLocationListAPIView(ListAPIView):
     Returns:
         - GET method - ShortLocationSerializer object list.
     """
-    permission_classes = (IsPartnerAuthorizedOfficerOrIMOForCurrentWorkspace,)
+    permission_classes = (IsAuthenticated,)
     serializer_class = ShortLocationSerializer
     lookup_field = lookup_url_kwarg = 'response_plan_id'
 
@@ -658,7 +666,7 @@ class PartnerAnalysisSummaryAPIView(APIView):
     Returns:
         - GET method - PartnerAnalysisSummarySerializer object.
     """
-    permission_classes = (IsPartnerAuthorizedOfficerOrIMOForCurrentWorkspace,)
+    permission_classes = (IsIMOForCurrentWorkspace,)
 
     def get(self, request, *args, **kwargs):
         if 'partner' not in request.query_params:
@@ -734,7 +742,7 @@ class PartnerAnalysisIndicatorResultAPIView(APIView):
     Returns:
         - GET method - ClusterPartnerAnalysisIndicatorResultSerializer object.
     """
-    permission_classes = (IsPartnerAuthorizedOfficerOrIMOForCurrentWorkspace,)
+    permission_classes = (IsIMOForCurrentWorkspace,)
 
     def get(self, request, response_plan_id, reportable_id, *args, **kwargs):
         reportable = get_object_or_404(Reportable, id=reportable_id)
@@ -757,7 +765,7 @@ class OperationalPresenceAggregationDataAPIView(APIView):
     Returns:
         - GET method - A JSON object of many aggregations.
     """
-    permission_classes = (IsPartnerAuthorizedOfficerOrIMOForCurrentWorkspace,)
+    permission_classes = (IsIMOForCurrentWorkspace,)
 
     def query_data(self, response_plan_id):
         response_plan = get_object_or_404(
@@ -850,7 +858,7 @@ class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
     Returns:
         - GET method - OperationalPresenceLocationListSerializer object list.
     """
-    permission_classes = (IsPartnerAuthorizedOfficerOrIMOForCurrentWorkspace,)
+    permission_classes = (IsIMOForCurrentWorkspace,)
     serializer_class = OperationalPresenceLocationListSerializer
     lookup_field = lookup_url_kwarg = 'response_plan_id'
 
@@ -977,7 +985,7 @@ class ClusterAnalysisIndicatorsListAPIView(GenericAPIView, ListModelMixin):
     Returns:
         - GET method - ClusterAnalysisIndicatorsListSerializer object list.
     """
-    permission_classes = (IsPartnerAuthorizedOfficerOrIMOForCurrentWorkspace,)
+    permission_classes = (IsIMOForCurrentWorkspace,)
     serializer_class = ClusterAnalysisIndicatorsListSerializer
     lookup_field = lookup_url_kwarg = 'response_plan_id'
 
@@ -1115,7 +1123,7 @@ class ClusterAnalysisIndicatorDetailsAPIView(APIView):
     Returns:
         - GET method - ClusterAnalysisIndicatorDetailSerializer object list.
     """
-    permission_classes = (IsPartnerAuthorizedOfficerOrIMOForCurrentWorkspace,)
+    permission_classes = (IsIMOForCurrentWorkspace,)
 
     def get(self, request, response_plan_id, reportable_id, *args, **kwargs):
         reportable = get_object_or_404(
