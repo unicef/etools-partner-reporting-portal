@@ -25,7 +25,6 @@ python-json-logger==0.1.7
 django-suit==0.2.21
 django-easy-pdf==0.1.1
 xhtml2pdf==0.2.1
-django-guardian==1.4.9
 Babel==2.5.3
 pycountry==18.2.23
 aiohttp==3.0.8

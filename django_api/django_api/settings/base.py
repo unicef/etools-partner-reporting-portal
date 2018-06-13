@@ -112,7 +112,6 @@ INSTALLED_APPS = [
     'easy_pdf',
     'django_cron',
     'fixture_magic',
-    'guardian',
     'social_django',
     'django_nose',
 
@@ -509,10 +508,8 @@ if not DISABLE_JWT_AUTH:
         'JWT_AUDIENCE': 'https://etools.unicef.org/',
     })
 
-# Django-Guardian
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',  # this is default
-    'guardian.backends.ObjectPermissionBackend',
 )
 
 TEST_RUNNER = 'utils.test_runner.CustomNoseTestSuiteRunner'
