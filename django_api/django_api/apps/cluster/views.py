@@ -17,12 +17,10 @@ import django_filters
 from core.common import PARTNER_TYPE
 from core.permissions import (
     IsIMOForCurrentWorkspaceCheck,
-    IsPartnerAuthorizedOfficerCheck,
     AnyPermission,
     IsPartnerEditor,
     IsAuthenticated,
     IsIMOForCurrentWorkspace,
-    IsPartnerAuthorizedOfficerOrIMOForCurrentWorkspace,
     IsPartnerAuthorizedOfficer,
     IsPartnerViewer,
 )

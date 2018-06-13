@@ -16,7 +16,6 @@ from core.permissions import (
     IsAuthenticated,
     IsIMO,
     AnyPermission,
-    IsPartnerEditorOrPartnerAuthorizedOfficer,
     IsPartnerAuthorizedOfficerCheck,
     IsIMOForCurrentWorkspaceCheck,
     IsPartnerAuthorizedOfficer,
