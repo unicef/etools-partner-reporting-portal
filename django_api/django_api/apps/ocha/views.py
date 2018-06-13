@@ -204,6 +204,13 @@ class RPMProjectDetailAPIView(APIView):
                 fs['name'] for fs in flow.get('sourceObjects', []) if fs['type'] == 'Organization'
             ])
         out_data['fundingSources'] = funding_sources
+        out_data['objective'] = current_project_data['objective']
+        additional_information = list()
+        if 'contacts' in current_project_data:
+            for contact in current_project_data['contacts']:
+                if "website" in contact and contact['website']:
+                    additional_information.append(contact['website'])
+        out_data['additional_information'] = ", ".join(additional_information)
 
         start_datetime = parse(out_data['startDate'])
         end_datetime = parse(out_data['endDate'])
