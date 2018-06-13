@@ -12,6 +12,7 @@ class ClusterResponsePlanSerializer(serializers.ModelSerializer):
     type = serializers.CharField(read_only=True)
     title = serializers.CharField(read_only=True,
                                   source='get_type_display')
+    imported_type = serializers.CharField(read_only=True)
 
     class Meta:
         model = Cluster
@@ -19,7 +20,8 @@ class ClusterResponsePlanSerializer(serializers.ModelSerializer):
             'id',
             'type',
             'title',
-            'response_plan'
+            'response_plan',
+            'imported_type',
         )
         depth = 1
 
