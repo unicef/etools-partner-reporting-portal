@@ -8,6 +8,7 @@ from .base import *
 # dev overrides
 DEBUG = True
 IS_DEV = True
+IS_STAGING = False
 
 # domains/hosts etc.
 DOMAIN_NAME = os.getenv('DOMAIN_NAME', '127.0.0.1:8082')

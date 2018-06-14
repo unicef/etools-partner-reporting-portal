@@ -63,7 +63,10 @@ class IndicatorsXLSXReader(object):
                         if not ind.filter(
                                 indicator_report__parent__reportable__partner_activities__partner=self.partner
                         ).exists():
-                            return "Parent of Indicator ID " + ild_id + " does not belong to partner " + str(self.partner)
+                            return "Parent of Indicator ID " \
+                                + ild_id \
+                                + " does not belong to partner " \
+                                + str(self.partner)
                     # Check if Partner is allowed to modify data
                     elif self.partner and ind.filter(
                             Q(**{

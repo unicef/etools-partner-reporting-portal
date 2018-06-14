@@ -40,7 +40,7 @@ urlpatterns = [
     url(r'^social/', include('social_django.urls', namespace='social')),
 ]
 
-if settings.DEBUG:
+if settings.DEBUG and settings.IS_DEV:
     import debug_toolbar
     urlpatterns = [
         url(r'^__debug__/', include(debug_toolbar.urls)),
