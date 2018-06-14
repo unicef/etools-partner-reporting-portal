@@ -345,7 +345,7 @@ class Reportable(TimeStampedExternalSourceModel):
     def progress_percentage(self):
         percentage = 0.0
 
-        if self.achieved and self.baseline is not None and self.target is not None:
+        if self.achieved and self.baseline['v'] is not None and self.target['v'] is not None:
             baseline = float(self.calculated_baseline)
             target = float(self.calculated_target)
 

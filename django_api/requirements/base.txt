@@ -3,6 +3,7 @@ Django==1.11.11
 django-redis==4.9.0
 django-nose==1.4.5
 nose-timer==0.7.1
+django-extensions==1.7.7
 
 #apm
 elastic-apm==2.0.0
@@ -25,7 +26,6 @@ python-json-logger==0.1.7
 django-suit==0.2.21
 django-easy-pdf==0.1.1
 xhtml2pdf==0.2.1
-django-guardian==1.4.9
 Babel==2.5.3
 pycountry==18.2.23
 aiohttp==3.0.8
