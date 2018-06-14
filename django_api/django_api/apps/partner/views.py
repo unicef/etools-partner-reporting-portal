@@ -12,7 +12,16 @@ import django_filters
 
 from core.models import IMORole
 from core.paginations import SmallPagination
-from core.permissions import IsAuthenticated
+from core.permissions import (
+    IsAuthenticated,
+    IsIMO,
+    AnyPermission,
+    IsPartnerAuthorizedOfficerCheck,
+    IsIMOForCurrentWorkspaceCheck,
+    IsPartnerAuthorizedOfficer,
+    IsPartnerEditor,
+    IsPartnerViewer,
+)
 from .serializers import (
     PartnerDetailsSerializer,
     PartnerProjectSerializer,
@@ -33,7 +42,7 @@ class PartnerDetailsAPIView(RetrieveAPIView):
     Endpoint for getting Partner Details for overview tab.
     """
     serializer_class = PartnerDetailsSerializer
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (AnyPermission(IsPartnerViewer, IsPartnerEditor, IsPartnerAuthorizedOfficer), )
 
     def get(self, request, *args, **kwargs):
         """
@@ -76,6 +85,9 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
         """
         Create on PartnerProject model
         """
+        if not IsPartnerAuthorizedOfficerCheck(request) and not IsIMOForCurrentWorkspaceCheck(request):
+            raise PermissionDenied
+
         partner_id = self.kwargs.get('partner_id')
 
         if partner_id:
@@ -120,6 +132,9 @@ class PartnerProjectAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def patch(self, request, *args, **kwargs):
+        if not IsPartnerAuthorizedOfficerCheck(request) and not IsIMOForCurrentWorkspaceCheck(request):
+            raise PermissionDenied
+
         partner_id = self.kwargs.get('partner_id')
 
         if partner_id:
@@ -140,11 +155,6 @@ class PartnerProjectAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def delete(self, *args, **kwargs):
-        instance = self.get_instance()
-        instance.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class PartnerProjectSimpleListAPIView(ListAPIView):
@@ -176,8 +186,7 @@ class PartnerActivityCreateAPIView(CreateAPIView):
     """
     PartnerActivityCreateAPIView CRUD endpoint
     """
-    # TODO: Implement Object-level permission for IMO
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (AnyPermission(IsIMO, IsPartnerAuthorizedOfficer), )
 
     def post(self, request, create_mode, *args, **kwargs):
         """
@@ -223,7 +232,7 @@ class PartnerActivityUpdateAPIView(UpdateAPIView):
     """
     PartnerActivityUpdateAPIView CRUD endpoint
     """
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (AnyPermission(IsIMO, IsPartnerAuthorizedOfficer), )
     serializer_class = PartnerActivityUpdateSerializer
 
     def get_queryset(self):
@@ -264,7 +273,7 @@ class PartnerActivityUpdateAPIView(UpdateAPIView):
 class ClusterActivityPartnersAPIView(ListAPIView):
 
     serializer_class = ClusterActivityPartnersSerializer
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (AnyPermission(IsIMO, IsPartnerEditor, IsPartnerViewer, IsPartnerAuthorizedOfficer), )
     pagination_class = SmallPagination
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     filter_class = ClusterActivityPartnersFilter
@@ -279,7 +288,7 @@ class ClusterActivityPartnersAPIView(ListAPIView):
 class PartnerActivityListAPIView(ListAPIView):
 
     serializer_class = PartnerActivitySerializer
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (AnyPermission(IsIMO, IsPartnerEditor, IsPartnerViewer, IsPartnerAuthorizedOfficer), )
     pagination_class = SmallPagination
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     filter_class = PartnerActivityFilter
@@ -310,7 +319,7 @@ class PartnerActivityAPIView(RetrieveAPIView):
     Endpoint for getting Partner Activity Details for overview tab.
     """
     serializer_class = PartnerActivitySerializer
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (AnyPermission(IsIMO, IsPartnerEditor, IsPartnerViewer, IsPartnerAuthorizedOfficer), )
 
     def get(self, request, response_plan_id, pk, *args, **kwargs):
         """

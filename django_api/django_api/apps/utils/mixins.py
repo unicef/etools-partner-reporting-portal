@@ -1,8 +1,15 @@
 import jwt
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
+
 from rest_framework.exceptions import PermissionDenied, AuthenticationFailed
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication, jwt_decode_handler
+
+from core.permissions import (
+    IsPartnerAuthorizedOfficerCheck,
+    IsIMOForCurrentWorkspaceCheck,
+)
 
 
 class CustomJSONWebTokenAuthentication(JSONWebTokenAuthentication):
@@ -47,6 +54,9 @@ class ListExportMixin(object):
     exporters = {}
 
     def get(self, request, *args, **kwargs):
+        if not IsPartnerAuthorizedOfficerCheck(request) and not IsIMOForCurrentWorkspaceCheck(request):
+            raise PermissionDenied
+
         exporter_class = self.exporters.get(self.request.query_params.get(self.export_url_kwarg))
         if exporter_class:
             return exporter_class(
@@ -62,6 +72,9 @@ class ObjectExportMixin(object):
     exporters = {}
 
     def get(self, request, *args, **kwargs):
+        if not IsPartnerAuthorizedOfficerCheck(request) and not IsIMOForCurrentWorkspaceCheck(request):
+            raise PermissionDenied
+
         exporter_class = self.exporters.get(self.request.query_params.get(self.export_url_kwarg))
         if exporter_class:
             return exporter_class(self.get_object()).get_as_response()
