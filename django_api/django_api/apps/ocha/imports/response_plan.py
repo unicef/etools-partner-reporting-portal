@@ -41,8 +41,18 @@ def save_activities_and_objectives_for_response_plan(entities_response={}, measu
 
     for activity in activities:
         try:
+            activity_data = activity['value']['support']
+
+            # Cameroon data is different format
+            # 'support': {'0': {'planEntityIds': []}}
+            if isinstance(activity_data, dict):
+                new_activity_data = list()
+                for value in activity_data.values():
+                    new_activity_data.append(value)
+            activity_data = new_activity_data
+
             parent_objective_ids = list(itertools.chain(*[
-                s['planEntityIds'] for s in activity['value']['support']
+                s['planEntityIds'] for s in activity_data
             ]))
 
             if len(parent_objective_ids) > 1:
