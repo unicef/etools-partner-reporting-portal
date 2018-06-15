@@ -40,6 +40,26 @@ class ReportingPeriodDatesSerializer(serializers.ModelSerializer):
         )
 
 
+class ProgrammeDocumentSimpleSerializer(serializers.ModelSerializer):
+    status = serializers.CharField(source='get_status_display')
+    document_type_display = serializers.CharField(source='get_document_type_display')
+
+    class Meta:
+        model = ProgrammeDocument
+        fields = (
+            'id',
+            'external_id',
+            'agreement',
+            'reference_number',
+            'title',
+            'start_date',
+            'end_date',
+            'status',
+            'document_type',
+            'document_type_display',
+        )
+
+
 class ProgrammeDocumentSerializer(serializers.ModelSerializer):
 
     id = serializers.SerializerMethodField()
@@ -208,7 +228,7 @@ class ProgrammeDocumentOutputSerializer(serializers.ModelSerializer):
 
 
 class ProgressReportSimpleSerializer(serializers.ModelSerializer):
-    programme_document = ProgrammeDocumentSerializer()
+    programme_document = ProgrammeDocumentSimpleSerializer()
     reporting_period = serializers.SerializerMethodField()
     is_draft = serializers.SerializerMethodField()
     review_overall_status_display = serializers.CharField(
@@ -514,7 +534,7 @@ class ProgrammeDocumentProgressSerializer(serializers.ModelSerializer):
         return ProgrammeDocumentOutputSerializer(obj).data
 
     def get_latest_accepted_pr(self, obj):
-        qset = ProgressReport.objects.filter(
+        qset = obj.progress_reports.filter(
             status=PROGRESS_REPORT_STATUS.accepted,
             report_type="QPR").order_by('-end_date')
         if qset:
@@ -528,7 +548,7 @@ class ProgrammeDocumentProgressSerializer(serializers.ModelSerializer):
         Return data about the latest accepted indicator report associated
         with this PD (if any).
         """
-        qset = ProgressReport.objects.filter(
+        qset = obj.progress_reports.filter(
             status=PROGRESS_REPORT_STATUS.accepted,
             report_type="QPR").order_by('-end_date')
         if qset:

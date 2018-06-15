@@ -4,18 +4,26 @@ from django.db.models import Q
 from django.contrib.gis.db.models.functions import AsGeoJSON
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
-from rest_framework.exceptions import ValidationError
 
+from rest_framework import status as statuses
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveAPIView, GenericAPIView
 from rest_framework.mixins import ListModelMixin
-from rest_framework import status as statuses
+from rest_framework.exceptions import ValidationError, PermissionDenied
 
 import django_filters
 
 from core.common import PARTNER_TYPE
-from core.permissions import IsAuthenticated
+from core.permissions import (
+    IsIMOForCurrentWorkspaceCheck,
+    AnyPermission,
+    IsPartnerEditor,
+    IsAuthenticated,
+    IsIMOForCurrentWorkspace,
+    IsPartnerAuthorizedOfficer,
+    IsPartnerViewer,
+)
 from core.paginations import SmallPagination
 from core.serializers import ShortLocationSerializer
 from core.models import Location, ResponsePlan, IMORole
@@ -77,11 +85,8 @@ class ClusterListAPIView(ListAPIView):
     filter_class = ClusterFilter
 
     def get_queryset(self, *args, **kwargs):
-        queryset = Cluster.objects
         response_plan_id = self.kwargs.get(self.lookup_field)
-        if response_plan_id:
-            return queryset.filter(response_plan_id=response_plan_id)
-        return queryset.all()
+        return Cluster.objects.filter(response_plan_id=response_plan_id)
 
 
 class ClusterObjectiveAPIView(APIView):
@@ -96,7 +101,6 @@ class ClusterObjectiveAPIView(APIView):
         - GET method - ClusterSimpleSerializer object.
         - PATCH method - ClusterObjectivePatchSerializer object.
         - PUT method - ClusterObjectiveSerializer object.
-        - DELETE method - 204 response code
     """
     serializer_class = ClusterObjectiveSerializer
     permission_classes = (IsAuthenticated, )
@@ -121,9 +125,13 @@ class ClusterObjectiveAPIView(APIView):
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
     def patch(self, request, pk, *args, **kwargs):
+        if not IsIMOForCurrentWorkspaceCheck(request):
+            raise PermissionDenied
+
         serializer = ClusterObjectivePatchSerializer(
             instance=self.get_instance(self.request, pk=pk),
-            data=self.request.data
+            data=self.request.data,
+            context={'request', request},
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -134,10 +142,14 @@ class ClusterObjectiveAPIView(APIView):
         Update on ClusterObjective model
         :return: ClusterObjective serializer data
         """
+        if not IsIMOForCurrentWorkspaceCheck(request):
+            raise PermissionDenied
+
         if 'id' in self.request.data.keys():
             serializer = ClusterObjectiveSerializer(
                 instance=self.get_instance(self.request),
-                data=self.request.data
+                data=self.request.data,
+                context={'request', request},
             )
         else:
             raise ValidationError({"id": "This field is required!"})
@@ -145,11 +157,6 @@ class ClusterObjectiveAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=statuses.HTTP_200_OK)
-
-    def delete(self, request, *args, **kwargs):
-        instance = self.get_instance(request)
-        instance.delete()
-        return Response(status=statuses.HTTP_204_NO_CONTENT)
 
 
 class ClusterObjectiveListCreateAPIView(ListCreateAPIView):
@@ -191,7 +198,13 @@ class ClusterObjectiveListCreateAPIView(ListCreateAPIView):
         Create on ClusterObjective model
         :return: ClusterObjective object id
         """
-        serializer = ClusterObjectiveSerializer(data=self.request.data)
+        if not IsIMOForCurrentWorkspaceCheck(request):
+            raise PermissionDenied
+
+        serializer = ClusterObjectiveSerializer(
+            data=self.request.data,
+            context={'request': request},
+        )
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(
@@ -211,7 +224,6 @@ class ClusterActivityAPIView(APIView):
         - GET method - ClusterActivitySerializer object.
         - PATCH method - ClusterActivityPatchSerializer object.
         - PUT method - ClusterActivitySerializer object.
-        - DELETE method - 204 response code
     """
     permission_classes = (IsAuthenticated, )
 
@@ -230,6 +242,9 @@ class ClusterActivityAPIView(APIView):
         return Response(serializer.data, status=statuses.HTTP_200_OK)
 
     def patch(self, request, pk, *args, **kwargs):
+        if not IsIMOForCurrentWorkspaceCheck(request):
+            raise PermissionDenied
+
         serializer = ClusterActivityPatchSerializer(
             instance=self.get_instance(self.request, pk),
             data=self.request.data
@@ -243,10 +258,14 @@ class ClusterActivityAPIView(APIView):
         Update on ClusterActivity model
         :return: ClusterActivity serializer data
         """
+        if not IsIMOForCurrentWorkspaceCheck(request):
+            raise PermissionDenied
+
         if 'id' in self.request.data.keys():
             serializer = ClusterActivitySerializer(
                 instance=self.get_instance(self.request, pk=pk),
-                data=self.request.data
+                data=self.request.data,
+                context={'request': request},
             )
         else:
             raise ValidationError({"id": "This field is required!"})
@@ -254,11 +273,6 @@ class ClusterActivityAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=statuses.HTTP_200_OK)
-
-    def delete(self, request, pk, *args, **kwargs):
-        instance = self.get_instance(request, pk)
-        instance.delete()
-        return Response(status=statuses.HTTP_204_NO_CONTENT)
 
 
 class ClusterActivityListAPIView(ListCreateAPIView):
@@ -300,14 +314,20 @@ class ClusterActivityListAPIView(ListCreateAPIView):
         Create on ClusterActivity model
         :return: ClusterActivity object id
         """
-        serializer = ClusterActivitySerializer(data=self.request.data)
+        if not IsIMOForCurrentWorkspaceCheck(request):
+            raise PermissionDenied
+
+        serializer = ClusterActivitySerializer(
+            data=self.request.data,
+            context={'request': request},
+        )
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({'id': serializer.instance.id},
                         status=statuses.HTTP_201_CREATED)
 
 
-class IndicatorReportsListAPIView(ListCreateAPIView, RetrieveAPIView):
+class IndicatorReportsListAPIView(ListAPIView, RetrieveAPIView):
     """
     Cluster IndicatorReport object list API - GET/POST
     Authentication required.
@@ -371,6 +391,7 @@ class ClusterReportablesIdListAPIView(ListAPIView):
         - GET method - ReportableIdSerializer object.
         - POST method - ReportableIdSerializer object.
     """
+    permission_classes = (IsAuthenticated, )
     serializer_class = ReportableIdSerializer
     pagination_class = filter_class = None
 
@@ -406,7 +427,7 @@ class ResponsePlanClusterDashboardAPIView(APIView):
     Returns:
         - GET method - ClusterDashboardSerializer object.
     """
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsIMOForCurrentWorkspace, )
 
     def get_instance(self, request, response_plan_id=None):
         try:
@@ -453,7 +474,7 @@ class ResponsePlanPartnerDashboardAPIView(ResponsePlanClusterDashboardAPIView):
     Returns:
         - GET method - ResponsePlanPartnerDashboardSerializer object.
     """
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (AnyPermission(IsPartnerAuthorizedOfficer, IsPartnerEditor, IsPartnerViewer), )
 
     def get(self, request, response_plan_id, *args, **kwargs):
         response_plan = self.get_instance(request, response_plan_id)
@@ -482,7 +503,7 @@ class ResponsePlanPartnerDashboardAPIView(ResponsePlanClusterDashboardAPIView):
 
 class ClusterIndicatorsListExcelImportView(APIView):
 
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AnyPermission(IsPartnerAuthorizedOfficer, IsIMOForCurrentWorkspace, IsPartnerEditor),)
 
     def post(self, request, response_plan_id, format=None):
 
@@ -528,7 +549,7 @@ class ClusterIndicatorsListExcelExportView(ListAPIView):
     Returns:
         - GET method - Cluster indicator list data as Excel file
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AnyPermission(IsPartnerAuthorizedOfficer, IsIMOForCurrentWorkspace, IsPartnerEditor),)
     serializer_class = ClusterIndicatorReportSerializer
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
     filter_class = ClusterIndicatorsFilter
@@ -584,6 +605,7 @@ class ClusterIndicatorsListExcelExportForAnalysisView(
     Returns:
         - GET method - Cluster indicator list data as Excel file
     """
+    permission_classes = (IsIMOForCurrentWorkspace,)
 
     def list(self, request, response_plan_id, *args, **kwargs):
         # Render to excel
@@ -605,7 +627,7 @@ class ClusterIndicatorsLocationListAPIView(ListAPIView):
     Returns:
         - GET method - ShortLocationSerializer object list.
     """
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,)
     serializer_class = ShortLocationSerializer
     lookup_field = lookup_url_kwarg = 'response_plan_id'
 
@@ -642,7 +664,7 @@ class PartnerAnalysisSummaryAPIView(APIView):
     Returns:
         - GET method - PartnerAnalysisSummarySerializer object.
     """
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsIMOForCurrentWorkspace,)
 
     def get(self, request, *args, **kwargs):
         if 'partner' not in request.query_params:
@@ -718,7 +740,7 @@ class PartnerAnalysisIndicatorResultAPIView(APIView):
     Returns:
         - GET method - ClusterPartnerAnalysisIndicatorResultSerializer object.
     """
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsIMOForCurrentWorkspace,)
 
     def get(self, request, response_plan_id, reportable_id, *args, **kwargs):
         reportable = get_object_or_404(Reportable, id=reportable_id)
@@ -741,7 +763,7 @@ class OperationalPresenceAggregationDataAPIView(APIView):
     Returns:
         - GET method - A JSON object of many aggregations.
     """
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsIMOForCurrentWorkspace,)
 
     def query_data(self, response_plan_id):
         response_plan = get_object_or_404(
@@ -834,7 +856,7 @@ class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
     Returns:
         - GET method - OperationalPresenceLocationListSerializer object list.
     """
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsIMOForCurrentWorkspace,)
     serializer_class = OperationalPresenceLocationListSerializer
     lookup_field = lookup_url_kwarg = 'response_plan_id'
 
@@ -961,7 +983,7 @@ class ClusterAnalysisIndicatorsListAPIView(GenericAPIView, ListModelMixin):
     Returns:
         - GET method - ClusterAnalysisIndicatorsListSerializer object list.
     """
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsIMOForCurrentWorkspace,)
     serializer_class = ClusterAnalysisIndicatorsListSerializer
     lookup_field = lookup_url_kwarg = 'response_plan_id'
 
@@ -1099,7 +1121,7 @@ class ClusterAnalysisIndicatorDetailsAPIView(APIView):
     Returns:
         - GET method - ClusterAnalysisIndicatorDetailSerializer object list.
     """
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsIMOForCurrentWorkspace,)
 
     def get(self, request, response_plan_id, reportable_id, *args, **kwargs):
         reportable = get_object_or_404(

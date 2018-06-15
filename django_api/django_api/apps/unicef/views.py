@@ -28,7 +28,9 @@ from core.paginations import SmallPagination
 from core.permissions import (
     IsAuthenticated,
     IsPartnerAuthorizedOfficer,
-    IsPartnerEditorOrPartnerAuthorizedOfficer
+    AnyPermission,
+    IsPartnerEditor,
+    IsPartnerViewer,
 )
 from core.models import Location, PartnerAuthorizedOfficerRole
 from core.serializers import ShortLocationSerializer
@@ -83,7 +85,7 @@ class ProgrammeDocumentAPIView(ListExportMixin, ListAPIView):
     filter by them.
     """
     serializer_class = ProgrammeDocumentSerializer
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (AnyPermission(IsPartnerAuthorizedOfficer, IsPartnerEditor, IsPartnerViewer), )
     pagination_class = SmallPagination
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     filter_class = ProgrammeDocumentFilter
@@ -101,7 +103,7 @@ class ProgrammeDocumentAPIView(ListExportMixin, ListAPIView):
 class ProgrammeDocumentDetailsAPIView(RetrieveAPIView):
 
     serializer_class = ProgrammeDocumentDetailSerializer
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (AnyPermission(IsPartnerAuthorizedOfficer, IsPartnerEditor, IsPartnerViewer), )
     lookup_url_kwarg = 'pd_id'
 
     def get(self, request, workspace_id, pd_id, *args, **kwargs):
@@ -133,7 +135,7 @@ class ProgrammeDocumentDetailsAPIView(RetrieveAPIView):
 class ProgrammeDocumentProgressAPIView(RetrieveAPIView):
 
     serializer_class = ProgrammeDocumentProgressSerializer
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (AnyPermission(IsPartnerAuthorizedOfficer, IsPartnerEditor, IsPartnerViewer), )
     lookup_url_kwarg = 'pd_id'
 
     def get(self, request, workspace_id, pd_id, *args, **kwargs):
@@ -194,6 +196,7 @@ class ProgrammeDocumentIndicatorsAPIView(ListExportMixin, ListAPIView):
         'xlsx': ReportableListXLSXExporter,
         'pdf': ReportableListPDFExporter,
     }
+    permission_classes = (AnyPermission(IsPartnerAuthorizedOfficer, IsPartnerEditor, IsPartnerViewer), )
 
     def get_queryset(self):
         programme_documents = ProgrammeDocument.objects.filter(
@@ -215,7 +218,7 @@ class ProgressReportAPIView(ListExportMixin, ListAPIView):
     """
     serializer_class = ProgressReportSimpleSerializer
     pagination_class = SmallPagination
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (AnyPermission(IsPartnerAuthorizedOfficer, IsPartnerEditor, IsPartnerViewer), )
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     filter_class = ProgressReportFilter
     exporters = {
@@ -272,6 +275,7 @@ class ProgressReportAnnexCPDFView(RetrieveAPIView):
     Endpoint for getting PDF of Progress Report Annex C.
     """
     queryset = ProgressReport.objects.all()
+    permission_classes = (AnyPermission(IsPartnerAuthorizedOfficer, IsPartnerEditor), )
 
     def get(self, request, *args, **kwargs):
         report = self.get_object()
@@ -298,8 +302,7 @@ class ProgressReportDetailsUpdateAPIView(APIView):
         Endpoint for updating Progress Report narrative fields
     """
     permission_classes = (
-        IsAuthenticated,
-        IsPartnerEditorOrPartnerAuthorizedOfficer,
+        AnyPermission(IsPartnerAuthorizedOfficer, IsPartnerEditor),
     )
 
     def get_object(self, pk):
@@ -337,7 +340,7 @@ class ProgressReportDetailsAPIView(ObjectExportMixin, RetrieveAPIView):
     Endpoint for getting a single Progress Report
     """
     serializer_class = ProgressReportSerializer
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (AnyPermission(IsPartnerAuthorizedOfficer, IsPartnerEditor, IsPartnerViewer), )
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     exporters = {
         'pdf': ProgressReportDetailPDFExporter,
@@ -367,7 +370,7 @@ class ProgressReportDetailsAPIView(ObjectExportMixin, RetrieveAPIView):
 class ProgressReportIndicatorsAPIView(ListAPIView):
     serializer_class = PDReportContextIndicatorReportSerializer
     pagination_class = SmallPagination
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AnyPermission(IsPartnerAuthorizedOfficer, IsPartnerEditor, IsPartnerViewer), )
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
     filter_class = PDReportsFilter
 
@@ -438,7 +441,7 @@ class ProgressReportSubmitAPIView(APIView):
     """
     Only a partner authorized officer can submit a progress report.
     """
-    permission_classes = (IsAuthenticated, IsPartnerAuthorizedOfficer)
+    permission_classes = (IsPartnerAuthorizedOfficer,)
 
     def get_object(self):
         try:
@@ -563,7 +566,7 @@ class ProgressReportSRSubmitAPIView(APIView):
     A dedicated API endpoint for submitting SR Progress Report.
     Only a partner authorized officer can submit a progress report.
     """
-    permission_classes = (IsAuthenticated, IsPartnerAuthorizedOfficer)
+    permission_classes = (IsPartnerAuthorizedOfficer,)
 
     def get_object(self):
         try:
@@ -645,7 +648,7 @@ class ProgressReportPullHFDataAPIView(APIView):
     to pull data from LLO Reportable's IndicatorLocationData on HR ProgressReports
     with overlapping start and end date period to QPR end date.
     """
-    permission_classes = (IsAuthenticated, IsPartnerAuthorizedOfficer)
+    permission_classes = (IsPartnerAuthorizedOfficer,)
 
     def get_object(self):
         try:
@@ -807,7 +810,7 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
     Only partner authorized officer and partner editor can change the
     calculation methods.
     """
-    permission_classes = (IsAuthenticated, CanChangePDCalculationMethod)
+    permission_classes = (CanChangePDCalculationMethod,)
     serializer_class = ProgrammeDocumentCalculationMethodsSerializer
 
     def get(self, request, workspace_id, pd_id):
@@ -897,7 +900,7 @@ class ProgrammeDocumentCalculationMethodsAPIView(APIView):
 
 
 class ProgressReportAttachmentAPIView(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AnyPermission(IsPartnerAuthorizedOfficer, IsPartnerEditor), )
     parser_classes = (FormParser, MultiPartParser, FileUploadParser)
 
     def get(self, request, workspace_id, progress_report_id):

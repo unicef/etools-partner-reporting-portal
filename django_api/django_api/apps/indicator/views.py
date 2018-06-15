@@ -20,6 +20,10 @@ from core.permissions import (
     IsAuthenticated,
     IsPartnerEditorOrPartnerAuthorizedOfficer,
     IsIMO,
+    IsPartnerEditor,
+    IsPartnerViewer,
+    IsPartnerAuthorizedOfficer,
+    AnyPermission,
 )
 from core.paginations import SmallPagination
 from core.models import Location
@@ -91,7 +95,7 @@ class PDReportsAPIView(ListAPIView):
 
     serializer_class = PDReportContextIndicatorReportSerializer
     pagination_class = SmallPagination
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (AnyPermission(IsPartnerEditor, IsPartnerViewer, IsPartnerAuthorizedOfficer), )
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     filter_class = PDReportsFilter
 
@@ -125,7 +129,7 @@ class PDReportsAPIView(ListAPIView):
 class PDReportsDetailAPIView(RetrieveAPIView):
 
     serializer_class = PDReportContextIndicatorReportSerializer
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (AnyPermission(IsPartnerEditor, IsPartnerViewer, IsPartnerAuthorizedOfficer), )
 
     def get_indicator_report(self, report_id):
         try:
@@ -163,6 +167,7 @@ class IndicatorListAPIView(ListAPIView):
      - /api/indicator/<content_object>/?content_object=co,object_id=34    [for cluster objective indicators]
      - /api/indicator/<content_object>/                                   [will throw exception]
     """
+    permission_classes = (AnyPermission(IsIMO, IsPartnerEditor, IsPartnerViewer, IsPartnerAuthorizedOfficer), )
     serializer_class = IndicatorListSerializer
     pagination_class = SmallPagination
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
@@ -253,7 +258,7 @@ class ReportableDetailAPIView(RetrieveAPIView):
     """
     serializer_class = IndicatorListSerializer
     queryset = Reportable.objects.all()
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (AnyPermission(IsIMO, IsPartnerEditor, IsPartnerViewer, IsPartnerAuthorizedOfficer), )
     lookup_url_kwarg = 'reportable_id'
 
     def patch(self, request, reportable_id, *args, **kwargs):
@@ -266,7 +271,7 @@ class ReportableLocationGoalBaselineInNeedAPIView(ListAPIView, UpdateAPIView):
     Reserved for IMO only.
     """
     serializer_class = ReportableLocationGoalBaselineInNeedSerializer
-    permission_classes = (IsAuthenticated, IsIMO,)
+    permission_classes = (IsIMO,)
     lookup_url_kwarg = 'reportable_id'
 
     def get_queryset(self, *args, **kwargs):
@@ -316,7 +321,7 @@ class IndicatorDataAPIView(APIView):
     TODO: check on the GET data being sent / used in the frontend and other
     HTTP operations being opened here.
     """
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (AnyPermission(IsIMO, IsPartnerEditor, IsPartnerAuthorizedOfficer), )
 
     def get_queryset(self, id):
         queryset = Reportable.objects.filter(
@@ -413,12 +418,12 @@ class IndicatorDataAPIView(APIView):
         if ir.submission_date is None or ir.report_status == INDICATOR_REPORT_STATUS.sent_back:
             ir.submission_date = date.today()
 
-            # set status on progress report
+            # Throw validation error if Indicator report is being submitted directly without its Progress Report
             if ir.progress_report is not None:
-                ir.report_status = INDICATOR_REPORT_STATUS.submitted
-                ir.save()
-                ir.progress_report.status = PROGRESS_REPORT_STATUS.submitted
-                ir.progress_report.save()
+                raise ValidationError(
+                    "This indicator report has Progress Report linked. Please submit the progress report for"
+                    "this indicator report instead."
+                )
             else:
                 # cluster IR's go to accepted directly
                 ir.report_status = INDICATOR_REPORT_STATUS.accepted
@@ -459,7 +464,6 @@ class PDLowerLevelOutputStatusAPIView(APIView):
     """
     serializer_class = OverallNarrativeSerializer
     permission_classes = (
-        IsAuthenticated,
         IsPartnerEditorOrPartnerAuthorizedOfficer,
     )
 
@@ -504,6 +508,7 @@ class IndicatorReportListAPIView(APIView):
     ideal design, since frontend is sending to this endpoint with irrelevant
     reportable_id many times.
     """
+    permission_classes = (AnyPermission(IsIMO, IsPartnerEditor, IsPartnerViewer, IsPartnerAuthorizedOfficer), )
 
     def get_queryset(self, *args, **kwargs):
         pks = self.request.query_params.get('pks', None)
@@ -590,6 +595,7 @@ class IndicatorLocationDataUpdateAPIView(APIView):
     """
     REST API endpoint to update one IndicatorLocationData, including disaggregation data.
     """
+    permission_classes = (AnyPermission(IsIMO, IsPartnerEditor, IsPartnerAuthorizedOfficer), )
 
     def get_object(self, request, pk=None):
         return get_object_or_404(IndicatorLocationData, id=pk)
@@ -648,7 +654,7 @@ class ClusterIndicatorAPIView(CreateAPIView, UpdateAPIView):
     """
 
     serializer_class = ClusterIndicatorSerializer
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (AnyPermission(IsIMO, IsPartnerEditor, IsPartnerAuthorizedOfficer), )
     queryset = Reportable.objects.all()
 
     def get_object(self):
@@ -685,7 +691,7 @@ class ClusterIndicatorSendIMOMessageAPIView(APIView):
     """
 
     permission_classes = (
-        IsPartnerEditorOrPartnerAuthorizedOfficer,
+        AnyPermission(IsPartnerEditor, IsPartnerAuthorizedOfficer),
     )
 
     def post(self, request, *args, **kwargs):
