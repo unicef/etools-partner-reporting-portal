@@ -154,7 +154,7 @@ class IndicatorsXLSXReader(object):
                             else:
                                 if isinstance(value, datetime):
                                     transaction.rollback()
-                                    return "Value in column {}, row {} is DateTime. Please format row to Plain Text."\
+                                    return "Value in column {}, row {} is Date Time. Please format row to Plain Text."\
                                         .format(self.sheet.cell(row=4, column=column).value, row)
                                 values = value.split("/")
                                 data[dis_type_id]["v"] = int(values[0])
