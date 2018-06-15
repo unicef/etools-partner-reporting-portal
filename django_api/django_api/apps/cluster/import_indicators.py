@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import traceback
+from datetime import datetime
 from django.db.models import Q
 from django.db import transaction
 
@@ -151,9 +152,13 @@ class IndicatorsXLSXReader(object):
                             if blueprint.unit == IndicatorBlueprint.NUMBER:
                                 data[dis_type_id]["v"] = value
                             else:
-                                v, d = value.split("/")
-                                data[dis_type_id]["v"] = int(v)
-                                data[dis_type_id]["d"] = int(d)
+                                if isinstance(value, datetime):
+                                    transaction.rollback()
+                                    return "Value in column {}, row {} is DateTime. Please format row to Plain Text."\
+                                        .format(self.sheet.cell(row=4, column=column).value, row)
+                                values = value.split("/")
+                                data[dis_type_id]["v"] = int(values[0])
+                                data[dis_type_id]["d"] = int(values[1])
                         else:
                             # if value is not present, check if it should be
                             # all rows need to updated
