@@ -42,6 +42,7 @@ class PartnerSimpleSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'title',
+            'ocha_external_id'
         )
 
 
