@@ -23,6 +23,7 @@
 
 <link rel="import" href="../../../../polyfills/es6-shim.html">
 <link rel="import" href="../../../etools-prp-ajax.html">
+<link rel="import" href="../../../message-box.html">
 <link rel="import" href="../../../../elements/etools-prp-permissions.html">
 <link rel="import" href="../../../../elements/cluster-reporting/creation-modal-project-details.html">
 <link rel="import" href="../../../../elements/cluster-reporting/planned-action/projects/custom-fields-widget.html">
@@ -108,7 +109,7 @@
       }
 
       .header h2 {
-        @apply(--paper-font-title);
+        @apply --paper-font-title;
         margin: 0;
         line-height: 48px;
       }
@@ -181,6 +182,9 @@
         color: var(--list-icon-hover-color, rgba(0, 0, 0, 0.87));
       }
 
+      message-box {
+        margin-bottom: 1em;
+      }
     </style>
 
     <etools-prp-permissions
@@ -212,8 +216,8 @@
     <etools-prp-ajax
       id="projects"
       timeout="100000"
-      body="[[partnerID]]"
-      url="[[ochaProjectsUrl]]">
+      url="[[ochaProjectsUrl]]"
+      params="[[ochaProjectsParams]]">
     </etools-prp-ajax>
 
     <etools-prp-ajax
@@ -254,6 +258,7 @@
               option-value="id"
               option-label="title"
               selected="{{data.partner_id}}"
+              selected-item="{{selectedPartner}}"
               on-iron-activate="_validate"
               trigger-value-change-event
               required>
@@ -271,7 +276,9 @@
                 is="dom-if"
                 if="[[canAddOchaProjects]]"
                 restamp="true">
-                <paper-radio-button name="ocha" active="true">
+                <paper-radio-button
+                    disabled="[[fromOchaDisabled]]"
+                    name="ocha">
                   <strong>From OCHA</strong>
                 </paper-radio-button>
               </template>
@@ -296,6 +303,17 @@
                     trigger-value-change-event
                     required>
                   </etools-single-selection-menu>
+
+                  <template
+                      is="dom-if"
+                      if="[[_equals(formattedProjects.length, 0)]]"
+                      restamp="true">
+                    <message-box
+                        type="warning">
+                      There are no OCHA projects assigned to this partner.
+                    </message-box>
+                  </template>
+
                   <creation-modal-project-details
                     id="details"
                     project-data="[[projectDetails]]"
@@ -313,7 +331,9 @@
                 is="dom-if"
                 if="[[canAddOchaProjects]]"
                 restamp="true">
-                <paper-radio-button name="custom">
+                <paper-radio-button
+                    disabled="[[customDisabled]]"
+                    name="custom">
                   <strong>Custom</strong>
                 </paper-radio-button>
               </template>
@@ -723,6 +743,11 @@
           computed: '_computeOchaProjectsUrl(responsePlanID)',
         },
 
+        ochaProjectsParams: {
+          type: Object,
+          computed: '_computeOchaProjectsParams(selectedPartner)',
+        },
+
         ochaProjectDetailsUrl: {
           type: String,
           computed: '_computeOchaProjectDetailsUrl(selectedProject)',
@@ -819,6 +844,23 @@
           type: Boolean,
           value: false,
         },
+
+        selectedPartner: {
+          type: Object,
+          value: function () {
+            return {};
+          },
+        },
+
+        fromOchaDisabled: {
+          type: Boolean,
+          computed: '_computeFromOchaDisabled(selectedPartner)',
+        },
+
+        customDisabled: {
+          type: Boolean,
+          computed: '_computeCustomDisabled(selectedPartner)',
+        },
       },
 
       listeners: {
@@ -826,11 +868,28 @@
       },
 
       observers: [
-        '_fetchOchaProjectsList(mode, ochaProjectsUrl)',
+        '_fetchOchaProjectsList(selectedPartner, ochaProjectsUrl)',
         '_computeOchaProjectDetailsUrl(selectedProject)',
         '_fetchOchaProjectDetails(selectedProject)',
         '_saveClusters(selectedClusters.splices)',
+        '_updateMode(fromOchaDisabled, customDisabled)',
       ],
+
+      _computeFromOchaDisabled: function (selectedPartner) {
+        return !selectedPartner || !selectedPartner.ocha_external_id;
+      },
+
+      _computeCustomDisabled: function (selectedPartner) {
+        return !selectedPartner;
+      },
+
+      _updateMode: function (fromOchaDisabled, customDisabled) {
+        this.debounce('set-mode', function () {
+          if (fromOchaDisabled && !customDisabled) {
+            this.set('mode', 'custom');
+          }
+        });
+      },
 
       _computeUrl: function(responsePlanID, mode, edit, data) {
         if (edit) {
@@ -844,6 +903,14 @@
 
       _computeOchaProjectsUrl: function(responsePlanID) {
         return App.Endpoints.ochaProjectsList(responsePlanID);
+      },
+
+      _computeOchaProjectsParams: function (selectedPartner) {
+        var ocha_external_id = selectedPartner.ocha_external_id;
+
+        return ocha_external_id ? {
+          ocha_external_id: ocha_external_id,
+        } : {};
       },
 
       _computeOchaProjectDetailsUrl: function(selectedProject) {
@@ -900,31 +967,31 @@
         return 'show more funding details';
       },
 
-      _fetchOchaProjectsList: function (mode) {
-        if (mode !== 'ocha') {
-          return;
-        }
-        this.set('projectsLoading', true);
-        var self = this;
-        this.$.projects.abort();
-        if (this.data.partner_id) {
-          this.$.projects.body = Object.assign({}, {'partnerID': this.data.partner_id});
-        } else {
-          this.$.projects.body = Object.assign({}, {'partnerID': this.partnerID});
-        }
-        this.$.projects.thunk()()
-            .then(function (res) {
-              self.set('projectsLoading', false);
-              self.set('projects', res.data);
-              self.fire('details-loaded', this.name);
-            })
-            .catch(function (err) { // jshint ignore:line
-              if (err.code === 504) {
-                self.fire('notify', {type: 'ocha-timeout'});
-              }
-              self.set('projectsLoading', false);
-              self.set('errors', err.data);
-            });
+      _fetchOchaProjectsList: function (selectedPartner) {
+        this.debounce('fetch-ocha-projects', function () {
+          if (!selectedPartner || !selectedPartner.ocha_external_id) {
+            return;
+          }
+
+          this.set('projectsLoading', true);
+          var self = this;
+          this.$.projects.abort();
+
+          this.$.projects.thunk()()
+              .then(function (res) {
+                self.set('projectsLoading', false);
+                self.set('projects', res.data);
+                self.fire('details-loaded', this.name);
+              })
+              .catch(function (err) { // jshint ignore:line
+                if (err.code === 504) {
+                  self.fire('notify', {type: 'ocha-timeout'});
+                }
+                self.set('projectsLoading', false);
+                self.set('errors', err.data);
+              });
+
+        }, 100);
       },
 
       _computeOchaProjectRequestId: function (selectedProject) {
@@ -1034,6 +1101,13 @@
             self.updatePending = false;
             self.set('errors', err.data);
           });
+      },
+
+      detached: function () {
+        this._cancelDebouncers([
+          'fetch-ocha-projects',
+          'set-mode',
+        ]);
       },
     });
   </script>
