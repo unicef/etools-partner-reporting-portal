@@ -137,6 +137,16 @@ spec:
                 secretKeyRef:
                   name: pmp-api-endpoint
                   key: password
+            - name: OCHA_API_USER
+              valueFrom:
+                secretKeyRef:
+                  name: ocha-api-username
+                  key: username
+            - name: OCHA_API_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ocha-api-password
+                  key: password
             
             # - name: POSTGRES_PASSWORD
             #   valueFrom:
