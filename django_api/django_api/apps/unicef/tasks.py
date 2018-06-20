@@ -428,6 +428,8 @@ def process_programme_documents(fast=False, area=False):
                                     # TODO: Update the PMP PD indicator data field
                                     # for ca_indicator_used_by_reporting_entity
 
+                                    partner_activity = None
+
                                     # Associate this LLO Reportable with ClusterActivity Reportable
                                     # for dual reporting
                                     if 'cluster_indicator_id' in i and i['cluster_indicator_id'] is not None:
@@ -470,9 +472,6 @@ def process_programme_documents(fast=False, area=False):
                                                 "Invalid ClusterActivity Reportable ID "
                                                 "for dual reporting - skipping link!"
                                             )
-
-                                    else:
-                                        partner_activity = None
 
                                     reportable.save()
 
