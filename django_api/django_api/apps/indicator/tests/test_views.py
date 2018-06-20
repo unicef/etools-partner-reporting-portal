@@ -123,9 +123,9 @@ class TestIndicatorDataAPIView(BaseAPITestCase):
                 programme_document=ir.reportable.content_object.indicator.programme_document)
             ir.save()
 
-        self.assertEquals(ir.progress_report.partner_contribution_to_date, '')
+        self.assertEquals(ir.progress_report.partner_contribution_to_date, None)
         self.assertEquals(
-            ir.progress_report.challenges_in_the_reporting_period, '')
+            ir.progress_report.challenges_in_the_reporting_period, None)
         data = {
             'progress_report': {
                 'id': ir.progress_report.id,
