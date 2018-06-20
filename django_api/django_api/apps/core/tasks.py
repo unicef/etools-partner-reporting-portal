@@ -285,6 +285,73 @@ def process_period_reports():
 
             return (next_progress_report, start_date, end_date, due_date)
 
+        def create_pr_ir_for_reportable(reportable, pai_ir_for_period, start_date, end_date, due_date):
+            if reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
+                print("Creating Quantity IndicatorReport for {} - {}".format(start_date, end_date))
+                indicator_report = QuantityIndicatorReportFactory(
+                    reportable=reportable,
+                    parent=pai_ir_for_period,
+                    time_period_start=start_date,
+                    time_period_end=end_date,
+                    due_date=due_date,
+                    title=reportable.blueprint.title,
+                    total={'c': 0, 'd': 0, 'v': 0},
+                    overall_status="NoS",
+                    report_status="Due",
+                    submission_date=None,
+                    reporting_entity=ReportingEntity.objects.get(title="UNICEF"),
+                )
+
+                for location in reportable.locations.all():
+                    print("Creating IndicatorReport {} IndicatorLocationData for {} - {}".format(
+                        indicator_report, start_date, end_date
+                    ))
+                    IndicatorLocationDataFactory(
+                        indicator_report=indicator_report,
+                        location=location,
+                        num_disaggregation=indicator_report.disaggregations.count(),
+                        level_reported=indicator_report.disaggregations.count(),
+                        disaggregation_reported_on=list(indicator_report.disaggregations.values_list(
+                            'id', flat=True)),
+                        disaggregation={
+                            '()': {'c': 0, 'd': 0, 'v': 0}
+                        },
+                    )
+
+            else:
+                print("Creating PD {} Ratio IndicatorReport for {} - {}".format(pd, start_date, end_date))
+                indicator_report = RatioIndicatorReportFactory(
+                    reportable=reportable,
+                    parent=pai_ir_for_period,
+                    time_period_start=start_date,
+                    time_period_end=end_date,
+                    due_date=due_date,
+                    title=reportable.blueprint.title,
+                    total={'c': 0, 'd': 0, 'v': 0},
+                    overall_status="NoS",
+                    report_status="Due",
+                    submission_date=None,
+                    reporting_entity=ReportingEntity.objects.get(title="UNICEF"),
+                )
+
+                for location in reportable.locations.all():
+                    print("Creating IndicatorReport {} IndicatorLocationData {} - {}".format(
+                        indicator_report, start_date, end_date
+                    ))
+                    IndicatorLocationDataFactory(
+                        indicator_report=indicator_report,
+                        location=location,
+                        num_disaggregation=indicator_report.disaggregations.count(),
+                        level_reported=indicator_report.disaggregations.count(),
+                        disaggregation_reported_on=list(indicator_report.disaggregations.values_list(
+                            'id', flat=True)),
+                        disaggregation={
+                            '()': {'c': 0, 'd': 0, 'v': 0}
+                        },
+                    )
+
+            return indicator_report
+
         def create_ir_and_ilds_for_pr(reportable_queryset, next_progress_report, start_date, end_date, due_date):
             """
             Create a set of new IndicatorReports and IndicatorLocationData instances per
@@ -298,98 +365,84 @@ def process_period_reports():
             """
 
             if next_progress_report.report_type != "SR":
-                for reportable in reportable_queryset:
-                    cai_indicator = reportable.ca_indicator_used_by_reporting_entity
-                    pai_ir_for_period = None
-
-                    # If LLO indicator has ClusterActivity Indicator ID reference,
-                    # find the adopted PartnerActivity indicator from ClusterActivity Indicator with LLO's Partner ID
-                    # and grab a corresponding IndicatorReport from ClusterActivity Indicator
-                    # given the start & end date
-                    if cai_indicator:
-                        try:
-                            pai_indicator = cai_indicator.children.get(partner_activities__partner=pd.partner)
-                            pai_ir_for_period = pai_indicator.indicator_reports.get(
-                                time_period_start=start_date,
-                                time_period_end=end_date,
-                            )
-                        except Reportable.DoesNotExist as e:
-                            print(
-                                "FAILURE: CANNOT FIND adopted PartnerActivity Reportable "
-                                "from given ClusterActivity Reportable and PD Partner ID. "
-                                "Skipping link!", e)
-                        except IndicatorReport.DoesNotExist as e:
-                            print(
-                                "FAILURE: CANNOT FIND IndicatorReport from adopted PartnerActivity Reportable "
-                                "linked with LLO Reportable. "
-                                "Skipping link!", e)
-
-                    if reportable.blueprint.unit == IndicatorBlueprint.NUMBER:
-                        print("Creating Quantity IndicatorReport for {} - {}".format(start_date, end_date))
-                        indicator_report = QuantityIndicatorReportFactory(
-                            reportable=reportable,
-                            parent=pai_ir_for_period,
-                            time_period_start=start_date,
-                            time_period_end=end_date,
-                            due_date=due_date,
-                            title=reportable.blueprint.title,
-                            total={'c': 0, 'd': 0, 'v': 0},
-                            overall_status="NoS",
-                            report_status="Due",
-                            submission_date=None,
-                            reporting_entity=ReportingEntity.objects.get(title="UNICEF"),
-                        )
-
-                        for location in reportable.locations.all():
-                            print("Creating IndicatorReport {} IndicatorLocationData for {} - {}".format(
-                                indicator_report, start_date, end_date
-                            ))
-                            IndicatorLocationDataFactory(
-                                indicator_report=indicator_report,
-                                location=location,
-                                num_disaggregation=indicator_report.disaggregations.count(),
-                                level_reported=indicator_report.disaggregations.count(),
-                                disaggregation_reported_on=list(indicator_report.disaggregations.values_list(
-                                    'id', flat=True)),
-                                disaggregation={
-                                    '()': {'c': 0, 'd': 0, 'v': 0}
-                                },
-                            )
-
-                    else:
-                        print("Creating PD {} Ratio IndicatorReport for {} - {}".format(pd, start_date, end_date))
-                        indicator_report = RatioIndicatorReportFactory(
-                            reportable=reportable,
-                            parent=pai_ir_for_period,
-                            time_period_start=start_date,
-                            time_period_end=end_date,
-                            due_date=due_date,
-                            title=reportable.blueprint.title,
-                            total={'c': 0, 'd': 0, 'v': 0},
-                            overall_status="NoS",
-                            report_status="Due",
-                            submission_date=None,
-                            reporting_entity=ReportingEntity.objects.get(title="UNICEF"),
-                        )
-
-                        for location in reportable.locations.all():
-                            print("Creating IndicatorReport {} IndicatorLocationData {} - {}".format(
-                                indicator_report, start_date, end_date
-                            ))
-                            IndicatorLocationDataFactory(
-                                indicator_report=indicator_report,
-                                location=location,
-                                num_disaggregation=indicator_report.disaggregations.count(),
-                                level_reported=indicator_report.disaggregations.count(),
-                                disaggregation_reported_on=list(indicator_report.disaggregations.values_list(
-                                    'id', flat=True)),
-                                disaggregation={
-                                    '()': {'c': 0, 'd': 0, 'v': 0}
-                                },
-                            )
-
+                # Filter non-Cluster reportables first
+                for reportable in reportable_queryset.filter(ca_indicator_used_by_reporting_entity__isnull=True):
+                    indicator_report = create_pr_ir_for_reportable(
+                        reportable,
+                        None,
+                        start_date,
+                        end_date,
+                        due_date,
+                    )
                     indicator_report.progress_report = next_progress_report
                     indicator_report.save()
+
+                if next_progress_report.report_type == "HR":
+                    # Pre-populate new HR report_number in case a new Progress Report needs to be generated
+                    report_number = next_progress_report.report_number + 1
+
+                    # Process cluster Reportables separately
+                    for reportable in reportable_queryset.filter(ca_indicator_used_by_reporting_entity__isnull=False):
+                        cai_indicator = reportable.ca_indicator_used_by_reporting_entity
+                        pai_ir_for_period = None
+
+                        # If LLO indicator has ClusterActivity Indicator ID reference,
+                        # find the adopted PartnerActivity indicator from ClusterActivity Indicator
+                        # with LLO's Partner ID
+                        # and grab a corresponding IndicatorReport from ClusterActivity Indicator
+                        # given the start & end date
+                        if cai_indicator:
+                            try:
+                                pai_indicator = cai_indicator.children.get(partner_activities__partner=pd.partner)
+                                pai_ir_for_period = pai_indicator.indicator_reports.get(
+                                    time_period_start=start_date,
+                                    time_period_end=end_date,
+                                )
+
+                                if pai_ir_for_period:
+                                    indicator_report = create_pr_ir_for_reportable(
+                                        reportable,
+                                        pai_ir_for_period,
+                                        pai_ir_for_period.time_period_start,
+                                        pai_ir_for_period.time_period_end,
+                                        pai_ir_for_period.due_date,
+                                    )
+
+                                    # Bundle this cluster LLO Indicator report to UNICEF HF HR progress report
+                                    # if the dates are matching
+                                    if indicator_report.time_period_start == next_progress_report.start_date \
+                                            and indicator_report.time_period_end == next_progress_report.end_date \
+                                            and indicator_report.due_date == next_progress_report.due_date:
+                                        indicator_report.progress_report = next_progress_report
+
+                                    # Otherwise, create a brand new HR progress report for this cluster LLO Indicator report
+                                    else:
+                                        new_cluster_hr_progress_report = ProgressReportFactory(
+                                            start_date=indicator_report.time_period_start,
+                                            end_date=indicator_report.time_period_end,
+                                            due_date=indicator_report.due_date,
+                                            programme_document=pd,
+                                            report_type="HR",
+                                            report_number=report_number,
+                                            is_final=False,
+                                        )
+                                        indicator_report.progress_report = new_cluster_hr_progress_report
+
+                                        # Increment report_number for next HR progress report to be created if needed
+                                        report_number += 1
+
+                                    indicator_report.save()
+                                
+                            except Reportable.DoesNotExist as e:
+                                print(
+                                    "FAILURE: CANNOT FIND adopted PartnerActivity Reportable "
+                                    "from given ClusterActivity Reportable and PD Partner ID. "
+                                    "Skipping link!", e)
+                            except IndicatorReport.DoesNotExist as e:
+                                print(
+                                    "FAILURE: CANNOT FIND IndicatorReport from adopted PartnerActivity Reportable "
+                                    "linked with LLO Reportable. "
+                                    "Skipping link!", e)
 
         with transaction.atomic():
             # Handling QPR reporting periods
