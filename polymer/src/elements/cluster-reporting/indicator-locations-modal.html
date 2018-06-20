@@ -136,25 +136,30 @@
                 [[data.blueprint.title]]
               </labelled-item>
 
-              <dl class="data-key">
-                <dt>Data key -</dt>
-                <template
-                    is="dom-if"
-                    if="[[_equals(data.blueprint.display_type, 'number')]]"
-                    restamp="true">
-                  <dd>[[[_withDefault(data.label)]]]</dd>
-                </template>
-                <template
-                    is="dom-if"
-                    if="[[!_equals(data.blueprint.display_type, 'number')]]"
-                    restamp="true">
-                  <dd>
-                    [[[_withDefault(data.numerator_label)]]]
-                    /
-                    [[[_withDefault(data.denominator_label)]]]
-                  </dd>
-                </template>
-              </dl>
+              <template
+                  is="dom-if"
+                  if="[[_equals(app, 'cluster-reporting')]]"
+                  restamp="true">
+                <dl class="data-key">
+                  <dt>Data key -</dt>
+                  <template
+                      is="dom-if"
+                      if="[[_equals(data.blueprint.display_type, 'number')]]"
+                      restamp="true">
+                    <dd>[[[_withDefault(data.label)]]]</dd>
+                  </template>
+                  <template
+                      is="dom-if"
+                      if="[[!_equals(data.blueprint.display_type, 'number')]]"
+                      restamp="true">
+                    <dd>
+                      [[[_withDefault(data.numerator_label)]]]
+                      /
+                      [[[_withDefault(data.denominator_label)]]]
+                    </dd>
+                  </template>
+                </dl>
+              </template>
             </div>
           </div>
 
@@ -274,6 +279,11 @@
         isNumber: {
           type: Boolean,
           computed: '_computeIsNumber(data.blueprint.display_type)',
+        },
+
+        app: {
+          type: String,
+          statePath: 'app.current',
         },
       },
 
