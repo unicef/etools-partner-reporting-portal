@@ -37,6 +37,7 @@ class ReportingPeriodDatesSerializer(serializers.ModelSerializer):
             'end_date',
             'due_date',
             'programme_document',
+            'report_type',
         )
 
 
