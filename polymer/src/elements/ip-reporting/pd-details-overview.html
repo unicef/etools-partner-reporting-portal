@@ -193,35 +193,40 @@
         </labelled-item>
       </etools-content-panel>
 
-      <etools-content-panel panel-title="Amendments" class="amendments">
-        <etools-loading active="[[!loaded]]"></etools-loading>
+      <template
+          is="dom-if"
+          if="[[_hasAmendments(pd)]]"
+          restamp="true">
+        <etools-content-panel panel-title="Amendments" class="amendments">
+          <etools-loading active="[[!loaded]]"></etools-loading>
 
-        <etools-data-table-header no-collapse no-titl>
-          <etools-data-table-column field="">
-            Amendment Types
-          </etools-data-table-column>
-          <etools-data-table-column field="">
-            Signed Date
-          </etools-data-table-column>
-        </etools-data-table-header>
+          <etools-data-table-header no-collapse no-titl>
+            <etools-data-table-column field="">
+              Amendment Types
+            </etools-data-table-column>
+            <etools-data-table-column field="">
+              Signed Date
+            </etools-data-table-column>
+          </etools-data-table-header>
 
-        <template
-            id="list"
-            is="dom-repeat"
-            items="[[pd.amendments]]"
-            as="amendment">
-          <etools-data-table-row no-collapse>
-            <div slot="row-data">
-              <div class="table-cell">
-                [[amendment.types]]
+          <template
+              id="list"
+              is="dom-repeat"
+              items="[[pd.amendments]]"
+              as="amendment">
+            <etools-data-table-row no-collapse>
+              <div slot="row-data">
+                <div class="table-cell">
+                  [[amendment.types]]
+                </div>
+                <div class="table-cell">
+                  [[amendment.signed_date]]
+                </div>
               </div>
-              <div class="table-cell">
-                [[amendment.signed_date]]
-              </div>
-            </div>
-          </etools-data-table-row>
-        </template>
-      </etools-content-panel>
+            </etools-data-table-row>
+          </template>
+        </etools-content-panel>
+      </template>
     </page-body>
   </template>
 
@@ -254,6 +259,10 @@
 
       _formatFocalPoint: function (items) {
         return this._withDefault(this._commaSeparatedDictValues(items, 'name'));
+      },
+
+      _hasAmendments: function (pd) {
+        return pd.amendments && !!pd.amendments.length;
       },
     });
   </script>
