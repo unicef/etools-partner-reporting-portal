@@ -172,11 +172,21 @@ class RPMProjectDetailAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
         details_url = HPC_V2_ROOT_URL + 'project/{}'.format(self.kwargs['id'])
-        budget_url = HPC_V1_ROOT_URL + 'fts/flow?projectId={}'.format(self.kwargs['id'])
+
+        details = fetch_json_urls_async([
+            details_url,
+        ])
+
+        # We should use project code whenever is possible. ID filtering might be not working in case of new OPS data
+        if details:
+            project_code = details[0]['data']['code']
+            budget_url = HPC_V1_ROOT_URL + 'fts/flow?projectCode={}'.format(project_code)
+        else:
+            budget_url = HPC_V1_ROOT_URL + 'fts/flow?projectId={}'.format(self.kwargs['id'])
 
         details, budget_info = fetch_json_urls_async([
             details_url,
-            budget_url
+            budget_url,
         ])
 
         out_data = {
@@ -193,10 +203,14 @@ class RPMProjectDetailAPIView(APIView):
 
         out_data['startDate'] = current_project_data['startDate']
         out_data['endDate'] = current_project_data['endDate']
+        out_data['name'] = current_project_data['name']
 
-        out_data['totalBudgetUSD'] = sum([
-            f['amountUSD'] for f in budget_info['data']['flows']
-        ]) if budget_info['data']['flows'] else None
+
+        # out_data['totalBudgetUSD'] = sum([
+        #     f['amountUSD'] for f in budget_info['data']['flows']
+        # ]) if budget_info['data']['flows'] else None
+
+        out_data['totalBudgetUSD'] = current_project_data['currentRequestedFunds']
 
         funding_sources = []
         for flow in budget_info['data']['flows']:
