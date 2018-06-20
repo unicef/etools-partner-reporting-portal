@@ -5,7 +5,6 @@
 <link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../../bower_components/iron-icons/social-icons.html">
 <link rel="import" href="../../../bower_components/app-localize-behavior/app-localize-behavior.html">
-<link rel="import" href="../../../bower_components/iron-location/iron-query-params.html">
 
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/page-nav.html">
@@ -19,48 +18,32 @@
   <template>
     <style include="page-nav-styles"></style>
 
-    <iron-query-params
-        params-string="{{pdQueryString}}"
-        params-object="{{pdQuery}}">
-    </iron-query-params>
-
-    <iron-query-params
-      params-string="{{reportsQueryString}}"
-      params-object="{{reportsQuery}}">
-    </iron-query-params>
-
-    <iron-query-params
-    params-string="{{indicatorsQueryString}}"
-    params-object="{{indicatorsQuery}}">
-  </iron-query-params>
-
     <paper-menu
         id="menu"
         selected="{{selected}}"
         attr-for-selected="name"
         selectable="paper-item"
         key-event-target="null">
-
       <paper-item name="overview">
-        <a href="[[buildUrl(_baseUrl, '/overview')]]">
+        <a href="[[overviewUrl]]">
           <span><iron-icon icon="social:public" role="presentation"></iron-icon>[[localize('overview')]]</span>
         </a>
       </paper-item>
 
       <paper-item name="pd">
-        <a href="[[buildUrl(_baseUrl, '/pd')]]?[[pdQueryString]]">
+        <a href="[[_appendQuery(pdUrl, pdQuery)]]">
           <span><iron-icon icon="description" role="presentation"></iron-icon>[[localize('programme_documents')]]</span>
         </a>
       </paper-item>
 
       <paper-item name="progress-reports">
-        <a href="[[buildUrl(_baseUrl, '/progress-reports')]]?[[reportsQueryString]]">
+        <a href="[[_appendQuery(progressReportsUrl, reportsQuery)]]">
           <span><iron-icon icon="assignment" role="presentation"></iron-icon>[[localize('progress_reports')]]</span>
         </a>
       </paper-item>
 
       <paper-item name="indicators">
-        <a href="[[buildUrl(_baseUrl, '/indicators')]]?[[indicatorsQueryString]]">
+        <a href="[[_appendQuery(indicatorsReportsUrl, indicatorsQuery)]]">
           <span><iron-icon icon="trending-up" role="presentation"></iron-icon>[[localize('indicators')]]</span>
         </a>
       </paper-item>
@@ -82,26 +65,54 @@
       ],
 
       properties: {
+        overviewUrl: {
+          type: String,
+          computed: 'buildUrl(_baseUrl, \'overview\')',
+        },
+
+        pdUrl: {
+          type: String,
+          computed: 'buildUrl(_baseUrl, \'pd\')',
+        },
+
+        progressReportsUrl: {
+          type: String,
+          computed: 'buildUrl(_baseUrl, \'progress-reports\')',
+        },
+
+        indicatorsReportsUrl: {
+          type: String,
+          computed: 'buildUrl(_baseUrl, \'indicators\')',
+        },
+
         pdQuery: {
           type: Object,
-          value: {
-            status: String(['Sig', 'Act', 'Sus']),
+          value: function () {
+            return {
+              status: String(['Sig', 'Act', 'Sus']),
+            };
           },
         },
+
         reportsQuery: {
           type: Object,
-          value: {
-            status: String(['Due', 'Ove', 'Sen']),
+          value: function () {
+            return {
+              status: String(['Due', 'Ove', 'Sen']),
+            };
           },
         },
+
         indicatorsQuery: {
           type: Object,
-          value: {
-            pd_statuses: String(['Act']),
+          value: function () {
+            return {
+              pd_statuses: String(['Act']),
+            };
           },
         },
       },
-      
+
     });
   </script>
 </dom-module>

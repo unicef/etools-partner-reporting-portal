@@ -136,8 +136,10 @@
 
         analysisQuery: {
           type: Object,
-          value: {
-            loc_type: 0,
+          value: function () {
+            return {
+              loc_type: 0,
+            };
           },
         },
 

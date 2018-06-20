@@ -57,13 +57,13 @@
         </location-filter>
 
         <dropdown-filter-multi
-          class="item item-2-col"
-          label="Report status"
-          name="status"
-          value="[[_withDefault(queryParams.status, '')]]"
-          data="[[statuses]]"
-          disabled="[[_equals(queryParams.due, '1')]]"
-          hide-search>
+            class="item item-2-col"
+            label="Report status"
+            name="status"
+            value="[[_withDefault(queryParams.status, '')]]"
+            data="[[statuses]]"
+            disabled="[[_equals(queryParams.due, '1')]]"
+            hide-search>
         </dropdown-filter-multi>
 
         <dropdown-filter-multi
@@ -96,22 +96,26 @@
 
         statuses: {
           type: Array,
-          value: [
-            {title: 'Overdue', id: 'Ove'},
-            {title: 'Sent back', id: 'Sen'},
-            {title: 'Due', id: 'Due'},
-            {title: 'Submitted', id: 'Sub'},
-            {title: 'Accepted', id: 'Acc'},
-          ],
+          value: function () {
+            return [
+              {title: 'Overdue', id: 'Ove'},
+              {title: 'Sent back', id: 'Sen'},
+              {title: 'Due', id: 'Due'},
+              {title: 'Submitted', id: 'Sub'},
+              {title: 'Accepted', id: 'Acc'},
+            ];
+          },
         },
 
         types: {
           type: Array,
-          value: [
-            {title: 'QPR', id: 'QPR'},
-            {title: 'HR', id: 'HR'},
-            {title: 'SR', id: 'SR'},
-          ],
+          value: function () {
+            return [
+              {title: 'QPR', id: 'QPR'},
+              {title: 'HR', id: 'HR'},
+              {title: 'SR', id: 'SR'},
+            ];
+          },
         },
       },
     });
