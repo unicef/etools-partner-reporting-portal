@@ -37,7 +37,7 @@
       },
 
       _isFinalReport: function(report) {
-        return report.is_final;
+        return report.is_final && report.report_type.toLowerCase() !== 'sr';
       },
     };
   }());
