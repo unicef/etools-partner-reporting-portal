@@ -89,7 +89,7 @@ class ClusterActivitySerializer(serializers.ModelSerializer):
         )
 
     def validate(self, data):
-        cluster = data['cluster']
+        cluster = data['cluster_objective'].cluster
         user = self.context['request'].user
 
         if cluster not in user.imo_clusters.all():
