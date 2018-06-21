@@ -101,6 +101,13 @@ def import_project(external_project_id, partner_id, response_plan=None, async=Tr
     if 'code' in project_data:
         current_project_data['code'] = project_data['code']
 
+    additional_information = list()
+    if 'contacts' in current_project_data:
+        for contact in current_project_data['contacts']:
+            if "website" in contact and contact['website']:
+                additional_information.append(contact['website'])
+    current_project_data['additional_information'] = ", ".join(additional_information)
+
     serializer = V2PartnerProjectImportSerializer(data=current_project_data)
     serializer.is_valid(raise_exception=True)
     project = serializer.save()

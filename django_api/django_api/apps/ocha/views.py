@@ -130,9 +130,23 @@ class RPMProjectListAPIView(APIView):
         return get_project_list_for_plan(response_plan.external_id)
 
     def get(self, request, *args, **kwargs):
+        ocha_external_id = request.GET.get('ocha_external_id', None)
         projects = self.get_projects()
+        # Limit projects to choosed partner only
+        result = list()
+        if ocha_external_id:
+            for project in projects:
+                try:
+                    if 'projectVersions' in project and len(project['projectVersions']) > 0 and 'organizations' in project['projectVersions'][0]:
+                        organizations_id = [org['id'] for org in project['projectVersions'][0]['organizations']]
+                        if int(ocha_external_id) in organizations_id:
+                            result.append(project)
+                except Exception:
+                    continue
+        else:
+            result = projects
 
-        return Response(trim_list(projects))
+        return Response(trim_list(result))
 
     def get_partner(self):
         if self.request.user.groups.filter(name=IMORole.as_group().name).exists():
