@@ -69,9 +69,11 @@ class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, ser
     id = serializers.IntegerField(source='external_id')
     name = serializers.CharField(source='title')
     objective = serializers.CharField(source='description', allow_null=True, allow_blank=True)
+    currentRequestedFunds = serializers.FloatField(source='total_budget', allow_null=True)
     startDate = serializers.DateTimeField(source='start_date')
     endDate = serializers.DateTimeField(source='end_date')
     code = serializers.CharField()
+    additional_information = serializers.CharField(allow_null=True, allow_blank=True)
     locations = V2PartnerProjectLocationImportSerializer(many=True)
 
     class Meta:
@@ -86,6 +88,8 @@ class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, ser
             'external_source',
             'code',
             'locations',
+            'currentRequestedFunds',
+            'additional_information'
         )
 
     def get_status(self):
@@ -99,6 +103,8 @@ class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, ser
 
     def create(self, validated_data):
         validated_data['status'] = self.get_status()
+        if not 'additional_information' in validated_data:
+            validated_data['additional_information'] = ''
         location_data_list = validated_data.pop('locations')
         partner_project = PartnerProject.objects.filter(code=validated_data['code']).first()
         if partner_project:
