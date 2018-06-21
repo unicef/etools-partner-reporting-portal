@@ -365,8 +365,14 @@ def process_period_reports():
             """
 
             if next_progress_report.report_type != "SR":
-                # Filter non-Cluster reportables first
-                for reportable in reportable_queryset.filter(ca_indicator_used_by_reporting_entity__isnull=True):
+                if next_progress_report.report_type == "QPR":
+                    queryset = reportable_queryset
+
+                else:
+                    # Filter non-Cluster reportables first
+                    queryset = reportable_queryset.filter(ca_indicator_used_by_reporting_entity__isnull=True)
+
+                for reportable in queryset:
                     indicator_report = create_pr_ir_for_reportable(
                         reportable,
                         None,
@@ -432,7 +438,7 @@ def process_period_reports():
                                         report_number += 1
 
                                     indicator_report.save()
-                                
+
                             except Reportable.DoesNotExist as e:
                                 print(
                                     "FAILURE: CANNOT FIND adopted PartnerActivity Reportable "
