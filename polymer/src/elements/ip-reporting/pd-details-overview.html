@@ -5,9 +5,12 @@
 <link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../../bower_components/etools-loading/etools-loading.html">
 <link rel="import" href="../../../bower_components/etools-data-table/etools-data-table.html">
+<link rel="import" href="../../../bower_components/moment-element/moment-import.html">
 
-<link rel="import" href="../../elements/page-body.html">
-
+<link rel="import" href="pd-details-reporting-requirements.html">
+<link rel="import" href="../page-body.html">
+<link rel="import" href="../list-placeholder.html">
+<link rel="import" href="../../settings.html">
 <link rel="import" href="../../redux/store.html">
 <link rel="import" href="../../redux/selectors/programmeDocuments.html">
 <link rel="import" href="../../behaviors/utils.html">
@@ -72,6 +75,17 @@
         --ecp-content: {
           padding: 0;
         };
+      }
+
+      .reporting-requirements {
+        --ecp-content: {
+          padding-left: 0;
+          padding-right: 0;
+        };
+      }
+
+      pd-details-reporting-requirements:not(:last-of-type) {
+        margin-bottom: 50px;
       }
     </style>
     <page-body>
@@ -200,7 +214,7 @@
         <etools-content-panel panel-title="Amendments" class="amendments">
           <etools-loading active="[[!loaded]]"></etools-loading>
 
-          <etools-data-table-header no-collapse no-titl>
+          <etools-data-table-header no-collapse no-title>
             <etools-data-table-column field="">
               Amendment Types
             </etools-data-table-column>
@@ -227,6 +241,28 @@
           </template>
         </etools-content-panel>
       </template>
+
+      <etools-content-panel panel-title="Reporting Requirements" class="reporting-requirements">
+        <etools-loading active="[[!loaded]]"></etools-loading>
+          <pd-details-reporting-requirements
+              title="QPR"
+              data="[[reportingRequirements.qpr]]"
+              loading="[[!loaded]]">
+          </pd-details-reporting-requirements>
+
+          <pd-details-reporting-requirements
+              title="HR"
+              data="[[reportingRequirements.hr]]"
+              loading="[[!loaded]]">
+          </pd-details-reporting-requirements>
+
+          <pd-details-reporting-requirements
+              title="SR"
+              data="[[reportingRequirements.sr]]"
+              loading="[[!loaded]]">
+          </pd-details-reporting-requirements>
+        </template>
+      </etools-content-panel>
     </page-body>
   </template>
 
@@ -251,6 +287,11 @@
           value: false,
           computed: '_computeLoaded(pd)',
         },
+
+        reportingRequirements: {
+          type: Object,
+          computed: '_computeReportingRequirements(pd.reporting_periods)',
+        },
       },
 
       _computeLoaded: function (pd) {
@@ -263,6 +304,31 @@
 
       _hasAmendments: function (pd) {
         return pd.amendments && !!pd.amendments.length;
+      },
+
+      _computeReportingRequirements: function (reportingPeriods) {
+        var byType = (reportingPeriods || []).reduce(function (acc, curr) {
+          var type = curr.report_type.toLowerCase();
+
+          if (!acc[type]) {
+            acc[type] = [];
+          }
+
+          acc[type].push(curr);
+
+          return acc;
+        }, {});
+
+        Object.keys(byType).forEach(function (type) {
+          byType[type].sort(function (a, b) {
+            var dateA = moment(a.start_date, App.Settings.dateFormat).toDate();
+            var dateB = moment(b.start_date, App.Settings.dateFormat).toDate();
+
+            return dateA - dateB;
+          });
+        });
+
+        return byType;
       },
     });
   </script>
