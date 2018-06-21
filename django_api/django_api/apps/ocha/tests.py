@@ -17,6 +17,7 @@ class V2PartnerProjectSerializerTest(BaseAPITestCase):
         with open(os.path.join(SAMPLES_DIR, 'V2_project_info.json')) as sample_file:
             external_project_data = json.load(sample_file)['data']
         external_project_data['partner'] = Partner.objects.first().pk
+        external_project_data['additional_information'] = "www.example.com"
         serializer = V2PartnerProjectImportSerializer(data=external_project_data)
         self.assertTrue(serializer.is_valid(raise_exception=True))
         partner_project = serializer.save()
