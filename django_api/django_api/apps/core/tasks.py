@@ -387,6 +387,9 @@ def process_period_reports():
                     # Pre-populate new HR report_number in case a new Progress Report needs to be generated
                     report_number = next_progress_report.report_number + 1
 
+                    hr_reports = list()
+                    hr_reports.append(next_progress_report)
+
                     # Process cluster Reportables separately
                     for reportable in reportable_queryset.filter(ca_indicator_used_by_reporting_entity__isnull=False):
                         cai_indicator = reportable.ca_indicator_used_by_reporting_entity
@@ -414,15 +417,17 @@ def process_period_reports():
                                         pai_ir_for_period.due_date,
                                     )
 
-                                    # Bundle this cluster LLO Indicator report to UNICEF HF HR progress report
-                                    # if the dates are matching
-                                    if indicator_report.time_period_start == next_progress_report.start_date \
-                                            and indicator_report.time_period_end == next_progress_report.end_date \
-                                            and indicator_report.due_date == next_progress_report.due_date:
-                                        indicator_report.progress_report = next_progress_report
+                                    # Bundle this cluster LLO Indicator report to HR progress report generated so far
+                                    # for this iteration if the dates are matching
+                                    for hr_report in hr_reports:
+                                        if indicator_report.time_period_start == hr_report.start_date \
+                                                and indicator_report.time_period_end == hr_report.end_date \
+                                                and indicator_report.due_date == hr_report.due_date:
+                                            indicator_report.progress_report = hr_report
+                                            break
 
-                                    # Otherwise, create a brand new HR progress report for this cluster LLO Indicator report
-                                    else:
+                                    if not indicator_report.progress_report:
+                                        # Otherwise, create a brand new HR progress report for this cluster LLO Indicator report
                                         new_cluster_hr_progress_report = ProgressReportFactory(
                                             start_date=indicator_report.time_period_start,
                                             end_date=indicator_report.time_period_end,
@@ -436,6 +441,7 @@ def process_period_reports():
 
                                         # Increment report_number for next HR progress report to be created if needed
                                         report_number += 1
+                                        hr_reports.append(new_cluster_hr_progress_report)
 
                                     indicator_report.save()
 
