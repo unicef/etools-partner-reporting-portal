@@ -914,7 +914,7 @@ class ProgressReportAttachmentAPIView(APIView):
             # lookup just so the possible FileNotFoundError can be triggered
             progress_report.attachment
             serializer = ProgressReportAttachmentSerializer(progress_report)
-            return Response([serializer.data], status=statuses.HTTP_200_OK)
+            return Response(serializer.data, status=statuses.HTTP_200_OK)
         except FileNotFoundError:
             pass
 
