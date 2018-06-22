@@ -137,7 +137,9 @@ class RPMProjectListAPIView(APIView):
         if ocha_external_id:
             for project in projects:
                 try:
-                    if 'projectVersions' in project and len(project['projectVersions']) > 0 and 'organizations' in project['projectVersions'][0]:
+                    if 'projectVersions' in project \
+                            and len(project['projectVersions']) > 0 \
+                            and 'organizations' in project['projectVersions'][0]:
                         organizations_id = [org['id'] for org in project['projectVersions'][0]['organizations']]
                         if int(ocha_external_id) in organizations_id:
                             result.append(project)
@@ -218,7 +220,6 @@ class RPMProjectDetailAPIView(APIView):
         out_data['startDate'] = current_project_data['startDate']
         out_data['endDate'] = current_project_data['endDate']
         out_data['name'] = current_project_data['name']
-
 
         # out_data['totalBudgetUSD'] = sum([
         #     f['amountUSD'] for f in budget_info['data']['flows']

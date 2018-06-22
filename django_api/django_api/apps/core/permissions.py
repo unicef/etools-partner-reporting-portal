@@ -123,6 +123,8 @@ class IsPartnerAuthorizedOfficerOrIMOForCurrentWorkspace(BasePermission):
             IsPartnerAuthorizedOfficerCheck(request) or
             IsIMOForCurrentWorkspaceCheck(request)
         )
+
+
 class IsSuperuser(BasePermission):
 
     def has_permission(self, request, view):

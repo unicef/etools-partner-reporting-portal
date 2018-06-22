@@ -427,7 +427,8 @@ def process_period_reports():
                                             break
 
                                     if not indicator_report.progress_report:
-                                        # Otherwise, create a brand new HR progress report for this cluster LLO Indicator report
+                                        # Otherwise, create a brand new HR progress report
+                                        # for this cluster LLO Indicator report
                                         new_cluster_hr_progress_report = ProgressReportFactory(
                                             start_date=indicator_report.time_period_start,
                                             end_date=indicator_report.time_period_end,
