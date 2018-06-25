@@ -9,8 +9,8 @@
     App.Reducers = App.Reducers || {};
 
     App.Reducers.ProgrammeDocumentReportsAttachments = Redux.combineReducers({
-      byReport: attachmentsByReportReducer,
-      pendingByReport: attachmentsPendingByReportReducer,
+      byReport: attachmentByReportReducer,
+      pendingByReport: attachmentPendingByReportReducer,
     });
 
     function updateForReport(state, reportId, newValue) {
@@ -21,13 +21,13 @@
       return Object.assign({}, state, change);
     }
 
-    function attachmentsByReportReducer(state, action) {
+    function attachmentByReportReducer(state, action) {
       if (typeof state === 'undefined') {
         state = {};
       }
 
       switch (action.type) {
-        case App.Constants.SET_PD_REPORT_ATTACHMENTS:
+        case App.Constants.SET_PD_REPORT_ATTACHMENT:
           return updateForReport(state, action.reportId, action.data);
 
         default:
@@ -35,16 +35,16 @@
       }
     }
 
-    function attachmentsPendingByReportReducer(state, action) {
+    function attachmentPendingByReportReducer(state, action) {
       if (typeof state === 'undefined') {
         state = {};
       }
 
       switch (action.type) {
-        case App.Constants.PD_REPORT_ATTACHMENTS_LOADING_START:
+        case App.Constants.PD_REPORT_ATTACHMENT_LOADING_START:
           return updateForReport(state, action.reportId, true);
 
-        case App.Constants.PD_REPORT_ATTACHMENTS_LOADING_STOP:
+        case App.Constants.PD_REPORT_ATTACHMENT_LOADING_STOP:
           return updateForReport(state, action.reportId, false);
 
         default:

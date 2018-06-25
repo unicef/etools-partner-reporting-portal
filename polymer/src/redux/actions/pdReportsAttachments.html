@@ -16,7 +16,7 @@
           return attachmentsThunk()
               .then(function (res) {
                 dispatch(App.Actions.PDReportsAttachments.loadingStop(reportId));
-                dispatch(App.Actions.PDReportsAttachments.set(reportId, res.data || []));
+                dispatch(App.Actions.PDReportsAttachments.set(reportId, res.data));
               })
               .catch(function (err) {
                 dispatch(App.Actions.PDReportsAttachments.loadingStop(reportId));
@@ -28,7 +28,7 @@
 
       set: function (reportId, data) {
         return {
-          type: App.Constants.SET_PD_REPORT_ATTACHMENTS,
+          type: App.Constants.SET_PD_REPORT_ATTACHMENT,
           reportId: reportId,
           data: data,
         };
@@ -36,14 +36,14 @@
 
       loadingStart: function (reportId) {
         return {
-          type: App.Constants.PD_REPORT_ATTACHMENTS_LOADING_START,
+          type: App.Constants.PD_REPORT_ATTACHMENT_LOADING_START,
           reportId: reportId,
         };
       },
 
       loadingStop: function (reportId) {
         return {
-          type: App.Constants.PD_REPORT_ATTACHMENTS_LOADING_STOP,
+          type: App.Constants.PD_REPORT_ATTACHMENT_LOADING_STOP,
           reportId: reportId,
         };
       },
