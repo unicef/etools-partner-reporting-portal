@@ -55,15 +55,19 @@
           transform = identity;
         }
 
-        result = fields.reduce(function (acc, curr) {
-          ['v', 'd'].forEach(function (key) {
-            if (typeof curr[key] !== 'undefined') {
-              acc[key] = (acc[key] || 0) + transform(curr[key]);
-            }
-          });
+        result = fields
+            .filter(function (field) {
+              return ['v', 'd'].every(function (key) {
+                return !isNaN(field[key]);
+              });
+            })
+            .reduce(function (acc, curr) {
+              ['v', 'd'].forEach(function (key) {
+                acc[key] = (acc[key] || 0) + transform(curr[key]);
+              });
 
-          return acc;
-        }, {});
+              return acc;
+            }, {});
 
         var c = result.v / result.d;
 

@@ -26,8 +26,7 @@
     <paper-input
         id="field"
         value="[[value]]"
-        type="number"
-        allowed-pattern="[+\-\d]"
+        allowed-pattern="^\d*\.?\d*$"
         invalid="{{invalid}}"
         validator="[[validator]]"
         min="[[min]]"

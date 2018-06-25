@@ -175,6 +175,12 @@
           });
         }
 
+        ['v', 'd'].forEach(function (key) {
+          if (isNaN(change[key])) {
+            delete change[key];
+          }
+        });
+
         this.set('localData', change);
       },
 
