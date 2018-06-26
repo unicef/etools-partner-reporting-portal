@@ -956,11 +956,8 @@ class ProgressReportAttachmentAPIView(APIView):
             except ValueError:
                 pass
 
-        serializer.save()
+        pr = serializer.save()
 
-        progress_reports = ProgressReport.objects.filter(
-            id=progress_report_id, programme_document__workspace_id=workspace_id
-        )
         return Response(
-            ProgressReportAttachmentSerializer(progress_reports, many=True).data, status=statuses.HTTP_200_OK
+            ProgressReportAttachmentSerializer(pr).data, status=statuses.HTTP_200_OK
         )
