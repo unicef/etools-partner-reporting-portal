@@ -191,6 +191,12 @@ def process_programme_documents(fast=False, area=False):
                         # Create PD
                         item['status'] = item['status'].title()[:3]
 
+                        # Amendment date formatting
+                        for idx in range(len(item['amendments'])):
+                            item['amendments'][idx]['signed_date'] = datetime.datetime.strptime(
+                                item['amendments'][idx]['signed_date'], "%Y-%m-%d"
+                            ).strftime("%d-%b-%Y")
+
                         try:
                             pd = process_model(
                                 ProgrammeDocument, PMPProgrammeDocumentSerializer, item,
