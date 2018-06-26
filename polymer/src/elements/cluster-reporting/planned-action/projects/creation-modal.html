@@ -745,7 +745,7 @@
 
         ochaProjectsParams: {
           type: Object,
-          computed: '_computeOchaProjectsParams(selectedPartner)',
+          computed: '_computeOchaProjectsParams(partner, selectedPartner)',
         },
 
         ochaProjectDetailsUrl: {
@@ -761,6 +761,11 @@
         clusters: {
           format: Array,
           value: [],
+        },
+
+        partner: {
+          type: String,
+          statePath: 'partner.current',
         },
 
         partnerID: {
@@ -854,7 +859,7 @@
 
         fromOchaDisabled: {
           type: Boolean,
-          computed: '_computeFromOchaDisabled(selectedPartner)',
+          computed: '_computeFromOchaDisabled(partner, selectedPartner)',
         },
 
         customDisabled: {
@@ -869,15 +874,16 @@
 
       observers: [
         '_resetOchaProjects(selectedPartner)',
-        '_fetchOchaProjectsList(selectedPartner, ochaProjectsUrl)',
+        '_fetchOchaProjectsList(partner, selectedPartner, ochaProjectsUrl)',
         '_computeOchaProjectDetailsUrl(selectedProject)',
         '_fetchOchaProjectDetails(selectedProject)',
         '_saveClusters(selectedClusters.splices)',
         '_updateMode(fromOchaDisabled, customDisabled)',
       ],
 
-      _computeFromOchaDisabled: function (selectedPartner) {
-        return !selectedPartner || !selectedPartner.ocha_external_id;
+      _computeFromOchaDisabled: function (partner, selectedPartner) {
+        return (!partner || !partner.ocha_external_id) &&
+            (!selectedPartner || !selectedPartner.ocha_external_id);
       },
 
       _computeCustomDisabled: function (selectedPartner) {
@@ -906,8 +912,9 @@
         return App.Endpoints.ochaProjectsList(responsePlanID);
       },
 
-      _computeOchaProjectsParams: function (selectedPartner) {
-        var ocha_external_id = selectedPartner.ocha_external_id;
+      _computeOchaProjectsParams: function (partner, selectedPartner) {
+        var ocha_external_id = (partner && partner.ocha_external_id) ||
+            selectedPartner.ocha_external_id;
 
         return ocha_external_id ? {
           ocha_external_id: ocha_external_id,
@@ -979,9 +986,13 @@
         }
       },
 
-      _fetchOchaProjectsList: function (selectedPartner) {
+      _fetchOchaProjectsList: function (partner, selectedPartner) {
         this.debounce('fetch-ocha-projects', function () {
-          if (!selectedPartner || !selectedPartner.ocha_external_id) {
+          if (
+            (!partner || !partner.ocha_external_id)
+            &&
+            (!selectedPartner || !selectedPartner.ocha_external_id)
+          ) {
             return;
           }
 
@@ -1078,6 +1089,7 @@
            }
         this.set('selectedProject', '');
         this.set('projectLoading', false);
+        this.set('selectedPartner', {});
         this.set('data', {
           'custom_fields': [],
           'funding': {}
