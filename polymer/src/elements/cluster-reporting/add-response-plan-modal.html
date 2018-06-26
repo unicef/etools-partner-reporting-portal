@@ -459,7 +459,7 @@
             .then(function (res) {
               self.set('planDetailsLoading', false);
               self.set('planDetails', res.data);
-              self.fire('details-loaded', this.name);
+              self.fire('details-loaded');
             })
             .catch(function (err) { // jshint ignore:line
               if (err.code === 504) {

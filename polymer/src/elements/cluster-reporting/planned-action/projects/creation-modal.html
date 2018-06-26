@@ -868,6 +868,7 @@
       },
 
       observers: [
+        '_resetOchaProjects(selectedPartner)',
         '_fetchOchaProjectsList(selectedPartner, ochaProjectsUrl)',
         '_computeOchaProjectDetailsUrl(selectedProject)',
         '_fetchOchaProjectDetails(selectedProject)',
@@ -967,6 +968,17 @@
         return 'show more funding details';
       },
 
+      _resetOchaProjects: function (partner) {
+        if (typeof partner.id !== 'undefined') {
+          this.set('selectedProject', '');
+
+          this.async(function () {
+            this.set('projectDetails', {});
+            this.fire('details-loaded');
+          });
+        }
+      },
+
       _fetchOchaProjectsList: function (selectedPartner) {
         this.debounce('fetch-ocha-projects', function () {
           if (!selectedPartner || !selectedPartner.ocha_external_id) {
@@ -981,7 +993,7 @@
               .then(function (res) {
                 self.set('projectsLoading', false);
                 self.set('projects', res.data);
-                self.fire('details-loaded', this.name);
+                self.fire('details-loaded');
               })
               .catch(function (err) { // jshint ignore:line
                 if (err.code === 504) {
@@ -1011,7 +1023,7 @@
             .then(function (res) {
               self.set('projectDetailsLoading', false);
               self.set('projectDetails', res.data);
-              self.fire('details-loaded', this.name);
+              self.fire('details-loaded');
             })
             .catch(function (err) { // jshint ignore:line
               if (err.code === 504) {
