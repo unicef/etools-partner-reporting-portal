@@ -228,9 +228,22 @@ class ProgressReportsXLSXExporter:
         )
 
         combination_to_column = {}
+        iter_column = -1
+        for combination in disaggregation_value_combinations:
+            # Same type combinations needs to be excluded
+            type_combinations = list()
+            exclude_combination = False
+            for _id in combination:
+                if disaggregation_value_id_to_type[_id] not in type_combinations:
+                    type_combinations.append(disaggregation_value_id_to_type[_id])
+                else:
+                    exclude_combination = True
+                    break
+            if exclude_combination:
+                continue
 
-        for column, combination in enumerate(disaggregation_value_combinations):
-            column = column + self.disaggregations_start_column + 1
+            iter_column += 1
+            column = iter_column + self.disaggregations_start_column + 1
 
             headers = sorted([
                 '{}: {}'.format(
