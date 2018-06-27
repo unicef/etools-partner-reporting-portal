@@ -10,7 +10,7 @@ from ocha.imports.serializers import V1FundingSourceImportSerializer
 from ocha.imports.utilities import get_json_from_url, save_location_list
 from ocha.imports.response_plan import import_response_plan, save_activities_and_objectives_for_response_plan
 from ocha.imports.project import import_project_details
-from partner.models import PartnerProject
+from partner.models import PartnerProject, Partner
 
 logger = logging.getLogger('ocha-sync')
 
@@ -30,6 +30,32 @@ def finish_response_plan_import(external_plan_id):
     save_activities_and_objectives_for_response_plan(
         entities_response=plan_data, measurements_response=strategic_objectives_data
     )
+
+
+@shared_task
+def sync_partners(area):
+    source_url = HPC_V1_ROOT_URL + 'organization'
+    org_data = get_json_from_url(source_url)['data']
+
+    # Prepare OCHA data dict
+    orgs_dict = dict()
+    for org in org_data:
+        orgs_dict[str.upper(org['name'])] = org['id']
+        if org['abbreviation']:
+            orgs_dict[str.upper(org['abbreviation'])] = org['id']
+
+    # Iterate over stored Partners and try assign proper organization id
+    partners = Partner.objects.filter(country_code=area) if area else Partner.objects.all()
+    for partner in partners:
+        if str.upper(partner.title) in orgs_dict:
+            # We have a match. Check if this is 1:1 match
+            logger.debug('Match found for {}'.format(partner.title))
+            if partners.filter(title=partner.title).count() == 1:
+                logger.debug('Assigned OCHA external ID: {}'.format(orgs_dict[partner.title]))
+                partner.ocha_external_id = orgs_dict[partner.title]
+                partner.save()
+            else:
+                logger.debug('SKIPPING. Found more then one entity of {}'.format(partner.title))
 
 
 @shared_task

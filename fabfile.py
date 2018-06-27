@@ -113,6 +113,13 @@ def generate_reports():
     local('docker-compose exec django_api python manage.py generate_reports')
 
 
+def sync_ocha_partners(area=False):
+    """
+    Generate reports based on current data
+    """
+    local('docker-compose exec django_api python manage.py sync_ocha_partners %s' % ("--area %s" % area if area else ""))
+
+
 def tests(test_path=''):
     """
     Run django_api tests.
