@@ -85,7 +85,7 @@
 
         <template
           is="dom-if"
-          if="[[isClusterApp]]"
+          if="[[haveReports]]"
           restamp="true">
           <etools-data-table-column field="">
             <div class="table-column">&nbsp;</div>
@@ -193,6 +193,11 @@
           computed: '_computeIsClusterApp(appName)',
         },
 
+        haveReports: {
+          type: Boolean,
+          computed: '_computeHaveReports(isClusterApp, type)',
+        },
+
         appName: {
           type: String,
           statePath: 'app.current',
@@ -232,6 +237,10 @@
         return baseConditionsMet && data.some(function (indicator) {
           return !indicator.locations.length;
         });
+      },
+
+      _computeHaveReports: function (isClusterApp, type) {
+        return isClusterApp && type !== 'ca';
       },
     });
   </script>

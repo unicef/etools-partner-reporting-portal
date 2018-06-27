@@ -211,7 +211,7 @@
           </div>
         </span>
 
-        <template is="dom-if" if="[[isClusterApp]]" restamp="true">
+        <template is="dom-if" if="[[hasReports]]" restamp="true">
           <span class="table-cell table-cell--text table-cell--action self-center">
             <a href="[[indicatorReportsUrl]]">REPORTS</a>
           </span>
@@ -223,7 +223,7 @@
               EDIT
               <template
                   is="dom-if"
-                  if="[[_showLocationsWarning(indicator)]]"
+                  if="[[_showLocationsWarning(indicator, type)]]"
                   restamp="true">
                 <iron-icon class="locations-warning" icon="icons:error"></iron-icon>
               </template>
@@ -297,6 +297,11 @@
           computed: '_computeCanEditLocations(isClusterApp, type, permissions)',
         },
 
+        hasReports: {
+          type: Boolean,
+          computed: '_computeHasReports(isClusterApp, type)',
+        },
+
         progressBarType: {
           type: String,
           computed: '_computeProgressBarType(isClusterApp, indicator)',
@@ -349,9 +354,12 @@
         }
       },
 
-      _showLocationsWarning: function (indicator) {
-        return !indicator.locations.length &&
-            !/clusteractivity/.test(indicator.content_type_key);
+      _computeHasReports: function (isClusterApp, type) {
+        return isClusterApp && type !== 'ca';
+      },
+
+      _showLocationsWarning: function (indicator, type) {
+        return !indicator.locations.length && type !== 'ca';
       },
     });
   </script>
