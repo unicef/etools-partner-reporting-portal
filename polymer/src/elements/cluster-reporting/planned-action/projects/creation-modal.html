@@ -914,7 +914,7 @@
 
       _computeOchaProjectsParams: function (partner, selectedPartner) {
         var ocha_external_id = (partner && partner.ocha_external_id) ||
-            selectedPartner.ocha_external_id;
+            (selectedPartner && selectedPartner.ocha_external_id);
 
         return ocha_external_id ? {
           ocha_external_id: ocha_external_id,
@@ -976,7 +976,7 @@
       },
 
       _resetOchaProjects: function (partner) {
-        if (typeof partner.id !== 'undefined') {
+        if (partner && partner.id) {
           this.set('selectedProject', '');
 
           this.async(function () {
