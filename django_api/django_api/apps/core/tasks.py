@@ -384,11 +384,18 @@ def process_period_reports():
                     indicator_report.save()
 
                 if next_progress_report.report_type == "HR":
-                    # Pre-populate new HR report_number in case a new Progress Report needs to be generated
-                    report_number = next_progress_report.report_number + 1
-
                     hr_reports = list()
-                    hr_reports.append(next_progress_report)
+
+                    # If there are no UNICEF HF indicator reports then delete blank ProgressReport
+                    if next_progress_report.indicator_reports.count() == 0:
+                        # Re-assign report_number to new HR
+                        report_number = next_progress_report.report_number
+                        next_progress_report.delete()
+
+                    else:
+                        # Pre-populate new HR report_number in case a new Progress Report needs to be generated
+                        report_number = next_progress_report.report_number + 1
+                        hr_reports.append(next_progress_report)
 
                     # Process cluster Reportables separately
                     for reportable in reportable_queryset.filter(ca_indicator_used_by_reporting_entity__isnull=False):
