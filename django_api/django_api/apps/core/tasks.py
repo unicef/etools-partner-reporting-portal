@@ -372,6 +372,8 @@ def process_period_reports():
                     # Filter non-Cluster reportables first
                     queryset = reportable_queryset.filter(ca_indicator_used_by_reporting_entity__isnull=True)
 
+                ir_list = list()
+
                 for reportable in queryset:
                     indicator_report = create_pr_ir_for_reportable(
                         reportable,
@@ -382,12 +384,13 @@ def process_period_reports():
                     )
                     indicator_report.progress_report = next_progress_report
                     indicator_report.save()
+                    ir_list.append(indicator_report)
 
                 if next_progress_report.report_type == "HR":
                     hr_reports = list()
 
                     # If there are no UNICEF HF indicator reports then delete blank ProgressReport
-                    if next_progress_report.indicator_reports.count() == 0:
+                    if len(ir_list) == 0:
                         # Re-assign report_number to new HR
                         report_number = next_progress_report.report_number
                         next_progress_report.delete()

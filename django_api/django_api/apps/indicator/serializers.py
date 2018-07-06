@@ -852,6 +852,29 @@ class IndicatorReportListSerializer(serializers.ModelSerializer):
             if obj.children.exists():
                 objects.extend(list(child_ilds))
 
+            # If the serializer is for IP reporting with cluster indicators
+            # Hide Cluster only location data
+            if pd_id_for_locations != -1:
+                loc_map = {}
+
+                # Map out locations from parent+child indicator location data instances
+                for ild in objects:
+                    if ild.location.id not in loc_map:
+                        loc_map[ild.location.id] = dict()
+
+                    # Map out each indicator location data id and its reporting entity per location
+                    if ild.indicator_report.reporting_entity.title not in loc_map[ild.location.id]:
+                        loc_map[ild.location.id][ild.indicator_report.reporting_entity.title] = ild.id
+
+                ild_ids_to_exclude = []
+
+                # Exclude any Cluster only location data
+                for key in loc_map:
+                    if len(loc_map[key]) == 1 and 'Cluster' in loc_map[key]:
+                        ild_ids_to_exclude.append(loc_map[key]['Cluster'])
+
+                objects = list(filter(lambda item: item.id not in ild_ids_to_exclude, objects))
+
         return SimpleIndicatorLocationDataListSerializer(
             objects,
             many=True,
