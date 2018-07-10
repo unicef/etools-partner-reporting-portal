@@ -200,14 +200,16 @@
               </dd>
             </dl>
 
-            <dl class="indicator-progress layout horizontal">
-                <dt class="flex-none self-center">Against In need:</dt>
-                <dd class="flex-none">
-                  <etools-prp-progress-bar-alt
-                      number="[[indicator.total_against_in_need]]">
-                  </etools-prp-progress-bar-alt>
-                </dd>
-              </dl>
+            <template is="dom-if" if="[[isClusterApp]]" restamp="true">
+              <dl class="indicator-progress layout horizontal">
+                  <dt class="flex-none self-center">Against In need:</dt>
+                  <dd class="flex-none">
+                    <etools-prp-progress-bar-alt
+                        number="[[indicator.total_against_in_need]]">
+                    </etools-prp-progress-bar-alt>
+                  </dd>
+                </dl>
+            </template>
           </div>
         </span>
 
