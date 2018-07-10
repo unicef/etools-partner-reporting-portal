@@ -417,10 +417,6 @@ def process_programme_documents(fast=False, area=False):
                                     i['start_date'] = item['start_date']
                                     i['end_date'] = item['end_date']
 
-                                    # Converting baseline and target to JSONFields
-                                    i['baseline'] = {'v': i['baseline'], 'd': 1}
-                                    i['target'] = {'v': i['target'], 'd': 1}
-
                                     # TODO: Fix db schema to accommodate larger lengths
                                     i['title'] = i['title'][:255] if i['title'] else "unknown"
                                     reportable = process_model(
