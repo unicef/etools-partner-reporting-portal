@@ -13,7 +13,7 @@ class CustomUserAdmin(UserAdmin):
         'email', 'username', 'last_login', 'date_joined', 'partner',
     )
     list_filter = (
-        'is_superuser', 'is_staff', 'is_active', 'groups', 'workspaces',
+        'is_superuser', 'is_staff', 'is_active', 'workspaces',
     )
     search_fields = ('email', 'username',)
     exclude = ('date_joined', 'last_login')
@@ -60,7 +60,7 @@ class CustomUserAdmin(UserAdmin):
         ),
     )
 
-    filter_horizontal = ('groups', 'user_permissions', 'workspaces', 'imo_clusters')
+    filter_horizontal = ('user_permissions', 'workspaces',)
 
 
 admin.site.register(User, CustomUserAdmin)
