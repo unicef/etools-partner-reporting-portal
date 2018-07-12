@@ -136,30 +136,25 @@
                 [[data.blueprint.title]]
               </labelled-item>
 
-              <template
-                  is="dom-if"
-                  if="[[_equals(app, 'cluster-reporting')]]"
-                  restamp="true">
-                <dl class="data-key">
-                  <dt>Label -</dt>
-                  <template
-                      is="dom-if"
-                      if="[[_equals(data.blueprint.display_type, 'number')]]"
-                      restamp="true">
-                    <dd>[[[_withDefault(data.label)]]]</dd>
-                  </template>
-                  <template
-                      is="dom-if"
-                      if="[[!_equals(data.blueprint.display_type, 'number')]]"
-                      restamp="true">
-                    <dd>
-                      [[[_withDefault(data.numerator_label)]]]
-                      /
-                      [[[_withDefault(data.denominator_label)]]]
-                    </dd>
-                  </template>
-                </dl>
-              </template>
+              <dl class="data-key">
+                <dt>Label -</dt>
+                <template
+                    is="dom-if"
+                    if="[[_equals(data.blueprint.display_type, 'number')]]"
+                    restamp="true">
+                  <dd>[[[_withDefault(data.label)]]]</dd>
+                </template>
+                <template
+                    is="dom-if"
+                    if="[[!_equals(data.blueprint.display_type, 'number')]]"
+                    restamp="true">
+                  <dd>
+                    [[[_withDefault(data.numerator_label)]]]
+                    /
+                    [[[_withDefault(data.denominator_label)]]]
+                  </dd>
+                </template>
+              </dl>
             </div>
           </div>
 
