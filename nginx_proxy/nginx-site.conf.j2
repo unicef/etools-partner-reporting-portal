@@ -52,10 +52,6 @@ server {
       proxy_pass http://polymer:8082/sockjs-node/;
     }
 
-    location /static/ {
-      try_files $uri /id-management/$uri;
-    }
-
     location /id-management/ {
       proxy_set_header Host $host:$server_port;
       proxy_set_header X-Real-IP $remote_addr;
