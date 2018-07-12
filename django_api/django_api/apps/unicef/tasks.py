@@ -58,8 +58,8 @@ def process_model(model_to_process, process_serializer, data, filter_dict):
 
 def create_user_for_person(person):
     # Check if given person already exists in user model (by email)
-    user, created = User.objects.get_or_create(email=person.email, defaults={
-        'username': person.email
+    user, created = User.objects.get_or_create(username=person.email, defaults={
+        'email': person.email
     })
     if created:
         user.set_unusable_password()
