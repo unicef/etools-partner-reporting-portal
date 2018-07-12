@@ -72,6 +72,16 @@ services:
       context: ./redis
       dockerfile: ./Dockerfile
 
+  id_management_frontend:
+    image: unicef/etools-prp-id-management-frontend
+    build:
+      context: ./react/id_management_frontend
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./react/id_management_frontend/:/code
+      - /code/node_modules
+    command: bash -c "npm start"
+
   polymer:
     image: unicef/etools-prp-polymer
     build:
