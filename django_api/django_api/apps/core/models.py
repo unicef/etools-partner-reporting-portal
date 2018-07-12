@@ -24,6 +24,7 @@ from .common import (
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
     EXTERNAL_DATA_SOURCES,
+    PRP_ROLE_TYPES,
 )
 from utils.groups.wrappers import GroupWrapper
 
@@ -44,13 +45,6 @@ try:
     IMORole = GroupWrapper(code='imo', name='IMO', create_group=False)
 except Exception as e:
     print("Group DB is not ready yet! - Error: %s" % e)
-
-
-def get_random_color():
-    def r():
-        random.randint(0, 255)
-
-    return '#%02X%02X%02X' % (r(), r(), r())
 
 
 class TimeStampedExternalSyncModelMixin(TimeStampedModel):
@@ -178,6 +172,31 @@ class Workspace(TimeStampedExternalSourceModel):
         return any([
             c.details for c in self.countries.all()
         ])
+
+
+class PRPRole(TimeStampedExternalSourceModel):
+    """
+    PRPRole model present a workspace-partner level permission entity
+    with cluster association.
+
+    related models:
+        account.User (ForeignKey): "user"
+    """
+    user = models.ForeignKey(
+        'account.User', related_name="prp_roles"
+    )
+    role = models.CharField(max_length=32, choices=PRP_ROLE_TYPES)
+    workspace = models.ForeignKey(
+        'core.Workspace', related_name="prp_roles",
+        null=True, blank=True
+    )
+    cluster = models.ForeignKey(
+        'cluster.Cluster', related_name="prp_roles",
+        blank=True, null=True
+    )
+
+    def __str__(self):
+        return '{} - {} in Workspace {}'.format(self.user, self.role, self.workspace)
 
 
 class ResponsePlan(TimeStampedExternalSourceModel):

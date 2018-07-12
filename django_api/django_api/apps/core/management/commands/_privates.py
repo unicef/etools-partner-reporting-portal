@@ -26,7 +26,8 @@ from core.models import (
     PartnerAuthorizedOfficerRole,
     PartnerEditorRole,
     PartnerViewerRole,
-    IMORole
+    IMORole,
+    PRPRole
 )
 from partner.models import (
     Partner,
@@ -88,6 +89,7 @@ from core.factories import (
     CartoDBTableFactory,
     CountryFactory,
     ReportingPeriodDatesFactory,
+    PRPRoleFactory,
 )
 from core.common import (
     INDICATOR_REPORT_STATUS,
@@ -95,6 +97,7 @@ from core.common import (
     REPORTING_TYPES,
     PD_STATUS,
     REPORTABLE_FREQUENCY_LEVEL,
+    PRP_ROLE_TYPES,
 )
 from core.countries import COUNTRIES_ALPHA2_CODE
 
@@ -146,6 +149,7 @@ def clean_up_data():
         CartoDBTable.objects.filter(domain__icontains="domain_").delete()
         Person.objects.filter(name__icontains="Person_").delete()
         UserSocialAuth.objects.all().delete()
+        PRPRole.objects.all().delete()
         print("All ORM objects deleted")
 
 
@@ -209,16 +213,29 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
         print('Workspace quantity reset to {}'.format(workspace_quantity))
 
     today = datetime.date.today()
+    admin_password = 'Passw0rd!'
 
-    users_created = generate_fake_users()
+    # Cluster admin creation
+    sys_admin, _ = User.objects.get_or_create(username='cluster_admin', defaults={
+        'email': 'cluster_admin@notanemail.com',
+        'is_superuser': True,
+        'is_staff': True,
+        'first_name': 'Cluster',
+        'last_name': 'Admin',
+    })
+    sys_admin.set_password(admin_password)
+    sys_admin.save()
 
-    print("Users created: {}/{}\n".format(users_created, 'Passw0rd!'))
+    # Give Cluster admin role to cluster_admin User
+    PRPRoleFactory(
+        user=sys_admin,
+        role=PRP_ROLE_TYPES.cluster_system_admin,
+        workspace=None,
+        cluster=None,
+    )
 
     SectionFactory.create_batch(workspace_quantity)
     print("{} Section objects created".format(workspace_quantity))
-
-    CountryFactory.create_batch(workspace_quantity)
-    print("{} Country objects created".format(workspace_quantity))
 
     unicef_re = ReportingEntity.objects.get(title="UNICEF")
     cluster_re = ReportingEntity.objects.get(title="Cluster")
@@ -238,11 +255,16 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
     end_of_this_year = datetime.date(today.year, 12, 31)
 
     for workspace in ws_list:
-        country = Country.objects.order_by('?').first()
+        country = CountryFactory(
+            country_short_code=workspace.workspace_code,
+            name=workspace.title,
+        )
         workspace.countries.add(country)
+
         for idx in range(0, 2):
             year = today.year - idx
-            # TODO: use ResponsePlanFactory
+
+            # Using direct ORM due to M2M factory to clusters
             ResponsePlan.objects.create(
                 workspace=workspace,
                 title="{} {} HR".format(
@@ -275,18 +297,45 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
 
         print("{} ResponsePlan objects created for {}".format(3, workspace))
 
+    # Cluster IMO creation
+    imo, _ = User.objects.get_or_create(username='cluster_imo', defaults={
+        'email': 'cluster_imo@notanemail.com',
+        'is_superuser': True,
+        'is_staff': True,
+        'first_name': 'Cluster',
+        'last_name': 'IMO',
+    })
+    imo.set_password(admin_password)
+    imo.save()
+
+    # Give Cluster IMO role in this cluster to cluster_admin User
+    PRPRoleFactory(
+        user=imo,
+        role=PRP_ROLE_TYPES.cluster_imo,
+        workspace=None,
+        cluster=None,
+    )
+
     for response_plan in ResponsePlan.objects.all():
         country = response_plan.workspace.countries.first()
-        locations = list(Location.objects.filter(gateway__country=country))
-
-        UserFactory(
-            first_name="WASH",
-            last_name="IMO"
+        locations = list(
+            Location.objects.filter(
+                gateway__country=country,
+                gateway__admin_level=5,
+            )
         )
 
         cluster = ClusterFactory(
             response_plan=response_plan,
             type="wash"
+        )
+
+        # Give Cluster IMO role in this cluster to cluster_admin User
+        PRPRoleFactory(
+            user=imo,
+            role=PRP_ROLE_TYPES.cluster_imo,
+            workspace=response_plan.workspace,
+            cluster=cluster,
         )
 
         co = ClusterObjectiveFactory(
@@ -320,25 +369,20 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
                 reportable=reportable
             )
 
-        user = UserFactory(
-            first_name="{} Cluster".format(cluster.type.upper()[:20]),
-            last_name="Partner")
-
         partner = PartnerFactory(
             title="{} - {} Cluster Partner".format(
                 cluster.response_plan.title, cluster.type.upper()),
             partner_activity=None,
             partner_project=None,
-            user=user,
         )
         partner.clusters.add(cluster)
 
         print(
-            "{} Cluster & Cluster user objects created for {}".format(
+            "{} Cluster objects created for {}".format(
                 1, response_plan.title))
 
         print(
-            "{} Partner objects & Partner user objects created for {}".format(
+            "{} Partner objects objects created for {}".format(
                 1,
                 cluster))
 
@@ -350,19 +394,97 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
     locations = list(
         Location.objects.filter(
             carto_db_table=table,
-            carto_db_table__country=carto_db_table.country))
+            gateway__country=carto_db_table.country,
+            gateway__admin_level=5
+        )
+    )
 
-    # associate partner, workspace, imo_clustes etc. with the users
+    # Associate partner, role, workspace with the partner users
     first_partner = Partner.objects.first()
-    for u in users_created:
-        for w in Workspace.objects.all():
-            u.workspaces.add(w)
-        if not u.groups.filter(name=IMORole.as_group().name):
-            u.partner = first_partner
-        else:
-            u.organization = 'UNICEF Cluster Team'
-            u.imo_clusters = Cluster.objects.all().order_by('?')[:2]
+    partner_users = list()
+
+    # Partner AO creation
+    ao, _ = User.objects.get_or_create(username='partner_ao', defaults={
+        'email': 'partner_ao@notanemail.com',
+        'is_superuser': True,
+        'is_staff': True,
+        'first_name': 'Partner',
+        'last_name': 'AO',
+    })
+    ao.set_password(admin_password)
+    ao.save()
+    partner_users.append(ao)
+
+    # Partner Editor creation
+    editor, _ = User.objects.get_or_create(username='partner_editor', defaults={
+        'email': 'partner_editor@notanemail.com',
+        'is_superuser': True,
+        'is_staff': True,
+        'first_name': 'Partner',
+        'last_name': 'Editor',
+    })
+    editor.set_password(admin_password)
+    editor.save()
+    partner_users.append(editor)
+
+    # Partner Viewer creation
+    viewer, _ = User.objects.get_or_create(username='partner_viewer', defaults={
+        'email': 'partner_viewer@notanemail.com',
+        'is_superuser': True,
+        'is_staff': True,
+        'first_name': 'Partner',
+        'last_name': 'Viewer',
+    })
+    viewer.set_password(admin_password)
+    viewer.save()
+    partner_users.append(viewer)
+
+    # Partner Admin creation
+    admin, _ = User.objects.get_or_create(username='partner_admin', defaults={
+        'email': 'partner_admin@notanemail.com',
+        'is_superuser': True,
+        'is_staff': True,
+        'first_name': 'Partner',
+        'last_name': 'Admin',
+    })
+    admin.set_password(admin_password)
+    admin.save()
+    partner_users.append(admin)
+
+    # Give Cluster IMO role in this cluster to cluster_admin User
+    PRPRoleFactory(
+        user=imo,
+        role=PRP_ROLE_TYPES.cluster_imo,
+        workspace=None,
+        cluster=None,
+    )
+
+    for u in partner_users:
+        partner_cluster = first_partner.clusters.first()
+        workspace = partner_cluster.response_plan.workspace
+
+        u.workspaces.add(workspace)
+        u.partner = first_partner
         u.save()
+
+        if 'ao' in u.username:
+            role = PRP_ROLE_TYPES.ip_authorized_officer
+
+        elif 'editor' in u.username:
+            role = PRP_ROLE_TYPES.ip_editor
+
+        elif 'viewer' in u.username:
+            role = PRP_ROLE_TYPES.ip_viewer
+
+        elif 'admin' in u.username:
+            role = PRP_ROLE_TYPES.ip_admin
+
+        PRPRoleFactory(
+            user=u,
+            role=role,
+            workspace=workspace,
+            cluster=None,
+        )
 
     for cluster_objective in ClusterObjective.objects.all():
         for idx in range(2, 0, -1):

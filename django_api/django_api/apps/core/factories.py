@@ -51,6 +51,7 @@ from core.models import (
     ResponsePlan,
     GatewayType,
     CartoDBTable,
+    PRPRole,
 )
 from core.countries import COUNTRIES_ALPHA2_CODE
 
@@ -688,3 +689,8 @@ class CartoDBTableFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = CartoDBTable
+
+
+class PRPRoleFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = PRPRole
