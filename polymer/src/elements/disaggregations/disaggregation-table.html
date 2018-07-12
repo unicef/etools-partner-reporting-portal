@@ -98,12 +98,8 @@
           is="dom-if"
           if="[[labels]]"
           restamp="true">
-        <template
-            is="dom-if"
-            if="[[_equals(app, 'cluster-reporting')]]"
-            restamp="true">
           <dl class="data-key">
-            <dt>Data key -</dt>
+            <dt>Label -</dt>
             <template
                 is="dom-if"
                 if="[[_equals(data.display_type, 'number')]]"
@@ -121,7 +117,6 @@
               </dd>
             </template>
           </dl>
-        </template>
       </template>
 
       <div class="layout horizontal justified">
