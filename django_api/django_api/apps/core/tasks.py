@@ -496,6 +496,12 @@ def process_period_reports():
             # Handling HR reporting periods
             for idx, reporting_period in enumerate(pd.reporting_periods.filter(report_type="HR").order_by(
                     'start_date')):
+
+                # If there is no start and/or end date from reporting period, skip!
+                if not reporting_period.start_date or not reporting_period.end_date:
+                    print("No new reports to generate: No start & end date pair available.")
+                    continue
+
                 # If PR start date is greater than now, skip!
                 if reporting_period.start_date > datetime.now().date():
                     print("No new reports to generate")
