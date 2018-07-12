@@ -106,7 +106,7 @@ Valid email address format
 
 {% api-method method="delete" host="/api/id-management" path="/role-group/:id" %}
 {% api-method-summary %}
-Delete a RoleGroup instance
+Delete a PRPRole instance
 {% endapi-method-summary %}
 
 {% api-method-description %}
@@ -132,11 +132,11 @@ Allows a valid user to delete one instance of a role group
 
 {% api-method method="patch" host="/api/id-management" path="/role-group/:id" %}
 {% api-method-summary %}
-Patch an existing RoleGroup instance
+Patch an existing PRPRole instance
 {% endapi-method-summary %}
 
 {% api-method-description %}
-Used when a role is changed in an existing RoleGroup instance by a valid user. Validation on the role should be done. Eg. an IMO cannot assign a super user role or a IP authorized officer cannot assign an IMO role etc. Additionally the user to which this RoleGroup is assigned to, should be one that the requesting user is allowed to modify.
+Used when a role is changed in an existing `PRPRole` instance by a valid user. Validation on the role should be done. Eg. an IMO cannot assign a super user role or a IP authorized officer cannot assign an IMO role etc. Additionally the user to which this `PRPRole` is assigned to, should be one that the requesting user is allowed to modify.
 {% endapi-method-description %}
 
 {% api-method-spec %}
