@@ -360,9 +360,7 @@ class PartnerActivityFromClusterActivitySerializer(PartnerActivityBaseCreateSeri
                 project=data['project'], partner=data['partner'], cluster_activity=cluster_activity
         ).exists():
             raise serializers.ValidationError({
-                'cluster_activity': 'The activity for given partner already exist in ClusterActivity ID {}.'.format(
-                    data['cluster_activity']
-                )
+                'cluster_activity': 'Please note that below activity has already been added to this project',
             })
 
         data['cluster_activity'] = cluster_activity

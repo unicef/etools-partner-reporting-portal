@@ -58,8 +58,8 @@ def process_model(model_to_process, process_serializer, data, filter_dict):
 
 def create_user_for_person(person):
     # Check if given person already exists in user model (by email)
-    user, created = User.objects.get_or_create(email=person.email, defaults={
-        'username': person.email
+    user, created = User.objects.get_or_create(username=person.email, defaults={
+        'email': person.email
     })
     if created:
         user.set_unusable_password()
@@ -286,17 +286,6 @@ def process_programme_documents(fast=False, area=False):
                                     'programme_document': pd.id,
                                 },
                             )
-
-                        # HR report date adjustment
-                        hr_periods = ReportingPeriodDates.objects.filter(report_type="HR").order_by('external_id')
-                        start_date = pd.start_date
-
-                        for idx, hr_period in enumerate(hr_periods):
-                            hr_period.start_date = start_date
-                            hr_period.end_date = hr_period.due_date
-                            hr_period.save()
-
-                            start_date = hr_period.due_date + datetime.timedelta(days=1)
 
                         if item['status'] not in ("draft, signed",):
                             # Mark all LLO/reportables assigned to this PD as inactive
