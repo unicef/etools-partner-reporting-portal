@@ -14,7 +14,7 @@ from rest_framework.exceptions import ValidationError, PermissionDenied
 
 import django_filters
 
-from core.common import PARTNER_TYPE
+from core.common import PARTNER_TYPE, PRP_ROLE_TYPES
 from core.permissions import (
     IsIMOForCurrentWorkspaceCheck,
     AnyPermission,
@@ -26,7 +26,7 @@ from core.permissions import (
 )
 from core.paginations import SmallPagination
 from core.serializers import ShortLocationSerializer
-from core.models import Location, ResponsePlan, IMORole
+from core.models import Location, ResponsePlan
 from indicator.serializers import (
     ClusterIndicatorReportSerializer,
     ReportableIdSerializer,
@@ -508,7 +508,7 @@ class ClusterIndicatorsListExcelImportView(APIView):
     def post(self, request, response_plan_id, format=None):
 
         # IMO user are able to upload any partner data
-        if request.user.groups.filter(name=IMORole.as_group().name).exists():
+        if request.user.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_imo).exists():
             partner = None
         else:
             partner = request.user.partner

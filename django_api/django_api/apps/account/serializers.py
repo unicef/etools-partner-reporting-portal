@@ -49,7 +49,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'email', 'first_name',
             'last_name', 'profile',
-            'groups', 'partner', 'organization',
+            'partner', 'organization',
             'workspaces', 'access', 'prp_roles',
         )
         depth = 1
