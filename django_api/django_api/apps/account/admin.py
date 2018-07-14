@@ -50,7 +50,7 @@ class CustomUserAdmin(UserAdmin):
         ),
         (
             'Application Permissions', {
-                'fields': ('groups', 'workspaces', 'imo_clusters',)
+                'fields': ('workspaces',)
             }
         ),
         (

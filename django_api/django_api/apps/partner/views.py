@@ -22,6 +22,9 @@ from core.permissions import (
     IsPartnerEditor,
     IsPartnerViewer,
 )
+
+from cluster.models import Cluster
+
 from .serializers import (
     PartnerDetailsSerializer,
     PartnerProjectSerializer,
@@ -96,7 +99,8 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
 
             partner = get_object_or_404(Partner, id=partner_id)
 
-            if not request.user.imo_clusters.filter(partners=partner).exists():
+            user_cluster_ids = request.user.prp_roles.values_list('cluster', flat=True)
+            if not Cluster.objects.filter(id__in=user_cluster_ids, partners=partner).exists():
                 raise ValidationError({
                     'partner_id': "the partner_id does not belong to your clusters"
                 })
@@ -142,7 +146,10 @@ class PartnerProjectAPIView(APIView):
                 raise PermissionDenied
 
             # Check if incoming partner belongs to IMO's clusters
-            if not request.user.imo_clusters.filter(partners=get_object_or_404(Partner, id=partner_id)).exists():
+            user_cluster_ids = request.user.prp_roles.values_list('cluster', flat=True)
+            if not Cluster.objects.filter(
+                id__in=user_cluster_ids, partners=get_object_or_404(Partner, id=partner_id)
+            ).exists():
                 raise ValidationError({
                     'partner_id': "the partner_id does not belong to your clusters"
                 })
@@ -200,8 +207,11 @@ class PartnerActivityCreateAPIView(CreateAPIView):
         partner = serializer.validated_data['partner']
 
         # If user is IMO check if incoming partner belongs to IMO's clusters
+        user_cluster_ids = request.user.prp_roles.values_list('cluster', flat=True)
+
         if request.user.groups.filter(name='IMO').exists() \
-                and partner.id not in request.user.imo_clusters.values_list('partners', flat=True):
+                and partner.id not in Cluster.objects.filter(
+                    id__in=user_cluster_ids).values_list('partners', flat=True):
             raise ValidationError({
                 'partner_id': "the partner_id does not belong to your clusters"
             })
@@ -254,8 +264,11 @@ class PartnerActivityUpdateAPIView(UpdateAPIView):
 
         # If user is IMO
         # Check if incoming partner belongs to IMO's clusters
+        user_cluster_ids = request.user.prp_roles.values_list('cluster', flat=True)
+
         if request.user.groups.filter(name='IMO').exists() \
-                and instance.partner.id not in request.user.imo_clusters.values_list('partners', flat=True):
+                and instance.partner.id not in Cluster.objects.filter(
+                    id__in=user_cluster_ids).values_list('partners', flat=True):
             raise ValidationError({
                 'partner_id': "the partner_id does not belong to your clusters"
             })

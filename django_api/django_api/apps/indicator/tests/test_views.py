@@ -477,10 +477,15 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
 #         self.client.login(username='admin_imo', password='Passw0rd!')
 
 #         cluster = Cluster.objects.first()
-#         self.user.imo_clusters.add(cluster)
+
+#         self.user.prp_roles.create(
+#             role=PRP_ROLE_TYPES.cluster_imo,
+#             cluster=cluster,
+#             workspace=cluster.response_plan.workspace,
+#         )
 #         self.user.workspaces.add(cluster.response_plan.workspace)
 
-#         self.response_plan = self.user.imo_clusters.first().response_plan
+#         self.response_plan = self.user.prp_roles.first().cluster.response_plan
 
 #         # Adding extra IndicatorReport to each QuantityReportable object
 #         self.sample_disaggregation_value_map = {
