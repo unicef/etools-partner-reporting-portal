@@ -8,7 +8,6 @@ import calendar
 import datetime
 import random
 
-import names
 from django.conf import settings
 
 from social_django.models import UserSocialAuth
@@ -139,6 +138,7 @@ def clean_up_data():
         PDResultLink.objects.all().delete()
         LowerLevelOutput.objects.all().delete()
         Workspace.objects.all().delete()
+        Country.objects.all().delete()
         ResponsePlan.objects.all().delete()
         Location.objects.filter(title__icontains="location_").delete()
         GatewayType.objects.filter(name__icontains="gateway_type_").delete()

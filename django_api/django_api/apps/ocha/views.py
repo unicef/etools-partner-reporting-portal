@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 
 from core.common import RESPONSE_PLAN_TYPE, EXTERNAL_DATA_SOURCES, PRP_ROLE_TYPES
 from core.models import Workspace, ResponsePlan, IMORole
-from core.permissions import IsIMOForCurrentWorkspace, IsPartnerAuthorizedOfficer, AnyPermission
+from core.permissions import IsIMOForCurrentWorkspace, IsPartnerAuthorizedOfficerForCurrentWorkspace, AnyPermission
 from core.serializers import ResponsePlanSerializer
 from ocha.constants import HPC_V1_ROOT_URL, RefCode, HPC_V2_ROOT_URL
 
@@ -123,7 +123,7 @@ class RPMWorkspaceResponsePlanDetailAPIView(APIView):
 class RPMProjectListAPIView(APIView):
 
     permission_classes = (
-        AnyPermission(IsIMOForCurrentWorkspace, IsPartnerAuthorizedOfficer),
+        AnyPermission(IsIMOForCurrentWorkspace, IsPartnerAuthorizedOfficerForCurrentWorkspace),
     )
 
     def get_response_plan(self):
@@ -194,7 +194,7 @@ class RPMProjectListAPIView(APIView):
 class RPMProjectDetailAPIView(APIView):
 
     permission_classes = (
-        AnyPermission(IsIMOForCurrentWorkspace, IsPartnerAuthorizedOfficer),
+        AnyPermission(IsIMOForCurrentWorkspace, IsPartnerAuthorizedOfficerForCurrentWorkspace),
     )
 
     def get(self, request, *args, **kwargs):

@@ -18,11 +18,11 @@ from core.common import PARTNER_TYPE, PRP_ROLE_TYPES
 from core.permissions import (
     IsIMOForCurrentWorkspaceCheck,
     AnyPermission,
-    IsPartnerEditor,
+    IsPartnerEditorForCurrentWorkspace,
     IsAuthenticated,
     IsIMOForCurrentWorkspace,
-    IsPartnerAuthorizedOfficer,
-    IsPartnerViewer,
+    IsPartnerAuthorizedOfficerForCurrentWorkspace,
+    IsPartnerViewerForCurrentWorkspace,
 )
 from core.paginations import SmallPagination
 from core.serializers import ShortLocationSerializer
@@ -474,7 +474,13 @@ class ResponsePlanPartnerDashboardAPIView(ResponsePlanClusterDashboardAPIView):
     Returns:
         - GET method - ResponsePlanPartnerDashboardSerializer object.
     """
-    permission_classes = (AnyPermission(IsPartnerAuthorizedOfficer, IsPartnerEditor, IsPartnerViewer), )
+    permission_classes = (
+        AnyPermission(
+            IsPartnerAuthorizedOfficerForCurrentWorkspace,
+            IsPartnerEditorForCurrentWorkspace,
+            IsPartnerViewerForCurrentWorkspace
+        ),
+    )
 
     def get(self, request, response_plan_id, *args, **kwargs):
         response_plan = self.get_instance(request, response_plan_id)
@@ -503,7 +509,13 @@ class ResponsePlanPartnerDashboardAPIView(ResponsePlanClusterDashboardAPIView):
 
 class ClusterIndicatorsListExcelImportView(APIView):
 
-    permission_classes = (AnyPermission(IsPartnerAuthorizedOfficer, IsIMOForCurrentWorkspace, IsPartnerEditor),)
+    permission_classes = (
+        AnyPermission(
+            IsPartnerAuthorizedOfficerForCurrentWorkspace,
+            IsIMOForCurrentWorkspace,
+            IsPartnerEditorForCurrentWorkspace
+        ),
+    )
 
     def post(self, request, response_plan_id, format=None):
 
@@ -549,7 +561,13 @@ class ClusterIndicatorsListExcelExportView(ListAPIView):
     Returns:
         - GET method - Cluster indicator list data as Excel file
     """
-    permission_classes = (AnyPermission(IsPartnerAuthorizedOfficer, IsIMOForCurrentWorkspace, IsPartnerEditor),)
+    permission_classes = (
+        AnyPermission(
+            IsPartnerAuthorizedOfficerForCurrentWorkspace,
+            IsIMOForCurrentWorkspace,
+            IsPartnerEditorForCurrentWorkspace
+        ),
+    )
     serializer_class = ClusterIndicatorReportSerializer
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
     filter_class = ClusterIndicatorsFilter

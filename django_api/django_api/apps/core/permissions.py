@@ -1,11 +1,6 @@
 from rest_framework.permissions import BasePermission
 
-from .models import (
-    PartnerAuthorizedOfficerRole,
-    PartnerEditorRole,
-    IMORole,
-    PartnerViewerRole,
-)
+from .common import PRP_ROLE_TYPES
 
 
 class AnyPermission(BasePermission):
@@ -36,93 +31,116 @@ class IsAuthenticated(BasePermission):
         return request.user.is_authenticated()
 
 
-def IsIMOForCurrentWorkspaceCheck(request):
-    rules = [
-        IMORole.as_group().user_set.filter(pk=request.user.pk).exists()
-    ]
+def IsForCurrentWorkspaceCheck(request):
     workspace_id = request.resolver_match.kwargs.get('workspace_id')
     if workspace_id:
-        rules.append(
-            request.user.workspaces.filter(id=workspace_id).exists()
-        )
-    return all(rules)
+        return request.user.workspaces.filter(id=workspace_id).exists()
+
+    return False
 
 
-def IsPartnerAuthorizedOfficerCheck(request):
+def IsIMOForCurrentWorkspaceCheck(request):
     rules = [
         request.user.is_authenticated(),
-        PartnerAuthorizedOfficerRole.as_group().user_set.filter(pk=request.user.pk).exists(),
+        request.user.prp_roles.filter(role=PRP_ROLE_TYPES.imo_cluster).exists(),
+        IsForCurrentWorkspaceCheck(request),
     ]
     return all(rules)
 
 
-class IsPartnerAuthorizedOfficer(BasePermission):
+def IsPartnerAuthorizedOfficerForCurrentWorkspaceCheck(request):
+    rules = [
+        request.user.is_authenticated(),
+        request.user.prp_roles.filter(role=PRP_ROLE_TYPES.ip_authorized_officer).exists(),
+        IsForCurrentWorkspaceCheck(request),
+    ]
+    return all(rules)
+
+
+def IsPartnerEditorForCurrentWorkspaceCheck(request):
+    rules = [
+        request.user.is_authenticated(),
+        request.user.prp_roles.filter(role=PRP_ROLE_TYPES.ip_editor).exists(),
+        IsForCurrentWorkspaceCheck(request),
+    ]
+    return all(rules)
+
+
+def IsPartnerViewerForCurrentWorkspaceCheck(request):
+    rules = [
+        request.user.is_authenticated(),
+        request.user.prp_roles.filter(role=PRP_ROLE_TYPES.ip_viewer).exists(),
+        IsForCurrentWorkspaceCheck(request),
+    ]
+    return all(rules)
+
+
+def IsPartnerAdminForCurrentWorkspaceCheck(request):
+    rules = [
+        request.user.is_authenticated(),
+        request.user.prp_roles.filter(role=PRP_ROLE_TYPES.ip_admin).exists(),
+        IsForCurrentWorkspaceCheck(request),
+    ]
+    return all(rules)
+
+
+def IsClusterSystemAdminCheck(request):
+    rules = [
+        request.user.is_authenticated(),
+        request.user.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_system_admin).exists(),
+    ]
+    return all(rules)
+
+
+def IsClusterViewerForCurrentWorkspaceCheck(request):
+    rules = [
+        request.user.is_authenticated(),
+        request.user.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_viewer).exists(),
+        IsForCurrentWorkspaceCheck(request),
+    ]
+    return all(rules)
+
+
+def IsClusterCoordinatorForCurrentWorkspaceCheck(request):
+    rules = [
+        request.user.is_authenticated(),
+        request.user.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_coordinator).exists(),
+        IsForCurrentWorkspaceCheck(request),
+    ]
+    return all(rules)
+
+
+def IsClusterMemberForCurrentWorkspaceCheck(request):
+    rules = [
+        request.user.is_authenticated(),
+        request.user.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_member).exists(),
+        IsForCurrentWorkspaceCheck(request),
+    ]
+    return all(rules)
+
+
+class IsPartnerAuthorizedOfficerForCurrentWorkspace(BasePermission):
 
     def has_permission(self, request, view):
-        user = request.user
-        return user.is_authenticated() and user.groups.filter(
-            name=PartnerAuthorizedOfficerRole.as_group().name).exists()
+        return IsPartnerAuthorizedOfficerForCurrentWorkspaceCheck(request)
 
 
-class IsPartnerEditor(BasePermission):
+class IsPartnerEditorForCurrentWorkspace(BasePermission):
 
     def has_permission(self, request, view):
-        user = request.user
-        return user.is_authenticated() and user.groups.filter(name=PartnerEditorRole.as_group().name).exists()
+        return IsPartnerEditorForCurrentWorkspaceCheck(request)
 
 
-class IsPartnerViewer(BasePermission):
-
-    def has_permission(self, request, view):
-        user = request.user
-        return user.is_authenticated() and user.groups.filter(name=PartnerViewerRole.as_group().name).exists()
-
-
-class IsPartnerEditorOrPartnerAuthorizedOfficer(BasePermission):
+class IsPartnerViewerForCurrentWorkspace(BasePermission):
 
     def has_permission(self, request, view):
-        user = request.user
-        return user.is_authenticated() and (
-            user.groups.filter(name=PartnerEditorRole.as_group().name).exists() or
-            user.groups.filter(name=PartnerAuthorizedOfficerRole.as_group().name).exists()
-        )
-
-
-class IsIMO(BasePermission):
-
-    def has_permission(self, request, view):
-        user = request.user
-        return user.is_authenticated() and user.groups.filter(name=IMORole.as_group().name).exists()
+        return IsPartnerViewerForCurrentWorkspaceCheck(request)
 
 
 class IsIMOForCurrentWorkspace(IsAuthenticated):
 
     def has_permission(self, request, view):
-        if super(IsIMOForCurrentWorkspace, self).has_permission(request, view):
-            return IsIMOForCurrentWorkspaceCheck(request)
-
-        return False
-
-
-class IsPartnerEditorOrPartnerAuthorizedOfficerOrIMOForCurrentWorkspace(BasePermission):
-
-    def has_permission(self, request, view):
-        user = request.user
-        return user.is_authenticated() and (
-            user.groups.filter(name=PartnerEditorRole.as_group().name).exists() or
-            user.groups.filter(name=PartnerAuthorizedOfficerRole.as_group().name).exists() or
-            IsIMOForCurrentWorkspaceCheck(request)
-        )
-
-
-class IsPartnerAuthorizedOfficerOrIMOForCurrentWorkspace(BasePermission):
-
-    def has_permission(self, request, view):
-        user = request.user
-        return user.is_authenticated() and (
-            IsPartnerAuthorizedOfficerCheck(request) or
-            IsIMOForCurrentWorkspaceCheck(request)
-        )
+        return IsIMOForCurrentWorkspaceCheck(request)
 
 
 class IsSuperuser(BasePermission):
