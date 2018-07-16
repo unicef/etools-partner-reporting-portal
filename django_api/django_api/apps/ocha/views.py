@@ -8,7 +8,12 @@ from rest_framework.views import APIView
 
 from core.common import RESPONSE_PLAN_TYPE, EXTERNAL_DATA_SOURCES, PRP_ROLE_TYPES
 from core.models import Workspace, ResponsePlan, IMORole
-from core.permissions import IsIMOForCurrentWorkspace, IsPartnerAuthorizedOfficerForCurrentWorkspace, AnyPermission
+from core.permissions import (
+    IsIMOForCurrentWorkspace,
+    IsPartnerAuthorizedOfficerForCurrentWorkspace,
+    AnyPermission,
+    IsIMOForCurrentWorkspaceCheck,
+)
 from core.serializers import ResponsePlanSerializer
 from ocha.constants import HPC_V1_ROOT_URL, RefCode, HPC_V2_ROOT_URL
 
@@ -160,7 +165,7 @@ class RPMProjectListAPIView(APIView):
         return Response(trim_list(result))
 
     def get_partner(self):
-        if self.request.user.groups.filter(name=IMORole.as_group().name).exists():
+        if IsIMOForCurrentWorkspaceCheck(request):
             partner = get_object_or_404(Partner, id=self.request.data.get('partner_id'))
 
             user_cluster_ids = self.request.user.prp_roles.values_list('cluster', flat=True)

@@ -6,8 +6,9 @@ from django.urls import reverse
 # from core.models imports Location, Workspace
 from rest_framework import status
 
-from core.common import CLUSTER_TYPES
-from core.models import Workspace, IMORole
+from core.common import CLUSTER_TYPES, PRP_ROLE_TYPES
+from core.models import Workspace
+from core.factories import PRPRoleFactory
 from core.tests.base import BaseAPITestCase
 
 
@@ -71,7 +72,10 @@ class TestResponsePlanAPIView(BaseAPITestCase):
         super(TestResponsePlanAPIView, self).setUp()
         self.workspace = Workspace.objects.first()
         self.user.workspaces.add(self.workspace)
-        self.user.groups.add(IMORole.as_group())
+        PRPRoleFactory(
+            user=self.user,
+            role=PRP_ROLE_TYPES.imo_cluster,
+        )
 
     def test_response_plan(self):
         rp_data = {

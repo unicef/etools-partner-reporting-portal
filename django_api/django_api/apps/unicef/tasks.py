@@ -1,17 +1,19 @@
 import logging
 import datetime
 
-from celery import shared_task
 from django.contrib.auth import get_user_model
-
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
+
+from celery import shared_task
+
 from rest_framework.exceptions import ValidationError
 
 from core.api import PMP_API
 from core.models import Workspace, GatewayType, Location, PartnerAuthorizedOfficerRole
 from core.serializers import PMPGatewayTypeSerializer, PMPLocationSerializer
-from core.common import PARTNER_ACTIVITY_STATUS
+from core.common import PARTNER_ACTIVITY_STATUS, PRP_ROLE_TYPES,
+from core.factories import PRPRoleFactory
 
 from partner.models import PartnerActivity
 
@@ -231,8 +233,13 @@ def process_programme_documents(fast=False, area=False):
 
                             user.partner = partner
                             user.workspaces.add(workspace)
-                            user.groups.add(partner_authorized_officer_group)
                             user.save()
+
+                            PRPRoleFactory(
+                                user=user,
+                                role=PRP_ROLE_TYPES.ip_authorized_officer,
+                                workspace=workspace,
+                            )
 
                         # Create focal_points
                         person_data_list = item['focal_points']
@@ -244,9 +251,14 @@ def process_programme_documents(fast=False, area=False):
                             pd.partner_focal_point.add(person)
 
                             user.partner = partner
-                            user.save()
                             user.workspaces.add(workspace)
-                            user.groups.add(partner_authorized_officer_group)
+                            user.save()
+
+                            PRPRoleFactory(
+                                user=user,
+                                role=PRP_ROLE_TYPES.ip_authorized_officer,
+                                workspace=workspace,
+                            )
 
                         # Create sections
                         section_data_list = item['sections']

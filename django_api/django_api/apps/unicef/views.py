@@ -22,7 +22,8 @@ from core.common import (
     PROGRESS_REPORT_STATUS,
     INDICATOR_REPORT_STATUS,
     OVERALL_STATUS,
-    PD_STATUS
+    PD_STATUS,
+    PRP_ROLE_TYPES,
 )
 from core.paginations import SmallPagination
 from core.permissions import (
@@ -567,7 +568,7 @@ class ProgressReportSubmitAPIView(APIView):
 
             authorized_officer_user = get_user_model().objects.filter(
                 email=provided_email or self.request.user.email,
-                groups=PartnerAuthorizedOfficerRole.as_group(),
+                prp_roles__role=PRP_ROLE_TYPES.ip_authorized_officer,
                 email__in=progress_report.programme_document.partner_focal_point.values_list('email', flat=True)
             ).first()
 
@@ -662,7 +663,7 @@ class ProgressReportSRSubmitAPIView(APIView):
 
             authorized_officer_user = get_user_model().objects.filter(
                 email=provided_email or self.request.user.email,
-                groups=PartnerAuthorizedOfficerRole.as_group(),
+                prp_roles__role=PRP_ROLE_TYPES.ip_authorized_officer,
                 email__in=progress_report.programme_document.partner_focal_point.values_list('email', flat=True)
             ).first()
 

@@ -1,8 +1,8 @@
 from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404
-from rest_framework.exceptions import ValidationError, PermissionDenied
 
+from rest_framework.exceptions import ValidationError, PermissionDenied
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveAPIView, ListCreateAPIView, ListAPIView, UpdateAPIView, CreateAPIView
 from rest_framework.response import Response
@@ -10,13 +10,13 @@ from rest_framework import status
 
 import django_filters
 
-from core.models import IMORole
 from core.paginations import SmallPagination
 from core.permissions import (
     IsAuthenticated,
     AnyPermission,
     IsPartnerAuthorizedOfficerForCurrentWorkspaceCheck,
     IsIMOForCurrentWorkspace,
+    IsIMOForCurrentWorkspaceCheck,
     IsPartnerAuthorizedOfficerForCurrentWorkspace,
     IsPartnerEditorForCurrentWorkspace,
     IsPartnerViewerForCurrentWorkspace,
@@ -99,7 +99,7 @@ class PartnerProjectListCreateAPIView(ListCreateAPIView):
         partner_id = self.kwargs.get('partner_id')
 
         if partner_id:
-            if not request.user.groups.filter(name=IMORole.as_group().name).exists():
+            if not IsIMOForCurrentWorkspaceCheck(request):
                 raise PermissionDenied
 
             partner = get_object_or_404(Partner, id=partner_id)
@@ -147,7 +147,7 @@ class PartnerProjectAPIView(APIView):
         partner_id = self.kwargs.get('partner_id')
 
         if partner_id:
-            if not request.user.groups.filter(name=IMORole.as_group().name).exists():
+            if not IsIMOForCurrentWorkspaceCheck(request):
                 raise PermissionDenied
 
             # Check if incoming partner belongs to IMO's clusters
@@ -219,7 +219,7 @@ class PartnerActivityCreateAPIView(CreateAPIView):
         # If user is IMO check if incoming partner belongs to IMO's clusters
         user_cluster_ids = request.user.prp_roles.values_list('cluster', flat=True)
 
-        if request.user.groups.filter(name='IMO').exists() \
+        if IsIMOForCurrentWorkspace(request) \
                 and partner.id not in Cluster.objects.filter(
                     id__in=user_cluster_ids).values_list('partners', flat=True):
             raise ValidationError({
@@ -244,7 +244,7 @@ class PartnerActivityCreateAPIView(CreateAPIView):
     def get_serializer_context(self):
         return {
             'request': self.request,
-            'imo': self.request.user.groups.filter(name='IMO').exists(),
+            'imo': IsIMOForCurrentWorkspace(self.request),
         }
 
 
@@ -281,7 +281,7 @@ class PartnerActivityUpdateAPIView(UpdateAPIView):
         # Check if incoming partner belongs to IMO's clusters
         user_cluster_ids = request.user.prp_roles.values_list('cluster', flat=True)
 
-        if request.user.groups.filter(name='IMO').exists() \
+        if IsIMOForCurrentWorkspace(request) \
                 and instance.partner.id not in Cluster.objects.filter(
                     id__in=user_cluster_ids).values_list('partners', flat=True):
             raise ValidationError({
@@ -294,7 +294,7 @@ class PartnerActivityUpdateAPIView(UpdateAPIView):
     def get_serializer_context(self):
         return {
             'request': self.request,
-            'imo': self.request.user.groups.filter(name='IMO').exists(),
+            'imo': IsIMOForCurrentWorkspace(self.request),
         }
 
 
