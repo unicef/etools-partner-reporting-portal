@@ -2,7 +2,7 @@ from django.db import transaction
 from rest_framework import serializers
 
 from cluster.models import Cluster
-from core.common import CLUSTER_TYPES
+from core.common import PRP_ROLE_TYPES, CLUSTER_TYPES
 from utils.serializers import CurrentWorkspaceDefault
 from .models import Workspace, Location, ResponsePlan, Country, GatewayType
 
@@ -129,13 +129,19 @@ class CreateResponsePlanSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         clusters_data = validated_data.pop('clusters')
         response_plan = ResponsePlan.objects.create(**validated_data)
-        clusters = []
+
         for cluster in clusters_data:
-            clusters.append(Cluster.objects.create(
+            cluster_obj = Cluster.objects.create(
                 type=cluster, response_plan=response_plan
-            ))
-        if 'request' in self.context:
-            self.context['request'].user.imo_clusters.add(*clusters)
+            )
+
+            if 'request' in self.context:
+                self.context['request'].user.prp_roles.create(
+                    role=PRP_ROLE_TYPES.cluster_imo,
+                    cluster=cluster_obj,
+                    workspace=response_plan.workspace,
+                )
+
         return response_plan
 
 

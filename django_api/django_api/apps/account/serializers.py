@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from core.models import IMORole
+from core.common import PRP_ROLE_TYPES
 
 from cluster.models import Cluster
 from partner.serializers import PartnerDetailsSerializer
@@ -27,14 +27,12 @@ class ClusterResponsePlanSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    imo_clusters = ClusterResponsePlanSerializer(read_only=True,
-                                                 many=True)
     partner = PartnerDetailsSerializer(read_only=True)
     access = serializers.SerializerMethodField()
 
     def get_access(self, obj):
         accesses = []
-        is_imo = obj.groups.filter(name=IMORole.as_group().name).exists()
+        is_imo = obj.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_imo).exists()
 
         # Cluster access check
         if is_imo or (obj.partner and obj.partner.clusters.exists()):
@@ -51,7 +49,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'email', 'first_name',
             'last_name', 'profile',
-            'groups', 'partner', 'organization',
-            'workspaces', 'imo_clusters', 'access'
+            'partner', 'organization',
+            'access', 'prp_roles',
         )
         depth = 1

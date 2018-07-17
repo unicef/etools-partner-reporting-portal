@@ -18,11 +18,10 @@ import django_filters.rest_framework
 
 from core.permissions import (
     IsAuthenticated,
-    IsPartnerEditorOrPartnerAuthorizedOfficer,
-    IsIMO,
-    IsPartnerEditor,
-    IsPartnerViewer,
-    IsPartnerAuthorizedOfficer,
+    IsIMOForCurrentWorkspace,
+    IsPartnerEditorForCurrentWorkspace,
+    IsPartnerViewerForCurrentWorkspace,
+    IsPartnerAuthorizedOfficerForCurrentWorkspace,
     AnyPermission,
 )
 from core.paginations import SmallPagination
@@ -95,7 +94,13 @@ class PDReportsAPIView(ListAPIView):
 
     serializer_class = PDReportContextIndicatorReportSerializer
     pagination_class = SmallPagination
-    permission_classes = (AnyPermission(IsPartnerEditor, IsPartnerViewer, IsPartnerAuthorizedOfficer), )
+    permission_classes = (
+        AnyPermission(
+            IsPartnerEditorForCurrentWorkspace,
+            IsPartnerViewerForCurrentWorkspace,
+            IsPartnerAuthorizedOfficerForCurrentWorkspace,
+        ),
+    )
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend, )
     filter_class = PDReportsFilter
 
@@ -129,7 +134,13 @@ class PDReportsAPIView(ListAPIView):
 class PDReportsDetailAPIView(RetrieveAPIView):
 
     serializer_class = PDReportContextIndicatorReportSerializer
-    permission_classes = (AnyPermission(IsPartnerEditor, IsPartnerViewer, IsPartnerAuthorizedOfficer), )
+    permission_classes = (
+        AnyPermission(
+            IsPartnerEditorForCurrentWorkspace,
+            IsPartnerViewerForCurrentWorkspace,
+            IsPartnerAuthorizedOfficerForCurrentWorkspace,
+        ),
+    )
 
     def get_indicator_report(self, report_id):
         try:
@@ -167,7 +178,14 @@ class IndicatorListAPIView(ListAPIView):
      - /api/indicator/<content_object>/?content_object=co,object_id=34    [for cluster objective indicators]
      - /api/indicator/<content_object>/                                   [will throw exception]
     """
-    permission_classes = (AnyPermission(IsIMO, IsPartnerEditor, IsPartnerViewer, IsPartnerAuthorizedOfficer), )
+    permission_classes = (
+        AnyPermission(
+            IsIMOForCurrentWorkspace,
+            IsPartnerEditorForCurrentWorkspace,
+            IsPartnerViewerForCurrentWorkspace,
+            IsPartnerAuthorizedOfficerForCurrentWorkspace,
+        ),
+    )
     serializer_class = IndicatorListSerializer
     pagination_class = SmallPagination
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
@@ -258,7 +276,14 @@ class ReportableDetailAPIView(RetrieveAPIView):
     """
     serializer_class = IndicatorListSerializer
     queryset = Reportable.objects.all()
-    permission_classes = (AnyPermission(IsIMO, IsPartnerEditor, IsPartnerViewer, IsPartnerAuthorizedOfficer), )
+    permission_classes = (
+        AnyPermission(
+            IsIMOForCurrentWorkspace,
+            IsPartnerEditorForCurrentWorkspace,
+            IsPartnerViewerForCurrentWorkspace,
+            IsPartnerAuthorizedOfficerForCurrentWorkspace,
+        ),
+    )
     lookup_url_kwarg = 'reportable_id'
 
     def patch(self, request, reportable_id, *args, **kwargs):
@@ -271,7 +296,7 @@ class ReportableLocationGoalBaselineInNeedAPIView(ListAPIView, UpdateAPIView):
     Reserved for IMO only.
     """
     serializer_class = ReportableLocationGoalBaselineInNeedSerializer
-    permission_classes = (IsIMO,)
+    permission_classes = (IsIMOForCurrentWorkspace,)
     lookup_url_kwarg = 'reportable_id'
 
     def get_queryset(self, *args, **kwargs):
@@ -321,7 +346,13 @@ class IndicatorDataAPIView(APIView):
     TODO: check on the GET data being sent / used in the frontend and other
     HTTP operations being opened here.
     """
-    permission_classes = (AnyPermission(IsIMO, IsPartnerEditor, IsPartnerAuthorizedOfficer), )
+    permission_classes = (
+        AnyPermission(
+            IsIMOForCurrentWorkspace,
+            IsPartnerEditorForCurrentWorkspace,
+            IsPartnerAuthorizedOfficerForCurrentWorkspace,
+        ),
+    )
 
     def get_queryset(self, id):
         queryset = Reportable.objects.filter(
@@ -464,7 +495,10 @@ class PDLowerLevelOutputStatusAPIView(APIView):
     """
     serializer_class = OverallNarrativeSerializer
     permission_classes = (
-        IsPartnerEditorOrPartnerAuthorizedOfficer,
+        AnyPermission(
+            IsPartnerEditorForCurrentWorkspace,
+            IsPartnerAuthorizedOfficerForCurrentWorkspace,
+        ),
     )
 
     def patch(self, request, pd_progress_report_id, llo_id, *args, **kwargs):
@@ -508,7 +542,14 @@ class IndicatorReportListAPIView(APIView):
     ideal design, since frontend is sending to this endpoint with irrelevant
     reportable_id many times.
     """
-    permission_classes = (AnyPermission(IsIMO, IsPartnerEditor, IsPartnerViewer, IsPartnerAuthorizedOfficer), )
+    permission_classes = (
+        AnyPermission(
+            IsIMOForCurrentWorkspace,
+            IsPartnerEditorForCurrentWorkspace,
+            IsPartnerViewerForCurrentWorkspace,
+            IsPartnerAuthorizedOfficerForCurrentWorkspace
+        ),
+    )
 
     def get_queryset(self, *args, **kwargs):
         pks = self.request.query_params.get('pks', None)
@@ -553,7 +594,7 @@ class IndicatorReportReviewAPIView(APIView):
 
     Only a IMO should be allowed to do this action.
     """
-    permission_classes = (IsIMO,)
+    permission_classes = (IsIMOForCurrentWorkspace,)
 
     def get_object(self):
         try:
@@ -595,7 +636,13 @@ class IndicatorLocationDataUpdateAPIView(APIView):
     """
     REST API endpoint to update one IndicatorLocationData, including disaggregation data.
     """
-    permission_classes = (AnyPermission(IsIMO, IsPartnerEditor, IsPartnerAuthorizedOfficer), )
+    permission_classes = (
+        AnyPermission(
+            IsIMOForCurrentWorkspace,
+            IsPartnerEditorForCurrentWorkspace,
+            IsPartnerAuthorizedOfficerForCurrentWorkspace,
+        ),
+    )
 
     def get_object(self, request, pk=None):
         return get_object_or_404(IndicatorLocationData, id=pk)
@@ -654,7 +701,13 @@ class ClusterIndicatorAPIView(CreateAPIView, UpdateAPIView):
     """
 
     serializer_class = ClusterIndicatorSerializer
-    permission_classes = (AnyPermission(IsIMO, IsPartnerEditor, IsPartnerAuthorizedOfficer), )
+    permission_classes = (
+        AnyPermission(
+            IsIMOForCurrentWorkspace,
+            IsPartnerEditorForCurrentWorkspace,
+            IsPartnerAuthorizedOfficerForCurrentWorkspace,
+        ),
+    )
     queryset = Reportable.objects.all()
 
     def get_object(self):
@@ -691,7 +744,10 @@ class ClusterIndicatorSendIMOMessageAPIView(APIView):
     """
 
     permission_classes = (
-        AnyPermission(IsPartnerEditor, IsPartnerAuthorizedOfficer),
+        AnyPermission(
+            IsPartnerEditorForCurrentWorkspace,
+            IsPartnerAuthorizedOfficerForCurrentWorkspace
+        ),
     )
 
     def post(self, request, *args, **kwargs):

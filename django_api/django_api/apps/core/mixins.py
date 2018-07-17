@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group
 
 from social_core.backends.azuread_b2c import AzureADB2COAuth2
 from social_core.pipeline import social_auth
@@ -36,7 +35,6 @@ def user_details(strategy, details, user=None, *args, **kwargs):
     updates_available = False
 
     if user:
-        user_groups = [group.name for group in user.groups.all()]
         # business_area_code = details.get("business_area_code", 'defaultBA1235')
 
         # Update username with email and unusable password
@@ -46,10 +44,7 @@ def user_details(strategy, details, user=None, *args, **kwargs):
         user.set_unusable_password()
         user.save()
 
-        if details.get("idp") == "UNICEF Azure AD" and "UNICEF User" not in user_groups:
-            user.groups.add(Group.objects.get(name='UNICEF User'))
-            user.is_staff = True
-            updates_available = True
+        updates_available = True
 
         # TODO: Not using country in profile for PRP at the moment. May need to re-evaluate
         # def update_user_country():

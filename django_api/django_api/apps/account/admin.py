@@ -13,7 +13,7 @@ class CustomUserAdmin(UserAdmin):
         'email', 'username', 'last_login', 'date_joined', 'partner',
     )
     list_filter = (
-        'is_superuser', 'is_staff', 'is_active', 'workspaces',
+        'is_superuser', 'is_staff', 'is_active',
     )
     search_fields = ('email', 'username',)
     exclude = ('date_joined', 'last_login')
@@ -49,18 +49,13 @@ class CustomUserAdmin(UserAdmin):
             }
         ),
         (
-            'Application Permissions', {
-                'fields': ('groups', 'workspaces', 'imo_clusters',)
-            }
-        ),
-        (
             'Django Permissions', {
                 'fields': ('is_active', 'is_staff', 'is_superuser', 'user_permissions')
             }
         ),
     )
 
-    filter_horizontal = ('user_permissions', 'workspaces',)
+    filter_horizontal = ('user_permissions',)
 
 
 admin.site.register(User, CustomUserAdmin)

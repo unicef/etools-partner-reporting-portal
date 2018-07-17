@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-import random
 import logging
 from datetime import datetime, timedelta
 from decimal import Decimal

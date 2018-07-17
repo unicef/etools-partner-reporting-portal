@@ -1,9 +1,9 @@
 from rest_framework.permissions import BasePermission
 
 
-from core.models import (
-    PartnerAuthorizedOfficerRole,
-    PartnerEditorRole,
+from core.permissions import (
+    IsPartnerAuthorizedOfficerForCurrentWorkspaceCheck,
+    IsPartnerEditorForCurrentWorkspaceCheck,
 )
 
 
@@ -21,12 +21,11 @@ class CanChangePDCalculationMethod(BasePermission):
         if user.is_authenticated() and request.method in SAFE_METHODS:
             return True
 
-        return user.is_authenticated() and \
-            user.groups.filter(
-            name__in=[
-                PartnerAuthorizedOfficerRole.as_group().name,
-                PartnerEditorRole.as_group().name
-            ]).exists()
+        partner_permission = IsPartnerEditorForCurrentWorkspaceCheck(request) \
+            and IsPartnerAuthorizedOfficerForCurrentWorkspaceCheck(request)
+
+        return user.is_authenticated() and partner_permission
+
 
 
 class UnicefPartnershipManagerOrRead(BasePermission):
@@ -41,6 +40,6 @@ class UnicefPartnershipManagerOrRead(BasePermission):
             return True
 
         return (user.is_authenticated() and user.is_superuser) or \
-            (user.is_authenticated and hasattr(user, 'jwt_payload') and
+            (user.is_authenticated() and hasattr(user, 'jwt_payload') and
              "groups" in user.jwt_payload and
              "Partnership Manager" in user.jwt_payload['groups'])

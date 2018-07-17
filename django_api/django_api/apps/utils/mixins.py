@@ -7,7 +7,7 @@ from rest_framework.exceptions import PermissionDenied, AuthenticationFailed
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication, jwt_decode_handler
 
 from core.permissions import (
-    IsPartnerAuthorizedOfficerCheck,
+    IsPartnerAuthorizedOfficerForCurrentWorkspaceCheck,
     IsIMOForCurrentWorkspaceCheck,
 )
 
@@ -54,7 +54,8 @@ class ListExportMixin(object):
     exporters = {}
 
     def get(self, request, *args, **kwargs):
-        if not IsPartnerAuthorizedOfficerCheck(request) and not IsIMOForCurrentWorkspaceCheck(request):
+        if not IsPartnerAuthorizedOfficerForCurrentWorkspaceCheck(request) \
+                and not IsIMOForCurrentWorkspaceCheck(request):
             raise PermissionDenied
 
         exporter_class = self.exporters.get(self.request.query_params.get(self.export_url_kwarg))
@@ -72,7 +73,8 @@ class ObjectExportMixin(object):
     exporters = {}
 
     def get(self, request, *args, **kwargs):
-        if not IsPartnerAuthorizedOfficerCheck(request) and not IsIMOForCurrentWorkspaceCheck(request):
+        if not IsPartnerAuthorizedOfficerForCurrentWorkspaceCheck(request) \
+                and not IsIMOForCurrentWorkspaceCheck(request):
             raise PermissionDenied
 
         exporter_class = self.exporters.get(self.request.query_params.get(self.export_url_kwarg))

@@ -6,9 +6,14 @@ from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.common import RESPONSE_PLAN_TYPE, EXTERNAL_DATA_SOURCES
+from core.common import RESPONSE_PLAN_TYPE, EXTERNAL_DATA_SOURCES, PRP_ROLE_TYPES
 from core.models import Workspace, ResponsePlan, IMORole
-from core.permissions import IsIMOForCurrentWorkspace, IsPartnerAuthorizedOfficer, AnyPermission
+from core.permissions import (
+    IsIMOForCurrentWorkspace,
+    IsPartnerAuthorizedOfficerForCurrentWorkspace,
+    AnyPermission,
+    IsIMOForCurrentWorkspaceCheck,
+)
 from core.serializers import ResponsePlanSerializer
 from ocha.constants import HPC_V1_ROOT_URL, RefCode, HPC_V2_ROOT_URL
 
@@ -17,6 +22,8 @@ from ocha.imports.response_plan import import_response_plan
 from ocha.imports.project import import_project, get_project_list_for_plan
 from ocha.imports.bulk import get_response_plans_for_countries, fetch_json_urls_async
 from ocha.utilities import trim_list
+
+from cluster.models import Cluster
 from partner.models import Partner
 from partner.serializers import PartnerProjectSerializer
 
@@ -71,7 +78,14 @@ class RPMWorkspaceResponsePlanAPIView(APIView):
 
         response_plan = import_response_plan(plan_id, workspace=self.get_workspace())
         response_plan.refresh_from_db()
-        request.user.imo_clusters.add(*response_plan.all_clusters)
+
+        for cluster in response_plan.all_clusters:
+            request.user.prp_roles.create(
+                role=PRP_ROLE_TYPES.cluster_imo,
+                cluster=cluster,
+                workspace=response_plan.workspace,
+            )
+
         return Response(ResponsePlanSerializer(response_plan).data, status=status.HTTP_201_CREATED)
 
 
@@ -114,7 +128,7 @@ class RPMWorkspaceResponsePlanDetailAPIView(APIView):
 class RPMProjectListAPIView(APIView):
 
     permission_classes = (
-        AnyPermission(IsIMOForCurrentWorkspace, IsPartnerAuthorizedOfficer),
+        AnyPermission(IsIMOForCurrentWorkspace, IsPartnerAuthorizedOfficerForCurrentWorkspace),
     )
 
     def get_response_plan(self):
@@ -151,9 +165,11 @@ class RPMProjectListAPIView(APIView):
         return Response(trim_list(result))
 
     def get_partner(self):
-        if self.request.user.groups.filter(name=IMORole.as_group().name).exists():
+        if IsIMOForCurrentWorkspaceCheck(request):
             partner = get_object_or_404(Partner, id=self.request.data.get('partner_id'))
-            if not self.request.user.imo_clusters.filter(partners=partner).exists():
+
+            user_cluster_ids = self.request.user.prp_roles.values_list('cluster', flat=True)
+            if not Cluster.objects.filter(id__in=user_cluster_ids, partners=partner).exists():
                 raise serializers.ValidationError({
                     'partner_id': "the partner_id does not belong to your clusters"
                 })
@@ -183,7 +199,7 @@ class RPMProjectListAPIView(APIView):
 class RPMProjectDetailAPIView(APIView):
 
     permission_classes = (
-        AnyPermission(IsIMOForCurrentWorkspace, IsPartnerAuthorizedOfficer),
+        AnyPermission(IsIMOForCurrentWorkspace, IsPartnerAuthorizedOfficerForCurrentWorkspace),
     )
 
     def get(self, request, *args, **kwargs):

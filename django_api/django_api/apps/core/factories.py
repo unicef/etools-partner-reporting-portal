@@ -210,11 +210,6 @@ class UserFactory(factory.django.DjangoModelFactory):
     email = factory.Sequence(lambda n: "user{}@notanemail.com".format(n))
     password = factory.PostGenerationMethodCall('set_password', 'test')
 
-    @factory.post_generation
-    def groups(self, create, extracted, **kwargs):
-        group, created = Group.objects.get_or_create(name='UNICEF User')
-        self.groups.add(group)
-
     class Meta:
         model = User
         django_get_or_create = ('email', )

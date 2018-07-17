@@ -8,7 +8,6 @@ import calendar
 import datetime
 import random
 
-import names
 from django.conf import settings
 
 from social_django.models import UserSocialAuth
@@ -23,11 +22,7 @@ from cluster.models import (
     ClusterActivity,
 )
 from core.models import (
-    PartnerAuthorizedOfficerRole,
-    PartnerEditorRole,
-    PartnerViewerRole,
-    IMORole,
-    PRPRole
+    PRPRole,
 )
 from partner.models import (
     Partner,
@@ -72,7 +67,7 @@ from core.factories import (
     QuantityIndicatorReportFactory,
     LocationWithReportableLocationGoalFactory,
     RatioIndicatorReportFactory,
-    UserFactory,
+    # UserFactory,
     ClusterFactory,
     ClusterObjectiveFactory,
     ClusterActivityFactory,
@@ -143,6 +138,7 @@ def clean_up_data():
         PDResultLink.objects.all().delete()
         LowerLevelOutput.objects.all().delete()
         Workspace.objects.all().delete()
+        Country.objects.all().delete()
         ResponsePlan.objects.all().delete()
         Location.objects.filter(title__icontains="location_").delete()
         GatewayType.objects.filter(name__icontains="gateway_type_").delete()
@@ -153,35 +149,8 @@ def clean_up_data():
         print("All ORM objects deleted")
 
 
-def generate_fake_users():
-    users_to_create = [
-        ('admin_imo', 'admin_imo@notanemail.com', IMORole),
-        ('admin_ao', 'admin_ao@notanemail.com', PartnerAuthorizedOfficerRole),
-        ('admin_pe', 'admin_pe@notanemail.com', PartnerEditorRole),
-        ('admin_pv', 'admin_pv@notanemail.com', PartnerViewerRole),
-        ('default_unicef_user', 'etools-api-user@unicef.org', PartnerAuthorizedOfficerRole),
-    ]
-    users_created = []
-    for username, email, group_wrapper in users_to_create:
-        admin, _ = User.objects.get_or_create(username=username, defaults={
-            'email': email,
-            'is_superuser': True,
-            'is_staff': True,
-            'first_name': names.get_first_name(),
-            'last_name': names.get_last_name(),
-        })
-        admin.set_password('Passw0rd!')
-        admin.save()
-        admin.groups.add(group_wrapper.as_group())
-        users_created.append(admin)
-
-    return users_created
-
-
 def generate_real_data(fast=False, area=None, update=False):
     if not update:
-        generate_fake_users()
-
         # Generate workspaces
         process_workspaces()
 
@@ -307,14 +276,6 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
     })
     imo.set_password(admin_password)
     imo.save()
-
-    # Give Cluster IMO role in this cluster to cluster_admin User
-    PRPRoleFactory(
-        user=imo,
-        role=PRP_ROLE_TYPES.cluster_imo,
-        workspace=None,
-        cluster=None,
-    )
 
     for response_plan in ResponsePlan.objects.all():
         country = response_plan.workspace.countries.first()
@@ -463,7 +424,6 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
         partner_cluster = first_partner.clusters.first()
         workspace = partner_cluster.response_plan.workspace
 
-        u.workspaces.add(workspace)
         u.partner = first_partner
         u.save()
 
