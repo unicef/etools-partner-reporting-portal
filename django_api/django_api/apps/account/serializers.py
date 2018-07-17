@@ -50,6 +50,6 @@ class UserSerializer(serializers.ModelSerializer):
             'id', 'email', 'first_name',
             'last_name', 'profile',
             'partner', 'organization',
-            'workspaces', 'access', 'prp_roles',
+            'access', 'prp_roles',
         )
         depth = 1

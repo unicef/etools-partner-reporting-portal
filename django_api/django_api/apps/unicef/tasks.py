@@ -232,7 +232,6 @@ def process_programme_documents(fast=False, area=False):
                             pd.unicef_officers.add(person)
 
                             user.partner = partner
-                            user.workspaces.add(workspace)
                             user.save()
 
                             PRPRoleFactory(
@@ -251,7 +250,6 @@ def process_programme_documents(fast=False, area=False):
                             pd.partner_focal_point.add(person)
 
                             user.partner = partner
-                            user.workspaces.add(workspace)
                             user.save()
 
                             PRPRoleFactory(

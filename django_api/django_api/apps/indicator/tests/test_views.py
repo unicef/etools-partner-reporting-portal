@@ -483,7 +483,6 @@ class TestClusterIndicatorAPIView(BaseAPITestCase):
 #             cluster=cluster,
 #             workspace=cluster.response_plan.workspace,
 #         )
-#         self.user.workspaces.add(cluster.response_plan.workspace)
 
 #         self.response_plan = self.user.prp_roles.first().cluster.response_plan
 

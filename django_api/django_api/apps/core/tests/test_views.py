@@ -71,7 +71,7 @@ class TestResponsePlanAPIView(BaseAPITestCase):
     def setUp(self):
         super(TestResponsePlanAPIView, self).setUp()
         self.workspace = Workspace.objects.first()
-        self.user.workspaces.add(self.workspace)
+
         PRPRoleFactory(
             user=self.user,
             role=PRP_ROLE_TYPES.imo_cluster,

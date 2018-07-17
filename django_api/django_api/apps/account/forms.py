@@ -18,11 +18,6 @@ class UserAdminForm(UserChangeForm):
         model = User
         exclude = ('last_login', 'date_joined')
 
-    def clean_workspaces(self):
-        if not self.cleaned_data['workspaces']:
-            raise forms.ValidationError("Required")
-        return self.cleaned_data['workspaces']
-
     def clean_organization(self):
         if not self.cleaned_data['partner'] and not self.cleaned_data['organization']:
             raise forms.ValidationError('Organization required for non-partner users')

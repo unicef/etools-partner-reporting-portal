@@ -31,57 +31,84 @@ class IsAuthenticated(BasePermission):
         return request.user.is_authenticated()
 
 
-def IsForCurrentWorkspaceCheck(request):
+def IsIMOForCurrentWorkspaceCheck(request):
     workspace_id = request.resolver_match.kwargs.get('workspace_id')
     if workspace_id:
-        return request.user.workspaces.filter(id=workspace_id).exists()
+        rules = [
+            request.user.is_authenticated(),
+            request.user.prp_roles.filter(
+                role=PRP_ROLE_TYPES.cluster_imo,
+                cluster__response_plan__workspace__id=workspace_id,
+            ).exists(),
+        ]
+
+        return all(rules)
 
     return False
 
 
-def IsIMOForCurrentWorkspaceCheck(request):
-    rules = [
-        request.user.is_authenticated(),
-        request.user.prp_roles.filter(role=PRP_ROLE_TYPES.imo_cluster).exists(),
-        IsForCurrentWorkspaceCheck(request),
-    ]
-    return all(rules)
-
-
 def IsPartnerAuthorizedOfficerForCurrentWorkspaceCheck(request):
-    rules = [
-        request.user.is_authenticated(),
-        request.user.prp_roles.filter(role=PRP_ROLE_TYPES.ip_authorized_officer).exists(),
-        IsForCurrentWorkspaceCheck(request),
-    ]
-    return all(rules)
+    workspace_id = request.resolver_match.kwargs.get('workspace_id')
+    if workspace_id:
+        rules = [
+            request.user.is_authenticated(),
+            request.user.prp_roles.filter(
+                role=PRP_ROLE_TYPES.ip_authorized_officer,
+                workspace__id=workspace_id,
+            ).exists(),
+        ]
+
+        return all(rules)
+
+    return False
 
 
 def IsPartnerEditorForCurrentWorkspaceCheck(request):
-    rules = [
-        request.user.is_authenticated(),
-        request.user.prp_roles.filter(role=PRP_ROLE_TYPES.ip_editor).exists(),
-        IsForCurrentWorkspaceCheck(request),
-    ]
-    return all(rules)
+    workspace_id = request.resolver_match.kwargs.get('workspace_id')
+    if workspace_id:
+        rules = [
+            request.user.is_authenticated(),
+            request.user.prp_roles.filter(
+                role=PRP_ROLE_TYPES.ip_editor,
+                workspace__id=workspace_id,
+            ).exists(),
+        ]
+
+        return all(rules)
+
+    return False
 
 
 def IsPartnerViewerForCurrentWorkspaceCheck(request):
-    rules = [
-        request.user.is_authenticated(),
-        request.user.prp_roles.filter(role=PRP_ROLE_TYPES.ip_viewer).exists(),
-        IsForCurrentWorkspaceCheck(request),
-    ]
-    return all(rules)
+    workspace_id = request.resolver_match.kwargs.get('workspace_id')
+    if workspace_id:
+        rules = [
+            request.user.is_authenticated(),
+            request.user.prp_roles.filter(
+                role=PRP_ROLE_TYPES.ip_viewer,
+                workspace__id=workspace_id,
+            ).exists(),
+        ]
+
+        return all(rules)
+
+    return False
 
 
 def IsPartnerAdminForCurrentWorkspaceCheck(request):
-    rules = [
-        request.user.is_authenticated(),
-        request.user.prp_roles.filter(role=PRP_ROLE_TYPES.ip_admin).exists(),
-        IsForCurrentWorkspaceCheck(request),
-    ]
-    return all(rules)
+    workspace_id = request.resolver_match.kwargs.get('workspace_id')
+    if workspace_id:
+        rules = [
+            request.user.is_authenticated(),
+            request.user.prp_roles.filter(
+                role=PRP_ROLE_TYPES.ip_admin,
+                workspace__id=workspace_id,
+            ).exists(),
+        ]
+
+        return all(rules)
+
+    return False
 
 
 def IsClusterSystemAdminCheck(request):
@@ -93,30 +120,51 @@ def IsClusterSystemAdminCheck(request):
 
 
 def IsClusterViewerForCurrentWorkspaceCheck(request):
-    rules = [
-        request.user.is_authenticated(),
-        request.user.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_viewer).exists(),
-        IsForCurrentWorkspaceCheck(request),
-    ]
-    return all(rules)
+    workspace_id = request.resolver_match.kwargs.get('workspace_id')
+    if workspace_id:
+        rules = [
+            request.user.is_authenticated(),
+            request.user.prp_roles.filter(
+                role=PRP_ROLE_TYPES.cluster_viewer,
+                cluster__response_plan__workspace__id=workspace_id,
+            ).exists(),
+        ]
+
+        return all(rules)
+
+    return False
 
 
 def IsClusterCoordinatorForCurrentWorkspaceCheck(request):
-    rules = [
-        request.user.is_authenticated(),
-        request.user.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_coordinator).exists(),
-        IsForCurrentWorkspaceCheck(request),
-    ]
-    return all(rules)
+    workspace_id = request.resolver_match.kwargs.get('workspace_id')
+    if workspace_id:
+        rules = [
+            request.user.is_authenticated(),
+            request.user.prp_roles.filter(
+                role=PRP_ROLE_TYPES.cluster_coordinator,
+                cluster__response_plan__workspace__id=workspace_id,
+            ).exists(),
+        ]
+
+        return all(rules)
+
+    return False
 
 
 def IsClusterMemberForCurrentWorkspaceCheck(request):
-    rules = [
-        request.user.is_authenticated(),
-        request.user.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_member).exists(),
-        IsForCurrentWorkspaceCheck(request),
-    ]
-    return all(rules)
+    workspace_id = request.resolver_match.kwargs.get('workspace_id')
+    if workspace_id:
+        rules = [
+            request.user.is_authenticated(),
+            request.user.prp_roles.filter(
+                role=PRP_ROLE_TYPES.cluster_member,
+                cluster__response_plan__workspace__id=workspace_id,
+            ).exists(),
+        ]
+
+        return all(rules)
+
+    return False
 
 
 class IsPartnerAuthorizedOfficerForCurrentWorkspace(BasePermission):

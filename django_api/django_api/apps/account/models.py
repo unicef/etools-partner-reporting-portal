@@ -29,10 +29,6 @@ class User(AbstractUser):
         unique=True,
         db_index=True
     )
-    workspaces = models.ManyToManyField(
-        'core.Workspace', related_name='users', blank=True,
-        help_text='These are workspaces that the user will be able to access.'
-    )
 
     def __str__(self):
         return '[{}] {} ({})'.format(

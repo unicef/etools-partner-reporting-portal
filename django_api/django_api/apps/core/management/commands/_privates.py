@@ -424,7 +424,6 @@ def generate_fake_data(workspace_quantity=10, generate_all_disagg=False):
         partner_cluster = first_partner.clusters.first()
         workspace = partner_cluster.response_plan.workspace
 
-        u.workspaces.add(workspace)
         u.partner = first_partner
         u.save()
 
