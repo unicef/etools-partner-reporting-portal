@@ -50,7 +50,10 @@ def process_partners(area=None):
 
                     # Constructing value for basis_for_risk_rating based on
                     # type_of_assessment and last_assessment_date field
-                    item['basis_for_risk_rating'] = item['type_of_assessment'] + item['last_assessment_date']
+                    if item['type_of_assessment'] and item['last_assessment_date']:
+                        item['basis_for_risk_rating'] = item['type_of_assessment'] + ' - ' + item['last_assessment_date']
+                    else:
+                        item['basis_for_risk_rating'] = "N/A"
 
                     print("{} Creating Partner: {}".format(workspace.workspace_code, item['unicef_vendor_number']))
                     try:

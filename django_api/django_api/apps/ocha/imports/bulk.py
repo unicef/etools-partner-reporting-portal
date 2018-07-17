@@ -1,5 +1,6 @@
 import aiohttp
 import asyncio
+import greenlet
 
 import itertools
 
@@ -8,23 +9,23 @@ from . import utilities
 
 
 def fetch_json_urls_async(url_list):
-    loop = asyncio.get_event_loop()
-    client = aiohttp.ClientSession(loop=loop, headers=utilities.get_headers())
+    data_list = list()
+    current_thread = greenlet.getcurrent()
 
-    async def get_json(client, url):
-        async with client.get(url) as response:
-            return await response.json()
+    @asyncio.coroutine
+    async def get_json(url, greenlet_instance, future):
+        async with aiohttp.ClientSession(headers=utilities.get_headers()) as session:
+            async with session.get(url) as response:
+                result = await response.json()
+                future.set_result(result)
+                greenlet_instance.switch()
 
-    data_list = loop.run_until_complete(
-        asyncio.gather(
-            *[get_json(client, url) for url in url_list]
-        )
-    )
+    for url in url_list:
+        future = asyncio.Future()
+        asyncio.Task(get_json(url, current_thread, future))
+        current_thread.parent.switch()
 
-    async def close_client():
-        return await client.close()
-
-    loop.run_until_complete(close_client())
+        data_list.append(future.result())
 
     return data_list
 
