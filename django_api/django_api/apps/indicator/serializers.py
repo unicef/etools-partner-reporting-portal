@@ -1181,8 +1181,12 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             get_object_or_404(ClusterActivity, pk=validated_data['object_id'])
             validated_data['is_cluster_indicator'] = True
         elif reportable_object_content_model == PartnerProject:
-            get_object_or_404(PartnerProject, pk=validated_data['object_id'])
+            content_object = get_object_or_404(PartnerProject, pk=validated_data['object_id'])
             validated_data['is_cluster_indicator'] = False
+
+            if validated_data['start_date_of_reporting_period'] < content_object.start_date:
+                raise ValidationError("Start date of reporting period cannot come before the project's start date")
+
         elif reportable_object_content_model == PartnerActivity:
             get_object_or_404(PartnerActivity, pk=validated_data['object_id'])
             validated_data['is_cluster_indicator'] = False
@@ -1247,6 +1251,18 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
         if not partner:
             self.check_progress_values(validated_data)
+
+        reportable_object_content_type = ContentType.objects.get_by_natural_key(
+            *validated_data.pop('object_type').split('.')
+        )
+        reportable_object_content_model = reportable_object_content_type.model_class()
+
+        if reportable_object_content_model == PartnerProject:
+            content_object = get_object_or_404(PartnerProject, pk=validated_data['object_id'])
+            validated_data['is_cluster_indicator'] = False
+
+            if validated_data['start_date_of_reporting_period'] < content_object.start_date:
+                raise ValidationError("Start date of reporting period cannot come before the project's start date")
 
         # Swapping validated_data['locations'] with raw request.data['locations']
         # Due to missing id field as it is write_only field
