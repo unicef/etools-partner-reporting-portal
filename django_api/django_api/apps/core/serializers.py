@@ -130,17 +130,18 @@ class CreateResponsePlanSerializer(serializers.ModelSerializer):
         clusters_data = validated_data.pop('clusters')
         response_plan = ResponsePlan.objects.create(**validated_data)
 
-        if 'request' in self.context:
-            for cluster in clusters_data:
-                cluster_obj = Cluster.objects.create(
-                    type=cluster, response_plan=response_plan
-                )
+        for cluster in clusters_data:
+            cluster_obj = Cluster.objects.create(
+                type=cluster, response_plan=response_plan
+            )
 
+            if 'request' in self.context:
                 self.context['request'].user.prp_roles.create(
                     role=PRP_ROLE_TYPES.cluster_imo,
                     cluster=cluster_obj,
                     workspace=response_plan.workspace,
                 )
+
         return response_plan
 
 
