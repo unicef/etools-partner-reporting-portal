@@ -39,7 +39,7 @@ spec:
             - name: static-volume-{{NAMESPACE}}
               mountPath: /data
           command: ["bash"]
-          args: ["-c", "/usr/local/bin/waitforit -host=db -port=5432 && uwsgi --ini /code/django_api/uwsgi.ini"]
+          args: ["-c", "/usr/local/bin/waitforit -host=db -port=5432 && uwsgi --asyncio 50 --greenlet --ini /code/django_api/uwsgi.ini"]
           ports:
             - containerPort: 8000
           env:

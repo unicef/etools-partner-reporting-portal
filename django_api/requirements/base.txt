@@ -43,9 +43,6 @@ factory_boy==2.8.1
 django-fixture-magic==0.1.3
 names==0.3.0
 
-# WSGI
-uwsgi==2.0.15
-
 openpyxl==2.4.8
 
 # GIS

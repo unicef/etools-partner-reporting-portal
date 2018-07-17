@@ -45,6 +45,10 @@ RUN pip install --upgrade fabric --trusted-host pypi.python.org
 ENV CPLUS_INCLUDE_PATH /usr/include/gdal
 ENV C_INCLUDE_PATH /usr/include/gdal
 
+# Build uwsgi with asyncio support
+RUN pip3 install greenlet==0.4.14
+RUN CFLAGS="-I/usr/local/include/python3.6" UWSGI_PROFILE="asyncio" pip3 install uwsgi==2.0.15
+
 ADD ./requirements/* /tmp/
 
 # Install PyPi dependencies
