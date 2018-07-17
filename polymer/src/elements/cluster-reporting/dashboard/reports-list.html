@@ -4,8 +4,10 @@
 
 <link rel="import" href="../../../constants.html">
 <link rel="import" href="../../../redux/store.html">
+<link rel="import" href="../../etools-prp-permissions.html">
 <link rel="import" href="../../confirm-box.html">
 <link rel="import" href="../../list-placeholder.html">
+
 <link rel="import" href="../../cluster-reporting/cluster-report.html">
 
 <dom-module id="reports-list">
@@ -24,6 +26,10 @@
         margin-bottom: 2px;
       }
     </style>
+
+    <etools-prp-permissions
+        permissions="{{permissions}}">
+    </etools-prp-permissions>
 
     <confirm-box id="confirm"></confirm-box>
 
@@ -84,6 +90,16 @@
           type: Boolean,
           statePath: 'clusterDashboardData.loading',
         },
+
+        profile: {
+          type: Object,
+          statePath: 'userProfile.profile',
+        },
+
+        isIMO: {
+          type: Boolean,
+          computed: '_computeIsIMOClusters(profile)'
+        },
       },
 
       listeners: {
@@ -103,18 +119,31 @@
         return dashboardData[collection];
       },
 
+      _computeIsIMOClusters: function (profile) {
+        return (profile.imo_clusters || []).length > 0;
+      },
+
       _onConfirm: function (e, result) {
         e.stopPropagation();
 
-        this.$.confirm.run({
-          body:
-              'The IMO will be informed of this submission and you will ' +
-              'not be able to make any changes on this report unless it ' +
-              'is sent back to you. Are you sure you’d like to Submit this report?',
-          result: result,
-          maxWidth: '500px',
-          mode: App.Constants.CONFIRM_MODAL,
-        });
+        if (!this.isIMO) {
+          this.$.confirm.run({
+            body:
+                'The IMO will be informed of this submission and you will ' +
+                'not be able to make any changes on this report unless it ' +
+                'is sent back to you. Are you sure you’d like to Submit this report?',
+            result: result,
+            maxWidth: '500px',
+            mode: App.Constants.CONFIRM_MODAL,
+          });
+        } else if (this.isIMO) {
+          this.$.confirm.run({
+            body: 'Are you sure you’d like to Submit this report?',
+            result: result,
+            maxWidth: '500px',
+            mode: App.Constants.CONFIRM_MODAL,
+          });
+        }
       },
     });
   </script>

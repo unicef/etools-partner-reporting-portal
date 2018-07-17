@@ -10,6 +10,7 @@
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/pagination.html">
 <link rel="import" href="../../behaviors/data-table.html">
+<link rel="import" href="../etools-prp-permissions.html">
 <link rel="import" href="../confirm-box.html">
 <link rel="import" href="../list-placeholder.html">
 <link rel="import" href="cluster-report-proxy.html">
@@ -46,6 +47,10 @@
         params-string="{{query}}"
         params-object="{{queryParams}}">
     </iron-query-params>
+
+    <etools-prp-permissions
+        permissions="{{permissions}}">
+    </etools-prp-permissions>
 
     <etools-data-table-footer
         page-size="[[pageSize]]"
@@ -117,6 +122,16 @@
           type: Number,
           statePath: 'clusterIndicatorReports.count',
         },
+
+        profile: {
+          type: Object,
+          statePath: 'userProfile.profile',
+        },
+
+        isIMO: {
+          type: Boolean,
+          computed: '_computeIsIMOClusters(profile)'
+        },
       },
 
       listeners: {
@@ -128,16 +143,24 @@
       _onConfirm: function (e, result) {
         e.stopPropagation();
 
-        this.$.confirm.run({
-          body:
-              'The IMO will be informed of this submission and you will ' +
-              'not be able to make any changes on this report unless it ' +
-              'is sent back to you. Are you sure you’d like to Submit this report?',
-          result: result,
-          maxWidth: '500px',
-          mode: App.Constants.CONFIRM_MODAL,
-        });
-      },
+        if (!this.isIMO) {
+          this.$.confirm.run({
+            body:
+                'The IMO will be informed of this submission and you will ' +
+                'not be able to make any changes on this report unless it ' +
+                'is sent back to you. Are you sure you’d like to Submit this report?',
+            result: result,
+            maxWidth: '500px',
+            mode: App.Constants.CONFIRM_MODAL,
+          });
+        } else if (this.isIMO) {
+          this.$.confirm.run({
+            body: 'Are you sure you’d like to Submit this report?',
+            result: result,
+            maxWidth: '500px',
+            mode: App.Constants.CONFIRM_MODAL,
+          });
+        }
 
       _onContentsChanged: function (e) {
         var tail = this.totalResults % this.pageSize;
