@@ -10,7 +10,6 @@
 <link rel="import" href="../../behaviors/utils.html">
 <link rel="import" href="../../behaviors/pagination.html">
 <link rel="import" href="../../behaviors/data-table.html">
-<link rel="import" href="../etools-prp-permissions.html">
 <link rel="import" href="../confirm-box.html">
 <link rel="import" href="../list-placeholder.html">
 <link rel="import" href="cluster-report-proxy.html">
@@ -47,10 +46,6 @@
         params-string="{{query}}"
         params-object="{{queryParams}}">
     </iron-query-params>
-
-    <etools-prp-permissions
-        permissions="{{permissions}}">
-    </etools-prp-permissions>
 
     <etools-data-table-footer
         page-size="[[pageSize]]"
