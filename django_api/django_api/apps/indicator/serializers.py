@@ -1185,11 +1185,22 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             validated_data['is_cluster_indicator'] = False
 
             if validated_data['start_date_of_reporting_period'] < content_object.start_date:
-                raise ValidationError("Start date of reporting period cannot come before the project's start date")
+                error_msg = "Start date of reporting period cannot come before the project's start date"
+
+                raise ValidationError({
+                    "start_date_of_reporting_period": error_msg,
+                })
 
         elif reportable_object_content_model == PartnerActivity:
             get_object_or_404(PartnerActivity, pk=validated_data['object_id'])
             validated_data['is_cluster_indicator'] = False
+
+            if validated_data['start_date_of_reporting_period'] < content_object.start_date:
+                error_msg = "Start date of reporting period cannot come before the activity's start date"
+
+                raise ValidationError({
+                    "start_date_of_reporting_period": error_msg,
+                })
         else:
             raise NotImplemented()
 
@@ -1259,10 +1270,23 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
         if reportable_object_content_model == PartnerProject:
             content_object = get_object_or_404(PartnerProject, pk=validated_data['object_id'])
-            validated_data['is_cluster_indicator'] = False
 
             if validated_data['start_date_of_reporting_period'] < content_object.start_date:
-                raise ValidationError("Start date of reporting period cannot come before the project's start date")
+                error_msg = "Start date of reporting period cannot come before the project's start date"
+
+                raise ValidationError({
+                    "start_date_of_reporting_period": error_msg,
+                })
+
+        elif reportable_object_content_model == PartnerActivity:
+            content_object = get_object_or_404(PartnerActivity, pk=validated_data['object_id'])
+
+            if validated_data['start_date_of_reporting_period'] < content_object.start_date:
+                error_msg = "Start date of reporting period cannot come before the activity's start date"
+
+                raise ValidationError({
+                    "start_date_of_reporting_period": error_msg,
+                })
 
         # Swapping validated_data['locations'] with raw request.data['locations']
         # Due to missing id field as it is write_only field
