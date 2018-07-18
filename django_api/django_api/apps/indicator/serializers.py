@@ -1192,7 +1192,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 })
 
         elif reportable_object_content_model == PartnerActivity:
-            get_object_or_404(PartnerActivity, pk=validated_data['object_id'])
+            content_object = get_object_or_404(PartnerActivity, pk=validated_data['object_id'])
             validated_data['is_cluster_indicator'] = False
 
             if validated_data['start_date_of_reporting_period'] < content_object.start_date:
