@@ -472,7 +472,7 @@ AWS_S3_SECRET_ACCESS_KEY = os.environ.get('AWS_S3_SECRET_ACCESS_KEY', None)
 AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME', None)
 
 if all([AZURE_ACCOUNT_NAME, AZURE_ACCOUNT_KEY, AZURE_CONTAINER]):
-    DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
+    DEFAULT_FILE_STORAGE = 'core.mixins.EToolsAzureStorage'
     AZURE_SSL = True
     AZURE_AUTO_SIGN = True  # flag for automatically signing urls
     AZURE_ACCESS_POLICY_EXPIRY = 120  # length of time before signature expires in seconds
