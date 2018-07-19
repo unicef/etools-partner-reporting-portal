@@ -15,7 +15,7 @@ from ocha.constants import HPC_V1_ROOT_URL, RefCode, HPC_V2_ROOT_URL
 from ocha.imports.utilities import get_json_from_url
 from ocha.imports.response_plan import import_response_plan
 from ocha.imports.project import import_project, get_project_list_for_plan
-from ocha.imports.bulk import get_response_plans_for_countries, fetch_json_urls_async
+from ocha.imports.bulk import get_response_plans_for_countries, fetch_json_urls
 from ocha.utilities import trim_list
 from partner.models import Partner
 from partner.serializers import PartnerProjectSerializer
@@ -189,7 +189,7 @@ class RPMProjectDetailAPIView(APIView):
     def get(self, request, *args, **kwargs):
         details_url = HPC_V2_ROOT_URL + 'project/{}'.format(self.kwargs['id'])
 
-        details = fetch_json_urls_async([
+        details = fetch_json_urls([
             details_url,
         ])
 
@@ -200,7 +200,7 @@ class RPMProjectDetailAPIView(APIView):
         else:
             budget_url = HPC_V1_ROOT_URL + 'fts/flow?projectId={}'.format(self.kwargs['id'])
 
-        details, budget_info = fetch_json_urls_async([
+        details, budget_info = fetch_json_urls([
             details_url,
             budget_url,
         ])

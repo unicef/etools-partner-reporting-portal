@@ -1,6 +1,4 @@
-import aiohttp
-import asyncio
-import greenlet
+import requests
 
 import itertools
 
@@ -8,24 +6,16 @@ from ocha.constants import HPC_V1_ROOT_URL
 from . import utilities
 
 
-def fetch_json_urls_async(url_list):
+def fetch_json_urls(url_list):
     data_list = list()
-    current_thread = greenlet.getcurrent()
 
-    @asyncio.coroutine
-    async def get_json(url, greenlet_instance, future):
-        async with aiohttp.ClientSession(headers=utilities.get_headers()) as session:
-            async with session.get(url) as response:
-                result = await response.json()
-                future.set_result(result)
-                greenlet_instance.switch()
+    def get_json(url):
+        response = requests.get(url, headers=utilities.get_headers())
+        return response.json()
 
     for url in url_list:
-        future = asyncio.Future()
-        asyncio.Task(get_json(url, current_thread, future))
-        current_thread.parent.switch()
-
-        data_list.append(future.result())
+        result = get_json(url)
+        data_list.append(result)
 
     return data_list
 
@@ -35,7 +25,7 @@ def get_response_plans_for_countries(iso3_codes):
         HPC_V1_ROOT_URL + 'plan/country/{}'.format(iso3) for iso3 in iso3_codes
     ]
 
-    results = fetch_json_urls_async(urls_to_retrieve)
+    results = fetch_json_urls(urls_to_retrieve)
 
     return list(itertools.chain.from_iterable([
         r['data'] for r in results
