@@ -29,3 +29,22 @@ AUTHENTICATION_BACKENDS = (
 )
 
 CORS_ORIGIN_WHITELIST += ('localhost:8082', )
+
+if all([AWS_S3_ACCESS_KEY_ID, AWS_S3_SECRET_ACCESS_KEY, AWS_STORAGE_BUCKET_NAME]):
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    AWS_S3_FILE_OVERWRITE = False
+    AWS_S3_SIGNATURE_VERSION = 's3v4'
+    AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'eu-central-1')
+
+elif all([AZURE_ACCOUNT_NAME, AZURE_ACCOUNT_KEY, AZURE_CONTAINER]):
+    DEFAULT_FILE_STORAGE = 'core.mixins.EToolsAzureStorage'
+    AZURE_SSL = True
+    AZURE_AUTO_SIGN = True  # flag for automatically signing urls
+    AZURE_ACCESS_POLICY_EXPIRY = 120  # length of time before signature expires in seconds
+    AZURE_ACCESS_POLICY_PERMISSION = 'r'  # read permission
+
+    from storages.backends.azure_storage import AzureStorage
+    storage = AzureStorage()
+    with storage.open('keys/jwt/certificate.pem') as jwt_cert:
+        with open('keys/jwt/certificate.pem', 'w+') as new_jwt_cert:
+            new_jwt_cert.write(jwt_cert.read())

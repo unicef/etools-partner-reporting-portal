@@ -12,6 +12,7 @@ from social_core.pipeline import user as social_core_user
 from azure.storage import AccessPolicy, SharedAccessPolicy
 
 from storages.backends.azure_storage import AzureStorage
+from storages.utils import setting
 
 
 def social_details(backend, details, response, *args, **kwargs):
@@ -92,14 +93,14 @@ class CustomAzureADBBCOAuth2(AzureADB2COAuth2):
 
 @deconstructible
 class EToolsAzureStorage(AzureStorage):
-    account_name = settings.AZURE_ACCOUNT_NAME
-    account_key = settings.AZURE_ACCOUNT_KEY
-    azure_container = settings.AZURE_CONTAINER
-    azure_ssl = settings.AZURE_SSL
+    account_name = setting("AZURE_ACCOUNT_NAME")
+    account_key = setting("AZURE_ACCOUNT_KEY")
+    azure_container = setting("AZURE_CONTAINER")
+    azure_ssl = setting("AZURE_SSL")
 
-    auto_sign = settings.AZURE_AUTO_SIGN
-    azure_access_policy_permission = settings.AZURE_ACCESS_POLICY_PERMISSION
-    ap_expiry = settings.AZURE_ACCESS_POLICY_EXPIRY
+    auto_sign = setting("AZURE_AUTO_SIGN")
+    azure_access_policy_permission = setting("AZURE_ACCESS_POLICY_PERMISSION")
+    ap_expiry = setting("AZURE_ACCESS_POLICY_EXPIRY")
 
     def __init__(self, *args, **kwargs):
         super(EToolsAzureStorage, self).__init__(*args, **kwargs)
