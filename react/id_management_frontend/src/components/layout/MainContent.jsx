@@ -5,7 +5,9 @@ import mainStyles from "../../styles/mainStyles";
 const styleSheet = {
     mainContent: {
         marginTop: mainStyles.header.height,
-        marginLeft: mainStyles.sideBar.width
+        marginLeft: mainStyles.sideBar.width,
+        backgroundColor: '#F1F1F1',
+        minHeight: 'calc(100vh - ' + mainStyles.header.height + 'px)'
     }
 };
 

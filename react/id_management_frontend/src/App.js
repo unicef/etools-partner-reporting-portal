@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import './App.css';
 import {Provider} from "react-redux";
 import store from './store';
 import Main from "./components/Main";
@@ -7,7 +6,7 @@ import {BrowserRouter as Router} from 'react-router-dom';
 
 class App extends Component {
     render() {
-        return (
+        return ( 
             <Provider store={store}>
                 <Router>
                     <Main/>
