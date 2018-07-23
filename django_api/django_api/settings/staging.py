@@ -42,9 +42,3 @@ elif all([AZURE_ACCOUNT_NAME, AZURE_ACCOUNT_KEY, AZURE_CONTAINER]):
     AZURE_AUTO_SIGN = True  # flag for automatically signing urls
     AZURE_ACCESS_POLICY_EXPIRY = 120  # length of time before signature expires in seconds
     AZURE_ACCESS_POLICY_PERMISSION = 'r'  # read permission
-
-    from storages.backends.azure_storage import AzureStorage
-    storage = AzureStorage()
-    with storage.open('keys/jwt/certificate.pem') as jwt_cert:
-        with open('keys/jwt/certificate.pem', 'w+') as new_jwt_cert:
-            new_jwt_cert.write(jwt_cert.read())
