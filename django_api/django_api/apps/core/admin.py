@@ -33,7 +33,7 @@ class LocationAdmin(LeafletGeoAdmin, admin.ModelAdmin):
         'gateway',
         'parent',
     )
-    list_display = ('title', 'parent', 'gateway', 'p_code', 'external_id')
+    list_display = ('title', 'parent', 'gateway', 'p_code',)
     search_fields = ('title', 'p_code',)
 
     def get_form(self, request, obj=None, **kwargs):
@@ -52,7 +52,6 @@ class CartoDBTableAdmin(admin.ModelAdmin):
     save_as = True
     list_display = (
         'domain',
-        'api_key',
         'table_name',
         'location_type',
         'parent_table_name',
@@ -65,7 +64,7 @@ class CartoDBTableAdmin(admin.ModelAdmin):
 
     def import_sites(self, request, queryset):
         for table in queryset:
-            update_sites_from_cartodb.delay(table)
+            update_sites_from_cartodb.delay(table.pk)
 
 
 class WorkspaceAdmin(admin.ModelAdmin):

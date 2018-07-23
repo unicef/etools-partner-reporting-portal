@@ -11,12 +11,16 @@ from django.core.validators import (
     MinValueValidator,
     MaxValueValidator
 )
+from django.utils.translation import ugettext as _
 from django.db.models import Q
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
 
 from model_utils.models import TimeStampedModel
+
+import mptt
 from mptt.models import MPTTModel, TreeForeignKey
+from mptt.managers import TreeManager
 
 from core.countries import COUNTRY_NAME_TO_ALPHA2_CODE
 from .common import (
@@ -401,28 +405,28 @@ class GatewayType(TimeStampedModel):
     Represents an Admin Type in location-related models.
     """
 
-    name = models.CharField(max_length=64, unique=True)
-    admin_level = models.PositiveSmallIntegerField()
+    name = models.CharField(max_length=64, unique=True, verbose_name=_('Name'))
+    admin_level = models.PositiveSmallIntegerField(null=True, verbose_name=_('Admin Level'))
 
     country = models.ForeignKey(Country, related_name="gateway_types")
 
     class Meta:
         ordering = ['name']
+        unique_together = ('country', 'admin_level')
         verbose_name = 'Location Type'
 
     def __str__(self):
         return '{} - {}'.format(self.country, self.name)
 
 
-class LocationManager(models.GeoManager):
+class LocationManager(TreeManager):
 
     def get_queryset(self):
-        return super(LocationManager, self).get_queryset(
-        ).select_related('gateway')
+        return super(LocationManager, self).get_queryset().order_by('title').select_related('gateway')
 
 
 @python_2_unicode_compatible
-class Location(TimeStampedExternalSourceModel):
+class Location(MPTTModel):
     """
     Location model define place where agents are working.
     The background of the location can be:
@@ -439,7 +443,7 @@ class Location(TimeStampedExternalSourceModel):
     title = models.CharField(max_length=255)
 
     gateway = models.ForeignKey(
-        GatewayType, verbose_name='Location Type', related_name='locations'
+        GatewayType, verbose_name='Location Type', related_name='locations',  on_delete=models.CASCADE,
     )
     carto_db_table = models.ForeignKey(
         'core.CartoDBTable',
@@ -470,8 +474,14 @@ class Location(TimeStampedExternalSourceModel):
     )
     p_code = models.CharField(max_length=32, blank=True, null=True, verbose_name='Postal Code')
 
-    parent = models.ForeignKey(
-        'self', null=True, blank=True, related_name='children', db_index=True
+    parent = TreeForeignKey(
+        'self',
+        verbose_name=_("Parent"),
+        null=True,
+        blank=True,
+        related_name='children',
+        db_index=True,
+        on_delete=models.CASCADE
     )
 
     geom = models.MultiPolygonField(null=True, blank=True)
@@ -513,14 +523,27 @@ class CartoDBTable(MPTTModel):
         core.Country: 'country'
     """
 
-    domain = models.CharField(max_length=254)
-    api_key = models.CharField(max_length=254)
-    table_name = models.CharField(max_length=254)
-    location_type = models.ForeignKey(GatewayType)
-    parent = TreeForeignKey('self', null=True, blank=True,
-                            related_name='children', db_index=True)
+    domain = models.CharField(max_length=254, verbose_name=_('Domain'))
+    table_name = models.CharField(max_length=254, verbose_name=_('Table Name'))
+    display_name = models.CharField(max_length=254, default='', blank=True, verbose_name=_('Display Name'))
+    location_type = models.ForeignKey(
+        GatewayType, verbose_name=_('Location Type'),
+        on_delete=models.CASCADE,
+    )
+    name_col = models.CharField(max_length=254, default='name', verbose_name=_('Name Column'))
+    pcode_col = models.CharField(max_length=254, default='pcode', verbose_name=_('Pcode Column'))
+    parent_code_col = models.CharField(max_length=254, default='', blank=True, verbose_name=_('Parent Code Column'))
+    parent = TreeForeignKey(
+        'self', null=True, blank=True, related_name='children', db_index=True,
+        verbose_name=_('Parent'),
+        on_delete=models.CASCADE,
+    )
 
     country = models.ForeignKey(Country, related_name="carto_db_tables")
 
     def __str__(self):
         return self.table_name
+
+
+mptt.register(Location, order_insertion_by=['title'])
+mptt.register(CartoDBTable, order_insertion_by=['table_name'])
