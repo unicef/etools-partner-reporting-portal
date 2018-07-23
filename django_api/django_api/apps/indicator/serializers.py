@@ -1073,18 +1073,22 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 {"disaggregations": "List of dict disaggregation expected"}
             )
 
-    def check_progress_values(self, validated_data):
+    def check_progress_values(self, partner, reportable_object_content_model, validated_data):
         """
         Validates baseline, target, in-need
         """
+
         if 'baseline' not in validated_data:
-            raise ValidationError(
-                {"baseline": "baseline is required for IMO creating Cluster Indicator"}
-            )
+            if not partner and reportable_object_content_model not in (PartnerProject, PartnerActivity):
+                    raise ValidationError(
+                        {"baseline": "baseline is required for IMO to create Indicator"}
+                    )
+            else:
+                validated_data['baseline'] = {'v': 0, 'd': 1}
 
         if 'target' not in validated_data:
             raise ValidationError(
-                {"target": "target is required for IMO creating Cluster Indicator"}
+                {"target": "target is required to create Indicator"}
             )
 
         if 'd' not in validated_data['baseline']:
@@ -1138,14 +1142,14 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             raise ValidationError(
                 {"locations": "Selected locations should share same admin level"})
 
+    def resolve_reportable_content_type(self, object_type):
+        return ContentType.objects.get_by_natural_key(
+            *object_type.split('.')
+        )
+
     @transaction.atomic
     def create(self, validated_data):
         partner = self.context['request'].user.partner
-
-        self.check_disaggregation(self.initial_data.get('disaggregations'))
-
-        if not partner:
-            self.check_progress_values(validated_data)
 
         if validated_data['blueprint']['display_type'] == IndicatorBlueprint.RATIO:
             validated_data['blueprint']['unit'] = IndicatorBlueprint.PERCENTAGE
@@ -1169,10 +1173,11 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
         validated_data['blueprint'] = blueprint.save()
 
-        reportable_object_content_type = ContentType.objects.get_by_natural_key(
-            *validated_data.pop('object_type').split('.')
-        )
+        reportable_object_content_type = self.resolve_reportable_content_type(validated_data.pop('object_type'))
         reportable_object_content_model = reportable_object_content_type.model_class()
+
+        self.check_disaggregation(self.initial_data.get('disaggregations'))
+        self.check_progress_values(partner, reportable_object_content_model, validated_data)
 
         if reportable_object_content_model == ClusterObjective:
             get_object_or_404(ClusterObjective, pk=validated_data['object_id'])
@@ -1229,7 +1234,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
             else:
                 # Location-level progress value validation
-                self.check_progress_values(loc_data)
+                self.check_progress_values(reportable_object_content_model, loc_data)
 
             loc_data['reportable'] = self.instance
 
@@ -1260,13 +1265,10 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
             validated_data.pop('in_need', None)
             validated_data.pop('target', None)
 
-        if not partner:
-            self.check_progress_values(validated_data)
-
-        reportable_object_content_type = ContentType.objects.get_by_natural_key(
-            *validated_data.pop('object_type').split('.')
-        )
+        reportable_object_content_type = self.resolve_reportable_content_type(validated_data.pop('object_type'))
         reportable_object_content_model = reportable_object_content_type.model_class()
+
+        self.check_progress_values(partner, reportable_object_content_model, validated_data)
 
         if reportable_object_content_model == PartnerProject:
             content_object = get_object_or_404(PartnerProject, pk=validated_data['object_id'])
@@ -1309,7 +1311,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
                 if not partner:
                     # Location-level progress value validation
-                    self.check_progress_values(loc_goal)
+                    self.check_progress_values(reportable_object_content_model, loc_goal)
 
         except Location.DoesNotExist:
             raise ValidationError("Location ID %d does not exist" % loc_goal['location'])
