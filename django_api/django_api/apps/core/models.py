@@ -412,7 +412,6 @@ class GatewayType(TimeStampedModel):
 
     class Meta:
         ordering = ['name']
-        unique_together = ('country', 'admin_level')
         verbose_name = 'Location Type'
 
     def __str__(self):
