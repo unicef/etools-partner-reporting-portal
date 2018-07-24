@@ -3,6 +3,7 @@ import time
 from django.db import IntegrityError, transaction
 from django.utils.encoding import force_text
 
+from celery import shared_task
 from celery.utils.log import get_task_logger
 
 from carto.sql import SQLClient
@@ -11,7 +12,6 @@ from carto.exceptions import CartoException
 
 from pyrestcli.auth import BaseAuthClient
 
-from core.celery import app, FaultTolerantTask
 from core.models import Location, CartoDBTable
 
 
