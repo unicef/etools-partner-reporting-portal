@@ -155,7 +155,7 @@ def create_location(pcode,
         return True, sites_not_added, sites_created, sites_updated
 
 
-@app.task(base=FaultTolerantTask)
+@shared_task
 def update_sites_from_cartodb(carto_table_pk):
     """
     Creates or Retrieve Location objects based on
