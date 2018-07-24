@@ -88,12 +88,12 @@
 
         profile: {
           type: Object,
-          statePath: 'userProfile.profile',
+          statePath: 'auth.accountType',
         },
 
         isIMO: {
           type: Boolean,
-          computed: '_computeIsIMOClusters(profile)'
+          computed: '_checkIMO(profile)'
         },
       },
 
@@ -114,8 +114,10 @@
         return dashboardData[collection];
       },
 
-      _computeIsIMOClusters: function (profile) {
-        return (profile.imo_clusters || []).length > 0;
+      _checkIMO: function (profile) {
+        if (String(profile) === "ACCOUNT_TYPE_IMO") {
+          return true;
+        } else return false;
       },
 
       _onConfirm: function (e, result) {

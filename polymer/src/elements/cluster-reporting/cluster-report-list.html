@@ -120,12 +120,12 @@
 
         profile: {
           type: Object,
-          statePath: 'userProfile.profile',
+          statePath: 'auth.accountType',
         },
 
         isIMO: {
           type: Boolean,
-          computed: '_computeIsIMOClusters(profile)'
+          computed: '_checkIMO(profile)'
         },
       },
 
@@ -133,6 +133,12 @@
         'report-submit-confirm': '_onConfirm',
         'report-submitted': '_onContentsChanged',
         'report-reviewed': '_onContentsChanged',
+      },
+
+      _checkIMO: function (profile) {
+        if (String(profile) === "ACCOUNT_TYPE_IMO") {
+          return true;
+        } else return false;
       },
 
       _onConfirm: function (e, result) {
