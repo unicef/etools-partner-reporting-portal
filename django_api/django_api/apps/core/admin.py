@@ -64,7 +64,7 @@ class CartoDBTableAdmin(admin.ModelAdmin):
 
     def import_sites(self, request, queryset):
         for table in queryset:
-            update_sites_from_cartodb.delay(table.pk)
+            update_sites_from_cartodb(table.pk)
 
 
 class WorkspaceAdmin(admin.ModelAdmin):
