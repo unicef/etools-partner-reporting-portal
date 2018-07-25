@@ -72,12 +72,8 @@ def process_period_reports():
             print("Indicator {} frequency is custom specific dates".format(reportable))
 
             if not latest_indicator_report:
-                # PartnerProject, PartnerActivity
-                if hasattr(reportable.content_object, 'start_date'):
-                    date_list = [reportable.content_object.start_date]
-                # ClusterObjective
-                elif hasattr(reportable.content_object, 'response_plan'):
-                    date_list = [reportable.content_object.response_plan.start]
+                date_list = list()
+                date_list.append(reportable.start_date_of_reporting_period)
                 date_list.extend(reportable.cs_dates)
             else:
                 date_list = [latest_indicator_report.time_period_end + timedelta(days=1)]

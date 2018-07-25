@@ -205,16 +205,9 @@ def calculate_end_date_given_start_date(start_date, frequency, cs_dates=None):
             start_date.year, quarter=quarter)
 
     elif frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
-        last_element_idx = len(cs_dates) - 1
-
         for idx, cs_date in enumerate(cs_dates):
             if cs_date > start_date:
-                if idx != last_element_idx:
-                    end_date = cs_date - timedelta(days=1)
-
-                else:
-                    end_date = cs_date
-
+                end_date = cs_date - timedelta(days=1)
                 break
 
     return end_date
