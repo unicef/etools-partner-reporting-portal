@@ -3,6 +3,7 @@ import PageHeader from "../common/PageHeader";
 import ButtonNew from "../common/ButtonNew";
 import PageContent from "../common/PageContent";
 import UsersFilter from "./UsersFilter";
+import UsersList from "./UsersList";
 
 const labels = {
     header: "Users"
@@ -18,6 +19,7 @@ class Users extends Component {
 
                 <PageContent>
                     <UsersFilter />
+                    <UsersList />
                 </PageContent>
             </div>
         );
