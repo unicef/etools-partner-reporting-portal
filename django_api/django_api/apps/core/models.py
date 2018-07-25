@@ -439,6 +439,15 @@ class Location(MPTTModel):
         core.Location (ForeignKey): "self"
         core.GatewayType: "gateway"
     """
+    external_id = models.CharField(
+        help_text='An ID representing this instance in an external system',
+        blank=True,
+        null=True,
+        max_length=32
+    )
+
+    external_source = models.TextField(choices=EXTERNAL_DATA_SOURCES, blank=True, null=True)
+
     title = models.CharField(max_length=255)
 
     gateway = models.ForeignKey(
@@ -488,7 +497,7 @@ class Location(MPTTModel):
     objects = LocationManager()
 
     class Meta:
-        unique_together = ('title', 'p_code')
+        unique_together = (('title', 'p_code'), ('external_id', 'external_source'))
         ordering = ['title']
 
     def __str__(self):
