@@ -188,7 +188,7 @@ def calculate_end_date_given_start_date(start_date, frequency, cs_dates=None):
     end_date = None
 
     if frequency == PD_FREQUENCY_LEVEL.weekly:
-        end_date = start_date + timedelta(7)
+        end_date = start_date + timedelta(6)
 
     elif frequency == PD_FREQUENCY_LEVEL.monthly:
         num_of_days = get_num_of_days_in_a_month(
@@ -205,16 +205,9 @@ def calculate_end_date_given_start_date(start_date, frequency, cs_dates=None):
             start_date.year, quarter=quarter)
 
     elif frequency == PD_FREQUENCY_LEVEL.custom_specific_dates:
-        last_element_idx = len(cs_dates) - 1
-
         for idx, cs_date in enumerate(cs_dates):
             if cs_date > start_date:
-                if idx != last_element_idx:
-                    end_date = cs_date - timedelta(days=1)
-
-                else:
-                    end_date = cs_date
-
+                end_date = cs_date - timedelta(days=1)
                 break
 
     return end_date
@@ -265,12 +258,17 @@ def find_missing_frequency_period_dates_for_indicator_report(indicator, latest_i
 
             missing_date = date_to_subtract_from - timedelta(day_delta_counter)
 
+            # If this is generating monthly report first time, adjust the date_to_subtract_from to prevent
+            # duplicate pro-rata dates
+            if frequency == PD_FREQUENCY_LEVEL.monthly and not latest_indicator_report_date and date_list:
+                missing_date = missing_date.replace(day=1)
+
             if frequency == PD_FREQUENCY_LEVEL.weekly:
                 # Check if we should proceed to next date
-                if day_delta >= 8:
+                if day_delta >= 7:
                     # If day_delta_counter has more week date to create
-                    if day_delta_counter >= 8:
-                        day_delta_counter -= 8
+                    if day_delta_counter >= 7:
+                        day_delta_counter -= 7
 
                     # We have exhausted day_delta_counter successfully. Exiting
                     else:
