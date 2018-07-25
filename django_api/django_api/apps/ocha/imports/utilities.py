@@ -125,11 +125,11 @@ def save_location_list(location_list, parent=None, save_children=False):
             )
 
             location, _ = Location.objects.update_or_create(
-                external_source=EXTERNAL_DATA_SOURCES.HPC,
-                external_id=location_data['data']['id'],
+                p_code=location_data['data']['pcode'],
                 defaults={
                     'title': location_data['data']['name'],
-                    'p_code': location_data['data']['pcode'],
+                    'external_source': EXTERNAL_DATA_SOURCES.HPC,
+                    'external_id': location_data['data']['id'],
                     'latitude': location_data['data'].get('latitude'),
                     'longitude': location_data['data'].get('longitude'),
                     'gateway': gateway,
