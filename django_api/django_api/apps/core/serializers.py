@@ -4,7 +4,7 @@ from rest_framework import serializers
 from cluster.models import Cluster
 from core.common import PRP_ROLE_TYPES, CLUSTER_TYPES
 from utils.serializers import CurrentWorkspaceDefault
-from .models import Workspace, Location, ResponsePlan, Country, GatewayType
+from .models import Workspace, Location, ResponsePlan, Country, GatewayType, PRPRole
 
 
 class CountrySerializer(serializers.ModelSerializer):
@@ -192,3 +192,9 @@ class PMPLocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
         fields = ('name', 'pcode', 'gateway')
+
+
+class PRPRoleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PRPRole
+        fields = ('role',)

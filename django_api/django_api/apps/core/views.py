@@ -4,7 +4,7 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
 import django_filters
-from rest_framework.generics import ListAPIView, CreateAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView, GenericAPIView, DestroyAPIView, UpdateAPIView
 from rest_framework.response import Response
 from rest_framework import status as statuses
 from rest_framework.views import APIView
@@ -16,13 +16,14 @@ from core.common import DISPLAY_CLUSTER_TYPES, PARTNER_PROJECT_STATUS
 from utils.serializers import serialize_choices
 from .filters import LocationFilter
 from .permissions import IsAuthenticated, IsIMOForCurrentWorkspace, IsSuperuser
-from .models import Workspace, Location, ResponsePlan
+from .models import Workspace, Location, ResponsePlan, PRPRole
 from .serializers import (
     WorkspaceSerializer,
     ShortLocationSerializer,
     ChildrenLocationSerializer,
     ResponsePlanSerializer,
     CreateResponsePlanSerializer,
+    PRPRoleSerializer,
 )
 
 
@@ -200,3 +201,9 @@ class TaskTriggerAPIView(APIView):
             'task_name': task_name,
             'status': 'started'
         })
+
+
+class PRPRoleUpdateDestroyAPIView(UpdateAPIView, DestroyAPIView, GenericAPIView):
+    serializer_class = PRPRoleSerializer
+    permission_classes = (IsAuthenticated,)
+    queryset = PRPRole.objects.all()
