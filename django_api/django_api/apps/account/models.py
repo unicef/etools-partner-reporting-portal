@@ -29,6 +29,7 @@ class User(AbstractUser):
         unique=True,
         db_index=True
     )
+    position = models.CharField(max_length=64, null=True, blank=True, default=None)
 
     def __str__(self):
         return '[{}] {} ({})'.format(
@@ -52,6 +53,11 @@ class User(AbstractUser):
         if created:
             instance.set_unusable_password()
             instance.save()
+
+    def save(self, *args, **kwargs):
+        if not self.username:
+            self.username = self.email
+        super().save(*args, **kwargs)
 
 
 class UserProfile(TimeStampedModel):
