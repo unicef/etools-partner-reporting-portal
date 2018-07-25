@@ -35,6 +35,7 @@ urlpatterns = [
     url(r'^api/unicef/', include('unicef.urls')),
     url(r'^api/cluster/', include('cluster.urls')),
     url(r'^api/ocha/', include('ocha.urls')),
+    url(r'^api/id-management/', include('id_management.urls')),
 
     # Social auth urls
     url(r'^social/', include('social_django.urls', namespace='social')),
