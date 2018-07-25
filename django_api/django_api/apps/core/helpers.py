@@ -265,6 +265,11 @@ def find_missing_frequency_period_dates_for_indicator_report(indicator, latest_i
 
             missing_date = date_to_subtract_from - timedelta(day_delta_counter)
 
+            # If this is generating monthly report first time, adjust the date_to_subtract_from to prevent
+            # duplicate pro-rata dates
+            if frequency == PD_FREQUENCY_LEVEL.monthly and not latest_indicator_report_date and date_list:
+                missing_date = missing_date.replace(day=1)
+
             if frequency == PD_FREQUENCY_LEVEL.weekly:
                 # Check if we should proceed to next date
                 if day_delta >= 7:
