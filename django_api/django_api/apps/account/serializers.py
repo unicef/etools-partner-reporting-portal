@@ -51,5 +51,7 @@ class UserSerializer(serializers.ModelSerializer):
             'last_name', 'profile',
             'partner', 'organization',
             'access', 'prp_roles',
+            'position'
         )
+        read_only_fields = ('id', 'profile', 'partner', 'organization', 'access', 'prp_roles')
         depth = 1
