@@ -76,11 +76,16 @@ def process_period_reports():
                 date_list.append(reportable.start_date_of_reporting_period)
                 date_list.extend(reportable.cs_dates)
             else:
-                date_list = [latest_indicator_report.time_period_end + timedelta(days=1)]
+                date_list = [latest_indicator_report.due_date]
                 date_list.extend(filter(
-                    lambda item: item > latest_indicator_report.time_period_end,
+                    lambda item: item > latest_indicator_report.due_date,
                     reportable.cs_dates
                 ))
+
+                # If there is no consecutive due date from last indicator report's due date
+                # Then, there is no need to generate reports
+                if len(date_list) == 1:
+                    date_list = list()
 
         else:
             # Get missing date list based on progress report existence
