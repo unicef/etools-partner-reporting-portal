@@ -1188,7 +1188,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 "start_date_of_reporting_period": error_msg,
             })
 
-        # If indicator reporting frequency is custom and there is no start_date_of_reporting_period
+        # If indicator reporting frequency is custom and start_date_of_reporting_period exists in the due dates
         if validated_data['frequency'] == REPORTABLE_FREQUENCY_LEVEL.custom_specific_dates \
                 and validated_data['start_date_of_reporting_period'] in validated_data['cs_dates']:
             error_msg = "Start date of reporting period cannot be in custom due dates of report"
