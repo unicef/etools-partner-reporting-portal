@@ -136,9 +136,11 @@
       },
 
       _checkIMO: function (profile) {
-        if (String(profile) === "ACCOUNT_TYPE_IMO") {
+        if (String(profile) === 'ACCOUNT_TYPE_IMO') {
           return true;
-        } else return false;
+        } else {
+          return false;
+        }
       },
 
       _onConfirm: function (e, result) {
