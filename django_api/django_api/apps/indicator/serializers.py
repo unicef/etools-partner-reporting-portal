@@ -211,12 +211,23 @@ class ReportableLocationGoalBaselineInNeedSerializer(serializers.ModelSerializer
     id = serializers.IntegerField()
     baseline = serializers.JSONField()
     in_need = serializers.JSONField()
+    target = serializers.JSONField()
     location = LocationSerializer(read_only=True)
 
+    def validate(self, data):
+        in_need = data['in_need']
+        target = data['target']
+        if 'v' in in_need and in_need['v'] > target['v']:
+            raise serializers.ValidationError("Target cannot be greater than In Need")
+        return data
+
     def validate_baseline(self, value):
+
+        if 'v' in value and value['v'] == "":
+            raise serializers.ValidationError("Baseline cannot be empty")
+
         if 'd' not in value:
             value['d'] = 1
-
         elif value['d'] == 0:
             raise serializers.ValidationError("key 'd' cannot be zero")
 
@@ -239,6 +250,7 @@ class ReportableLocationGoalBaselineInNeedSerializer(serializers.ModelSerializer
             'baseline',
             'in_need',
             'location',
+            'target',
         )
 
 
