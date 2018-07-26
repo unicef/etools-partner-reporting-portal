@@ -81,9 +81,6 @@ services:
       - ./react/id_management_frontend/:/code
       - /code/node_modules
     command: bash -c "npm start"
-    ports:
-      - "3000:8082"
-      - "9222:9222"
 
   polymer:
     image: unicef/etools-prp-polymer
