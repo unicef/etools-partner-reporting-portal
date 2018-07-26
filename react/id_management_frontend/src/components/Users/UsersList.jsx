@@ -6,88 +6,6 @@ const labels = {
     header: "Users"
 };
 
-// TODO: Remove when API connected
-const items = [
-    {
-        name: "John Lemon",
-        position: "Manager",
-        email: "john.lemon@moln.org",
-        status: "active",
-        last_login: "2018-07-23"
-    },
-    {
-        name: "John Lemon",
-        position: "Manager",
-        email: "john.lemon@moln.org",
-        status: "active",
-        last_login: "2018-07-23"
-    },
-    {
-        name: "John Lemon",
-        position: "Manager",
-        email: "john.lemon@moln.org",
-        status: "active",
-        last_login: "2018-07-23"
-    },
-    {
-        name: "John Lemon",
-        position: "Manager",
-        email: "john.lemon@moln.org",
-        status: "active",
-        last_login: "2018-07-23"
-    },
-    {
-        name: "John Lemon",
-        position: "Manager",
-        email: "john.lemon@moln.org",
-        status: "active",
-        last_login: "2018-07-23"
-    },
-    {
-        name: "John Lemon",
-        position: "Manager",
-        email: "john.lemon@moln.org",
-        status: "active",
-        last_login: "2018-07-23"
-    },
-    {
-        name: "John Lemon",
-        position: "Manager",
-        email: "john.lemon@moln.org",
-        status: "active",
-        last_login: "2018-07-23"
-    },
-    {
-        name: "John Lemon",
-        position: "Manager",
-        email: "john.lemon@moln.org",
-        status: "active",
-        last_login: "2018-07-23"
-    },
-    {
-        name: "John Lemon",
-        position: "Manager",
-        email: "john.lemon@moln.org",
-        status: "active",
-        last_login: "2018-07-23"
-    },
-    {
-        name: "John Lemon",
-        position: "Manager",
-        email: "john.lemon@moln.org",
-        status: "active",
-        last_login: "2018-07-23"
-    },
-    {
-        name: "John Lemon",
-        position: "Manager",
-        email: "john.lemon@moln.org",
-        status: "active",
-        last_login: "2018-07-23"
-    },
-
-]
-
 class UsersList extends Component {
     getColumns() {
         return [
@@ -115,6 +33,8 @@ class UsersList extends Component {
     }
 
     render() {
+        const {items} = this.props;
+
         return (
             <div>
                 <PaginatedList

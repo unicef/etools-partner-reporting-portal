@@ -1,10 +1,10 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 import GreyPanel from "../common/GreyPanel";
-import TextField from "@material-ui/core/TextField";
 import Grid from "@material-ui/core/Grid";
-import MenuSelect from "../common/MenuSelect";
-import FilterInput from "../common/FilterInput";
 import FilterButtons from "../common/FilterButtons";
+import {reduxForm} from 'redux-form';
+import TextFieldForm from "../form/TextFieldForm";
+import SelectForm from "../form/SelectForm";
 
 const labels = {
     search: "Search",
@@ -36,69 +36,33 @@ const roleOptions = [
 ];
 
 class UsersFilter extends Component {
-    state = {
-        search: "",
-        workspace: "",
-        role: ""
-    };
-
-    handleChange = event => {
-        this.setState({ [event.target.name]: event.target.value });
-    };
-
-    handleClear = event => {
-        this.setState({
-            search: "",
-            workspace: "",
-            role: ""
-        });
-    };
-
     render() {
+        const {reset} = this.props;
+
         return (
             <GreyPanel>
                 <form noValidate>
                     <Grid container spacing={24}>
                         <Grid item md={4}>
-                            <FilterInput>
-                                <TextField
-                                    value={this.state.search}
-                                    onChange={this.handleChange}
-                                    id="search"
-                                    name="search"
-                                    label={labels.search}
-                                    placeholder={labels.searchPlaceholder}
-                                    margin="none"
-                                />
-                            </FilterInput>
+                            <TextFieldForm fieldName="name_email" label={labels.search}
+                                           placeholder={labels.searchPlaceholder}
+                                           margin="none" optional/>
                         </Grid>
                         <Grid item md={4}>
-                            <MenuSelect
-                                value={this.state.workspace}
-                                onChange={this.handleChange}
-                                label={labels.workspace}
-                                name="workspace"
-                                options={workspaceOptions}
-                                nullable
-                            />
+                            <SelectForm fieldName="workspaces" label={labels.workspace} values={workspaceOptions}
+                                        optional multiple/>
                         </Grid>
                         <Grid item md={4}>
-                            <MenuSelect
-                                value={this.state.role}
-                                onChange={this.handleChange}
-                                label={labels.role}
-                                name="role"
-                                options={roleOptions}
-                                nullable
-                            />
+                            <SelectForm fieldName="roles" label={labels.role} values={roleOptions}
+                                        optional multiple/>
                         </Grid>
                     </Grid>
 
-                    <FilterButtons onClear={this.handleClear} />
+                    <FilterButtons onClear={reset}/>
                 </form>
             </GreyPanel>
         );
     }
 }
 
-export default UsersFilter;
+export default reduxForm({form: 'usersFilter'})(UsersFilter);
