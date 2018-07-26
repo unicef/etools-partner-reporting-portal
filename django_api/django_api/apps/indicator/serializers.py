@@ -1121,6 +1121,16 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 {"target": "denominator for target cannot be zero"}
             )
 
+        if validated_data['baseline']['v'] == "":
+            raise ValidationError(
+                {"baseline": "cannot be empty"}
+            )
+
+        if validated_data['target']['v'] == "":
+            raise ValidationError(
+                {"target": "cannot be empty"}
+            )
+
         baseline_value = float(validated_data['baseline']['v']) if float(validated_data['baseline']['d']) == 1 else \
             float(validated_data['baseline']['v']) / float(validated_data['baseline']['d'])
 
