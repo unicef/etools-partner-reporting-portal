@@ -497,7 +497,7 @@ class Location(MPTTModel):
     objects = LocationManager()
 
     class Meta:
-        unique_together = (('title', 'p_code'), ('external_id', 'external_source'))
+        unique_together = ('title', 'p_code')
         ordering = ['title']
 
     def __str__(self):
