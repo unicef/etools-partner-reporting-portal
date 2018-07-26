@@ -12,7 +12,7 @@ from rest_framework.exceptions import ValidationError
 from core.api import PMP_API
 from core.models import Workspace, GatewayType, Location, PartnerAuthorizedOfficerRole
 from core.serializers import PMPGatewayTypeSerializer, PMPLocationSerializer
-from core.common import PARTNER_ACTIVITY_STATUS, PRP_ROLE_TYPES,
+from core.common import PARTNER_ACTIVITY_STATUS, PRP_ROLE_TYPES
 from core.factories import PRPRoleFactory
 
 from partner.models import PartnerActivity
