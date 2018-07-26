@@ -333,7 +333,7 @@ class Reportable(TimeStampedExternalSourceModel):
 
     @property
     def calculated_in_need(self):
-        if not self.in_need:
+        if not self.in_need or self.in_need['v'] == "":
             return None
 
         if self.blueprint.unit == IndicatorBlueprint.NUMBER:

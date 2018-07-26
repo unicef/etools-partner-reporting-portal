@@ -217,7 +217,7 @@ class ReportableLocationGoalBaselineInNeedSerializer(serializers.ModelSerializer
     def validate(self, data):
         in_need = data['in_need']
         target = data['target']
-        if in_need and 'v' in in_need and int(in_need['v']) < int(target['v']):
+        if in_need and 'v' in in_need and float(in_need['v']) < float(target['v']):
             raise serializers.ValidationError("Target cannot be greater than In Need")
         return data
 
@@ -1132,7 +1132,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 {"baseline": "Cannot be greater than target"}
             )
 
-        if 'in_need' in validated_data and validated_data['in_need']:
+        if 'in_need' in validated_data and validated_data['in_need'] and validated_data['in_need']['v'] != "" :
             if 'd' not in validated_data['in_need']:
                 validated_data['in_need']['d'] = 1
 
