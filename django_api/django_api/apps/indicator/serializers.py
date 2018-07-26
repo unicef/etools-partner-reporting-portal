@@ -15,7 +15,7 @@ from unicef.models import LowerLevelOutput, ProgressReport
 from partner.models import PartnerProject, PartnerActivity
 from cluster.models import ClusterObjective, ClusterActivity
 
-from core.common import OVERALL_STATUS, INDICATOR_REPORT_STATUS, FINAL_OVERALL_STATUS
+from core.common import OVERALL_STATUS, INDICATOR_REPORT_STATUS, FINAL_OVERALL_STATUS, REPORTABLE_FREQUENCY_LEVEL
 from core.serializers import LocationSerializer, IdLocationSerializer
 from core.models import Location
 from core.validators import add_indicator_object_type_validator
@@ -1190,6 +1190,24 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
 
         self.check_disaggregation(self.initial_data.get('disaggregations'))
         self.check_progress_values(partner, reportable_object_content_model, validated_data)
+
+        # If indicator reporting frequency is custom and there is no start_date_of_reporting_period
+        if validated_data['frequency'] == REPORTABLE_FREQUENCY_LEVEL.custom_specific_dates \
+                and not validated_data['start_date_of_reporting_period']:
+            error_msg = "Start date of reporting period is required for custom specific date frequency"
+
+            raise ValidationError({
+                "start_date_of_reporting_period": error_msg,
+            })
+
+        # If indicator reporting frequency is custom and start_date_of_reporting_period exists in the due dates
+        if validated_data['frequency'] == REPORTABLE_FREQUENCY_LEVEL.custom_specific_dates \
+                and validated_data['start_date_of_reporting_period'] in validated_data['cs_dates']:
+            error_msg = "Start date of reporting period cannot be in custom due dates of report"
+
+            raise ValidationError({
+                "start_date_of_reporting_period": error_msg,
+            })
 
         if reportable_object_content_model == ClusterObjective:
             get_object_or_404(ClusterObjective, pk=validated_data['object_id'])

@@ -72,19 +72,20 @@ def process_period_reports():
             print("Indicator {} frequency is custom specific dates".format(reportable))
 
             if not latest_indicator_report:
-                # PartnerProject, PartnerActivity
-                if hasattr(reportable.content_object, 'start_date'):
-                    date_list = [reportable.content_object.start_date]
-                # ClusterObjective
-                elif hasattr(reportable.content_object, 'response_plan'):
-                    date_list = [reportable.content_object.response_plan.start]
+                date_list = list()
+                date_list.append(reportable.start_date_of_reporting_period)
                 date_list.extend(reportable.cs_dates)
             else:
-                date_list = [latest_indicator_report.time_period_end + timedelta(days=1)]
+                date_list = [latest_indicator_report.due_date]
                 date_list.extend(filter(
-                    lambda item: item > latest_indicator_report.time_period_end,
+                    lambda item: item > latest_indicator_report.due_date,
                     reportable.cs_dates
                 ))
+
+                # If there is no consecutive due date from last indicator report's due date
+                # Then, there is no need to generate reports
+                if len(date_list) == 1:
+                    date_list = list()
 
         else:
             # Get missing date list based on progress report existence
