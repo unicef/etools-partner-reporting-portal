@@ -58,7 +58,7 @@ class ClusterObjectiveSerializer(serializers.ModelSerializer):
         return data
 
 
-class ClusterObjectivePatchSerializer(ClusterObjectiveSerializer):
+class ClusterObjectivePatchSerializer(serializers.ModelSerializer):
     title = serializers.CharField(required=False)
 
     class Meta:
