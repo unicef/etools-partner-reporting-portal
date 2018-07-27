@@ -8,6 +8,8 @@ import {debounce} from 'throttle-debounce';
 import {api} from "../../infrastructure/api";
 import {fullName} from "../../helpers/filters";
 import qs from 'query-string';
+import AddUserDialog from "./AddUserDialog";
+import withDialogHandling from "../hoc/withDialogHandling";
 
 const labels = {
     header: "Users"
@@ -17,7 +19,8 @@ class Users extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            items: []
+            items: [],
+            addUserDialogOpen: false
         };
         this.filterChange = debounce(500, (filter) => this.onSearch(filter));
     }
@@ -39,7 +42,7 @@ class Users extends Component {
                 })
             }));
 
-        const { history } = this.props;
+        const {history} = this.props;
 
         history.push({
             pathname: history.location.pathname,
@@ -48,19 +51,23 @@ class Users extends Component {
     }
 
     render() {
+        const {dialogOpen, handleDialogOpen, handleDialogClose} = this.props;
+
         return (
             <div>
                 <PageHeader>
-                    {labels.header} <ButtonNew/>
+                    {labels.header} <ButtonNew onClick={() => handleDialogOpen('addUser')}/>
                 </PageHeader>
 
                 <PageContent>
                     <UsersFilter onChange={this.filterChange} initialValues={this.getQuery()}/>
                     <UsersList items={this.state.items}/>
                 </PageContent>
+
+                <AddUserDialog open={dialogOpen.addUser} onClose={handleDialogClose}/>
             </div>
         );
     }
 }
 
-export default Users;
+export default withDialogHandling(Users);

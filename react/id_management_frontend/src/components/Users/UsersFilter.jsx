@@ -63,10 +63,6 @@ const partnerOptions = [
 ];
 
 class UsersFilter extends Component {
-    constructor(props) {
-        super(props);
-    }
-
     componentDidUpdate(prevProps) {
         if (prevProps.portal !== this.props.portal) {
             this.props.reset();

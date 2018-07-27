@@ -13,10 +13,10 @@ const styleSheet = theme => ({
 
 class ButtonNew extends Component {
     render() {
-        const { classes } = this.props;
+        const { classes, onClick } = this.props;
 
         return (
-            <Button variant="contained" color="primary">
+            <Button variant="contained" color="primary" onClick={onClick}>
                 <Add className={classes.icon} /> New
             </Button>
         );
