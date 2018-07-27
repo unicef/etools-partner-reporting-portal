@@ -14,7 +14,7 @@ const styleSheet = theme => ({
     }
 });
 
-class UserRoleControl extends Component {
+class UserWorkspaceRoleControl extends Component {
     render() {
         const { role, action, classes } = this.props;
 
@@ -27,8 +27,8 @@ class UserRoleControl extends Component {
     }
 }
 
-UserRoleControl.propTypes = {
+UserWorkspaceRoleControl.propTypes = {
     role: PropTypes.string.isRequired
 }
 
-export default withStyles(styleSheet)(UserRoleControl);
+export default withStyles(styleSheet)(UserWorkspaceRoleControl);

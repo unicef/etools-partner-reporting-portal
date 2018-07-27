@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import UserRoleControl from "./UserRoleControl";
+import UserRoleControl from "./UserWorkspaceRoleControl";
 
 class UserRowExpanded extends Component {
     render() {

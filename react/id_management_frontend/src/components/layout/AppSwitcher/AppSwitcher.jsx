@@ -1,15 +1,17 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 import Apps from "@material-ui/icons/Apps";
 import IconButton from "@material-ui/core/IconButton";
 import Menu from "@material-ui/core/Menu";
 import Grid from "@material-ui/core/Grid";
-import { withStyles } from "@material-ui/core/styles";
+import {withStyles} from "@material-ui/core/styles";
 import AppButton from "./AppButton";
-import { grey } from "@material-ui/core/colors";
-import { PORTALS, switchPortal } from "../../../actions";
-import { connect } from "react-redux";
+import {grey} from "@material-ui/core/colors";
+import {PORTALS, switchPortal} from "../../../actions";
+import {connect} from "react-redux";
 import PropTypes from "prop-types";
 import withMenu from "../../hoc/withMenu";
+import withPortal from "../../hoc/withPortal";
+import {withRouter} from "react-router-dom";
 
 const border = "1px solid #e0e0e0";
 
@@ -39,10 +41,11 @@ class AppSwitcher extends Component {
     appButtonClick = portal => {
         this.props.handleClose();
         this.props.onAppButtonClick(portal);
+        this.props.history.push(`/${portal}`);
     };
 
     render() {
-        const { classes, portal, anchorEl, handleClick, handleClose } = this.props;
+        const {classes, portal, anchorEl, handleClick, handleClose} = this.props;
 
         return (
             <div className={classes.wrapper}>
@@ -52,21 +55,21 @@ class AppSwitcher extends Component {
                     aria-haspopup="true"
                     aria-owns={anchorEl ? "apps-menu" : null}
                 >
-                    <Apps />
+                    <Apps/>
                 </IconButton>
                 <Menu
                     id="apps-menu"
                     anchorEl={anchorEl}
                     open={Boolean(anchorEl)}
                     onClose={handleClose}
-                    MenuListProps={{ className: classes.appSwitcher }}
+                    MenuListProps={{className: classes.appSwitcher}}
                 >
                     <div>
                         <div className={classes.appsHeader}>
                             Select an application
                         </div>
                         <Grid container>
-                            <Grid item style={{ borderRight: border }}>
+                            <Grid item style={{borderRight: border}}>
                                 <AppButton
                                     onClick={() =>
                                         this.appButtonClick(PORTALS.CLUSTER)
@@ -97,12 +100,6 @@ AppSwitcher.propTypes = {
     onAppButtonClick: PropTypes.func.isRequired
 };
 
-const mapStateToProps = state => {
-    return {
-        portal: state.portal
-    };
-};
-
 const mapDispatchToProps = dispatch => {
     return {
         onAppButtonClick: portal => {
@@ -112,8 +109,8 @@ const mapDispatchToProps = dispatch => {
 };
 
 const ConnectedAppSwitcher = connect(
-    mapStateToProps,
+    null,
     mapDispatchToProps
-)(withStyles(styleSheet)(withMenu(AppSwitcher)));
+)(withPortal((withStyles(styleSheet)(withMenu(AppSwitcher)))));
 
-export default ConnectedAppSwitcher;
+export default withRouter(ConnectedAppSwitcher);

@@ -7,7 +7,6 @@ import UsersList from "./UsersList";
 import {debounce} from 'throttle-debounce';
 import {api} from "../../infrastructure/api";
 import {fullName} from "../../helpers/filters";
-import {merge} from 'ramda';
 import qs from 'query-string';
 
 const labels = {
@@ -24,7 +23,11 @@ class Users extends Component {
     }
 
     componentDidMount() {
-        this.onSearch();
+        this.onSearch(this.getQuery());
+    }
+
+    getQuery() {
+        return qs.parse(this.props.history.location.search);
     }
 
     onSearch(filter) {
@@ -40,7 +43,7 @@ class Users extends Component {
 
         history.push({
             pathname: history.location.pathname,
-            search: qs.stringify(merge(history.location.query, filter))
+            search: qs.stringify(filter)
         });
     }
 
@@ -52,7 +55,7 @@ class Users extends Component {
                 </PageHeader>
 
                 <PageContent>
-                    <UsersFilter onChange={this.filterChange}/>
+                    <UsersFilter onChange={this.filterChange} initialValues={this.getQuery()}/>
                     <UsersList items={this.state.items}/>
                 </PageContent>
             </div>

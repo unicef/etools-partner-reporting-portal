@@ -1,24 +1,28 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 import MainAppBar from "./layout/MainAppBar";
 import MainSideBar from "./layout/MainSideBar";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
-import { blue, green, grey } from "@material-ui/core/colors";
-import { connect } from "react-redux";
-import { PORTALS } from "../actions";
+import {MuiThemeProvider, createMuiTheme} from "@material-ui/core/styles";
+import {blue, green, grey} from "@material-ui/core/colors";
+import {PORTALS} from "../actions";
 import MainContent from "./layout/MainContent";
 import MainRoutes from "./MainRoutes";
-import { Route } from "react-router-dom";
-import { withRouter } from "react-router-dom";
+import {Redirect, Route} from "react-router-dom";
+import {withRouter} from "react-router-dom";
+import withPortal from "./hoc/withPortal";
 
 const labels = {
-    IP: "IP REPORTING",
-    CLUSTER: "CLUSTER REPORTING"
+    [PORTALS.IP]: "IP REPORTING",
+    [PORTALS.CLUSTER]: "CLUSTER REPORTING"
 };
 
 class Main extends Component {
+    getPortalsPath() {
+        return `/:portal(${PORTALS.IP}|${PORTALS.CLUSTER})/`
+    }
+
     render() {
-        const { portal } = this.props;
+        const {portal} = this.props;
 
         const theme = createMuiTheme({
             palette: {
@@ -36,10 +40,11 @@ class Main extends Component {
         return (
             <MuiThemeProvider theme={theme}>
                 <div className="App">
-                    <CssBaseline />
-                    <MainAppBar />
+                    <Route exact path="/" render={() => <Redirect to={`/${PORTALS.IP}`}/>}/>
+                    <CssBaseline/>
+                    <MainAppBar/>
                     <Route
-                        path="/id-management"
+                        path={this.getPortalsPath()}
                         render={props => (
                             <MainSideBar
                                 {...props}
@@ -49,9 +54,9 @@ class Main extends Component {
                     />
                     <MainContent>
                         <Route
-                            path="/id-management"
+                            path={this.getPortalsPath()}
                             render={props => (
-                                <MainRoutes {...props} portal={portal} />
+                                <MainRoutes {...props} portal={portal}/>
                             )}
                         />
                     </MainContent>
@@ -61,10 +66,4 @@ class Main extends Component {
     }
 }
 
-const mapStateToProps = state => {
-    return {
-        portal: state.portal
-    };
-};
-
-export default withRouter(connect(mapStateToProps)(Main));
+export default withRouter(withPortal(Main));

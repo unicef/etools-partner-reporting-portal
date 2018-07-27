@@ -2,12 +2,12 @@ import React, { Component } from "react";
 import { NavLink } from "react-router-dom";
 import Group from "@material-ui/icons/Group";
 import Business from "@material-ui/icons/Business";
-import { connect } from "react-redux";
 import { PORTALS } from "../../actions";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import { withStyles } from "@material-ui/core/styles";
 import { Typography, Grid } from "@material-ui/core";
+import withPortal from "../hoc/withPortal";
 
 const styleSheet = theme => ({
     menuLink: {
@@ -68,10 +68,4 @@ class MainMenu extends Component {
     }
 }
 
-const mapStateToProps = state => {
-    return {
-        portal: state.portal
-    };
-};
-
-export default connect(mapStateToProps)(withStyles(styleSheet)(MainMenu));
+export default withPortal(withStyles(styleSheet)(MainMenu));

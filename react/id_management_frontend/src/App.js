@@ -8,7 +8,7 @@ class App extends Component {
     render() {
         return ( 
             <Provider store={store}>
-                <Router>
+                <Router basename="/id-management">
                     <Main/>
                 </Router>
             </Provider>

@@ -1,6 +1,6 @@
 export const PORTALS = {
-    CLUSTER: 'CLUSTER',
-    IP: 'IP'
+    CLUSTER: 'cluster-reporting',
+    IP: 'ip-reporting'
 };
 
 export const SWITCH_PORTAL = 'SWITCH_PORTAL';
