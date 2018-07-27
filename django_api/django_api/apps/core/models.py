@@ -406,13 +406,14 @@ class GatewayType(TimeStampedModel):
     """
 
     name = models.CharField(max_length=64, unique=True, verbose_name=_('Name'))
-    admin_level = models.PositiveSmallIntegerField(null=True, verbose_name=_('Admin Level'))
+    admin_level = models.PositiveSmallIntegerField(verbose_name=_('Admin Level'))
 
     country = models.ForeignKey(Country, related_name="gateway_types")
 
     class Meta:
         ordering = ['name']
         verbose_name = 'Location Type'
+        unique_together = ('country', 'admin_level')
 
     def __str__(self):
         return '{} - {}'.format(self.country, self.name)

@@ -170,11 +170,10 @@ class PMPWorkspaceSerializer(serializers.ModelSerializer):
 class PMPGatewayTypeSerializer(serializers.ModelSerializer):
     gateway_country = serializers.PrimaryKeyRelatedField(
         queryset=Country.objects.all(), source="country")
-    pcode = serializers.CharField(source='name')
 
     class Meta:
         model = GatewayType
-        fields = ('pcode', 'admin_level', 'gateway_country')
+        fields = ('admin_level', 'gateway_country')
 
 
 class PMPLocationSerializer(serializers.ModelSerializer):
