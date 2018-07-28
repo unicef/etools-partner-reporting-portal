@@ -344,15 +344,21 @@ def process_programme_documents(fast=False, area=False):
                                         # Create gateway for location
                                         # TODO: assign country after PMP add these
                                         # fields into API
-                                        l['gateway_country'] = workspace.countries.first().id
+                                        country = workspace.countries.first()
+                                        l['gateway_country'] = country.id
 
-                                        if not l['admin_level']:
+                                        if l['admin_level'] is None:
                                             print("Admin level empty! Skipping!")
                                             continue
 
-                                        if not l['pcode']:
+                                        if l['pcode'] is None or not l['pcode']:
                                             print("Location code empty! Skipping!")
                                             continue
+
+                                        l['location_type'] = '{}-Admin Level {}'.format(
+                                            country.country_short_code,
+                                            l['admin_level']
+                                        )
 
                                         gateway = process_model(
                                             GatewayType,
@@ -371,8 +377,7 @@ def process_programme_documents(fast=False, area=False):
                                             PMPLocationSerializer,
                                             l,
                                             {
-                                                'gateway__admin_level': l['admin_level'],
-                                                'gateway__country': l['gateway_country'],
+                                                'gateway': l['gateway'],
                                                 'p_code': l['pcode'],
                                             }
                                         )
