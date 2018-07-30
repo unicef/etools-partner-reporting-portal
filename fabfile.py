@@ -117,7 +117,7 @@ def sync_ocha_partners(area=False):
     """
     Generate reports based on current data
     """
-    local('docker-compose exec django_api python manage.py sync_ocha_partners %s' % ("--area %s" % area if area else ""))
+    local('docker-compose exec django_api python manage.py sync_ocha_partners %s' % ("--country %s" % area if area else ""))
 
 
 def tests(test_path=''):

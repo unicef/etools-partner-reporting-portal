@@ -63,7 +63,6 @@ class V2PartnerProjectLocationImportSerializer(serializers.ModelSerializer):
             'adminLevel',
         )
 
-
 class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, serializers.ModelSerializer):
     external_source = serializers.CharField(default=EXTERNAL_DATA_SOURCES.HPC)
     id = serializers.IntegerField(source='external_id')
@@ -75,6 +74,7 @@ class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, ser
     code = serializers.CharField()
     additional_information = serializers.CharField(allow_null=True, allow_blank=True)
     locations = V2PartnerProjectLocationImportSerializer(many=True)
+    cluster_ids = serializers.ListField(child=serializers.IntegerField(), allow_null=True)
 
     class Meta:
         model = PartnerProject
@@ -89,7 +89,8 @@ class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, ser
             'code',
             'locations',
             'currentRequestedFunds',
-            'additional_information'
+            'additional_information',
+            'cluster_ids'
         )
 
     def get_status(self):
@@ -106,6 +107,7 @@ class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, ser
         if 'additional_information' not in validated_data:
             validated_data['additional_information'] = ''
         location_data_list = validated_data.pop('locations')
+        cluster_ids = validated_data.pop('cluster_ids', None)
         partner_project = PartnerProject.objects.filter(code=validated_data['code']).first()
         if partner_project:
             partner_project = super(V2PartnerProjectImportSerializer, self).update(partner_project, validated_data)
@@ -113,6 +115,11 @@ class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, ser
             partner_project = super(V2PartnerProjectImportSerializer, self).create(validated_data)
 
         locations = save_location_list(location_data_list)
+
+        # Add clusters
+        if cluster_ids:
+            clusters = Cluster.objects.filter(external_id__in=cluster_ids)
+            partner_project.clusters.add(*clusters)
 
         partner_project.locations.add(*locations)
         return partner_project
