@@ -1,5 +1,6 @@
 import qs from "query-string";
 import axios from "axios";
+import {SubmissionError} from "redux-form";
 
 const baseUrl = "/api/";
 
@@ -15,12 +16,8 @@ function makeRequest(method, url, data) {
         headers: {
             'Content-Type': 'application/json'
         }
-    }).catch(function (error) {
-        alert('API call error occurred!');
-        console.error(error);
-        console.error('Request URL', error.config.url);
-        console.error('Response Data', JSON.stringify(error.response.data));
-        console.error('Request Data', error.config.data);
+    }).catch(error => {
+        throw new SubmissionError(error.response.data);
     });
 }
 

@@ -33,6 +33,7 @@ class Dialog extends Component {
             <MDialog
                 open={!!open}
                 onClose={onClose}
+                fullWidth
             >
                 <AppBar position="static" className={classes.appBar}>
                     <Toolbar className={classes.toolbar}>

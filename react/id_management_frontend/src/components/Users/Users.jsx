@@ -10,6 +10,7 @@ import {fullName} from "../../helpers/filters";
 import qs from 'query-string';
 import AddUserDialog from "./AddUserDialog";
 import withDialogHandling from "../hoc/withDialogHandling";
+import AddPermissionsDialog from "./AddPermissionsDialog";
 
 const labels = {
     header: "Users"
@@ -20,13 +21,21 @@ class Users extends Component {
         super(props);
         this.state = {
             items: [],
+            selectedUser: null,
             addUserDialogOpen: false
         };
         this.filterChange = debounce(500, (filter) => this.onSearch(filter));
+        this.reload = this.reload.bind(this);
+        this.onUserSave = this.onUserSave.bind(this);
+        this.openPermissionsDialog = this.openPermissionsDialog.bind(this);
+    }
+
+    reload() {
+        this.onSearch(this.getQuery());
     }
 
     componentDidMount() {
-        this.onSearch(this.getQuery());
+        this.reload();
     }
 
     getQuery() {
@@ -50,6 +59,16 @@ class Users extends Component {
         });
     }
 
+    onUserSave(user) {
+        this.reload();
+        this.openPermissionsDialog(user);
+    }
+
+    openPermissionsDialog(user) {
+        this.setState({selectedUser: user});
+        this.props.handleDialogOpen("addPermissions");
+    }
+
     render() {
         const {dialogOpen, handleDialogOpen, handleDialogClose} = this.props;
 
@@ -64,7 +83,10 @@ class Users extends Component {
                     <UsersList items={this.state.items}/>
                 </PageContent>
 
-                <AddUserDialog open={dialogOpen.addUser} onClose={handleDialogClose}/>
+                {this.state.selectedUser && <AddPermissionsDialog user={this.state.selectedUser} open={dialogOpen.addPermissions}
+                                      onClose={handleDialogClose}/>}
+
+                <AddUserDialog open={dialogOpen.addUser} onClose={handleDialogClose} onSave={this.onUserSave}/>
             </div>
         );
     }

@@ -4,7 +4,8 @@ import DialogActions from "../common/DialogActions";
 import TextFieldForm from "../form/TextFieldForm";
 import {Grid, Button} from "@material-ui/core";
 import {email} from "../../helpers/validation";
-import {reduxForm} from 'redux-form';
+import {reduxForm, SubmissionError} from 'redux-form';
+import {api} from "../../infrastructure/api";
 
 const labels = {
     title: "Add new user",
@@ -22,10 +23,17 @@ class AddUserDialog extends Component {
         super(props);
 
         this.onClose = this.onClose.bind(this);
+        this.onSubmit = this.onSubmit.bind(this);
     }
 
     onSubmit(values) {
-        console.log(values);
+        const {onSave} = this.props;
+
+        return api.post("id-management/users/", values)
+            .then(res => {
+                this.onClose();
+                onSave(res.data);
+            })
     }
 
     onClose() {

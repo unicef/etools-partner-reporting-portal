@@ -4,7 +4,7 @@ import {withStyles} from "@material-ui/core/styles";
 
 const styleSheet = (theme) => ({
     actions: {
-        marginTop: theme.spacing.unit * 8
+        marginTop: theme.spacing.unit * 3
     }
 });
 
