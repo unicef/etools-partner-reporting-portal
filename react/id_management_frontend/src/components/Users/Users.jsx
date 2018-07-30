@@ -93,7 +93,7 @@ class Users extends Component {
                 <AddPermissionsDialog user={this.state.selectedUser} open={dialogOpen.addPermissions}
                                       onClose={handleDialogClose}/>}
 
-                {this.state.selectedUser &&
+                {this.state.selectedUser && this.state.selectedPermission &&
                 <EditPermissionDialog user={this.state.selectedUser} permission={this.state.selectedPermission}
                                       open={dialogOpen.editPermission}
                                       onClose={handleDialogClose}/>}

@@ -22,27 +22,33 @@ const styleSheet = (theme) => ({
     caption: {
         padding: `${theme.spacing.unit}px ${theme.spacing.unit * 3}px`,
         backgroundColor: theme.palette.common.grey,
+    },
+    dialogLoading: {
+        pointerEvents: 'none',
     }
 });
 
 class Dialog extends Component {
     render() {
-        const {open, onClose, title, children, classes, caption} = this.props;
+        const {open, onClose, title, children, classes, caption, loading} = this.props;
 
         return (
             <MDialog
                 open={!!open}
                 onClose={onClose}
                 fullWidth
+                disableBackdropClick={loading}
+                disableEscapeKeyDown={loading}
+                className={loading ? classes.dialogLoading : ''}
             >
                 <AppBar position="static" className={classes.appBar}>
                     <Toolbar className={classes.toolbar}>
                         <Typography variant="title" color="inherit">
                             {title}
                         </Typography>
-                        <IconButton className={classes.close} onClick={onClose} aria-label="Close">
+                        {!loading && <IconButton className={classes.close} onClick={onClose} aria-label="Close">
                             <Close/>
-                        </IconButton>
+                        </IconButton>}
                     </Toolbar>
                 </AppBar>
                 {caption && <div className={classes.caption}>

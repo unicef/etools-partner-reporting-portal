@@ -7,6 +7,7 @@ import {email} from "../../helpers/validation";
 import {reduxForm} from 'redux-form';
 import {api} from "../../infrastructure/api";
 import {getLabels} from "../../labels";
+import ButtonSubmit from "../common/ButtonSubmit";
 
 const labels = getLabels({
     title: "Add new user",
@@ -19,6 +20,10 @@ class AddUserDialog extends Component {
     constructor(props) {
         super(props);
 
+        this.state = {
+            loading: false
+        };
+
         this.onClose = this.onClose.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
     }
@@ -26,11 +31,14 @@ class AddUserDialog extends Component {
     onSubmit(values) {
         const {onSave} = this.props;
 
+        this.setState({loading: true});
+
         return api.post("id-management/users/", values)
             .then(res => {
                 this.onClose();
                 onSave(res.data);
             })
+            .finally(() => this.setState({loading: false}))
     }
 
     onClose() {
@@ -49,6 +57,7 @@ class AddUserDialog extends Component {
                 onClose={this.onClose}
                 title={labels.title}
                 caption={labels.caption}
+                loading={this.state.loading}
             >
                 <form onSubmit={handleSubmit(this.onSubmit)} noValidate>
                     <Grid container spacing={24}>
@@ -68,7 +77,7 @@ class AddUserDialog extends Component {
 
                     <DialogActions>
                         <Button onClick={this.onClose}>{labels.cancel}</Button>
-                        <Button type="submit" variant="contained" color="primary">{labels.saveAndContinue}</Button>
+                        <ButtonSubmit loading={this.state.loading} label={labels.saveAndContinue}/>
                     </DialogActions>
                 </form>
             </Dialog>
