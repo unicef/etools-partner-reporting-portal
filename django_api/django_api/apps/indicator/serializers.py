@@ -1572,7 +1572,7 @@ class ClusterIndicatorReportSerializer(serializers.ModelSerializer):
 
     def get_cluster(self, obj):
         cluster = self._get_cluster(obj)
-        return {"id": cluster.id, "title": cluster.get_type_display()} if cluster else None
+        return {"id": cluster.id, "title": cluster.title} if cluster else None
 
     def get_cluster_id(self, obj):
         cluster = self._get_cluster(obj)
