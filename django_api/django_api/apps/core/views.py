@@ -13,6 +13,7 @@ from rest_framework.exceptions import ValidationError
 from djcelery.models import PeriodicTask
 
 from core.common import DISPLAY_CLUSTER_TYPES, PARTNER_PROJECT_STATUS
+from id_management.permissions import RoleGroupUpdateDestroyPermission
 from utils.serializers import serialize_choices
 from .filters import LocationFilter
 from .permissions import IsAuthenticated, IsIMOForCurrentWorkspace, IsSuperuser
@@ -205,5 +206,5 @@ class TaskTriggerAPIView(APIView):
 
 class PRPRoleUpdateDestroyAPIView(UpdateAPIView, DestroyAPIView, GenericAPIView):
     serializer_class = PRPRoleSerializer
-    permission_classes = (IsAuthenticated,)
-    queryset = PRPRole.objects.all()
+    permission_classes = (IsAuthenticated, RoleGroupUpdateDestroyPermission)
+    queryset = PRPRole.objects.select_related('user', 'workspace', 'cluster')
