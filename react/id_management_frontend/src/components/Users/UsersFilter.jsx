@@ -9,8 +9,9 @@ import withPortal from "../hoc/withPortal";
 import {PORTALS} from "../../actions";
 import { connect } from "react-redux";
 import labels from "../../labels";
+import {PRP_ROLE_OPTIONS} from "../../constants";
 
-const searchPlaceholder = "Name or Email"
+const searchPlaceholder = "Name or Email";
 
 const workspaceOptions = [
     {
@@ -19,17 +20,6 @@ const workspaceOptions = [
     },
     {
         label: "Workspace 2",
-        value: 2
-    }
-];
-
-const roleOptions = [
-    {
-        label: "Role 1",
-        value: 1
-    },
-    {
-        label: "Role 2",
         value: 2
     }
 ];
@@ -89,7 +79,7 @@ class UsersFilter extends Component {
                         </Grid>}
 
                         <Grid item md={4}>
-                            <SelectForm fieldName="roles" label={labels.role} values={roleOptions}
+                            <SelectForm fieldName="roles" label={labels.role} values={PRP_ROLE_OPTIONS}
                                         optional multiple/>
                         </Grid>
 
