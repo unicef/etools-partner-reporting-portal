@@ -11,10 +11,9 @@ import qs from 'query-string';
 import AddUserDialog from "./AddUserDialog";
 import withDialogHandling from "../hoc/withDialogHandling";
 import AddPermissionsDialog from "./AddPermissionsDialog";
+import EditPermissionDialog from "./EditPermissionDialog";
 
-const labels = {
-    header: "Users"
-};
+const header = "Users";
 
 class Users extends Component {
     constructor(props) {
@@ -22,12 +21,14 @@ class Users extends Component {
         this.state = {
             items: [],
             selectedUser: null,
+            selectedPermission: null,
             addUserDialogOpen: false
         };
         this.filterChange = debounce(500, (filter) => this.onSearch(filter));
         this.reload = this.reload.bind(this);
         this.onUserSave = this.onUserSave.bind(this);
-        this.openPermissionsDialog = this.openPermissionsDialog.bind(this);
+        this.openAddPermissionsDialog = this.openAddPermissionsDialog.bind(this);
+        this.openEditPermissionsDialog = this.openEditPermissionsDialog.bind(this);
     }
 
     reload() {
@@ -61,12 +62,17 @@ class Users extends Component {
 
     onUserSave(user) {
         this.reload();
-        this.openPermissionsDialog(user);
+        this.openAddPermissionsDialog(user);
     }
 
-    openPermissionsDialog(user) {
+    openAddPermissionsDialog(user) {
         this.setState({selectedUser: user});
         this.props.handleDialogOpen("addPermissions");
+    }
+
+    openEditPermissionsDialog(user, permission) {
+        this.setState({selectedUser: user, selectedPermission: permission});
+        this.props.handleDialogOpen("editPermission");
     }
 
     render() {
@@ -75,15 +81,21 @@ class Users extends Component {
         return (
             <div>
                 <PageHeader>
-                    {labels.header} <ButtonNew onClick={() => handleDialogOpen('addUser')}/>
+                    {header} <ButtonNew onClick={() => handleDialogOpen('addUser')}/>
                 </PageHeader>
 
                 <PageContent>
                     <UsersFilter onChange={this.filterChange} initialValues={this.getQuery()}/>
-                    <UsersList items={this.state.items}/>
+                    <UsersList items={this.state.items} onPermissionEdit={this.openEditPermissionsDialog}/>
                 </PageContent>
 
-                {this.state.selectedUser && <AddPermissionsDialog user={this.state.selectedUser} open={dialogOpen.addPermissions}
+                {this.state.selectedUser &&
+                <AddPermissionsDialog user={this.state.selectedUser} open={dialogOpen.addPermissions}
+                                      onClose={handleDialogClose}/>}
+
+                {this.state.selectedUser &&
+                <EditPermissionDialog user={this.state.selectedUser} permission={this.state.selectedPermission}
+                                      open={dialogOpen.editPermission}
                                       onClose={handleDialogClose}/>}
 
                 <AddUserDialog open={dialogOpen.addUser} onClose={handleDialogClose} onSave={this.onUserSave}/>

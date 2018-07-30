@@ -4,9 +4,7 @@ import Button from "@material-ui/core/Button";
 import grey from "@material-ui/core/colors/grey"
 import classNames from 'classnames';
 
-const labels = {
-    appSubtext: "USER MANAGEMENT"
-};
+const appSubtext = "USER MANAGEMENT";
 
 const styleSheet = {
     appButton: {
@@ -35,7 +33,7 @@ class AppButton extends Component {
                 <div className={classes.appName}>
                     {name}
                     <div className={classes.appSubtext}>
-                        {labels.appSubtext}
+                        {appSubtext}
                     </div>
                 </div>
             </Button>

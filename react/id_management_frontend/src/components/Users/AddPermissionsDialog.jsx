@@ -4,16 +4,9 @@ import DialogActions from "../common/DialogActions";
 import {Button} from "@material-ui/core";
 import {FieldArray, reduxForm} from 'redux-form';
 import renderPermissionsFields from "./renderPermissionsFields";
+import labels from "../../labels";
 
-const labels = {
-    title: "Add permissions",
-    label: "Role per Workspace",
-    workspace: "Workspace",
-    role: "Role",
-    addNew: "Add new",
-    cancel: "Cancel",
-    save: "Save"
-};
+const title = "Add permissions";
 
 class AddPermissionsDialog extends Component {
     constructor(props) {
@@ -41,7 +34,7 @@ class AddPermissionsDialog extends Component {
             <Dialog
                 open={open}
                 onClose={this.onClose}
-                title={labels.title}
+                title={title}
             >
                 <form onSubmit={handleSubmit(this.onSubmit)} noValidate>
                     <FieldArray name="prp_roles" component={renderPermissionsFields}/>
@@ -56,4 +49,4 @@ class AddPermissionsDialog extends Component {
     }
 }
 
-export default reduxForm({form: "addUserForm", initialValues: {prp_roles: [{}]}})(AddPermissionsDialog);
+export default reduxForm({form: "addPermissionsForm", initialValues: {prp_roles: [{}]}})(AddPermissionsDialog);

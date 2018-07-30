@@ -5,9 +5,7 @@ import Grid from "@material-ui/core/Grid";
 import {withStyles} from "@material-ui/core/styles";
 import grey from "@material-ui/core/colors/grey";
 
-const labels = {
-    userManagement: "User Management"
-};
+const label = "User Management";
 
 const styleSheet = (theme) => ({
     mainBackButton: {
@@ -33,7 +31,7 @@ class MainBackButton extends Component {
             <Button variant="contained" color="primary" className={classes.mainBackButton}>
                 <Grid container spacing={24} alignItems="center" wrap="nowrap">
                     <Grid item><ArrowBack className={classes.backArrow}/></Grid>
-                    <Grid item>{labels.userManagement}</Grid>
+                    <Grid item>{label}</Grid>
                 </Grid>
             </Button>
         )

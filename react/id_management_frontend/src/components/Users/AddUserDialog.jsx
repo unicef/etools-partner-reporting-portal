@@ -4,19 +4,16 @@ import DialogActions from "../common/DialogActions";
 import TextFieldForm from "../form/TextFieldForm";
 import {Grid, Button} from "@material-ui/core";
 import {email} from "../../helpers/validation";
-import {reduxForm, SubmissionError} from 'redux-form';
+import {reduxForm} from 'redux-form';
 import {api} from "../../infrastructure/api";
+import {getLabels} from "../../labels";
 
-const labels = {
+const labels = getLabels({
     title: "Add new user",
     caption: "Message with invitation will be send at provided e-mail address",
-    firstName: "First name",
-    lastName: "Last name",
-    email: "E-mail",
     position: "Position (optional)",
-    cancel: "Cancel",
     saveAndContinue: "Save and continue"
-};
+});
 
 class AddUserDialog extends Component {
     constructor(props) {

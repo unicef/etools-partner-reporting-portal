@@ -2,10 +2,6 @@ import React, { Component } from "react";
 import PaginatedList from "../common/PaginatedList";
 import UserRowExpanded from "./UserRowExpanded";
 
-const labels = {
-    header: "Users"
-};
-
 class UsersList extends Component {
     getColumns() {
         return [
@@ -33,14 +29,14 @@ class UsersList extends Component {
     }
 
     render() {
-        const {items} = this.props;
+        const {items, onPermissionEdit} = this.props;
 
         return (
             <div>
                 <PaginatedList
                     items={items}
                     columns={this.getColumns()}
-                    expandedCell={row => <UserRowExpanded user={row} />}
+                    expandedCell={row => <UserRowExpanded user={row} onPermissionEdit={onPermissionEdit} />}
                 />
             </div>
         );

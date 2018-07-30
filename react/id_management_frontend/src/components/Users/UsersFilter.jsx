@@ -8,15 +8,9 @@ import SelectForm from "../form/SelectForm";
 import withPortal from "../hoc/withPortal";
 import {PORTALS} from "../../actions";
 import { connect } from "react-redux";
+import labels from "../../labels";
 
-const labels = {
-    search: "Search",
-    searchPlaceholder: "Name or Email",
-    workspace: "Workspace",
-    role: "Role",
-    cluster: "Cluster",
-    partner: "Partner"
-};
+const searchPlaceholder = "Name or Email"
 
 const workspaceOptions = [
     {
@@ -78,7 +72,7 @@ class UsersFilter extends Component {
                     <Grid container spacing={24}>
                         <Grid item md={4}>
                             <TextFieldForm fieldName="name_email" label={labels.search}
-                                           placeholder={labels.searchPlaceholder}
+                                           placeholder={searchPlaceholder}
                                            margin="none" optional/>
                         </Grid>
 

@@ -6,13 +6,9 @@ import DeleteButton from "../common/DeleteButton";
 import FieldsArrayItem from "../common/FieldsArrayItem";
 import FieldsArrayPanel from "../common/FieldsArrayPanel";
 import FieldsArrayAddButton from "../common/FieldsArrayAddButton";
+import labels from "../../labels";
 
-const labels = {
-    title: "Role per Workspace",
-    workspace: "Workspace",
-    role: "Role",
-    addNew: "Add new",
-};
+const title = "Role per Workspace";
 
 const workspaceOptions = [
     {
@@ -27,7 +23,7 @@ const workspaceOptions = [
 
 const renderPermissionsFields = ({fields}) => (
     <div>
-        <Typography variant="caption" gutterBottom>{labels.title}</Typography>
+        <Typography variant="caption" gutterBottom>{title}</Typography>
 
         <FieldsArrayPanel>
             {fields.map((item, index, fields) => (

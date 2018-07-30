@@ -2,10 +2,7 @@ import React, { Component } from "react";
 import { InputLabel, Select, MenuItem } from "@material-ui/core";
 import PropTypes from "prop-types";
 import FilterInput from "./FilterInput";
-
-const labels = {
-    none: "None"
-};
+import labels from "../../labels";
 
 class MenuSelect extends Component {
     render() {
