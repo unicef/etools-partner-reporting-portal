@@ -5,6 +5,7 @@ import {Button} from "@material-ui/core";
 import {FieldArray, reduxForm} from 'redux-form';
 import renderPermissionsFields from "./renderPermissionsFields";
 import labels from "../../labels";
+import ButtonSubmit from "../common/ButtonSubmit";
 
 const title = "Add permissions";
 
@@ -41,7 +42,7 @@ class AddPermissionsDialog extends Component {
 
                     <DialogActions>
                         <Button onClick={this.onClose}>{labels.cancel}</Button>
-                        <Button type="submit" variant="contained" color="primary">{labels.save}</Button>
+                        <ButtonSubmit/>
                     </DialogActions>
                 </form>
             </Dialog>

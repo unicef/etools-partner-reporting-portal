@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { withStyles } from "@material-ui/core/styles";
 import classnames from "classnames";
+import PropTypes from "prop-types";
 
 const styleSheet = theme => ({
     button: {
@@ -31,6 +32,12 @@ class LinkButton extends Component {
             </div>
         );
     }
+}
+
+LinkButton.propTypes = {
+    onClick: PropTypes.func.isRequired,
+    label: PropTypes.string.isRequired,
+    variant: PropTypes.oneOf(["danger"])
 }
 
 export default withStyles(styleSheet)(LinkButton);

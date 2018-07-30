@@ -2,6 +2,7 @@ import React, {Component} from "react";
 import {Button, CircularProgress} from "@material-ui/core";
 import {withStyles} from "@material-ui/core/styles";
 import labels from "../../labels";
+import PropTypes from "prop-types";
 
 const styleSheet = theme => ({
     wrapper: {
@@ -31,5 +32,10 @@ class ButtonSubmit extends Component {
         );
     }
 }
+
+ButtonSubmit.propTypes = {
+    label: PropTypes.string,
+    loading: PropTypes.bool
+};
 
 export default withStyles(styleSheet)(ButtonSubmit);

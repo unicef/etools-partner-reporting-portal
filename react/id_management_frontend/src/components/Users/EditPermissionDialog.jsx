@@ -9,6 +9,7 @@ import TextFieldForm from "../form/TextFieldForm";
 import SelectForm from "../form/SelectForm";
 import {connect} from "react-redux";
 import PropTypes from "prop-types";
+import ButtonSubmit from "../common/ButtonSubmit";
 
 const title = "Edit permission";
 
@@ -45,7 +46,7 @@ class EditPermissionDialog extends Component {
 
                     <DialogActions>
                         <Button onClick={onClose}>{labels.cancel}</Button>
-                        <Button type="submit" variant="contained" color="primary">{labels.save}</Button>
+                        <ButtonSubmit/>
                     </DialogActions>
                 </form>
             </Dialog>

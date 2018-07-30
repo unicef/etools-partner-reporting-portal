@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { withStyles } from "@material-ui/core/styles";
 import ButtonClear from "./ButtonClear";
 import Grid from "@material-ui/core/Grid";
+import PropTypes from "prop-types";
 
 const styleSheet = theme => ({
     filterButtons: {
@@ -9,7 +10,7 @@ const styleSheet = theme => ({
     }
 });
 
-class ButtonNew extends Component {
+class FilterButtons extends Component {
     render() {
         const { classes, onClear } = this.props;
 
@@ -23,4 +24,8 @@ class ButtonNew extends Component {
     }
 }
 
-export default withStyles(styleSheet)(ButtonNew);
+FilterButtons.propTypes = {
+    onClear: PropTypes.func.isRequired
+};
+
+export default withStyles(styleSheet)(FilterButtons);
