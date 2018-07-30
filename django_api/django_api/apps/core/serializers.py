@@ -118,6 +118,17 @@ class CreateResponsePlanSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         validated_data = super(CreateResponsePlanSerializer, self).validate(attrs)
+
+        if 'start' not in validated_data:
+            raise serializers.ValidationError({
+                'start': 'Start date is required'
+            })
+
+        if 'end' not in validated_data:
+            raise serializers.ValidationError({
+                'end': 'End date is required'
+            })
+
         if validated_data['end'] < validated_data['start']:
             raise serializers.ValidationError({
                 'end': 'Cannot be earlier than Start'
@@ -170,11 +181,11 @@ class PMPWorkspaceSerializer(serializers.ModelSerializer):
 class PMPGatewayTypeSerializer(serializers.ModelSerializer):
     gateway_country = serializers.PrimaryKeyRelatedField(
         queryset=Country.objects.all(), source="country")
-    pcode = serializers.CharField(source='name')
+    location_type = serializers.CharField(source='name')
 
     class Meta:
         model = GatewayType
-        fields = ('pcode', 'admin_level', 'gateway_country')
+        fields = ('location_type', 'admin_level', 'gateway_country')
 
 
 class PMPLocationSerializer(serializers.ModelSerializer):

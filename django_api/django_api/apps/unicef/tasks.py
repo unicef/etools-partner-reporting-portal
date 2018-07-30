@@ -344,22 +344,43 @@ def process_programme_documents(fast=False, area=False):
                                         # Create gateway for location
                                         # TODO: assign country after PMP add these
                                         # fields into API
-                                        l['gateway_country'] = workspace.countries.all()[
-                                            0].id  # TODO: later figure out how to fix this on eTools PMP side
-                                        if not l['admin_level']:
-                                            l['admin_level'] = 1
-                                        if not l['pcode']:
+                                        country = workspace.countries.first()
+                                        l['gateway_country'] = country.id
+
+                                        if l['admin_level'] is None:
+                                            print("Admin level empty! Skipping!")
+                                            continue
+
+                                        if l['pcode'] is None or not l['pcode']:
                                             print("Location code empty! Skipping!")
                                             continue
+
+                                        l['location_type'] = '{}-Admin Level {}'.format(
+                                            country.country_short_code,
+                                            l['admin_level']
+                                        )
+
                                         gateway = process_model(
-                                            GatewayType, PMPGatewayTypeSerializer, l, {
-                                                'name': l['pcode']})
+                                            GatewayType,
+                                            PMPGatewayTypeSerializer,
+                                            l,
+                                            {
+                                                'admin_level': l['admin_level'],
+                                                'country': l['gateway_country'],
+                                            },
+                                        )
 
                                         # Create location
                                         l['gateway'] = gateway.id
                                         location = process_model(
-                                            Location, PMPLocationSerializer, l, {
-                                                'p_code': l['pcode']})
+                                            Location,
+                                            PMPLocationSerializer,
+                                            l,
+                                            {
+                                                'gateway': l['gateway'],
+                                                'p_code': l['pcode'],
+                                            }
+                                        )
                                         locations.append(location)
 
                                     # If indicator is not cluster, create
