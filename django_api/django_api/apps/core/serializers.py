@@ -118,6 +118,17 @@ class CreateResponsePlanSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         validated_data = super(CreateResponsePlanSerializer, self).validate(attrs)
+
+        if 'start' not in validated_data:
+            raise serializers.ValidationError({
+                'start': 'Start date is required'
+            })
+
+        if 'end' not in validated_data:
+            raise serializers.ValidationError({
+                'end': 'End date is required'
+            })
+
         if validated_data['end'] < validated_data['start']:
             raise serializers.ValidationError({
                 'end': 'Cannot be earlier than Start'
