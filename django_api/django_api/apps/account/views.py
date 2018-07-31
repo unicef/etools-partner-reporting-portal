@@ -9,6 +9,7 @@ from rest_framework.views import APIView
 import django_filters
 from drfpasswordless.utils import authenticate_by_token
 
+from core.paginations import SmallPagination
 from core.permissions import IsAuthenticated
 
 from .filters import UserFilter
@@ -72,6 +73,7 @@ class UserListCreateAPIView(ListCreateAPIView):
     permission_classes = (IsAuthenticated,)
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
     filter_class = UserFilter
+    pagination_class = SmallPagination
 
     def get_queryset(self):
         return User.objects.select_related('profile', 'partner').prefetch_related('prp_roles')
