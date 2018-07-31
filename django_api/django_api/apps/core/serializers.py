@@ -198,3 +198,9 @@ class PRPRoleUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = PRPRole
         fields = ('role',)
+
+
+class PRPRoleCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PRPRole
+        fields = ('user', 'role', 'workspace', 'cluster')

@@ -25,6 +25,7 @@ from .serializers import (
     ResponsePlanSerializer,
     CreateResponsePlanSerializer,
     PRPRoleUpdateSerializer,
+    PRPRoleCreateSerializer,
 )
 
 
@@ -208,3 +209,12 @@ class PRPRoleUpdateDestroyAPIView(UpdateAPIView, DestroyAPIView, GenericAPIView)
     serializer_class = PRPRoleUpdateSerializer
     permission_classes = (IsAuthenticated, RoleGroupCreateUpdateDestroyPermission)
     queryset = PRPRole.objects.select_related('user', 'workspace', 'cluster')
+
+
+class PRPRoleCreateAPIView(CreateAPIView):
+    serializer_class = PRPRoleCreateSerializer
+    permission_classes = (IsAuthenticated, RoleGroupCreateUpdateDestroyPermission)
+
+    def perform_create(self, serializer):
+        self.check_object_permissions(self.request, obj=PRPRole(**serializer.validated_data))
+        super().perform_create(serializer)
