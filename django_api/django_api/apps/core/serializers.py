@@ -194,7 +194,7 @@ class PMPLocationSerializer(serializers.ModelSerializer):
         fields = ('name', 'pcode', 'gateway')
 
 
-class PRPRoleSerializer(serializers.ModelSerializer):
+class PRPRoleUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = PRPRole
         fields = ('role',)

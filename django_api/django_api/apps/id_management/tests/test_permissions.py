@@ -6,7 +6,7 @@ from account.models import User
 from cluster.models import Cluster
 from core.common import PRP_ROLE_TYPES
 from core.models import PRPRole, Workspace
-from id_management.permissions import RoleGroupUpdateDestroyPermission
+from id_management.permissions import RoleGroupCreateUpdateDestroyPermission
 from partner.models import Partner
 
 
@@ -16,7 +16,7 @@ class TestUpdateDestroyPermissionsForRoleClusterMember(APITestCase):
                                          PRP_ROLE_TYPES.ip_authorized_officer, PRP_ROLE_TYPES.ip_admin,
                                          PRP_ROLE_TYPES.ip_editor, PRP_ROLE_TYPES.ip_viewer]
 
-        self.perm = RoleGroupUpdateDestroyPermission()
+        self.perm = RoleGroupCreateUpdateDestroyPermission()
         self.factory = APIRequestFactory()
         self.partner = Partner.objects.create()
         self.cluster = Cluster.objects.create()
@@ -203,7 +203,7 @@ class TestUpdateDestroyPermissionsForRoleClusterViewer(APITestCase):
                                          PRP_ROLE_TYPES.ip_authorized_officer, PRP_ROLE_TYPES.ip_admin,
                                          PRP_ROLE_TYPES.ip_editor, PRP_ROLE_TYPES.ip_viewer]
 
-        self.perm = RoleGroupUpdateDestroyPermission()
+        self.perm = RoleGroupCreateUpdateDestroyPermission()
         self.factory = APIRequestFactory()
         self.partner = Partner.objects.create()
         self.cluster = Cluster.objects.create()
@@ -390,7 +390,7 @@ class TestUpdateDestroyPermissionsForRoleClusterIMO(APITestCase):
                                          PRP_ROLE_TYPES.ip_authorized_officer, PRP_ROLE_TYPES.ip_admin,
                                          PRP_ROLE_TYPES.ip_editor, PRP_ROLE_TYPES.ip_viewer]
 
-        self.perm = RoleGroupUpdateDestroyPermission()
+        self.perm = RoleGroupCreateUpdateDestroyPermission()
         self.factory = APIRequestFactory()
         self.partner = Partner.objects.create()
         self.cluster = Cluster.objects.create()
@@ -511,7 +511,7 @@ class TestUpdateDestroyPermissionsForRoleClusterSystemAdmin(APITestCase):
                                          PRP_ROLE_TYPES.ip_authorized_officer, PRP_ROLE_TYPES.ip_admin,
                                          PRP_ROLE_TYPES.ip_editor, PRP_ROLE_TYPES.ip_viewer]
 
-        self.perm = RoleGroupUpdateDestroyPermission()
+        self.perm = RoleGroupCreateUpdateDestroyPermission()
         self.factory = APIRequestFactory()
         self.partner = Partner.objects.create()
         self.cluster = Cluster.objects.create()
@@ -600,7 +600,7 @@ class TestUpdateDestroyPermissionsForIPAuthorizedOfficer(APITestCase):
                                          PRP_ROLE_TYPES.ip_authorized_officer, PRP_ROLE_TYPES.ip_admin,
                                          PRP_ROLE_TYPES.ip_editor, PRP_ROLE_TYPES.ip_viewer]
 
-        self.perm = RoleGroupUpdateDestroyPermission()
+        self.perm = RoleGroupCreateUpdateDestroyPermission()
         self.factory = APIRequestFactory()
         self.partner = Partner.objects.create()
         self.cluster = Cluster.objects.create()
@@ -688,7 +688,7 @@ class TestUpdateDestroyPermissionsForIPAdmin(APITestCase):
                                          PRP_ROLE_TYPES.cluster_coordinator, PRP_ROLE_TYPES.cluster_viewer,
                                          PRP_ROLE_TYPES.ip_admin, PRP_ROLE_TYPES.ip_editor, PRP_ROLE_TYPES.ip_viewer]
 
-        self.perm = RoleGroupUpdateDestroyPermission()
+        self.perm = RoleGroupCreateUpdateDestroyPermission()
         self.factory = APIRequestFactory()
         self.partner = Partner.objects.create()
         self.cluster = Cluster.objects.create()
@@ -901,7 +901,7 @@ class TestUpdateDestroyPermissionsForIPEditor(APITestCase):
                                          PRP_ROLE_TYPES.cluster_coordinator, PRP_ROLE_TYPES.cluster_viewer,
                                          PRP_ROLE_TYPES.ip_editor, PRP_ROLE_TYPES.ip_viewer]
 
-        self.perm = RoleGroupUpdateDestroyPermission()
+        self.perm = RoleGroupCreateUpdateDestroyPermission()
         self.factory = APIRequestFactory()
         self.partner = Partner.objects.create()
         self.cluster = Cluster.objects.create()
@@ -1238,7 +1238,7 @@ class TestUpdateDestroyPermissionsForIPViewer(APITestCase):
                                          PRP_ROLE_TYPES.cluster_coordinator, PRP_ROLE_TYPES.cluster_viewer,
                                          PRP_ROLE_TYPES.ip_editor, PRP_ROLE_TYPES.ip_viewer]
 
-        self.perm = RoleGroupUpdateDestroyPermission()
+        self.perm = RoleGroupCreateUpdateDestroyPermission()
         self.factory = APIRequestFactory()
         self.partner = Partner.objects.create()
         self.cluster = Cluster.objects.create()
