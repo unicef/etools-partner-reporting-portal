@@ -1,34 +1,97 @@
 import React, {Component} from "react";
-import {Paper} from "@material-ui/core";
+import {Paper, Typography, CircularProgress} from "@material-ui/core";
 import {
     Grid,
     Table,
     TableHeaderRow,
-    TableRowDetail
+    TableRowDetail,
+    PagingPanel
 } from "@devexpress/dx-react-grid-material-ui";
+import {
+    PagingState,
+    CustomPaging,
+} from '@devexpress/dx-react-grid';
 import {RowDetailState} from "@devexpress/dx-react-grid";
 import {withStyles} from "@material-ui/core/styles";
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 
-const styleSheet = (theme) => ({
-    container: {
-        marginTop: theme.spacing.unit * 3
+const allowedPageSizes = [5, 10, 15];
+
+const styleSheet = (theme) => {
+    const paddingSmall = theme.spacing.unit * 2;
+    const paddingBig = theme.spacing.unit * 3;
+
+    return {
+        container: {
+            marginTop: paddingBig,
+            position: 'relative'
+        },
+        loading: {
+            backgroundColor: theme.palette.grey[200],
+            pointerEvents: 'none'
+        },
+        header: {
+            padding: `${paddingSmall}px 0 ${paddingSmall}px ${paddingBig}px`,
+        },
+        loadingIndicator: {
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            marginLeft: -20,
+            marginTop: -20
+        }
     }
-});
+};
 
 class PaginatedList extends Component {
-    render() {
-        const {columns, items, expandedCell, classes} = this.props;
+    header() {
+        const {data: {count}, classes, page, pageSize} = this.props;
+
+        const resultsFrom = (page - 1) * pageSize + 1;
+        const resultsTo = Math.min(resultsFrom + pageSize - 1, count);
 
         return (
-            <Paper className={classes.container}>
-                <Grid rows={items} columns={columns}>
+            <div className={classes.header}>
+                <Typography variant="headline">
+                    {`${resultsFrom}-${resultsTo} of ${count} results to show`}
+                </Typography>
+            </div>
+        );
+    }
+
+    render() {
+        const {columns, data, expandedCell, classes, page, onPageChange, pageSize, onPageSizeChange, loading} = this.props;
+
+        const containerClasses = classNames(
+            classes.container,
+            {
+                [classes.loading]: loading
+            }
+        );
+
+        return (
+            <Paper className={containerClasses}>
+                <Grid rows={data.results} columns={columns}>
+                    {this.header()}
+
+                    <PagingState
+                        currentPage={page - 1}
+                        onCurrentPageChange={(page) => onPageChange(page + 1)}
+                        pageSize={pageSize}
+                        onPageSizeChange={onPageSizeChange}
+                    />
+                    <CustomPaging
+                        totalCount={data.count}
+                    />
                     <Table/>
                     <TableHeaderRow/>
                     <RowDetailState/>
                     <TableRowDetail
                         contentComponent={({row}) => expandedCell(row)}
                     />
+                    <PagingPanel pageSizes={allowedPageSizes}/>
+                    {loading && <CircularProgress className={classes.loadingIndicator} />}
                 </Grid>
             </Paper>
         );
@@ -37,8 +100,10 @@ class PaginatedList extends Component {
 
 PaginatedList.propTypes = {
     columns: PropTypes.array.isRequired,
-    items: PropTypes.array.isRequired,
-    expandedCell: PropTypes.func
+    data: PropTypes.object.isRequired,
+    expandedCell: PropTypes.func,
+    page: PropTypes.number.isRequired,
+    onPageChange: PropTypes.func.isRequired
 };
 
 export default withStyles(styleSheet)(PaginatedList);

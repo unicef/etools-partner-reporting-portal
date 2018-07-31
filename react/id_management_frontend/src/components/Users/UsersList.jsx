@@ -29,12 +29,12 @@ class UsersList extends Component {
     }
 
     render() {
-        const {items, onPermissionEdit, onPermissionDelete} = this.props;
+        const {onPermissionEdit, onPermissionDelete, ...otherProps} = this.props;
 
         return (
             <div>
                 <PaginatedList
-                    items={items}
+                    {...otherProps}
                     columns={this.getColumns()}
                     expandedCell={row => <UserRowExpanded user={row} onPermissionEdit={onPermissionEdit}
                                                           onPermissionDelete={onPermissionDelete}/>}

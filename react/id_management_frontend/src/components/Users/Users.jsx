@@ -14,6 +14,7 @@ import AddPermissionsDialog from "./AddPermissionsDialog";
 import EditPermissionDialog from "./EditPermissionDialog";
 import ConfirmDialog from "../common/ConfirmDialog";
 
+const firstPage = 1;
 const header = "Users";
 const CONFIRM_ACTIONS = {
     DELETE: "DELETE",
@@ -30,22 +31,32 @@ class Users extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            items: [],
+            data: {
+                results: []
+            },
             selectedUser: null,
             selectedPermission: null,
             addUserDialogOpen: false,
-            action: CONFIRM_ACTIONS.DELETE
+            action: CONFIRM_ACTIONS.DELETE,
+            page: firstPage,
+            page_size: 10,
+            loading: false
         };
-        this.filterChange = debounce(500, (filter) => this.onSearch(filter));
+
+        this.filterChange = debounce(500, (filter) => {
+            this.onSearch(filter, firstPage);
+        });
+
         this.reload = this.reload.bind(this);
         this.onUserSave = this.onUserSave.bind(this);
         this.openAddPermissionsDialog = this.openAddPermissionsDialog.bind(this);
         this.openEditPermissionsDialog = this.openEditPermissionsDialog.bind(this);
         this.onConfirm = this.onConfirm.bind(this);
+        this.onPageSizeChange = this.onPageSizeChange.bind(this);
     }
 
-    reload() {
-        this.onSearch(this.getQuery());
+    reload(page, pageSize) {
+        this.onSearch(this.getQuery(), page, pageSize);
     }
 
     componentDidMount() {
@@ -56,20 +67,39 @@ class Users extends Component {
         return qs.parse(this.props.history.location.search);
     }
 
-    onSearch(filter) {
-        api.get("id-management/users/", filter)
-            .then(res => this.setState({
-                items: res.data.map(function (item) {
+    onPageSizeChange(pageSize) {
+        this.reload(firstPage, pageSize);
+    }
+
+    onSearch(filter, page, pageSize) {
+        let request = filter;
+
+        request.page = page || filter.page || this.state.page;
+        request.page_size = pageSize || filter.page_size || this.state.page_size;
+
+        this.setState({
+            page: parseInt(request.page),
+            page_size: parseInt(request.page_size),
+            loading: true
+        });
+
+        api.get("id-management/users/", request)
+            .then(res => {
+                res.data.results.forEach(function (item) {
                     item.name = fullName(item);
-                    return item;
+                });
+
+                this.setState({
+                    data: res.data,
+                    loading: false
                 })
-            }));
+            });
 
         const {history} = this.props;
 
         history.push({
             pathname: history.location.pathname,
-            search: qs.stringify(filter)
+            search: qs.stringify(request)
         });
     }
 
@@ -110,7 +140,10 @@ class Users extends Component {
 
                 <PageContent>
                     <UsersFilter onChange={this.filterChange} initialValues={this.getQuery()}/>
-                    <UsersList items={this.state.items} onPermissionEdit={this.openEditPermissionsDialog}
+                    <UsersList loading={this.state.loading} pageSize={this.state.page_size}
+                               onPageSizeChange={this.onPageSizeChange} page={this.state.page}
+                               onPageChange={this.reload} data={this.state.data}
+                               onPermissionEdit={this.openEditPermissionsDialog}
                                onPermissionDelete={this.openConfirmDialog(CONFIRM_ACTIONS.DELETE)}/>
                 </PageContent>
 
