@@ -605,7 +605,7 @@ class ClusterIndicatorsListExcelExportForAnalysisView(
     Returns:
         - GET method - Cluster indicator list data as Excel file
     """
-    permission_classes = (IsIMOForCurrentWorkspace,)
+    permission_classes = (AnyPermission(IsPartnerAuthorizedOfficer, IsIMOForCurrentWorkspace),)
 
     def list(self, request, response_plan_id, *args, **kwargs):
         # Render to excel
