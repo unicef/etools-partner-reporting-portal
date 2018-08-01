@@ -15,12 +15,12 @@ import withSearch from "../hoc/withSearch";
 
 const header = "Users";
 const CONFIRM_ACTIONS = {
-    DELETE: "DELETE",
+    DELETE_PERMISSION: "DELETE_PERMISSION",
     MAKE_IP_ADMIN: "MAKE_IP_ADMIN",
     REMOVE_IP_ADMIN: "REMOVE_IP_ADMIN"
 };
 const confirmMessages = {
-    [CONFIRM_ACTIONS.DELETE]: "Are you sure you want to remove IP Admin role for this user in this workspace?",
+    [CONFIRM_ACTIONS.DELETE_PERMISSION]: "Are you sure you want to remove IP Admin role for this user in this workspace?",
     [CONFIRM_ACTIONS.MAKE_IP_ADMIN]: "Are you sure you want to make this user an IP Admin in this workspace?",
     [CONFIRM_ACTIONS.REMOVE_IP_ADMIN]: "Are you sure you want to remove IP Admin role for this user in this workspace?"
 };
@@ -32,17 +32,20 @@ class Users extends Component {
             selectedUser: null,
             selectedPermission: null,
             addUserDialogOpen: false,
-            action: CONFIRM_ACTIONS.DELETE
+            action: CONFIRM_ACTIONS.DELETE_PERMISSION
         };
 
         this.onUserSave = this.onUserSave.bind(this);
         this.openAddPermissionsDialog = this.openAddPermissionsDialog.bind(this);
         this.openEditPermissionsDialog = this.openEditPermissionsDialog.bind(this);
         this.onConfirm = this.onConfirm.bind(this);
+        this.closeAndReload = this.closeAndReload.bind(this);
     }
 
     onUserSave(user) {
-        this.reload();
+        const {reload} = this.props;
+
+        reload();
         this.openAddPermissionsDialog(user);
     }
 
@@ -51,24 +54,40 @@ class Users extends Component {
         this.props.handleDialogOpen("addPermissions");
     }
 
-    openEditPermissionsDialog(user, permission) {
-        this.setState({selectedUser: user, selectedPermission: permission});
+    openEditPermissionsDialog(permission) {
+        this.setState({selectedPermission: permission});
         this.props.handleDialogOpen("editPermission");
     }
 
     openConfirmDialog(action) {
-        return (user, permission) => {
-            this.setState({confirmAction: action, selectedUser: user, selectedPermission: permission});
+        return (permission) => {
+            this.setState({confirmAction: action, selectedPermission: permission});
             this.props.handleDialogOpen("confirm");
         }
     }
 
+    closeAndReload() {
+        const {reload, handleDialogClose} = this.props;
+
+        handleDialogClose();
+        reload();
+    }
+
+    deletePermission(permission) {
+        api.delete(`id-management/role-group/${permission.id}/`)
+            .then(this.closeAndReload);
+    }
+
     onConfirm() {
-        console.log(this.state.action);
+        switch(this.state.action) {
+            case CONFIRM_ACTIONS.DELETE_PERMISSION:
+                this.deletePermission(this.state.selectedPermission);
+                break;
+        }
     }
 
     render() {
-        const {dialogOpen, handleDialogOpen, handleDialogClose, filterChange, listProps, getQuery} = this.props;
+        const {dialogOpen, handleDialogOpen, handleDialogClose, filterChange, listProps, getQuery, reload} = this.props;
 
         return (
             <div>
@@ -79,8 +98,9 @@ class Users extends Component {
                 <PageContent>
                     <UsersFilter onChange={filterChange} initialValues={getQuery()}/>
                     <UsersList {...listProps}
+                               onPermissionsAdd={this.openAddPermissionsDialog}
                                onPermissionEdit={this.openEditPermissionsDialog}
-                               onPermissionDelete={this.openConfirmDialog(CONFIRM_ACTIONS.DELETE)}/>
+                               onPermissionDelete={this.openConfirmDialog(CONFIRM_ACTIONS.DELETE_PERMISSION)}/>
                 </PageContent>
 
                 {this.state.selectedUser &&
@@ -88,9 +108,11 @@ class Users extends Component {
                                       onClose={handleDialogClose}/>}
 
                 {this.state.selectedUser && this.state.selectedPermission &&
-                <EditPermissionDialog user={this.state.selectedUser} permission={this.state.selectedPermission}
+                <EditPermissionDialog user={this.state.selectedUser}
+                                      permission={this.state.selectedPermission}
                                       open={dialogOpen.editPermission}
-                                      onClose={handleDialogClose}/>}
+                                      onClose={handleDialogClose}
+                                      onSave={reload}/>}
 
                 <ConfirmDialog open={dialogOpen.confirm} onClose={handleDialogClose} onConfirm={this.onConfirm}
                                message={confirmMessages[this.state.action]}/>

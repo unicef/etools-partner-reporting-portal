@@ -17,6 +17,10 @@ function makeRequest(method, url, data) {
             'Content-Type': 'application/json'
         }
     }).catch(error => {
+        if (error.response.data.error_codes === "not_authenticated") {
+            document.location.href = "/";
+        }
+
         throw new SubmissionError(error.response.data);
     });
 }
@@ -33,5 +37,8 @@ export var api = {
     },
     put: function (url, data) {
         return makeRequest('put', url, data);
+    },
+    delete: function (url) {
+        return makeRequest('delete', url);
     },
 };

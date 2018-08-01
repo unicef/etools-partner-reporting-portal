@@ -7,6 +7,7 @@ import EtoolsLogo from "./EtoolsLogo";
 import { Typography } from "@material-ui/core";
 import grey from "@material-ui/core/colors/grey";
 import ProfileMenu from "./ProfileMenu/ProfileMenu";
+import withUser from "../hoc/withUser";
 
 const styleSheet = {
     header: Object.assign({}, mainStyles.header, {
@@ -25,11 +26,9 @@ const styleSheet = {
     }
 };
 
-const organization = "Save the children";
-
 class MainAppBar extends Component {
     render() {
-        const { classes } = this.props;
+        const { classes, user } = this.props;
 
         return (
             <Grid container justify="space-between" className={classes.header}>
@@ -55,7 +54,7 @@ class MainAppBar extends Component {
                             className={classes.organization}
                             variant="subheading"
                         >
-                            {organization}
+                            {user.organization}
                         </Typography>
                         <ProfileMenu/>
                     </Grid>
@@ -65,4 +64,4 @@ class MainAppBar extends Component {
     }
 }
 
-export default withStyles(styleSheet, { name: "MainAppBar" })(MainAppBar);
+export default withUser(withStyles(styleSheet, { name: "MainAppBar" })(MainAppBar));

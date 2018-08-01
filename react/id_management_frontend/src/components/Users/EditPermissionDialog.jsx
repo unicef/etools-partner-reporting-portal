@@ -4,12 +4,14 @@ import DialogActions from "../common/DialogActions";
 import {Button, Grid} from "@material-ui/core";
 import {reduxForm} from 'redux-form';
 import labels from "../../labels";
-import {PRP_ROLE_OPTIONS} from "../../constants";
+import {EDITABLE_PRP_ROLE_OPTIONS} from "../../constants";
 import TextFieldForm from "../form/TextFieldForm";
 import SelectForm from "../form/SelectForm";
 import {connect} from "react-redux";
 import PropTypes from "prop-types";
 import ButtonSubmit from "../common/ButtonSubmit";
+import {api} from "../../infrastructure/api";
+import withPortal from "../hoc/withPortal";
 
 const title = "Edit permission";
 
@@ -17,15 +19,28 @@ class EditPermissionDialog extends Component {
     constructor(props) {
         super(props);
 
+        this.state = {
+            loading: false
+        };
+
         this.onSubmit = this.onSubmit.bind(this);
     }
 
     onSubmit(values) {
-        console.log(values);
+        const {permission: {id}, onSave, onClose} = this.props;
+
+        this.setState({loading: true});
+
+        api.patch(`id-management/role-group/${id}/`, {role: values.role})
+            .then(res => {
+                onClose();
+                onSave();
+            })
+            .finally(() => this.setState({loading: false}));
     }
 
     render() {
-        const {open, handleSubmit, onClose} = this.props;
+        const {open, handleSubmit, onClose, portal} = this.props;
 
         return (
             <Dialog
@@ -40,13 +55,13 @@ class EditPermissionDialog extends Component {
                         </Grid>
                         <Grid item md={6}>
                             <SelectForm fieldName="role" label={labels.role}
-                                        values={PRP_ROLE_OPTIONS}/>
+                                        values={EDITABLE_PRP_ROLE_OPTIONS[portal]}/>
                         </Grid>
                     </Grid>
 
                     <DialogActions>
                         <Button onClick={onClose}>{labels.cancel}</Button>
-                        <ButtonSubmit/>
+                        <ButtonSubmit loading={this.state.loading}/>
                     </DialogActions>
                 </form>
             </Dialog>
@@ -55,7 +70,6 @@ class EditPermissionDialog extends Component {
 }
 
 EditPermissionDialog.propTypes = {
-    user: PropTypes.object.isRequired,
     permission: PropTypes.shape({
         workspace: PropTypes.any.isRequired,
         role: PropTypes.any.isRequired,
@@ -65,10 +79,10 @@ EditPermissionDialog.propTypes = {
 const mapStateToProps = (state, ownProps) => {
     return {
         initialValues: {
-            workspace: ownProps.permission.workspace,
+            workspace: ownProps.permission.workspace.title,
             role: ownProps.permission.role
         }
     }
 };
 
-export default connect(mapStateToProps)(reduxForm({form: "editPermissionForm"})(EditPermissionDialog));
+export default withPortal(connect(mapStateToProps)(reduxForm({form: "editPermissionForm"})(EditPermissionDialog)));

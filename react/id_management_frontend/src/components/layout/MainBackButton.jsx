@@ -4,6 +4,7 @@ import ArrowBack from "@material-ui/icons/ArrowBack";
 import Grid from "@material-ui/core/Grid";
 import {withStyles} from "@material-ui/core/styles";
 import grey from "@material-ui/core/colors/grey";
+import withPortal from "../hoc/withPortal";
 
 const label = "User Management";
 
@@ -24,11 +25,18 @@ const styleSheet = (theme) => ({
 });
 
 class MainBackButton extends Component {
+    goBack() {
+        const {portal} = this.props;
+
+        document.location.href = "/app/NE/" + portal;
+    }
+
     render() {
         const {classes} = this.props;
 
         return (
-            <Button variant="contained" color="primary" className={classes.mainBackButton}>
+            <Button onClick={() => this.goBack()} variant="contained" color="primary"
+                    className={classes.mainBackButton}>
                 <Grid container spacing={24} alignItems="center" wrap="nowrap">
                     <Grid item><ArrowBack className={classes.backArrow}/></Grid>
                     <Grid item>{label}</Grid>
@@ -38,4 +46,4 @@ class MainBackButton extends Component {
     }
 }
 
-export default withStyles(styleSheet)(MainBackButton);
+export default withPortal(withStyles(styleSheet)(MainBackButton));

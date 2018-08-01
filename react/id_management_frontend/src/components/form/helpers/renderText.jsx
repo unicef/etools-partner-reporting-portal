@@ -57,6 +57,7 @@ export const renderText = ({
                     className={className}
                     style={{whiteSpace: 'pre-wrap'}}
                     {...other}
+                    variant="subheading"
                 >
                     {Array.isArray(value) ? value.join(', ') : value}
                 </Typography>

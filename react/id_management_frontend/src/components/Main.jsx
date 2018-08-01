@@ -4,12 +4,15 @@ import MainSideBar from "./layout/MainSideBar";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import {MuiThemeProvider, createMuiTheme} from "@material-ui/core/styles";
 import {blue, green, grey} from "@material-ui/core/colors";
-import {PORTALS} from "../actions";
+import {PORTALS, userProfile} from "../actions";
 import MainContent from "./layout/MainContent";
 import MainRoutes from "./MainRoutes";
 import {Redirect, Route} from "react-router-dom";
 import {withRouter} from "react-router-dom";
 import withPortal from "./hoc/withPortal";
+import {api} from "../infrastructure/api";
+import {connect} from "react-redux";
+
 
 const labels = {
     [PORTALS.IP]: "IP REPORTING",
@@ -17,6 +20,20 @@ const labels = {
 };
 
 class Main extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            loading: true
+        };
+
+        api.get("account/user-profile")
+            .then(res => {
+                props.dispatchUserProfile(res.data);
+            })
+            .finally(() => this.setState({loading: false}));
+    }
+
     getPortalsPath() {
         return `/:portal(${PORTALS.IP}|${PORTALS.CLUSTER})/`
     }
@@ -39,6 +56,7 @@ class Main extends Component {
 
         return (
             <MuiThemeProvider theme={theme}>
+                {!this.state.loading &&
                 <div className="App">
                     <Route exact path="/" render={() => <Redirect to={`/${PORTALS.IP}`}/>}/>
                     <CssBaseline/>
@@ -60,10 +78,18 @@ class Main extends Component {
                             )}
                         />
                     </MainContent>
-                </div>
+                </div>}
             </MuiThemeProvider>
         );
     }
 }
 
-export default withRouter(withPortal(Main));
+const mapDispatchToProps = dispatch => {
+    return {
+        dispatchUserProfile: user => {
+            dispatch(userProfile(user));
+        }
+    };
+};
+
+export default withRouter(connect(null, mapDispatchToProps)(withPortal(Main)));

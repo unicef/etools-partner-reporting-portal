@@ -23,6 +23,7 @@ export default (getDataFn) =>
                 });
 
                 this.getQuery = this.getQuery.bind(this);
+                this.reload = this.reload.bind(this);
             }
 
             reload(page, pageSize) {
@@ -71,12 +72,13 @@ export default (getDataFn) =>
                     pageSize: this.state.page_size,
                     data: this.state.data,
                     onPageSizeChange: this.onPageSizeChange.bind(this),
-                    onPageChange: this.reload.bind(this)
+                    onPageChange: this.reload
                 };
 
                 return (
                     <WrappedComponent
                         filterChange={this.filterChange}
+                        reload={this.reload}
                         getQuery={this.getQuery}
                         listProps={listProps}
                         {...this.props}
