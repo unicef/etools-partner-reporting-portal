@@ -59,7 +59,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserWithPRPRolesSerializer(UserSerializer):
-    prp_roles = PRPRoleWithRelationsSerializer(many=True)
+    prp_roles = PRPRoleWithRelationsSerializer(many=True, read_only=True)
 
     class Meta:
         model = User
@@ -70,4 +70,4 @@ class UserWithPRPRolesSerializer(UserSerializer):
             'access', 'prp_roles',
             'position'
         )
-        read_only_fields = ('id', 'profile', 'partner', 'organization', 'access', 'prp_roles')
+        read_only_fields = ('id', 'profile', 'partner', 'organization', 'access')
