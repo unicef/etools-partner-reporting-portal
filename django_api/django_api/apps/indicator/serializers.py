@@ -217,8 +217,17 @@ class ReportableLocationGoalBaselineInNeedSerializer(serializers.ModelSerializer
     def validate(self, data):
         in_need = data['in_need']
         target = data['target']
-        if in_need and 'v' in in_need and float(in_need['v']) < float(target['v']):
-            raise serializers.ValidationError("Target cannot be greater than In Need")
+
+        if in_need and 'v' in in_need:
+            # Defaulting to 0 if this is optional value
+            if in_need['v'] == "":
+                data['in_need']['v'] = 0
+
+            elif float(in_need['v']) < float(target['v']):
+                raise serializers.ValidationError({
+                    "in_need": "Target cannot be greater than In Need",
+                })
+
         return data
 
     def validate_baseline(self, value):
