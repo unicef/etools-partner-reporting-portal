@@ -34,6 +34,20 @@ class ClusterSimpleSerializer(serializers.ModelSerializer):
         )
 
 
+class ClusterIDManagementSerializer(serializers.ModelSerializer):
+    full_title = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Cluster
+        fields = (
+            'id',
+            'full_title',
+        )
+
+    def get_full_title(self, obj):
+        return f'{obj.title} ({obj.response_plan.title} {obj.response_plan.workspace.title})'
+
+
 class ClusterObjectiveSerializer(serializers.ModelSerializer):
     cluster_title = serializers.CharField(source='cluster.title', read_only=True)
 

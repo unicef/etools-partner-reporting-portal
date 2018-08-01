@@ -1,4 +1,5 @@
 from django.contrib.auth import login, logout
+from django.db.models import Prefetch
 
 from rest_framework import status as statuses
 from rest_framework.exceptions import ValidationError
@@ -9,12 +10,13 @@ from rest_framework.views import APIView
 import django_filters
 from drfpasswordless.utils import authenticate_by_token
 
+from core.models import PRPRole
 from core.paginations import SmallPagination
 from core.permissions import IsAuthenticated
 
 from .filters import UserFilter
 from .models import User
-from .serializers import UserSerializer
+from .serializers import UserSerializer, UserWithPRPRolesSerializer
 
 
 class UserProfileAPIView(RetrieveAPIView):
@@ -69,11 +71,14 @@ class LoginUserWithTokenAPIView(APIView):
 
 
 class UserListCreateAPIView(ListCreateAPIView):
-    serializer_class = UserSerializer
+    serializer_class = UserWithPRPRolesSerializer
     permission_classes = (IsAuthenticated,)
     filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
     filter_class = UserFilter
     pagination_class = SmallPagination
 
     def get_queryset(self):
-        return User.objects.select_related('profile', 'partner').prefetch_related('prp_roles')
+        prp_roles_queryset = PRPRole.objects.select_related('workspace', 'cluster', 'cluster__response_plan',
+                                                            'cluster__response_plan__workspace')
+        prp_roles_prefetch = Prefetch('prp_roles', queryset=prp_roles_queryset)
+        return User.objects.select_related('profile', 'partner').prefetch_related(prp_roles_prefetch)

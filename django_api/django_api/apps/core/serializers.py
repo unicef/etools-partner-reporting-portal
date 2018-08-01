@@ -13,6 +13,12 @@ class CountrySerializer(serializers.ModelSerializer):
         fields = ('name', 'country_short_code', 'long_name')
 
 
+class WorkspaceSimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Workspace
+        fields = ('id', 'title')
+
+
 class WorkspaceSerializer(serializers.ModelSerializer):
 
     countries = CountrySerializer(many=True)

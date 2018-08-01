@@ -3,6 +3,7 @@ from rest_framework import serializers
 from core.common import PRP_ROLE_TYPES
 
 from cluster.models import Cluster
+from id_management.serializers import PRPRoleWithRelationsSerializer
 from partner.serializers import PartnerDetailsSerializer
 from .models import User
 
@@ -55,3 +56,18 @@ class UserSerializer(serializers.ModelSerializer):
         )
         read_only_fields = ('id', 'profile', 'partner', 'organization', 'access', 'prp_roles')
         depth = 1
+
+
+class UserWithPRPRolesSerializer(UserSerializer):
+    prp_roles = PRPRoleWithRelationsSerializer(many=True)
+
+    class Meta:
+        model = User
+        fields = (
+            'id', 'email', 'first_name',
+            'last_name', 'profile',
+            'partner', 'organization',
+            'access', 'prp_roles',
+            'position'
+        )
+        read_only_fields = ('id', 'profile', 'partner', 'organization', 'access', 'prp_roles')
