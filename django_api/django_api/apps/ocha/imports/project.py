@@ -112,8 +112,12 @@ def import_project(external_project_id, partner_id, response_plan=None, async=Tr
     if 'governingEntities' in current_project_data:
         for cluster in current_project_data['governingEntities']:
             if 'clusterNumber' in cluster:
-                current_project_data['cluster'] = current_project_data['cluster_ids'].append(
-                    int(cluster['clusterNumber']))
+                if not cluster['clusterNumber'].isdigit():
+                    cluster_number = int(cluster['clusterNumber'][1:])
+                else:
+                    cluster_number = int(cluster['clusterNumber'])
+
+                current_project_data['cluster'] = current_project_data['cluster_ids'].append(cluster_number)
 
     serializer = V2PartnerProjectImportSerializer(data=current_project_data)
     serializer.is_valid(raise_exception=True)
