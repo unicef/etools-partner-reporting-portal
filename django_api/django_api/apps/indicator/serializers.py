@@ -1151,7 +1151,7 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 {"baseline": "Cannot be greater than target"}
             )
 
-        if 'in_need' in validated_data and validated_data['in_need'] and validated_data['in_need']['v'] != "" :
+        if 'in_need' in validated_data and validated_data['in_need'] and validated_data['in_need']['v'] != "":
             if 'd' not in validated_data['in_need']:
                 validated_data['in_need']['d'] = 1
 
@@ -1308,18 +1308,8 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         # Remove disaggregations to update
         validated_data.pop('disaggregations', [])
 
-        if partner:
-            # Filter out IndicatorBlueprint instance
-            # and Indicator level baseline, in_need, and target
-            validated_data.pop('blueprint', None)
-            validated_data.pop('baseline', None)
-            validated_data.pop('in_need', None)
-            validated_data.pop('target', None)
-
         reportable_object_content_type = self.resolve_reportable_content_type(validated_data.pop('object_type'))
         reportable_object_content_model = reportable_object_content_type.model_class()
-
-        self.check_progress_values(partner, reportable_object_content_model, validated_data)
 
         if reportable_object_content_model == PartnerProject:
             content_object = get_object_or_404(PartnerProject, pk=validated_data['object_id'])
@@ -1340,6 +1330,21 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 raise ValidationError({
                     "start_date_of_reporting_period": error_msg,
                 })
+
+            # If PartnerActivity is adopted from CA,
+            # Filter out IndicatorBlueprint instance
+            # and Indicator level baseline, in_need, and target
+            if partner and content_object.cluster_activity:
+                validated_data.pop('blueprint', None)
+                validated_data.pop('baseline', None)
+                validated_data.pop('in_need', None)
+                validated_data.pop('target', None)
+
+        # If partner updating partner activity indicator adopted from CA, do not process progress value as it is fixed
+        if reportable_object_content_model == PartnerActivity and content_object.cluster_activity and partner:
+            pass
+        else:
+            self.check_progress_values(partner, reportable_object_content_model, validated_data)
 
         # Swapping validated_data['locations'] with raw request.data['locations']
         # Due to missing id field as it is write_only field
