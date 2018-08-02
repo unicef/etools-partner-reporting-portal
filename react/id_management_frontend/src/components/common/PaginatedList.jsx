@@ -15,6 +15,8 @@ import {RowDetailState} from "@devexpress/dx-react-grid";
 import {withStyles} from "@material-ui/core/styles";
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import {connect} from 'react-redux';
+import {expandedRowIds} from "../../actions";
 
 const allowedPageSizes = [5, 10, 15];
 
@@ -61,7 +63,19 @@ class PaginatedList extends Component {
     }
 
     render() {
-        const {columns, data, expandedCell, classes, page, onPageChange, pageSize, onPageSizeChange, loading} = this.props;
+        const {
+            columns,
+            data,
+            expandedCell,
+            classes,
+            page,
+            onPageChange,
+            pageSize,
+            onPageSizeChange,
+            loading,
+            expandedRowIds,
+            dispatchExpandedRowIds
+        } = this.props;
 
         const containerClasses = classNames(
             classes.container,
@@ -86,12 +100,13 @@ class PaginatedList extends Component {
                     />
                     <Table/>
                     <TableHeaderRow/>
-                    <RowDetailState/>
+                    <RowDetailState expandedRowIds={expandedRowIds}
+                                    onExpandedRowIdsChange={dispatchExpandedRowIds}/>
                     <TableRowDetail
                         contentComponent={({row}) => expandedCell(row)}
                     />
                     <PagingPanel pageSizes={allowedPageSizes}/>
-                    {loading && <CircularProgress className={classes.loadingIndicator} />}
+                    {loading && <CircularProgress className={classes.loadingIndicator}/>}
                 </Grid>
             </Paper>
         );
@@ -106,4 +121,18 @@ PaginatedList.propTypes = {
     onPageChange: PropTypes.func.isRequired
 };
 
-export default withStyles(styleSheet)(PaginatedList);
+const mapStateToProps = (state) => {
+    const {expandedRowIds} = state;
+
+    return {
+        expandedRowIds
+    };
+};
+
+const mapDispatchToProps = dispatch => {
+    return {
+        dispatchExpandedRowIds: ids => dispatch(expandedRowIds(ids))
+    }
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styleSheet)(PaginatedList));

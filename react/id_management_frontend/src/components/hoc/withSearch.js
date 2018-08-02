@@ -1,87 +1,106 @@
 import React, {Component} from 'react';
 import qs from "query-string";
 import {debounce} from "throttle-debounce";
+import {expandedRowIds} from "../../actions";
+import {connect} from "react-redux";
 
 const firstPage = 1;
 
-export default (getDataFn) =>
-    WrappedComponent =>
-        class WithSearch extends Component {
-            constructor(props) {
-                super(props);
-                this.state = {
-                    data: {
-                        results: []
-                    },
-                    page: firstPage,
-                    page_size: 10,
-                    loading: false
-                };
+const mapDispatchToProps = dispatch => {
+    return {
+        resetExpandedRows: () => dispatch(expandedRowIds([]))
+    }
+};
 
-                this.filterChange = debounce(500, (filter) => {
-                    this.onSearch(filter, firstPage);
-                });
+export default (getDataFn) => {
+    return WrappedComponent =>
+        connect(null, mapDispatchToProps)(
+            class WithSearch extends Component {
+                constructor(props) {
+                    super(props);
+                    this.state = {
+                        data: {
+                            results: []
+                        },
+                        page: firstPage,
+                        page_size: 10,
+                        loading: false
+                    };
 
-                this.getQuery = this.getQuery.bind(this);
-                this.reload = this.reload.bind(this);
-            }
+                    this.filterChange = debounce(500, (filter) => {
+                        this.onSearch(filter, firstPage);
+                        props.resetExpandedRows();
+                    });
 
-            reload(page, pageSize) {
-                this.onSearch(this.getQuery(), page, pageSize);
-            }
+                    this.getQuery = this.getQuery.bind(this);
+                    this.reload = this.reload.bind(this);
+                    this.onPageChange = this.onPageChange.bind(this);
+                }
 
-            componentDidMount() {
-                this.reload();
-            }
+                reload(page, pageSize) {
+                    this.onSearch(this.getQuery(), page, pageSize);
+                }
 
-            getQuery() {
-                return qs.parse(this.props.history.location.search);
-            }
+                componentDidMount() {
+                    this.reload();
+                    this.props.resetExpandedRows();
+                }
 
-            onPageSizeChange(pageSize) {
-                this.reload(firstPage, pageSize);
-            }
+                getQuery() {
+                    return qs.parse(this.props.history.location.search);
+                }
 
-            onSearch(filter, page, pageSize) {
-                let request = filter;
+                onPageSizeChange(pageSize) {
+                    this.reload(firstPage, pageSize);
+                    this.props.resetExpandedRows();
+                }
 
-                request.page = page || filter.page || this.state.page;
-                request.page_size = pageSize || filter.page_size || this.state.page_size;
+                onPageChange(page, pageSize) {
+                    this.reload(page, pageSize);
+                    this.props.resetExpandedRows();
+                }
 
-                this.setState({
-                    page: parseInt(request.page),
-                    page_size: parseInt(request.page_size),
-                    loading: true
-                });
+                onSearch(filter, page, pageSize) {
+                    let request = filter;
 
-                Promise.resolve(getDataFn(request))
-                    .then(data => this.setState({data, loading: false}));
+                    request.page = page || filter.page || this.state.page;
+                    request.page_size = pageSize || filter.page_size || this.state.page_size;
 
-                const {history} = this.props;
+                    this.setState({
+                        page: parseInt(request.page),
+                        page_size: parseInt(request.page_size),
+                        loading: true
+                    });
 
-                history.push({
-                    pathname: history.location.pathname,
-                    search: qs.stringify(request)
-                });
-            }
+                    Promise.resolve(getDataFn(request))
+                        .then(data => this.setState({data, loading: false}));
 
-            render() {
-                const listProps = {
-                    page: this.state.page,
-                    loading: this.state.loading,
-                    pageSize: this.state.page_size,
-                    data: this.state.data,
-                    onPageSizeChange: this.onPageSizeChange.bind(this),
-                    onPageChange: this.reload
-                };
+                    const {history} = this.props;
 
-                return (
-                    <WrappedComponent
-                        filterChange={this.filterChange}
-                        reload={this.reload}
-                        getQuery={this.getQuery}
-                        listProps={listProps}
-                        {...this.props}
-                    />);
-            }
-        };
+                    history.push({
+                        pathname: history.location.pathname,
+                        search: qs.stringify(request)
+                    });
+                }
+
+                render() {
+                    const listProps = {
+                        page: this.state.page,
+                        loading: this.state.loading,
+                        pageSize: this.state.page_size,
+                        data: this.state.data,
+                        onPageSizeChange: this.onPageSizeChange.bind(this),
+                        onPageChange: this.onPageChange
+                    };
+
+                    return (
+                        <WrappedComponent
+                            filterChange={this.filterChange}
+                            reload={this.reload}
+                            getQuery={this.getQuery}
+                            listProps={listProps}
+                            {...this.props}
+                        />);
+                }
+            });
+}
