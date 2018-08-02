@@ -1278,7 +1278,9 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         self.check_location_admin_levels(location_queryset)
 
         for loc_data in locations:
-            if partner:
+            # If partner updating partner activity indicator adopted from CA,
+            # do not take out baseline and in-need at location level
+            if reportable_object_content_model == PartnerActivity and content_object.cluster_activity and partner:
                 # Filter out location goal level baseline, in_need
                 loc_data.pop('baseline', None)
                 loc_data.pop('in_need', None)
@@ -1360,7 +1362,9 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
                 loc_goal['location'] = Location.objects.get(id=loc_goal['location'])
                 loc_goal['reportable'] = reportable
 
-                if partner:
+                # If partner updating partner activity indicator adopted from CA,
+                # do not take out baseline and in-need at location level
+                if reportable_object_content_model == PartnerActivity and content_object.cluster_activity and partner:
                     # Filter out location goal level baseline, in_need
                     loc_goal.pop('baseline', None)
                     loc_goal.pop('in_need', None)
@@ -1397,8 +1401,10 @@ class ClusterIndicatorSerializer(serializers.ModelSerializer):
         for data_id, data in data_mapping.items():
             loc_goal = loc_goal_mapping.get(data_id, None)
 
-            if partner:
-                # Filter out location level baseline and in_need
+            # If partner updating partner activity indicator adopted from CA,
+            # do not take out baseline and in-need at location level
+            if reportable_object_content_model == PartnerActivity and content_object.cluster_activity and partner:
+                # Filter out location goal level baseline, in_need
                 data.pop('baseline', None)
                 data.pop('in_need', None)
 

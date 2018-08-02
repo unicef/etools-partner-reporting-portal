@@ -63,6 +63,7 @@ class V2PartnerProjectLocationImportSerializer(serializers.ModelSerializer):
             'adminLevel',
         )
 
+
 class V2PartnerProjectImportSerializer(DiscardUniqueTogetherValidationMixin, serializers.ModelSerializer):
     external_source = serializers.CharField(default=EXTERNAL_DATA_SOURCES.HPC)
     id = serializers.IntegerField(source='external_id')
