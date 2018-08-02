@@ -4,7 +4,7 @@ import DialogActions from "../common/DialogActions";
 import {Button, Grid} from "@material-ui/core";
 import {reduxForm} from 'redux-form';
 import labels from "../../labels";
-import {EDITABLE_PRP_ROLE_OPTIONS} from "../../constants";
+import {EDITABLE_PRP_ROLE_OPTIONS, PRP_ROLE} from "../../constants";
 import TextFieldForm from "../form/TextFieldForm";
 import SelectForm from "../form/SelectForm";
 import {connect} from "react-redux";
@@ -56,7 +56,7 @@ class EditPermissionDialog extends Component {
                         </Grid>
                         <Grid item md={6}>
                             <SelectForm fieldName="role" label={labels.role}
-                                        values={EDITABLE_PRP_ROLE_OPTIONS[portal]}/>
+                                        values={EDITABLE_PRP_ROLE_OPTIONS[PRP_ROLE.IP_ADMIN]}/>
                         </Grid>
                     </Grid>
 

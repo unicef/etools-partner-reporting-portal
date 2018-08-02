@@ -3,17 +3,19 @@ import UserRoleControl from "./UserRoleControl";
 import LinkButton from "../common/LinkButton";
 import {PRP_ROLE, EDITABLE_PRP_ROLES} from "../../constants";
 import withUser from "../hoc/withUser";
-import {hasAnyRole} from "../../helpers/user";
+import {hasAnyRole, userRoleInWorkspace} from "../../helpers/user";
 import {PORTALS} from "../../actions";
 import {getLabels} from "../../labels";
 import {Typography} from "@material-ui/core";
-import withPortal from "../hoc/withPortal";
 import {withStyles} from "@material-ui/core/styles";
 import PlainButton from "../common/PlainButton";
 import UserRowExpandedText from "./UserRowExpandedText";
 
 const labels = getLabels({
-    userType: "User type"
+    userType: "User type",
+    makeIpAdmin: "(make IP admin)",
+    edit: "edit",
+    delete: "delete"
 });
 
 const roleCaption = {
@@ -32,15 +34,26 @@ const styleSheet = (theme) => ({
 
 class UserRowExpanded extends Component {
     getActions(role) {
-        const {user, onPermissionEdit, onPermissionDelete, row, portal} = this.props;
+        const {user, onPermissionEdit, onPermissionDelete, onRemoveIpAdmin, onMakeIpAdmin, row} = this.props;
+
+        const userRole = userRoleInWorkspace(user, role.workspace.id);
 
         return (
             <Fragment>
-                {user.prpRole[PRP_ROLE.IP_ADMIN] && hasAnyRole(row, EDITABLE_PRP_ROLES[portal]) &&
+                {userRole === PRP_ROLE.IP_ADMIN &&
+                hasAnyRole(row, EDITABLE_PRP_ROLES[PRP_ROLE.IP_ADMIN]) &&
                 <Fragment>
-                    <LinkButton label="edit" onClick={() => onPermissionEdit(role)}/>
-                    <LinkButton label="delete" variant="danger" onClick={() => onPermissionDelete(role)}/>
+                    <LinkButton label={labels.edit} onClick={() => onPermissionEdit(role)}/>
+                    <LinkButton label={labels.delete} variant="danger" onClick={() => onPermissionDelete(role)}/>
                 </Fragment>}
+
+                {userRole === PRP_ROLE.IP_AUTHORIZED_OFFICER &&
+                ([PRP_ROLE.IP_EDITOR, PRP_ROLE.IP_VIEWER].indexOf(role.role) > -1) &&
+                <LinkButton label={labels.makeIpAdmin} onClick={() => onMakeIpAdmin(role)}/>}
+
+                {userRole === PRP_ROLE.IP_AUTHORIZED_OFFICER &&
+                role.role === PRP_ROLE.IP_ADMIN &&
+                <LinkButton label={labels.delete} variant="danger" onClick={() => onRemoveIpAdmin(role)}/>}
             </Fragment>
         )
     }
@@ -68,11 +81,11 @@ class UserRowExpanded extends Component {
                     <UserRoleControl key={role.id} role={role} actions={this.getActions(role)}/>
                 ))}
 
-                {user.prpRole[PRP_ROLE.IP_ADMIN] &&
+                {(user.prpRole[PRP_ROLE.IP_ADMIN] || user.prpRole[PRP_ROLE.IP_AUTHORIZED_OFFICER]) &&
                 <PlainButton color="primary" onClick={() => onPermissionsAdd(row)}>Add new permission</PlainButton>}
             </div>
         );
     }
 }
 
-export default withPortal(withUser(withStyles(styleSheet)(UserRowExpanded)));
+export default withUser(withStyles(styleSheet)(UserRowExpanded));

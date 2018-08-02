@@ -9,38 +9,48 @@ import FieldsArrayAddButton from "../common/FieldsArrayAddButton";
 import labels from "../../labels";
 import withPortal from "../hoc/withPortal";
 import withWorkspaceOptions from "../hoc/withWorkspaceOptions";
+import withUser from "../hoc/withUser";
+import {userRoleInWorkspace} from "../../helpers/user";
 
 const title = "Role per Workspace";
 
-const renderPermissionsFields = ({fields, portal, workspaceOptions}) => (
+const renderPermissionsFields = ({fields, portal, workspaceOptions, user}) => (
     <div>
         <Typography variant="caption" gutterBottom>{title}</Typography>
 
         <FieldsArrayPanel>
-            {fields.map((item, index, fields) => (
-                <FieldsArrayItem key={index}>
-                    <Grid container justify="flex-end">
-                        <Grid item>
-                            <DeleteButton onClick={() => fields.remove(index)}/>
-                        </Grid>
-                    </Grid>
+            {fields.map((item, index, fields) => {
+                const workspace = fields.get(index).workspace;
+                const role = userRoleInWorkspace(user, workspace);
 
-                    <Grid container spacing={24}>
-                        <Grid item md={6}>
-                            <SelectForm fieldName={`${item}.workspace`} label={labels.workspace}
-                                        values={workspaceOptions}/>
+                const roleOptions = role ? EDITABLE_PRP_ROLE_OPTIONS[role] : [];
+
+                return (
+                    <FieldsArrayItem key={index}>
+                        <Grid container justify="flex-end">
+                            <Grid item>
+                                <DeleteButton onClick={() => fields.remove(index)}/>
+                            </Grid>
                         </Grid>
-                        <Grid item md={6}>
-                            <SelectForm fieldName={`${item}.role`} label={labels.role}
-                                        values={EDITABLE_PRP_ROLE_OPTIONS[portal]}/>
+
+                        <Grid container spacing={24}>
+                            <Grid item md={6}>
+                                <SelectForm fieldName={`${item}.workspace`} label={labels.workspace}
+                                            values={workspaceOptions}/>
+                            </Grid>
+
+                            <Grid item md={6}>
+                                <SelectForm fieldName={`${item}.role`} label={labels.role}
+                                            values={roleOptions}/>
+                            </Grid>
                         </Grid>
-                    </Grid>
-                </FieldsArrayItem>
-            ))}
+                    </FieldsArrayItem>
+                )
+            })}
 
             <FieldsArrayAddButton onClick={() => fields.push({})}/>
         </FieldsArrayPanel>
     </div>
 );
 
-export default withWorkspaceOptions(withPortal(renderPermissionsFields));
+export default withWorkspaceOptions(withPortal(withUser(renderPermissionsFields)));

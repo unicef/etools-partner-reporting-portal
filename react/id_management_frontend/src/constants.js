@@ -52,11 +52,18 @@ export const PRP_ROLE_OPTIONS = [
 ];
 
 export const EDITABLE_PRP_ROLES = {
-    [PORTALS.IP]: [PRP_ROLE.IP_VIEWER, PRP_ROLE.IP_EDITOR],
-    [PORTALS.CLUSTER]: []
-}
-
-export const EDITABLE_PRP_ROLE_OPTIONS = {
-    [PORTALS.IP]: PRP_ROLE_OPTIONS.filter(option => EDITABLE_PRP_ROLES[PORTALS.IP].indexOf(option.value) > -1),
-    [PORTALS.CLUSTER]: PRP_ROLE_OPTIONS.filter(option => EDITABLE_PRP_ROLES[PORTALS.CLUSTER].indexOf(option.value) > -1)
+    [PRP_ROLE.IP_ADMIN]: [PRP_ROLE.IP_VIEWER, PRP_ROLE.IP_EDITOR],
+    [PRP_ROLE.IP_AUTHORIZED_OFFICER]: [PRP_ROLE.IP_ADMIN]
 };
+
+const getEditablePrpRoleOptions = () => {
+    let options = {};
+
+    for (let prop in EDITABLE_PRP_ROLES) {
+        options[prop] = PRP_ROLE_OPTIONS.filter(option => EDITABLE_PRP_ROLES[prop].indexOf(option.value) > -1)
+    }
+
+    return options;
+};
+
+export const EDITABLE_PRP_ROLE_OPTIONS = getEditablePrpRoleOptions();

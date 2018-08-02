@@ -43,7 +43,7 @@ class UsersList extends Component {
     }
 
     render() {
-        const {onPermissionEdit, onPermissionDelete, onPermissionsAdd, ...otherProps} = this.props;
+        const {onPermissionEdit, onPermissionDelete, onPermissionsAdd, onRemoveIpAdmin, onMakeIpAdmin, ...otherProps} = this.props;
 
         return (
             <div>
@@ -55,6 +55,8 @@ class UsersList extends Component {
                                          onPermissionEdit={onPermissionEdit}
                                          onPermissionDelete={onPermissionDelete}
                                          onPermissionsAdd={onPermissionsAdd}
+                                         onRemoveIpAdmin={onRemoveIpAdmin}
+                                         onMakeIpAdmin={onMakeIpAdmin}
                         />
                     )}
                 />

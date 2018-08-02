@@ -12,6 +12,7 @@ import AddPermissionsDialog from "./AddPermissionsDialog";
 import EditPermissionDialog from "./EditPermissionDialog";
 import ConfirmDialog from "../common/ConfirmDialog";
 import withSearch from "../hoc/withSearch";
+import {PRP_ROLE} from "../../constants";
 
 const header = "Users";
 const CONFIRM_ACTIONS = {
@@ -61,7 +62,7 @@ class Users extends Component {
 
     openConfirmDialog(action) {
         return (permission) => {
-            this.setState({confirmAction: action, selectedPermission: permission});
+            this.setState({action, selectedPermission: permission});
             this.props.handleDialogOpen("confirm");
         }
     }
@@ -78,10 +79,19 @@ class Users extends Component {
             .then(this.closeAndReload);
     }
 
+    makeIpAdmin(permission) {
+        api.patch(`id-management/role-group/${permission.id}/`, {role: PRP_ROLE.IP_ADMIN})
+            .then(this.closeAndReload)
+    }
+
     onConfirm() {
         switch (this.state.action) {
             case CONFIRM_ACTIONS.DELETE_PERMISSION:
+            case CONFIRM_ACTIONS.REMOVE_IP_ADMIN:
                 this.deletePermission(this.state.selectedPermission);
+                break;
+            case CONFIRM_ACTIONS.MAKE_IP_ADMIN:
+                this.makeIpAdmin(this.state.selectedPermission);
                 break;
         }
     }
@@ -100,7 +110,9 @@ class Users extends Component {
                     <UsersList {...listProps}
                                onPermissionsAdd={this.openAddPermissionsDialog}
                                onPermissionEdit={this.openEditPermissionsDialog}
-                               onPermissionDelete={this.openConfirmDialog(CONFIRM_ACTIONS.DELETE_PERMISSION)}/>
+                               onPermissionDelete={this.openConfirmDialog(CONFIRM_ACTIONS.DELETE_PERMISSION)}
+                               onRemoveIpAdmin={this.openConfirmDialog(CONFIRM_ACTIONS.REMOVE_IP_ADMIN)}
+                               onMakeIpAdmin={this.openConfirmDialog(CONFIRM_ACTIONS.MAKE_IP_ADMIN)}/>
                 </PageContent>
 
                 {this.state.selectedUser &&
