@@ -209,4 +209,19 @@ class PRPRoleUpdateSerializer(serializers.ModelSerializer):
 class PRPRoleCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = PRPRole
-        fields = ('user', 'role', 'workspace', 'cluster')
+        fields = ('role', 'workspace', 'cluster')
+
+
+class PRPRoleCreateMultipleSerializer(serializers.Serializer):
+    user_id = serializers.IntegerField()
+    prp_roles = PRPRoleCreateSerializer(many=True)
+
+    def create(self, validated_data):
+        user_id = validated_data['user_id']
+
+        roles_created = [
+            PRPRole.objects.create(user_id=user_id, **prp_roles_data)
+            for prp_roles_data in validated_data['prp_roles']
+        ]
+
+        return {'user_id': user_id, 'prp_roles': roles_created}
