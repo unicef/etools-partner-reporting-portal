@@ -39,7 +39,7 @@ Authorization: Basic base64(clientABC:passwordXYZ)
 Synced models should be updated with additional fields, to document their origin. This is achieved using a dedicated base model class.
 
 | **Column** | **Type** |
-| --- | --- | --- |
+| :--- | :--- |
 | `external_id` | _integer_ |
 | `external_source` | _choice_ - HPC or OPS |
 
@@ -64,7 +64,7 @@ Example: [https://api.hpc.tools/v1/public/plan/country/UKR](https://api.hpc.tool
 #### Field mapping
 
 | **PRP Response Plan** | **HPC Plan** |
-| :--- | :--- | :--- |
+| :--- | :--- |
 | _`title`_ | _`name`_ |
 | _`workspace`_ | _`emergencies[0] if present else use locations[0]`_ |
 | _`start`_ | _`startDate`_ |
@@ -205,7 +205,7 @@ Endpoint for access global Clusters list:
 > https://api.hpc.tools/v1/public/rpm/plan/id/{id}?content=entities
 
 | **PRP Cluster model fields** | **RPM Plan API fields** |
-| --- | --- | --- |
+| :--- | :--- |
 | _`type`_ | _`governingEntities -> name`\(1\)_ |
 | _`response_plan`_ | _`id`_ |
 
@@ -222,7 +222,7 @@ To retrieve cluster activities it has to be used _content=entities_ parameter:
 #### Field mapping
 
 | **PRP Cluster Activity model fields** | **RPM Plan API fields** |
-| --- | --- | --- | --- | --- |
+| :--- | :--- |
 | _`title`_ | _`planEntities -> value -> description` \(1\)_ |
 | _`cluster_objective`_ | `support` \(2\)  |
 | _**`locations`**_ | _`attachments`_ \(3\) |
@@ -257,7 +257,7 @@ In some case the 3 layer structure of `strategic objectives > cluster objectives
 #### Field mapping
 
 | **PRP Cluster Objective model fields** | **RPM Plan API fields** |
-| --- | --- | --- | --- | --- |
+| :--- | :--- |
 | _`title`_ | _`planEntities -> value -> description` \(1\)_ |
 | _`cluster`_ | `parent -> parentId` \(2\)  |
 | _**`locations`**_ | _`attachments`_ \(3\) |
@@ -288,7 +288,7 @@ To retrieve disaggregation data it has to be used _content=measurements_ paramet
 #### Field mapping
 
 | PRP Reportable model fields | **RPM Plan API fields** |
-| --- | --- | --- | --- | --- | --- | --- |
+| :--- | :--- |
 |  _`target`_ | `attachments -> value -> metrics -> values -> totals -> "type": "target"` |
 | _` baseline`_ | `attachments -> value -> metrics -> values -> totals -> "type": "baseline"` |
 | _` in_need`_ | `attachments -> value -> metrics -> values -> totals -> "type": "inNeed"` |
@@ -315,7 +315,7 @@ Response plan and Disaggregation data have assigned locations.
 #### Response Plan location field mapping
 
 | **PRP Location** | **RPM API Plan Location** |
-| --- | --- | --- |
+| :--- | :--- |
 | `title` | `name` |
 | `gateway -> admin_level` | `adminLevel` |
 
@@ -324,7 +324,7 @@ However disaggregation `admin_level` is provided only in OPS. By default in RMP,
 #### Disaggregation data location field mapping
 
 | **PRP Location** | **RPM API Plan Location** |
-| --- | --- | --- |
+| :--- | :--- |
 | `title` | `name` |
 | `gateway -> admin_level` | **0** |
 
@@ -403,7 +403,7 @@ To get project details:
 #### Fields mapping
 
 | **PRP Partner Project model** | **New Project Module response** |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| :--- | :--- |
 | `title` | `name` |
 | `description` | `objective` |
 | `additional_information` | `objective` |
@@ -452,7 +452,7 @@ class FundingSource(models.model):
 **FTS field mapping**
 
 | PRP FundingSource model fields | FTS API response |
-| --- | --- | --- | --- | --- | --- | --- | --- |
+| :--- | :--- |
 | `partner_project` | **Partner Project object** |
 | `source_name` | `data -> flows -> sourceObjects -> name` |
 | `source_id` | `data -> flows -> sourceObjects -> id` |
@@ -466,7 +466,7 @@ class FundingSource(models.model):
 #### Additional fields to capture
 
 | **PRP Partner Project model new fields** | **New Project Module response** |
-| --- | --- | --- |
+| :--- | :--- |
 | `code` | `code` |
 | `priorization_classification` | `projectPriority` **\(1\)** |
 
@@ -485,7 +485,7 @@ I do not see possibility of filtering data.
 #### Fields mapping
 
 | **PRP Partner Project model** | **OPS response** |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| :--- | :--- |
 | `title` | title |
 | `description` | `description -> ProjectDescription -> Value (where "type": "objectives")` |
 | `additional_information` | n/a |
@@ -512,14 +512,14 @@ There is `globalClusters`  section where provided ID is global for all projects 
 **PRP Cluster model fields**
 
 | **PRP Cluster model** | **RPM API fields** |
-| --- | --- | --- |
+| :--- | :--- |
 | _`type`_ | _`globalClusters -> name` \(1\)_ |
 | _`response_plan`_ | _`plans -> id` \(matched by external\_id\)_ |
 
 #### Old OPS
 
 | **PRP Cluster model** | **OPS API fields** |
-| --- | --- | --- |
+| :--- | :--- |
 | _`type`_ | `cluster -> value` |
 | _`response_plan`_ | _`appeal -> id`_ \(matched by external\_id\) |
 
@@ -538,7 +538,7 @@ We need to assign OCHA partners with partners synchronized with PMP system. Cont
 #### New Project Module
 
 | **PRP Location** | **RPM API Location** |
-| --- | --- | --- | --- | --- | --- |
+| :--- | :--- |
 | `title` | `locations -> name` |
 | `gateway -> admin_level` | `locations -> adminLevel` |
 | ` latitude` | `locations -> latitude` |
@@ -548,7 +548,7 @@ We need to assign OCHA partners with partners synchronized with PMP system. Cont
 #### Old OPS
 
 | **PRP Location** | **OPS API Location** |
-| --- | --- | --- | --- |
+| :--- | :--- |
 | `title` | `locations -> value` |
 | `gateway -> admin_level` | `locations -> level` |
 | `gateway -> name` | `locations -< name` |

@@ -25,7 +25,7 @@ To account for this workspace endpoint had a `can_import_ocha_response_plans` bo
 `https://api.hpc.tools/v1/public/rpm/plan/id/<pk>` Is the base URL to retrieve basic Response Plan information.
 
 | **Response Plan Model** | **OCHA Source** |
-| --- | --- | --- | --- | --- |
+| :--- | :--- |
 | title | name |
 | start | startDate |
 | end | endDate |
@@ -40,7 +40,7 @@ For categories id 4 maps to HRP, 5 to FA, there are other types that are ignored
 Cluster list is located under `governingEntities` key in the response, where `entityPrototype.refCode` is equal to **CL**.
 
 | **Cluster Model** | **OCHA Source** |
-| --- | --- | --- |
+| :--- | :--- |
 | type | Manually set to **Imported** |
 | imported\_type | name |
 
@@ -60,7 +60,7 @@ and _measurements_ response:
 So to get them all both responses need to be retrieved and combined. They are contained with the same `governingEntities` list as Clusters, but with `entityPrototype.refCode` as follows.
 
 | Strategic Objective | SO |
-| --- | --- | --- |
+| :--- | :--- |
 | Cluster Objective | CO |
 | Cluster Activity | CA |
 
@@ -71,7 +71,7 @@ Some Objective don't seem to have `parent_id`, in which case we get the info fro
 {% endhint %}
 
 | **Cluster Objective Model** | **OCHA Source** |
-| --- | --- | --- |
+| :--- | :--- |
 | cluster | parentId |
 | title | value.description |
 
@@ -82,7 +82,7 @@ In OCHA single Activity **can support multiple Objectives, this is not the case 
 {% endhint %}
 
 | **Cluster Activity Model** | **OCHA Source** |
-| --- | --- | --- |
+| :--- | :--- |
 | cluster\_objective | value.support.planEntityIds\[0\] |
 | title | value.description |
 
@@ -93,14 +93,14 @@ Indicators are stored under `attachments` key in the objective / activity payloa
 First we create the `IndicatorBlueprint` object:
 
 | **IndicatorBlueprint Model** | **OCHA Source** |
-| --- | --- | --- |
+| :--- | :--- |
 | title | value.description |
 | disaggregatable | disaggregated |
 
 And with that we can make the `Reportable`
 
 | **Reportable Model** | **OCHA Source** |
-| --- | --- | --- | --- | --- | --- | --- |
+| :--- | :--- |
 | blueprint | IndicatorBlueprint as created above |
 | content\_object | Cluster Objective or Activity it comes from. |
 | target | value.metrics.values.totals\[type=target\] |
@@ -117,13 +117,13 @@ Global disaggregation groups and categories can be retrieved from https://api.hp
 Name of the category \(eg. Age\) is saved as follows.
 
 | **Disaggregation Model** | **OCHA Source** |
-| --- | --- |
+| :--- | :--- |
 | name | label |
 
 Then we save values \(eg. Children, Elderly, Adult\)
 
 | **Disaggregation Value Model** | **OCHA Source** |
-| --- | --- | --- |
+| :--- | :--- |
 | value | label |
 | disaggregation | _as saved above_ |
 
