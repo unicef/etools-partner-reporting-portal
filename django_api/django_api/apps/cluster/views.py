@@ -763,7 +763,7 @@ class OperationalPresenceAggregationDataAPIView(APIView):
     Returns:
         - GET method - A JSON object of many aggregations.
     """
-    permission_classes = (IsIMOForCurrentWorkspace,)
+    permission_classes = (AnyPermission(IsPartnerAuthorizedOfficer, IsIMOForCurrentWorkspace),)
 
     def query_data(self, response_plan_id):
         response_plan = get_object_or_404(
@@ -856,7 +856,7 @@ class OperationalPresenceLocationListAPIView(GenericAPIView, ListModelMixin):
     Returns:
         - GET method - OperationalPresenceLocationListSerializer object list.
     """
-    permission_classes = (IsIMOForCurrentWorkspace,)
+    permission_classes = (AnyPermission(IsPartnerAuthorizedOfficer, IsIMOForCurrentWorkspace),)
     serializer_class = OperationalPresenceLocationListSerializer
     lookup_field = lookup_url_kwarg = 'response_plan_id'
 
@@ -983,7 +983,7 @@ class ClusterAnalysisIndicatorsListAPIView(GenericAPIView, ListModelMixin):
     Returns:
         - GET method - ClusterAnalysisIndicatorsListSerializer object list.
     """
-    permission_classes = (IsIMOForCurrentWorkspace,)
+    permission_classes = (AnyPermission(IsPartnerAuthorizedOfficer, IsIMOForCurrentWorkspace),)
     serializer_class = ClusterAnalysisIndicatorsListSerializer
     lookup_field = lookup_url_kwarg = 'response_plan_id'
 
@@ -1121,7 +1121,7 @@ class ClusterAnalysisIndicatorDetailsAPIView(APIView):
     Returns:
         - GET method - ClusterAnalysisIndicatorDetailSerializer object list.
     """
-    permission_classes = (IsIMOForCurrentWorkspace,)
+    permission_classes = (AnyPermission(IsPartnerAuthorizedOfficer, IsIMOForCurrentWorkspace),)
 
     def get(self, request, response_plan_id, reportable_id, *args, **kwargs):
         reportable = get_object_or_404(
