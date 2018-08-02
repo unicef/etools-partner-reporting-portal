@@ -1,21 +1,12 @@
 import React, {Component} from "react";
-import {withStyles} from "@material-ui/core/styles";
 import PropTypes from 'prop-types';
-import {Typography} from "../../../node_modules/@material-ui/core";
 import withPortal from "../hoc/withPortal";
 import {PORTALS} from "../../actions";
-
-const styleSheet = theme => ({
-    role: {
-        fontSize: 12,
-        lineHeight: '24px',
-        display: "inline-block",
-    }
-});
+import UserRowExpandedText from "./UserRowExpandedText";
 
 class UserRoleControl extends Component {
     render() {
-        const {role, actions, classes, portal} = this.props;
+        const {role, actions, portal} = this.props;
 
         let text = "";
 
@@ -32,7 +23,7 @@ class UserRoleControl extends Component {
 
         return (
             <div>
-                <Typography className={classes.role}>{text}</Typography>
+                <UserRowExpandedText>{text}</UserRowExpandedText>
                 {actions}
             </div>
         );
@@ -43,4 +34,4 @@ UserRoleControl.propTypes = {
     role: PropTypes.object.isRequired
 };
 
-export default withPortal(withStyles(styleSheet)(UserRoleControl));
+export default withPortal(UserRoleControl);

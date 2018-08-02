@@ -8,7 +8,8 @@ const styleSheet = theme => ({
         display: 'inline-block',
         margin: `0 ${theme.spacing.unit}px`,
         textDecoration: "underline",
-        color: theme.palette.primary.main
+        color: theme.palette.primary.main,
+        cursor: 'pointer'
     },
     danger: {
         color: theme.palette.error.main

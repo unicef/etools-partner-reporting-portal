@@ -86,4 +86,4 @@ const mapStateToProps = (state, ownProps) => {
     }
 };
 
-export default withPortal(connect(mapStateToProps)(reduxForm({form: "editPermissionForm"})(EditPermissionDialog)));
+export default withPortal(connect(mapStateToProps)(reduxForm({form: "editPermissionForm", enableReinitialize: true})(EditPermissionDialog)));

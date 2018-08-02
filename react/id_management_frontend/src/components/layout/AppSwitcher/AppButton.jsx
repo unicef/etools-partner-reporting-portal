@@ -11,7 +11,8 @@ const styleSheet = {
         padding: '35px 40px'
     },
     disabled: {
-        backgroundColor: grey[200]
+        backgroundColor: grey[200],
+        pointerEvents: 'none'
     },
     appName: {
         width: 130,

@@ -5,11 +5,16 @@ import {PRP_ROLE, EDITABLE_PRP_ROLES} from "../../constants";
 import withUser from "../hoc/withUser";
 import {hasAnyRole} from "../../helpers/user";
 import {PORTALS} from "../../actions";
-import labels from "../../labels";
+import {getLabels} from "../../labels";
 import {Typography} from "@material-ui/core";
 import withPortal from "../hoc/withPortal";
 import {withStyles} from "@material-ui/core/styles";
 import PlainButton from "../common/PlainButton";
+import UserRowExpandedText from "./UserRowExpandedText";
+
+const labels = getLabels({
+    userType: "User type"
+});
 
 const roleCaption = {
     [PORTALS.IP]: `${labels.workspace} / ${labels.role}`,
@@ -19,6 +24,9 @@ const roleCaption = {
 const styleSheet = (theme) => ({
     container: {
         padding: `${theme.spacing.unit}px 0`
+    },
+    userType: {
+        marginBottom: theme.spacing.unit * 2
     }
 });
 
@@ -40,12 +48,23 @@ class UserRowExpanded extends Component {
     render() {
         const {user, row, portal, classes, onPermissionsAdd} = this.props;
 
+        const userTypes = row.prp_roles.filter(item => !item.workspace && !item.cluster);
+        const userType = userTypes.length ? userTypes[0].role_display : null;
+
+        const roles = row.prp_roles.filter(item => item.workspace || item.cluster);
+
         return (
             <div className={classes.container}>
-                {row.prp_roles.length > 0 &&
+                {userType &&
+                <div className={roles.length ? classes.userType : ''}>
+                    <Typography variant="caption" gutterBottom>{labels.userType}</Typography>
+                    <UserRowExpandedText>{userType}</UserRowExpandedText>
+                </div>}
+
+                {roles.length > 0 &&
                 <Typography variant="caption" gutterBottom>{roleCaption[portal]}</Typography>}
 
-                {row.prp_roles.map(role => (
+                {roles.map(role => (
                     <UserRoleControl key={role.id} role={role} actions={this.getActions(role)}/>
                 ))}
 

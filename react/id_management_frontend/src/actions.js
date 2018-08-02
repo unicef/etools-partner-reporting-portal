@@ -20,3 +20,9 @@ export const EXPANDED_ROW_IDS = 'EXPANDED_ROW_IDS';
 export function expandedRowIds(ids) {
     return {type: EXPANDED_ROW_IDS, ids}
 }
+
+export const WORKSPACES = 'WORKSPACES';
+
+export function workspaces(data) {
+    return {type: WORKSPACES, data};
+}

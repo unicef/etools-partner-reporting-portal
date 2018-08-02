@@ -5,6 +5,7 @@ import {expandedRowIds} from "../../actions";
 import {connect} from "react-redux";
 
 const firstPage = 1;
+const arrayFormat = 'bracket';
 
 const mapDispatchToProps = dispatch => {
     return {
@@ -47,7 +48,7 @@ export default (getDataFn) => {
                 }
 
                 getQuery() {
-                    return qs.parse(this.props.history.location.search);
+                    return qs.parse(this.props.history.location.search, {arrayFormat});
                 }
 
                 onPageSizeChange(pageSize) {
@@ -79,7 +80,7 @@ export default (getDataFn) => {
 
                     history.push({
                         pathname: history.location.pathname,
-                        search: qs.stringify(request)
+                        search: qs.stringify(request, {arrayFormat})
                     });
                 }
 

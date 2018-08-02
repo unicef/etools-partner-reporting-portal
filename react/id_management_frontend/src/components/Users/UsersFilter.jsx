@@ -10,19 +10,9 @@ import {PORTALS} from "../../actions";
 import { connect } from "react-redux";
 import labels from "../../labels";
 import {PRP_ROLE_OPTIONS} from "../../constants";
+import withWorkspaceOptions from "../hoc/withWorkspaceOptions";
 
 const searchPlaceholder = "Name or Email";
-
-const workspaceOptions = [
-    {
-        label: "Workspace 1",
-        value: 1
-    },
-    {
-        label: "Workspace 2",
-        value: 2
-    }
-];
 
 const clusterOptions = [
     {
@@ -53,8 +43,15 @@ class UsersFilter extends Component {
         }
     }
 
+    reset() {
+        const {destroy, initialize} = this.props;
+
+        destroy();
+        initialize({});
+    }
+
     render() {
-        const {reset, portal} = this.props;
+        const {portal, workspaceOptions} = this.props;
 
         return (
             <GreyPanel>
@@ -89,7 +86,7 @@ class UsersFilter extends Component {
                         </Grid>}
                     </Grid>
 
-                    <FilterButtons onClear={reset}/>
+                    <FilterButtons onClear={() => this.reset()}/>
                 </form>
             </GreyPanel>
         );
@@ -102,4 +99,4 @@ const mapStateToProps = (state, ownProps) => {
     }
 };
 
-export default connect(mapStateToProps)(reduxForm({form: 'usersFilter'})(withPortal(UsersFilter)));
+export default connect(mapStateToProps)(reduxForm({form: 'usersFilter'})(withWorkspaceOptions(withPortal(UsersFilter))));

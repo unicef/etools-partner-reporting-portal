@@ -109,7 +109,7 @@ class Users extends Component {
                                       onClose={handleDialogClose}
                                       onSave={reload}/>}
 
-                {this.state.selectedUser && this.state.selectedPermission &&
+                {this.state.selectedPermission &&
                 <EditPermissionDialog user={this.state.selectedUser}
                                       permission={this.state.selectedPermission}
                                       open={dialogOpen.editPermission}

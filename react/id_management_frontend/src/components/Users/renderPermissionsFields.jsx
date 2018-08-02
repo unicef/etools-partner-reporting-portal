@@ -8,21 +8,11 @@ import FieldsArrayPanel from "../common/FieldsArrayPanel";
 import FieldsArrayAddButton from "../common/FieldsArrayAddButton";
 import labels from "../../labels";
 import withPortal from "../hoc/withPortal";
+import withWorkspaceOptions from "../hoc/withWorkspaceOptions";
 
 const title = "Role per Workspace";
 
-const workspaceOptions = [
-    {
-        label: "Workspace 1",
-        value: 1
-    },
-    {
-        label: "Workspace 2",
-        value: 2
-    }
-];
-
-const renderPermissionsFields = ({fields, portal}) => (
+const renderPermissionsFields = ({fields, portal, workspaceOptions}) => (
     <div>
         <Typography variant="caption" gutterBottom>{title}</Typography>
 
@@ -53,4 +43,4 @@ const renderPermissionsFields = ({fields, portal}) => (
     </div>
 );
 
-export default withPortal(renderPermissionsFields);
+export default withWorkspaceOptions(withPortal(renderPermissionsFields));
