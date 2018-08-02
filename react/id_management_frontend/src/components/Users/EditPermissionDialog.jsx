@@ -47,6 +47,7 @@ class EditPermissionDialog extends Component {
                 open={open}
                 onClose={onClose}
                 title={title}
+                loading={this.state.loading}
             >
                 <form onSubmit={handleSubmit(this.onSubmit)} noValidate>
                     <Grid container spacing={24}>

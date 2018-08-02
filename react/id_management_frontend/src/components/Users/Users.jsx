@@ -79,7 +79,7 @@ class Users extends Component {
     }
 
     onConfirm() {
-        switch(this.state.action) {
+        switch (this.state.action) {
             case CONFIRM_ACTIONS.DELETE_PERMISSION:
                 this.deletePermission(this.state.selectedPermission);
                 break;
@@ -104,8 +104,10 @@ class Users extends Component {
                 </PageContent>
 
                 {this.state.selectedUser &&
-                <AddPermissionsDialog user={this.state.selectedUser} open={dialogOpen.addPermissions}
-                                      onClose={handleDialogClose}/>}
+                <AddPermissionsDialog user={this.state.selectedUser}
+                                      open={dialogOpen.addPermissions}
+                                      onClose={handleDialogClose}
+                                      onSave={reload}/>}
 
                 {this.state.selectedUser && this.state.selectedPermission &&
                 <EditPermissionDialog user={this.state.selectedUser}

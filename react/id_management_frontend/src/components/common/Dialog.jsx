@@ -68,7 +68,8 @@ Dialog.propTypes = {
     open: PropTypes.bool,
     onClose: PropTypes.func.isRequired,
     title: PropTypes.string.isRequired,
-    caption: PropTypes.string
+    caption: PropTypes.string,
+    loading: PropTypes.bool
 };
 
 export default withStyles(styleSheet)(Dialog);
