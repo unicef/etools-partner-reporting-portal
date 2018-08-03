@@ -1,27 +1,39 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 import ProfileButton from "./ProfileButton";
-import { Menu, MenuItem, ListItemIcon, ListItemText } from "@material-ui/core";
-import { AccountCircle, PowerSettingsNew } from "@material-ui/icons";
+import {Menu, MenuItem, ListItemIcon, ListItemText} from "@material-ui/core";
+import {AccountCircle, PowerSettingsNew} from "@material-ui/icons";
 import withMenu from "../../hoc/withMenu";
-
-const options = [
-    {
-        icon: AccountCircle,
-        label: "Profile"
-    },
-    {
-        icon: PowerSettingsNew,
-        label: "Sign out"
-    }
-];
+import withDialogHandling from "../../hoc/withDialogHandling";
+import MyProfileDialog from "../MyProfileDialog";
+import {logout} from "../../../helpers/user";
 
 class ProfileMenu extends Component {
+    constructor(props) {
+        super(props);
+
+        this.options = [
+            {
+                icon: AccountCircle,
+                label: "Profile",
+                action: () => {
+                    props.handleDialogOpen("myProfile");
+                    props.handleClose();
+                }
+            },
+            {
+                icon: PowerSettingsNew,
+                label: "Sign out",
+                action: logout
+            }
+        ];
+    }
+
     render() {
-        const { anchorEl, handleClick, handleClose } = this.props;
+        const {anchorEl, handleClick, handleClose, dialogOpen, handleDialogClose} = this.props;
 
         return (
             <div>
-                <ProfileButton onClick={handleClick} />
+                <ProfileButton onClick={handleClick}/>
 
                 <Menu
                     id="profile-menu"
@@ -29,18 +41,20 @@ class ProfileMenu extends Component {
                     open={Boolean(anchorEl)}
                     onClose={handleClose}
                 >
-                    {options.map((option, idx) => (
-                        <MenuItem key={idx} onClick={handleClose}>
+                    {this.options.map((option, idx) => (
+                        <MenuItem key={idx} onClick={option.action}>
                             <ListItemIcon>
-                                <option.icon />
+                                <option.icon/>
                             </ListItemIcon>
-                            <ListItemText inset primary={option.label} />
+                            <ListItemText inset primary={option.label}/>
                         </MenuItem>
                     ))}
                 </Menu>
+
+                <MyProfileDialog open={dialogOpen.myProfile} onClose={handleDialogClose}/>
             </div>
         );
     }
 }
 
-export default withMenu(ProfileMenu);
+export default withDialogHandling(withMenu(ProfileMenu));

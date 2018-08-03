@@ -10,6 +10,7 @@ import {Typography} from "@material-ui/core";
 import {withStyles} from "@material-ui/core/styles";
 import PlainButton from "../common/PlainButton";
 import UserRowExpandedText from "./UserRowExpandedText";
+import withPortal from "../hoc/withPortal";
 
 const labels = getLabels({
     userType: "User type",
@@ -88,4 +89,4 @@ class UserRowExpanded extends Component {
     }
 }
 
-export default withUser(withStyles(styleSheet)(UserRowExpanded));
+export default withPortal(withUser(withStyles(styleSheet)(UserRowExpanded)));
