@@ -2,7 +2,7 @@ from django.contrib.auth import login, logout
 from django.db.models import Prefetch
 
 from rest_framework import status as statuses
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, PermissionDenied
 from rest_framework.generics import RetrieveAPIView, ListCreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -10,6 +10,7 @@ from rest_framework.views import APIView
 import django_filters
 from drfpasswordless.utils import authenticate_by_token
 
+from core.common import PRP_ROLE_TYPES
 from core.models import PRPRole
 from core.paginations import SmallPagination
 from core.permissions import IsAuthenticated
@@ -78,7 +79,24 @@ class UserListCreateAPIView(ListCreateAPIView):
     pagination_class = SmallPagination
 
     def get_queryset(self):
+        user = self.request.user
+        user_prp_roles = set(user.prp_roles.values_list('role', flat=True).distinct())
+
+        users_queryset = User.objects.exclude(id=user.id)
+
+        partner_users_access = {PRP_ROLE_TYPES.ip_authorized_officer, PRP_ROLE_TYPES.ip_admin,
+                                PRP_ROLE_TYPES.cluster_member}
+        all_users_access = {PRP_ROLE_TYPES.cluster_system_admin, PRP_ROLE_TYPES.cluster_imo}
+
+        if partner_users_access.intersection(user_prp_roles):
+            users_queryset = users_queryset.filter(partner_id=user.partner_id)
+        elif all_users_access.intersection(user_prp_roles):
+            pass
+        else:
+            raise PermissionDenied()
+
         prp_roles_queryset = PRPRole.objects.select_related('workspace', 'cluster', 'cluster__response_plan',
                                                             'cluster__response_plan__workspace')
         prp_roles_prefetch = Prefetch('prp_roles', queryset=prp_roles_queryset)
-        return User.objects.select_related('profile', 'partner').prefetch_related(prp_roles_prefetch)
+
+        return users_queryset.select_related('profile', 'partner').prefetch_related(prp_roles_prefetch)
