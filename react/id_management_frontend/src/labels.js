@@ -10,7 +10,8 @@ const labels = {
     firstName: "First name",
     lastName: "Last name",
     email: "E-mail",
-    none: "None"
+    none: "None",
+    phoneNumber: "Phone number"
 };
 
 export function getLabels(localLabels) {

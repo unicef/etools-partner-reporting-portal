@@ -1,9 +1,10 @@
-import React, {Component} from "react";
+import React, {Component, Fragment} from "react";
 import {Redirect, Route, matchPath, withRouter} from "react-router-dom";
 import Users from "./Users/Users";
 import Partners from "./Partners/Partners";
 import {PORTALS, switchPortal} from "../actions";
 import {connect} from "react-redux";
+import withPortal from "./hoc/withPortal";
 
 class MainRoutes extends Component {
     constructor(props) {
@@ -46,11 +47,14 @@ class MainRoutes extends Component {
 
         return (
             <div>
-                {matchPath(location.pathname, {
-                    path: match.url,
-                    exact: true
-                }) && <Redirect to={routes[0].url}/>}
-                {availableRoutes}
+                {!!portal &&
+                <Fragment>
+                    {matchPath(location.pathname, {
+                        path: match.url,
+                        exact: true
+                    }) && <Redirect to={routes[0].url}/>}
+                    {availableRoutes}
+                </Fragment>}
             </div>
         );
     }
@@ -64,4 +68,4 @@ const mapDispatchToProps = dispatch => {
     };
 };
 
-export default withRouter(connect(null, mapDispatchToProps)(MainRoutes));
+export default withRouter(connect(null, mapDispatchToProps)(withPortal(MainRoutes)));

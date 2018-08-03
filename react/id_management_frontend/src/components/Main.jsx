@@ -91,7 +91,7 @@ class Main extends Component {
                         <Route
                             path={this.getPortalsPath()}
                             render={props => (
-                                <MainRoutes {...props} portal={portal}/>
+                                <MainRoutes {...props}/>
                             )}
                         />
                     </MainContent>

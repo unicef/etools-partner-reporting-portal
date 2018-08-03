@@ -96,7 +96,7 @@ class AppSwitcher extends Component {
 }
 
 AppSwitcher.propTypes = {
-    portal: PropTypes.string.isRequired,
+    portal: PropTypes.string,
     onAppButtonClick: PropTypes.func.isRequired
 };
 
