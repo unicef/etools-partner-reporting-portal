@@ -12,6 +12,13 @@ export const PRP_ROLE = {
     CLUSTER_MEMBER: "CLUSTER_MEMBER"
 };
 
+function getRoles(prefix) {
+    return Object.values(PRP_ROLE).filter(role => role.startsWith(prefix));
+}
+
+const PRP_ROLES_IP = getRoles("IP");
+const PRP_ROLES_CLUSTER = getRoles("CLUSTER");
+
 export const PRP_ROLE_OPTIONS = [
     {
         value: "IP_AUTHORIZED_OFFICER",
@@ -50,6 +57,9 @@ export const PRP_ROLE_OPTIONS = [
         label: "Cluster Member"
     },
 ];
+
+export const PRP_ROLE_IP_OPTIONS = PRP_ROLE_OPTIONS.filter(option => PRP_ROLES_IP.indexOf(option.value) > -1);
+export const PRP_ROLE_CLUSTER_OPTIONS = PRP_ROLE_OPTIONS.filter(option => PRP_ROLES_CLUSTER.indexOf(option.value) > -1);
 
 export const EDITABLE_PRP_ROLES = {
     [PRP_ROLE.IP_ADMIN]: [PRP_ROLE.IP_VIEWER, PRP_ROLE.IP_EDITOR],

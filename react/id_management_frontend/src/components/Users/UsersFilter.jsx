@@ -9,7 +9,7 @@ import withPortal from "../hoc/withPortal";
 import {PORTALS} from "../../actions";
 import { connect } from "react-redux";
 import labels from "../../labels";
-import {PRP_ROLE_OPTIONS} from "../../constants";
+import {PRP_ROLE_IP_OPTIONS, PRP_ROLE_CLUSTER_OPTIONS} from "../../constants";
 import withWorkspaceOptions from "../hoc/withWorkspaceOptions";
 
 const searchPlaceholder = "Name or Email";
@@ -53,6 +53,8 @@ class UsersFilter extends Component {
     render() {
         const {portal, workspaceOptions} = this.props;
 
+        const roleOptions = portal === PORTALS.CLUSTER ? PRP_ROLE_CLUSTER_OPTIONS : PRP_ROLE_IP_OPTIONS;
+
         return (
             <GreyPanel>
                 <form noValidate>
@@ -76,7 +78,7 @@ class UsersFilter extends Component {
                         </Grid>}
 
                         <Grid item md={4}>
-                            <SelectForm fieldName="roles" label={labels.role} values={PRP_ROLE_OPTIONS}
+                            <SelectForm fieldName="roles" label={labels.role} values={roleOptions}
                                         optional multiple/>
                         </Grid>
 
