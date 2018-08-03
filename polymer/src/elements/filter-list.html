@@ -177,7 +177,7 @@
 
       _updateLoading: function () {
         this.async(function () {
-          var filtersCount = this.filters.length;
+          var filtersCount = this.filters.length - this.ignoredFilters.length;
           var readyCount = Object.keys(this.filtersReady).length;
 
           this.set('loading', readyCount < filtersCount);
