@@ -68,6 +68,6 @@ class UserWithPRPRolesSerializer(UserSerializer):
             'last_name', 'profile',
             'partner', 'organization',
             'access', 'prp_roles',
-            'position'
+            'position', 'last_login'
         )
-        read_only_fields = ('id', 'profile', 'partner', 'organization', 'access')
+        read_only_fields = ('id', 'profile', 'partner', 'organization', 'access', 'last_login')
