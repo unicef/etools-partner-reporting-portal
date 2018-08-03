@@ -25,6 +25,7 @@ class UsersList extends Component {
             },
             {
                 title: "Last login",
+                name: "last_login",
                 getCellValue: row => row.last_login ? date(row.last_login) : ''
             }
         ];
@@ -36,6 +37,7 @@ class UsersList extends Component {
             },
             [PORTALS.CLUSTER]: {
                 title: "Partner",
+                name: "partner",
                 getCellValue: row => row.partner ? row.partner.title : ''
             }
         };
