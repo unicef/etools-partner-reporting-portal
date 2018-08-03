@@ -1,6 +1,5 @@
 import React, {Component} from "react";
 import {getLabels} from "../../labels";
-import {withStyles} from "@material-ui/core/styles";
 import Dialog from "../common/Dialog";
 import TextFieldForm from "../form/TextFieldForm";
 import {reduxForm} from "redux-form";
@@ -12,14 +11,16 @@ import withWorkspaceOptions from "../hoc/withWorkspaceOptions";
 const title = "My Profile";
 
 const labels = getLabels({
-    myWorkspacesRoles: "My workspaces / roles"
+    myRoles: "My roles"
 });
-
-const styleSheet = (theme) => ({});
 
 class MyProfileDialog extends Component {
     constructor(props) {
         super(props);
+
+        this.state = {
+            roleLabel: ''
+        };
 
         this.formatPrpRoles = this.formatPrpRoles.bind(this);
     }
@@ -27,13 +28,21 @@ class MyProfileDialog extends Component {
     formatPrpRoles(prp_roles) {
         const {workspaceOptions} = this.props;
 
-        const roles = prp_roles.map(role => `${getWorkspaceLabel(workspaceOptions, role.workspace)} / ${getRoleLabel(role.role)}`);
+        const _role = prp_roles.filter(item => !item.workspace && !item.cluster);
+        let result = _role.length ? getRoleLabel(_role[0].role) : null;
 
-        return roles.length ? roles.join(", ") : '-';
+        if (!result) {
+            const workspaceRoles = prp_roles.filter(role => !!role.workspace);
+            const roles = workspaceRoles.map(role => `${getWorkspaceLabel(workspaceOptions, role.workspace)} / ${getRoleLabel(role.role)}`);
+
+            result = roles.length ? roles.join(", ") : '-';
+        }
+
+        return result;
     }
 
     render() {
-        const {open, onClose, classes} = this.props;
+        const {open, onClose} = this.props;
 
         const textFieldProps = {
             disabled: true
@@ -59,7 +68,7 @@ class MyProfileDialog extends Component {
 
                     </Grid>
                     <Grid item xs={12}>
-                        <TextFieldForm fieldName="prp_roles" label={labels.myWorkspacesRoles}
+                        <TextFieldForm fieldName="prp_roles" label={labels.myRoles}
                                        textFieldProps={textFieldProps} format={this.formatPrpRoles}/>
                     </Grid>
                     <Grid item xs={12}>
@@ -79,10 +88,10 @@ const mapStateToProps = (state) => {
             first_name,
             last_name,
             email,
-            partner: partner.title,
+            partner: partner ? partner.title : '-',
             prp_roles
         }
     }
 };
 
-export default connect(mapStateToProps)(withWorkspaceOptions((reduxForm({form: "myProfile"})(withStyles(styleSheet)(MyProfileDialog)))));
+export default connect(mapStateToProps)(withWorkspaceOptions((reduxForm({form: "myProfile"})(MyProfileDialog))));
