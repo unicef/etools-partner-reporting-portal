@@ -4,6 +4,7 @@ import UserRowExpanded from "./UserRowExpanded";
 import withPortal from "../hoc/withPortal";
 import {PORTALS} from "../../actions";
 import * as R from 'ramda';
+import {date} from "../../helpers/filters";
 
 class UsersList extends Component {
     getColumns() {
@@ -23,8 +24,8 @@ class UsersList extends Component {
                 title: "Status"
             },
             {
-                name: "last_login",
-                title: "Last login"
+                title: "Last login",
+                getCellValue: row => row.last_login ? date(row.last_login) : ''
             }
         ];
 
