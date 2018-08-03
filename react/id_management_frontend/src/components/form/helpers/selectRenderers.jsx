@@ -46,7 +46,7 @@ const multipleSelectionsStyleSheet = (theme) => {
             padding: `0 ${padding}px 0 0`,
         },
         close: {
-            fill: theme.palette.secondary.main,
+            fill: theme.palette.primary.main,
             fontSize: '18px'
         },
         rowContainer: {
@@ -99,7 +99,7 @@ const selectionItemStyleSheet = theme => ({
 
     },
     selected: {
-        color: theme.palette.secondary.main,
+        color: theme.palette.primary.main,
         backgroundColor: 'white',
     },
 });
