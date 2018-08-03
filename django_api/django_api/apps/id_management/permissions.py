@@ -2,9 +2,12 @@ from django.db.models import Q
 from rest_framework.permissions import BasePermission
 
 from core.common import PRP_ROLE_TYPES as ROLES
+from core.models import PRPRole
 
 
 class RoleGroupCreateUpdateDestroyPermission(BasePermission):
+    message = 'You do not have permission to perform this action.'
+
     def has_object_permission(self, request, view, obj):
         user = request.user
 
@@ -15,6 +18,15 @@ class RoleGroupCreateUpdateDestroyPermission(BasePermission):
                 request.method in ('PATCH', 'DELETE') and (
                 obj.role in {ROLES.cluster_system_admin, ROLES.ip_authorized_officer} or
                 role_in_payload == obj.role)):
+            return False
+
+        if (request.method == 'POST' and
+                PRPRole.objects.filter(
+                    Q(workspace_id=obj.workspace_id) |
+                    Q(cluster_id=obj.cluster_id),
+                    user_id=obj.user_id
+                ).exists()):
+            self.message = f'{self.message} Role already exists in cluster or workspace.'
             return False
 
         # for CLUSTER roles:
