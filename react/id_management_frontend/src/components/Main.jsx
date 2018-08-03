@@ -12,6 +12,8 @@ import {withRouter} from "react-router-dom";
 import withPortal from "./hoc/withPortal";
 import {api} from "../infrastructure/api";
 import {connect} from "react-redux";
+import {hasAnyRole} from "../helpers/user";
+import {PORTAL_ACCESS} from "../constants";
 
 
 const labels = {
@@ -30,7 +32,12 @@ class Main extends Component {
         let promises = [
             api.get("account/user-profile/")
                 .then(res => {
-                    props.dispatchUserProfile(res.data);
+                    if (hasAnyRole(res.data, PORTAL_ACCESS)) {
+                        props.dispatchUserProfile(res.data);
+                    }
+                    else {
+                        window.location.href = "/";
+                    }
                 }),
             api.get("core/workspace/")
                 .then(res => {
@@ -39,7 +46,9 @@ class Main extends Component {
         ];
 
         Promise.all(promises)
-            .finally(() => {this.setState({loading: false})});
+            .finally(() => {
+                this.setState({loading: false})
+            });
     }
 
     getPortalsPath() {

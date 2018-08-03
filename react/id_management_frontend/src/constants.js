@@ -77,3 +77,11 @@ const getEditablePrpRoleOptions = () => {
 };
 
 export const EDITABLE_PRP_ROLE_OPTIONS = getEditablePrpRoleOptions();
+
+export const PORTAL_ACCESS = [
+    PRP_ROLE.IP_ADMIN,
+    PRP_ROLE.IP_AUTHORIZED_OFFICER,
+    PRP_ROLE.CLUSTER_IMO,
+    PRP_ROLE.CLUSTER_MEMBER,
+    PRP_ROLE.CLUSTER_SYSTEM_ADMIN
+];
