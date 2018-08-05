@@ -314,7 +314,7 @@ LOGGING = {
         },
     },
     'loggers': {
-        '': {
+        'django': {
             'handlers': ['default'],
             'level': 'INFO',
             'propagate': True

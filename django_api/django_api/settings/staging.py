@@ -1,10 +1,11 @@
 from __future__ import absolute_import
+import sys
 import os
 
 from .base import *
 
 
-DEBUG = True
+DEBUG = False
 IS_DEV = False
 IS_STAGING = True
 
@@ -15,6 +16,7 @@ ALLOWED_HOSTS = [DOMAIN_NAME, "*"]
 
 # other
 EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+SERVER_EMAIL = 'admin@' + DOMAIN_NAME
 
 INSTALLED_APPS += [
     'django_extensions',
@@ -27,6 +29,17 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 )
+
+LOGGING['handlers']['mail_admins'] = {
+    'level': 'ERROR',
+    'class': 'django.utils.log.AdminEmailHandler',
+}
+
+LOGGING['loggers']['django.request'] = {
+    'handlers': ['mail_admins'],
+    'level': 'ERROR',
+    'propagate': False,
+}
 
 CORS_ORIGIN_WHITELIST += ('localhost:8082', )
 
