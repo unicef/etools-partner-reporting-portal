@@ -491,7 +491,7 @@ class ResponsePlanPartnerDashboardAPIView(ResponsePlanClusterDashboardAPIView):
             if not clusters:
                 raise Exception('Invalid cluster ids')
         else:
-            clusters = []
+            clusters = Cluster.objects.filter(response_plan=response_plan)
 
         serializer = ResponsePlanPartnerDashboardSerializer(
             instance=response_plan, context={

@@ -238,14 +238,14 @@ class ResponsePlan(TimeStampedExternalSourceModel):
     def num_of_partners(self, clusters=None):
         from partner.models import Partner
 
-        if not clusters:
+        if not clusters or clusters == []:
             clusters = self.all_clusters
         return Partner.objects.filter(clusters__in=clusters).distinct().count()
 
     def num_of_due_overdue_indicator_reports(self,
                                              clusters=None,
                                              partner=None):
-        if not clusters:
+        if not clusters or clusters == []:
             clusters = self.all_clusters
 
         count = 0
@@ -256,7 +256,7 @@ class ResponsePlan(TimeStampedExternalSourceModel):
     def num_of_non_cluster_activities(self,
                                       clusters=None,
                                       partner=None):
-        if not clusters:
+        if not clusters or clusters == []:
             clusters = self.all_clusters
 
         count = 0
@@ -265,7 +265,7 @@ class ResponsePlan(TimeStampedExternalSourceModel):
         return count
 
     def num_of_met_indicator_reports(self, clusters=None, partner=None):
-        if not clusters:
+        if not clusters or clusters == []:
             clusters = self.all_clusters
 
         count = 0
@@ -275,7 +275,7 @@ class ResponsePlan(TimeStampedExternalSourceModel):
 
     def num_of_constrained_indicator_reports(
             self, clusters=None, partner=None):
-        if not clusters:
+        if not clusters or clusters == []:
             clusters = self.all_clusters
 
         count = 0
@@ -284,7 +284,7 @@ class ResponsePlan(TimeStampedExternalSourceModel):
         return count
 
     def num_of_on_track_indicator_reports(self, clusters=None, partner=None):
-        if not clusters:
+        if not clusters or clusters == []:
             clusters = self.all_clusters
 
         count = 0
@@ -294,7 +294,7 @@ class ResponsePlan(TimeStampedExternalSourceModel):
 
     def num_of_no_progress_indicator_reports(
             self, clusters=None, partner=None):
-        if not clusters:
+        if not clusters or clusters == []:
             clusters = self.all_clusters
 
         count = 0
@@ -303,7 +303,7 @@ class ResponsePlan(TimeStampedExternalSourceModel):
         return count
 
     def num_of_no_status_indicator_reports(self, clusters=None, partner=None):
-        if not clusters:
+        if not clusters or clusters == []:
             clusters = self.all_clusters
 
         count = 0
@@ -314,7 +314,7 @@ class ResponsePlan(TimeStampedExternalSourceModel):
     def num_of_projects(self, clusters=None, partner=None):
         from partner.models import PartnerProject
 
-        if not clusters:
+        if not clusters or clusters == []:
             clusters = self.all_clusters
 
         qset = PartnerProject.objects.filter(clusters__in=clusters)
@@ -333,7 +333,7 @@ class ResponsePlan(TimeStampedExternalSourceModel):
 
     def upcoming_indicator_reports(self, clusters=None, partner=None,
                                    limit=None, days=15):
-        if not clusters:
+        if not clusters or clusters == []:
             clusters = self.all_clusters
 
         days_in_future = datetime.today() + timedelta(days=days)
@@ -352,7 +352,7 @@ class ResponsePlan(TimeStampedExternalSourceModel):
         Returns indicator reports associated with partner activities or
         partner projects that are overdue, if partner is specified.
         """
-        if not clusters:
+        if not clusters or clusters == []:
             clusters = self.all_clusters
 
         indicator_reports = self._latest_indicator_reports(clusters)
@@ -372,7 +372,7 @@ class ResponsePlan(TimeStampedExternalSourceModel):
 
     def constrained_indicator_reports(self, clusters=None, partner=None,
                                       limit=None):
-        if not clusters:
+        if not clusters or clusters == []:
             clusters = self.all_clusters
 
         indicator_reports = self._latest_indicator_reports(clusters)
@@ -391,7 +391,7 @@ class ResponsePlan(TimeStampedExternalSourceModel):
         return indicator_reports
 
     def partner_activities(self, partner, clusters=None, limit=None):
-        if not clusters:
+        if not clusters or clusters == []:
             clusters = self.all_clusters
         qset = partner.partner_activities.filter(
             partner__clusters__in=clusters)
