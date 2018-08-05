@@ -323,10 +323,16 @@ class ResponsePlan(TimeStampedExternalSourceModel):
         return qset.count()
 
     def _latest_indicator_reports(self, clusters):
+        """
+        Return reportables that are linked to partner activities. The logic
+        to filter out activities that belong to these clusters is a bit involved
+        given PA could be custom or not and hence eithe CA or CO could be null
+        on it.
+        """
         from indicator.models import Reportable, IndicatorReport
         reportables = Reportable.objects.filter(
-            Q(partner_activities__partner__clusters__in=clusters)
-        )
+            Q(partner_activities__cluster_activity__cluster_objective__cluster__in=clusters) | \
+            Q(partner_activities__cluster_objective__cluster__in=clusters))
         return IndicatorReport.objects.filter(
             reportable__in=reportables).order_by(
             '-time_period_end').distinct()
