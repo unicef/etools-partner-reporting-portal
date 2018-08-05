@@ -39,12 +39,12 @@ def get_username(strategy, details, backend, user=None, *args, **kwargs):
 
 
 def user_details(strategy, details, user=None, *args, **kwargs):
-    # This is where we update the user
-    # see what the property to map by is here
-    updates_available = False
+    # # This is where we update the user
+    # # see what the property to map by is here
+    # updates_available = False
 
     if user:
-        user_groups = [group.name for group in user.groups.all()]
+        # user_groups = [group.name for group in user.groups.all()]
         # business_area_code = details.get("business_area_code", 'defaultBA1235')
 
         # Update username with email and unusable password
@@ -53,11 +53,6 @@ def user_details(strategy, details, user=None, *args, **kwargs):
         user.last_name = details['last_name']
         user.set_unusable_password()
         user.save()
-
-        if details.get("idp") == "UNICEF Azure AD" and "UNICEF User" not in user_groups:
-            user.groups.add(Group.objects.get(name='UNICEF User'))
-            user.is_staff = True
-            updates_available = True
 
         # TODO: Not using country in profile for PRP at the moment. May need to re-evaluate
         # def update_user_country():
@@ -77,9 +72,9 @@ def user_details(strategy, details, user=None, *args, **kwargs):
         #         update_user_country()
         #         updates_available = True
 
-        if updates_available:
-            user.save()
-            user.profile.save()
+        # if updates_available:
+        #     user.save()
+        #     user.profile.save()
 
     return social_core_user.user_details(strategy, details, user, *args, **kwargs)
 
