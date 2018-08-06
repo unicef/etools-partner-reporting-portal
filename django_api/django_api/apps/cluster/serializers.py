@@ -45,7 +45,9 @@ class ClusterIDManagementSerializer(serializers.ModelSerializer):
         )
 
     def get_full_title(self, obj):
-        return f'{obj.title} ({obj.response_plan.title} {obj.response_plan.workspace.title})'
+        if obj.response_plan:
+            return f'{obj.title} ({obj.response_plan.title} {obj.response_plan.workspace.title})'
+        return obj.title
 
 
 class ClusterObjectiveSerializer(serializers.ModelSerializer):

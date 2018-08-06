@@ -56,6 +56,7 @@ from cluster.serializers import (
     ResponsePlanPartnerDashboardSerializer,
     PartnerAnalysisSummarySerializer,
     OperationalPresenceLocationListSerializer,
+    ClusterIDManagementSerializer,
 )
 from cluster.filters import (
     ClusterObjectiveFilter,
@@ -1148,3 +1149,21 @@ class ClusterAnalysisIndicatorDetailsAPIView(APIView):
         serializer = ClusterAnalysisIndicatorDetailSerializer(reportable)
 
         return Response(serializer.data, status=statuses.HTTP_200_OK)
+
+
+class AssignableClustersListView(ListAPIView):
+    permission_classes = (IsAuthenticated, )
+    serializer_class = ClusterIDManagementSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        user_prp_roles = set(user.prp_roles.values_list('role', flat=True).distinct())
+
+        if PRP_ROLE_TYPES.cluster_system_admin in user_prp_roles:
+            return Cluster.objects.all()
+        if PRP_ROLE_TYPES.cluster_imo in user_prp_roles:
+            return Cluster.objects.filter(prp_roles__user=user, prp_roles__role=PRP_ROLE_TYPES.cluster_imo)
+        if PRP_ROLE_TYPES.cluster_member in user_prp_roles:
+            return Cluster.objects.filter(prp_roles__user=user, prp_roles__role=PRP_ROLE_TYPES.cluster_member)
+
+        raise PermissionDenied()
