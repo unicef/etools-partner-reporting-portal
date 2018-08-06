@@ -26,3 +26,9 @@ export const WORKSPACES = 'WORKSPACES';
 export function workspaces(data) {
     return {type: WORKSPACES, data};
 }
+
+export const CLUSTERS = 'CLUSTERS';
+
+export function clusters(data) {
+    return {type: CLUSTERS, data};
+}

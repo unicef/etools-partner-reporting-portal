@@ -3,7 +3,7 @@ import UserRoleControl from "./UserRoleControl";
 import LinkButton from "../common/LinkButton";
 import {PRP_ROLE, EDITABLE_PRP_ROLES} from "../../constants";
 import withUser from "../hoc/withUser";
-import {hasAnyRole, userRoleInWorkspace} from "../../helpers/user";
+import {hasAnyRole, getUserRole} from "../../helpers/user";
 import {PORTALS} from "../../actions";
 import {getLabels} from "../../labels";
 import {Typography} from "@material-ui/core";
@@ -34,15 +34,27 @@ const styleSheet = (theme) => ({
 });
 
 class UserRowExpanded extends Component {
+    canEdit(userRole) {
+        switch (userRole) {
+            case PRP_ROLE.IP_ADMIN:
+            case PRP_ROLE.CLUSTER_IMO:
+            case PRP_ROLE.CLUSTER_MEMBER:
+            case PRP_ROLE.CLUSTER_SYSTEM_ADMIN:
+                return true;
+            default:
+                return false;
+        }
+    }
+
     getActions(role) {
         const {user, onPermissionEdit, onPermissionDelete, onRemoveIpAdmin, onMakeIpAdmin, row} = this.props;
 
-        const userRole = userRoleInWorkspace(user, role.workspace.id);
+        const userRole = getUserRole(user, role);
 
         return (
             <Fragment>
-                {userRole === PRP_ROLE.IP_ADMIN &&
-                hasAnyRole(row, EDITABLE_PRP_ROLES[PRP_ROLE.IP_ADMIN]) &&
+                {this.canEdit(userRole) &&
+                hasAnyRole(row, EDITABLE_PRP_ROLES[userRole]) &&
                 <Fragment>
                     <LinkButton label={labels.edit} onClick={() => onPermissionEdit(role)}/>
                     <LinkButton label={labels.delete} variant="danger" onClick={() => onPermissionDelete(role)}/>
@@ -57,6 +69,16 @@ class UserRowExpanded extends Component {
                 <LinkButton label={labels.delete} variant="danger" onClick={() => onRemoveIpAdmin(role)}/>}
             </Fragment>
         )
+    }
+
+    canAdd(user) {
+        return hasAnyRole(user, [
+             PRP_ROLE.IP_ADMIN,
+             PRP_ROLE.IP_AUTHORIZED_OFFICER,
+             PRP_ROLE.CLUSTER_IMO,
+             PRP_ROLE.CLUSTER_MEMBER,
+             PRP_ROLE.CLUSTER_SYSTEM_ADMIN,
+        ]);
     }
 
     render() {
@@ -82,7 +104,7 @@ class UserRowExpanded extends Component {
                     <UserRoleControl key={role.id} role={role} actions={this.getActions(role)}/>
                 ))}
 
-                {(user.prpRole[PRP_ROLE.IP_ADMIN] || user.prpRole[PRP_ROLE.IP_AUTHORIZED_OFFICER]) &&
+                {this.canAdd(user) &&
                 <PlainButton color="primary" onClick={() => onPermissionsAdd(row)}>Add new permission</PlainButton>}
             </div>
         );

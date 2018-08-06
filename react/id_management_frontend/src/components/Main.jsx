@@ -4,7 +4,7 @@ import MainSideBar from "./layout/MainSideBar";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import {MuiThemeProvider, createMuiTheme} from "@material-ui/core/styles";
 import {blue, green, grey} from "@material-ui/core/colors";
-import {PORTALS, userProfile, workspaces} from "../actions";
+import {clusters, PORTALS, userProfile, workspaces} from "../actions";
 import MainContent from "./layout/MainContent";
 import MainRoutes from "./MainRoutes";
 import {Redirect, Route} from "react-router-dom";
@@ -42,6 +42,11 @@ class Main extends Component {
             api.get("core/workspace/")
                 .then(res => {
                     props.dispatchWorkspaces(res.data);
+                }),
+
+            api.get("id-management/assignable-clusters/")
+                .then(res => {
+                    props.dispatchClusters(res.data);
                 })
         ];
 
@@ -108,6 +113,9 @@ const mapDispatchToProps = dispatch => {
         },
         dispatchWorkspaces: data => {
             dispatch(workspaces(data))
+        },
+        dispatchClusters: data => {
+            dispatch(clusters(data))
         }
     };
 };

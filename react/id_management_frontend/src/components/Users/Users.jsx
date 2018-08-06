@@ -21,7 +21,7 @@ const CONFIRM_ACTIONS = {
     REMOVE_IP_ADMIN: "REMOVE_IP_ADMIN"
 };
 const confirmMessages = {
-    [CONFIRM_ACTIONS.DELETE_PERMISSION]: "Are you sure you want to remove IP Admin role for this user in this workspace?",
+    [CONFIRM_ACTIONS.DELETE_PERMISSION]: "Are you sure you want to remove this role for this user?",
     [CONFIRM_ACTIONS.MAKE_IP_ADMIN]: "Are you sure you want to make this user an IP Admin in this workspace?",
     [CONFIRM_ACTIONS.REMOVE_IP_ADMIN]: "Are you sure you want to remove IP Admin role for this user in this workspace?"
 };
