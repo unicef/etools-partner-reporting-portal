@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from core.common import PRP_ROLE_TYPES
+from core.common import PRP_ROLE_TYPES, USER_STATUS_TYPES
 
 from cluster.models import Cluster
 from id_management.serializers import PRPRoleWithRelationsSerializer
@@ -65,11 +65,11 @@ class UserWithPRPRolesSerializer(UserSerializer):
     def get_status(self, obj):
         if obj.is_active:
             if obj.last_login:
-                return 'Active'
+                return USER_STATUS_TYPES.active
             else:
-                return 'Invited'
+                return USER_STATUS_TYPES.invited
         else:
-            return 'Deactivated'
+            return USER_STATUS_TYPES.deactivated
 
     class Meta:
         model = User

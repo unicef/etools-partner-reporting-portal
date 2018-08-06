@@ -29,6 +29,12 @@ DISPLAY_CLUSTER_TYPES = Choices(
     ('wash', 'WASH'),
 )
 
+USER_STATUS_TYPES = Choices(
+    ('ACTIVE', 'active', 'Active'),
+    ('INVITED', 'invited', 'Invited'),
+    ('DEACTIVATED', 'deactivated', 'Deactivated'),
+)
+
 PRP_ROLE_TYPES = Choices(
     ('IP_AUTHORIZED_OFFICER', 'ip_authorized_officer', 'IP Authorized officer'),
     ('IP_EDITOR', 'ip_editor', 'IP Editor'),
