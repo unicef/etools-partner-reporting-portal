@@ -46,6 +46,16 @@ if settings.DEBUG and settings.IS_DEV:
         url(r'^__debug__/', include(debug_toolbar.urls)),
     ] + urlpatterns
 
-# Serving staticserve files for both dev and remote environments
-urlpatterns += staticfiles_urlpatterns('/api/static/')
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    # Serving staticserve files for both dev and remote environments
+    urlpatterns += staticfiles_urlpatterns('/api/static/')
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+elif settings.STATICFILES_STORAGE == 'django.contrib.staticfiles.storage.StaticFilesStorage':
+    from django.views.static import serve
+    urlpatterns += [
+        url(r'^api/static/(?P<path>.*)$', serve, {
+            'document_root': settings.STATIC_ROOT,
+        }),
+        url(r'^api/media/(?P<path>.*)$', serve, {
+            'document_root': settings.MEDIA_ROOT,
+        }),
+    ]
