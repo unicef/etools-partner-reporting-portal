@@ -5,8 +5,44 @@ import withPortal from "../hoc/withPortal";
 import {PORTALS} from "../../actions";
 import * as R from 'ramda';
 import {date} from "../../helpers/filters";
+import {FiberManualRecord as Dot} from "@material-ui/icons";
+import {red, green, grey} from "@material-ui/core/colors";
+import Grid from "@material-ui/core/Grid";
+
+const statusColor = {
+    ACTIVE: green[500],
+    INVITED: red[500],
+    DEACTIVATED: grey[900]
+};
+
+const statusLabel = {
+    ACTIVE: "Active",
+    INVITED: "Invited",
+    DEACTIVATED: "Deactivated"
+};
 
 class UsersList extends Component {
+    renderDot(status) {
+        const dotStyle = {
+            color: statusColor[status],
+            fontSize: '16px',
+            marginRight: 5
+        };
+
+        return <Dot style={dotStyle}/>
+    }
+
+    renderStatus(row) {
+        return (
+            <Grid container alignItems="center">
+                <Grid item component={() => this.renderDot(row.status)}/>
+                <Grid item>
+                    {statusLabel[row.status]}
+                </Grid>
+            </Grid>
+        )
+    }
+
     getColumns() {
         const {portal} = this.props;
 
@@ -21,7 +57,8 @@ class UsersList extends Component {
             },
             {
                 name: "status",
-                title: "Status"
+                title: "Status",
+                getCellValue: (row) => this.renderStatus(row)
             },
             {
                 title: "Last login",
