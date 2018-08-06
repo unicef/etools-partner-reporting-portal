@@ -89,7 +89,7 @@ CACHES = {
 
 # Application definition
 INSTALLED_APPS = [
-    'elasticapm.contrib.django',
+    # 'elasticapm.contrib.django',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -125,7 +125,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE_CLASSES = [
-    'elasticapm.contrib.django.middleware.TracingMiddleware',
+    # 'elasticapm.contrib.django.middleware.TracingMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -308,10 +308,10 @@ LOGGING = {
             'stream': sys.stdout,
             'formatter': 'standard',
         },
-        'elasticapm': {
-            'level': 'ERROR',
-            'class': 'elasticapm.contrib.django.handlers.LoggingHandler',
-        },
+        # 'elasticapm': {
+        #     'level': 'ERROR',
+        #     'class': 'elasticapm.contrib.django.handlers.LoggingHandler',
+        # },
     },
     'loggers': {
         'django': {
@@ -324,11 +324,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True
         },
-        'elasticapm.errors': {
-            'level': 'ERROR',
-            'handlers': ['default'],
-            'propagate': False,
-        },
+        # 'elasticapm.errors': {
+        #     'level': 'ERROR',
+        #     'handlers': ['default'],
+        #     'propagate': False,
+        # },
     }
 }
 
