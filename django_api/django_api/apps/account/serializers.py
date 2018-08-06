@@ -60,6 +60,16 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserWithPRPRolesSerializer(UserSerializer):
     prp_roles = PRPRoleWithRelationsSerializer(many=True, read_only=True)
+    status = serializers.SerializerMethodField()
+
+    def get_status(self, obj):
+        if obj.is_active:
+            if obj.last_login:
+                return 'Active'
+            else:
+                return 'Invited'
+        else:
+            return 'Deactivated'
 
     class Meta:
         model = User
@@ -68,6 +78,7 @@ class UserWithPRPRolesSerializer(UserSerializer):
             'last_name', 'profile',
             'partner', 'organization',
             'access', 'prp_roles',
-            'position', 'last_login'
+            'position', 'last_login',
+            'status'
         )
-        read_only_fields = ('id', 'profile', 'partner', 'organization', 'access', 'last_login')
+        read_only_fields = ('id', 'profile', 'partner', 'organization', 'access', 'last_login', 'status')
