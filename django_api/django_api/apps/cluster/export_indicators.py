@@ -527,7 +527,7 @@ class IndicatorsXLSXExporter:
                     disaggregation_types_base, i))
 
         # Generate data per spreadsheet
-        sheet_no = 0
+        sheet_no = 1
         to_remove = list()
         for disaggregation_types in disaggregation_types_list:
             # Check if indicators belongs to this disaggregation_types
@@ -547,13 +547,14 @@ class IndicatorsXLSXExporter:
             if not indicators:
                 continue
 
-            if sheet_no > 0:
-                self.sheets.append(self.duplicate_sheet(self.sheets[0]))
+            self.sheets.append(self.duplicate_sheet(self.sheets[0]))
             self.sheet = self.sheets[sheet_no]
 
             if not self.fill_sheet(disaggregation_types, indicators):
                 to_remove.append(self.sheets[sheet_no])
             sheet_no += 1
+
+        to_remove.append(self.sheets[0])
 
         # Remove empty spreadsheets
         for s in to_remove:
