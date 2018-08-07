@@ -38,13 +38,6 @@ class Main extends Component {
                 }),
         ];
 
-        if (props.portal === PORTALS.CLUSTER) {
-            promises.push(api.get("id-management/assignable-clusters/")
-                .then(res => {
-                    props.dispatchClusters(res.data);
-                }));
-        }
-
         Promise.all(promises)
             .finally(() => {
                 this.setState({loading: false})
@@ -56,7 +49,7 @@ class Main extends Component {
     }
 
     componentDidUpdate() {
-        const {user, location, dispatchSwitchPortal, history} = this.props;
+        const {user, location, dispatchSwitchPortal, history, dispatchClusters, portal} = this.props;
 
         if (!user.hasIpAccess && !user.hasClusterAccess) {
             window.location.href = "/";
@@ -68,6 +61,13 @@ class Main extends Component {
 
         if ((!user.hasClusterAccess && matchPath(location.pathname, `/${PORTALS.CLUSTER}`))) {
             dispatchSwitchPortal(PORTALS.IP, history);
+        }
+
+        if (portal === PORTALS.CLUSTER) {
+            api.get("id-management/assignable-clusters/")
+                .then(res => {
+                    dispatchClusters(res.data);
+                })
         }
     }
 
@@ -91,11 +91,13 @@ class Main extends Component {
             }
         });
 
+        const redirect = portal || PORTALS.IP;
+
         return (
             <MuiThemeProvider theme={theme}>
                 {!this.state.loading &&
                 <div className="App">
-                    <Route exact path="/" render={() => <Redirect to={`/${portal}`}/>}/>
+                    <Route exact path="/" render={() => <Redirect to={`/${redirect}`}/>}/>
                     <CssBaseline/>
                     <MainAppBar/>
                     <Route

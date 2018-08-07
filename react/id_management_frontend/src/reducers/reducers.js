@@ -5,6 +5,7 @@ import userProfile from "./userProfile";
 import expandedRowIds from "./expandedRowIds";
 import workspaces from "./workspaces";
 import clusters from "./clusters";
+import options from "./options";
 
 const reducers = combineReducers({
     portal: switchPortal,
@@ -12,7 +13,8 @@ const reducers = combineReducers({
     user: userProfile,
     expandedRowIds,
     workspaces,
-    clusters
+    clusters,
+    options
 });
 
 export default reducers;

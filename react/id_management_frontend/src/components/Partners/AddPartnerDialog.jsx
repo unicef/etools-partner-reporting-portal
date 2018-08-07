@@ -9,6 +9,8 @@ import {api} from "../../infrastructure/api";
 import {getLabels} from "../../labels";
 import ButtonSubmit from "../common/ButtonSubmit";
 import SelectForm from "../form/SelectForm";
+import {connect} from "react-redux";
+import withPartnerTypeOptions from "../hoc/withPartnerTypeOptions";
 
 const labels = getLabels({
     title: "Add new Partner",
@@ -73,7 +75,7 @@ class AddUserDialog extends Component {
     }
 
     render() {
-        const {open, handleSubmit} = this.props;
+        const {open, handleSubmit, sharedPartnerOptions, csoTypeOptions, partnerTypeOptions} = this.props;
 
         return (
             <Dialog
@@ -85,8 +87,7 @@ class AddUserDialog extends Component {
                 <form onSubmit={handleSubmit(this.onSubmit)} noValidate>
                     <Grid container spacing={24}>
                         <Grid item md={6}>
-                            {/* TODO: add options */}
-                            <SelectForm fieldName="ocha_id" label={labels.ochaId} values={[]}/>
+                            <TextFieldForm fieldName="ocha_external_id" label={labels.ochaId}/>
                         </Grid>
 
                         <Grid item md={6}/>
@@ -114,18 +115,15 @@ class AddUserDialog extends Component {
                         </Grid>
 
                         <Grid item md={6}>
-                            {/* TODO: add options */}
-                            <SelectForm fieldName="shared_partner" label={labels.sharedPartner} values={[]}/>
+                            <SelectForm fieldName="shared_partner" label={labels.sharedPartner} values={sharedPartnerOptions}/>
                         </Grid>
 
                         <Grid item md={6}>
-                            {/* TODO: add options */}
-                            <SelectForm fieldName="partner_type" label={labels.partnerType} values={[]}/>
+                            <SelectForm fieldName="partner_type" label={labels.partnerType} values={partnerTypeOptions}/>
                         </Grid>
 
                         <Grid item md={6}>
-                            {/* TODO: add options */}
-                            <SelectForm fieldName="cso_type" label={labels.csoType} values={[]}/>
+                            <SelectForm fieldName="cso_type" label={labels.csoType} values={csoTypeOptions}/>
                         </Grid>
 
                         <Grid item md={6}>
@@ -201,4 +199,11 @@ class AddUserDialog extends Component {
     }
 }
 
-export default reduxForm({form: "addPartnerForm"})(AddUserDialog);
+const mapStateToProps = (state) => {
+    return {
+        sharedPartnerOptions: state.options.shared_partner || [],
+        csoTypeOptions: state.options.cso_type || []
+    }
+};
+
+export default withPartnerTypeOptions(connect(mapStateToProps)(reduxForm({form: "addPartnerForm"})(AddUserDialog)));

@@ -32,3 +32,9 @@ export const CLUSTERS = 'CLUSTERS';
 export function clusters(data) {
     return {type: CLUSTERS, data};
 }
+
+export const OPTIONS = 'OPTIONS';
+
+export function options(data, fields) {
+    return {type: OPTIONS, data, fields}
+}

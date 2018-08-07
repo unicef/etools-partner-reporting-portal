@@ -41,4 +41,7 @@ export var api = {
     delete: function (url) {
         return makeRequest('delete', url);
     },
+    options: function (url) {
+        return makeRequest('options', url);
+    }
 };
