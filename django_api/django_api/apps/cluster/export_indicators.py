@@ -38,11 +38,11 @@ class IndicatorsXLSXExporter:
     def duplicate_sheet(self, sheet):
         return self.wb.copy_worksheet(sheet)
 
-    def fill_sheet(self, disaggregation_types):
-        # Setup a title
+    def fill_sheet(self, disaggregation_types, indicators):
+        # Setup a title (limited to 30 chars via excel requirements)
         self.sheet.title = ", ".join(
             [dt.name for dt in disaggregation_types]
-        ) if disaggregation_types else "None"
+        )[:30] if disaggregation_types else "None"
 
         # Generate disaggregation types columns
         # it holds column number for given Disaggregation Type ID
@@ -107,22 +107,6 @@ class IndicatorsXLSXExporter:
         totals_header_cell.alignment = Alignment(horizontal='center')
 
         disaggregation_values_map["()"] = totals_column
-
-        indicators = self.indicators
-        indicators = IndicatorReport.objects.filter(pk__in=[i.id for i in indicators])
-        if disaggregation_types:
-            indicators = indicators.annotate(
-                count=Count('reportable__disaggregations')).filter(
-                count=len(disaggregation_types))
-            for dt in disaggregation_types:
-                indicators = indicators.filter(reportable__disaggregations=dt)
-        else:
-            indicators = indicators.filter(reportable__disaggregations__isnull=True)
-
-        indicators = indicators.order_by('reportable__id')
-
-        if not indicators:
-            return False
 
         # Each row is one location per indicator
         start_row_id = INDICATOR_DATA_ROW_START
@@ -524,10 +508,13 @@ class IndicatorsXLSXExporter:
         merged_sheet.freeze_panes = 'A%d' % INDICATOR_DATA_ROW_START
 
     def export_data(self):
-        # Disaggregation types
-        disaggregation_types_base = Disaggregation.objects.filter(
-            response_plan__id=self.response_plan_id
-        )
+
+        # Prepare list of unique disaggregations for choosed indicators
+        disaggregation_types_base_set = set()
+        for i in self.indicators:
+            for d in i.reportable.disaggregations.all():
+                disaggregation_types_base_set.add(d)
+        disaggregation_types_base = list(disaggregation_types_base_set)
 
         # Split data into spreadsheets, combination of
         # disaggregation_types_length with r-length tuples and no repeated
@@ -538,16 +525,32 @@ class IndicatorsXLSXExporter:
                 itertools.combinations(
                     disaggregation_types_base, i))
 
-        # Duplicate spreadsheets base
-        for i in range(1, len(disaggregation_types_list)):
-            self.sheets.append(self.duplicate_sheet(self.sheet))
-
         # Generate data per spreadsheet
         sheet_no = 0
         to_remove = list()
         for disaggregation_types in disaggregation_types_list:
+            # Check if indicators belongs to this disaggregation_types
+            # Skip if not
+            indicators = self.indicators
+            indicators = IndicatorReport.objects.filter(pk__in=[i.id for i in indicators])
+            if disaggregation_types:
+                indicators = indicators.annotate(
+                    count=Count('reportable__disaggregations')).filter(
+                    count=len(disaggregation_types))
+                for dt in disaggregation_types:
+                    indicators = indicators.filter(reportable__disaggregations=dt)
+            else:
+                indicators = indicators.filter(reportable__disaggregations__isnull=True)
+
+            indicators = indicators.order_by('reportable__id')
+            if not indicators:
+                continue
+
+            if sheet_no > 0:
+                self.sheets.append(self.duplicate_sheet(self.sheets[0]))
             self.sheet = self.sheets[sheet_no]
-            if not self.fill_sheet(disaggregation_types):
+
+            if not self.fill_sheet(disaggregation_types, indicators):
                 to_remove.append(self.sheets[sheet_no])
             sheet_no += 1
 
