@@ -6,6 +6,7 @@ from django.conf import settings
 from django.db.models import Count
 
 import itertools
+import uuid
 
 from indicator.models import Disaggregation, DisaggregationValue, IndicatorBlueprint, IndicatorReport
 
@@ -564,6 +565,6 @@ class IndicatorsXLSXExporter:
         if self.analysis:
             self.merge_sheets()
 
-        file_path = SAVE_PATH + 'export.xlsx'
+        file_path = SAVE_PATH + 'export_' + uuid.uuid4().hex + '.xlsx'
         self.wb.save(file_path)
         return file_path
