@@ -1,11 +1,18 @@
 import React, {Component} from 'react';
 import qs from "query-string";
 import {debounce} from "throttle-debounce";
-import {expandedRowIds} from "../../actions";
+import {expandedRowIds, PORTALS} from "../../actions";
 import {connect} from "react-redux";
+import {PORTAL_TYPE} from "../../constants";
 
 const firstPage = 1;
 const arrayFormat = 'bracket';
+
+const mapStateToProps = state => {
+    return {
+        portal: PORTAL_TYPE[state.portal]
+    }
+};
 
 const mapDispatchToProps = dispatch => {
     return {
@@ -15,7 +22,7 @@ const mapDispatchToProps = dispatch => {
 
 export default (getDataFn) => {
     return WrappedComponent =>
-        connect(null, mapDispatchToProps)(
+        connect(mapStateToProps, mapDispatchToProps)(
             class WithSearch extends Component {
                 constructor(props) {
                     super(props);
@@ -62,6 +69,8 @@ export default (getDataFn) => {
                 }
 
                 onSearch(filter, page, pageSize) {
+                    const {history, portal} = this.props;
+
                     let request = filter;
 
                     request.page = page || filter.page || this.state.page;
@@ -73,10 +82,11 @@ export default (getDataFn) => {
                         loading: true
                     });
 
-                    Promise.resolve(getDataFn(request))
+                    Promise.resolve(getDataFn(Object.assign({}, request, {
+                        portal
+                    })))
                         .then(data => this.setState({data, loading: false}));
 
-                    const {history} = this.props;
 
                     history.push({
                         pathname: history.location.pathname,

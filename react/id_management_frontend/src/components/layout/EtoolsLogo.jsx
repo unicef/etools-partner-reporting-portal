@@ -2,7 +2,7 @@ import React from 'react';
 
 function EtoolsLogo(props) {
     return (
-        <svg xmlns="http://www.w3.org/2000/svg" width={props.size} viewBox="0 0 363.7 105.4"
+        <svg xmlns="http://www.w3.org/2000/svg" width={props.size} style={{marginLeft: ".75em"}} viewBox="0 0 363.7 105.4"
              enableBackground="new 0 0 363.7 105.4">
             <path fill="#00A551" d="M50.9 96v-45.2h45.2z"/>
             <path fill="#1C85BF" d="M50.9 5.6v45.2h-45.2z"/>

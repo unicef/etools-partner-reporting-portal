@@ -1,6 +1,6 @@
-import {SWITCH_PORTAL} from "../actions";
+import {PORTALS, SWITCH_PORTAL} from "../actions";
 
-export default function switchPortal(state = null, action) {
+export default function switchPortal(state = PORTALS.IP, action) {
     switch (action.type) {
         case SWITCH_PORTAL:
             return action.portal;

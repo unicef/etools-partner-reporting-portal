@@ -1,10 +1,10 @@
-import React, { Component } from "react";
-import { withStyles } from "@material-ui/core/styles";
+import React, {Component} from "react";
+import {withStyles} from "@material-ui/core/styles";
 import mainStyles from "../../styles/mainStyles";
 import AppSwitcher from "./AppSwitcher/AppSwitcher";
 import Grid from "@material-ui/core/Grid";
 import EtoolsLogo from "./EtoolsLogo";
-import { Typography } from "@material-ui/core";
+import {Typography} from "@material-ui/core";
 import grey from "@material-ui/core/colors/grey";
 import ProfileMenu from "./ProfileMenu/ProfileMenu";
 import withUser from "../hoc/withUser";
@@ -28,7 +28,7 @@ const styleSheet = {
 
 class MainAppBar extends Component {
     render() {
-        const { classes, user } = this.props;
+        const {classes, user} = this.props;
 
         return (
             <Grid container justify="space-between" className={classes.header}>
@@ -39,8 +39,9 @@ class MainAppBar extends Component {
                         alignItems="center"
                         className={classes.height}
                     >
-                        <Grid item component={AppSwitcher} />
-                        <EtoolsLogo size={120} color="white" />
+                        {user.hasIpAccess && user.hasClusterAccess &&
+                        <Grid item component={AppSwitcher}/>}
+                        <EtoolsLogo size={120} color="white"/>
                     </Grid>
                 </Grid>
                 <Grid item>
@@ -64,4 +65,4 @@ class MainAppBar extends Component {
     }
 }
 
-export default withUser(withStyles(styleSheet, { name: "MainAppBar" })(MainAppBar));
+export default withUser(withStyles(styleSheet, {name: "MainAppBar"})(MainAppBar));

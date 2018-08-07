@@ -33,7 +33,6 @@ const styleSheet = {
     },
     wrapper: {
         height: "100%",
-        marginRight: ".75em"
     }
 };
 

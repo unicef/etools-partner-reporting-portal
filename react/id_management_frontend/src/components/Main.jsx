@@ -4,17 +4,15 @@ import MainSideBar from "./layout/MainSideBar";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import {MuiThemeProvider, createMuiTheme} from "@material-ui/core/styles";
 import {blue, green, grey} from "@material-ui/core/colors";
-import {clusters, PORTALS, userProfile, workspaces} from "../actions";
+import {clusters, PORTALS, switchPortal, userProfile, workspaces} from "../actions";
 import MainContent from "./layout/MainContent";
 import MainRoutes from "./MainRoutes";
 import {Redirect, Route} from "react-router-dom";
-import {withRouter} from "react-router-dom";
+import {withRouter, matchPath} from "react-router-dom";
 import withPortal from "./hoc/withPortal";
 import {api} from "../infrastructure/api";
 import {connect} from "react-redux";
-import {hasAnyRole} from "../helpers/user";
-import {PORTAL_ACCESS} from "../constants";
-
+import withUser from "./hoc/withUser";
 
 const labels = {
     [PORTALS.IP]: "IP REPORTING",
@@ -32,23 +30,20 @@ class Main extends Component {
         let promises = [
             api.get("account/user-profile/")
                 .then(res => {
-                    if (hasAnyRole(res.data, PORTAL_ACCESS)) {
-                        props.dispatchUserProfile(res.data);
-                    }
-                    else {
-                        window.location.href = "/";
-                    }
+                    props.dispatchUserProfile(res.data);
                 }),
             api.get("core/workspace/")
                 .then(res => {
                     props.dispatchWorkspaces(res.data);
                 }),
+        ];
 
-            api.get("id-management/assignable-clusters/")
+        if (props.portal === PORTALS.CLUSTER) {
+            promises.push(api.get("id-management/assignable-clusters/")
                 .then(res => {
                     props.dispatchClusters(res.data);
-                })
-        ];
+                }));
+        }
 
         Promise.all(promises)
             .finally(() => {
@@ -60,8 +55,28 @@ class Main extends Component {
         return `/:portal(${PORTALS.IP}|${PORTALS.CLUSTER})/`
     }
 
+    componentDidUpdate() {
+        const {user, location, dispatchSwitchPortal, history} = this.props;
+
+        if (!user.hasIpAccess && !user.hasClusterAccess) {
+            window.location.href = "/";
+        }
+
+        if ((!user.hasIpAccess && matchPath(location.pathname, `/${PORTALS.IP}`))) {
+            dispatchSwitchPortal(PORTALS.CLUSTER, history);
+        }
+
+        if ((!user.hasClusterAccess && matchPath(location.pathname, `/${PORTALS.CLUSTER}`))) {
+            dispatchSwitchPortal(PORTALS.IP, history);
+        }
+    }
+
     render() {
-        const {portal} = this.props;
+        const {portal, user} = this.props;
+
+        if (!user) {
+            return null;
+        }
 
         const theme = createMuiTheme({
             palette: {
@@ -80,7 +95,7 @@ class Main extends Component {
             <MuiThemeProvider theme={theme}>
                 {!this.state.loading &&
                 <div className="App">
-                    <Route exact path="/" render={() => <Redirect to={`/${PORTALS.IP}`}/>}/>
+                    <Route exact path="/" render={() => <Redirect to={`/${portal}`}/>}/>
                     <CssBaseline/>
                     <MainAppBar/>
                     <Route
@@ -116,8 +131,12 @@ const mapDispatchToProps = dispatch => {
         },
         dispatchClusters: data => {
             dispatch(clusters(data))
+        },
+        dispatchSwitchPortal: (portal, history) => {
+            dispatch(switchPortal(portal));
+            history.push(`/${portal}`);
         }
     };
 };
 
-export default withRouter(connect(null, mapDispatchToProps)(withPortal(Main)));
+export default withRouter(connect(null, mapDispatchToProps)(withUser(withPortal(Main))));

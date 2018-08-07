@@ -8,6 +8,8 @@ import {reduxForm} from 'redux-form';
 import {api} from "../../infrastructure/api";
 import {getLabels} from "../../labels";
 import ButtonSubmit from "../common/ButtonSubmit";
+import {PORTAL_TYPE} from "../../constants";
+import withPortal from "../hoc/withPortal";
 
 const labels = getLabels({
     title: "Add new user",
@@ -29,11 +31,15 @@ class AddUserDialog extends Component {
     }
 
     onSubmit(values) {
-        const {onSave} = this.props;
+        const {onSave, portal} = this.props;
+
+        let request = values;
+
+        request.portal = PORTAL_TYPE[portal];
 
         this.setState({loading: true});
 
-        return api.post("id-management/users/", values)
+        return api.post("id-management/users/", request)
             .then(res => {
                 this.onClose();
                 onSave(res.data);
@@ -85,4 +91,4 @@ class AddUserDialog extends Component {
     }
 }
 
-export default reduxForm({form: "addUserForm"})(AddUserDialog);
+export default withPortal(reduxForm({form: "addUserForm"})(AddUserDialog));
