@@ -79,7 +79,7 @@ class UserListCreateAPIView(ListCreateAPIView):
     pagination_class = SmallPagination
 
     def get_queryset(self):
-        referer = self.request.META['HTTP_REFERER']
+        portal_choice = self.request.query_params.get('portal')
 
         user = self.request.user
         user_prp_roles = set(user.prp_roles.values_list('role', flat=True).distinct())
@@ -89,10 +89,10 @@ class UserListCreateAPIView(ListCreateAPIView):
         ip_users_access = {PRP_ROLE_TYPES.ip_authorized_officer, PRP_ROLE_TYPES.ip_admin}
         all_users_access = {PRP_ROLE_TYPES.cluster_system_admin, PRP_ROLE_TYPES.cluster_imo}
 
-        if 'cluster-reporting' in referer and all_users_access.intersection(user_prp_roles):
+        if portal_choice == 'CLUSTER' and all_users_access.intersection(user_prp_roles):
             pass
-        elif ('ip-reporting' in referer and ip_users_access.intersection(user_prp_roles) or
-              'cluster_reporting' in referer and PRP_ROLE_TYPES.cluster_member in user_prp_roles):
+        elif (portal_choice == 'IP' and ip_users_access.intersection(user_prp_roles) or
+              portal_choice == 'CLUSTER' and PRP_ROLE_TYPES.cluster_member in user_prp_roles):
             users_queryset = users_queryset.filter(partner_id__isnull=False, partner_id=user.partner_id)
         else:
             raise PermissionDenied()
