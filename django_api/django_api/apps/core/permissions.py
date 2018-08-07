@@ -47,6 +47,14 @@ def IsIMOForCurrentWorkspaceCheck(request):
     return False
 
 
+def IsIMOCheck(request):
+    rules = [
+        request.user.is_authenticated(),
+        request.user.prp_roles.filter(role=PRP_ROLE_TYPES.cluster_imo).exists(),
+    ]
+    return all(rules)
+
+
 def IsPartnerAuthorizedOfficerForCurrentWorkspaceCheck(request):
     workspace_id = request.resolver_match.kwargs.get('workspace_id')
     if workspace_id:
@@ -196,3 +204,13 @@ class IsSuperuser(BasePermission):
     def has_permission(self, request, view):
         user = request.user
         return user.is_authenticated() and user.is_superuser
+
+
+class IsClusterSystemAdmin(BasePermission):
+    def has_permission(self, request, view):
+        return IsClusterSystemAdminCheck(request)
+
+
+class IsIMO(BasePermission):
+    def has_permission(self, request, view):
+        return IsIMOCheck(request)

@@ -111,6 +111,37 @@ class PartnerDetailsSerializer(serializers.ModelSerializer):
         return obj.get_shared_partner_display()
 
 
+class PartnerIDManagementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Partner
+        fields = (
+            'id',
+            'ocha_external_id',
+            'external_id',
+            'external_source',
+            'title',
+            'short_title',
+            'alternate_title',
+            'shared_partner',
+            'partner_type',
+            'cso_type',
+            'email',
+            'phone_number',
+            'street_address',
+            'city',
+            'postal_code',
+            'country_code',
+            'total_ct_cp',
+            'total_ct_cy',
+            'vendor_number',
+            'alternate_id',
+            'rating',
+            # 'type_of_assessment',
+            'basis_for_risk_rating',
+            'clusters',
+        )
+
+
 class PartnerProjectFundingSerializer(serializers.ModelSerializer):
 
     class Meta:

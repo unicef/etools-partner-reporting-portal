@@ -20,6 +20,8 @@ from core.permissions import (
     IsPartnerAuthorizedOfficerForCurrentWorkspace,
     IsPartnerEditorForCurrentWorkspace,
     IsPartnerViewerForCurrentWorkspace,
+    IsIMO,
+    IsClusterSystemAdmin,
 )
 
 from cluster.models import Cluster
@@ -34,9 +36,16 @@ from .serializers import (
     PartnerActivityFromCustomActivitySerializer,
     PartnerSimpleSerializer,
     PartnerActivityUpdateSerializer,
+    PartnerIDManagementSerializer,
 )
 from .models import PartnerProject, PartnerActivity, Partner
-from .filters import PartnerProjectFilter, ClusterActivityPartnersFilter, PartnerActivityFilter, PartnerFilter
+from .filters import (
+    PartnerProjectFilter,
+    ClusterActivityPartnersFilter,
+    PartnerActivityFilter,
+    PartnerFilter,
+    PartnerIDManagementFilter
+)
 
 
 class PartnerDetailsAPIView(RetrieveAPIView):
@@ -60,6 +69,20 @@ class PartnerDetailsAPIView(RetrieveAPIView):
             request.user.partner
         )
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class PartnerListCreateAPIView(ListCreateAPIView):
+    serializer_class = PartnerIDManagementSerializer
+    permission_classes = (
+        AnyPermission(
+            IsIMO,
+            IsClusterSystemAdmin
+        ),
+    )
+    queryset = Partner.objects.all()
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
+    filter_class = PartnerIDManagementFilter
+    pagination_class = SmallPagination
 
 
 class PartnerProjectListCreateAPIView(ListCreateAPIView):
