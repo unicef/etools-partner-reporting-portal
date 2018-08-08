@@ -23,6 +23,7 @@
 * LLO - Lower Level Output
 * Location - A geographic area at a certain admin level
 * OCHA - Office for the Coordination of Humanitarian Affairs. [Website](https://www.unocha.org/).
+* OPS - OCHA tool, Online Projects/Planning Module. [Link](https://ops.unocha.org/Home.aspx).
 * Output - Think of this as a statement of what is expected to be achieved.
 * QPR \(Quarterly Progress Report\) - This is a report that the partner files with UNICEF, typically on a quarterly basis to report progress on indicators as part of a PD. This report contains progress on all indicators, irrespective of whether they PD indicators, high frequency non-cluster or high frequency cluster indicators.
 * **Programme Document \(PD\)** - At least one programme document is required to operationalize the PCA \(Annex C of the CSO Procedure\).
