@@ -12,12 +12,12 @@ class PartnersList extends Component {
             },
             {
                 title: "Partner Type",
-                name: "partner_type"
+                name: "partner_type_display"
             },
             {
                 title: "Clusters",
                 name: "clusters",
-                getCellValue: row => row.clusters.join(", ")
+                getCellValue: row => row.clusters.map(cluster => cluster.title).join(", ")
             }
         ];
     }
