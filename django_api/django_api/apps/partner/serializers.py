@@ -112,6 +112,9 @@ class PartnerDetailsSerializer(serializers.ModelSerializer):
 
 
 class PartnerIDManagementSerializer(serializers.ModelSerializer):
+    partner_type_display = serializers.CharField(source='get_partner_type_display', read_only=True)
+    clusters = ClusterSimpleSerializer(many=True, read_only=True)
+
     class Meta:
         model = Partner
         fields = (
@@ -124,6 +127,7 @@ class PartnerIDManagementSerializer(serializers.ModelSerializer):
             'alternate_title',
             'shared_partner',
             'partner_type',
+            'partner_type_display',
             'cso_type',
             'email',
             'phone_number',
@@ -140,6 +144,17 @@ class PartnerIDManagementSerializer(serializers.ModelSerializer):
             'basis_for_risk_rating',
             'clusters',
         )
+
+    @transaction.atomic
+    def create(self, validated_data):
+        cluster_ids = self.initial_data.pop('clusters', [])
+        if not cluster_ids and not isinstance(cluster_ids, list):
+            raise serializers.ValidationError({
+                'clusters': 'This should be a list and cannot be empty.'
+            })
+        partner = super().create(validated_data)
+        partner.clusters.add(*cluster_ids)
+        return partner
 
 
 class PartnerProjectFundingSerializer(serializers.ModelSerializer):
