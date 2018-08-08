@@ -11,6 +11,7 @@
 * CSO - Civil Society Organization
 * CSP - Civil Society Partnership. When partnerships require a transfer of resources from UNICEF to the CSO, there are two established modalities: 1\) a Small Scale Funding Agreement \(SSFA\), or a 2\) Programme Cooperation Agreement \(PCA\).
 * Disaggregation - How reported data is split based on certain key indicating dimensions, eg. gender, age etc.
+* FA - Flash Appeal
 * FACE -  Funding Authorization and Certification of Expenditures. FACE form in Annex J, along with the itemized cost estimate, is used to request cash transfers, report on expenditures and certify expenditures. FACE is used for all types of fund transfers; Cash Advance/Direct cash transfers, direct payments and reimbursements.
 * FRG - Field Results Group. [Presentation](https://www.unicef.org/publicpartnerships/files/UNICEF_Results_Based_Management.pdf).
 * FTS - Financial Tracking System, by OCHA.
@@ -23,7 +24,6 @@
 * LLO - Lower Level Output
 * Location - A geographic area at a certain admin level
 * OCHA - Office for the Coordination of Humanitarian Affairs. [Website](https://www.unocha.org/).
-* OPS - OCHA tool, Online Projects/Planning Module. [Link](https://ops.unocha.org/Home.aspx).
 * Output - Think of this as a statement of what is expected to be achieved.
 * QPR \(Quarterly Progress Report\) - This is a report that the partner files with UNICEF, typically on a quarterly basis to report progress on indicators as part of a PD. This report contains progress on all indicators, irrespective of whether they PD indicators, high frequency non-cluster or high frequency cluster indicators.
 * **Programme Document \(PD\)** - At least one programme document is required to operationalize the PCA \(Annex C of the CSO Procedure\).
