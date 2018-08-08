@@ -13,63 +13,84 @@ import withUser from "../hoc/withUser";
 import {userRoleInCluster, userRoleInWorkspace} from "../../helpers/user";
 import withClusterOptions from "../hoc/withClusterOptions";
 import {PORTALS} from "../../actions";
+import {filterOptionsValues} from "../../helpers/options";
 
 const title = {
     [PORTALS.IP]: "Role per Workspace",
     [PORTALS.CLUSTER]: "Role per Cluster"
 };
 
-const renderPermissionsFields = ({fields, portal, workspaceOptions, user, clusterOptions}) => (
-    <div>
-        <Typography variant="caption" gutterBottom>{title[portal]}</Typography>
+const getSelectedOptions = (optionName, fields, index) => {
+    let options = [];
 
-        <FieldsArrayPanel>
-            {fields.map((item, index, fields) => {
-                const field = fields.get(index);
+    fields.forEach((item, idx, fields) => {
+        if (idx !== index && fields.get(idx)[optionName]) {
+            options.push(fields.get(idx)[optionName]);
+        }
+    });
 
-                let role;
+    return options;
+};
 
-                if (portal === PORTALS.IP) {
-                    role = userRoleInWorkspace(user, field.workspace);
-                }
-                else {
-                    role = userRoleInCluster(user, field.cluster)
-                }
+const renderPermissionsFields = ({fields, portal, workspaceOptions, user, clusterOptions}) => {
+    return (
+        <div>
+            <Typography variant="caption" gutterBottom>{title[portal]}</Typography>
 
+            <FieldsArrayPanel>
+                {fields.map((item, index, fields) => {
+                    const field = fields.get(index);
 
-                const roleOptions = role ? EDITABLE_PRP_ROLE_OPTIONS[role] : [];
+                    const selectedClusters = getSelectedOptions("cluster", fields, index);
+                    const selectedWorkspaces = getSelectedOptions("workspace", fields, index);
+                    const filteredWorkspaceOptions = filterOptionsValues(workspaceOptions, selectedWorkspaces);
+                    const filteredClusterOptions = filterOptionsValues(clusterOptions, selectedClusters);
 
-                return (
-                    <FieldsArrayItem key={index}>
-                        <Grid container justify="flex-end">
-                            <Grid item>
-                                <DeleteButton onClick={() => fields.remove(index)}/>
+                    let role;
+
+                    if (portal === PORTALS.IP) {
+                        role = userRoleInWorkspace(user, field.workspace);
+                    }
+                    else {
+                        role = userRoleInCluster(user, field.cluster)
+                    }
+
+                    const roleOptions = role ? EDITABLE_PRP_ROLE_OPTIONS[role] : [];
+
+                    return (
+                        <FieldsArrayItem key={index}>
+                            <Grid container justify="flex-end">
+                                <Grid item>
+                                    {fields.length > 1 &&
+                                    <DeleteButton onClick={() => fields.remove(index)}/>}
+                                </Grid>
                             </Grid>
-                        </Grid>
 
-                        <Grid container spacing={24}>
-                            <Grid item md={6}>
-                                {portal === PORTALS.IP &&
-                                <SelectForm fieldName={`${item}.workspace`} label={labels.workspace}
-                                            values={workspaceOptions}/>}
+                            <Grid container spacing={24}>
+                                <Grid item md={6}>
+                                    {portal === PORTALS.IP &&
+                                    <SelectForm fieldName={`${item}.workspace`} label={labels.workspace}
+                                                values={filteredWorkspaceOptions}/>}
 
-                                {portal === PORTALS.CLUSTER &&
-                                <SelectForm fieldName={`${item}.cluster`} label={labels.cluster}
-                                            values={clusterOptions}/>}
+                                    {portal === PORTALS.CLUSTER &&
+                                    <SelectForm fieldName={`${item}.cluster`} label={labels.cluster}
+                                                values={filteredClusterOptions}/>}
+                                </Grid>
+
+                                <Grid item md={6}>
+                                    <SelectForm fieldName={`${item}.role`} label={labels.role}
+                                                values={roleOptions}
+                                                selectFieldProps={{disabled: !roleOptions.length}}/>
+                                </Grid>
                             </Grid>
+                        </FieldsArrayItem>
+                    )
+                })}
 
-                            <Grid item md={6}>
-                                <SelectForm fieldName={`${item}.role`} label={labels.role}
-                                            values={roleOptions}/>
-                            </Grid>
-                        </Grid>
-                    </FieldsArrayItem>
-                )
-            })}
-
-            <FieldsArrayAddButton onClick={() => fields.push({})}/>
-        </FieldsArrayPanel>
-    </div>
-);
+                <FieldsArrayAddButton onClick={() => fields.push({})}/>
+            </FieldsArrayPanel>
+        </div>
+    )
+};
 
 export default withClusterOptions(withWorkspaceOptions(withPortal(withUser(renderPermissionsFields))));

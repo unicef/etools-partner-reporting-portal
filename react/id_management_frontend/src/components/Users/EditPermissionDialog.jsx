@@ -89,7 +89,7 @@ const mapStateToProps = (state, ownProps) => {
     return {
         roleOptions: EDITABLE_PRP_ROLE_OPTIONS[userRole],
         initialValues: {
-            workspace: ownProps.permission.workspace.title,
+            workspace: ownProps.permission.workspace ? ownProps.permission.workspace.title : null,
             role: ownProps.permission.role,
             cluster: ownProps.permission.cluster ? ownProps.permission.cluster.full_title : null
         }

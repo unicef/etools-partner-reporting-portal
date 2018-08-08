@@ -8,6 +8,8 @@ export function hasAnyRole(user, roles) {
 }
 
 export function userRoleInWorkspace(user, workspace) {
+    if (!workspace) return null;
+
     const roles = user.prp_roles.filter(role => role.workspace == workspace);
 
     return roles.length ? roles[0].role : null;
@@ -28,6 +30,8 @@ export function logout() {
 }
 
 export function userRoleInCluster(user, cluster) {
+    if (!cluster) return null;
+
     const roles = user.prp_roles.filter(role => role.cluster == cluster || role.role === PRP_ROLE.CLUSTER_SYSTEM_ADMIN);
 
     return roles.length ? roles[0].role : null;

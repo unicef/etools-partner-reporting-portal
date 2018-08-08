@@ -4,3 +4,7 @@ export function optionsFromChoices(choices) {
         label: choice.display_name
     }));
 }
+
+export function filterOptionsValues(options, values) {
+    return options.filter(option => values.indexOf(option.value) < 0);
+}

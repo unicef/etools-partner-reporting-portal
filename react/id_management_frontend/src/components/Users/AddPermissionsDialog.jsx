@@ -23,7 +23,7 @@ class AddPermissionsDialog extends Component {
     }
 
     onSubmit(values) {
-        const {user: {id}, onSave, onClose} = this.props;
+        const {user: {id}, onSave} = this.props;
 
         let request = values;
         request.user_id = id;
@@ -34,7 +34,7 @@ class AddPermissionsDialog extends Component {
         api.post("id-management/role-group/", request)
             .then(res => {
                 onSave();
-                onClose();
+                this.onClose();
             })
             .finally(() => this.setState({loading: false}));
     }
