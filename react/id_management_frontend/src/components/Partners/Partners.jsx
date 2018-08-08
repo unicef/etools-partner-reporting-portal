@@ -33,7 +33,7 @@ class Partners extends Component {
     }
 
     render() {
-        const {dialogOpen, handleDialogOpen, handleDialogClose, filterChange, getQuery, listProps} = this.props;
+        const {dialogOpen, handleDialogOpen, handleDialogClose, filterChange, getQuery, listProps, reload} = this.props;
 
         if (this.state.initialLoading) {
             return null;
@@ -50,7 +50,7 @@ class Partners extends Component {
                     <PartnersList {...listProps}/>
                 </PageContent>
 
-                <AddPartnerDialog open={dialogOpen.addPartner} onClose={handleDialogClose}/>
+                <AddPartnerDialog open={dialogOpen.addPartner} onClose={handleDialogClose} onSave={() => reload()}/>
             </div>
         )
     }

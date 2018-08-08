@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import qs from "query-string";
 import {debounce} from "throttle-debounce";
-import {expandedRowIds, PORTALS} from "../../actions";
+import {expandedRowIds} from "../../actions";
 import {connect} from "react-redux";
 import {PORTAL_TYPE} from "../../constants";
 
@@ -77,8 +77,8 @@ export default (getDataFn) => {
                     request.page_size = pageSize || filter.page_size || this.state.page_size;
 
                     this.setState({
-                        page: parseInt(request.page),
-                        page_size: parseInt(request.page_size),
+                        page: parseInt(request.page, 10),
+                        page_size: parseInt(request.page_size, 10),
                         loading: true
                     });
 

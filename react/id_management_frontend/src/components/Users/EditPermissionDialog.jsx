@@ -4,7 +4,7 @@ import DialogActions from "../common/DialogActions";
 import {Button, Grid} from "@material-ui/core";
 import {reduxForm} from 'redux-form';
 import labels from "../../labels";
-import {EDITABLE_PRP_ROLE_OPTIONS, PRP_ROLE} from "../../constants";
+import {EDITABLE_PRP_ROLE_OPTIONS} from "../../constants";
 import TextFieldForm from "../form/TextFieldForm";
 import SelectForm from "../form/SelectForm";
 import {connect} from "react-redux";
@@ -33,7 +33,7 @@ class EditPermissionDialog extends Component {
 
         this.setState({loading: true});
 
-        api.patch(`id-management/role-group/${id}/`, {role: values.role})
+        return api.patch(`id-management/role-group/${id}/`, {role: values.role})
             .then(res => {
                 onClose();
                 onSave();

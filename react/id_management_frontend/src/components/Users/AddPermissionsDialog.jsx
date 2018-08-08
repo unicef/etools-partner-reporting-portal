@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import Dialog from "../common/Dialog";
 import DialogActions from "../common/DialogActions";
-import {Button} from "@material-ui/core";
+import {Button, Typography} from "@material-ui/core";
 import {FieldArray, reduxForm} from 'redux-form';
 import renderPermissionsFields from "./renderPermissionsFields";
 import labels from "../../labels";
@@ -31,7 +31,7 @@ class AddPermissionsDialog extends Component {
         this.setState({loading: true});
 
 
-        api.post("id-management/role-group/", request)
+        return api.post("id-management/role-group/", request)
             .then(res => {
                 onSave();
                 this.onClose();
@@ -47,7 +47,7 @@ class AddPermissionsDialog extends Component {
     }
 
     render() {
-        const {open, handleSubmit} = this.props;
+        const {open, handleSubmit, error} = this.props;
 
         return (
             <Dialog
@@ -58,6 +58,8 @@ class AddPermissionsDialog extends Component {
             >
                 <form onSubmit={handleSubmit(this.onSubmit)} noValidate>
                     <FieldArray name="prp_roles" component={renderPermissionsFields}/>
+
+                    {error && <Typography color="error" variant="body2">{error}</Typography>}
 
                     <DialogActions>
                         <Button onClick={this.onClose}>{labels.cancel}</Button>

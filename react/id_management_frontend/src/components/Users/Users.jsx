@@ -86,12 +86,11 @@ class Users extends Component {
 
     onConfirm() {
         switch (this.state.action) {
-            case CONFIRM_ACTIONS.DELETE_PERMISSION:
-            case CONFIRM_ACTIONS.REMOVE_IP_ADMIN:
-                this.deletePermission(this.state.selectedPermission);
-                break;
             case CONFIRM_ACTIONS.MAKE_IP_ADMIN:
                 this.makeIpAdmin(this.state.selectedPermission);
+                break;
+            default:
+                this.deletePermission(this.state.selectedPermission);
                 break;
         }
     }
