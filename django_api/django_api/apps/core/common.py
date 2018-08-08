@@ -35,6 +35,12 @@ USER_STATUS_TYPES = Choices(
     ('DEACTIVATED', 'deactivated', 'Deactivated'),
 )
 
+USER_TYPES = Choices(
+    ('CLUSTER_ADMIN', 'cluster_admin', 'Cluster Admin'),
+    ('IMO', 'imo', 'IMO'),
+    ('PARTNER', 'partner', 'Partner user')
+)
+
 PRP_ROLE_TYPES = Choices(
     ('IP_AUTHORIZED_OFFICER', 'ip_authorized_officer', 'IP Authorized officer'),
     ('IP_EDITOR', 'ip_editor', 'IP Editor'),

@@ -8,6 +8,8 @@ from django.utils.functional import cached_property
 
 from model_utils.models import TimeStampedModel
 
+from core.common import PRP_ROLE_TYPES, USER_TYPES
+
 
 class User(AbstractUser):
     """
@@ -53,6 +55,22 @@ class User(AbstractUser):
         if created:
             instance.set_unusable_password()
             instance.save()
+
+    @cached_property
+    def role_list(self):
+        return self.prp_roles.values_list('role', flat=True).distinct()
+
+    @property
+    def user_type(self):
+        user_prp_roles = set(self.role_list)
+        if PRP_ROLE_TYPES.cluster_system_admin in user_prp_roles:
+            return USER_TYPES.cluster_admin
+        if PRP_ROLE_TYPES.cluster_imo in user_prp_roles:
+            return USER_TYPES.imo
+        if {PRP_ROLE_TYPES.cluster_member,
+            PRP_ROLE_TYPES.cluster_viewer,
+            PRP_ROLE_TYPES.cluster_coordinator}.intersection(user_prp_roles):
+            return USER_TYPES.partner
 
     def save(self, *args, **kwargs):
         if not self.username:

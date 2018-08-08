@@ -1,10 +1,10 @@
 from rest_framework import serializers
 
-from core.common import PRP_ROLE_TYPES, USER_STATUS_TYPES
+from core.common import PRP_ROLE_TYPES, USER_STATUS_TYPES, USER_TYPES
 
 from cluster.models import Cluster
 from id_management.serializers import PRPRoleWithRelationsSerializer
-from partner.serializers import PartnerDetailsSerializer
+from partner.serializers import PartnerDetailsSerializer, PartnerSimpleSerializer
 from .models import User
 
 
@@ -58,9 +58,11 @@ class UserSerializer(serializers.ModelSerializer):
         depth = 1
 
 
-class UserWithPRPRolesSerializer(UserSerializer):
+class UserWithPRPRolesSerializer(serializers.ModelSerializer):
+    partner = PartnerSimpleSerializer(read_only=True)
     prp_roles = PRPRoleWithRelationsSerializer(many=True, read_only=True)
-    status = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField(read_only=True)
+    user_type = serializers.ChoiceField(choices=USER_TYPES)
 
     def get_status(self, obj):
         if obj.is_active:
@@ -75,10 +77,8 @@ class UserWithPRPRolesSerializer(UserSerializer):
         model = User
         fields = (
             'id', 'email', 'first_name',
-            'last_name', 'profile',
-            'partner', 'organization',
-            'access', 'prp_roles',
+            'last_name', 'partner',
+            'organization', 'prp_roles',
             'position', 'last_login',
-            'status'
+            'status', 'user_type',
         )
-        read_only_fields = ('id', 'profile', 'partner', 'organization', 'access', 'last_login', 'status')
