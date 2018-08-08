@@ -23,7 +23,7 @@ export const renderSelectField = ({
   } else {
     valueForSelect = input.value || defaultValue || 'placeholder_none';
   }
-  return (<FormControl fullWidth style={formControlStyle} error={(touched && error) || warning}>
+  return (<FormControl fullWidth style={formControlStyle} error={(touched && !!error) || warning}>
     <FieldLabelWithTooltipIcon
       infoText={infoText}
       tooltipIconProps={{
