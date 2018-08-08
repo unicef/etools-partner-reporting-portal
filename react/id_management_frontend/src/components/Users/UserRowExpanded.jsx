@@ -3,7 +3,7 @@ import UserRoleControl from "./UserRoleControl";
 import LinkButton from "../common/LinkButton";
 import {PRP_ROLE, EDITABLE_PRP_ROLES} from "../../constants";
 import withUser from "../hoc/withUser";
-import {hasAnyRole, getUserRole} from "../../helpers/user";
+import {hasAnyRole, getUserRole, getUserTypeLabel} from "../../helpers/user";
 import {PORTALS} from "../../actions";
 import {getLabels} from "../../labels";
 import {Typography} from "@material-ui/core";
@@ -83,18 +83,15 @@ class UserRowExpanded extends Component {
 
     render() {
         const {user, row, portal, classes, onPermissionsAdd} = this.props;
-
-        const userTypes = row.prp_roles.filter(item => !item.workspace && !item.cluster);
-        const userType = userTypes.length ? userTypes[0].role_display : null;
-
-        const roles = row.prp_roles.filter(item => item.workspace || item.cluster);
+        const roles = row.prp_roles;
+        const userTypeLabel = row.user_type ? getUserTypeLabel(row.user_type) : null;
 
         return (
             <div className={classes.container}>
-                {userType &&
+                {row.user_type &&
                 <div className={roles.length ? classes.userType : ''}>
                     <Typography variant="caption" gutterBottom>{labels.userType}</Typography>
-                    <UserRowExpandedText>{userType}</UserRowExpandedText>
+                    <UserRowExpandedText>{userTypeLabel}</UserRowExpandedText>
                 </div>}
 
                 {roles.length > 0 &&

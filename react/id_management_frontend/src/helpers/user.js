@@ -1,4 +1,4 @@
-import {PRP_ROLE, PRP_ROLE_OPTIONS} from "../constants";
+import {PRP_ROLE, PRP_ROLE_OPTIONS, USER_TYPE_OPTIONS} from "../constants";
 import {api} from "../infrastructure/api";
 
 export function hasAnyRole(user, roles) {
@@ -18,6 +18,10 @@ export function userRoleInWorkspace(user, workspace) {
 
 export function getRoleLabel(role) {
     return PRP_ROLE_OPTIONS.filter(option => option.value === role)[0].label;
+}
+
+export function getUserTypeLabel(userType) {
+    return USER_TYPE_OPTIONS.filter(option => option.value === userType)[0].label;
 }
 
 export function getWorkspaceLabel(workspaceOptions, workspace) {
