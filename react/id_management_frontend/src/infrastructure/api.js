@@ -21,7 +21,12 @@ function makeRequest(method, url, data) {
             document.location.href = "/";
         }
 
-        throw new SubmissionError(error.response.data);
+        switch (error.response.status) {
+            case 403:
+                throw new SubmissionError({_error: error.response.data.detail[0]});
+            default:
+                throw new SubmissionError(error.response.data);
+        }
     });
 }
 

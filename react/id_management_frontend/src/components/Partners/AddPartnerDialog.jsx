@@ -11,6 +11,7 @@ import ButtonSubmit from "../common/ButtonSubmit";
 import SelectForm from "../form/SelectForm";
 import {connect} from "react-redux";
 import withPartnerTypeOptions from "../hoc/withPartnerTypeOptions";
+import withClusterOptions from "../hoc/withClusterOptions";
 
 const labels = getLabels({
     title: "Add new Partner",
@@ -58,8 +59,7 @@ class AddUserDialog extends Component {
 
         this.setState({loading: true});
 
-        // TODO: Link to API endpoint
-        return api.post("", values)
+        return api.post("id-management/partners/", values)
             .then(res => {
                 this.onClose();
                 onSave(res.data);
@@ -75,7 +75,7 @@ class AddUserDialog extends Component {
     }
 
     render() {
-        const {open, handleSubmit, sharedPartnerOptions, csoTypeOptions, partnerTypeOptions} = this.props;
+        const {open, handleSubmit, sharedPartnerOptions, csoTypeOptions, partnerTypeOptions, clusterOptions} = this.props;
 
         return (
             <Dialog
@@ -87,78 +87,78 @@ class AddUserDialog extends Component {
                 <form onSubmit={handleSubmit(this.onSubmit)} noValidate>
                     <Grid container spacing={24}>
                         <Grid item md={6}>
-                            <TextFieldForm fieldName="ocha_external_id" label={labels.ochaId}/>
+                            <TextFieldForm fieldName="ocha_external_id" label={labels.ochaId} optional/>
                         </Grid>
 
                         <Grid item md={6}/>
 
                         <Grid item md={6}>
                             <TextFieldForm fieldName="external_id" label={labels.externalId}
-                                           textFieldProps={{helperText: labels.externalIdHelper}}/>
+                                           textFieldProps={{helperText: labels.externalIdHelper}} optional/>
                         </Grid>
 
                         <Grid item md={12}>
-                            <TextFieldForm fieldName="external_source" label={labels.externalSource}/>
+                            <TextFieldForm fieldName="external_source" label={labels.externalSource} optional/>
                         </Grid>
 
                         <Grid item md={6}>
-                            <TextFieldForm fieldName="full_name" label={labels.fullName}
+                            <TextFieldForm fieldName="title" label={labels.fullName}
                                            textFieldProps={{helperText: labels.fullNameHelper}}/>
                         </Grid>
 
                         <Grid item md={6}>
-                            <TextFieldForm fieldName="short_title" label={labels.shortTitle}/>
+                            <TextFieldForm fieldName="short_title" label={labels.shortTitle} optional/>
                         </Grid>
 
                         <Grid item md={6}>
-                            <TextFieldForm fieldName="alternate_title" label={labels.alternateTitle}/>
+                            <TextFieldForm fieldName="alternate_title" label={labels.alternateTitle} optional/>
                         </Grid>
 
                         <Grid item md={6}>
-                            <SelectForm fieldName="shared_partner" label={labels.sharedPartner} values={sharedPartnerOptions}/>
+                            <SelectForm fieldName="shared_partner" label={labels.sharedPartner} values={sharedPartnerOptions} optional/>
                         </Grid>
 
                         <Grid item md={6}>
-                            <SelectForm fieldName="partner_type" label={labels.partnerType} values={partnerTypeOptions}/>
+                            <SelectForm fieldName="partner_type" label={labels.partnerType} values={partnerTypeOptions} optional/>
                         </Grid>
 
                         <Grid item md={6}>
-                            <SelectForm fieldName="cso_type" label={labels.csoType} values={csoTypeOptions}/>
+                            <SelectForm fieldName="cso_type" label={labels.csoType} values={csoTypeOptions} optional/>
                         </Grid>
 
                         <Grid item md={6}>
-                            <TextFieldForm fieldName="email" label={labels.email} validation={[email]}/>
+                            <TextFieldForm fieldName="email" label={labels.email} validation={[email]} optional/>
                         </Grid>
 
                         <Grid item md={6}>
                             <TextFieldForm fieldName="phone_number" label={labels.phoneNumber}
-                                           validation={[phoneNumber]}/>
+                                           validation={[phoneNumber]} optional/>
                         </Grid>
 
                         <Grid item md={6}>
-                            <TextFieldForm fieldName="street_address" label={labels.streetAddress}/>
+                            <TextFieldForm fieldName="street_address" label={labels.streetAddress} optional/>
                         </Grid>
 
                         <Grid item md={6}>
-                            <TextFieldForm fieldName="city" label={labels.city}/>
+                            <TextFieldForm fieldName="city" label={labels.city} optional/>
                         </Grid>
 
                         <Grid item md={6}>
-                            <TextFieldForm fieldName="postal_code" label={labels.postalCode}/>
+                            <TextFieldForm fieldName="postal_code" label={labels.postalCode} optional/>
                         </Grid>
 
                         <Grid item md={6}>
-                            <TextFieldForm fieldName="country_code" label={labels.countryCode}/>
+                            <TextFieldForm fieldName="country_code" label={labels.countryCode} optional/>
                         </Grid>
 
                         <Grid item md={6}>
                             <TextFieldForm fieldName="total_ct_cp" label={labels.totalCtCp}
-                                           textFieldProps={{helperText: labels.totalCtCpHelper}}/>
+                                           textFieldProps={{helperText: labels.totalCtCpHelper}} optional/>
                         </Grid>
 
                         <Grid item md={6}>
                             <TextFieldForm fieldName="total_ct_cy" label={labels.totalCtCy}
-                                           textFieldProps={{helperText: labels.totalCtCyHelper}}/>
+                                           textFieldProps={{helperText: labels.totalCtCyHelper}} optional/>
                         </Grid>
 
                         <Grid item md={6}>
@@ -166,26 +166,25 @@ class AddUserDialog extends Component {
                         </Grid>
 
                         <Grid item md={6}>
-                            <TextFieldForm fieldName="alternate_id" label={labels.alternateId}/>
+                            <TextFieldForm fieldName="alternate_id" label={labels.alternateId} optional/>
                         </Grid>
 
                         <Grid item md={6}>
-                            <TextFieldForm fieldName="risk_rating" label={labels.riskRating}/>
+                            <TextFieldForm fieldName="rating" label={labels.riskRating} optional/>
                         </Grid>
 
                         <Grid item md={6}>
-                            <TextFieldForm fieldName="type_of_assessment" label={labels.typeOfAssessment}/>
+                            <TextFieldForm fieldName="type_of_assessment" label={labels.typeOfAssessment} optional/>
                         </Grid>
 
                         <Grid item md={6}>
-                            <TextFieldForm fieldName="basis_for_risk_rating" label={labels.basisForRiskRating}/>
+                            <TextFieldForm fieldName="basis_for_risk_rating" label={labels.basisForRiskRating} optional/>
                         </Grid>
 
                         <Grid item md={6}/>
 
                         <Grid item md={12}>
-                            {/* TODO: add options */}
-                            <SelectForm fieldName="clusters" label={labels.clusters} values={[]}/>
+                            <SelectForm fieldName="clusters" label={labels.clusters} values={clusterOptions} multiple/>
                         </Grid>
                     </Grid>
 
@@ -206,4 +205,4 @@ const mapStateToProps = (state) => {
     }
 };
 
-export default withPartnerTypeOptions(connect(mapStateToProps)(reduxForm({form: "addPartnerForm"})(AddUserDialog)));
+export default withClusterOptions(withPartnerTypeOptions(connect(mapStateToProps)(reduxForm({form: "addPartnerForm"})(AddUserDialog))));

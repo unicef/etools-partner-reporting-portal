@@ -102,3 +102,24 @@ export const PORTAL_TYPE = {
     [PORTALS.CLUSTER]: "CLUSTER",
     [PORTALS.IP]: "IP"
 };
+
+export const USER_TYPE = {
+    CLUSTER_ADMIN: "CLUSTER_ADMIN",
+    IMO: "IMO",
+    PARTNER: "PARTNER"
+};
+
+export const USER_TYPE_OPTIONS = [
+    {
+        label: "Cluster Admin",
+        value: USER_TYPE.CLUSTER_ADMIN
+    },
+    {
+        label: "IMO",
+        value: USER_TYPE.IMO
+    },
+    {
+        label: "Partner user",
+        value: USER_TYPE.PARTNER
+    }
+];
