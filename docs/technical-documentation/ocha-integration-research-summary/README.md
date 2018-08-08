@@ -367,7 +367,7 @@ To get list of available projects for given plan:
 [https://api.hpc.tools/v1/public/project/plan/637](https://api.hpc.tools/v1/public/project/plan/637)
 
 {% hint style="info" %}
-We need to figure out if we want to limit projects to choosed partner \(organization\)  
+We are able to get the Organisation Id [https://api.hpc.tools/v1/public/organization](https://api.hpc.tools/v1/public/organization). Business Analyst for UNICEF will add the Organisation ID into the OCHA External Partner field in PRP Django Admin
 {% endhint %}
 
 Filtering is not available, so iteration over all set is required \(`organizations -> organization -> name` or `abbreviation` should be same like choosed PRP organization / partner\).

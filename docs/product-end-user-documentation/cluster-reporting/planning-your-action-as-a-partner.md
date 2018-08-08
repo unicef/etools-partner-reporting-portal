@@ -10,7 +10,9 @@ This section is only visible to a partner user who is logged in.
 
 
 
-Partners can add custom Projects here or pull from OCHA. 
+If we do have OCHA external ID, Partner can proceed with creating a project from OCHA or a custom project. If we don’t have OCHA external ID, Partner will have to create custom project.
+
+Business Analyst from UNICEF side will add the Organisation ID from [https://api.hpc.tools/v1/public/organization](https://api.hpc.tools/v1/public/organization) as OCHA External ID field in PRP Django Admin. 
 
 ![](../../.gitbook/assets/screen-shot-2018-02-14-at-1.55.38-pm.png)
 
