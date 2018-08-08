@@ -12,7 +12,8 @@ const labels = {
     email: "E-mail",
     none: "None",
     phoneNumber: "Phone number",
-    partnerType: "Partner type"
+    partnerType: "Partner type",
+    userType: "User type"
 };
 
 export function getLabels(localLabels) {

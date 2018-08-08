@@ -8,14 +8,16 @@ import {reduxForm} from 'redux-form';
 import {api} from "../../infrastructure/api";
 import {getLabels} from "../../labels";
 import ButtonSubmit from "../common/ButtonSubmit";
-import {PORTAL_TYPE} from "../../constants";
+import {PORTAL_TYPE, USER_TYPE_OPTIONS} from "../../constants";
 import withPortal from "../hoc/withPortal";
+import SelectForm from "../form/SelectForm";
+import {PORTALS} from "../../actions";
 
 const labels = getLabels({
     title: "Add new user",
     caption: "Message with invitation will be send at provided e-mail address",
     position: "Position (optional)",
-    saveAndContinue: "Save and continue"
+    saveAndContinue: "Save and continue",
 });
 
 class AddUserDialog extends Component {
@@ -55,7 +57,7 @@ class AddUserDialog extends Component {
     }
 
     render() {
-        const {open, handleSubmit} = this.props;
+        const {open, handleSubmit, portal} = this.props;
 
         return (
             <Dialog
@@ -79,6 +81,11 @@ class AddUserDialog extends Component {
                         <Grid item md={6}>
                             <TextFieldForm fieldName="position" label={labels.position} optional/>
                         </Grid>
+
+                        {portal === PORTALS.CLUSTER &&
+                        <Grid item md={6}>
+                            <SelectForm fieldName="user_type" label={labels.userType} values={USER_TYPE_OPTIONS}/>
+                        </Grid>}
                     </Grid>
 
                     <DialogActions>
