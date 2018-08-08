@@ -24,6 +24,9 @@ function makeRequest(method, url, data) {
         switch (error.response.status) {
             case 403:
                 throw new SubmissionError({_error: error.response.data.detail[0]});
+            case 500:
+                alert("Internal Server Error occurred");
+                throw new Error(error.response);
             default:
                 throw new SubmissionError(error.response.data);
         }
