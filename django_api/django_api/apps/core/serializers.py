@@ -1,5 +1,6 @@
 from django.db import transaction
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from cluster.models import Cluster
 from core.common import PRP_ROLE_TYPES, CLUSTER_TYPES
@@ -216,6 +217,7 @@ class PRPRoleCreateMultipleSerializer(serializers.Serializer):
     user_id = serializers.IntegerField()
     prp_roles = PRPRoleCreateSerializer(many=True)
 
+    @transaction.atomic
     def create(self, validated_data):
         user_id = validated_data['user_id']
 
@@ -225,3 +227,15 @@ class PRPRoleCreateMultipleSerializer(serializers.Serializer):
         ]
 
         return {'user_id': user_id, 'prp_roles': roles_created}
+
+    def validate(self, attrs):
+        prp_roles = attrs['prp_roles']
+        clusters, workspaces = set(), set()
+        for prp_role in prp_roles:
+            cluster = prp_role.get('cluster')
+            workspace = prp_role.get('workspace')
+            if (cluster and cluster in clusters) or (workspace and workspace in workspaces):
+                raise ValidationError('User can only have one role in the same cluster or workspace.')
+            clusters.add(cluster)
+            workspaces.add(workspace)
+        return attrs
