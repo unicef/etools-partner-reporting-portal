@@ -5,11 +5,12 @@ import {
     Table,
     TableHeaderRow,
     TableRowDetail,
-    PagingPanel
+    PagingPanel,
+    TableEditColumn
 } from "@devexpress/dx-react-grid-material-ui";
 import {
     PagingState,
-    CustomPaging,
+    CustomPaging, EditingState,
 } from '@devexpress/dx-react-grid';
 import {RowDetailState} from "@devexpress/dx-react-grid";
 import {withStyles} from "@material-ui/core/styles";
@@ -17,6 +18,8 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {connect} from 'react-redux';
 import {expandedRowIds} from "../../actions";
+import IconButton from "@material-ui/core/IconButton";
+import Delete from "@material-ui/icons/Delete";
 
 const allowedPageSizes = [5, 10, 15];
 
@@ -46,6 +49,25 @@ const styleSheet = (theme) => {
     }
 };
 
+const DeleteButton = ({onExecute}) => (
+    <IconButton onClick={onExecute} title="Delete row">
+        <Delete/>
+    </IconButton>
+);
+
+const commandComponents = {
+    delete: DeleteButton,
+};
+
+const Command = ({id, onExecute}) => {
+    const CommandButton = commandComponents[id];
+    return (
+        <CommandButton
+            onExecute={onExecute}
+        />
+    );
+};
+
 class PaginatedList extends Component {
     header() {
         const {data: {count}, classes, page, pageSize} = this.props;
@@ -62,6 +84,12 @@ class PaginatedList extends Component {
         );
     }
 
+    commitChanges({deleted}) {
+        const {onDelete, data: {results}} = this.props;
+
+        onDelete(results[deleted[0]]);
+    }
+
     render() {
         const {
             columns,
@@ -74,7 +102,8 @@ class PaginatedList extends Component {
             onPageSizeChange,
             loading,
             expandedRowIds,
-            dispatchExpandedRowIds
+            dispatchExpandedRowIds,
+            onDelete
         } = this.props;
 
         const containerClasses = classNames(
@@ -98,13 +127,28 @@ class PaginatedList extends Component {
                     <CustomPaging
                         totalCount={data.count}
                     />
+
+                    {!!onDelete &&
+                    <EditingState
+                        onCommitChanges={this.commitChanges}
+                    />}
+
                     <Table/>
                     <TableHeaderRow/>
                     <RowDetailState expandedRowIds={expandedRowIds}
                                     onExpandedRowIdsChange={dispatchExpandedRowIds}/>
+
                     <TableRowDetail
                         contentComponent={({row}) => expandedCell(row)}
                     />
+
+                    {!!onDelete &&
+                    <TableEditColumn
+                        width={64}
+                        showDeleteCommand
+                        commandComponent={Command}
+                    />}
+
                     <PagingPanel pageSizes={allowedPageSizes}/>
                     {loading && <CircularProgress className={classes.loadingIndicator}/>}
                 </Grid>
@@ -118,7 +162,8 @@ PaginatedList.propTypes = {
     data: PropTypes.object.isRequired,
     expandedCell: PropTypes.func,
     page: PropTypes.number.isRequired,
-    onPageChange: PropTypes.func.isRequired
+    onPageChange: PropTypes.func.isRequired,
+    onDelete: PropTypes.func
 };
 
 const mapStateToProps = (state) => {
