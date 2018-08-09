@@ -26,8 +26,8 @@ class RoleGroupCreateUpdateDestroyPermission(BasePermission):
 
         if (request.method == 'POST' and
                 PRPRole.objects.filter(
-                    Q(workspace_id=obj.workspace_id) |
-                    Q(cluster_id=obj.cluster_id),
+                    Q(workspace__isnull=False, workspace_id=obj.workspace_id) |
+                    Q(cluster__isnull=False, cluster_id=obj.cluster_id),
                     user_id=obj.user_id
                 ).exists()):
             self.message = 'Role already exists in cluster or workspace.'
